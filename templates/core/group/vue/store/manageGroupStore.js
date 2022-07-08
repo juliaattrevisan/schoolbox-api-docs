@@ -55,6 +55,7 @@ export const useStore = defineStore('manageGroup', {
                 const groupMembers = responseJson.map((groupMember) => { //add in some additional properties
                     return { 
                         ...groupMember,
+                        accessTypeCode: groupMember.accessType === 'waiting' ? 1 : 0,
                         isNew: false, //to highlight new members just added 
                         justUpdated: false, //to highlight members that have just been changed
                     } 

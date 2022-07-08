@@ -69,14 +69,33 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
             callback: (row, query) => row.accessType !== query,
         },
     ],
+    customSorting: {
+        name: (ascending) => { //'waiting' members to always show on top and then sort by lastName
+            return (a, b) => {
+                if (a.accessTypeCode < b.accessTypeCode) { //the accessTypeCode is set in manageGroupStore.js
+                    return 1;
+                } else if (a.accessTypeCode > b.accessTypeCode) { 
+                    return -1;
+                } 
+                if (ascending) {
+                    return a.lastName >= b.lastName ? 1 : -1;
+                }
+                return a.lastName <= b.lastName ? 1 : -1;
+            }
+        },
+    },
     debounce: 100, //shorter debounce time as data is stored locally
     headings: {
         name: 'Name',
         accessType: 'Access',
     },
     hiddenColumns: ['meta'], //the meta data is added to the name column, but we need a meta column so we can search for it
-    perPage: 10,
-    perPageValues: [10, 15, 200], //50, 100, 200
+    orderBy: { //initial sorting display
+        ascending: true,
+        column: 'name'
+    },
+    perPage: 50,
+    perPageValues: [50, 100, 200], 
     resizableColumns: false,
     rowClassCallback: (row) => { //to differentiate just updated members so it's clear they've just been updated
         return row.justUpdated ? 'just-updated' : '';
@@ -216,10 +235,14 @@ function updateSelectedMembers () {
                 </template>
                 <template #name="data">
                     <div class="card small-12">
-                        <a href="#">
-                            <img src="https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${data.row.name} portrait`">
-                            {{ data.row.name }}
+                        <a v-if="data.row.userId" :href="`/search/user/${data.row.userId}`" title="View profile" class="name">
+                            <img src="https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${data.row.firstName} portrait`">
+                            {{ data.row.firstName }} {{ data.row.lastName }}
                         </a>
+                        <div v-else>
+                            <img src="https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${data.row.firstName} portrait`">
+                            {{ data.row.firstName }} {{ data.row.lastName }}
+                        </div>
                         <p class="meta">{{ data.row.meta }}</p>
                     </div>
                 </template>
@@ -252,6 +275,10 @@ function updateSelectedMembers () {
 <style lang="scss">
 
 @import '@schoolboxVue/components/vueTables2/vueTables2';
+
+.VueTables {
+    margin-bottom: 150px; //to allow space for the bottom-drawer so it can't cut off the bottom of the table
+}
 
 .VueTables__search {
     padding-bottom: 0.5rem; //to put the manage-group-filters.vue up closer to the search input

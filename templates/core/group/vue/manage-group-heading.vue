@@ -7,6 +7,16 @@
 import { ref  } from 'vue';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
 
+
+const props = defineProps({
+    /**
+     * To display the toast access status changes
+     */
+    toastEl: {
+        required: true,
+    },
+});
+
 const updateSettingsModal = ref(null);
 
 /**

@@ -149,10 +149,6 @@ function onRemoveMembersSelected () {
     }
 }
 
-.flex-list {
-    gap: 0.5rem; //add a bit more space between the buttons so each is better defined
-}
-
 select, 
 button {
     margin-bottom: 0; //to bring the bottom-drawer down, we don't need any margin currently

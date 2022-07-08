@@ -32,8 +32,7 @@ export const useUpdateStore = defineStore('manageGroupUpdate', {
                 const responseJson = await response.json();
                 if (responseJson.success) {
                     const updatedMember = store.groupMembers.find((groupMember) => groupMember.id === member.id);
-                    updatedMember.accessType = accessType; //only once the change has occured in the database, do we reflect this change in the display table
-                    updatedMember.justUpdated = true;
+                    updateMember(updatedMember, accessType);
                 } else {
                     throw new Error();
                 }
@@ -66,8 +65,7 @@ export const useUpdateStore = defineStore('manageGroupUpdate', {
                     store.selectedMembers.forEach((member) => {
                         member.accessType = accessType; //the selectedMembers data is unique to the groupMembers data 
                         const updatedMember = store.groupMembers.find((groupMember) => groupMember.id === member.id);
-                        updatedMember.accessType = accessType; //only once the change has occured in the database, do we reflect this change in the display table
-                        updatedMember.justUpdated = true;
+                        updateMember(updatedMember, accessType);
                     });
                 } else {
                     throw new Error();
@@ -99,4 +97,16 @@ function getFormData (selectedMembers, accessType) {
     });
     formData.append('access', accessType);
     return formData;
+}
+
+/**
+ * Set the new data on the just updated member
+ *
+ * @param { Object }
+ * @param { String }
+ */
+function updateMember (member, accessType) {
+    member.accessType = accessType; //only once the change has occured in the database, do we reflect this change in the display table
+    member.accessTypeCode = 0; //ensure the member doesn't always appear at the top of the table once they are off the waitlist
+    member.justUpdated = true; //to add a class in the display table to help show the member has just been updated
 }

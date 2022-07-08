@@ -60,7 +60,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <manage-group-heading />
+    <manage-group-heading :toast-el="toastEl" />
     <manage-group-add />
     <manage-group-table :toast-el="toastEl" />
     <manage-group-select :toast-el="toastEl" />

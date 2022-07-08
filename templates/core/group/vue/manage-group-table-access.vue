@@ -5,6 +5,7 @@
  */
 
 import { ref, computed } from 'vue';
+import { useStore } from './store/manageGroupStore';
 import { useUpdateStore } from './store/manageGroupUpdateStore';
 import AccessTypes from './manageGroupAccessTypes';
 
@@ -25,7 +26,8 @@ const props = defineProps({
     },
 });
 
-const store = useUpdateStore();
+const store = useStore();
+const updateStore = useUpdateStore();
 const isProcessing = ref(false); //to update the button text when an event is taking place
 
 /**
@@ -34,7 +36,7 @@ const isProcessing = ref(false); //to update the button text when an event is ta
  * @param { Object } related row 
  */
 function onApproveMembershipSelected (row) {
-    store.updateMemberAccess(row, AccessTypes.READ);
+    updateStore.updateMemberAccess(row, AccessTypes.READ);
 }
 
 /**
@@ -43,14 +45,14 @@ function onApproveMembershipSelected (row) {
  * @param { Object } related row 
  */
 function onMemberAccessChange (row) {
-    store.updateMemberAccess(row, row.accessType);
+    updateStore.updateMemberAccess(row, row.accessType);
 }
 
 /**
  * so we can track the progress of the member access change
  * and update the UI accordingly
  */
-store.$onAction(({ name, args, after, onError }) => {
+updateStore.$onAction(({ name, args, after, onError }) => {
     const updatedRow = args[0];
     if (name === 'updateMemberAccess' && updatedRow.id === props.row.id) { //as each row is subscribed to onAction, we have to check for the selected row
         isProcessing.value = true;
@@ -74,7 +76,6 @@ store.$onAction(({ name, args, after, onError }) => {
  * @returns { String }
  */
 const approveButtonText = computed(() => isProcessing.value ? 'Approving...' : 'Approve Membership');
-
 
 </script>
 
