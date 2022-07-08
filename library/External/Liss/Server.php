@@ -760,16 +760,12 @@ class External_Liss_Server
              */
             $helper->deleteEventsFromSource();
 
-            /* Set a default event type for now - use the first one in the list
+            /* Get an indexed set of known luEventType records
+             * If this is empty, just leave
              */
-            $allEventTypes = $eventTypeMapper->findAll([
-                'limit' => 1,
-                'id' => 'ASC'
-            ]);
+            $allEventTypes = $eventTypeMapper->findAll()->indexBy('type');
 
-            if ($allEventTypes->count()) {
-                $eventType = $allEventTypes->first();
-            } else {
+            if (!$allEventTypes->count()) {
                 $this->log()->critical(self::NO_EVENT_TYPES);
                 return $this->generateResponse(self::NO_EVENT_TYPES);
             }
@@ -880,10 +876,17 @@ class External_Liss_Server
                     continue;
                 }
 
+                /* The type that is currently specified also has a corresponding
+                 * luEventType record; use that luEventType instance
+                 *
+                 * Otherwise default to the first instance in the list (this will occur when the
+                 * default you specified in config doesn't exist as an luEventType instance)
+                 */
+                $eventType = $allEventTypes[$currentEvent['type']] ?? $allEventTypes->first();
+
                 /* Otherwise continue to process under the guise that it will be either a
                  * homepage (folder) event, or a personal event
                  */
-
                 $event = $eventMapper->createModel();
                 $event->setOwner($author);
                 $event->setAuthor($author);
