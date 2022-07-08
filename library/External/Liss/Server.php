@@ -718,10 +718,11 @@ class External_Liss_Server
      *
      * @param Request $message
      * @return Response
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
-     * @throws InvalidColumnException
      */
     public function publishDailyData(Request $message): Response
     {
@@ -739,7 +740,7 @@ class External_Liss_Server
 
         /* These event types are ignored
          */
-        $exclusions = ['Duty', 'Study', 'RollClass'];
+        $exclusions = array_map('trim', explode(',', $this->config->get('external_liss_exclusions')));
 
         /* Owner set in config
          */
