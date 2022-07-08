@@ -321,15 +321,14 @@ export default {
 
                 /* Remember the earliest time we saw
                  */
-                let start = new Date(data[i].start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
+                let start = dayjs(new Date(data[i].start)).format('HH:mm:ss');
                 if (null === slotMinTime || slotMinTime > start) {
                     slotMinTime = start;
                 }
 
                 /* Remember the latest time we saw
                  */
-                let finish = new Date(data[i].end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                let finish = dayjs(new Date(data[i].end)).format('HH:mm:ss');
 
                 if (null === slotMaxTime || slotMaxTime < finish) {
                     slotMaxTime = finish;
