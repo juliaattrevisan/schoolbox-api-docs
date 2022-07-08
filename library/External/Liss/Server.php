@@ -804,24 +804,56 @@ class External_Liss_Server
 
             $total = count($allEvents);
 
-            foreach ($allEvents as $currentEvent) {
-                /* Skip events that don't have a type
+            /* Default event type, specified in config
+             */
+            $defaultEventType = trim((string)$this->config->get('external_liss_default_event_type'));
+
+            foreach ($allEvents as $lissEvent) {
+                $currentEvent = $lissEvent;
+
+                /* Event doesn't have a type; see if we specified one in config
+                 * If we did, give it that event type instead, then carry onwards
                  */
                 if (trim($currentEvent['type']) === '') {
-                    $this->log()->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['guid']}\": no type");
+                    if ('' === $defaultEventType) {
+                        /* Skip events that don't have a type, because we didn't define
+                         * a default event type in config
+                         */
+                        $this->log()->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['guid']}\": no type");
+
+                        if ($includePayloadInLogging) {
+                            $this->log()->warning("Payload for guid \"{$currentEvent['guid']}\": " . json_encode($currentEvent));
+                            $this->log()->warning('');
+                        }
+
+                        $skipCount['noType']++;
+                        $skipCount['total']++;
+
+                        /* Skip processing this event entirely
+                         */
+                        continue;
+                    }
+
+                    /* Assign a default one and carry on as if this event
+                     * always had this type to start with
+                     */
+                    $currentEvent['type'] = $defaultEventType;
+
+                    $this->log()->debug(sprintf(
+                        'Assigning default event type "%s" to %s with guid %s',
+                        $defaultEventType,
+                        $currentEvent['className'],
+                        $currentEvent['guid']
+                    ));
 
                     if ($includePayloadInLogging) {
                         $this->log()->warning("Payload for guid \"{$currentEvent['guid']}\": " . json_encode($currentEvent));
                         $this->log()->warning('');
                     }
-
-                    $skipCount['noType']++;
-                    $skipCount['total']++;
-
-                    continue;
                 }
 
                 /* Skip events that have a particular type
+                 * This also applies if you exclude the default one you chose in config
                  */
                 if (\in_array($currentEvent['type'], $exclusions, false)) {
                     $this->log()->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['guid']}\": has excluded type \"{$currentEvent['type']}\"");
