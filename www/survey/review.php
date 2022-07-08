@@ -204,7 +204,7 @@ $prevSection = $sectionHandler->getBefore($this->arg[0], $section['sequence']);
 /* If there is no next section and no previous section, this was a one-section
  * assessment and should only have the Finish button
  */
-if (!is_numeric($nextSection['section_id'] ?? null) && !is_numeric($prevSection['section_id'] ?? null)) {
+if (!$nextSection && !$prevSection) {
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
     $this->parse('endAssess_block', 'endAssess');
