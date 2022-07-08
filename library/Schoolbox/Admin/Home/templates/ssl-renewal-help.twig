@@ -31,21 +31,26 @@
     }
 
     //Populate the request details part of the page
-    function updateRequestDetails(type, uri, headers) {
+    function updateRequestDetails(type, uri, headersString) {
         document.getElementById("request_type").innerText = type;
         document.getElementById("request_uri").innerText = uri;
-        document.getElementById("request_headers").innerText = buildHeadersString(headers);
+        document.getElementById("request_headers").innerText = headersString;
     }
 
     //Shows the user what response Let's Encrypt is getting
-    function updateResponseDetails(statusCode, headers, body) {
-        const statusCodeATag = document.getElementById("response_status");
-        statusCodeATag.setAttribute("href", "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/" + statusCode);
-        statusCodeATag.innerText = statusCode;
+    function updateResponseDetails(statusCode, headersString, body, createLinkOnStatusCode=true) {
+        let statusCodeHTMLString;
+        if (createLinkOnStatusCode) {
+            const statusCodeATag = document.createElement("a");
+            statusCodeATag.setAttribute("href", "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/" + statusCode);
+            statusCodeATag.innerText = statusCode;
+            statusCodeHTMLString = statusCodeATag.outerText;
+        } else {
+            statusCodeHTMLString = statusCode;
+        }
 
-        const headersString = buildHeadersString(headers);
-        document.getElementById("response_headers").innerText = headers ? headersString : " ";
-
+        document.getElementById("response_status").innerText = statusCodeHTMLString;
+        document.getElementById("response_headers").innerText = headersString ? headersString : " ";
         document.getElementById("response_body").innerText = body ? body : " ";
     }
 
@@ -53,9 +58,9 @@
         updateRequestDetails(
                 "GET",
                 urlCheckUrl,
-                {
+                buildHeadersString({
                     "user-agent": letsEncryptUserAgent,
-                },
+                }),
         );
 
         // check if https://api.schoolbox.cloud/urlCheck?url=http://$current_domain/.well-known/acme-challenge/ping is accessible
@@ -67,30 +72,40 @@
                 updateStatusBar("ssl_upstream_error", "Pass", "success");
             },
             error: function (xhr) {
-                updateStatusBar("ssl_port_80", "Fail", "alert");
+                if (xhr.responseJSON == null) {
+                    updateStatusBar("ssl_port_80", "Internal error", "warning");
+                    updateStatusBar("ssl_https_upgrade", "Internal error", "warning");
+                    updateStatusBar("ssl_upstream_error", "Internal error", "warning");
+                } else {
+                    updateStatusBar("ssl_port_80", "Fail", "alert");
 
-                if ('location' in xhr.responseJSON.response.headers) {
-                    if (xhr.responseJSON.response.headers['location'].startsWith("https")) {
-                        if ('server' in xhr.responseJSON.response.headers) {
-                            const serverResponseHeader = xhr.responseJSON.response.headers['server']
-                            updateStatusBar("ssl_https_upgrade", "Fail", "alert");
-                            updateServer(serverResponseHeader);
+                    if ('location' in xhr.responseJSON.response.headers) {
+                        if (xhr.responseJSON.response.headers['location'].startsWith("https")) {
+                            if ('server' in xhr.responseJSON.response.headers) {
+                                const serverResponseHeader = xhr.responseJSON.response.headers['server']
+                                updateStatusBar("ssl_https_upgrade", "Fail: Check " + serverResponseHeader, "alert");
+                                updateServer(serverResponseHeader);
+                            } else {
+                                updateStatusBar("ssl_https_upgrade", "Fail", "alert");
+                            }
                         } else {
-                            updateStatusBar("ssl_https_upgrade", "Fail", "alert");
+                            updateStatusBar("ssl_https_upgrade", "Indeterminate", "warning");
                         }
-                    } else {
-                        updateStatusBar("ssl_https_upgrade", "Indeterminate", "warning");
                     }
-                }
 
-                if (xhr.status === 400) {
-                    updateStatusBar("ssl_upstream_error", "Fail", "alert");
-                } else if (xhr.status === 500) {
-                    updateStatusBar("ssl_upstream_error", "Timeout", "alert");
+                    if (xhr.status === 400) {
+                        updateStatusBar("ssl_upstream_error", "Fail", "alert");
+                    } else if (xhr.status === 500) {
+                        updateStatusBar("ssl_upstream_error", "Fail: Timeout", "alert");
+                    }
                 }
             },
             complete: function (xhr) {
-                updateResponseDetails(xhr.responseJSON.response.status, xhr.responseJSON.response.headers, xhr.responseJSON.response.body);
+                if (xhr.responseJSON == null) {
+                    updateResponseDetails("Internal error encountered", "Internal error encountered", "Internal error encountered", false);
+                } else {
+                    updateResponseDetails(xhr.responseJSON.response.status, buildHeadersString(xhr.responseJSON.response.headers), xhr.responseJSON.response.body);
+                }
             },
         });
 
@@ -109,8 +124,12 @@
                     }
                 )
             },
-            error: function () {
-                updateStatusBar("ssl_user_agent", "Indeterminate", "warning");
+            error: function (xhr) {
+                if (xhr.responseJSON == null) {
+                    updateStatusBar("ssl_user_agent", "Internal error", "warning");
+                } else {
+                    updateStatusBar("ssl_user_agent", "Indeterminate", "warning");
+                }
             },
         });
     });
@@ -324,7 +343,7 @@
                             <h5 class="no-margin">Response status code:</h5>
                         </div>
                         <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
-                            <pre><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status" id="response_status"><span class="loader"></span></a></pre>
+                            <pre id="response_status"><span class="loader"></span></pre>
                         </div>
                     </li>
                     <li class="">
