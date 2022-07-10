@@ -92,10 +92,21 @@ class Base extends AchievementReportBase
                 $mypData[$classCode] = [
                     'topics'     => [],
                     'overview'   => $row['Overview'],
-                    'comment'    => $row['Comment'],
+                    'comments'   => [],
                     'staffName'  => $staffName,
                     'staffEmail' => $staffEmail,
                 ];
+            }
+            if (!in_array(trim($row['Comment']), array_column($mypData[$classCode]['comments'], 'comment'))) {
+                $mypData[$classCode]['comments'][] =
+                    [
+                        'comment'    => trim($row['Comment']),
+                        'staffName'  => $staffName,
+                        'staffEmail' => $staffEmail,
+                    ];
+                uasort($mypData[$classCode]['comments'], static function (array $a, array $b) {
+                    return strnatcasecmp($a['comment'], $b['comment']);
+                });
             }
             if (!key_exists($topicHeading, $mypData[$classCode]['topics'])) {
                 $mypData[$classCode]['topics'][$topicHeading] = [];
