@@ -86,9 +86,6 @@ class Processor extends CliTool\App
         } catch (\RuntimeException $e) {
             exit(1);
         }
-        if (!$lock->isAcquired()) {
-            exit(1);
-        }
         $this->setMaxExecutionTime($timeout);
 
         // ------------------------------------------------------------------------------------------------------------

@@ -112,13 +112,12 @@ HELP;
             $timeout = self::DEFAULT_TIMEOUT;
         }
 
-        $this->lock = $this->acquireLock(self::LOCK_NAME, $timeout);
-        if ($this->lock->acquire()) {
-            $this->setMaxExecutionTime($timeout);
-            return;
+        try {
+            $this->lock = $this->acquireLock(self::LOCK_NAME, $timeout);
+        } catch (\RuntimeException $e) {
+            exit(1);
         }
-
-        exit(1);
+        $this->setMaxExecutionTime($timeout);
     }
 
 

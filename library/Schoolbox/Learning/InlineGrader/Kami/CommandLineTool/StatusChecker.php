@@ -68,8 +68,9 @@ class StatusChecker extends CliTool\App
 
         $this->logConfigurationState($maxAttempts, $maxSkips, $baseBackOff, $timeout);
 
-        $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
-        if (!$lock->isAcquired()) {
+        try {
+            $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
+        } catch (\RuntimeException $e) {
             exit(1);
         }
 

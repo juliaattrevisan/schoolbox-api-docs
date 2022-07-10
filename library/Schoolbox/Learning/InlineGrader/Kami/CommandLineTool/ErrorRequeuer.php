@@ -117,8 +117,9 @@ HELP;
         }
 
         // Ensure only one instance of tool is running at a time
-        $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
-        if (!$lock->isAcquired()) {
+        try {
+            $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
+        } catch (\RuntimeException $e) {
             exit(1);
         }
 

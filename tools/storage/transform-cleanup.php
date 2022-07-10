@@ -95,9 +95,9 @@ $app = new class extends CliTool\App {
             exit;
         }
 
-        $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
-
-        if (!$lock->isAcquired()) {
+        try {
+            $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
+        } catch (\RuntimeException $e) {
             $this->getLogger()->notice("[Terminated] Unable to run this tool as another process is currently running.");
             exit;
         }

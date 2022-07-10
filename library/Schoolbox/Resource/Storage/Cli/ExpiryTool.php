@@ -89,9 +89,9 @@ HELP;
 
         /* Check that this isn't currently running
          */
-        $lock = $this->acquireLock(self::EXPIRED_STORAGE_REMOVAL_LOCK_NAME, self::LOCK_TTL);
-
-        if (!$lock->isAcquired()) {
+        try {
+            $lock = $this->acquireLock(self::EXPIRED_STORAGE_REMOVAL_LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
             $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
             exit(1);
         }
