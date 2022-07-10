@@ -46,7 +46,6 @@ export const useUpdateStore = defineStore('manageGroupUpdate', {
         /**
          * update the selected members access type
          * 
-         * @param { Object } the members data
          * @param { String } a FilterTypes
          */
         async updateSelectedMembersAccess (accessType) {
@@ -107,6 +106,5 @@ function getFormData (selectedMembers, accessType) {
  */
 function updateMember (member, accessType) {
     member.accessType = accessType; //only once the change has occured in the database, do we reflect this change in the display table
-    member.accessTypeCode = 0; //ensure the member doesn't always appear at the top of the table once they are off the waitlist
     member.justUpdated = true; //to add a class in the display table to help show the member has just been updated
 }

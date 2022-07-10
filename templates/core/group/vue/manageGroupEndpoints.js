@@ -8,4 +8,5 @@ export default Object({
     GET_MEMBERS: '',
     REMOVE_MEMBERS: '',
     UPDATE_MEMBERS: '',
+    ADD_MEMBERS: '',
 });

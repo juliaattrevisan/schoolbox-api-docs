@@ -55,7 +55,7 @@ export const useStore = defineStore('manageGroup', {
                 const groupMembers = responseJson.map((groupMember) => { //add in some additional properties
                     return { 
                         ...groupMember,
-                        accessTypeCode: groupMember.accessType === 'waiting' ? 1 : 0,
+                        displayPriority: groupMember.accessType === 'waiting' ? 1 : 0,
                         isNew: false, //to highlight new members just added 
                         justUpdated: false, //to highlight members that have just been changed
                     } 
@@ -108,6 +108,9 @@ export const useStore = defineStore('manageGroup', {
             await nextTick();
             this.groupMembers.forEach((member) => {
                 member.isNew = false;
+                if (member.justUpdated) {
+                    member.displayPriority = 0; //to only put the updated member in its correct sort after a display table change, like a sort or filter
+                }
                 member.justUpdated = false;
             });
         },

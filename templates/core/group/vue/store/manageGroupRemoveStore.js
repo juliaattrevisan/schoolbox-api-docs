@@ -24,8 +24,6 @@ export const useRemoveStore = defineStore('manageGroupRemove', {
 
         /**
          * member removal has been confirmed so pull them out
-         * 
-         * @param { String }
          */
         async removeSelectedMembers () {
             const store = useStore();

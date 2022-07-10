@@ -5,6 +5,22 @@
  */
 
 
+const props = defineProps({
+    /**
+     * To display the toast access status changes
+     */
+    toastEl: {
+        required: true,
+    },
+});
+
+/**
+ * 
+ */
+function onAddUsersSelected () {
+    
+}
+
 </script>
 
 <template>
@@ -62,7 +78,7 @@
                                     </label>
                                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
                                     <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
-                                    <input type="submit" value="Add Users" />
+                                    <input type="submit" value="Add Users" @click.prevent="onAddUsersSelected" />
                                 </form>
                             </div>
                         </div>

@@ -46,7 +46,7 @@ onMounted(() => {
  ****************************************************************/
 
 const tableEl = ref(null);
-const tableColumns = ['name', 'meta', 'accessType'];
+const tableColumns = ['name', 'firstName', 'lastName', 'meta', 'accessType'];
 const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
     columnsClasses: {
         accessType: 'access-td ', //to specify a width
@@ -72,9 +72,16 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     customSorting: {
         name: (ascending) => { //'waiting' members to always show on top and then sort by lastName
             return (a, b) => {
-                if (a.accessTypeCode < b.accessTypeCode) { //the accessTypeCode is set in manageGroupStore.js
+                
+                // if (a.justUpdated && !b.justUpdated) { 
+                //     return 1;
+                // } else if (!a.justUpdated && b.justUpdated) { 
+                //     return -1;
+                // } 
+
+                if (a.displayPriority < b.displayPriority) { //the displayPriority is set in manageGroupStore.js
                     return 1;
-                } else if (a.accessTypeCode > b.accessTypeCode) { 
+                } else if (a.displayPriority > b.displayPriority) { 
                     return -1;
                 } 
                 if (ascending) {
@@ -89,7 +96,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         name: 'Name',
         accessType: 'Access',
     },
-    hiddenColumns: ['meta'], //the meta data is added to the name column, but we need a meta column so we can search for it
+    hiddenColumns: ['firstName', 'lastName', 'meta'], //these are all added to name, but we need to add them to tableColumns so we can search them
     orderBy: { //initial sorting display
         ascending: true,
         column: 'name'
@@ -97,8 +104,13 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     perPage: 50,
     perPageValues: [50, 100, 200], 
     resizableColumns: false,
-    rowClassCallback: (row) => { //to differentiate just updated members so it's clear they've just been updated
-        return row.justUpdated ? 'just-updated' : '';
+    rowClassCallback: (row) => { //to differentiate new / updated rows
+        if (row.isNew) { //so it's clear the rows have just been added (if they're visible...)
+            return 'is-new';
+        } else if (row.justUpdated) { //so it's clear they've just been updated
+            return 'just-updated';
+        }
+        return '';
     },
     selectable: {
         mode: 'multiple' //to enable multi-select for those with permission
@@ -275,6 +287,7 @@ function updateSelectedMembers () {
 <style lang="scss">
 
 @import '@schoolboxVue/components/vueTables2/vueTables2';
+@import 'www/static/css/core/base/_colors.scss';
 
 .VueTables {
     margin-bottom: 150px; //to allow space for the bottom-drawer so it can't cut off the bottom of the table
@@ -297,15 +310,30 @@ function updateSelectedMembers () {
     width: 15rem; //keep the edit icon on the right side
 }
 
-.VueTables__table tr.just-updated { //have to be pretty specific to overwrite foundation rules...
+.change-animation {
     animation-duration: 2s;
     animation-iteration-count: 1;
-    animation-name: fadeOutBackgroundColour;
 }
 
-@keyframes fadeOutBackgroundColour {
+.VueTables__table tr.is-new { //have to be pretty specific to overwrite foundation rules...
+    @extend .change-animation;
+    animation-name: isNewAnimation;
+}
+
+@keyframes isNewAnimation {
+    0% { background-color: $success-color; }
+    100% { background-color: white; }
+}
+
+.VueTables__table tr.just-updated { //have to be pretty specific to overwrite foundation rules...
+    @extend .change-animation;
+    animation-name: justUpdatedAnimation;
+}
+
+@keyframes justUpdatedAnimation {
     0% { background-color: var(--accent-background); }
     100% { background-color: white; }
 }
+
 
 </style>

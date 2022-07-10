@@ -42,6 +42,7 @@ const Template = (args, { argTypes }) => ({
 const getMembersEndpoint = '/getMembers'; //just using any active endpoint for a connection
 const removeMembersEndpoint = '/removeMembers';
 const updateMembersEndpoint = '/updateMembers';
+const addMembersEndpoint = '/addMembers';
 
 export const Default = Template.bind({});
 Default.parameters = {
@@ -56,7 +57,7 @@ Default.parameters = {
             }),
             rest.delete(removeMembersEndpoint, (req, res, ctx) => {
                 return res(
-                    ctx.delay(3000),
+                    ctx.delay(2000),
                     ctx.json({
                        success: true,
                     })
@@ -70,6 +71,20 @@ Default.parameters = {
                     })
                 )
             }), 
+            rest.post(updateMembersEndpoint, (req, res, ctx) => {
+                return res(
+                    ctx.delay(1000),
+                    ctx.json({
+                        newMembers: [
+                            {"id":201,"firstName":"John","lastName":"Smith","userId":200,"accessType":"read","meta":"year 11"},
+                            {"id":202,"firstName":"Jane","lastName":"Cooper","userId":201,"accessType":"read","meta":"year 11"},
+                            {"id":203,"firstName":"Candy","lastName":"Melon","userId":202,"accessType":"read","meta":"teacher"},
+                            {"id":204,"firstName":"Guava","lastName":"Apple","userId":203,"accessType":"read","meta":"year 11"},
+                        ],
+                        success: true,
+                    })
+                )
+            }), 
         ]
     },
 }
@@ -77,6 +92,7 @@ Default.args = {
     getMembersEndpoint: getMembersEndpoint,
     removeMembersEndpoint: removeMembersEndpoint,
     updateMembersEndpoint: updateMembersEndpoint,
+    addMembersEndpoint: addMembersEndpoint,
 }
 
 // export const LoadError = Template.bind({});

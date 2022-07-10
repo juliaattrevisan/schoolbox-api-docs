@@ -36,6 +36,13 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    /**
+     * the endpoint to add members
+     */
+    addMembersEndpoint: {
+        type: String,
+        required: true,
+    },
 });
 
 const toastEl = ref(null);
@@ -48,6 +55,7 @@ onBeforeMount(() => {
     Endpoints.GET_MEMBERS = props.getMembersEndpoint;
     Endpoints.REMOVE_MEMBERS = props.removeMembersEndpoint;
     Endpoints.UPDATE_MEMBERS = props.updateMembersEndpoint;
+    Endpoints.ADD_MEMBERS = props.addMembersEndpoint;
 });
 
 /**
@@ -61,7 +69,7 @@ onMounted(() => {
 
 <template>
     <manage-group-heading :toast-el="toastEl" />
-    <manage-group-add />
+    <manage-group-add :toast-el="toastEl" />
     <manage-group-table :toast-el="toastEl" />
     <manage-group-select :toast-el="toastEl" />
     <manage-group-remove :toast-el="toastEl" />

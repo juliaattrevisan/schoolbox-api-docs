@@ -1,5 +1,5 @@
 export const data = [
-    {"id":1,"firstName":"Deva","lastName":"Pachta","userId":1,"accessType":"read","meta":"senior campus"},
+    {"id":1,"firstName":"Deva","lastName":"Aadvark","userId":1,"accessType":"waiting","meta":"senior campus"},
     {"id":2,"firstName":"Orton","lastName":"Skilling","userId":2,"accessType":"read","meta":"year 9"},
     {"id":3,"firstName":"Bertine","lastName":"Van der Hoven","userId":3,"accessType":"read","meta":"year 11"},
     {"id":4,"firstName":"Veronika","lastName":"Outerbridge","userId":4,"accessType":"read","meta":"teacher"},
