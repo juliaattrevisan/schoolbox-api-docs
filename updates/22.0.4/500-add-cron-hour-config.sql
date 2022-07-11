@@ -58,7 +58,7 @@ INSERT INTO `config` (
             END
         FROM `config` WHERE name = 'site_type') t1
     ),
-    'User Provisioning System schedule',
+    'User Provisioning System daily run time',
     'Time of day to schedule User Provisioning System. Please allow 30min for changes to this field to take effect.',
     (SELECT id FROM lu_config_field WHERE field = 'timepicker'),
     (SELECT id FROM lu_config_type WHERE `type` = 'External DB'),
