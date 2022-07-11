@@ -718,10 +718,11 @@ class External_Liss_Server
      *
      * @param Request $message
      * @return Response
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
      * @throws MapperException
      * @throws PDOException
      * @throws UnexpectedValueException
-     * @throws InvalidColumnException
      */
     public function publishDailyData(Request $message): Response
     {
@@ -739,7 +740,7 @@ class External_Liss_Server
 
         /* These event types are ignored
          */
-        $exclusions = ['Duty', 'Study', 'RollClass'];
+        $exclusions = array_map('trim', explode(',', $this->config->get('external_liss_exclusions')));
 
         /* Owner set in config
          */
@@ -759,16 +760,12 @@ class External_Liss_Server
              */
             $helper->deleteEventsFromSource();
 
-            /* Set a default event type for now - use the first one in the list
+            /* Get an indexed set of known luEventType records
+             * If this is empty, just leave
              */
-            $allEventTypes = $eventTypeMapper->findAll([
-                'limit' => 1,
-                'id' => 'ASC'
-            ]);
+            $allEventTypes = $eventTypeMapper->findAll()->indexBy('type');
 
-            if ($allEventTypes->count()) {
-                $eventType = $allEventTypes->first();
-            } else {
+            if (!$allEventTypes->count()) {
                 $this->log()->critical(self::NO_EVENT_TYPES);
                 return $this->generateResponse(self::NO_EVENT_TYPES);
             }
@@ -803,24 +800,56 @@ class External_Liss_Server
 
             $total = count($allEvents);
 
-            foreach ($allEvents as $currentEvent) {
-                /* Skip events that don't have a type
+            /* Default event type, specified in config
+             */
+            $defaultEventType = trim((string)$this->config->get('external_liss_default_event_type'));
+
+            foreach ($allEvents as $lissEvent) {
+                $currentEvent = $lissEvent;
+
+                /* Event doesn't have a type; see if we specified one in config
+                 * If we did, give it that event type instead, then carry onwards
                  */
                 if (trim($currentEvent['type']) === '') {
-                    $this->log()->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['guid']}\": no type");
+                    if ('' === $defaultEventType) {
+                        /* Skip events that don't have a type, because we didn't define
+                         * a default event type in config
+                         */
+                        $this->log()->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['guid']}\": no type");
+
+                        if ($includePayloadInLogging) {
+                            $this->log()->warning("Payload for guid \"{$currentEvent['guid']}\": " . json_encode($currentEvent));
+                            $this->log()->warning('');
+                        }
+
+                        $skipCount['noType']++;
+                        $skipCount['total']++;
+
+                        /* Skip processing this event entirely
+                         */
+                        continue;
+                    }
+
+                    /* Assign a default one and carry on as if this event
+                     * always had this type to start with
+                     */
+                    $currentEvent['type'] = $defaultEventType;
+
+                    $this->log()->debug(sprintf(
+                        'Assigning default event type "%s" to event %s with guid %s',
+                        $defaultEventType,
+                        $currentEvent['className'],
+                        $currentEvent['guid']
+                    ));
 
                     if ($includePayloadInLogging) {
                         $this->log()->warning("Payload for guid \"{$currentEvent['guid']}\": " . json_encode($currentEvent));
                         $this->log()->warning('');
                     }
-
-                    $skipCount['noType']++;
-                    $skipCount['total']++;
-
-                    continue;
                 }
 
                 /* Skip events that have a particular type
+                 * This also applies if you exclude the default one you chose in config
                  */
                 if (\in_array($currentEvent['type'], $exclusions, false)) {
                     $this->log()->warning("Skipping event \"{$currentEvent['className']}\" with guid \"{$currentEvent['guid']}\": has excluded type \"{$currentEvent['type']}\"");
@@ -847,10 +876,17 @@ class External_Liss_Server
                     continue;
                 }
 
+                /* The type that is currently specified also has a corresponding
+                 * luEventType record; use that luEventType instance
+                 *
+                 * Otherwise default to the first instance in the list (this will occur when the
+                 * default you specified in config doesn't exist as an luEventType instance)
+                 */
+                $eventType = $allEventTypes[$currentEvent['type']] ?? $allEventTypes->first();
+
                 /* Otherwise continue to process under the guise that it will be either a
                  * homepage (folder) event, or a personal event
                  */
-
                 $event = $eventMapper->createModel();
                 $event->setOwner($author);
                 $event->setAuthor($author);
