@@ -17,7 +17,6 @@ use Schoolbox\Learning\Turnitin;
  */
 class RetrofitTool extends CliTool\App
 {
-
     /**
      * Lock name
      */
