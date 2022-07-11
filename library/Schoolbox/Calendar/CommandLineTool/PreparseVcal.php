@@ -38,11 +38,20 @@ class PreparseVcal extends CliTool\App
 
         // Find every active vCal config
         /** @var iterable&Calendar_Api_Config_Record[] $configs */
-        $configs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+        $configs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords(true);
         $this->getLogger()->debug(sprintf('Found %d calendar configurations', count($configs)));
 
         // Fetch it from file cache, then parse and store in Redis
         foreach ($configs as $config) {
+            if ($config->isDead()) {
+                $this->getLogger()->info(
+                    sprintf(
+                        'Calendar configuration #%d has failed %d times: lets try again...',
+                        $config->getId(),
+                        $config->getFailedCount()
+                    )
+                );
+            }
             $this->cacheCalendar($config);
         }
     }
@@ -91,6 +100,16 @@ class PreparseVcal extends CliTool\App
         );
         try {
             $this->cache->write($decodedConfig);
+            if (0 !== $config->getFailedCount()) {
+                $this->getLogger()->info(
+                    sprintf(
+                        'Success. Calendar Config #%d, was able to get data. Setting failed count to 0',
+                        $config->getId()
+                    )
+                );
+                $config->setFailedCount(0);
+                Calendar_Api_Config_Mapper::getInstance()->save($config);
+            }
         } catch (InvalidArgumentException | ParseException | InvalidDataException $e) {
             // There was a failure when writing the cache,
             // or reading from the URL in the config.
@@ -108,6 +127,16 @@ class PreparseVcal extends CliTool\App
                     $e->getMessage()
                 )
             );
+            //sb exceptions should have a previous exception, so lets log that also
+            //but if it doesn't just log the normal...
+            if (null !== $e->getPrevious()) {
+                $this->getLogger()->warning(
+                    sprintf(
+                        'Previous Exception: %s',
+                        $e->getPrevious()->getMessage()
+                    )
+                );
+            }
             $config->addFailedCount();
             Calendar_Api_Config_Mapper::getInstance()->save($config);
         }
