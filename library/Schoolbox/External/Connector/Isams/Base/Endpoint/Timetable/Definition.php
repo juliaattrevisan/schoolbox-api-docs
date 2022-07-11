@@ -14,7 +14,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -30,7 +29,6 @@ use SimpleXMLElement;
  */
 class Definition implements IStrategy
 {
-
     /**
      * Temporarily here to denote the start and end of cycles
      * There appears to be no equivalent concept in isams
