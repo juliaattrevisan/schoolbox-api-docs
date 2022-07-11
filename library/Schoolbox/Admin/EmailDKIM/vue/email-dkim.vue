@@ -168,8 +168,8 @@ export default {
                 this.$refs.domainModal.close();
                 await this.loadRows();
             } catch (error) {
-                console.log(error);
-                this.$refs.toast.timeout('Failed', false, 2000);
+                console.warn(error);
+                this.$refs.toast.timeout('Update failed', false, 2000);
             } finally {
                 this.selectedDomain = Object.assign({}, this.emptyDomain);
             }
@@ -206,8 +206,8 @@ export default {
                 this.$refs.deleteModal.close();
                 await this.loadRows();
             } catch (error) {
-                this.$refs.toast.timeout('Failed', false, 2000);
-                console.log(error);
+                console.warn(error);
+                this.$refs.toast.timeout('Delete failed', false, 2000);
             } finally {
                 this.selectedDomain = Object.assign({}, this.emptyDomain);
             }
@@ -245,11 +245,10 @@ export default {
                 this.dkimValueSplit1 = dkimData[0].dkimValueSplit[1];
                 this.$refs.dkimModal.open();
             } catch (error) {
-                console.log(error);
-                this.hasLoadError = true; //display error note in the DOM
+                console.warn(error);
+                this.$refs.toast.timeout('Record retrieval failed', false, 2000);
             } finally {
                 this.selectedDomain = Object.assign({}, this.emptyDomain);
-                this.hasDataLoaded = true; //update the display to show the list
             }
         },
 
