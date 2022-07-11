@@ -311,7 +311,6 @@ export default {
             :data="rows"
             :columns="tableColumns"
             :options="tableOptions"
-            @loaded="onLoaded"
         >
             <template #beforeTable>
             </template>
@@ -367,30 +366,22 @@ export default {
         <h2>DKIM TXT Record for <strong>{{ domainName }}</strong></h2>
         <h3>TXT Record Name</h3>
         <div class="input-group">
-            <div class="small-12"><input ref="dkimName" readonly type="text" v-model="dkimName"></div>
-            <div>
-                <button ref="copyNameButton" class="icon-copy">Copy</button>
-            </div>
+            <input ref="dkimName" readonly type="text" v-model="dkimName">
+            <button ref="copyNameButton" class="icon-copy">Copy</button>
         </div>
         <h3>TXT Record Value</h3>
         <div class="input-group">
-            <div class="small-12"><input ref="dkimValue" readonly type="text" v-model="dkimValue"></div>
-            <div>
-                <button ref="copyValueButton" class="icon-copy">Copy</button>
-            </div>
+            <input ref="dkimValue" readonly type="text" v-model="dkimValue">
+            <button ref="copyValueButton" class="icon-copy">Copy</button>
         </div>
         <h3>TXT Record Value (split to 255 character parts)</h3>
         <div class="input-group">
-            <div class="small-12"><input ref="dkimValueSplit0" readonly type="text" v-model="dkimValueSplit0"></div>
-            <div>
-                <button ref="copyValueSplit0Button" class="icon-copy">Copy</button>
-            </div>
+            <input ref="dkimValueSplit0" readonly type="text" v-model="dkimValueSplit0">
+            <button ref="copyValueSplit0Button" class="icon-copy">Copy</button>
         </div>
         <div class="input-group">
-            <div class="small-12"><input ref="dkimValueSplit1" readonly type="text" v-model="dkimValueSplit1"></div>
-            <div>
-                <button ref="copyValueSplit1Button" class="icon-copy">Copy</button>
-            </div>
+            <input ref="dkimValueSplit1" readonly type="text" v-model="dkimValueSplit1">
+            <button ref="copyValueSplit1Button" class="icon-copy">Copy</button>
         </div>
     </reveal-modal>
     <reveal-modal ref="deleteModal">
@@ -412,7 +403,6 @@ export default {
 
 <style lang="scss">
 
-@import 'www/static/css/core/base/_colors.scss';
 @import '@schoolboxVue/components/vueTables2/vueTables2';
 
 .VueTables table {
