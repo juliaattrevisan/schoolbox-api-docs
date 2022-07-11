@@ -230,7 +230,7 @@ class Subnav
                 'visible'    => $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/setting/EPortfolio' => [
+                    '/adminv2/setting/ePortfolio' => [
                         'name'        => 'Policy',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
                         'children'    => [],
