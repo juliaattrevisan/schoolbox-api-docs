@@ -76,13 +76,13 @@ export default {
                     ['dateModified.formatted']: 'Date modified',
                     edit: '' //to not show any heading
                 },
-                orderBy: { //initial sorting display
+                orderBy: { //initial and only sorting display
                     ascending: true,
-                    column: 'domain'
+                    column: 'dateModified.formatted'
                 },
                 perPage: 9999, //absurdly large value to avoid pagination as there's no footer
                 resizableColumns: false,
-                sortable: ['domain', 'dateModified.formatted'], //currently no columns are sortable?
+                sortable: [], //no need for sortable columns, just sorted by date ascending
                 tabbable: false,
                 texts: {
                     count: '' //don't show any 'x record' at the bottom of the table
@@ -231,6 +231,7 @@ export default {
          * @returns {Promise<void>}
          */
         async onClickGetKey (toggledDkim) {
+            this.$refs.toast.activate('Retrieving...');
             try {
                 const response = await fetch(toggledDkim.dkimUrl, {
                     method: 'GET',
@@ -244,6 +245,7 @@ export default {
                 this.dkimValueSplit0 = dkimData[0].dkimValueSplit[0];
                 this.dkimValueSplit1 = dkimData[0].dkimValueSplit[1];
                 this.$refs.dkimModal.open();
+                this.$refs.toast.timeout('Record retrieved', true, 2000);
             } catch (error) {
                 console.warn(error);
                 this.$refs.toast.timeout('Record retrieval failed', false, 2000);
@@ -261,11 +263,18 @@ export default {
         async onCopySelected (event, id) {
             const copyText = document.getElementById(id);
             copyText.select();
-            copyText.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(copyText.value);
-            event.target.innerText = 'Copied';
-            await timeout(2000);
-            event.target.innerText = 'Copy';
+            copyText.setSelectionRange(0, 999); //to ensure we have the whole range
+            try { 
+                await navigator.clipboard.writeText(copyText.value);
+                event.target.innerText = 'Copied';
+                await timeout(2000);
+                event.target.innerText = 'Copy';
+            } catch (error) {
+                console.warn('Failed to copy: ', error);
+                event.target.innerText = 'Copy failed';
+                await timeout(2000);
+                event.target.innerText = 'Copy';
+            }
         },
 
     },
@@ -295,8 +304,7 @@ export default {
             <p>DKIM, is an email standard that helps validate emails have come from a trusted source.</p>
             <p>By using public/private keys a 3rd party can authorise emails signed by your Schoolbox server as
                 valid and trusted to avoid spam filters and impersonation. For each domain that you control and your
-                users send email from you must setup a DKIM key and add then add the appropriate records to your DNS
-                zone.</p>
+                users send email from, you must setup a DKIM key and add the appropriate records to your DNS zone.</p>
         </div>
         <v-client-table
             v-else-if="hasDataLoaded && rows.length > 0"
