@@ -12,7 +12,7 @@
 
 /** @var SitePage $this */
 
-if (strlen($_POST['password'])) {
+if (strlen($_POST['password'] ?? '')) {
     $_SESSION['password'] = $_POST['password'];
 
     // Redirect

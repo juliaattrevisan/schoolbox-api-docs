@@ -27,7 +27,7 @@ if (is_numeric($_GET['id']) && Config::get('webdav_enable')) {
     }
     $file['realname'] = substr($_SESSION['portfolioIdPathMap'][$_GET['id']], strrpos($_SESSION['portfolioIdPathMap'][$_GET['id']], '/') + 1);
 
-    if ($_GET['save']) {
+    if ($_GET['save'] ?? false) {
         $attach = "attachment;";
     } else {
         $attach = "";
@@ -40,7 +40,7 @@ if (is_numeric($_GET['id']) && Config::get('webdav_enable')) {
     }
 
     //send headers
-    if ($file['mime_type']) {
+    if ($file['mime_type'] ?? false) {
         header("Content-Type: {$file['mime_type']}");
     } else {
         header("Content-Type: application/octet-stream");
