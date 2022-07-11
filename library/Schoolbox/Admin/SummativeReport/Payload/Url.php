@@ -102,10 +102,10 @@ class Url
             $roleIds = $this->roleMapper->findByColumn('group_type', Role::STUDENT)->indexBy('id')->keys();
 
             $demographicStudents = $this->userBulkMapper->bulkModifySearch(
-                empty($optionsPayload['yearLevels']) ? [ UserBulkMapper::ANY ] : $optionsPayload['yearLevels'],
+                empty($optionsPayload['campuses']) ? [ UserBulkMapper::ANY ] : $optionsPayload['campuses'],
                 $roleIds,
                 UserBulkMapper::ANY,
-                empty($optionsPayload['campuses']) ? [ UserBulkMapper::ANY ] : $optionsPayload['campuses'],
+                empty($optionsPayload['yearLevels']) ? [ UserBulkMapper::ANY ] : $optionsPayload['yearLevels'],
                 UserBulkMapper::ANY
             );
 
