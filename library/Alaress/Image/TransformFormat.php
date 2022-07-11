@@ -17,6 +17,7 @@ namespace Alaress\Image;
 class TransformFormat
 {
     private array $formatMap = [
+        'image/heif'    => 'jpg',
         'image/heic'    => 'jpg',
         'image/tiff'    => 'jpg',
         'image/jpeg'    => 'jpg',
