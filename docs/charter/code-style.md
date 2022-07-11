@@ -155,7 +155,8 @@ Strings may be concatenated using the "." operator. A space must always be added
 
 ## Inline Documentation
 
-All documentation blocks ("docblocks") must be compatible with the phpDocumentor format. Describing the phpDocumentor format is beyond the scope of this document. For more information, visit: https://docs.phpdoc.org/latest/guides/docblocks.html
+All documentation blocks ("docblocks") must be compatible with the phpDocumentor format. Describing the phpDocumentor format is beyond the scope of this document. For more information, visit: https://docs.phpdoc.org/guide/guides/docblocks.html
+
 
 Every method, must have a docblock that contains at a minimum:
 
