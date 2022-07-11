@@ -5,14 +5,14 @@
  */
 import Toast from '@schoolboxVue/components/toast';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
-import ClipboardJs from 'clipboard/dist/clipboard';
+import { timeout } from '@js/util/jsUtils';
+
 
 export default {
 
     components: {
         Toast,
         RevealModal,
-        ClipboardJs
     },
 
     props: {
@@ -58,6 +58,16 @@ export default {
                     ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
                     edit: 'edit-td ', //to specify a width
                 },
+                customSorting: {
+                    ['dateModified.formatted']: (ascending) => { //sort date modified accurately by the timestamp
+                        return (a, b) => {
+                            if (ascending) {
+                                return a.dateModified.timestamp >= b.dateModified.timestamp ? 1 : -1;
+                            }
+                            return a.dateModified.timestamp <= b.dateModified.timestamp ? 1 : -1;
+                        }
+                    },
+                },
                 debounce: 100, //faster debounce as data is stored on the client side,
                 filterable: false,
                 filterByColumn: false,
@@ -66,9 +76,13 @@ export default {
                     ['dateModified.formatted']: 'Date modified',
                     edit: '' //to not show any heading
                 },
+                orderBy: { //initial sorting display
+                    ascending: true,
+                    column: 'domain'
+                },
                 perPage: 9999, //absurdly large value to avoid pagination as there's no footer
                 resizableColumns: false,
-                sortable: [], //currently no columns are sortable?
+                sortable: ['domain', 'dateModified.formatted'], //currently no columns are sortable?
                 tabbable: false,
                 texts: {
                     count: '' //don't show any 'x record' at the bottom of the table
@@ -78,30 +92,6 @@ export default {
     },
 
     mounted () {
-        new ClipboardJs(
-            this.$refs.copyValueButton,
-            {
-                target: () => this.$refs.dkimValue,
-            }
-        );
-        new ClipboardJs(
-            this.$refs.copyNameButton,
-            {
-                target: () => this.$refs.dkimName,
-            }
-        );
-        new ClipboardJs(
-            this.$refs.copyValueSplit0Button,
-            {
-                target: () => this.$refs.dkimValueSplit0,
-            }
-        );
-        new ClipboardJs(
-            this.$refs.copyValueSplit1Button,
-            {
-                target: () => this.$refs.dkimValueSplit1,
-            }
-        );
         this.loadRows();
     },
 
@@ -118,7 +108,7 @@ export default {
                 });
                 this.rows = await response.json();
             } catch (error) {
-                console.log(error);
+                console.warn(error);
                 this.hasLoadError = true; //display error note in the DOM
             } finally {
                 this.selectedDomain = Object.assign({}, this.emptyDomain);
@@ -246,7 +236,7 @@ export default {
                     method: 'GET',
                     responseType: 'json'
                 });
-                let dkimData = await response.json();
+                const dkimData = await response.json();
                 this.domainName = dkimData[0].domain;
                 this.dkimName = dkimData[0].dkimName;
                 this.dkimValue = dkimData[0].dkimValue;
@@ -262,7 +252,25 @@ export default {
                 this.hasDataLoaded = true; //update the display to show the list
             }
         },
+
+        /**
+         * Copy the linked text value 
+         *
+         * @param { Event }
+         * @param { String }
+         */
+        async onCopySelected (event, id) {
+            const copyText = document.getElementById(id);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            event.target.innerText = 'Copied';
+            await timeout(2000);
+            event.target.innerText = 'Copy';
+        },
+
     },
+
 }
 </script>
 
@@ -293,7 +301,6 @@ export default {
         </div>
         <v-client-table
             v-else-if="hasDataLoaded && rows.length > 0"
-            ref="table"
             :data="rows"
             :columns="tableColumns"
             :options="tableOptions"
@@ -342,28 +349,27 @@ export default {
         <h2>DKIM TXT Record for <strong>{{ domainName }}</strong></h2>
         <h3>TXT Record Name</h3>
         <div class="input-group">
-            <input ref="dkimName" readonly type="text" v-model="dkimName">
-            <button ref="copyNameButton" class="icon-copy">Copy</button>
+            <input id="dkimName" readonly type="text" v-model="dkimName">
+            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimName')">Copy</button>
         </div>
         <h3>TXT Record Value</h3>
         <div class="input-group">
-            <input ref="dkimValue" readonly type="text" v-model="dkimValue">
-            <button ref="copyValueButton" class="icon-copy">Copy</button>
+            <input id="dkimValue" readonly type="text" v-model="dkimValue">
+            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimValue')">Copy</button>
         </div>
         <h3>TXT Record Value (split to 255 character parts)</h3>
         <div class="input-group">
-            <input ref="dkimValueSplit0" readonly type="text" v-model="dkimValueSplit0">
-            <button ref="copyValueSplit0Button" class="icon-copy">Copy</button>
+            <input id="dkimValueSplit0" readonly type="text" v-model="dkimValueSplit0">
+            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimValueSplit0')">Copy</button>
         </div>
         <div class="input-group">
-            <input ref="dkimValueSplit1" readonly type="text" v-model="dkimValueSplit1">
-            <button ref="copyValueSplit1Button" class="icon-copy">Copy</button>
+            <input id="dkimValueSplit1" readonly type="text" v-model="dkimValueSplit1">
+            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimValueSplit1')">Copy</button>
         </div>
     </reveal-modal>
     <reveal-modal ref="deleteModal">
         <h2>Please Confirm</h2>
-        <p>You are about to delete the DKIM keys for <b>{{ selectedDomain.domain }}</b>, are you sure you want to
-            proceed?</p>
+        <p>You are about to delete the DKIM keys for <b>{{ selectedDomain.domain }}</b>, are you sure you want to proceed?</p>
         <form>
             <ul class="flex-list buttons">
                 <li>
@@ -382,7 +388,7 @@ export default {
 @import '@schoolboxVue/components/vueTables2/vueTables2';
 
 .VueTables table {
-    table-layout: fixed;
+    table-layout: fixed; //to ensure the flex within can shrink all the way down
 }
 
 .VueTables__table td {
