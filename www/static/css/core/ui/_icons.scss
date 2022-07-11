@@ -1,6 +1,6 @@
 /*
     All the icons contained within Schoolbox
-    See: https://vagrant.dev.schoolbox.cloud/pantry/icons to 
+    See: https://vagrant.dev.schoolbox.cloud/pantry/icons to
     view the entire list
 */
 
@@ -923,5 +923,10 @@
 
 .icon-intellischool:before {
     content: '\e926';
+    font-family: $font-family-icon;
+}
+
+.icon-engage-logo:before {
+    content: '\e929';
     font-family: $font-family-icon;
 }
