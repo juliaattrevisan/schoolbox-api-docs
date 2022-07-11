@@ -24,7 +24,7 @@ class EDiary implements IStrategy
     /**
      * Filter to specific people; set to null to disable filtering
      */
-    private const WATCHLIST = null;
+    private const WATCHLIST = ['051301', 'SKK'];
 
 
     /**
@@ -186,29 +186,29 @@ class EDiary implements IStrategy
      */
     public function import(): void
     {
-//        /* I think the ediary feed endpoint was supposed to supply the synonymous
-//         * eventType string associated with each ediary event
-//         *
-//         * This algorithmic complexity is about to take a toll on tass
-//         */
-//        $feeds = $this->getFeedList('S');
-//
-//        /* Get a list of Student external ids
-//         * Use the profile mappers to get a 1D array of those
-//         * For each person in that set,
-//         * Hit the endpoint and grab their calendar
-//         */
-//        if ($feeds) {
-//            $userProfiles = $this->studentProfileMapper->findAll();
-//
-//            foreach ($feeds['calendar'] as $feed) {
-//                foreach ($userProfiles as $userProfile) {
-//                    $this->importStudentEvents($userProfile, $feed);
-//                }
-//            }
-//        } else {
-//            $this->log->info('No feed data found; skipping');
-//        }
+        /* I think the ediary feed endpoint was supposed to supply the synonymous
+         * eventType string associated with each ediary event
+         *
+         * This algorithmic complexity is about to take a toll on tass
+         */
+        $feeds = $this->getFeedList('S');
+
+        /* Get a list of Student external ids
+         * Use the profile mappers to get a 1D array of those
+         * For each person in that set,
+         * Hit the endpoint and grab their calendar
+         */
+        if ($feeds) {
+            $userProfiles = $this->studentProfileMapper->findAll();
+
+            foreach ($feeds['calendar'] as $feed) {
+                foreach ($userProfiles as $userProfile) {
+                    $this->importStudentEvents($userProfile, $feed);
+                }
+            }
+        } else {
+            $this->log->info('No feed data found; skipping');
+        }
 
         /* I think the ediary feed endpoint was supposed to supply the synonymous
          * eventType string associated with each ediary event
@@ -466,10 +466,31 @@ class EDiary implements IStrategy
             }
 
             /* Process as usual
+             * Sometimes dates aren't in da database format, but instead,
+             * are in a format like this:
+             *
+             * 2023-03-02 12:00 AM
+             *
+             * FATAL Carbon\Exceptions\InvalidFormatException: A two digit second could not be found
+             *
+             * ... in that case, if Carbon throws an InvalidFormatException,
+             * just strtotime it - there's no way you can guess what wild
+             * format tass will randomly throw at you next
              */
-            $startDatetime = \Alaress_Date_Format::newDatabaseDate($tassStartDate);
-            $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEndDate);
+            try {
+                $startDatetime = \Alaress_Date_Format::newDatabaseDate($tassStartDate);
+            } catch(\Carbon\Exceptions\InvalidFormatException $e) {
+                $startDatetime = \Alaress_Date_Format::newFromTimestamp(strtotime($tassStartDate));
+            }
 
+            try {
+                $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEndDate);
+            } catch(\Carbon\Exceptions\InvalidFormatException $e) {
+                $endDatetime = \Alaress_Date_Format::newFromTimestamp(strtotime($tassEndDate));
+            }
+
+            /* Sometimes all_day is not present
+             */
             $allDay = (bool)($tassEvent['all_day'] ?? false);
 
             /* Third-party source identifier for our import
