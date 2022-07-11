@@ -9,14 +9,8 @@ declare(strict_types=1);
 
 namespace External\Canvas\Importer\Cli;
 
-use Alaress\Lock\InstanceLockFactory;
-use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\Store\RedisStore;
 
 /**
  * CLI Tool for processing Canvas Announcements
@@ -88,10 +82,10 @@ class AnnouncementsTool extends CliTool\App
 
 Import canvas' course announcements into schoolbox folder news articles.
 
-Mandatory: you need to specify a schoolbox user id as the default owner of these 
+Mandatory: you need to specify a schoolbox user id as the default owner of these
 articles if we can't find their actual owner.
 
-Mandatory: you need to specify a schoolbox topic id as the default topic of these 
+Mandatory: you need to specify a schoolbox topic id as the default topic of these
 articles because that concept doesn't exist in Canvas and articles get lost in
 the noise of everything else in schoolbox without a topic to segregate them
 
@@ -105,20 +99,13 @@ HELP;
         /* Check that this isn't currently running
          */
 
-        /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis.cache');
-        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
-
-        $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
-        $lock        = $lockFactory->createLock(self::CANVAS_ANNOUNCEMENTS_LOCK_NAME, self::LOCK_TTL);
-
         try {
-            $acquired = $lock->acquire();
-        } catch (LockConflictedException | LockAcquiringException $e) {
-            $acquired = false;
+            $lock = $this->acquireLock(self::CANVAS_ANNOUNCEMENTS_LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            $lock = null;
         }
 
-        if ($acquired) {
+        if ($lock) {
             $bearerToken = $this->getConfig()->get('canvas_bearer_token');
 
             if ('' === trim((string)$bearerToken)) {
