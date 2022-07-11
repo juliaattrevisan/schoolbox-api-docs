@@ -86,7 +86,7 @@ export default {
          * @returns { Boolean }
          */
         isPrivate () {
-            return this.group.type === groupTypes.PRIVATE && this.enrolmentStatus === enrolmentTypes.ENROLLED;
+            return this.group.type === groupTypes.PRIVATE && this.enrolmentStatus === enrolmentTypes.ENROLED;
         },
 
         /**
@@ -96,7 +96,7 @@ export default {
          */
         isEnrolled () {
             return (this.group.type === groupTypes.FREE || this.group.type === groupTypes.MODERATED)
-                    && this.enrolmentStatus === enrolmentTypes.ENROLLED;
+                    && this.enrolmentStatus === enrolmentTypes.ENROLED;
         },
 
         /**
@@ -114,7 +114,7 @@ export default {
          * @returns { Boolean }
          */
         isRequestToJoin () {
-            return this.group.type === groupTypes.MODERATED && this.enrolmentStatus === enrolmentTypes.NOT_ENROLLED;
+            return this.group.type === groupTypes.MODERATED && this.enrolmentStatus === enrolmentTypes.NOT_ENROLED;
         },
 
     },
@@ -197,7 +197,7 @@ export default {
                 } else if (responseData.status === 400) {
                     this.$emit('on-edit-error', responseData.title);
                 } else {
-                    this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLLED;
+                    this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLED;
                     this.$emit('on-edit-success', 'Group left');
                     if (this.group.isFavourite) { //assumed that wouldn't be a favourite group if re-added
                         this.group.isFavourite = false;
