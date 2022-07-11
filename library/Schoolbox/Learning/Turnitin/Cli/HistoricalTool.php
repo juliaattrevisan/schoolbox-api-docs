@@ -9,21 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Cli;
 
-use Alaress\Lock\InstanceLockFactory;
-use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\Store\RedisStore;
 
 /**
  * CLI Tool for historically adding files that should be in Turnitin, but aren't
  */
 class HistoricalTool extends CliTool\App
 {
-
     /**
      * Lock name
      */
@@ -117,62 +110,49 @@ HELP;
 
         /* Check that this isn't currently running
          */
-
-        /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis.cache');
-        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
-
-        $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
-        $lock        = $lockFactory->createLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
-
         try {
-            $acquired = $lock->acquire();
-        } catch (LockConflictedException | LockAcquiringException $e) {
-            $acquired = false;
+            $lock = $this->acquireLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            exit(1);
         }
 
-        if ($acquired) {
-            /* Interpret the date range from cli options
-             */
-            if ($this->getOpt(self::OPT_LONG_START)) {
-                $start = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_START)))->startOfDay();
-            } else {
-                $start = \Alaress_Date_Format::now()->addYears(-1)->startOfDay();
-            }
-
-            if ($this->getOpt(self::OPT_LONG_END)) {
-                $end = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_END)))->endOfDay();
-            } else {
-                $end = \Alaress_Date_Format::now()->endOfDay();
-            }
-
-            $this->getLogger()->debug(sprintf(
-                'Historically adding stuff between %s and %s',
-                $start->getDatabase(),
-                $end->getDatabase()
-            ));
-
-            (new Turnitin\Historical(
-                Turnitin\File\Mapper::getInstance(),
-                \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
-                \Schoolbox\Resource\Storage\Mapper::getInstance(),
-                $this->perform(),
-                $this->getLogger()
-            ))->historical($start, $end, $lock);
-
-            if (!$this->perform()) {
-                $this->getLogger()->info('Planning finished.');
-            } else {
-                $this->getLogger()->info('Done.');
-            }
-
-            /* Releasing control
-             */
-            $lock->release();
+        /* Interpret the date range from cli options
+         */
+        if ($this->getOpt(self::OPT_LONG_START)) {
+            $start = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_START)))->startOfDay();
         } else {
-            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
-            exit;
+            $start = \Alaress_Date_Format::now()->addYears(-1)->startOfDay();
         }
+
+        if ($this->getOpt(self::OPT_LONG_END)) {
+            $end = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_END)))->endOfDay();
+        } else {
+            $end = \Alaress_Date_Format::now()->endOfDay();
+        }
+
+        $this->getLogger()->debug(sprintf(
+            'Historically adding stuff between %s and %s',
+            $start->getDatabase(),
+            $end->getDatabase()
+        ));
+
+        (new Turnitin\Historical(
+            Turnitin\File\Mapper::getInstance(),
+            \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
+            \Schoolbox\Resource\Storage\Mapper::getInstance(),
+            $this->perform(),
+            $this->getLogger()
+        ))->historical($start, $end, $lock);
+
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        } else {
+            $this->getLogger()->info('Done.');
+        }
+
+        /* Releasing control
+         */
+        $lock->release();
     }
 
 

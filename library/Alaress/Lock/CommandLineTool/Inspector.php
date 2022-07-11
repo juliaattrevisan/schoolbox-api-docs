@@ -31,8 +31,6 @@ use Schoolbox\Pastoral\CommandLineTool\AttachmentUploader;
 use Schoolbox\Resource\Storage\Cli\ExpiryTool;
 use Schoolbox\Video\CommandLineTool\Processor;
 use Schoolbox\Intellischool\CommandLineTool\DataSync;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
 
@@ -234,18 +232,17 @@ DESCRIPTION
             $this->getLogger()->notice(sprintf('Testing lock: %s, script: %s', $lockName, $lockDescription));
 
             $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
-            $lock        = $lockFactory->createLock($lockName, 0);
             $key         = $lockFactory->calculateKeyName($lockName);
 
             // Is this lock acquirable?
-            $acquired = false;
             try {
-                $acquired = $lock->acquire();
-            } catch (LockConflictedException | LockAcquiringException $e) {
+                $lock = $this->acquireLock($lockName, 0);
+            } catch (\RuntimeException $e) {
+                $lock = null;
                 // noop
             }
 
-            if ($acquired) {
+            if ($lock) {
                 $this->getLogger()->info('... script is not locked');
                 $lock->release();
             } else {

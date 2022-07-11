@@ -9,24 +9,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Cli;
 
-use Alaress\Lock\InstanceLockFactory;
-use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Turnitin\Helper;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\Store\RedisStore;
 
 /**
  * CLI Tool for processing Turnitin Groups and Turnitin Group Attachments
  */
 class GroupTool extends CliTool\App
 {
-
     /**
      * Lock name
      */
@@ -138,123 +131,111 @@ HELP;
         /* Check that this isn't currently running
          */
 
-        /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis.cache');
-        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
-
-        $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
-        $lock        = $lockFactory->createLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
-
         try {
-            $acquired = $lock->acquire();
-        } catch (LockConflictedException | LockAcquiringException $e) {
-            $acquired = false;
+            $lock = $this->acquireLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            exit(1);
         }
 
-        if ($acquired) {
-            /* Find all the records to process in a synonymous data struct
+        /* Find all the records to process in a synonymous data struct
+         */
+        if ($this->getOpt(self::OPT_LONG_GROUP_ID)) {
+            /* Optionally:
+             * Forcibly retransmit everything in Pending, Group Attachment, Uploading
+             * regardless of whether they're in those states normally; used
+             * to recommence a stalled or broken process, but you might also
+             * reprocess something that's in this state naturally
              */
-            if ($this->getOpt(self::OPT_LONG_GROUP_ID)) {
-                /* Optionally:
-                 * Forcibly retransmit everything in Pending, Group Attachment, Uploading
-                 * regardless of whether they're in those states normally; used
-                 * to recommence a stalled or broken process, but you might also
-                 * reprocess something that's in this state naturally
-                 */
-                if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
-                    $models = Turnitin\Group\Mapper::getInstance()->findByColumnList([
-                        'id' => $this->getOpt(self::OPT_LONG_GROUP_ID),
-                        'status' => [
-                            Turnitin\Group\Model::STATUS_TRANSMIT_PENDING,
-                            Turnitin\Group\Model::STATUS_TRANSMIT_GROUP,
-                            Turnitin\Group\Model::STATUS_TRANSMIT_GROUP_ATTACHMENT,
-                        ]
-                    ]);
-                } else {
-                    $models = Turnitin\Group\Mapper::getInstance()->findByColumnList([
-                        'id' => $this->getOpt(self::OPT_LONG_GROUP_ID),
-                        'status' => Turnitin\Group\Model::STATUS_TRANSMIT_PENDING
-                    ]);
-                }
-            } else {
-                /* Optionally:
-                 * Forcibly retransmit everything in Pending, Group, Group Attachment
-                 * regardless of whether they're in those states normally; used
-                 * to recommence a stalled or broken process, but you might also
-                 * reprocess something that's in this state naturally
-                 */
-                if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
-                    $models = Turnitin\Group\Mapper::getInstance()->findByColumn('status', [
+            if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
+                $models = Turnitin\Group\Mapper::getInstance()->findByColumnList([
+                    'id' => $this->getOpt(self::OPT_LONG_GROUP_ID),
+                    'status' => [
                         Turnitin\Group\Model::STATUS_TRANSMIT_PENDING,
                         Turnitin\Group\Model::STATUS_TRANSMIT_GROUP,
                         Turnitin\Group\Model::STATUS_TRANSMIT_GROUP_ATTACHMENT,
-                    ]);
-                } else {
-                    $models = Turnitin\Group\Mapper::getInstance()->findByColumn('status', Turnitin\Group\Model::STATUS_TRANSMIT_PENDING);
-                }
+                    ]
+                ]);
+            } else {
+                $models = Turnitin\Group\Mapper::getInstance()->findByColumnList([
+                    'id' => $this->getOpt(self::OPT_LONG_GROUP_ID),
+                    'status' => Turnitin\Group\Model::STATUS_TRANSMIT_PENDING
+                ]);
             }
-
-            /* Leave immediately when nothing to do
-             */
-            if (!$models->count()) {
-                $this->getLogger()->info('There are no pending Turnitin groups; nothing to do');
-                $this->getLogger()->info('Done.');
-                exit();
-            }
-
-            /* Otherwise keep going
-             */
-            $this->getLogger()->info(sprintf(
-                'Commencing upload sequence for %s pending Turnitin groups',
-                $models->count()
-            ));
-
-            /* We need this api
-             */
-            $api = new Turnitin\Api(
-                $this->getConfig()->get('site_version'),
-                $this->getConfig()->get('turnitin_api_host'),
-                $this->getConfig()->get('turnitin_api_key')
-            );
-
-            /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy */
-            $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
-
-            /* Set up a record processor
-             */
-            $processor = (new Turnitin\Group\Process\Group(
-                $this->getConfig()->get('site_type'),
-                $api,
-                Turnitin\Group\Mapper::getInstance(),
-                Turnitin\Group\Attachment\Mapper::getInstance(),
-                SubmissionBoxMapper::getInstance(),
-                SubmissionBox\SingleFile\Mapper::getInstance(),
-                $assessmentMapperProxy,
-                $this->getLogger()
-            ));
-
-            /* Shank them all up
-             */
-            foreach ($models as $model) {
-                $this->getLogger()->debug(sprintf(
-                    'Refreshing lock for another %s seconds',
-                    self::LOCK_TTL
-                ));
-
-                $lock->refresh();
-
-                $processor->process($model);
-            }
-
-            $this->getLogger()->info('Done.');
-
-            /* Releasing control
-             */
-            $lock->release();
         } else {
-            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
-            exit;
+            /* Optionally:
+             * Forcibly retransmit everything in Pending, Group, Group Attachment
+             * regardless of whether they're in those states normally; used
+             * to recommence a stalled or broken process, but you might also
+             * reprocess something that's in this state naturally
+             */
+            if ($this->getOpt(self::OPT_LONG_FORCE_PUSH)) {
+                $models = Turnitin\Group\Mapper::getInstance()->findByColumn('status', [
+                    Turnitin\Group\Model::STATUS_TRANSMIT_PENDING,
+                    Turnitin\Group\Model::STATUS_TRANSMIT_GROUP,
+                    Turnitin\Group\Model::STATUS_TRANSMIT_GROUP_ATTACHMENT,
+                ]);
+            } else {
+                $models = Turnitin\Group\Mapper::getInstance()->findByColumn('status', Turnitin\Group\Model::STATUS_TRANSMIT_PENDING);
+            }
         }
+
+        /* Leave immediately when nothing to do
+         */
+        if (!$models->count()) {
+            $this->getLogger()->info('There are no pending Turnitin groups; nothing to do');
+            $this->getLogger()->info('Done.');
+            exit();
+        }
+
+        /* Otherwise keep going
+         */
+        $this->getLogger()->info(sprintf(
+            'Commencing upload sequence for %s pending Turnitin groups',
+            $models->count()
+        ));
+
+        /* We need this api
+         */
+        $api = new Turnitin\Api(
+            $this->getConfig()->get('site_version'),
+            $this->getConfig()->get('turnitin_api_host'),
+            $this->getConfig()->get('turnitin_api_key')
+        );
+
+        /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+        /* Set up a record processor
+         */
+        $processor = (new Turnitin\Group\Process\Group(
+            $this->getConfig()->get('site_type'),
+            $api,
+            Turnitin\Group\Mapper::getInstance(),
+            Turnitin\Group\Attachment\Mapper::getInstance(),
+            SubmissionBoxMapper::getInstance(),
+            SubmissionBox\SingleFile\Mapper::getInstance(),
+            $assessmentMapperProxy,
+            $this->getLogger()
+        ));
+
+        /* Shank them all up
+         */
+        foreach ($models as $model) {
+            $this->getLogger()->debug(sprintf(
+                'Refreshing lock for another %s seconds',
+                self::LOCK_TTL
+            ));
+
+            $lock->refresh();
+
+            $processor->process($model);
+        }
+
+        $this->getLogger()->info('Done.');
+
+        /* Releasing control
+         */
+        $lock->release();
     }
 
 

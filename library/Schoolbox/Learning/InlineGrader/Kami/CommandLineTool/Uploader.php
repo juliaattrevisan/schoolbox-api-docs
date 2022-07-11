@@ -129,8 +129,9 @@ class Uploader extends CliTool\App
             $sentry = $this->getDi()->get('sentry');
         }
 
-        $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
-        if (!$lock->isAcquired()) {
+        try {
+            $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
+        } catch (\RuntimeException $e) {
             exit(1);
         }
 

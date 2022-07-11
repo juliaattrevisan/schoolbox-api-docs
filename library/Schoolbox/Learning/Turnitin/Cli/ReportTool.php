@@ -9,23 +9,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Cli;
 
-use Alaress\Lock\InstanceLockFactory;
-use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Helper;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
-use Symfony\Component\Lock\Store\RedisStore;
 
 /**
  * CLI Tool for generating Turnitin Reports
  */
 class ReportTool extends CliTool\App
 {
-
     /**
      * Lock name
      */
@@ -133,58 +126,45 @@ HELP;
 
         /* Check that this isn't currently running
          */
-
-        /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis.cache');
-        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
-
-        $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
-        $lock        = $lockFactory->createLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
-
         try {
-            $acquired = $lock->acquire();
-        } catch (LockConflictedException | LockAcquiringException $e) {
-            $acquired = false;
+            $lock = $this->acquireLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            exit(1);
         }
 
-        if ($acquired) {
-            /* We need this api
-             */
-            $api = new Turnitin\Api(
-                $this->getConfig()->get('site_version'),
-                $this->getConfig()->get('turnitin_api_host'),
-                $this->getConfig()->get('turnitin_api_key')
-            );
+        /* We need this api
+         */
+        $api = new Turnitin\Api(
+            $this->getConfig()->get('site_version'),
+            $this->getConfig()->get('turnitin_api_host'),
+            $this->getConfig()->get('turnitin_api_key')
+        );
 
-            /* Set up a record processor
-             */
-            $processor = (new Turnitin\File\Process\Report(
-                $api,
-                Turnitin\File\Mapper::getInstance(),
-                $this->getLogger()
-            ));
+        /* Set up a record processor
+         */
+        $processor = (new Turnitin\File\Process\Report(
+            $api,
+            Turnitin\File\Mapper::getInstance(),
+            $this->getLogger()
+        ));
 
-            /* Start kicking things along
-             *
-             * Loaded reports get shoved toward Prepared
-             * Prepared reports get shoved toward Complete
-             *
-             * Both those stages finish whenever turnitin is done
-             * so we have to ask it to finish both stages independently
-             * of each other
-             */
-            $this->processLoadedReports($processor, $lock);
-            $this->processPreparedReports($processor, $lock);
+        /* Start kicking things along
+         *
+         * Loaded reports get shoved toward Prepared
+         * Prepared reports get shoved toward Complete
+         *
+         * Both those stages finish whenever turnitin is done
+         * so we have to ask it to finish both stages independently
+         * of each other
+         */
+        $this->processLoadedReports($processor, $lock);
+        $this->processPreparedReports($processor, $lock);
 
-            $this->getLogger()->info('Done.');
+        $this->getLogger()->info('Done.');
 
-            /* Releasing control
-             */
-            $lock->release();
-        } else {
-            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
-            exit;
-        }
+        /* Releasing control
+         */
+        $lock->release();
     }
 
 

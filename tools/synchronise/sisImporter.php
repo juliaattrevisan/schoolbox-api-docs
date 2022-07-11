@@ -32,7 +32,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
@@ -113,9 +112,9 @@ NULLTYPE;
          * and the instances could start up a new import before the existing one
          * has even finished. If you can't reserve this, then abort.
          */
-        $lock = $this->acquireLock(Endpoint\Scheduler::LOCK_NAME, $timeout);
-
-        if (!$lock->isAcquired()) {
+        try {
+            $lock = $this->acquireLock(Endpoint\Scheduler::LOCK_NAME, $timeout);
+        } catch (\RuntimeException $e) {
             exit(1);
         }
 

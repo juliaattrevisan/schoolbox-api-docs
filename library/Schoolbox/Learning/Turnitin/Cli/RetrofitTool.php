@@ -9,21 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Cli;
 
-use Alaress\Lock\InstanceLockFactory;
-use Predis\ClientInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\Store\RedisStore;
 
 /**
  * CLI Tool for retrofitting files that should be in Turnitin, but aren't
  */
 class RetrofitTool extends CliTool\App
 {
-
     /**
      * Lock name
      */
@@ -93,43 +86,30 @@ HELP;
 
         /* Check that this isn't currently running
          */
-
-        /** @var ClientInterface $redis */
-        $redis      = $this->getDi()->get('redis.cache');
-        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
-
-        $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
-        $lock        = $lockFactory->createLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
-
         try {
-            $acquired = $lock->acquire();
-        } catch (LockConflictedException | LockAcquiringException $e) {
-            $acquired = false;
+            $lock = $this->acquireLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            exit(1);
         }
 
-        if ($acquired) {
-            if (!$this->getOpt(self::OPT_LONG_ASSESSMENT_ID)) {
-                $this->getLogger()->info('An assessment id is required.');
-                exit();
-            }
-
-            $this->getLogger()->info(sprintf(
-                'Retrofitting student submission files for assessment %s',
-                $this->getOpt(self::OPT_LONG_ASSESSMENT_ID)
-            ));
-
-            (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance(), \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(), $this->getLogger()))
-                ->retrofit((int)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
-
-            $this->getLogger()->info('Done.');
-
-            /* Releasing control
-             */
-            $lock->release();
-        } else {
-            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
-            exit;
+        if (!$this->getOpt(self::OPT_LONG_ASSESSMENT_ID)) {
+            $this->getLogger()->info('An assessment id is required.');
+            exit(1);
         }
+
+        $this->getLogger()->info(sprintf(
+            'Retrofitting student submission files for assessment %s',
+            $this->getOpt(self::OPT_LONG_ASSESSMENT_ID)
+        ));
+
+        (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance(), \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(), $this->getLogger()))
+            ->retrofit((int)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
+
+        $this->getLogger()->info('Done.');
+
+        /* Releasing control
+         */
+        $lock->release();
     }
 
 

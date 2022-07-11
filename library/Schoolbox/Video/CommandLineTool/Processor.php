@@ -81,8 +81,9 @@ class Processor extends CliTool\App
             $timeout = self::DEFAULT_TIMEOUT;
         }
 
-        $lock    = $this->acquireLock(self::LOCK_NAME, $timeout);
-        if (!$lock->isAcquired()) {
+        try {
+            $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
+        } catch (\RuntimeException $e) {
             exit(1);
         }
         $this->setMaxExecutionTime($timeout);

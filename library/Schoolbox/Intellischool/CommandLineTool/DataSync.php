@@ -39,8 +39,9 @@ class DataSync extends \Schoolbox\Application\CliTool\App
             $timeout = self::DEFAULT_TIMEOUT;
         }
 
-        $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
-        if (!$lock->isAcquired()) {
+        try {
+            $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
+        } catch (\RuntimeException $e) {
             exit(1);
         }
 

@@ -100,8 +100,8 @@ Usage: php importer.php [--perform]
 
 ----
 
-Import Clipboard Students into schoolbox Teams. This depends on the hierarchy which 
-you will end up obtaining anyway, so you have to augment with students' data by using this 
+Import Clipboard Students into schoolbox Teams. This depends on the hierarchy which
+you will end up obtaining anyway, so you have to augment with students' data by using this
 additional flag. This would be your main day-to-day usage as it periodically synchronises
 most of the Clipbard hierarchy to schoolbox.
 
@@ -113,7 +113,7 @@ Import Clipboard Sessions into schoolbox Matchups. This also depends on the exis
  memberships. This creates schoolbox Fixtures, assigns students to their respective positions,
  adds coaches, etc. Anyone who can't be found will be skipped. This usage assigns team members
  to positions and matchups, so last-minute variations or alterations take place here.
- 
+
 Usage: php importer.php --sessions [--perform]
 
 
@@ -130,9 +130,10 @@ HELP;
 
         /* Check that this isn't currently running
          */
-        $lock = $this->acquireLock(self::CLIPBOARD_IMPORTER_LOCK_NAME, self::LOCK_TTL);
 
-        if (!$lock->isAcquired()) {
+        try {
+            $lock = $this->acquireLock(self::CLIPBOARD_IMPORTER_LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
             $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
             exit;
         }
