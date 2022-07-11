@@ -90,10 +90,12 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/intro.twig',
             'data' => [
-                'pageCurrent' => $this->router->generate('upsRuleset.intro'),
+                'pageCurrent'    => $this->router->generate('upsRuleset.intro'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.intro')),
-                'allNavigation' => $allNavigation->getAllNodes(),
-                'logs' => $this->findLogs(3)
+                'allNavigation'  => $allNavigation->getAllNodes(),
+                'logs'           => $this->findLogs(3),
+                'upsCronTime'    => $this->getConfigLoader()->get('ups_cron_run_time'),
+                'timezone'       => $this->getConfigLoader()->get('date_timezone'),
             ]
         ]);
     }
