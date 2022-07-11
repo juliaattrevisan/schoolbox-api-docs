@@ -150,7 +150,10 @@
             success: function(data) {
                 let status = "";
                 let light = "";
-                if (data.expiry < 0){
+                if ("error_code" in data) {
+                    status = "Error retrieving SSL cert";
+                    light = "warning";
+                } else if (data.expiry < 0){
                     status = "Expired";
                     light = "alert";
                 } else if (data.expiry < 30){
