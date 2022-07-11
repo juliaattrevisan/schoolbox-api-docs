@@ -19,7 +19,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 /**
  * @method Calendar_Api_Config_Record createModel()
  * @method Calendar_Api_Config_Record findOneByColumnList($columnList, array $options = [])
- * @method Calendar_Api_Config_Record[] findByColumnList($columnList, $options = [])
+ * @method Collection|Calendar_Api_Config_Record[] findByColumnList($columnList, $options = [])
  */
 class Calendar_Api_Config_Mapper extends BaseMapper
 {
@@ -53,11 +53,23 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      * Un-uniqueified because this was ramming all vCal sources into the same
      * connector, and they should be unique (for filtering by source).
      *
+     * Has the ability to list the failed entries.
+     * mostly used in admin or cli cron to find the sources that require to be re-enabled.
+     * @param bool $includeFailed
      * @return Collection|Calendar_Api_Config_Record[]
      */
-    public function getAllConfigRecords()
+    public function getAllConfigRecords(bool $includeFailed = false)
     {
-        return $this->findByColumn('status', 1);
+        $predicates = $this->getPredicateBuilder();
+        $predicates->equals('status', 1);
+        if ($includeFailed) {
+            //show the failed items... so the user can hopefully fix them
+            $predicates->greaterThanOrEqualTo('failed_count', Calendar_Api_Config_Record::MAXFAILED);
+        } else {
+            //hide anything that has failed too many times
+            $predicates->lessThan('failed_count', Calendar_Api_Config_Record::MAXFAILED);
+        }
+        return $this->findByPredicates($predicates);
     }
 
 

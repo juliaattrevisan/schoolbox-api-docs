@@ -129,7 +129,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
         $cache = new Vcal($this->getDi()->get('redis.cache'));
 
         /** @var iterable&Calendar_Api_Config_Record[] $configs */
-        $enabledConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
+        $enabledConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords(true);
         foreach ($enabledConfigs as $enabledConfig) {
             $decodedConfig = $enabledConfig->decodeConfig();
             if ($decodedConfig instanceof Calendar_Api_Config_Connector_Vcal && $decodedConfig->getUrl() && !$enabledConfig->isDead()) {
