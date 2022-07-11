@@ -19,7 +19,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class ReportTool extends CliTool\App
 {
-
     /**
      * Lock name
      */

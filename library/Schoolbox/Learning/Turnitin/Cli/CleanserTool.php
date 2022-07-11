@@ -23,7 +23,6 @@ use Schoolbox\Learning\Turnitin\Helper;
  */
 class CleanserTool extends CliTool\App
 {
-
     /**
      * Lock name
      */

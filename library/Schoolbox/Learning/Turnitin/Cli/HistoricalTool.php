@@ -17,7 +17,6 @@ use Schoolbox\Learning\Turnitin;
  */
 class HistoricalTool extends CliTool\App
 {
-
     /**
      * Lock name
      */

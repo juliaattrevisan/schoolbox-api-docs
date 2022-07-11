@@ -18,7 +18,6 @@ use Schoolbox\Application\CliTool;
  */
 class ExpiryTool extends CliTool\App
 {
-
     /**
      * Lock name for the Inspector
      */

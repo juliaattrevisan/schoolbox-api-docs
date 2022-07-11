@@ -20,7 +20,6 @@ use Schoolbox\Learning\Turnitin\Helper;
  */
 class GroupTool extends CliTool\App
 {
-
     /**
      * Lock name
      */

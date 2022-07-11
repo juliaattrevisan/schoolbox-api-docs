@@ -20,7 +20,6 @@ use Schoolbox\UserMapper;
  */
 class TransmitTool extends CliTool\App
 {
-
     /**
      * Lock name
      */

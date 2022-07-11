@@ -32,7 +32,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
