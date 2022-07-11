@@ -11,9 +11,9 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -29,7 +29,6 @@ use SimpleXMLElement;
  */
 class Definition implements IStrategy
 {
-
     /**
      * Temporarily here to denote the start and end of cycles
      * There appears to be no equivalent concept in isams
@@ -103,24 +102,23 @@ class Definition implements IStrategy
 
     /**
      * Import data from xml into local schema
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
      */
     public function import(): void
     {
-
         /* Find a way to identify this Cycle
          */
         $publishedTimetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
         /* Exit if you can't identify the cycle
          */
-        if ($publishedTimetables) {
-            $ext = trim((string)$publishedTimetables[0]->xpath('@Id')[0]->Id);
-        } else {
+        if (!$publishedTimetables) {
             $this->log->debug('Cannot identify cycle identifier for PublishedTimetables in this xml.');
             exit;
         }
-
-        $cycles = $this->batchxml->fetchXml('/iSAMS/TimetableManager/Structure/Week');
 
         /* MASSIVE CAVEAT
          * Assign the same timetable definition to every campus because there's no obvious
@@ -128,7 +126,27 @@ class Definition implements IStrategy
          * Also, we haven't seen any evidence that they have multiple timetables or multiple
          * timetable definitions; their xml, however, suggests that it possible in theory
          */
+        $cycles = $this->batchxml->fetchXml('/iSAMS/TimetableManager/Structure/Week');
+
         foreach ($cycles as $cycle) {
+            /* Multiple cycles might exist for a given publishedTimetable
+             * Each cycle should exist independently of other cycles
+             *
+             * This means we need to construct an $ext per cycle so that users
+             * can assign them to their corresponding luCampus
+             *
+             * If you don't, you end up getting foreign key issues in the schema
+             *
+             * For an $ext, you just need to find something that's identifiable to humans
+             * Try to find the first meaningful value out of ShortName, Name and Cycle Id
+             * (not sure if ShortName is required in isams itself)
+             */
+            $ext = (new FirstMeaningfulValue())->find([
+                trim((string)$cycle->ShortName),
+                trim((string)$cycle->Name),
+                trim((string)$cycle->xpath('@Id')[0]->Id)
+            ]);
+
             $dayData = $this->findDays($cycle);
             $cycleStart = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
             $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
@@ -154,18 +172,22 @@ class Definition implements IStrategy
              *
              * This is intended to prevent the accumulation of obsolete cycles
              */
-            /** @var TimetableCycle $timetableCycle */
             try {
                 $timetableCycle = $this->timetableCycleMapper->findOneByColumn('cycle_identifier', $ext);
-            } catch (Exception $e) {
-                $this->log->debug(sprintf(
-                    'Purging all previous cycles and creating a new cycle, %s.',
-                    $cycleName
+
+                $this->log->info(sprintf(
+                    'Reusing an existing cycle, %s (ext %s)',
+                    $cycleName,
+                    $ext
                 ));
-
-                $this->timetableCycleMapper->truncate();
-
+            } catch (Exception $e) {
                 $timetableCycle = $this->timetableCycleMapper->createModel();
+
+                $this->log->info(sprintf(
+                    'Creating a new cycle, %s (ext %s)',
+                    $cycleName,
+                    $ext
+                ));
             }
 
             $timetableCycle
