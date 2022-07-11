@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Custom\Acgs\NccdDownload;
 
 use Alaress\Database\Predicate\Builder;
+use Alaress_Date_Format;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Laminas\Uri\Uri;
@@ -212,6 +213,9 @@ class CommandLineTool extends App
             if (!$student) {
                 $logger->notice(sprintf('... #%d (%s) does not contain a student ID: skipping', $row['id'], $row['name']));
                 continue;
+            }
+            if ($student->isDeleted()) {
+                $logger->info(sprintf('... #%d (%s) has been deleted: proceeding anyway', $row['id'], $row['name']));
             } else {
                 $logger->info(sprintf('... #%d (%s)', $row['id'], $row['name']));
             }
@@ -273,7 +277,7 @@ class CommandLineTool extends App
             foreach (array_values($folderFilesTuple['files']) as $i => $file) {
                 /** @var IStorage $storage */
                 $storage    = $file['storage'];
-                $yearLevel  = $student->getYear()->getName();
+                $yearLevel  = $student->getYear()?->getName() ?? 'unknown';
                 $externalId = $student->getExternalId();
                 $filename   = $file['filename'] . '.' . $storage->getExtension();
                 $files[]    = [
@@ -293,7 +297,7 @@ class CommandLineTool extends App
             foreach (array_values($assessmentFilesTuple['files']) as $j => $file) {
                 /** @var IStorage $storage */
                 $storage    = $file['storage'];
-                $yearLevel  = $student->getYear()->getName();
+                $yearLevel  = $student->getYear()?->getName() ?? 'unknown';
                 $externalId = $student->getExternalId();
                 $filename   = $file['filename'] . '.' . $storage->getExtension();
                 $files[]    = [
@@ -475,9 +479,17 @@ class CommandLineTool extends App
     {
         if (preg_match(self::FOLDER_PATTERN, $folderName, $matches)) {
             try {
+                // This never raises a deleted exception?
                 return UserMapper::getInstance()->findByExternalId($matches['externalId']);
+            } catch (Exception\Deleted $e) {
+                if ($e->getDeletedObject() instanceof User) {
+                    return $e->getDeletedObject();
+                }
             } catch (Exception $e) {
-                return null;
+                // Matches pattern but user not found? Make something up
+                return UserMapper::getInstance()->getUnknownUser()
+                    ->setExternalId($matches['externalId'])
+                    ->setDeletedAt(Alaress_Date_Format::now());
             }
         }
         return null;
