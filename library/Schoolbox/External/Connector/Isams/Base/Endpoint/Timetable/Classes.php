@@ -19,6 +19,7 @@ use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
@@ -161,77 +162,102 @@ class Classes implements IStrategy
             return;
         }
 
-        foreach ($timetables as $timetable) {
-            $ext = trim((string)$timetable->xpath('@Id')[0]->Id);
+        /* Multiple cycles might exist
+         * Apply $timetable structure to each as best we know
+         */
+        $cycles = $this->batchxml->fetchXml('/iSAMS/TimetableManager/Structure/Week');
 
-            $currentTimetable = $this->batchxml->fetchXml("/iSAMS/TimetableManager/PublishedTimetables/Timetable[@Id='{$ext}']")[0];
-
-            /* Find all the classes and their details as best we can
+        foreach ($cycles as $cycle) {
+            /* Multiple cycles might exist for a given publishedTimetable
+             * Each cycle should exist independently of other cycles
              *
-             * Some parts will rely on data to have already been imported into local schema,
-             * such as period ids, user ids, etc. so we try to get those and assemble them into
-             * a convenient struct which we can then just ram home
+             * This means we need to construct an $ext per cycle so that users
+             * can assign them to their corresponding luCampus
+             *
+             * If you don't, you end up getting foreign key issues in the schema
+             *
+             * For an $ext, you just need to find something that's identifiable to humans
+             * Try to find the first meaningful value out of ShortName, Name and Cycle Id
+             * (not sure if ShortName is required in isams itself)
              */
-            try {
-                $classes = new ScheduleIterator($this->batchxml, $currentTimetable);
-            } catch (\RuntimeException $e) {
-                /* This occurs when a PublishedTimetable exists, but there aren't any Schedules
-                 * inside it, perhaps because there are no Sets. Nothing to process.
-                 */
-                $this->log->warning(sprintf(
-                    'No Schedules/Schedule nodes found for timetable %s; skipping',
-                    $ext
-                ));
+            $ext = (new FirstMeaningfulValue())->find([
+                trim((string)$cycle->ShortName),
+                trim((string)$cycle->Name),
+                trim((string)$cycle->xpath('@Id')[0]->Id)
+            ]);
 
-                continue;
-            }
-
-            foreach ($classes as $class) {
-                /* Look up the period instance by (name, day)
+            /* Typically there's one published timetable at a time
+             * so despite what this looks like, it should only happen once
+             * (one publishedTimetable data is applied to all cycles)
+             */
+            foreach ($timetables as $timetable) {
+                /* Find all the classes and their details as best we can
                  *
-                 * If the period doesn't correspond to something in our timetable definition,
-                 * we can't process it anyway, so skip it
+                 * Some parts will rely on data to have already been imported into local schema,
+                 * such as period ids, user ids, etc. so we try to get those and assemble them into
+                 * a convenient struct which we can then just ram home
                  */
-                $timetablePeriod = $this->findPeriod($ext, $periods, (string)$class['period']['day'], $class['period']['name']);
-
-                $this->log->debug(sprintf(
-                    'Looking for cycle_identifier %s, day %s, period %s',
-                    $ext,
-                    $class['period']['day'],
-                    $class['period']['name']
-                ));
-
-                if (null === $timetablePeriod) {
+                try {
+                    $classes = new ScheduleIterator($this->batchxml, $timetable);
+                } catch (\RuntimeException $e) {
+                    /* This occurs when a PublishedTimetable exists, but there aren't any Schedules
+                     * inside it, perhaps because there are no Sets. Nothing to process.
+                     */
                     $this->log->warning(sprintf(
-                        'The period named %s on day %s does not exist in timetable structure for cycle_identifier %s',
-                        $class['period']['name'],
-                        $class['period']['day'],
+                        'No Schedules/Schedule nodes found for timetable %s; skipping',
                         $ext
                     ));
 
                     continue;
                 }
 
-                /* Assemble the pieces
-                 */
-                $timetableClass = $this->createTimetableClass($class);
-                $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
-
-                /* Process students
-                 */
-                foreach ($class['students'] as $student) {
-                    /* Throw warning, but assign them anyway
+                foreach ($classes as $class) {
+                    /* Look up the period instance by (name, day)
+                     *
+                     * If the period doesn't correspond to something in our timetable definition,
+                     * we can't process it anyway, so skip it
                      */
-                    if (!isset($users[$student['username']])) {
+                    $timetablePeriod = $this->findPeriod($ext, $periods, (string)$class['period']['day'], $class['period']['name']);
+
+                    $this->log->debug(sprintf(
+                        'Looking for cycle_identifier %s, day %s, period %s',
+                        $ext,
+                        $class['period']['day'],
+                        $class['period']['name']
+                    ));
+
+                    if (null === $timetablePeriod) {
                         $this->log->warning(sprintf(
-                            'Tried to assign nonexistent schoolbox account %s to class %s %s; username might not exist in schoolbox user table',
-                            $student['username'],
-                            $timetableClass->getName(),
-                            $timetableClass->getCode()
+                            'The period named %s on day %s does not exist in timetable structure for cycle_identifier %s',
+                            $class['period']['name'],
+                            $class['period']['day'],
+                            $ext
                         ));
+
+                        continue;
                     }
 
-                    $this->createTimetableClassInvolvement($student, $timetableClass);
+                    /* Assemble the pieces
+                     */
+                    $timetableClass = $this->createTimetableClass($class);
+                    $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
+
+                    /* Process students
+                     */
+                    foreach ($class['students'] as $student) {
+                        /* Throw warning, but assign them anyway
+                         */
+                        if (!isset($users[$student['username']])) {
+                            $this->log->warning(sprintf(
+                                'Tried to assign nonexistent schoolbox account %s to class %s %s; username might not exist in schoolbox user table',
+                                $student['username'],
+                                $timetableClass->getName(),
+                                $timetableClass->getCode()
+                            ));
+                        }
+
+                        $this->createTimetableClassInvolvement($student, $timetableClass);
+                    }
                 }
             }
         }
