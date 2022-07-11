@@ -54,39 +54,29 @@ export default {
             dkimValueSplit1: '',
             tableColumns: ['domain', 'dateModified.formatted', 'edit'],
             tableOptions: {
-                debounce: 100, //faster debounce as data is stored on the client side,
-                headings: {
-                    domain: 'Domain',
-                    ['dateModified.formatted']: 'Date modified',
-                    edit: ''
-                },
-                resizableColumns: false,
                 columnsClasses: {
                     ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
                     edit: 'edit-td ', //to specify a width
                 },
-                selectable: {
-                    mode: '',
-                },
+                debounce: 100, //faster debounce as data is stored on the client side,
                 filterable: false,
                 filterByColumn: false,
-                sortable: [], //the edit column doesn't need to be sortable
-                sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
+                headings: {
+                    domain: 'Domain',
+                    ['dateModified.formatted']: 'Date modified',
+                    edit: '' //to not show any heading
                 },
-                texts: {
-                    count: ''
-                },
+                perPage: 9999, //absurdly large value to avoid pagination as there's no footer
+                resizableColumns: false,
+                sortable: [], //currently no columns are sortable?
                 tabbable: false,
+                texts: {
+                    count: '' //don't show any 'x record' at the bottom of the table
+                },
             },
-            selectContainer: null,
-            isShiftKeySelected: false, //to multi-select fields,
-            hasSelectedShiftKey: false, //to hide a UI note
         }
     },
+
     mounted () {
         new ClipboardJs(
             this.$refs.copyValueButton,
@@ -116,6 +106,7 @@ export default {
     },
 
     methods: {
+
         /**
          * Load domains
          */
@@ -178,11 +169,11 @@ export default {
                     method: 'POST',
                     body: this.getFormData(),
                 });
-                const responseDat = await response.json();
+                const responseData = await response.json();
                 if (response.ok) {
                     this.$refs.toast.timeout('Success', true, 2000);
                 } else {
-                    this.$refs.toast.timeout('Failed - ' + responseDat.error, false, 2000);
+                    this.$refs.toast.timeout('Failed - ' + responseData.error, false, 2000);
                 }
                 this.$refs.domainModal.close();
                 await this.loadRows();
@@ -218,10 +209,9 @@ export default {
         async onDeleteDomain () {
             this.$refs.toast.activate('Deleting...');
             try {
-                const response = await fetch(this.selectedDomain.deleteUrl, {
+                await fetch(this.selectedDomain.deleteUrl, {
                     method: 'DELETE'
                 });
-                const responseData = await response.json();
                 this.$refs.toast.timeout('Deleted', true, 2000);
                 this.$refs.deleteModal.close();
                 await this.loadRows();
@@ -277,11 +267,9 @@ export default {
 </script>
 
 <template>
-    <div class="row actions-small-1">
+    <div class="actions-small-1">
         <div class="list-item">
-            <div class="small-12 island">
-                <h2 class="subheader">Domains</h2>
-            </div>
+            <h2 class="subheader">Domains</h2>
         </div>
         <nav>
             <a @click.prevent="onClickAddDomain" class="icon-add" title="Add a domain"></a>
@@ -295,25 +283,21 @@ export default {
                 </div>
             </section>
         </div>
-        <template v-if="rows.length === 0">
-            <div id="listEmptyState" class="empty-state">
-                <i class="icon-email"></i>
-                <p>DKIM, is an email standard that helps validate emails have come from a trusted source.</p>
-                <p>By using public/private keys a 3rd party can authorise emails signed by your Schoolbox server as
-                    valid and trusted to avoid spam filters and impersonation. For each domain that you control and your
-                    users send email from you must setup a DKIM key and add then add the appropriate records to your DNS
-                    zone.</p>
-            </div>
-        </template>
+        <div v-else-if="hasDataLoaded && rows.length === 0" id="listEmptyState" class="empty-state">
+            <i class="icon-email"></i>
+            <p>DKIM, is an email standard that helps validate emails have come from a trusted source.</p>
+            <p>By using public/private keys a 3rd party can authorise emails signed by your Schoolbox server as
+                valid and trusted to avoid spam filters and impersonation. For each domain that you control and your
+                users send email from you must setup a DKIM key and add then add the appropriate records to your DNS
+                zone.</p>
+        </div>
         <v-client-table
-            v-else-if="hasDataLoaded"
+            v-else-if="hasDataLoaded && rows.length > 0"
             ref="table"
             :data="rows"
             :columns="tableColumns"
             :options="tableOptions"
         >
-            <template #beforeTable>
-            </template>
             <template #domain="props">
                 <a @click.prevent="onClickGetKey(props.row)" title="View DKIM TXT Record">{{ props.row.domain }}</a>
             </template>
@@ -327,18 +311,10 @@ export default {
         </v-client-table>
         <div v-else>
             <table class="skeleton">
-                <thead>
-                <tr>
-                    <th></th>
-                </tr>
-                </thead>
                 <tbody>
-                <tr>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                </tr>
+                    <tr><td></td></tr>
+                    <tr><td></td></tr>
+                    <tr><td></td></tr>
                 </tbody>
             </table>
         </div>
