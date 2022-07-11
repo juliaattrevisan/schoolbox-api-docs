@@ -1,9 +1,9 @@
-/** 
+/**
  * The enrolment options of a group
  */
 
 export default Object.freeze({
-    ENROLLED: 'enrolled',
+    ENROLED: 'enroled',
     PENDING: 'pending',
-    NOT_ENROLLED: 'notEnrolled',
+    NOT_ENROLED: 'notEnroled',
 })
