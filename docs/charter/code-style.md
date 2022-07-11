@@ -42,7 +42,7 @@ class Foo extends Bar implements FooInterface
 
 ## Naming Conventions
 
-We the following naming structure for our standard objects. Of course due to PSR-1 the namespace and folder structures and filenames should match the namespace and class names.
+We use the following naming structure for our standard objects. Of course due to PSR-1 the namespace and folder structures and filenames should match the namespace and class names.
 
 ```
 /Module/Controller
