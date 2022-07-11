@@ -23,7 +23,7 @@ INSERT INTO `config` (
                     SELECT * FROM (
                         SELECT CASE
                             WHEN value = 'canbggs' THEN '04:00'
-                            ELSE '23:00'
+                            ELSE '22:00'
                         END
                         FROM `config` WHERE name = 'site_school_code') t2
                     )
@@ -50,11 +50,11 @@ INSERT INTO `config` (
                             WHEN value = 'lhags'   THEN '05:00'
                             WHEN value = 'smags'   THEN '04:00'
                             WHEN value = 'luc'     THEN '01:00'
-                            ELSE '23:00'
+                            ELSE '22:00'
                         END
                         FROM `config` WHERE name = 'site_school_code') t3
                     )
-                ELSE '23:00'
+                ELSE '22:00'
             END
         FROM `config` WHERE name = 'site_type') t1
     ),
