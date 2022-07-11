@@ -129,47 +129,42 @@ HELP;
         try {
             $lock = $this->acquireLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
-            $lock = null;
+            exit(1);
         }
 
-        if ($lock) {
-            /* We need this api
-             */
-            $api = new Turnitin\Api(
-                $this->getConfig()->get('site_version'),
-                $this->getConfig()->get('turnitin_api_host'),
-                $this->getConfig()->get('turnitin_api_key')
-            );
+        /* We need this api
+         */
+        $api = new Turnitin\Api(
+            $this->getConfig()->get('site_version'),
+            $this->getConfig()->get('turnitin_api_host'),
+            $this->getConfig()->get('turnitin_api_key')
+        );
 
-            /* Set up a record processor
-             */
-            $processor = (new Turnitin\File\Process\Report(
-                $api,
-                Turnitin\File\Mapper::getInstance(),
-                $this->getLogger()
-            ));
+        /* Set up a record processor
+         */
+        $processor = (new Turnitin\File\Process\Report(
+            $api,
+            Turnitin\File\Mapper::getInstance(),
+            $this->getLogger()
+        ));
 
-            /* Start kicking things along
-             *
-             * Loaded reports get shoved toward Prepared
-             * Prepared reports get shoved toward Complete
-             *
-             * Both those stages finish whenever turnitin is done
-             * so we have to ask it to finish both stages independently
-             * of each other
-             */
-            $this->processLoadedReports($processor, $lock);
-            $this->processPreparedReports($processor, $lock);
+        /* Start kicking things along
+         *
+         * Loaded reports get shoved toward Prepared
+         * Prepared reports get shoved toward Complete
+         *
+         * Both those stages finish whenever turnitin is done
+         * so we have to ask it to finish both stages independently
+         * of each other
+         */
+        $this->processLoadedReports($processor, $lock);
+        $this->processPreparedReports($processor, $lock);
 
-            $this->getLogger()->info('Done.');
+        $this->getLogger()->info('Done.');
 
-            /* Releasing control
-             */
-            $lock->release();
-        } else {
-            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
-            exit;
-        }
+        /* Releasing control
+         */
+        $lock->release();
     }
 
 

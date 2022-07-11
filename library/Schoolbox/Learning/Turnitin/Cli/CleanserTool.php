@@ -122,110 +122,105 @@ HELP;
         try {
             $lock = $this->acquireLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
-            $lock = null;
+            exit(1);
         }
 
-        if ($lock) {
-            /* Needed both the Start and End options
+        /* Needed both the Start and End options
+         */
+        if (!$this->getOpt(self::OPT_LONG_START) || !$this->getOpt(self::OPT_LONG_END)) {
+            $this->getLogger()->info('You need to supply both the start and end submission box ids');
+            return;
+        }
+
+        /* We need this api
+         */
+        $api = new Turnitin\Api(
+            $this->getConfig()->get('site_version'),
+            $this->getConfig()->get('turnitin_api_host'),
+            $this->getConfig()->get('turnitin_api_key')
+        );
+
+        /* Find all the submission boxes between --start and --end primary keys
+         * These are ones we probably added during testing in our vagrants
+         */
+        $boxIds = range((int)$this->getOpt(self::OPT_LONG_START), (int)$this->getOpt(self::OPT_LONG_END));
+
+        $codec = new Turnitin\Group\IdCodec();
+        $groupIds = [];
+
+        foreach ($boxIds as $boxId) {
+            $groupIds[] = $codec->encode($boxId, self::SITE_TYPE);
+        }
+
+        /* Now find out what Turnitin knows
+         */
+        foreach ($groupIds as $groupId) {
+            $this->getLogger()->debug(sprintf(
+                'Refreshing lock for another %s seconds',
+                self::LOCK_TTL
+            ));
+
+            $lock->refresh();
+
+            /* Get the group
+             * If it doesn't exist, don't worry about it and continue
              */
-            if (!$this->getOpt(self::OPT_LONG_START) || !$this->getOpt(self::OPT_LONG_END)) {
-                $this->getLogger()->info('You need to supply both the start and end submission box ids');
-                return;
-            }
-
-            /* We need this api
-             */
-            $api = new Turnitin\Api(
-                $this->getConfig()->get('site_version'),
-                $this->getConfig()->get('turnitin_api_host'),
-                $this->getConfig()->get('turnitin_api_key')
-            );
-
-            /* Find all the submission boxes between --start and --end primary keys
-             * These are ones we probably added during testing in our vagrants
-             */
-            $boxIds = range((int)$this->getOpt(self::OPT_LONG_START), (int)$this->getOpt(self::OPT_LONG_END));
-
-            $codec = new Turnitin\Group\IdCodec();
-            $groupIds = [];
-
-            foreach ($boxIds as $boxId) {
-                $groupIds[] = $codec->encode($boxId, self::SITE_TYPE);
-            }
-
-            /* Now find out what Turnitin knows
-             */
-            foreach ($groupIds as $groupId) {
+            try {
+                $group = $api->retrieve('GET', "/api/v1/groups/{$groupId}", []);
+            } catch (Turnitin\Exception\BadEndpoint $e) {
+                /* Group doesn't exist; noop
+                 */
                 $this->getLogger()->debug(sprintf(
-                    'Refreshing lock for another %s seconds',
-                    self::LOCK_TTL
+                    'Turnitin Group %s: not found - skipping',
+                    $groupId
                 ));
 
-                $lock->refresh();
+                continue;
+            }
 
-                /* Get the group
-                 * If it doesn't exist, don't worry about it and continue
+            if ($group) {
+                /* If you got the group, go find some Turnitin Group Attachments
                  */
-                try {
-                    $group = $api->retrieve('GET', "/api/v1/groups/{$groupId}", []);
-                } catch (Turnitin\Exception\BadEndpoint $e) {
-                    /* Group doesn't exist; noop
-                     */
+                $attachments = $api->retrieve('GET', "/api/v1/groups/{$groupId}/attachments", []);
+
+                /* If there are any, purge them manually
+                 */
+                foreach ($attachments['attachments'] as $attachment) {
                     $this->getLogger()->debug(sprintf(
-                        'Turnitin Group %s: not found - skipping',
-                        $groupId
+                        'Turnitin Group %s: found Group Attachment %s',
+                        $groupId,
+                        $attachment['id']
                     ));
 
-                    continue;
-                }
+                    $this->getLogger()->debug(sprintf(
+                        'Refreshing lock for another %s seconds',
+                        self::LOCK_TTL
+                    ));
 
-                if ($group) {
-                    /* If you got the group, go find some Turnitin Group Attachments
-                     */
-                    $attachments = $api->retrieve('GET', "/api/v1/groups/{$groupId}/attachments", []);
+                    $lock->refresh();
 
-                    /* If there are any, purge them manually
-                     */
-                    foreach ($attachments['attachments'] as $attachment) {
-                        $this->getLogger()->debug(sprintf(
-                            'Turnitin Group %s: found Group Attachment %s',
-                            $groupId,
-                            $attachment['id']
-                        ));
-
-                        $this->getLogger()->debug(sprintf(
-                            'Refreshing lock for another %s seconds',
-                            self::LOCK_TTL
-                        ));
-
-                        $lock->refresh();
-
-                        try {
-                            $api->retrieve('DELETE', "/api/v1/groups/{$groupId}/attachments/{$attachment['id']}", []);
-                        } catch (\DomainException $e) {
-                            /* No Content means you succeeded, I guess
-                             */
-                            if (204 === $e->getCode()) {
-                                $this->getLogger()->debug(sprintf(
-                                    'Turnitin Group %s: deleted Group Attachment %s successfully.',
-                                    $groupId,
-                                    $attachment['id']
-                                ));
-                            }
+                    try {
+                        $api->retrieve('DELETE', "/api/v1/groups/{$groupId}/attachments/{$attachment['id']}", []);
+                    } catch (\DomainException $e) {
+                        /* No Content means you succeeded, I guess
+                         */
+                        if (204 === $e->getCode()) {
+                            $this->getLogger()->debug(sprintf(
+                                'Turnitin Group %s: deleted Group Attachment %s successfully.',
+                                $groupId,
+                                $attachment['id']
+                            ));
                         }
                     }
                 }
             }
-
-            $this->getLogger()->info('Done.');
-
-            /* Releasing control
-             */
-            $lock->release();
-        } else {
-            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
-            exit;
         }
+
+        $this->getLogger()->info('Done.');
+
+        /* Releasing control
+         */
+        $lock->release();
     }
 
 

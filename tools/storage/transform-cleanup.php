@@ -98,7 +98,6 @@ $app = new class extends CliTool\App {
         try {
             $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
         } catch (\RuntimeException $e) {
-            $this->getLogger()->notice("[Terminated] Unable to run this tool as another process is currently running.");
             exit;
         }
         $this->storageDir = rtrim($this->getConfig()->get('storage_dir'), DIRECTORY_SEPARATOR);

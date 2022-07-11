@@ -113,51 +113,46 @@ HELP;
         try {
             $lock = $this->acquireLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
-            $lock = null;
+            exit(1);
         }
 
-        if ($lock) {
-            /* Interpret the date range from cli options
-             */
-            if ($this->getOpt(self::OPT_LONG_START)) {
-                $start = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_START)))->startOfDay();
-            } else {
-                $start = \Alaress_Date_Format::now()->addYears(-1)->startOfDay();
-            }
-
-            if ($this->getOpt(self::OPT_LONG_END)) {
-                $end = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_END)))->endOfDay();
-            } else {
-                $end = \Alaress_Date_Format::now()->endOfDay();
-            }
-
-            $this->getLogger()->debug(sprintf(
-                'Historically adding stuff between %s and %s',
-                $start->getDatabase(),
-                $end->getDatabase()
-            ));
-
-            (new Turnitin\Historical(
-                Turnitin\File\Mapper::getInstance(),
-                \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
-                \Schoolbox\Resource\Storage\Mapper::getInstance(),
-                $this->perform(),
-                $this->getLogger()
-            ))->historical($start, $end, $lock);
-
-            if (!$this->perform()) {
-                $this->getLogger()->info('Planning finished.');
-            } else {
-                $this->getLogger()->info('Done.');
-            }
-
-            /* Releasing control
-             */
-            $lock->release();
+        /* Interpret the date range from cli options
+         */
+        if ($this->getOpt(self::OPT_LONG_START)) {
+            $start = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_START)))->startOfDay();
         } else {
-            $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
-            exit;
+            $start = \Alaress_Date_Format::now()->addYears(-1)->startOfDay();
         }
+
+        if ($this->getOpt(self::OPT_LONG_END)) {
+            $end = \Alaress_Date_Format::newFromTimestamp(strtotime($this->getOpt(self::OPT_LONG_END)))->endOfDay();
+        } else {
+            $end = \Alaress_Date_Format::now()->endOfDay();
+        }
+
+        $this->getLogger()->debug(sprintf(
+            'Historically adding stuff between %s and %s',
+            $start->getDatabase(),
+            $end->getDatabase()
+        ));
+
+        (new Turnitin\Historical(
+            Turnitin\File\Mapper::getInstance(),
+            \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
+            \Schoolbox\Resource\Storage\Mapper::getInstance(),
+            $this->perform(),
+            $this->getLogger()
+        ))->historical($start, $end, $lock);
+
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        } else {
+            $this->getLogger()->info('Done.');
+        }
+
+        /* Releasing control
+         */
+        $lock->release();
     }
 
 
