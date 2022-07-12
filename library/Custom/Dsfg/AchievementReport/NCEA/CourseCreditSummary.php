@@ -78,7 +78,7 @@ class CourseCreditSummary extends Base
             $internalExternal = $current['InternalorExternalAssessment'];
             $endorsement = $current['Endorsement'];
 
-            if (!is_array($finalStack['courses'][$courseName])) {
+            if (!isset($finalStack['courses'][$courseName])) {
                 $finalStack['courses'][$courseName] = [
                     'enteredCredits' => 0,
                     'letters' => array_fill_keys($this->getLetterRegistry(), 0),
