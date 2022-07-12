@@ -6,6 +6,7 @@
 
 import { ref, computed } from 'vue';
 import { useStore } from './store/manageGroupStore';
+import { useMembersStore } from './store/manageGroupMembersStore';
 import { useAddMembersStore } from './store/manageGroupAddMembersStore';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table';
 
@@ -20,21 +21,22 @@ const props = defineProps({
 });
 
 const store = useStore();
-const addStore = useAddMembersStore();
+const membersStore = useMembersStore();
+const addMembersStore = useAddMembersStore();
 const isProcessing = ref(false);
 
 /**
  * add the selected members to the group
  */
 function onAddMembersSelected () {
-    addStore.addMembers();
+    addMembersStore.addMembers();
 }
 
 /**
  * so we can track the progress of the member access change
  * and update the UI accordingly
  */
-addStore.$onAction(({ name, after, onError }) => {
+addMembersStore.$onAction(({ name, after, onError }) => {
     if (name === 'addMembers') { //as each row is subscribed to onAction, we have to check for the selected row
         isProcessing.value = true;
         props.toastEl.activate('Adding...');
@@ -64,7 +66,7 @@ const addButtonText = computed(() => isProcessing.value ? 'Adding...' : 'Add Mem
     <div class="row">
         <div class="small-12 island">
         <h2 class="subheader">Add Members</h2>
-            <section v-if="store.hasGroupMembers">
+            <section v-if="membersStore.hasGroupMembers">
                 <div class="content" id="addMembers">
                     <dl class="tabs" data-tab>
                         <dd class="active"><a href="#userName">From Name</a></dd>

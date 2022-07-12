@@ -6,15 +6,15 @@
 
 import { computed } from 'vue';
 import filterTypes from './manageGroupAccessTypes';
-import { useStore } from './store/manageGroupStore';
+import { useMembersStore } from './store/manageGroupMembersStore';
 
 
-const store = useStore(); //to access the selectedFilters and notify of any changes
+const membersStore = useMembersStore(); //to access the selectedFilters and notify of any changes
 
-const isShowWaitingListChecked = computed(() => store.selectedFilters.includes(filterTypes.WAITING));
-const isShowReadAccessChecked = computed(() => store.selectedFilters.includes(filterTypes.READ));
-const isShowWriteAccessChecked = computed(() => store.selectedFilters.includes(filterTypes.WRITE));
-const isShowAdminAccessChecked = computed(() => store.selectedFilters.includes(filterTypes.ADMIN));
+const isShowWaitingListChecked = computed(() => membersStore.selectedFilters.includes(filterTypes.WAITING));
+const isShowReadAccessChecked = computed(() => membersStore.selectedFilters.includes(filterTypes.READ));
+const isShowWriteAccessChecked = computed(() => membersStore.selectedFilters.includes(filterTypes.WRITE));
+const isShowAdminAccessChecked = computed(() => membersStore.selectedFilters.includes(filterTypes.ADMIN));
 
 /**
  * Dispatch to filter the member display 
@@ -22,7 +22,7 @@ const isShowAdminAccessChecked = computed(() => store.selectedFilters.includes(f
  * @param { String }
  */
 function onFilterChange (accessType) {
-    store.updateFilterSelection(accessType);
+    membersStore.updateFilterSelection(accessType);
 }
 
 </script>

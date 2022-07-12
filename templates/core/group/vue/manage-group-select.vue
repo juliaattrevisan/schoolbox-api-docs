@@ -7,6 +7,7 @@
 
 import { ref, computed, watch, onMounted  } from 'vue';
 import { useStore } from './store/manageGroupStore';
+import { useMembersStore } from './store/manageGroupMembersStore';
 import { useRemoveMembersStore } from './store/manageGroupRemoveMembersStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
 import ManageGroupSelectAccess from './manage-group-select-access.vue';
@@ -21,8 +22,9 @@ const props = defineProps({
     },
 });
 
-const store = useStore(); //to keep track of selectedMembers
-const removeStore = useRemoveMembersStore(); //to remove selectedMembers
+const store = useStore(); //to disable butons on processing
+const membersStore = useMembersStore(); //to keep track of selectedMembers
+const removeMembersStore = useRemoveMembersStore(); //to remove selectedMembers
 const isShiftKeySelected = ref(false);
 const shiftSelectNoteEl = ref(null);
 
@@ -49,8 +51,8 @@ function initShiftKeyDetection () {
 /**
  * remove the note once a selection with shift key down has been detected
  */
-watch(() => store.selectedMembers, () => {
-    if (store.selectedMembers.length > 1 && isShiftKeySelected.value) { //to hide a UI note, notifying of availability of shift-select
+watch(() => membersStore.selectedMembers, () => {
+    if (membersStore.selectedMembers.length > 1 && isShiftKeySelected.value) { //to hide a UI note, notifying of availability of shift-select
         shiftSelectNoteEl.value.remove();
     } 
 });
@@ -60,7 +62,7 @@ watch(() => store.selectedMembers, () => {
  *
  * @returns { Number }
  */
-const selectedMembersCount = computed(() => store.selectedMembers.length);
+const selectedMembersCount = computed(() => membersStore.selectedMembers.length);
 
 /**
  * For proper count display, eg: 'Member' / 'Members'
@@ -86,7 +88,7 @@ const selectedMembersCountWithRowName = computed(() => {
  * Dispatch to manage-group.vue so the selection can be cleared
  */
 function onClearMemberSelection () {
-    store.clearSelectedMembers();
+    membersStore.clearSelectedMembers();
 }
 
 /**
@@ -100,7 +102,7 @@ function onEmailMembersSelected () {
  * So the selected members can be removed
  */
 function onRemoveMembersSelected () {
-    removeStore.promptRemoveSelectedMembers();
+    removeMembersStore.promptRemoveSelectedMembers();
 }
 
 </script>

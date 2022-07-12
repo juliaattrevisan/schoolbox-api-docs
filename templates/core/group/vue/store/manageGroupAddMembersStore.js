@@ -3,7 +3,8 @@
  */
 
 import { defineStore } from 'pinia';
-import { useStore } from './manageGroupStore'
+import { useStore } from './manageGroupStore';
+import { useMembersStore } from './manageGroupMembersStore';
 import Endpoints from '../manageGroupEndpoints';
 
 
@@ -35,7 +36,8 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
                             justUpdated: false, //to highlight members that have just been changed
                         } 
                     });
-                    store.groupMembers = [...store.groupMembers, ...newMembers]; //add in the new members to the table
+                    const membersStore = useMembersStore();
+                    membersStore.groupMembers = [...membersStore.groupMembers, ...newMembers]; //add in the new members to the table
                 } else {
                     throw new Error();
                 }
@@ -51,7 +53,7 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
 })
 
 /**
- * Set up a deleted users array to POST
+ * Pass in user ids of the members to add
  *
  * @param { Array }
  * 

@@ -4,6 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
+import { useMembersStore } from './manageGroupMembersStore';
 import Endpoints from '../manageGroupEndpoints';
 
 
@@ -20,7 +21,8 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
         async updateMemberAccess (member, accessType) {
             const store = useStore();
             store.isProcessing = true;
-            store.refreshMembers();
+            const membersStore = useMembersStore();
+            membersStore.refreshMembers();
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
                     method: 'PATCH',
@@ -31,7 +33,7 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    const updatedMember = store.groupMembers.find((groupMember) => groupMember.id === member.id);
+                    const updatedMember = membersStore.groupMembers.find((groupMember) => groupMember.id === member.id);
                     updateMember(updatedMember, accessType);
                 } else {
                     throw new Error();
@@ -51,20 +53,21 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
         async updateSelectedMembersAccess (accessType) {
             const store = useStore();
             store.isProcessing = true;
-            store.refreshMembers();
+            const membersStore = useMembersStore();
+            membersStore.refreshMembers();
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: getFormData(store.selectedMembers, accessType)
+                    body: getFormData(membersStore.selectedMembers, accessType)
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) { //update the state only after the DB change is a success
-                    store.selectedMembers.forEach((member) => {
+                    membersStore.selectedMembers.forEach((member) => {
                         member.accessType = accessType; //the selectedMembers data is unique to the groupMembers data 
-                        const updatedMember = store.groupMembers.find((groupMember) => groupMember.id === member.id);
+                        const updatedMember = membersStore.groupMembers.find((groupMember) => groupMember.id === member.id);
                         updateMember(updatedMember, accessType);
                     });
                 } else {

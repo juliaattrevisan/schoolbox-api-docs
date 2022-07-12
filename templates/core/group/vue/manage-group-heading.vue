@@ -5,7 +5,7 @@
  */
 
 import { ref  } from 'vue';
-import { useUpdateSettingsStore } from './store/manageGroupUpdateSettingsStore';
+import { useSettingsStore } from './store/manageGroupSettingsStore';
 
 
 const props = defineProps({
@@ -17,13 +17,13 @@ const props = defineProps({
     },
 });
 
-const updateSettingsStore = useUpdateSettingsStore();
+const settingsStore = useSettingsStore();
 
 /**
  * to open the update settings modal 
  */
 function onUpdateSettingsSelected () {
-    updateSettingsStore.promptUpdateSettings();
+    settingsStore.promptUpdateSettings();
 }
 
 /**

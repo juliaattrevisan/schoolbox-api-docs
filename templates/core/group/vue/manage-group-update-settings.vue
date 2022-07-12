@@ -6,7 +6,7 @@
 
 import { ref, computed, watch } from 'vue';
 import { useStore } from './store/manageGroupStore';
-import { useUpdateSettingsStore } from './store/manageGroupUpdateSettingsStore';
+import { useSettingsStore } from './store/manageGroupSettingsStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
@@ -20,7 +20,7 @@ const props = defineProps({
 });
 
 const store = useStore();
-const updateSettingsStore = useUpdateSettingsStore();
+const updateSettingsStore = useSettingsStore();
 const updateModalEl = ref(null);
 const isProcessing = ref(false);
 

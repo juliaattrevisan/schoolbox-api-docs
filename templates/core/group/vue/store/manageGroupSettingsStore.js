@@ -7,13 +7,27 @@ import { useStore } from './manageGroupStore'
 import Endpoints from '../manageGroupEndpoints';
 
 
-export const useUpdateSettingsStore = defineStore('manageGroupUpdateSettings', {
+export const useSettingsStore = defineStore('manageGroupSettings', {
     
     state: () => ({
+        access: '', //can be private, moderated or free
+        isNotificationsEnabled: false, //to send notifications to the group
+        isForceFollow: false, //so notifcations are ALWAYS sent to all members
         isPromptOpen: false, //to notify that the prompt is opened / closed
     }),
 
     actions: {
+
+        /**
+         * Add in the group settings for reference / updating
+         * 
+         * @param { Object }
+         */
+        loadSettings (settings) {
+            this.access = settings.access; 
+            this.isNotificationsEnabled = settings.isNotificationsEnabled; 
+            this.isForceFollow = settings.isForceFollow; 
+        },
 
         /**
          * to display a prompt to confirm member removal

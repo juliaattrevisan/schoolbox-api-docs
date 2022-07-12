@@ -18,14 +18,14 @@ const props = defineProps({
     },
 });
 
-const store = useRemoveMembersStore();
+const removeMembersStore = useRemoveMembersStore();
 const removeModalEl = ref(null);
 const isProcessing = ref(false);
 
 /**
  * to open the modal when requested
  */
-watch(() => store.isPromptOpen, (newIsOpen) => {
+watch(() => removeMembersStore.isPromptOpen, (newIsOpen) => {
     newIsOpen ? removeModalEl.value.open() : removeModalEl.value.close();
 });
 
@@ -33,14 +33,14 @@ watch(() => store.isPromptOpen, (newIsOpen) => {
  * remove the selected members
  */
 function onRemoveSelected () {
-    store.removeSelectedMembers();
+    removeMembersStore.removeSelectedMembers();
 }
 
 /**
  * so we can track the progress of the member removal 
  * and update the UI accordingly
  */
-store.$onAction(({ name, after, onError }) => {
+removeMembersStore.$onAction(({ name, after, onError }) => {
     if (name === 'removeSelectedMembers') {
         isProcessing.value = true;
         props.toastEl.activate('Removing...');
@@ -76,7 +76,7 @@ const isCloseModalDisabled = computed(() => isProcessing.value);
  * to close the modal 
  */
 function onCancelSelected () {
-    store.cancelRemoveSelectedMembers();
+    removeMembersStore.cancelRemoveSelectedMembers();
 }
 
 /**
@@ -84,7 +84,7 @@ function onCancelSelected () {
  * as we can currently also use foundation to close the modal 
  */
 function onModalClosed () {
-    store.cancelRemoveSelectedMembers();
+    removeMembersStore.cancelRemoveSelectedMembers();
 }
 
 </script>

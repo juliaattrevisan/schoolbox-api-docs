@@ -3,7 +3,8 @@
  */
 
 import { defineStore } from 'pinia';
-import { useStore } from './manageGroupStore'
+import { useStore } from './manageGroupStore';
+import { useMembersStore } from './manageGroupMembersStore';
 import Endpoints from '../manageGroupEndpoints';
 
 
@@ -34,14 +35,15 @@ export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: getFormData(store.selectedMembers),
+                    body: getFormData(),
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    store.groupMembers = store.groupMembers.filter((row) => { //pull out any removed members, those rows that are in selectedMembers, which have just been deleted
-                        return !store.selectedMembers.some(rowToDelete => rowToDelete.id === row.id);
+                    const membersStore = useMembersStore();
+                    membersStore.groupMembers = membersStore.groupMembers.filter((row) => { //pull out any removed members, those rows that are in selectedMembers, which have just been deleted
+                        return !membersStore.selectedMembers.some(rowToDelete => rowToDelete.id === row.id);
                     });
-                    store.selectedMembers = []; //can't keep selecting members that have just been removed
+                    membersStore.selectedMembers = []; //can't keep selecting members that have just been removed
                 } else {
                     throw new Error();
                 }
@@ -67,15 +69,12 @@ export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
 /**
  * Set up a deleted users array to POST
  *
- * @param { Array }
- * 
  * @returns { FormData }
  */
-function getFormData (selectedMembers) {
-    const membersToRemoveIdList = selectedMembers.map(row => row.id);
-    const formData = new FormData();
-    membersToRemoveIdList.forEach((item) => {
-        formData.append('users[]', item);
-    });
-    return formData;
+function getFormData () {
+    const membersStore = useMembersStore();
+    const membersToRemoveIdList = membersStore.selectedMembers.map(row => row.id);
+    return JSON.stringify([
+        { mmebers: membersToRemoveIdList.join(',') },
+    ]);
 }

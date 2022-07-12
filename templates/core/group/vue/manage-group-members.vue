@@ -7,10 +7,11 @@
 import { ref, watch } from 'vue';
 import { EventBus } from 'v-tables-3-select-rows';
 import { useStore } from './store/manageGroupStore';
+import { useMembersStore } from './store/manageGroupMembersStore';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table';
-import ManageGroupTableFilters from './manage-group-table-filters.vue';
-import ManageGroupTableAccess from './manage-group-table-access.vue';
+import ManageGroupMembersFilters from './manage-group-members-filters.vue';
+import ManageGroupMembersAccess from './manage-group-members-access.vue';
 import FilterEvents from './manageGroupFilterEvents';
 import AccessTypes from './manageGroupAccessTypes';
 
@@ -32,6 +33,7 @@ const props = defineProps({
  ****************************************************************/
 
 const store = useStore();
+const membersStore = useMembersStore();
 const tableEl = ref(null);
 const tableColumns = ['name', 'firstName', 'lastName', 'meta', 'accessType'];
 const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
@@ -59,13 +61,6 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     customSorting: {
         name: (ascending) => { //'waiting' members to always show on top and then sort by lastName
             return (a, b) => {
-                
-                // if (a.justUpdated && !b.justUpdated) { 
-                //     return 1;
-                // } else if (!a.justUpdated && b.justUpdated) { 
-                //     return -1;
-                // } 
-
                 if (a.displayPriority < b.displayPriority) { //the displayPriority is set in manageGroupStore.js
                     return 1;
                 } else if (a.displayPriority > b.displayPriority) { 
@@ -139,14 +134,14 @@ function onRefreshSelected () {
  * @param { Array }
  */
 function onRowSelected (currentSelection) {
-    store.updateSelectedMembers(currentSelection);
+    membersStore.updateSelectedMembers(currentSelection);
 }
 
 /**
  * ensure the table selection is also cleared when 'Clear Selection' is selected
  * or when the selected members have been removed
  */
-watch(() => store.selectedMembers, (newSelectedMembers, oldSelectedMembers) => {
+watch(() => membersStore.selectedMembers, (newSelectedMembers, oldSelectedMembers) => {
     if (newSelectedMembers.length === 0 && oldSelectedMembers.length > 0) { //to clear the current selection
         tableEl.value.resetSelectedRows();
     } 
@@ -163,8 +158,8 @@ watch(() => store.selectedMembers, (newSelectedMembers, oldSelectedMembers) => {
 /**
  * to update the table display based on the selected filters change
  */
-watch(() => store.selectedFilters, (newSelectedFilters, oldSelectedFilters) => {
-    let selectedFilter = []; //to store the filter that has been toggled
+watch(() => membersStore.selectedFilters, (newSelectedFilters, oldSelectedFilters) => {
+    let selectedFilter = []; //to membersStore the filter that has been toggled
     if (newSelectedFilters.length < oldSelectedFilters.length) { //a filter has been taken out
         selectedFilter = oldSelectedFilters.filter(filterType => !newSelectedFilters.includes(filterType)); //comparing the two arrays to find the only value in oldSelectedFilters
     } else { //otherwise one has been added back in
@@ -181,7 +176,7 @@ watch(() => store.selectedFilters, (newSelectedFilters, oldSelectedFilters) => {
  * @param { String }
  */
 function dispatchFilterEvent (selectedFilter) {
-    const filterParam = store.selectedFilters.includes(selectedFilter) ? '' : selectedFilter ;
+    const filterParam = membersStore.selectedFilters.includes(selectedFilter) ? '' : selectedFilter ;
     const filterEventsType = {
         [AccessTypes.WAITING]: FilterEvents.SHOW_WAITING_LIST,
         [AccessTypes.READ]: FilterEvents.SHOW_READ_ACCESS,
@@ -196,10 +191,10 @@ function dispatchFilterEvent (selectedFilter) {
  * taking any out that no longer match the selected filters
  */
 function updateSelectedMembers () {
-    const newSelectedMembers = []; //to store the newly selected members with the filter change considered
-    const membersToRemove = []; //to store those selected members that need to be removed due to the filter change
-    store.selectedMembers.forEach((member) => {
-        if (store.selectedFilters.some((accessType) => member.accessType == accessType)) {
+    const newSelectedMembers = []; //to membersStore the newly selected members with the filter change considered
+    const membersToRemove = []; //to membersStore those selected members that need to be removed due to the filter change
+    membersStore.selectedMembers.forEach((member) => {
+        if (membersStore.selectedFilters.some((accessType) => member.accessType == accessType)) {
             newSelectedMembers.push(member); //add the member to the new filtered list
         } else {
             membersToRemove.push(member.id); //otherwise pull it out
@@ -208,7 +203,7 @@ function updateSelectedMembers () {
     if (membersToRemove.length > 0) {
         tableEl.value.unselectRows(membersToRemove); //pull out all the unselected members at once
     }
-    store.updateSelectedMembers(newSelectedMembers);
+    membersStore.updateSelectedMembers(newSelectedMembers);
 }
 
 </script>
@@ -218,19 +213,19 @@ function updateSelectedMembers () {
         <div class="small-12 island">
             <h2 class="subheader">Current Members</h2>
             <v-client-table
-                v-if="store.hasGroupMembers"
+                v-if="membersStore.hasGroupMembers"
                 ref="tableEl"
-                :data="store.groupMembers"
+                :data="membersStore.groupMembers"
                 :columns="tableColumns"
                 :options="tableOptions"
                 @loaded="onLoaded"
                 @select="onRowSelected"
-                @sorted="store.refreshMembers(true)"
-                @pagination="store.refreshMembers(true)"
-                @filter="store.refreshMembers(true)"
+                @sorted="membersStore.refreshMembers(true)"
+                @pagination="membersStore.refreshMembers(true)"
+                @filter="membersStore.refreshMembers(true)"
             >
                 <template #beforeTable>
-                    <manage-group-table-filters />
+                    <manage-group-members-filters />
                 </template>
                 <template #name="data">
                     <div class="card small-12">
@@ -246,17 +241,17 @@ function updateSelectedMembers () {
                     </div>
                 </template>
                 <template #accessType="data">
-                    <manage-group-table-access :row="data.row" :toast-el="props.toastEl" />
+                    <manage-group-members-access :row="data.row" :toast-el="props.toastEl" />
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooterEl" data-table-footer></div>
                 </template>
             </v-client-table>
-            <div v-else-if="store.hasNoGroupMembers" class="empty-state">
+            <div v-else-if="membersStore.hasNoGroupMembers" class="empty-state">
                 <i class="icon-group"></i>
                 <p>This group currently has no members.<br>Once members have been added they will appear here.</p>
             </div>
-            <div v-else-if="store.hasLoadError">
+            <div v-else-if="membersStore.hasLoadError">
                 <section class="content">
                     <div tableData-alert class="alert-box alert">
                         Sorry, we are currently unable to load the group members. Please <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected">refresh the page</a> to try again contact and your support it the problem persists.

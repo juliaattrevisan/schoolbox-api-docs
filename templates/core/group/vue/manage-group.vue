@@ -9,7 +9,7 @@ import Endpoints from './manageGroupEndpoints';
 import { useStore } from './store/manageGroupStore';
 import ManageGroupHeading from './manage-group-heading.vue';
 import ManageGroupAddMembers from './manage-group-add-members.vue';
-import ManageGroupTable from './manage-group-table.vue';
+import ManageGroupMembers from './manage-group-members.vue';
 import ManageGroupSelect from './manage-group-select.vue';
 import ManageGroupRemoveMembers from './manage-group-remove-members.vue';
 import ManageGroupUpdateSettings from './manage-group-update-settings.vue';
@@ -82,7 +82,7 @@ onMounted(() => {
 <template>
     <manage-group-heading :toast-el="toastEl" />
     <manage-group-add-members :toast-el="toastEl" />
-    <manage-group-table :toast-el="toastEl" />
+    <manage-group-members :toast-el="toastEl" />
     <manage-group-select :toast-el="toastEl" />
     <manage-group-remove-members :toast-el="toastEl" />
     <manage-group-update-settings :toast-el="toastEl" />
