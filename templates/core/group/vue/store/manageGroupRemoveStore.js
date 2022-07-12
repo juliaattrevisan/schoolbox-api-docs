@@ -10,7 +10,7 @@ import Endpoints from '../manageGroupEndpoints';
 export const useRemoveStore = defineStore('manageGroupRemove', {
     
     state: () => ({
-        isRemoveSelectedMembersPromptOpen: false, //to notify that the prompt is opened / closed
+        isPromptOpen: false, //to notify that the prompt is opened / closed
     }),
 
     actions: {
@@ -19,7 +19,7 @@ export const useRemoveStore = defineStore('manageGroupRemove', {
          * to display a prompt to confirm member removal
          */
         promptRemoveSelectedMembers () {
-            this.isRemoveSelectedMembersPromptOpen = true;
+            this.isPromptOpen = true;
         },
 
         /**
@@ -48,7 +48,7 @@ export const useRemoveStore = defineStore('manageGroupRemove', {
             } catch (error) {
                 console.warn(error);
             } finally {
-                this.isRemoveSelectedMembersPromptOpen = false;
+                this.isPromptOpen = false;
                 store.isProcessing = false;
             }
         },
@@ -57,7 +57,7 @@ export const useRemoveStore = defineStore('manageGroupRemove', {
          * to hide the confirmation prompt
          */
         cancelRemoveSelectedMembers () {
-            this.isRemoveSelectedMembersPromptOpen = false;
+            this.isPromptOpen = false;
         },
 
     },

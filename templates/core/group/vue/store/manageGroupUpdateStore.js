@@ -20,7 +20,7 @@ export const useUpdateStore = defineStore('manageGroupUpdate', {
         async updateMemberAccess (member, accessType) {
             const store = useStore();
             store.isProcessing = true;
-            await store.refreshMembers();
+            store.refreshMembers();
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
                     method: 'PATCH',
@@ -51,6 +51,7 @@ export const useUpdateStore = defineStore('manageGroupUpdate', {
         async updateSelectedMembersAccess (accessType) {
             const store = useStore();
             store.isProcessing = true;
+            store.refreshMembers();
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
                     method: 'PATCH',
@@ -106,5 +107,6 @@ function getFormData (selectedMembers, accessType) {
  */
 function updateMember (member, accessType) {
     member.accessType = accessType; //only once the change has occured in the database, do we reflect this change in the display table
+    member.isNew = false; //no longer considered new once updated 
     member.justUpdated = true; //to add a class in the display table to help show the member has just been updated
 }

@@ -4,6 +4,10 @@
  * Add members to the group
  */
 
+import { ref, computed } from 'vue';
+import { useStore } from './store/manageGroupStore';
+import { useAddStore } from './store/manageGroupAddStore';
+
 
 const props = defineProps({
     /**
@@ -14,12 +18,44 @@ const props = defineProps({
     },
 });
 
+const store = useStore();
+const addStore = useAddStore();
+const isProcessing = ref(false);
+
 /**
- * 
+ * add the selected members to the group
  */
-function onAddUsersSelected () {
-    
+function onAddMembersSelected () {
+    addStore.addMembers();
 }
+
+/**
+ * so we can track the progress of the member access change
+ * and update the UI accordingly
+ */
+addStore.$onAction(({ name, after, onError }) => {
+    if (name === 'addMembers') { //as each row is subscribed to onAction, we have to check for the selected row
+        isProcessing.value = true;
+        props.toastEl.activate('Adding...');
+        after(() => {
+            props.toastEl.timeout('Members successfully added', true, 5000);
+            isProcessing.value = false;
+        });
+        onError((error) => {
+            console.warn(error);
+            props.toastEl.timeout('Unable to add members', false, 5000);
+            isProcessing.value = false;
+        });
+    }
+});
+
+/**
+ * To instantly notify the user that the members access is being updated 
+ * by updating the button text
+ *
+ * @returns { String }
+ */
+const addButtonText = computed(() => isProcessing.value ? 'Adding...' : 'Add Members');
 
 </script>
 
@@ -45,7 +81,7 @@ function onAddUsersSelected () {
                                         <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
                                     </label>
                                     <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-                                    <input type="submit" value="Add Users" />
+                                    <input type="submit" :value="addButtonText" :disabled="store.isProcessing" @click.prevent="onAddMembersSelected" />
                                 </form>
                             </div>
                             <div class="content" id="userGroups">
@@ -56,7 +92,7 @@ function onAddUsersSelected () {
                                         <span data-tooltip class="has-tip tip-top hint" title="Add all users that belong to another group.">?</span>
                                     </label>
                                     <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
-                                    <input type="submit" value="Add Users" />
+                                    <input type="submit" :value="addButtonText" :disabled="store.isProcessing" @click.prevent="onAddMembersSelected" />
                                 </form>
                             </div>
                             <div class="content" id="userRoles">
@@ -67,7 +103,7 @@ function onAddUsersSelected () {
                                         <span data-tooltip class="has-tip tip-top hint" title="Add all users of a particular role in the system.">?</span>
                                     </label>
                                     <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
-                                    <input type="submit" value="Add Users" />
+                                    <input type="submit" :value="addButtonText" :disabled="store.isProcessing" @click.prevent="onAddMembersSelected" />
                                 </form>
                             </div>
                             <div class="content" id="userList">
@@ -78,7 +114,7 @@ function onAddUsersSelected () {
                                     </label>
                                     <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
                                     <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
-                                    <input type="submit" value="Add Users" @click.prevent="onAddUsersSelected" />
+                                    <input type="submit" :value="addButtonText" :disabled="store.isProcessing" @click.prevent="onAddMembersSelected" />
                                 </form>
                             </div>
                         </div>

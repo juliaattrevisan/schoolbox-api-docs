@@ -105,9 +105,9 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     perPageValues: [50, 100, 200], 
     resizableColumns: false,
     rowClassCallback: (row) => { //to differentiate new / updated rows
-        if (row.isNew) { //so it's clear the rows have just been added (if they're visible...)
+        if (row.isNew) { //so it's clear the rows have just been added
             return 'is-new';
-        } else if (row.justUpdated) { //so it's clear they've just been updated
+        } else if (row.justUpdated) { //and so it's clear they've just been updated
             return 'just-updated';
         }
         return '';
@@ -238,9 +238,9 @@ function updateSelectedMembers () {
                 :options="tableOptions"
                 @loaded="onLoaded"
                 @select="onRowSelected"
-                @sorted="store.refreshMembers"
-                @pagination="store.refreshMembers"
-                @filter="store.refreshMembers"
+                @sorted="store.refreshMembers(true)"
+                @pagination="store.refreshMembers(true)"
+                @filter="store.refreshMembers(true)"
             >
                 <template #beforeTable>
                     <manage-group-table-filters />

@@ -71,7 +71,7 @@ Default.parameters = {
                     })
                 )
             }), 
-            rest.post(updateMembersEndpoint, (req, res, ctx) => {
+            rest.post(addMembersEndpoint, (req, res, ctx) => {
                 return res(
                     ctx.delay(1000),
                     ctx.json({

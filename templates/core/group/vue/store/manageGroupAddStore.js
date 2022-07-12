@@ -30,12 +30,12 @@ export const useAddStore = defineStore('manageGroupAdd', {
                     const newMembers = responseJson.newMembers.map((newMember) => { //add in some additional properties
                         return { 
                             ...newMember,
-                            displayPriority: 0,
+                            displayPriority: 2, //to show at the very top of the display table
                             isNew: true, //to highlight new members just added 
                             justUpdated: false, //to highlight members that have just been changed
                         } 
                     });
-                    this.groupMembers = [...this.groupMembers, ...newMembers];
+                    store.groupMembers = [...store.groupMembers, ...newMembers]; //add in the new members to the table
                 } else {
                     throw new Error();
                 }

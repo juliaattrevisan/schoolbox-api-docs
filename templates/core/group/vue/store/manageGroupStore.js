@@ -5,7 +5,7 @@
 import { nextTick } from 'vue';
 import { defineStore } from 'pinia';
 import Endpoints from '../manageGroupEndpoints';
-import FilterTypes from '../manageGroupAccessTypes';
+import AccessTypes from '../manageGroupAccessTypes';
 
 
 export const useStore = defineStore('manageGroup', {
@@ -16,7 +16,7 @@ export const useStore = defineStore('manageGroup', {
         isProcessing: false, //to notify that an action is taking place, like updating a member access
         groupMembers: [], //all the group members
         selectedMembers: [], //to track the current group member selection
-        selectedFilters: [FilterTypes.WAITING, FilterTypes.READ, FilterTypes.WRITE, FilterTypes.ADMIN], //the list of table filters available
+        selectedFilters: [AccessTypes.WAITING, AccessTypes.READ, AccessTypes.WRITE, AccessTypes.ADMIN], //the list of table filters available
     }),
 
     getters: {
@@ -100,18 +100,24 @@ export const useStore = defineStore('manageGroup', {
         },
 
         /**
-         * Perform on any further user interaction, like updating filters, sorting or searching
-         * Otherwise the animation used to clearly show where new files have been added will be
-         * replayed on any state change
+         * Perform on any further table interaction like updating filters, sorting or searching or 
+         * when a members access is being changed 
+         * Otherwise the animations used to clearly show where members have been added/updated
+         * will be replayed on any table display change (like sorting)
+         * Also, we don't want newly added or just approved members to go into the usual sort (displayPriority: 0) until 
+         * the table display is changing, not when say a newly approved member has been changed from read to admin access
+         * This is so members don't suddenly 'dissapear' when they are approved as this can be a bit confusing 
+         * 
+         * @param { Boolean }
          */
-        async refreshMembers () {
+        async refreshMembers (isTableChange=false ) {
             await nextTick();
             this.groupMembers.forEach((member) => {
                 member.isNew = false;
-                if (member.justUpdated) {
-                    member.displayPriority = 0; //to only put the updated member in its correct sort after a display table change, like a sort or filter
-                }
                 member.justUpdated = false;
+                if (isTableChange && member.displayPriority > 0 && member.accessType !== AccessTypes.WAITING) {
+                    member.displayPriority = 0; //to only put the added/updated member in correct sort after a display table change: search, sort or pagination
+                }
             });
         },
 
