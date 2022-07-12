@@ -145,7 +145,7 @@ execute_upgrade_script(){
   log "Starting script: $script"
   if [[ $script == *".sql" ]]; then
     # Check for and report errors
-    if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" < "$script"; then
+    if ! mysql --defaults-extra-file=/etc/schoolbox/mariadb-no-max-statement-time.cnf -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" < "$script"; then
       error "Error running update: $script"
       error_int=1;
       error_msg="$error_msg,$script";

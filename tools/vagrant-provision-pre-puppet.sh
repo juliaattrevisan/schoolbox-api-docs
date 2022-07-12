@@ -76,7 +76,7 @@ function drop_mysql_schema_and_user() {
   # Is mysql installed ? (it won't if packer image build)
   if type mysql 2>/dev/null >&2 && test -f /root/.my.cnf; then
     echo "[SB][$(date +%Y-%m-%d\ %X)] Removing current Schoolbox MySQL database"
-    mysql --defaults-extra-file=/root/.my.cnf -e "DROP DATABASE IF EXISTS schoolbox"
+    mysql --defaults-extra-file=/root/.my.cnf -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE IF EXISTS schoolbox"
 
     echo "[SB][$(date +%Y-%m-%d\ %X)] Removing current Schoolbox MySQL user"
     mysql --defaults-extra-file=/root/.my.cnf -e "DROP USER IF EXISTS 'schoolboxvagrant'@'localhost'"
