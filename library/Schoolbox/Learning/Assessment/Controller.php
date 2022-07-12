@@ -47,7 +47,6 @@ use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
  */
 abstract class Controller extends ListController implements IAssessmentController
 {
-
     /**
      * @var WorkTypeMapper
      */
@@ -122,7 +121,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function getAssessment(IAssessable $assessment): void
     {
-
         /* Presume a default url.
          *
          * If you're a parent you'll end up at a dead end if you don't have
@@ -189,11 +187,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'studentId'    => $student->getId(),
             ]
         );
-
-        if ($this->request->server->get('HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH')) {
-            $defaultUrl .= '?' . http_build_query([Payload::SEB_KEY => $this->request->server->get('HTTP_X_SAFEEXAMBROWSER_CONFIGKEYHASH')]);
-        }
-        $this->redirect($defaultUrl);
+        $defaultUrl .= '?' . http_build_query([Payload::SEB_KEY => '']);
+        $content    = $this->buildUnthemedHtmlOutput('@learningAssessment/seb.twig', [
+            'url' => $defaultUrl,
+        ]);
+        $this->getResponse()->content->set($content);
     }
 
 

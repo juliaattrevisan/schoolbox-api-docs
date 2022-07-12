@@ -1,0 +1,10 @@
+<script>
+    let url = "{{ url }}";
+    if (typeof (SafeExamBrowser) !== 'undefined') {
+        let pageConfigKey = SafeExamBrowser.security.configKey;
+        url = url + pageConfigKey;
+    }
+    window.addEventListener('load', function () {
+        this.location.href = url;
+    });
+</script>
