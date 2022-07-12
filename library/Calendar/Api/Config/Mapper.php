@@ -62,11 +62,8 @@ class Calendar_Api_Config_Mapper extends BaseMapper
     {
         $predicates = $this->getPredicateBuilder();
         $predicates->equals('status', 1);
-        if ($includeFailed) {
-            //show the failed items... so the user can hopefully fix them
-            $predicates->greaterThanOrEqualTo('failed_count', Calendar_Api_Config_Record::MAXFAILED);
-        } else {
-            //hide anything that has failed too many times
+        if (!$includeFailed) {
+            //hide anything that has failed too many times, unless requested
             $predicates->lessThan('failed_count', Calendar_Api_Config_Record::MAXFAILED);
         }
         return $this->findByPredicates($predicates);
