@@ -4,7 +4,7 @@
  * Display the group members in a table display
  */
 
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { EventBus } from 'v-tables-3-select-rows';
 import { useStore } from './store/manageGroupStore';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
@@ -27,24 +27,11 @@ const props = defineProps({
 
 /*****************************************************************
  * 
- * Load the group members
- * 
- ****************************************************************/
-
-const store = useStore();
-
-onMounted(() => {
-    store.loadGroupMembers();
-});
-
-
-
-/*****************************************************************
- * 
  * Display the group members in a table
  * 
  ****************************************************************/
 
+const store = useStore();
 const tableEl = ref(null);
 const tableColumns = ['name', 'firstName', 'lastName', 'meta', 'accessType'];
 const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
@@ -276,9 +263,7 @@ function updateSelectedMembers () {
                     </div>
                 </section>
             </div>
-            <div v-else-if="store.isLoading">
-                <loading-table />
-            </div>
+            <loading-table v-else-if="store.isLoading" />
         </div><!-- small-12 island -->
     </div><!-- row  -->
     

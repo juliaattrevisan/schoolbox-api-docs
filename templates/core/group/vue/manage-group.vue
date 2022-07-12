@@ -6,11 +6,13 @@
 
 import { ref, onBeforeMount, onMounted } from 'vue';
 import Endpoints from './manageGroupEndpoints';
+import { useStore } from './store/manageGroupStore';
 import ManageGroupHeading from './manage-group-heading.vue';
-import ManageGroupAdd from './manage-group-add.vue';
+import ManageGroupAddMembers from './manage-group-add-members.vue';
 import ManageGroupTable from './manage-group-table.vue';
 import ManageGroupSelect from './manage-group-select.vue';
-import ManageGroupRemove from './manage-group-remove.vue';
+import ManageGroupRemoveMembers from './manage-group-remove-members.vue';
+import ManageGroupUpdateSettings from './manage-group-update-settings.vue';
 import Toast from '@schoolboxVue/components/toast.vue';
 
 
@@ -18,7 +20,7 @@ const props = defineProps({
     /**
      * the endpoint to retrieve all the group data from
      */
-    getMembersEndpoint: {
+    groupDataEndpoint: {
         type: String,
         required: true,
     },
@@ -43,6 +45,13 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    /**
+     * the endpoint to add members
+     */
+    updateSettingsEndpoint: {
+        type: String,
+        required: true,
+    },
 });
 
 const toastEl = ref(null);
@@ -52,16 +61,19 @@ const toastEl = ref(null);
  * rather than having to pass them through as props as these values wont change
  */
 onBeforeMount(() => {
-    Endpoints.GET_MEMBERS = props.getMembersEndpoint;
+    Endpoints.GROUP_DATA = props.groupDataEndpoint;
     Endpoints.REMOVE_MEMBERS = props.removeMembersEndpoint;
     Endpoints.UPDATE_MEMBERS = props.updateMembersEndpoint;
     Endpoints.ADD_MEMBERS = props.addMembersEndpoint;
+    Endpoints.UPDATE_SETTINGS = props.updateSettingsEndpoint;
 });
 
 /**
- * to enable the Foundation features such as the drop down in -header and tabs in -add-members
+ * load the data and ensure any foundation features work 
  */
 onMounted(() => {
+    const store = useStore();
+    store.loadData();
     $(document).foundation(); 
 });
 
@@ -69,9 +81,10 @@ onMounted(() => {
 
 <template>
     <manage-group-heading :toast-el="toastEl" />
-    <manage-group-add :toast-el="toastEl" />
+    <manage-group-add-members :toast-el="toastEl" />
     <manage-group-table :toast-el="toastEl" />
     <manage-group-select :toast-el="toastEl" />
-    <manage-group-remove :toast-el="toastEl" />
+    <manage-group-remove-members :toast-el="toastEl" />
+    <manage-group-update-settings :toast-el="toastEl" />
     <toast ref="toastEl"></toast>
 </template>

@@ -14,6 +14,9 @@ export const useStore = defineStore('manageGroup', {
         isLoading: true, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place, like updating a member access
+        access: '', //can be private, moderated or free
+        isNotificationsEnabled: false, //to send notifications to the group
+        isForceFollow: false, //so notifcations are ALWAYS sent to all members
         groupMembers: [], //all the group members
         selectedMembers: [], //to track the current group member selection
         selectedFilters: [AccessTypes.WAITING, AccessTypes.READ, AccessTypes.WRITE, AccessTypes.ADMIN], //the list of table filters available
@@ -48,14 +51,19 @@ export const useStore = defineStore('manageGroup', {
          * 
          * @param { String }
          */
-        async loadGroupMembers () {
+        async loadData () {
             try {
-                const response = await fetch(Endpoints.GET_MEMBERS);
+                const response = await fetch(Endpoints.GROUP_DATA);
                 const responseJson = await response.json();
-                const groupMembers = responseJson.map((groupMember) => { //add in some additional properties
+                const settings = responseJson.settings;
+                this.access = settings.access; 
+                this.isNotificationsEnabled = settings.isNotificationsEnabled; 
+                this.isForceFollow = settings.isForceFollow; 
+                const members = responseJson.members;
+                const groupMembers = members.map((groupMember) => { //add in some additional properties
                     return { 
                         ...groupMember,
-                        displayPriority: groupMember.accessType === 'waiting' ? 1 : 0,
+                        displayPriority: groupMember.accessType === 'waiting' ? 1 : 0, //waiting list members are put at the top of the table
                         isNew: false, //to highlight new members just added 
                         justUpdated: false, //to highlight members that have just been changed
                     } 

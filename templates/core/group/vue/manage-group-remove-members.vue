@@ -5,7 +5,7 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useRemoveStore } from './store/manageGroupRemoveStore';
+import { useRemoveMembersStore } from './store/manageGroupRemoveMembersStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
@@ -18,14 +18,14 @@ const props = defineProps({
     },
 });
 
-const store = useRemoveStore();
+const store = useRemoveMembersStore();
 const removeModalEl = ref(null);
 const isProcessing = ref(false);
 
 /**
  * to open the modal when requested
  */
-watch(() => store.isRemoveSelectedMembersPromptOpen, (newIsOpen) => {
+watch(() => store.isPromptOpen, (newIsOpen) => {
     newIsOpen ? removeModalEl.value.open() : removeModalEl.value.close();
 });
 
@@ -80,7 +80,7 @@ function onCancelSelected () {
 }
 
 /**
- * ensure the isRemoveSelectedMembersPromptOpen is kept up to date
+ * ensure the isPromptOpen is kept up to date
  * as we can currently also use foundation to close the modal 
  */
 function onModalClosed () {
@@ -90,7 +90,8 @@ function onModalClosed () {
 </script>
 
 <template>
-    <reveal-modal ref="removeModalEl" 
+    <reveal-modal 
+        ref="removeModalEl" 
         :is-close-disabled="isCloseModalDisabled" 
         :close-on-background-click="false" 
         @closed="onModalClosed"

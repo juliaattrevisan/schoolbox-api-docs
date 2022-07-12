@@ -39,17 +39,18 @@ const Template = (args, { argTypes }) => ({
         `,
 });
 
-const getMembersEndpoint = '/getMembers'; //just using any active endpoint for a connection
+const groupDataEndpoint = '/groupData'; 
 const removeMembersEndpoint = '/removeMembers';
 const updateMembersEndpoint = '/updateMembers';
 const addMembersEndpoint = '/addMembers';
+const updateSettingsEndpoint = '/updateSettings';
 
 export const Default = Template.bind({});
 Default.parameters = {
     controls: { hideNoControlsWarning: true },
     msw: {
         handlers: [
-            rest.get(getMembersEndpoint, (req, res, ctx) => {
+            rest.get(groupDataEndpoint, (req, res, ctx) => {
                 return res( //we grab an endpoint and then modify the data before it's returned
                     ctx.delay(1000),
                     ctx.json(data)
@@ -85,14 +86,23 @@ Default.parameters = {
                     })
                 )
             }), 
+            rest.post(updateSettingsEndpoint, (req, res, ctx) => {
+                return res(
+                    ctx.delay(2000),
+                    ctx.json({
+                        success: true,
+                    })
+                )
+            }), 
         ]
     },
 }
 Default.args = {
-    getMembersEndpoint: getMembersEndpoint,
+    groupDataEndpoint: groupDataEndpoint,
     removeMembersEndpoint: removeMembersEndpoint,
     updateMembersEndpoint: updateMembersEndpoint,
     addMembersEndpoint: addMembersEndpoint,
+    updateSettingsEndpoint: updateSettingsEndpoint,
 }
 
 // export const LoadError = Template.bind({});

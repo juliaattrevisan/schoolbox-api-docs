@@ -1,5 +1,5 @@
 /** 
- * Handles the store to remove members from the Manage Group page
+ * Handles the store to update the group settings 
  */
 
 import { defineStore } from 'pinia';
@@ -7,7 +7,7 @@ import { useStore } from './manageGroupStore'
 import Endpoints from '../manageGroupEndpoints';
 
 
-export const useRemoveStore = defineStore('manageGroupRemove', {
+export const useUpdateSettingsStore = defineStore('manageGroupUpdateSettings', {
     
     state: () => ({
         isPromptOpen: false, //to notify that the prompt is opened / closed
@@ -18,30 +18,27 @@ export const useRemoveStore = defineStore('manageGroupRemove', {
         /**
          * to display a prompt to confirm member removal
          */
-        promptRemoveSelectedMembers () {
+        promptUpdateSettings () {
             this.isPromptOpen = true;
         },
 
         /**
          * member removal has been confirmed so pull them out
          */
-        async removeSelectedMembers () {
+        async updateSettings () {
             const store = useStore();
             store.isProcessing = true;
             try {
-                const response = await fetch(Endpoints.REMOVE_MEMBERS, {
-                    method: 'DELETE',
+                const response = await fetch(Endpoints.UPDATE_SETTINGS, {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: getFormData(store.selectedMembers),
+                    body: getFormData(),
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    store.groupMembers = store.groupMembers.filter((row) => { //pull out any removed members, those rows that are in selectedMembers, which have just been deleted
-                        return !store.selectedMembers.some(rowToDelete => rowToDelete.id === row.id);
-                    });
-                    store.selectedMembers = []; //can't keep selecting members that have just been removed
+                    // 
                 } else {
                     throw new Error();
                 }
@@ -56,7 +53,7 @@ export const useRemoveStore = defineStore('manageGroupRemove', {
         /**
          * to hide the confirmation prompt
          */
-        cancelRemoveSelectedMembers () {
+        cancelUpdateSettings () {
             this.isPromptOpen = false;
         },
 
@@ -65,17 +62,17 @@ export const useRemoveStore = defineStore('manageGroupRemove', {
 })
 
 /**
- * Set up a deleted users array to POST
- *
- * @param { Array }
+ * Pass through the latest settings
  * 
  * @returns { FormData }
  */
-function getFormData (selectedMembers) {
-    const membersToRemoveIdList = selectedMembers.map(row => row.id);
-    const formData = new FormData();
-    membersToRemoveIdList.forEach((item) => {
-        formData.append('users[]', item);
+function getFormData () {
+    const store = useStore();
+    return JSON.stringify({ 
+        settings: {
+            access: store.access,
+            isNotificationsEnabled: store.isNotificationsEnabled,
+            isForceFollow: store.isForceFollow,
+        }
     });
-    return formData;
 }

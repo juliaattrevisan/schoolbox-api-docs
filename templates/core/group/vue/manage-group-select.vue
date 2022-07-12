@@ -7,7 +7,7 @@
 
 import { ref, computed, watch, onMounted  } from 'vue';
 import { useStore } from './store/manageGroupStore';
-import { useRemoveStore } from './store/manageGroupRemoveStore';
+import { useRemoveMembersStore } from './store/manageGroupRemoveMembersStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
 import ManageGroupSelectAccess from './manage-group-select-access.vue';
 
@@ -22,7 +22,7 @@ const props = defineProps({
 });
 
 const store = useStore(); //to keep track of selectedMembers
-const removeStore = useRemoveStore(); //to remove selectedMembers
+const removeStore = useRemoveMembersStore(); //to remove selectedMembers
 const isShiftKeySelected = ref(false);
 const shiftSelectNoteEl = ref(null);
 

@@ -6,7 +6,7 @@
 
 import { ref, watch, computed } from 'vue';
 import { useStore } from './store/manageGroupStore';
-import { useUpdateStore } from './store/manageGroupUpdateStore';
+import { useUpdateMembersStore } from './store/manageGroupUpdateMembersStore';
 import AccessTypes from './manageGroupAccessTypes';
 
 
@@ -20,7 +20,7 @@ const props = defineProps({
 });
 
 const store = useStore(); //to keep track of selectedMembers
-const updateStore = useUpdateStore(); //to udpate member access
+const updateStore = useUpdateMembersStore(); //to udpate member access
 const areAllSelectedOnWaitingList = ref(false); //to determine whether we can show the approve membership button if all selected are awaiting membership
 const isProcessing = ref(false); //to notify of process taking place
 const changeMemberAccess = ref(''); //to bulk update members access rights

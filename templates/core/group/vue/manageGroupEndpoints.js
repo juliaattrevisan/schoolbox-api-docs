@@ -5,8 +5,9 @@
  */
 
 export default Object({
-    GET_MEMBERS: '',
+    GROUP_DATA: '',
     REMOVE_MEMBERS: '',
     UPDATE_MEMBERS: '',
     ADD_MEMBERS: '',
+    UPDATE_SETTINGS: '',
 });

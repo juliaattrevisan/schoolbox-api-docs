@@ -6,7 +6,7 @@
 
 import { ref, computed } from 'vue';
 import { useStore } from './store/manageGroupStore';
-import { useUpdateStore } from './store/manageGroupUpdateStore';
+import { useUpdateMembersStore } from './store/manageGroupUpdateMembersStore';
 import AccessTypes from './manageGroupAccessTypes';
 
 
@@ -27,7 +27,7 @@ const props = defineProps({
 });
 
 const store = useStore();
-const updateStore = useUpdateStore();
+const updateStore = useUpdateMembersStore();
 const isProcessing = ref(false); //to update the button text when an event is taking place
 
 /**

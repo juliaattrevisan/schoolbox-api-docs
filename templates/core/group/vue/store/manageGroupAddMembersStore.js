@@ -7,7 +7,7 @@ import { useStore } from './manageGroupStore'
 import Endpoints from '../manageGroupEndpoints';
 
 
-export const useAddStore = defineStore('manageGroupAdd', {
+export const useAddMembersStore = defineStore('manageGroupAddMembers', {
 
     actions: {
 
@@ -59,15 +59,9 @@ export const useAddStore = defineStore('manageGroupAdd', {
  */
 function getFormData () {
     return JSON.stringify([
-        {"userId":200,},
-        {"userId":201,},
-        {"userId":202,},
-        {"userId":203,},
+        { "userId": 200 },
+        { "userId": 201 },
+        { "userId": 202 },
+        { "userId": 203 },
     ]);
-    // const membersToRemoveIdList = selectedMembers.map(row => row.id);
-    // const formData = new FormData();
-    // membersToRemoveIdList.forEach((item) => {
-    //     formData.append('users[]', item);
-    // });
-    // return formData;
 }

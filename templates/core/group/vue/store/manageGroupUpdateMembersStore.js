@@ -7,10 +7,10 @@ import { useStore } from './manageGroupStore';
 import Endpoints from '../manageGroupEndpoints';
 
 
-export const useUpdateStore = defineStore('manageGroupUpdate', {
+export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
 
     actions: {
-
+        
         /**
          * update an individual members access 
          * 
@@ -91,12 +91,10 @@ export const useUpdateStore = defineStore('manageGroupUpdate', {
  */
 function getFormData (selectedMembers, accessType) {
     const membersToUpdateIdList = selectedMembers.map(row => row.id);
-    const formData = new FormData();
-    membersToUpdateIdList.forEach((item) => {
-        formData.append('users[]', item);
+    return JSON.stringify({
+        members: membersToUpdateIdList.join(','),
+        accessType: accessType,
     });
-    formData.append('access', accessType);
-    return formData;
 }
 
 /**
