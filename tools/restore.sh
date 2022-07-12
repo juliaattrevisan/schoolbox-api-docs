@@ -739,7 +739,7 @@ if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --sk
   exit 1
 fi
 ## Drop existing DB and reload just config table
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "DROP DATABASE $sqldb;";
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE $sqldb;";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/$sqldb-config-`date -I`.sql;
 ## Unpack if gzipped
@@ -752,7 +752,7 @@ then
 fi
 echo "Restoring database '$sourcedb'";
 ## Restore specified database (commenting out VIEW DEFINER clause on the fly)
-if ! cat $sourcedb | pv -s "$(du -b "$sourcedb" | cut -f 1)" | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb; then
+if ! cat $sourcedb | pv -s "$(du -b "$sourcedb" | cut -f 1)" | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql --defaults-extra-file=/etc/schoolbox/mariadb-no-max-statement-time.cnf -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb; then
   error "Unable to import database from backup file. Exiting."
 fi
 
@@ -863,14 +863,14 @@ fi
 if [ "$sourcetype" != '[A]' ];
 then
   echo "DB-only restore. Truncating 'storage_transform' table" >&2
-  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE storage_transform";
+  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SET MAX_STATEMENT_TIME=0; TRUNCATE storage_transform";
 fi
 
 # If a shared host, need to truncate etherpad to prevent updates/deletes from staging destroying production data
 # (First test is old single-instance arch, second test is new multi-instance arch)
 if { [ -f /usr/share/schoolbox/www/index.php ] && [ -f /usr/share/schoolboxdev/www/index.php ]; } || { [ -f /etc/schoolbox/instances.ini ] && [[ $(schoolbox-read-instances --option instance-list | wc -l) -gt 1 ]] ;}; then
   echo "Shared stg/prd host detected, truncating 'etherpad_pad' table";
-  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE etherpad_pad";
+  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SET MAX_STATEMENT_TIME=0; TRUNCATE etherpad_pad";
 fi
 
 # Restart nginx

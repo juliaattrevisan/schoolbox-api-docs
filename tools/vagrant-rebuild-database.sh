@@ -26,11 +26,11 @@ echo "$vag Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -ptnp879 mysql;
 
 echo "$vag Removing current Schoolbox MySQL database";
-mysql -u root -ptnp879 -e "drop database if exists schoolbox";
+mysql -u root -ptnp879 -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE IF EXISTS schoolbox";
 
 echo "$vag Loading Schoolbox MySQL Demo data";
 mysql -u root -ptnp879 -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
-mysql -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-v6.1.sql
+mysql --defaults-extra-file=/etc/schoolbox/mariadb-no-max-statement-time.cnf -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-v6.1.sql
 
 echo "$vag Generating data dir sql fixes";
 /usr/share/schoolbox/tools/generate-dir-sql.sh /var/lib/schoolbox >> $cachedir/schoolboxdemo-vagrant-v6.1.sql;
