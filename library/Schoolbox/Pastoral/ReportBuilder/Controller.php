@@ -694,7 +694,7 @@ class Controller extends Base
 
         $report = $this->pastoralReportMapper->createModel($post['reportId']);
 
-        $result = $this->updatePastoralDashboard($report, $post['display']);
+        $result = $this->updatePastoralDashboard($report, (bool)$post->get('display'));
 
         $this->getResponse()->content->set([
             'format' => 'json',
