@@ -5,7 +5,6 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useStore } from './store/manageGroupStore';
 import { useSettingsStore } from './store/manageGroupSettingsStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
@@ -19,15 +18,14 @@ const props = defineProps({
     },
 });
 
-const store = useStore();
-const updateSettingsStore = useSettingsStore();
+const settingsStore = useSettingsStore();
 const updateModalEl = ref(null);
 const isProcessing = ref(false);
 
 /**
  * to open the modal when requested
  */
-watch(() => updateSettingsStore.isPromptOpen, (newIsOpen) => {
+watch(() => settingsStore.isPromptOpen, (newIsOpen) => {
     newIsOpen ? updateModalEl.value.open() : updateModalEl.value.close();
 });
 
@@ -35,14 +33,14 @@ watch(() => updateSettingsStore.isPromptOpen, (newIsOpen) => {
  * update the group settings
  */
 function onUpdateSelected () {
-    updateSettingsStore.updateSettings();
+    settingsStore.updateSettings();
 }
 
 /**
  * so we can track the progress of the member removal 
  * and update the UI accordingly
  */
-updateSettingsStore.$onAction(({ name, after, onError }) => {
+settingsStore.$onAction(({ name, after, onError }) => {
     if (name === 'updateSettings') {
         isProcessing.value = true;
         props.toastEl.activate('Updating...');
@@ -78,7 +76,7 @@ const isUpdateModalDisabled = computed(() => isProcessing.value);
  * to close the modal 
  */
 function onCancelSelected () {
-    updateSettingsStore.cancelUpdateSettings();
+    settingsStore.cancelUpdateSettings();
 }
 
 /**
@@ -86,7 +84,7 @@ function onCancelSelected () {
  * as we can currently also use foundation to close the modal 
  */
 function onModalClosed () {
-    updateSettingsStore.cancelUpdateSettings();
+    settingsStore.cancelUpdateSettings();
 }
 
 </script>
@@ -105,21 +103,21 @@ function onModalClosed () {
                 <legend>Access</legend>
                 <ul class="option-list">
                     <li>
-                        <input id="type-1" type="radio" v-model="store.access" value="private" />
+                        <input id="type-1" type="radio" v-model="settingsStore.access" value="private" />
                         <label for="type-1" class="radio-label">
                             Private
                             <span data-tooltip class="has-tip tip-top hint" title="Membership is only by invitation from a group admin.">?</span>
                         </label>
                     </li>
                     <li>
-                        <input id="type-2" type="radio" v-model="store.access" value="moderated" />
+                        <input id="type-2" type="radio" v-model="settingsStore.access" value="moderated" />
                         <label for="type-2" class="radio-label">
                             Moderated
                             <span data-tooltip class="has-tip tip-top hint" title="Users may request membership, but must be approved by a group admin.">?</span>
                         </label>
                     </li>
                     <li>
-                        <input id="type-3" type="radio" v-model="store.access" value="free" />
+                        <input id="type-3" type="radio" v-model="settingsStore.access" value="free" />
                         <label for="type-3" class="radio-label">
                             Free
                             <span data-tooltip class="has-tip tip-top hint" title="Users may join and leave at any time, without approval.">?</span>
@@ -129,10 +127,10 @@ function onModalClosed () {
             </div><!-- small-12 medium-6 columns -->
             <div class="small-12 medium-6 columns no-pad">
                 <legend>Notifications</legend>  
-                <input id="msg-enabled" type="checkbox" v-model="store.isNotificationsEnabled" />
+                <input id="msg-enabled" type="checkbox" v-model="settingsStore.isNotificationsEnabled" />
                 <label for="msg-enabled" class="checkbox-label">Notifications enabled</label>
-                <div v-if="store.isNotificationsEnabled">
-                    <input id="msg-force-follow" type="checkbox" v-model="store.isForceFollow" />
+                <div v-if="settingsStore.isNotificationsEnabled">
+                    <input id="msg-force-follow" type="checkbox" v-model="settingsStore.isForceFollow" />
                     <label for="msg-force-follow" class="checkbox-label">
                         Force Follow
                         <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>

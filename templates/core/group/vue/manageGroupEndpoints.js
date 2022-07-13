@@ -10,4 +10,5 @@ export default Object({
     UPDATE_MEMBERS: '',
     ADD_MEMBERS: '',
     UPDATE_SETTINGS: '',
+    DISBAND_GROUP: '',
 });

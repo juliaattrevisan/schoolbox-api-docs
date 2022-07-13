@@ -1,4 +1,5 @@
 export const data = {
+    groupId: 23,
     settings: {
         access: 'moderated',
         isNotificationsEnabled: true,

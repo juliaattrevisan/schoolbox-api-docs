@@ -44,6 +44,7 @@ const removeMembersEndpoint = '/removeMembers';
 const updateMembersEndpoint = '/updateMembers';
 const addMembersEndpoint = '/addMembers';
 const updateSettingsEndpoint = '/updateSettings';
+const disbandGroupEndpoint = '/disbandGroup';
 
 export const Default = Template.bind({});
 Default.parameters = {
@@ -94,6 +95,14 @@ Default.parameters = {
                     })
                 )
             }), 
+            rest.post(disbandGroupEndpoint, (req, res, ctx) => {
+                return res(
+                    ctx.delay(2000),
+                    ctx.json({
+                        success: true,
+                    })
+                )
+            }), 
         ]
     },
 }
@@ -103,6 +112,7 @@ Default.args = {
     updateMembersEndpoint: updateMembersEndpoint,
     addMembersEndpoint: addMembersEndpoint,
     updateSettingsEndpoint: updateSettingsEndpoint,
+    disbandGroupEndpoint: disbandGroupEndpoint,
 }
 
 // export const LoadError = Template.bind({});

@@ -13,6 +13,7 @@ import ManageGroupMembers from './manage-group-members.vue';
 import ManageGroupSelect from './manage-group-select.vue';
 import ManageGroupRemoveMembers from './manage-group-remove-members.vue';
 import ManageGroupUpdateSettings from './manage-group-update-settings.vue';
+import ManageGroupDisbandGroup from './manage-group-disband-group.vue';
 import Toast from '@schoolboxVue/components/toast.vue';
 
 
@@ -46,9 +47,16 @@ const props = defineProps({
         required: true,
     },
     /**
-     * the endpoint to add members
+     * the endpoint to update settings
      */
     updateSettingsEndpoint: {
+        type: String,
+        required: true,
+    },
+    /**
+     * the endpoint to disband the group
+     */
+    disbandGroupEndpoint: {
         type: String,
         required: true,
     },
@@ -66,6 +74,7 @@ onBeforeMount(() => {
     Endpoints.UPDATE_MEMBERS = props.updateMembersEndpoint;
     Endpoints.ADD_MEMBERS = props.addMembersEndpoint;
     Endpoints.UPDATE_SETTINGS = props.updateSettingsEndpoint;
+    Endpoints.DISBAND_GROUP = props.disbandGroupEndpoint;
 });
 
 /**
@@ -86,5 +95,6 @@ onMounted(() => {
     <manage-group-select :toast-el="toastEl" />
     <manage-group-remove-members :toast-el="toastEl" />
     <manage-group-update-settings :toast-el="toastEl" />
+    <manage-group-disband-group :toast-el="toastEl" />
     <toast ref="toastEl"></toast>
 </template>

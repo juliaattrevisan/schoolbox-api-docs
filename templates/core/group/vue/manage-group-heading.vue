@@ -6,6 +6,7 @@
 
 import { ref  } from 'vue';
 import { useSettingsStore } from './store/manageGroupSettingsStore';
+import { useDisbandStore } from './store/manageGroupDisbandStore';
 
 
 const props = defineProps({
@@ -18,6 +19,7 @@ const props = defineProps({
 });
 
 const settingsStore = useSettingsStore();
+const disbandStore = useDisbandStore();
 
 /**
  * to open the update settings modal 
@@ -41,10 +43,10 @@ function onEmailGroupParentsSelected () {
 }
 
 /**
- * 
+ * to prompt to disband the group
  */
 function onDisbandSelected () {
-    
+    disbandStore.promptDisbandGroup();
 }
 
 </script>
