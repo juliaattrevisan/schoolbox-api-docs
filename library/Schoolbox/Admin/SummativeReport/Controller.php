@@ -69,6 +69,23 @@ class Controller extends ConfigController
         Role::STAFF => 'Staff',
     ];
 
+
+    /**
+     * This id corresponds to a fictitious option "No Year Level"
+     * which doesn't exist in a lookup
+     */
+    private const NO_YEAR_LEVEL_ID = 0;
+
+
+    /**
+     * This tuple corresponds to a fictitious option "No Year Level"
+     * which doesn't exist in a lookup
+     */
+    private const NO_YEAR_LEVEL_TUPLE = [
+        'id' => self::NO_YEAR_LEVEL_ID, 'name' => 'No Year Level'
+    ];
+
+
     /**
      * @var \Schoolbox\Error\Mapper
      */
@@ -383,6 +400,16 @@ class Controller extends ConfigController
 
         $options['yearLevels'] = [];
 
+        /* Arbitrarily-injected "No Year Level" option if it was in the payload originally
+         */
+        if (\in_array(self::NO_YEAR_LEVEL_ID, $optionsPayload['yearLevels'], false)) {
+            $options['yearLevels'] = [
+                self::NO_YEAR_LEVEL_TUPLE
+            ];
+        }
+
+        /* Cram in the rest
+         */
         foreach ($yearLevels as $yearLevel) {
             $options['yearLevels'][] = [
                 'id'   => $yearLevel->getId(),
@@ -476,7 +503,7 @@ class Controller extends ConfigController
      */
     public function getYearLevels(): void
     {
-        $output = [['id' => 0, 'name' => 'No Year Level']];
+        $output = [self::NO_YEAR_LEVEL_TUPLE];
 
         $yearLevels = $this->yearLevelMapper->findAll()->sortBy('sequence', 'ASC');
 
