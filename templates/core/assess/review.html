@@ -38,6 +38,11 @@ $(document).ready(function() {
     forms.find('textarea, input').blur(function(e) {
         e.preventDefault();
         if ($(this).val() !== '') {
+            //if field is input not textarea
+            //check if set mark is larger than 1000, set to that max
+            if ($(this).is('input') && 10000 <= $(this).val()) {
+                $(this).val(1000);
+            }
             $.post(
                 $(this).closest('form').attr('action'),
                 $(this).closest('form').serialize()
