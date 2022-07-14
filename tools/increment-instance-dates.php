@@ -16,7 +16,14 @@ require_once __DIR__ . '/../conf/core/require.php';
  * Tool to increment data dates for sandbox instances
  */
 $app = new class extends CliTool\App {
-    // Columns to increment by year
+    /* This data should only have their Year date components updated,
+     * leaving month and day unchanged. Typically represents a "rollover"
+     * style situation where you want to keep the same dates and months,
+     * only changing the year to something relevant.
+     * Some columns aren't specifically date-related, such as term titles, but
+     * in our demo data such columns -contain- a year which needs updating,
+     * even if it's only for nonfunctional purposes in the ui e.g. "Semester 1, 2015"
+     */
     private const WHITELISTED_COLUMNS_YEAR = [
         'sis_timetable_cycle'      => ['finish', 'start', 'title'],
         'sis_user_profile_student' => ['date_of_birth'],
@@ -24,7 +31,8 @@ $app = new class extends CliTool\App {
         'term'                     => ['start', 'actual_finish', 'display_finish', 'title', 'code'],
     ];
 
-    // Columns to increment
+    /* These columns can have any of their date components adjusted
+     * by incrementation - days, months, years...can all change */
     private const WHITELISTED_COLUMNS = [
         'assess'                 => ['finish', 'start'],
         'assessment'             => ['close_date', 'due_date', 'open_date', 'publish_date'],
@@ -111,19 +119,28 @@ $app = new class extends CliTool\App {
             $this->getLogger()->notice("'date_increment_epoch' not set. Exiting.");
             exit;
         }
-        $epochDate = new Alaress_Date_Format($epoch_config, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        try {
+            $epochDate = new Alaress_Date_Format($epoch_config, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        } catch (InvalidArgumentException $e) {
+            $this->getLogger()->notice("The 'date_increment_epoch' config needs to be in the format " . Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            exit;
+        }
+
+        $now = Alaress_Date_Format::now();
 
         // If date_increment_epoch is more than 7 days ago, increment dates by week(s)
         // I don't think we ever want to set a date in the future to this config?
-        $diffDays = floor(($epochDate->diffInDays(Alaress_Date_Format::now(), false) / 7)) * 7;
+        $diffDays = (int)floor(($epochDate->diffInDays($now, false) / 7)) * 7;
         if ($diffDays <= 0) {
-            $this->getLogger()->notice("Day diff: $diffDays. There's nothing to do here just yet. Exiting.");
+            $this->getLogger()->notice("Day diff of today and date_increment_epoch is $diffDays. It needs to be more than 7 to the increment to happen.");
             exit;
         }
+        $diffYears = $epochDate->diffInYears($now);
+
         $this->getLogger()->notice("Incrementing dates by $diffDays days.");
         $this->getDatabaseInternal()->beginTransaction();
         try {
-            $this->incrementDates((int)$diffDays);
+            $this->incrementDates((int)$diffDays, $diffYears);
         } catch (\Throwable $e) {
             $this->getLogger()->error("Exception caught. Rolling back transaction.");
             $this->getDatabaseInternal()->rollBack();
@@ -136,7 +153,7 @@ $app = new class extends CliTool\App {
     /**
      * Increments all dates in database by specified number
      */
-    private function incrementDates(int $diffDays): void
+    private function incrementDates(int $diffDays, int $diffYears): void
     {
         // Fetch all tables
         $query        = $this->getDatabaseInternal()->executeQuery(
@@ -157,10 +174,10 @@ $app = new class extends CliTool\App {
             $tableColumns[$table][] = $column;
         }
 
-        $diffYears = (int)floor($diffDays / 365);
-
         foreach ($tableColumns as $tableName => $columns) {
-            $this->incrementColumn($tableName, $columns, $diffDays);
+            if (isset(self::WHITELISTED_COLUMNS[$tableName])) {
+                $this->incrementColumn($tableName, $columns, $diffDays);
+            }
             if ($diffYears > 0 && isset(self::WHITELISTED_COLUMNS_YEAR[$tableName])) {
                 $this->incrementYear($tableName, $columns, $diffYears);
             }
@@ -274,12 +291,12 @@ $app = new class extends CliTool\App {
             $updateQuery = $this->getDatabaseInternal()->prepareQuery(
                 "
             UPDATE `$tableName`
-            SET `$column` = DATE_ADD(`$column`, INTERVAL :diff DAY)
+            SET `$column` = DATE_ADD(`$column`, INTERVAL :diff YEAR)
             $whereNotDeleted
             ORDER BY `$column` DESC
         "
             );
-            $updateQuery->execute([':diff' => $diffYears * 365]);
+            $updateQuery->execute([':diff' => $diffYears]);
         }
     }
 };
