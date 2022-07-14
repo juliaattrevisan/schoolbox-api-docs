@@ -1,0 +1,20 @@
+<script type="text/javascript">
+    let url = "{{ url }}";
+
+    function displaySEBSecurityInfo () {
+        SafeExamBrowser.security.updateKeys(didUpdateSEBSecurityInfo);
+    }
+
+    function didUpdateSEBSecurityInfo () {
+        var pageConfigKey = SafeExamBrowser.security.configKey;
+        // var pageBrowserExamKey = SafeExamBrowser.security.browserExamKey;
+        // var sebClientVersion = SafeExamBrowser.version;
+        window.location.href = url + pageConfigKey;
+    }
+
+    if (typeof (SafeExamBrowser) !== 'undefined') {
+        window.addEventListener('load', displaySEBSecurityInfo);
+    } else {
+        window.location.href = url;
+    }
+</script>
