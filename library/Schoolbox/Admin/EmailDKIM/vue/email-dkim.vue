@@ -5,14 +5,14 @@
  */
 import Toast from '@schoolboxVue/components/toast';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
-import ClipboardJs from 'clipboard/dist/clipboard';
+import { timeout } from '@js/util/jsUtils';
+
 
 export default {
 
     components: {
         Toast,
         RevealModal,
-        ClipboardJs
     },
 
     props: {
@@ -54,68 +54,49 @@ export default {
             dkimValueSplit1: '',
             tableColumns: ['domain', 'dateModified.formatted', 'edit'],
             tableOptions: {
-                debounce: 100, //faster debounce as data is stored on the client side,
-                headings: {
-                    domain: 'Domain',
-                    ['dateModified.formatted']: 'Date modified',
-                    edit: ''
-                },
-                resizableColumns: false,
                 columnsClasses: {
                     ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
                     edit: 'edit-td ', //to specify a width
                 },
-                selectable: {
-                    mode: '',
+                customSorting: {
+                    ['dateModified.formatted']: (ascending) => { //sort date modified accurately by the timestamp
+                        return (a, b) => {
+                            if (ascending) {
+                                return a.dateModified.timestamp >= b.dateModified.timestamp ? 1 : -1;
+                            }
+                            return a.dateModified.timestamp <= b.dateModified.timestamp ? 1 : -1;
+                        }
+                    },
                 },
+                debounce: 100, //faster debounce as data is stored on the client side,
                 filterable: false,
                 filterByColumn: false,
-                sortable: [], //the edit column doesn't need to be sortable
-                sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
+                headings: {
+                    domain: 'Domain',
+                    ['dateModified.formatted']: 'Date modified',
+                    edit: '' //to not show any heading
                 },
-                texts: {
-                    count: ''
+                orderBy: { //initial and only sorting display
+                    ascending: true,
+                    column: 'dateModified.formatted'
                 },
+                perPage: 9999, //absurdly large value to avoid pagination as there's no footer
+                resizableColumns: false,
+                sortable: [], //no need for sortable columns, just sorted by date ascending
                 tabbable: false,
+                texts: {
+                    count: '' //don't show any 'x record' at the bottom of the table
+                },
             },
-            selectContainer: null,
-            isShiftKeySelected: false, //to multi-select fields,
-            hasSelectedShiftKey: false, //to hide a UI note
         }
     },
+
     mounted () {
-        new ClipboardJs(
-            this.$refs.copyValueButton,
-            {
-                target: () => this.$refs.dkimValue,
-            }
-        );
-        new ClipboardJs(
-            this.$refs.copyNameButton,
-            {
-                target: () => this.$refs.dkimName,
-            }
-        );
-        new ClipboardJs(
-            this.$refs.copyValueSplit0Button,
-            {
-                target: () => this.$refs.dkimValueSplit0,
-            }
-        );
-        new ClipboardJs(
-            this.$refs.copyValueSplit1Button,
-            {
-                target: () => this.$refs.dkimValueSplit1,
-            }
-        );
         this.loadRows();
     },
 
     methods: {
+
         /**
          * Load domains
          */
@@ -127,7 +108,7 @@ export default {
                 });
                 this.rows = await response.json();
             } catch (error) {
-                console.log(error);
+                console.warn(error);
                 this.hasLoadError = true; //display error note in the DOM
             } finally {
                 this.selectedDomain = Object.assign({}, this.emptyDomain);
@@ -178,17 +159,17 @@ export default {
                     method: 'POST',
                     body: this.getFormData(),
                 });
-                const responseDat = await response.json();
+                const responseData = await response.json();
                 if (response.ok) {
                     this.$refs.toast.timeout('Success', true, 2000);
                 } else {
-                    this.$refs.toast.timeout('Failed - ' + responseDat.error, false, 2000);
+                    this.$refs.toast.timeout('Failed - ' + responseData.error, false, 2000);
                 }
                 this.$refs.domainModal.close();
                 await this.loadRows();
             } catch (error) {
-                console.log(error);
-                this.$refs.toast.timeout('Failed', false, 2000);
+                console.warn(error);
+                this.$refs.toast.timeout('Update failed', false, 2000);
             } finally {
                 this.selectedDomain = Object.assign({}, this.emptyDomain);
             }
@@ -218,16 +199,15 @@ export default {
         async onDeleteDomain () {
             this.$refs.toast.activate('Deleting...');
             try {
-                const response = await fetch(this.selectedDomain.deleteUrl, {
+                await fetch(this.selectedDomain.deleteUrl, {
                     method: 'DELETE'
                 });
-                const responseData = await response.json();
                 this.$refs.toast.timeout('Deleted', true, 2000);
                 this.$refs.deleteModal.close();
                 await this.loadRows();
             } catch (error) {
-                this.$refs.toast.timeout('Failed', false, 2000);
-                console.log(error);
+                console.warn(error);
+                this.$refs.toast.timeout('Delete failed', false, 2000);
             } finally {
                 this.selectedDomain = Object.assign({}, this.emptyDomain);
             }
@@ -251,12 +231,13 @@ export default {
          * @returns {Promise<void>}
          */
         async onClickGetKey (toggledDkim) {
+            this.$refs.toast.activate('Retrieving...');
             try {
                 const response = await fetch(toggledDkim.dkimUrl, {
                     method: 'GET',
                     responseType: 'json'
                 });
-                let dkimData = await response.json();
+                const dkimData = await response.json();
                 this.domainName = dkimData[0].domain;
                 this.dkimName = dkimData[0].dkimName;
                 this.dkimValue = dkimData[0].dkimValue;
@@ -264,24 +245,47 @@ export default {
                 this.dkimValueSplit0 = dkimData[0].dkimValueSplit[0];
                 this.dkimValueSplit1 = dkimData[0].dkimValueSplit[1];
                 this.$refs.dkimModal.open();
+                this.$refs.toast.timeout('Record retrieved', true, 2000);
             } catch (error) {
-                console.log(error);
-                this.hasLoadError = true; //display error note in the DOM
+                console.warn(error);
+                this.$refs.toast.timeout('Record retrieval failed', false, 2000);
             } finally {
                 this.selectedDomain = Object.assign({}, this.emptyDomain);
-                this.hasDataLoaded = true; //update the display to show the list
             }
         },
+
+        /**
+         * Copy the linked text value 
+         *
+         * @param { Event }
+         * @param { String }
+         */
+        async onCopySelected (event, id) {
+            const copyText = document.getElementById(id);
+            copyText.select();
+            copyText.setSelectionRange(0, 999); //to ensure we have the whole range
+            try { 
+                await navigator.clipboard.writeText(copyText.value);
+                event.target.innerText = 'Copied';
+                await timeout(2000);
+                event.target.innerText = 'Copy';
+            } catch (error) {
+                console.warn('Failed to copy: ', error);
+                event.target.innerText = 'Copy failed';
+                await timeout(2000);
+                event.target.innerText = 'Copy';
+            }
+        },
+
     },
+
 }
 </script>
 
 <template>
-    <div class="row actions-small-1">
+    <div class="actions-small-1">
         <div class="list-item">
-            <div class="small-12 island">
-                <h2 class="subheader">Domains</h2>
-            </div>
+            <h2 class="subheader">Domains</h2>
         </div>
         <nav>
             <a @click.prevent="onClickAddDomain" class="icon-add" title="Add a domain"></a>
@@ -295,26 +299,19 @@ export default {
                 </div>
             </section>
         </div>
-        <template v-if="rows.length === 0">
-            <div id="listEmptyState" class="empty-state">
-                <i class="icon-email"></i>
-                <p>DKIM, is an email standard that helps validate emails have come from a trusted source.</p>
-                <p>By using public/private keys a 3rd party can authorise emails signed by your Schoolbox server as
-                    valid and trusted to avoid spam filters and impersonation. For each domain that you control and your
-                    users send email from you must setup a DKIM key and add then add the appropriate records to your DNS
-                    zone.</p>
-            </div>
-        </template>
+        <div v-else-if="hasDataLoaded && rows.length === 0" id="listEmptyState" class="empty-state">
+            <i class="icon-email"></i>
+            <p>DKIM, is an email standard that helps validate emails have come from a trusted source.</p>
+            <p>By using public/private keys a 3rd party can authorise emails signed by your Schoolbox server as
+                valid and trusted to avoid spam filters and impersonation. For each domain that you control and your
+                users send email from, you must setup a DKIM key and add the appropriate records to your DNS zone.</p>
+        </div>
         <v-client-table
-            v-else-if="hasDataLoaded"
-            ref="table"
+            v-else-if="hasDataLoaded && rows.length > 0"
             :data="rows"
             :columns="tableColumns"
             :options="tableOptions"
-            @loaded="onLoaded"
         >
-            <template #beforeTable>
-            </template>
             <template #domain="props">
                 <a @click.prevent="onClickGetKey(props.row)" title="View DKIM TXT Record">{{ props.row.domain }}</a>
             </template>
@@ -328,18 +325,10 @@ export default {
         </v-client-table>
         <div v-else>
             <table class="skeleton">
-                <thead>
-                <tr>
-                    <th></th>
-                </tr>
-                </thead>
                 <tbody>
-                <tr>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                </tr>
+                    <tr><td></td></tr>
+                    <tr><td></td></tr>
+                    <tr><td></td></tr>
                 </tbody>
             </table>
         </div>
@@ -367,36 +356,27 @@ export default {
         <h2>DKIM TXT Record for <strong>{{ domainName }}</strong></h2>
         <h3>TXT Record Name</h3>
         <div class="input-group">
-            <div class="small-12"><input ref="dkimName" readonly type="text" v-model="dkimName"></div>
-            <div>
-                <button ref="copyNameButton" class="icon-copy">Copy</button>
-            </div>
+            <input id="dkimName" readonly type="text" v-model="dkimName">
+            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimName')">Copy</button>
         </div>
         <h3>TXT Record Value</h3>
         <div class="input-group">
-            <div class="small-12"><input ref="dkimValue" readonly type="text" v-model="dkimValue"></div>
-            <div>
-                <button ref="copyValueButton" class="icon-copy">Copy</button>
-            </div>
+            <input id="dkimValue" readonly type="text" v-model="dkimValue">
+            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimValue')">Copy</button>
         </div>
         <h3>TXT Record Value (split to 255 character parts)</h3>
         <div class="input-group">
-            <div class="small-12"><input ref="dkimValueSplit0" readonly type="text" v-model="dkimValueSplit0"></div>
-            <div>
-                <button ref="copyValueSplit0Button" class="icon-copy">Copy</button>
-            </div>
+            <input id="dkimValueSplit0" readonly type="text" v-model="dkimValueSplit0">
+            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimValueSplit0')">Copy</button>
         </div>
         <div class="input-group">
-            <div class="small-12"><input ref="dkimValueSplit1" readonly type="text" v-model="dkimValueSplit1"></div>
-            <div>
-                <button ref="copyValueSplit1Button" class="icon-copy">Copy</button>
-            </div>
+            <input id="dkimValueSplit1" readonly type="text" v-model="dkimValueSplit1">
+            <button class="icon-copy" @click.prevent="onCopySelected($event, 'dkimValueSplit1')">Copy</button>
         </div>
     </reveal-modal>
     <reveal-modal ref="deleteModal">
         <h2>Please Confirm</h2>
-        <p>You are about to delete the DKIM keys for <b>{{ selectedDomain.domain }}</b>, are you sure you want to
-            proceed?</p>
+        <p>You are about to delete the DKIM keys for <b>{{ selectedDomain.domain }}</b>, are you sure you want to proceed?</p>
         <form>
             <ul class="flex-list buttons">
                 <li>
@@ -412,11 +392,10 @@ export default {
 
 <style lang="scss">
 
-@import 'www/static/css/core/base/_colors.scss';
 @import '@schoolboxVue/components/vueTables2/vueTables2';
 
 .VueTables table {
-    table-layout: fixed;
+    table-layout: fixed; //to ensure the flex within can shrink all the way down
 }
 
 .VueTables__table td {
