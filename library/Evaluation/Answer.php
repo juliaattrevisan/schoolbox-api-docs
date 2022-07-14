@@ -248,6 +248,10 @@ abstract class Evaluation_Answer extends DeprecatedModel
      */
     public function saveReviewedResponse($data, $response_id)
     {
+        //fix mark to not overflow
+        if (9999999999999.99 <= $data['reviewedMarks']) {
+            $data['reviewedMarks'] = '9999999999999.99';
+        }
         $reviewedResponse = array(
             'response_id' => $response_id,
             'comment' => $data['comment'],
