@@ -354,15 +354,13 @@
             opacity: 1
           };
 
-          return setTimeout(function () {
-            return el
-              .css(css)
-              .animate(end_css, settings.animation_speed, 'linear', function () {
-                context.locked = false;
-                el.trigger('opened.fndtn.reveal');
-              })
-              .addClass('open');
-          }, settings.animation_speed / 2);
+          return el
+            .css(css)
+            .animate(end_css, settings.animation_speed, 'linear', function () {
+              context.locked = false;
+              el.trigger('opened.fndtn.reveal');
+            })
+            .addClass('open');
         }
 
         css.top = $(window).scrollTop() + el.data('css-top') + 'px';
@@ -370,15 +368,13 @@
         if (animData.fade) {
           var end_css = {opacity: 1};
 
-          return setTimeout(function () {
-            return el
-              .css(css)
-              .animate(end_css, settings.animation_speed, 'linear', function () {
-                context.locked = false;
-                el.trigger('opened.fndtn.reveal');
-              })
-              .addClass('open');
-          }, settings.animation_speed / 2);
+          return el
+            .css(css)
+            .animate(end_css, settings.animation_speed, 'linear', function () {
+              context.locked = false;
+              el.trigger('opened.fndtn.reveal');
+            })
+            .addClass('open');
         }
 
         return el.css(css).show().css({opacity : 1}).addClass('open').trigger('opened.fndtn.reveal');
@@ -421,27 +417,23 @@
             opacity: 0
           };
 
-          return setTimeout(function () {
-            return el
-              .animate(end_css, settings.animation_speed, 'linear', function () {
-                context.locked = false;
-                el.css(css).trigger('closed.fndtn.reveal');
-              })
-              .removeClass('open');
-          }, settings.animation_speed / 2);
+          return el
+            .animate(end_css, settings.animation_speed, 'linear', function () {
+              context.locked = false;
+              el.css(css).trigger('closed.fndtn.reveal');
+            })
+            .removeClass('open');
         }
 
         if (animData.fade) {
           var end_css = {opacity : 0};
 
-          return setTimeout(function () {
-            return el
-              .animate(end_css, settings.animation_speed, 'linear', function () {
-                context.locked = false;
-                el.css(css).trigger('closed.fndtn.reveal');
-              })
-              .removeClass('open');
-          }, settings.animation_speed / 2);
+          return el
+            .animate(end_css, settings.animation_speed, 'linear', function () {
+              context.locked = false;
+              el.css(css).trigger('closed.fndtn.reveal');
+            })
+            .removeClass('open');
         }
 
         return el.hide().css(css).removeClass('open').trigger('closed.fndtn.reveal');
