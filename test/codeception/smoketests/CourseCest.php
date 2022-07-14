@@ -439,6 +439,9 @@ class CourseCest
         #THEN
         $i->seeResponseCodeIs(200);
 
+        # taking the class assessments ids for the activities exported above
+        $dueWorkUnitSpec1Id = $i->grabNumRecords('v_assessment_relation');
+        $taskUnitSpec1Id= $i->grabNumRecords('v_assessment_relation');
         #WHEN removes 1 due work already exported to the class
         $assessmentPayloadDelete = new Payload\Course\Specification\Delete($course_spec->getId(),$dueWorkUnitSpec1->getId());
         $i->amGoingTo('Send request to delete due work 1 - due work already exported to a class');
@@ -452,10 +455,71 @@ class CourseCest
         #THEN
         $i->seeResponseCodeIs(303);
         $i->amGoingTo("check that the task and due work removed from the course are still presented in the class page");
-        $folderId = $i->grabFromDatabase('v_assessment_relation','folder_id',['assessment_id' => $dueWorkUnitSpec1->getId()]);
-        var_dump($folderId);
-        var_dump($groupFolder->getId());
+        $folderId = $i->grabFromDatabase('v_assessment_relation','folder_id',['assessment_id' =>$dueWorkUnitSpec1Id]);
         $i->assertEquals($folderId,$groupFolder->getId());
+        $folderId = $i->grabFromDatabase('v_assessment_relation','folder_id',['assessment_id' =>$taskUnitSpec1Id]);
+        $i->assertEquals($folderId,$groupFolder->getId());
+
+        #remove 1 due work not yet exported to the class
+        $assessmentPayloadDelete = new Payload\Course\Specification\Delete($course_spec->getId(),$dueWorkUnitSpec3->getId());
+        $i->amGoingTo('Send request to delete due work 3 - due work not exported to a class');
+        $i->sendRequest($assessmentPayloadDelete);
+        #THEN
+        $i->seeResponseCodeIs(303);
+        #remove 1 task not yet exported to the class
+        $assessmentPayloadDelete = new Payload\Course\Specification\Delete($course_spec->getId(),$taskUnitSpec3->getId());
+        $i->amGoingTo('Send request to delete task 3 - task not exported to a class');
+        $i->sendRequest($assessmentPayloadDelete);
+        #THEN
+        $i->seeResponseCodeIs(303);
+
+        #WHEN a due work and a task to the class not yet exported
+        $importCourseSpecPayload = new Payload\Course\Import\Part1($course_spec->getId(), $groupFolder->getId(), 0, '');
+        $i->amGoingTo('Send import Step 1. course spec to class page #' . $groupFolder->getId());
+        $i->sendRequest($importCourseSpecPayload);
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        #WHEN
+        $part2 = new Payload\Course\Import\Part2($course_spec->getId(), $groupFolder->getId(), 0, '', $course_spec->getId(), (string)$groupFolder->getId(), null);
+        $unitOpen = strtotime('- 5 day');
+        $unitClose = strtotime('+ 35 day');
+        $part2->setUnitImport(3, $unitSpecId3, null, true, $unitOpen, $unitClose);
+        $i->amGoingTo('Send import Step 2. unit specs to group page course, group page #' . $groupFolder->getId());
+        $i->sendRequest($part2);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        #WHEN
+        $selectedUnits = [
+            [
+                'spec_id' => $unitSpecId3,
+                'impl_id' => '',
+                'open'    => date('d/m/Y', strtotime('- 5 day')),
+                'close'   => date('d/m/Y', strtotime('+ 35 day')),
+            ],
+        ];
+        $part3 = new Payload\Course\Import\Part3($course_spec->getId(), $groupFolder->getId(), 0, '', $course_spec->getId(), (string)$groupFolder->getId(), null, $selectedUnits);
+        $part3->setAssessmentImport($unitSpecId3, $dueWorkUnitSpec4->getId(), null, true, strtotime('-10 day'), null, strtotime('+10 day'), null);
+        $part3->setAssessmentImport($unitSpecId3, $taskUnitSpec4->getId(), null, true, strtotime('-10 day'), null, strtotime('+10 day'), null);
+
+        $i->amGoingTo('Send import Step 3. assessments to class page course unit spec, class page #' . $groupFolder->getId());
+        $i->sendRequest($part3);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
+
+        # taking the class assessments ids for the activities exported above
+        $dueWorkUnitSpec4Id = $i->grabNumRecords('v_assessment_relation');
+        $taskUnitSpec4Id= $i->grabNumRecords('v_assessment_relation');
+
+        $i->amGoingTo("check that the task and due work are presented in the class page");
+        $folderId = $i->grabFromDatabase('v_assessment_relation','folder_id',['assessment_id' =>$dueWorkUnitSpec4Id]);
+        $i->assertEquals($folderId,$groupFolder->getId());
+        $folderId = $i->grabFromDatabase('v_assessment_relation','folder_id',['assessment_id' =>$taskUnitSpec4Id]);
+        $i->assertEquals($folderId,$groupFolder->getId());
+
     }
 
     /** Convenience helper to create assessments
