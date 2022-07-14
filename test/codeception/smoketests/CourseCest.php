@@ -64,11 +64,7 @@ class CourseCest
         #WHEN
         $course_spec = $i->grabFirstCourseSpecByTitle($title);
         $unit_name   = $title . ' EmptyUnit';
-
-        $unitSpecPayload = new Payload\Course\Unit\Specification\Create($course_spec->getId());
-        $unitSpecPayload->setFormParam('name', $unit_name);
-        $i->amGoingTo('Send request create a unit spec');
-        $i->sendRequest($unitSpecPayload);
+        $this->createUnit($i,$course_spec->getId(),$unit_name);
 
         #THEN
         $i->seeResponseCodeIs(200);
@@ -126,10 +122,7 @@ class CourseCest
         $course_spec = $i->grabFirstCourseSpecByTitle($title);
         $unit_name   = $title . ' With 1 project';
 
-        $unitSpecPayload = new Payload\Course\Unit\Specification\Create($course_spec->getId());
-        $unitSpecPayload->setFormParam('name', $unit_name);
-        $i->amGoingTo('Send request create a unit spec');
-        $i->sendRequest($unitSpecPayload);
+        $this->createUnit($i,$course_spec->getId(),$unit_name);
         $unitSpec        = $i->grabFirstUnitSpecByTitle($unit_name);
         $unit_folder = $i->grabFirstFolderByTitle($unit_name);
 
@@ -455,10 +448,16 @@ class CourseCest
         #THEN
         $i->seeResponseCodeIs(303);
         $i->amGoingTo("check that the task and due work removed from the course are still presented in the class page");
-        $folderId = $i->grabFromDatabase('v_assessment_relation','folder_id',['assessment_id' =>$dueWorkUnitSpec1Id]);
-        $i->assertEquals($folderId,$groupFolder->getId());
-        $folderId = $i->grabFromDatabase('v_assessment_relation','folder_id',['assessment_id' =>$taskUnitSpec1Id]);
-        $i->assertEquals($folderId,$groupFolder->getId());
+
+        # taking the class assessments ids for the activities removed from the course above and
+        # checking if the assessment id is presented in the class page
+        $dueWorkUnitSpec1Id = $i->grabFromDatabase('assessment','id',['title' => $dueWorkUnitSpec1->getTitle(),'publish_date !=' => null]);
+        $taskUnitSpec1Id= $i->grabFromDatabase('assessment','id',['title' => $taskUnitSpec1->getTitle(),'publish_date !=' => null]);
+        $arr = array($dueWorkUnitSpec1Id,$taskUnitSpec1Id);
+        foreach ($arr as &$value) {
+            $folderId = $i->grabFromDatabase('v_assessment_relation', 'folder_id', ['assessment_id' => $value]);
+            $i->assertEquals($folderId, $groupFolder->getId());
+        }
 
         #remove 1 due work not yet exported to the class
         $assessmentPayloadDelete = new Payload\Course\Specification\Delete($course_spec->getId(),$dueWorkUnitSpec3->getId());
@@ -510,16 +509,16 @@ class CourseCest
         #THEN
         $i->seeResponseCodeIs(200);
 
-        # taking the class assessments ids for the activities exported above
-        $dueWorkUnitSpec4Id = $i->grabNumRecords('v_assessment_relation');
-        $taskUnitSpec4Id= $i->grabNumRecords('v_assessment_relation');
-
-        $i->amGoingTo("check that the task and due work are presented in the class page");
-        $folderId = $i->grabFromDatabase('v_assessment_relation','folder_id',['assessment_id' =>$dueWorkUnitSpec4Id]);
-        $i->assertEquals($folderId,$groupFolder->getId());
-        $folderId = $i->grabFromDatabase('v_assessment_relation','folder_id',['assessment_id' =>$taskUnitSpec4Id]);
-        $i->assertEquals($folderId,$groupFolder->getId());
-
+        # taking the class assessments ids for the activities exported above and
+        # checking if the assessment id is presented in the class page
+        $i->amGoingTo("check if the assessments exported are presented in the class page");
+        $dueWorkUnitSpec4Id = $i->grabFromDatabase('assessment','id',['title' => $dueWorkUnitSpec4->getTitle(),'publish_date !=' => null]);
+        $taskUnitSpec4Id= $i->grabFromDatabase('assessment','id',['title' => $taskUnitSpec4->getTitle(),'publish_date !=' => null]);
+        $arr = array($dueWorkUnitSpec4Id,$taskUnitSpec4Id);
+        foreach ($arr as &$value) {
+            $folderId = $i->grabFromDatabase('v_assessment_relation', 'folder_id', ['assessment_id' => $value]);
+            $i->assertEquals($folderId, $groupFolder->getId());
+        }
     }
 
     /** Convenience helper to create assessments
