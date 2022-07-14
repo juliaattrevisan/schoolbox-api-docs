@@ -13,7 +13,12 @@ use Schoolbox\Application\CliTool;
 require_once __DIR__ . '/../conf/core/require.php';
 
 /**
- * Tool to increment data dates for sandbox instances
+ * This tool runs regularly on the demo instance. It's currently scheduled to run every night to refresh its data,
+ * ensuring that dates maintain relevancy around the current datetime, preventing data stagnating and/or
+ * consequently disappearing from view.
+ *
+ * (It's not listed in the repo cron nor is it particularly obvious where this occurs, but this tool wasn't really intended
+ * for regular human interactivity)
  */
 $app = new class extends CliTool\App {
     /* This data should only have their Year date components updated,
@@ -186,7 +191,7 @@ $app = new class extends CliTool\App {
         $this->getDatabaseInternal()->executeQuery(
             "
                 UPDATE config
-                SET value = DATE_ADD(value, INTERVAL :diff DAY)
+                SET value = DATE_FORMAT(DATE_ADD(value, INTERVAL :diff DAY), '%Y-%m-%d')
                 WHERE name = :configName
             ",
             [
