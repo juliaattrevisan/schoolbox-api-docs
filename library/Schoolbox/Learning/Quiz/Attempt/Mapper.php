@@ -560,6 +560,12 @@ class Mapper extends BaseMapper
         /**
          * collate all marks and total possible marks, and update this field.
          */
+        /**
+         * If the sum of the answer marks will overflow the assess_attempt::mark field, use the max_mark value,
+         * unless that will overflow then use the max allowed value `9999999999999.99` which is created from `decimal(15,2)`
+         * Also update the max_mark to the sum of question marks, if it will overflow assess_attempt::max_mark
+         * then use the max allowed value `9999999999999.99` which is created from `decimal(15,2)`
+         */
         $query =  $this->getDatabase()->prepare("
         UPDATE assess_attempt,
             (SELECT
