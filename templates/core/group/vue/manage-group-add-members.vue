@@ -4,11 +4,9 @@
  * Add members to the group
  */
 
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useStore } from './store/manageGroupStore';
-import { useMembersStore } from './store/manageGroupMembersStore';
 import { useAddMembersStore } from './store/manageGroupAddMembersStore';
-import LoadingTable from '@schoolboxVue/components/loading/loading-table';
 
 
 const props = defineProps({
@@ -21,9 +19,15 @@ const props = defineProps({
 });
 
 const store = useStore();
-const membersStore = useMembersStore();
 const addMembersStore = useAddMembersStore();
 const isProcessing = ref(false);
+
+/**
+ * ensure the tabs and tooltips work
+ */
+onMounted(() => {
+    $(document).foundation(); 
+});
 
 /**
  * add the selected members to the group
@@ -66,7 +70,7 @@ const addButtonText = computed(() => isProcessing.value ? 'Adding...' : 'Add Mem
     <div class="row">
         <div class="small-12 island">
         <h2 class="subheader">Add Members</h2>
-            <section v-if="membersStore.hasGroupMembers">
+            <section>
                 <div class="content" id="addMembers">
                     <dl class="tabs" data-tab>
                         <dd class="active"><a href="#userName">From Name</a></dd>
@@ -124,7 +128,6 @@ const addButtonText = computed(() => isProcessing.value ? 'Adding...' : 'Add Mem
                     </section>
                 </div>
             </section>
-            <loading-table v-else-if="store.isLoading" />
         </div><!-- small-12 island -->
     </div><!-- row  -->
 </template>

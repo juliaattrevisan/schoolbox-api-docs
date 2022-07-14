@@ -9,7 +9,6 @@ import { EventBus } from 'v-tables-3-select-rows';
 import { useStore } from './store/manageGroupStore';
 import { useMembersStore } from './store/manageGroupMembersStore';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
-import LoadingTable from '@schoolboxVue/components/loading/loading-table';
 import ManageGroupMembersFilters from './manage-group-members-filters.vue';
 import ManageGroupMembersAccess from './manage-group-members-access.vue';
 import FilterEvents from './manageGroupFilterEvents';
@@ -111,13 +110,6 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
  */
 async function onLoaded () {
     updateFooterUI();
-}
-
-/**
- * Reload the page to try loading again
- */
-function onRefreshSelected () {
-    location.reload();
 }
 
 
@@ -251,14 +243,6 @@ function updateSelectedMembers () {
                 <i class="icon-group"></i>
                 <p>This group currently has no members.<br>Once members have been added they will appear here.</p>
             </div>
-            <div v-else-if="membersStore.hasLoadError">
-                <section class="content">
-                    <div tableData-alert class="alert-box alert">
-                        Sorry, we are currently unable to load the group members. Please <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected">refresh the page</a> to try again contact and your support it the problem persists.
-                    </div>
-                </section>
-            </div>
-            <loading-table v-else-if="store.isLoading" />
         </div><!-- small-12 island -->
     </div><!-- row  -->
     

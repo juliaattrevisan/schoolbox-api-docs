@@ -8,6 +8,7 @@ import { ref, onBeforeMount, onMounted } from 'vue';
 import Endpoints from './manageGroupEndpoints';
 import { useStore } from './store/manageGroupStore';
 import ManageGroupHeading from './manage-group-heading.vue';
+import LoadingTable from '@schoolboxVue/components/loading/loading-table';
 import ManageGroupAddMembers from './manage-group-add-members.vue';
 import ManageGroupMembers from './manage-group-members.vue';
 import ManageGroupSelect from './manage-group-select.vue';
@@ -62,6 +63,7 @@ const props = defineProps({
     },
 });
 
+const store = useStore();
 const toastEl = ref(null);
 
 /**
@@ -81,20 +83,42 @@ onBeforeMount(() => {
  * load the data and ensure any foundation features work 
  */
 onMounted(() => {
-    const store = useStore();
+    store.$reset(); //ensure the store state is as it's initially set, this is just for Storybook when switching between stories
     store.loadData();
-    $(document).foundation(); 
 });
+
+/**
+ * Reload the page to try loading again
+ */
+function onRefreshSelected () {
+    location.reload();
+}
 
 </script>
 
 <template>
     <manage-group-heading :toast-el="toastEl" />
-    <manage-group-add-members :toast-el="toastEl" />
-    <manage-group-members :toast-el="toastEl" />
-    <manage-group-select :toast-el="toastEl" />
-    <manage-group-remove-members :toast-el="toastEl" />
-    <manage-group-update-settings :toast-el="toastEl" />
-    <manage-group-disband-group :toast-el="toastEl" />
-    <toast ref="toastEl"></toast>
+    <div v-if="store.isLoading" class="row">
+        <div class="small-12 island">
+            <loading-table  />
+        </div>
+    </div>
+    <div v-else-if="store.hasLoadError" class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <div tableData-alert class="alert-box alert">
+                    Sorry, we are currently unable to load this groups data. Please <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected">refresh the page</a> to try again and contact your support if the problem persists.
+                </div>
+            </section>
+        </div>
+    </div>
+    <template v-else-if="store.hasLoadedOk">
+        <manage-group-add-members :toast-el="toastEl" />
+        <manage-group-members :toast-el="toastEl" />
+        <manage-group-select :toast-el="toastEl" />
+        <manage-group-remove-members :toast-el="toastEl" />
+        <manage-group-update-settings :toast-el="toastEl" />
+        <manage-group-disband-group :toast-el="toastEl" />
+        <toast ref="toastEl"></toast>
+    </template>
 </template>

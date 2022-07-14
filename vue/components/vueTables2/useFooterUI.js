@@ -26,13 +26,13 @@ export async function updateFooterUI () {
 function pushUIIntoFooterSlot () {
     const perPageControls = document.querySelector('.VueTables__limit');
     const tableFooter = document.querySelector('[data-table-footer]');
-    if (perPageControls) { //may not exist depending on how many results are currently available / filtered
+    if (perPageControls && tableFooter) { //may not exist depending on how many results are currently available / filtered
         tableFooter.appendChild(perPageControls);
+        const paginationCount = document.querySelector('.VuePagination__count');
+        tableFooter.appendChild(paginationCount);
+        const paginationControls = document.querySelector('.VuePagination');
+        tableFooter.appendChild(paginationControls);
     }
-    const paginationCount = document.querySelector('.VuePagination__count');
-    tableFooter.appendChild(paginationCount);
-    const paginationControls = document.querySelector('.VuePagination');
-    tableFooter.appendChild(paginationControls);
 }
 
 /**

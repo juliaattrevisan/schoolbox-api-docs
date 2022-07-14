@@ -18,6 +18,20 @@ export const useStore = defineStore('manageGroup', {
         groupId: 0, //the id of the group
     }),
 
+    getters: {
+
+        /**
+         * When load is complete and and was a success
+         * 
+         * @returns { Boolean } 
+         */
+        hasLoadedOk () {
+            const store = useStore();
+            return !this.isLoading && !this.hasLoadError;
+        },
+
+    },
+
     actions: {
 
         /**
@@ -28,12 +42,17 @@ export const useStore = defineStore('manageGroup', {
         async loadData () {
             try {
                 const response = await fetch(Endpoints.GROUP_DATA);
-                const responseJson = await response.json();
-                this.groupId = responseJson.groupId;
-                const settingsStore = useSettingsStore();
-                settingsStore.loadSettings(responseJson.settings);
-                const membersStore = useMembersStore();
-                membersStore.loadMembers(responseJson.members);
+                if (response.ok) {
+                    const responseJson = await response.json();
+                    this.groupId = responseJson.groupId;
+                    const settingsStore = useSettingsStore();
+                    settingsStore.loadSettings(responseJson.settings);
+                    const membersStore = useMembersStore();
+                    membersStore.loadMembers(responseJson.members);
+                } else {
+                    console.warn(response);
+                    this.hasLoadError = true; //show the load error display state 
+                }
             } catch (error) {
                 console.warn(error);
                 this.hasLoadError = true; //show the load error display state 
