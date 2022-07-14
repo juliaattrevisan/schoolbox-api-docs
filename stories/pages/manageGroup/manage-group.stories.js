@@ -101,6 +101,7 @@ export default {
     title: 'Pages/ManageGroup',
 };
 
+
 const Template = (args, { argTypes }) => ({
     components: { ManageGroup },
     setup() {
@@ -111,7 +112,6 @@ const Template = (args, { argTypes }) => ({
         <manage-group v-bind="args" />
         `,
 });
-
 
 
 export const Default = Template.bind({});
@@ -140,6 +140,24 @@ NoMembers.parameters = {
                     ctx.json({
                         ...data, 
                         members: [], //start with no members
+                    })
+                ) 
+            }),
+            ...mswHandlers,
+        ]
+    }
+}
+
+export const NoGroupAdmins = Template.bind({});
+NoGroupAdmins.parameters = {
+    msw: {
+        handlers: [
+            rest.get(groupDataEndpoint, (req, res, ctx) => {
+                return res( 
+                    ctx.delay(1000),
+                    ctx.json({
+                        ...data, 
+                        members: [ ...data.members.filter((member) => member.accessType !== 'admin')], //to pull out the admins
                     })
                 ) 
             }),

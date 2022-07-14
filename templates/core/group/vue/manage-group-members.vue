@@ -204,6 +204,7 @@ function updateSelectedMembers () {
    <div class="row">
         <div class="small-12 island">
             <h2 class="subheader">Current Members</h2>
+            <div v-if="membersStore.hasNoGroupAdmins" class="alert-box warning">Please note, this group currently has no Group Admins.</div>
             <v-client-table
                 v-if="membersStore.hasGroupMembers"
                 ref="tableEl"

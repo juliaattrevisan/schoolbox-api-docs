@@ -37,6 +37,15 @@ export const useMembersStore = defineStore('manageGroupMembers', {
             const store = useStore();
             return !store.isLoading && !store.hasLoadError && this.groupMembers.length === 0;
         },
+
+        /**
+         * To display an alert note there's currently no group admins 
+         * 
+         * @returns { Boolean } 
+         */
+        hasNoGroupAdmins () {
+            return this.groupMembers.filter((member) => member.accessType === AccessTypes.ADMIN).length === 0;
+        },
         
     },
 
