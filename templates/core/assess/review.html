@@ -39,9 +39,9 @@ $(document).ready(function() {
         e.preventDefault();
         if ($(this).val() !== '') {
             //if field is input not textarea
-            //check if set mark is larger than 1000, set to that max
-            if ($(this).is('input') && 10000 <= $(this).val()) {
-                $(this).val(10000);
+            //check if set mark is larger than 9999999999999.99, set to that max
+            if ($(this).is('input') && 9999999999999.99 <= $(this).val()) {
+                $(this).val(9999999999999.99);
             }
             $.post(
                 $(this).closest('form').attr('action'),
