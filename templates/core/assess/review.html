@@ -41,7 +41,7 @@ $(document).ready(function() {
             //if field is input not textarea
             //check if set mark is larger than 1000, set to that max
             if ($(this).is('input') && 10000 <= $(this).val()) {
-                $(this).val(1000);
+                $(this).val(10000);
             }
             $.post(
                 $(this).closest('form').attr('action'),
