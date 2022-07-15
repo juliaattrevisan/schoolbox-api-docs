@@ -39,10 +39,10 @@ const mswHandlers = [
             ctx.delay(1000),
             ctx.json({
                 newMembers: [
-                    {"id":201,"firstName":"John","lastName":"Smith","userId":200,"accessType":"read","meta":"Year 11, Senior Campus"},
-                    {"id":202,"firstName":"Jane","lastName":"Cooper","userId":201,"accessType":"read","meta":"Year 11, Senior Campus"},
-                    {"id":203,"firstName":"Candy","lastName":"Melon","userId":202,"accessType":"read","meta":"Teacher"},
-                    {"id":204,"firstName":"Guava","lastName":"Apple","userId":203,"accessType":"read","meta":"Year 11, Senior Campus"},
+                    {"id":201,"firstName":"Valentine","lastName":"Holmes","userId":200,"accessType":"read","meta":"2022 QLD State of Origin Team"},
+                    {"id":202,"firstName":"Kurt","lastName":"Capewell","userId":201,"accessType":"read","meta":"2022 QLD State of Origin Team"},
+                    {"id":203,"firstName":"Kalyn","lastName":"Ponga","userId":202,"accessType":"read","meta":"2022 QLD State of Origin Team"},
+                    {"id":204,"firstName":"Ben","lastName":"Hunt","userId":203,"accessType":"read","meta":"2022 QLD State of Origin Team"},
                 ],
                 success: true,
             })
