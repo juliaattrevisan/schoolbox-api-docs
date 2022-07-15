@@ -23,7 +23,7 @@ $kernel       = new Kernel();
 $user         = $_SESSION['user'];
 $folderMapper = FolderMapper::getInstance();
 
-// Return the IDs homepages that the current user has read access to that matches the prefix
+// Return the ID's of homepages that the current user has read access to that matches the prefix
 $groupFolders = $folderMapper->findForUser($user, false, UserAccess::ACCESS_READ, false, true)
                              ->sortNaturally('name')
                              ->filter(
