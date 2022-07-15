@@ -79,24 +79,25 @@
                 } else {
                     updateStatusBar("ssl_port_80", "Fail", "alert");
 
-                    if ('location' in xhr.responseJSON.response.headers) {
-                        if (xhr.responseJSON.response.headers['location'].startsWith("https")) {
-                            if ('server' in xhr.responseJSON.response.headers) {
-                                const serverResponseHeader = xhr.responseJSON.response.headers['server']
-                                updateStatusBar("ssl_https_upgrade", "Fail: Check " + serverResponseHeader, "alert");
-                                updateServer(serverResponseHeader);
-                            } else {
-                                updateStatusBar("ssl_https_upgrade", "Fail", "alert");
-                            }
-                        } else {
-                            updateStatusBar("ssl_https_upgrade", "Indeterminate", "warning");
-                        }
-                    }
-
                     if (xhr.status === 400) {
                         updateStatusBar("ssl_upstream_error", "Fail", "alert");
+
+                        if ('location' in xhr.responseJSON.response.headers) {
+                            if (xhr.responseJSON.response.headers['location'].startsWith("https")) {
+                                if ('server' in xhr.responseJSON.response.headers) {
+                                    const serverResponseHeader = xhr.responseJSON.response.headers['server']
+                                    updateStatusBar("ssl_https_upgrade", "Fail: Check " + serverResponseHeader, "alert");
+                                    updateServer(serverResponseHeader);
+                                } else {
+                                    updateStatusBar("ssl_https_upgrade", "Fail", "alert");
+                                }
+                            } else {
+                                updateStatusBar("ssl_https_upgrade", "Indeterminate", "warning");
+                            }
+                        }
                     } else if (xhr.status === 500) {
                         updateStatusBar("ssl_upstream_error", "Fail: Timeout", "alert");
+                        updateStatusBar("ssl_https_upgrade", "Indeterminate", "warning");
                     }
                 }
             },
