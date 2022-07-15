@@ -14,6 +14,7 @@ use Schoolbox\Mail\EmailFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Address;
 
 /**
  * Class MailService
@@ -45,6 +46,7 @@ class MailService
      */
     private $resetMapper;
 
+    private Address | null $from;
 
     /**
      * @param IConfigLoader $config
@@ -58,9 +60,9 @@ class MailService
         UserMapper $userMapper,
         EmailFactory $mailFactory
     ) {
-        $this->config = $config;
+        $this->config      = $config;
         $this->mailFactory = $mailFactory;
-        $this->userMapper = $userMapper;
+        $this->userMapper  = $userMapper;
         $this->resetMapper = $resetMapper;
     }
 
@@ -71,8 +73,8 @@ class MailService
      *
      * @param string $emailAddress
      * @param string $remoteAddress
-     * @throws PDOException if the attempt to save the Reset object fails
      * @return void
+     * @throws PDOException if the attempt to save the Reset object fails
      */
     public function sendResetLinkToAddress($emailAddress, $remoteAddress)
     {
@@ -98,13 +100,13 @@ class MailService
      * and a link to set their password for the first time.
      *
      * @param User $user
-     * @throws PDOException if the attempt to save the Reset object fails
      * @return void
+     * @throws PDOException if the attempt to save the Reset object fails
      */
     public function sendWelcomeEmailToUser(User $user)
     {
         $this->sendResetToUsers(
-            [ $user ],
+            [$user],
             '0.0.0.0',
             'userPasswordReset/welcome/reset.twig',
             'userPasswordReset/welcome/userNotAllowedReset.twig',
@@ -120,9 +122,7 @@ class MailService
      */
     public function sendUsernameChangeEmailToUser(User $user, $oldUsername)
     {
-        $subject     = $this->config->get('title') . ' Username Change';
-        $fromAddress = $this->config->get('password_change_email_from');
-        $fromName    = $this->config->get('mail_from_name');
+        $subject = $this->config->get('title') . ' Username Change';
 
         $email = $this->mailFactory->buildTwigEmail(
             'userPasswordReset/welcome/usernameChange.twig',
@@ -130,12 +130,12 @@ class MailService
             $user
         );
 
-        $email->setFrom($fromAddress, $fromName);
+        $email->setFrom($this->getFrom());
 
         $email->setContext([
-            'user'        => $user,
-            'oldUsername' => $oldUsername
-        ]);
+                               'user'        => $user,
+                               'oldUsername' => $oldUsername,
+                           ]);
 
         try {
             return $email->send();
@@ -153,8 +153,8 @@ class MailService
      * @param string $canResetTemplate
      * @param string $canNotResetTemplate
      * @param string $subject
-     * @throws PDOException                 if the attempt to save the Reset object fails
      * @return bool[]                       array of successes/failures, indexed by address, ie. [ email => success ]
+     * @throws PDOException                 if the attempt to save the Reset object fails
      */
     private function sendResetToUsers(
         array $users,
@@ -163,8 +163,8 @@ class MailService
         string $canNotResetTemplate,
         ?string $subject = null
     ) {
-        $sent = [];
-        $subject     = $subject ?: $this->config->get('title') . ' Password Reset';
+        $sent    = [];
+        $subject = $subject ?: $this->config->get('title') . ' Password Reset';
 
         if (empty($users)) {
             // No users to mail to were found.
@@ -174,9 +174,6 @@ class MailService
             $email->sendToBlackhole();
             return $sent;
         }
-
-        $fromAddress = $this->config->get('password_change_email_from');
-        $fromName    = $this->config->get('mail_from_name');
 
         foreach ($users as $user) {
             // Make sure the user is allowed to reset password based on their role
@@ -190,9 +187,7 @@ class MailService
                     $sent[$user->getEmail()] = $this->sendResetWithTemplate(
                         $reset,
                         $canResetTemplate,
-                        $subject,
-                        $fromAddress,
-                        $fromName
+                        $subject
                     );
                 }
             } else {
@@ -200,9 +195,7 @@ class MailService
                 $sent[$user->getEmail()] = $this->sendResetWithTemplate(
                     $this->resetMapper->createModel()->setUser($user),
                     $canNotResetTemplate,
-                    $subject,
-                    $fromAddress,
-                    $fromName
+                    $subject
                 );
             }
         }
@@ -215,11 +208,9 @@ class MailService
      * @param Reset\Model $reset
      * @param string      $template
      * @param string      $subject
-     * @param string      $fromAddress
-     * @param string      $fromName
      * @return bool                    whether or not the email successfully sent
      */
-    private function sendResetWithTemplate(Reset\Model $reset, $template, $subject, $fromAddress, $fromName)
+    private function sendResetWithTemplate(Reset\Model $reset, $template, $subject)
     {
         $user = $reset->getUser();
         if (!filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL)) {
@@ -229,7 +220,7 @@ class MailService
         }
 
         $email = $this->mailFactory->buildTwigEmail($template, $subject, $user);
-        $email->setFrom($fromAddress, $fromName);
+        $email->setFrom($this->getFrom());
         $email->encodeBase64();
         $email->setContext([
                                'user'            => $user,
@@ -242,5 +233,16 @@ class MailService
         } catch (TransportExceptionInterface $e) {
             return false;
         }
+    }
+
+    /**
+     * @return Address|null
+     */
+    private function getFrom()
+    {
+        if (!$this->from) {
+            $this->from = new Address($this->config->get(EmailFactory::CONFIG_MAIL_PASSWORD_CHANGE), $this->config->get(EmailFactory::CONFIG_MAIL_FROM_NAME));
+        }
+        return $this->from;
     }
 }

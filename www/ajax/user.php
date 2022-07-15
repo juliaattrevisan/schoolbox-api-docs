@@ -25,12 +25,11 @@ $groupHandler = new Group();
 $pageHandler = $kernel->get('sitePage');
 $pageHandler->initSession();
 
-$emailObj = new Email();
 $userMapper = UserMapper::getInstance();
 
 $result = $suggestions = $data = $return = [];
 
-$excludeID = $_GET['excludeID'] ?? null;
+$excludeID = isset($_GET['excludeID']) ? intval($_GET['excludeID']) : null;
 $keyword = $_GET['query'] ?? null;
 $groupID = $_GET['groupID'] ?? null;
 $roleTypeID = $_GET['roleTypeID'] ?? null;
@@ -39,6 +38,7 @@ $roleTypeID = $_GET['roleTypeID'] ?? null;
 //$showCampus = !empty($_GET['showCampus']);
 $showCampus = false;
 $residentialHouseID = $_GET['residentialHouseID'] ?? null;
+$showEmail = $_GET['email'] ?? false;
 
 if (!empty($residentialHouseID)) {
     $residentialHouseID = explode(';', $residentialHouseID);
@@ -81,6 +81,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
     }
 
     $userList = false;
+    $userCollection = $userMapper->createCollection();
 
     // If groupID is empty array, we should not return any users
     // If groupID = [0], we should return all matching users regardless of role
@@ -91,6 +92,9 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
             $residentialHouseID,
             30
         );
+        if ($userList && ($showEmail || $filterParents)) {
+            $userCollection = $userMapper->findByColumn('id', array_column($userList, 'uid'))->indexBy('id');
+        }
     }
 
     $student = null;
@@ -98,22 +102,27 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
     // If we are getting parents of a student, load the student and populate their parents
 
     if ($filterParents) {
-        $student = $userMapper->findById($_GET["studentId"] ?? null);
-        if ($student) {
+        try {
+            $student = $userMapper->findById($_GET["studentId"] ?? null);
             $student->loadParents();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop
         }
     }
 
     if (is_array($userList)) {
         foreach ($userList as $user) {
-            if ($user['uid'] == $excludeID) {
+            $userId = intval($user['uid']);
+            if ($userId === $excludeID) {
                 continue;
             }
 
             // If required, filter to parents of the selected child
 
             if ($filterParents && $student != null) {
-                if ($userSchoolbox = $userMapper->findById($user["uid"])) {
+                /** @var \Schoolbox\User|null $userSchoolbox */
+                $userSchoolbox = $userCollection->offsetGet($userId);
+                if ($userSchoolbox) {
                     if ($userSchoolbox->getRole()->isParent()) {
                         if (!$userSchoolbox->getChildren()) {
                             $userSchoolbox->setChildren(\Schoolbox\User::createCollection());
@@ -125,15 +134,15 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                 }
             }
 
-            if ($_GET['email'] ?? null) {
+            if ($showEmail) {
                 $emailVisible ??= new ValidEmailVisible($kernel->get('externalUser'), $kernel->get('config'));
-                if ($emailVisible->isSatisfiedBy($userMapper->findById($user["uid"]), $_SESSION['user'])) {
-                    $email = $emailObj->formatEmailFromArray($user);
-                    if ($email) {
-                        $fullEmail = $user['firstname'] . " " . $user['lastname'] . ' <' . $email . '>';
+                /** @var \Schoolbox\User|null $userSchoolbox */
+                $userSchoolbox = $userCollection->offsetGet($userId);
+                if ($userSchoolbox && $emailVisible->isSatisfiedBy($userSchoolbox, $_SESSION['user'])) {
+                    if ($userSchoolbox->getEmail()) {
                         $return[] = [
-                            'name' => $fullEmail,
-                            'id'   => $fullEmail,
+                            'name' => $userSchoolbox->getFormattedEmailDisplay(),
+                            'id'   => $userSchoolbox->getFormattedEmailDisplay(),
                         ];
                     }
                 }
@@ -156,7 +165,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
 
                 $return[] = [
                     'name' => $person,
-                    'id' => intval($user['uid']),
+                    'id' => $userId,
                     'first_name' => $user['firstname'],
                     'last_name' => $user['lastname'],
                     'role' => $user['gname'],

@@ -265,7 +265,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
 
         return "
             SELECT
-                {$this->getColumnString('lr')},
+                {$this->getColumnString()},
                 {$this->getJoinColumnString('user', 'u')},
                 {$this->getJoinColumnString('author', 'a')},
                 {$this->getJoinColumnString('authorisationUser', 'au')},
@@ -273,12 +273,12 @@ class Leave_RequestMapper extends Schoolbox\Mapper
                 {$this->getJoinColumnString('host_type', 'ht')},
                 {$userMapper->getJoinColumnString('year', 'lyl')},
                 lyl.name AS year
-            FROM `{$this->table}` lr
-            LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
-            LEFT JOIN {$this->getJoinSql('author', 'lr', 'a')}
-            LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
-            LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
-            LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
+            FROM `{$this->table}`
+            LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('author', '', 'a')}
+            LEFT JOIN {$this->getJoinSql('authorisationUser', '', 'au')}
+            LEFT JOIN {$this->getJoinSql('travelType', '', 'tt')}
+            LEFT JOIN {$this->getJoinSql('host_type', '', 'ht')}
             LEFT JOIN {$userMapper->getJoinSql('year', 'u', 'lyl')}
         ";
     }
@@ -293,9 +293,9 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     {
         $statement = $this->database->prepare("
             {$this->getBaseQuery()}
-            WHERE lr.user_id = :userId
-            AND lr.status != :status
-            ORDER BY lr.start
+            WHERE `{$this->table}`.user_id = :userId
+            AND `{$this->table}`.status != :status
+            ORDER BY `{$this->table}`.start
         ");
 
         $statement->execute(
@@ -342,9 +342,9 @@ class Leave_RequestMapper extends Schoolbox\Mapper
         $statement = $this->database->prepare("
             {$this->getBaseQuery()}
             WHERE u.residential_house_id = :houseId
-            AND lr.created >= :limit
-            AND lr.status != :deleted
-            ORDER BY substr(lr.start, 1, 10), LENGTH(year), year, u.lastname
+            AND `{$this->table}`.created >= :limit
+            AND `{$this->table}`.status != :deleted
+            ORDER BY substr(`{$this->table}`.start, 1, 10), LENGTH(year), year, u.lastname
         ");
 
         $statement->execute(
@@ -383,9 +383,9 @@ class Leave_RequestMapper extends Schoolbox\Mapper
         $statement = $this->database->prepare("
             {$this->getBaseQuery()}
             WHERE u.residential_house_id = :houseId
-            AND lr.status = :status
-            AND lr.created >= :limit
-            ORDER BY substr(lr.start, 1, 10), LENGTH(year), year, u.lastname
+            AND `{$this->table}`.status = :status
+            AND `{$this->table}`.created >= :limit
+            ORDER BY substr(`{$this->table}`.start, 1, 10), LENGTH(year), year, u.lastname
         ");
 
         $statement->execute(
@@ -492,21 +492,21 @@ class Leave_RequestMapper extends Schoolbox\Mapper
         // res.house, regardless of whether they have a leave request or not.
         $statement = $this->database->prepare("
             SELECT
-                {$this->getColumnString('lr')},
+                {$this->getColumnString()},
                 {$this->getUserMapper()->getColumnString('u')},
                 {$this->getUserMapper()->getColumnString('au')},
                 {$this->getJoinColumnString('travelType', 'tt')},
                 {$this->getJoinColumnString('host_type', 'ht')},
                 {$this->getUserMapper()->getJoinColumnString('year', 'lyl')},
                 lyl.name AS year
-            FROM {$this->getTable()} `lr`
-            RIGHT JOIN {$this->getJoinSql('user', 'lr', 'u')}
-                AND CAST(lr.start AS DATE) <= :finish
-                AND lr.finish >= :start
-                AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
-            LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
-            LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
-            LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
+            FROM {$this->getTable()}
+            RIGHT JOIN {$this->getJoinSql('user', '', 'u')}
+                AND CAST(`{$this->table}`.start AS DATE) <= :finish
+                AND `{$this->table}`.finish >= :start
+                AND (`{$this->table}`.status = :statusApproved OR `{$this->table}`.status = :statusPending OR `{$this->table}`.status IS NULL)
+            LEFT JOIN {$this->getJoinSql('authorisationUser', '', 'au')}
+            LEFT JOIN {$this->getJoinSql('travelType', '', 'tt')}
+            LEFT JOIN {$this->getJoinSql('host_type', '', 'ht')}
             LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
             WHERE u.residential_house_id = :houseId
             AND u.deleted_at IS NULL
@@ -612,7 +612,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     {
         $statement = $this->database->prepare("
             {$this->getBaseQuery()}
-            WHERE lr.id = :id
+            WHERE `{$this->table}`.id = :id
         ");
 
         $statement->execute(
@@ -636,7 +636,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     {
         $statement = $this->database->prepare("
             {$this->getBaseQuery()}
-            WHERE lr.start < :finish AND lr.finish > :start AND lt.status != :deleted
+            WHERE `{$this->table}`.start < :finish AND `{$this->table}`.finish > :start AND lt.status != :deleted
         ");
 
         $statement->execute(
@@ -656,10 +656,6 @@ class Leave_RequestMapper extends Schoolbox\Mapper
 
     public function hydrateList($rowList, $alias = '', $callback = null)
     {
-        if (empty($alias)) {
-            $alias = 'lr';
-        }
-
         if (empty($callback)) {
             $callback = function ($mapper, $request, $row) {
                 /** @var self $mapper */

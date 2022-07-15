@@ -18,6 +18,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Twig\Error\RuntimeError;
 use UnderflowException;
@@ -94,13 +95,14 @@ class Mailer
 
         // we can only include the reply-to header if there is but one email
         if ($this->useReplyTo && $decorator->count() === 1) {
-            try {
                 $effectors = $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getReplyToIds());
-                // do NOT format rcf2822, because swift mailer
-                $email->setReplyTo($this->getReplyTo($effectors));
-            } catch (RfcComplianceException $e) {
-                $this->log->warning('Error applying reply-to: ' . $e->getMessage());
-            }
+                foreach ($effectors as $effector) {
+                    try {
+                        $email->addReplyTo(new Address($effector->getEmail(), $effector->formatName()));
+                    } catch (RfcComplianceException | LogicException $e) {
+                        $this->log->warning('Error applying reply-to: ' . $e->getMessage());
+                    }
+                }
         }
 
         try {
@@ -129,24 +131,5 @@ class Mailer
         }
 
         return false;
-    }
-
-
-    /**
-     * @param Collection|User[] $effectors
-     * @return string[]
-     */
-    private function getReplyTo(Collection $effectors)
-    {
-        $replyTo = [];
-
-        foreach ($effectors as $effector) {
-            $replyAddr = trim($effector->getEmail());
-            if ($replyAddr) {
-                $replyTo[$replyAddr] = $effector->formatName();
-            }
-        }
-
-        return $replyTo;
     }
 }

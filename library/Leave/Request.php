@@ -511,11 +511,11 @@ class Leave_Request
      *
      * @param int $index
      *
-     * @return string
+     * @return string|null
      */
     public function getConfirmedByMapIndex($index)
     {
-        return $this->confirmedByMap[$index];
+        return $this->confirmedByMap[$index] ?? null;
     }
 
     /**

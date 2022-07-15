@@ -24,6 +24,7 @@ use Schoolbox\Notif\Handler\MySQLHandler;
 use Schoolbox\Notif\Handler\SymfonyMailerHandler;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 class HandlerFactory
@@ -202,10 +203,10 @@ class HandlerFactory
      */
     protected function createMailHandler($title, $severity, $bubble = true, $to = null, $from = null): SymfonyMailerHandler
     {
-        $to   = $to ?: $this->conf->get('mail_support_address');
+        $to   = $to ?: $this->conf->get(EmailFactory::CONFIG_MAIL_SUPPORT_ADDRESS);
         $from = $from ?: [
-            $this->conf->get('mail_from_address'),
-            $this->conf->get('mail_from_name')
+            $this->conf->get(EmailFactory::CONFIG_MAIL_FROM_ADDRESS),
+            $this->conf->get(EmailFactory::CONFIG_MAIL_FROM_NAME)
         ];
 
         $mailFactory = new EmailFactory(
@@ -215,7 +216,7 @@ class HandlerFactory
 
         try {
             $toAddress = new Address($to);
-        } catch (RfcComplianceException $e) {
+        } catch (RfcComplianceException | LogicException $e) {
             $toAddress = new Address(self::FALLBACK_EMAIL);
         }
 
@@ -228,10 +229,10 @@ class HandlerFactory
             } else {
                 $from = new Address($from);
             }
-        } catch (RfcComplianceException $e) {
+        } catch (RfcComplianceException | LogicException $e) {
             $from = new Address(self::FALLBACK_EMAIL);
         }
-        $mail->setFrom($from->getAddress(), $from->getName());
+        $mail->setFrom($from);
 
         return new SymfonyMailerHandler(
             $mail,

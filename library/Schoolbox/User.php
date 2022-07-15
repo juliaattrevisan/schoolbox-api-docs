@@ -1401,7 +1401,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @return GenericCollection<User>
+     * @return GenericCollection<User>|null
      */
     public function getChildren()
     {
