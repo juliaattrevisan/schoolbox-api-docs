@@ -21,7 +21,6 @@ sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
 
 # ensure the DB itself is defaulting to UTF8
 mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SET MAX_STATEMENT_TIME=0; ALTER DATABASE $sqldb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; "
-
 # select all tables that are UTF8, but are NOT collated 'general'
 QUERY="SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '$sqldb' AND TABLE_COLLATION NOT LIKE 'utf8mb4_unicode_ci'"
 AWKST='{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; SET foreign_key_checks = 1; "}'
@@ -30,7 +29,7 @@ AWKST='{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "CHARSET=utf8mb4 CO
 mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST"
 
 # execute
-mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST" | mysql --defaults-extra-file=/etc/schoolbox/mariadb-no-max-statement-time.cnf -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb
+(echo 'SET MAX_STATEMENT_TIME=0; '; mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST") | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb
 
 
 # now doublecheck for any remnant non-default fields

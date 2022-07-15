@@ -30,7 +30,7 @@ mysql -u root -ptnp879 -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE IF EXISTS sch
 
 echo "$vag Loading Schoolbox MySQL Demo data";
 mysql -u root -ptnp879 -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
-mysql --defaults-extra-file=/etc/schoolbox/mariadb-no-max-statement-time.cnf -u root -ptnp879 schoolbox < $cachedir/schoolboxdemo-v6.1.sql
+(echo "SET MAX_STATEMENT_TIME=0; "; cat $cachedir/schoolboxdemo-v6.1.sql) | mysql -u root -ptnp879 schoolbox
 
 echo "$vag Generating data dir sql fixes";
 /usr/share/schoolbox/tools/generate-dir-sql.sh /var/lib/schoolbox >> $cachedir/schoolboxdemo-vagrant-v6.1.sql;

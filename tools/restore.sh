@@ -752,7 +752,7 @@ then
 fi
 echo "Restoring database '$sourcedb'";
 ## Restore specified database (commenting out VIEW DEFINER clause on the fly)
-if ! cat $sourcedb | pv -s "$(du -b "$sourcedb" | cut -f 1)" | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql --defaults-extra-file=/etc/schoolbox/mariadb-no-max-statement-time.cnf -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb; then
+if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$sourcedb") | pv -s "$(du -b "$sourcedb" | cut -f 1)" | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb; then
   error "Unable to import database from backup file. Exiting."
 fi
 
