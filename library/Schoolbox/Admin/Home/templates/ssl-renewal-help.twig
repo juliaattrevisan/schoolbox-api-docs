@@ -110,7 +110,7 @@
             },
         });
 
-        const chromeUserAgentCheck = $.ajax({
+        $.ajax({
             url: "{{ api_url }}" + apiEndpoint + "?url=" + urlCheckUrl + "&useragent=" + chromeUserAgent,
             success: function () {
                 // wait for baseCheck to complete
