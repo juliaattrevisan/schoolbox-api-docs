@@ -4,7 +4,7 @@
  * All the functionality to be able to manage a group
  */
 
-import { ref, onBeforeMount, onMounted } from 'vue';
+import { ref, onBeforeMount } from 'vue';
 import Endpoints from './manageGroupEndpoints';
 import { useStore } from './store/manageGroupStore';
 import ManageGroupHeading from './manage-group-heading.vue';
@@ -64,6 +64,8 @@ const props = defineProps({
 });
 
 const store = useStore();
+store.$reset(); //ensure the store state is as it's initially set, this is just for Storybook when switching between stories
+store.loadData();
 const toastEl = ref(null);
 
 /**
@@ -77,14 +79,6 @@ onBeforeMount(() => {
     Endpoints.ADD_MEMBERS = props.addMembersEndpoint;
     Endpoints.UPDATE_SETTINGS = props.updateSettingsEndpoint;
     Endpoints.DISBAND_GROUP = props.disbandGroupEndpoint;
-});
-
-/**
- * load the data and ensure any foundation features work 
- */
-onMounted(() => {
-    store.$reset(); //ensure the store state is as it's initially set, this is just for Storybook when switching between stories
-    store.loadData();
 });
 
 /**

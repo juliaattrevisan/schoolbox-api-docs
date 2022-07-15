@@ -4,7 +4,7 @@
  * through as props
  */
 
-export default Object({
+export default Object.seal({
     GROUP_DATA: '',
     REMOVE_MEMBERS: '',
     UPDATE_MEMBERS: '',

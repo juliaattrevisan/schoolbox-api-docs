@@ -44,7 +44,8 @@ export const useMembersStore = defineStore('manageGroupMembers', {
          * @returns { Boolean } 
          */
         hasNoGroupAdmins () {
-            return this.groupMembers.filter((member) => member.accessType === AccessTypes.ADMIN).length === 0;
+            return this.groupMembers.filter((member) => member.accessType === AccessTypes.ADMIN).length === 0
+                    && this.hasGroupMembers;
         },
         
     },

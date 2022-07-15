@@ -21,12 +21,28 @@ const props = defineProps({
 const store = useStore();
 const addMembersStore = useAddMembersStore();
 const isProcessing = ref(false);
+const currentFromSelect = ref('name');
 
 /**
  * ensure the tabs and tooltips work
  */
 onMounted(() => {
     $(document).foundation(); 
+});
+
+/**
+ * Update the input place holder text depending on the currentFromSelect
+ *
+ * @returns { String }
+ */
+const inputPlaceholder = computed(() => {
+    const placeholderOptions = {
+        'name': 'Search Users',
+        'group': 'Search User Groups',
+        'role': 'Search User Roles',
+        'list': 'Add from a list',
+    }
+    return placeholderOptions[currentFromSelect.value];
 });
 
 /**
@@ -71,67 +87,81 @@ const addButtonText = computed(() => isProcessing.value ? 'Adding...' : 'Add Mem
         <div class="small-12 island">
         <h2 class="subheader">Add Members</h2>
             <section>
-                <div class="content" id="addMembers">
-                    <dl class="tabs" data-tab>
-                        <dd class="active"><a href="#userName">From Name</a></dd>
-                        <dd><a href="#userGroups">From Group</a></dd>
-                        <dd><a href="#userRoles">From Role</a></dd>
-                        <dd><a href="#userList">From List</a></dd>
-                    </dl>
-                    <section>
-                        <div class="tabs-content no-margin">
-                            <div class="content active" id="userName">
-                                <form action="/group/modifyForm.php" method="post" class="no-margin">
-                                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                                    <label for="addUser">
-                                        Add Members
-                                        <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
-                                    </label>
-                                    <select id="addUser" name="userID[]" multiple placeholder="Search Users"></select>
-                                    <input type="submit" :value="addButtonText" :disabled="store.isProcessing" @click.prevent="onAddMembersSelected" />
-                                </form>
-                            </div>
-                            <div class="content" id="userGroups">
-                                <form action="/group/addUserByGroup.php?type=individual&destinationID={CATEGORY_ID}" method="post" class="no-margin">
-                                    <input type="hidden" name="individualGroupID" id="individualGroupID" />
-                                    <label for="addUsersByIndividualGroup">
-                                        Group
-                                        <span data-tooltip class="has-tip tip-top hint" title="Add all users that belong to another group.">?</span>
-                                    </label>
-                                    <input id="addUsersByIndividualGroup" type="text" size="30" placeholder="Search User Groups" />
-                                    <input type="submit" :value="addButtonText" :disabled="store.isProcessing" @click.prevent="onAddMembersSelected" />
-                                </form>
-                            </div>
-                            <div class="content" id="userRoles">
-                                <form action="/group/addUserByGroup.php?type=system&destinationID={CATEGORY_ID}" method="post" class="no-margin">
-                                    <input type="hidden" name="systemGroupID" id="systemGroupID" />
-                                    <label for="addUsersBySystemGroup">
-                                        Role
-                                        <span data-tooltip class="has-tip tip-top hint" title="Add all users of a particular role in the system.">?</span>
-                                    </label>
-                                    <input id="addUsersBySystemGroup" type="text" size="30" placeholder="Search User Roles" />
-                                    <input type="submit" :value="addButtonText" :disabled="store.isProcessing" @click.prevent="onAddMembersSelected" />
-                                </form>
-                            </div>
-                            <div class="content" id="userList">
-                                <form action="/group/modifyForm.php" method="post" class="no-margin">
-                                    <label for="addUsersByList">
-                                        User List
-                                        <span data-tooltip class="has-tip tip-top hint" title="Add a list of users (either external user IDs or Schoolbox usernames).">?</span>
-                                    </label>
-                                    <input type="hidden" name="categoryID" value="{CATEGORY_ID}" />
-                                    <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
-                                    <input type="submit" :value="addButtonText" :disabled="store.isProcessing" @click.prevent="onAddMembersSelected" />
-                                </form>
-                            </div>
+                <div class="content">
+                    <div class="filters">
+                        <div class="checklist">
+                            <label class="title">From:</label>
+                            <ul class="option-list">
+                                <li>
+                                    <input type="radio" id="name" value="name" v-model="currentFromSelect">
+                                    <label for="name">Name</label>
+                                </li>
+                                <li>
+                                    <input type="radio" id="group" value="group" v-model="currentFromSelect">
+                                    <label for="group">Group</label>
+                                </li>
+                                <li>
+                                    <input type="radio" id="role" value="role" v-model="currentFromSelect">
+                                    <label for="role">Role</label>
+                                </li>
+                                <li>
+                                    <input type="radio" id="list" value="list" v-model="currentFromSelect">
+                                    <label for="list">List</label>
+                                </li>
+                            </ul>
                         </div>
-                    </section>
+                    </div>
+                    <input
+                        type="text"
+                        :placeholder="inputPlaceholder"
+                        @input="$event.target.composing = false"
+                        disabled
+                    />
+                    <button @click.prevent="onAddMembersSelected" class="button submit" :disabled="store.isProcessing">{{ addButtonText }}</button>
                 </div>
             </section>
         </div><!-- small-12 island -->
     </div><!-- row  -->
 </template>
 
-<style scoped>
-    
+<style lang="scss" scoped>
+
+.filters {
+    background: white;
+    display: flex;
+    padding: 0.5rem 0 0 0 ;
+}
+
+.title,
+.option-list,
+.option-list li {
+    display: inline-block; //line up along the bottom of the search field input
+}
+
+.title,
+label {
+    font-size: 0.8125rem;
+}
+
+.title {
+    margin-bottom: 0.5rem;
+    margin-right: 1rem;    
+}
+
+.title,
+.option-list {
+    @media (max-width: 700px) { //shift things down now as horizontal space is getting tight
+        display: block;
+    }
+}
+
+.option-list li {
+    margin-right: 2rem;
+    @media (max-width: 700px) { //break the list down into 2 columns to display better on mobile
+        display: inline-block; 
+        margin-right: 0;
+        min-width: 110px; //takes us all the way down to 320px devices
+    }
+}
+
 </style>
