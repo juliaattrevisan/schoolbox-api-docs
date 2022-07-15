@@ -68,11 +68,6 @@ parameters:
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
-			path: library/Alaress/Authorizer/Rule/IsParentOfUser.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
 			path: library/Alaress/Authorizer/Rule/IsUser.php
 
 		-
@@ -2891,19 +2886,9 @@ parameters:
 			path: library/Schoolbox/Assessment/Term/Model.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Comment/Notifier.php
-
-		-
 			message: "#^Property Schoolbox\\\\Blog\\\\Eportfolio\\\\Comment\\\\Notifier\\:\\:\\$folderMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Blog/Eportfolio/Comment/Notifier.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Notifier.php
 
 		-
 			message: "#^Property Schoolbox\\\\Blog\\\\Eportfolio\\\\Post\\\\Notifier\\:\\:\\$folderMapper is never read, only written\\.$#"
@@ -3161,11 +3146,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/Folder.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/Folder.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between HouseResidential and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/ResHouse.php
@@ -3179,11 +3159,6 @@ parameters:
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/RoleType.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/SimpleStrategy.php
 
 		-
 			message: "#^Parameter \\#1 \\$users \\(iterable\\<Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\Strategy\\\\User\\>&Schoolbox\\\\GenericCollection\\) of method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\Strategy\\\\User\\:\\:getValues\\(\\) should be compatible with parameter \\$users \\(iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection\\) of method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\ISimpleStrategy\\:\\:getValues\\(\\)$#"
@@ -4674,11 +4649,6 @@ parameters:
 			message: "#^Dead catch \\- RuntimeException is never thrown in the try block\\.$#"
 			count: 1
 			path: library/Schoolbox/InstanceRegistry/ApiClient.php
-
-		-
-			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/LTI/Role/ClaimFactory.php
 
 		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Analytics\\\\CohortAnalysis\\:\\:getParticipatingStudents\\(\\) should return iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\Collection\\.$#"

@@ -2,7 +2,6 @@
 
 class Leave_Request
 {
-
     /* Leave Requests confirmation types and their presentation labels
       */
     private $confirmedByMap = array(

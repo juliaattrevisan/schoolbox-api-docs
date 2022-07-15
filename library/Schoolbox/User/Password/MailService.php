@@ -236,7 +236,7 @@ class MailService
     }
 
     /**
-     * @return Address|null
+     * @return Address
      */
     private function getFrom()
     {
