@@ -264,9 +264,9 @@ if (is_numeric($this->arg[0])) {
         'mail_all_parents_form_block' => '',
     ]);
 
-    if (\Config::get('mail_enable') && $_SESSION['user']->hasEmail()) {
+    if (\Config::get(\Schoolbox\Config\ConfigMapper::NAME_MAIL_ENABLED) && $_SESSION['user']->hasEmail()) {
         $this->setVar([
-            'REPLYTO'  => $_SESSION['user']->getEmail()
+            'REPLYTO' => $_SESSION['user']->getFormattedEmailDisplay()
         ]);
 
         if (!empty($all_emails)) {

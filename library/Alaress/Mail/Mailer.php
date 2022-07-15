@@ -633,6 +633,7 @@ class Mailer
     }
 
     /**
+     * Replace current from address with system from address
      * @return void
      */
     private function forceFrom()
@@ -640,6 +641,7 @@ class Mailer
         /** @var Address[] $replaceFrom */
         $replaceFrom = [];
         foreach ($this->email->getFrom() as $from) {
+            // if current from is not system from, move it to reply to
             if (
                 $from->getAddress() !== $this->systemFrom->getAddress()
                 && empty($this->email->getReplyTo())

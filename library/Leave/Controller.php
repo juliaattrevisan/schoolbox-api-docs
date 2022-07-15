@@ -1677,7 +1677,7 @@ class Leave_Controller extends Controller
         $emailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
         $email = $emailFactory->buildTwigEmail('leave/userNoticeEmail.twig', 'test', 'steve.chan@alaress.com.au');
 
-        $email->setFrom(new \Symfony\Component\Mime\Address(Config::get(EmailFactory::CONFIG_MAIL_FROM_NAME), 'Test Schoolbox'));
+        $email->setFrom(new \Symfony\Component\Mime\Address(Config::get(EmailFactory::CONFIG_MAIL_FROM_ADDRESS), 'Test Schoolbox'));
         $email->send();
     }
 
