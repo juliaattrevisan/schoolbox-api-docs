@@ -19,14 +19,10 @@ use Schoolbox\Mapper;
  */
 class UserRuleset extends Ruleset
 {
-
     /**
-     * Abstractify this check so subclasses can wrangle
-     *
-     * @param string $property
-     * @return bool
+     * @inheritdoc
      */
-    protected function isCollection($property)
+    protected function isCollection(string $property): bool
     {
         $map = $this->mapper->getMap();
         $mapping = $map->getOffset($property);
