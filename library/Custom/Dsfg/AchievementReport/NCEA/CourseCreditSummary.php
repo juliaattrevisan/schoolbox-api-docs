@@ -10,7 +10,6 @@ namespace Custom\Dsfg\AchievementReport\NCEA;
 
 class CourseCreditSummary extends Base
 {
-
     /**
      * Heading
      *

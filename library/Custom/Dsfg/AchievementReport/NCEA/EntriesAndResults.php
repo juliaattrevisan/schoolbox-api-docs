@@ -10,7 +10,6 @@ namespace Custom\Dsfg\AchievementReport\NCEA;
 
 class EntriesAndResults extends Base
 {
-
     /**
      * Heading
      *
