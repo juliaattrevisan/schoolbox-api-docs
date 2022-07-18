@@ -205,7 +205,7 @@ function upgrade_instances(){
 
 function restart_php_fpm(){
   log "Reloading php-fpm ..."
-  service "$(systemctl -a  --plain | grep -Eo 'php.+fpm')" reload         # Ensure web requests use upgraded code
+  service "$(systemctl -a  --plain --state=active | grep -Eo 'php.+fpm')" reload         # Ensure web requests use upgraded code
 }
 
 function remove_maintenance_page(){
