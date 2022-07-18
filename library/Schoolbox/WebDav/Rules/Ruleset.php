@@ -57,8 +57,9 @@ class Ruleset extends TokenizedRuleset
 
 
     /**
-     * @param callable $effect
-     * @param bool     $negate
+     * @param callable $effect The rule's conditions and effects
+     * @param bool     $negate If true: run if the conditions are NOT met
+     * @param string   $label  A text label for the rule
      * @return Rule
      */
     protected function createRule($effect, $negate = false, string $label = '')

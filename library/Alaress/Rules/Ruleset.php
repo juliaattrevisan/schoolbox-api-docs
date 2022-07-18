@@ -53,12 +53,17 @@ abstract class Ruleset
      * @param Condition[]     $conditions the list of conditions that must pass for this rule to take effect
      * @param Construct|mixed $response   the output of this rule if the conditions pass, which is either with a Construct to be applied, or a literal value
      * @param bool            $negate     whether or not to negate
+     * @param string          $label      A text label for the rule
      */
     public function newRule(array $conditions, $response, $negate = false, string $label = '')
     {
-        $rule = $this->createRule(function () use ($response) {
-            return $response;
-        }, $negate);
+        $rule = $this->createRule(
+            function () use ($response) {
+                return $response;
+            },
+            $negate,
+            $label,
+        );
 
         foreach ($conditions as $condition) {
             $rule->addCondition($condition);
@@ -76,8 +81,9 @@ abstract class Ruleset
 
 
     /**
-     * @param callable $effect
-     * @param bool     $negate
+     * @param callable $effect The rule's conditions and effects
+     * @param bool     $negate If true: run if the conditions are NOT met
+     * @param string   $label  A text label for the rule
      * @return Rule
      */
     abstract protected function createRule($effect, $negate = false, string $label = '');

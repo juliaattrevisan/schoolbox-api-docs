@@ -17,9 +17,16 @@ use Alaress\Rules\Token;
 class Rule extends Super
 {
     /**
-     * A label for this rule.
+     * Constructor
+     *
+     * @param callable $effect The rule's conditions and effects
+     * @param bool     $negate If true: run if the conditions are NOT met
+     * @param string   $label  A text label for the rule
      */
-    private string $label;
+    public function __construct($effect, $negate = false, private string $label = '')
+    {
+        parent::__construct($effect, $negate);
+    }
 
     /**
      * @return array
@@ -130,15 +137,5 @@ class Rule extends Super
     public function getLabel(): string
     {
         return $this->label;
-    }
-
-    /**
-     * @param string $label
-     * @return $this
-     */
-    public function setLabel(string $label): self
-    {
-        $this->label = $label;
-        return $this;
     }
 }
