@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Turnitin\Cli;
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Helper;
 
 /**
  * CLI Tool for retrofitting files that should be in Turnitin, but aren't
@@ -84,6 +86,13 @@ HELP;
             exit;
         }
 
+        /* Check if turnitin is configured sufficiently
+         */
+        if (!(new Helper($this->getConfig()))->isConfigured()) {
+            $this->getLogger()->info('Turnitin configuration invalid.');
+            exit(1);
+        }
+
         /* Check that this isn't currently running
          */
         try {
@@ -102,8 +111,12 @@ HELP;
             $this->getOpt(self::OPT_LONG_ASSESSMENT_ID)
         ));
 
-        (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance(), \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(), $this->getLogger()))
-            ->retrofit((int)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
+        (new Turnitin\Retrofit(
+            Turnitin\Group\Mapper::getInstance(),
+            Turnitin\File\Mapper::getInstance(),
+            SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
+            $this->getLogger())
+        )->retrofit((int)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
 
         $this->getLogger()->info('Done.');
 

@@ -11,6 +11,9 @@ namespace Schoolbox\Learning\Turnitin;
 
 use PDOException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Learning\Turnitin;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
@@ -30,31 +33,49 @@ class Retrofit
 
 
     /**
+     * @var Turnitin\Group\Mapper
+     */
+    private Turnitin\Group\Mapper $turnitinGroupMapper;
+
+
+    /**
      * @var File\Mapper
      */
     private File\Mapper $turnitinFileMapper;
 
 
     /**
-     * @var \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper
+     * @var SubmissionBox\Submission\SingleFile\Mapper
      */
-    private \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper;
+    private SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper;
+
+
+    /**
+     * @var SubmissionBoxMapper
+     */
+    private SubmissionBoxMapper $submissionBoxMapper;
 
 
     /**
      * Retrofit constructor.
      *
-     * @param File\Mapper                                                                $turnitinFileMapper
-     * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper
-     * @param LoggerInterface|null                                                       $log
+     * @param Turnitin\Group\Mapper                      $turnitinGroupMapper
+     * @param File\Mapper                                $turnitinFileMapper
+     * @param SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper
+     * @param SubmissionBoxMapper                        $submissionBoxMapper
+     * @param LoggerInterface|null                       $log
      */
     public function __construct(
+        Turnitin\Group\Mapper $turnitinGroupMapper,
         File\Mapper $turnitinFileMapper,
-        \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper,
+        SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper,
+        SubmissionBoxMapper $submissionBoxMapper,
         ?LoggerInterface $log = null
     ) {
+        $this->turnitinGroupMapper = $turnitinGroupMapper;
         $this->turnitinFileMapper = $turnitinFileMapper;
         $this->singleFileMapper = $singleFileMapper;
+        $this->submissionBoxMapper = $submissionBoxMapper;
         $this->log = $log;
     }
 
