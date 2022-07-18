@@ -103,7 +103,8 @@ class Factory
             $set->newRule(
                 $translatedRule['conditions'],
                 $translatedRule['effects'],
-                $translatedRule['negate']
+                $translatedRule['negate'],
+                $rule->getName(),
             );
         }
         return $set;

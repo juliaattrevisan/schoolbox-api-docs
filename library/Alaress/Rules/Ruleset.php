@@ -54,7 +54,7 @@ abstract class Ruleset
      * @param Construct|mixed $response   the output of this rule if the conditions pass, which is either with a Construct to be applied, or a literal value
      * @param bool            $negate     whether or not to negate
      */
-    public function newRule(array $conditions, $response, $negate = false)
+    public function newRule(array $conditions, $response, $negate = false, string $label = '')
     {
         $rule = $this->createRule(function () use ($response) {
             return $response;
@@ -80,5 +80,5 @@ abstract class Ruleset
      * @param bool     $negate
      * @return Rule
      */
-    abstract protected function createRule($effect, $negate = false);
+    abstract protected function createRule($effect, $negate = false, string $label = '');
 }

@@ -13,10 +13,13 @@ use Alaress\Rules\Condition;
 use Alaress\Rules\Lang\Construct;
 use Alaress\Rules\Rule as Super;
 use Alaress\Rules\Token;
-use Schoolbox\User;
 
 class Rule extends Super
 {
+    /**
+     * A label for this rule.
+     */
+    private string $label;
 
     /**
      * @return array
@@ -119,5 +122,23 @@ class Rule extends Super
         }
 
         return $obj;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    /**
+     * @param string $label
+     * @return $this
+     */
+    public function setLabel(string $label): self
+    {
+        $this->label = $label;
+        return $this;
     }
 }

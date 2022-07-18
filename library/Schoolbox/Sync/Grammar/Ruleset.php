@@ -370,9 +370,10 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
      * @param bool     $negate
      * @return Rule
      */
-    protected function createRule($effect, $negate = false)
+    protected function createRule($effect, $negate = false, string $label = '')
     {
-        return new Rule($effect, $negate);
+        $rule = new Rule($effect, $negate);
+        return $rule->setLabel($label);
     }
 
     /**

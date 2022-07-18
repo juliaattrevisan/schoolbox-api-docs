@@ -31,17 +31,27 @@ class Ruleset extends TokenizedRuleset
         parent::__construct(new Tokenizer());
 
         // default rule to set base vars
-        $this->newRule(array(), array(
-            'baseUri'  => $uri,
-            'userName' => $username,
-            'password' => $password,
-        ));
+        $this->newRule(
+            [],
+            [
+                'baseUri'  => $uri,
+                'userName' => $username,
+                'password' => $password,
+            ],
+            false,
+            '',
+        );
 
         // if default paths are defined, include paths
         if (count($paths)) {
-            $this->newRule(array(), array(
-                'paths' => $paths
-            ));
+            $this->newRule(
+                [],
+                [
+                    'paths' => $paths
+                ],
+                false,
+                '',
+            );
         }
     }
 
@@ -51,7 +61,7 @@ class Ruleset extends TokenizedRuleset
      * @param bool     $negate
      * @return Rule
      */
-    protected function createRule($effect, $negate = false)
+    protected function createRule($effect, $negate = false, string $label = '')
     {
         return new Rule($effect, $negate);
     }
