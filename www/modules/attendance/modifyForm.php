@@ -34,7 +34,7 @@ $attendanceDate->startOfDay();
 
 $now = new Alaress_Date_Format(time(), 'U');
 
-if ($attendanceDate->getUsingFormat('W') < ($now->getUsingFormat('W') - 1)) {
+if ((int)$attendanceDate->getUsingFormat('W') < ((int)$now->getUsingFormat('W') - 1)) {
     error(ErrorMapper::ERROR_ATTENDANCE_FUTURE);
 }
 
@@ -83,6 +83,7 @@ foreach ($attendancePeriods as $attendancePeriod) {
     }
 
     // Find period, so I can ensure I don't save something outside the class' time
+    /** @var External_Synergetic_Attendance $attendanceHandler */
     $periodDefinition = $attendanceHandler->getAttendanceMaster()->findTimetablePeriod();
     $periodStart      = Alaress_Date_Format::newFromTimestamp(strtotime($periodDefinition['TimeFrom']))->getDatabaseTime();
     $periodEnd        = Alaress_Date_Format::newFromTimestamp(strtotime($periodDefinition['TimeTo']))->getDatabaseTime();
@@ -96,22 +97,18 @@ foreach ($attendancePeriods as $attendancePeriod) {
 
         // Then if you could do that, save each person
 
-        if (is_array($_POST['attending'])) {
-            $attending = $_POST['attending'];
-        } else {
-            $attending = [];
-        }
+        $attending = $_POST['attending'] ?? [];
 
-        for ($i = 0; $_POST['studentID'][$i]; $i++) {
+        foreach ($_POST['studentID'] as $i => $studentId) {
             // Create a new record
 
             $data = [
                 'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
-                'ID' => $_POST['studentID'][$i],
+                'ID' => $studentId,
                 'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode'][$i]),
                 'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i]),
                 'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i]),
-                'AttendedFlag' => in_array($_POST['studentID'][$i], $attending) ? 0 : 1,
+                'AttendedFlag' => in_array($studentId, $attending) ? 0 : 1,
 
                 /* dbo.wkAttendances lets the EarlyDepartureTime and LateArrivalTime be null
                  * so this basically means you're clearing these fields in our ui; but when you
