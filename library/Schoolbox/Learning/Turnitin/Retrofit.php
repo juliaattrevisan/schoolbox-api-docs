@@ -163,6 +163,13 @@ class Retrofit
 
         $this->turnitinGroupMapper->save($turnitinGroup);
 
+        $this->log->info(sprintf(
+            'Turnitin group %s with submission box id %s was staged for GroupTool crontab with status [%s]',
+            $turnitinGroup->getId(),
+            $turnitinGroup->getSubmissionBoxId(),
+            $turnitinGroup->getStatus()
+        ));
+
         /* For a given turnitin_group record,
          * Find all its attachments and create turnitin_group_attachment records
          * (You can do this by giving Turnitin/Group/Process/Group.php the turnitin_group record)
