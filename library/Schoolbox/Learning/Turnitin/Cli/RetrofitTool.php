@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Turnitin\Cli;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Helper;
 
@@ -48,6 +49,12 @@ class RetrofitTool extends CliTool\App
 
 
     /**
+     * Retrofit *all* previous student submissions
+     */
+    private const OPT_LONG_RETROFIT_ALL = 'all';
+
+
+    /**
      * Lock ttl
      */
     private const LOCK_TTL = 10 * 60;
@@ -62,6 +69,7 @@ class RetrofitTool extends CliTool\App
             self::OPT_LONG_HELP,
             self::OPT_LONG_INSTANCE,
             self::OPT_LONG_ASSESSMENT_ID,
+            self::OPT_LONG_RETROFIT_ALL
         ];
     }
 
@@ -79,7 +87,14 @@ needed, put them into turnitin_report for processing. This occurs mainly when te
 activate Similarity Check after some students have submitted, but not others, and you
 needed to put those -others- into turnitin_report.
 
-Usage: retrofit.php --assessment=1234 [--instance=INSTANCE_ID]
+The --all flag lets you retrofit *all* previous students' submissions regardless of 
+the submitted date. This lets you accommodate certain schools who use a single Due Work
+to represent a multi-part assessment which is unconventional for our intended usage. 
+
+Otherwise, if you omit --all, it'll just retrofit each student's most recent submission.
+(This is the default behaviour)
+
+Usage: retrofit.php --assessment=1234 [--instance=INSTANCE_ID] [--all]
 
 
 HELP;
@@ -106,17 +121,34 @@ HELP;
             exit(1);
         }
 
-        $this->getLogger()->info(sprintf(
-            'Retrofitting student submission files for assessment %s',
-            $this->getOpt(self::OPT_LONG_ASSESSMENT_ID)
-        ));
+        if (!$this->getOpt(self::OPT_LONG_ASSESSMENT_ID)) {
+            $this->getLogger()->info('An assessment id is required.');
+            exit(1);
+        }
+
+        /* Tell the user the manner of their retrofitting
+         */
+        $retrofitAll = (bool)$this->getOpt(self::OPT_LONG_RETROFIT_ALL);
+
+        if ($retrofitAll) {
+            $this->getLogger()->info(sprintf(
+                'Retrofitting ALL submissions (and their files) for each student in assessment %s',
+                $this->getOpt(self::OPT_LONG_ASSESSMENT_ID)
+            ));
+        } else {
+            $this->getLogger()->info(sprintf(
+                'Retrofitting the most recent submission (and their files) for each student in assessment %s',
+                $this->getOpt(self::OPT_LONG_ASSESSMENT_ID)
+            ));
+        }
 
         (new Turnitin\Retrofit(
             Turnitin\Group\Mapper::getInstance(),
             Turnitin\File\Mapper::getInstance(),
             SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
+            SubmissionBoxMapper::getInstance(),
             $this->getLogger())
-        )->retrofit((int)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID));
+        )->retrofit((int)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID), $retrofitAll);
 
         $this->getLogger()->info('Done.');
 
