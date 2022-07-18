@@ -65,11 +65,48 @@ class Retrofit
      *
      * @param int $assessmentId
      * @return void
+     */
+    public function retrofit(int $assessmentId): void
+    {
+        /* For the given $assessmentId, find the submission_box.id
+         */
+
+        /* See if there's a turnitin_group for it
+         * If there isn't, create one
+         */
+
+        /* For a given turnitin_group record,
+         * Find all its attachments and create turnitin_group_attachment records
+         * (You can do this by giving Turnitin/Group/Process/Group.php the turnitin_group record)
+         *
+         * The crontab already does this step for us so we could count on that.
+         * Alternatively, inject the dependencies and run the GroupTool directly,
+         * guaranteeing that they process before staging each student submission's file
+         * (That's a bit slower and might not be necessary)
+         */
+
+        /* For the given submission_box.id,
+         * Find a list of each student's most recent submission
+         */
+
+        /* For each of the submissions found, find each of the files associated with it
+         * and send them up to turnitin. You might be able to trust that each file's
+         * submitted_at timestamp is identical for all the files in the same submission
+         */
+    }
+
+
+    /**
+     * Retrofit all the student_submission_file_id's for $assessmentId that don't already
+     * have a turnitin_report row associated
+     *
+     * @param int $assessmentId
+     * @return void
      * @throws PDOException
      * @throws Exception
      * @throws UnexpectedValueException
      */
-    public function retrofit(int $assessmentId): void
+    public function retrofitOld(int $assessmentId): void
     {
         /* For the given $assessmentId, find the most recent student_submission records
          * and from there, find all the student_submission_file_id values
