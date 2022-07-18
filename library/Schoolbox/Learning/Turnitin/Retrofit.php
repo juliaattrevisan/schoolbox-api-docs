@@ -19,7 +19,7 @@ use UnexpectedValueException;
  *
  * For an assessment id, find all the student_submission_file_id's that don't have a corresponding
  * turnitin_report row and create one for them, setting the status to Pending. This applies to
- * all the student_sbmission_file_ids from the most recent submission that a student made to this
+ * all the student_submission_file_ids from the most recent submission that a student made to this
  * Due Work (it won't retroactively upload absolutely everything, just their most recent submission)
  *
  * @package Schoolbox\Learning\Turnitin
