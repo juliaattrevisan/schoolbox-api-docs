@@ -104,7 +104,7 @@ class Factory
                 $translatedRule['conditions'],
                 $translatedRule['effects'],
                 $translatedRule['negate'],
-                $rule->getName(),
+                $rule->getName() !== '' ? $rule->getName() : ('Rule ' . $rule->getId()),
             );
         }
         return $set;
