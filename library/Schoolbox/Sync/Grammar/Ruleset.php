@@ -23,7 +23,6 @@ use Schoolbox\User as InternalUser;
  */
 class Ruleset extends TokenizedRuleset implements HydratorInterface
 {
-
     /**
      * @var Mapper
      */
@@ -121,10 +120,10 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
      */
     public function applyPartial(array $sequences, $input, $previous = null)
     {
-        $object = $previous ?: $this->mapper->createModel();
-
-        $rules = $this->getRules();
-
+        $object                         = $previous ?: $this->mapper->createModel();
+        $rules                          = $this->getRules();
+        $context                        = [];
+        $propertiesWithAmbiguousEffects = [];
         foreach ($rules as $sequence => $rule) {
             if (!in_array($sequence, $sequences)) {
                 continue;
@@ -189,6 +188,27 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
                         $this->applyModelPropertyValue($object, $property, $value);
                         $context['new data'][$property] = $value;
+                    } elseif ($this->isModel($property)) {
+                        $value = (array)$value;
+                        // Did the effect for this model property return more
+                        // than one value?
+                        // This indicates that the SIS value matched multiple
+                        // conditions for a mapping effect: since a model
+                        // property may have one and only one value, we have to
+                        // guess which value should be used. Let's just use the
+                        // last value.
+                        if (count($value) > 1) {
+                            // $rule doesn't contain any information about the
+                            // rule as stored in the DB, only its effects:
+                            // therefore I can't log which rule should change.
+                            // I also don't know the user's name with certainty,
+                            // as it might not have been set by UPS yet: just
+                            // log for now that it has an ambiguous effect.
+                            $propertiesWithAmbiguousEffects[$property] = $property;
+                        }
+                        $value = trim(end($value));
+                        $this->applyModelPropertyValue($object, $property, $value);
+                        $context['new data'][$property] = $value;
                     } else {
                         if (is_array($value)) {
                             $value = implode(',', $value);
@@ -209,22 +229,59 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
             }
         }
 
+        // Log warnings for ambiguous effects here
+        if (!empty($propertiesWithAmbiguousEffects)) {
+            $this->log->warning(
+                sprintf(
+                    'An effect matches more than one value for %s (%s) for %s "%s": using the last match, but consider revising rules which set this property',
+                    $object->formatName(),
+                    $object->getExternalId(),
+                    (count($propertiesWithAmbiguousEffects) > 1 ? 'properties' : 'property'),
+                    implode(',', $propertiesWithAmbiguousEffects),
+                ),
+                $context,
+            );
+        }
+
         return $object;
     }
 
 
     /**
-     * Abstractify this check so subclasses can wrangle
+     * Is this property a collection property?
+     *
+     * Collection properties are assigned differently to scalar properties: each
+     * value to be assigned is added to the collection.
      *
      * @param string $property
      * @return bool
      */
-    protected function isCollection($property)
+    protected function isCollection(string $property): bool
     {
         $map = $this->mapper->getMap();
         $mapping = $map->getOffset($property);
 
         return $mapping['type'] == Mapper::TYPE_COLLECTION;
+    }
+
+
+    /**
+     * Is this property a model property?
+     *
+     * Model properties are assigned differently to scalar properties: if there
+     * is more than one value, a warning is raised and the last value is used.
+     * (Multiple values occur if the SIS value matches more than one mapping
+     * condition.)
+     *
+     * @param string $property
+     * @return bool
+     */
+    protected function isModel(string $property): bool
+    {
+        $map = $this->mapper->getMap();
+        $mapping = $map->getOffset($property);
+
+        return $mapping['type'] == Mapper::TYPE_MODEL;
     }
 
 
