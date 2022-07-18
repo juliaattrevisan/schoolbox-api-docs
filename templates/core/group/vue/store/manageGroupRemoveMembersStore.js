@@ -72,9 +72,13 @@ export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
  * @returns { FormData }
  */
 function getFormData () {
+    const store = useStore();
     const membersStore = useMembersStore();
     const membersToRemoveIdList = membersStore.selectedMembers.map(row => row.id);
     return JSON.stringify([
-        { mmebers: membersToRemoveIdList.join(',') },
+        { 
+            groupId: store.groupId,
+            members: membersToRemoveIdList.join(',') 
+        },
     ]);
 }

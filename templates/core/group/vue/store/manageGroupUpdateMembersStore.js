@@ -102,8 +102,10 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
  * @returns { FormData }
  */
 function getFormData (selectedMembers, accessType) {
+    const store = useStore();
     const membersToUpdateIdList = selectedMembers.map(row => row.id);
     return JSON.stringify({
+        groupId: store.groupId,
         members: membersToUpdateIdList.join(','),
         accessType: accessType,
     });

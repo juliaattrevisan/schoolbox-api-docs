@@ -27,7 +27,6 @@ export const useStore = defineStore('manageGroup', {
          * @returns { Boolean } 
          */
         hasLoadedOk () {
-            const store = useStore();
             return !this.isLoading && !this.hasLoadError;
         },
 

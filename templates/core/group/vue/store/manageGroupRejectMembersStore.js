@@ -33,7 +33,10 @@ export const useRejectMembersStore = defineStore('manageGroupRejectMembers', {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify([
-                        { members: member.id },
+                        { 
+                            groupId: store.groupId,
+                            members: member.id,
+                        },
                     ]),
                 });
                 const responseJson = await response.json();
@@ -91,9 +94,13 @@ export const useRejectMembersStore = defineStore('manageGroupRejectMembers', {
  * @returns { FormData }
  */
 function getFormData () {
+    const store = useStore();
     const membersStore = useMembersStore();
     const membersToRejectIdList = membersStore.selectedMembers.map(row => row.id);
     return JSON.stringify([
-        { members: membersToRejectIdList.join(',') },
+        { 
+            groupId: store.groupId,
+            members: membersToRejectIdList.join(',') 
+        },
     ]);
 }

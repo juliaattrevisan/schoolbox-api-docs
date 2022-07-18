@@ -66,10 +66,14 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
  * @returns { FormData }
  */
 function getFormData () {
-    return JSON.stringify([
-        { "userId": 200 },
-        { "userId": 201 },
-        { "userId": 202 },
-        { "userId": 203 },
-    ]);
+    const store = useStore();
+    return JSON.stringify({
+        groupId: store.groupId,
+        members: [
+            { "userId": 200 },
+            { "userId": 201 },
+            { "userId": 202 },
+            { "userId": 203 },
+        ]
+    });
 }
