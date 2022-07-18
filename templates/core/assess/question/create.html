@@ -88,9 +88,16 @@
         });
 
         /* Enforce two decimal places
+         * and limit mark upper limit to 9999999999999.99
          */
         $('[data-marks]').change(function() {
             var marks = parseFloat($(this).val()).toFixed(2);
+
+            /* limit mark to 9999999999999.99
+             */
+            if (9999999999999.99 <= marks) {
+                marks = 9999999999999.99;
+            }
 
             if (isNaN(marks)) {
                 marks = '';

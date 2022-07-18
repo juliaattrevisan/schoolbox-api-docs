@@ -11,7 +11,6 @@
  */
 abstract class Evaluation_Response extends DeprecatedModel
 {
-
     /**
      * A const to determine whether to randomise questions
      */

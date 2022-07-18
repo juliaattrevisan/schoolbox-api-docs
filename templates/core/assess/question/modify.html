@@ -77,6 +77,7 @@
         });
 
         /* Enforce two decimal places
+         * and limit mark upper limit to 9999999999999.99
          */
         $('input[name=marks]').change(function() {
             var val;
@@ -88,6 +89,12 @@
             }
             else {
                 val = $(this).val();
+            }
+
+            /* limit mark to 9999999999999.99
+             */
+            if (9999999999999.99 <= val) {
+                val = 9999999999999.99;
             }
 
             $(this).val(parseFloat(val).toFixed(2));

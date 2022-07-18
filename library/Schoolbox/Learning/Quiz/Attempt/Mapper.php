@@ -32,7 +32,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * @var Participant\Plan\InteractionIntegrityChecker
      */
@@ -560,20 +559,26 @@ class Mapper extends BaseMapper
         /**
          * collate all marks and total possible marks, and update this field.
          */
+        /**
+         * If the sum of the answer marks will overflow the assess_attempt::mark field, use the max_mark value,
+         * unless that will overflow then use the max allowed value `9999999999999.99` which is created from `decimal(15,2)`
+         * Also update the max_mark to the sum of question marks, if it will overflow assess_attempt::max_mark
+         * then use the max allowed value `9999999999999.99` which is created from `decimal(15,2)`
+         */
         $query =  $this->getDatabase()->prepare("
         UPDATE assess_attempt,
             (SELECT
-                 SUM(ar.mark)  AS mark,
-                 SUM(aq.marks) AS max_mark,
-                 aa.attempt_id
-             FROM assess_attempt aa
-                      JOIN assess q ON q.assess_id = aa.assess_id
-                      LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
-                      LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
-             WHERE aa.attempt_id = :attemptId
-               AND ar.deleted_at IS NULL
-               AND aq.deleted_at IS NULL
-             GROUP BY aa.assess_id, aa.attempt_id) as newVal
+                if((SUM(ar.mark) >= 9999999999999.99), if((SUM(aq.marks) >= 9999999999999.99), 9999999999999.99, SUM(aq.marks)), SUM(ar.mark))  AS mark,
+                if((SUM(aq.marks) >= 9999999999999.99), 9999999999999.99, SUM(aq.marks))  AS max_mark,
+                aa.attempt_id
+            FROM assess_attempt aa
+                JOIN assess q ON q.assess_id = aa.assess_id
+                LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
+                LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+            WHERE aa.attempt_id = :attemptId
+                AND ar.deleted_at IS NULL
+                AND aq.deleted_at IS NULL
+            GROUP BY aa.assess_id, aa.attempt_id) as newVal
         SET
             assess_attempt.max_mark = newVal.max_mark,
             assess_attempt.mark  = newVal.mark

@@ -67,6 +67,10 @@ if (!empty($_POST)) {
         }
     }
 
+    //fix mark to not overflow
+    if (9999999999999.9 <= $_POST['marks']) {
+        $_POST['marks'] = '9999999999999.99';
+    }
     /* Put that data in the question
      */
     $data = $_POST;
