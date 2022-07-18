@@ -4,7 +4,8 @@
  * To select Curriculum codes
  */
 
-import CsSearchInput from './cs-search-input.vue'
+import CsSearchInput from './cs-search-input.vue';
+import CsModal from './modal/cs-modal.vue';
 
 </script>
 
@@ -17,6 +18,7 @@ import CsSearchInput from './cs-search-input.vue'
             <cs-search-input />
         </div>
     </div>
+    <cs-modal />
 </template>
 
 <style scoped>

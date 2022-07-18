@@ -5,12 +5,12 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useStore } from '../store/curriculumSelectorStore';
+// import { useStore } from '../store/curriculumSelectorStore';
 import { useModalStore } from '../store/csModalStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const store = useStore();
+// const store = useStore();
 const modalStore = useModalStore();
 const modalEl = ref(null);
 
@@ -72,16 +72,16 @@ watch(() => modalStore.isOpen, (newIsOpen) => {
  * ensure the isPromptOpen is kept up to date
  * as we can currently also use foundation to close the modal 
  */
-// function onModalClosed () {
-//     removeMembersStore.cancelRemoveSelectedMembers();
-// }
+function onModalClosed () {
+    // removeMembersStore.cancelRemoveSelectedMembers();
+}
 
 </script>
 
 <template>
     <reveal-modal 
         ref="modalEl" 
-        :is-close-disabled="isCloseModalDisabled" 
+        :is-close-disabled="false" 
         :close-on-background-click="false" 
         @closed="onModalClosed"
     >
