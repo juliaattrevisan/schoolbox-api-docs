@@ -66,7 +66,7 @@ class Controller extends Base
     public function apiMembership(User $user)
     {
 
-        $users_groups = $this->groupsHelper->getCurrentGroups($user);
+        $users_groups = $this->groupsHelper->getCurrentGroups($user, false);
         $apiGroups = new Collection($users_groups);
         $output = $apiGroups->map(new ModelToArray());
         $this->response->content->set(
@@ -95,7 +95,7 @@ class Controller extends Base
             return; //exit early the user is part of the group.
         }
 
-        $users_groups = $this->groupsHelper->getGroup($user, $group);
+        $users_groups = $this->groupsHelper->getGroup($user, $group, false);
         $apiGroups    = new Collection($users_groups);
         $output = $apiGroups->map(new ModelToArray());
         $this->response->content->set(
@@ -152,7 +152,7 @@ class Controller extends Base
 
         $this->groupsHelper->addToGroup($user, $group, $post['enrolmentStatus'], $post['membership'], $post['isFavourite']);
         $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
-        $users_groups = $this->groupsHelper->getGroup($user, $group);
+        $users_groups = $this->groupsHelper->getGroup($user, $group, false);
         $apiGroups    = new Collection($users_groups);
         $output       = $apiGroups->map(new ModelToArray());
         $this->response->content->set(
@@ -224,7 +224,7 @@ class Controller extends Base
             return; //exit early the user is part of the group.
         }
 
-        $users_group = $this->groupsHelper->getGroup($user, $group)[0];
+        $users_group = $this->groupsHelper->getGroup($user, $group, false)[0];
         $post = json_decode(json_encode($this->request->content->get()), true);
         $defaultData = [
             'membership'        => $this->groupsHelper->getMembershipStringFromGroup($users_group),
@@ -281,7 +281,7 @@ class Controller extends Base
         $this->groupsHelper->updateUserGroup($user, $group, $post['membership'], $post['isFavourite'], $post['isNotificationsOn']);
 
         //get data from save
-        $users_groups = $this->groupsHelper->getGroup($user, $group);
+        $users_groups = $this->groupsHelper->getGroup($user, $group, false);
         $apiGroups = new Collection($users_groups);
         $output = $apiGroups->map(new ModelToArray());
         //output

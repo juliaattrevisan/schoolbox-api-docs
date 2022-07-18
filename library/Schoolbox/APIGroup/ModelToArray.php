@@ -42,6 +42,7 @@ class ModelToArray
             'isNotificationsOn' => $group['isNotificationsOn'],
             'enrolmentStatus'   => $group['enrolmentStatus'],
             'membership'        => $membership,
+            'hasHomepage'       => $group['hasHomepage'],
             '_links'            => [
                 'homepage'      => sprintf('/homepage/%d', $group['id'])
             ]
