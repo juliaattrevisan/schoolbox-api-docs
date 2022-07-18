@@ -10,6 +10,11 @@ import Endpoints from '../manageGroupEndpoints';
 
 export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
 
+    state: () => ({
+        isProcessing: false,
+        isSelectedProcessing: false, //need to distinguish between processing a single member via updateMemberAccess() and updateSelectedMembersAccess()
+    }),
+
     actions: {
         
         /**
@@ -19,10 +24,11 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
          * @param { String } a FilterTypes
          */
         async updateMemberAccess (member, accessType) {
+            this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
-            const membersStore = useMembersStore();
-            membersStore.refreshMembers();
+            const membersStore = useMembersStore(); 
+            membersStore.refreshMembers(); //to set any previously isNew or justUpdated to false
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
                     method: 'PATCH',
@@ -41,6 +47,7 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
             } catch (error) {
                 console.warn(error);
             } finally {
+                this.isProcessing = false;
                 store.isProcessing = false;
             }
         },
@@ -51,10 +58,11 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
          * @param { String } a FilterTypes
          */
         async updateSelectedMembersAccess (accessType) {
+            this.isSelectedProcessing = true;
             const store = useStore();
             store.isProcessing = true;
-            const membersStore = useMembersStore();
-            membersStore.refreshMembers();
+            const membersStore = useMembersStore(); 
+            membersStore.refreshMembers(); //to set any previously isNew or justUpdated to false
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
                     method: 'PATCH',
@@ -76,6 +84,7 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
             } catch (error) {
                 console.warn(error);
             } finally {
+                this.isSelectedProcessing = false;
                 store.isProcessing = false;
             }
         },

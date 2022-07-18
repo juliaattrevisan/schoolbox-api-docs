@@ -12,15 +12,6 @@ import { useSettingsStore } from './store/manageGroupSettingsStore';
 import { useDisbandStore } from './store/manageGroupDisbandStore';
 
 
-const props = defineProps({
-    /**
-     * To display the toast access status changes
-     */
-    toastEl: {
-        required: true,
-    },
-});
-
 const store = useStore();
 const membersStore = useMembersStore();
 const settingsStore = useSettingsStore();

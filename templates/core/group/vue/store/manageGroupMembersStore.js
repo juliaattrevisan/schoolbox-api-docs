@@ -12,7 +12,7 @@ export const useMembersStore = defineStore('manageGroupMembers', {
     
     state: () => ({
         groupMembers: [], //all the group members
-        selectedMembers: [], //to track the current group member selection
+        selectedMemberIds: [], //to track the current group member selection
         selectedFilters: [AccessTypes.WAITING, AccessTypes.READ, AccessTypes.WRITE, AccessTypes.ADMIN], //the list of table filters available
     }),
 
@@ -47,6 +47,18 @@ export const useMembersStore = defineStore('manageGroupMembers', {
             return this.groupMembers.filter((member) => member.accessType === AccessTypes.ADMIN).length === 0
                     && this.hasGroupMembers;
         },
+
+        /**
+         * Retrieve the selected members based on the selectedMemberIds
+         * We do this so we are referencing the groupMembers directly, 
+         * so any data changes are kept on groupMembers, not a copy if we created
+         * a seperate selectedMembers array
+         * 
+         * @returns { Array } 
+         */
+        selectedMembers () {
+            return this.groupMembers.filter((member) => this.selectedMemberIds.includes(member.id));
+        },
         
     },
 
@@ -75,14 +87,33 @@ export const useMembersStore = defineStore('manageGroupMembers', {
          * @param { Array }
          */
         updateSelectedMembers (selectedMembers) {
-            this.selectedMembers = selectedMembers;
+            this.selectedMemberIds = selectedMembers.map((member) => member.id);
+        },
+
+        /**
+         * pull out a specific member
+         * 
+         * @param { Object }
+         */
+        removeMember (removedMember) {
+            this.groupMembers = this.groupMembers.filter((member) => member.id !== removedMember.id);
+            this.selectedMemberIds = this.selectedMemberIds.filter((memberId) => memberId !== removedMember.id);; //ensure the member wasn't also a selected member
+        },
+
+        /**
+         * pull out any removed/rejected members, those rows that are in selectedMembers, 
+         * which have just been deleted or rejected
+         */
+        removeSelectedGroupMembers () {
+            this.groupMembers = this.groupMembers.filter((member) => !this.selectedMemberIds.includes(member.id));
+            this.clearSelectedMembers(); //can't keep selecting members that have just been removed/rejected
         },
 
         /**
          * clear the current selected member selection
          */
         clearSelectedMembers () {
-            this.selectedMembers = [];
+            this.selectedMemberIds = [];
         },
 
         /**

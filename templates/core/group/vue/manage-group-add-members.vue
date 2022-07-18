@@ -9,22 +9,12 @@ import { useStore } from './store/manageGroupStore';
 import { useAddMembersStore } from './store/manageGroupAddMembersStore';
 
 
-const props = defineProps({
-    /**
-     * To display the toast access status changes
-     */
-    toastEl: {
-        required: true,
-    },
-});
-
 const store = useStore();
 const addMembersStore = useAddMembersStore();
-const isProcessing = ref(false);
 const currentFromSelect = ref('name');
 
 /**
- * ensure the tabs and tooltips work
+ * ensure the tooltips work
  */
 onMounted(() => {
     $(document).foundation(); 
@@ -58,16 +48,13 @@ function onAddMembersSelected () {
  */
 addMembersStore.$onAction(({ name, after, onError }) => {
     if (name === 'addMembers') { //as each row is subscribed to onAction, we have to check for the selected row
-        isProcessing.value = true;
-        props.toastEl.activate('Adding...');
+        store.toastEl.activate('Adding...');
         after(() => {
-            props.toastEl.timeout('Members successfully added', true, 5000);
-            isProcessing.value = false;
+            store.toastEl.timeout('Members successfully added', true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            props.toastEl.timeout('Unable to add members', false, 5000);
-            isProcessing.value = false;
+            store.toastEl.timeout('Unable to add members', false, 5000);
         });
     }
 });
@@ -78,7 +65,7 @@ addMembersStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const addButtonText = computed(() => isProcessing.value ? 'Adding...' : 'Add Members');
+const addButtonText = computed(() => addMembersStore.isProcessing ? 'Adding...' : 'Add Members');
 
 </script>
 

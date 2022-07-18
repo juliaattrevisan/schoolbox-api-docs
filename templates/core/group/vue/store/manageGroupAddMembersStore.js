@@ -10,12 +10,17 @@ import Endpoints from '../manageGroupEndpoints';
 
 export const useAddMembersStore = defineStore('manageGroupAddMembers', {
 
+    state: () => ({
+        isProcessing: false, //to notify that an action is taking place, like updating a member access
+    }),
+
     actions: {
 
         /**
-         * member removal has been confirmed so pull them out
+         * add the members to the group
          */
         async addMembers () {
+            this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
             try {
@@ -44,6 +49,7 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
             } catch (error) {
                 console.warn(error);
             } finally {
+                this.isProcessing = true;
                 store.isProcessing = false;
             }
         },

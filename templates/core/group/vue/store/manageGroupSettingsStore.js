@@ -10,6 +10,7 @@ import Endpoints from '../manageGroupEndpoints';
 export const useSettingsStore = defineStore('manageGroupSettings', {
     
     state: () => ({
+        isProcessing: false,
         access: '', //can be private, moderated or free
         isNotificationsEnabled: false, //to send notifications to the group
         isForceFollow: false, //so notifcations are ALWAYS sent to all members
@@ -37,9 +38,10 @@ export const useSettingsStore = defineStore('manageGroupSettings', {
         },
 
         /**
-         * member removal has been confirmed so pull them out
+         * update the pages settings
          */
         async updateSettings () {
+            this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
             try {
@@ -59,8 +61,9 @@ export const useSettingsStore = defineStore('manageGroupSettings', {
             } catch (error) {
                 console.warn(error);
             } finally {
-                this.isPromptOpen = false;
+                this.isProcessing = false;
                 store.isProcessing = false;
+                this.isPromptOpen = false;
             }
         },
 

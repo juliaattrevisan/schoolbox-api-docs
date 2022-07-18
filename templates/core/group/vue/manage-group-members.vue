@@ -15,15 +15,6 @@ import FilterEvents from './manageGroupFilterEvents';
 import AccessTypes from './manageGroupAccessTypes';
 
 
-const props = defineProps({
-    /**
-     * To display the toast access status changes
-     */
-    toastEl: {
-        required: true,
-    },
-});
-
 
 /*****************************************************************
  * 
@@ -100,7 +91,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     tabbable: false,
     texts: {
         count: '{from}-{to} of {count} members|{count} members|1 member',
-        filterPlaceholder: 'Search group members, they can be searched by name or role',
+        filterPlaceholder: 'Search group members, they can be searched by name, year level, campus or role',
         noResults: 'No matching group members',
     },
 }
@@ -234,7 +225,7 @@ function updateSelectedMembers () {
                     </div>
                 </template>
                 <template #accessType="data">
-                    <manage-group-members-access :row="data.row" :toast-el="props.toastEl" />
+                    <manage-group-members-access :member="data.row" />
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooterEl" data-table-footer></div>
@@ -272,7 +263,7 @@ function updateSelectedMembers () {
 
 .VueTables__table .access-td {
     padding-left: 0; //bring it inline with the right side border
-    width: 15rem; //keep the edit icon on the right side
+    width: 25rem; //keep the edit icon on the right side
 }
 
 .change-animation {

@@ -4,7 +4,7 @@
  * All the functionality to be able to manage a group
  */
 
-import { ref, onBeforeMount } from 'vue';
+import { ref, onBeforeMount, onMounted } from 'vue';
 import Endpoints from './manageGroupEndpoints';
 import { useStore } from './store/manageGroupStore';
 import ManageGroupHeading from './manage-group-heading.vue';
@@ -64,8 +64,6 @@ const props = defineProps({
 });
 
 const store = useStore();
-store.$reset(); //ensure the store state is as it's initially set, this is just for Storybook when switching between stories
-store.loadData();
 const toastEl = ref(null);
 
 /**
@@ -82,6 +80,15 @@ onBeforeMount(() => {
 });
 
 /**
+ * Start loading the group data
+ */
+onMounted(() => {
+    store.toastEl = toastEl;
+    store.$reset(); //ensure the store state is as it's initially set, this is just for Storybook when switching between stories
+    store.loadData();
+});
+
+/**
  * Reload the page to try loading again
  */
 function onRefreshSelected () {
@@ -91,7 +98,7 @@ function onRefreshSelected () {
 </script>
 
 <template>
-    <manage-group-heading :toast-el="toastEl" />
+    <manage-group-heading />
     <div v-if="store.isLoading" class="row">
         <div class="small-12 island">
             <loading-table  />
@@ -107,12 +114,12 @@ function onRefreshSelected () {
         </div>
     </div>
     <template v-else-if="store.hasLoadedOk">
-        <manage-group-add-members :toast-el="toastEl" />
-        <manage-group-members :toast-el="toastEl" />
-        <manage-group-select :toast-el="toastEl" />
-        <manage-group-remove-members :toast-el="toastEl" />
-        <manage-group-update-settings :toast-el="toastEl" />
-        <manage-group-disband-group :toast-el="toastEl" />
+        <manage-group-add-members />
+        <manage-group-members />
+        <manage-group-select />
+        <manage-group-remove-members />
+        <manage-group-update-settings />
+        <manage-group-disband-group />
         <toast ref="toastEl"></toast>
     </template>
 </template>

@@ -8,23 +8,15 @@ import { ref, watch, computed } from 'vue';
 import { useStore } from './store/manageGroupStore';
 import { useMembersStore } from './store/manageGroupMembersStore';
 import { useUpdateMembersStore } from './store/manageGroupUpdateMembersStore';
+import { useRejectMembersStore } from './store/manageGroupRejectMembersStore';
 import AccessTypes from './manageGroupAccessTypes';
 
-
-const props = defineProps({
-    /**
-     * To display the toast access status changes
-     */
-    toastEl: {
-        required: true,
-    },
-});
 
 const store = useStore(); //to disable buttons on processing
 const membersStore = useMembersStore(); //to keep track of selectedMembers
 const updateMembersStore = useUpdateMembersStore(); //to update member access
+const rejectMembersStore = useRejectMembersStore(); //to reject the selected members
 const areAllSelectedOnWaitingList = ref(false); //to determine whether we can show the approve membership button if all selected are awaiting membership
-const isProcessing = ref(false); //to notify of process taking place
 const changeMemberAccess = ref(''); //to bulk update members access rights
 
 /**
@@ -44,7 +36,7 @@ watch(() => membersStore.selectedMembers, () => {
  * @returns { String }
  */
 const appproveButtonText = computed(() => {
-    if (areAllSelectedOnWaitingList.value && isProcessing.value) {
+    if (areAllSelectedOnWaitingList.value && updateMembersStore.isSelectedProcessing) {
         return 'Approving...';
     } else {
         return 'Approve Membership';
@@ -63,7 +55,7 @@ function onApproveMembersSelected () {
  */
 function onMemberAccessChange () {
     if (changeMemberAccess.value !== '') {
-        updateMembersStore.updateSelectedMembersAccess(this.changeMemberAccess);
+        updateMembersStore.updateSelectedMembersAccess(changeMemberAccess.value);
     }
 }
 
@@ -73,17 +65,51 @@ function onMemberAccessChange () {
  */
 updateMembersStore.$onAction(({ name, after, onError }) => {
     if (name === 'updateSelectedMembersAccess') {
-        isProcessing.value = true;
-        props.toastEl.activate('Updating...');
+        store.toastEl.activate('Updating...');
         after(() => {
-            props.toastEl.timeout('Members successfully updated', true, 5000);
-            isProcessing.value = false;
+            store.toastEl.timeout('Members successfully updated', true, 5000);
             changeMemberAccess.value = ''; //default back to blank on any update
         });
         onError((error) => {
             console.warn(error);
-            props.toastEl.timeout('Unable to update members', false, 5000);
-            isProcessing.value = false;
+            store.toastEl.timeout('Unable to update members', false, 5000);
+        });
+    }
+});
+
+/**
+ * To instantly notify the user they've selected the reject button
+ *
+ * @returns { String }
+ */
+const rejectButtonText = computed(() => {
+    if (areAllSelectedOnWaitingList.value && rejectMembersStore.isSelectedProcessing) {
+        return 'Rejecting...';
+    } else {
+        return 'Reject Membership';
+    }
+});
+
+/**
+ * reject the selected members
+ */
+function onRejectMembersSelected () {
+    rejectMembersStore.rejectSelectedMembers();
+}
+
+/**
+ * so we can track the progress of the member access change
+ * and update the UI accordingly
+ */
+rejectMembersStore.$onAction(({ name, after, onError }) => {
+    if (name === 'rejectSelectedMembers') {
+        store.toastEl.activate('Rejecting...');
+        after(() => {
+            store.toastEl.timeout('Members successfully rejected', true, 5000);
+        });
+        onError((error) => {
+            console.warn(error);
+            store.toastEl.timeout('Unable to reject members', false, 5000);
         });
     }
 });
@@ -91,9 +117,14 @@ updateMembersStore.$onAction(({ name, after, onError }) => {
 </script>
 
 <template>
-    <li v-if="areAllSelectedOnWaitingList">
-        <button @click.prevent="onApproveMembersSelected" class="button submit icon-add" :disabled="store.isProcessing">{{ appproveButtonText }}</button>
-    </li>
+    <template v-if="areAllSelectedOnWaitingList">
+        <li>
+            <button @click.prevent="onApproveMembersSelected" class="button submit icon-add" :disabled="store.isProcessing">{{ appproveButtonText }}</button>
+        </li>
+        <li>
+            <button @click.prevent="onRejectMembersSelected" class="button submit icon-close" :disabled="store.isProcessing">{{ rejectButtonText }}</button>
+        </li>
+    </template>
     <li v-else-if="membersStore.selectedMembers.length > 0">
         <select v-model="changeMemberAccess" :disabled="store.isProcessing" @change="onMemberAccessChange()">
             <option value="">Change Access</option>

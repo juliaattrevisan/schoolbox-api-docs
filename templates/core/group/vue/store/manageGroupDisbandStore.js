@@ -10,6 +10,7 @@ import Endpoints from '../manageGroupEndpoints';
 export const useDisbandStore = defineStore('manageGroupDisband', {
     
     state: () => ({
+        isProcessing: false,
         isPromptOpen: false, //to notify that the prompt is opened / closed
     }),
 
@@ -26,6 +27,7 @@ export const useDisbandStore = defineStore('manageGroupDisband', {
          * member removal has been confirmed so pull them out
          */
         async disbandGroup () {
+            this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
             try {
@@ -44,7 +46,10 @@ export const useDisbandStore = defineStore('manageGroupDisband', {
                 }
             } catch (error) {
                 console.warn(error);
-            } 
+            } finally {
+                this.isProcessing = false;
+                store.isProcessing = false;
+            }
         },
 
         /**

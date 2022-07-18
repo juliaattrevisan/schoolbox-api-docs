@@ -5,22 +5,14 @@
  */
 
 import { ref, computed, watch } from 'vue';
+import { useStore } from './store/manageGroupStore';
 import { useRemoveMembersStore } from './store/manageGroupRemoveMembersStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const props = defineProps({
-    /**
-     * To display the toast access status changes
-     */
-    toastEl: {
-        required: true,
-    },
-});
-
+const store = useStore();
 const removeMembersStore = useRemoveMembersStore();
 const removeModalEl = ref(null);
-const isProcessing = ref(false);
 
 /**
  * to open the modal when requested
@@ -42,16 +34,13 @@ function onRemoveSelected () {
  */
 removeMembersStore.$onAction(({ name, after, onError }) => {
     if (name === 'removeSelectedMembers') {
-        isProcessing.value = true;
-        props.toastEl.activate('Removing...');
+        store.toastEl.activate('Removing...');
         after(() => {
-            isProcessing.value = false;
-            props.toastEl.timeout('Members successfully removed', true, 5000);
+            store.toastEl.timeout('Members successfully removed', true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            isProcessing.value = false;
-            props.toastEl.timeout('Unable to remove members', false, 5000);
+            store.toastEl.timeout('Unable to remove members', false, 5000);
         });
     }
 });
@@ -62,7 +51,7 @@ removeMembersStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const removeButtonText = computed(() => isProcessing.value ? 'Removing...' : 'Remove');
+const removeButtonText = computed(() => removeMembersStore.isProcessing ? 'Removing...' : 'Remove');
 
 /**
  * to prevent the user from moving away from the modal while 
@@ -70,7 +59,7 @@ const removeButtonText = computed(() => isProcessing.value ? 'Removing...' : 'Re
  *
  * @returns { Boolean }
  */
-const isCloseModalDisabled = computed(() => isProcessing.value);
+const isCloseModalDisabled = computed(() => removeMembersStore.isProcessing);
 
 /**
  * to close the modal 
@@ -99,8 +88,8 @@ function onModalClosed () {
         <h2>Please Confirm</h2>
         <p>Are you sure you wish to remove the selected members?</p>
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onRemoveSelected" class="button submit" :disabled="isProcessing">{{ removeButtonText }}</button></li>
-            <li><button @click.prevent="onCancelSelected" class="button" :disabled="isProcessing">Cancel</button></li>
+            <li><button @click.prevent="onRemoveSelected" class="button submit" :disabled="removeMembersStore.isProcessing">{{ removeButtonText }}</button></li>
+            <li><button @click.prevent="onCancelSelected" class="button" :disabled="removeMembersStore.isProcessing">Cancel</button></li>
         </ul>
     </reveal-modal>
 </template>

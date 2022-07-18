@@ -5,22 +5,14 @@
  */
 
 import { ref, computed, watch } from 'vue';
+import { useStore } from './store/manageGroupStore';
 import { useDisbandStore } from './store/manageGroupDisbandStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const props = defineProps({
-    /**
-     * To display the toast access status changes
-     */
-    toastEl: {
-        required: true,
-    },
-});
-
+const store = useStore();
 const disbandStore = useDisbandStore();
 const removeModalEl = ref(null);
-const isProcessing = ref(false);
 
 /**
  * to open the modal when requested
@@ -42,16 +34,14 @@ function onDisbandGroupSelected () {
  */
 disbandStore.$onAction(({ name, after, onError }) => {
     if (name === 'disbandGroup') {
-        isProcessing.value = true;
-        props.toastEl.activate('Disbanding...');
+        store.toastEl.activate('Disbanding...');
         after(() => {
-            props.toastEl.timeout('Group successfully disbanded', true, 5000);
+            store.toastEl.timeout('Group successfully disbanded', true, 5000);
             //redirect to the home page
         });
         onError((error) => {
             console.warn(error);
-            isProcessing.value = false;
-            props.toastEl.timeout('Unable to disband group', false, 5000);
+            store.toastEl.timeout('Unable to disband group', false, 5000);
         });
     }
 });
@@ -62,7 +52,7 @@ disbandStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const disbandButtonText = computed(() => isProcessing.value ? 'Disbanding...' : 'Yes');
+const disbandButtonText = computed(() => disbandStore.isProcessing ? 'Disbanding...' : 'Yes');
 
 /**
  * to prevent the user from moving away from the modal while 
@@ -70,7 +60,7 @@ const disbandButtonText = computed(() => isProcessing.value ? 'Disbanding...' : 
  *
  * @returns { Boolean }
  */
-const isCloseModalDisabled = computed(() => isProcessing.value);
+const isCloseModalDisabled = computed(() => disbandStore.isProcessing);
 
 /**
  * to close the modal 
@@ -99,8 +89,8 @@ function onModalClosed () {
         <h2>Please Confirm</h2>
         <p>Are you sure you wish to disband this group? All members of the group will be removed, but all homepage content will remain.</p>
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onDisbandGroupSelected" class="button submit" :disabled="isProcessing">{{ disbandButtonText }}</button></li>
-            <li><button @click.prevent="onCancelSelected" class="button" :disabled="isProcessing">Cancel</button></li>
+            <li><button @click.prevent="onDisbandGroupSelected" class="button submit" :disabled="disbandStore.isProcessing">{{ disbandButtonText }}</button></li>
+            <li><button @click.prevent="onCancelSelected" class="button" :disabled="disbandStore.isProcessing">Cancel</button></li>
         </ul>
     </reveal-modal>
 </template>

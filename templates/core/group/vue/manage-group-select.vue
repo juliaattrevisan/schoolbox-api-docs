@@ -13,15 +13,6 @@ import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vu
 import ManageGroupSelectAccess from './manage-group-select-access.vue';
 
 
-const props = defineProps({
-    /**
-     * To display the toast access status changes
-     */
-    toastEl: {
-        required: true,
-    },
-});
-
 const store = useStore(); //to disable butons on processing
 const membersStore = useMembersStore(); //to keep track of selectedMembers
 const removeMembersStore = useRemoveMembersStore(); //to remove selectedMembers
@@ -113,7 +104,7 @@ function onRemoveMembersSelected () {
         <span ref="shiftSelectNoteEl" class="shift-select-note">Use Shift+Select to select multiple members</span>
         <button @click.prevent="onClearMemberSelection" class="button-clear" :disable="store.isProcessing">Clear member selection</button>
         <ul class="flex-list">
-            <manage-group-select-access :toast-el="props.toastEl" />
+            <manage-group-select-access />
             <li>
                 <button @click.prevent="onEmailMembersSelected" class="button submit icon-email" :disabled="store.isProcessing">Email {{ selectedMembersPlural }}</button>
             </li>

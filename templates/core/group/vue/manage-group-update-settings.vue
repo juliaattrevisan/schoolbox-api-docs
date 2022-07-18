@@ -5,22 +5,14 @@
  */
 
 import { ref, computed, watch } from 'vue';
+import { useStore } from './store/manageGroupStore';
 import { useSettingsStore } from './store/manageGroupSettingsStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const props = defineProps({
-    /**
-     * To display the toast access status changes
-     */
-    toastEl: {
-        required: true,
-    },
-});
-
+const store = useStore();
 const settingsStore = useSettingsStore();
 const updateModalEl = ref(null);
-const isProcessing = ref(false);
 
 /**
  * to open the modal when requested
@@ -42,16 +34,13 @@ function onUpdateSelected () {
  */
 settingsStore.$onAction(({ name, after, onError }) => {
     if (name === 'updateSettings') {
-        isProcessing.value = true;
-        props.toastEl.activate('Updating...');
+        store.toastEl.activate('Updating...');
         after(() => {
-            isProcessing.value = false;
-            props.toastEl.timeout('Settings successfully updated', true, 5000);
+            store.toastEl.timeout('Settings successfully updated', true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            isProcessing.value = false;
-            props.toastEl.timeout('Unable to update settings', false, 5000);
+            store.toastEl.timeout('Unable to update settings', false, 5000);
         });
     }
 });
@@ -62,7 +51,7 @@ settingsStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const updateButtonText = computed(() => isProcessing.value ? 'Updating...' : 'Update');
+const updateButtonText = computed(() => settingsStore.isProcessing ? 'Updating...' : 'Update');
 
 /**
  * to prevent the user from moving away from the modal while 
@@ -70,7 +59,7 @@ const updateButtonText = computed(() => isProcessing.value ? 'Updating...' : 'Up
  *
  * @returns { Boolean }
  */
-const isUpdateModalDisabled = computed(() => isProcessing.value);
+const isUpdateModalDisabled = computed(() => settingsStore.isProcessing);
 
 /**
  * to close the modal 
@@ -127,21 +116,24 @@ function onModalClosed () {
             </div><!-- small-12 medium-6 columns -->
             <div class="small-12 medium-6 columns no-pad">
                 <legend>Notifications</legend>  
-                <input id="msg-enabled" type="checkbox" v-model="settingsStore.isNotificationsEnabled" />
-                <label for="msg-enabled" class="checkbox-label">Notifications enabled</label>
-                <div v-if="settingsStore.isNotificationsEnabled">
-                    <input id="msg-force-follow" type="checkbox" v-model="settingsStore.isForceFollow" />
-                    <label for="msg-force-follow" class="checkbox-label">
-                        Force Follow
-                        <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
-                    </label>
-                </div>
+                <ul class="option-list">
+                    <li>
+                        <input id="msg-enabled" type="checkbox" v-model="settingsStore.isNotificationsEnabled" />
+                        <label for="msg-enabled" class="checkbox-label">Notifications enabled</label>
+                    </li>
+                    <li>
+                        <input id="msg-force-follow" type="checkbox" v-model="settingsStore.isForceFollow" :disabled="!settingsStore.isNotificationsEnabled" />
+                        <label for="msg-force-follow" class="checkbox-label">
+                            Force Follow
+                            <span data-tooltip class="has-tip tip-top hint" title="Group members may not opt out of receiving messages if Force Follow is enabled.">?</span>
+                        </label>
+                    </li>
+                </ul>
             </div>
         </div><!-- small-12 medium-6 columns -->
-        <!-- END msg_enabled -->
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onUpdateSelected" class="button submit" :disabled="isProcessing">{{ updateButtonText }}</button></li>
-            <li><button @click.prevent="onCancelSelected" class="button" :disabled="isProcessing">Cancel</button></li>
+            <li><button @click.prevent="onUpdateSelected" class="button submit" :disabled="settingsStore.isProcessing">{{ updateButtonText }}</button></li>
+            <li><button @click.prevent="onCancelSelected" class="button" :disabled="settingsStore.isProcessing">Cancel</button></li>
         </ul>
     </reveal-modal>
 </template>

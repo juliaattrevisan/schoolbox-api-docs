@@ -12,6 +12,7 @@ export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
     
     state: () => ({
         isPromptOpen: false, //to notify that the prompt is opened / closed
+        isProcessing: false, 
     }),
 
     actions: {
@@ -27,6 +28,7 @@ export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
          * member removal has been confirmed so pull them out
          */
         async removeSelectedMembers () {
+            this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
             try {
@@ -40,18 +42,16 @@ export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
                 const responseJson = await response.json();
                 if (responseJson.success) {
                     const membersStore = useMembersStore();
-                    membersStore.groupMembers = membersStore.groupMembers.filter((row) => { //pull out any removed members, those rows that are in selectedMembers, which have just been deleted
-                        return !membersStore.selectedMembers.some(rowToDelete => rowToDelete.id === row.id);
-                    });
-                    membersStore.selectedMembers = []; //can't keep selecting members that have just been removed
+                    membersStore.removeSelectedGroupMembers();
                 } else {
                     throw new Error();
                 }
             } catch (error) {
                 console.warn(error);
             } finally {
-                this.isPromptOpen = false;
+                this.isProcessing = false;
                 store.isProcessing = false;
+                this.isPromptOpen = false;
             }
         },
 
