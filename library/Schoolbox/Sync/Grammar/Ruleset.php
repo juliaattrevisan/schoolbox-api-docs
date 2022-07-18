@@ -23,7 +23,6 @@ use Schoolbox\User as InternalUser;
  */
 class Ruleset extends TokenizedRuleset implements HydratorInterface
 {
-
     /**
      * @var Mapper
      */
