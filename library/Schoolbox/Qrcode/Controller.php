@@ -140,7 +140,8 @@ class Controller extends Base
                     // already generated, update expiry
                     /** @var Model $token */
                     $token = $tokens->offsetGet($student->getId());
-                    $token->setExpiry($expiry);
+                    $token->setExpiry($expiry)
+                          ->setUpdatedBy($this->getUser());
                     $this->tokenMapper->save($token);
                     continue;
                 }
