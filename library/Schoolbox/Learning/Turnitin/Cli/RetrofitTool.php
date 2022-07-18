@@ -142,13 +142,8 @@ HELP;
             ));
         }
 
-        (new Turnitin\Retrofit(
-            Turnitin\Group\Mapper::getInstance(),
-            Turnitin\File\Mapper::getInstance(),
-            SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
-            SubmissionBoxMapper::getInstance(),
-            $this->getLogger())
-        )->retrofit((int)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID), $retrofitAll);
+        (new Turnitin\Retrofit(Turnitin\Group\Mapper::getInstance(), Turnitin\File\Mapper::getInstance(), SubmissionBox\Submission\SingleFile\Mapper::getInstance(), SubmissionBoxMapper::getInstance(), $this->getLogger()))
+            ->retrofit((int)$this->getOpt(self::OPT_LONG_ASSESSMENT_ID), $retrofitAll);
 
         $this->getLogger()->info('Done.');
 
