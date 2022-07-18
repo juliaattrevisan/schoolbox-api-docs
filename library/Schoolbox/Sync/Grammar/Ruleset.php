@@ -121,10 +121,10 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
      */
     public function applyPartial(array $sequences, $input, $previous = null)
     {
-        $object = $previous ?: $this->mapper->createModel();
-
-        $rules = $this->getRules();
-
+        $object                         = $previous ?: $this->mapper->createModel();
+        $rules                          = $this->getRules();
+        $context                        = [];
+        $propertiesWithAmbiguousEffects = [];
         foreach ($rules as $sequence => $rule) {
             if (!in_array($sequence, $sequences)) {
                 continue;
@@ -203,23 +203,9 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                             // rule as stored in the DB, only its effects:
                             // therefore I can't log which rule should change.
                             // I also don't know the user's name with certainty,
-                            // as it might not have been set by UPS yet: use the
-                            // values from SIS.
-                            $this->log->warning(
-                                sprintf(
-                                    'An effect matches more than one value for %s, property "%s": using the last match, but consider revising rules which set this property',
-                                    trim(
-                                        sprintf(
-                                            '%s %s %s',
-                                            $input->getTitle(),
-                                            $input->getPreferredName(),
-                                            $input->getLastname(),
-                                        )
-                                    ),
-                                    $property,
-                                ),
-                                $context,
-                            );
+                            // as it might not have been set by UPS yet: just
+                            // log for now that it has an ambiguous effect.
+                            $propertiesWithAmbiguousEffects[$property] = $property;
                         }
                         $value = trim(end($value));
                         $this->applyModelPropertyValue($object, $property, $value);
@@ -242,6 +228,20 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                 // TODO log that the rule did not apply [SB-10514]
                 $this->log->debug("Rule did not match", $context);
             }
+        }
+
+        // Log warnings for ambiguous effects here
+        if (!empty($propertiesWithAmbiguousEffects)) {
+            $this->log->warning(
+                sprintf(
+                    'An effect matches more than one value for %s (%s) for %s "%s": using the last match, but consider revising rules which set this property',
+                    $object->formatName(),
+                    $object->getExternalId(),
+                    (count($propertiesWithAmbiguousEffects) > 1 ? 'properties' : 'property'),
+                    implode(',', $propertiesWithAmbiguousEffects),
+                ),
+                $context,
+            );
         }
 
         return $object;
