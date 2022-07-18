@@ -32,7 +32,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * @var Participant\Plan\InteractionIntegrityChecker
      */
