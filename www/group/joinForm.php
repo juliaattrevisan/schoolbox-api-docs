@@ -25,7 +25,7 @@ $response = 'error';
 $groupsSelected = [];
 if (!empty($_POST['group'])) {
     $groupsSelected = $_POST['group'];
-} elseif (is_numeric($_GET['join'])) {
+} elseif (is_numeric($_GET['join'] ?? false)) {
     $groupsSelected[$_GET['join']] = true;
 } elseif (is_numeric($_GET['leave'])) {
     $groupsSelected[$_GET['leave']] = false;
