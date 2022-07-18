@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 class Ruleset extends TokenizedRuleset
 {
-
     /** @var Tokenizer */
     protected $tokenizer;
 

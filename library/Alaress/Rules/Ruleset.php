@@ -14,7 +14,6 @@ use SplObjectStorage;
 
 abstract class Ruleset
 {
-
     /** @var SplObjectStorage|Rule[] */
     protected $rules;
 
