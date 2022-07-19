@@ -842,6 +842,9 @@ abstract class Mapper implements IMapper, Serializable
      *
      * Attempts to perform this action in as few queries as possible.
      *
+     * @deprecated figure if this is actually required: this is complicated and
+     *             seems expensive for something done on every curriculum load
+     *
      * @param mixed  $object
      * @param string $parentField
      * @param int    $currentDepth
@@ -902,6 +905,9 @@ abstract class Mapper implements IMapper, Serializable
      * Loads all descendants of this model or collection.
      *
      * Attempts to perform this action in as few queries as possible.
+     *
+     * @deprecated figure if this is actually required: this is complicated and
+     *             used only once
      *
      * @param mixed  $object
      * @param string $parentField
