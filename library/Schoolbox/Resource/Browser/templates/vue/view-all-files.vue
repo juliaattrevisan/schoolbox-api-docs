@@ -479,6 +479,7 @@ export default {
                     @select="onRowSelected"
                     @filter="markAllFilesAsOld"
                     @sorted="markAllFilesAsOld"
+                    @pagination="markAllFilesAsOld"
                 >
                     <template #beforeTable>
                         <view-all-files-filters
