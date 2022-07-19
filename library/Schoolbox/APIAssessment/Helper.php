@@ -501,6 +501,16 @@ v_most_recent_feedback.review_route = 'instructor' AND
                 ];
             }
         }
+        //$output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']];
+        //clean the data, remove the numeric array keys
+        foreach ($output['capabilities'] as $capKey => $capArr) {
+            foreach ($capArr['indicators'] as $indKey => $indArr) {
+                $output['capabilities'][$capKey]['indicators'][$indKey]['descriptors'] = array_values($indArr['descriptors']);
+            }
+            //grab the otiginal array indicators values which above has changed, not the old ones from the foreach loop that have numeric keys
+            $output['capabilities'][$capKey]['indicators'] = array_values($output['capabilities'][$capKey]['indicators']);
+        }
+        $output['capabilities'] = array_values($output['capabilities']);
         return $output;
         /**
          * Output format:
