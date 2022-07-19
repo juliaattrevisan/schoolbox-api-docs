@@ -1174,7 +1174,7 @@ function BrickManager(codec, entityTypeLabelMap) {
         var newBrick        = new Brick(codec.decode(key), this.entityTypeLabelMap, segmentValueLabels),
             brickCandidates = [];
 
-        for (const i of Object.keys(bricks)) {
+        for (var i in bricks) {
             var brick = bricks[i];
             if(brick.containsBrick(newBrick)){
                 selectize.removeItem(key);
@@ -1303,7 +1303,7 @@ function BrickManager(codec, entityTypeLabelMap) {
      */
     var onBrickChanged = function (selectize, bricks, changedBrick) {
         for(var i in bricks){
-            if (changedBrick.segments[0].entityValue === bricks[i].segments[0].entityValue) {
+            if (JSON.stringify(changedBrick) === JSON.stringify(bricks[i])) {
                 continue;
             }
             if(changedBrick.containsBrick(bricks[i])){
