@@ -435,4 +435,105 @@ v_most_recent_feedback.review_route = 'instructor' AND
         }
         return $this->folderCodes[$folderId] ?? null;
     }
+
+    /**
+     * get full rubric template
+     */
+    public function getRubric(string $assessmentId)
+    {
+        $statement = $this->mapper->getDatabase()->prepare("
+        select `sb`.`assessment_id`                                AS `assessment_id`,
+           `rc`.`id`                               AS `capability_id`,
+           `rc`.`name`                             AS `capability_name`,
+           `rcu`.`max_value`                       AS `capability_max_value`,
+           `rcu`.`sequence`                        AS `capability_sequence`,
+           `sb`.`rubric_capability_mark_type_id`   AS `capability_mark_type_id`,
+           `sb`.`rubric_capability_grade_group_id` AS `capability_grade_group_id`,
+           `ri`.`id`                               AS `indicator_id`,
+           `ri`.`name`                             AS `indicator_name`,
+           `riu`.`sequence`                        AS `indicator_sequence`,
+           `riu`.`max_value`                       AS `indicator_max_value`,
+           `rd`.`id`                               AS `descriptor_id`,
+           `rd`.`description`                      AS `descriptor_descriptor`,
+           `rd`.`max_value`                        AS `descriptor_max_value`,
+           `rl`.`sequence`                         AS `descriptor_sequence`,
+           `rl`.`name`                             AS `rubric_level`
+        from ((((((`submission_box` `sb`
+            join `rubric_capability_usage` `rcu` on (`sb`.`id` = `rcu`.`submission_box_id`))
+            join `rubric_capability` `rc` on (`rcu`.`rubric_capability_id` = `rc`.`id`))
+            join `rubric_indicator_usage` `riu` on (`sb`.`id` = `riu`.`submission_box_id`))
+            join `rubric_indicator` `ri` on (`riu`.`rubric_indicator_id` = `ri`.`id` and `ri`.`rubric_capability_id` = `rc`.`id`))
+            join `rubric_level` `rl` on (`sb`.`id` = `rl`.`box_id`))
+            JOIN `rubric_descriptor` `rd` on (`rl`.`id` = `rd`.`level_id` and `rd`.`rubric_indicator_id` = `riu`.`rubric_indicator_id`))
+        where `sb`.`use_rubric` is true
+          and `rc`.`deleted_at` is null
+          and `ri`.`deleted_at` is null
+          AND `sb`.`assessment_id` = :assessmentID
+        order by `sb`.`assessment_id`, `rcu`.`sequence`, `rc`.`id`, `riu`.`sequence`, `ri`.`id`
+        ");
+        $statement->execute(['assessmentID' => $assessmentId]);
+        $output = [];
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            //build the capability if it does not already exist
+            if (!isset($output['capabilities'][$row['capability_id']])) {
+                $output['capabilities'][$row['capability_id']] = [
+                    'id'            => $row['capability_id'],
+                    'name'          => $row['capability_name'],
+                    'indicators'    => []
+                ];
+            }
+            //capability should already exist, so lets build the indicator for that capability
+            if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
+                $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
+                    'id'            => $row['indicator_id'],
+                    'name'          => $row['indicator_name'],
+                    'maxValue'      => $row['indicator_max_value'],
+                    'descriptors'   => []
+                ];
+            }
+            //indicator should already exist, so lets build the descriptor for that indicator for that capability
+            if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']])) {
+                $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']] = [
+                    'id'            => $row['descriptor_id'],
+                    'description'   => $row['descriptor_descriptor'],
+                    'maxValue'      => $row['descriptor_max_value'],
+                    'sequence'      => $row['descriptor_sequence']
+                ];
+            }
+        }
+        return $output;
+        /**
+         * Output format:
+    rubric: {
+        capabilities: {
+            id: 123,
+            name: "Capability 1",
+            indicators: {
+                id: 123,
+                name: "Spelling and Grammar",
+                maxValue: 10.00,
+                descriptors:
+                    {
+                        id: 321,
+                        description: "Grammar and mechanics of sentences is mostly correct.",
+                        max_value: 3
+                    },
+                    {
+                        id: 322,
+                        description: "Basic idea of sentences is understood.",
+                        max_value: 2.0
+                    }
+                }
+            }
+        }
+         */
+    }
+
+    /**
+     * get feedback rubric
+     */
+    private function getRubricFeedback(string $assessmentId)
+    {
+
+    }
 }

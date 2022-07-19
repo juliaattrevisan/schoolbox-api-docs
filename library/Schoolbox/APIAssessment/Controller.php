@@ -125,4 +125,37 @@ class Controller extends Base
             )
         );
     }
+
+    public function apiRubricGet(string $assessmentId)
+    {
+        if (!is_numeric($assessmentId)) {
+            $problem = (new ApiProblem('Assessment not found, ID must be a number'))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
+        //get all assessment info for object
+        try {
+            $output = $this->assessmentHelper->getRubric($assessmentId);
+        } catch (SchoolboxException $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(404)
+                ->asArray();
+            $this->getResponse()->status->setCode(404);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the user is part of the group.
+        }
+
+        /**
+         * build the whole thing
+         */
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $output
+            )
+        );
+    }
 }
