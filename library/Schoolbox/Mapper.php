@@ -822,19 +822,18 @@ abstract class Mapper implements IMapper, Serializable
         $setChildren = $this->getSetMethodName($childField);
         foreach ($collection as $node) {
             $nodeId   = $node->$getId();
-            $parentId = $node->$getParent()->$getId();
+            $parentId = $node->$getParent()?->$getId();
             if (!$parentId) {
                 $treeList->add($node);
             }
             $node->$setChildren(
                 $collection->filter(
                     function ($childNode) use ($nodeId, $getParent, $getId) {
-                        return $childNode->$getParent()->$getId() == $nodeId;
+                        return $childNode->$getParent()?->$getId() === $nodeId;
                     }
                 )
             );
         }
-        unset($flatList);
         return $treeList;
     }
 
