@@ -103,6 +103,8 @@ class Helper
                     'id' => $row['project'],
                 ];
             }
+            //get the rubric for the assessment
+            $rubric = $this->getRubric($row['id']);
             if (!isset($output[$row['id']])) {
                 $output[$row['id']] = [
                     'id'               => $row['id'],
@@ -117,6 +119,7 @@ class Helper
                     'project'          => $project,
                     'weighted'         => $weighted,
                     'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
+                    'rubric'           => $rubric,
                     'participants'     => null,
                 ];
             }
