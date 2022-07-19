@@ -543,7 +543,7 @@ class CourseCest
      * Convenience helper to create a unit
      * @param IntegrationTester $i
      */
-    private function createUnit(IntegrationTester $i, int $courseSpecId, string $unit_name):void
+    private function createUnit(IntegrationTester $i, int $courseSpecId, string $unit_name): void
     {
 
         $unitSpecPayload = new Payload\Course\Unit\Specification\Create($courseSpecId);
