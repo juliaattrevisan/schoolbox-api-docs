@@ -36,7 +36,6 @@
                 <tbody>
                 {% for log in logs %}
                     <tr>
-                        {# TODO SA-13980? #}
                         <td>{{ log.timestamp }}</td>
                         <td>{{ log.message }}</td>
                         <td class="text-right">{{ log.status }}</td>
