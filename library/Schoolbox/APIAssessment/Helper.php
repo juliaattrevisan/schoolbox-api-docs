@@ -547,6 +547,5 @@ v_most_recent_feedback.review_route = 'instructor' AND
      */
     private function getRubricFeedback(string $assessmentId)
     {
-
     }
 }

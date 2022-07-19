@@ -19,7 +19,6 @@ use PDO;
 
 class Controller extends Base
 {
-
     protected Helper $assessmentHelper;
     protected Mapper $dbMapper;
 
