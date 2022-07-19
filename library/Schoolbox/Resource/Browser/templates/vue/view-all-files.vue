@@ -62,6 +62,7 @@ export default {
             selectedFilters: [],
             tableData: [],
             tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
+                alwaysShowPerPageSelect: true,
                 columnsClasses: {
                     ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
                     edit: 'edit-td ', //to specify a width
@@ -478,6 +479,7 @@ export default {
                     @select="onRowSelected"
                     @filter="markAllFilesAsOld"
                     @sorted="markAllFilesAsOld"
+                    @pagination="markAllFilesAsOld"
                 >
                     <template #beforeTable>
                         <view-all-files-filters
