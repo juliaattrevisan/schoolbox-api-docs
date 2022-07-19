@@ -103,7 +103,8 @@ class Factory
             $set->newRule(
                 $translatedRule['conditions'],
                 $translatedRule['effects'],
-                $translatedRule['negate']
+                $translatedRule['negate'],
+                $rule->getName() !== '' ? $rule->getName() : ('Rule ' . $rule->getId()),
             );
         }
         return $set;
@@ -176,6 +177,7 @@ class Factory
                 $result['conditions'][] = $this->buildCondition(
                     $condition->getConditionType()->getName(),
                     $condition->getArguments(),
+                    $condition->getRule()->getName(),
                 );
             } catch (OutOfBoundsException | OutOfRangeException $e) {
                 // Log that this condition is broken,
@@ -197,7 +199,8 @@ class Factory
             try {
                 $result['effects'][$effect->getUserProperty()] = $this->buildEffect(
                     $effect->getEffectType()->getName(),
-                    $effect->getArguments()
+                    $effect->getArguments(),
+                    $effect->getRule()->getName(),
                 );
             } catch (OutOfBoundsException | OutOfRangeException $e) {
                 // Log that this effect is broken,
@@ -233,14 +236,13 @@ class Factory
      *
      * @param string $type
      * @param array  $args
-     * @throws OutOfBoundsException
-     * @throws OutOfRangeException
+     * @param string $label
      * @return \Alaress\Rules\Condition
      */
-    protected function buildCondition($type, array $args)
+    protected function buildCondition($type, array $args, string $label)
     {
         try {
-            return $this->reflectivelyBuild(self::CONDITION_NAMESPACE, $type, $args);
+            return $this->reflectivelyBuild(self::CONDITION_NAMESPACE, $type, $args, $label);
         } catch (ReflectionException $e) {
             throw new OutOfBoundsException("Condition type '$type' not found.", 0, $e);
         }
@@ -252,13 +254,14 @@ class Factory
      *
      * @param string $type
      * @param array  $args
+     * @param string $label
      * @return bool|string|Map
      */
-    protected function buildEffect($type, array $args)
+    protected function buildEffect($type, array $args, string $label)
     {
         try {
             // attempt to treat as language construct
-            return $this->reflectivelyBuild(self::EFFECT_NAMESPACE, $type, $args);
+            return $this->reflectivelyBuild(self::EFFECT_NAMESPACE, $type, $args, $label);
         } catch (ReflectionException $e) {
             // no? ok, it's a string literal
             return $args[0];
@@ -269,11 +272,13 @@ class Factory
     /**
      * @param string $namespace
      * @param string $classname
-     * @param array $arguments
-     * @throws OutOfRangeException
+     * @param array  $arguments
+     * @param string $label
      * @return object
+     * @throws OutOfRangeException if not enough params
+     * @throws ReflectionException if something else went wrong in construction
      */
-    protected function reflectivelyBuild($namespace, $classname, array $arguments)
+    protected function reflectivelyBuild($namespace, $classname, array $arguments, string $label)
     {
         $fqcn = $namespace . '\\' . $classname;
 

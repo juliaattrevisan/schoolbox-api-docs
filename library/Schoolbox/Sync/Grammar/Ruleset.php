@@ -120,10 +120,8 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
      */
     public function applyPartial(array $sequences, $input, $previous = null)
     {
-        $object                         = $previous ?: $this->mapper->createModel();
-        $rules                          = $this->getRules();
-        $context                        = [];
-        $propertiesWithAmbiguousEffects = [];
+        $object = $previous ?: $this->mapper->createModel();
+        $rules  = $this->getRules();
         foreach ($rules as $sequence => $rule) {
             if (!in_array($sequence, $sequences)) {
                 continue;
@@ -203,8 +201,25 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                             // therefore I can't log which rule should change.
                             // I also don't know the user's name with certainty,
                             // as it might not have been set by UPS yet: just
-                            // log for now that it has an ambiguous effect.
+                            // log the name from input.
                             $propertiesWithAmbiguousEffects[$property] = $property;
+                            $this->log->warning(
+                                sprintf(
+                                    'Rule "%s" has ambiguous value for property "%s" for user "%s" (%s): using the last match, but consider revising rule',
+                                    $rule->getLabel(),
+                                    $property,
+                                    trim(
+                                        sprintf(
+                                            '%s %s %s',
+                                            $input->getTitle(),
+                                            $input->getPreferredName(),
+                                            $input->getLastname(),
+                                        ),
+                                    ),
+                                    $input->getId(),
+                                ),
+                                $context,
+                            );
                         }
                         $value = trim(end($value));
                         $this->applyModelPropertyValue($object, $property, $value);
@@ -222,27 +237,12 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                 }
 
                 // TODO log that the rule applied [SB-10514], and provide the new set of values [SB-10515]
-                $this->log->debug("Rule matched and applied", $context);
+                $this->log->debug(sprintf('Rule "%s" matched and applied', $rule->getLabel()), $context);
             } else {
                 // TODO log that the rule did not apply [SB-10514]
-                $this->log->debug("Rule did not match", $context);
+                $this->log->debug(sprintf('Rule "%s" did not match', $rule->getLabel()), $context);
             }
         }
-
-        // Log warnings for ambiguous effects here
-        if (!empty($propertiesWithAmbiguousEffects)) {
-            $this->log->warning(
-                sprintf(
-                    'An effect matches more than one value for %s (%s) for %s "%s": using the last match, but consider revising rules which set this property',
-                    $object->formatName(),
-                    $object->getExternalId(),
-                    (count($propertiesWithAmbiguousEffects) > 1 ? 'properties' : 'property'),
-                    implode(',', $propertiesWithAmbiguousEffects),
-                ),
-                $context,
-            );
-        }
-
         return $object;
     }
 
@@ -366,13 +366,14 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
 
     /**
-     * @param callable $effect
-     * @param bool     $negate
+     * @param callable $effect The rule's conditions and effects
+     * @param bool     $negate If true: run if the conditions are NOT met
+     * @param string   $label  A text label for the rule
      * @return Rule
      */
-    protected function createRule($effect, $negate = false)
+    protected function createRule($effect, $negate = false, string $label = '')
     {
-        return new Rule($effect, $negate);
+        return new Rule($effect, $negate, $label);
     }
 
     /**

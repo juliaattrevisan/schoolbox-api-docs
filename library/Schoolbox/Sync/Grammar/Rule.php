@@ -13,10 +13,20 @@ use Alaress\Rules\Condition;
 use Alaress\Rules\Lang\Construct;
 use Alaress\Rules\Rule as Super;
 use Alaress\Rules\Token;
-use Schoolbox\User;
 
 class Rule extends Super
 {
+    /**
+     * Constructor
+     *
+     * @param callable $effect The rule's conditions and effects
+     * @param bool     $negate If true: run if the conditions are NOT met
+     * @param string   $label  A text label for the rule
+     */
+    public function __construct($effect, $negate = false, private string $label = '')
+    {
+        parent::__construct($effect, $negate);
+    }
 
     /**
      * @return array
@@ -119,5 +129,13 @@ class Rule extends Super
         }
 
         return $obj;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel(): string
+    {
+        return $this->label;
     }
 }
