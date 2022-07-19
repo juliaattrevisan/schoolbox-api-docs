@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * To select Curriculum codes
+ * To search for codes or select the browse button to open the modal
  */
 
 import { ref } from 'vue'; 
@@ -25,7 +25,6 @@ function onBrowseSelected () {
 
 <template>
     <div class="input-group">
-        <input name="curriculumCodes[]" type="hidden" tabindex="-1" value="" />
         <input
             v-if="isClassSelectorActive"
             v-model="query"
@@ -37,6 +36,7 @@ function onBrowseSelected () {
             @input="$event.target.composing = false"
         />
         <button class="button icon-curriculum" title="Browse and select from the Curriculum" @click.prevent="onBrowseSelected">Browse</button>
+        <input name="curriculumCodes[]" type="hidden" tabindex="-1" value="" />
     </div>
 </template>
 

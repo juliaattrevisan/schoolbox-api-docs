@@ -8,6 +8,9 @@ import { ref, computed, watch } from 'vue';
 // import { useStore } from '../store/curriculumSelectorStore';
 import { useModalStore } from '../store/csModalStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
+import CsModalHeader from './cs-modal-header.vue';
+import CsModalResults from './cs-modal-results.vue';
+import CsModalFooter from './cs-modal-footer.vue';
 
 
 // const store = useStore();
@@ -85,7 +88,9 @@ function onModalClosed () {
         :close-on-background-click="false" 
         @closed="onModalClosed"
     >
-        <h2>Yep</h2>
+        <cs-modal-header />
+        <cs-modal-results />
+        <cs-modal-footer />
     </reveal-modal>
 </template>
 

@@ -9,7 +9,7 @@ export const useModalStore = defineStore('csModalStore', {
     
     state: () => ({
         isOpen: false, //to notify that the modal is opened / closed
-        isProcessing: false, 
+        query: '', //the term to search for 
     }),
 
     actions: {
