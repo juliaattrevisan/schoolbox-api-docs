@@ -2,10 +2,10 @@
     <div class="small-12 island">
         {# TODO SA-13980 #}
         <h2 class="subheader">Online Submission</h2>
-        {% if file.exists %}
+        {% if data.content is not null %}
             <section class="content">
                 <article>
-                    {{ file.storage.read | purify }}
+                    {{ data.content | purify }}
                 </article>
             </section>
         {% else %}

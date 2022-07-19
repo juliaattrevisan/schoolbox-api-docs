@@ -13,7 +13,10 @@
 
 namespace Schoolbox\Learning\InlineGrader\Factory;
 
+use League\Flysystem\FilesystemException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 use Schoolbox\Video\ResourceVideoMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -34,33 +37,19 @@ class ResponseFile
     );
 
     /**
-     * @var Kami\Mapper
-     */
-    private $kamiMapper;
-
-    /**
-     * @var Kami\Connector
-     */
-    private $kamiConnector;
-
-
-    /**
-     * @var \Schoolbox\Assessment\Term\Mapper
-     */
-    private \Schoolbox\Assessment\Term\Mapper $termMapper;
-
-    /**
      * ResponseFile constructor.
      *
-     * @param Kami\Mapper    $kamiMapper
-     * @param Kami\Connector $kamiConnector
-     * @param \Schoolbox\Assessment\Term\Mapper $termMapper
+     * @param Kami\Mapper     $kamiMapper
+     * @param Kami\Connector  $kamiConnector
+     * @param TermMapper      $termMapper
+     * @param FilesystemProxy $filesystemProxy,
      */
-    public function __construct(Kami\Mapper $kamiMapper, Kami\Connector $kamiConnector, \Schoolbox\Assessment\Term\Mapper $termMapper)
-    {
-        $this->kamiMapper    = $kamiMapper;
-        $this->kamiConnector = $kamiConnector;
-        $this->termMapper = $termMapper;
+    public function __construct(
+        private Kami\Mapper $kamiMapper,
+        private Kami\Connector $kamiConnector,
+        private TermMapper $termMapper,
+        private FilesystemProxy $filesystemProxy,
+    ) {
     }
 
 
@@ -119,7 +108,7 @@ class ResponseFile
             return [
                 'strategy' => 'audio.twig',
                 'data' => [
-                    'hash' => $file->getHash(),
+                    'hash'  => $file->getHash(),
                     'audio' => $audio,
                 ]
             ];
@@ -138,7 +127,7 @@ class ResponseFile
             return [
                 'strategy' => 'video.twig',
                 'data' => [
-                    'hash' => $file->getHash(),
+                    'hash'  => $file->getHash(),
                     'video' => $video,
                 ]
             ];
@@ -147,8 +136,18 @@ class ResponseFile
         if ($file->getEditableInline()) {
             /* Load purified html into a random div or suchlike
              */
+            $content = null;
+            try {
+                $content = $this->filesystemProxy->read($file);
+            } catch (FilesystemException) {
+                // noop: fallback to null
+            }
             return [
-                'strategy' => 'html.twig'
+                'strategy' => 'html.twig',
+                'data'     => [
+                    'hash'    => $file->getHash(),
+                    'content' => $content,
+                ],
             ];
         }
 
