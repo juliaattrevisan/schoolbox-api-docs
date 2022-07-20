@@ -8,6 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use OneLogin\Saml2\Utils;
 use Schoolbox\Engagement\Login;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
@@ -348,73 +349,59 @@ switch ($_POST['module']) {
         ];
         break;
     case 'service_saml_cert':
-        $databaseSamlCert = $config->get('saml_idp_certificate');
-        $samlCertMetadataUrl = $config->get('saml_idp_metadata_url');
+        $samlConfig = SamlCertHelper::parseSamlConfig($config->get('saml_idp_certificate'), $config->get('saml_idp_metadata_url'));
 
-        $daysBeforeExpiry = null;
-        $dbSamlCertErrorMessage = "";
-        $metadataUrlSamlCertErrorMessage = "";
+        $certsArray = SamlCertHelper::getArrayOfSamlCerts($samlConfig);
 
-        //if database cert field contains a value, get the days before expiry
-        if ($databaseSamlCert) {
-            $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($databaseSamlCert);
-
-            if ($daysBeforeExpiry === null) {
-                //if IDP cert in DB is invalid
-                $dbSamlCertErrorMessage = "Invalid IDP cert";
+        //find days before expiry for all certs excluding null values from invalid certs
+        $certExpiryArray = [];
+        foreach ($certsArray as $cert) {
+            $formattedCert = Utils::formatCert($cert);
+            $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($formattedCert);
+            if ($daysBeforeExpiry !== null) {
+                $certExpiryArray[] = $daysBeforeExpiry;
             }
         }
 
-        if (($daysBeforeExpiry === null) && $samlCertMetadataUrl) {
-            $metadataSamlCerts = SamlCertHelper::getSamlCertsFromMetadataUrl($samlCertMetadataUrl);
-
-            if ($metadataSamlCerts !== null) {
-                $bestSamlCert     = SamlCertHelper::getCertWithLongestDatedExpiryFromX509CertMulti($metadataSamlCerts);
-                $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($bestSamlCert);
-            } else {
-                //if IDP metadata URL cannot be reached
-                $metadataUrlSamlCertErrorMessage = "IDP metadata URL offline";
-            }
+        //if there are no valid certs
+        if (count($certExpiryArray) === 0) {
+            $output[] = [
+                'SAML_LIGHT'   => 'alert',
+                'SAML_MESSAGE' => 'Invalid SAML config',
+            ];
+            break;
         }
 
-        if ($daysBeforeExpiry === null) {
-            //code will only reach here if neither saml config is valid
-            if ($dbSamlCertErrorMessage && $metadataUrlSamlCertErrorMessage) {
-                //if both saml_idp_certificate AND saml_idp_metadata_url are invalid
-                $separator = '; ';
-            } else {
-                $separator = '';
-            }
+        $bestDaysBeforeExpiry = max($certExpiryArray);
 
-            $output[] = array('SAML_LIGHT'  => 'alert',
-                            'SAML_MESSAGE' => $dbSamlCertErrorMessage . $separator . $metadataUrlSamlCertErrorMessage,
-            );
+        $absDaysBeforeExpiry = abs($bestDaysBeforeExpiry);
+        //get plural/singular form of 'day'
+        if ($absDaysBeforeExpiry === 1) {
+            $dayOrDays = "day";
         } else {
-            $absDaysBeforeExpiry = abs($daysBeforeExpiry);
-            //get plural/singular form of 'day'
-            if ($absDaysBeforeExpiry === 1) {
-                $dayOrDays = "day";
-            } else {
-                $dayOrDays = "days";
-            }
+            $dayOrDays = "days";
+        }
 
-            if ($daysBeforeExpiry < 0) {
-                $output[] = array('SAML_LIGHT'  => 'alert',
-                                  'SAML_MESSAGE' => 'Expired'
-                );
-            } elseif ($daysBeforeExpiry < 7) {
-                $output[] = array('SAML_LIGHT'  => 'alert',
-                                  'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays
-                );
-            } elseif ($daysBeforeExpiry < 30) {
-                $output[] = array('SAML_LIGHT'  => 'warning',
-                                  'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays
-                );
-            } else {
-                $output[] = array('SAML_LIGHT'  => 'success',
-                                  'SAML_MESSAGE' => 'Valid'
-                );
-            }
+        if ($bestDaysBeforeExpiry < 0) {
+            $output[] = [
+                'SAML_LIGHT'   => 'alert',
+                'SAML_MESSAGE' => 'Expired',
+            ];
+        } elseif ($bestDaysBeforeExpiry < 7) {
+            $output[] = [
+                'SAML_LIGHT'   => 'alert',
+                'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays,
+            ];
+        } elseif ($bestDaysBeforeExpiry < 30) {
+            $output[] = [
+                'SAML_LIGHT'   => 'warning',
+                'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays,
+            ];
+        } else {
+            $output[] = [
+                'SAML_LIGHT'   => 'success',
+                'SAML_MESSAGE' => 'Valid',
+            ];
         }
         break;
     default:

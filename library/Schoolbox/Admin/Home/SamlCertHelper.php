@@ -2,6 +2,8 @@
 
 namespace Schoolbox\Admin\Home;
 
+use Alaress_Saml_Cache;
+use Exception;
 use OneLogin\Saml2\IdPMetadataParser;
 
 /**
@@ -13,14 +15,13 @@ class SamlCertHelper
      * Get days before SAML cert expires
      *
      * @param string $samlCert Certificate of IDP
-     * @return int|null  Days before the $cert expires,
-     *                negative if past expiry
+     * @return int|null Days before the $samlCert expires, negative if past expiry
      */
     public static function getDaysBeforeExpiry(string $samlCert): ?int
     {
-        $samlCertMetadata = @openssl_x509_parse($samlCert);
+        $samlCertMetadata = openssl_x509_parse($samlCert);
 
-        if (!is_array($samlCertMetadata)) {
+        if ($samlCertMetadata === false) {
             return null;
         }
 
@@ -32,73 +33,58 @@ class SamlCertHelper
     }
 
     /**
-     * Get SAML cert/s from metadata url
+     * Parse SAML config and build configuration info array
      *
-     * @param string $url
-     * @return array|null SAML certificates found
+     * Replicates the SAML parsing present in the product
+     *
+     * @param string $saml_idp_certificate
+     * @param string $saml_idp_metadata_url
+     * @return array
      */
-    public static function getSamlCertsFromMetadataUrl(string $url): ?array
+    public static function parseSamlConfig(string $saml_idp_certificate, string $saml_idp_metadata_url): array
     {
-        $certsOut = null;
+        // TODO merge this and saml-setup.php into common implementation. See IST-1773
+        $settingsInfo = [
+            'idp' => [
+                'x509cert' => preg_replace("/\r/m", "", $saml_idp_certificate),
+            ],
+        ];
         try {
-            $url = new \Laminas\Uri\Uri($url);
+            $url = new \Laminas\Uri\Uri($saml_idp_metadata_url);
             $idpMetadataUrl = $url->toString();
 
-            $cache = new \Alaress_Saml_Cache();
-            $idpMetadataCache = $cache->init($idpMetadataUrl);
+            $cache = new Alaress_Saml_Cache();
+            $idpMetadata = $cache->init($idpMetadataUrl);
 
             // if cache exists, update $setting info from cache
-            if (!empty($idpMetadataCache->getStreamContents()) && file_exists($idpMetadataCache->getCachedFile())) {
-                $idpMetadata = [];
+            /** @noinspection NotOptimalIfConditionsInspection */
+            if (file_exists($idpMetadata->getCachedFile()) && !empty($idpMetadata->getStreamContents())) {
                 try {
-                    $idpMetadata = IdPMetadataParser::parseXML($idpMetadataCache->getStreamContents());
-                } catch (\Exception $e) {
+                    $settingsInfo = IdPMetadataParser::injectIntoSettings($settingsInfo, IdPMetadataParser::parseXML($idpMetadata->getStreamContents()));
+                } catch (Exception $e) {
                     $cache->invalidateCache();
                 }
-
-                if (array_key_exists('x509cert', $idpMetadata['idp'])) {
-                    $certsOut = array(self::buildCertString($idpMetadata['idp']['x509cert']));
-                } elseif (array_key_exists('x509certMulti', $idpMetadata['idp'])) {
-                    $certsOut = [];
-                    foreach ($idpMetadata['idp']['x509certMulti']['signing'] as $certInner) {
-                        $certsOut[] = self::buildCertString($certInner);
-                    }
-                }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             //noop, metadata url invalid
         }
-        return $certsOut;
+        return $settingsInfo;
     }
 
     /**
-     * Find the cert in an array that contains has the most days before expiry
+     * Arrayify certs from parseSAMLConfig
      *
-     * @param array $certs array of certs to be checked
-     * @return string|null  SAML certificate
-     */
-    public static function getCertWithLongestDatedExpiryFromX509CertMulti(array $certs): ?string
+     * @param array $samlConfig
+     * @return array
+    */
+    public static function getArrayOfSamlCerts(array $samlConfig): array
     {
-        $bestCertIndex = -1;
-        $bestCertExpiry = -1;
-        foreach ($certs as $index => $cert) {
-            $currentCertExpiry = self::getDaysBeforeExpiry($cert);
-            if ($currentCertExpiry > $bestCertExpiry) {
-                $bestCertIndex = $index;
-                $bestCertExpiry = $currentCertExpiry;
-            }
+        $out = [];
+        if (isset($samlConfig['idp']['x509certMulti'])) {
+            $out = $samlConfig['idp']['x509certMulti']['signing'];
+        } elseif (isset($samlConfig['idp']['x509cert'])) {
+            $out = [$samlConfig['idp']['x509cert']];
         }
-        return $certs[$bestCertIndex] ?? null;
-    }
-
-    /**
-     * Add 'begin cert' and 'end cert' onto the provided string
-     *
-     * @param string $certInner
-     * @return string  SAML certificate
-     */
-    private static function buildCertString(string $certInner): string
-    {
-        return "-----BEGIN CERTIFICATE-----\n" . $certInner . "\n-----END CERTIFICATE-----";
+        return $out;
     }
 }
