@@ -15,9 +15,9 @@ use ConfigFallback;
 use Database;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mail\EmailFactory;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class Notifactory
@@ -96,7 +96,7 @@ class Notifactory
                 Database::reinitialise();
 
                 $this->conf = ConfigLoader::getInstance();
-                $this->conf->get(EmailFactory::CONFIG_MAIL_SUPPORT_ADDRESS);
+                $this->conf->get(ConfigMapper::NAME_MAIL_SUPPORT_ADDRESS);
             } catch (PDOException $e) {
                 // if something PDO-esque broke, fall back
                 $this->conf = new ConfigFallback();

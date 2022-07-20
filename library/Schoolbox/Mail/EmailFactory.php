@@ -29,12 +29,6 @@ use Twig\TwigFilter;
  */
 class EmailFactory
 {
-    public const CONFIG_MAIL_FORCE_FROM_SYSTEM = 'mail_force_from_system';
-    public const CONFIG_MAIL_FROM_ADDRESS      = 'mail_from_address';
-    public const CONFIG_MAIL_FROM_NAME         = 'mail_from_name';
-    public const CONFIG_MAIL_PASSWORD_CHANGE   = 'password_change_email_from';
-    public const CONFIG_MAIL_SUPPORT_ADDRESS   = 'mail_support_address';
-
     /**
      * Context used for building emails
      *

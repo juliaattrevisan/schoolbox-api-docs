@@ -9,6 +9,7 @@
 namespace Schoolbox\User\Password;
 
 use PDOException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\EmailFactory;
 use Schoolbox\User;
@@ -241,7 +242,7 @@ class MailService
     private function getFrom()
     {
         if (!$this->from) {
-            $this->from = new Address($this->config->get(EmailFactory::CONFIG_MAIL_PASSWORD_CHANGE), $this->config->get(EmailFactory::CONFIG_MAIL_FROM_NAME));
+            $this->from = new Address($this->config->get(ConfigMapper::NAME_MAIL_PASSWORD_CHANGE), $this->config->get(ConfigMapper::NAME_MAIL_FROM_NAME));
         }
         return $this->from;
     }

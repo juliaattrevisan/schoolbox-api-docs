@@ -14,8 +14,8 @@ use Alaress\Lumberjack\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\EmailDKIM\Mapper;
 use Schoolbox\Admin\EmailDKIM\Model as EmailDKIM;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mail\EmailFactory;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Symfony\Component\Mailer\Envelope;
@@ -97,7 +97,7 @@ class Mailer
         $this->email = new Email();
 
         // setup default from
-        $this->systemFrom = new Address($this->config->get(EmailFactory::CONFIG_MAIL_FROM_ADDRESS), $this->config->get(EmailFactory::CONFIG_MAIL_FROM_NAME));
+        $this->systemFrom = new Address($this->config->get(ConfigMapper::NAME_MAIL_FROM_ADDRESS), $this->config->get(ConfigMapper::NAME_MAIL_FROM_NAME));
         $this->setFrom($this->systemFrom);
 
         // setup header
@@ -395,7 +395,7 @@ class Mailer
             // get all recipients before signing
             $recipients = array_merge($this->email->getTo(), $this->email->getCC(), $this->email->getBcc());
 
-            if ($this->config->get(EmailFactory::CONFIG_MAIL_FORCE_FROM_SYSTEM)) {
+            if ($this->config->get(ConfigMapper::NAME_MAIL_FORCE_FROM_SYSTEM)) {
                 $this->forceFrom();
             }
 

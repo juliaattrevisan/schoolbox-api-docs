@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use RangeException;
 use RuntimeException;
 use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\EmailFactory;
 use Schoolbox\Notif\Handler\MySQLHandler;
@@ -203,10 +204,10 @@ class HandlerFactory
      */
     protected function createMailHandler($title, $severity, $bubble = true, $to = null, $from = null): SymfonyMailerHandler
     {
-        $to   = $to ?: $this->conf->get(EmailFactory::CONFIG_MAIL_SUPPORT_ADDRESS);
+        $to   = $to ?: $this->conf->get(ConfigMapper::NAME_MAIL_SUPPORT_ADDRESS);
         $from = $from ?: [
-            $this->conf->get(EmailFactory::CONFIG_MAIL_FROM_ADDRESS),
-            $this->conf->get(EmailFactory::CONFIG_MAIL_FROM_NAME)
+            $this->conf->get(ConfigMapper::NAME_MAIL_FROM_ADDRESS),
+            $this->conf->get(ConfigMapper::NAME_MAIL_FROM_NAME)
         ];
 
         $mailFactory = new EmailFactory(

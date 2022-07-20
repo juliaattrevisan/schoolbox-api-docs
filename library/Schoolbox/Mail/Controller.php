@@ -406,7 +406,7 @@ class Controller extends Base
             $context['hideUnsubscribe'] = true;
 
             $subject = $this->getConfigLoader()->get('title') . ' Feedback - ' . $this->request->post->get('subject');
-            $to      = new Address($this->getConfigLoader()->get(EmailFactory::CONFIG_MAIL_SUPPORT_ADDRESS), $this->getConfigLoader()->get(EmailFactory::CONFIG_MAIL_FROM_NAME));
+            $to      = new Address($this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_SUPPORT_ADDRESS), $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_FROM_NAME));
             $email   = $this->emailFactory->buildTwigEmail('feedback.twig', $subject, $to);
             $email->addReplyTo($replyTo);
             $email->setContext($context);
