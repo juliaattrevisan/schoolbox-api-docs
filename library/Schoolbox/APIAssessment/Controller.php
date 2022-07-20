@@ -138,7 +138,7 @@ class Controller extends Base
 
         //get all assessment info for object
         try {
-            $output = $this->assessmentHelper->getRubric($assessmentId);
+            $output = $this->assessmentHelper->getRubricFeedback($assessmentId);
         } catch (SchoolboxException $e) {
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus(404)
