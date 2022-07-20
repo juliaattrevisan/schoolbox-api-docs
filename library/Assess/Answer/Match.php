@@ -39,6 +39,11 @@ class Assess_Answer_Match extends Evaluation_Answer_Match implements IAutomarkab
             }
         }
 
+        //fix mark to not overflow
+        if (9999999999999.99 <= $totalMarks) {
+            $totalMarks = '9999999999999.99';
+        }
+
         /* Total marks for this question
            */
         $marks = array(

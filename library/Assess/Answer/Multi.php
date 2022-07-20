@@ -59,6 +59,11 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
             }
         }
 
+        //fix mark to not overflow
+        if (9999999999999.99 <= $total) {
+            $total = '9999999999999.99';
+        }
+
         /* Total marks for this question
          */
         $marks = array(

@@ -29,6 +29,11 @@ class Assess_Answer_Exact extends Evaluation_Answer_Exact implements IAutomarkab
             $totalMarks = 0;
         }
 
+        //fix mark to not overflow
+        if (9999999999999.99 <= $totalMarks) {
+            $totalMarks = '9999999999999.99';
+        }
+
         /* Total marks for this question
          */
         $marks = array(
