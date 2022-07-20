@@ -476,6 +476,10 @@ v_most_recent_feedback.review_route = 'instructor' AND
         ");
         $statement->execute(['assessmentID' => $assessmentId]);
         $output = [];
+        //if assessment has no rubric, return null
+        if (0 === $statement->rowCount()) {
+            return null;
+        }
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             //build the capability if it does not already exist
             if (!isset($output['capabilities'][$row['capability_id']])) {
