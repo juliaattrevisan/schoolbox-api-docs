@@ -34,6 +34,11 @@ class Assess_Answer_Numeric extends Evaluation_Answer_Numeric implements IAutoma
             $total = $currentResponse['marks'];
         }
 
+        //fix mark to not overflow
+        if (9999999999999.99 <= $total) {
+            $total = '9999999999999.99';
+        }
+
         /* Total marks for this question
          */
         $marks = [
