@@ -9,6 +9,7 @@
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Permission\Access\UserAccess;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
@@ -79,6 +80,8 @@ $app = new class extends CliTool\App {
             'due_work_self_assessments' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND self_reviewability != "none"',
             'due_work_online_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 1',
             'due_work_offline_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 0',
+            'due_work_common_assessment' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND course_managed = 1',
+            'due_work_seb'      => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND seb_enabled = 1',
             'assessment_visibility_staff' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 0',
             'assessment_visibility_student' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 1',
             'assessment_visibility_parent' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 2',
@@ -86,6 +89,7 @@ $app = new class extends CliTool\App {
             'kami_processing'   => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "processing" and deleted_at is null',
             'kami_errors'       => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "error" and deleted_at is null',
             'turnitin_docs'     => 'SELECT count(*) FROM turnitin_report WHERE status = "complete" and deleted_at is null',
+            'turnitin_assessments' => 'SELECT COUNT(*) FROM turnitin_group WHERE status = "complete" AND deleted_at is null',
             'turnitin_errors'   => 'SELECT count(*) FROM turnitin_report WHERE status = "error" and deleted_at is null',
 
             //Homepages
@@ -95,6 +99,7 @@ $app = new class extends CliTool\App {
             'surveys'           => 'SELECT count(*) FROM assess WHERE availability = "survey" AND deleted_at IS NULL',
             'polls'             => 'SELECT count(*) FROM poll',
             'tiles'             => 'SELECT count(*) FROM tile WHERE deleted_at IS NULL',
+            'tile_set'          => 'SELECT count(*) FROM tile_layout WHERE deleted_at IS NULL',
             'textbox'           => 'SELECT count(*) FROM textBox WHERE deleted IS NULL',
             'wiki'              => 'SELECT count(*) FROM wiki WHERE deleted = "false"',
             'chat'              => 'SELECT count(*) FROM chat',
@@ -104,6 +109,9 @@ $app = new class extends CliTool\App {
             'groups_open'       => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::FREE_GROUP . ' AND f.deleted_at is null',
             'groups_moderated'  => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::MODERATED_GROUP . ' AND f.deleted_at is null',
             'groups_private'    => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::PRIVATE_GROUP . ' AND f.deleted_at is null',
+            'groups_members'     => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE,
+            'groups_admin'       => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE . ' AND type = 3',
+            'groups_favourite'   => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE . ' AND favourite = 1',
             'views_total'       => 'SELECT SUM(hitcount) FROM homepage_log',
             'views_groups'      => 'SELECT SUM(hitcount) FROM homepage_log JOIN userGroups u on homepage_log.folder_id = u.cid',
             'views_classes'     => 'SELECT SUM(hitcount) FROM homepage_log JOIN folder_code fc ON homepage_log.folder_id = fc.folder_id',
@@ -141,6 +149,7 @@ $app = new class extends CliTool\App {
             'pastoral_actions_total'  => 'SELECT COUNT(*) FROM pastoral_record_action WHERE deleted_at IS NULL',
             'pastoral_actions_completed' => 'SELECT COUNT(*) FROM pastoral_record_action WHERE completed = 1 AND deleted_at IS NULL',
             'pastoral_comment'   => 'SELECT COUNT(*) FROM pastoral_comment WHERE deleted_at IS NULL',
+            'pastoral_reports'    => 'SELECT COUNT(*) FROM pastoral_report WHERE deleted_at IS NULL',
 
             //EOTC
             'eotc_events'       => 'SELECT count(*) FROM eotc_event WHERE deleted_at IS NULL',
