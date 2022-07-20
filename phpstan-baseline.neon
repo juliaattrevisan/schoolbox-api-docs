@@ -5991,11 +5991,6 @@ parameters:
 			path: library/Schoolbox/LearningAnalytics/Module.php
 
 		-
-			message: "#^Call to function unset\\(\\) contains undefined variable \\$flatList\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
