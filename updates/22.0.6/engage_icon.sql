@@ -1,1 +1,1 @@
-INSERT INTO menu_icons (name, title) VALUES ('engage', 'Engage');
+INSERT INTO menu_icons (name, title) VALUES ('engage-logo', 'Engage');
