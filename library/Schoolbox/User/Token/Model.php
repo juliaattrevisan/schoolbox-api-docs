@@ -15,17 +15,19 @@ use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
 
 class Model implements ISoftDeletable
 {
     use DeletedAtDate;
     use CreatedAtDate;
+    use UpdatedAtDate;
 
     // default expiry days
     public const DEFAULT_EXPIRY = 60;
 
-    public const TYPE_API = 'api';
+    public const TYPE_API    = 'api';
     public const TYPE_QRCODE = 'qrcode';
 
     /**
@@ -47,6 +49,11 @@ class Model implements ISoftDeletable
      * @var User|null
      */
     protected ?User $createdBy = null;
+
+    /**
+     * @var User|null
+     */
+    protected ?User $updatedBy = null;
 
     /**
      * @var User|null
@@ -147,6 +154,25 @@ class Model implements ISoftDeletable
     public function setCreatedBy(?User $createdBy): self
     {
         $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updatedBy;
+    }
+
+    /**
+     * @param User|null $updatedBy
+     *
+     * @return $this
+     */
+    public function setUpdatedBy(?User $updatedBy): self
+    {
+        $this->updatedBy = $updatedBy;
         return $this;
     }
 

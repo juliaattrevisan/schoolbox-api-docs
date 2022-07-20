@@ -33,9 +33,11 @@ class Mapper extends BaseMapper
         $this->uses('expiry', self::TYPE_DATETIME);
         $this->uses('type', self::TYPE_STRING, self::COLUMN_ENUM, null, [Model::TYPE_API, Model::TYPE_QRCODE, null]);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
+        $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->joins('deleted_by', UserMapper::class, 'id', null, null, 'deletedBy', 'deletedBy');
     }
 
@@ -48,9 +50,11 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('createdBy', 'c')}
+                {$this->getJoinColumnString('createdBy', 'c')},
+                {$this->getJoinColumnString('updatedBy', 'u')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'c', true)}
+            LEFT JOIN {$this->getJoinSql('updatedBy', '', 'u', true)}
         ";
     }
 
@@ -62,11 +66,16 @@ class Mapper extends BaseMapper
         $collection = $this->createCollection();
 
         foreach ($statement as $row) {
-            $model     = $this->hydrate($row);
-            $createdBy = $this->hydrateJoin($row, 'createdBy', 'c');
+            $model = $this->hydrate($row);
 
+            $createdBy = $this->hydrateJoin($row, 'createdBy', 'c');
             if ($createdBy instanceof User) {
                 $model->setCreatedBy($createdBy);
+            }
+
+            $updatedBy = $this->hydrateJoin($row, 'updatedBy', 'u');
+            if ($updatedBy instanceof User) {
+                $model->setUpdatedBy($updatedBy);
             }
             $collection->add($model);
         }

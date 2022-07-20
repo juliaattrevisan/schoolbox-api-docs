@@ -584,13 +584,13 @@
                                 <li class="actions-small-1" data-token>
                                     <div class="list-item">
                                         <div class="card small-3">
-                                            {{ token.createdAt.short }}
+                                            {{ token.updatedAt is not empty ? token.updatedAt.short : token.createdAt.short }}
                                         </div>
                                         <div class="card small-3">
                                             {{ (token.expiry and not token.expiry.null) ? token.expiry.short : '–' }}
                                         </div>
                                         <div class="card small-3">
-                                            {{ token.createdBy.fullName }}
+                                            {{ token.updatedBy ? token.updatedBy.fullName : token.createdBy.fullName }}
                                         </div>
                                         <div class="card small-3">
                                             {{ token.type ?? 'Not set'}}
