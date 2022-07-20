@@ -334,20 +334,20 @@ class External_Pcschools_User implements External_UserInterface
 
     public function findPeriod()
     {
-        $query = "SELECT TIME_PERIOD, SUB_PERIOD FROM dbo.CALENDAR WHERE DATE = :now";
+        $query  = "SELECT TIME_PERIOD, SUB_PERIOD FROM dbo.CALENDAR WHERE DATE = :now";
         $period = $this->getDatabase()->getRow($query, [':now' => date('ymd')]);
-        if ($period['TIME_PERIOD'] == 0 || $period['SUB_PERIOD'] == 0) {
-            $query = "SELECT TIME_PERIOD, SUBJECT_PD FROM dbo.SYSFILE";
-            $altPeriod = $this->getDatabase()->getRow($query);
-            $period['TIME_PERIOD'] = $period['TIME_PERIOD'] ?: $altPeriod['TIME_PERIOD'];
-            $period['SUB_PERIOD'] = $period['TIME_PERIOD'] ?: $altPeriod['SUBJECT_PD'];
+        if ((int)$period['TIME_PERIOD'] === 0 || (int)$period['SUB_PERIOD'] === 0) {
+            $query                 = "SELECT TIME_PERIOD, SUBJECT_PD FROM dbo.SYSFILE";
+            $altPeriod             = $this->getDatabase()->getRow($query);
+            $period['TIME_PERIOD'] = (int)$period['TIME_PERIOD'] ?: $altPeriod['TIME_PERIOD'];
+            $period['SUB_PERIOD']  = (int)$period['SUB_PERIOD'] ?: $altPeriod['SUBJECT_PD'];
         }
 
         // Annoyingly the `time_period` gets retrieved by the PDO driver without the trailing zeros that are required.
         // The data type in MSSQL is defined as a DECIMAL (4,2) so to fudge around this I'm doing a number format
 
         $period['TIME_PERIOD'] = number_format((float)$period['TIME_PERIOD'], 2);
-        $period['SUB_PERIOD'] = number_format((float)$period['SUB_PERIOD'], 2);
+        $period['SUB_PERIOD']  = number_format((float)$period['SUB_PERIOD'], 2);
 
         return $period;
     }
