@@ -79,6 +79,10 @@ class Mailer
      */
     private bool $encodeBase64 = false;
 
+    /**
+     * System default from address
+     * @var Address
+     */
     private Address $systemFrom;
 
     /**
