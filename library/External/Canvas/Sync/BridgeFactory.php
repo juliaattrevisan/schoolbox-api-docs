@@ -11,6 +11,7 @@ namespace External\Canvas\Sync;
 
 use Alaress\Database\Connector\IConnector;
 use External\Canvas\Sync\Bridge\Assignment;
+use External\Canvas\Sync\Bridge\AssignmentDates;
 use External\Canvas\Sync\Bridge\Course;
 use External\Canvas\Sync\Bridge\CourseSection;
 use Psr\Log\LoggerInterface;
@@ -60,6 +61,16 @@ class BridgeFactory
     {
         $className = $this->getClassName('Assignment');
         return new $className($markTypes, $workTypes);
+    }
+
+    /**
+     * Gets class for assignmentDates
+     * @return AssignmentDates
+     */
+    public function getAssignmentDates(): AssignmentDates
+    {
+        $className = $this->getClassName('AssignmentDates');
+        return new $className();
     }
 
     /**

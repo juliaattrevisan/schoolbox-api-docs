@@ -28,7 +28,6 @@ use function strcmp;
  */
 class AssignmentDates
 {
-
     /**
      * Derive the logical publish/open/due/close dates of a Canvas Assignment.
      *
@@ -41,7 +40,7 @@ class AssignmentDates
      * @param string|null $lockAt           Timestamp for when the Assignment is locked
      * @param string      $unitImplOpenDate Derived from Canvas CourseSection, CourseSection.EnrollmentTerm, CourseSection.Course, CourseSection.Course.EnrollmentTerm dates
      * @param string      $unitImplDueDate  Derived from Canvas CourseSection, CourseSection.EnrollmentTerm, CourseSection.Course, CourseSection.Course.EnrollmentTerm dates
-     * @return string[]
+     * @return array
      */
     public function assessmentDates(
         ?string $unlockAt,
