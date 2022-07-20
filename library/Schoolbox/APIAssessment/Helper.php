@@ -622,15 +622,18 @@ v_most_recent_feedback.review_route = 'instructor' AND
                     'id'            => $row['indicator_id'],
                     'name'          => $row['indicator_name'],
                     'maxValue'      => $row['indicator_max_value'],
-                    'mark'      => $row['indicator_mark'],
                     'descriptors'   => []
                 ];
             }
             //indicator should already exist, so lets build the descriptor for that indicator for that capability
-
-            $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][] = [
-                'description'   => $row['descriptor_name'],
-            ];
+            //indicator should already exist, so lets build the descriptor for that indicator for that capability
+            if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']])) {
+                $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']] = [
+                    'id'          => $row['descriptor_id'],
+                    'description' => $row['descriptor_name'],
+                    'mark'      => $row['indicator_mark'],
+                ];
+            }
         }
         //$output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']];
         //clean the data, remove the numeric array keys
