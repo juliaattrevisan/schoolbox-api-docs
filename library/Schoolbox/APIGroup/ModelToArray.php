@@ -33,7 +33,7 @@ class ModelToArray
         } elseif ($group['isAccessAdmin']) {
             $membership = GroupsHelper::MEMBERSHIP_ADMIN;
         }
-        return [
+        $array = [
             'id'                => $group['id'],
             'name'              => $group['name'],
             'type'              => $group['type'],
@@ -42,9 +42,14 @@ class ModelToArray
             'isNotificationsOn' => $group['isNotificationsOn'],
             'enrolmentStatus'   => $group['enrolmentStatus'],
             'membership'        => $membership,
-            '_links'            => [
-                'homepage'      => sprintf('/homepage/%d', $group['id'])
-            ]
+            '_links'            => null,
+
         ];
+        if ($group['hasHomepage']) {
+            $array['_links'] = [
+                'homepage'      => sprintf('/homepage/%d', $group['id'])
+            ];
+        }
+        return $array;
     }
 }

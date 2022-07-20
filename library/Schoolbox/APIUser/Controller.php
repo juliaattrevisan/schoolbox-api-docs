@@ -97,7 +97,7 @@ class Controller extends Base
          * we are not using User::getAccessList(), as that will also include SIS group folders,
          * that the user is unable to change membership of, or other details.
          */
-        $users_groups = $this->groupsHelper->getCurrentGroups($user);
+        $users_groups = $this->groupsHelper->getCurrentGroups($user, false);
         $apiGroups = new Collection($users_groups);
         $groupsArr = $apiGroups->map(new GroupArray());
 
@@ -389,7 +389,7 @@ class Controller extends Base
 
         //get hydrated user, or the campus/role/house wont have names, just ids...
         $updatedUser = $this->userMapper->findById($model->getId());
-        $users_groups = $this->groupsHelper->getCurrentGroups($updatedUser);
+        $users_groups = $this->groupsHelper->getCurrentGroups($updatedUser, false);
         $apiGroups = new Collection($users_groups);
         $groupsArr = $apiGroups->map(new GroupArray());
         /**
@@ -442,7 +442,7 @@ class Controller extends Base
          */
         $users = $this->userMapper->findByColumn('id', $userIds);
         foreach ($users as $user) {
-            $users_groups = $this->groupsHelper->getCurrentGroups($user);
+            $users_groups = $this->groupsHelper->getCurrentGroups($user, false);
             $apiGroups = new Collection($users_groups);
             $groupsArr = $apiGroups->map(new GroupArray());
 

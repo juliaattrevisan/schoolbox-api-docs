@@ -67,19 +67,24 @@ class GroupsHelper
         //combine to show list of all groups, both available to the user, and those they are enroled in
         $groupIds = array_unique(array_merge($userPerms->keys(), $groupsArr));
 
-        return $this->buildGroups($user, $groupIds, $userPerms);
+        return $this->buildGroups($user, $groupIds, true, $userPerms);
     }
 
     /**
      * get all groups a user is currently enroled in
+     * Users can be part of groups that have no homepage, you can return these or ignore them
+     * these no homepage groups are usually used for notifications, and are sis controlled
+     * @param User $user
+     * @param bool $mustHaveHomepage (only build groups that have a homepage, selectable with this variable)
+     * @return array
      */
-    public function getCurrentGroups(User $user)
+    public function getCurrentGroups(User $user, bool $mustHaveHomepage)
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
         $userPerms = $this->userAccessMapper->findAllGroupsForUser($user)->indexBy('serviceIdentifier');
 
-        return $this->buildGroups($user, $userPerms->keys(), $userPerms);
+        return $this->buildGroups($user, $userPerms->keys(), $mustHaveHomepage, $userPerms);
     }
 
     /**
@@ -217,8 +222,13 @@ class GroupsHelper
 
     /**
      * build groups object
+     * @param User  $user
+     * @param array $groupIds
+     * @param bool  $mustHaveHomepage (only build groups that have a homepage, selectable with this variable)
+     * @param array $userPerms
+     * @return array
      */
-    private function buildGroups(User $user, array $groupIds, $userPerms = []): array
+    private function buildGroups(User $user, array $groupIds, bool $mustHaveHomepage, $userPerms = []): array
     {
         //folder colours helper
         $folderColours = new FolderColour($this->timetableColourMapper, new ColorFactory());
@@ -243,8 +253,9 @@ class GroupsHelper
              * some groups / folders may have no homepage, and are being used just for data storage
              * lets make sure they are kept hidden from this page (but you can still go and access them directly
              * this is to keep functionality that previously existed in < 21.1.12
+             * if the groups has no homepage, but we have requested groups that do not have homepages, also show them
              */
-            if (null === $folder->getHomepage()) {
+            if (null === $folder->getHomepage() && $mustHaveHomepage) {
                 continue;
             }
             /**
@@ -312,6 +323,7 @@ class GroupsHelper
                 'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
                 'isPrivate'         => $folder->getGroup()->isPrivate(),
                 'modifyLink'        => $modifyLink,
+                'hasHomepage'       => $folder->hasHomepage()
             ];
         }
         return $possibleGroups;
@@ -394,12 +406,20 @@ class GroupsHelper
 
     /**
      * gets the standard group output for a single user/group
+     * Users can be part of groups that have no homepage, you can return these or ignore them
+     * these no homepage groups are usually used for notifications, and are sis controlled
+     * @param User  $user
+     * @param Group $group
+     * @param bool  $mustHaveHomepage (return groups that also have no homepage set)
+     * @return array
+     * @throws NotFound
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function getGroup(User $user, Group $group)
+    public function getGroup(User $user, Group $group, bool $mustHaveHomepage)
     {
         // Get the group the user is currently a member, their enrolment type and favourite status
         $userPerms = $this->findSingleGroup($user, $group);
-        return $this->buildGroups($user, [$userPerms->getServiceIdentifier()], [$group->getFolder()->getId() => $userPerms]);
+        return $this->buildGroups($user, [$userPerms->getServiceIdentifier()], $mustHaveHomepage, [$group->getFolder()->getId() => $userPerms]);
     }
 
     /**
