@@ -1,0 +1,274 @@
+<?php
+/** @noinspection PhpUnhandledExceptionInspection */
+
+
+/**
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Admin\Home\Test;
+
+use Alaress_Date_Format;
+use PHPUnit\Framework;
+use Schoolbox\Admin\Home\SamlCertHelper;
+
+
+/**
+ * Tests SAML public cert expiry logic
+ *
+ * @covers \Schoolbox\Admin\Home\SamlCertHelper
+ * @codeCoverageIgnore
+ */
+class SamlCertHelperTest extends Framework\TestCase
+{
+    // Expires 2027-04-26T00:51:48.000Z
+    private const METADATA_2027_04_26 = '<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://accounts.google.com/o/saml2?idpid=C04d5hemc" validUntil="2027-04-26T00:51:48.000Z">
+        <md:IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <md:KeyDescriptor use="signing">
+        <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:X509Data>
+        <ds:X509Certificate>
+        MIIDdDCCAlygAwIBAgIGAYBogLrfMA0GCSqGSIb3DQEBCwUAMHsxFDASBgNVBAoTC0dvb2dsZSBJ
+        bmMuMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MQ8wDQYDVQQDEwZHb29nbGUxGDAWBgNVBAsTD0dv
+        b2dsZSBGb3IgV29yazELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWEwHhcNMjIwNDI3
+        MDA1MTQ4WhcNMjcwNDI2MDA1MTQ4WjB7MRQwEgYDVQQKEwtHb29nbGUgSW5jLjEWMBQGA1UEBxMN
+        TW91bnRhaW4gVmlldzEPMA0GA1UEAxMGR29vZ2xlMRgwFgYDVQQLEw9Hb29nbGUgRm9yIFdvcmsx
+        CzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+        MIIBCgKCAQEAvIQ2tTP3w4vpCjArgMLV2YdyFZsT5lUsDgC80NctUCYh7ljKc+Hrqi4GRSLpmgfD
+        u3iozFik+UZiP32kfpMN+G6GFTK01BhNIFQNmIX5Bzwtm3XI653n70ZCkVfox2TsrAN3XSIg1FTv
+        ZgMNVYtGfnwG2IlaosdVVQCir/gCJ+MobioWw3VrT6I2b2856scMsCljsKwBI6YtywGHwv1eifQv
+        dN2AmMv5Nj9kUL6/QW6AHaSQ/bXvxjFVwFX4RGyxoc/uOk+DfY6423SOQe7azWcBliZVz4ms1Gjp
+        3NZvCWukxfT5i5bg9dnN1oF84/Q7ENChOHi7tPhEcktFKYksHwIDAQABMA0GCSqGSIb3DQEBCwUA
+        A4IBAQCM5OZ137KN4a/PV7FaiL1mIYx+s/GPXdqfGFQbDswnD8bSSQv9FPAGWvr+M+12U03LZ14I
+        eQtFGY6u5twD7I5WxXCta3hFJMWDjyPv8jKbIc2c4CzAwInWfaGXMaSxySecgrbL1R8bnxIIYFIm
+        3+L4bUTsivmBCID3pR+57z6x/YRh5DT1+rBbXMQvjXLGGCCMisV8QL67yaKBk4Q6CXIC4NhrhTlH
+        GtLHNyGqEBquSg66HgTVXPahllMe1gqroS0oNDao3s0Wj/rcEnApNNsIpaK53tc6tDLSRxVqGK6W
+        Nf1qqHW6vBAev7bpT+bFZ4gui9f96iGlAYjsWGHU2VcW</ds:X509Certificate>
+        </ds:X509Data>
+        </ds:KeyInfo>
+        </md:KeyDescriptor>
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
+        <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://accounts.google.com/o/saml2/idp?idpid=C04d5hemc"/>
+        <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://accounts.google.com/o/saml2/idp?idpid=C04d5hemc"/>
+        </md:IDPSSODescriptor>
+        </md:EntityDescriptor>';
+
+    // Expires 2027-04-26T00:51:48.000Z
+    private const CERT_2027_04_26 = "
+        MIIDdDCCAlygAwIBAgIGAYBogLrfMA0GCSqGSIb3DQEBCwUAMHsxFDASBgNVBAoT
+        C0dvb2dsZSBJ bmMuMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MQ8wDQYDVQQDEwZ
+        Hb29nbGUxGDAWBgNVBAsTD0dv b2dsZSBGb3IgV29yazELMAkGA1UEBhMCVVMxEz
+        ARBgNVBAgTCkNhbGlmb3JuaWEwHhcNMjIwNDI3 MDA1MTQ4WhcNMjcwNDI2MDA1M
+        TQ4WjB7MRQwEgYDVQQKEwtHb29nbGUgSW5jLjEWMBQGA1UEBxMN TW91bnRhaW4g
+        VmlldzEPMA0GA1UEAxMGR29vZ2xlMRgwFgYDVQQLEw9Hb29nbGUgRm9yIFdvcmsx
+        CzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMIIBIjANBgkqhkiG9w0B
+        AQEFAAOCAQ8AMIIBCgKCAQEAvIQ2tTP3w4vpCjArgMLV2YdyFZsT5lUsDgC80Nct
+        UCYh7ljKc+Hrqi4GRSLpmgfD u3iozFik+UZiP32kfpMN+G6GFTK01BhNIFQNmIX
+        5Bzwtm3XI653n70ZCkVfox2TsrAN3XSIg1FTv ZgMNVYtGfnwG2IlaosdVVQCir/
+        gCJ+MobioWw3VrT6I2b2856scMsCljsKwBI6YtywGHwv1eifQv dN2AmMv5Nj9kU
+        L6/QW6AHaSQ/bXvxjFVwFX4RGyxoc/uOk+DfY6423SOQe7azWcBliZVz4ms1Gjp3
+        NZvCWukxfT5i5bg9dnN1oF84/Q7ENChOHi7tPhEcktFKYksHwIDAQABMA0GCSqGS
+        Ib3DQEBCwUA A4IBAQCM5OZ137KN4a/PV7FaiL1mIYx+s/GPXdqfGFQbDswnD8bS
+        SQv9FPAGWvr+M+12U03LZ14I eQtFGY6u5twD7I5WxXCta3hFJMWDjyPv8jKbIc2
+        c4CzAwInWfaGXMaSxySecgrbL1R8bnxIIYFIm 3+L4bUTsivmBCID3pR+57z6x/Y
+        Rh5DT1+rBbXMQvjXLGGCCMisV8QL67yaKBk4Q6CXIC4NhrhTlH GtLHNyGqEBquS
+        g66HgTVXPahllMe1gqroS0oNDao3s0Wj/rcEnApNNsIpaK53tc6tDLSRxVqGK6WN
+        f1qqHW6vBAev7bpT+bFZ4gui9f96iGlAYjsWGHU2VcW";
+
+    // Expires 2022/09/08
+    private const CERT_2022_09_08 = "
+        MIIBpDCCAU6gAwIBAgIURz4CRqX+iRipceptsJIGkBTXNTcwDQYJKoZIhvcNAQEL
+        BQAwFjEUMBIGA1UEAwwLZXhhbXBsZS5jb20wHhcNMjIwNzIwMTE0MTQyWhcNMjIw
+        OTA4MTE0MTQyWjAWMRQwEgYDVQQDDAtleGFtcGxlLmNvbTBcMA0GCSqGSIb3DQEB
+        AQUAA0sAMEgCQQDhS93jDy+c5T9dPYaDG7n2cKgyVnMNoobw7vIVuCA77i9NgL0N
+        4qIR+KGffpiN59FjxRy+aqRyF6JqK2N8l8EnAgMBAAGjdDByMB0GA1UdDgQWBBS8
+        e9bRWc9tYkOnTk8HSs7raWqmwjAfBgNVHSMEGDAWgBS8e9bRWc9tYkOnTk8HSs7r
+        aWqmwjAOBgNVHQ8BAf8EBAMCBaAwIAYDVR0lAQH/BBYwFAYIKwYBBQUHAwEGCCsG
+        AQUFBwMCMA0GCSqGSIb3DQEBCwUAA0EApy5r6D8I6OwS4krQBbFrXlUifcHiI8QD
+        pVD6z4oqU+9WEA7/hJq/8HFbfA7uT7jeOq6LOjgotc6dMUW32o4evw==";
+
+    // idP cert empty
+
+    public function test_IdpCertEmpty_metadataUrlEmpty(): void
+    {
+        $widget = SamlCertHelper::buildWidget("", "");
+        self::assertEquals(SamlCertHelper::LIGHT_ALERT, $widget->getLight());
+        self::assertEquals('Empty SAML config', $widget->getMessage());
+    }
+
+
+    public function test_IdpCertEmpty_metadataUrlOffline(): void
+    {
+        $widget = SamlCertHelper::buildWidget("", "", SamlCertHelper::FORCE_METADATA_URL_OFFLINE);
+        self::assertEquals(SamlCertHelper::LIGHT_ALERT, $widget->getLight());
+        self::assertEquals('Metadata URL offline', $widget->getMessage());
+    }
+
+
+    public function test_IdpCertEmpty_metadataUrlNonParsable(): void
+    {
+        $widget = SamlCertHelper::buildWidget("", "", "some invalid xml content");
+        self::assertEquals(SamlCertHelper::LIGHT_ALERT, $widget->getLight());
+        self::assertEquals('Metadata invalid', $widget->getMessage());
+    }
+
+    /**
+     * @dataProvider provider_IdpCertEmpty_metadataUrlOk
+     */
+    public function test_IdpCertEmpty_metadataUrlOk(string $nowOverride, string $light, string $message): void
+    {
+        $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $widget = SamlCertHelper::buildWidget("", "", self::METADATA_2027_04_26, $now);
+        self::assertEquals($light, $widget->getLight());
+        self::assertEquals($message, $widget->getMessage());
+    }
+
+    public function provider_IdpCertEmpty_metadataUrlOk(): array
+    {
+        return [
+            ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, 'Valid'],
+            ["2027-03-30", SamlCertHelper::LIGHT_WARNING, 'Expires in 26 days'],
+            ["2027-04-23", SamlCertHelper::LIGHT_ALERT, 'Expires in 2 days'],
+            ["2027-04-27", SamlCertHelper::LIGHT_ALERT, 'Expired'],
+        ];
+    }
+
+    public function test_IdpCertUnparsable_metadataUrlEmpty(): void
+    {
+        $widget = SamlCertHelper::buildWidget("some invalid cert content", "");
+        self::assertEquals(SamlCertHelper::LIGHT_ALERT, $widget->getLight());
+        self::assertEquals('Certificate invalid', $widget->getMessage());
+    }
+
+
+    public function test_IdpCertUnparsable_metadataUrlOffline(): void
+    {
+        $widget = SamlCertHelper::buildWidget("some invalid cert content", "", SamlCertHelper::FORCE_METADATA_URL_OFFLINE);
+        self::assertEquals(SamlCertHelper::LIGHT_ALERT, $widget->getLight());
+        self::assertEquals('Certificate invalid. Metadata URL offline', $widget->getMessage());
+    }
+
+
+    public function test_IdpCertUnparsable_metadataUrlNonParsable(): void
+    {
+        $widget = SamlCertHelper::buildWidget("some invalid cert content", "", "some invalid xml content");
+        self::assertEquals(SamlCertHelper::LIGHT_ALERT, $widget->getLight());
+        self::assertEquals('Certificate invalid. Metadata invalid', $widget->getMessage());
+    }
+
+
+    /**
+     * @dataProvider provider_IdpCertUnparsable_metadataUrlOk
+     */
+    public function test_IdpCertUnparsable_metadataUrlOk(string $nowOverride, string $light, string $message): void
+    {
+        $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $widget = SamlCertHelper::buildWidget("some invalid cert content", "", self::METADATA_2027_04_26, $now);
+        self::assertEquals($light, $widget->getLight());
+        self::assertEquals($message, $widget->getMessage());
+    }
+
+    public function provider_IdpCertUnparsable_metadataUrlOk(): array
+    {
+        return [
+            ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
+            ["2027-03-30", SamlCertHelper::LIGHT_WARNING, "Expires in 26 days"],
+            ["2027-04-23", SamlCertHelper::LIGHT_ALERT, "Expires in 2 days"],
+            ["2027-04-27", SamlCertHelper::LIGHT_ALERT, "Expired"],
+        ];
+    }
+
+    /**
+     * @dataProvider provider_IdpCertOk_metadataUrlEmpty
+     */
+    public function test_IdpCertOk_metadataUrlEmpty(string $nowOverride, string $light, string $message): void
+    {
+        $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $widget = SamlCertHelper::buildWidget(self::CERT_2027_04_26, "", null, $now);
+        self::assertEquals($light, $widget->getLight());
+        self::assertEquals($message, $widget->getMessage());
+    }
+
+    public function provider_IdpCertOk_metadataUrlEmpty(): array
+    {
+        return [
+            ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
+            ["2027-03-30", SamlCertHelper::LIGHT_WARNING, "Expires in 26 days"],
+            ["2027-04-23", SamlCertHelper::LIGHT_ALERT, "Expires in 2 days"],
+            ["2027-04-27", SamlCertHelper::LIGHT_ALERT, "Expired"],
+        ];
+    }
+
+
+    /**
+     * @dataProvider provider_IdpCertOk_metadataUrlOffline
+     */
+    public function test_IdpCertOk_metadataUrlOffline(string $nowOverride, string $light, string $message): void
+    {
+        $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $widget = SamlCertHelper::buildWidget(self::CERT_2027_04_26, "", SamlCertHelper::FORCE_METADATA_URL_OFFLINE, $now);
+        self::assertEquals($light, $widget->getLight());
+        self::assertEquals($message, $widget->getMessage());
+    }
+
+    public function provider_IdpCertOk_metadataUrlOffline(): array
+    {
+        return [
+            ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
+            ["2027-03-30", SamlCertHelper::LIGHT_WARNING, "Expires in 26 days"],
+            ["2027-04-23", SamlCertHelper::LIGHT_ALERT, "Expires in 2 days"],
+            ["2027-04-27", SamlCertHelper::LIGHT_ALERT, "Expired"],
+        ];
+    }
+
+
+    /**
+     * @dataProvider provider_IdpCertOk_metadataUrlNonParsable
+     */
+    public function test_IdpCertOk_metadataUrlNonParsable(string $nowOverride, string $light, string $message): void
+    {
+        $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $widget = SamlCertHelper::buildWidget(self::CERT_2027_04_26, "", "some invalid xml content", $now);
+        self::assertEquals($light, $widget->getLight());
+        self::assertEquals($message, $widget->getMessage());
+    }
+
+    public function provider_IdpCertOk_metadataUrlNonParsable(): array
+    {
+        return [
+            ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
+            ["2027-03-30", SamlCertHelper::LIGHT_WARNING, "Expires in 26 days"],
+            ["2027-04-23", SamlCertHelper::LIGHT_ALERT, "Expires in 2 days"],
+            ["2027-04-27", SamlCertHelper::LIGHT_ALERT, "Expired"],
+        ];
+    }
+
+
+    /**
+     * @dataProvider provider_IdpCertOk_metadataUrlOk
+     */
+    public function test_IdpCertOk_metadataUrlOk(string $nowOverride, string $idpCert, string $light, string $message): void
+    {
+        $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $widget = SamlCertHelper::buildWidget($idpCert, "", self::METADATA_2027_04_26, $now);
+        self::assertEquals($light, $widget->getLight());
+        self::assertEquals($message, $widget->getMessage());
+    }
+
+    public function provider_IdpCertOk_metadataUrlOk(): array
+    {
+        return [
+            ["2027-03-20", self::CERT_2022_09_08, SamlCertHelper::LIGHT_SUCCESS, 'Valid'],
+            ["2027-03-20", self::CERT_2027_04_26, SamlCertHelper::LIGHT_SUCCESS, 'Valid'],
+            ["2027-03-30", self::CERT_2022_09_08, SamlCertHelper::LIGHT_WARNING, 'Expires in 26 days'],
+            ["2027-03-30", self::CERT_2027_04_26, SamlCertHelper::LIGHT_WARNING, 'Expires in 26 days'],
+            ["2027-04-23", self::CERT_2022_09_08, SamlCertHelper::LIGHT_ALERT, 'Expires in 2 days'],
+            ["2027-04-23", self::CERT_2027_04_26, SamlCertHelper::LIGHT_ALERT, 'Expires in 2 days'],
+            ["2027-04-27", self::CERT_2022_09_08, SamlCertHelper::LIGHT_ALERT, 'Expired'],
+            ["2027-04-27", self::CERT_2027_04_26, SamlCertHelper::LIGHT_ALERT, 'Expired'],
+        ];
+    }
+}

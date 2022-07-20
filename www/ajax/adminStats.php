@@ -8,7 +8,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use OneLogin\Saml2\Utils;
 use Schoolbox\Engagement\Login;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
@@ -349,60 +348,16 @@ switch ($_POST['module']) {
         ];
         break;
     case 'service_saml_cert':
-        $samlConfig = SamlCertHelper::parseSamlConfig($config->get('saml_idp_certificate'), $config->get('saml_idp_metadata_url'));
-
-        $certsArray = SamlCertHelper::getArrayOfSamlCerts($samlConfig);
-
-        //find days before expiry for all certs excluding null values from invalid certs
-        $certExpiryArray = [];
-        foreach ($certsArray as $cert) {
-            $formattedCert = Utils::formatCert($cert);
-            $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($formattedCert);
-            if ($daysBeforeExpiry !== null) {
-                $certExpiryArray[] = $daysBeforeExpiry;
-            }
-        }
-
-        //if there are no valid certs
-        if (count($certExpiryArray) === 0) {
-            $output[] = [
-                'SAML_LIGHT'   => 'alert',
-                'SAML_MESSAGE' => 'Invalid SAML config',
-            ];
-            break;
-        }
-
-        $bestDaysBeforeExpiry = max($certExpiryArray);
-
-        $absDaysBeforeExpiry = abs($bestDaysBeforeExpiry);
-        //get plural/singular form of 'day'
-        if ($absDaysBeforeExpiry === 1) {
-            $dayOrDays = "day";
-        } else {
-            $dayOrDays = "days";
-        }
-
-        if ($bestDaysBeforeExpiry < 0) {
-            $output[] = [
-                'SAML_LIGHT'   => 'alert',
-                'SAML_MESSAGE' => 'Expired',
-            ];
-        } elseif ($bestDaysBeforeExpiry < 7) {
-            $output[] = [
-                'SAML_LIGHT'   => 'alert',
-                'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays,
-            ];
-        } elseif ($bestDaysBeforeExpiry < 30) {
-            $output[] = [
-                'SAML_LIGHT'   => 'warning',
-                'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays,
-            ];
-        } else {
-            $output[] = [
-                'SAML_LIGHT'   => 'success',
-                'SAML_MESSAGE' => 'Valid',
-            ];
-        }
+        // TODO this probably needs to be an instance rather than a static now that we are injecting dependecies
+        $samlWidget = SamlCertHelper::buildWidget(
+            $config->get('saml_idp_certificate') ?? "",
+            $config->get('saml_idp_metadata_url') ?? "",
+            new Alaress_Saml_Cache()
+        );
+        $output[] = [
+            'SAML_LIGHT'   => $samlWidget->getLight(),
+            'SAML_MESSAGE' => $samlWidget->getMessage(),
+        ];
         break;
     default:
         break;
