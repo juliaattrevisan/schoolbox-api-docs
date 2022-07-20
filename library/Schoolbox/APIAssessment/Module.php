@@ -41,8 +41,6 @@ class Module extends BaseModule
 
         $this->register('GET', '/{assessmentId}', 'apiAssessmentGet', $hasApiAccess);
         $this->register('GET', '', 'apiAssessmentSearch', $hasApiAccess);
-        //for testing only will remove
-        $this->register('GET', '/rubric/{assessmentId}', 'apiRubricGet', $hasApiAccess);
     }
 
 

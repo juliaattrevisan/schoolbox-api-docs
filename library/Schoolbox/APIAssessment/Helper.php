@@ -376,7 +376,6 @@ v_most_recent_feedback.review_route = 'instructor' AND
                         'lastName'   => $row['staffLastname'],
                         'externalId' => $row['staffExternalId'],
                     ],
-                    'feedbackID'    => $row['feedbackID'], //testing only
                     'rubric'        => $rubric,
                 ];
         }
@@ -512,13 +511,12 @@ v_most_recent_feedback.review_route = 'instructor' AND
                 ];
             }
         }
-        //$output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']];
         //clean the data, remove the numeric array keys
         foreach ($output['capabilities'] as $capKey => $capArr) {
             foreach ($capArr['indicators'] as $indKey => $indArr) {
                 $output['capabilities'][$capKey]['indicators'][$indKey]['descriptors'] = array_values($indArr['descriptors']);
             }
-            //grab the otiginal array indicators values which above has changed, not the old ones from the foreach loop that have numeric keys
+            //grab the original array indicators values which above has changed, not the old ones from the foreach loop that have numeric keys
             $output['capabilities'][$capKey]['indicators'] = array_values($output['capabilities'][$capKey]['indicators']);
         }
         $output['capabilities'] = array_values($output['capabilities']);
@@ -635,16 +633,37 @@ v_most_recent_feedback.review_route = 'instructor' AND
                 ];
             }
         }
-        //$output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']];
         //clean the data, remove the numeric array keys
         foreach ($output['capabilities'] as $capKey => $capArr) {
             foreach ($capArr['indicators'] as $indKey => $indArr) {
                 $output['capabilities'][$capKey]['indicators'][$indKey]['descriptors'] = array_values($indArr['descriptors']);
             }
-            //grab the otiginal array indicators values which above has changed, not the old ones from the foreach loop that have numeric keys
+            //grab the original array indicators values which above has changed, not the old ones from the foreach loop that have numeric keys
             $output['capabilities'][$capKey]['indicators'] = array_values($output['capabilities'][$capKey]['indicators']);
         }
         $output['capabilities'] = array_values($output['capabilities']);
         return $output;
+        /**
+         * Output format:
+        rubric: {
+            "capabilities": {
+                "id": "19",
+                "name": "Grammar",
+                "mark": "2.00000000000",
+                "max_value": "4.00000000000",
+                "human_readable_mark": "50 %",
+                "indicators": {
+                    "id": "37",
+                    "name": "Coherence",
+                    "maxValue": "4.00000000000",
+                    "descriptors": {
+                        "id": "223",
+                        "description": "Grammar and mechanics of sentences is mostly correct.",
+                        "mark": "2.00000000000"
+                    }
+                }
+            }
+        }
+         */
     }
 }
