@@ -7,6 +7,7 @@
 import { ref, onMounted } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
 import CsSearchInput from './cs-search-input.vue';
+import CsSelectedCodes from './cs-selected-codes.vue';
 import CsModal from './modal/cs-modal.vue';
 
 
@@ -48,6 +49,7 @@ function onRefreshSelected () {
                 <span data-tooltip="" class="hint has-tip tip-top" data-width="200" data-selector="tooltip-l5qfe53bv" aria-describedby="tooltip-l5qfe53bv" title="">?</span>
             </label>
             <cs-search-input />
+            <cs-selected-codes />
         </div>
     </div>
     <cs-modal />

@@ -11,7 +11,7 @@ const dataEndpoint = '/curriculumData';
 const mswHandlers = [
     rest.get(dataEndpoint, (req, res, ctx) => {
         return res( //we grab an endpoint and then modify the data before it's returned
-            ctx.delay(1000),
+            // ctx.delay(1000),
             ctx.json(data)
         ) 
     }),

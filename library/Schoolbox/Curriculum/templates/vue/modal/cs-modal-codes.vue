@@ -16,7 +16,7 @@ const depth = ref(0); //to increment each time we go down the node tree to visua
 
 <template>
    <ul>
-       <cs-modal-code
+        <cs-modal-code
             v-for="code in codesStore.codes"
             :key="code.id"
             :code="code"

@@ -23,11 +23,10 @@ watch(() => modalStore.isOpen, (newIsOpen) => {
 });
 
 /**
- * ensure the isPromptOpen is kept up to date
- * as we can currently also use foundation to close the modal 
+ * close the modal
  */
 function onModalClosed () {
-    // removeMembersStore.cancelRemoveSelectedMembers();
+    modalStore.cancel();
 }
 
 </script>

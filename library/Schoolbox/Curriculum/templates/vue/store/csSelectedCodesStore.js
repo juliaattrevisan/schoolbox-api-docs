@@ -8,7 +8,7 @@ import { defineStore } from 'pinia';
 export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
 
     state: () => ({
-        codes: [],
+        codes: [], //the currently selected codes
     }),
 
     getters: {
@@ -29,10 +29,14 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
         /**
          * add a code 
          * 
-         * @param { Object }
+         * @param { Object or Array } either a single code, or mulitple can be added
          */
         add (codeToAdd) {
-            this.codes  = [...this.codes, codeToAdd];
+            if (Array.isArray(codeToAdd)) {
+                this.codes  = [...this.codes, ...codeToAdd];
+            } else {
+                this.codes  = [...this.codes, codeToAdd];
+            }
         },
 
         /**
@@ -42,6 +46,15 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
          */
         remove (codeToRemove) {
             this.codes = this.codes.filter((code) => code.id !== codeToRemove.id);
+        },
+
+        /**
+         * completely update the codes with a new array
+         * 
+         * @param { Aray }
+         */
+        update (updatedCodes) {
+            this.codes  = [...updatedCodes];
         },
 
         /**
