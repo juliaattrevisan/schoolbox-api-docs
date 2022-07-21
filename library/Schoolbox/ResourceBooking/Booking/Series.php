@@ -379,11 +379,17 @@ class Series
                         );
                     }
                 } elseif ($relatedBooking instanceof Model) {
-                    // delete or don't add. Maybe mark as deleted?
-                    // If it wasn't, then do nothing with it at all
-                    $relatedBooking->setDeletedAt(new Alaress_Date_Format(new DateTime()));
+                    // This item was deleted:
+                    // only add it to the list if fetching deleted objects.
+                    if ($seriesType === self::SERIES_DELETED) {
+                        $bookingList->add($relatedBooking);
+                    }
+                    continue;
                 }
-                if ($relatedBooking instanceof Model) {
+
+                // This item still exists:
+                // only add it to the list if fetching updated objects.
+                if ($relatedBooking instanceof Model && $seriesType === self::SERIES_UPDATED) {
                     $relatedBooking->setEvent($event);
                     $bookingList->add($relatedBooking);
                 }
