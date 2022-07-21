@@ -53,7 +53,7 @@ const showThirdNodeSelect = computed(() => modalActiveCodesStore.selectedSecondN
             <option v-for="node in modalActiveCodesStore.thirdNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
         </select>
    </div>
-   <input
+   <!-- <input
         v-if="true"
         v-model="modalActiveCodesStore.query"
         ref="queryInputEl"
@@ -62,7 +62,7 @@ const showThirdNodeSelect = computed(() => modalActiveCodesStore.selectedSecondN
         :readonly="false"
         placeholder="Search for codes or keywords..."
         @input="$event.target.composing = false"
-    />
+    /> -->
 </template>
 
 <style scoped>

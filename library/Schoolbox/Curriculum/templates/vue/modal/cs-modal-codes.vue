@@ -6,10 +6,10 @@
  */
 
 import { ref } from 'vue';
-import { useCodesStore } from '../store/csCodesStore';
+import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
 import CsModalCode from './cs-modal-code.vue'
 
-const codesStore = useCodesStore();
+const modalActiveCodesStore = useModalActiveCodesStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
 
 </script>
@@ -17,7 +17,7 @@ const depth = ref(0); //to increment each time we go down the node tree to visua
 <template>
    <ul>
         <cs-modal-code
-            v-for="code in codesStore.codes"
+            v-for="code in modalActiveCodesStore.codes"
             :key="code.id"
             :code="code"
             :depth="depth"

@@ -10,7 +10,6 @@ import { useCodesStore } from './csCodesStore';
 export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
     
     state: () => ({
-        codes: [], //all the codes relevant to the current filtration
         query: '', //current search term to filter the active codes
         selectedFirstNodeId: 0,
         selectedSecondNodeId: 0,
@@ -30,6 +29,15 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
                 ...useCodesStore().codes
             ];
         },
+
+        /**
+         * 
+         * 
+         * @return { Object }
+         */
+        // selectedFirstNode () {
+        //     return this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
+        // },
 
         /**
          * To determine whether there's any second level nodes
@@ -77,6 +85,32 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
                 getEmptyNode(),
                 ...selectedSecondNode.children,
             ];
+        },
+
+        /**
+         * Display the current nodes based on filtration
+         * 
+         * @return { Array }
+         */
+        codes () {
+            if (this.selectedFirstNodeId !== 0 && this.selectedSecondNodeId !== 0 && this.selectedThirdNodeId !== 0) {
+                const selectedThirdNode = this.thirdNodes.find((node) => node.id === this.selectedThirdNodeId);
+                return [selectedThirdNode];
+            } else if (this.selectedFirstNodeId !== 0 && this.selectedSecondNodeId !== 0) {
+                const selectedSecondNode = this.secondNodes.find((node) => node.id === this.selectedSecondNodeId);
+                return [selectedSecondNode];
+            } else if (this.selectedFirstNodeId !== 0) {
+                const selectedFirstNode = this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
+                return [selectedFirstNode];
+            } else {
+                return [];
+            }
+            // if (this.selectedFirstNodeId !== 0 && this.hasSecondNodes) {
+            //     const selectedFirstNode = this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
+            //     return [selectedFirstNode];
+            // } else {
+            //     return [];
+            // }
         },
 
     },
