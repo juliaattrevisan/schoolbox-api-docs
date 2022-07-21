@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\EmailDKIM;
 
+use Alaress\Redis;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -39,5 +40,18 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME);
         $this->uses('updated_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'reloadRouteDaemon']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'reloadRouteDaemon']);
+    }
+
+    /**
+     * Reload route daemon
+     * @return void
+     */
+    protected function reloadRouteDaemon()
+    {
+        $redisClient = Redis::getSignalQueueClientInstance();
+        $redisClient->publish('routed.' . INSTANCE_ID . '.reload', '');
     }
 }

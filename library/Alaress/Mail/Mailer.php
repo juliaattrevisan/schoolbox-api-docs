@@ -14,6 +14,7 @@ use Alaress\Lumberjack\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\EmailDKIM\Mapper;
 use Schoolbox\Admin\EmailDKIM\Model as EmailDKIM;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
@@ -37,7 +38,7 @@ use Symfony\Component\Mime\Part\TextPart;
 use function count;
 use function trim;
 
-class Mailer implements IMailer
+class Mailer
 {
     // These two const are just a key for an array structure that will separate valid and invalid email addresses
     // As of the moment, these keys are being used here and in createMail.php::45 only
@@ -79,6 +80,12 @@ class Mailer implements IMailer
     private bool $encodeBase64 = false;
 
     /**
+     * System default from address
+     * @var Address
+     */
+    private Address $systemFrom;
+
+    /**
      * Construct the basics of a new Mailer
      *
      * @param string                    $subject
@@ -92,9 +99,12 @@ class Mailer implements IMailer
         $this->dkimMapper = $dkimMapper;
 
         $this->email = new Email();
-        $this->setFrom($this->config->get('mail_from_address'), $this->config->get('mail_from_name'));
 
-        //setup header
+        // setup default from
+        $this->systemFrom = new Address($this->config->get(ConfigMapper::NAME_MAIL_FROM_ADDRESS), $this->config->get(ConfigMapper::NAME_MAIL_FROM_NAME));
+        $this->setFrom($this->systemFrom);
+
+        // setup header
         $this->headers['MessageID'] = '<' . md5(time()) . '@alaressmailer>';
 
         $this->setTo($to);
@@ -212,33 +222,21 @@ class Mailer implements IMailer
 
     /**
      * Set from
-     * @param string $email
-     * @param string $name
+     * @param Address $address
      */
-    public function setFrom(string $email, string $name = '')
+    public function setFrom(Address $address)
     {
-        $this->email->from(new Address($email, $name));
-        $this->email->returnPath($email);
+        $this->email->from($address);
+        $this->email->returnPath($address);
     }
 
     /**
      * Set the reply-to header
-     *
-     * @param string|array $email
-     * @param string       $name
+     * @param Address $address
      */
-    public function setReplyTo($email, string $name = '')
+    public function addReplyTo(Address $address)
     {
-        /**
-         * if $email is an array... do magic combining, else just do what it was doing...
-         */
-        if (is_array($email)) {
-            foreach ($email as $address => $name) {
-                $this->email->addReplyTo(new Address($address, $name));
-            }
-        } else {
-            $this->email->replyTo(new Address($email, $name));
-        }
+        $this->email->addReplyTo($address);
     }
 
     /**
@@ -336,16 +334,11 @@ class Mailer implements IMailer
     /**
      * Attempts to send the email constructed by this class. Returns mailing success or failure.
      *
-     * @param string $to
      * @return bool
      * @throws TransportExceptionInterface
      */
-    public function send($to = '')
+    public function send()
     {
-        if (!empty($to)) {
-            $this->setTo($to);
-        }
-
         // construct body and set headers
         $this->email->text($this->composePlain());
         $this->email->html($this->composeHTML());
@@ -405,6 +398,10 @@ class Mailer implements IMailer
 
             // get all recipients before signing
             $recipients = array_merge($this->email->getTo(), $this->email->getCC(), $this->email->getBcc());
+
+            if ($this->config->get(ConfigMapper::NAME_MAIL_FORCE_FROM_SYSTEM)) {
+                $this->forceFrom();
+            }
 
             foreach ($this->email->getFrom() as $from) {
                 [$email, $domain] = explode('@', $from->getAddress());
@@ -479,7 +476,7 @@ class Mailer implements IMailer
     /**
      * @param string $emailAddresses A collection of email addresses in a string format that's separated with self::EMAIL_SEPARATOR_CODE
      *
-     * @return array
+     * @return array ['valid' => [['email' => 'name']], 'invalid' => [['email' => 'name']]]
      */
     public static function parseAddressString(string $emailAddresses, string $defaultHost): array
     {
@@ -637,5 +634,32 @@ class Mailer implements IMailer
                 ->headersToIgnore(['message-id', 'date', 'mime-version', 'messageid'])
                 ->toArray()
         );
+    }
+
+    /**
+     * Replace current from address with system from address
+     * @return void
+     */
+    private function forceFrom()
+    {
+        /** @var Address[] $replaceFrom */
+        $replaceFrom = [];
+        foreach ($this->email->getFrom() as $from) {
+            // if current from is not system from, move it to reply to
+            if (
+                $from->getAddress() !== $this->systemFrom->getAddress()
+                && empty($this->email->getReplyTo())
+            ) {
+                $this->email->addReplyTo($from);
+            }
+            $replaceFrom[] = new Address($this->systemFrom->getAddress(), $from->getName());
+        }
+        foreach ($replaceFrom as $i => $replace) {
+            if ($i === 0) {
+                $this->email->from($replace);
+            } else {
+                $this->email->addFrom($replace);
+            }
+        }
     }
 }

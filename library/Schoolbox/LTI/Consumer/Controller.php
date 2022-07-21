@@ -20,6 +20,7 @@ use Component_ConfigMapper;
 use Component_ControllerAbstract;
 use DateTime;
 use Exception;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\LTI\Component\Homepage\Controller as LtiComponent;
 use Schoolbox\LTI\Provider\Model as Provider;
@@ -488,7 +489,7 @@ class Controller extends Base
             'tool_consumer_instance_name'            => $this->getConfigLoader()->get('school_name'),
             'tool_consumer_instance_description'     => 'Schoolbox LMS',
             'tool_consumer_instance_url'             => $this->baseUrl,
-            'tool_consumer_instance_contact_email'   => $this->getConfigLoader()->get('mail_from_address'),
+            'tool_consumer_instance_contact_email'   => $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_FROM_ADDRESS),
             'tool_consumer_info_product_family_code' => 'schoolbox',
             'tool_consumer_info_version'             => $this->getConfigLoader()->get('site_version'),
             'ext_lms'                                => 'schoolbox-' . $this->getConfigLoader()->get('site_version'),

@@ -142,7 +142,6 @@ if (is_numeric($this->arg[0])) {
 
     // Keep list of everyone to email
     $all_emails        = [];
-    $email_object      = new Email();
 
     foreach ($memberList as $member) {
         $memberAccess = $userAccessMapper->findByColumnList([
@@ -265,9 +264,9 @@ if (is_numeric($this->arg[0])) {
         'mail_all_parents_form_block' => '',
     ]);
 
-    if (\Config::get('mail_enable') && $_SESSION['user']->hasEmail()) {
+    if (\Config::get(\Schoolbox\Config\ConfigMapper::NAME_MAIL_ENABLED) && $_SESSION['user']->hasEmail()) {
         $this->setVar([
-            'REPLYTO'  => $email_object->formatEmailFromArray($_SESSION)
+            'REPLYTO' => $_SESSION['user']->getEmail()
         ]);
 
         if (!empty($all_emails)) {

@@ -268,19 +268,14 @@ class Controller extends Base
         $mail        = $this->emailFactory->buildSimpleEmail($subject, '');
 
         //get users email address to use in from field
-        $fromEmail = new Email($this->getUser()->getEmail());
-        if (!$fromEmail->isValid()) {
+
+        try {
+            $fromEmail = new Address($this->getUser()->getEmail(), $this->getUser()->formatName());
+            $mail->setFrom($fromEmail);
+            $mail->addReplyTo($fromEmail);
+        } catch (RfcComplianceException | LogicException $e) {
             $this->sendError('Invalid email from address');
         }
-
-        $mail->setFrom(
-            $this->getUser()->getEmail(),
-            $this->getUser()->formatName()
-        );
-        $mail->setReplyTo(
-            $this->getUser()->getEmail(),
-            $this->getUser()->formatName()
-        );
 
         //if id is submitted to form convert to email
         if (is_numeric($to)) {
@@ -411,9 +406,9 @@ class Controller extends Base
             $context['hideUnsubscribe'] = true;
 
             $subject = $this->getConfigLoader()->get('title') . ' Feedback - ' . $this->request->post->get('subject');
-            $to      = new Address($this->getConfigLoader()->get('mail_support_address'), $this->getConfigLoader()->get('mail_from_name'));
+            $to      = new Address($this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_SUPPORT_ADDRESS), $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_FROM_NAME));
             $email   = $this->emailFactory->buildTwigEmail('feedback.twig', $subject, $to);
-            $email->setReplyTo($replyTo->getAddress(), $replyTo->getName());
+            $email->addReplyTo($replyTo);
             $email->setContext($context);
             $email->send();
             /*  if($_POST['receipt']) {

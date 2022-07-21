@@ -124,9 +124,14 @@ class ConfigMapper extends Mapper
     public const NAME_S3_PRESIGNED_URL_ENABLED       = 'otfs_s3_presigned_urls_enabled';
     public const NAME_IMAGE_S3_PRESIGNED_URL_ENABLED = 'otfs_image_s3_presigned_urls_enabled';
 
-    public const NAME_MAIL_ENABLED    = 'mail_enable';
-    public const NAME_MAIL_ADDRESS    = 'mail_address';
-    public const NAME_EMAIL_SIGNATURE = 'email_signature';
+    public const NAME_MAIL_ENABLED           = 'mail_enable';
+    public const NAME_MAIL_ADDRESS           = 'mail_address';
+    public const NAME_EMAIL_SIGNATURE        = 'email_signature';
+    public const NAME_MAIL_FORCE_FROM_SYSTEM = 'mail_force_from_system';
+    public const NAME_MAIL_PASSWORD_CHANGE   = 'password_change_email_from';
+    public const NAME_MAIL_SUPPORT_ADDRESS   = 'mail_support_address';
+    public const NAME_MAIL_FROM_ADDRESS      = 'mail_from_address';
+    public const NAME_MAIL_FROM_NAME         = 'mail_from_name';
 
     public const NAME_BROWSER_CACHE_IMAGE_TIMEOUT    = 'browser_cache_image_timeout';
     public const NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT = 'browser_cache_portrait_timeout';
@@ -213,6 +218,7 @@ class ConfigMapper extends Mapper
         'mail_replyto_enabled',
         'feedback_url',
         'feedback_text',
+        self::NAME_MAIL_FORCE_FROM_SYSTEM,
     ];
 
     /**
@@ -233,7 +239,7 @@ class ConfigMapper extends Mapper
      *
      * If any of these settings change: rebuild the route and module tables.
      */
-    public const SETTINGS_AFFECTING_MODULES = [
+    public const SETTINGS_AFFECTING_MODULES    = [
         ConfigMapper::NAME_LMS_ENABLED,
         ConfigMapper::NAME_PASTORAL_ENABLED,
         ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED,

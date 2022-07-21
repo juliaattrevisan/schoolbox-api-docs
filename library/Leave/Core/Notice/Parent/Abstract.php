@@ -10,7 +10,9 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
+use Symfony\Component\Mime\Exception\LogicException;
 use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mail\EmailFactory;
@@ -35,7 +37,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
         $subject = '(Parent) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
         $emailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
-        $email = $emailFactory->buildTwigEmail($this->emailTemplateFile, $subject, $this->getRequest()->getUser());
+        $email        = $emailFactory->buildTwigEmail($this->emailTemplateFile, $subject, $this->getRequest()->getUser());
 
         $context = [
             'LEAVE_USER_NAME'      => $this->getRequest()->getUser()->formatName(),
@@ -68,7 +70,7 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
         $allParents = $this->externalUser->getStudentContactList([$this->getRequest()->getUser()->getExternalId()]);
 
         if (is_array($allParents)) {
-            $emailList = array();
+            $emailList = [];
 
             foreach ($allParents as $parent) {
                 $email1 = $parent['StudentContactDefaultEmail'];
@@ -81,17 +83,23 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
                 }
             }
 
-            foreach ($emailList as $parentEmail) {
-                if (Config::get('debug_email_address') != '') {
-                    $email = new \Email(Config::get('debug_email_address'));
-                } else {
-                    $email = new \Email($parentEmail);
+            $debugEmailAddress = Config::get('debug_email_address');
+            if (!empty($debugEmailAddress)) {
+                try {
+                    $this->email->setTo(new Address($debugEmailAddress));
+                    $this->email->send();
+                    return;
+                } catch (RfcComplianceException | LogicException $e) {
+                    // noop
                 }
+            }
 
-                /* Only send if the email is valid
-                 */
-                if ($email->isValid()) {
-                    $this->email->send($email->getEmail());
+            foreach ($emailList as $parentEmail) {
+                try {
+                    $this->email->setTo(new Address($parentEmail));
+                    $this->email->send();
+                } catch (RfcComplianceException | LogicException $e) {
+                    continue;
                 }
             }
         }

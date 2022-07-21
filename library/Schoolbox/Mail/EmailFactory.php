@@ -10,9 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Mail;
 
-use Alaress\Lumberjack\Logger;
 use Alaress\Mail\Mailer;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\IConfigLoader;

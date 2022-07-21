@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\Application\Exception as ApplicationException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
@@ -889,7 +890,7 @@ class Leave_Controller extends Controller
         $request->setUserPhone($data['request']['userPhone']);
         $request->setDescription($data['request']['description']);
         $request->setNotes($data['request']['notes']);
-        $request->setConfirmedBy($data['request']['confirmedBy']);
+        $request->setConfirmedBy($data['request']['confirmedBy'] ?? '');
         $request->setReturnerName($data['request']['returnerName'] ?? '');
         $request->setCollectorName($data['request']['collectorName'] ?? '');
         $request->setReason($data['request']['reason'] ?? '');
@@ -1677,7 +1678,7 @@ class Leave_Controller extends Controller
         $emailFactory = new EmailFactory(ConfigLoader::getInstance(), DKIMMapper::getInstance());
         $email = $emailFactory->buildTwigEmail('leave/userNoticeEmail.twig', 'test', 'steve.chan@alaress.com.au');
 
-        $email->setFrom(Config::get('mail_from_address'), 'Test Schoolbox');
+        $email->setFrom(new \Symfony\Component\Mime\Address(Config::get(ConfigMapper::NAME_MAIL_FROM_ADDRESS), 'Test Schoolbox'));
         $email->send();
     }
 
