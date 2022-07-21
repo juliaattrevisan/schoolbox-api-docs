@@ -33,6 +33,11 @@ use Schoolbox\Video\QueueMapper;
 class Mapper extends BaseMapper implements IReceiver
 {
     /**
+     * Max length for filenames: anything longer causes issues on upload.
+     */
+    public const FILENAME_MAX_LENGTH = 250;
+
+    /**
      * @return void
      * @throws MapperException
      */

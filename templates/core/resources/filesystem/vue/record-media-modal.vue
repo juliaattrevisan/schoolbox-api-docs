@@ -27,7 +27,7 @@ export default {
         RecordScreen,
         OverMediaModal //to slot in upload modal
     },
-    
+
     data () {
         return {
             currentRecordMediaType: recordMediaTypes.UNSET, //the currently selected media recording
@@ -67,7 +67,7 @@ export default {
             }
         },
 
-        /** 
+        /**
          * grab the new filename with the relevant extension (can be webm/mp4/mp3)
          *
          * @returns { String }
@@ -81,7 +81,7 @@ export default {
 
     watch: {
 
-        /** 
+        /**
          * ensure no invalid chars are added to the user added filename
          */
         newFilename (newValue) {
@@ -93,7 +93,7 @@ export default {
     created () {
         this.hasDeviceCapture = hasDeviceCapture();
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
-        
+
     },
 
     mounted () {
@@ -135,7 +135,7 @@ export default {
         },
 
         /**
-         * To set up appropriate initial height on container, typically keeping the same size as a 16:9 video element 
+         * To set up appropriate initial height on container, typically keeping the same size as a 16:9 video element
          * unless otherwise set by say, a mobile phone recorded video requested a larger size to fit a portrait recorded video
          */
         initContainerHeight () {
@@ -188,7 +188,7 @@ export default {
 
         /**
          * to upload the recorded data
-         * 
+         *
          * @params { Object }
          */
         onRecordedMediaReady (recordedData) {
@@ -204,7 +204,7 @@ export default {
             if (this.hasDeviceCapture) { //restore the height to a decent amount, especially if was a phone portrait capture
                 this.currentRatio = this.defaultRatio;
                 this.updateContainerHeight();
-            } 
+            }
         },
 
         /**
@@ -253,7 +253,7 @@ export default {
             }
         },
 
-        /** 
+        /**
          * the video is ready, so upload it up to SchoolBox
          */
         async uploadMediaAndReturnResponse () {
@@ -273,7 +273,7 @@ export default {
             }
         },
 
-        /** 
+        /**
          * What to send in the upload
          *
          * @returns { FormData }
@@ -304,6 +304,9 @@ export default {
         checkErrorMessage (errorResponseData) {
             if (errorResponseData.hash?.includes('This file exceeds the file size restriction')) {
                 this.uploadErrorMessage = `Sorry, the recording of ${filesize(this.recordedData.size)} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
+            }
+            if (errorResponseData.hash?.includes('The specified filename exceeds the max length')) {
+                this.uploadErrorMessage = `Sorry, the specified filename is longer than the allowed length.\nPlease shorten the filename length.`;
             }
         },
 
@@ -381,9 +384,9 @@ export default {
     <div>
 
         <div class="ab-pane">
-            
+
             <div v-if="!hasClosed" class="record-media-container" ref="container" :style="{ height: targetHeight }">
-            
+
                 <record-media-modal-menu
                     v-if="currentRecordMediaType === recordMediaTypes.UNSET"
                     @on-record-media-type-selected="onRecordMediaTypeSelected"
@@ -395,7 +398,7 @@ export default {
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
                     @on-resize="onResize"
-                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                    @on-over-media-modal-opened="onOverMediaModalOpened"
                     @on-over-media-modal-closed="onOverMediaModalClosed"
                 />
                 <record-photo
@@ -405,7 +408,7 @@ export default {
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
                     @on-resize="onResize"
-                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                    @on-over-media-modal-opened="onOverMediaModalOpened"
                     @on-over-media-modal-closed="onOverMediaModalClosed"
                 />
                 <record-camera
@@ -415,7 +418,7 @@ export default {
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
                     @on-resize="onResize"
-                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                    @on-over-media-modal-opened="onOverMediaModalOpened"
                     @on-over-media-modal-closed="onOverMediaModalClosed"
                 />
                 <record-screen
@@ -425,15 +428,15 @@ export default {
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
                     @on-resize="onResize"
-                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                    @on-over-media-modal-opened="onOverMediaModalOpened"
                     @on-over-media-modal-closed="onOverMediaModalClosed"
                 />
 
-                <over-media-modal 
-                    v-if="isFilenameModalActive"  
-                    :is-closing="isOverMediaModalClosing" 
-                    :closed-call-back="onFilenameModalClosed" 
-                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                <over-media-modal
+                    v-if="isFilenameModalActive"
+                    :is-closing="isOverMediaModalClosing"
+                    :closed-call-back="onFilenameModalClosed"
+                    @on-over-media-modal-opened="onOverMediaModalOpened"
                     @on-over-media-modal-closed="onOverMediaModalClosed"
                     key="filenameModal"
                 >
@@ -443,7 +446,7 @@ export default {
                     <div class="modal-actions">
                         <button class="submit" @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Upload</button>
                         <button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
-                    </div>	
+                    </div>
                 </over-media-modal>
                 <over-media-modal v-else-if="isUploading" key="isUploadingModal">
                     <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ width: uploadProgressRatio }"></span></div>
@@ -452,18 +455,18 @@ export default {
                 <over-media-modal v-else-if="hasUploaded" @on-over-media-modal-closed="onOverMediaModalClosed" key="hasUploadedModal">
                     <p><em>Media successfully uploaded.</em></p>
                 </over-media-modal>
-                <over-media-modal 
-                    v-else-if="hasUploadError" 
-                    :is-closing="isOverMediaModalClosing" 
-                    :closed-call-back="onErrorModalClosed" 
-                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                <over-media-modal
+                    v-else-if="hasUploadError"
+                    :is-closing="isOverMediaModalClosing"
+                    :closed-call-back="onErrorModalClosed"
+                    @on-over-media-modal-opened="onOverMediaModalOpened"
                     @on-over-media-modal-closed="onOverMediaModalClosed"
                     key="errorUploadModal">
                     <div class="alert-box alert">{{ uploadErrorMessage }}</div>
                     <button @click.prevent="onCloseErrorModalSelected">Close</button>
-                </over-media-modal>	
+                </over-media-modal>
 
-            </div>	
+            </div>
 
         </div><!-- .ab-pane -->
 
