@@ -491,18 +491,31 @@ class Model implements ISoftDeletable, JsonSerializable
      *
      * They can if:
      * * They're a superuser
-     * * They have the resource booking service at level "moderate"
-     * * They are a moderator for this item
+     * * They are a moderator of this item: @see isUserModerator
      *
      * @param User $user
-     *
      * @return bool
      */
     public function canUserModerateThisItem(User $user)
     {
-        if ($user->isSuperuser()) {
-            return true;
-        }
+        return $user->isSuperuser() || $this->isUserModerator($user);
+    }
+
+    /**
+     * Is this user actually a moderator of this item?
+     *
+     * They are if:
+     * * They have the resource booking service at level "moderate"
+     * * They are a moderator for this item
+     *
+     * Note that superusers are not necessarily moderators of an item: however,
+     * they may act as a moderator for any item: @see canUserModerateThisItem.
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function isUserModerator(User $user): bool
+    {
         foreach ($user->getAccessList() as $access) {
             if (
                 $access->getService() == UserAccess::SERVICE_RESOURCE_BOOKING
@@ -511,7 +524,8 @@ class Model implements ISoftDeletable, JsonSerializable
                 return true;
             }
         }
-        //if there are no moderators, do not attempt to iterate through the null
+
+        // if there are no moderators, do not attempt to iterate through the null
         if (null !== $this->getModeratorList()) {
             foreach ($this->getModeratorList() as $moderator) {
                 if ($moderator->getId() == $user->getId()) {

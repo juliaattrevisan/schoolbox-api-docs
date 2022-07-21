@@ -131,7 +131,7 @@ class Validation
         $startDate     = null;
         $endDate       = null;
 
-        // Only moderators of this booking may override validation
+        // Only users allowed to moderate this item may override validation
         $override = !empty($postData['override_validation'])
             && $resource->canUserModerateThisItem($this->user);
 
