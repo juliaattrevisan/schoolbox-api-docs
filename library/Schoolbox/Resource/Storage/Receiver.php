@@ -93,6 +93,11 @@ class Receiver implements IReceiver
         $storage->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME));
         $storage->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
 
+        //if filename is longer than the db limit, error out here
+        if (Mapper::FILENAME_MAX_LENGTH <= \strlen($storage->getFilename())) {
+            throw new FileException(sprintf("The specified filename exceeds the max length of %d characters", Mapper::FILENAME_MAX_LENGTH));
+        }
+
         // Find the location within the filesystem where the temp file lives.
         // TODO: Find a way to remove the need for this truncation
         $tempLocationInFilesystem = str_replace(sys_get_temp_dir(), '', $tempLocation);
