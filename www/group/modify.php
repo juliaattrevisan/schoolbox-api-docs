@@ -266,7 +266,7 @@ if (is_numeric($this->arg[0])) {
 
     if (\Config::get(\Schoolbox\Config\ConfigMapper::NAME_MAIL_ENABLED) && $_SESSION['user']->hasEmail()) {
         $this->setVar([
-            'REPLYTO' => $_SESSION['user']->getFormattedEmailDisplay()
+            'REPLYTO' => $_SESSION['user']->getEmail()
         ]);
 
         if (!empty($all_emails)) {
