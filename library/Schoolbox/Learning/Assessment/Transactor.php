@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use LogicException;
 use PDOException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\Learning\Assessment\DueWork;
@@ -218,7 +219,7 @@ class Transactor
                     /* If turnitin is enabled, retrofit any old submissions' documents
                      */
                     if ((new Turnitin\Helper(Loader::getInstance()))->isConfigured()) {
-                        (new Turnitin\Retrofit(Turnitin\File\Mapper::getInstance(), $this->submissionFileMapper))->retrofit($this->assessment->getId());
+                        (new Turnitin\Retrofit(Turnitin\Group\Mapper::getInstance(), Turnitin\File\Mapper::getInstance(), $this->submissionFileMapper, SubmissionBoxMapper::getInstance()))->retrofit($this->assessment->getId());
                     }
                 }
             }
