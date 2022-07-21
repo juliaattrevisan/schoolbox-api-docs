@@ -13,7 +13,6 @@ use Alaress\Color\Color;
 
 interface IFolder
 {
-
     // Any child of a node with this ID will be considered a root node
     // @see https://www.jstree.com/docs/json/
     // TODO consider changing this to -1 and perform -1 => '#' mapping for JS-tree implementation only

@@ -13,6 +13,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception as MapperException;
 use Alaress\Authorizer\Rule;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\FullAccessController;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\My;
@@ -68,6 +69,7 @@ class Module extends AbstractModule
             ->setFileMapper($this->getMapperFactory()->get(My\File\Mapper::class))
             ->setConfig($this->getConfig())
             ->setUserMapper($this->getMapperFactory()->get(UserMapper::class))
+            ->setUserAccessMapper($this->getMapperFactory()->get(UserAccessMapper::class))
             ->setNodeFactory(new NodeFactory())
             ->setTreeBuilder($treeBuilder)
             ->setFolderMapper($this->getMapperFactory()->get(My\Folder\Mapper::class))

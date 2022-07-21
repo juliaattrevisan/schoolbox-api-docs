@@ -16,6 +16,7 @@ use Aura\Router\Router;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Browser\AbstractModule;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -153,6 +154,7 @@ class Module extends AbstractModule
             ->setFileMapper($this->getMapperFactory()->get(Resource\File\Mapper::class))
             ->setConfig($this->getConfig())
             ->setUserMapper($this->getMapperFactory()->get(UserMapper::class))
+            ->setUserAccessMapper($this->getMapperFactory()->get(UserAccessMapper::class))
             ->setNodeFactory(new Resource\Browser\NodeFactory())
             ->setTreeBuilder($treeBuilder)
             ->setFolderMapper($this->getMapperFactory()->get(Resource\Folder\Mapper::class))

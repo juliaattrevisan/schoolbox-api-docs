@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Browser\WebDav;
 
 use Alaress\Web\Controller\Base;
 use PortfolioWebDAV;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractModule;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\UserMapper;
@@ -45,6 +46,7 @@ class Module extends AbstractModule
             ->setFileMapper($dav)
             ->setConfig($this->getConfig())
             ->setUserMapper($this->getMapperFactory()->get(UserMapper::class))
+            ->setUserAccessMapper($this->getMapperFactory()->get(UserAccessMapper::class))
             ->setNodeFactory(new NodeFactory())
             ->setTreeBuilder(new TreeBuilder($dav))
             ->setFolderMapper($dav)

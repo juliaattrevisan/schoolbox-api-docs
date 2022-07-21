@@ -108,7 +108,7 @@ abstract class AbstractController extends BaseController
 
         $groupAccess = null;
         try {
-            $groupAccessObj = $this->getUserAccessMapper()->findOneByColumnList(
+            $groupAccessObj = $this->userAccessMapper->findOneByColumnList(
                 [
                     'uid' => $this->getUser()->getId(),
                     'sid' => $folderId,
@@ -117,7 +117,7 @@ abstract class AbstractController extends BaseController
             );
             $groupAccess = $groupAccessObj->getAccessLevel();
         } catch (Mapper\Exception $e) {
-
+            // noop
         }
 
         try {
@@ -649,13 +649,11 @@ abstract class AbstractController extends BaseController
     }
 
     /**
-     * @return UserAccessMapper
+     * @return self
      */
-    private function getUserAccessMapper(): UserAccessMapper
+    public function setUserAccessMapper(UserAccessMapper $userAccessMapper)
     {
-        if (!$this->userAccessMapper) {
-            $this->userAccessMapper = UserAccessMapper::getInstance();
-        }
-        return $this->userAccessMapper;
+        $this->userAccessMapper = $userAccessMapper;
+        return $this;
     }
 }
