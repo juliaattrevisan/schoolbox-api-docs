@@ -22,7 +22,7 @@ function onFirstNodeChanged () {
  *
  * @returns { Boolean }
  */
-const showSecondNodeSelect = computed(() => modalActiveCodesStore.selectedFirstNodeId !== 0 && modalActiveCodesStore.hasSecondNodes);
+const showSecondNodeSelect = computed(() => modalActiveCodesStore.hasSelectedFirstNode && modalActiveCodesStore.hasSecondNodes);
 
 /**
  * To reset the selectedThirdNodeId when there's a change in the second
@@ -36,7 +36,7 @@ function onSecondNodeChanged () {
  *
  * @returns { Boolean }
  */
-const showThirdNodeSelect = computed(() => modalActiveCodesStore.selectedSecondNodeId !== 0 && modalActiveCodesStore.hasThirdNodes);
+const showThirdNodeSelect = computed(() => modalActiveCodesStore.hasSelectedSecondNode && modalActiveCodesStore.hasThirdNodes);
 
 </script>
 

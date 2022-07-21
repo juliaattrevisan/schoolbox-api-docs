@@ -15,21 +15,21 @@ const depth = ref(0); //to increment each time we go down the node tree to visua
 </script>
 
 <template>
-   <ul>
+    <ul>
         <cs-modal-code
             v-for="code in modalActiveCodesStore.codes"
             :key="code.id"
             :code="code"
             :depth="depth"
         />
-   </ul>
+    </ul>
 </template>
 
 <style scoped>
 
 ul {
     list-style: none;
-    margin: 0;
+    margin: 0 0 1rem 0;
     max-height: 500px; /*restrict the size of the modal, it'll scroll when larger */
     min-height: 500px;
     overflow-y: scroll;

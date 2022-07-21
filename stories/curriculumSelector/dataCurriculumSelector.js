@@ -1608,7 +1608,7 @@ export const data = [
             {
                 "id":801,
                 "name":"My first option",
-                "code":"GCL-ULAV",
+                "code":"M1O",
                 "description":"",
                 "reference":null,
                 "children":[
@@ -1621,7 +1621,7 @@ export const data = [
             {
                 "id":802,
                 "name":"My second option",
-                "code":"GCL-USK",
+                "code":"M20",
                 "description":"",
                 "reference":null,
                 "children":[

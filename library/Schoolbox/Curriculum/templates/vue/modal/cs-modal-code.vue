@@ -71,13 +71,26 @@ function onSelected () {
 const hasChildren = computed(() => props.code.children && props.code.children.length > 0);
 
 /**
+ * Add in the code if it's available otherwise just show the title
+ *
+ * @returns { String }
+ */
+const codeTitle = computed(() => {
+    if (props.code.code && props.code.code !== '') {
+        return `[${props.code.code}] ${props.code.name}`;
+    } else {
+        return props.code.name;
+    }
+});
+
+/**
  * To determine whether we need to display further child nodes within for this code
  *
  * @returns { HTML }
  */
 const highlightTitleSearch = computed(() => {
     // return highlightSearchInElement(props.result.name);
-    return props.code.name;
+    return codeTitle.value;
 });
 
 /**

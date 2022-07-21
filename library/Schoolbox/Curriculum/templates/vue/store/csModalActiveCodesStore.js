@@ -6,20 +6,22 @@
 import { defineStore } from 'pinia';
 import { useCodesStore } from './csCodesStore';
 
+const UNSET = 0; 
 
 export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
     
     state: () => ({
         query: '', //current search term to filter the active codes
-        selectedFirstNodeId: 0,
-        selectedSecondNodeId: 0,
-        selectedThirdNodeId: 0,
+        selectedFirstNodeId: UNSET,
+        selectedSecondNodeId: UNSET,
+        selectedThirdNodeId: UNSET,
     }),
 
     getters: {
        
         /**
          * The first level of Curriculum nodes
+         * plus the empty node by default if there's more than one child
          * 
          * @return { Array }
          */
@@ -29,88 +31,121 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
                 ...useCodesStore().codes
             ];
         },
+        
+        /**
+         * Whether a first node has been selected via cs-modal-header.vue
+         * 
+         * @return { Boolean }
+         */
+        hasSelectedFirstNode () {
+            return this.selectedFirstNodeId !== UNSET;
+        },
 
         /**
-         * 
+         * The currently selected first node
          * 
          * @return { Object }
          */
-        // selectedFirstNode () {
-        //     return this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
-        // },
+        selectedFirstNode () {
+            return this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
+        },
 
         /**
-         * To determine whether there's any second level nodes
+         * To determine whether there's any second level nodes (children) in the selectedFirstNode
          * 
          * @return { Boolean }
          */
         hasSecondNodes () {
-            const selectedFirstNode = this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
-            return selectedFirstNode.children.length > 1 ? true : false;
+            return this.selectedFirstNode.children.length > 1 ? true : false;
         },
 
         /**
-         * The second level of Curriculum nodes, once a firstNode is selected, this second level is displayed
-         * showing all the second level nodes within the secondNode
+         * Show the second level nodes, which are the children of the selectedFirstNode
+         * plus the empty node by default if there's more than one child
          * 
          * @return { Array }
          */
         secondNodes () {
-            const selectedFirstNode = this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
             return [ 
                 getEmptyNode(),
-                ...selectedFirstNode.children,
+                ...this.selectedFirstNode.children,
             ];
         },
 
         /**
-         * To determine whether there's any third level nodes
+         * Whether a second node has been selected via cs-modal-header.vue
+         * 
+         * @return { Boolean }
+         */
+        hasSelectedSecondNode () {
+            return this.selectedSecondNodeId !== UNSET;
+        },
+
+        /**
+         * The currently selected second node 
+         * 
+         * @return { Object }
+         */
+        selectedSecondNode () {
+            return this.secondNodes.find((node) => node.id === this.selectedSecondNodeId);
+        },
+
+        /**
+         * To determine whether there's any third level nodes (children) in the selectedSecondNode
          * 
          * @return { Boolean }
          */
         hasThirdNodes () {
-            const selectedSecondNode = this.secondNodes.find((node) => node.id === this.selectedSecondNodeId);
-            return selectedSecondNode.children.length > 1 ? true : false;
+            return this.selectedSecondNode.children.length > 1 ? true : false;
         },
 
         /**
-         * The third level of Curriculum nodes, once a secondNode is selected, this third level is displayed
-         * showing all the third level nodes within the thirdNode
+         * Show the third level nodes, which are the children of the selectedSecondNode
+         * plus the empty node by default if there's more than one child
          * 
          * @return { Array }
          */
         thirdNodes () {
-            const selectedSecondNode = this.secondNodes.find((node) => node.id === this.selectedSecondNodeId);
             return [ 
                 getEmptyNode(),
-                ...selectedSecondNode.children,
+                ...this.selectedSecondNode.children,
             ];
         },
 
         /**
-         * Display the current nodes based on filtration
+         * Whether a third node has been selected via cs-modal-header.vue
+         * 
+         * @return { Boolean }
+         */
+        hasSelectedThirdNode () {
+            return this.selectedThirdNodeId !== UNSET;
+        },
+
+        /**
+         * The currently selected third node 
+         * 
+         * @return { Object }
+         */
+        selectedThirdNode () {
+            return this.thirdNodes.find((node) => node.id === this.selectedThirdNodeId);
+        },
+
+        /**
+         * Display the current nodes based on filtration, so what's selected via the <selects>
+         * and search <input> in cs-modal-header.vue
          * 
          * @return { Array }
          */
         codes () {
-            if (this.selectedFirstNodeId !== 0 && this.selectedSecondNodeId !== 0 && this.selectedThirdNodeId !== 0) {
-                const selectedThirdNode = this.thirdNodes.find((node) => node.id === this.selectedThirdNodeId);
-                return [selectedThirdNode];
-            } else if (this.selectedFirstNodeId !== 0 && this.selectedSecondNodeId !== 0) {
-                const selectedSecondNode = this.secondNodes.find((node) => node.id === this.selectedSecondNodeId);
-                return [selectedSecondNode];
-            } else if (this.selectedFirstNodeId !== 0) {
-                const selectedFirstNode = this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
-                return [selectedFirstNode];
+            if (this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode) {
+                return [this.selectedThirdNode];
+            } else if (this.hasSelectedFirstNode && this.hasSelectedSecondNode) {
+                return [this.selectedSecondNode];
+            } else if (this.hasSelectedFirstNode) {
+                return [this.selectedFirstNode];
             } else {
                 return [];
             }
-            // if (this.selectedFirstNodeId !== 0 && this.hasSecondNodes) {
-            //     const selectedFirstNode = this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
-            //     return [selectedFirstNode];
-            // } else {
-            //     return [];
-            // }
         },
 
     },
@@ -120,15 +155,15 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         /**
          * to reset the selected second node, reverting the node to empty 
          */
-         resetSelectedSecondNode () {
-            this.selectedSecondNodeId = 0;
+        resetSelectedSecondNode () {
+            this.selectedSecondNodeId = UNSET;
         },
 
         /**
          * to reset the selected thurd node, reverting the node to empty 
          */
         resetSelectedThirdNode () {
-            this.selectedThirdNodeId = 0;
+            this.selectedThirdNodeId = UNSET;
         },
 
     },
@@ -143,7 +178,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
  */
  function getEmptyNode () {
     return { 
-        id: 0, 
+        id: UNSET, 
         name: '-',
         children: [], 
     }
