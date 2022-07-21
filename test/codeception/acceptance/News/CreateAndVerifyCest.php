@@ -226,10 +226,12 @@ class CreateAndVerifyCest
 //            ->fillBlurb($blurb)
 //            ->fillFeatureImage($image)
 //            ->fillTopic($topic)
-            ->createCompositeAudience($audienceType1, $audienceType2, $checkbox1, $checkbox2)
+            ->createCompositeAudience($audienceType1, $audienceType2, $checkbox1, $checkbox2);
 //            ->fillCampuses($campi)
 //            ->fillUsers($users)
-            ->fillPublishDate($publish)
-            ->fillExpiryDate($expiry);
+//            ->fillPublishDate($publish)
+//            ->fillExpiryDate($expiry);
+        $formPage->seeRoles(['1 Team & 1 Year Level']);
     }
+
 }
