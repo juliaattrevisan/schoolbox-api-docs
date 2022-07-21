@@ -30,6 +30,17 @@ use Schoolbox\Calendar\EventRecurrenceMapper;
  */
 class Series
 {
+    /**
+     * Internal constant used by `$this->getUpdatedSeries`.
+     */
+    private const SERIES_UPDATED = 'updated';
+
+
+    /**
+     * Internal constant used by `$this->getDeletedSeries`.
+     */
+    private const SERIES_DELETED = 'deleted';
+
 
     /**
      * @var BookingMapper
@@ -211,6 +222,73 @@ class Series
         DateTime $endDate,
         array $relatedItems,
         $efficacy
+    ) {
+        return $this->getSeries(
+            $item,
+            $startDate,
+            $endDate,
+            $relatedItems,
+            $efficacy,
+            self::SERIES_UPDATED,
+        );
+    }
+
+
+    /**
+     * Gets a series for deletion.
+     *
+     * @param Model    $item
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @param array    $relatedItems
+     * @param string   $efficacy
+     *
+     * @return Collection|Model[]
+     * @throws MapperException
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    public function getDeletedSeries(
+        Model $item,
+        DateTime $startDate,
+        DateTime $endDate,
+        array $relatedItems,
+        $efficacy
+    ) {
+        return $this->getSeries(
+            $item,
+            $startDate,
+            $endDate,
+            $relatedItems,
+            $efficacy,
+            self::SERIES_DELETED,
+        );
+    }
+
+    /**
+     * Gets a series for update, adjusting their start and end dates.
+     *
+     * @param Model    $item
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @param array    $relatedItems
+     * @param string   $efficacy
+     * @param string   $seriesType
+     *
+     * @return Collection|Model[]
+     * @throws MapperException
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    private function getSeries(
+        Model $item,
+        DateTime $startDate,
+        DateTime $endDate,
+        array $relatedItems,
+        $efficacy,
+        string $seriesType,
     ) {
         // Get the date and time changes.
         $startDelta = Interval::createFromDateTimeDifference(
