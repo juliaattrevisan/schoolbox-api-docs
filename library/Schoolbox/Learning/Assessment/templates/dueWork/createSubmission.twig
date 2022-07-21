@@ -68,14 +68,14 @@ Data:
 
         // The autosave pre-submit method - called by the autosave method. Calls the actual submit method if the textbox has changed.
         let autosavePresubmit = function () {
-            
+
             // Has anything changed? If not check again later (re-init the autosave counter)
             currentSubmissionContent = CKEDITOR.instances['editor-body'].getData(); //start with grabbing the ckeditor content
             const formData = new FormData(document.getElementById('editor-form')); //then retrieve any dropzone, rubric and self-assessment changes
             formData.forEach((value) => currentSubmissionContent += value); //loop through and grab all the form values, creating a single string
 
             if (savedSubmissionContent === currentSubmissionContent) {
-                initAutosave(); //nothing's changed, so keep looping through to check 
+                initAutosave(); //nothing's changed, so keep looping through to check
             }
             else { //othewise let's save the draft
                 savedSubmissionContent = currentSubmissionContent;
@@ -370,44 +370,48 @@ Data:
                     <a class="button full-width" data-interaction="close">OK</a>
                     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                 </div>
+            {% endif %}
 
-                {% if requiresReflection or policy | length %}
-                    <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
-                        {% if policy | length %}
-                            <p>{{ policy | purify }}</p>
-                            {% if requiresReflection %}
-                                <p id="confirm-empty-self-assessment-comment" class="hide">
-                                    (You should also provide a
-                                    {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
-                                    comment.)
-                                </p>
-                            {% endif %}
-                            <ul class="flex-list buttons">
-                                <li><a class="button submit" data-accept>Yes, I agree</a></li>
-                                <li><a class="button" data-reject>Cancel</a></li>
-                            </ul>
-                        {% else %}
-                            {% if requiresReflection %}
-                                <div id="confirm-empty-self-assessment-comment" class="hide">
-                                    <h2>
-                                        Are you sure you wish to submit an incomplete
-                                        {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}?
-                                    </h2>
-
-                                    <p>
-                                        It is preferable to provide a
-                                        {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
-                                        comment. Please confirm that you wish to provide no comment.
-                                    </p>
-                                </div>
-                            {% endif %}
-                            <ul class="flex-list buttons">
-                                <li><a class="button submit" data-accept>Yes</a></li>
-                                <li><a class="button" data-reject>No</a></li>
-                            </ul>
+            {##
+             # The dialog which a student must accept before submitting:
+             # a policy, and/or an acknowledgement the reflection is empty
+             #}
+            {% if requiresReflection or policy | length %}
+                <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
+                    {% if policy | length %}
+                        <p>{{ policy | purify }}</p>
+                        {% if requiresReflection %}
+                            <p id="confirm-empty-self-assessment-comment" class="hide">
+                                (You should also provide a
+                                {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
+                                comment.)
+                            </p>
                         {% endif %}
-                    </div>
-                {% endif %}
+                        <ul class="flex-list buttons">
+                            <li><a class="button submit" data-accept>Yes, I agree</a></li>
+                            <li><a class="button" data-reject>Cancel</a></li>
+                        </ul>
+                    {% else %}
+                        {% if requiresReflection %}
+                            <div id="confirm-empty-self-assessment-comment" class="hide">
+                                <h2>
+                                    Are you sure you wish to submit an incomplete
+                                    {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}?
+                                </h2>
+
+                                <p>
+                                    It is preferable to provide a
+                                    {{ assessment.selfGradable ? locale.selfAssessment.singularForm : locale.selfReflection.singularForm }}
+                                    comment. Please confirm that you wish to provide no comment.
+                                </p>
+                            </div>
+                        {% endif %}
+                        <ul class="flex-list buttons">
+                            <li><a class="button submit" data-accept>Yes</a></li>
+                            <li><a class="button" data-reject>No</a></li>
+                        </ul>
+                    {% endif %}
+                </div>
             {% endif %}
 
             {# If this is a self-reflectable assessment, and is being submitted by the student, include the section for self-reflecting #}
