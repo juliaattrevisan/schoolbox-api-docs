@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * The filtered results from using the selects or search input
+ * The filtered results from using the <selects> or search <input>
  * From here curriclum codes can be selected 
  */
 

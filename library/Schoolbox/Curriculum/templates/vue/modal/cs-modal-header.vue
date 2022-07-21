@@ -4,24 +4,55 @@
  * The modal header, containing the title, select nodes and search input
  */
 
+import { computed } from 'vue';
 import { useModalStore } from '../store/csModalStore';
+import { useCodesStore } from '../store/csCodesStore';
 
 
 const modalStore = useModalStore();
+const codesStore = useCodesStore();
+
+/**
+ * To reset the selectedSecondNodeId when there's a change in the first
+ */
+function onFirstNodeChanged () {
+    codesStore.selectedSecondNodeId = 0;
+}
+
+/**
+ * Only show the <select> if a first node has been selected, and there's nodes within to show
+ *
+ * @returns { Boolean }
+ */
+const showSecondNodeSelect = computed(() => codesStore.selectedFirstNodeId !== 0 && codesStore.hasSecondNodes);
+
+/**
+ * To reset the selectedThirdNodeId when there's a change in the second
+ */
+function onSecondNodeChanged () {
+    codesStore.selectedThirdNodeId = 0;
+}
+
+/**
+ * Only show the <select> if a second node has been selected, and there's nodes within to show
+ *
+ * @returns { Boolean }
+ */
+const showThirdNodeSelect = computed(() => codesStore.selectedSecondNodeId !== 0 && codesStore.hasThirdNodes);
 
 </script>
 
 <template>
    <h2>Select Curriculum Codes</h2>
-   <div class="node-options">
-        <select>
-            <option>1</option>
+   <div class="node-selects">
+        <select v-model="codesStore.selectedFirstNodeId" @change="onFirstNodeChanged">
+            <option v-for="node in codesStore.firstNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
         </select>
-        <select>
-            <option>1</option>
+        <select v-if="showSecondNodeSelect" v-model="codesStore.selectedSecondNodeId" @change="onSecondNodeChanged">
+            <option v-for="node in codesStore.secondNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
         </select>
-        <select>
-            <option>1</option>
+        <select v-if="showThirdNodeSelect"  v-model="codesStore.selectedThirdNodeId">
+            <option v-for="node in codesStore.thirdNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
         </select>
    </div>
    <input
@@ -38,7 +69,7 @@ const modalStore = useModalStore();
 
 <style scoped>
 
-.node-options {
+.node-selects {
     display: grid;
     gap: 0.5rem;
     grid-template-columns: repeat(3, 1fr);

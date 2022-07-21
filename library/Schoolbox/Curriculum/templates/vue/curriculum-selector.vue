@@ -4,8 +4,40 @@
  * To select Curriculum codes
  */
 
+import { ref, onMounted } from 'vue';
+import { useStore } from './store/curriculumSelectorStore';
 import CsSearchInput from './cs-search-input.vue';
 import CsModal from './modal/cs-modal.vue';
+
+
+const props = defineProps({
+    /**
+     * the endpoint to retrieve all the group data from
+     */
+    dataEndpoint: {
+        type: String,
+        required: true,
+    },
+});
+
+const store = useStore();
+const toastEl = ref(null);
+
+/**
+ * Start loading the group data
+ */
+onMounted(() => {
+    store.toastEl = toastEl;
+    store.$reset(); //ensure the store state is as it's initially set, this is just for Storybook when switching between stories
+    store.load(props.dataEndpoint);
+});
+
+/**
+ * Reload the page to try loading again
+ */
+function onRefreshSelected () {
+    location.reload();
+}
 
 </script>
 
