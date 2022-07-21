@@ -187,14 +187,12 @@ class Series
 
         $dateParts = [];
         foreach ($series as $thisBooking) {
-            if (!$thisBooking->isDeleted()) {
-                $dateParts[] = [
-                    $thisBooking->getResource(),
-                    $thisBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
-                    $thisBooking->getEvent()->getEndDateTime()->getDateTimeObject(),
-                    $thisBooking,
-                ];
-            }
+            $dateParts[] = [
+                $thisBooking->getResource(),
+                $thisBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
+                $thisBooking->getEvent()->getEndDateTime()->getDateTimeObject(),
+                $thisBooking,
+            ];
         }
 
         return $dateParts;
