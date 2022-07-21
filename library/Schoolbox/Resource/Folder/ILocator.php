@@ -18,7 +18,7 @@ interface ILocator
      * Return the folder with the given ID
      *
      * @param int $nodeId
-     * @return IFolder
+     * @return IFolder|null
      */
     public function findById($nodeId);
 
