@@ -346,7 +346,10 @@ class Controller extends Base
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId     = $booking->getStatus()->getId();
 
-                if ($booking->getResource()->canUserModerateThisItem($this->getUser()) && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()) {
+                if (
+                    $booking->getResource()->isUserModerator($this->getUser())
+                    && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
+                ) {
                     /* If you're a Moderator and can moderate this request,
                      * and you created the booking in the first place,
                      * set it to Approved - otherwise you'll end up approving your own request anyway
@@ -605,7 +608,10 @@ class Controller extends Base
         // booking immediately.
         if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
             $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
-        } elseif ($resource->canUserModerateThisItem($this->getUser()) && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()) {
+        } elseif (
+            $resource->isUserModerator($this->getUser())
+            && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
+        ) {
             /* If you're a Moderator and can moderate this request,
              * and you created the booking in the first place,
              * set it to Approved - otherwise you'll end up approving your own request anyway
