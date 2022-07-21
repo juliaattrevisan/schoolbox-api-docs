@@ -98,6 +98,7 @@ class Controller extends BaseController
             $userGroup = $this->userAccessMapper->findOneByColumnList([
                                                                           'uid' => $user->getId(),
                                                                           'sid' => $post['group'],
+                                                                          'service' => UserAccess::SERVICE_HOMEPAGE
                                                                       ]);
             //user is already part of the group, error out.
             $problem = (new ApiProblem('User is already part of the group. Please refresh the page to ensure everything is up to date.'))
@@ -123,7 +124,7 @@ class Controller extends BaseController
                       ->setUser($user)
                       ->setService(UserAccess::SERVICE_HOMEPAGE)
                       ->setAccessLevel(UserAccess::ACCESS_AWAITING_AUTHORISATION)
-                      ->setFavourite(false); //default to no favourite groups.
+                      ->setFavourite(true); //default to favourite
             if ($group->isFree()) {
                 $userGroup->setAccessLevel(UserAccess::ACCESS_READ);
             }

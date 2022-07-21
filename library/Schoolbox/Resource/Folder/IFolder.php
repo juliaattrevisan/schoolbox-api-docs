@@ -36,7 +36,7 @@ interface IFolder
 
 
     /**
-     * @return self
+     * @return self|null
      */
     public function getParent();
 

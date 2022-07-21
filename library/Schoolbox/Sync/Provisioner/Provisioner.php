@@ -256,11 +256,6 @@ class Provisioner
             $externalUsers = [];
         }
 
-        if ($this->config->get('ups_groups_enabled')) {
-            $mutedFolders = (RerouteOverrideMapper::getInstance())->getMutedFolders();
-            $this->userMapper->setMutedFolders($mutedFolders[RerouteOverride::USER_ID_ALL] ?? []);
-        }
-
         foreach ($externalUsers as $externalUser) {
             // No user id? do nothing
             $externalUserId = $externalUser->getId();

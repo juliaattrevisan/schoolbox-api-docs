@@ -15,6 +15,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
@@ -82,6 +83,7 @@ abstract class AbstractController extends BaseController
      */
     protected $tab = 'resources';
 
+    private ?UserAccessMapper $userAccessMapper = null;
 
     /**
      *
@@ -104,6 +106,20 @@ abstract class AbstractController extends BaseController
         // retrieve folder data
         $folder = $this->getFolder($folderId);
 
+        $groupAccess = null;
+        try {
+            $groupAccessObj = $this->getUserAccessMapper()->findOneByColumnList(
+                [
+                    'uid' => $this->getUser()->getId(),
+                    'sid' => $folderId,
+                    'service' => UserAccess::SERVICE_HOMEPAGE,
+                ]
+            );
+            $groupAccess = $groupAccessObj->getAccessLevel();
+        } catch (Mapper\Exception $e) {
+
+        }
+
         try {
             // attempt to compile an ancestry for this folder, but if it doesn't work, that's ok
             $tree = $folder->getParent() instanceof IFolder ? $this->getBreadcrumbs($folder->getParent()) : [];
@@ -116,6 +132,7 @@ abstract class AbstractController extends BaseController
             'folder'    => $folder,
             'nodeType'  => $this->treeBuilder->getNodeType($folder),
             'access'    => $access,
+            'groupAccess' => $groupAccess,
             'user'      => $this->getUser(),
             'conf'      => $this->conf,
             'namespace' => $this->namespace,
@@ -629,5 +646,16 @@ abstract class AbstractController extends BaseController
     {
         $this->filesystemProxy = $filesystemProxy;
         return $this;
+    }
+
+    /**
+     * @return UserAccessMapper
+     */
+    private function getUserAccessMapper(): UserAccessMapper
+    {
+        if (!$this->userAccessMapper) {
+            $this->userAccessMapper = UserAccessMapper::getInstance();
+        }
+        return $this->userAccessMapper;
     }
 }

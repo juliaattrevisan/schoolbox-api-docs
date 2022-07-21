@@ -173,8 +173,17 @@ export default {
                 } else if (responseData.status === 400) {
                     this.$emit('on-edit-error', responseData.title);
                 } else {
-                    this.group.enrolmentStatus = responseData.enrolmentStatus; //could be either 'enrolled' or 'pending'
-                    this.$emit('on-edit-success', 'Group joined');
+                    this.group.enrolmentStatus = responseData.enrolmentStatus; //could be either 'enroled' or 'pending'
+                    if (this.group.enrolmentStatus === 'enroled') {
+                        this.group.isFavourite = responseData.isFavourite;
+                        this.group.isNotificationsOn = responseData.isNotificationsOn;
+                        if (this.group.isFavourite) {
+                            await addGroupToSideMenu(this.group.name, `/homepage/${this.group.id}/`);
+                        }
+                        this.$emit('on-edit-success', 'Group joined');
+                    } else {
+                        this.$emit('on-edit-success', 'Requested to join group');
+                    }
                 }
             } catch (error) {
                 console.warn(error);
