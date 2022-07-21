@@ -101,6 +101,22 @@ class External_Tass_V53_User extends External_Tass_User
      */
     public function getStudentContactList(array $externalUserIds): array
     {
+        $externalUserIdChunks = array_chunk($externalUserIds, 2000);
+        $results = [];
+        foreach ($externalUserIdChunks as $externalUserIdChunk) {
+            $result = $this->getStudentContactListChunk($externalUserIdChunk);
+            $results = array_merge($results, $result);
+        }
+        return $results;
+    }
+
+    /**
+     *
+     * @param array $externalUserIds
+     * @return array
+     */
+    private function getStudentContactListChunk(array $externalUserIds): array
+    {
         if (empty($externalUserIds)) {
             return [];
         }
