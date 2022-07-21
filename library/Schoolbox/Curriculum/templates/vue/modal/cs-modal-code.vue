@@ -5,7 +5,7 @@
  */
 
 import { computed } from 'vue';
-import { useModalStore } from '../store/csModalStore';
+import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
 
 
 const props = defineProps({
@@ -32,7 +32,7 @@ const props = defineProps({
     },
 });
 
-const modalStore = useModalStore();
+const modalSelectedCodesStore = useModalSelectedCodesStore();
 
 /**
  * to gradually and more paddingLeft to indicate node level depth
@@ -48,7 +48,7 @@ const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.75rem)`);
  * @returns { Boolean }
  */
 const isCodeSelected = computed(() => { 
-    return modalStore.codes.some((code) => props.code.id === code.id);
+    return modalSelectedCodesStore.codes.some((code) => props.code.id === code.id);
 });
 
 /**
@@ -57,9 +57,9 @@ const isCodeSelected = computed(() => {
  */
 function onSelected () {
     if (isCodeSelected.value) {
-        modalStore.removeCode(props.code);
+        modalSelectedCodesStore.remove(props.code);
     } else {
-        modalStore.addCode(props.code);
+        modalSelectedCodesStore.add(props.code);
     }
 }
 

@@ -7,10 +7,12 @@
 import { computed } from 'vue';
 import { useModalStore } from '../store/csModalStore';
 import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
+import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
 
 
 const modalStore = useModalStore();
 const selectedCodesStore = useSelectedCodesStore();
+const modalSelectedCodesStore = useModalSelectedCodesStore();
 
 /**
  * Close the modal
@@ -33,13 +35,7 @@ function onSelected () {
  *
  * @returns { String }
  */
-const saveText = computed(() => {
-    if (selectedCodesStore.hasNoCodes) {
-        return 'Select';
-    } else {
-        return 'Update';
-    }
-});
+const saveText = computed(() => selectedCodesStore.hasNoCodes ? 'Select' : 'Update');
 
 /**
  * If there's no codes currently selected and we haven't selected any
@@ -47,9 +43,7 @@ const saveText = computed(() => {
  *
  * @returns { String }
  */
-const isSaveDisabled = computed(() => {
-    return selectedCodesStore.hasNoCodes && modalStore.hasNoCodes;
-});
+const isSaveDisabled = computed(() => selectedCodesStore.hasNoCodes && modalSelectedCodesStore.hasNoCodes);
 
 </script>
 

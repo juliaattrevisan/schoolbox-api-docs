@@ -5,18 +5,16 @@
  */
 
 import { computed } from 'vue';
-import { useModalStore } from '../store/csModalStore';
-import { useCodesStore } from '../store/csCodesStore';
+import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
 
 
-const modalStore = useModalStore();
-const codesStore = useCodesStore();
+const modalActiveCodesStore = useModalActiveCodesStore();
 
 /**
  * To reset the selectedSecondNodeId when there's a change in the first
  */
 function onFirstNodeChanged () {
-    codesStore.selectedSecondNodeId = 0;
+    modalActiveCodesStore.resetSelectedSecondNode();
 }
 
 /**
@@ -24,13 +22,13 @@ function onFirstNodeChanged () {
  *
  * @returns { Boolean }
  */
-const showSecondNodeSelect = computed(() => codesStore.selectedFirstNodeId !== 0 && codesStore.hasSecondNodes);
+const showSecondNodeSelect = computed(() => modalActiveCodesStore.selectedFirstNodeId !== 0 && modalActiveCodesStore.hasSecondNodes);
 
 /**
  * To reset the selectedThirdNodeId when there's a change in the second
  */
 function onSecondNodeChanged () {
-    codesStore.selectedThirdNodeId = 0;
+    modalActiveCodesStore.resetSelectedThirdNode();
 }
 
 /**
@@ -38,26 +36,26 @@ function onSecondNodeChanged () {
  *
  * @returns { Boolean }
  */
-const showThirdNodeSelect = computed(() => codesStore.selectedSecondNodeId !== 0 && codesStore.hasThirdNodes);
+const showThirdNodeSelect = computed(() => modalActiveCodesStore.selectedSecondNodeId !== 0 && modalActiveCodesStore.hasThirdNodes);
 
 </script>
 
 <template>
    <h2>Select Curriculum Codes</h2>
    <div class="node-selects">
-        <select v-model="codesStore.selectedFirstNodeId" @change="onFirstNodeChanged">
-            <option v-for="node in codesStore.firstNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
+        <select v-model="modalActiveCodesStore.selectedFirstNodeId" @change="onFirstNodeChanged">
+            <option v-for="node in modalActiveCodesStore.firstNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
         </select>
-        <select v-if="showSecondNodeSelect" v-model="codesStore.selectedSecondNodeId" @change="onSecondNodeChanged">
-            <option v-for="node in codesStore.secondNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
+        <select v-if="showSecondNodeSelect" v-model="modalActiveCodesStore.selectedSecondNodeId" @change="onSecondNodeChanged">
+            <option v-for="node in modalActiveCodesStore.secondNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
         </select>
-        <select v-if="showThirdNodeSelect"  v-model="codesStore.selectedThirdNodeId">
-            <option v-for="node in codesStore.thirdNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
+        <select v-if="showThirdNodeSelect"  v-model="modalActiveCodesStore.selectedThirdNodeId">
+            <option v-for="node in modalActiveCodesStore.thirdNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
         </select>
    </div>
    <input
         v-if="true"
-        v-model="modalStore.query"
+        v-model="modalActiveCodesStore.query"
         ref="queryInputEl"
         type="text"
         class="search-input"
