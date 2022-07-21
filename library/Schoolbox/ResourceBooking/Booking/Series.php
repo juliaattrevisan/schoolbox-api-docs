@@ -202,11 +202,20 @@ class Series
     /**
      * Gets a series for update, adjusting their start and end dates.
      *
-     * @param Model    $item
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     * @param array    $relatedItems
-     * @param string   $efficacy
+     * @param Model                            $item         The item whose series should be updated.
+     * @param DateTime                         $startDate    The new start date of the item: the start date of other
+     *                                                       items in the series will be adjusted by the delta between
+     *                                                       the existing and new start date.
+     * @param DateTime                         $endDate      The new end date of the item: the end date of other items
+     *                                                       in the series will be adjusted by the delta between the
+     *                                                       existing and new end date.
+     * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
+     *                                                       notes key in the value contains the notes for the related
+     *                                                       booking.
+     * @param string                           $efficacy     The efficiacy of this update:
+     *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to update the
+     *                                                       entire series, otherwise update only this item.
+     *                                                       (Related bookings are always updated.)
      *
      * @return Collection|Model[]
      * @throws MapperException
@@ -235,11 +244,16 @@ class Series
     /**
      * Gets a series for deletion.
      *
-     * @param Model    $item
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     * @param array    $relatedItems
-     * @param string   $efficacy
+     * @param Model                            $item         The item whose series should be deleted.
+     * @param DateTime                         $startDate    Ignored for this method.
+     * @param DateTime                         $endDate      Ignored for this method.
+     * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
+     *                                                       notes key in the value contains the notes for the related
+     *                                                       booking.
+     * @param string                           $efficacy     The efficiacy of this update:
+     *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to delete the
+     *                                                       entire series, otherwise update only this item.
+     *                                                       (Related bookings are always updated.)
      *
      * @return Collection|Model[]
      * @throws MapperException
@@ -265,14 +279,26 @@ class Series
     }
 
     /**
-     * Gets a series for update, adjusting their start and end dates.
+     * Gets a series for either:
+     * * update, adjusting their start and end dates
+     * * delete
      *
-     * @param Model    $item
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     * @param array    $relatedItems
-     * @param string   $efficacy
-     * @param string   $seriesType
+     * @param Model                            $item         The item whose series should be updated.
+     * @param DateTime                         $startDate    The new start date of the item: the start date of other
+     *                                                       items in the series will be adjusted by the delta between
+     *                                                       the existing and new start date.
+     * @param DateTime                         $endDate      The new end date of the item: the end date of other items
+     *                                                       in the series will be adjusted by the delta between the
+     *                                                       existing and new end date.
+     * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
+     *                                                       notes key in the value contains the notes for the related
+     *                                                       booking.
+     * @param string                           $efficacy     The efficiacy of this update:
+     *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to update the
+     *                                                       entire series, otherwise update only this item.
+     *                                                       (Related bookings are always updated.)
+     * @param string                           $seriesType   Which type of series is requested?
+     *                                                       (`self::SERIES_UPDATED` or `self::SERIES_DELETED`.)
      *
      * @return Collection|Model[]
      * @throws MapperException
