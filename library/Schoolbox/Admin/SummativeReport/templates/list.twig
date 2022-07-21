@@ -54,6 +54,11 @@
                                 </div>
                             </div>
                             <nav>
+                                {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getPreview', {reportId:report.id}) %}
+                                {% if generateRoute %}
+                                    <a class="icon-eye" href="{{ generateRoute }}" title="Preview Report" data-preview></a>
+                                {% endif %}
+
                                 {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getGenerate', {report:report, reportId: report.id}) %}
                                 {% if generateRoute %}
                                 <a class="icon-download" href="{{ generateRoute }}" title="Download"></a>
@@ -109,6 +114,14 @@
                                                             });
                                                     }
                                                 });
+                                            });
+                                        });
+                                        //preview in new window at specific size
+                                        $(function() {
+                                            $('[data-preview]').click(function(event) {
+                                                event.preventDefault();
+
+                                                window.open($(this).attr('href'),'1396330261396','width=950,height=800,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=0,left=0,top=0');
                                             });
                                         });
                                     </script>

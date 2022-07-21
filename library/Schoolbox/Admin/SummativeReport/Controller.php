@@ -14,6 +14,7 @@ use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\CampusMapper;
@@ -914,5 +915,39 @@ class Controller extends ConfigController
             }
         }
         return $feedbacks;
+    }
+
+    /**
+     * if there are reports to generate, send the user to the preview, or just show an error message
+     *
+     * @param Model $report
+     * @throws RouteNotFound
+     * @throws \JsonException
+     */
+    public function getPreview(Model $report)
+    {
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        /* Generate a (warnings, reportConfigs) stack
+         */
+        $reportConfigs = (new Payload\Url(
+            $this->router,
+            $urlBase,
+            $this->termMapper,
+            $this->roleMapper,
+            $this->userBulkMapper,
+            $this->userMapper
+        ))->generate($report);
+
+        $reports = $reportConfigs['reportConfigs'];
+
+        //if report list is empty, display nice error message
+        if (0 === count($reports)) {
+            throw new Exception("There are currently no students in the report list to preview");
+        } else {
+            //if reports exist.
+            //redirect user to report preview
+            $this->getResponse()->redirect->to($reports[0]['url']);
+        }
     }
 }
