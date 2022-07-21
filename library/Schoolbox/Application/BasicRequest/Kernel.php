@@ -45,6 +45,7 @@ use Schoolbox\TaskDaemon\ProducerFactory;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Version\Version;
 use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -146,7 +147,7 @@ class Kernel extends WebKernelAbstract
                 $conf->get('site_version'),
                 $conf->get('site_type'),
                 $conf->get('site_school_code'),
-                $conf->get('site_environment'),
+                $conf->get('site_environment') ?? Version::SITE_ENVIRONMENT_CLIENT_HOSTED,
             );
         }));
 

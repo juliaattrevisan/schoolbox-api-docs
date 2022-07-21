@@ -169,6 +169,7 @@ use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Version\Version;
 use Scrub;
 use SitePage;
 use Symfony\Component\Lock\LockFactory;
@@ -486,7 +487,7 @@ abstract class Kernel
                 $conf->get('site_version'),
                 $conf->get('site_type'),
                 $conf->get('site_school_code'),
-                $conf->get('site_environment'),
+                $conf->get('site_environment') ?? Version::SITE_ENVIRONMENT_CLIENT_HOSTED,
             );
         }));
 
