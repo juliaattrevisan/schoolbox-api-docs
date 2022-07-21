@@ -5,9 +5,11 @@
  */
 
 import { useModalStore } from '../store/csModalStore';
+import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
 
 
 const modalStore = useModalStore();
+const selectedCodesStore = useSelectedCodesStore();
 
 /**
  * Close the modal
@@ -29,7 +31,7 @@ function onSelected () {
 <template>
    <ul class="flex-list buttons">
         <li><button @click.prevent="onCancelled" class="button" :disabled="false">Cancel</button></li>
-        <li><button @click.prevent="onSelected" class="button submit" :disabled="true">Select</button></li>
+        <li><button @click.prevent="onSelected" class="button submit" :disabled="selectedCodesStore.hasNoCodes">Select</button></li>
     </ul>
 </template>
 

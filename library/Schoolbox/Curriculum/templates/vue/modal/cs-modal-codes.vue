@@ -5,10 +5,12 @@
  * From here curriclum codes can be selected 
  */
 
+import { ref } from 'vue';
 import { useCodesStore } from '../store/csCodesStore';
 import CsModalCode from './cs-modal-code.vue'
 
 const codesStore = useCodesStore();
+const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
 
 </script>
 
@@ -18,6 +20,7 @@ const codesStore = useCodesStore();
             v-for="code in codesStore.codes"
             :key="code.id"
             :code="code"
+            :depth="depth"
         />
    </ul>
 </template>
@@ -26,6 +29,7 @@ const codesStore = useCodesStore();
 
 ul {
     list-style: none;
+    margin: 0;
     max-height: 500px; /*restrict the size of the modal, it'll scroll when larger */
     min-height: 500px;
     overflow-y: scroll;

@@ -5,6 +5,8 @@
  */
 
 import { computed } from 'vue';
+import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
+
 
 const props = defineProps({
     /**
@@ -21,7 +23,45 @@ const props = defineProps({
             }
         }
     },
+    /**
+     * to gradually and more paddingLeft to indicate node level depth
+     */
+    depth: {
+        type: Number, 
+        required: true,
+    },
 });
+
+const selectedCodesStore = useSelectedCodesStore();
+
+/**
+ * to gradually and more paddingLeft to indicate node level depth
+ *
+ * @returns { Number }
+ */
+const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.75rem)`);
+
+/**
+ * To determine whether the checkbox is currently selected based on whether it's 
+ * in the selected list
+ *
+ * @returns { Boolean }
+ */
+const isCodeSelected = computed(() => { 
+    return selectedCodesStore.codes.some((code) => props.code.id === code.id);
+});
+
+/**
+ * To determine the display of the checkbox based on whether
+ * the code is currently selected
+ */
+function onSelected () {
+    if (isCodeSelected.value) {
+        selectedCodesStore.remove(props.code);
+    } else {
+        selectedCodesStore.add(props.code);
+    }
+}
 
 /**
  * To determine whether we need to display further child nodes within for this code
@@ -62,45 +102,51 @@ const highlightTitleSearch = computed(() => {
 
 <template>
    <li>
-        <div class="code-container">
+        <button 
+            class="code-button" 
+            :style="{ paddingLeft: paddingLeft }" 
+            @click.prevent="onSelected"
+            @keyup.enter="onSelected"
+        >
             <div class="checklist">
                 <input 
                     :id="`checkbox-${props.code.id}`"
                     type="checkbox"
-                    :checked="false"
+                    :checked="isCodeSelected"
                 />
                 <label :for="`checkbox-${props.code.id}`"></label>
             </div>
             <span v-html="highlightTitleSearch"></span>
-        </div>
+        </button>
         <ul v-if="hasChildren">
             <cs-modal-code
                 v-for="code in props.code.children"
                 :key="props.code.id"
                 :code="code"
+                :depth="props.depth+1"
             />
        </ul>
    </li>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 
-.code-container {
-    /* background: white; */
+.code-button {
+    background: none;
     display: flex;
-    /* font-size: 0.825rem;
+    font-size: 1rem;
     margin: 0;
     padding: 0.5rem 0.75rem;
-    text-align: left;
     transition: background 0.2s;
     width: 100%;
     &:hover {
         background: var(--content-ui-hover);
-    } */
+    } 
 }
 
 ul {
-    list-style: none;
+    list-style: none; //don't use any dots
+    margin: 0; //and spacing is controlled by props.depth
 }
 
 </style>
