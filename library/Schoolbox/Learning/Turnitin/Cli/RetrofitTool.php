@@ -87,9 +87,9 @@ needed, put them into turnitin_report for processing. This occurs mainly when te
 activate Similarity Check after some students have submitted, but not others, and you
 needed to put those -others- into turnitin_report.
 
-The --all flag lets you retrofit *all* previous students' submissions regardless of 
+The --all flag lets you retrofit *all* previous students' submissions regardless of
 the submitted date. This lets you accommodate certain schools who use a single Due Work
-to represent a multi-part assessment which is unconventional for our intended usage. 
+to represent a multi-part assessment which is unconventional for our intended usage.
 
 Otherwise, if you omit --all, it'll just retrofit each student's most recent submission.
 (This is the default behaviour)
@@ -113,11 +113,6 @@ HELP;
         try {
             $lock = $this->acquireLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
-            exit(1);
-        }
-
-        if (!$this->getOpt(self::OPT_LONG_ASSESSMENT_ID)) {
-            $this->getLogger()->info('An assessment id is required.');
             exit(1);
         }
 
