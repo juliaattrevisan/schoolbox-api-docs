@@ -333,7 +333,10 @@ class Series
             );
             $event->setEndDateTime(new Alaress_Date_Format($newEnd));
 
-            $bookingList->add($booking);
+            // Only add this booking if getting the updated series.
+            if ($seriesType === self::SERIES_UPDATED) {
+                $bookingList->add($booking);
+            }
 
             // Set up bookings for related items
             $existingRelatedBookings = $this->getBookingMapper()->findRelatedBookings($booking->getId());
