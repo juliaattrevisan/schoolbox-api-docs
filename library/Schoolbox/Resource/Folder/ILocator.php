@@ -13,7 +13,6 @@ use Schoolbox\Collection;
 
 interface ILocator
 {
-
     /**
      * Return the folder with the given ID
      *
