@@ -197,7 +197,7 @@ class Form
      */
     public function seeTopic(string $topic): self
     {
-        $this->tester->canSee($topic,'div.item');
+        $this->tester->canSee($topic, 'div.item');
         return $this;
     }
     /**
@@ -207,7 +207,6 @@ class Form
     public function fillRoles(array $roles): self
     {
         foreach ($roles as &$role) {
-
             $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
             $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
             $this->tester->waitForText('Roles');
@@ -222,10 +221,8 @@ class Form
             $this->tester->clickWithLeftButton($teacher_element);
             $this->tester->click('button.button.submit');
             sleep(2);
-
         }
         return $this;
-
     }
 
     /**
@@ -248,7 +245,6 @@ class Form
     {
 
         foreach ($campuses as &$campus) {
-
             $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
             $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
             $this->tester->waitForText('Year Levels');
@@ -285,7 +281,6 @@ class Form
     public function fillUsers(array $users): self
     {
         foreach ($users as &$user) {
-
             $this->tester->click('input#audience-search-selectized');
             $user_chars = str_split($user);
             foreach ($user_chars as &$user_char) {
@@ -302,10 +297,41 @@ class Form
      */
     public function seeUsers(array $users): self
     {
-        foreach ($users as &$user)  {
+        foreach ($users as &$user) {
             $this->tester->canSee($user);
         }
         return $this;
+    }
+
+    /**
+     * @param string $audienceType1
+     * @param string $audienceType2
+     * @param string $checkbox1
+     * @param string $checkbox2
+     * @return Form
+     */
+    public function createCompositeAudience(string $audienceType1, string $audienceType2, string $checkbox1, string $checkbox2): self
+    {
+            $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
+            $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
+            $this->tester->waitForText('Roles');
+            $this->tester->click('Create Composite Audience');
+            $this->tester->waitForText("Choose audience types and select the appropriate tickboxes to create a composite audience. E.g. Parents and Students only in the Senior Campus.");
+            $this->tester->selectOption('//*[@id="audience-browse"]/div[3]/div[2]/div[1]/legend/select', $audienceType1);
+            $this->tickCheckboxes($checkbox1);
+            $this->tester->selectOption('//*[@id="audience-browse"]/div[3]/div[2]/div[2]/legend/select', $audienceType2);
+            $this->tickCheckboxes($checkbox2);
+            $this->tester->click('button.button.submit');
+            sleep(2);
+            return $this;
+    }
+
+    /**
+     * tick the checkboxes
+     */
+    public function tickCheckboxes(string $checkbox): void
+    {
+        $this->tester->click('label[for="' . $checkbox . '"]');
     }
 
     /**
