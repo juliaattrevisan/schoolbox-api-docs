@@ -471,6 +471,7 @@ v_most_recent_feedback.review_route = 'instructor' AND
                 $output['capabilities'][$row['capability_id']] = [
                     'id'            => $row['capability_id'],
                     'name'          => $row['capability_name'],
+                    'max_value'     => $row['capability_max_value'],
                     'indicators'    => []
                 ];
             }
