@@ -444,6 +444,24 @@ v_most_recent_feedback.review_route = 'instructor' AND
 
     /**
      * get full rubric template
+     * @param string $assessmentId
+     * @return null|array{
+     *     capabilities: array{
+     *     id: integer,
+     *     name: string,
+     *     maxValue: float,
+     *     indicators: array{
+     *          id: integer,
+     *          name: string,
+     *          maxValue: float,
+     *              descriptors: array{
+     *                  id: integer,
+     *                  description: string,
+     *                  max_value: float
+     *                  }
+     *              }
+     *          }
+     *    }
      */
     public function getRubric(string $assessmentId)
     {
@@ -504,31 +522,6 @@ v_most_recent_feedback.review_route = 'instructor' AND
         }
         $output['capabilities'] = array_values($output['capabilities']);
         return $output;
-        /**
-         * Output format:
-    rubric: {
-        capabilities: {
-            id: 123,
-            name: "Capability 1",
-            indicators: {
-                id: 123,
-                name: "Spelling and Grammar",
-                maxValue: 10.00,
-                descriptors:
-                    {
-                        id: 321,
-                        description: "Grammar and mechanics of sentences is mostly correct.",
-                        max_value: 3
-                    },
-                    {
-                        id: 322,
-                        description: "Basic idea of sentences is understood.",
-                        max_value: 2.0
-                    }
-                }
-            }
-        }
-         */
     }
 
     /**
