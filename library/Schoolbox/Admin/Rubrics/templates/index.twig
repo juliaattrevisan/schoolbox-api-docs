@@ -133,7 +133,7 @@ input.rubric-wide-input
                                 <div data-role="newRubricResult">
                                     <label>
                                         <span class="rubric-value-span" data-role="value">&nbsp;</span>
-                                        <input class="rubric-wide-input nullable"  type="text" name="items[{{ resultSetId }}][{{ currentRubric.value+1|purify }}]" maxlength="64" value="" />
+                                        <input class="rubric-wide-input" type="text" name="items[{{ resultSetId }}][{{ currentRubric.value+1|purify }}]" maxlength="64" value="" />
                                     </label>
                                 </div>
                             </div>
@@ -146,7 +146,7 @@ input.rubric-wide-input
                             <h3>New Set</h3>
                             <div data-role="newRubricResult" data-resultNumber="0">
                                 <label>
-                                    <input class="nullable" type="text" name="items[{{ currentResultSetId }}][0]" maxlength="64" value="" />
+                                    <input type="text" name="items[{{ currentResultSetId }}][0]" maxlength="64" value="" />
                                 </label>
                             </div>
                         </div>
