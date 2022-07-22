@@ -269,9 +269,9 @@ table.rb {
             border-right-width: 1px;
         }
     }
-    ::placeholder { 
-        color: gray; 
-        font-weight: normal; 
+    ::placeholder {
+        color: gray;
+        font-weight: normal;
     }
 }
 .rb-criterion {
@@ -507,4 +507,15 @@ select.letter-grade-select {
     }
 }
 
+// This style applies to the adminv2/rubric-results page.
+span.rubric-value-span {
+    display: inline-block;
+    width: 10px;
+}
 
+// This style applies to the adminv2/rubric-results page.
+input.rubric-wide-input {
+    display: inline-block;
+    margin-left: 10px;
+    width: 95%;
+}
