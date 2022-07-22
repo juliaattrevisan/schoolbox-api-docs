@@ -163,7 +163,7 @@ class Retrofit
 
         $this->turnitinGroupMapper->save($turnitinGroup);
 
-        $this->log->info(sprintf(
+        $this->logInfo(sprintf(
             'Turnitin group %s with submission box id %s was staged for GroupTool crontab with status [%s]',
             $turnitinGroup->getId(),
             $turnitinGroup->getSubmissionBoxId(),
