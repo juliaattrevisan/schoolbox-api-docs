@@ -206,32 +206,15 @@ class CreateAndVerifyCest
         $i->amGoingTo("Fill in form values with composite audience: 4 roles and 2 campuses + team and role");
         $timestamp = time();
         $headline     = "Acceptance Test News Audience Article Testing " . $timestamp;
-//        $article = "<h2>Random Article</h2> <p>Random article text</p>";
-//        $blurb     = "<p>Blurb</p>";
-//        $image     = __DIR__ . '/upload/test.jpg';
-//        $topic     = 'General';
-//        $topicSlug = (new \Url($topic, ''))->getSlug();
-        $roles     = ['Teacher'];
-        $audienceType1     = 'Team';
-        $audienceType2     = 'Year Level';
-        $checkbox1 = 'primary-IjEi';
-        $checkbox2 = 'secondary-Ijki';
-//        $campi     = ['Primary','Secondary'];
-//        $users     = ['Jana Reed','Mario Izzo'];
         $publish   = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
         $expiry    = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
         $formPage
             ->fillHeadline($headline)
-//            ->fillArticle($article)
-//            ->fillBlurb($blurb)
-//            ->fillFeatureImage($image)
-//            ->fillTopic($topic)
-            ->createCompositeAudience($audienceType1, $audienceType2, $checkbox1, $checkbox2);
-//            ->fillCampuses($campi)
-//            ->fillUsers($users)
-//            ->fillPublishDate($publish)
-//            ->fillExpiryDate($expiry);
+            ->createCompositeAudience('Team', 'Year Level', ['primary-IjEi', 'secondary-Ijki']);
         $formPage->seeRoles(['1 Team & 1 Year Level']);
+        $formPage
+            ->createCompositeAudience('Role', 'Campus', ['primary-IjEi','primary-IjIi','primary-Ijci', 'primary-IjQi', 'secondary-IjEi','secondary-IjIi']);
+        $formPage->seeRoles(['2 Campuses & 4 Roles']);
     }
 
 }

@@ -306,11 +306,10 @@ class Form
     /**
      * @param string $audienceType1
      * @param string $audienceType2
-     * @param string $checkbox1
-     * @param string $checkbox2
+     * @param array $checkboxes
      * @return Form
      */
-    public function createCompositeAudience(string $audienceType1, string $audienceType2, string $checkbox1, string $checkbox2): self
+    public function createCompositeAudience(string $audienceType1, string $audienceType2, array $checkboxes): self
     {
             $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
             $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
@@ -318,20 +317,22 @@ class Form
             $this->tester->click('Create Composite Audience');
             $this->tester->waitForText("Choose audience types and select the appropriate tickboxes to create a composite audience. E.g. Parents and Students only in the Senior Campus.");
             $this->tester->selectOption('//*[@id="audience-browse"]/div[3]/div[2]/div[1]/legend/select', $audienceType1);
-            $this->tickCheckboxes($checkbox1);
             $this->tester->selectOption('//*[@id="audience-browse"]/div[3]/div[2]/div[2]/legend/select', $audienceType2);
-            $this->tickCheckboxes($checkbox2);
-            $this->tester->click('button.button.submit');
+            $this->tickCheckboxes($checkboxes);
+            $this->tester->click(Locator::lastElement('button.button.submit'));
             sleep(2);
             return $this;
     }
 
     /**
      * tick the checkboxes
+     * @param array $checkboxes
      */
-    public function tickCheckboxes(string $checkbox): void
+    public function tickCheckboxes(array $checkboxes): void
     {
-        $this->tester->click('label[for="' . $checkbox . '"]');
+        foreach ($checkboxes as &$checkbox) {
+            $this->tester->click('label[for="' . $checkbox . '"]');
+        }
     }
 
     /**
