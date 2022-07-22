@@ -32,6 +32,12 @@ abstract class Base implements IBroker
      */
     public const QUERY_TIMEOUT = 30;
 
+    /**
+     * Number of bind parameter for one query.
+     * This is used for TASS and CISPL custom query
+     */
+    public const MAX_BIND_NUMBER = 1000;
+
     /** @var array $options Connection options */
     protected $options = [];
 

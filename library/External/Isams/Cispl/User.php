@@ -22,9 +22,13 @@ class External_Isams_Cispl_User extends External_Isams_User
             return [];
         }
 
-        $predicate = PredicateBuilder::getArrayBindings($externalUserId, 'studentIds');
+        $results              = [];
+        $externalUserIdChunks = array_chunk($externalUserId, \Alaress\Database\Broker\Base::MAX_BIND_NUMBER);
 
-        $query = "
+        foreach ($externalUserIdChunks as $externalUserIds) {
+            $predicate = PredicateBuilder::getArrayBindings($externalUserIds, 'studentIds');
+
+            $query   = "
             SELECT
                         V_Parent.ParentID             AS StudentContactID,
                         ''                            AS StudentContactTitle,
@@ -54,7 +58,9 @@ class External_Isams_Cispl_User extends External_Isams_User
             JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID
             WHERE       V_Student.StudentID IN ({$predicate['placeholders']})
         ";
-
-        return $this->getConnector()->executeQuery($query, $predicate['bindings'])->fetchAll();
+            $result  = $this->getConnector()->executeQuery($query, $predicate['bindings'])->fetchAll();
+            $results = array_merge($results, $result);
+        }
+        return $results;
     }
 }
