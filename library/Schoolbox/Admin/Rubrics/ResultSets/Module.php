@@ -8,7 +8,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Admin\Rubrics;
+namespace Schoolbox\Admin\Rubrics\ResultSets;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;

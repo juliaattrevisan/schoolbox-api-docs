@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Rubrics;
+namespace Schoolbox\Admin\Rubrics\ResultSet;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;

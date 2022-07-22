@@ -8,11 +8,12 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Admin\Rubrics;
+namespace Schoolbox\Admin\Rubrics\ResultSets;
 
 use Exception;
 use http\Exception\InvalidArgumentException;
 use PDO;
+use Schoolbox\Assessment\Rubric\DataModel\Result\Model;
 use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper
@@ -84,11 +85,11 @@ class Mapper extends BaseMapper
                  * This is the maximum width allowed in our db schema and will cause sentry errors
                  * unless we forcibly ensure that it doesn't exceed the space available
                  */
-                $truncatedLabel = mb_substr($label, 0, \Schoolbox\Assessment\Rubric\DataModel\Result\Model::LABEL_MAXLENGTH, 'UTF-8');
+                $truncatedLabel = mb_substr($label, 0, Model::LABEL_MAXLENGTH, 'UTF-8');
 
                 $stmt->execute(
                     array(
-                       'resultset_id' => $setId + 1, // because SQL begins at 1...
+                       'resultset_id' => $setId + 1, // Because SQL begins at 1...
                        'value'        => $value,
                        'label'        => $truncatedLabel
                     )
