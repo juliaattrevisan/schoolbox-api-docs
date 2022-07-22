@@ -59,7 +59,7 @@ class Mapper extends BaseMapper
      * @return void
      * @throws Exception
      */
-    public function saveRubricResultsFromPostedForm(array $items): void
+    public function saveRubricResults(array $items): void
     {
         $stmt = $this->database->prepare(
             "INSERT INTO rubric_result
@@ -71,12 +71,10 @@ class Mapper extends BaseMapper
             if (!(is_int($setId) && is_array($results) && count($results) > 0)) {
                 continue;
             }
-            // Strip any values that might have been inserted as keys.
-            $results = array_values($results);
 
-            // Do a cursory check that none of the labels are blank.
+            // Avoid saving blank values as that will be confusing for everyone.
             foreach ($results as $lbl) {
-                if ('' === $lbl) {
+                if ('' === trim((string)$lbl)) {
                     throw new InvalidArgumentException("Expected only non-blank labels.  Blank label found.");
                 }
             }

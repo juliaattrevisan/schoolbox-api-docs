@@ -59,7 +59,7 @@ class Controller extends Base
     public function postRubricResults(): void
     {
         if ($this->getRequest()->post->get('action') === 'set') {
-            $this->mapper->saveRubricResultsFromPostedForm($this->getRequest()->post->get('items'));
+            $this->mapper->saveRubricResults($this->getRequest()->post->get('items'));
         }
 
         $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubrics.getRubricResults'));
