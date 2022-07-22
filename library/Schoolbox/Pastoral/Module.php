@@ -128,7 +128,6 @@ class Module extends BaseModule
         // Permissions required to view a students pastoral page
 
         $permissionStudentView = new Rule\Any(
-            $permissionPastoralModerator,
             $permissionStaff,
             $permissionParentOfStudent,
             $permissionStudent,
@@ -141,19 +140,23 @@ class Module extends BaseModule
             $permissionStaff
         );
 
-        $permissionRecordView = new Rule\Any(
-            $permissionPastoralModerator,
-            new Rule\All(
-                $permissionInRecordAudience,
-                new Rule\Any(
-                    $permissionStaff,
-                    $permissionParentOfStudent,
-                    $permissionStudent,
-                ),
+        $permissionRecordView = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                $permissionPastoralModerator,
+                new Rule\All(
+                    $permissionInRecordAudience,
+                    new Rule\Any(
+                        $permissionStaff,
+                        $permissionParentOfStudent,
+                        $permissionStudent,
+                    ),
+                )
             )
         );
 
         $permissionRecordUpdate = new Rule\All(
+            new Rule\IsLoggedIn(),
             new Rule\Any(
                 $permissionPastoralModeratorWrite,
                 $permissionRecordOwner
@@ -161,6 +164,7 @@ class Module extends BaseModule
         );
 
         $permissionRecordDelete = new Rule\All(
+            new Rule\IsLoggedIn(),
             new Rule\Any(
                 $permissionPastoralModeratorModerate,
                 $permissionRecordOwner
@@ -178,20 +182,24 @@ class Module extends BaseModule
 
         $permissionCommentAllowed = new IsCommentAllowed();
 
-        $permissionCommentInsert = new Rule\Any(
+        $permissionCommentInsert =
             new Rule\All(
-                $permissionStaff,
+                new Rule\IsLoggedIn(),
                 new Rule\Any(
-                    $permissionPastoralModeratorWrite,
-                    $permissionInRecordAudience,
-                    $permissionRecordOwner
-                )
-            ),
-            new Rule\All(
-                $permissionInRecordAudience,
-                $permissionCommentAllowed,
-            ),
-        );
+                    new Rule\All(
+                        $permissionStaff,
+                        new Rule\Any(
+                            $permissionPastoralModeratorWrite,
+                            $permissionInRecordAudience,
+                            $permissionRecordOwner
+                        )
+                    ),
+                    new Rule\All(
+                        $permissionInRecordAudience,
+                        $permissionCommentAllowed,
+                    ),
+                ),
+            );
 
         $permissionCommentDelete = new Rule\All(
             $permissionStaff,
@@ -202,13 +210,17 @@ class Module extends BaseModule
             )
         );
 
-        $permissionActionUpdate = new Rule\Any(
-            $permissionPastoralModerator,
+        $permissionActionUpdate =
             new Rule\All(
-                $permissionStaff,
-                $permissionInRecordAudience
-            ),
-        );
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    $permissionPastoralModerator,
+                    new Rule\All(
+                        $permissionStaff,
+                        $permissionInRecordAudience
+                    ),
+                )
+            );
 
         // Define routes and assign permissions to them
 
@@ -216,7 +228,7 @@ class Module extends BaseModule
             [
                 'GET'  => [
                     ''                                                                             => ['getIndex' => $permissionStaff],
-                    '/groups'                                                                      => ['getGroups' => $permissionPastoralModerator],
+                    '/groups'                                                                      => ['getGroups' => $permissionStaff],
                     '/actions'                                                                     => ['getActions' => $permissionStaff],
                     '/search'                                                                      => ['getSearch' => $permissionStaff],
                     '/student/{studentId:\d+}'                                                     => ['getStudent' => $permissionStudentView],
