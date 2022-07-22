@@ -533,6 +533,28 @@ v_most_recent_feedback.review_route = 'instructor' AND
 
     /**
      * get feedback rubric
+     *
+     * @param string $assessmentId
+     * @param int    $feedbackID
+     * @return null|array{
+     *     capabilities: array{
+     *         id: integer,
+     *         name: string,
+     *         mark: float,
+     *         max_value: float,
+     *         human_readable_mark: string,
+     *         indicators: array{
+     *             id: integer,
+     *             name: string,
+     *             maxValue: float,
+     *             descriptors: array{
+     *                 id: integer,
+     *                 description: string,
+     *                 mark: float
+     *                 }
+     *             }
+     *         }
+     *     }
      */
     public function getRubricFeedback(string $assessmentId, int $feedbackID)
     {
@@ -618,27 +640,5 @@ v_most_recent_feedback.review_route = 'instructor' AND
         }
         $output['capabilities'] = array_values($output['capabilities']);
         return $output;
-        /**
-         * Output format:
-        rubric: {
-            "capabilities": {
-                "id": "19",
-                "name": "Grammar",
-                "mark": "2.00000000000",
-                "max_value": "4.00000000000",
-                "human_readable_mark": "50 %",
-                "indicators": {
-                    "id": "37",
-                    "name": "Coherence",
-                    "maxValue": "4.00000000000",
-                    "descriptors": {
-                        "id": "223",
-                        "description": "Grammar and mechanics of sentences is mostly correct.",
-                        "mark": "2.00000000000"
-                    }
-                }
-            }
-        }
-         */
     }
 }
