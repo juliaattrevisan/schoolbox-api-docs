@@ -101,7 +101,7 @@ class External_Tass_V53_User extends External_Tass_User
      */
     public function getStudentContactList(array $externalUserIds): array
     {
-        $externalUserIdChunks = array_chunk($externalUserIds, 2000);
+        $externalUserIdChunks = array_chunk($externalUserIds, \Alaress\Database\Broker\Base::MAX_BIND_NUMBER);
         $results = [];
         foreach ($externalUserIdChunks as $externalUserIdChunk) {
             $result = $this->getStudentContactListChunk($externalUserIdChunk);

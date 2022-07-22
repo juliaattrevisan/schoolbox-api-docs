@@ -23,7 +23,7 @@ class External_Isams_Cispl_User extends External_Isams_User
         }
 
         $results              = [];
-        $externalUserIdChunks = array_chunk($externalUserId, 2000);
+        $externalUserIdChunks = array_chunk($externalUserId, \Alaress\Database\Broker\Base::MAX_BIND_NUMBER);
 
         foreach ($externalUserIdChunks as $externalUserIds) {
             $predicate = PredicateBuilder::getArrayBindings($externalUserIds, 'studentIds');
