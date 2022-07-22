@@ -448,34 +448,16 @@ v_most_recent_feedback.review_route = 'instructor' AND
     public function getRubric(string $assessmentId)
     {
         $statement = $this->mapper->getDatabase()->prepare("
-        select `sb`.`assessment_id`                                AS `assessment_id`,
-           `rc`.`id`                               AS `capability_id`,
-           `rc`.`name`                             AS `capability_name`,
-           `rcu`.`max_value`                       AS `capability_max_value`,
-           `rcu`.`sequence`                        AS `capability_sequence`,
-           `sb`.`rubric_capability_mark_type_id`   AS `capability_mark_type_id`,
-           `sb`.`rubric_capability_grade_group_id` AS `capability_grade_group_id`,
-           `ri`.`id`                               AS `indicator_id`,
-           `ri`.`name`                             AS `indicator_name`,
-           `riu`.`sequence`                        AS `indicator_sequence`,
-           `riu`.`max_value`                       AS `indicator_max_value`,
-           `rd`.`id`                               AS `descriptor_id`,
-           `rd`.`description`                      AS `descriptor_descriptor`,
-           `rd`.`max_value`                        AS `descriptor_max_value`,
-           `rl`.`sequence`                         AS `descriptor_sequence`,
-           `rl`.`name`                             AS `rubric_level`
-        from ((((((`submission_box` `sb`
-            join `rubric_capability_usage` `rcu` on (`sb`.`id` = `rcu`.`submission_box_id`))
-            join `rubric_capability` `rc` on (`rcu`.`rubric_capability_id` = `rc`.`id`))
-            join `rubric_indicator_usage` `riu` on (`sb`.`id` = `riu`.`submission_box_id`))
-            join `rubric_indicator` `ri` on (`riu`.`rubric_indicator_id` = `ri`.`id` and `ri`.`rubric_capability_id` = `rc`.`id`))
-            join `rubric_level` `rl` on (`sb`.`id` = `rl`.`box_id`))
-            JOIN `rubric_descriptor` `rd` on (`rl`.`id` = `rd`.`level_id` and `rd`.`rubric_indicator_id` = `riu`.`rubric_indicator_id`))
-        where `sb`.`use_rubric` is true
-          and `rc`.`deleted_at` is null
-          and `ri`.`deleted_at` is null
-          AND `sb`.`assessment_id` = :assessmentID
-        order by `sb`.`assessment_id`, `rcu`.`sequence`, `rc`.`id`, `riu`.`sequence`, `ri`.`id`
+        SELECT
+            rd.id as `descriptor_id`,
+            rd.max_value as `descriptor_max_value`,
+            rd.description as `descriptor_descriptor`,
+            rl.sequence as `descriptor_sequence`,
+            t.*
+        FROM v_rubric t
+                INNER JOIN rubric_descriptor rd ON t.indicator_id = rd.rubric_indicator_id
+                INNER JOIN rubric_level rl on rd.level_id = rl.id
+        WHERE assessment_id =  :assessmentID
         ");
         $statement->execute(['assessmentID' => $assessmentId]);
         $output = [];
