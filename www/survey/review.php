@@ -213,11 +213,9 @@ if (!$nextSection && !$prevSection) {
      * previous button if applicable
      */
     if ($nextSection) {
-        $this->setVar(
-            array(
-                'NEXT_SECTION_ID' => $nextSection['section_id'],
-            )
-        );
+        $this->setVar([
+            'NEXT_SECTION_ID' => $nextSection['section_id'],
+        ]);
 
         $this->parse('nextSection_block', 'nextSection');
         $this->setVar('endAssess_block', '');
@@ -229,11 +227,9 @@ if (!$nextSection && !$prevSection) {
     /* Conditions where the previous button is available
      */
     if ($prevSection) {
-        $this->setVar(
-            array(
-                'PREV_SECTION_ID' => $prevSection['section_id'],
-            )
-        );
+        $this->setVar([
+            'PREV_SECTION_ID' => $prevSection['section_id'],
+        ]);
 
         $this->parse('prevSection_block', 'prevSection');
     } else {
