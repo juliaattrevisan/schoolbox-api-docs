@@ -603,24 +603,16 @@ v_most_recent_feedback.review_route = 'instructor' AND
                     'id'            => $row['indicator_id'],
                     'name'          => $row['indicator_name'],
                     'maxValue'      => floatval($row['indicator_max_value']),
-                    'descriptors'   => []
-                ];
-            }
-            //indicator should already exist, so lets build the descriptor for that indicator for that capability
-            //indicator should already exist, so lets build the descriptor for that indicator for that capability
-            if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']])) {
-                $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']] = [
-                    'id'            => $row['descriptor_id'],
-                    'description'   => $row['descriptor_name'],
-                    'mark'          => floatval($row['indicator_mark']),
+                    'descriptor'   => [
+                        'id'            => $row['descriptor_id'],
+                        'description'   => $row['descriptor_name'],
+                        'mark'          => floatval($row['indicator_mark'])
+                    ]
                 ];
             }
         }
         //clean the data, remove the numeric array keys
         foreach ($output['capabilities'] as $capKey => $capArr) {
-            foreach ($capArr['indicators'] as $indKey => $indArr) {
-                $output['capabilities'][$capKey]['indicators'][$indKey]['descriptors'] = array_values($indArr['descriptors']);
-            }
             //grab the original array indicators values which above has changed, not the old ones from the foreach loop that have numeric keys
             $output['capabilities'][$capKey]['indicators'] = array_values($output['capabilities'][$capKey]['indicators']);
         }
