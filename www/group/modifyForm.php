@@ -22,7 +22,7 @@ $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 $uaMapper = UserAccessMapper::getInstance();
 $ua = new UserAccess();
 $ua->setService(UserAccess::SERVICE_HOMEPAGE);
-$ua->setFavourite(false);
+$ua->setFavourite(true);
 
 $catMapper = FolderMapper::getInstance();
 $userMapper = UserMapper::getInstance();

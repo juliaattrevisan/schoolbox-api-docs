@@ -1,11 +1,8 @@
 <?php
 
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Notif;
-use Schoolbox\Notif\Notifactory;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Realtime\Schedule\Event\Event;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\Group;
 
@@ -53,7 +50,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
     } catch (Mapper\Exception $e) {
         $ua = new UserAccess();
         $ua->setUser($user)
-            ->setFavourite(false)
+            ->setFavourite(true)
             ->setAccessLevel(UserAccess::ACCESS_DENY)
             ->setService(UserAccess::SERVICE_HOMEPAGE)
             ->setServiceIdentifier($groupId);

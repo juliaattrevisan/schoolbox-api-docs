@@ -2801,11 +2801,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Markbook/SortForCourseMarkbook.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Course/TreeBuilder.php
-
-		-
 			message: "#^Variable \\$userMapper in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Participant/Plan/Mapper.php
@@ -6671,11 +6666,6 @@ parameters:
 			path: library/Schoolbox/Resource/Browser/AbstractController.php
 
 		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/AbstractController.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Resource\\\\File\\\\IFile\\:\\:getTitle\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Browser/AbstractNode.php
@@ -7154,11 +7144,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\Sync\\\\Log\\\\Mapper\\:\\:getStorageMapper\\(\\) should return Schoolbox\\\\Resource\\\\Storage\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Log/Mapper.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findAllGroupsForUser\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Provisioner/UserMapper.php
 
 		-
 			message: "#^Right side of && is always true\\.$#"

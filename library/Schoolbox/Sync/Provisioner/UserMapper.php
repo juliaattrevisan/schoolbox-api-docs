@@ -18,12 +18,6 @@ use Schoolbox\Permission\Access\UserAccess;
 /** @method User findByExternalId($id, $roleType = null) */
 class UserMapper extends SchoolboxMapper
 {
-    /**
-     * muted folder id cache
-     * @var array
-     */
-    private array $mutedFolders = [];
-
     protected function mapping()
     {
         parent::mapping();
@@ -50,7 +44,9 @@ class UserMapper extends SchoolboxMapper
      */
     protected function findAccessList(Schoolbox\User $user)
     {
-        return $this->getJoinMapper('userAccess')->findAllGroupsForUser($user);
+        /** @var UserAccessMapper $userAccessMapper */
+        $userAccessMapper = $this->getJoinMapper('userAccess');
+        return $userAccessMapper->findAllGroupsForUser($user);
     }
 
 
@@ -116,22 +112,13 @@ class UserMapper extends SchoolboxMapper
                                                    ->setUser($user)
                                                    ->setService(UserAccess::SERVICE_HOMEPAGE)
                                                    ->setServiceIdentifier($folderId)
-                                                   ->setFavourite(!in_array($folderId, $this->mutedFolders));
+                                                   ->setFavourite(true);
                 }
 
                 $userAccess->setAccessLevel($accessLevel);
                 $userAccessMapper->save($userAccess);
             }
         }
-    }
-
-    /**
-     * @param array $mutedFolders
-     * @return void
-     */
-    public function setMutedFolders(array $mutedFolders)
-    {
-        $this->mutedFolders = $mutedFolders;
     }
 
     /**
