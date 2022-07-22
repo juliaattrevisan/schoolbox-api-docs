@@ -1,0 +1,160 @@
+<style>
+span.rubric-value-span
+{
+    display: inline-block;
+    width: 10px;
+}
+
+input.rubric-wide-input
+{
+    display: inline-block;
+    margin-left: 10px;
+    width: 95%;
+}
+</style>
+<script type="text/javascript">
+    $(function() {
+        let form = $('form[data-action="saveRubricResults"]');
+
+        form.on('change', '[data-role="rubricSet"] [data-role="newRubricResult"]:last-of-type input', function(e) {
+            let self = $(this);
+            let thisSet = self.closest('[data-role="rubricSet"]');
+            let thisRow = self.closest('[data-role="newRubricResult"]');
+            let newRow = thisRow.clone();
+            let code = thisRow.find('[data-role="value"]');
+            code.html(thisSet.find('[data-role="existingRubricResult"], [data-role="newRubricResult"]').length - 1);
+            newRow.find('input').val('');
+            thisSet.append(newRow);
+            newRow.find(':input:visible:first').focus();
+        });
+
+        form.alaressValidate({
+            submitHandler: function(htmlForm) {
+                let method = form.attr('method');
+                let action = form.attr('action');
+
+                // Mangle together a form.
+                // Go through each set and result, add them to the form data.
+                let currentSet = 0;
+                let formData = {};
+                form.find('[data-role="rubricSet"]').each(function() {
+                    let rubricSet = $(this);
+                    let isSetUsed = false;
+                    let currentResult = 0;
+                    rubricSet.find('[data-role="existingRubricResult"], [data-role="newRubricResult"]').each(function() {
+                        let rubricResult = $(this);
+                        let value        = rubricResult.find('input').val();
+                        if (value.length > 0) {
+                            isSetUsed = true;
+                            if (!(currentSet in formData)) {
+                                formData[currentSet] = {};
+                            }
+                            formData[currentSet][currentResult] = value;
+                            currentResult++;
+                        }
+                    });
+                    if (isSetUsed) {
+                        currentSet++;
+                    }
+                });
+
+                // And "submit" the form data.
+                $.ajax({
+                    async: false,
+                    url: action,
+                    type: method,
+                    data: {
+                        'action': 'set',
+                        'items': formData
+                    }
+                });
+                window.location.reload();
+            }
+        });
+    });
+</script>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <section class="content">
+                <div class="row">
+                    <div class="small-12 columns">
+                        <h3>Creating Rubric Results</h3>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <p>
+                            Edit the rubric result sets here: these are the pre-populated default values that will appear on every rubric.
+                        </p>
+                        <p>
+                            Note that once results have been created, they cannot be removed; they can be renamed, but ensure that if you do
+                            that you rename them to something semantically equivalent, since it will affect all marks already given.
+                        </p>
+                        <p>
+                            Each set should be a discrete list of items of a single measurement;
+                            for example, 'Very Good' and 'Yes' should not be in the same set.
+                        </p>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <p>The first element is always valued zero, and sets must contain at least two elements.</p>
+                        <p>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</p>
+                        <p>New sets cannot be deleted once created.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="small-12 island">
+            <form data-action="saveRubricResults" method="POST" action="{{ routeLookupIfAuthorized('adminRubrics.saveRubricResults') }}">
+                <input type="hidden" name="action" value="set"/>
+
+                <div data-role="rubricList">
+                    {% set currentResultSetId = null %}
+                    {% for resultSetId, rubrics in rubricsByResultSetId %}
+                        <section class="content">
+                            <div data-role="rubricSet" data-setNumber="{{ resultSetId }}">
+                                <h3>Existing Set</h3>
+                                {% set currentRubric = null %}
+                                {% for rubric in rubrics %}
+                                    <div data-role="existingRubricResult" data-resultNumber="{{ rubric.value|purify }}">
+                                        <label>
+                                            <span class="rubric-value-span" data-role="value">{{ rubric.value|purify }}</span>
+                                            <input class="rubric-wide-input" type="text" name="items[{{ rubric.resultset_id }}][{{ rubric.value|purify }}]" value="{{ rubric.label|purify }}" maxlength="64" required />
+                                        </label>
+                                    </div>
+                                    {% set currentRubric = rubric%}
+                                {% endfor %}
+                                <div data-role="newRubricResult">
+                                    <label>
+                                        <span class="rubric-value-span" data-role="value">&nbsp;</span>
+                                        <input class="rubric-wide-input nullable"  type="text" name="items[{{ resultSetId }}][{{ currentRubric.value+1|purify }}]" maxlength="64" value="" />
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
+                        {% set currentResultSetId = resultSetId %}
+                    {% endfor %}
+
+                    <section class="content">
+                        <div data-role="rubricSet" data-setNumber="{{ currentResultSetId }}">
+                            <h3>New Set</h3>
+                            <div data-role="newRubricResult" data-resultNumber="0">
+                                <label>
+                                    <input class="nullable" type="text" name="items[{{ currentResultSetId }}][0]" maxlength="64" value="" />
+                                </label>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <input type="submit" value="Save Changes" />
+            </form>
+        </div>
+    </div>
+</div>

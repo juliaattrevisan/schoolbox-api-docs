@@ -118,5 +118,8 @@ class Admin extends ModuleLoader
 
         // Email DKIM
         $this->loadModule($di, \Schoolbox\Admin\EmailDKIM\Module::class, '/adminv2/email-dkim');
+
+        // Rubrics
+        $this->loadModule($di, \Schoolbox\Admin\Rubrics\Module::class, '/adminv2/rubric-results-v2');
     }
 }
