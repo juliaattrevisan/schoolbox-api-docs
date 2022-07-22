@@ -276,6 +276,17 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
     {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
+        /* If a question was added after the attempt was made by the student,
+         * then $response['response'] might not even exist
+         */
+        if (!$response) {
+            return [
+                'response' => '',
+                'comment' => '',
+                'mark' => ''
+            ];
+        }
+
         $data = unserialize($response['response']);
 
         if (is_array($data)) {
@@ -287,11 +298,11 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         }
 
         /* Append commentary
-            */
+         */
         $data['comment'] = $response['comment'];
 
         /* Append awarded mark
-           */
+         */
         $data['mark'] = $response['mark'];
 
         return $data;
@@ -322,9 +333,14 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
     {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
-        $data = unserialize($response['response']);
+        /* If a question was added after the attempt was made by the student,
+         * then $response['response'] might not even exist; return empty array
+         */
+        if ($response) {
+            return unserialize($response['response']);
+        }
 
-        return $data;
+        return [];
     }
 
     /**
