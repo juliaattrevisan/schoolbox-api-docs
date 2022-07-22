@@ -449,15 +449,15 @@ v_most_recent_feedback.review_route = 'instructor' AND
      *     capabilities: array{
      *     id: integer,
      *     name: string,
-     *     maxValue: float,
+     *     maxValue: float|null,
      *     indicators: array{
      *          id: integer,
      *          name: string,
-     *          maxValue: float,
+     *          maxValue: float|null,
      *              descriptors: array{
      *                  id: integer,
      *                  description: string,
-     *                  max_value: float
+     *                  max_value: float|null
      *                  }
      *              }
      *          }
@@ -533,17 +533,17 @@ v_most_recent_feedback.review_route = 'instructor' AND
      *     capabilities: array{
      *         id: integer,
      *         name: string,
-     *         mark: float,
-     *         max_value: float,
-     *         human_readable_mark: string,
+     *         mark: float|null,
+     *         max_value: float|null,
+     *         human_readable_mark: string|null,
      *         indicators: array{
      *             id: integer,
      *             name: string,
-     *             maxValue: float,
+     *             maxValue: float|null,
      *             descriptors: array{
      *                 id: integer,
      *                 description: string,
-     *                 mark: float
+     *                 mark: float|null
      *                 }
      *             }
      *         }
