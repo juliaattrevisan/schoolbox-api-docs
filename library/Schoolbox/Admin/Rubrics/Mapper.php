@@ -27,14 +27,31 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * This function gets the data directly from the database instead of using mappers and models.
+     * We do this because the base mapper functions do not work with tables with compound primary keys.
+     * (Table result_rubric has a compound primary key on (resultset_id, value)).
      * @return array
      */
-    public function getAllUsingSimpleSelectQuery(): array
+    public function findSets(): array
     {
         $pdoStatement = $this->database->prepare('SELECT * FROM rubric_result');
         $pdoStatement->execute();
 
-        return $pdoStatement->fetchAll(PDO::FETCH_ASSOC);
+        $rows = $pdoStatement->fetchAll(PDO::FETCH_ASSOC);
+
+        // Reformat data into arrays of rubrics indexed by resultSetId.
+        $rubricsByResultSetId = [];
+        foreach ($rows as $row) {
+            $resultSetId = $row['resultset_id'];
+
+            if (!array_key_exists($resultSetId, $rubricsByResultSetId)) {
+                $rubricsByResultSetId[$resultSetId] = [];
+            }
+
+            $rubricsByResultSetId[$resultSetId][] = $row;
+        }
+
+        return $rubricsByResultSetId;
     }
 
     /**

@@ -38,27 +38,12 @@ class Controller extends Base
      */
     public function getRubricResults(): void
     {
-        // NOTE: Mapper->findAll() will not work here because of the compound primary key on rubric_result.
-        $allRubrics = $this->mapper->getAllUsingSimpleSelectQuery();
-
-        // Reformat data into arrays of rubrics indexed by resultSetId.
-        $rubricsByResultSetId = [];
-        foreach ($allRubrics as $rubric) {
-            $resultSetId = $rubric['resultset_id'];
-
-            if (!array_key_exists($resultSetId, $rubricsByResultSetId)) {
-                $rubricsByResultSetId[$resultSetId] = [];
-            }
-
-            $rubricsByResultSetId[$resultSetId][] = $rubric;
-        }
-
         $this->getResponse()->content->set(
             [
                 'template' => '@adminRubrics/index.twig',
                 'data'     => [
                     'pageCurrent'          => $this->router->generate('adminRubrics.getRubricResults'),
-                    'rubricsByResultSetId' => $rubricsByResultSetId,
+                    'rubricsByResultSetId' => $this->mapper->findSets(),
                     'allBreadcrumbs'       => (
                         (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubrics.getRubricResults'))
                     )
