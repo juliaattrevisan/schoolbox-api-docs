@@ -5,7 +5,9 @@
  */
 
 import { computed } from 'vue';
+import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
 import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
+import { escapeRegExp } from '@js/util/jsUtils';
 
 
 const props = defineProps({
@@ -32,6 +34,7 @@ const props = defineProps({
     },
 });
 
+const modalActiveCodesStore = useModalActiveCodesStore();
 const modalSelectedCodesStore = useModalSelectedCodesStore();
 
 /**
@@ -89,8 +92,7 @@ const codeTitle = computed(() => {
  * @returns { HTML }
  */
 const highlightTitleSearch = computed(() => {
-    // return highlightSearchInElement(props.result.name);
-    return codeTitle.value;
+    return highlightSearchInElement(codeTitle.value);
 });
 
 /**
@@ -101,15 +103,15 @@ const highlightTitleSearch = computed(() => {
  *
  * @returns { String } string for v-html with <mark></mark> wrapped around each found result
  */
-// function highlightSearchInElement (toHighlight) {
-//     let highlighted = toHighlight;
-//     props.queryWordList.forEach((wordInSearch) => {
-//         highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^>]*>)`, 'ig'), (match) => {
-//             return `<mark>${match}</mark>`;
-//         });
-//     });
-//     return highlighted;
-// }
+function highlightSearchInElement (toHighlight) {
+    let highlighted = toHighlight;
+    modalActiveCodesStore.queryWordList.forEach((wordInSearch) => {
+        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^>]*>)`, 'ig'), (match) => {
+            return `<mark>${match}</mark>`;
+        });
+    });
+    return highlighted;
+}
 
 </script>
 
