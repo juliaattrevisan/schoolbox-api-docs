@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 interface IArticleResolver
 {
-
     /**
      * Return the set of ids of articles whose audience contains this user
      *

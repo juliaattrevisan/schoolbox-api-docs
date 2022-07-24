@@ -23,7 +23,6 @@ use UnexpectedValueException;
 
 class Controller extends Base
 {
-
     /**
      * @var Mapper
      */
@@ -56,8 +55,7 @@ class Controller extends Base
         News\Mapper $newsMapper,
         News\File\Mapper $fileMapper,
         ArticleResolver $articleResolver
-    )
-    {
+    ) {
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->newsMapper         = $newsMapper;
         $this->fileMapper         = $fileMapper;

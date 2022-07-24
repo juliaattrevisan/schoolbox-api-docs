@@ -3306,11 +3306,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Querystring.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:getMessageById\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/SaveForLater/Module.php
-
-		-
 			message: "#^Left side of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Statistics/Interactions.php

@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class MockArticleResolver implements IArticleResolver
 {
-
     /**
      * @inheritdoc
      */
