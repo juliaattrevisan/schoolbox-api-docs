@@ -13,8 +13,8 @@ namespace Schoolbox\Comms\News\SaveForLater;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Lookup\ReadMore;
-use Schoolbox\Comms\News\ValidHasReadMore;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
@@ -40,6 +40,8 @@ class Controller extends Base
      */
     private News\File\Mapper $fileMapper;
 
+    /** @var ArticleResolver */
+    private ArticleResolver $articleResolver;
 
     /**
      * Controller constructor.
@@ -47,12 +49,19 @@ class Controller extends Base
      * @param Mapper           $saveForLaterMapper
      * @param News\Mapper      $newsMapper
      * @param News\File\Mapper $fileMapper
+     * @param ArticleResolver  $articleResolver
      */
-    public function __construct(Mapper $saveForLaterMapper, News\Mapper $newsMapper, News\File\Mapper $fileMapper)
+    public function __construct(
+        Mapper $saveForLaterMapper,
+        News\Mapper $newsMapper,
+        News\File\Mapper $fileMapper,
+        ArticleResolver $articleResolver
+    )
     {
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->newsMapper         = $newsMapper;
         $this->fileMapper         = $fileMapper;
+        $this->articleResolver    = $articleResolver;
     }
 
 
@@ -66,14 +75,15 @@ class Controller extends Base
      */
     public function getList(): void
     {
-        $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
-        $params = new News\Querystring($this->getRequest()->query);
-        $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
-
+        $articleIds = $this->articleResolver->findArticlesForUser($this->getUser(), News\Model::STATE_PUBLIC, true);
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput($articles->getPropertyValues('id')));
+            $this->getResponse()->content->set($this->buildJsonOutput($articleIds));
             return;
         }
+
+        $params = new News\Querystring($this->getRequest()->query);
+        $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
+        $articles = $this->newsMapper->findByColumn('id', $articleIds);
 
         $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
 

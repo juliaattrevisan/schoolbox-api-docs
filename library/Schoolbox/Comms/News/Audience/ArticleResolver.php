@@ -103,8 +103,8 @@ class ArticleResolver implements IArticleResolver
      * Returns the set of articles whose audience contains the specified user
      *
      * @param User     $user
-     * @param int|null $state If provided, find only IDs of articles in this
-     *                        state
+     * @param int|null $state If provided, find only IDs of articles in this state
+     * @param bool     $savedOnly If true, returns only saved articles
      * @return int[]
      * @throws UnderflowException
      * @throws InvalidColumnException
@@ -112,7 +112,7 @@ class ArticleResolver implements IArticleResolver
      * @throws UnexpectedValueException
      * @throws Database\Exception
      */
-    public function findArticlesForUser(User $user, ?int $state): array
+    public function findArticlesForUser(User $user, ?int $state, bool $savedOnly = false): array
     {
         /* Business Rules + Algorithm:
          * * An articles is targeted to 0:N audience segments.
@@ -160,13 +160,13 @@ class ArticleResolver implements IArticleResolver
         $subQueries = [];
 
         // We always need the simple subquery
-        [$sqlSimple, $params] = $this->generateSimpleSubquery($selfAttributes, $relatedAttributes, $user, $state);
+        [$sqlSimple, $params] = $this->generateSimpleSubquery($selfAttributes, $relatedAttributes, $user, $state, $savedOnly);
         $subQueries[] = $sqlSimple;
 
         // We can avoid the sub-query in the unlikely case the system is configured to not permit targeting
         // to 'self', as that is the implicit relationship modifier of all complex audiences segments.
         if ($selfAttributes->count()) {
-            [$sqlComplex, $paramsComplex] = $this->generateComplexSubquery($selfAttributes, $state);
+            [$sqlComplex, $paramsComplex] = $this->generateComplexSubquery($selfAttributes, $user, $state, $savedOnly);
             $subQueries[] = $sqlComplex;
             $params       = array_merge($params, $paramsComplex);
         }
@@ -275,6 +275,7 @@ class ArticleResolver implements IArticleResolver
      * @param Collection|string[][]|null[][] $relatedAttributes
      * @param User                           $user
      * @param int|null                       $state
+     * @param bool                           $savedOnly
      * @return array
      * @throws InvalidColumnException
      * @throws UnderflowException
@@ -283,7 +284,8 @@ class ArticleResolver implements IArticleResolver
         Collection $selfAttributes,
         Collection $relatedAttributes,
         User $user,
-        ?int $state
+        ?int $state,
+        bool $savedOnly = false
     ): array {
         $audienceAlias = 'simple';
         $articleAlias  = 'simple_article';
@@ -310,9 +312,10 @@ class ArticleResolver implements IArticleResolver
             SELECT     {$articleAlias}.id
             FROM       comms_news_audience {$audienceAlias}
             INNER JOIN comms_news_article {$articleAlias} ON {$audienceAlias}.comms_news_article_id = {$articleAlias}.id
+            {$this->getSavedQuery($articleAlias, $savedOnly)}
             WHERE      {$pb->getWhereIntersect()}
         ";
-        return [$sql, $pb->getParams()];
+        return [$sql, array_merge($pb->getParams(), $this->getSavedParams($user, $savedOnly))];
     }
 
 
@@ -320,12 +323,14 @@ class ArticleResolver implements IArticleResolver
      * Returns a query suitable for matching complex audience segments
      *
      * @param Collection|string[][]|null[][] $selfAttributes
+     * @param User                           $user
      * @param int|null                       $state
+     * @param bool                           $savedOnly
      * @return array
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    private function generateComplexSubquery(Collection $selfAttributes, ?int $state): array
+    private function generateComplexSubquery(Collection $selfAttributes, User $user, ?int $state, bool $savedOnly = false): array
     {
         $audienceAlias = 'complex';
         $articleAlias  = 'complex_article';
@@ -365,10 +370,11 @@ class ArticleResolver implements IArticleResolver
             SELECT     {$articleAlias}.id
             FROM       comms_news_audience_complex {$audienceAlias}
             INNER JOIN comms_news_article {$articleAlias} ON {$audienceAlias}.comms_news_article_id = {$articleAlias}.id
+            {$this->getSavedQuery($articleAlias, $savedOnly)}
             WHERE      {$pb->getWhereIntersect()}
         ";
 
-        return [$sql, $pb->getParams()];
+        return [$sql, array_merge($pb->getParams(), $this->getSavedParams($user, $savedOnly))];
     }
 
 
@@ -605,5 +611,28 @@ class ArticleResolver implements IArticleResolver
             $hydrator,
             'hydrate',
         ], $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+    /**
+     * @param string $articleAlias
+     * @param bool   $savedOnly
+     * @return string
+     */
+    private function getSavedQuery(string $articleAlias, bool $savedOnly): string
+    {
+        return $savedOnly ? " INNER JOIN comms_news_saveforlater
+                          ON comms_news_saveforlater.article_id = {$articleAlias}.id
+                          AND comms_news_saveforlater.deleted_at IS NULL
+                          AND comms_news_saveforlater.user_id = :savedUserId " : '';
+    }
+
+    /**
+     * @param User $user
+     * @param bool $savedOnly
+     * @return array
+     */
+    private function getSavedParams(User $user, bool $savedOnly): array
+    {
+        return $savedOnly ? ['savedUserId' => $user->getId()] : [];
     }
 }

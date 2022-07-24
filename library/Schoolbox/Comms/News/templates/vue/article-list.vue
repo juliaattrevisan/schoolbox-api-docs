@@ -59,13 +59,15 @@
         },
         mounted: function () {
 
-            fetch(this.data.getSavedArticlesRoute, { headers: getHeaders})
-            .then((response) => response.json())
-            .then((data) => {
-                this.savedArticleIds = data;
-            }).catch((error) => {
-                console.warn(error);
-            });
+            if (this.data.getSavedArticlesRoute) {
+                fetch(this.data.getSavedArticlesRoute, {headers: getHeaders})
+                    .then((response) => response.json())
+                    .then((data) => {
+                        this.savedArticleIds = data;
+                    }).catch((error) => {
+                    console.warn(error);
+                });
+            }
 
             // Find some articles
             fetch(this.data.getArticlesRoute)
