@@ -137,12 +137,12 @@ class Module extends BaseModule
         $permissionRecordView = new Rule\Any(
             $permissionPastoralModeratorRead,
             new Rule\All(
-                new IsInAudience(),
                 new Rule\Any(
                     $permissionStaff,
                     $permissionParentOfStudent,
                     $permissionStudent,
                 ),
+                new IsInAudience(),
             )
         );
 
@@ -151,8 +151,8 @@ class Module extends BaseModule
             new Rule\Any(
                 $permissionPastoralModeratorWrite,
                 new Rule\All(
+                    $permissionStaff,
                     new IsOwner(),
-                    $permissionStaff
                 )
             )
         );
@@ -162,8 +162,8 @@ class Module extends BaseModule
             new Rule\Any(
                 $permissionPastoralModeratorModerate,
                 new Rule\All(
-                    new IsOwner(),
-                    $permissionStaff
+                    $permissionStaff,
+                    new IsOwner()
                 )
             )
         );
@@ -196,17 +196,13 @@ class Module extends BaseModule
             )
         );
 
-        $permissionActionUpdate =
+        $permissionActionUpdate = new Rule\Any(
+            $permissionPastoralModeratorRead,
             new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    $permissionPastoralModeratorRead,
-                    new Rule\All(
-                        $permissionStaff,
-                        new IsInAudience()
-                    ),
-                )
-            );
+                $permissionStaff,
+                new IsInAudience()
+            ),
+        );
 
         // Define routes and assign permissions to them
 
