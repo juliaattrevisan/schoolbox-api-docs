@@ -29,13 +29,13 @@
                 <section>
                     <ul class="information-list">
                         {% for report in reports %}
-                        {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getGenerate', {report:report, reportId: report.id}) %}
+                        {% set updateRoute = routeLookupIfAuthorized('adminSummativeReport.getUpdate', {reportId: report.id}) %}
 
                         <li class="actions-small-5">
                             <div class="list-item">
                                 <div class="card small-12">
-                                    {% if generateRoute %}
-                                        <a href="{{ generateRoute }}">
+                                    {% if updateRoute %}
+                                        <a href="{{ updateRoute }}">
                                             <h3>{{ report.title }}</h3>
                                         </a>
                                         {% else %}
