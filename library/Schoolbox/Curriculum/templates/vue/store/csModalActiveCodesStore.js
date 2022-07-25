@@ -179,6 +179,28 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
+         * 
+         * 
+         * @return { Boolean }
+         */
+        isSearchActive () {
+            return this.query.length > MIN_QUERY_LENGTH;
+        },
+
+        /**
+         * no children descendents, all put in an array one level deep
+         * 
+         * @returns { Array } 
+         */
+        nodesFlattened () {
+            if (this.isSearchActive) {
+                return splitChildrenToArray(this.codes[0]);
+            } else {
+                return [];
+            }
+        },
+
+        /**
          * the classes found relevant to the search input, capped to the maximum 
          * amount of results to be shown
          * 
@@ -250,6 +272,22 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         name: '-',
         children: [], 
     }
+}
+
+/**
+ * 
+ * 
+ * @param { Object }
+ */
+function splitChildrenToArray (obj) {
+    let array = [obj];
+    if (obj.children && obj.children.length > 0) {
+        obj.children.forEach((child) => {
+            array = [...array, ...splitChildrenToArray(child)];
+        });
+        obj.children = []; 
+    }
+    return array;
 }
 
 /**
