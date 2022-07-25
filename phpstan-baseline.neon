@@ -4161,11 +4161,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Profile/Profile.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Timetable/Definition.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Importer\\\\User\\:\\:parseStringBoolean\\(\\) should return bool but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Importer/User.php
