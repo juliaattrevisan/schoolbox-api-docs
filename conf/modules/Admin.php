@@ -121,6 +121,6 @@ class Admin extends ModuleLoader
 
         // Rubrics
         $this->loadModule($di, \Schoolbox\Admin\Rubrics\ResultSets\Module::class, '/adminv2/rubric-results');
-        $this->loadModule($di, \Schoolbox\Admin\Rubrics\ResultSet\Module::class, '/adminv2/rubric-results/todoReplaceWithResultSetId');
+        $this->loadModule($di, \Schoolbox\Admin\Rubrics\ResultSet\Module::class, '/adminv2/rubric-results/{resultSetId}');
     }
 }

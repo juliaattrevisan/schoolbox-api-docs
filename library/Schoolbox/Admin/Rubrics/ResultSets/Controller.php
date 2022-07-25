@@ -36,16 +36,16 @@ class Controller extends Base
      * Load templates/index.twig using data obtained in this function.
      * @throws RouteNotFound
      */
-    public function getRubricResults(): void
+    public function getRubricResultSets(): void
     {
         $this->getResponse()->content->set(
             [
                 'template' => '@adminRubrics/index.twig',
                 'data'     => [
-                    'pageCurrent'          => $this->router->generate('adminRubrics.getRubricResults'),
+                    'pageCurrent'          => $this->router->generate('adminRubrics.getRubricResultSets'),
                     'rubricsByResultSetId' => $this->mapper->findSets(),
                     'allBreadcrumbs'       => (
-                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubrics.getRubricResults'))
+                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubrics.getRubricResultSets'))
                     )
                 ]
             ]
@@ -53,15 +53,11 @@ class Controller extends Base
     }
 
     /**
-     * Save $_POSTed data to database, then redirect to getRubricResults().
-     * @throws Exception
+     * Delete the result set defined by $resultSetId.
      */
-    public function postRubricResults(): void
+    public function deleteRubricResultSet($resultSetId): void
     {
-        if ($this->getRequest()->post->get('action') === 'set') {
-            $this->mapper->saveRubricResults($this->getRequest()->post->get('items'));
-        }
-
-        $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubrics.getRubricResults'));
+        $this->mapper->deleteRubricResultSet((int)$resultSetId);
+        $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubrics.getRubricResultSets'));
     }
 }
