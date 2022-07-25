@@ -58,7 +58,7 @@ class UserFeed
     {
         return array_unique(
             array_merge(
-                $this->articleResolver->findArticlesForUser($user, $state),
+                $this->articleResolver->findArticlesForUser($user, $state, false),
                 $this->newsMapper->findAuthoredOrAcceptedArticleIds($user, $state)
             )
         );

@@ -112,7 +112,7 @@ class ArticleResolver implements IArticleResolver
      * @throws UnexpectedValueException
      * @throws Database\Exception
      */
-    public function findArticlesForUser(User $user, ?int $state, bool $savedOnly = false): array
+    public function findArticlesForUser(User $user, ?int $state, bool $savedOnly): array
     {
         /* Business Rules + Algorithm:
          * * An articles is targeted to 0:N audience segments.

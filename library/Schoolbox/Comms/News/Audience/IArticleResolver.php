@@ -22,7 +22,7 @@ interface IArticleResolver
      * @param bool     $savedOnly If true, returns only saved articles
      * @return int[]
      */
-    public function findArticlesForUser(User $user, ?int $state, bool $savedOnly = false): array;
+    public function findArticlesForUser(User $user, ?int $state, bool $savedOnly): array;
 
 
     /**
