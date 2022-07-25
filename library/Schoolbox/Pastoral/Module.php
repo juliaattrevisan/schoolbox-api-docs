@@ -60,8 +60,11 @@ class Module extends BaseModule
 
         $permissionPastoralModeratorModerate = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL);
         $permissionPastoralModeratorWrite    = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
-        $permissionPastoralModerator         = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ);
-
+        $permissionPastoralModerator =
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ),
+            );
         $permissionStaff =
             new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -128,6 +131,7 @@ class Module extends BaseModule
         // Permissions required to view a students pastoral page
 
         $permissionStudentView = new Rule\Any(
+            $permissionPastoralModerator,
             $permissionStaff,
             $permissionParentOfStudent,
             $permissionStudent,
@@ -140,18 +144,15 @@ class Module extends BaseModule
             $permissionStaff
         );
 
-        $permissionRecordView = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                $permissionPastoralModerator,
-                new Rule\All(
-                    $permissionInRecordAudience,
-                    new Rule\Any(
-                        $permissionStaff,
-                        $permissionParentOfStudent,
-                        $permissionStudent,
-                    ),
-                )
+        $permissionRecordView = new Rule\Any(
+            $permissionPastoralModerator,
+            new Rule\All(
+                $permissionInRecordAudience,
+                new Rule\Any(
+                    $permissionStaff,
+                    $permissionParentOfStudent,
+                    $permissionStudent,
+                ),
             )
         );
 
@@ -228,7 +229,7 @@ class Module extends BaseModule
             [
                 'GET'  => [
                     ''                                                                             => ['getIndex' => $permissionStaff],
-                    '/groups'                                                                      => ['getGroups' => $permissionStaff],
+                    '/groups'                                                                      => ['getGroups' => $permissionPastoralModerator],
                     '/actions'                                                                     => ['getActions' => $permissionStaff],
                     '/search'                                                                      => ['getSearch' => $permissionStaff],
                     '/student/{studentId:\d+}'                                                     => ['getStudent' => $permissionStudentView],
