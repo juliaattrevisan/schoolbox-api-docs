@@ -915,8 +915,8 @@
             var groupRow = $(this).closest('[data-group]');
 
             $(this).confirmDialog({
-                text: 'Are you sure you want to delete this group?',
-                confirmLabel: 'Delete',
+                text: 'Are you sure you want to remove the user from this group?',
+                confirmLabel: 'Remove User',
                 confirmEvent: function () {
                     $.post('{{ routeLookup('adminUser.postDeleteGroup', {userId: user.id, folderId: 'folderId'}) }}'.replace(/folderId/g, folderId)).done(function() {
                         groupRow.remove();
