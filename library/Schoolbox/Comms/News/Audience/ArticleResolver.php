@@ -285,7 +285,7 @@ class ArticleResolver implements IArticleResolver
         Collection $relatedAttributes,
         User $user,
         ?int $state,
-        bool $savedOnly = false
+        bool $savedOnly
     ): array {
         $audienceAlias = 'simple';
         $articleAlias  = 'simple_article';
@@ -331,7 +331,7 @@ class ArticleResolver implements IArticleResolver
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    private function generateComplexSubquery(Collection $selfAttributes, User $user, ?int $state, bool $savedOnly = false): array
+    private function generateComplexSubquery(Collection $selfAttributes, User $user, ?int $state, bool $savedOnly): array
     {
         $audienceAlias = 'complex';
         $articleAlias  = 'complex_article';

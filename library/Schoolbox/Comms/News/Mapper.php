@@ -536,19 +536,19 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $joinSaved = SaveForLater\Mapper::getSavedJoin($this->getTable(), $savedOnly);
         $select    = "SELECT `{$this->getTable()}`.id FROM `{$this->getTable()}` {$joinSaved} ";
 
-        $pb    = isset($state)
+        $pb = isset($state)
             ? $this->getPredicateForState($state)
             : $this->getPredicateBuilder();
+        $pb->isNull('deleted_at');
         $pb    = $pb->all(
             $this->getPredicateBuilder()->any(
                 $this->getPredicateBuilder()
                      ->equals('author_id', $user->getId())
                      ->equals('accepted_by', $user->getId())
-                     ->isNull('deleted_at')
             )
         );
         $query = $select . ' WHERE ' . implode(' AND ', $pb->getWhere());
-        $ids = $this->database->query($query, array_merge($pb->getParams(), SaveForLater\Mapper::getSavedJoinParams($user, $savedOnly)))->fetchAll(\PDO::FETCH_COLUMN) ?: [];
+        $ids   = $this->database->query($query, array_merge($pb->getParams(), SaveForLater\Mapper::getSavedJoinParams($user, $savedOnly)))->fetchAll(\PDO::FETCH_COLUMN) ?: [];
         return array_map('intval', $ids);
     }
 
