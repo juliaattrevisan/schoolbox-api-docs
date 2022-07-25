@@ -29,7 +29,6 @@ use const PHP_URL_SCHEME;
 
 class Controller extends Base
 {
-
     /** @var News\Mapper */
     private $newsMapper;
 
