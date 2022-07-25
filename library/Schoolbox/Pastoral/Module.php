@@ -60,7 +60,11 @@ class Module extends BaseModule
 
         $permissionPastoralModeratorModerate = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL);
         $permissionPastoralModeratorWrite    = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
-        $permissionPastoralModerator         = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ);
+        $permissionPastoralModeratorRead     =
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ),
+            );
 
         $permissionStaff =
             new Rule\All(
@@ -69,7 +73,7 @@ class Module extends BaseModule
                     new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF),
                     new Rule\All(
                         new Rule\HasRole(Role::STAFF),
-                        $permissionPastoralModerator
+                        $permissionPastoralModeratorRead
                     )
                 )
             );
@@ -121,92 +125,82 @@ class Module extends BaseModule
             }
         );
 
-        // User is in the audience of the pastoral record
-
-        $permissionInRecordAudience = new IsInAudience();
-
         // Permissions required to view a students pastoral page
-
         $permissionStudentView = new Rule\Any(
-            $permissionPastoralModerator,
+            $permissionPastoralModeratorRead,
             $permissionStaff,
             $permissionParentOfStudent,
             $permissionStudent,
         );
 
         // Permissions required to view/update/delete a pastoral record (any staff member can insert)
-
-        $permissionRecordOwner = new Rule\All(
-            new IsOwner(),
-            $permissionStaff
-        );
-
         $permissionRecordView = new Rule\Any(
-            $permissionPastoralModerator,
+            $permissionPastoralModeratorRead,
             new Rule\All(
-                $permissionInRecordAudience,
                 new Rule\Any(
                     $permissionStaff,
                     $permissionParentOfStudent,
                     $permissionStudent,
                 ),
+                new IsInAudience(),
             )
         );
 
         $permissionRecordUpdate = new Rule\All(
+            new Rule\IsLoggedIn(),
             new Rule\Any(
                 $permissionPastoralModeratorWrite,
-                $permissionRecordOwner
+                new Rule\All(
+                    $permissionStaff,
+                    new IsOwner(),
+                )
             )
         );
 
         $permissionRecordDelete = new Rule\All(
+            new Rule\IsLoggedIn(),
             new Rule\Any(
                 $permissionPastoralModeratorModerate,
-                $permissionRecordOwner
+                new Rule\All(
+                    $permissionStaff,
+                    new IsOwner()
+                )
             )
         );
 
-        $permissionAttachmentView = $permissionRecordView;
-
-        // Permissions required to insert/delete a pastoral comment
-
-        $permissionCommentOwner = new Rule\All(
-            new IsCommentOwner(),
-            $permissionStaff
-        );
-
-        $permissionCommentAllowed = new IsCommentAllowed();
-
-        $permissionCommentInsert = new Rule\Any(
+        $permissionCommentInsert =
             new Rule\All(
-                $permissionStaff,
+                new Rule\IsLoggedIn(),
                 new Rule\Any(
-                    $permissionPastoralModeratorWrite,
-                    $permissionInRecordAudience,
-                    $permissionRecordOwner
-                )
-            ),
-            new Rule\All(
-                $permissionInRecordAudience,
-                $permissionCommentAllowed,
-            ),
-        );
+                    new Rule\All(
+                        $permissionStaff,
+                        new Rule\Any(
+                            $permissionPastoralModeratorWrite,
+                            new IsInAudience(),
+                            new IsOwner(),
+                        )
+                    ),
+                    new Rule\All(
+                        new IsInAudience(),
+                        new IsCommentAllowed(),
+                    ),
+                ),
+            );
 
         $permissionCommentDelete = new Rule\All(
             $permissionStaff,
             new Rule\Any(
                 $permissionPastoralModeratorWrite,
-                $permissionCommentOwner,
-                $permissionRecordOwner
+                new IsCommentOwner(),
+                new IsOwner(),
             )
         );
 
         $permissionActionUpdate = new Rule\Any(
-            $permissionPastoralModerator,
+            $permissionPastoralModeratorRead,
             new Rule\All(
                 $permissionStaff,
-                $permissionInRecordAudience
+                new IsInAudience()
             ),
         );
 
@@ -216,14 +210,14 @@ class Module extends BaseModule
             [
                 'GET'  => [
                     ''                                                                             => ['getIndex' => $permissionStaff],
-                    '/groups'                                                                      => ['getGroups' => $permissionPastoralModerator],
+                    '/groups'                                                                      => ['getGroups' => $permissionPastoralModeratorRead],
                     '/actions'                                                                     => ['getActions' => $permissionStaff],
                     '/search'                                                                      => ['getSearch' => $permissionStaff],
                     '/student/{studentId:\d+}'                                                     => ['getStudent' => $permissionStudentView],
                     '/students/count/{studentIds:[\d\x2c]+}'                                       => ['getStudentsCount' => $permissionStudentView],
                     '/student/{studentId:\d+}/record/{recordId:\d+}'                               => ['getStudentRecord' => $permissionRecordView],
                     '/student/{studentId:\d+}/linked/{linkedStudentId:\d+}'                        => ['getLinked' => $permissionStudentView],
-                    '/student/{studentId:\d+}/record/{recordId:\d+}/attachment/{attachmentId:\d+}' => ['getStudentRecordAttachment' => $permissionAttachmentView],
+                    '/student/{studentId:\d+}/record/{recordId:\d+}/attachment/{attachmentId:\d+}' => ['getStudentRecordAttachment' => $permissionRecordView],
                     '/student/{studentId:\d+}/record/insert'                                       => ['getStudentRecordInsertForm' => $permissionStaff],
                     '/student/{studentId:\d+}/record/{recordId:\d+}/update'                        => ['getStudentRecordUpdateForm' => $permissionRecordUpdate],
                 ],
