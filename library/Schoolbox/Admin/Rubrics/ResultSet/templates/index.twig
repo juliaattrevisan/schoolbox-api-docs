@@ -1,65 +1,97 @@
-<script type="text/javascript">
-    $(function() {
-        let form = $('form[data-action="saveRubricResults"]');
+<style>
+    span.result-set-comma-separated-container
+    {
+        display: inline-block;
+        width: 90%;
+    }
 
-        form.on('change', '[data-role="rubricSet"] [data-role="newRubricResult"]:last-of-type input', function(e) {
-            let self = $(this);
-            let thisSet = self.closest('[data-role="rubricSet"]');
-            let thisRow = self.closest('[data-role="newRubricResult"]');
-            let newRow = thisRow.clone();
-            let code = thisRow.find('[data-role="value"]');
-            code.html(thisSet.find('[data-role="existingRubricResult"], [data-role="newRubricResult"]').length - 1);
-            newRow.find('input').val('');
-            thisSet.append(newRow);
-            newRow.find(':input:visible:first').focus();
-        });
+    div#plusButtonContainerDiv
+    {
+        text-align: right;
+    }
+</style>
+<script>
+/**
+ * When the plus button is clicked, we add a new row to the form.
+ */
+function onClickPlusButton()
+{
+    let rowsContainerDiv = document.getElementById('rowsContainerDiv');
+    let newRowValue      = getHighestRowNumberOnPage(true) + 1;
+    let newRowHtml       = (
+        "<div id='new-row-div-" + newRowValue + "' data-role='newRow'>" +
+            "<label>" +
+                "<span class='rubric-value-span' data-role='newRowValue'>" + newRowValue + "</span> " + // Whitespace at end of line is important.
+                "<input type='hidden' name='new-row-" + newRowValue + "-value' value='" + newRowValue + "'/>" +
+                "<input class='rubric-wide-input' type='text' name='new-row-" + newRowValue + "-label' maxlength='64' value=''/> " + // Whitespace at end of line is important.
+                "<a onclick='onClickDeleteNewRow(" + newRowValue + ")'>Delete</a>" +
+            "</label>" +
+        "</div>"
+    );
 
-        form.alaressValidate({
-            submitHandler: function(htmlForm) {
-                let method = form.attr('method');
-                let action = form.attr('action');
+    rowsContainerDiv.innerHTML += newRowHtml;
+}
 
-                // Mangle together a form.
-                // Go through each set and result, add them to the form data.
-                let currentSet = 0;
-                let formData = {};
-                form.find('[data-role="rubricSet"]').each(function() {
-                    let rubricSet = $(this);
-                    let isSetUsed = false;
-                    let currentResult = 0;
-                    rubricSet.find('[data-role="existingRubricResult"], [data-role="newRubricResult"]').each(function() {
-                        let rubricResult = $(this);
-                        let value        = rubricResult.find('input').val();
-                        if (value.length > 0) {
-                            isSetUsed = true;
-                            if (!(currentSet in formData)) {
-                                formData[currentSet] = {};
-                            }
-                            formData[currentSet][currentResult] = value;
-                            currentResult++;
-                        }
-                    });
-                    if (isSetUsed) {
-                        currentSet++;
-                    }
-                });
+/**
+ * When the delete button is clicked on a new row, we remove the new row from the form.
+ * We also must update the numbers on the left of the new form rows so there are no gaps.
+ */
+function onClickDeleteNewRow(newRowValue)
+{
+    let newRowDiv = document.getElementById('new-row-div-' + newRowValue);
+    newRowDiv.remove();
 
-                // And "submit" the form data.
-                $.ajax({
-                    async: false,
-                    url: action,
-                    type: method,
-                    data: {
-                        'action': 'set',
-                        'items': formData
-                    }
-                });
-                window.location.reload();
-            }
-        });
-    });
+    renumberNewRows();
+}
+
+/**
+ * Find the highest number from the non-new rows, then update the numbers on the new rows
+ * so that the number of each row is one more than the number on the row directly above.
+ */
+function renumberNewRows()
+{
+    let maxValue = getHighestRowNumberOnPage(false);
+    let spans    = document.getElementsByClassName('rubric-value-span');
+
+    for (let i = 0; i < spans.length; ++i) {
+        let span = spans[i];
+
+        if (span.getAttribute('data-role') != 'newRowValue') {
+            continue;
+        }
+
+        span.innerHTML = ++maxValue;
+    }
+}
+
+/**
+ * Find the highest number from all rows on the page.
+ *
+ * @param boolIncludeNewRows
+ *    Set to false to exclude the new-row numbers.
+ */
+function getHighestRowNumberOnPage(boolIncludeNewRows)
+{
+    let spans    = document.getElementsByClassName('rubric-value-span');
+    let maxValue = 0;
+
+    for (let i = 0; i < spans.length; ++i) {
+        let span = spans[i];
+
+        if (!boolIncludeNewRows && span.getAttribute('data-role') == 'newRowValue') {
+            continue;
+        }
+
+        let spanValue = Number(span.innerHTML);
+
+            if (spanValue > maxValue) {
+            maxValue = spanValue;
+        }
+    }
+
+    return maxValue;
+}
 </script>
-
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -75,72 +107,43 @@
                     <div class="small-12 columns">
                         <h3>Creating Rubric Results</h3>
                     </div>
-                    <div class="small-12 large-6 columns">
+                    <div class="small-12 large-12 columns">
                         <p>
-                            Edit the rubric result sets here: these are the pre-populated default values that will appear on every rubric.
-                        </p>
-                        <p>
-                            Note that once results have been created, they cannot be removed; they can be renamed, but ensure that if you do
-                            that you rename them to something semantically equivalent, since it will affect all marks already given.
+                            Edit the rubric result set here.  These are the pre-populated default values that will appear when creating a rubric.
                         </p>
                         <p>
                             Each set should be a discrete list of items of a single measurement;
                             for example, 'Very Good' and 'Yes' should not be in the same set.
                         </p>
-                    </div>
-                    <div class="small-12 large-6 columns">
                         <p>The first element is always valued zero, and sets must contain at least two elements.</p>
-                        <p>Type into empty fields to add result elements; if you wish to remove a newly created element, just leave it blank.</p>
-                        <p>New sets cannot be deleted once created.</p>
                     </div>
                 </div>
             </section>
         </div>
         <div class="small-12 island">
-            <form data-action="saveRubricResults" method="POST" action="{{ routeLookupIfAuthorized('adminRubrics.saveRubricResults') }}">
-                <input type="hidden" name="action" value="set"/>
+<!--            <form data-action="saveRubricResultRows" method="POST" action="{{ routeLookupIfAuthorized('adminRubric.saveRubricResults') }}">-->
+                <input type="hidden" name="resultSetId" value="{{ resultSetId }}"/>
 
-                <div data-role="rubricList">
-                    {% set currentResultSetId = null %}
-                    {% for resultSetId, rubrics in rubricsByResultSetId %}
-                        <section class="content">
-                            <div data-role="rubricSet" data-setNumber="{{ resultSetId }}">
-                                <h3>Existing Set</h3>
-                                {% set currentRubric = null %}
-                                {% for rubric in rubrics %}
-                                    <div data-role="existingRubricResult" data-resultNumber="{{ rubric.value|purify }}">
-                                        <label>
-                                            <span class="rubric-value-span" data-role="value">{{ rubric.value|purify }}</span>
-                                            <input class="rubric-wide-input" type="text" name="items[{{ rubric.resultset_id }}][{{ rubric.value|purify }}]" value="{{ rubric.label|purify }}" maxlength="64" required />
-                                        </label>
-                                    </div>
-                                    {% set currentRubric = rubric%}
-                                {% endfor %}
-                                <div data-role="newRubricResult">
-                                    <label>
-                                        <span class="rubric-value-span" data-role="value">&nbsp;</span>
-                                        <input class="rubric-wide-input" type="text" name="items[{{ resultSetId }}][{{ currentRubric.value+1|purify }}]" maxlength="64" value="" />
-                                    </label>
-                                </div>
-                            </div>
-                        </section>
-                        {% set currentResultSetId = resultSetId %}
-                    {% endfor %}
-
-                    <section class="content">
-                        <div data-role="rubricSet" data-setNumber="{{ currentResultSetId }}">
-                            <h3>New Set</h3>
-                            <div data-role="newRubricResult" data-resultNumber="0">
-                                <label>
-                                    <input type="text" name="items[{{ currentResultSetId }}][0]" maxlength="64" value="" />
-                                </label>
-                            </div>
+                <div id="rowsContainerDiv">
+                    <h3>Existing Set</h3>
+                    {% set currentRow = null %}
+                    {% for row in rubricResultRows %}
+                        <div data-role="existingRubricResult" data-resultNumber="{{ row.value|purify }}">
+                            <label>
+                                <span class="rubric-value-span" data-role="value">{{ row.value|purify }}</span>
+                                <input class="rubric-wide-input" type="text" name="items[{{ row.resultset_id }}][{{ row.value|purify }}]" value="{{ row.label|purify }}" maxlength="64" required />
+                                <a href="/adminv2/rubric-results/{{ resultSetId }}/delete">Delete</a>
+                            </label>
                         </div>
-                    </section>
+                        {% set currentRow = row%}
+                    {% endfor %}
+                </div>
+                <div id="plusButtonContainerDiv">
+                    <button onclick="onClickPlusButton()">+</button>
                 </div>
 
-                <input type="submit" value="Save Changes" />
-            </form>
+            <input type="submit" value="Save Changes" />
+<!--            </form>-->
         </div>
     </div>
 </div>

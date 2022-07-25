@@ -36,16 +36,17 @@ class Controller extends Base
      * Load templates/index.twig using data obtained in this function.
      * @throws RouteNotFound
      */
-    public function getRubricResults(): void
+    public function getRubricResults($resultSetId): void
     {
         $this->getResponse()->content->set(
             [
-                'template' => '@adminRubrics/index.twig',
+                'template' => '@adminRubric/index.twig',
                 'data'     => [
-                    'pageCurrent'          => $this->router->generate('adminRubrics.getRubricResults'),
-                    'rubricsByResultSetId' => $this->mapper->findSets(),
-                    'allBreadcrumbs'       => (
-                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubrics.getRubricResults'))
+                    'pageCurrent'      => $this->router->generate('adminRubric.getRubricResults'),
+                    'resultSetId'      => $resultSetId,
+                    'rubricResultRows' => $this->mapper->findRubricResultRows((int)$resultSetId),
+                    'allBreadcrumbs'   => (
+                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubric.getRubricResults'))
                     )
                 ]
             ]
@@ -59,9 +60,9 @@ class Controller extends Base
     public function postRubricResults(): void
     {
         if ($this->getRequest()->post->get('action') === 'set') {
-            $this->mapper->saveRubricResults($this->getRequest()->post->get('items'));
+            $this->mapper->saveRubricResultRows($this->getRequest()->post->get('items'));
         }
 
-        $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubrics.getRubricResults'));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubric.getRubricResults'));
     }
 }

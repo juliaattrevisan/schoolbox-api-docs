@@ -31,28 +31,15 @@ class Mapper extends BaseMapper
      * This function gets the data directly from the database instead of using mappers and models.
      * We do this because the base mapper functions do not work with tables with compound primary keys.
      * (Table result_rubric has a compound primary key on (resultset_id, value)).
+     * @param int $resultSetId
      * @return array
      */
-    public function findSets(): array
+    public function findRubricResultRows(int $resultSetId): array
     {
-        $pdoStatement = $this->database->prepare('SELECT * FROM rubric_result');
-        $pdoStatement->execute();
+        $pdoStatement = $this->database->prepare('SELECT * FROM rubric_result WHERE resultset_id = :resultSetId');
+        $pdoStatement->execute(array('resultSetId' => $resultSetId));
 
-        $rows = $pdoStatement->fetchAll(PDO::FETCH_ASSOC);
-
-        // Reformat data into arrays of rubrics indexed by resultSetId.
-        $rubricsByResultSetId = [];
-        foreach ($rows as $row) {
-            $resultSetId = $row['resultset_id'];
-
-            if (!array_key_exists($resultSetId, $rubricsByResultSetId)) {
-                $rubricsByResultSetId[$resultSetId] = [];
-            }
-
-            $rubricsByResultSetId[$resultSetId][] = $row;
-        }
-
-        return $rubricsByResultSetId;
+        return $pdoStatement->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -60,7 +47,7 @@ class Mapper extends BaseMapper
      * @return void
      * @throws Exception
      */
-    public function saveRubricResults(array $items): void
+    public function saveRubricResultRows(array $items): void
     {
         $stmt = $this->database->prepare(
             "INSERT INTO rubric_result
