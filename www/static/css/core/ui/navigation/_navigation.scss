@@ -135,7 +135,7 @@ $allow-sidebar-stash: $large-up;
     transform: none;
 
     .left-menu-dock::after {
-      content: "\e916"; // hollow pin icon
+      content: "\e916"; //.icon-pin-hollow
     }
   }
   .exit-off-canvas {
@@ -425,7 +425,7 @@ $allow-sidebar-stash: $large-up;
       }
 
       &::after {
-        content: "\e914"; // pin icon
+        content: "\e914"; //.icon-pin
         font-family: $font-family-icon;
         padding-left: rem-calc(4);
       }
