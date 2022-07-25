@@ -88,6 +88,11 @@
                         <label>Token</label>
                         <input type="text" class='suds-crypto' name="dsn[tassapi][modules][schoolcalendarandnotices][token]" value="{{ modules.schoolcalendarandnotices.token ?? ''}}" />
                     </div>
+
+                    <div class="small-12 columns">
+                        <input id="enable-ediary" type="checkbox" name="dsn[tassapi][options][ediary]" value="1" {% if options.ediary ?? false %}checked="checked"{% endif %} />
+                        <label for="enable-ediary" class="checkbox-label">Enable eDiary</label>
+                    </div>
                 </div>
 
                 <hr />
