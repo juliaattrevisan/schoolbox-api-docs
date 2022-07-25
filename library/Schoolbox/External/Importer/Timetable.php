@@ -32,7 +32,6 @@ use Schoolbox\UserMapper;
  */
 class Timetable extends AbstractImporter
 {
-
     /**
      * @var UserMapper
      */

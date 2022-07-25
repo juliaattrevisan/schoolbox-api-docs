@@ -31,7 +31,6 @@ use Schoolbox\UserMapper;
  */
 class TimetableEnrolment extends AbstractImporter
 {
-
     /**
      * @var IConnector
      */
