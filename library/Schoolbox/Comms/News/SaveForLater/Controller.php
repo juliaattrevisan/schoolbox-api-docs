@@ -75,11 +75,26 @@ class Controller extends Base
      */
     public function getList(): void
     {
+        $ids = $this->saveForLaterMapper->findSavedIdsForUser($this->getUser()->getId());
+        $savedArticleIds = array_map('intval', $ids);
+        if ($this->isXhrRequest()) {
+            // this is for turning on saved icon in news feed
+            // this may contain non-accessible article ids, but should not be a problem
+            $this->getResponse()->content->set($this->buildJsonOutput($savedArticleIds));
+            return;
+        }
+
+        // get safe saved articles
         $userFeed = new UserFeed($this->newsMapper, $this->articleResolver);
         $articleIds = $userFeed->find($this->getUser(), Model::STATE_PUBLIC, true);
-        if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput($articleIds));
-            return;
+
+        // check saved articles but not in the feed
+        $idsToCheck = array_diff($savedArticleIds, $articleIds);
+        if (!empty($idsToCheck)) {
+            $articleIds = array_merge(
+                $articleIds,
+                $this->newsMapper->findArticleIdsForRole($this->getUser()->getRole(), $idsToCheck)
+            );
         }
 
         $params = new News\Querystring($this->getRequest()->query);

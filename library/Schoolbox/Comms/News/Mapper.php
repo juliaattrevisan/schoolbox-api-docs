@@ -26,6 +26,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress_Date_Format;
@@ -728,6 +729,35 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $statement->execute(array_merge($pb->getParams(), $folderParams));
 
         return (bool)$statement->fetch(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * @param Role  $role
+     * @param array $articleIdsToLimit
+     * @return array
+     */
+    public function findArticleIdsForRole(Role $role, array $articleIdsToLimit): array
+    {
+        $query  = "
+            SELECT `comms_news_article`.id
+                FROM `comms_news_article`
+                JOIN `comms_news_audience` ON `comms_news_audience`.comms_news_article_id = comms_news_article.id
+                                           AND `comms_news_audience`.relationship = :self
+                JOIN `perms` ON `perms`.cid = comms_news_audience.entity_value AND `perms`.type > 0
+                WHERE `perms`.gid = :roleId
+                  AND `comms_news_article`.deleted_at IS NULL
+        ";
+        $params = [
+            'self'   => \Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_SELF,
+            'roleId' => $role->getId(),
+        ];
+        if (!empty($articleIdsToLimit)) {
+            $bindings = Builder::getBindings($articleIdsToLimit, 'a');
+            $query    .= " AND `comms_news_article`.id IN ({$bindings->getPlaceholder()}) ";
+            $params   = array_merge($params, $bindings->getParams());
+        }
+        $ids = $this->database->query($query, $params)->fetchAll(\PDO::FETCH_COLUMN);
+        return array_map('intval', $ids);
     }
 
     /**
