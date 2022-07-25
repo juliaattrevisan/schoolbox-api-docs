@@ -102,7 +102,7 @@
     .status-icon:after {
       background-color: tint($success-color, 74%);
       color: $success-color;
-      content: "\e604";
+      content: "\e604"; //.icon-approve
     }
   }
 
@@ -110,7 +110,7 @@
     .status-icon:after {
       background-color: tint($alert-color, 74%);
       color: $alert-color;
-      content: "\e60d";
+      content: "\e60d"; //.icon-close
     }
   }
 }

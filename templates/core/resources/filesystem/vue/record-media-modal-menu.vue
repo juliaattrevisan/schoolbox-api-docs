@@ -286,7 +286,7 @@ $font-family-icon: 'schoolbox';
 .icon-screen-capture {
     @extend .icon;
     &:before {
-        content: '\e920';
+        content: '\e921';
     }
 }
 

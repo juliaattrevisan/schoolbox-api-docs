@@ -4,11 +4,10 @@
 
 @font-face {
   font-family: "schoolbox";
-  src: url("#{$cdn-prefix}/fonts/schoolbox.eot?uc3c4p");
-  src: url("#{$cdn-prefix}/fonts/schoolbox.eot?uc3c4p#iefix") format("embedded-opentype"),
-    url("#{$cdn-prefix}/fonts/schoolbox.ttf?uc3c4p") format("truetype"),
-    url("#{$cdn-prefix}/fonts/schoolbox.woff?uc3c4p") format("woff"),
-    url("#{$cdn-prefix}/fonts/schoolbox.svg?uc3c4p#schoolbox") format("svg");
+  src:
+    url('#{$cdn-prefix}/fonts/schoolbox.ttf?7bbold') format('truetype'),
+    url('#{$cdn-prefix}/fonts/schoolbox.woff?7bbold') format('woff'),
+    url('#{$cdn-prefix}/fonts/schoolbox.svg?7bbold#schoolbox') format('svg');  
   font-weight: normal;
   font-style: normal;
 }

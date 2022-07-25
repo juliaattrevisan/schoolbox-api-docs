@@ -98,7 +98,7 @@ $allow-notification-stash: $xlarge-up;
             z-index: 1; // Safari will not see the icon without this
 
             &::after {
-                content: "\e915"; // hollow pin icon
+                content: "\e916"; //.icon-pin-hollow
                 font-family: $font-family-icon;
                 font-size: 1rem;
                 padding-left: rem-calc(4);
@@ -162,7 +162,7 @@ $allow-notification-stash: $xlarge-up;
 @media #{$allow-notification-stash} {
     .right-open {
         .right-menu-dock::after {
-            content: "\e913"; // pin icon
+            content: "\e914"; //.icon-pin
         }
     }
 }
