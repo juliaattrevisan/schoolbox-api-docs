@@ -291,96 +291,96 @@ class Factory
                 $from,
                 $to
             ))
-            ->add(new ParentCalendar(
-                $this->log,
-                $this->perform,
-                $api,
-                $campuses,
-                $eventTypes,
-                $this->eventMapper,
-                $this->roletypeRelationMapper,
-                $this->campusRelationMapper,
-                $this->roleMapper,
-                self::SOURCE_NAME,
-                $registry,
-                $from,
-                $to
-            ))
-            ->add(new ParentNotices(
-                $this->log,
-                $this->perform,
-                $api,
-                $campuses,
-                $eventTypes,
-                $this->eventMapper,
-                $this->roletypeRelationMapper,
-                $this->campusRelationMapper,
-                $this->roleMapper,
-                self::SOURCE_NAME,
-                $registry,
-                $from,
-                $to
-            ))
-            ->add(new StudentCalendar(
-                $this->log,
-                $this->perform,
-                $api,
-                $campuses,
-                $eventTypes,
-                $this->eventMapper,
-                $this->roletypeRelationMapper,
-                $this->campusRelationMapper,
-                $this->roleMapper,
-                self::SOURCE_NAME,
-                $registry,
-                $from,
-                $to
-            ))
-            ->add(new StudentNotices(
-                $this->log,
-                $this->perform,
-                $api,
-                $campuses,
-                $eventTypes,
-                $this->eventMapper,
-                $this->roletypeRelationMapper,
-                $this->campusRelationMapper,
-                $this->roleMapper,
-                self::SOURCE_NAME,
-                $registry,
-                $from,
-                $to
-            ))
-            ->add(new TeacherCalendar(
-                $this->log,
-                $this->perform,
-                $api,
-                $campuses,
-                $eventTypes,
-                $this->eventMapper,
-                $this->roletypeRelationMapper,
-                $this->campusRelationMapper,
-                $this->roleMapper,
-                self::SOURCE_NAME,
-                $registry,
-                $from,
-                $to
-            ))
-            ->add(new TeacherNotices(
-                $this->log,
-                $this->perform,
-                $api,
-                $campuses,
-                $eventTypes,
-                $this->eventMapper,
-                $this->roletypeRelationMapper,
-                $this->campusRelationMapper,
-                $this->roleMapper,
-                self::SOURCE_NAME,
-                $registry,
-                $from,
-                $to
-            ))
+//            ->add(new ParentCalendar(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $campuses,
+//                $eventTypes,
+//                $this->eventMapper,
+//                $this->roletypeRelationMapper,
+//                $this->campusRelationMapper,
+//                $this->roleMapper,
+//                self::SOURCE_NAME,
+//                $registry,
+//                $from,
+//                $to
+//            ))
+//            ->add(new ParentNotices(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $campuses,
+//                $eventTypes,
+//                $this->eventMapper,
+//                $this->roletypeRelationMapper,
+//                $this->campusRelationMapper,
+//                $this->roleMapper,
+//                self::SOURCE_NAME,
+//                $registry,
+//                $from,
+//                $to
+//            ))
+//            ->add(new StudentCalendar(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $campuses,
+//                $eventTypes,
+//                $this->eventMapper,
+//                $this->roletypeRelationMapper,
+//                $this->campusRelationMapper,
+//                $this->roleMapper,
+//                self::SOURCE_NAME,
+//                $registry,
+//                $from,
+//                $to
+//            ))
+//            ->add(new StudentNotices(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $campuses,
+//                $eventTypes,
+//                $this->eventMapper,
+//                $this->roletypeRelationMapper,
+//                $this->campusRelationMapper,
+//                $this->roleMapper,
+//                self::SOURCE_NAME,
+//                $registry,
+//                $from,
+//                $to
+//            ))
+//            ->add(new TeacherCalendar(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $campuses,
+//                $eventTypes,
+//                $this->eventMapper,
+//                $this->roletypeRelationMapper,
+//                $this->campusRelationMapper,
+//                $this->roleMapper,
+//                self::SOURCE_NAME,
+//                $registry,
+//                $from,
+//                $to
+//            ))
+//            ->add(new TeacherNotices(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $campuses,
+//                $eventTypes,
+//                $this->eventMapper,
+//                $this->roletypeRelationMapper,
+//                $this->campusRelationMapper,
+//                $this->roleMapper,
+//                self::SOURCE_NAME,
+//                $registry,
+//                $from,
+//                $to
+//            ))
             ->add(new Cleanup(
                 $this->log,
                 $this->perform,

@@ -24,13 +24,13 @@ class EDiary implements IStrategy
     /**
      * Filter to specific people; set to null to disable filtering
      */
-    private const WATCHLIST = ['ANS'];
+    private const WATCHLIST = null;
 
 
     /**
      * @var LoggerInterface
      */
-    protected LoggerInterface $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -38,25 +38,25 @@ class EDiary implements IStrategy
      *
      * @var bool
      */
-    protected bool $perform;
+    private bool $perform;
 
 
     /**
      * @var array
      */
-    protected array $api;
+    private array $api;
 
 
     /**
      * @var GenericCollection
      */
-    protected GenericCollection $campuses;
+    private GenericCollection $campuses;
 
 
     /**
      * @var GenericCollection
      */
-    protected GenericCollection $eventTypes;
+    private GenericCollection $eventTypes;
 
 
     /**
@@ -74,13 +74,13 @@ class EDiary implements IStrategy
     /**
      * @var \Schoolbox\External\Event\Mapper
      */
-    protected \Schoolbox\External\Event\Mapper $eventMapper;
+    private \Schoolbox\External\Event\Mapper $eventMapper;
 
 
     /**
      * @var \Schoolbox\External\Event\User\Mapper
      */
-    protected \Schoolbox\External\Event\User\Mapper $userRelationMapper;
+    private \Schoolbox\External\Event\User\Mapper $userRelationMapper;
 
 
     /**
@@ -89,7 +89,7 @@ class EDiary implements IStrategy
      *
      * @var string
      */
-    protected string $source = '';
+    private string $source;
 
 
     /**
@@ -103,7 +103,7 @@ class EDiary implements IStrategy
      *
      * @var \Alaress_Date_Format
      */
-    protected \Alaress_Date_Format $from;
+    private \Alaress_Date_Format $from;
 
 
     /**
@@ -111,7 +111,7 @@ class EDiary implements IStrategy
      *
      * @var \Alaress_Date_Format
      */
-    protected \Alaress_Date_Format $to;
+    private \Alaress_Date_Format $to;
 
 
     /**
@@ -186,29 +186,29 @@ class EDiary implements IStrategy
      */
     public function import(): void
     {
-        /* I think the ediary feed endpoint was supposed to supply the synonymous
-         * eventType string associated with each ediary event
-         *
-         * This algorithmic complexity is about to take a toll on tass
-         */
-        $feeds = $this->getFeedList('S');
-
-        /* Get a list of Student external ids
-         * Use the profile mappers to get a 1D array of those
-         * For each person in that set,
-         * Hit the endpoint and grab their calendar
-         */
-        if ($feeds) {
-            $userProfiles = $this->studentProfileMapper->findAll();
-
-            foreach ($feeds['calendar'] as $feed) {
-                foreach ($userProfiles as $userProfile) {
-                    $this->importStudentEvents($userProfile, $feed);
-                }
-            }
-        } else {
-            $this->log->info('No feed data found; skipping');
-        }
+//        /* I think the ediary feed endpoint was supposed to supply the synonymous
+//         * eventType string associated with each ediary event
+//         *
+//         * This algorithmic complexity is about to take a toll on tass
+//         */
+//        $feeds = $this->getFeedList('S');
+//
+//        /* Get a list of Student external ids
+//         * Use the profile mappers to get a 1D array of those
+//         * For each person in that set,
+//         * Hit the endpoint and grab their calendar
+//         */
+//        if ($feeds) {
+//            $userProfiles = $this->studentProfileMapper->findAll();
+//
+//            foreach ($feeds['calendar'] as $feed) {
+//                foreach ($userProfiles as $userProfile) {
+//                    $this->importStudentEvents($userProfile, $feed);
+//                }
+//            }
+//        } else {
+//            $this->log->info('No feed data found; skipping');
+//        }
 
         /* I think the ediary feed endpoint was supposed to supply the synonymous
          * eventType string associated with each ediary event
@@ -345,6 +345,19 @@ class EDiary implements IStrategy
             return;
         }
 
+        /* Only process Teachers, not Employees
+         */
+        if (\Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Profile::TEACHER !== $userProfile->getCategory()) {
+            $this->log->info(sprintf(
+                'Staff %s %s (%s) is not a teacher; skipping',
+                $userProfile->getBaseProfile()->getFirstname(),
+                $userProfile->getBaseProfile()->getLastname(),
+                $userExternalId
+            ));
+
+            return;
+        }
+
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
          */
@@ -457,7 +470,7 @@ class EDiary implements IStrategy
             $startDatetime = \Alaress_Date_Format::newDatabaseDate($tassStartDate);
             $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEndDate);
 
-            $allDay = (bool)$tassEvent['all_day'];
+            $allDay = (bool)($tassEvent['all_day'] ?? false);
 
             /* Third-party source identifier for our import
              *
