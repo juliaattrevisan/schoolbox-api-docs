@@ -7,12 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -25,11 +24,10 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  * These don't have any associated sis_class_period records;
  * it only has sis_class and sis_class_user records.
  *
- * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable
+ * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar
  */
 class AdditionalSubjects implements IStrategy
 {
-
     /**
      * This endpoint contains a list of subjects that a student/staff owns
      * These subjects might not appear in the Timetable endpoints so
@@ -37,6 +35,12 @@ class AdditionalSubjects implements IStrategy
      */
     private const ENDPOINT_STUDENTSUBJECTS = 'getStudentSubjects';
     private const ENDPOINT_TEACHERSUBJECTS = 'getTeacherSubjects';
+
+
+    /**
+     * Filter to specific people; set to null to disable filtering
+     */
+    private const WATCHLIST = null;
 
 
     /**
@@ -72,12 +76,6 @@ class AdditionalSubjects implements IStrategy
 
 
     /**
-     * @var ClassPeriodMapper
-     */
-    private ClassPeriodMapper $classPeriodMapper;
-
-
-    /**
      * @var Lookup
      */
     private Lookup $lookup;
@@ -92,7 +90,6 @@ class AdditionalSubjects implements IStrategy
      * @param Lookup                 $lookup
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
-     * @param ClassPeriodMapper      $classPeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -100,8 +97,7 @@ class AdditionalSubjects implements IStrategy
         array $api,
         Lookup $lookup,
         ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper
+        ClassInvolvementMapper $classInvolvementMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -109,17 +105,25 @@ class AdditionalSubjects implements IStrategy
         $this->lookup = $lookup;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->classPeriodMapper = $classPeriodMapper;
     }
 
 
     /**
      * Import data from api endpoints into local schema
+     *
+     * @return void
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function import(): void
     {
-        $this->importStudentAdditionalSubjects();
-        $this->importStaffAdditionalSubjects();
+        $this->importStudentAdditionalSubjects(self::WATCHLIST);
+        $this->importStaffAdditionalSubjects(self::WATCHLIST);
     }
 
 
@@ -128,12 +132,12 @@ class AdditionalSubjects implements IStrategy
      * Students are assigned specifically to $code
      *
      * @throws \DomainException
+     * @throws \JsonException
      * @throws \PDOException
-     * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStudentAdditionalSubjects(): void
+    private function importStudentAdditionalSubjects(?array $watchlist = null): void
     {
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
@@ -146,6 +150,12 @@ class AdditionalSubjects implements IStrategy
         $involvements = $this->lookup->getInvolvements();
 
         foreach ($users as $externalId => $userData) {
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
+                continue;
+            }
+
             try {
                 $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
                     'code' => $externalId
@@ -249,13 +259,14 @@ class AdditionalSubjects implements IStrategy
                         "Additional subject involvement in %s (%s) added for %s (%s)",
                         $additionalSubject['sub_long'],
                         $code,
-                        trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
+                        trim("{$userData['firstname']} {$userData['lastname']}"),
                         $externalId
                     ));
                 }
             }
         }
     }
+
 
     /**
      * Associate a staff with additional subjects
@@ -264,12 +275,12 @@ class AdditionalSubjects implements IStrategy
      *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
+     * @throws \JsonException
      * @throws \PDOException
-     * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStaffAdditionalSubjects(): void
+    private function importStaffAdditionalSubjects(?array $watchlist = null): void
     {
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
@@ -280,6 +291,12 @@ class AdditionalSubjects implements IStrategy
         $endpoint = self::ENDPOINT_TEACHERSUBJECTS;
 
         foreach ($users as $externalId => $userData) {
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
+                continue;
+            }
+
             /* Allow continuation even if this dies irrecoverably
              */
             try {
@@ -346,42 +363,42 @@ class AdditionalSubjects implements IStrategy
                             'class_id'    => $class->getId()
                         ]);
                     } catch (\Schoolbox\Mapper\Exception $e) {
-                        /* Maybe this person is a teacher; check sis_class_period to see
-                         * If they are already a teacher, don't need to make an arbitrary involvement
-                         */
-                        try {
-                            $isTeacher = $this->classPeriodMapper->findOneByColumnList([
-                                'class_id'            => $class->getId(),
-                                'teacher_external_id' => $externalId
-                            ]);
+                        $classInvolvement = $this->classInvolvementMapper->createModel()
+                            ->setExternalId((string)$externalId)
+                            ->setClass($class);
 
-                            $this->log->info(sprintf(
-                                '%s (user %s) is already a teacher of class %s (%s) - no subject involvement change required',
-                                trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
-                                $externalId,
-                                $class->getId(),
-                                $class->getName()
-                            ));
-                        } catch (\Schoolbox\Mapper\Exception $e) {
-                            $classInvolvement = $this->classInvolvementMapper->createModel()
-                                ->setExternalId((string)$externalId)
-                                ->setClass($class);
-
-                            if ($this->perform) {
-                                $this->classInvolvementMapper->save($classInvolvement);
-                            }
-
-                            $this->log->info(sprintf(
-                                "Additional subject involvement in %s (%s) added for %s (user %s)",
-                                $additionalSubject['sub_long'],
-                                $code,
-                                trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
-                                $externalId
-                            ));
+                        if ($this->perform) {
+                            $this->classInvolvementMapper->save($classInvolvement);
                         }
+
+                        $this->log->info(sprintf(
+                            "Additional subject involvement in %s (%s) added for %s (user %s)",
+                            $additionalSubject['sub_long'],
+                            $code,
+                            trim("{$userData['firstname']} {$userData['lastname']}"),
+                            $externalId
+                        ));
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Decide if $externalId is in $watchlist, which is a set of externalIds
+     *
+     * @param string|null $externalId
+     * @param array|null  $watchlist
+     * @return bool
+     */
+    private function isOnWatchlist(?string $externalId, ?array $watchlist): bool
+    {
+        /* "Everyone is on the watchlist"
+         */
+        if (null === $watchlist) {
+            return true;
+        }
+
+        return $watchlist && in_array($externalId, $watchlist, false);
     }
 }

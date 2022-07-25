@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
 
 use Alaress_Date_Format;
 
@@ -16,11 +16,10 @@ use Alaress_Date_Format;
  *
  * Decide if the current datetime is between a subject's FROM and TO dates
  *
- * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable
+ * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar
  */
 class ValidActiveEnrolment
 {
-
     /**
      * @var Alaress_Date_Format|null
      */

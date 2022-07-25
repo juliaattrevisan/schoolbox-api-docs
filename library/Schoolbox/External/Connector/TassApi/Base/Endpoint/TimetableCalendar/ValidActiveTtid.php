@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
 
 /**
  * This takes a set of tt_calendar records and figures out if the ttid
@@ -22,7 +22,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
  */
 class ValidActiveTtid
 {
-
     /**
      * A set of tt_calendar array records
      *

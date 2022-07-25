@@ -4161,11 +4161,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Profile/Profile.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Timetable/Definition.php
-
-		-
 			message: "#^Result of \\|\\| is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Importer/TimetableEnrolment.php

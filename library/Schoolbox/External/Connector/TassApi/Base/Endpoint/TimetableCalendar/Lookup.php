@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
 
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Profile;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -18,11 +18,10 @@ use Schoolbox\Mapper\Exception;
  *
  * Generate a list of known users and known periods for creating class involvement
  *
- * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable
+ * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar
  */
 class Lookup
 {
-
     /**
      * @var TimetablePeriodMapper
      */

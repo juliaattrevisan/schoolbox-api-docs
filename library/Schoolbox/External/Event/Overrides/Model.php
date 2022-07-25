@@ -33,9 +33,15 @@ class Model
 
 
     /**
+     * @var string|null
+     */
+    private ?string $externalId = null;
+
+
+    /**
      * @var \Schoolbox\User|null
      */
-    private ?\Schoolbox\User $user;
+    private ?\Schoolbox\User $user = null;
 
 
     /**
@@ -66,6 +72,26 @@ class Model
     public function setEventId(?int $eventId): self
     {
         $this->eventId = $eventId;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+
+    /**
+     * @param string|null $externalId
+     * @return Model
+     */
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
         return $this;
     }
 
