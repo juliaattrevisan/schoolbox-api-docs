@@ -1,1 +1,1 @@
-INSERT INTO menu_icons (name, title) VALUES ('was-logo', 'WAS');
+INSERT INTO menu_icons (name, title) VALUES ('was-logo', 'Reach Boarding');
