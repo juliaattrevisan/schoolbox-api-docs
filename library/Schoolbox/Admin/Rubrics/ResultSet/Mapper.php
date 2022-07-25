@@ -43,45 +43,46 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param array $items
+     * @param int $rubricResultId
+     * @param array $labelsInOrder
      * @return void
-     * @throws Exception
+     * @throws \InvalidArgumentException
      */
-    public function saveRubricResultRows(array $items): void
+    public function createOrOverwriteRubricResultSet(int $resultSetId, array $labelsInOrder): void
     {
         $stmt = $this->database->prepare(
-            "INSERT INTO rubric_result
-            VALUES (:resultset_id, :value, :label)
-            ON DUPLICATE KEY UPDATE label = :label"
+            "DELETE FROM rubric_result
+            WHERE resultset_id = :resultSetId"
+        );
+        $stmt->execute(array('resultSetId' => $resultSetId));
+
+        $counter       = 0;
+        $sqlInsertStmt = $this->database->prepare(
+            "INSERT INTO rubric_result SET
+            resultset_id = :resultSetId,
+            value = :value,
+            label = :label"
         );
 
-        foreach ($items as $setId => $results) {
-            if (!(is_int($setId) && is_array($results) && count($results) > 0)) {
-                continue;
-            }
-
+        foreach ($labelsInOrder as $label) {
             // Avoid saving blank values as that will be confusing for everyone.
-            foreach ($results as $lbl) {
-                if ('' === trim((string)$lbl)) {
-                    throw new InvalidArgumentException("Expected only non-blank labels.  Blank label found.");
-                }
+            if ('' === trim((string)$label)) {
+                throw new \InvalidArgumentException("Expected only non-blank labels.  Blank label found.");
             }
 
-            foreach ($results as $value => $label) {
-                /* Forcibly truncate $label values, so they don't exceed Model::LABEL_MAXLENGTH chars.
-                 * This is the maximum width allowed in our db schema and will cause sentry errors
-                 * unless we forcibly ensure that it doesn't exceed the space available
-                 */
-                $truncatedLabel = mb_substr($label, 0, Model::LABEL_MAXLENGTH, 'UTF-8');
+            /* Forcibly truncate $label values, so they don't exceed Model::LABEL_MAXLENGTH chars.
+             * This is the maximum width allowed in our db schema and will cause sentry errors
+             * unless we forcibly ensure that it doesn't exceed the space available
+             */
+            $truncatedLabel = mb_substr($label, 0, Model::LABEL_MAXLENGTH, 'UTF-8');
 
-                $stmt->execute(
-                    array(
-                       'resultset_id' => $setId + 1, // Because SQL begins at 1...
-                       'value'        => $value,
-                       'label'        => $truncatedLabel
-                    )
-                );
-            }
+            $sqlInsertStmt->execute(
+                array(
+                    'resultSetId' => $resultSetId,
+                    'value'       => $counter++,
+                    'label'       => $truncatedLabel
+                )
+            );
         }
     }
 }

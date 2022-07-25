@@ -15,6 +15,7 @@ namespace Schoolbox\Admin\Rubrics\ResultSet;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Exception;
+use http\Exception\InvalidArgumentException;
 use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base
@@ -57,11 +58,26 @@ class Controller extends Base
      * Save $_POSTed data to database, then redirect to getRubricResults().
      * @throws Exception
      */
-    public function postRubricResults(): void
+    public function postRubricResults($resultSetId): void
     {
-        if ($this->getRequest()->post->get('action') === 'set') {
-            $this->mapper->saveRubricResultRows($this->getRequest()->post->get('items'));
+// TODO: Get entire $_POST array using $this->getRequest() somehow.
+//        $postedData = $this->getRequest()->post;
+        $postedData    = $_POST;
+        $indexedLabels = array();
+
+        foreach ($postedData as $key => $value) {
+            // Expect $key to be in format "row-$n-label".  Where $n is rubric_result.value.
+            $partialKey = str_replace('row-', '', $key);
+            $n          = str_replace('-label', '', $partialKey);
+
+            if (!ctype_digit($n)) {
+                throw new \InvalidArgumentException("Could not parse integer \$n from 'row-\$n-value' string.  Found '$n' instead of integer.");
+            }
+
+            $indexedLabels[$n] = $value;
         }
+
+        $this->mapper->createOrOverwriteRubricResultSet((int)$resultSetId, $indexedLabels);
 
         $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubric.getRubricResults'));
     }

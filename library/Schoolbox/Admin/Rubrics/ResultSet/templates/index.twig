@@ -19,14 +19,15 @@ function onClickPlusButton()
     let rowsContainerDiv = document.getElementById('rowsContainerDiv');
     let newRowValue      = getHighestRowNumberOnPage(true) + 1;
     let newRowHtml       = (
-        "<div id='row-div-" + newRowValue + "' data-role='newRow'>" +
-            "<label>" +
-                "<span class='rubric-value-span' data-role='newRowValue'>" + newRowValue + "</span> " + // Whitespace at end of line is important.
-                "<input type='hidden' name='new-row-" + newRowValue + "-value' value='" + newRowValue + "'/>" +
-                "<input class='rubric-wide-input' type='text' name='new-row-" + newRowValue + "-label' maxlength='64' value=''/> " + // Whitespace at end of line is important.
-                "<a onclick='onClickDeleteRow(" + newRowValue + ")'>Delete</a>" +
-            "</label>" +
-        "</div>"
+        // NOTE: The newlines at the end of each line below are important for styling.
+        //       The HTML here must match the HTML used in the inner-loop of the twig template.
+        "<div id='row-div-" + newRowValue + "' data-role='newRow'>\n" +
+            "<label>\n" +
+                "<span class='rubric-value-span' data-role='newRowValue'>" + newRowValue + "</span>\n" +
+                "<input class='rubric-wide-input' type='text' name='row-" + newRowValue + "-label' maxlength='64' required/>\n" +
+                "<a onclick='onClickDeleteRow(" + newRowValue + ")'>Delete</a>\n" +
+            "</label>\n" +
+        "</div>\n"
     );
 
     rowsContainerDiv.innerHTML += newRowHtml;
@@ -50,17 +51,21 @@ function onClickDeleteRow(rowValue)
  */
 function renumberNewRows()
 {
-    let maxValue = getHighestRowNumberOnPage(false);
     let spans    = document.getElementsByClassName('rubric-value-span');
+    let newValue = getHighestRowNumberOnPage(false);
 
     for (let i = 0; i < spans.length; ++i) {
-        let span = spans[i];
+        let span     = spans[i];
 
-        if (span.getAttribute('data-role') != 'newRowValue') {
+        if (span.getAttribute('data-role') !== 'newRowValue') {
             continue;
         }
 
-        span.innerHTML = ++maxValue;
+        span.innerHTML = ++newValue;
+
+        // Must also rename the text input.
+        var labelTextInput = span.nextElementSibling;
+        labelTextInput.setAttribute('name', 'row-' + newValue + '-label');
     }
 }
 
@@ -68,7 +73,7 @@ function renumberNewRows()
  * Find the highest number from all rows on the page.
  *
  * @param boolIncludeNewRows
- *    Set to false to exclude the new-row numbers.
+ *    Set to false to exclude the row numbers.
  */
 function getHighestRowNumberOnPage(boolIncludeNewRows)
 {
@@ -78,7 +83,7 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
     for (let i = 0; i < spans.length; ++i) {
         let span = spans[i];
 
-        if (!boolIncludeNewRows && span.getAttribute('data-role') == 'newRowValue') {
+        if (!boolIncludeNewRows && span.getAttribute('data-role') === 'newRowValue') {
             continue;
         }
 
@@ -93,14 +98,10 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
 }
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
-
 {{ bread.crumbsArray(allBreadcrumbs) }}
-
 <div class="admin-container row">
-
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
-
     <div class="admin-content">
         <div class="small-12 island">
             <section class="content">
@@ -110,7 +111,8 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
                     </div>
                     <div class="small-12 large-12 columns">
                         <p>
-                            Edit the rubric result set here.  These are the pre-populated default values that will appear when creating a rubric.
+                            Edit the rubric result set here.
+                            These are the pre-populated default values that will appear when creating a rubric.
                         </p>
                         <p>
                             Each set should be a discrete list of items of a single measurement;
@@ -122,29 +124,24 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
             </section>
         </div>
         <div class="small-12 island">
-<!--            <form data-action="saveRubricResultRows" method="POST" action="{{ routeLookupIfAuthorized('adminRubric.saveRubricResults') }}">-->
-                <input type="hidden" name="resultSetId" value="{{ resultSetId }}"/>
-
+            <form data-action="saveRubricResultRows" method="POST" name="rubricResultRows" action="/adminv2/rubric-results/{{ resultSetId }}">
                 <div id="rowsContainerDiv">
                     <h3>Existing Set</h3>
-                    {% set currentRow = null %}
                     {% for row in rubricResultRows %}
                         <div id="row-div-{{ row.value|purify }}">
                             <label>
                                 <span class="rubric-value-span" data-role="value">{{ row.value|purify }}</span>
-                                <input class="rubric-wide-input" type="text" name="items[{{ row.resultset_id }}][{{ row.value|purify }}]" value="{{ row.label|purify }}" maxlength="64" required />
+                                <input class="rubric-wide-input" type="text" name="row-{{ row.value|purify }}-label" value="{{ row.label|purify }}" maxlength="64" required/>
                                 <a onclick='onClickDeleteRow({{  row.value|purify }})'>Delete</a>
                             </label>
                         </div>
-                        {% set currentRow = row%}
                     {% endfor %}
                 </div>
                 <div id="plusButtonContainerDiv">
                     <button onclick="onClickPlusButton()">+</button>
                 </div>
-
-            <input type="submit" value="Save Changes" />
-<!--            </form>-->
+                <input type="submit" value="Save Changes"/>
+            </form>
         </div>
     </div>
 </div>
