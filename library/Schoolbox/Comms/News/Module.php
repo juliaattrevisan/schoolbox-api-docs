@@ -68,13 +68,12 @@ class Module extends BaseModule
 
         /* To see an article, you must be a SU, CommsOfficer, Moderator, or Author - or the article must be published/expired
          * and either publicly visible, or you are in the audience
+         * This rule set is also used in SaveForLater::getAuthRuleCanRead()
          */
         $readerPerms = new Rule\LazyCallback(function () {
-            /**
-             * @var UserResolver $userResolver
-             * @var StrategyFactory $strategyFactory
-             */
-            $userResolver    = $this->injector->get('commsNewsUserResolver');
+            /** @var UserResolver $userResolver */
+            $userResolver = $this->injector->get('commsNewsUserResolver');
+            /** @var StrategyFactory $strategyFactory */
             $strategyFactory = $this->injector->get('commsNewsAudienceStrategyFactory');
             return new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -139,13 +138,7 @@ class Module extends BaseModule
         // Use the authorizer the discussion thread uses.
         $canAssociate = new Rule\Callback(function ($params, ?User $user) {
             $authorizer = $this->injector->get('authorizer');
-            $rule       = new CanModerateThread(
-                $authorizer,
-                new ThreadLocator(
-                    $this->getMapperFactory()->get(Thread\Mapper::class),
-                    $this->getMapperFactory()->get(Mapper::class)
-                )
-            );
+            $rule       = new CanModerateThread($authorizer);
             if (!$rule->hasPermission($params['article'], $user)) {
                 throw new Unauthorized('User does not have permission to associate a thread with this article');
             }

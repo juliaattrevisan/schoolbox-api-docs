@@ -202,6 +202,7 @@ class Module extends BaseModule
 
     /**
      * Returns a lazy auth rule to determine, if a user can read the article
+     * This rule set should be as same as $readerPerms in News/Module.php
      *
      * @return Rule\IAuthorizationRule
      */
