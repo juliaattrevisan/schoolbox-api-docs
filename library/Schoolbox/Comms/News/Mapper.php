@@ -47,7 +47,6 @@ use function is_array;
  */
 class Mapper extends \Schoolbox\Mapper implements Searchable
 {
-
     /**
      * This const represents "all topics", as an int id
      */

@@ -38,7 +38,6 @@ use function in_array;
  */
 class Archive extends Base
 {
-
     /**
      * Note: This is now used only in News Archive
      *
