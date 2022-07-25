@@ -14,7 +14,6 @@ namespace Schoolbox\Admin\Rubrics\ResultSets;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use Exception;
 use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base

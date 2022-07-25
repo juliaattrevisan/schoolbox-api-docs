@@ -19,12 +19,12 @@ function onClickPlusButton()
     let rowsContainerDiv = document.getElementById('rowsContainerDiv');
     let newRowValue      = getHighestRowNumberOnPage(true) + 1;
     let newRowHtml       = (
-        "<div id='new-row-div-" + newRowValue + "' data-role='newRow'>" +
+        "<div id='row-div-" + newRowValue + "' data-role='newRow'>" +
             "<label>" +
                 "<span class='rubric-value-span' data-role='newRowValue'>" + newRowValue + "</span> " + // Whitespace at end of line is important.
                 "<input type='hidden' name='new-row-" + newRowValue + "-value' value='" + newRowValue + "'/>" +
                 "<input class='rubric-wide-input' type='text' name='new-row-" + newRowValue + "-label' maxlength='64' value=''/> " + // Whitespace at end of line is important.
-                "<a onclick='onClickDeleteNewRow(" + newRowValue + ")'>Delete</a>" +
+                "<a onclick='onClickDeleteRow(" + newRowValue + ")'>Delete</a>" +
             "</label>" +
         "</div>"
     );
@@ -36,10 +36,10 @@ function onClickPlusButton()
  * When the delete button is clicked on a new row, we remove the new row from the form.
  * We also must update the numbers on the left of the new form rows so there are no gaps.
  */
-function onClickDeleteNewRow(newRowValue)
+function onClickDeleteRow(rowValue)
 {
-    let newRowDiv = document.getElementById('new-row-div-' + newRowValue);
-    newRowDiv.remove();
+    let rowDiv = document.getElementById('row-div-' + rowValue);
+    rowDiv.remove();
 
     renumberNewRows();
 }
@@ -84,7 +84,7 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
 
         let spanValue = Number(span.innerHTML);
 
-            if (spanValue > maxValue) {
+        if (spanValue > maxValue) {
             maxValue = spanValue;
         }
     }
@@ -93,6 +93,7 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
 }
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
+
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="admin-container row">
@@ -128,11 +129,11 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
                     <h3>Existing Set</h3>
                     {% set currentRow = null %}
                     {% for row in rubricResultRows %}
-                        <div data-role="existingRubricResult" data-resultNumber="{{ row.value|purify }}">
+                        <div id="row-div-{{ row.value|purify }}">
                             <label>
                                 <span class="rubric-value-span" data-role="value">{{ row.value|purify }}</span>
                                 <input class="rubric-wide-input" type="text" name="items[{{ row.resultset_id }}][{{ row.value|purify }}]" value="{{ row.label|purify }}" maxlength="64" required />
-                                <a href="/adminv2/rubric-results/{{ resultSetId }}/delete">Delete</a>
+                                <a onclick='onClickDeleteRow({{  row.value|purify }})'>Delete</a>
                             </label>
                         </div>
                         {% set currentRow = row%}
