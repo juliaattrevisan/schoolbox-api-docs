@@ -407,6 +407,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.',
                     ],
+                    '/adminv2/rubric-results/{resultSetId}' => [
+                        'name'        => 'Rubrics Result Set',
+                        'visible'     => false,
+                        'children'    => [],
+                        'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.',
+                    ],
                 ],
             ],
             '/adminv2/lists/achievement-category' => [
