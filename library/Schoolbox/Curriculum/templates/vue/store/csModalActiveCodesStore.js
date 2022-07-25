@@ -194,7 +194,11 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          */
         nodesFlattened () {
             if (this.isSearchActive) {
-                return splitChildrenToArray(this.codes[0]);
+                let flatChildren = [];
+                this.codes.forEach((obj) => {
+                    flatChildren = [...flatChildren, ...flattenChildren(obj)];
+                });
+                return flatChildren;
             } else {
                 return [];
             }
@@ -279,11 +283,11 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
  * 
  * @param { Object }
  */
-function splitChildrenToArray (obj) {
+ function flattenChildren (obj) {
     let array = [obj];
     if (obj.children && obj.children.length > 0) {
         obj.children.forEach((child) => {
-            array = [...array, ...splitChildrenToArray(child)];
+            array = [...array, ...flattenChildren(child)];
         });
         obj.children = []; 
     }
