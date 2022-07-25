@@ -126,11 +126,11 @@ img.mfp-img{
 		width: auto !important;
 	}
 	.mfp-container .mfp-arrow-left:after{
-		content: "\e655" !important;
+		content: "\e655" !important; //.icon-previous
 		margin-left: 26px;
 	}
 	.mfp-container .mfp-arrow-right:after{
-		content: "\e64b" !important;
+		content: "\e64b" !important; //.icon-next
 		margin-left: 2px;
 	}
 	.mfp-container .mfp-arrow-right:before {

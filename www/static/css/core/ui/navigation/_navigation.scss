@@ -361,7 +361,7 @@ $allow-sidebar-stash: $large-up;
 
       .profile-drop:after {
         font-family: $font-family-icon;
-        content: "\e901";
+        content: "\e901"; //.icon-up-arrow
         color: $accounts-menu-foreground;
         display: table-cell;
         padding: 0px 10px;
@@ -378,7 +378,7 @@ $allow-sidebar-stash: $large-up;
 
       &.active > a:after {
         font-family: $font-family-icon;
-        content: "\e900";
+        content: "\e902"; //.icon-down-arrow
       }
 
       .content {
@@ -457,7 +457,7 @@ $allow-sidebar-stash: $large-up;
     li {
       &.has-submenu > a:after {
         font-family: $font-family-icon;
-        content: "\e64b"; // right caret
+        content: "\e64b"; //.icon-next
         float: right;
       }
       a {
@@ -549,7 +549,7 @@ $allow-sidebar-stash: $large-up;
 
   .left-submenu .back > a:before {
     font-family: $font-family-icon;
-    content: "\e655";
+    content: "\e655"; //.icon-previous
     font-family: "schoolbox";
   }
 }

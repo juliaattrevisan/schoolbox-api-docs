@@ -36,11 +36,11 @@
 }
 
 .fc-icon-chevron-left:before {
-  content: "\e655" !important;
+  content: "\e655" !important; //.icon-previous
 }
 
 .fc-icon-chevron-right:before {
-  content: "\e64b" !important;
+  content: "\e64b" !important; //.icon-next
 }
 
 /* Force FullCalendar control buttons to absorb

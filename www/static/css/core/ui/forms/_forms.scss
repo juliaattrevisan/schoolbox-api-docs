@@ -890,7 +890,7 @@ td {
     font-family: $font-family-icon;
     position: absolute;
     display: block;
-    content: "\e604";
+    content: "\e604"; //.icon-approve
     color: rgba($white, 0);
     margin: 0;
     text-align: center;
@@ -968,7 +968,7 @@ td {
                 background-color: $content-ui-background;
             }
             &:after {
-                content: "\e60f";
+                content: "\e60f"; //.icon-collapse
             }
         }
     }

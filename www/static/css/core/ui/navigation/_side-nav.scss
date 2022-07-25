@@ -188,7 +188,7 @@ $border-bottom-width: 2px;
     }
     &.parent-item > a:after {
       font-family: $font-family-icon;
-      content: "\e64b"; // right caret
+      content: "\e64b"; //.icon-next
       float: right;
 
       @media #{$medium-down} {
@@ -217,7 +217,7 @@ $border-bottom-width: 2px;
 
     &:after {
       font-family: $font-family-icon;
-      content: "\e621";
+      content: "\e621"; //.icon-dropdown
       float: right;
     }
   }
