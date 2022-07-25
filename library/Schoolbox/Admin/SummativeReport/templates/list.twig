@@ -31,7 +31,7 @@
                         {% for report in reports %}
                         {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getGenerate', {report:report, reportId: report.id}) %}
 
-                        <li class="actions-small-4">
+                        <li class="actions-small-5">
                             <div class="list-item">
                                 <div class="card small-12">
                                     {% if generateRoute %}
