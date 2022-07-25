@@ -6,7 +6,7 @@
 <font id="schoolbox" horiz-adv-x="1024">
 <font-face units-per-em="1024" ascent="960" descent="-64" />
 <missing-glyph horiz-adv-x="1024" />
-<glyph unicode="&#x20;" horiz-adv-x="512" d="" />
+<glyph unicode="&#x20;" horiz-adv-x="256" d="" />
 <glyph unicode="&#xe600;" glyph-name="add" d="M1024 512h-448v448h-128v-448h-448v-128h448v-448h128v448h448z" />
 <glyph unicode="&#xe601;" glyph-name="advanced-list" d="M512 960h512v-128h-512v128zM512 704h320v-128h-320v128zM0 960h384v-384h-384v384zM512 320h512v-128h-512v128zM512 64h320v-128h-320v128zM0 320h384v-384h-384v384z" />
 <glyph unicode="&#xe602;" glyph-name="alert" d="M512 960l-512-1024h1024l-512 1024zM576 64h-128v128h128v-128zM448 320v320h128v-320h-128z" />
