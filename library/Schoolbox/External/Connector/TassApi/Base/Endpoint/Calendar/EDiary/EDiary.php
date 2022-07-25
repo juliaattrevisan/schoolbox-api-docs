@@ -24,8 +24,9 @@ class EDiary implements IStrategy
 {
     /**
      * Filter to specific people; set to null to disable filtering
+     * e.g. ['051301', 'SKK', 'BAU', '051365', '052546'];
      */
-    private const WATCHLIST = ['051301', 'SKK', 'BAU', '051365', '052546'];
+    private const WATCHLIST = null;
 
 
     /**
