@@ -14,7 +14,9 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
+use Schoolbox\Comms\News\Lists\UserFeed;
 use Schoolbox\Comms\News\Lookup\ReadMore;
+use Schoolbox\Comms\News\Model;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
@@ -73,7 +75,8 @@ class Controller extends Base
      */
     public function getList(): void
     {
-        $articleIds = $this->articleResolver->findArticlesForUser($this->getUser(), News\Model::STATE_PUBLIC, true);
+        $userFeed = new UserFeed($this->newsMapper, $this->articleResolver);
+        $articleIds = $userFeed->find($this->getUser(), Model::STATE_PUBLIC, true);
         if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput($articleIds));
             return;

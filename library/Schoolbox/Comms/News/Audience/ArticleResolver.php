@@ -304,6 +304,7 @@ class ArticleResolver implements IArticleResolver
         }
 
         // Also: all articles must be in the requested state (if there was one)
+        $savedJoin = News\SaveForLater\Mapper::getSavedJoin($articleAlias, $savedOnly);
         $pb  = isset($state)
             ? $this->articleMapper->getPredicateForState($state, $articleAlias)
             : $this->articleMapper->getPredicateBuilder();
@@ -312,10 +313,10 @@ class ArticleResolver implements IArticleResolver
             SELECT     {$articleAlias}.id
             FROM       comms_news_audience {$audienceAlias}
             INNER JOIN comms_news_article {$articleAlias} ON {$audienceAlias}.comms_news_article_id = {$articleAlias}.id
-            {$this->getSavedQuery($articleAlias, $savedOnly)}
+            {$savedJoin}
             WHERE      {$pb->getWhereIntersect()}
         ";
-        return [$sql, array_merge($pb->getParams(), $this->getSavedParams($user, $savedOnly))];
+        return [$sql, array_merge($pb->getParams(), News\SaveForLater\Mapper::getSavedJoinParams($user, $savedOnly))];
     }
 
 
@@ -362,6 +363,8 @@ class ArticleResolver implements IArticleResolver
         }
 
         // Also: all articles must be in the requested state (if there was one)
+        $savedJoin = News\SaveForLater\Mapper::getSavedJoin($articleAlias, $savedOnly);
+
         $pb  = isset($state)
             ? $this->articleMapper->getPredicateForState($state, $articleAlias)
             : $this->articleMapper->getPredicateBuilder();
@@ -370,11 +373,11 @@ class ArticleResolver implements IArticleResolver
             SELECT     {$articleAlias}.id
             FROM       comms_news_audience_complex {$audienceAlias}
             INNER JOIN comms_news_article {$articleAlias} ON {$audienceAlias}.comms_news_article_id = {$articleAlias}.id
-            {$this->getSavedQuery($articleAlias, $savedOnly)}
+            {$savedJoin}
             WHERE      {$pb->getWhereIntersect()}
         ";
 
-        return [$sql, array_merge($pb->getParams(), $this->getSavedParams($user, $savedOnly))];
+        return [$sql, array_merge($pb->getParams(), News\SaveForLater\Mapper::getSavedJoinParams($user, $savedOnly))];
     }
 
 
@@ -611,28 +614,5 @@ class ArticleResolver implements IArticleResolver
             $hydrator,
             'hydrate',
         ], $this->db->executeQuery($sql, $pb->getParams())->fetchAll(PDO::FETCH_COLUMN));
-    }
-
-    /**
-     * @param string $articleAlias
-     * @param bool   $savedOnly
-     * @return string
-     */
-    private function getSavedQuery(string $articleAlias, bool $savedOnly): string
-    {
-        return $savedOnly ? " INNER JOIN comms_news_saveforlater
-                          ON comms_news_saveforlater.article_id = {$articleAlias}.id
-                          AND comms_news_saveforlater.deleted_at IS NULL
-                          AND comms_news_saveforlater.user_id = :savedUserId " : '';
-    }
-
-    /**
-     * @param User $user
-     * @param bool $savedOnly
-     * @return array
-     */
-    private function getSavedParams(User $user, bool $savedOnly): array
-    {
-        return $savedOnly ? ['savedUserId' => $user->getId()] : [];
     }
 }

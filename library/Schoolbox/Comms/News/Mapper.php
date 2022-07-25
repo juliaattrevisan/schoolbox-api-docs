@@ -17,6 +17,7 @@ use PDO;
 use PDOException;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
+use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
@@ -527,22 +528,29 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param User     $user
      * @param int|null $state If provided, find only IDs of articles in this
      *                        state
+     * @param bool     $savedOnly
      * @return array
      * @throws InvalidColumnException
      */
-    public function findAuthoredOrAcceptedArticleIds(User $user, ?int $state = null): array
+    public function findAuthoredOrAcceptedArticleIds(User $user, ?int $state, bool $savedOnly): array
     {
-        $pb = isset($state)
+        $joinSaved = SaveForLater\Mapper::getSavedJoin($this->getTable(), $savedOnly);
+        $select    = "SELECT `{$this->getTable()}`.id FROM `{$this->getTable()}` {$joinSaved} ";
+
+        $pb    = isset($state)
             ? $this->getPredicateForState($state)
             : $this->getPredicateBuilder();
-        $pb = $pb->all(
+        $pb    = $pb->all(
             $this->getPredicateBuilder()->any(
                 $this->getPredicateBuilder()
                      ->equals('author_id', $user->getId())
                      ->equals('accepted_by', $user->getId())
+                     ->isNull('deleted_at')
             )
         );
-        return $this->findIdsByPredicates($pb);
+        $query = $select . ' WHERE ' . implode(' AND ', $pb->getWhere());
+        $ids = $this->database->query($query, array_merge($pb->getParams(), SaveForLater\Mapper::getSavedJoinParams($user, $savedOnly)))->fetchAll(\PDO::FETCH_COLUMN) ?: [];
+        return array_map('intval', $ids);
     }
 
 
