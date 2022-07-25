@@ -18,7 +18,6 @@ use Schoolbox\GenericCollection;
  */
 class EventUsers
 {
-
     /**
      * @var Mapper
      */
