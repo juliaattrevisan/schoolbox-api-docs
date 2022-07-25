@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar\EDiary;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar\Registry;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
@@ -452,9 +453,21 @@ class EDiary implements IStrategy
 
             /* Datetimes for the event and whether it's an all-day event
              * Sometimes one of these will be empty for no reason (skip it)
+             *
+             * Sometimes it'll be $tassEvent['start'] and sometimes $tassEvent['start_date']
+             * Sometimes it'll be $tassEvent['end'] and sometimes $tassEvent['end_date']
+             *
+             * Disgusting!
              */
-            $tassStartDate = trim((string)$tassEvent['start']);
-            $tassEndDate = trim((string)$tassEvent['end']);
+            $tassStartDate = (new FirstMeaningfulValue())->find([
+                $tassEvent['start'] ?? null,
+                $tassEvent['start_date'] ?? null
+            ]);
+
+            $tassEndDate = (new FirstMeaningfulValue())->find([
+                $tassEvent['end'] ?? null,
+                $tassEvent['end_date'] ?? null
+            ]);
 
             if ('' === $tassStartDate || '' === $tassEndDate) {
                 $this->log->debug(sprintf(
