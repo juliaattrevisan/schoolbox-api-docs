@@ -19,23 +19,10 @@
 {% if routeDelete        %}<li><a class="icon-delete"   data-action="delete"   href="{{ routeDelete }}" data-delete>Delete</a></li>{% endif %}
 
 {% if folder.group %}
-
     {# <h5 class="subheader">Access Type</h5> #}
     {% if (groupAccess >= 3 or user.isSuperuser) and not folder.inherit %}
         <li>
             <a class="icon-group-managers" data-action="manage" href="/group/modify/{{ folder.id }}">Manage Group</a>
         </li>
     {% endif %}
-
-    <li>
-        {% if groupAccess > 0 and groupAccess < 3 %}
-            <a class="icon-logout" data-action="leave" href="/group/joinForm.php?leave={{ folder.id }}">Leave Group</a>
-        {% elseif groupAccess is null %}
-            <a class="icon-group" data-action="join" href="/group/joinForm.php?join={{ folder.id }}">Join Group</a>
-            {#        {% elseif groupAccess == 0 and folder.group.moderated %} #}
-            {#            <span>Membership request pending</span> #}
-        {% endif %}
-    </li>
-    {# notably, if you are the admin, you can't leave the group #}
-
 {% endif %}
