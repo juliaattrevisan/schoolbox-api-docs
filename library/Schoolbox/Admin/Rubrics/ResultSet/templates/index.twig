@@ -12,6 +12,35 @@
 </style>
 <script>
 /**
+ * This function is a vanilla Javascript alternative to the Jquery $(document).ready().
+ * Taken from https://youmightnotneedjquery.com
+ */
+function ready(fn) {
+    if (document.readyState != 'loading') {
+        fn();
+    } else {
+        document.addEventListener('DOMContentLoaded', fn);
+    }
+}
+
+ready(
+    /**
+     * If fewer than two editable rows are present, add rows so that two are present.
+     * (A minimum of two rows are required for the form to be submitted.)
+     */
+    function ()
+    {
+        let rowsContainerDiv = document.getElementById('rowsContainerDiv');
+        let nRowsDisplayed   = rowsContainerDiv.children.length;
+        let nRowsToAdd       = (nRowsDisplayed >= 2)? 0: 2 - nRowsDisplayed;
+
+        for (let i = 0; i < nRowsToAdd; ++i) {
+            onClickPlusButton();
+        }
+    }
+);
+
+/**
  * When the plus button is clicked, we add a new row to the form.
  */
 function onClickPlusButton()
@@ -57,7 +86,7 @@ function renumberNewRows()
     let newValue = getHighestRowNumberOnPage(false);
 
     for (let i = 0; i < spans.length; ++i) {
-        let span     = spans[i];
+        let span = spans[i];
 
         if (span.getAttribute('data-role') !== 'newRowValue') {
             continue;
@@ -110,7 +139,12 @@ function enableSaveButton()
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
-        <div><a href="/adminv2/rubric-results/">Back to Rubrics Result Sets</a></div>
+        <div class="small-12 island">
+            <ul class="breadcrumb">
+                <li><a href="/adminv2/rubric-results/">Rubric Result Sets</a></li>
+                <li class="active"><a>Rubric Result Set</a></li>
+            </ul>
+        </div>
         <div class="small-12 island">
             <section class="content">
                 <div class="row">
@@ -126,7 +160,6 @@ function enableSaveButton()
                             Each set should be a discrete list of items of a single measurement;
                             for example, 'Very Good' and 'Yes' should not be in the same set.
                         </p>
-                        <p>The first element is always valued zero, and sets must contain at least two elements.</p>
                     </div>
                 </div>
             </section>
@@ -145,7 +178,7 @@ function enableSaveButton()
                     {% endfor %}
                 </div>
                 <div class="plus-button-container-div">
-                    <button onclick="onClickPlusButton()">+</button>
+                    <button class="icon-add" onclick="onClickPlusButton()"></button>
                 </div>
                 <input id='save-button' disabled='disabled' type="submit" value="Save Changes"/>
             </form>

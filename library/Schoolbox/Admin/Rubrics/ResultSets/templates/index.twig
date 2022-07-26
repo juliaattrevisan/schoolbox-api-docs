@@ -5,9 +5,15 @@ span.result-set-comma-separated-container
     width: 90%;
 }
 
-div.plus-button-container-div
+button.create-new-result-set-button
 {
-   text-align: right;
+   float: right;
+}
+
+div.clear-floats
+{
+    clear: both;
+    margin-bottom: 5px;
 }
 </style>
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -44,7 +50,11 @@ div.plus-button-container-div
         </div>
         <div class="small-12 island">
             <div data-role="rubricList">
-                <h3>Result Sets</h3>
+                <div>
+                    <button class='create-new-result-set-button icon-add' onclick="document.location.href='/adminv2/rubric-results/-1';">Create new result set</button>
+                    <h3>Result Sets</h3>
+                    <div class="clear-floats"></div>
+                </div>
                 {% set currentResultSetId = null %}
                 {% for resultSetId, rubrics in rubricsByResultSetId %}
                     <section class="content">
@@ -60,9 +70,6 @@ div.plus-button-container-div
                     </section>
                     {% set currentResultSetId = resultSetId %}
                 {% endfor %}
-                <div class="plus-button-container-div">
-                    <button onclick="document.location.href='/adminv2/rubric-results/-1';">+</button>
-                </div>
             </div>
         </div>
     </div>
