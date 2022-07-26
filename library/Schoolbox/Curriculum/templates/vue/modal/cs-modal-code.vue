@@ -92,7 +92,11 @@ const codeTitle = computed(() => {
  * @returns { HTML }
  */
 const highlightTitleSearch = computed(() => {
-    return highlightSearchInElement(codeTitle.value);
+    if (modalActiveCodesStore.isSearchActive) {
+        return highlightSearchInElement(codeTitle.value);
+    } else {
+        return codeTitle.value;
+    }
 });
 
 /**
@@ -163,5 +167,9 @@ ul {
     list-style: none; //don't use any dots
     margin: 0; //and spacing is controlled by props.depth
 }
+
+// span {
+//     font-weight: bold;
+// }
 
 </style>

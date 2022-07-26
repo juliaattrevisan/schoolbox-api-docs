@@ -5,9 +5,10 @@
 
 import { defineStore } from 'pinia';
 import { useCodesStore } from './csCodesStore';
+import cloneDeep from 'lodash/cloneDeep';
 
 const UNSET_ID = 0; 
-const MIN_QUERY_LENGTH = 2; 
+const MIN_QUERY_LENGTH = 3; 
 
 export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
     
@@ -155,9 +156,8 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          */
         queryWordList () {
             const queryTrimmed = this.query.trim(); //remove any front or back white space
-            const re = /\s*(?:,|$)\s*/ //adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
-            const commaSeparated = queryTrimmed.split(re) ?? []; //split the string into a comma separated list
-            return commaSeparated.filter(word => word.length > 0); //and ensure each contains a character
+            const spaceSeparated = queryTrimmed.split(' ') ?? []; //split the string with every space
+            return spaceSeparated.filter(word => word.length > 0); //and ensure each contains a character
         },
         
         /**
@@ -179,7 +179,25 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
+         * no children descendents, all put in an array one level deep
+         * for search results
          * 
+         * @returns { Array } 
+         */
+        codesFlattened () {
+            if (this.isSearchActive) {
+                let flatChildren = [];
+                const codesClone = cloneDeep(this.codes); //cloneDeep is from lodash.js
+                codesClone.forEach((obj) => flatChildren = [...flatChildren, ...flattenCodes(obj)]);
+                return flatChildren;
+            } else {
+                return [];
+            }
+        },
+
+        /**
+         * To only start showing search results once enough characters
+         * have been added 
          * 
          * @return { Boolean }
          */
@@ -188,36 +206,33 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
-         * no children descendents, all put in an array one level deep
+         * When the search is active, will return any codes
+         * that match the current search query
          * 
-         * @returns { Array } 
+         * @return { Array }
          */
-        nodesFlattened () {
-            if (this.isSearchActive) {
-                let flatChildren = [];
-                this.codes.forEach((obj) => {
-                    flatChildren = [...flatChildren, ...flattenChildren(obj)];
-                });
-                return flatChildren;
-            } else {
-                return [];
-            }
+        searchResults () {
+            return this.codesFlattened.filter(this.searchForName);
         },
 
         /**
-         * the classes found relevant to the search input, capped to the maximum 
-         * amount of results to be shown
+         * To show that no codes march the current search
          * 
-         * @returns { Array } all relevant search results, once we've reached the minQueryLength
+         * @return { Boolean }
+         */
+        hasNoSearchResults () {
+            return this.searchResults.length === 0 && this.isSearchActive && this.hasSelectedFirstNode;
+        },
+
+        /**
+         * the codes found relevant to the search input
+         * 
+         * @returns { Array } 
          */
         codesWithSearch () {
-            if (this.query.length < MIN_QUERY_LENGTH) {
-                return this.codes;
-            } else if (this.codes.filter(this.searchForName).length > 0) { 
-                console.warn(this.codes.filter(this.searchForName).length);
-                const fullResults = this.codes.filter(this.searchForName);
-                return fullResults;
-            } else {
+            if (this.isSearchActive) { //only start showing results once the query is long enough
+                return this.searchResults;
+            } else { //otherwise just show codes
                 return this.codes;
             }
         },
@@ -231,7 +246,6 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          */
         resetSelectedSecondNode () {
             this.selectedSecondNodeId = UNSET_ID;
-            this.query = '';
         },
 
         /**
@@ -239,12 +253,11 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          */
         resetSelectedThirdNode () {
             this.selectedThirdNodeId = UNSET_ID;
-            this.query = '';
         },
 
         /**
-         * find all those results that match EACH search word
-         * within the the title field
+         * find all those results that match any search words
+         * within the the code or name fields
          *
          * @params { Object }
          *
@@ -253,11 +266,21 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         searchForName (code) {
             let wordMatchCount = 0;
             this.queryWordList.forEach(wordInSearch => {
+                if (code.code?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+                    wordMatchCount++;
+                }
                 if (code.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
                     wordMatchCount++;
                 }
             });
-            return wordMatchCount > 0 ? true : false; //if a word matches
+            return wordMatchCount > 0 ? true : false; //if there's any matches
+        },
+
+        /**
+         * clear the current search
+         */
+        clearSearch () {
+            this.query = '';
         },
 
     },
@@ -279,35 +302,18 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 }
 
 /**
- * 
+ * The codes are nested with children:[], so we pull them all
+ * out into a single level when searching 
  * 
  * @param { Object }
  */
- function flattenChildren (obj) {
+ function flattenCodes (obj) {
     let array = [obj];
     if (obj.children && obj.children.length > 0) {
         obj.children.forEach((child) => {
-            array = [...array, ...flattenChildren(child)];
+            array = [...array, ...flattenCodes(child)];
         });
         obj.children = []; 
     }
     return array;
 }
-
-/**
- * find all those results that match EACH search word
- * within the the title field
- *
- * @params { Object }
- *
- * @return { Boolean } true if found
- */
-// function searchForName (code) {
-//     let wordMatchCount = 0;
-//     this.queryWordList.forEach(wordInSearch => {
-//         if (code.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-//             wordMatchCount++;
-//         }
-//     });
-//     return wordMatchCount > 0 ? true : false; //if a word matches
-// }
