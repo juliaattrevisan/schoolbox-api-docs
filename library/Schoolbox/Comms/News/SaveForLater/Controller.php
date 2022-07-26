@@ -111,16 +111,7 @@ class Controller extends Base
                 );
             }
 
-            // check remaining ids with route
-            $idsToCheck = array_diff($idsToCheck, $articleIds);
-            if (!empty($idsToCheck)) {
-                $articlesToCheck = $this->newsMapper->findByColumn('id', $idsToCheck);
-                foreach ($articlesToCheck as $articleToCheck) {
-                    if ($this->getRouteIfAuthorized('commsNews.getDetail', ['article' => $articleToCheck])) {
-                        $articleIds[] = $articleToCheck->getId();
-                    }
-                }
-            }
+            // TODO: there may remain viewable articles
         }
 
         $params = new News\Querystring($this->getRequest()->query);
