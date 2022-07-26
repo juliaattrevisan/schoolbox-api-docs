@@ -46,13 +46,14 @@ ready(
 function onClickPlusButton()
 {
     let rowsContainerDiv = document.getElementById('rowsContainerDiv');
-    let newRowValue      = getHighestRowNumberOnPage(true) + 1;
+    let maxRowNumber     = getHighestRowNumberOnPage();
+    let newRowValue      = (maxRowNumber === null)? 0: maxRowNumber + 1;
     let newRowHtml       = (
         // NOTE: The newlines at the end of each line below are important for styling.
         //       The HTML here must match the HTML used in the inner-loop of the twig template.
         "<div id='row-div-" + newRowValue + "' data-role='newRow'>\n" +
             "<label>\n" +
-                "<span class='rubric-value-span' data-role='newRowValue'>" + newRowValue + "</span>\n" +
+                "<span class='rubric-value-span'>" + newRowValue + "</span>\n" +
                 "<input class='rubric-wide-input' type='text' name='row-" + newRowValue + "-label' maxlength='64' required/>\n" +
                 "<a onclick='onClickDeleteRow(" + newRowValue + ")'>Delete</a>\n" +
             "</label>\n" +
@@ -71,8 +72,7 @@ function onClickDeleteRow(rowValue)
 {
     let rowDiv = document.getElementById('row-div-' + rowValue);
     rowDiv.remove();
-
-    renumberNewRows();
+    renumberRows();
     enableSaveButton();
 }
 
@@ -80,47 +80,34 @@ function onClickDeleteRow(rowValue)
  * Find the highest number from the non-new rows, then update the numbers on the new rows
  * so that the number of each row is one more than the number on the row directly above.
  */
-function renumberNewRows()
+function renumberRows()
 {
-    let spans    = document.getElementsByClassName('rubric-value-span');
-    let newValue = getHighestRowNumberOnPage(false);
+    let spans = document.getElementsByClassName('rubric-value-span');
 
     for (let i = 0; i < spans.length; ++i) {
         let span = spans[i];
 
-        if (span.getAttribute('data-role') !== 'newRowValue') {
-            continue;
-        }
-
-        span.innerHTML = ++newValue;
+        span.innerHTML = i;
 
         // Must also rename the text input.
-        var labelTextInput = span.nextElementSibling;
-        labelTextInput.setAttribute('name', 'row-' + newValue + '-label');
+        let labelTextInput = span.nextElementSibling;
+        labelTextInput.setAttribute('name', 'row-' + i + '-label');
     }
 }
 
 /**
  * Find the highest number from all rows on the page.
- *
- * @param boolIncludeNewRows
- *    Set to false to exclude the row numbers.
  */
-function getHighestRowNumberOnPage(boolIncludeNewRows)
+function getHighestRowNumberOnPage()
 {
     let spans    = document.getElementsByClassName('rubric-value-span');
-    let maxValue = 0;
+    let maxValue = null;
 
     for (let i = 0; i < spans.length; ++i) {
-        let span = spans[i];
-
-        if (!boolIncludeNewRows && span.getAttribute('data-role') === 'newRowValue') {
-            continue;
-        }
-
+        let span      = spans[i];
         let spanValue = Number(span.innerHTML);
 
-        if (spanValue > maxValue) {
+        if (maxValue === null || spanValue > maxValue) {
             maxValue = spanValue;
         }
     }
@@ -139,12 +126,6 @@ function enableSaveButton()
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
-        <div class="small-12 island">
-            <ul class="breadcrumb">
-                <li><a href="/adminv2/rubric-results/">Rubric Result Sets</a></li>
-                <li class="active"><a>Rubric Result Set</a></li>
-            </ul>
-        </div>
         <div class="small-12 island">
             <section class="content">
                 <div class="row">
