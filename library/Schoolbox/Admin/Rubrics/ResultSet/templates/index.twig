@@ -31,6 +31,7 @@ function onClickPlusButton()
     );
 
     rowsContainerDiv.innerHTML += newRowHtml;
+    enableSaveButton();
 }
 
 /**
@@ -43,6 +44,7 @@ function onClickDeleteRow(rowValue)
     rowDiv.remove();
 
     renumberNewRows();
+    enableSaveButton();
 }
 
 /**
@@ -96,6 +98,11 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
 
     return maxValue;
 }
+
+function enableSaveButton()
+{
+    document.getElementById('save-button').disabled = false;
+}
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -131,7 +138,7 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
                         <div id="row-div-{{ row.value|purify }}">
                             <label>
                                 <span class="rubric-value-span" data-role="value">{{ row.value|purify }}</span>
-                                <input class="rubric-wide-input" type="text" name="row-{{ row.value|purify }}-label" value="{{ row.label|purify }}" maxlength="64" required/>
+                                <input class="rubric-wide-input" type="text" name="row-{{ row.value|purify }}-label" value="{{ row.label|purify }}" onkeyup="enableSaveButton()" maxlength="64" required/>
                                 <a onclick='onClickDeleteRow({{  row.value|purify }})'>Delete</a>
                             </label>
                         </div>
@@ -140,7 +147,7 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
                 <div class="plus-button-container-div">
                     <button onclick="onClickPlusButton()">+</button>
                 </div>
-                <input type="submit" value="Save Changes"/>
+                <input id='save-button' disabled='disabled' type="submit" value="Save Changes"/>
             </form>
         </div>
     </div>
