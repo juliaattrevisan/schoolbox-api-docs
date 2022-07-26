@@ -5,7 +5,7 @@
         width: 90%;
     }
 
-    div#plusButtonContainerDiv
+    div.plus-button-container-div
     {
         text-align: right;
     }
@@ -103,6 +103,7 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
+        <div><a href="/adminv2/rubric-results/">Back to Rubrics Result Sets</a></div>
         <div class="small-12 island">
             <section class="content">
                 <div class="row">
@@ -126,7 +127,6 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
         <div class="small-12 island">
             <form data-action="saveRubricResultRows" method="POST" name="rubricResultRows" action="/adminv2/rubric-results/{{ resultSetId }}">
                 <div id="rowsContainerDiv">
-                    <h3>Existing Set</h3>
                     {% for row in rubricResultRows %}
                         <div id="row-div-{{ row.value|purify }}">
                             <label>
@@ -137,7 +137,7 @@ function getHighestRowNumberOnPage(boolIncludeNewRows)
                         </div>
                     {% endfor %}
                 </div>
-                <div id="plusButtonContainerDiv">
+                <div class="plus-button-container-div">
                     <button onclick="onClickPlusButton()">+</button>
                 </div>
                 <input type="submit" value="Save Changes"/>
