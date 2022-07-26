@@ -60,7 +60,7 @@ function onClickPlusButton()
         "</div>\n"
     );
 
-    rowsContainerDiv.innerHTML += newRowHtml;
+    rowsContainerDiv.insertAdjacentHTML('beforeend', newRowHtml);
     enableSaveButton();
 }
 
