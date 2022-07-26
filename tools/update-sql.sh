@@ -194,17 +194,27 @@ execute_upgrade_scripts(){
 # Reset facter fact
 update_puppet_facts(){
   mkdir -p /etc/facter/facts.d/ >/dev/null 2>&1;
+  mkdir -p /tmp/facter/ >/dev/null 2>&1;
+  fact_file="/etc/facter/facts.d/schoolbox_update.json";
+  tmp_fact_file="/tmp/facter/schoolbox_$INSTANCE_ID_update.json";
   if [ $error_int -ne 0 ]; then
     error_msg=$(echo "$error_msg" | cut -d',' -f2-100);
-    echo "schoolbox_update_error=$error_int" > /etc/facter/facts.d/schoolbox_update.txt;
-    echo "schoolbox_update_errormsg=$error_msg" >> /etc/facter/facts.d/schoolbox_update.txt;
+
+    #create temp file for this instance
+    jq -n -c \
+      --arg instanceid "$INSTANCE_ID" \
+      --arg errint "$error_int" \
+      --arg errmsg "$error_msg" \
+      '.schoolbox_update_error[$instanceid] = $errint | .schoolbox_update_errormsg[$instanceid] = $errmsg' \
+      > $tmp_fact_file;
+
     error "SQL updates completed with errors. Please manually fix issues or rollback to pre-update backup."
   else
-    echo "schoolbox_update_error=0" > /etc/facter/facts.d/schoolbox_update.txt;
+    #
+    jq -n ".$INSTANCE_ID.schoolbox_update_error = 0" > $fact_file;
     log "SQL updates completed";
   fi
 }
-
 
 # Validates the 'start' + 'end' update dirs
 check_start_end_dirs(){
