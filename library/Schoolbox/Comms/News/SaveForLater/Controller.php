@@ -112,7 +112,7 @@ class Controller extends Base
             }
 
             // check remaining ids with route
-            $idsToCheck      = array_diff($idsToCheck, $articleIds);
+            $idsToCheck = array_diff($idsToCheck, $articleIds);
             if (!empty($idsToCheck)) {
                 $articlesToCheck = $this->newsMapper->findByColumn('id', $idsToCheck);
                 foreach ($articlesToCheck as $articleToCheck) {
