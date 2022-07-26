@@ -66,7 +66,7 @@
                             <span data-tooltip class="hint has-tip tip-top" data-width="200"
                                 title="I'm here to display the description of the current field.">?</span>
                         </label>
-                        
+
                         <input type="text" name="text" id="text" placeholder="Put some text here" required />
                     </div>
                     <div class="small-12 columns">
@@ -74,8 +74,8 @@
                             <span class="required-with-tip">Input Number</span>
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This field only allows numbers">?</span>
                         </label>
-                        
-                        <input type="number" name="number" id="number" value="20" required />
+
+                        <input type="text" inputmode="numeric" name="number" id="number" value="20" required />
                     </div>
                     <div class="small-12 columns">
                         <label class="required">Input Group</label>
@@ -249,11 +249,11 @@
                         </fieldset>
                         <script>
                             $(function() {
-                                
+
                                 var parentCheckboxSelector = "[data-parent-checkbox]";
                                 var childCheckboxSelector = "[data-child-checkbox]";
                                 var childGroupSelector = "[data-child-group]";
-                                  
+
                                 // Initial setup: if any parent types are already checked (from saved data), show their subtypes
                                 // otherwise hide the subtypes to save space
                                 $(parentCheckboxSelector).each(function(index, parentCheckbox) {
