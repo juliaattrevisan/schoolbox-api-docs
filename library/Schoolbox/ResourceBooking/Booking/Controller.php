@@ -291,7 +291,6 @@ class Controller extends Base
      */
     public function update(Model $item)
     {
-        $bookingList   = null;
         $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
         $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
 
