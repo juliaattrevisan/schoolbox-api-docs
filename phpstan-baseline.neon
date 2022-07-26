@@ -4146,21 +4146,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Profile/Profile.php
 
 		-
-			message: "#^Result of \\|\\| is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
-
-		-
-			message: "#^Variable \\$classCode in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
-
-		-
-			message: "#^Variable \\$studentCode in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Importer\\\\User\\:\\:parseStringBoolean\\(\\) should return bool but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Importer/User.php

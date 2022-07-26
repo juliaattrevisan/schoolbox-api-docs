@@ -32,7 +32,6 @@ use Schoolbox\UserMapper;
  */
 class Timetable extends AbstractImporter
 {
-
     /**
      * @var UserMapper
      */
@@ -110,7 +109,7 @@ class Timetable extends AbstractImporter
         $timetablePeriodCache = [];
 
         foreach ($this->reader as $i => $row) {
-            $key = trim($row['Class Code']);
+            $key = trim($row['Class Code'] ?? '');
 
             /* The class code must exist, otherwise we can't import it
              * Purely whitespace class codes aren't valid class codes

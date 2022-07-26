@@ -31,7 +31,6 @@ use Schoolbox\UserMapper;
  */
 class TimetableEnrolment extends AbstractImporter
 {
-
     /**
      * @var IConnector
      */
@@ -100,10 +99,10 @@ class TimetableEnrolment extends AbstractImporter
         $result = [];
 
         foreach ($this->reader as $i => $row) {
-            $classCode   = trim($row['Class Code']);
-            $studentCode = trim($row['Student Code']);
+            $classCode   = trim($row['Class Code'] ?? '');
+            $studentCode = trim($row['Student Code'] ?? '');
 
-            if (!isset($classCode) || !isset($studentCode)) {
+            if ('' === $classCode || '' === $studentCode) {
                 $this->log->warning('Mandatory fields "Class Code" and "Student Code" not defined: skipping!');
                 continue;
             }
