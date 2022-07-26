@@ -10,8 +10,6 @@
 
 namespace Schoolbox\Admin\Rubrics\ResultSet;
 
-use Exception;
-use http\Exception\InvalidArgumentException;
 use PDO;
 use Schoolbox\Assessment\Rubric\DataModel\Result\Model;
 use Schoolbox\Mapper as BaseMapper;
@@ -60,7 +58,7 @@ class Mapper extends BaseMapper
             $stmt->execute();
 
             $rows        = $stmt->fetchAll();
-            $resultSetId = (count($rows) == 0) ? 1 : (int)$rows[0]['resultset_id'];
+            $resultSetId = (count($rows) == 0) ? 1 : (int)$rows[0]['resultset_id'] + 1;
         }
 
         $stmt = $this->database->prepare(
