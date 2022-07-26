@@ -167,12 +167,13 @@ class Controller extends ConfigController
         $host = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $type = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
+        $includePhoto = $this->getConfigLoader()->get('photo_sis_import');
 
         $isReachable = false;
 
         if ('' !== $type) {
             try {
-                $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+                $status = (new Endpoint\Status\Factory($host, $key, $includePhoto))->produce($type);
 
                 if ($status) {
                     $isReachable = $status->isReachable();
@@ -196,13 +197,14 @@ class Controller extends ConfigController
         $host = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $type = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
+        $includePhoto = $this->getConfigLoader()->get('photo_sis_import');
 
         $report = null;
         $message = self::DEFAULT_UNKNOWN_DATA_SOURCE;
 
         if ('' !== $type) {
             try {
-                $status = (new Endpoint\Status\Factory($host, $key))->produce($type);
+                $status = (new Endpoint\Status\Factory($host, $key, $includePhoto))->produce($type);
 
                 if ($status) {
                     $report = $status->getReport();
