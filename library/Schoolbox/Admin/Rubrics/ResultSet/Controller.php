@@ -37,6 +37,28 @@ class Controller extends Base
      * Load templates/index.twig using data obtained in this function.
      * @throws RouteNotFound
      */
+    public function getRubricResultsForCreate(): void
+    {
+        $this->getResponse()->content->set(
+            [
+                // Same template and data schema as for getRubricResults().
+                'template' => '@adminRubric/index.twig',
+                'data'     => [
+                    'pageCurrent'      => $this->router->generate('adminRubric.getRubricResultsForCreate'),
+                    'resultSetId'      => null,
+                    'rubricResultRows' => [],
+                    'allBreadcrumbs'   => (
+                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubric.getRubricResultsForCreate'))
+                    )
+                ]
+            ]
+        );
+    }
+
+    /**
+     * Load templates/index.twig using data obtained in this function.
+     * @throws RouteNotFound
+     */
     public function getRubricResults($resultSetId): void
     {
         $this->getResponse()->content->set(
@@ -58,7 +80,7 @@ class Controller extends Base
      * Save $_POSTed data to database, then redirect to getRubricResults().
      * @throws Exception
      */
-    public function postRubricResults($resultSetId): void
+    public function postRubricResults(?int $resultSetIdOrNull): void
     {
         $postedData    = $this->getRequest()->post->getArrayCopy();
         $indexedLabels = array();
@@ -75,9 +97,7 @@ class Controller extends Base
             $indexedLabels[$n] = $value;
         }
 
-        // The returned $resultSetId will differ from the supplied only if a new result set is created.
-        // This will happen if the supplied $resultSetId is -1.
-        $resultSetId = $this->mapper->createOrOverwriteRubricResultSet((int)$resultSetId, $indexedLabels);
+        $resultSetId = $this->mapper->createOrOverwriteRubricResultSet($resultSetIdOrNull, $indexedLabels);
 
         $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubric.getRubricResults', ['resultSetId' => $resultSetId]));
     }

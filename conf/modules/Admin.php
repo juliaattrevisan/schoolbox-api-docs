@@ -101,7 +101,7 @@ class Admin extends ModuleLoader
         // Filters
         $this->loadModule($di, FilterModule::class, '/adminv2/filters');
 
-        // Restore (undelete) entities that have been recenetly deleted
+        // Restore (undelete) entities that have been recently deleted
         $this->loadModule($di, \Schoolbox\Admin\Restore\Module::class, '/adminv2/restore');
 
         // Grades page
@@ -120,7 +120,7 @@ class Admin extends ModuleLoader
         $this->loadModule($di, \Schoolbox\Admin\EmailDKIM\Module::class, '/adminv2/email-dkim');
 
         // Rubrics
-        $this->loadModule($di, \Schoolbox\Admin\Rubrics\ResultSets\Module::class, '/adminv2/rubric-results');
-        $this->loadModule($di, \Schoolbox\Admin\Rubrics\ResultSet\Module::class, '/adminv2/rubric-results/{resultSetId}');
+        $this->loadModule($di, \Schoolbox\Admin\Rubrics\ResultSets\Module::class, '/adminv2/rubric-results-sets');
+        $this->loadModule($di, \Schoolbox\Admin\Rubrics\ResultSet\Module::class, '/adminv2/rubric-results-set');
     }
 }

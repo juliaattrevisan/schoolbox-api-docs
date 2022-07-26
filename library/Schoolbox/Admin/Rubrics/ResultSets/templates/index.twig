@@ -51,7 +51,7 @@ div.clear-floats
         <div class="small-12 island">
             <div data-role="rubricList">
                 <div>
-                    <button class='create-new-result-set-button icon-add' onclick="document.location.href='/adminv2/rubric-results/-1';">Create new result set</button>
+                    <button class='create-new-result-set-button icon-add' onclick="document.location.href='/adminv2/rubric-results-set/create';">Create new result set</button>
                     <h3>Result Sets</h3>
                     <div class="clear-floats"></div>
                 </div>
@@ -64,8 +64,8 @@ div.clear-floats
                                 {{ rubric.label|purify }}{% if loop.index != loop.last %},{% endif %}
                             {% endfor %}
                             </span>
-                            <a href="/adminv2/rubric-results/{{ resultSetId }}">Edit</a> |
-                            <a href="/adminv2/rubric-results/delete/{{ resultSetId }}" onclick="return confirm('Do you really want to delete this result set?')">Delete</a>
+                            <a href="/adminv2/rubric-results-set/{{ resultSetId }}">Edit</a> |
+                            <a href="/adminv2/rubric-results-sets/delete/{{ resultSetId }}" onclick="return confirm('Do you really want to delete this result set?')">Delete</a>
                         </div>
                     </section>
                     {% set currentResultSetId = resultSetId %}

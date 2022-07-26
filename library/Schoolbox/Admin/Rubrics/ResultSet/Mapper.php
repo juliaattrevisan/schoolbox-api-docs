@@ -46,9 +46,9 @@ class Mapper extends BaseMapper
      * @return int ($resultSetId)
      * @throws \InvalidArgumentException
      */
-    public function createOrOverwriteRubricResultSet(int $resultSetId, array $labelsInOrder): int
+    public function createOrOverwriteRubricResultSet(?int $resultSetIdOrNull, array $labelsInOrder): int
     {
-        if ($resultSetId === -1) {
+        if ($resultSetIdOrNull === null) {
             $stmt = $this->database->prepare(
                 'SELECT resultset_id
                 FROM rubric_result
@@ -59,6 +59,8 @@ class Mapper extends BaseMapper
 
             $rows        = $stmt->fetchAll();
             $resultSetId = (count($rows) == 0) ? 1 : (int)$rows[0]['resultset_id'] + 1;
+        } else {
+            $resultSetId = $resultSetIdOrNull;
         }
 
         $stmt = $this->database->prepare(

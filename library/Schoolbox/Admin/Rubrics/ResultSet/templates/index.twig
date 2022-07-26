@@ -55,7 +55,7 @@ function onClickPlusButton()
             "<label>\n" +
                 "<span class='rubric-value-span'>" + newRowValue + "</span>\n" +
                 "<input class='rubric-wide-input' type='text' name='row-" + newRowValue + "-label' maxlength='64' required/>\n" +
-                "<a onclick='onClickDeleteRow(" + newRowValue + ")'>Delete</a>\n" +
+                "<a class='delete-row-button icon-delete' onclick='onClickDeleteRow(" + newRowValue + ")'></a>\n" +
             "</label>\n" +
         "</div>\n"
     );
@@ -146,14 +146,14 @@ function enableSaveButton()
             </section>
         </div>
         <div class="small-12 island">
-            <form data-action="saveRubricResultRows" method="POST" name="rubricResultRows" action="/adminv2/rubric-results/{{ resultSetId }}">
+            <form data-action="saveRubricResultRows" method="POST" name="rubricResultRows" action="/adminv2/rubric-results-set/{{ resultSetId }}">
                 <div id="rowsContainerDiv">
                     {% for row in rubricResultRows %}
                         <div id="row-div-{{ row.value|purify }}">
                             <label>
                                 <span class="rubric-value-span" data-role="value">{{ row.value|purify }}</span>
                                 <input class="rubric-wide-input" type="text" name="row-{{ row.value|purify }}-label" value="{{ row.label|purify }}" onkeyup="enableSaveButton()" maxlength="64" required/>
-                                <a onclick='onClickDeleteRow({{  row.value|purify }})'>Delete</a>
+                                <a class='delete-row-button icon-delete' onclick='onClickDeleteRow({{  row.value|purify }})'></a>
                             </label>
                         </div>
                     {% endfor %}
