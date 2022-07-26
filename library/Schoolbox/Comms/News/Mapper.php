@@ -743,12 +743,14 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 FROM `comms_news_article`
                 JOIN `comms_news_audience` ON `comms_news_audience`.comms_news_article_id = comms_news_article.id
                                            AND `comms_news_audience`.relationship = :self
+                                           AND `comms_news_audience`.entity_type = :folder
                 JOIN `perms` ON `perms`.cid = comms_news_audience.entity_value AND `perms`.type > 0
                 WHERE `perms`.gid = :roleId
                   AND `comms_news_article`.deleted_at IS NULL
         ";
         $params = [
             'self'   => \Schoolbox\Comms\News\Audience\Model::RELATIONSHIP_SELF,
+            'folder' => Folder::getEntityType(),
             'roleId' => $role->getId(),
         ];
         if (!empty($articleIdsToLimit)) {

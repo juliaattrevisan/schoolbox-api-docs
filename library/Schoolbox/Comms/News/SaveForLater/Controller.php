@@ -19,6 +19,8 @@ use Schoolbox\Comms\News\Lookup\ReadMore;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use PDOException;
 use UnexpectedValueException;
@@ -44,6 +46,8 @@ class Controller extends Base
     /** @var ArticleResolver */
     private ArticleResolver $articleResolver;
 
+    private UserAccessMapper $userAccessMapper;
+
     /**
      * Controller constructor.
      *
@@ -51,31 +55,34 @@ class Controller extends Base
      * @param News\Mapper      $newsMapper
      * @param News\File\Mapper $fileMapper
      * @param ArticleResolver  $articleResolver
+     * @param UserAccessMapper $userAccessMapper
      */
     public function __construct(
         Mapper $saveForLaterMapper,
         News\Mapper $newsMapper,
         News\File\Mapper $fileMapper,
-        ArticleResolver $articleResolver
+        ArticleResolver $articleResolver,
+        UserAccessMapper $userAccessMapper
     ) {
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->newsMapper         = $newsMapper;
         $this->fileMapper         = $fileMapper;
         $this->articleResolver    = $articleResolver;
+        $this->userAccessMapper   = $userAccessMapper;
     }
 
 
     /**
      * A list of articles that you saved for later
      *
-     * @api GET /news/saved
      * @throws PDOException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
+     * @api GET /news/saved
      */
     public function getList(): void
     {
-        $ids = $this->saveForLaterMapper->findSavedIdsForUser($this->getUser()->getId());
+        $ids             = $this->saveForLaterMapper->findSavedIdsForUser($this->getUser()->getId());
         $savedArticleIds = array_map('intval', $ids);
         if ($this->isXhrRequest()) {
             // this is for turning on saved icon in news feed
@@ -84,17 +91,34 @@ class Controller extends Base
             return;
         }
 
-        // get safe saved articles
-        $userFeed = new UserFeed($this->newsMapper, $this->articleResolver);
-        $articleIds = $userFeed->find($this->getUser(), Model::STATE_PUBLIC, true);
+        $articleIds = $savedArticleIds;
 
-        // check saved articles but not in the feed
-        $idsToCheck = array_diff($savedArticleIds, $articleIds);
-        if (!empty($idsToCheck)) {
-            $articleIds = array_merge(
-                $articleIds,
-                $this->newsMapper->findArticleIdsForRole($this->getUser()->getRole(), $idsToCheck)
-            );
+        // Check article visibility, if current user is not superuser or doesn't have news permission
+        if (
+            !$this->getUser()->isSuperuser()
+            && $this->userAccessMapper->findServiceForUser($this->getUser(), UserAccess::SERVICE_NEWS)->count() === 0
+        ) {
+            // get safe saved articles
+            $userFeed   = new UserFeed($this->newsMapper, $this->articleResolver);
+            $articleIds = $userFeed->find($this->getUser(), Model::STATE_PUBLIC, true);
+
+            // check saved articles but not in the feed
+            $idsToCheck = array_diff($savedArticleIds, $articleIds);
+            if (!empty($idsToCheck)) {
+                $articleIds = array_merge(
+                    $articleIds,
+                    $this->newsMapper->findArticleIdsForRole($this->getUser()->getRole(), $idsToCheck)
+                );
+            }
+
+            // check remaining ids with route
+            $idsToCheck      = array_diff($idsToCheck, $articleIds);
+            $articlesToCheck = $this->newsMapper->findByColumn('id', $idsToCheck);
+            foreach ($articlesToCheck as $articleToCheck) {
+                if ($this->getRouteIfAuthorized('commsNews.getDetail', ['article' => $articleToCheck])) {
+                    $articleIds[] = $articleToCheck->getId();
+                }
+            }
         }
 
         $params = new News\Querystring($this->getRequest()->query);
@@ -123,14 +147,14 @@ class Controller extends Base
 
         $data = array_merge(
             [
-                'articles' => $articles,
+                'articles'         => $articles,
                 'attachmentCounts' => $attachmentCounts,
-                'referrer' => $params->getReferrer(),
-                'readMores' => $readMores,
-                'fallbackImage' => [
+                'referrer'         => $params->getReferrer(),
+                'readMores'        => $readMores,
+                'fallbackImage'    => [
                     'type' => $this->getConfigLoader()->get('comms_news_article_list_fallback_image'),
-                    'hash' => $this->getConfigLoader()->get('skin_logo_large')
-                ]
+                    'hash' => $this->getConfigLoader()->get('skin_logo_large'),
+                ],
             ],
             $sidebar->generate()
         );

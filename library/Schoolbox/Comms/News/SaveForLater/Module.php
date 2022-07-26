@@ -29,6 +29,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Module extends BaseModule
 {
@@ -114,6 +115,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(NewsMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Comms\News\File\Mapper::class),
             $this->injector->get('commsNewsArticleResolver'),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
         );
     }
 
