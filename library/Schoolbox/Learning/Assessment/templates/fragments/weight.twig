@@ -9,6 +9,6 @@
  #}
 <label>
     Weight <span data-tooltip class="hint has-tip tip-top"  title="This value indicates how much this assessment's outcome contributes to the final overall grade - a value of 0 indicates this assessment has no impact on the overall grade. Generally, this is a number between 0 and 100.">?</span>
-    <input type="number" name="weight" value="{{ assessment.weight }}" {% if courseManagedReadonly ?? false %}readonly{% endif %}>
+    <input type="text" inputmode="numeric" name="weight" value="{{ assessment.weight }}" {% if courseManagedReadonly ?? false %}readonly{% endif %}>
 </label>
 
