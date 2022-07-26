@@ -3266,22 +3266,12 @@ parameters:
 			path: library/Schoolbox/Comms/News/Moderation/Module.php
 
 		-
-			message: "#^Class Schoolbox\\\\Comms\\\\News\\\\Discussion\\\\Permission\\\\CanModerateThread constructor invoked with 2 parameters, 1 required\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Module.php
-
-		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Comms\\\\News\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Module.php
 
 		-
 			message: "#^PHPDoc tag @return with type object is not subtype of native type Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\StrategyFactory\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Module.php
-
-		-
-			message: "#^Variable \\$strategyFactory in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Module.php
 
@@ -3304,11 +3294,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Querystring\\:\\:\\$querystring \\(ArrayAccess\\) does not accept array\\<string, mixed\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Querystring.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:getMessageById\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/SaveForLater/Module.php
 
 		-
 			message: "#^Left side of && is always true\\.$#"

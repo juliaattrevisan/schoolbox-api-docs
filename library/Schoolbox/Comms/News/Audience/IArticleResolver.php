@@ -14,16 +14,15 @@ use Schoolbox\User;
 
 interface IArticleResolver
 {
-
     /**
      * Return the set of ids of articles whose audience contains this user
      *
      * @param User     $user
-     * @param int|null $state If provided, find only IDs of articles in this
-     *                        state
+     * @param int|null $state If provided, find only IDs of articles in this state
+     * @param bool     $savedOnly If true, returns only saved articles
      * @return int[]
      */
-    public function findArticlesForUser(User $user, ?int $state): array;
+    public function findArticlesForUser(User $user, ?int $state, bool $savedOnly): array;
 
 
     /**

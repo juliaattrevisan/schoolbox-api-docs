@@ -14,11 +14,10 @@ use Schoolbox\User;
 
 class MockArticleResolver implements IArticleResolver
 {
-
     /**
      * @inheritdoc
      */
-    public function findArticlesForUser(User $user, ?int $state): array
+    public function findArticlesForUser(User $user, ?int $state, bool $savedOnly): array
     {
         $articles = [];
         foreach (MockUserResolver::ARTICLE_AUDIENCES as $articleId => $userIds) {

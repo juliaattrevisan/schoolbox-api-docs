@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\SaveForLater;
 
 use InvalidArgumentException;
 use Schoolbox\Comms\News;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -23,7 +24,6 @@ class Mapper extends \Schoolbox\Mapper
      */
     public const SAVED = 1;
     public const UNSAVED = 0;
-
 
     /**
      * @inheritdoc
@@ -93,5 +93,30 @@ class Mapper extends \Schoolbox\Mapper
         $statement->execute($pb->getParams());
 
         return $statement->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Returns join string to join comms_news_saveforlater table
+     * @param string $articleAlias
+     * @param bool   $savedOnly
+     * @return string
+     */
+    public static function getSavedJoin(string $articleAlias, bool $savedOnly): string
+    {
+        return $savedOnly ? " INNER JOIN comms_news_saveforlater
+                          ON comms_news_saveforlater.article_id = {$articleAlias}.id
+                          AND comms_news_saveforlater.deleted_at IS NULL
+                          AND comms_news_saveforlater.user_id = :savedUserId " : '';
+    }
+
+    /**
+     * Returns params to join comms_news_saveforlater table
+     * @param User $user
+     * @param bool $savedOnly
+     * @return array
+     */
+    public static function getSavedJoinParams(User $user, bool $savedOnly): array
+    {
+        return $savedOnly ? ['savedUserId' => $user->getId()] : [];
     }
 }

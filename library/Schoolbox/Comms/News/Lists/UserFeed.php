@@ -54,12 +54,14 @@ class UserFeed
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    public function find(User $user, ?int $state): array
+    public function find(User $user, ?int $state, bool $savedOnly): array
     {
-        return array_unique(
-            array_merge(
-                $this->articleResolver->findArticlesForUser($user, $state),
-                $this->newsMapper->findAuthoredOrAcceptedArticleIds($user, $state)
+        return array_values(
+            array_unique(
+                array_merge(
+                    $this->articleResolver->findArticlesForUser($user, $state, $savedOnly),
+                    $this->newsMapper->findAuthoredOrAcceptedArticleIds($user, $state, $savedOnly)
+                )
             )
         );
     }
