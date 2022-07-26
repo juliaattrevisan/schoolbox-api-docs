@@ -36,20 +36,33 @@ class Mapper extends BaseMapper
      */
     public function findRubricResultRows(int $resultSetId): array
     {
-        $pdoStatement = $this->database->prepare('SELECT * FROM rubric_result WHERE resultset_id = :resultSetId');
-        $pdoStatement->execute(array('resultSetId' => $resultSetId));
+        $stmt = $this->database->prepare('SELECT * FROM rubric_result WHERE resultset_id = :resultSetId');
+        $stmt->execute(array('resultSetId' => $resultSetId));
 
-        return $pdoStatement->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
-     * @param int $rubricResultId
+     * @param int $resultSetId (Supply -1 to create a new rubric result set.  MAX(resultset_id)+1 will be used.)
      * @param array $labelsInOrder
-     * @return void
+     * @return int ($resultSetId)
      * @throws \InvalidArgumentException
      */
-    public function createOrOverwriteRubricResultSet(int $resultSetId, array $labelsInOrder): void
+    public function createOrOverwriteRubricResultSet(int $resultSetId, array $labelsInOrder): int
     {
+        if ($resultSetId === -1) {
+            $stmt = $this->database->prepare(
+                'SELECT resultset_id
+                FROM rubric_result
+                ORDER BY resultset_id DESC
+                LIMIT 1'
+            );
+            $stmt->execute();
+
+            $rows        = $stmt->fetchAll();
+            $resultSetId = (count($rows) == 0) ? 1 : (int)$rows[0]['resultset_id'];
+        }
+
         $stmt = $this->database->prepare(
             "DELETE FROM rubric_result
             WHERE resultset_id = :resultSetId"
@@ -84,5 +97,7 @@ class Mapper extends BaseMapper
                 )
             );
         }
+
+        return $resultSetId;
     }
 }

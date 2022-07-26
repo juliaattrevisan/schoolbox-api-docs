@@ -75,7 +75,9 @@ class Controller extends Base
             $indexedLabels[$n] = $value;
         }
 
-        $this->mapper->createOrOverwriteRubricResultSet((int)$resultSetId, $indexedLabels);
+        // The returned $resultSetId will differ from the supplied only if a new result set is created.
+        // This will happen if the supplied $resultSetId is -1.
+        $resultSetId = $this->mapper->createOrOverwriteRubricResultSet((int)$resultSetId, $indexedLabels);
 
         $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubric.getRubricResults', ['resultSetId' => $resultSetId]));
     }
