@@ -78,9 +78,9 @@ class Series
      * @param Item\Model  $resource
      * @param DateTime    $startDate
      * @param DateTime    $endDate
-     * @param String|null $repeatUntil
-     * @param String|null $related
-     * @param String|null $repeat
+     * @param string|null $repeatUntil
+     * @param array|null  $related
+     * @param string|null $repeat
      * @param Campus|null $campus
      *
      * @return array
@@ -90,9 +90,9 @@ class Series
         Item\Model $resource,
         DateTime $startDate,
         DateTime $endDate,
-        $repeatUntil = null,
-        $related = null,
-        $repeat = null,
+        ?string $repeatUntil = null,
+        ?array $related = null,
+        ?string $repeat = null,
         Campus $campus = null
     ) {
         $dateParts = [];
@@ -156,11 +156,11 @@ class Series
     /**
      * Get all related booking dates
      *
-     * @param Booking  $existingBooking
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     * @param String $related
-     * @param String $efficacy
+     * @param Booking     $existingBooking
+     * @param DateTime    $startDate
+     * @param DateTime    $endDate
+     * @param array|null  $related
+     * @param string|null $efficacy
      * @return array
      * @throws MapperException
      */
@@ -168,8 +168,8 @@ class Series
         Booking $existingBooking,
         DateTime $startDate,
         DateTime $endDate,
-        $related = null,
-        $efficacy = null
+        ?array $related = null,
+        ?string $efficacy = null
     ) {
         $relatedItems  = [];
         foreach ($related ?: [] as $relatedItem) {
@@ -212,7 +212,7 @@ class Series
      * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
      *                                                       notes key in the value contains the notes for the related
      *                                                       booking.
-     * @param string                           $efficacy     The efficiacy of this update:
+     * @param string|null                      $efficacy     The efficiacy of this update:
      *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to update the
      *                                                       entire series, otherwise update only this item.
      *                                                       (Related bookings are always updated.)
@@ -228,7 +228,7 @@ class Series
         DateTime $startDate,
         DateTime $endDate,
         array $relatedItems,
-        $efficacy
+        ?string $efficacy
     ) {
         return $this->getSeries(
             $item,
@@ -250,7 +250,7 @@ class Series
      * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
      *                                                       notes key in the value contains the notes for the related
      *                                                       booking.
-     * @param string                           $efficacy     The efficiacy of this update:
+     * @param string|null                      $efficacy     The efficiacy of this update:
      *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to delete the
      *                                                       entire series, otherwise update only this item.
      *                                                       (Related bookings are always updated.)
@@ -266,7 +266,7 @@ class Series
         DateTime $startDate,
         DateTime $endDate,
         array $relatedItems,
-        $efficacy
+        ?string $efficacy
     ) {
         return $this->getSeries(
             $item,
@@ -293,7 +293,7 @@ class Series
      * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
      *                                                       notes key in the value contains the notes for the related
      *                                                       booking.
-     * @param string                           $efficacy     The efficiacy of this update:
+     * @param string|null                      $efficacy     The efficiacy of this update:
      *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to update the
      *                                                       entire series, otherwise update only this item.
      *                                                       (Related bookings are always updated.)
@@ -311,7 +311,7 @@ class Series
         DateTime $startDate,
         DateTime $endDate,
         array $relatedItems,
-        $efficacy,
+        ?string $efficacy,
         string $seriesType,
     ) {
         // Get the date and time changes.

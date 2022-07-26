@@ -317,7 +317,7 @@ class Controller extends Base
                 Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject(),
                 Alaress_Date_Format::newLocal($this->getRequest()->post['endDate'])->getDateTimeObject(),
                 $this->getRelatedItemsFromForm(),
-                $this->request->post['efficacy']
+                $this->request->post['efficacy'] ?? null,
             );
 
             // Get the date and time changes from original booking
