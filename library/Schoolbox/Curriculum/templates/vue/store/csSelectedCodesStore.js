@@ -22,6 +22,15 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
             return this.codes.length === 0;
         },
 
+        /**
+         * Do we have any selected codes?
+         * 
+         * @return { Boolean }
+         */
+        hasCodes () {
+            return this.codes.length > 0;
+        },
+
     },
    
     actions: {

@@ -48,8 +48,8 @@ function onRefreshSelected () {
             <label>Curriculum Codes
                 <span data-tooltip="" class="hint has-tip tip-top" data-width="200" data-selector="tooltip-l5qfe53bv" aria-describedby="tooltip-l5qfe53bv" title="">?</span>
             </label>
-            <cs-search-input />
             <cs-selected-codes />
+            <cs-search-input />
         </div>
     </div>
     <cs-modal />
