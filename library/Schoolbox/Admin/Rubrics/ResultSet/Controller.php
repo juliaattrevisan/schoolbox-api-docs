@@ -60,9 +60,7 @@ class Controller extends Base
      */
     public function postRubricResults($resultSetId): void
     {
-// TODO: Get entire $_POST array using $this->getRequest() somehow.
-//        $postedData = $this->getRequest()->post;
-        $postedData    = $_POST;
+        $postedData    = $this->getRequest()->post->getArrayCopy();
         $indexedLabels = array();
 
         foreach ($postedData as $key => $value) {
@@ -79,6 +77,6 @@ class Controller extends Base
 
         $this->mapper->createOrOverwriteRubricResultSet((int)$resultSetId, $indexedLabels);
 
-        $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubric.getRubricResults'));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubric.getRubricResults', ['resultSetId' => $resultSetId]));
     }
 }
