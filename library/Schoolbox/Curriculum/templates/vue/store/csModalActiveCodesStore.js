@@ -1,6 +1,6 @@
 /** 
  * Manages the currently active codes, those filtered by both <select> and 
- * the search <input>
+ * also the search <input>
  */
 
 import { defineStore } from 'pinia';
@@ -133,16 +133,46 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
+         * To determine the display of elements based on how far along 
+         * the node selection tree we are
+         * 
+         * @return { Boolean }
+         */
+        isOnFirstNode () {
+            return this.hasSelectedFirstNode && !this.hasSelectedSecondNode && !this.hasSelectedThirdNode;
+        },
+
+        /**
+         * To determine the display of elements based on how far along 
+         * the node selection tree we are
+         * 
+         * @return { Boolean }
+         */
+        isOnSecondNode () {
+            return this.hasSelectedFirstNode && this.hasSelectedSecondNode && !this.hasSelectedThirdNode;
+        },
+
+        /**
+         * To determine the display of elements based on how far along 
+         * the node selection tree we are
+         * 
+         * @return { Boolean }
+         */
+        isOnThirdNode () {
+            return this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode;
+        },
+
+        /**
          * The currently selected code
          * 
          * @return { Object }
          */
         selectedCode () {
-            if (this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode) {
+            if (this.isOnThirdNode) {
                 return this.selectedThirdNode;
-            } else if (this.hasSelectedFirstNode && this.hasSelectedSecondNode) {
+            } else if (this.isOnSecondNode) {
                 return this.selectedSecondNode;
-            } else if (this.hasSelectedFirstNode) {
+            } else if (this.isOnFirstNode) {
                 return this.selectedFirstNode;
             } else {
                 return [];

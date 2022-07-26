@@ -42,7 +42,7 @@ const modalSelectedCodesStore = useModalSelectedCodesStore();
  *
  * @returns { Number }
  */
-const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.75rem)`);
+const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.5rem)`);
 
 /**
  * To determine whether the checkbox is currently selected based on whether it's 
@@ -117,10 +117,27 @@ function highlightSearchInElement (toHighlight) {
     return highlighted;
 }
 
+/**
+ * Add some styling to help visually clarify the tree structure
+ *
+ * @returns { String }
+ */
+const containerClass = computed(() => {
+    if (modalActiveCodesStore.isOnFirstNode && props.depth === 0 || modalActiveCodesStore.isOnSecondNode && props.depth === 0) {
+        return 'parent-container';
+    } else if (modalActiveCodesStore.isOnFirstNode && props.depth === 1 || modalActiveCodesStore.isOnSecondNode && props.depth === 1) {
+        return 'first-child-container-with-border';
+    } else if (modalActiveCodesStore.isOnThirdNode && props.depth === 0) {
+        return 'first-child-container';
+    } else {
+        '';
+    }
+});
+
 </script>
 
 <template>
-   <li>
+   <li :class="containerClass">
         <button 
             class="code-button" 
             :style="{ paddingLeft: paddingLeft }" 
@@ -140,7 +157,7 @@ function highlightSearchInElement (toHighlight) {
         <ul v-if="hasChildren">
             <cs-modal-code
                 v-for="code in props.code.children"
-                :key="props.code.id"
+                :key="code.id"
                 :code="code"
                 :depth="props.depth+1"
             />
@@ -149,6 +166,27 @@ function highlightSearchInElement (toHighlight) {
 </template>
 
 <style lang="scss" scoped>
+
+.parent-container {
+    > button span { 
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+}
+.first-child-container {
+    > button span { 
+        font-size: 1.0625rem;
+        font-weight: bold;
+    }
+}
+
+.first-child-container-with-border {
+    @extend .first-child-container;
+    border-top: 2px solid #aaa;
+    > button {
+        padding-top: 0.75rem;
+    }
+}
 
 .code-button {
     background: none;
@@ -167,9 +205,5 @@ ul {
     list-style: none; //don't use any dots
     margin: 0; //and spacing is controlled by props.depth
 }
-
-// span {
-//     font-weight: bold;
-// }
 
 </style>

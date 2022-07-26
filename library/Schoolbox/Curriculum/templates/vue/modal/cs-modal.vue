@@ -36,6 +36,7 @@ function onModalClosed () {
         ref="modalEl" 
         :is-close-disabled="false" 
         :close-on-background-click="false" 
+        size="large"
         @closed="onModalClosed"
     >
         <cs-modal-header />
