@@ -30,6 +30,17 @@ use Schoolbox\Calendar\EventRecurrenceMapper;
  */
 class Series
 {
+    /**
+     * Internal constant used by `$this->getUpdatedSeries`.
+     */
+    private const SERIES_UPDATED = 'updated';
+
+
+    /**
+     * Internal constant used by `$this->getDeletedSeries`.
+     */
+    private const SERIES_DELETED = 'deleted';
+
 
     /**
      * @var BookingMapper
@@ -67,9 +78,9 @@ class Series
      * @param Item\Model  $resource
      * @param DateTime    $startDate
      * @param DateTime    $endDate
-     * @param String|null $repeatUntil
-     * @param String|null $related
-     * @param String|null $repeat
+     * @param string|null $repeatUntil
+     * @param array|null  $related
+     * @param string|null $repeat
      * @param Campus|null $campus
      *
      * @return array
@@ -79,9 +90,9 @@ class Series
         Item\Model $resource,
         DateTime $startDate,
         DateTime $endDate,
-        $repeatUntil = null,
-        $related = null,
-        $repeat = null,
+        ?string $repeatUntil = null,
+        ?array $related = null,
+        ?string $repeat = null,
         Campus $campus = null
     ) {
         $dateParts = [];
@@ -124,7 +135,6 @@ class Series
             }
         }
         foreach ($resource->getRelatedResourceList() as $relatedResource) {
-            // @phpstan-ignore-next-line: I don't know how this can be considered to always be false
             if (array_key_exists($relatedResource->getId(), $relatedItems)) {
                 if (isset($difference)) {
                     foreach ($series as $occurenceStart) {
@@ -145,11 +155,11 @@ class Series
     /**
      * Get all related booking dates
      *
-     * @param Booking  $existingBooking
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     * @param String $related
-     * @param String $efficacy
+     * @param Booking     $existingBooking
+     * @param DateTime    $startDate
+     * @param DateTime    $endDate
+     * @param array|null  $related
+     * @param string|null $efficacy
      * @return array
      * @throws MapperException
      */
@@ -157,8 +167,8 @@ class Series
         Booking $existingBooking,
         DateTime $startDate,
         DateTime $endDate,
-        $related = null,
-        $efficacy = null
+        ?array $related = null,
+        ?string $efficacy = null
     ) {
         $relatedItems  = [];
         foreach ($related ?: [] as $relatedItem) {
@@ -176,14 +186,12 @@ class Series
 
         $dateParts = [];
         foreach ($series as $thisBooking) {
-            if (!$thisBooking->isDeleted()) {
-                $dateParts[] = [
-                    $thisBooking->getResource(),
-                    $thisBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
-                    $thisBooking->getEvent()->getEndDateTime()->getDateTimeObject(),
-                    $thisBooking,
-                ];
-            }
+            $dateParts[] = [
+                $thisBooking->getResource(),
+                $thisBooking->getEvent()->getStartDateTime()->getDateTimeObject(),
+                $thisBooking->getEvent()->getEndDateTime()->getDateTimeObject(),
+                $thisBooking,
+            ];
         }
 
         return $dateParts;
@@ -193,11 +201,20 @@ class Series
     /**
      * Gets a series for update, adjusting their start and end dates.
      *
-     * @param Model    $item
-     * @param DateTime $startDate
-     * @param DateTime $endDate
-     * @param array    $relatedItems
-     * @param string   $efficacy
+     * @param Model                            $item         The item whose series should be updated.
+     * @param DateTime                         $startDate    The new start date of the item: the start date of other
+     *                                                       items in the series will be adjusted by the delta between
+     *                                                       the existing and new start date.
+     * @param DateTime                         $endDate      The new end date of the item: the end date of other items
+     *                                                       in the series will be adjusted by the delta between the
+     *                                                       existing and new end date.
+     * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
+     *                                                       notes key in the value contains the notes for the related
+     *                                                       booking.
+     * @param string|null                      $efficacy     The efficiacy of this update:
+     *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to update the
+     *                                                       entire series, otherwise update only this item.
+     *                                                       (Related bookings are always updated.)
      *
      * @return Collection|Model[]
      * @throws MapperException
@@ -210,7 +227,91 @@ class Series
         DateTime $startDate,
         DateTime $endDate,
         array $relatedItems,
-        $efficacy
+        ?string $efficacy
+    ) {
+        return $this->getSeries(
+            $item,
+            $startDate,
+            $endDate,
+            $relatedItems,
+            $efficacy,
+            self::SERIES_UPDATED,
+        );
+    }
+
+
+    /**
+     * Gets a series for deletion.
+     *
+     * @param Model                            $item         The item whose series should be deleted.
+     * @param DateTime                         $startDate    Ignored for this method.
+     * @param DateTime                         $endDate      Ignored for this method.
+     * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
+     *                                                       notes key in the value contains the notes for the related
+     *                                                       booking.
+     * @param string|null                      $efficacy     The efficiacy of this update:
+     *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to delete the
+     *                                                       entire series, otherwise update only this item.
+     *                                                       (Related bookings are always updated.)
+     *
+     * @return Collection|Model[]
+     * @throws MapperException
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    public function getDeletedSeries(
+        Model $item,
+        DateTime $startDate,
+        DateTime $endDate,
+        array $relatedItems,
+        ?string $efficacy
+    ) {
+        return $this->getSeries(
+            $item,
+            $startDate,
+            $endDate,
+            $relatedItems,
+            $efficacy,
+            self::SERIES_DELETED,
+        );
+    }
+
+    /**
+     * Gets a series for either:
+     * * update, adjusting their start and end dates
+     * * delete
+     *
+     * @param Model                            $item         The item whose series should be updated.
+     * @param DateTime                         $startDate    The new start date of the item: the start date of other
+     *                                                       items in the series will be adjusted by the delta between
+     *                                                       the existing and new start date.
+     * @param DateTime                         $endDate      The new end date of the item: the end date of other items
+     *                                                       in the series will be adjusted by the delta between the
+     *                                                       existing and new end date.
+     * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
+     *                                                       notes key in the value contains the notes for the related
+     *                                                       booking.
+     * @param string|null                      $efficacy     The efficiacy of this update:
+     *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to update the
+     *                                                       entire series, otherwise update only this item.
+     *                                                       (Related bookings are always updated.)
+     * @param string                           $seriesType   Which type of series is requested?
+     *                                                       (`self::SERIES_UPDATED` or `self::SERIES_DELETED`.)
+     *
+     * @return Collection|Model[]
+     * @throws MapperException
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    private function getSeries(
+        Model $item,
+        DateTime $startDate,
+        DateTime $endDate,
+        array $relatedItems,
+        ?string $efficacy,
+        string $seriesType,
     ) {
         // Get the date and time changes.
         $startDelta = Interval::createFromDateTimeDifference(
@@ -257,7 +358,10 @@ class Series
             );
             $event->setEndDateTime(new Alaress_Date_Format($newEnd));
 
-            $bookingList->add($booking);
+            // Only add this booking if getting the updated series.
+            if ($seriesType === self::SERIES_UPDATED) {
+                $bookingList->add($booking);
+            }
 
             // Set up bookings for related items
             $existingRelatedBookings = $this->getBookingMapper()->findRelatedBookings($booking->getId());
@@ -301,11 +405,17 @@ class Series
                         );
                     }
                 } elseif ($relatedBooking instanceof Model) {
-                    // delete or don't add. Maybe mark as deleted?
-                    // If it wasn't, then do nothing with it at all
-                    $relatedBooking->setDeletedAt(new Alaress_Date_Format(new DateTime()));
+                    // This item was deleted:
+                    // only add it to the list if fetching deleted objects.
+                    if ($seriesType === self::SERIES_DELETED) {
+                        $bookingList->add($relatedBooking);
+                    }
+                    continue;
                 }
-                if ($relatedBooking instanceof Model) {
+
+                // This item still exists:
+                // only add it to the list if fetching updated objects.
+                if ($relatedBooking instanceof Model && $seriesType === self::SERIES_UPDATED) {
                     $relatedBooking->setEvent($event);
                     $bookingList->add($relatedBooking);
                 }

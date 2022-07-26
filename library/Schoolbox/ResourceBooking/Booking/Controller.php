@@ -291,7 +291,6 @@ class Controller extends Base
      */
     public function update(Model $item)
     {
-        $bookingList   = null;
         $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
         $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
 
@@ -317,7 +316,7 @@ class Controller extends Base
                 Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject(),
                 Alaress_Date_Format::newLocal($this->getRequest()->post['endDate'])->getDateTimeObject(),
                 $this->getRelatedItemsFromForm(),
-                $this->request->post['efficacy']
+                $this->request->post['efficacy'] ?? null,
             );
 
             // Get the date and time changes from original booking
@@ -363,15 +362,19 @@ class Controller extends Base
                     $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
                 }
 
-                // getUpdatedSeries() sets deleted field if the item isn't in
-                // the sequence.
-                if ($booking->isDeleted()) {
-                    $this->bookingMapper->delete($booking);
-                } else {
-                    $bookingList->add($booking);
-                }
+                $bookingList->add($booking);
             }
             $this->bookingMapper->save($bookingList);
+
+            // Now delete deleted series
+            $deletedSeries = $bookingSeries->getDeletedSeries(
+                $item,
+                Alaress_Date_Format::newLocal($this->getRequest()->post['startDate'])->getDateTimeObject(),
+                Alaress_Date_Format::newLocal($this->getRequest()->post['endDate'])->getDateTimeObject(),
+                $this->getRelatedItemsFromForm(),
+                $this->request->post['efficacy']
+            );
+            $this->bookingMapper->delete($deletedSeries);
         } else {
             $code = 400;
         }

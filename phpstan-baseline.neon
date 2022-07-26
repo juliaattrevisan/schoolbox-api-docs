@@ -6966,11 +6966,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Series.php
 
 		-
-			message: "#^Empty array passed to foreach\\.$#"
-			count: 2
-			path: library/Schoolbox/ResourceBooking/Booking/Series.php
-
-		-
 			message: "#^Call to method DateTime\\:\\:format\\(\\) on a separate line has no effect\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Validation.php
