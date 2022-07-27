@@ -19,7 +19,6 @@ use Schoolbox\External\Importer\Endpoint;
  */
 class Factory
 {
-
     /**
      * API Endpoint url
      *
@@ -37,15 +36,23 @@ class Factory
 
 
     /**
+     * @var bool
+     */
+    private bool $includePhoto;
+
+
+    /**
      * Factory constructor.
      *
      * @param string $host
      * @param string $key
+     * @param bool   $includePhoto
      */
-    public function __construct(string $host, string $key)
+    public function __construct(string $host, string $key, bool $includePhoto)
     {
         $this->host = $host;
         $this->key = $key;
+        $this->includePhoto = $includePhoto;
     }
 
 
@@ -69,7 +76,7 @@ class Factory
                 return new Connector\Sentral\Base\Endpoint\Status($this->host, $this->key);
 
             case Endpoint\Factory::TASS_API:
-                return new Connector\TassApi\Base\Endpoint\Status($this->host, $this->key);
+                return new Connector\TassApi\Base\Endpoint\Status($this->host, $this->key, $this->includePhoto);
 
             case Endpoint\Factory::COMPASS:
                 return new Connector\Compass\Base\Endpoint\Status($this->host, $this->key);

@@ -23,7 +23,6 @@ use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
  */
 class Specification implements ISpecification
 {
-
     /**
      * @var string
      */
@@ -37,15 +36,23 @@ class Specification implements ISpecification
 
 
     /**
+     * @var bool
+     */
+    private bool $includePhoto;
+
+
+    /**
      * Specification constructor.
      *
      * @param string $host
      * @param string $dsn
+     * @param bool   $includePhoto
      */
-    public function __construct(string $host, string $dsn)
+    public function __construct(string $host, string $dsn, bool $includePhoto)
     {
         $this->host = $host;
         $this->dsn = $dsn;
+        $this->includePhoto = $includePhoto;
     }
 
 
@@ -125,7 +132,7 @@ class Specification implements ISpecification
                 'version' => 3,
                 'args' => [
                     'currentstatus' => 'current',
-                    'includephoto'  => true,
+                    'includephoto'  => $this->includePhoto,
                 ]
             ],
             [
@@ -152,7 +159,7 @@ class Specification implements ISpecification
                 'version' => 3,
                 'args' => [
                     'currentstatus' => 'current',
-                    'includephoto'  => true,
+                    'includephoto'  => $this->includePhoto,
                 ]
             ],
             [
