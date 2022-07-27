@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3aeaf2e507c7c9f1f2b0c68ab9c80e0e",
+    "content-hash": "ad55e820a30bdba2147764fcc2ccc274",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -2579,6 +2579,58 @@
                 "source": "https://github.com/php-imagine/Imagine/tree/1.3.2"
             },
             "time": "2022-04-01T11:58:30+00:00"
+        },
+        {
+            "name": "imangazaliev/didom",
+            "version": "2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Imangazaliev/DiDOM.git",
+                "reference": "87f7089d95aef7fd09dc68826cfa245b90f3040b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Imangazaliev/DiDOM/zipball/87f7089d95aef7fd09dc68826cfa245b90f3040b",
+                "reference": "87f7089d95aef7fd09dc68826cfa245b90f3040b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-iconv": "*",
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DiDom\\": "src/DiDom/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Imangazaliev Muhammad",
+                    "email": "imangazalievm@gmail.com"
+                }
+            ],
+            "description": "Simple and fast HTML parser",
+            "homepage": "https://github.com/Imangazaliev/DiDOM",
+            "keywords": [
+                "didom",
+                "html",
+                "parser",
+                "xml"
+            ],
+            "support": {
+                "issues": "https://github.com/Imangazaliev/DiDOM/issues",
+                "source": "https://github.com/Imangazaliev/DiDOM/tree/2.0"
+            },
+            "time": "2022-05-08T01:48:13+00:00"
         },
         {
             "name": "intelliscl/sdk",
