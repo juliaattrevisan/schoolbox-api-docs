@@ -463,9 +463,9 @@ class Scrub
      * Now caches previous calls in Redis!
      *
      * @param  string|null $html
-     * @return mixed
+     * @return string
      */
-    public static function html(?string $html)
+    public static function html(?string $html): string
     {
         if (!isset($html)) {
             return '';
