@@ -23,7 +23,6 @@ use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
  */
 class Specification implements ISpecification
 {
-
     /**
      * @var string
      */

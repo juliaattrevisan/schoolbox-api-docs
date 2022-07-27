@@ -19,7 +19,6 @@ use Schoolbox\External\Importer\Endpoint;
  */
 class Factory
 {
-
     /**
      * API Endpoint url
      *

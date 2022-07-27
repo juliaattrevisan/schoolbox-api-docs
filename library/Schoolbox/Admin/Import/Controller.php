@@ -37,7 +37,6 @@ use UnexpectedValueException;
  */
 class Controller extends ConfigController
 {
-
     /**
      * Default message if you happen to have the status report open
      * but you got your settings arbitrarily reset
