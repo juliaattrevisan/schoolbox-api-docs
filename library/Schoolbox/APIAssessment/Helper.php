@@ -454,10 +454,11 @@ v_most_recent_feedback.review_route = 'instructor' AND
      *          id: integer,
      *          name: string,
      *          maxValue: float|null,
-     *              descriptors: array{
+     *          descriptors: array{
      *                  id: integer,
      *                  description: string,
-     *                  max_value: float|null
+     *                  maxValue: float|null,
+     *                  sequence: int
      *                  }
      *              }
      *          }
@@ -487,28 +488,28 @@ v_most_recent_feedback.review_route = 'instructor' AND
             //build the capability if it does not already exist
             if (!isset($output['capabilities'][$row['capability_id']])) {
                 $output['capabilities'][$row['capability_id']] = [
-                    'id'            => intval($row['capability_id']),
+                    'id'            => (int)$row['capability_id'],
                     'name'          => $row['capability_name'],
-                    'max_value'     => floatval($row['capability_max_value']),
+                    'maxValue'     => (float)$row['capability_max_value'],
                     'indicators'    => []
                 ];
             }
             //capability should already exist, so lets build the indicator for that capability
             if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
                 $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
-                    'id'            => intval($row['indicator_id']),
+                    'id'            => (int)$row['indicator_id'],
                     'name'          => $row['indicator_name'],
-                    'maxValue'      => floatval($row['indicator_max_value']),
+                    'maxValue'      => (float)$row['indicator_max_value'],
                     'descriptors'   => []
                 ];
             }
             //indicator should already exist, so lets build the descriptor for that indicator for that capability
             if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']])) {
                 $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']] = [
-                    'id'            => intval($row['descriptor_id']),
+                    'id'            => (int)$row['descriptor_id'],
                     'description'   => $row['descriptor_descriptor'],
-                    'maxValue'      => floatval($row['descriptor_max_value']),
-                    'sequence'      => floatval($row['descriptor_sequence'])
+                    'maxValue'      => (float)$row['descriptor_max_value'],
+                    'sequence'      => (int)$row['descriptor_sequence']
                 ];
             }
         }
@@ -534,13 +535,13 @@ v_most_recent_feedback.review_route = 'instructor' AND
      *         id: integer,
      *         name: string,
      *         mark: float|null,
-     *         max_value: float|null,
+     *         maxValue: float|null,
      *         human_readable_mark: string|null,
      *         indicators: array{
      *             id: integer,
      *             name: string,
      *             maxValue: float|null,
-     *             descriptors: array{
+     *             descriptor: array{
      *                 id: integer,
      *                 description: string,
      *                 mark: float|null
@@ -604,10 +605,10 @@ v_most_recent_feedback.review_route = 'instructor' AND
             //build the capability if it does not already exist
             if (!isset($output['capabilities'][$row['capability_id']])) {
                 $output['capabilities'][$row['capability_id']] = [
-                    'id'                    => intval($row['capability_id']),
+                    'id'                    => (int)$row['capability_id'],
                     'name'                  => $row['capability_name'],
-                    'mark'                  => floatval($row['capability_mark']),
-                    'max_value'             => floatval($row['capability_max_value']),
+                    'mark'                  => (float)$row['capability_mark'],
+                    'maxValue'              => (float)$row['capability_max_value'],
                     'human_readable_mark'   => $row['capability_human_readable_mark'],
                     'indicators'            => []
                 ];
@@ -615,13 +616,13 @@ v_most_recent_feedback.review_route = 'instructor' AND
             //capability should already exist, so lets build the indicator for that capability
             if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
                 $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
-                    'id'            => intval($row['indicator_id']),
+                    'id'            => (int)$row['indicator_id'],
                     'name'          => $row['indicator_name'],
-                    'maxValue'      => floatval($row['indicator_max_value']),
+                    'maxValue'      => (float)$row['indicator_max_value'],
                     'descriptor'   => [
-                        'id'            => intval($row['descriptor_id']),
+                        'id'            => (int)$row['descriptor_id'],
                         'description'   => $row['descriptor_name'],
-                        'mark'          => floatval($row['indicator_mark'])
+                        'mark'          => (float)$row['indicator_mark']
                     ]
                 ];
             }
