@@ -1,5 +1,5 @@
-/** 
- * The endpoints where data is requested / sent to 
+/**
+ * The endpoints where data is requested / sent to
  * Thy will be added when in manage-group.vue they are passed
  * through as props
  */

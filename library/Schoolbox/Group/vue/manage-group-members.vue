@@ -17,9 +17,9 @@ import AccessTypes from './manageGroupAccessTypes';
 
 
 /*****************************************************************
- * 
+ *
  * Display the group members in a table
- * 
+ *
  ****************************************************************/
 
 const store = useStore();
@@ -53,9 +53,9 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
             return (a, b) => {
                 if (a.displayPriority < b.displayPriority) { //the displayPriority is set in manageGroupStore.js
                     return 1;
-                } else if (a.displayPriority > b.displayPriority) { 
+                } else if (a.displayPriority > b.displayPriority) {
                     return -1;
-                } 
+                }
                 if (ascending) {
                     return a.lastName >= b.lastName ? 1 : -1;
                 }
@@ -74,7 +74,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         column: 'name'
     },
     perPage: 50,
-    perPageValues: [50, 100, 200], 
+    perPageValues: [50, 100, 200],
     resizableColumns: false,
     rowClassCallback: (row) => { //to differentiate new / updated rows
         if (row.isNew) { //so it's clear the rows have just been added
@@ -106,14 +106,14 @@ async function onLoaded () {
 
 
 /*****************************************************************
- * 
+ *
  * Select group members
- * 
+ *
  ****************************************************************/
 
 /**
  * to keep track of selected rows
- * 
+ *
  * @param { Array }
  */
 function onRowSelected (currentSelection) {
@@ -127,15 +127,15 @@ function onRowSelected (currentSelection) {
 watch(() => membersStore.selectedMembers, (newSelectedMembers, oldSelectedMembers) => {
     if (newSelectedMembers.length === 0 && oldSelectedMembers.length > 0) { //to clear the current selection
         tableEl.value.resetSelectedRows();
-    } 
+    }
 });
 
 
 
 /*****************************************************************
- * 
+ *
  * Filter the group members
- * 
+ *
  ****************************************************************/
 
 /**
@@ -170,7 +170,7 @@ function dispatchFilterEvent (selectedFilter) {
 }
 
 /**
- * Ensure the current selectedMembers also considers the current filter selection, 
+ * Ensure the current selectedMembers also considers the current filter selection,
  * taking any out that no longer match the selected filters
  */
 function updateSelectedMembers () {
@@ -214,13 +214,14 @@ function updateSelectedMembers () {
                 <template #name="data">
                     <div class="card small-12">
                         <a v-if="data.row.userId" :href="`/search/user/${data.row.userId}`" title="View profile" class="name">
-                            <img src="https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${data.row.firstName} portrait`">
+                            <img :src="`/portrait.php?id=${data.row.userId}&size=square64`" :alt="`${data.row.firstName} portrait`">
                             {{ data.row.firstName }} {{ data.row.lastName }}
                         </a>
                         <div v-else>
-                            <img src="https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${data.row.firstName} portrait`">
+                            <img src="/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${data.row.firstName} portrait`">
                             {{ data.row.firstName }} {{ data.row.lastName }}
                         </div>
+                        <p class="meta">{{ data.row.role }}</p>
                         <p class="meta">{{ data.row.meta }}</p>
                     </div>
                 </template>
@@ -237,13 +238,13 @@ function updateSelectedMembers () {
             </div>
         </div><!-- small-12 island -->
     </div><!-- row  -->
-    
+
 </template>
 
 <style lang="scss">
 
 @import '@schoolboxVue/components/vueTables2/vueTables2';
-@import 'www/static/css/core/base/_colors.scss';
+@import '../../../../www/static/css/core/base/colors';
 
 .VueTables {
     margin-bottom: 150px; //to allow space for the bottom-drawer so it can't cut off the bottom of the table

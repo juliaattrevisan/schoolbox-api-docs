@@ -1,4 +1,4 @@
-/** 
+/**
  * Handles the store to disband the group
  */
 
@@ -8,7 +8,7 @@ import Endpoints from '../manageGroupEndpoints';
 
 
 export const useDisbandStore = defineStore('manageGroupDisband', {
-    
+
     state: () => ({
         isProcessing: false,
         isPromptOpen: false, //to notify that the prompt is opened / closed
@@ -40,7 +40,7 @@ export const useDisbandStore = defineStore('manageGroupDisband', {
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    // 
+                    //
                 } else {
                     throw new Error();
                 }
@@ -60,17 +60,17 @@ export const useDisbandStore = defineStore('manageGroupDisband', {
         },
 
     },
-    
+
 })
 
 /**
  * Pass through the group id
- * 
+ *
  * @returns { FormData }
  */
 function getFormData () {
     const store = useStore();
-    return JSON.stringify({ 
+    return JSON.stringify({
         groupId: store.groupId
     });
 }

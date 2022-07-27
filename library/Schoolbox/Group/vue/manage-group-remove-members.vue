@@ -29,7 +29,7 @@ function onRemoveSelected () {
 }
 
 /**
- * so we can track the progress of the member removal 
+ * so we can track the progress of the member removal
  * and update the UI accordingly
  */
 removeMembersStore.$onAction(({ name, after, onError }) => {
@@ -46,7 +46,7 @@ removeMembersStore.$onAction(({ name, after, onError }) => {
 });
 
 /**
- * To instantly notify the user that the members are being removed 
+ * To instantly notify the user that the members are being removed
  * by updating the button text
  *
  * @returns { String }
@@ -54,7 +54,7 @@ removeMembersStore.$onAction(({ name, after, onError }) => {
 const removeButtonText = computed(() => removeMembersStore.isProcessing ? 'Removing...' : 'Remove');
 
 /**
- * to prevent the user from moving away from the modal while 
+ * to prevent the user from moving away from the modal while
  * processing is taking place
  *
  * @returns { Boolean }
@@ -62,7 +62,7 @@ const removeButtonText = computed(() => removeMembersStore.isProcessing ? 'Remov
 const isCloseModalDisabled = computed(() => removeMembersStore.isProcessing);
 
 /**
- * to close the modal 
+ * to close the modal
  */
 function onCancelSelected () {
     removeMembersStore.cancelRemoveSelectedMembers();
@@ -70,7 +70,7 @@ function onCancelSelected () {
 
 /**
  * ensure the isPromptOpen is kept up to date
- * as we can currently also use foundation to close the modal 
+ * as we can currently also use foundation to close the modal
  */
 function onModalClosed () {
     removeMembersStore.cancelRemoveSelectedMembers();
@@ -79,10 +79,10 @@ function onModalClosed () {
 </script>
 
 <template>
-    <reveal-modal 
-        ref="removeModalEl" 
-        :is-close-disabled="isCloseModalDisabled" 
-        :close-on-background-click="false" 
+    <reveal-modal
+        ref="removeModalEl"
+        :is-close-disabled="isCloseModalDisabled"
+        :close-on-background-click="false"
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>

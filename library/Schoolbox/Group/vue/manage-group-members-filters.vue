@@ -17,8 +17,8 @@ const isShowWriteAccessChecked = computed(() => membersStore.selectedFilters.inc
 const isShowAdminAccessChecked = computed(() => membersStore.selectedFilters.includes(filterTypes.ADMIN));
 
 /**
- * Dispatch to filter the member display 
- * 
+ * Dispatch to filter the member display
+ *
  * @param { String }
  */
 function onFilterChange (accessType) {
@@ -74,7 +74,7 @@ label {
 
 .title {
     margin-bottom: 0.5rem;
-    margin-right: 1rem;    
+    margin-right: 1rem;
 }
 
 .title,
@@ -87,7 +87,7 @@ label {
 .option-list li {
     margin-right: 2rem;
     @media (max-width: 700px) { //break the list down into 2 columns to display better on mobile
-        display: inline-block; 
+        display: inline-block;
         margin-right: 0;
         min-width: 110px; //takes us all the way down to 320px devices
     }

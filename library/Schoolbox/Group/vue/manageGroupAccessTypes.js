@@ -1,4 +1,4 @@
-/** 
+/**
  * The various filter types that can occur
  *
  */

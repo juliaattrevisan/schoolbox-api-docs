@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * To view and update each members status 
+ * To view and update each members status
  */
 
 import { ref, computed } from 'vue';
@@ -27,15 +27,15 @@ const isProcessing = ref(false); //so only the just selected member is active
 
 
 /*****************************************************************
- * 
- * Update member access 
- * 
+ *
+ * Update member access
+ *
  ****************************************************************/
 
 const updateMembersStore = useUpdateMembersStore();
 
 /**
- * To instantly notify the user that the members access is being updated 
+ * To instantly notify the user that the members access is being updated
  * by updating the button text
  *
  * @returns { String }
@@ -44,8 +44,8 @@ const approveButtonText = computed(() => updateMembersStore.isProcessing && isPr
 
 /**
  * To approve a members membership request and set them as read by default
- * 
- * @param { Object } related member 
+ *
+ * @param { Object } related member
  */
 function onApproveMembershipSelected (member) {
     updateMembersStore.updateMemberAccess(member, AccessTypes.READ);
@@ -53,8 +53,8 @@ function onApproveMembershipSelected (member) {
 
 /**
  * To update a group members access
- * 
- * @param { Object } related member 
+ *
+ * @param { Object } related member
  */
 function onMemberAccessChange (member) {
     updateMembersStore.updateMemberAccess(member, member.accessType);
@@ -84,9 +84,9 @@ updateMembersStore.$onAction(({ name, args, after, onError }) => {
 
 
 /*****************************************************************
- * 
- * Reject member access 
- * 
+ *
+ * Reject member access
+ *
  ****************************************************************/
 
 const rejectMembersStore = useRejectMembersStore();
@@ -101,8 +101,8 @@ const rejectButtonText = computed(() => rejectMembersStore.isProcessing && isPro
 
 /**
  * To reject a members request and remove the user
- * 
- * @param { Object } related member 
+ *
+ * @param { Object } related member
  */
 function onRejectMembershipSelected (member) {
     rejectMembersStore.rejectMember(member);
@@ -134,7 +134,7 @@ rejectMembersStore.$onAction(({ name, args, after, onError }) => {
 <template>
     <ul v-if="props.member.accessType === 'waiting'" class="flex-list">
         <li>
-            <button 
+            <button
                 class="button expand icon-add"
                 title="Approve Membership"
                 :disabled="store.isProcessing"
@@ -144,7 +144,7 @@ rejectMembersStore.$onAction(({ name, args, after, onError }) => {
             </button>
         </li>
         <li>
-            <button 
+            <button
                 class="button expand icon-close"
                 title="Reject Membership"
                 :disabled="store.isProcessing"
@@ -154,8 +154,8 @@ rejectMembersStore.$onAction(({ name, args, after, onError }) => {
             </button>
         </li>
     </ul>
-    <select 
-        v-else 
+    <select
+        v-else
         v-model="props.member.accessType"
         :disabled="store.isProcessing"
         @change="onMemberAccessChange(props.member)"

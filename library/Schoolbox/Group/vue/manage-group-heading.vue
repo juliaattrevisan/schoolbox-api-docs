@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * Shows the page title and to give access to the jelly tot menu, 
+ * Shows the page title and to give access to the jelly tot menu,
  * providing various group wide tools
  */
 
@@ -21,28 +21,29 @@ const disbandStore = useDisbandStore();
  * ensure the jelly tot menu works
  */
 onMounted(() => {
-    $(document).foundation(); 
+
+    $(document).foundation();
 });
 
 /**
- * to open the update settings modal 
+ * to open the update settings modal
  */
 function onUpdateSettingsSelected () {
     settingsStore.promptUpdateSettings();
 }
 
 /**
- * 
+ *
  */
 function onEmailGroupSelected () {
-    
+
 }
 
 /**
- * 
+ *
  */
 function onEmailGroupParentsSelected () {
-    
+
 }
 
 /**

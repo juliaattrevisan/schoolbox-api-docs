@@ -29,7 +29,7 @@ function onDisbandGroupSelected () {
 }
 
 /**
- * so we can track the progress of the member removal 
+ * so we can track the progress of the member removal
  * and update the UI accordingly
  */
 disbandStore.$onAction(({ name, after, onError }) => {
@@ -47,7 +47,7 @@ disbandStore.$onAction(({ name, after, onError }) => {
 });
 
 /**
- * To instantly notify the user that the members are being removed 
+ * To instantly notify the user that the members are being removed
  * by updating the button text
  *
  * @returns { String }
@@ -55,7 +55,7 @@ disbandStore.$onAction(({ name, after, onError }) => {
 const disbandButtonText = computed(() => disbandStore.isProcessing ? 'Disbanding...' : 'Yes');
 
 /**
- * to prevent the user from moving away from the modal while 
+ * to prevent the user from moving away from the modal while
  * processing is taking place
  *
  * @returns { Boolean }
@@ -63,7 +63,7 @@ const disbandButtonText = computed(() => disbandStore.isProcessing ? 'Disbanding
 const isCloseModalDisabled = computed(() => disbandStore.isProcessing);
 
 /**
- * to close the modal 
+ * to close the modal
  */
 function onCancelSelected () {
     disbandStore.cancelDisbandGroup();
@@ -71,7 +71,7 @@ function onCancelSelected () {
 
 /**
  * ensure the isPromptOpen is kept up to date
- * as we can currently also use foundation to close the modal 
+ * as we can currently also use foundation to close the modal
  */
 function onModalClosed () {
     disbandStore.cancelDisbandGroup();
@@ -80,10 +80,10 @@ function onModalClosed () {
 </script>
 
 <template>
-    <reveal-modal 
-        ref="removeModalEl" 
-        :is-close-disabled="isCloseModalDisabled" 
-        :close-on-background-click="false" 
+    <reveal-modal
+        ref="removeModalEl"
+        :is-close-disabled="isCloseModalDisabled"
+        :close-on-background-click="false"
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>

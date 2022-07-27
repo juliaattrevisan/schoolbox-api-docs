@@ -1,4 +1,4 @@
-/** 
+/**
  * Handles the store of the current Manage Group page
  */
 
@@ -16,10 +16,10 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
     }),
 
     actions: {
-        
+
         /**
-         * update an individual members access 
-         * 
+         * update an individual members access
+         *
          * @param { Object } the members data
          * @param { String } a FilterTypes
          */
@@ -27,7 +27,7 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
             this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
-            const membersStore = useMembersStore(); 
+            const membersStore = useMembersStore();
             membersStore.refreshMembers(); //to set any previously isNew or justUpdated to false
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
@@ -54,14 +54,14 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
 
         /**
          * update the selected members access type
-         * 
+         *
          * @param { String } a FilterTypes
          */
         async updateSelectedMembersAccess (accessType) {
             this.isSelectedProcessing = true;
             const store = useStore();
             store.isProcessing = true;
-            const membersStore = useMembersStore(); 
+            const membersStore = useMembersStore();
             membersStore.refreshMembers(); //to set any previously isNew or justUpdated to false
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
@@ -74,7 +74,7 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
                 const responseJson = await response.json();
                 if (responseJson.success) { //update the state only after the DB change is a success
                     membersStore.selectedMembers.forEach((member) => {
-                        member.accessType = accessType; //the selectedMembers data is unique to the groupMembers data 
+                        member.accessType = accessType; //the selectedMembers data is unique to the groupMembers data
                         const updatedMember = membersStore.groupMembers.find((groupMember) => groupMember.id === member.id);
                         updateMember(updatedMember, accessType);
                     });
@@ -90,7 +90,7 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
         },
 
     },
-    
+
 })
 
 /**
@@ -98,7 +98,7 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
  *
  * @param { Array }
  * @param { String }
- * 
+ *
  * @returns { FormData }
  */
 function getFormData (selectedMembers, accessType) {
@@ -119,6 +119,6 @@ function getFormData (selectedMembers, accessType) {
  */
 function updateMember (member, accessType) {
     member.accessType = accessType; //only once the change has occured in the database, do we reflect this change in the display table
-    member.isNew = false; //no longer considered new once updated 
+    member.isNew = false; //no longer considered new once updated
     member.justUpdated = true; //to add a class in the display table to help show the member has just been updated
 }

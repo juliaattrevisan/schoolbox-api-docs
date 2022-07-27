@@ -1,10 +1,10 @@
 
-import ManageGroup from '../../../templates/core/group/vue/manage-group';
+import ManageGroup from '../../../library/Schoolbox/Group/vue/manage-group';
 import { rest } from 'msw';
 import { data } from './dataManageGroup';
 // import { largeData } from '../../classSelector/largeDataClassSelectoreDataClassSelector';
 
-const groupDataEndpoint = '/groupData'; 
+const groupDataEndpoint = '/groupData';
 const removeMembersEndpoint = '/removeMembers';
 const updateMembersEndpoint = '/updateMembers';
 const addMembersEndpoint = '/addMembers';
@@ -16,7 +16,7 @@ const mswHandlers = [
         return res( //we grab an endpoint and then modify the data before it's returned
             ctx.delay(1000),
             ctx.json(data)
-        ) 
+        )
     }),
     rest.delete(removeMembersEndpoint, (req, res, ctx) => {
         return res(
@@ -25,7 +25,7 @@ const mswHandlers = [
                success: true,
             })
         )
-    }), 
+    }),
     rest.patch(updateMembersEndpoint, (req, res, ctx) => {
         return res(
             ctx.delay(1000),
@@ -33,7 +33,7 @@ const mswHandlers = [
                success: true,
             })
         )
-    }), 
+    }),
     rest.post(addMembersEndpoint, (req, res, ctx) => {
         return res(
             ctx.delay(1000),
@@ -47,7 +47,7 @@ const mswHandlers = [
                 success: true,
             })
         )
-    }), 
+    }),
     rest.post(updateSettingsEndpoint, (req, res, ctx) => {
         return res(
             ctx.delay(2000),
@@ -55,7 +55,7 @@ const mswHandlers = [
                 success: true,
             })
         )
-    }), 
+    }),
     rest.post(disbandGroupEndpoint, (req, res, ctx) => {
         return res(
             ctx.delay(2000),
@@ -63,7 +63,7 @@ const mswHandlers = [
                 success: true,
             })
         )
-    }), 
+    }),
 ]
 
 export default {
@@ -77,7 +77,7 @@ export default {
     },
     component: ManageGroup,
     decorators: [
-        () => ({ 
+        () => ({
             template: `
                 <div id="container">
                     <div id="content">
@@ -119,11 +119,11 @@ export const Default = Template.bind({});
 export const LoadError = Template.bind({});
 LoadError.parameters = {
     msw: {
-        handlers: [ 
+        handlers: [
             rest.get(groupDataEndpoint, (req, res, ctx) => {
-                return res( 
+                return res(
                     ctx.status(500) //to simulate an error
-                ) 
+                )
             }),
             ...mswHandlers,
         ]
@@ -135,13 +135,13 @@ NoMembers.parameters = {
     msw: {
         handlers: [
             rest.get(groupDataEndpoint, (req, res, ctx) => {
-                return res( 
+                return res(
                     ctx.delay(1000),
                     ctx.json({
-                        ...data, 
+                        ...data,
                         members: [], //start with no members
                     })
-                ) 
+                )
             }),
             ...mswHandlers,
         ]
@@ -153,13 +153,13 @@ NoGroupAdmins.parameters = {
     msw: {
         handlers: [
             rest.get(groupDataEndpoint, (req, res, ctx) => {
-                return res( 
+                return res(
                     ctx.delay(1000),
                     ctx.json({
-                        ...data, 
+                        ...data,
                         members: [ ...data.members.filter((member) => member.accessType !== 'admin')], //to pull out the admins
                     })
-                ) 
+                )
             }),
             ...mswHandlers,
         ]

@@ -17,7 +17,7 @@ const currentFromSelect = ref('name');
  * ensure the tooltips work
  */
 onMounted(() => {
-    $(document).foundation(); 
+    $(document).foundation();
 });
 
 /**
@@ -60,7 +60,7 @@ addMembersStore.$onAction(({ name, after, onError }) => {
 });
 
 /**
- * To instantly notify the user that the members access is being updated 
+ * To instantly notify the user that the members access is being updated
  * by updating the button text
  *
  * @returns { String }
@@ -132,7 +132,7 @@ label {
 
 .title {
     margin-bottom: 0.5rem;
-    margin-right: 1rem;    
+    margin-right: 1rem;
 }
 
 .title,
@@ -145,7 +145,7 @@ label {
 .option-list li {
     margin-right: 2rem;
     @media (max-width: 700px) { //break the list down into 2 columns to display better on mobile
-        display: inline-block; 
+        display: inline-block;
         margin-right: 0;
         min-width: 110px; //takes us all the way down to 320px devices
     }

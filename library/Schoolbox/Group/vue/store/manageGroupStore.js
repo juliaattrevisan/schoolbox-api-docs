@@ -1,4 +1,4 @@
-/** 
+/**
  * Handles the load of the current Manage Group page and
  * sends off the data to settings/members stores
  */
@@ -10,7 +10,7 @@ import { useMembersStore } from './manageGroupMembersStore';
 
 
 export const useStore = defineStore('manageGroup', {
-    
+
     state: () => ({
         isLoading: true, //to display loading note
         hasLoadError: false, //to display loading error
@@ -23,8 +23,8 @@ export const useStore = defineStore('manageGroup', {
 
         /**
          * When load is complete and and was a success
-         * 
-         * @returns { Boolean } 
+         *
+         * @returns { Boolean }
          */
         hasLoadedOk () {
             return !this.isLoading && !this.hasLoadError;
@@ -35,8 +35,8 @@ export const useStore = defineStore('manageGroup', {
     actions: {
 
         /**
-         * load all the group data  
-         * 
+         * load all the group data
+         *
          * @param { String }
          */
         async loadData () {
@@ -51,16 +51,16 @@ export const useStore = defineStore('manageGroup', {
                     membersStore.loadMembers(responseJson.members);
                 } else {
                     console.warn(response);
-                    this.hasLoadError = true; //show the load error display state 
+                    this.hasLoadError = true; //show the load error display state
                 }
             } catch (error) {
                 console.warn(error);
-                this.hasLoadError = true; //show the load error display state 
+                this.hasLoadError = true; //show the load error display state
             } finally {
                 this.isLoading = false; //otherwise show the table
             }
         },
 
     },
-    
+
 });

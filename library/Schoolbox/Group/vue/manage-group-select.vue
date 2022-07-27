@@ -45,11 +45,11 @@ function initShiftKeyDetection () {
 watch(() => membersStore.selectedMembers, () => {
     if (membersStore.selectedMembers.length > 1 && isShiftKeySelected.value) { //to hide a UI note, notifying of availability of shift-select
         shiftSelectNoteEl.value.remove();
-    } 
+    }
 });
 
 /**
- * To track how many are selected 
+ * To track how many are selected
  *
  * @returns { Number }
  */
@@ -69,10 +69,10 @@ const selectedMembersPlural = computed(() => selectedMembersCount.value > 1 ? 'M
  */
 const selectedMembersCountWithRowName = computed(() => {
     if (selectedMembersCount.value === 0) {
-        return `No Members`;	
+        return `No Members`;
     } else {
-        return `${selectedMembersCount.value} ${selectedMembersPlural.value}`;	
-    } 
+        return `${selectedMembersCount.value} ${selectedMembersPlural.value}`;
+    }
 });
 
 /**
@@ -142,7 +142,7 @@ function onRemoveMembersSelected () {
     }
 }
 
-select, 
+select,
 button {
     margin-bottom: 0; //to bring the bottom-drawer down, we don't need any margin currently
 }

@@ -1,4 +1,4 @@
-/** 
+/**
  * Handles the store to remove members from the Manage Group page
  */
 
@@ -9,10 +9,10 @@ import Endpoints from '../manageGroupEndpoints';
 
 
 export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
-    
+
     state: () => ({
         isPromptOpen: false, //to notify that the prompt is opened / closed
-        isProcessing: false, 
+        isProcessing: false,
     }),
 
     actions: {
@@ -63,7 +63,7 @@ export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
         },
 
     },
-    
+
 })
 
 /**
@@ -75,10 +75,10 @@ function getFormData () {
     const store = useStore();
     const membersStore = useMembersStore();
     const membersToRemoveIdList = membersStore.selectedMembers.map(row => row.id);
-    return JSON.stringify([
-        { 
+    return JSON.stringify(
+        {
             groupId: store.groupId,
-            members: membersToRemoveIdList.join(',') 
+            members: membersToRemoveIdList.join(',')
         },
-    ]);
+    );
 }

@@ -1,5 +1,5 @@
-/** 
- * Handles the store to update the group settings 
+/**
+ * Handles the store to update the group settings
  */
 
 import { defineStore } from 'pinia';
@@ -8,7 +8,7 @@ import Endpoints from '../manageGroupEndpoints';
 
 
 export const useSettingsStore = defineStore('manageGroupSettings', {
-    
+
     state: () => ({
         isProcessing: false,
         access: '', //can be private, moderated or free
@@ -21,13 +21,13 @@ export const useSettingsStore = defineStore('manageGroupSettings', {
 
         /**
          * Add in the group settings for reference / updating
-         * 
+         *
          * @param { Object }
          */
         loadSettings (settings) {
-            this.access = settings.access; 
-            this.isNotificationsEnabled = settings.isNotificationsEnabled; 
-            this.isForceFollow = settings.isForceFollow; 
+            this.access = settings.access;
+            this.isNotificationsEnabled = settings.isNotificationsEnabled;
+            this.isForceFollow = settings.isForceFollow;
         },
 
         /**
@@ -50,11 +50,11 @@ export const useSettingsStore = defineStore('manageGroupSettings', {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: getFormData(),
+                    body: getFormData(this),
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    // 
+                    //
                 } else {
                     throw new Error();
                 }
@@ -75,22 +75,22 @@ export const useSettingsStore = defineStore('manageGroupSettings', {
         },
 
     },
-    
+
 })
 
 /**
  * Pass through the latest settings
- * 
+ *
  * @returns { FormData }
  */
-function getFormData () {
+function getFormData (myStore) {
     const store = useStore();
-    return JSON.stringify({ 
+    return JSON.stringify({
         groupId: store.groupId,
         settings: {
-            access: store.access,
-            isNotificationsEnabled: store.isNotificationsEnabled,
-            isForceFollow: store.isForceFollow,
+            access: myStore.access,
+            isNotificationsEnabled: myStore.isNotificationsEnabled,
+            isForceFollow: myStore.isForceFollow,
         }
     });
 }

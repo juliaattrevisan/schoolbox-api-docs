@@ -137,7 +137,7 @@ rejectMembersStore.$onAction(({ name, after, onError }) => {
 
 <style lang="scss" scoped>
 
-select, 
+select,
 button {
     margin-bottom: 0; //to bring the bottom-drawer down, we don't need any margin currently
 }

@@ -8,3 +8,4 @@ createApp({
         ManageGroup
     }
 }).use(ClientTable).use(createPinia()).mount('#manage-group-container');
+

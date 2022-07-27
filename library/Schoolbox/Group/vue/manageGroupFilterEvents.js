@@ -1,4 +1,4 @@
-/** 
+/**
  * The various filter events that can occur
  */
 

@@ -29,7 +29,7 @@ function onUpdateSelected () {
 }
 
 /**
- * so we can track the progress of the member removal 
+ * so we can track the progress of the member removal
  * and update the UI accordingly
  */
 settingsStore.$onAction(({ name, after, onError }) => {
@@ -46,7 +46,7 @@ settingsStore.$onAction(({ name, after, onError }) => {
 });
 
 /**
- * To instantly notify the user that the members are being removed 
+ * To instantly notify the user that the members are being removed
  * by updating the button text
  *
  * @returns { String }
@@ -54,7 +54,7 @@ settingsStore.$onAction(({ name, after, onError }) => {
 const updateButtonText = computed(() => settingsStore.isProcessing ? 'Updating...' : 'Update');
 
 /**
- * to prevent the user from moving away from the modal while 
+ * to prevent the user from moving away from the modal while
  * processing is taking place
  *
  * @returns { Boolean }
@@ -62,7 +62,7 @@ const updateButtonText = computed(() => settingsStore.isProcessing ? 'Updating..
 const isUpdateModalDisabled = computed(() => settingsStore.isProcessing);
 
 /**
- * to close the modal 
+ * to close the modal
  */
 function onCancelSelected () {
     settingsStore.cancelUpdateSettings();
@@ -70,7 +70,7 @@ function onCancelSelected () {
 
 /**
  * ensure the isPromptOpen is kept up to date
- * as we can currently also use foundation to close the modal 
+ * as we can currently also use foundation to close the modal
  */
 function onModalClosed () {
     settingsStore.cancelUpdateSettings();
@@ -79,11 +79,11 @@ function onModalClosed () {
 </script>
 
 <template>
-    <reveal-modal 
-        ref="updateModalEl" 
+    <reveal-modal
+        ref="updateModalEl"
         size="tiny"
-        :is-close-disabled="isUpdateModalDisabled" 
-        :close-on-background-click="false" 
+        :is-close-disabled="isUpdateModalDisabled"
+        :close-on-background-click="false"
         @closed="onModalClosed"
     >
         <h2>Update Group Settings</h2>
@@ -115,7 +115,7 @@ function onModalClosed () {
                 </ul>
             </div><!-- small-12 medium-6 columns -->
             <div class="small-12 medium-6 columns no-pad">
-                <legend>Notifications</legend>  
+                <legend>Notifications</legend>
                 <ul class="option-list">
                     <li>
                         <input id="msg-enabled" type="checkbox" v-model="settingsStore.isNotificationsEnabled" />

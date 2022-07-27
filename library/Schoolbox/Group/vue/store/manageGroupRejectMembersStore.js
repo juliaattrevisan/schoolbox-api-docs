@@ -1,4 +1,4 @@
-/** 
+/**
  * Handles the store to remove members from the Manage Group page
  */
 
@@ -9,9 +9,9 @@ import Endpoints from '../manageGroupEndpoints';
 
 
 export const useRejectMembersStore = defineStore('manageGroupRejectMembers', {
-    
+
     state: () => ({
-        isProcessing: false, 
+        isProcessing: false,
         isSelectedProcessing: false, //need to distinguish between processing a single member via rejectMember() and rejectSelectedMembers()
     }),
 
@@ -19,8 +19,8 @@ export const useRejectMembersStore = defineStore('manageGroupRejectMembers', {
 
         /**
          * reject the single member
-         * 
-         * @param { Object } 
+         *
+         * @param { Object }
          */
         async rejectMember (member) {
             this.isProcessing = true;
@@ -33,7 +33,7 @@ export const useRejectMembersStore = defineStore('manageGroupRejectMembers', {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify([
-                        { 
+                        {
                             groupId: store.groupId,
                             members: member.id,
                         },
@@ -85,7 +85,7 @@ export const useRejectMembersStore = defineStore('manageGroupRejectMembers', {
         },
 
     },
-    
+
 })
 
 /**
@@ -98,9 +98,9 @@ function getFormData () {
     const membersStore = useMembersStore();
     const membersToRejectIdList = membersStore.selectedMembers.map(row => row.id);
     return JSON.stringify([
-        { 
+        {
             groupId: store.groupId,
-            members: membersToRejectIdList.join(',') 
+            members: membersToRejectIdList.join(',')
         },
     ]);
 }

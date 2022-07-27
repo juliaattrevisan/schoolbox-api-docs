@@ -1,4 +1,4 @@
-/** 
+/**
  * Handles the store to remove members from the Manage Group page
  */
 
@@ -34,12 +34,12 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
                 const responseJson = await response.json();
                 if (responseJson.success) {
                     const newMembers = responseJson.newMembers.map((newMember) => { //add in some additional properties
-                        return { 
+                        return {
                             ...newMember,
                             displayPriority: 2, //to show at the very top of the display table
-                            isNew: true, //to highlight new members just added 
+                            isNew: true, //to highlight new members just added
                             justUpdated: false, //to highlight members that have just been changed
-                        } 
+                        }
                     });
                     const membersStore = useMembersStore();
                     membersStore.groupMembers = [...membersStore.groupMembers, ...newMembers]; //add in the new members to the table
@@ -55,14 +55,14 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
         },
 
     },
-    
+
 })
 
 /**
  * Pass in user ids of the members to add
  *
  * @param { Array }
- * 
+ *
  * @returns { FormData }
  */
 function getFormData () {
