@@ -17,7 +17,6 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\GroupMapper;
@@ -112,28 +111,31 @@ class Module extends BaseModule
     private function preloadGroup(array $params): object
     {
         try {
-            $group = $this->getGroupMapper()->findOneByColumn('cid', $params['groupId']);
+            $folder = $this->getFolderMapper()->findById($params['groupId']);
+            $group = $folder->getGroup();
+            if (!$group) {
+                throw new SchoolboxException('Group Does not Exist', 404, null, 404);
+            }
         } catch (MapperException $e) {
             throw new SchoolboxException('Group Does not Exist', 404, null, 404);
         }
-
         return $group;
     }
 
     /**
-     * @return Mapper|UserMapper
+     * @return UserMapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
-    protected function getUserMapper()
+    protected function getUserMapper(): UserMapper
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
 
     /**
-     * @return GroupMapper
+     * @return FolderMapper
      */
-    protected function getGroupMapper(): GroupMapper
+    protected function getFolderMapper(): FolderMapper
     {
-        return $this->getMapperFactory()->get(GroupMapper::class);
+        return $this->getMapperFactory()->get(FolderMapper::class);
     }
 }

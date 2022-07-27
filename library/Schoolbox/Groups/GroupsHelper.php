@@ -1,10 +1,17 @@
 <?php
 
+/**
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
 namespace Schoolbox\Groups;
 
 use Alaress\Color\ColorFactory;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -13,9 +20,11 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Resource\Folder\FolderColour;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Timetable_ColourMapper;
 
 class GroupsHelper
@@ -25,16 +34,16 @@ class GroupsHelper
     public const NOTENROLED = 'notEnroled';
     public const PENDING    = 'pending';
 
-    public const MEMBERSHIP_NONE = 'none';
-    public const MEMBERSHIP_READ = 'read';
+    public const MEMBERSHIP_NONE  = 'none';
+    public const MEMBERSHIP_READ  = 'read';
     public const MEMBERSHIP_WRITE = 'write';
     public const MEMBERSHIP_ADMIN = 'admin';
 
-    private GroupMapper $groupMapper;
-    private UserAccessMapper $userAccessMapper;
-    private FolderMapper $folderMapper;
+    private GroupMapper            $groupMapper;
+    private UserAccessMapper       $userAccessMapper;
+    private FolderMapper           $folderMapper;
     private Timetable_ColourMapper $timetableColourMapper;
-    private RerouteOverrideMapper $reRouteOverrideMapper;
+    private RerouteOverrideMapper  $reRouteOverrideMapper;
 
     /**
      * constructor for dependency injection
@@ -46,28 +55,11 @@ class GroupsHelper
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper
     ) {
-        $this->groupMapper              = $groupMapper;
-        $this->userAccessMapper         = $userAccessMapper;
-        $this->folderMapper             = $folderMapper;
-        $this->timetableColourMapper    = $timetableColourMapper;
-        $this->reRouteOverrideMapper    = $reRouteOverrideMapper;
-    }
-
-    /**
-     * get all groups a user is in, and could request or enroll.
-     */
-    public function getAllGroups(User $user)
-    {
-        //check if user is currently member
-        // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->findGroups($user);
-//        $userPerms = $user->getAccessList()->indexBy('serviceIdentifier');
-
-        $groupsArr = $this->groupMapper->getAvailableGroupIds($user);
-        //combine to show list of all groups, both available to the user, and those they are enroled in
-        $groupIds = array_unique(array_merge($userPerms->keys(), $groupsArr));
-
-        return $this->buildGroups($user, $groupIds, true, $userPerms);
+        $this->groupMapper           = $groupMapper;
+        $this->userAccessMapper      = $userAccessMapper;
+        $this->folderMapper          = $folderMapper;
+        $this->timetableColourMapper = $timetableColourMapper;
+        $this->reRouteOverrideMapper = $reRouteOverrideMapper;
     }
 
     /**
@@ -75,16 +67,26 @@ class GroupsHelper
      * Users can be part of groups that have no homepage, you can return these or ignore them
      * these no homepage groups are usually used for notifications, and are sis controlled
      * @param User $user
-     * @param bool $mustHaveHomepage (only build groups that have a homepage, selectable with this variable)
-     * @return array
+     * @return GenericCollection
      */
-    public function getCurrentGroups(User $user, bool $mustHaveHomepage)
+    public function getCurrentGroups(User $user): GenericCollection
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
         $userPerms = $this->userAccessMapper->findAllGroupsForUser($user)->indexBy('serviceIdentifier');
+        $folders   = $this->folderMapper->findByColumn('id', $userPerms->keys())->indexBy('id');
 
-        return $this->buildGroups($user, $userPerms->keys(), $mustHaveHomepage, $userPerms);
+        $accesses = $this->userAccessMapper->createCollection();
+        foreach ($userPerms as $userPerm) {
+            /** @var Folder|null $folder */
+            $folder = $folders->offsetGet($userPerm->getServiceIdentifier());
+            if ($folder && $folder->getGroup()) {
+                $userPerm->setFolder($folder);
+                $accesses->add($userPerm);
+            }
+        }
+        $this->populateNotification($user, $accesses, null);
+        return $accesses;
     }
 
     /**
@@ -96,18 +98,12 @@ class GroupsHelper
      * by default the user will receive notifications for all groups they are a member of, unless they mute them
      * (if those groups are not set to force follow)
      *
-     * @param \Schoolbox\User $user
-     * @return array
+     * @param User                   $user
+     * @param GenericCollection      $accesses
+     * @param GenericCollection|null $folders
      */
-    public function getNotifications(\Schoolbox\User $user): array
+    public function populateNotification(User $user, GenericCollection $accesses, ?GenericCollection $folders)
     {
-        // as much as we'd like get this as cached in session, we can't include subjects here
-        $accesses = $this->userAccessMapper->findAllGroupsForUser($user);
-
-        $folderIds = $accesses->getPropertyValues('serviceIdentifier');
-
-        $folders = $this->folderMapper->findByColumn('id', $folderIds)->sortBy('name', 'asc');
-
         $rerouteOverrides = $this->reRouteOverrideMapper->getMutedFolders($user->getId());
 
         $muted = [
@@ -115,33 +111,25 @@ class GroupsHelper
             'disabled' => $rerouteOverrides[RerouteOverride::USER_ID_ALL] ?? [],
         ];
 
-        $followment = [];
-
         // following
-        foreach ($folders as $folder) {
-            $grp    = $folder->getGroup();
-            /**
-             * some folders/groups may be broken
-             * (sales data folder 62, is apparently a group, but does not have a db entry in userGroups, and has no 'access' set
-             * so lets check if the group object / settings exist and if not ignore that folder
-             */
-            $forced = false;
-            if (null !== $grp) {
-                $forced = $grp->getForceFollow();
-            }
-
-            $disabled = in_array($folder->getId(), $muted['disabled']);
-            $follow   = !in_array($folder->getId(), $muted['unfollow']) && !$disabled;
-
-            $followment[$folder->getId()] = [
-                'name'     => $folder->getName(),
-                'follow'   => $follow,
-                'force'    => $forced,
-                'disabled' => $disabled,
-            ];
+        /** @var UserAccess $access */
+        foreach ($accesses as $access) {
+            $disabled = in_array($access->getFolder()->getId(), $muted['disabled']);
+            $follow   = !in_array($access->getFolder()->getId(), $muted['unfollow']) && !$disabled;
+            $access->setFollowing($follow);
+            $access->getFolder()->getGroup()->setNotificationDisabled($disabled);
         }
 
-        return $followment;
+        if (!$folders) {
+            return;
+        }
+        /** @var Folder $folder */
+        foreach ($folders as $folder) {
+            if (!$folder->getGroup()) {
+                continue;
+            }
+            $folder->getGroup()->setNotificationDisabled(in_array($folder->getId(), $muted['disabled']));
+        }
     }
 
     /**
@@ -151,8 +139,10 @@ class GroupsHelper
      * @param int  $group
      * @param User $user
      * @param bool $isNotificationOn
+     * @return void
+     * @throws MapperException
      */
-    public function setNotification(int $group, \Schoolbox\User $user, bool $isNotificationOn): void
+    public function setNotification(int $group, User $user, bool $isNotificationOn): void
     {
         //helpers
         $serviceKey = 'service.' . UserAccess::SERVICE_HOMEPAGE . ".$group";
@@ -194,7 +184,7 @@ class GroupsHelper
      * @param null|UserAccess $userGroup
      * @return string
      */
-    public function getEnrollmentText(?UserAccess $userGroup): string
+    public static function getEnrollmentText(?UserAccess $userGroup): string
     {
         if ($userGroup === null) {
             return self::NOTENROLED;
@@ -221,22 +211,36 @@ class GroupsHelper
     }
 
     /**
-     * build groups object
-     * @param User  $user
-     * @param array $groupIds
-     * @param bool  $mustHaveHomepage (only build groups that have a homepage, selectable with this variable)
-     * @param array $userPerms
+     * get all groups a user is in, and could request or enroll.
+     * @param User $user
      * @return array
      */
-    private function buildGroups(User $user, array $groupIds, bool $mustHaveHomepage, $userPerms = []): array
+    public function getAllGroups(User $user): array
     {
+        //check if user is currently member
+        // Get the groups the user is currently a member, their enrolment type and favourite status
+        $userPerms = $this->userAccessMapper->findAllGroupsForUser($user)->indexBy('serviceIdentifier');
+
+        $groupsArr = $this->groupMapper->getAvailableGroupIds($user);
+        //combine to show list of all groups, both available to the user, and those they are enroled in
+        $groupIds = array_unique(array_merge($userPerms->keys(), $groupsArr));
+
         //folder colours helper
         $folderColours = new FolderColour($this->timetableColourMapper, new ColorFactory());
-        //build notifications (will notify by default, the user will have to opt out)
-        $notificationsList = $this->getNotifications($user);
 
         //build the folder list object with hydration
-        $folders = $this->folderMapper->findByColumnList(['id' => $groupIds]);
+        $folders = $this->folderMapper->findByColumnList(['id' => $groupIds])->indexBy('id');
+
+        //build notifications (will notify by default, the user will have to opt out)
+        foreach ($userPerms->keys() as $folderId) {
+            $folder = $folders->offsetGet($folderId);
+            if ($folder) {
+                $userPerms->offsetGet($folderId)->setFolder($folders->offsetGet($folderId));
+            } else {
+                $userPerms->offsetUnset($folderId);
+            }
+        }
+        $this->populateNotification($user, $userPerms, $folders);
 
         // build output array
         $possibleGroups = [];
@@ -249,23 +253,8 @@ class GroupsHelper
             if (null === $folder->getGroup()) {
                 continue;
             }
-            /**
-             * some groups / folders may have no homepage, and are being used just for data storage
-             * lets make sure they are kept hidden from this page (but you can still go and access them directly
-             * this is to keep functionality that previously existed in < 21.1.12
-             * if the groups has no homepage, but we have requested groups that do not have homepages, also show them
-             */
-            if (null === $folder->getHomepage() && $mustHaveHomepage) {
-                continue;
-            }
-            /**
-             * default favourite to false, as the use is not a member of the group
-             * then confirm with the $userPerms array to see if the user has that group as a favourite
-             */
-            $isFavourite = false;
-            if ($userPerms[$folder->getId()] ?? false) {
-                $isFavourite = $userPerms[$folder->getId()]->getFavourite();
-            }
+            /** @var UserAccess|null $userPerm */
+            $userPerm = $userPerms->offsetGet($folder->getId());
 
             //nullable image cause something to have no defaults...
             $imageHash = null;
@@ -276,32 +265,13 @@ class GroupsHelper
                 $folder->setColour($folderColours->getNewColour());
             }
 
-            /**
-             * check if user is part of the group, if so use the group perms for the access,
-             * if they aren't a member they may have 'read' access via folder perms, but return deny (from group view)
-             */
-            $access = UserAccess::ACCESS_DENY;
-            if ($userPerms[$folder->getId()] ?? false) {
-                $access = $userPerms[$folder->getId()]->getAccessLevel();
-            }
-            /**
-             * check if admin
-             * admin will have $userPerm[folderID] ACCESS_FULL
-             * Superuser will not.
-             */
-            $isAdmin = false;
-            if ($userPerms[$folder->getId()] ?? false) {
-                $isAdmin = UserAccess::ACCESS_FULL === $userPerms[$folder->getId()]->getAccessLevel();
-            }
-
-
             //get group edit access, for the edit link
-            if (UserAccess::ACCESS_WRITE <= $access) {
+            if ($userPerm && UserAccess::ACCESS_WRITE <= $userPerm->getAccessLevel()) {
                 /**
-                $modifyLink = $this->router->generate(
-                'folder.getFolderModify',
-                ['id' => $folder->getId(), 'folder' => $folder]
-                );
+                 * $modifyLink = $this->router->generate(
+                 * 'folder.getFolderModify',
+                 * ['id' => $folder->getId(), 'folder' => $folder]
+                 * );
                  */
                 $modifyLink = sprintf('/resource/folder/%d/modify', $folder->getId());
             } else {
@@ -313,95 +283,20 @@ class GroupsHelper
                 'enrolmentStatus'   => $this->getEnrollmentText($userPerms[$folder->getId()]),
                 'colour'            => $folder->getColour()->getAsHex(),
                 'coverImageHash'    => $imageHash,
-                'isNotificationsOn' => $notificationsList[$folder->getId()]['follow'] ?? false,
-                'isForceFollow'     => $notificationsList[$folder->getId()]['force'] ?? false,
-                'isMsgDisabled'     => $notificationsList[$folder->getId()]['disabled'] ?? false,
-                'isFavourite'       => $isFavourite,
+                'isNotificationsOn' => $userPerm && $userPerm->getFollowing(),
+                'isForceFollow'     => $folder->getGroup()->getForceFollow(),
+                'isMsgDisabled'     => $folder->getGroup()->getNotificationDisabled(),
+                'isFavourite'       => $userPerm && $userPerm->getFavourite(),
                 'type'              => $folder->getGroup()->getTypeString(),
-                'isAccessAdmin'     => $isAdmin,
-                'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
-                'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
+                'isAccessAdmin'     => $userPerm && ($userPerm->getAccessLevel() === UserAccess::ACCESS_FULL),
+                'isAccessWrite'     => $userPerm && ($userPerm->getAccessLevel() === UserAccess::ACCESS_WRITE),
+                'isAccessRead'      => $userPerm && ($userPerm->getAccessLevel() === UserAccess::ACCESS_READ),
                 'isPrivate'         => $folder->getGroup()->isPrivate(),
                 'modifyLink'        => $modifyLink,
-                'hasHomepage'       => $folder->hasHomepage()
+                'hasHomepage'       => $folder->hasHomepage(),
             ];
         }
         return $possibleGroups;
-    }
-
-    /**
-     * add user to group
-     * @param User  $user
-     * @param Group $group
-     * @param int   $enrollmentStatus (default: ACCESS_AWAITING_AUTHORISATION)
-     * @param int   $membership (default: ACCESS_READ, only has effect if $enrolmentStatus is GroupsHelper::ENROLED)
-     * @param bool  $isFavourite (default: false)
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    public function addToGroup(User $user, Group $group, int $enrollmentStatus = UserAccess::ACCESS_AWAITING_AUTHORISATION, int $membership = UserAccess::ACCESS_READ, bool $isFavourite = false)
-    {
-        //is awaiting Auth?
-        $accessLevel = $enrollmentStatus;
-        if (UserAccess::ACCESS_AWAITING_AUTHORISATION !== $accessLevel && UserAccess::ACCESS_DENY !== $accessLevel) {
-            $accessLevel = $membership;
-        }
-        //add the user to the group
-        $userGroup = $this->userAccessMapper->createModel();
-        $userGroup->setServiceIdentifier($group->getFolder()->getId())
-                  ->setUser($user)
-                  ->setService(UserAccess::SERVICE_HOMEPAGE)
-                  ->setAccessLevel($accessLevel)
-                  ->setFavourite($isFavourite); //default to no favourite groups.
-        //save group object
-        $this->userAccessMapper->save($userGroup);
-    }
-
-    /**
-     * update params for user / group
-     */
-    public function updateUserGroup(User $user, Group $group, int $membership, bool $isFavourite, bool $isNotificaionsOn)
-    {
-        //find user record
-        $userGroup = $this->userAccessMapper->findOneByColumnList([
-                                                                      'uid' => $user->getId(),
-                                                                      'sid' => $group->getFolder()->getId(),
-                                                                  ]);
-        //update fields
-        $userGroup->setFavourite($isFavourite)
-            ->setAccessLevel($membership);
-
-        $this->userAccessMapper->save($userGroup);
-
-        /**
-         * remove the mute for the user / group this will remove the mute entry from the database.
-         */
-        $this->setNotification($group->getFolder()->getId(), $user, $isNotificaionsOn);
-    }
-
-    /**
-     * delete user from group
-     */
-    public function deleteFromGroup(User $user, Group $group)
-    {
-        //find user record
-        $userGroup = $this->findSingleGroup($user, $group);
-        //remove the user group / favourite
-        $this->userAccessMapper->delete($userGroup);
-
-        /**
-         * remove the mute for the user / group this will remove the mute entry from the database.
-         */
-        $this->setNotification($group->getFolder()->getId(), $user, true);
-    }
-
-    /**
-     * sets Favourite
-     */
-    public function setFavourite(User $user, Group $group, bool $isFavourite)
-    {
-        $userPerms = $this->findSingleGroup($user, $group);
-        $userPerms->setFavourite($isFavourite);
-        $this->userAccessMapper->save($userPerms);
     }
 
     /**
@@ -410,58 +305,52 @@ class GroupsHelper
      * these no homepage groups are usually used for notifications, and are sis controlled
      * @param User  $user
      * @param Group $group
-     * @param bool  $mustHaveHomepage (return groups that also have no homepage set)
-     * @return array
-     * @throws NotFound
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @return UserAccess
      */
-    public function getGroup(User $user, Group $group, bool $mustHaveHomepage)
+    public function getGroup(User $user, Group $group): UserAccess
     {
         // Get the group the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->findSingleGroup($user, $group);
-        return $this->buildGroups($user, [$userPerms->getServiceIdentifier()], $mustHaveHomepage, [$group->getFolder()->getId() => $userPerms]);
+        $userPerm = $this->userAccessMapper->findForFolderUser(
+            $group->getFolder(),
+            (new GenericCollection(User::class))->add($user)
+        );
+        $userPerm->first()->setFolder($group->getFolder());
+        $userPerms = $this->userAccessMapper->createCollection()->add($userPerm);
+        $this->populateNotification($user, $userPerms, null);
+        return $userPerms->first();
     }
 
     /**
-     * checks if the user is a member of the group (not including sis groups)
-     */
-    public function inGroup(User $user, Group $group): bool
-    {
-        try {
-            $userPerms = $this->findSingleGroup($user, $group);
-            return true;
-        } catch (NotFound $e) {
-            return false;
-        }
-    }
-
-    /**
-     * get only configurable groups (not SIS controlled)
-     * @return GenericCollection|UserAccess[]
-     */
-    private function findGroups(User $user): GenericCollection
-    {
-        return $this->userAccessMapper->findByColumnList([
-                                                                   'uid'     => $user->getId(),
-                                                                   'service' => UserAccess::SERVICE_HOMEPAGE
-                                                               ])->indexBy('serviceIdentifier');
-    }
-
-    /**
-     * get the 1 group that is also configurable (not SIS controlled)
-     * @param User  $user
+     * Get all users in the group
      * @param Group $group
-     * @return UserAccess
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\Mapper\Exception\NotFound
+     * @return array
      */
-    private function findSingleGroup(User $user, Group $group): UserAccess
+    public function getGroupUsers(Group $group): array
     {
-        return $this->userAccessMapper->findOneByColumnList([
-                                                             'uid'     => $user->getId(),
-                                                             'service' => UserAccess::SERVICE_HOMEPAGE,
-                                                             'sid'     => $group->getFolder()->getId()
-                                                         ], ['cache' => false]);
+        /** @var UserMapper $userMapper */
+        $userMapper     = $this->userAccessMapper->getJoinMapper('user');
+        $userAccessList = $this->userAccessMapper->findForFolder($group->getFolder())
+                                                 ->indexByCallback(static function (UserAccess $userAccess) {
+                                                     return $userAccess->getUser()->getId();
+                                                 });
+
+        $memberList = $userMapper->findByColumn('id', $userAccessList->keys());
+
+        $members = [];
+        foreach ($memberList as $member) {
+            /** @var UserAccess $userAccess */
+            $userAccess = $userAccessList->offsetGet($member->getId());
+            $members[]  = [
+                'id'         => $member->getId(),
+                'firstName'  => $member->getFirstname(),
+                'lastName'   => $member->getLastname(),
+                'userId'     => $member->getId(),
+                'accessType' => self::getMembershipString($userAccess->getAccessLevel()),
+                'role'       => $member->getRole()->getName(),
+                'meta'       => ($member->getYear() && $member->getYear()->getName()) ? $member->getYear()->getLongName() : '',
+            ];
+        }
+        return $members;
     }
 
     /**
@@ -474,10 +363,10 @@ class GroupsHelper
     public static function getMembershipInt(string $membership): int
     {
         $membershipArray = [
-            self::MEMBERSHIP_NONE   => UserAccess::ACCESS_DENY,
-            self::MEMBERSHIP_READ   => UserAccess::ACCESS_READ,
-            self::MEMBERSHIP_WRITE  => UserAccess::ACCESS_WRITE,
-            self::MEMBERSHIP_ADMIN  => UserAccess::ACCESS_FULL,
+            self::MEMBERSHIP_NONE  => UserAccess::ACCESS_DENY,
+            self::MEMBERSHIP_READ  => UserAccess::ACCESS_READ,
+            self::MEMBERSHIP_WRITE => UserAccess::ACCESS_WRITE,
+            self::MEMBERSHIP_ADMIN => UserAccess::ACCESS_FULL,
         ];
         if (!isset($membershipArray[$membership])) {
             throw new SchoolboxException("Incorrect membership value");
@@ -495,73 +384,11 @@ class GroupsHelper
     public static function getMembershipString(int $membership): string
     {
         $membershipArray = [
-            UserAccess::ACCESS_DENY     => self::MEMBERSHIP_NONE,
-            UserAccess::ACCESS_READ     => self::MEMBERSHIP_READ,
-            UserAccess::ACCESS_WRITE    => self::MEMBERSHIP_WRITE,
-            UserAccess::ACCESS_FULL     => self::MEMBERSHIP_ADMIN,
+            UserAccess::ACCESS_DENY  => self::MEMBERSHIP_NONE,
+            UserAccess::ACCESS_READ  => self::MEMBERSHIP_READ,
+            UserAccess::ACCESS_WRITE => self::MEMBERSHIP_WRITE,
+            UserAccess::ACCESS_FULL  => self::MEMBERSHIP_ADMIN,
         ];
         return $membershipArray[$membership];
-    }
-
-    /**
-     * convert enrolment string to enrolment int for DB use
-     * notEnroled   => UserAccess::ACCESS_DENY
-     * pending      => UserAccess::ACCESS_AWAITING_AUTH
-     * enroled      => UserAccess::ACCESS_READ
-     */
-    public static function getEnrolmentInt(string $enrolment): int
-    {
-        $enrolmentArray = [
-            self::NOTENROLED => UserAccess::ACCESS_DENY,
-            self::PENDING    => UserAccess::ACCESS_AWAITING_AUTHORISATION,
-            self::ENROLED    => UserAccess::ACCESS_READ,
-        ];
-        if (!isset($enrolmentArray[$enrolment])) {
-            throw new SchoolboxException("Incorrect enrolment value");
-        }
-        return $enrolmentArray[$enrolment];
-    }
-
-    /**
-     * get membership int from string, usually used in the API
-     */
-    public function membershipStringToInt(string $membership): int
-    {
-        switch ($membership) {
-            case 'admin':
-                return UserAccess::ACCESS_FULL;
-            case 'write':
-                return UserAccess::ACCESS_WRITE;
-            case 'read':
-                return UserAccess::ACCESS_READ;
-            case 'none':
-                return UserAccess::ACCESS_DENY;
-            default:
-                throw new SchoolboxException("Incorrect membership value");
-        }
-    }
-
-    /**
-     * get user membership string from buildGroup object
-     */
-    public function getMembershipStringFromGroup(array $groupObject): string
-    {
-        /**
-         * looking for something true in
-         * 'isAccessAdmin'     => $isAdmin,
-         * 'isAccessWrite'     => ($access === UserAccess::ACCESS_WRITE),
-         * 'isAccessRead'      => ($access === UserAccess::ACCESS_READ),
-         */
-
-        if ($groupObject['isAccessAdmin']) {
-            return self::MEMBERSHIP_ADMIN;
-        }
-        if ($groupObject['isAccessWrite']) {
-            return self::MEMBERSHIP_WRITE;
-        }
-        if ($groupObject['isAccessRead']) {
-            return self::MEMBERSHIP_READ;
-        }
-        return self::MEMBERSHIP_NONE;
     }
 }

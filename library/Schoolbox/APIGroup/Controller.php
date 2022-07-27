@@ -11,25 +11,24 @@ declare(strict_types=1);
 namespace Schoolbox\APIGroup;
 
 use Alaress\Web\Controller\Base;
+use Aura\Web\Exception\InvalidStatusCode;
 use Crell\ApiProblem\ApiProblem;
-use Schoolbox\Collection;
 use Schoolbox\Groups\GroupsHelper;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Timetable_ColourMapper;
 
 class Controller extends Base
 {
     private GroupsHelper $groupsHelper;
-    protected UserMapper $userMapper;
+
+    private UserAccessMapper $userAccessMapper;
 
     /**
      * Controller constructor.
@@ -47,7 +46,8 @@ class Controller extends Base
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper
     ) {
-        $this->groupsHelper = new GroupsHelper(
+        $this->userAccessMapper = $userAccessMapper;
+        $this->groupsHelper     = new GroupsHelper(
             $groupMapper,
             $userAccessMapper,
             $folderMapper,
@@ -60,15 +60,13 @@ class Controller extends Base
      * Returns group memberships for a user
      *
      * @param User $user
-     * @api /user/{userId}/group
+     * @api  /user/{userId}/group
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipSearch
      */
     public function apiMembership(User $user)
     {
-
-        $users_groups = $this->groupsHelper->getCurrentGroups($user, false);
-        $apiGroups = new Collection($users_groups);
-        $output = $apiGroups->map(new ModelToArray());
+        $accesses = $this->groupsHelper->getCurrentGroups($user);
+        $output   = $accesses->map(new ModelToArray());
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
@@ -79,25 +77,20 @@ class Controller extends Base
     /**
      * Returns group membership for a user
      *
-     * @param User $user
+     * @param User  $user
      * @param Group $group
-     * @api GET /user/{userId}/group/{groupId}
+     * @api  GET /user/{userId}/group/{groupId}
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipGet
      */
     public function apiMembershipGet(User $user, Group $group)
     {
-        if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not enroled in the group'))
-                ->setStatus(404)
-                ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
+        try {
+            $userGroup = $this->groupsHelper->getGroup($user, $group);
+        } catch (MapperException $e) {
+            $this->sendJsonError('User is not enroled in the group', 404);
+            return;
         }
-
-        $users_groups = $this->groupsHelper->getGroup($user, $group, false);
-        $apiGroups    = new Collection($users_groups);
-        $output = $apiGroups->map(new ModelToArray());
+        $output = (new ModelToArray())($userGroup);
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
@@ -108,183 +101,99 @@ class Controller extends Base
     /**
      * adds a user into a group
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPost
-     * @api POST /user/{userId}/group/{groupId}
+     * @api  POST /user/{userId}/group/{groupId}
      */
     public function apiMembershipAdd(User $user, Group $group)
     {
-        if ($this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is already enroled in the group'))
-                ->setStatus(409)
-                ->asArray();
-            $this->getResponse()->status->setCode(409);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
+        try {
+            $userAccess = $this->groupsHelper->getGroup($user, $group);
+            if ($userAccess->getAccessLevel() !== 0) {
+                $this->sendJsonError('User is already enroled in the group', 409);
+                return;
+            }
+        } catch (MapperException $e) {
+            $userAccess = (new UserAccess())
+                ->setServiceIdentifier($group->getFolder()->getId())
+                ->setUser($user)
+                ->setFolder($group->getFolder())
+                ->setService(UserAccess::SERVICE_HOMEPAGE);
         }
 
-        $post = json_decode(json_encode($this->request->content->get()), true);
-        /**
-         * check post array if missing any, lets error out...
-         */
-        if (
-            !isset($post['membership'], $post['isNotificationsOn'], $post['isFavourite'])
-        ) {
-            $problem = (new ApiProblem('Not all fields are filled'))
-                ->setStatus(401)
-                ->asArray();
-            $this->getResponse()->status->setCode(401);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the api does not have enough data to work correctly.
-        }
-        $post['membership']        = $this->groupsHelper->getMembershipInt($post['membership']);
-        //check if user is trying to break the system by deleting a user via the PUT command, and error
-        $post['enrolmentStatus'] = $post['enrolmentStatus'] ?? GroupsHelper::ENROLED;
-        if (GroupsHelper::NOTENROLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
-            $problem = (new ApiProblem('Unable to remove a user from this endpoint, please use the DELETE method'))
-                ->setStatus(401)
-                ->asArray();
-            $this->getResponse()->status->setCode(401);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early this API wont delete a user...
-        }
-        $post['isNotificationsOn'] = $group->getForceFollow() ? true : $post['isNotificationsOn'];
-        $post['isFavourite']       = $post['isFavourite'] ?? false;
-        $post['enrolmentStatus']   = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus']);
-
-        $this->groupsHelper->addToGroup($user, $group, $post['enrolmentStatus'], $post['membership'], $post['isFavourite']);
-        $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $post['isNotificationsOn']);
-        $users_groups = $this->groupsHelper->getGroup($user, $group, false);
-        $apiGroups    = new Collection($users_groups);
-        $output       = $apiGroups->map(new ModelToArray());
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $output
-            )
-        );
+        $this->processGroupPostData($userAccess, $user, $group);
     }
 
     /**
      * updated all group field for a user
      *
-     * @param User $user
+     * @param User  $user
      * @param Group $group
-     * @api PUT /user/{userId}/group/{groupId}
+     * @api  PUT /user/{userId}/group/{groupId}
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPut
      */
     public function apiMembershipPut(User $user, Group $group)
     {
-        if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not enroled in the group'))
-                ->setStatus(404)
-                ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
+        try {
+            $userAccess = $this->groupsHelper->getGroup($user, $group);
+        } catch (MapperException $e) {
+            $this->sendJsonError('User does not exist in the group', 409);
+            return;
         }
-
-        $post = json_decode(json_encode($this->request->content->get()), true);
-        /**
-         * check post array if missing any, lets error out...
-         */
-        if (
-            !isset($post['membership'], $post['isNotificationsOn'], $post['isFavourite'])
-        ) {
-            $problem = (new ApiProblem('Not all fields are filled'))
-                ->setStatus(401)
-                ->asArray();
-            $this->getResponse()->status->setCode(401);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the api does not have enough data to work correctly.
-        }
-
-        $defaultData = [
-            'membership'        => UserAccess::ACCESS_READ,
-            'isNotificationsOn' => true,
-            'isFavourite'       => false,
-            'enrolmentStatus'   => GroupsHelper::ENROLED,
-        ];
-        $this->processGroupPostData($user, $group, $post, $defaultData);
+        $this->processGroupPostData($userAccess, $user, $group);
     }
 
     /**
      * updated selected group field for a user
      *
-     * @param User $user
+     * @param User  $user
      * @param Group $group
-     * @api PATCH /user/{userId}/group/{groupId}
+     * @api  PATCH /user/{userId}/group/{groupId}
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPatch
      */
     public function apiMembershipPatch(User $user, Group $group)
     {
-        if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not enroled in the group'))
-                ->setStatus(404)
-                ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
+        try {
+            $userAccess = $this->groupsHelper->getGroup($user, $group);
+        } catch (MapperException $e) {
+            $this->sendJsonError('User is not enroled in the group', 404);
+            return;
         }
-
-        $users_group = $this->groupsHelper->getGroup($user, $group, false)[0];
-        $post = json_decode(json_encode($this->request->content->get()), true);
-        $defaultData = [
-            'membership'        => $this->groupsHelper->getMembershipStringFromGroup($users_group),
-            'isNotificationsOn' => $users_group['isNotificationsOn'],
-            'isFavourite'       => $users_group['isFavourite'],
-            'enrolmentStatus'   => $users_group['enrolmentStatus'],
-        ];
-        $this->processGroupPostData($user, $group, $post, $defaultData);
+        $this->processGroupPostData($userAccess, $user, $group);
     }
 
-    private function processGroupPostData(User $user, Group $group, array $post, array $defaultData): void
+    /**
+     * @param UserAccess $userAccess
+     * @param User       $user
+     * @param Group      $group
+     * @return void
+     */
+    private function processGroupPostData(UserAccess $userAccess, User $user, Group $group)
     {
-        if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not enroled in the group'))
-                ->setStatus(404)
-                ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
+        $post = json_decode(json_encode($this->request->content->get()), true);
+
+        try {
+            /** @var UserAccess $newAccess */
+            $newAccess = (new ArrayToModel())($post ?? [], $userAccess);
+        } catch (\Exception $e) {
+            $this->sendJsonError($e->getMessage(), 401);
+            return;
         }
 
-        //check if user is trying to break the system by deleting a user via the PUT command, and error
-        if (GroupsHelper::NOTENROLED === $post['enrolmentStatus']  || GroupsHelper::MEMBERSHIP_NONE === $post['membership']) {
-            $problem = (new ApiProblem('Unable to remove a user from this endpoint, please use the DELETE method'))
-                ->setStatus(401)
-                ->asArray();
-            $this->getResponse()->status->setCode(401);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early this API wont delete a user...
+        try {
+            $this->userAccessMapper->save($newAccess);
+        } catch (MapperException $e) {
+            $this->sendJsonError($e->getMessage(), $e->getCode());
+            return;
         }
 
-        $post['membership'] = $this->groupsHelper->membershipStringToInt($post['membership'] ?? $defaultData['membership']);
-        $post['isNotificationsOn'] = $post['isNotificationsOn'] ?? $defaultData['isNotificationsOn'];
-        $post['isFavourite'] = $post['isFavourite'] ?? $defaultData['isFavourite'];
-        $post['enrolmentStatus'] = $this->groupsHelper->getEnrolmentInt($post['enrolmentStatus'] ?? $defaultData['enrolmentStatus']);
-
-        /**
-         * check if we should be updating the users enrolment / membership
-         * if enrolment status is set, and is Enroled / awaiting auth, then lets change the membership perms
-         */
-        if (UserAccess::ACCESS_AWAITING_AUTHORISATION === $post['enrolmentStatus']) {
-            //if set to awaiting auth, set to deny (which is in the groups system awaiting auth)
-            $post['membership'] = UserAccess::ACCESS_DENY;
+        if (!$group->getForceFollow()) {
+            try {
+                $this->groupsHelper->setNotification($group->getFolder()->getId(), $user, $newAccess->getFollowing());
+            } catch (MapperException $e) {
+                $this->sendJsonError($e->getMessage(), $e->getCode());
+                return;
+            }
         }
-        if (UserAccess::ACCESS_READ === $post['enrolmentStatus']) {
-            /**
-             * it should grab the higher perm either membership or read
-             * $post['membership'] could be none, read, write or admin, so need to check, not just assume.
-             */
-            $post['membership'] = max($post['membership'], UserAccess::ACCESS_READ);
-        }
-
-        //update details
-        $this->groupsHelper->updateUserGroup($user, $group, $post['membership'], $post['isFavourite'], $post['isNotificationsOn']);
-
-        //get data from save
-        $users_groups = $this->groupsHelper->getGroup($user, $group, false);
-        $apiGroups = new Collection($users_groups);
-        $output = $apiGroups->map(new ModelToArray());
-        //output
+        $output = (new ModelToArray())($newAccess);
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
@@ -294,29 +203,41 @@ class Controller extends Base
 
     /**
      * Deletes a user's group membership
-     * @api DELETE /user/{userId}/group
+     * @api  DELETE /user/{userId}/group
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipDelete
      */
     public function apiMembershipDelete(User $user, Group $group)
     {
-        if (!$this->groupsHelper->inGroup($user, $group)) {
-            $problem = (new ApiProblem('User is not enroled in the group'))
-                ->setStatus(404)
-                ->asArray();
-            $this->getResponse()->status->setCode(404);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
+        try {
+            $userAccess = $this->groupsHelper->getGroup($user, $group);
+        } catch (MapperException $e) {
+            $this->sendJsonError('User is not enroled in the group', 404);
+            return;
         }
 
         try {
-            $this->groupsHelper->deleteFromGroup($user, $group);
+            $this->userAccessMapper->delete($userAccess);
             $this->getResponse()->status->setCode(204);
-        } catch (Exception $e) {
-            $problem = (new ApiProblem('Unable to remove the user from the group.'))
-                ->setStatus(400)
-                ->asArray();
-            $this->getResponse()->status->setCode(400);
-            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+        } catch (MapperException $e) {
+            $this->sendJsonError('Unable to remove the user from the group.', 400);
         }
+    }
+
+    /**
+     * @param string $message
+     * @param int    $code
+     * @return void
+     */
+    private function sendJsonError(string $message, int $code)
+    {
+        $problem = (new ApiProblem($message))
+            ->setStatus($code)
+            ->asArray();
+        try {
+            $this->getResponse()->status->setCode($code);
+        } catch (InvalidStatusCode $e) {
+            // noop
+        }
+        $this->getResponse()->content->set($this->buildJsonOutput($problem));
     }
 }

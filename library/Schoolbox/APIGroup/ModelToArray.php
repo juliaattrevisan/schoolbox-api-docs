@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\APIGroup;
 
 use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Translator for translating a group model into an array, ready for JSON
@@ -20,34 +21,31 @@ use Schoolbox\Groups\GroupsHelper;
 class ModelToArray
 {
     /**
-     * @param array $group
+     * @param UserAccess $access
      * @return array
      */
-    public function __invoke(array $group): array
+    public function __invoke(UserAccess $access): array
     {
-        $membership = GroupsHelper::MEMBERSHIP_NONE;
-        if ($group['isAccessRead']) {
-            $membership = GroupsHelper::MEMBERSHIP_READ;
-        } elseif ($group['isAccessWrite']) {
-            $membership = GroupsHelper::MEMBERSHIP_WRITE;
-        } elseif ($group['isAccessAdmin']) {
-            $membership = GroupsHelper::MEMBERSHIP_ADMIN;
+        $group = $access->getFolder()->getGroup();
+        if (!$group) {
+            return [];
         }
+
         $array = [
-            'id'                => $group['id'],
-            'name'              => $group['name'],
-            'type'              => $group['type'],
-            'isForceFollow'     => $group['isForceFollow'],
-            'isFavourite'       => $group['isFavourite'],
-            'isNotificationsOn' => $group['isNotificationsOn'],
-            'enrolmentStatus'   => $group['enrolmentStatus'],
-            'membership'        => $membership,
+            'id'                => $access->getFolder()->getId(),
+            'name'              => $access->getFolder()->getName(),
+            'type'              => $group->getType(),
+            'isForceFollow'     => $group->getForceFollow(),
+            'isFavourite'       => $access->getFavourite(),
+            'isNotificationsOn' => $access->getFollowing(),
+            'enrolmentStatus'   => GroupsHelper::getEnrollmentText($access),
+            'membership'        => GroupsHelper::getMembershipString($access->getAccessLevel()),
             '_links'            => null,
 
         ];
-        if ($group['hasHomepage']) {
+        if ($access->getFolder()->hasHomepage()) {
             $array['_links'] = [
-                'homepage'      => sprintf('/homepage/%d', $group['id'])
+                'homepage' => sprintf('/homepage/%d', $access->getFolder()->getId()),
             ];
         }
         return $array;
