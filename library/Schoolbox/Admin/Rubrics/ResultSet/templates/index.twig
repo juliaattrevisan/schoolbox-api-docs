@@ -1,168 +1,187 @@
 <style>
-    span.result-set-comma-separated-container
-    {
-        display: inline-block;
-        width: 90%;
-    }
+span.rubric-value-span {
+    display: inline-block;
+    width: 10px;
+}
 
-    div.plus-button-container-div
-    {
-        text-align: right;
-    }
+input.rubric-wide-input {
+    display: inline-block;
+    margin-left: 10px;
+    width: 95%;
+}
+
+label.rubric-result-set-row-label {
+    white-space: nowrap;
+}
 </style>
 <script>
-/**
- * This function is a vanilla Javascript alternative to the Jquery $(document).ready().
- * Taken from https://youmightnotneedjquery.com
- */
-function ready(fn) {
-    if (document.readyState != 'loading') {
-        fn();
-    } else {
-        document.addEventListener('DOMContentLoaded', fn);
-    }
-}
-
-ready(
     /**
-     * If fewer than two editable rows are present, add rows so that two are present.
-     * (A minimum of two rows are required for the form to be submitted.)
+     * This function is a vanilla Javascript alternative to the Jquery $(document).ready().
+     * Taken from https://youmightnotneedjquery.com
      */
-    function ()
-    {
-        let rowsContainerDiv = document.getElementById('rowsContainerDiv');
-        let nRowsDisplayed   = rowsContainerDiv.children.length;
-        let nRowsToAdd       = (nRowsDisplayed >= 2)? 0: 2 - nRowsDisplayed;
-
-        for (let i = 0; i < nRowsToAdd; ++i) {
-            onClickPlusButton();
+    function ready(fn) {
+        if (document.readyState != 'loading') {
+            fn();
+        } else {
+            document.addEventListener('DOMContentLoaded', fn);
         }
     }
-);
 
-/**
- * When the plus button is clicked, we add a new row to the form.
- */
-function onClickPlusButton()
-{
-    let rowsContainerDiv = document.getElementById('rowsContainerDiv');
-    let maxRowNumber     = getHighestRowNumberOnPage();
-    let newRowValue      = (maxRowNumber === null)? 0: maxRowNumber + 1;
-    let newRowHtml       = (
-        // NOTE: The newlines at the end of each line below are important for styling.
-        //       The HTML here must match the HTML used in the inner-loop of the twig template.
-        "<div id='row-div-" + newRowValue + "' data-role='newRow'>\n" +
-            "<label>\n" +
-                "<span class='rubric-value-span'>" + newRowValue + "</span>\n" +
-                "<input class='rubric-wide-input' type='text' name='row-" + newRowValue + "-label' maxlength='64' required/>\n" +
-                "<a class='delete-row-button icon-delete' onclick='onClickDeleteRow(" + newRowValue + ")'></a>\n" +
-            "</label>\n" +
-        "</div>\n"
+    ready(
+        /**
+         * If fewer than two editable rows are present, add rows so that two are present.
+         * (A minimum of two rows are required for the form to be submitted.)
+         */
+        function () {
+            let rowsContainerUl = document.getElementById('rows-container-ul');
+            let nRowsDisplayed  = rowsContainerUl.children.length;
+            let nRowsToAdd      = (nRowsDisplayed >= 2) ? 0 : 2 - nRowsDisplayed;
+
+            for (let i = 0; i < nRowsToAdd; ++i) {
+                onClickPlusButton();
+            }
+        }
     );
 
-    rowsContainerDiv.insertAdjacentHTML('beforeend', newRowHtml);
-    enableSaveButton();
-}
+    /**
+     * When the plus button is clicked, we add a new row to the form.
+     */
+    function onClickPlusButton() {
+        let rowsContainerUl = document.getElementById('rows-container-ul');
+        let maxRowNumber    = getHighestRowNumberOnPage();
+        let newRowValue     = (maxRowNumber === null) ? 0 : maxRowNumber + 1;
+        let newRowHtml      = (
+            "<li id='row-li-" + newRowValue + "'>\n" +
+            "    <div class='actions-small-0'>\n" +
+            "        <div class='list-item'>\n" +
+            "            <div class='small-12 medium-12 column'>\n" +
+            "                <label>\n" +
+            "                    <span class='rubric-value-span' data-role='value'>" + newRowValue + "</span>\n" +
+            "                    <input class='rubric-wide-input' type='text' name='row-" + newRowValue + "-label'" +
+                                " onkeyup='enableSaveButton()' maxlength='64' required/>\n" +
+            "                    <a class='delete-row-button icon-delete' onclick='onClickDeleteRow(" + newRowValue + ")'></a>\n" +
+            "                </label>\n" +
+            "            </div>\n" +
+            "        </div>\n" +
+            "    </div>\n" +
+            "</li>\n"
+        );
 
-/**
- * When the delete button is clicked on a new row, we remove the new row from the form.
- * We also must update the numbers on the left of the new form rows so there are no gaps.
- */
-function onClickDeleteRow(rowValue)
-{
-    let rowDiv = document.getElementById('row-div-' + rowValue);
-    rowDiv.remove();
-    renumberRows();
-    enableSaveButton();
-}
-
-/**
- * Find the highest number from the non-new rows, then update the numbers on the new rows
- * so that the number of each row is one more than the number on the row directly above.
- */
-function renumberRows()
-{
-    let spans = document.getElementsByClassName('rubric-value-span');
-
-    for (let i = 0; i < spans.length; ++i) {
-        let span = spans[i];
-
-        span.innerHTML = i;
-
-        // Must also rename the text input.
-        let labelTextInput = span.nextElementSibling;
-        labelTextInput.setAttribute('name', 'row-' + i + '-label');
+        rowsContainerUl.insertAdjacentHTML('beforeend', newRowHtml);
+        enableSaveButton();
     }
-}
 
-/**
- * Find the highest number from all rows on the page.
- */
-function getHighestRowNumberOnPage()
-{
-    let spans    = document.getElementsByClassName('rubric-value-span');
-    let maxValue = null;
+    /**
+     * When the delete button is clicked on a new row, we remove the new row from the form.
+     * We also must update the numbers on the left of the new form rows so there are no gaps.
+     */
+    function onClickDeleteRow(rowValue) {
+        let rowLi = document.getElementById('row-li-' + rowValue);
+        rowLi.remove();
+        renumberRows();
+        enableSaveButton();
+    }
 
-    for (let i = 0; i < spans.length; ++i) {
-        let span      = spans[i];
-        let spanValue = Number(span.innerHTML);
+    /**
+     * Find the highest number from the non-new rows, then update the numbers on the new rows
+     * so that the number of each row is one more than the number on the row directly above.
+     */
+    function renumberRows() {
+        let spans = document.getElementsByClassName('rubric-value-span');
 
-        if (maxValue === null || spanValue > maxValue) {
-            maxValue = spanValue;
+        for (let i = 0; i < spans.length; ++i) {
+            let span = spans[i];
+
+            span.innerHTML = i;
+
+            // Must also rename the text input.
+            let labelTextInput = span.nextElementSibling;
+            labelTextInput.setAttribute('name', 'row-' + i + '-label');
         }
     }
 
-    return maxValue;
-}
+    /**
+     * Find the highest number from all rows on the page.
+     */
+    function getHighestRowNumberOnPage() {
+        let spans = document.getElementsByClassName('rubric-value-span');
+        let maxValue = null;
 
-function enableSaveButton()
-{
-    document.getElementById('save-button').disabled = false;
-}
+        for (let i = 0; i < spans.length; ++i) {
+            let span = spans[i];
+            let spanValue = Number(span.innerHTML);
+
+            if (maxValue === null || spanValue > maxValue) {
+                maxValue = spanValue;
+            }
+        }
+
+        return maxValue;
+    }
+
+    function enableSaveButton() {
+        document.getElementById('save-button').disabled = false;
+    }
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 <div class="admin-container row">
-    {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
-        <div class="small-12 island">
-            <section class="content">
-                <div class="row">
-                    <div class="small-12 columns">
-                        <h3>Creating Rubric Results</h3>
-                    </div>
-                    <div class="small-12 large-12 columns">
+        <!-- Main content section starts here. -->
+        <div class="row">
+            <div class="small-12 island">
+                <section>
+                    <header class="list-header actions-small-0">
+                    </header>
+                    <div class="small-12 medium-12 column">
                         <p>
-                            Edit the rubric result set here.
-                            These are the pre-populated default values that will appear when creating a rubric.
+                            Create or edit a rubric result set template here.
                         </p>
                         <p>
                             Each set should be a discrete list of items of a single measurement;
                             for example, 'Very Good' and 'Yes' should not be in the same set.
                         </p>
+                        <p>
+                            Deleting or modifying a result set here will not affect any previous use of that result set elsewhere in Schoolbox.
+                            This is because the result sets here are just templates that are copied to create new result sets on rubrics.
+                        </p>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
-        <div class="small-12 island">
-            <form data-action="saveRubricResultRows" method="POST" name="rubricResultRows" action="/adminv2/rubric-results-set/{{ resultSetId }}">
-                <div id="rowsContainerDiv">
-                    {% for row in rubricResultRows %}
-                        <div id="row-div-{{ row.value|purify }}">
-                            <label>
-                                <span class="rubric-value-span" data-role="value">{{ row.value|purify }}</span>
-                                <input class="rubric-wide-input" type="text" name="row-{{ row.value|purify }}-label" value="{{ row.label|purify }}" onkeyup="enableSaveButton()" maxlength="64" required/>
-                                <a class='delete-row-button icon-delete' onclick='onClickDeleteRow({{  row.value|purify }})'></a>
-                            </label>
+        <div class="row">
+            <div class="small-12 island">
+                <form data-action="saveRubricResultRows" method="post" action="/adminv2/rubric-results-set/{{ resultSetId }}">
+                    <section>
+                        <ul id="rows-container-ul" class="information-list unsortable">
+                            {% for row in rubricResultRows %}
+                                <li id="row-li-{{ row.value|purify }}">
+                                    <div class="actions-small-0">
+                                        <div class="list-item">
+                                            <div class="small-12 medium-12 column">
+                                                <label class="rubric-result-set-row-label">
+                                                    <span class="rubric-value-span" data-role="value">{{ row.value|purify }}</span>
+                                                    <input class="rubric-wide-input" type="text" name="row-{{ row.value|purify }}-label"
+                                                     value="{{ row.label|purify }}" onkeyup="enableSaveButton()" maxlength="64" required/>
+                                                    <a class='delete-row-button icon-delete' onclick='onClickDeleteRow({{ row.value|purify }})'></a>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <div class="component-action">
+                            <section>
+                                <a class="button" onclick="onClickPlusButton()">Add Row</a>
+                            </section>
                         </div>
-                    {% endfor %}
-                </div>
-                <div class="plus-button-container-div">
-                    <button class="icon-add" onclick="onClickPlusButton()"></button>
-                </div>
-                <input id='save-button' disabled='disabled' type="submit" value="Save Changes"/>
-            </form>
+                    </section>
+                    <input id="save-button" type="submit" value="Submit" disabled="disabled">
+                </form>
+            </div>
         </div>
+        <!-- Main content section ends here. -->
     </div>
 </div>

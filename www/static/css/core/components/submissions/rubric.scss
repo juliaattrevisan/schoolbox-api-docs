@@ -506,16 +506,3 @@ select.letter-grade-select {
         font-style: italic;
     }
 }
-
-// This style applies to the adminv2/rubric-results page.
-span.rubric-value-span {
-    display: inline-block;
-    width: 10px;
-}
-
-// This style applies to the adminv2/rubric-results page.
-input.rubric-wide-input {
-    display: inline-block;
-    margin-left: 10px;
-    width: 95%;
-}

@@ -4,10 +4,6 @@ div.create-new-button-container-div
     text-align: right;
 }
 
-div.result-set-row-div
-{
-}
-
 span.result-rubric-label-span
 {
     display: inline-block;
@@ -21,11 +17,6 @@ span.buttons-container-span
 {
     display: inline-block;
     float: right;
-}
-
-span.buttons-container-span > a
-{
-    background-color: white;
 }
 
 div.clear-floats
@@ -84,8 +75,8 @@ div.clear-floats
                                                     </span>
                                                 {% endfor %}
                                                 <span class="buttons-container-span">
-                                                    <a class="button icon-modify" href="/adminv2/rubric-results-set/{{ resultSetId }}"></a>
-                                                    <a class="button icon-delete" href="/adminv2/rubric-results-sets/delete/{{ resultSetId }}"></a>
+                                                    <a class="edit-row-button icon-modify" href="/adminv2/rubric-results-set/{{ resultSetId }}"></a>
+                                                    <a class="delete-row-button icon-delete" href="/adminv2/rubric-results-sets/delete/{{ resultSetId }}"></a>
                                                 </span>
                                                 <div class="clear-floats"></div>
                                             </label>
