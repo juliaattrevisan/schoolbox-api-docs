@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Mail;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Mail\Mailer;
 use Schoolbox\Admin\EmailDKIM\Mapper as DKIMMapper;
 use Schoolbox\Cdn\PrefixGenerator;
@@ -126,19 +127,20 @@ class EmailFactory
         // load up a twig environment that will search for school-specific templates if the directory exists
         $twig = new Environment(new FilesystemLoader($paths), $options);
 
-        //TODO: Refactor to use the Twig Environment from the bootstrap
+        // TODO: Refactor to use the Twig Environment from the bootstrap
         // HTML Purifier filter - known to output safe HTML
+        $scrubAdapter = new ScrubAdapter();
         $twig->addFilter(
             new TwigFilter(
                 'purify',
-                [Scrub::class, 'html'],
+                [$scrubAdapter, 'purify'],
                 ['is_safe' => ['html']]
             )
         );
         $twig->addFilter(
             new TwigFilter(
                 'purifyAbsoluteUri',
-                [Scrub::class, 'htmlAbsoluteUri'],
+                [$scrubAdapter, 'purifyAbsoluteUri'],
                 ['is_safe' => ['html']]
             )
         );
