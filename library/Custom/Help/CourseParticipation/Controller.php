@@ -315,6 +315,7 @@ class Controller extends Base
                             ->setAccessLevel(UserAccess::ACCESS_READ)
                             ->setService(UserAccess::SERVICE_HOMEPAGE)
                             ->setServiceIdentifier($folderId)
+                            ->setFavourite(true)
                     );
                 } else {
                     // remove this user from this folder
