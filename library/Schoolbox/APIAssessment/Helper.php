@@ -445,26 +445,9 @@ v_most_recent_feedback.review_route = 'instructor' AND
     /**
      * get full rubric template
      * @param string $assessmentId
-     * @return null|array{
-     *     capabilities: array{
-     *     id: integer,
-     *     name: string,
-     *     maxValue: float|null,
-     *     indicators: array{
-     *          id: integer,
-     *          name: string,
-     *          maxValue: float|null,
-     *          descriptors: array{
-     *                  id: integer,
-     *                  description: string,
-     *                  maxValue: float|null,
-     *                  sequence: int
-     *                  }
-     *              }
-     *          }
-     *    }
+     * @return array|null
      */
-    public function getRubric(string $assessmentId)
+    public function getRubric(string $assessmentId): ?array
     {
         $statement = $this->mapper->getDatabase()->prepare("
         SELECT
@@ -530,27 +513,9 @@ v_most_recent_feedback.review_route = 'instructor' AND
      *
      * @param string $assessmentId
      * @param int    $feedbackID
-     * @return null|array{
-     *     capabilities: array{
-     *         id: integer,
-     *         name: string,
-     *         mark: float|null,
-     *         maxValue: float|null,
-     *         human_readable_mark: string|null,
-     *         indicators: array{
-     *             id: integer,
-     *             name: string,
-     *             maxValue: float|null,
-     *             descriptor: array{
-     *                 id: integer,
-     *                 description: string,
-     *                 mark: float|null
-     *                 }
-     *             }
-     *         }
-     *     }
+     * @return null|array
      */
-    public function getRubricFeedback(string $assessmentId, int $feedbackID)
+    public function getRubricFeedback(string $assessmentId, int $feedbackID): ?array
     {
         $statement = $this->mapper->getDatabase()->prepare("
         select `sb`.`assessment_id`                                  AS `assessment_id`,
