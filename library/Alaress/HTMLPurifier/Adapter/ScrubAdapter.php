@@ -24,4 +24,12 @@ class ScrubAdapter implements IPurifier
     {
         return isset($input) ? Scrub::html($input) : null;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function purifyAbsoluteUri(?string $input, string $domain): ?string
+    {
+        return isset($input) ? Scrub::htmlAbsoluteUri($input, $domain) : null;
+    }
 }

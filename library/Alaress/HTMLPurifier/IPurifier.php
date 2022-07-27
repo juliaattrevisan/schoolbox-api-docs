@@ -25,4 +25,14 @@ interface IPurifier
      * @return string|null
      */
     public function purify(?string $input): ?string;
+
+    /**
+     * Runs `$input` through a HTMLPurifier instance, and converts relative
+     * links within `$input` to absolute links to `$domain`.
+     *
+     * @param string|null $input
+     * @param string      $domain
+     * @return string|null
+     */
+    public function purifyAbsoluteUri(?string $input, string $domain): ?string;
 }

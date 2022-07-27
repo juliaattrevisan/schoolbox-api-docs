@@ -237,6 +237,10 @@ class ModelToArrayTest extends TestCase
             {
                 return $input;
             }
+            public function purifyAbsoluteUri(?string $input, string $domain): ?string
+            {
+                return $input;
+            }
         };
 
         return new ModelToArray(
