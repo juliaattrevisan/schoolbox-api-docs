@@ -15,6 +15,7 @@ use DiDom\Exceptions\InvalidSelectorException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Laminas\Uri\Uri;
+use ValueError;
 
 /**
  * Replaces Iframely embeds within a HTML fragment with a version which avoids
@@ -92,12 +93,17 @@ class EmbedReplacer
     public function replace(string $html): string
     {
         // Empty HTML: just return the empty content.
-        if ($html === '') {
+        if (trim($html) === '') {
             return $html;
         }
 
-        // Load the purified content into a DOM document
-        $doc = new Document($html, false, 'UTF-8');
+        // Try to load the purified content into a DOM document
+        try {
+            $doc = new Document($html, false, 'UTF-8');
+            /** @phpstan-ignore-next-line - this can raise a ValueError */
+        } catch (ValueError) {
+            return $html;
+        }
 
         // Search for Iframely embeds (within data-oembed-url attributes).
         // If there are none, return early
