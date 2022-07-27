@@ -20,6 +20,8 @@ use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base
 {
+    private const MAX_ROWS_PER_RESULT_SET = 11;
+
     /**
      * @var Mapper
      */
@@ -65,10 +67,11 @@ class Controller extends Base
             [
                 'template' => '@adminRubric/index.twig',
                 'data'     => [
-                    'pageCurrent'      => $this->router->generate('adminRubric.getRubricResults'),
-                    'resultSetId'      => $resultSetId,
-                    'rubricResultRows' => $this->mapper->findRubricResultRows((int)$resultSetId),
-                    'allBreadcrumbs'   => (
+                    'MAX_ROWS_PER_RESULT_SET' => self::MAX_ROWS_PER_RESULT_SET,
+                    'pageCurrent'             => $this->router->generate('adminRubric.getRubricResults'),
+                    'resultSetId'             => $resultSetId,
+                    'rubricResultRows'        => $this->mapper->findRubricResultRows((int)$resultSetId),
+                    'allBreadcrumbs'          => (
                         (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubric.getRubricResults'))
                     )
                 ]
@@ -84,6 +87,7 @@ class Controller extends Base
     {
         $postedData    = $this->getRequest()->post->getArrayCopy();
         $indexedLabels = array();
+        $labelsCount   = 0;
 
         foreach ($postedData as $key => $value) {
             // Expect $key to be in format "row-$n-label".  Where $n is rubric_result.value.
@@ -95,6 +99,12 @@ class Controller extends Base
             }
 
             $indexedLabels[$n] = $value;
+
+            if (++$labelsCount > self::MAX_ROWS_PER_RESULT_SET) {
+                // The client should not send more than self::MAX_ROWS_PER_RESULT_SET to be saved.
+                // In any case, we apply this limit at the server, and if it is surpassed we just ignore the excess rows.
+                break;
+            }
         }
 
         $resultSetId = $this->mapper->createOrOverwriteRubricResultSet($resultSetIdOrNull, $indexedLabels);

@@ -49,8 +49,14 @@ label.rubric-result-set-row-label {
     function onClickPlusButton() {
         let rowsContainerUl = document.getElementById('rows-container-ul');
         let maxRowNumber    = getHighestRowNumberOnPage();
-        let newRowValue     = (maxRowNumber === null) ? 0 : maxRowNumber + 1;
-        let newRowHtml      = (
+
+        if (maxRowNumber > {{ MAX_ROWS_PER_RESULT_SET }}) {
+            // We limit the number of rows here to an arbitrarily chosen sensible value.
+            return;
+        }
+
+        let newRowValue = (maxRowNumber === null) ? 0 : maxRowNumber + 1;
+        let newRowHtml  = (
             "<li id='row-li-" + newRowValue + "'>\n" +
             "    <div class='actions-small-0'>\n" +
             "        <div class='list-item'>\n" +
@@ -69,6 +75,7 @@ label.rubric-result-set-row-label {
 
         rowsContainerUl.insertAdjacentHTML('beforeend', newRowHtml);
         enableSaveButton();
+        document.getElementById('empty-state-island-div').style.display = 'none'; // Hide empty state box.
     }
 
     /**
@@ -80,6 +87,10 @@ label.rubric-result-set-row-label {
         rowLi.remove();
         renumberRows();
         enableSaveButton();
+
+        if (document.getElementById('rows-container-ul').children.length == 0) {
+            document.getElementById('empty-state-island-div').style.display = ''; // Show empty state box.
+        }
     }
 
     /**
@@ -92,7 +103,7 @@ label.rubric-result-set-row-label {
         for (let i = 0; i < spans.length; ++i) {
             let span = spans[i];
 
-            span.innerHTML = i;
+            span.innerHTML = String(i); // Cast to avoid warning.
 
             // Must also rename the text input.
             let labelTextInput = span.nextElementSibling;
@@ -104,11 +115,11 @@ label.rubric-result-set-row-label {
      * Find the highest number from all rows on the page.
      */
     function getHighestRowNumberOnPage() {
-        let spans = document.getElementsByClassName('rubric-value-span');
+        let spans    = document.getElementsByClassName('rubric-value-span');
         let maxValue = null;
 
         for (let i = 0; i < spans.length; ++i) {
-            let span = spans[i];
+            let span      = spans[i];
             let spanValue = Number(span.innerHTML);
 
             if (maxValue === null || spanValue > maxValue) {
@@ -122,6 +133,18 @@ label.rubric-result-set-row-label {
     function enableSaveButton() {
         document.getElementById('save-button').disabled = false;
     }
+</script>
+<script type="text/javascript">
+    $(function() {
+        $("#pdForm").alaressValidate({
+            rules: {
+                'pdNumber':  {
+                    alphanumeric: true,
+                    requiredNotBlank:true
+                }
+            }
+        });
+    });
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -151,6 +174,13 @@ label.rubric-result-set-row-label {
             </div>
         </div>
         <div class="row">
+            <div id="empty-state-island-div" class="small-12 island"{% if rubricResultRows %}style="display:none"{% endif %}>
+                <div class="empty-state">
+                    <i class="icon-list"></i>
+                    <p>This rubrics result set is empty.</p>
+                    <p><a onclick="onClickPlusButton()">Add a row</a></p>
+                </div>
+            </div>
             <div class="small-12 island">
                 <form data-action="saveRubricResultRows" method="post" action="/adminv2/rubric-results-set/{{ resultSetId }}">
                     <section>
@@ -162,6 +192,7 @@ label.rubric-result-set-row-label {
                                             <div class="small-12 medium-12 column">
                                                 <label class="rubric-result-set-row-label">
                                                     <span class="rubric-value-span" data-role="value">{{ row.value|purify }}</span>
+                                                    <!-- A sensible maxlength of 64 chars was chosen arbitrarily for the input below.  The database field can handle more. -->
                                                     <input class="rubric-wide-input" type="text" name="row-{{ row.value|purify }}-label"
                                                      value="{{ row.label|purify }}" onkeyup="enableSaveButton()" maxlength="64" required/>
                                                     <a class='delete-row-button icon-delete' onclick='onClickDeleteRow({{ row.value|purify }})'></a>

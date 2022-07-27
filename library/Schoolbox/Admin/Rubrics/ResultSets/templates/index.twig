@@ -6,11 +6,11 @@ div.create-new-button-container-div
 
 span.result-rubric-label-span
 {
-    display: inline-block;
-    padding: 0.5rem;
     background-color: lightgrey;
+    display: inline-block;
+    margin-bottom: 0.2rem;
     margin-right: 0.2rem;
-    vertical-align: bottom;
+    padding: 0.5rem;
 }
 
 span.buttons-container-span
@@ -52,42 +52,52 @@ div.clear-floats
             </div>
         </div>
         <div class="row">
-            <div class="small-12 island">
-                <div class="create-new-button-container-div">
-                    <a class='button icon-add' href="/adminv2/rubric-results-set/create">Create new result set</a>
+            {% if not rubricsByResultSetId %}
+                <div id="empty-state-island-div" class="small-12 island">
+                    <div class="empty-state">
+                        <i class="icon-list"></i>
+                        <p>No rubric result sets have been created.</p>
+                        <p><a href="/adminv2/rubric-results-set/create">Create new result set</a></p>
+                    </div>
                 </div>
-                <section>
-                    <header class="list-header actions-small-0">
-                        <div class="list-item">
-                            <div class="medium-12 column">Result Set</div>
-                        </div>
-                    </header>
-                    <ul class="information-list unsortable">
-                        {% for resultSetId, rubrics in rubricsByResultSetId %}
-                            <li>
-                                <div class="actions-small-0">
-                                    <div class="list-item">
-                                        <div class="small-12 medium-12 column">
-                                            <label>
-                                                {% for rubric in rubrics %}
-                                                    <span class="result-rubric-label-span">
-                                                        {{ rubric.label|purify }}
+            {% else %}
+                <div id="rubric-rows-island-div" class="small-12 island">
+                    <div class="create-new-button-container-div">
+                        <a class='button icon-add' href="/adminv2/rubric-results-set/create">Create new result set</a>
+                    </div>
+                    <section>
+                        <header class="list-header actions-small-0">
+                            <div class="list-item">
+                                <div class="medium-12 column">Result Set</div>
+                            </div>
+                        </header>
+                        <ul id="rows-container-ul" class="information-list unsortable">
+                            {% for resultSetId, rubrics in rubricsByResultSetId %}
+                                <li>
+                                    <div class="actions-small-0">
+                                        <div class="list-item">
+                                            <div class="small-12 medium-12 column">
+                                                <label>
+                                                    {% for rubric in rubrics %}
+                                                        <span class="result-rubric-label-span">
+                                                            {{ rubric.label|purify }}
+                                                        </span>
+                                                    {% endfor %}
+                                                    <span class="buttons-container-span">
+                                                        <a class="edit-row-button icon-modify" href="/adminv2/rubric-results-set/{{ resultSetId }}"></a>
+                                                        <a class="delete-row-button icon-delete" href="/adminv2/rubric-results-sets/delete/{{ resultSetId }}"></a>
                                                     </span>
-                                                {% endfor %}
-                                                <span class="buttons-container-span">
-                                                    <a class="edit-row-button icon-modify" href="/adminv2/rubric-results-set/{{ resultSetId }}"></a>
-                                                    <a class="delete-row-button icon-delete" href="/adminv2/rubric-results-sets/delete/{{ resultSetId }}"></a>
-                                                </span>
-                                                <div class="clear-floats"></div>
-                                            </label>
+                                                    <div class="clear-floats"></div>
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </section>
-            </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                </div>
+            {% endif %}
         </div>
         <!-- Main content section ends here. -->
     </div>
