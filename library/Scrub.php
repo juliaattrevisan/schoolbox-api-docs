@@ -462,11 +462,14 @@ class Scrub
      * Cleans crap out of input using HTMLPurifier.
      * Now caches previous calls in Redis!
      *
-     * @param  string $html
+     * @param  string|null $html
      * @return mixed
      */
-    public static function html(string $html)
+    public static function html(?string $html)
     {
+        if (!isset($html)) {
+            return '';
+        }
         return Alaress\Redis::getCacheInstance()->cacheFunctionCall(
             'scrub.html',
             function ($param) {
@@ -482,12 +485,15 @@ class Scrub
     /**
      * Variant of html
      *
-     * @param string $html
-     * @param string $domain
+     * @param string|null $html
+     * @param string      $domain
      * @return string
      */
-    public static function htmlAbsoluteUri(string $html, string $domain): string
+    public static function htmlAbsoluteUri(?string $html, string $domain): string
     {
+        if (!isset($html)) {
+            return '';
+        }
         return Alaress\Redis::getCacheInstance()->cacheFunctionCall(
             'scrub.htmlAbsoluteUri',
             function ($params) {
