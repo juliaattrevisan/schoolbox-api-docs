@@ -465,7 +465,7 @@ class Scrub
      * @param  string $html
      * @return mixed
      */
-    public static function html($html)
+    public static function html(string $html)
     {
         return Alaress\Redis::getCacheInstance()->cacheFunctionCall(
             'scrub.html',
@@ -473,7 +473,7 @@ class Scrub
                 $purified = self::getHtmlPurifierInstance()->purify($param);
                 return self::buildEmbedReplacer()->replace($purified);
             },
-            "$html",
+            $html,
             Config::get('scrub_html_cache_timeout')
         );
     }
@@ -495,7 +495,7 @@ class Scrub
                 $purified = $purifier->purify($params[0]);
                 return self::buildEmbedReplacer()->replace($purified);
             },
-            ["$html", $domain],
+            [$html, $domain],
             Config::get('scrub_html_cache_timeout')
         );
     }
