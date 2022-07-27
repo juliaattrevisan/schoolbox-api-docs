@@ -85,6 +85,7 @@ $app = new class extends CliTool\App
         $userMapper = UserMapper::getInstance();
         $userAccessMapper = UserAccessMapper::getInstance();
         $folderMapper = FolderMapper::getInstance();
+        $groupMapper = \Schoolbox\Resource\GroupMapper::getInstance();
 
         // suppress the route cache mutations
         $userAccessMapper->unregisterCallbacks();
@@ -177,6 +178,14 @@ $app = new class extends CliTool\App
             if ($currentFolder->getInherit()) {
                 $this->getLogger()->error("'{$folders[$folderId]->getTitle()}' (id: {$folders[$folderId]->getId()}) inherits permissions, cannot create group members");
                 continue;
+            }
+
+            if ($this->perform() && !$currentFolder->getGroup()) {
+                $group = $groupMapper->createModel()
+                                     ->setType(\Schoolbox\Resource\Group::PRIVATE_GROUP)
+                                     ->setFolder($currentFolder)
+                                     ->setForceFollow(false);
+                $groupMapper->save($group);
             }
 
             // Add parents from class codes to the specified classes
