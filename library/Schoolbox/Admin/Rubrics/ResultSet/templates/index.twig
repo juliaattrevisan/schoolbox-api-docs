@@ -13,6 +13,18 @@ input.rubric-wide-input {
 label.rubric-result-set-row-label {
     white-space: nowrap;
 }
+
+label.rubric-result-set-row-label > span.rubric-value-span,
+label.rubric-result-set-row-label > a.delete-row-button {
+    /* These styles are important when the validation message appears below the input field. */
+    padding-top: 0.5rem;
+    vertical-align: top;
+}
+
+label.rubric-result-set-row-label > span.input-container {
+    display: inline-block;
+    width: 97%;
+}
 </style>
 <script>
     /**
@@ -61,10 +73,13 @@ label.rubric-result-set-row-label {
             "    <div class='actions-small-0'>\n" +
             "        <div class='list-item'>\n" +
             "            <div class='small-12 medium-12 column'>\n" +
-            "                <label>\n" +
+            "                <label class='rubric-result-set-row-label'>\n" +
             "                    <span class='rubric-value-span' data-role='value'>" + newRowValue + "</span>\n" +
-            "                    <input class='rubric-wide-input' type='text' name='rubricResultLabels[" + newRowValue + "]'" +
-                                " onkeyup='enableSaveButton()' maxlength='64' required/>\n" +
+            "                    <span class='input-container'>\n" +
+            "                        <!-- This input-container span is necessary in order to contain the input and the validation message span that will be added if the field contains invalid data. -->\n" +
+            "                        <input class='rubric-wide-input' type='text' name='rubricResultLabels[" + newRowValue + "]'" +
+                                    " onkeyup='enableSaveButton()' maxlength='64' required/>\n" +
+            "                    </span>\n" +
             "                    <a class='delete-row-button icon-delete' onclick='onClickDeleteRow(" + newRowValue + ")'></a>\n" +
             "                </label>\n" +
             "            </div>\n" +
@@ -74,6 +89,10 @@ label.rubric-result-set-row-label {
         );
 
         rowsContainerUl.insertAdjacentHTML('beforeend', newRowHtml);
+
+        // Add validation rules to new input.
+        $('input[name="rubricResultLabels[' + String(newRowValue) + ']"').rules('add', {requiredNotBlank: true});
+
         enableSaveButton();
         document.getElementById('empty-state-island-div').style.display = 'none'; // Hide empty state box.
     }
@@ -134,15 +153,12 @@ label.rubric-result-set-row-label {
         document.getElementById('save-button').disabled = false;
     }
 </script>
-<script type="text/javascript">
+<script>
     $(function() {
-        $("#pdForm").alaressValidate({
-            rules: {
-                'pdNumber':  {
-                    alphanumeric: true,
-                    requiredNotBlank:true
-                }
-            }
+        $('#rubricResultSetForm').alaressValidate();
+
+        $('#rubricResultSetForm input').each(function(index, element) {
+            $(element).rules('add', {requiredNotBlank: true});
         });
     });
 </script>
@@ -182,7 +198,7 @@ label.rubric-result-set-row-label {
                 </div>
             </div>
             <div class="small-12 island">
-                <form data-action="saveRubricResultRows" method="post" action="/adminv2/rubric-results-set/{{ resultSetId }}">
+                <form id="rubricResultSetForm" method="post" action="/adminv2/rubric-results-set/{{ resultSetId }}">
                     <section>
                         <ul id="rows-container-ul" class="information-list unsortable">
                             {% for row in rubricResultRows %}
@@ -193,8 +209,11 @@ label.rubric-result-set-row-label {
                                                 <label class="rubric-result-set-row-label">
                                                     <span class="rubric-value-span" data-role="value">{{ row.value|purify }}</span>
                                                     <!-- A sensible maxlength of 64 chars was chosen arbitrarily for the input below.  The database field can handle more. -->
-                                                    <input class="rubric-wide-input" type="text" name="rubricResultLabels[{{ row.value|purify }}]"
-                                                     value="{{ row.label|purify }}" onkeyup="enableSaveButton()" maxlength="64" required/>
+                                                    <span class="input-container">
+                                                        <!-- This input-container span is necessary in order to contain the input and the validation message span that will be added if the field contains invalid data. -->
+                                                        <input class="rubric-wide-input" type="text" name="rubricResultLabels[{{ row.value|purify }}]"
+                                                         value="{{ row.label|purify }}" onkeyup="enableSaveButton()" maxlength="64" required/>
+                                                    </span>
                                                     <a class='delete-row-button icon-delete' onclick='onClickDeleteRow({{ row.value|purify }})'></a>
                                                 </label>
                                             </div>
