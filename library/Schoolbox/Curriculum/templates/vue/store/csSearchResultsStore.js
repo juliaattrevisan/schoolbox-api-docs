@@ -4,6 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { useCodesStore } from './csCodesStore';
+import { useSelectedCodesStore } from './csSelectedCodesStore';
 import cloneDeep from 'lodash/cloneDeep';
 
 const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
@@ -74,12 +75,13 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
          * @return { Array }
          */
         results () {
-            const fullResults = this.codesFlattened.filter(this.searchForName);
+            const fullResults = this.codesFlattened.filter(this.searchForMatches);
             if (fullResults.length > CAPPED_RESULTS_LENGTH) { //too many results, so cap them
                 this.isResultsCapped = true; //to display the results are capped note
                 this.resultsNotShownCount = fullResults.length - CAPPED_RESULTS_LENGTH; //and how many are actually capped
                 return fullResults.slice(0, CAPPED_RESULTS_LENGTH);
             } else { //otherwise just return them all
+                this.isResultsCapped = false; 
                 return fullResults;
             }
         },
@@ -89,33 +91,9 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
          * 
          * @return { Boolean }
          */
-        hasNoSearchResults () {
-            return this.searchResults.length === 0 && this.isSearchActive && this.hasSelectedFirstNode;
+        hasNoResults () {
+            return this.results.length === 0 && this.isSearchActive;
         },
-
-        // /**
-        //  * the classes found relevant to the search input, capped to the maximum 
-        //  * amount of results to be shown
-        //  * 
-        //  * @returns { Array } all relevant search results, once we've reached the minQueryLength
-        //  */
-        // results () {
-        //     this.isResultsCapped = false;
-        //     if (this.isSearchActive) {
-        //         return [];
-        //     } else if (classes.value.filter(searchForName).length > 0) { 
-        //         const fullResults = classes.value.filter(searchForName);
-        //         if (fullResults.length > CAPPED_RESULTS_LENGTH) { //too many results, so cap them
-        //             this.isResultsCapped = true; //to display the results are capped note
-        //             this.resultsNotShownCount = fullResults.length - CAPPED_RESULTS_LENGTH; //and how many are actually capped
-        //             return fullResults.slice(0, CAPPED_RESULTS_LENGTH);
-        //         } else { //otherwise just return them all
-        //             return fullResults;
-        //         }
-        //     } else {
-        //         return [];
-        //     }
-        // },
 
     },
    
@@ -123,13 +101,13 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
     
         /**
          * find all those results that match any search words
-         * within the the code or name fields
+         * within the the code, name or breadcrumb fields
          *
          * @params { Object }
          *
          * @return { Boolean } true if found
          */
-        searchForName (code) {
+        searchForMatches (code) {
             let wordMatchCount = 0;
             this.queryWordList.forEach(wordInSearch => {
                 if (code.code?.toLowerCase().includes(wordInSearch.toLowerCase())) {
@@ -138,8 +116,40 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
                 if (code.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
                     wordMatchCount++;
                 }
+                if (code.breadcrumb?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+                    wordMatchCount++;
+                }
             });
             return wordMatchCount > 0 ? true : false; //if there's any matches
+        },
+
+        /**
+         * add all found results to the selection
+         */
+        addAllResults () {
+            const selectedCodesStore = useSelectedCodesStore();
+            const newSelectedCodes = this.results.filter((newSelectedCode) => { //check if the code isn't in the list already
+                return !selectedCodesStore.codes.some((selectedCode) => selectedCode.id === newSelectedCode.id); //don't add in those that match
+            });
+            selectedCodesStore.add(newSelectedCodes);
+        },
+
+        /**
+         * remove all found results from the selection
+         */
+        removeAllResults () {
+            const selectedCodesStore = useSelectedCodesStore();
+            const matchedSelectedCodes = this.results.filter((matchedSelectedCode) => { //check if the code is in the list already
+                return selectedCodesStore.codes.some((selectedCode) => selectedCode.id === matchedSelectedCode.id); //add in those that match
+            });
+            selectedCodesStore.remove(matchedSelectedCodes);
+        },
+
+        /**
+         * clear the current search
+         */
+        clear () {
+            this.query = '';
         },
 
     },

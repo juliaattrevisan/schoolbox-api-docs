@@ -4,7 +4,7 @@
  * To select Curriculum Codes to assign to something like a Due Work 
  */
 
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
 import CsSearchInput from './cs-search-input.vue';
 import CsSelectedCodes from './cs-selected-codes.vue';
@@ -23,6 +23,7 @@ const props = defineProps({
 });
 
 const store = useStore();
+const curriculumSelectorEl = ref(null); 
 
 /**
  * Start loading the curriculum data
@@ -32,22 +33,27 @@ onMounted(() => {
     store.load(props.dataEndpoint);
 });
 
+
 </script>
 
 <template>
-   <div class="row">
+   <div class="row" ref="curriculumSelectorEl">
         <div class="small-12 columns">
             <label>Curriculum Codes
                 <span data-tooltip="" class="hint has-tip tip-top" data-width="200" data-selector="tooltip-l5qfe53bv" aria-describedby="tooltip-l5qfe53bv" title="">?</span>
             </label>
             <cs-selected-codes />
-            <cs-search-input />
+            <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
             <cs-search-results />
         </div>
     </div>
     <cs-modal />
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+
+.columns {
+    margin-bottom: 1rem;  
+}
 
 </style>

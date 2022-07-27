@@ -242,7 +242,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          * @return { Array }
          */
         searchResults () {
-            return this.codesFlattened.filter(this.searchForName);
+            return this.codesFlattened.filter(this.searchForCodeAndName);
         },
 
         /**
@@ -293,13 +293,16 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          *
          * @return { Boolean } true if found
          */
-        searchForName (code) {
+        searchForCodeAndName (code) {
             let wordMatchCount = 0;
             this.queryWordList.forEach(wordInSearch => {
                 if (code.code?.toLowerCase().includes(wordInSearch.toLowerCase())) {
                     wordMatchCount++;
                 }
                 if (code.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+                    wordMatchCount++;
+                }
+                if (code.breadcrumb?.toLowerCase().includes(wordInSearch.toLowerCase())) {
                     wordMatchCount++;
                 }
             });

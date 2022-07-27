@@ -21,14 +21,43 @@ const props = defineProps({
         default: () => {
             return {
                 id: 0,
-                name: 'name',
+                code: '',
+                name: '',
+                breadcrumb: '',
             }
         }
     },
 });
 
+/**
+ * Add in the code if it's available otherwise just show the title
+ *
+ * @returns { String }
+ */
+const title = computed(() => {
+    if (props.result.code && props.result.code !== '') {
+        return `[${props.result.code}] ${props.result.name}`;
+    } else {
+        return props.result.name;
+    }
+});
+
+/**
+ * To highlight any search selections in the code / title
+ *
+ * @returns { HTML }
+ */
 const highlightTitleSearch = computed(() => {
-    return highlightSearchInElement(props.result.name);
+    return highlightSearchInElement(title.value);
+});
+
+/**
+ * To highlight any search selections in the breadcrumbs
+ *
+ * @returns { HTML }
+ */
+const highlightBreadcrumbSearch = computed(() => {
+    return highlightSearchInElement(props.result.breadcrumb);
 });
 
 /**
@@ -87,7 +116,10 @@ function onSelected () {
             />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
-        <span v-html="highlightTitleSearch"></span>
+        <div>
+            <span v-html="highlightTitleSearch"></span>
+            <aside v-html="highlightBreadcrumbSearch"></aside>
+        </div>
     </button>
 </template>
 
@@ -108,6 +140,11 @@ function onSelected () {
 
 input[type=checkbox]:not(.plain) + label {
     margin: 0;
+}
+
+aside {
+    font-size: 0.725rem;
+    font-style: italic;
 }
 
 </style>

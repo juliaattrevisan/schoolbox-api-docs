@@ -68,22 +68,14 @@ function onSelectAll () {
  * pull all results out 
  */
 function removeAllResults () {
-    const matchedSelectedCodes = searchResultsStore.results.filter((matchedSelectedCode) => { //check if the code is in the list already
-        return selectedCodesStore.codes.some((selectedClass) => selectedClass.id === matchedSelectedCode.id); //add in those that match
-    });
-    selectedCodesStore.remove(matchedSelectedCodes);
-    // matchedSelectedCodes.forEach((matchedSelectedCode) => matchedSelectedCode.isSelected = false); //set false on all
-    // selectedClasses.value = selectedClasses.value.filter((selectedClass) => selectedClass.isSelected); //and then remove those there were just unset  
+    searchResultsStore.removeAllResults();
 }
 
 /**
  * add all results in 
  */
 function addAllResults () {
-    const newSelectedCodes = searchResultsStore.results.filter((newSelectedCode) => { //check if the code isn't in the list already
-        return !selectedCodesStore.codes.some((selectedClass) => selectedClass.id === newSelectedCode.id); //don't add in those that match
-    });
-    selectedCodesStore.add(newSelectedCodes);
+    searchResultsStore.addAllResults();
 }
 
 </script>

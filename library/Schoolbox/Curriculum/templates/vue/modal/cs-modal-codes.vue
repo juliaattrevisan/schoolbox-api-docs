@@ -5,7 +5,7 @@
  * From here curriclum codes can be selected 
  */
 
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useCodesStore } from '../store/csCodesStore';
 import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
 import CsModalCode from './cs-modal-code.vue'
@@ -13,6 +13,8 @@ import CsModalCode from './cs-modal-code.vue'
 const codesStore = useCodesStore();
 const modalActiveCodesStore = useModalActiveCodesStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
+const codesContainerEl = ref(null); //to scroll back to top on any selection change
+
 
 /**
  * To list the parent node titles, separated by a command and or for the last
@@ -39,6 +41,10 @@ function onClearSearchSelected () {
 }
 
 
+watch(modalActiveCodesStore.codesWithSearch, () => {
+    console.warn(`change`)
+});
+
 </script>
 
 <template>
@@ -51,7 +57,7 @@ function onClearSearchSelected () {
         <p>No Curriculum Codes in: {{ currentSelectedNodeTitle }} match your current search.</p>
         <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
     </div>
-    <ul v-else>
+    <ul v-else ref="codesContainerEl">
         <cs-modal-code
             v-for="code in modalActiveCodesStore.codesWithSearch"
             :key="code.id"

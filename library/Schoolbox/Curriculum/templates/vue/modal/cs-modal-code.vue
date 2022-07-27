@@ -78,7 +78,7 @@ const hasChildren = computed(() => props.code.children && props.code.children.le
  *
  * @returns { String }
  */
-const codeTitle = computed(() => {
+const title = computed(() => {
     if (props.code.code && props.code.code !== '') {
         return `[${props.code.code}] ${props.code.name}`;
     } else {
@@ -87,15 +87,28 @@ const codeTitle = computed(() => {
 });
 
 /**
- * To determine whether we need to display further child nodes within for this code
+ * To highlight any search selections in the code / title
  *
  * @returns { HTML }
  */
 const highlightTitleSearch = computed(() => {
     if (modalActiveCodesStore.isSearchActive) {
-        return highlightSearchInElement(codeTitle.value);
+        return highlightSearchInElement(title.value);
     } else {
-        return codeTitle.value;
+        return title.value;
+    }
+});
+
+/**
+ * To highlight any search selections in the breadcrumbs
+ *
+ * @returns { HTML }
+ */
+const highlightBreadcrumbSearch = computed(() => {
+    if (modalActiveCodesStore.isSearchActive) {
+        return highlightSearchInElement(props.code.breadcrumb);
+    } else {
+        return '';
     }
 });
 
@@ -154,7 +167,10 @@ const containerClass = computed(() => {
                 />
                 <label :for="`checkbox-${props.code.id}`"></label>
             </div>
-            <span v-html="highlightTitleSearch"></span>
+            <div>
+                <span v-html="highlightTitleSearch"></span>
+                <aside v-if="modalActiveCodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
+            </div>
         </button>
         <ul v-if="hasChildren">
             <cs-modal-code
@@ -206,6 +222,11 @@ const containerClass = computed(() => {
 ul {
     list-style: none; //don't use any dots
     margin: 0; //and spacing is controlled by props.depth
+}
+
+aside {
+    font-size: 0.725rem;
+    font-style: italic;
 }
 
 </style>
