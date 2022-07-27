@@ -54,7 +54,13 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
          * @param { Object }
          */
         remove (codeToRemove) {
-            this.codes = this.codes.filter((code) => code.id !== codeToRemove.id);
+            if (Array.isArray(codeToRemove)) {
+                codeToRemove.forEach((code) => {
+                    this.codes = this.codes.filter((selectedCode) => selectedCode.id !== code.id);
+                });
+            } else {
+                this.codes = this.codes.filter((code) => code.id !== codeToRemove.id);
+            }
         },
 
         /**
@@ -69,7 +75,7 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
         /**
          * clear all the currently selected codes
          */
-        empty (codeToAdd) {
+        empty () {
             this.codes  = [];
         },
         

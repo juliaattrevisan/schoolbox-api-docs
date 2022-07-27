@@ -31,6 +31,19 @@ const props = defineProps({
  * @returns { String }
  */
 const title = computed(() => {
+    if (props.code.code && props.code.code != '') {
+        return props.code.code;
+    } else {
+        return props.code.name;
+    }
+});
+
+/**
+ * Add in the code if it's available otherwise just show the title
+ *
+ * @returns { String }
+ */
+const titleAttr = computed(() => {
     return `${props.code.breadcrumb}>${props.code.name}`;
 });
 
@@ -44,8 +57,8 @@ function onRemoveSelected () {
 </script>
 
 <template>
-   <div class="selected-code sb-tooltip sb-tooltip--bottom" :title="title">
-        <span>{{ props.code.code }}</span>
+   <div class="selected-code sb-tooltip sb-tooltip--bottom" :title="titleAttr">
+        <span>{{ title }}</span>
         <button class="remove-button icon-close" :aria-label="`Remove ${props.code.name}`" @click.prevent="onRemoveSelected" @keyup.enter="onRemoveSelected"></button>
     </div>
 </template>

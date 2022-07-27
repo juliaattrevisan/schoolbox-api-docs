@@ -6,13 +6,15 @@
 
 import { ref } from 'vue'; 
 import { useModalStore } from './store/csModalStore'; 
+import { useSearchResultsStore } from './store/csSearchResultsStore'; 
 
+
+const searchResultsStore = useSearchResultsStore();
+const modalStore = useModalStore();
 const isLoading = ref(false);
 const hasLoadError = ref(false);
 const isClassSelectorActive = ref(true);
-const query = ref('');
-const inputPlaceholder = ref('Search');
-const modalStore = useModalStore();
+const inputPlaceholder = ref('Search for curriculum codes or keywords...');
 
 /**
  * to open the modal
@@ -27,7 +29,7 @@ function onBrowseSelected () {
     <div class="input-group">
         <input
             v-if="isClassSelectorActive"
-            v-model="query"
+            v-model="searchResultsStore.query"
             ref="queryInputEl"
             type="text"
             class="search-input"

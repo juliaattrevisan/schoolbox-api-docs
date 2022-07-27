@@ -1,13 +1,14 @@
 <script setup>
 
 /**
- * To select Curriculum codes
+ * To select Curriculum Codes to assign to something like a Due Work 
  */
 
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
 import CsSearchInput from './cs-search-input.vue';
 import CsSelectedCodes from './cs-selected-codes.vue';
+import CsSearchResults from './cs-search-results.vue';
 import CsModal from './modal/cs-modal.vue';
 
 
@@ -22,23 +23,14 @@ const props = defineProps({
 });
 
 const store = useStore();
-const toastEl = ref(null);
 
 /**
- * Start loading the group data
+ * Start loading the curriculum data
  */
 onMounted(() => {
-    store.toastEl = toastEl;
     store.$reset(); //ensure the store state is as it's initially set, this is just for Storybook when switching between stories
     store.load(props.dataEndpoint);
 });
-
-/**
- * Reload the page to try loading again
- */
-function onRefreshSelected () {
-    location.reload();
-}
 
 </script>
 
@@ -50,6 +42,7 @@ function onRefreshSelected () {
             </label>
             <cs-selected-codes />
             <cs-search-input />
+            <cs-search-results />
         </div>
     </div>
     <cs-modal />

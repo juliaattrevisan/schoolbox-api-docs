@@ -123,11 +123,13 @@ function highlightSearchInElement (toHighlight) {
  * @returns { String }
  */
 const containerClass = computed(() => {
-    if (modalActiveCodesStore.isOnFirstNode && props.depth === 0 || modalActiveCodesStore.isOnSecondNode && props.depth === 0) {
+    if (modalActiveCodesStore.isSearchActive) { //don't style when using search, as all the codes are on one level
+        return '';
+    } else if (modalActiveCodesStore.isOnFirstNode && props.depth === 0 || modalActiveCodesStore.isOnSecondNode && props.depth === 0) {
         return 'parent-container';
     } else if (modalActiveCodesStore.isOnFirstNode && props.depth === 1 || modalActiveCodesStore.isOnSecondNode && props.depth === 1) {
         return 'first-child-container-with-border';
-    } else if (modalActiveCodesStore.isOnThirdNode && props.depth === 0) {
+    } else if (modalActiveCodesStore.isOnThirdNode && props.depth === 0) { 
         return 'first-child-container';
     } else {
         '';
