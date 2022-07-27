@@ -89,16 +89,8 @@ class Controller extends Base
         $indexedLabels = array();
         $labelsCount   = 0;
 
-        foreach ($postedData as $key => $value) {
-            // Expect $key to be in format "row-$n-label".  Where $n is rubric_result.value.
-            $partialKey = str_replace('row-', '', $key);
-            $n          = str_replace('-label', '', $partialKey);
-
-            if (!ctype_digit($n)) {
-                throw new \InvalidArgumentException("Could not parse integer \$n from 'row-\$n-value' string.  Found '$n' instead of integer.");
-            }
-
-            $indexedLabels[$n] = $value;
+        foreach ($postedData['rubricResultLabels'] as $value => $label) {
+            $indexedLabels[$value] = $label;
 
             if (++$labelsCount > self::MAX_ROWS_PER_RESULT_SET) {
                 // The client should not send more than self::MAX_ROWS_PER_RESULT_SET to be saved.
