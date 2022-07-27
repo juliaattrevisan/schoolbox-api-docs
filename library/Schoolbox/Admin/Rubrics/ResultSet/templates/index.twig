@@ -28,34 +28,6 @@ label.rubric-result-set-row-label > span.input-container {
 </style>
 <script>
     /**
-     * This function is a vanilla Javascript alternative to the Jquery $(document).ready().
-     * Taken from https://youmightnotneedjquery.com
-     */
-    function ready(fn) {
-        if (document.readyState != 'loading') {
-            fn();
-        } else {
-            document.addEventListener('DOMContentLoaded', fn);
-        }
-    }
-
-    ready(
-        /**
-         * If fewer than two editable rows are present, add rows so that two are present.
-         * (A minimum of two rows are required for the form to be submitted.)
-         */
-        function () {
-            let rowsContainerUl = document.getElementById('rows-container-ul');
-            let nRowsDisplayed  = rowsContainerUl.children.length;
-            let nRowsToAdd      = (nRowsDisplayed >= 2) ? 0 : 2 - nRowsDisplayed;
-
-            for (let i = 0; i < nRowsToAdd; ++i) {
-                onClickPlusButton();
-            }
-        }
-    );
-
-    /**
      * When the plus button is clicked, we add a new row to the form.
      */
     function onClickPlusButton() {
