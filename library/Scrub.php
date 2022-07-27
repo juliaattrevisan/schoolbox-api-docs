@@ -116,13 +116,13 @@ class Scrub
      */
     public static function smartQuotes($text)
     {
-        $search = array(chr(145), chr(146), chr(147), chr(148), chr(151));
-        $replace = array("'", "'", '"', '"', '-');
+        $search  = [chr(145), chr(146), chr(147), chr(148), chr(151)];
+        $replace = ["'", "'", '"', '"', '-'];
 
         $data = str_replace($search, $replace, $text);
 
-        $search = array('&#8220;', '&#8221;', '&#8216;', '&#8217;', '&#8243;');
-        $replace = array('&quot;', '&quot;', '&#39;', '&#39;', '&quot;');
+        $search  = ['&#8220;', '&#8221;', '&#8216;', '&#8217;', '&#8243;'];
+        $replace = ['&quot;', '&quot;', '&#39;', '&#39;', '&quot;'];
 
         return str_replace($search, $replace, $data);
     }
@@ -160,7 +160,7 @@ class Scrub
 
             // Allow Iframe
             $config->set('HTML.SafeIframe', true);
-            $safeIframeSources = array(
+            $safeIframeSources = [
                 'www.youtube.com/',
                 'www.youtube-nocookie.com/embed/',
                 'player.vimeo.com/video/',
@@ -198,8 +198,7 @@ class Scrub
                 'sway.com/',
                 'flipgrid.com/',
                 'spark.adobe.com/',
-
-            );
+            ];
 
             // Add any additional iframe sources as configured
             foreach (explode("\n", Config::get('safe_iframe_source_list')) as $source) {
@@ -217,12 +216,12 @@ class Scrub
 
             $config->set(
                 'Attr.AllowedFrameTargets',
-                array(
+                [
                     '_blank',
                     '_self',
                     '_parent',
                     '_top',
-                )
+                ]
             );
 
             // Don't allow classes that affect layout in Foundation
@@ -230,7 +229,7 @@ class Scrub
 
             $config->set(
                 'URI.AllowedSchemes',
-                array(
+                [
                     'http'    => true,
                     'https'   => true,
                     'mailto'  => true,
@@ -242,7 +241,7 @@ class Scrub
                     'data'    => true,
                     'tel'     => true,
                     'webcal'  => true,
-                )
+                ]
             );
 
             // Make url absolute, when fqdn is provided
@@ -291,7 +290,7 @@ class Scrub
                     'Inline',
                     'Empty',
                     'Common',
-                    array(
+                    [
                         'src*'              => 'URI#embedded',
                         'type'              => 'ContentType',
                         'width'             => 'Pixels#' . $max,
@@ -301,7 +300,7 @@ class Scrub
                         'flashvars'         => 'Text',
                         'wmode'             => 'Enum#window,transparent,opaque',
                         'name'              => 'ID',
-                    )
+                    ]
                 );
                 $embed->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeEmbed();
 
@@ -311,13 +310,14 @@ class Scrub
                     'Block',  // content set
                     'Flow', // allowed children
                     'Common', // attribute collection
-                    array( // attributes
-                        'name' => 'CDATA',
-                        'id' => 'ID',
+                    [
+                        // attributes
+                        'name'  => 'CDATA',
+                        'id'    => 'ID',
                         'title' => 'CDATA',
-                    )
+                    ]
                 );
-                $map->excludes = array('map' => true);
+                $map->excludes = ['map' => true];
 
                 // Add area tag
                 $area = $def->addElement(
@@ -325,27 +325,28 @@ class Scrub
                     'Block',  // content set
                     'Empty', // don't allow children
                     'Common', // attribute collection
-                    array( // attributes
-                        'name' => 'CDATA',
-                        'id' => 'ID',
-                        'alt' => 'Text',
-                        'coords' => 'CDATA',
+                    [
+                        // attributes
+                        'name'      => 'CDATA',
+                        'id'        => 'ID',
+                        'alt'       => 'Text',
+                        'coords'    => 'CDATA',
                         'accesskey' => 'Character',
-                        'nohref' => new HTMLPurifier_AttrDef_Enum(array('nohref')),
-                        'href' => 'URI',
-                        'shape' => new HTMLPurifier_AttrDef_Enum(array('rect','circle','poly','default')),
-                        'tabindex' => 'Number',
-                        'target' => new HTMLPurifier_AttrDef_Enum(array('_blank','_self','_target','_top')),
-                    )
+                        'nohref'    => new HTMLPurifier_AttrDef_Enum(['nohref']),
+                        'href'      => 'URI',
+                        'shape'     => new HTMLPurifier_AttrDef_Enum(['rect', 'circle', 'poly', 'default']),
+                        'tabindex'  => 'Number',
+                        'target'    => new HTMLPurifier_AttrDef_Enum(['_blank', '_self', '_target', '_top']),
+                    ]
                 );
-                $area->excludes = array('area' => true);
+                $area->excludes = ['area' => true];
 
                 $object = $def->addElement(
                     'object',
                     'Inline',
                     'Optional: param | Flow | #PCDATA',
                     'Common',
-                    array(
+                    [
                         // While technically not required by the spec, we're forcing
                         // it to this value.
                         'type'    => 'ContentType',
@@ -353,7 +354,7 @@ class Scrub
                         'height'  => 'Pixels#' . $max,
                         'data'    => 'URI#embedded',
                         'classid' => 'Text',
-                    )
+                    ]
                 );
                 $object->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeObject();
 
@@ -362,11 +363,11 @@ class Scrub
                     false,
                     'Empty',
                     false,
-                    array(
+                    [
                         'id'    => 'ID',
                         'name*' => 'Text',
                         'value' => 'Text',
-                    )
+                    ]
                 );
                 $param->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeParam();
                 $def->info_injector[] = new Alaress_HTMLPurifier_Injector_SafeObject();
