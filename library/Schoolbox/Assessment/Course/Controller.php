@@ -883,6 +883,7 @@ class Controller extends Base\Base
             $ua->setUser($this->getUser())
                 ->setAccessLevel(UserAccess::ACCESS_WRITE)
                 ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setFavourite(false)
                 ->setServiceIdentifier($folder->getId());
 
             $this->userAccessMapper->save($ua);

@@ -310,6 +310,7 @@ HELP;
                     $userAccess->setServiceIdentifier($folderId);
                     $userAccess->setService(UserAccessModel::SERVICE_HOMEPAGE);
                     $userAccess->setAccessLevel(UserAccessModel::ACCESS_READ);
+                    $userAccess->setFavourite(true);
                     $userAccessMapper->save($userAccess);
                 }
 
