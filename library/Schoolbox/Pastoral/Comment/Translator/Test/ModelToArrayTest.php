@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral\Comment\Translator\Test;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress\HTMLPurifier\IPurifier;
+use Alaress\HTMLPurifier\Adapter\MockAdapter;
 use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Format;
 use DateTimeInterface;
@@ -231,18 +231,6 @@ class ModelToArrayTest extends TestCase
                 return false;
             });
 
-        // Test purifier setup
-        $testPurifier = new class implements IPurifier {
-            public function purify(?string $input): ?string
-            {
-                return $input;
-            }
-            public function purifyAbsoluteUri(?string $input, string $domain): ?string
-            {
-                return $input;
-            }
-        };
-
         return new ModelToArray(
             static function (User $user) {
                 return ['id' => $user->getId()];
@@ -250,7 +238,7 @@ class ModelToArrayTest extends TestCase
             $testRouter,
             $testAuthorizer,
             new User(),
-            $testPurifier,
+            new MockAdapter(),
         );
     }
 }
