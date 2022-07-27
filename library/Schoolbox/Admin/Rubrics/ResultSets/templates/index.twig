@@ -1,76 +1,103 @@
 <style>
-span.result-set-comma-separated-container
+div.create-new-button-container-div
 {
-    display: inline-block;
-    width: 90%;
+    text-align: right;
 }
 
-button.create-new-result-set-button
+div.result-set-row-div
 {
-   float: right;
+}
+
+span.result-rubric-label-span
+{
+    display: inline-block;
+    padding: 0.5rem;
+    background-color: lightgrey;
+    margin-right: 0.2rem;
+    vertical-align: bottom;
+}
+
+span.buttons-container-span
+{
+    display: inline-block;
+    float: right;
+}
+
+span.buttons-container-span > a
+{
+    background-color: white;
 }
 
 div.clear-floats
 {
     clear: both;
-    margin-bottom: 5px;
 }
 </style>
 {% import 'sub/breadcrumbs.twig' as bread %}
-
 {{ bread.crumbsArray(allBreadcrumbs) }}
-
 <div class="admin-container row">
-
-    {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
-
     <div class="admin-content">
-        <div class="small-12 island">
-            <section class="content">
-                <div class="row">
-                    <div class="small-12 columns">
-                        <h3>Creating Rubric Results</h3>
-                    </div>
-                    <div class="small-12 large-12 columns">
+        <!-- Main content section starts here. -->
+        <div class="row">
+            <div class="small-12 island">
+                <section>
+                    <header class="list-header actions-small-0">
+                    </header>
+                    <div class="small-12 medium-12 column">
                         <p>
-                            Edit the rubric result sets here: these are the pre-populated default values that will appear on every rubric.
+                            Edit rubric result set templates here.
                         </p>
                         <p>
                             Each set should be a discrete list of items of a single measurement;
                             for example, 'Very Good' and 'Yes' should not be in the same set.
                         </p>
                         <p>
-                            Deleting a result set here will not affect any previous use of that result set in rubrics elsewhere in Schoolbox.
+                            Deleting or modifying a result set here will not affect any previous use of that result set elsewhere in Schoolbox.
                             This is because the result sets here are just templates that are copied to create new result sets on rubrics.
                         </p>
                     </div>
-                </div>
-            </section>
-        </div>
-        <div class="small-12 island">
-            <div data-role="rubricList">
-                <div>
-                    <button class='create-new-result-set-button icon-add' onclick="document.location.href='/adminv2/rubric-results-set/create';">Create new result set</button>
-                    <h3>Result Sets</h3>
-                    <div class="clear-floats"></div>
-                </div>
-                {% set currentResultSetId = null %}
-                {% for resultSetId, rubrics in rubricsByResultSetId %}
-                    <section class="content">
-                        <div data-role="rubricSet" data-setNumber="{{ resultSetId }}">
-                            <span class="result-set-comma-separated-container">
-                            {% for rubric in rubrics %}
-                                {{ rubric.label|purify }}{% if loop.index != loop.last %},{% endif %}
-                            {% endfor %}
-                            </span>
-                            <a href="/adminv2/rubric-results-set/{{ resultSetId }}">Edit</a> |
-                            <a href="/adminv2/rubric-results-sets/delete/{{ resultSetId }}" onclick="return confirm('Do you really want to delete this result set?')">Delete</a>
-                        </div>
-                    </section>
-                    {% set currentResultSetId = resultSetId %}
-                {% endfor %}
+                <section>
             </div>
         </div>
+        <div class="row">
+            <div class="small-12 island">
+                <div class="create-new-button-container-div">
+                    <a class='button icon-add' href="/adminv2/rubric-results-set/create">Create new result set</a>
+                </div>
+                <section>
+                    <header class="list-header actions-small-0">
+                        <div class="list-item">
+                            <div class="medium-12 column">Result Set</div>
+                        </div>
+                    </header>
+                    <ul class="information-list unsortable">
+                        {% for resultSetId, rubrics in rubricsByResultSetId %}
+                            <li>
+                                <div class="actions-small-0">
+                                    <div class="list-item">
+                                        <div class="small-12 medium-12 column">
+                                            <label>
+                                                {% for rubric in rubrics %}
+                                                    <span class="result-rubric-label-span">
+                                                        {{ rubric.label|purify }}
+                                                    </span>
+                                                {% endfor %}
+                                                <span class="buttons-container-span">
+                                                    <a class="button icon-modify" href="/adminv2/rubric-results-set/{{ resultSetId }}"></a>
+                                                    <a class="button icon-delete" href="/adminv2/rubric-results-sets/delete/{{ resultSetId }}"></a>
+                                                </span>
+                                                <div class="clear-floats"></div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <!-- Main content section ends here. -->
     </div>
 </div>
