@@ -146,6 +146,7 @@
 
                     self.renderFile({
                         previewElement: file.previewElement,
+                        icon: file.icon,
                         type: file.type
                     });
                     azone.trigger('addedfile.attachzone', [file]);
@@ -529,8 +530,12 @@
                 name: list[i].title,
                 type: list[i].mimeType,
                 size: list[i].filesize,
-                hash: list[i].hash
+                hash: list[i].hash,
+                icon: '/ajax/mime/' + list[i].mimeType
             };
+            if (list[i].file && list[i].file.imageUrl) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
+                data.icon = list[i].file.imageUrl;
+            }
 
             if (this.dropzone) { //from the Upload files modal option
 
@@ -676,7 +681,9 @@
             elem.find('input[data-az-attachment]').val(hash);
         }
 
-        if (file.type) {
+        if (file.icon) {
+            elem.find('img[data-dz-thumbnail]').attr('src', file.icon);
+        } else if (file.type) {
             elem.find('img[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
         }
     };
