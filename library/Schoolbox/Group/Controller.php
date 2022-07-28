@@ -18,6 +18,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\UserMapper;
 
@@ -76,8 +77,14 @@ class Controller extends Base
         $this->getResponse()->content->set(
             [
                 'template' => '@group/modify.twig',
-                'title'    => 'Group',
-                'data'     => ['folder' => $folder,],
+                'title'    => 'Manage Group',
+                'data'     => [
+                    'folder'      => $folder,
+                    'breadcrumbs' => [
+                        [$folder->getTitle(), "/homepage/{$folder->getId()}"],
+                        ['Manage Group'],
+                    ],
+                ],
             ]
         );
     }
@@ -189,31 +196,37 @@ class Controller extends Base
     /**
      * @param Folder $folder
      * @return void
-     * @api   /group/updateMembers/{folderId}
+     * @throws MapperException
      * @since 22.1
+     * @api   /group/updateMembers/{folderId}
      */
     public function updateSettings(Folder $folder)
     {
         // access, isNotificationsEnabled, isForceFollow
         $requestBody = json_decode(json_encode($this->request->content->get()), true);
 
-        $folder->getGroup()->
+        $folder->getGroup()->setNotificationDisabled(!$requestBody['settings']['isNotificationsEnabled'])
+               ->setForceFollow($requestBody['settings']['isForceFollow'] && $requestBody['settings']['isNotificationsEnabled'])
+               ->setType(Group::TYPE_NAME_TO_VAL[$requestBody['settings']['access']]);
+        $this->groupMapper->save($folder->getGroup());
 
-
-        $users        = $this->userMapper->findByColumnList(['id' => $userIds]);
-        $userAccesses = $this->userAccessMapper->findForFolderUser($folder, $users);
-
-        $newAccesses = $userAccesses->map(function ($userAccess) use ($requestBody) {
-            return (new UserAccess())($requestBody, $userAccess);
-        });
-        $this->userAccessMapper->save($newAccesses);
+        $this->groupsHelper->setNotification(
+            $folder->getId(),
+            $this->userMapper->createModel()->setId(0),
+            !$folder->getGroup()->getNotificationDisabled()
+        );
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput(['success' => true])
         );
     }
 
+    /**
+     * @param Folder $folder
+     * @return void
+     */
     public function disband(Folder $folder)
     {
+        $this->groupMapper->deleteByColumn('cid', $folder->getId());
     }
 }

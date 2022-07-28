@@ -34,11 +34,6 @@ class GroupsHelper
     public const NOTENROLED = 'notEnroled';
     public const PENDING    = 'pending';
 
-    public const MEMBERSHIP_NONE  = 'none';
-    public const MEMBERSHIP_READ  = 'read';
-    public const MEMBERSHIP_WRITE = 'write';
-    public const MEMBERSHIP_ADMIN = 'admin';
-
     private GroupMapper            $groupMapper;
     private UserAccessMapper       $userAccessMapper;
     private FolderMapper           $folderMapper;
@@ -85,7 +80,7 @@ class GroupsHelper
                 $accesses->add($userPerm);
             }
         }
-        $this->populateNotification($user, $accesses, null);
+        $this->populateNotification($user, $accesses);
         return $accesses;
     }
 
@@ -102,7 +97,7 @@ class GroupsHelper
      * @param GenericCollection      $accesses
      * @param GenericCollection|null $folders
      */
-    public function populateNotification(User $user, GenericCollection $accesses, ?GenericCollection $folders)
+    public function populateNotification(User $user, GenericCollection $accesses)
     {
         $rerouteOverrides = $this->reRouteOverrideMapper->getMutedFolders($user->getId());
 
@@ -119,33 +114,22 @@ class GroupsHelper
             $access->setFollowing($follow);
             $access->getFolder()->getGroup()->setNotificationDisabled($disabled);
         }
-
-        if (!$folders) {
-            return;
-        }
-        /** @var Folder $folder */
-        foreach ($folders as $folder) {
-            if (!$folder->getGroup()) {
-                continue;
-            }
-            $folder->getGroup()->setNotificationDisabled(in_array($folder->getId(), $muted['disabled']));
-        }
     }
 
     /**
      * follows / unfollows a group
      * uses have follow (have notifications set) by default
      * they require to opt out.
-     * @param int  $group
+     * @param int  $folderId
      * @param User $user
      * @param bool $isNotificationOn
      * @return void
      * @throws MapperException
      */
-    public function setNotification(int $group, User $user, bool $isNotificationOn): void
+    public function setNotification(int $folderId, User $user, bool $isNotificationOn): void
     {
         //helpers
-        $serviceKey = 'service.' . UserAccess::SERVICE_HOMEPAGE . ".$group";
+        $serviceKey = 'service.' . UserAccess::SERVICE_HOMEPAGE . ".$folderId";
 
         //see if the object already exists in the db, if so grab it to edit.
         $muteObj = $this->reRouteOverrideMapper->findByColumnList([
@@ -240,7 +224,7 @@ class GroupsHelper
                 $userPerms->offsetUnset($folderId);
             }
         }
-        $this->populateNotification($user, $userPerms, $folders);
+        $this->populateNotification($user, $userPerms);
 
         // build output array
         $possibleGroups = [];
@@ -280,7 +264,7 @@ class GroupsHelper
             $possibleGroups[] = [
                 'id'                => $folder->getId(),
                 'name'              => $folder->getName(),
-                'enrolmentStatus'   => $this->getEnrollmentText($userPerms[$folder->getId()]),
+                'enrolmentStatus'   => $this->getEnrollmentText($userPerm),
                 'colour'            => $folder->getColour()->getAsHex(),
                 'coverImageHash'    => $imageHash,
                 'isNotificationsOn' => $userPerm && $userPerm->getFollowing(),
@@ -316,7 +300,7 @@ class GroupsHelper
         );
         $userPerm->first()->setFolder($group->getFolder());
         $userPerms = $this->userAccessMapper->createCollection()->add($userPerm);
-        $this->populateNotification($user, $userPerms, null);
+        $this->populateNotification($user, $userPerms);
         return $userPerms->first();
     }
 
@@ -345,50 +329,11 @@ class GroupsHelper
                 'firstName'  => $member->getFirstname(),
                 'lastName'   => $member->getLastname(),
                 'userId'     => $member->getId(),
-                'accessType' => self::getMembershipString($userAccess->getAccessLevel()),
+                'accessType' => UserAccess::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()],
                 'role'       => $member->getRole()->getName(),
                 'meta'       => ($member->getYear() && $member->getYear()->getName()) ? $member->getYear()->getLongName() : '',
             ];
         }
         return $members;
-    }
-
-    /**
-     * convert membership string to membership int for DB use
-     * MEMBERSHIP_NONE      => UserAccess::ACCESS_DENY
-     * MEMBERSHIP_READ      => UserAccess::ACCESS_READ
-     * MEMBERSHIP_WRITE     => UserAccess::ACCESS_WRITE
-     * MEMBERSHIP_ADMIN     => UserAccess::ACCESS_FULL
-     */
-    public static function getMembershipInt(string $membership): int
-    {
-        $membershipArray = [
-            self::MEMBERSHIP_NONE  => UserAccess::ACCESS_DENY,
-            self::MEMBERSHIP_READ  => UserAccess::ACCESS_READ,
-            self::MEMBERSHIP_WRITE => UserAccess::ACCESS_WRITE,
-            self::MEMBERSHIP_ADMIN => UserAccess::ACCESS_FULL,
-        ];
-        if (!isset($membershipArray[$membership])) {
-            throw new SchoolboxException("Incorrect membership value");
-        }
-        return $membershipArray[$membership];
-    }
-
-    /**
-     * convert membership int to membership string for json use
-     * UserAccess::ACCESS_DENY     => MEMBERSHIP_NONE
-     * UserAccess::ACCESS_READ     => MEMBERSHIP_READ
-     * UserAccess::ACCESS_WRITE    => MEMBERSHIP_WRITE
-     * UserAccess::ACCESS_FULL     => MEMBERSHIP_ADMIN
-     */
-    public static function getMembershipString(int $membership): string
-    {
-        $membershipArray = [
-            UserAccess::ACCESS_DENY  => self::MEMBERSHIP_NONE,
-            UserAccess::ACCESS_READ  => self::MEMBERSHIP_READ,
-            UserAccess::ACCESS_WRITE => self::MEMBERSHIP_WRITE,
-            UserAccess::ACCESS_FULL  => self::MEMBERSHIP_ADMIN,
-        ];
-        return $membershipArray[$membership];
     }
 }

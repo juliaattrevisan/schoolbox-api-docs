@@ -21,8 +21,8 @@ const disbandStore = useDisbandStore();
  * ensure the jelly tot menu works
  */
 onMounted(() => {
-
-    $(document).foundation();
+    //
+    // $(document).foundation();
 });
 
 /**
@@ -74,7 +74,7 @@ function onDisbandSelected () {
                 <a href="#" class="icon-staff" id="emailAllParents" title="Includes parents of students in the group, as well as parents directly in the group." @click.prevent="onEmailGroupParentsSelected">Email Group Parents</a>
             </li>
             <li>
-                <a href="/group/modifyForm.php?disband=1&categoryID={CATEGORY_ID}" class="icon-delete" @click.prevent="onDisbandSelected">Disband Group</a>
+                <a href="#" class="icon-delete" @click.prevent="onDisbandSelected">Disband Group</a>
             </li>
         </ul>
     </div>

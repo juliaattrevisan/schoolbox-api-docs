@@ -11,16 +11,20 @@ namespace Schoolbox\Group;
 
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule\All;
-use Alaress\Authorizer\Rule\IsConfigOn;
+use Alaress\Authorizer\Rule\Any;
+use Alaress\Authorizer\Rule\HasHomepageAccess;
 use Alaress\Authorizer\Rule\IsLoggedIn;
+use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\UserMapper;
 
@@ -38,6 +42,19 @@ class Module extends BaseModule
     {
         $perm = new All(
             new IsLoggedIn(),
+            new Any(
+                new IsSuperuser(),
+                new HasHomepageAccess(
+                    UserAccess::ACCESS_FULL,
+                    function (array $params = []) {
+                        if ($params['folder'] instanceof Model) {
+                            return $params['folder']->getId();
+                        }
+                        return null;
+                    },
+                    Access::getInstance()
+                )
+            )
         );
 
         $preloadFolder = function ($params) {

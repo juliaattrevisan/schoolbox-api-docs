@@ -1,3 +1,5 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
 <div id="manage-group-container">
     <manage-group
             group-data-endpoint="{{ routeLookupIfAuthorized('group.getData', {'folderId': folder.id, 'folder': folder}) }}"

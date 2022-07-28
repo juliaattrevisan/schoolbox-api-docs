@@ -116,7 +116,26 @@ class UserAccess implements IModel
      * Value for $this->accessLevel:
      * $this->user has moderate access to resource in $this->service.
      */
-    public const ACCESS_FULL = 3;
+    public const ACCESS_FULL      = 3;
+
+    public const MEMBERSHIP_WRITE = 'write';
+    public const MEMBERSHIP_NONE  = 'none';
+    public const MEMBERSHIP_READ  = 'read';
+    public const MEMBERSHIP_ADMIN = 'admin';
+
+    public const ACCESS_NAME_TO_LEVEL = [
+        self::ACCESS_DENY  => self::MEMBERSHIP_NONE,
+        self::ACCESS_READ  => self::MEMBERSHIP_READ,
+        self::ACCESS_WRITE => self::MEMBERSHIP_WRITE,
+        self::ACCESS_FULL  => self::MEMBERSHIP_ADMIN,
+    ];
+
+    public const ACCESS_LEVEL_TO_NAME = [
+        UserAccess::ACCESS_DENY  => UserAccess::MEMBERSHIP_NONE,
+        UserAccess::ACCESS_READ  => UserAccess::MEMBERSHIP_READ,
+        UserAccess::ACCESS_WRITE => UserAccess::MEMBERSHIP_WRITE,
+        UserAccess::ACCESS_FULL  => UserAccess::MEMBERSHIP_ADMIN,
+    ];
 
     /** @var User */
     protected $user;

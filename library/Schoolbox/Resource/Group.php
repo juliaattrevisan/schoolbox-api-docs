@@ -25,6 +25,12 @@ class Group
     public const MODERATED_GROUP = 2;
     public const FREE_GROUP = 3;
 
+    public const TYPE_NAME_TO_VAL = [
+        'private'   => self::PRIVATE_GROUP,
+        'moderated' => self::MODERATED_GROUP,
+        'free'      => self::FREE_GROUP,
+    ];
+
     /**
      * The type of group
      *

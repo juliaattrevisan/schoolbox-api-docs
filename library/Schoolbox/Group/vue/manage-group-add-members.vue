@@ -102,7 +102,6 @@ const addButtonText = computed(() => addMembersStore.isProcessing ? 'Adding...' 
                         type="text"
                         :placeholder="inputPlaceholder"
                         @input="$event.target.composing = false"
-                        disabled
                     />
                     <button @click.prevent="onAddMembersSelected" class="button submit" :disabled="store.isProcessing">{{ addButtonText }}</button>
                 </div>

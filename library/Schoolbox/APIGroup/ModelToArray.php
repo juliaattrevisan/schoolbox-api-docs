@@ -39,7 +39,7 @@ class ModelToArray
             'isFavourite'       => $access->getFavourite(),
             'isNotificationsOn' => $access->getFollowing(),
             'enrolmentStatus'   => GroupsHelper::getEnrollmentText($access),
-            'membership'        => GroupsHelper::getMembershipString($access->getAccessLevel()),
+            'membership'        => UserAccess::ACCESS_LEVEL_TO_NAME[$access->getAccessLevel()],
             '_links'            => null,
 
         ];

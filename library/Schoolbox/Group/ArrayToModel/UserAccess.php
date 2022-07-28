@@ -14,18 +14,14 @@ use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 
 /**
- * Translator for translating an array representation of learning moment
- * evidence into a model.
- *
- * Used when translating JSON passed in a request body into a model, so that it
- * may be persisted.
+ * Translator for translating an array representation of UserAccess into a model.
  */
 class UserAccess extends Base
 {
     /**
      * Translate the array representation of the group access into a model.
      */
-    public function __invoke(array $json, ?object $model = null): object
+    public function __invoke(array $array, ?object $model = null): object
     {
         if (!isset($model)) {
             $model = new UserAccessModel();
@@ -48,8 +44,9 @@ class UserAccess extends Base
             ],
         ];
 
+        $errors = [];
         foreach ($fields as $name => $attributes) {
-            $postedValue = $json[$name] ?? null;
+            $postedValue = $array[$name] ?? null;
             if (!$postedValue) {
                 $errors[] = "{$name} is not set.";
                 continue;
@@ -72,8 +69,8 @@ class UserAccess extends Base
 
         // combining enrolementStatus and membership
         $accessLevel = 0;
-        if (isset($json['accessType'])) {
-            $accessLevel = GroupsHelper::getMembershipInt($json['accessType']);
+        if (isset($array['accessType'])) {
+            $accessLevel = \Schoolbox\Permission\Access\UserAccess::ACCESS_NAME_TO_LEVEL[$array['accessType']];
         }
         $model->setAccessLevel($accessLevel);
         return $model;

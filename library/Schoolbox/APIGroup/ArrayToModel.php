@@ -31,9 +31,9 @@ class ArrayToModel extends Base
             'membership'        => [
                 'type'   => 'enum',
                 'values' => [
-                    GroupsHelper::MEMBERSHIP_ADMIN,
-                    GroupsHelper::MEMBERSHIP_WRITE,
-                    GroupsHelper::MEMBERSHIP_READ,
+                    UserAccess::MEMBERSHIP_ADMIN,
+                    UserAccess::MEMBERSHIP_WRITE,
+                    UserAccess::MEMBERSHIP_READ,
                 ],
             ],
             'enrolmentStatus'   => [
@@ -75,7 +75,7 @@ class ArrayToModel extends Base
         // combining enrolementStatus and membership
         $accessLevel = 0;
         if ($array['enrolmentStatus'] === 'enroled') {
-            $accessLevel = GroupsHelper::getMembershipInt($array['membership']);
+            $accessLevel = UserAccess::ACCESS_NAME_TO_LEVEL[$array['membership']];
         }
         $model->setAccessLevel($accessLevel);
         $model->setFavourite((bool)$array['isFavourite']);
