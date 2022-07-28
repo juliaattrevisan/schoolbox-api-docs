@@ -405,24 +405,20 @@ class Subnav
                         'name'        => 'Rubrics Result Sets',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.',
-                        'children'    => [
-// TODO: Figure out how to make '/adminv2/rubric-results-set/{resultSetId}' a child of '/adminv2/rubric-results-sets'.
-//       The aim is for the breadcrumb trail to appear like "LMS > Rubric Result Sets > Rubric Result Set".
-//       The method tried below does not achieve this.
-                            '/adminv2/rubric-results-set/{resultSetId}' => [
-                                'name'        => 'Rubrics Result Set',
-                                'visible'     => false,
-                                'children'    => [],
-                                'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.'
-                            ]
-                        ]
+                        'children'    => []
                     ],
-//                    '/adminv2/rubric-results-set/{resultSetId}' => [
-//                        'name'        => 'Rubrics Result Set',
-//                        'visible'     => false,
-//                        'children'    => [],
-//                        'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.'
-//                    ]
+                    '/adminv2/rubric-results-set/{resultSetId}' => [
+                        'name'        => 'Rubrics Result Set',
+                        'visible'     => false,
+                        'children'    => [],
+                        'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.'
+                    ],
+                    '/adminv2/rubric-results-set/create' => [
+                        'name'        => 'Create Rubrics Result Set',
+                        'visible'     => false,
+                        'children'    => [],
+                        'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.'
+                    ]
                 ],
             ],
             '/adminv2/lists/achievement-category' => [
