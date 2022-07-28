@@ -331,12 +331,12 @@ class Kernel extends WebKernelAbstract
                     $twig->addExtension(new AdminNavigationRenderer());
 
                     // HTML Purifier filter - known to output safe HTML
-
+                    $scrubAdapter = new ScrubAdapter();
                     $twig->addFilter(
                         new TwigFilter(
                             'purify',
-                            array('Scrub', 'html'),
-                            array('is_safe' => array('html'))
+                            [$scrubAdapter, 'purify'],
+                            ['is_safe' => ['html']]
                         )
                     );
 
@@ -344,7 +344,7 @@ class Kernel extends WebKernelAbstract
                     $twig->addFilter(
                         new TwigFilter(
                             'html2text',
-                            array('Scrub', 'html2text')
+                            ['Scrub', 'html2text']
                         )
                     );
 
@@ -352,7 +352,7 @@ class Kernel extends WebKernelAbstract
                     $twig->addFilter(
                         new TwigFilter(
                             'cutSentence',
-                            array('TextFormatter', 'cutSentence')
+                            ['TextFormatter', 'cutSentence']
                         )
                     );
 
@@ -360,7 +360,7 @@ class Kernel extends WebKernelAbstract
                     $twig->addFilter(
                         new TwigFilter(
                             'bytes',
-                            array('Alaress_Byte_Format', 'bytesToString')
+                            ['Alaress_Byte_Format', 'bytesToString']
                         )
                     );
 
