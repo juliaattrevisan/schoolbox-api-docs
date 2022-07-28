@@ -6,6 +6,11 @@
 
 import { ref, onMounted } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
+import { useSelectedCodesStore } from './store/csSelectedCodesStore';
+import { useSearchResultsStore } from './store/csSearchResultsStore';
+import { useModalStore } from './store/csModalStore';
+import { useModalActiveCodesStore } from './store/csModalActiveCodesStore';
+import CsHeading from './cs-heading.vue';
 import CsSearchInput from './cs-search-input.vue';
 import CsSelectedCodes from './cs-selected-codes.vue';
 import CsSearchResults from './cs-search-results.vue';
@@ -27,8 +32,14 @@ const curriculumSelectorEl = ref(null);
 
 /**
  * Start loading the curriculum data
+ * 
+ * @TODO - move this storybook resets into something else... 
  */
 onMounted(() => {
+    useSelectedCodesStore().$reset();
+    useSearchResultsStore().$reset();
+    useModalStore().$reset();
+    useModalActiveCodesStore().$reset();
     store.$reset(); //ensure the store state is as it's initially set, this is just for Storybook when switching between stories
     store.load(props.dataEndpoint);
 });
@@ -39,9 +50,7 @@ onMounted(() => {
 <template>
    <div class="row" ref="curriculumSelectorEl">
         <div class="small-12 columns">
-            <label>Curriculum Codes
-                <span data-tooltip="" class="hint has-tip tip-top" data-width="200" data-selector="tooltip-l5qfe53bv" aria-describedby="tooltip-l5qfe53bv" title="">?</span>
-            </label>
+            <cs-heading />
             <cs-selected-codes />
             <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
             <cs-search-results />

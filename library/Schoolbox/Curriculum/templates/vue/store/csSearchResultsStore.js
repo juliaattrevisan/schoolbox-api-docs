@@ -27,7 +27,7 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
          * @return { Boolean }
          */
         isSearchActive () {
-            return this.query.length > MIN_QUERY_LENGTH;
+            return this.query.length >= MIN_QUERY_LENGTH;
         },
 
         /**

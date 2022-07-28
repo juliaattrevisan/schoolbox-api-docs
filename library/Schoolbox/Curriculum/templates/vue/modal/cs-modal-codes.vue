@@ -40,10 +40,15 @@ function onClearSearchSelected () {
     modalActiveCodesStore.clearSearch();
 }
 
-
-watch(modalActiveCodesStore.codesWithSearch, () => {
-    console.warn(`change`)
+/**
+ * to scroll back to top on any selection change
+ */
+watch(() => modalActiveCodesStore.codesWithSearch, () => {
+    if (codesContainerEl.value) { //may not always exists in the dom
+        codesContainerEl.value.scrollTop = 0;
+    }
 });
+
 
 </script>
 

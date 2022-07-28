@@ -42,7 +42,7 @@ const showThirdNodeSelect = computed(() => modalActiveCodesStore.hasSelectedSeco
 
 <template>
    <div class="select-list">
-        <select v-model="modalActiveCodesStore.selectedFirstNodeId" @change="onFirstNodeChanged">
+        <select v-model="modalActiveCodesStore.selectedFirstNodeId" @change="onFirstNodeChanged" :disabled="modalActiveCodesStore.hasSingleCurriculumGroup">
             <option v-for="node in modalActiveCodesStore.firstNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
         </select>
         <select v-if="showSecondNodeSelect" v-model="modalActiveCodesStore.selectedSecondNodeId" @change="onSecondNodeChanged">

@@ -45,6 +45,13 @@ const modalSelectedCodesStore = useModalSelectedCodesStore();
 const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.5rem)`);
 
 /**
+ * The top level node can't be selected, so disable it
+ *
+ * @returns { String }
+ */
+const pointerEvents = computed(() => props.code.isFirstLevel ? 'none' : 'auto');
+
+/**
  * To determine whether the checkbox is currently selected based on whether it's 
  * in the selected list
  *
@@ -105,7 +112,7 @@ const highlightTitleSearch = computed(() => {
  * @returns { HTML }
  */
 const highlightBreadcrumbSearch = computed(() => {
-    if (modalActiveCodesStore.isSearchActive) {
+    if (modalActiveCodesStore.isSearchActive && props.code.breadcrumb) {
         return highlightSearchInElement(props.code.breadcrumb);
     } else {
         return '';
@@ -155,11 +162,11 @@ const containerClass = computed(() => {
    <li :class="containerClass">
         <button 
             class="code-button" 
-            :style="{ paddingLeft: paddingLeft }" 
+            :style="{ paddingLeft: paddingLeft, pointerEvents: pointerEvents }" 
             @click.prevent="onSelected"
             @keyup.enter="onSelected"
         >
-            <div class="checklist">
+            <div class="checklist" v-if="!props.code.isFirstLevel">
                 <input 
                     :id="`checkbox-${props.code.id}`"
                     type="checkbox"
@@ -212,6 +219,7 @@ const containerClass = computed(() => {
     font-size: 1rem;
     margin: 0;
     padding: 0.5rem 0.75rem;
+    text-align: left;
     transition: background 0.2s;
     width: 100%;
     &:hover {

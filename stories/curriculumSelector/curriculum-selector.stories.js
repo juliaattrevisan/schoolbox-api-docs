@@ -4,15 +4,15 @@
 
 import CurriculumSelector from '../../library/Schoolbox/Curriculum/templates/vue/curriculum-selector.vue';
 import { rest } from 'msw';
-import { data } from './dataCurriculumSelector';
+import { data as allCurriculumData } from './dataCurriculumSelector';
+import { data as vicCurriculumData } from './dataVicCurriculum';
 
 const dataEndpoint = '/curriculumData'; 
 
 const mswHandlers = [
     rest.get(dataEndpoint, (req, res, ctx) => {
-        return res( //we grab an endpoint and then modify the data before it's returned
-            // ctx.delay(1000),
-            ctx.json(data)
+        return res( 
+            ctx.json(allCurriculumData)
         ) 
     }),
 ];
@@ -69,3 +69,42 @@ const Template = (args, { argTypes }) => ({
 });
 
 export const Default = Template.bind({});
+
+export const LoadError = Template.bind({});
+LoadError.parameters = {
+    msw: {
+        handlers: [ 
+            rest.get(dataEndpoint, (req, res, ctx) => {
+                return res( 
+                    ctx.status(500) //to simulate an error
+                ) 
+            }),
+            ...mswHandlers,
+        ]
+    }
+}
+
+export const SingleCurriculumGroup = Template.bind({});
+SingleCurriculumGroup.parameters = {
+    msw: {
+        handlers: [ 
+            rest.get(dataEndpoint, (req, res, ctx) => {
+                return res( 
+                    ctx.json(vicCurriculumData)
+                ) 
+            }),
+            ...mswHandlers,
+        ]
+    }
+}
+
+export const SearchExamples = Template.bind({});
+SearchExamples.decorators = [
+    () => ({ 
+        template: `
+        <story />
+        <p>Paste Codes: GCCCT-ALR, GCCCT-DCDCA, GCCCT-EPO, GCN-RUPR, GCN-IPR, GCN-APR</p>
+        <p>Search Terms: self-awareness</p>
+        `
+    })
+]

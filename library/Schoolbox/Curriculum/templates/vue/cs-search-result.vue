@@ -57,7 +57,11 @@ const highlightTitleSearch = computed(() => {
  * @returns { HTML }
  */
 const highlightBreadcrumbSearch = computed(() => {
-    return highlightSearchInElement(props.result.breadcrumb);
+    if (props.result.breadcrumb) {
+        return highlightSearchInElement(props.result.breadcrumb);
+    } else {
+        return '';
+    }
 });
 
 /**

@@ -4,18 +4,17 @@
  * To search for codes or select the browse button to open the modal
  */
 
-import { ref, onMounted } from 'vue'; 
+import { ref, computed, onMounted } from 'vue'; 
+import { useStore } from './store/curriculumSelectorStore'; 
 import { useModalStore } from './store/csModalStore'; 
 import { useSearchResultsStore } from './store/csSearchResultsStore'; 
 
 
-const searchResultsStore = useSearchResultsStore();
+const store = useStore();
 const modalStore = useModalStore();
-const isLoading = ref(false);
-const hasLoadError = ref(false);
+const searchResultsStore = useSearchResultsStore();
 const isSelectorActive = ref(true);
 const queryInputEl = ref(null); //to deterch if the search input is currently active
-const inputPlaceholder = ref('Search for curriculum codes or keywords...');
 
 
 const props = defineProps({
@@ -26,6 +25,22 @@ const props = defineProps({
         // type: Object,
         required: true,
     },
+});
+
+/**
+ * notify of loading, a load error or that we are right to get searching
+ * 
+ * @returns { String } 
+ */
+const inputPlaceholder = computed(() => {
+    if (store.isLoading) {
+        return 'Loading Curriculum Codes...';
+    } else if (store.hasLoadError) {
+        return 'Currently unable to load Curriculum Codes. Please contact your IT support if the problem persists.';
+    } else {
+        return 'Search for curriculum codes or keywords...';
+    }
+    
 });
 
 /**
@@ -95,11 +110,11 @@ function onBrowseSelected () {
             ref="queryInputEl"
             type="text"
             class="search-input"
-            :readonly="isLoading || hasLoadError"
+            :readonly="!store.hasLoadedOk"
             :placeholder="inputPlaceholder"
             @input="$event.target.composing = false"
         />
-        <button class="button icon-curriculum" title="Browse and select from the Curriculum" @click.prevent="onBrowseSelected">Browse</button>
+        <button v-if="store.hasLoadedOk" class="button icon-curriculum" title="Browse and select from the Curriculum" @click.prevent="onBrowseSelected">Browse</button>
         <input name="curriculumCodes[]" type="hidden" tabindex="-1" value="" />
     </div>
 </template>

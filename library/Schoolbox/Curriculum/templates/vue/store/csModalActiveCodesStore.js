@@ -22,16 +22,37 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
     getters: {
        
         /**
+         * If there's only one curriculum group, we can select it
+         * straight away, otherwise we allow the user to make the selection
+         * 
+         * @return { Boolean }
+         */
+        hasSingleCurriculumGroup () {
+            const codesStore = useCodesStore();
+            if (codesStore.codes.length === 1) {
+                this.selectedFirstNodeId = codesStore.codes[0].id;
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        /**
          * The first level of Curriculum nodes
          * plus the empty node by default if there's more than one child
          * 
          * @return { Array }
          */
         firstNodes () {
-            return [ 
-                getEmptyNode(),
-                ...useCodesStore().codes
-            ];
+            const codesStore = useCodesStore();
+            if (this.hasSingleCurriculumGroup) {
+                return [...codesStore.codes];
+            } else {
+                return [ 
+                    getEmptyNode(),
+                    ...codesStore.codes
+                ];
+            }
         },
         
         /**
@@ -232,7 +253,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          * @return { Boolean }
          */
         isSearchActive () {
-            return this.query.length > MIN_QUERY_LENGTH;
+            return this.query.length >= MIN_QUERY_LENGTH;
         },
 
         /**
