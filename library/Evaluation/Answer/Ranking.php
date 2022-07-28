@@ -10,7 +10,6 @@
  */
 abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 {
-
     /**
      * Javascript class to use when creating UI
      *

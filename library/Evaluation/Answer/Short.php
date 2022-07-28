@@ -11,7 +11,6 @@
  */
 abstract class Evaluation_Answer_Short extends Evaluation_Answer
 {
-
     /**
      * Javascript class to use when creating UI
      *

@@ -11,7 +11,6 @@
  */
 class Survey_Answer_Signature extends Evaluation_Answer_Signature
 {
-
     /**
      * @var string
      */
