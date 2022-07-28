@@ -56,9 +56,14 @@ class Mapper extends BaseMapper
             );
             $stmt->execute();
 
-            $rows           = $stmt->fetchAll();
-            $maxResultSetId = (int)$rows[0]['resultset_id'];
-            $resultSetId    = (count($rows) === 0) ? 1 : $maxResultSetId + 1;
+            $rows = $stmt->fetchAll();
+
+            if (count($rows) === 0) {
+                $resultSetId = 1;
+            } else {
+                $maxResultSetId = (int)$rows[0]['resultset_id'];
+                $resultSetId    = $maxResultSetId + 1;
+            }
         } else {
             $resultSetId = $resultSetIdOrNull;
         }
