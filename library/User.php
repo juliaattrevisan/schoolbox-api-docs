@@ -449,7 +449,8 @@ class User extends DeprecatedModel
         }
         foreach ($tags[0] as $tag) {
             $key = trim($tag, '{}');
-            if (is_string($userInfo[$key] ?? null)) {
+
+            if (isset($userInfo[$key]) && is_string($userInfo[$key])) {
                 $value = $userInfo[$key];
             } else {
                 $value = '';

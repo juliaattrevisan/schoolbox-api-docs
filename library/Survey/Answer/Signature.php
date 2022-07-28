@@ -11,7 +11,6 @@
  */
 class Survey_Answer_Signature extends Evaluation_Answer_Signature
 {
-
     /**
      * @var string
      */
@@ -94,6 +93,17 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
     public function exportResponseToCSV($attempt_id, $question_id)
     {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
+
+        /* If a question was added after the attempt was made by the student,
+         * then $response['response'] might not even exist
+         */
+        if (!$response) {
+            return [
+                'response' => 'Unsigned',
+                'comment' => '',
+                'mark' => ''
+            ];
+        }
 
         /* In case someone saves with empty signature, which is
          * represented by an empty array []
