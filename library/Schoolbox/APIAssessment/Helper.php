@@ -540,12 +540,12 @@ v_most_recent_feedback.review_route = 'instructor' AND
            `rd`.`max_value`                                      AS `descriptor_max_value`,
            `rd`.`description`                                    AS `descriptor_descriptor`,
            `rl`.`sequence`                                       AS `descriptor_sequence`
-        from ((((`schoolbox`.`v_rubric` `vr`
-            join `schoolbox`.`submission_box` `sb`on (`vr`.`assessment_id` = `sb`.`assessment_id`))
-            join `schoolbox`.`submission_return` `sr` on (`sb`.`id` = `sr`.`box_id`))
-            join `schoolbox`.`rubric_capability_mark` `rcm` on (`rcm`.`return_id` = `sr`.`id` and `rcm`.`rubric_capability_id` =
+        from ((((`v_rubric` `vr`
+            join `submission_box` `sb`on (`vr`.`assessment_id` = `sb`.`assessment_id`))
+            join `submission_return` `sr` on (`sb`.`id` = `sr`.`box_id`))
+            join `rubric_capability_mark` `rcm` on (`rcm`.`return_id` = `sr`.`id` and `rcm`.`rubric_capability_id` =
                                                      `vr`.`capability_id`))
-            left join `schoolbox`.`v_rubric_indicator_mark_extend` `rim` on (`rim`.`rubric_indicator_id` = `vr`.`indicator_id` and `rcm`.`id` = `rim`.`rubric_capability_mark_id`))
+            left join `v_rubric_indicator_mark_extend` `rim` on (`rim`.`rubric_indicator_id` = `vr`.`indicator_id` and `rcm`.`id` = `rim`.`rubric_capability_mark_id`))
             INNER JOIN `rubric_descriptor` `rd` on `rim`.`descriptor_id` = `rd`.`id`
             INNER JOIN `rubric_level` `rl` on `rd`.`level_id` = `rl`.`id`
         where `sr`.`deleted_at` is null
