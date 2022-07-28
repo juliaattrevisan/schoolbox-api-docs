@@ -203,6 +203,12 @@ class EDiary implements IStrategy
         if ($feeds) {
             $userProfiles = $this->studentProfileMapper->findAll();
 
+            /* TODO getStudentEDiary allegedly supports multiple feed codes
+             * in the endpoint params, but:
+             *    - I can't tell which feed codes we actually need/want
+             *    - Presumably they meant a csv separated value
+             *    - Not sure if this actually works (untried)
+             */
             foreach ($feeds['calendar'] as $feed) {
                 foreach ($userProfiles as $userProfile) {
                     $this->importStudentEvents($userProfile, $feed);
@@ -228,6 +234,12 @@ class EDiary implements IStrategy
              */
             $userProfiles = $this->staffProfileMapper->findAll();
 
+            /* TODO getTeacherEDiary allegedly supports multiple feed codes
+             * in the endpoint params, but:
+             *    - I can't tell which feed codes we actually need/want
+             *    - Presumably they meant a csv separated value
+             *    - Not sure if this actually works (untried)
+             */
             foreach ($feeds['calendar'] as $feed) {
                 foreach ($userProfiles as $userProfile) {
                     $this->importStaffEvents($userProfile, $feed);
