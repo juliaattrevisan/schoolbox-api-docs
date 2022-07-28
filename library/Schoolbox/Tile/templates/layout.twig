@@ -233,7 +233,8 @@
                          data-hide-watch-value="grid">
                         <label for="grid_width">px</label>
                         <input id="grid_width"
-                               type="number"
+                               type="text"
+                               inputmode="numeric"
                                name="grid_width"
                                value="{{ item.gridWidth|e('html_attr') }}"
                                class="layout-width"
@@ -256,7 +257,8 @@
                          data-hide-watch-value="column">
                         <label for="column_count">tiles/row</label>
                         <input id="column_count"
-                               type="number"
+                               type="text"
+                               inputmode="numeric"
                                name="column_count"
                                value="{{ item.columnCount|e('html_attr') }}"
                                class="layout-width"
@@ -267,7 +269,8 @@
                          data-hide-watch-value="column">
                         <label for="column_padding">% padding</label>
                         <input id="column_padding"
-                               type="number"
+                               type="text"
+                               inputmode="numeric"
                                name="column_padding"
                                value="{{ item.columnPadding|e('html_attr') }}"
                                class="layout-width"
@@ -298,7 +301,8 @@
                          data-hide-watch-value="custom">
                         <label for="aspect_ratio_x">Width Ratio</label>
                         <input id="aspect_ratio_x"
-                               type="number"
+                               type="text"
+                               inputmode="numeric"
                                name="aspect_ratio_x"
                                value="{{ item.aspectRatioX|e('html_attr') }}"
                                class="aspect-ratio"
@@ -309,7 +313,8 @@
                          data-hide-watch-value="custom">
                         <label for="aspect_ratio_y">Height Ratio</label>
                         <input id="aspect_ratio_y"
-                               type="number"
+                               type="text"
+                               inputmode="numeric"
                                name="aspect_ratio_y"
                                value="{{ item.aspectRatioY|e('html_attr') }}"
                                class="aspect-ratio"
