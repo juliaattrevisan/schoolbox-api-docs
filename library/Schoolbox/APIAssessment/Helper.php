@@ -536,13 +536,18 @@ v_most_recent_feedback.review_route = 'instructor' AND
            `vr`.`indicator_max_value`                            AS `indicator_max_value`,
            if(`rim`.`valid`, `rim`.`value`, NULL)                AS `indicator_mark`,
            `rim`.`descriptor_id`                                 AS `descriptor_id`,
-           `rim`.`descriptor_name`                               AS `descriptor_name`
+           `rim`.`descriptor_name`                               AS `descriptor_name`,
+           `rd`.`max_value`                                      AS `descriptor_max_value`,
+           `rd`.`description`                                    AS `descriptor_descriptor`,
+           `rl`.`sequence`                                       AS `descriptor_sequence`
         from ((((`schoolbox`.`v_rubric` `vr`
             join `schoolbox`.`submission_box` `sb`on (`vr`.`assessment_id` = `sb`.`assessment_id`))
             join `schoolbox`.`submission_return` `sr` on (`sb`.`id` = `sr`.`box_id`))
             join `schoolbox`.`rubric_capability_mark` `rcm` on (`rcm`.`return_id` = `sr`.`id` and `rcm`.`rubric_capability_id` =
                                                      `vr`.`capability_id`))
             left join `schoolbox`.`v_rubric_indicator_mark_extend` `rim` on (`rim`.`rubric_indicator_id` = `vr`.`indicator_id` and `rcm`.`id` = `rim`.`rubric_capability_mark_id`))
+            INNER JOIN `rubric_descriptor` `rd` on `rim`.`descriptor_id` = `rd`.`id`
+            INNER JOIN `rubric_level` `rl` on `rd`.`level_id` = `rl`.`id`
         where `sr`.`deleted_at` is null
             and `sr`.`published_at` is not null
             and (`rcm`.`valid` is true or `rim`.`valid` is true)
@@ -572,9 +577,9 @@ v_most_recent_feedback.review_route = 'instructor' AND
                 $output['capabilities'][$row['capability_id']] = [
                     'id'                    => (int)$row['capability_id'],
                     'name'                  => $row['capability_name'],
-                    'mark'                  => (float)$row['capability_mark'],
+                    'value'                 => (float)$row['capability_mark'],
                     'maxValue'              => (float)$row['capability_max_value'],
-                    'human_readable_mark'   => $row['capability_human_readable_mark'],
+                    'mark'                  => $row['capability_human_readable_mark'],
                     'indicators'            => []
                 ];
             }
@@ -584,10 +589,12 @@ v_most_recent_feedback.review_route = 'instructor' AND
                     'id'            => (int)$row['indicator_id'],
                     'name'          => $row['indicator_name'],
                     'maxValue'      => (float)$row['indicator_max_value'],
-                    'descriptor'   => [
+                    'value'         => (float)$row['indicator_mark'],
+                    'descriptor'    => [
                         'id'            => (int)$row['descriptor_id'],
                         'description'   => $row['descriptor_name'],
-                        'mark'          => (float)$row['indicator_mark']
+                        'maxValue'      => (float)$row['descriptor_max_value'],
+                        'sequence'      => (int)$row['descriptor_sequence']
                     ]
                 ];
             }
