@@ -493,13 +493,13 @@ class EDiary implements IStrategy
              */
             try {
                 $startDatetime = \Alaress_Date_Format::newDatabaseDate($tassStartDate);
-            } catch(\Carbon\Exceptions\InvalidFormatException $e) {
+            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
                 $startDatetime = \Alaress_Date_Format::newFromTimestamp(strtotime($tassStartDate));
             }
 
             try {
                 $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEndDate);
-            } catch(\Carbon\Exceptions\InvalidFormatException $e) {
+            } catch (\Carbon\Exceptions\InvalidFormatException $e) {
                 $endDatetime = \Alaress_Date_Format::newFromTimestamp(strtotime($tassEndDate));
             }
 
