@@ -41,10 +41,9 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param int $resultSetId (Supply -1 to create a new rubric result set.  MAX(resultset_id)+1 will be used.)
+     * @param int|null $resultSetIdOrNull (Supply -1 to create a new rubric result set.  MAX(resultset_id)+1 will be used.)
      * @param array $labelsInOrder
-     * @return int ($resultSetId)
-     * @throws \InvalidArgumentException
+     * @return int ($resultSetIdOrNull)
      */
     public function createOrOverwriteRubricResultSet(?int $resultSetIdOrNull, array $labelsInOrder): int
     {
@@ -57,8 +56,9 @@ class Mapper extends BaseMapper
             );
             $stmt->execute();
 
-            $rows        = $stmt->fetchAll();
-            $resultSetId = (count($rows) == 0) ? 1 : (int)$rows[0]['resultset_id'] + 1;
+            $rows           = $stmt->fetchAll();
+            $maxResultSetId = (int)$rows[0]['resultset_id'];
+            $resultSetId    = (count($rows) === 0) ? 1 : $maxResultSetId + 1;
         } else {
             $resultSetId = $resultSetIdOrNull;
         }
@@ -80,7 +80,10 @@ class Mapper extends BaseMapper
         foreach ($labelsInOrder as $label) {
             // Avoid saving blank values as that will be confusing for everyone.
             if ('' === trim((string)$label)) {
-                throw new \InvalidArgumentException("Expected only non-blank labels.  Blank label found.");
+                // If we encounter a blank label, it is best to skip it rather than throwing an exception.  The client
+                // does its best to prevent blank labels from being submitted, but client-side validation code can
+                // be bypassed by a determined user.  So that this will happen is expected and not exceptional.
+                continue;
             }
 
             /* Forcibly truncate $label values, so they don't exceed Model::LABEL_MAXLENGTH chars.

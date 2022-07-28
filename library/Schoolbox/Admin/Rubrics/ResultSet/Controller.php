@@ -15,7 +15,6 @@ namespace Schoolbox\Admin\Rubrics\ResultSet;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Exception;
-use http\Exception\InvalidArgumentException;
 use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base
@@ -46,10 +45,13 @@ class Controller extends Base
                 // Same template and data schema as for getRubricResults().
                 'template' => '@adminRubric/index.twig',
                 'data'     => [
-                    'pageCurrent'      => $this->router->generate('adminRubric.getRubricResultsForCreate'),
-                    'resultSetId'      => null,
-                    'rubricResultRows' => [],
-                    'allBreadcrumbs'   => (
+                    'MAX_ROWS_PER_RESULT_SET' => self::MAX_ROWS_PER_RESULT_SET,
+                    'pageCurrent'             => $this->router->generate('adminRubric.getRubricResultsForCreate'),
+                    'resultSetId'             => null,
+                    'rubricResultRows'        => [],
+                    'toastPopupMessage'       => '',
+                    'toastPopupMessageType'   => '',
+                    'allBreadcrumbs'          => (
                         (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubric.getRubricResultsForCreate'))
                     )
                 ]
@@ -59,9 +61,12 @@ class Controller extends Base
 
     /**
      * Load templates/index.twig using data obtained in this function.
+     * @toastPopupMessageType string Expected values 'success', 'alert', ''.  Blank means do not display.
+     * @toastPopupMessage string
+     * @serverProcessSucceeded ?bool
      * @throws RouteNotFound
      */
-    public function getRubricResults($resultSetId): void
+    public function getRubricResults(int $resultSetId, ?string $toastPopupMessageType = null, ?string $toastPopupMessage = null): void
     {
         $this->getResponse()->content->set(
             [
@@ -71,6 +76,8 @@ class Controller extends Base
                     'pageCurrent'             => $this->router->generate('adminRubric.getRubricResults'),
                     'resultSetId'             => $resultSetId,
                     'rubricResultRows'        => $this->mapper->findRubricResultRows((int)$resultSetId),
+                    'toastPopupMessage'       => $toastPopupMessage,
+                    'toastPopupMessageType'   => $toastPopupMessageType,
                     'allBreadcrumbs'          => (
                         (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubric.getRubricResults'))
                     )
@@ -81,9 +88,8 @@ class Controller extends Base
 
     /**
      * Save $_POSTed data to database, then redirect to getRubricResults().
-     * @throws Exception
      */
-    public function postRubricResults(?int $resultSetIdOrNull): void
+    public function postRubricResults(): void
     {
         $postedData    = $this->getRequest()->post->getArrayCopy();
         $indexedLabels = array();
@@ -99,8 +105,27 @@ class Controller extends Base
             }
         }
 
-        $resultSetId = $this->mapper->createOrOverwriteRubricResultSet($resultSetIdOrNull, $indexedLabels);
+        $boolRequestSucceeded = true;
+        $resultSetIdOrNull    = (($postedData['resultSetIdOrBlank'] === '') ? null : (int)$postedData['resultSetIdOrBlank']);
 
-        $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubric.getRubricResults', ['resultSetId' => $resultSetId]));
+        try {
+            $resultSetId = $this->mapper->createOrOverwriteRubricResultSet($resultSetIdOrNull, $indexedLabels);
+        } catch (Exception $e) {
+            // TODO: Should I log the exception message somewhere?
+            $boolRequestSucceeded = false;
+            $resultSetId          = $resultSetIdOrNull;
+        }
+
+        if ($resultSetId === null) {
+            // This may happen on a create request if an exception is caught in the try block above.
+            // Since we do not have a resultSetId in this case, all we can do is redirect to the result sets page.
+            $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubrics.getRubricResultSets'));
+        } else {
+            $this->getRubricResults(
+                $resultSetId,
+                (($boolRequestSucceeded) ? 'success' : 'alert'   ),
+                (($boolRequestSucceeded) ? 'Success!' : 'Failure.')
+            );
+        }
     }
 }

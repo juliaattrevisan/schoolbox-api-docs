@@ -31,9 +31,9 @@ class Module extends BaseModule
     {
         $perms = new Rule\IsSuperuser();
 
-        $this->register('GET', '/create', 'getRubricResults', $perms);
+        $this->register('GET', '/create', 'getRubricResultsForCreate', $perms);
         $this->register('GET', '/{resultSetId}', 'getRubricResults', $perms);
-        $this->register('POST', '/{resultSetId}', 'postRubricResults', $perms);
+        $this->register('POST', '', 'postRubricResults', $perms);
     }
 
     /**

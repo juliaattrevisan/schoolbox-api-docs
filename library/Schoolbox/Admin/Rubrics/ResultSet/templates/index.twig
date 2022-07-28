@@ -126,13 +126,40 @@ label.rubric-result-set-row-label > span.input-container {
     }
 </script>
 <script>
+    // This script block uses JQuery.
+
     $(function() {
         $('#rubricResultSetForm').alaressValidate();
 
         $('#rubricResultSetForm input').each(function(index, element) {
-            $(element).rules('add', {requiredNotBlank: true});
+            if (element.getAttribute('type') != 'hidden') {
+                $(element).rules('add', {requiredNotBlank: true});
+            }
         });
     });
+
+    {% if toastPopupMessageType %}
+        $(document).ready(
+            /**
+             * Show toast success or failure message depending on twig variable.
+             */
+            function () {
+                let toastJq = $('[data-toast]');
+                toastJq.toastActivate();
+                window.setTimeout(
+                    function () {
+                        toastJq.toastTimeout(
+                            {
+                                duration: 3000,
+                                css     : '{{ toastPopupMessageType }}',
+                                text    : '{{ toastPopupMessage }}'
+                            }
+                        );
+                    }, 0
+                );
+            }
+        );
+    {% endif %}
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -170,7 +197,8 @@ label.rubric-result-set-row-label > span.input-container {
                 </div>
             </div>
             <div class="small-12 island">
-                <form id="rubricResultSetForm" method="post" action="/adminv2/rubric-results-set/{{ resultSetId }}">
+                <form id="rubricResultSetForm" method="post" action="/adminv2/rubric-results-set">
+                    <input type='hidden' name='resultSetIdOrBlank' value='{{ resultSetId }}'/>
                     <section>
                         <ul id="rows-container-ul" class="information-list unsortable">
                             {% for row in rubricResultRows %}
@@ -200,10 +228,13 @@ label.rubric-result-set-row-label > span.input-container {
                             </section>
                         </div>
                     </section>
-                    <input id="save-button" type="submit" value="Submit" disabled="disabled">
+                    <input id="save-button" type="submit" value="Save" disabled="disabled">
                 </form>
             </div>
         </div>
+        <section class="content">
+            <div id="toaster" class="toast success" data-toast=""></div>
+        </section>
         <!-- Main content section ends here. -->
     </div>
 </div>
