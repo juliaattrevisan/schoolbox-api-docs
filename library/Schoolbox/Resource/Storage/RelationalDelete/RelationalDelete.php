@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage\RelationalDelete;
 
 use Component\Eportfolio\FileListMapper;
 use Eportfolio\CoverPhotoMapper;
+use Schoolbox\Learning\Turnitin;
 use Schoolbox\Resource\Storage;
 use Psr\Log\LoggerInterface;
 
@@ -151,10 +152,11 @@ class RelationalDelete implements IRelationalDelete
                 \Database::getInstance(),
             ),
 
-            // Assessments
-            new Deletable(
+            // Student Submission File
+            new \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\RelationalDelete(
                 \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
-                $this->logger
+                $this->logger,
+                Turnitin\File\Mapper::getInstance(),
             ),
 
             // Submission box file
