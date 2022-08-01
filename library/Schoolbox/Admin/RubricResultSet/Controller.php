@@ -56,6 +56,7 @@ class Controller extends Base
 
     /**
      * Delete the result set defined by $resultSetId.
+     * @throws RouteNotFound
      */
     public function getDelete($resultSetId): void
     {
@@ -90,6 +91,10 @@ class Controller extends Base
     }
 
     // Same as postUpdate()?
+
+    /**
+     * @throws RouteNotFound
+     */
     public function postCreate(): void
     {
         $this->postUpdate();
@@ -111,7 +116,7 @@ class Controller extends Base
                     'MAX_ROWS_PER_RESULT_SET' => self::MAX_ROWS_PER_RESULT_SET,
                     'pageCurrent'             => $this->router->generate('adminRubricResultSet.getList'),
                     'resultSetId'             => $resultSetId,
-                    'rubricResultRows'        => $this->mapper->findRubricResultRows((int)$resultSetId),
+                    'rubricResultRows'        => $this->mapper->findRubricResultRows($resultSetId),
                     'toastPopupMessage'       => $toastPopupMessage,
                     'toastPopupMessageType'   => $toastPopupMessageType,
                     'allBreadcrumbs'          => array_merge(
@@ -125,6 +130,7 @@ class Controller extends Base
 
     /**
      * Save $_POSTed data to database, then redirect to getList().
+     * @throws RouteNotFound
      */
     public function postUpdate(): void
     {
@@ -161,7 +167,7 @@ class Controller extends Base
             // TODO: Redirect instead of calling $this->getUpdate().
             $this->getUpdate(
                 $resultSetId,
-                (($boolRequestSucceeded) ? 'success' : 'alert'    ),
+                (($boolRequestSucceeded) ? 'success'  : 'alert'   ),
                 (($boolRequestSucceeded) ? 'Success!' : 'Failure.')
             );
         }
