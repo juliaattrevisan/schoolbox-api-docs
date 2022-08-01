@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\RelationalDelete;
 
 use Eportfolio\CoverPhotoMapper;
+use Schoolbox\Resource\Storage;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -30,7 +31,7 @@ class RelationalDelete implements IRelationalDelete
     private $logger;
 
     /**
-     * @var \Schoolbox\Resource\Storage\Mapper
+     * @var Storage\Mapper
      */
     private $storageMapper;
 
@@ -39,11 +40,10 @@ class RelationalDelete implements IRelationalDelete
      *
      * @param LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, Storage\Mapper $storageMapper)
     {
         $this->logger           = $logger;
-
-        $this->storageMapper    = new \Schoolbox\Resource\Storage\Mapper();
+        $this->storageMapper    = $storageMapper;
 
         $this->collectors       = array_merge(
             $this->generateDeletables(),
