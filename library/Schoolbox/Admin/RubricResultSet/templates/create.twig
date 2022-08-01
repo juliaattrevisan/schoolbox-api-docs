@@ -125,29 +125,6 @@ label.rubric-result-set-row-label > span.input-container {
             }
         });
     });
-
-    {% if toastPopupMessageType %}
-        $(document).ready(
-            /**
-             * Show toast success or failure message depending on twig variable.
-             */
-            function () {
-                let toastJq = $('[data-toast]');
-                toastJq.toastActivate();
-                window.setTimeout(
-                    function () {
-                        toastJq.toastTimeout(
-                            {
-                                duration: 3000,
-                                css     : '{{ toastPopupMessageType }}',
-                                text    : '{{ toastPopupMessage }}'
-                            }
-                        );
-                    }, 0
-                );
-            }
-        );
-    {% endif %}
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -198,9 +175,6 @@ label.rubric-result-set-row-label > span.input-container {
                 </form>
             </div>
         </div>
-        <section class="content">
-            <div id="toaster" class="toast success" data-toast=""></div>
-        </section>
         <!-- Main content section ends here. -->
     </div>
 </div>

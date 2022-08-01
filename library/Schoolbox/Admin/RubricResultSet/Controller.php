@@ -14,7 +14,6 @@ namespace Schoolbox\Admin\RubricResultSet;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use Exception;
 use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base
@@ -68,46 +67,7 @@ class Controller extends Base
      * Load templates/index.twig using data obtained in this function.
      * @throws RouteNotFound
      */
-    public function getCreate(): void
-    {
-        $this->getResponse()->content->set(
-            [
-                // Same template and data schema as for getList().
-                'template' => '@adminRubricResultSet/create.twig',
-                'data'     => [
-                    'MAX_ROWS_PER_RESULT_SET' => self::MAX_ROWS_PER_RESULT_SET,
-                    'pageCurrent'             => $this->router->generate('adminRubricResultSet.getList'),
-                    'resultSetId'             => null,
-                    'rubricResultRows'        => [],
-                    'toastPopupMessage'       => '',
-                    'toastPopupMessageType'   => '',
-                    'allBreadcrumbs'          => array_merge(
-                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList')),
-                        [['Create', '']]
-                    )
-                ]
-            ]
-        );
-    }
-
-    // Same as postUpdate()?
-
-    /**
-     * @throws RouteNotFound
-     */
-    public function postCreate(): void
-    {
-        $this->postUpdate();
-    }
-
-    /**
-     * Load templates/index.twig using data obtained in this function.
-     * @toastPopupMessageType string Expected values 'success', 'alert', ''.  Blank means do not display.
-     * @toastPopupMessage string
-     * @serverProcessSucceeded ?bool
-     * @throws RouteNotFound
-     */
-    public function getUpdate(int $resultSetId, ?string $toastPopupMessageType = null, ?string $toastPopupMessage = null): void
+    public function getUpdate(?int $resultSetId): void
     {
         $this->getResponse()->content->set(
             [
@@ -116,9 +76,7 @@ class Controller extends Base
                     'MAX_ROWS_PER_RESULT_SET' => self::MAX_ROWS_PER_RESULT_SET,
                     'pageCurrent'             => $this->router->generate('adminRubricResultSet.getList'),
                     'resultSetId'             => $resultSetId,
-                    'rubricResultRows'        => $this->mapper->findRubricResultRows($resultSetId),
-                    'toastPopupMessage'       => $toastPopupMessage,
-                    'toastPopupMessageType'   => $toastPopupMessageType,
+                    'rubricResultRows'        => (($resultSetId === null)? []: $this->mapper->findRubricResultRows($resultSetId)),
                     'allBreadcrumbs'          => array_merge(
                         (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList')),
                         [['Update', '']]
@@ -126,6 +84,39 @@ class Controller extends Base
                 ]
             ]
         );
+    }
+
+    /**
+     * Load templates/index.twig using data obtained in this function.
+     * @throws RouteNotFound
+     */
+    public function getCreate(): void
+    {
+        $this->getUpdate(null);
+//        $this->getResponse()->content->set(
+//            [
+//                // Same template and data schema as for getUpdate().
+//                'template' => '@adminRubricResultSet/create.twig',
+//                'data'     => [
+//                    'MAX_ROWS_PER_RESULT_SET' => self::MAX_ROWS_PER_RESULT_SET,
+//                    'pageCurrent'             => $this->router->generate('adminRubricResultSet.getList'),
+//                    'resultSetId'             => null,
+//                    'rubricResultRows'        => [],
+//                    'allBreadcrumbs'          => array_merge(
+//                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList')),
+//                        [['Create', '']]
+//                    )
+//                ]
+//            ]
+//        );
+    }
+
+    /**
+     * @throws RouteNotFound
+     */
+    public function postCreate(): void
+    {
+        $this->postUpdate();
     }
 
     /**
@@ -148,28 +139,9 @@ class Controller extends Base
             }
         }
 
-        $boolRequestSucceeded = true;
-        $resultSetIdOrNull    = (($postedData['resultSetIdOrBlank'] === '') ? null : (int)$postedData['resultSetIdOrBlank']);
+        $resultSetIdOrNull = (($postedData['resultSetIdOrBlank'] === '') ? null : (int)$postedData['resultSetIdOrBlank']);
+        $this->mapper->createOrOverwriteRubricResultSet($resultSetIdOrNull, $indexedLabels);
 
-        try {
-            $resultSetId = $this->mapper->createOrOverwriteRubricResultSet($resultSetIdOrNull, $indexedLabels);
-        } catch (Exception $e) {
-            // TODO: Should I log the exception message somewhere?
-            $boolRequestSucceeded = false;
-            $resultSetId          = $resultSetIdOrNull;
-        }
-
-        if ($resultSetId === null) {
-            // This may happen on a create request if an exception is caught in the try block above.
-            // Since we do not have a resultSetId in this case, all we can do is redirect to the result sets page.
-            $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubricResultSet.getList'));
-        } else {
-            // TODO: Redirect instead of calling $this->getUpdate().
-            $this->getUpdate(
-                $resultSetId,
-                (($boolRequestSucceeded) ? 'success'  : 'alert'   ),
-                (($boolRequestSucceeded) ? 'Success!' : 'Failure.')
-            );
-        }
+        $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubricResultSet.getList'));
     }
 }
