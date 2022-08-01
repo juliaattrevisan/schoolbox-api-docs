@@ -32,11 +32,16 @@ label.rubric-result-set-row-label > span.input-container {
      */
     function onClickPlusButton() {
         let rowsContainerUl = document.getElementById('rows-container-ul');
-        let maxRowNumber    = getHighestRowNumberOnPage();
+        let spans           = document.getElementsByClassName('rubric-value-span');
+        let maxRowNumber    = null;
 
-        if (maxRowNumber > {{ MAX_ROWS_PER_RESULT_SET }}) {
-            // We limit the number of rows here to an arbitrarily chosen sensible value.
-            return;
+        if (spans.length > 0) {
+            let maxRowNumber = spans.length;
+
+            if (maxRowNumber > {{ MAX_ROWS_PER_RESULT_SET }}) {
+                // We limit the number of rows here to an arbitrarily chosen sensible value.
+                return;
+            }
         }
 
         let newRowValue = (maxRowNumber === null) ? 0 : maxRowNumber + 1;
@@ -49,8 +54,7 @@ label.rubric-result-set-row-label > span.input-container {
             "                    <span class='rubric-value-span' data-role='value'>" + newRowValue + "</span>\n" +
             "                    <span class='input-container'>\n" +
             "                        <!-- This input-container span is necessary in order to contain the input and the validation message span that will be added if the field contains invalid data. -->\n" +
-            "                        <input class='rubric-wide-input' type='text' name='rubricResultLabels[" + newRowValue + "]'" +
-                                    " onkeyup='enableSaveButton()' maxlength='64' required/>\n" +
+            "                        <input class='rubric-wide-input' type='text' name='rubricResultLabels[" + newRowValue + "]' maxlength='64' required/>\n" +
             "                    </span>\n" +
             "                    <a class='delete-row-button icon-delete' onclick='onClickDeleteRow(" + newRowValue + ")'></a>\n" +
             "                </label>\n" +
@@ -65,7 +69,7 @@ label.rubric-result-set-row-label > span.input-container {
         // Add validation rules to new input.
         $('input[name="rubricResultLabels[' + String(newRowValue) + ']"').rules('add', {requiredNotBlank: true});
 
-        enableSaveButton();
+        togglePlusAndSaveButtons(true);
         document.getElementById('empty-state-island-div').style.display = 'none'; // Hide empty state box.
     }
 
@@ -77,10 +81,12 @@ label.rubric-result-set-row-label > span.input-container {
         let rowLi = document.getElementById('row-li-' + rowValue);
         rowLi.remove();
         renumberRows();
-        enableSaveButton();
 
         if (document.getElementById('rows-container-ul').children.length == 0) {
             document.getElementById('empty-state-island-div').style.display = ''; // Show empty state box.
+            togglePlusAndSaveButtons(false);
+        } else {
+            togglePlusAndSaveButtons(true);
         }
     }
 
@@ -103,26 +109,12 @@ label.rubric-result-set-row-label > span.input-container {
     }
 
     /**
-     * Find the highest number from all rows on the page.
+     *
      */
-    function getHighestRowNumberOnPage() {
-        let spans    = document.getElementsByClassName('rubric-value-span');
-        let maxValue = null;
-
-        for (let i = 0; i < spans.length; ++i) {
-            let span      = spans[i];
-            let spanValue = Number(span.innerHTML);
-
-            if (maxValue === null || spanValue > maxValue) {
-                maxValue = spanValue;
-            }
-        }
-
-        return maxValue;
-    }
-
-    function enableSaveButton() {
-        document.getElementById('save-button').disabled = false;
+    function togglePlusAndSaveButtons(boolShow) {
+        let displayValue = ((boolShow)? '': 'none');
+        document.getElementById('save-button'              ).style.display = displayValue;
+        document.getElementById('plus-button-container-div').style.display = displayValue;
     }
 </script>
 <script>
@@ -167,28 +159,6 @@ label.rubric-result-set-row-label > span.input-container {
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
         <!-- Main content section starts here. -->
-        <a href="https://vagrant.dev.schoolbox.cloud/adminv2/rubric-result-set">Back to Rubrics Result Sets</a>
-        <div class="row">
-            <div class="small-12 island">
-                <section>
-                    <header class="list-header actions-small-0">
-                    </header>
-                    <div class="small-12 medium-12 column">
-                        <p>
-                            Create or edit a rubric result set template here.
-                        </p>
-                        <p>
-                            Each set should be a discrete list of items of a single measurement;
-                            for example, 'Very Good' and 'Yes' should not be in the same set.
-                        </p>
-                        <p>
-                            Deleting or modifying a result set here will not affect any previous use of that result set elsewhere in Schoolbox.
-                            This is because the result sets here are just templates that are copied to create new result sets on rubrics.
-                        </p>
-                    </div>
-                </section>
-            </div>
-        </div>
         <div class="row">
             <div id="empty-state-island-div" class="small-12 island"{% if rubricResultRows %}style="display:none"{% endif %}>
                 <div class="empty-state">
@@ -212,8 +182,7 @@ label.rubric-result-set-row-label > span.input-container {
                                                     <!-- A sensible maxlength of 64 chars was chosen arbitrarily for the input below.  The database field can handle more. -->
                                                     <span class="input-container">
                                                         <!-- This input-container span is necessary in order to contain the input and the validation message span that will be added if the field contains invalid data. -->
-                                                        <input class="rubric-wide-input" type="text" name="rubricResultLabels[{{ row.value|purify }}]"
-                                                         value="{{ row.label|purify }}" onkeyup="enableSaveButton()" maxlength="64" required/>
+                                                        <input class="rubric-wide-input" type="text" name="rubricResultLabels[{{ row.value|purify }}]" value="{{ row.label|purify }}" maxlength="64" required/>
                                                     </span>
                                                     <a class='delete-row-button icon-delete' onclick='onClickDeleteRow({{ row.value|purify }})'></a>
                                                 </label>
@@ -223,13 +192,13 @@ label.rubric-result-set-row-label > span.input-container {
                                 </li>
                             {% endfor %}
                         </ul>
-                        <div class="component-action">
+                        <div id="plus-button-container-div" class="component-action"{% if not rubricResultRows %}style="display:none"{% endif %}>
                             <section>
                                 <a class="button" onclick="onClickPlusButton()">Add Row</a>
                             </section>
                         </div>
                     </section>
-                    <input id="save-button" type="submit" value="Save" disabled="disabled">
+                    <input id="save-button" type="submit" value="Save"{% if not rubricResultRows %}style="display:none"{% endif %}>
                 </form>
             </div>
         </div>
