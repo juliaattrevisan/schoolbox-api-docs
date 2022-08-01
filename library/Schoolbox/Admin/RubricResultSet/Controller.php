@@ -57,7 +57,7 @@ class Controller extends Base
      * Delete the result set defined by $resultSetId.
      * @throws RouteNotFound
      */
-    public function getDelete($resultSetId): void
+    public function postDelete($resultSetId): void
     {
         $this->mapper->deleteRubricResultSet((int)$resultSetId);
         $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubricResultSet.getList'));
