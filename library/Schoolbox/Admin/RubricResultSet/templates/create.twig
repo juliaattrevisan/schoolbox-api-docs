@@ -32,31 +32,27 @@ label.rubric-result-set-row-label > span.input-container {
      */
     function onClickPlusButton() {
         let rowsContainerUl = document.getElementById('rows-container-ul');
-        let spans           = document.getElementsByClassName('rubric-value-span');
-        let maxRowNumber    = null;
+        let nRows           = document.getElementsByClassName('rubric-value-span').length;
 
-        if (spans.length > 0) {
-            let maxRowNumber = spans.length;
-
-            if (maxRowNumber > {{ MAX_ROWS_PER_RESULT_SET }}) {
+        if (nRows > 0) {
+            if (nRows > {{ MAX_ROWS_PER_RESULT_SET }}) {
                 // We limit the number of rows here to an arbitrarily chosen sensible value.
                 return;
             }
         }
 
-        let newRowValue = (maxRowNumber === null) ? 0 : maxRowNumber + 1;
-        let newRowHtml  = (
-            "<li id='row-li-" + newRowValue + "'>\n" +
+        let newRowHtml = (
+            "<li id='row-li-" + nRows + "'>\n" +
             "    <div class='actions-small-0'>\n" +
             "        <div class='list-item'>\n" +
             "            <div class='small-12 medium-12 column'>\n" +
             "                <label class='rubric-result-set-row-label'>\n" +
-            "                    <span class='rubric-value-span' data-role='value'>" + newRowValue + "</span>\n" +
+            "                    <span class='rubric-value-span' data-role='value'>" + nRows + "</span>\n" +
             "                    <span class='input-container'>\n" +
             "                        <!-- This input-container span is necessary in order to contain the input and the validation message span that will be added if the field contains invalid data. -->\n" +
-            "                        <input class='rubric-wide-input' type='text' name='rubricResultLabels[" + newRowValue + "]' maxlength='64' required/>\n" +
+            "                        <input class='rubric-wide-input' type='text' name='rubricResultLabels[" + nRows + "]' maxlength='64' required/>\n" +
             "                    </span>\n" +
-            "                    <a class='delete-row-button icon-delete' onclick='onClickDeleteRow(" + newRowValue + ")'></a>\n" +
+            "                    <a class='delete-row-button icon-delete' onclick='onClickDeleteRow(" + nRows + ")'></a>\n" +
             "                </label>\n" +
             "            </div>\n" +
             "        </div>\n" +
@@ -67,7 +63,7 @@ label.rubric-result-set-row-label > span.input-container {
         rowsContainerUl.insertAdjacentHTML('beforeend', newRowHtml);
 
         // Add validation rules to new input.
-        $('input[name="rubricResultLabels[' + String(newRowValue) + ']"').rules('add', {requiredNotBlank: true});
+        $('input[name="rubricResultLabels[' + String(nRows) + ']"').rules('add', {requiredNotBlank: true});
 
         togglePlusAndSaveButtons(true);
         document.getElementById('empty-state-island-div').style.display = 'none'; // Hide empty state box.
