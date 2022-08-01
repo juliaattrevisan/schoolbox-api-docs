@@ -207,23 +207,6 @@ class Transactor
              */
             $this->assessmentMapperProxy->save($this->assessment, $currentUser);
 
-            /* Due Work has a special thing going on where it can upload to Plagscan/Turnitin
-             *
-             * If Similarity Check was previously disabled, but has now been enabled,
-             * Then attempt to retrofit all the previous submissions
-             */
-            if (($this->assessment instanceof DueWork\Model) && !$before['assessment']['similarityCheckEnabled']) {
-
-                /** @var DueWork\Model $assessment */
-                if ($assessment->getSimilarityCheckEnabled()) {
-                    /* If turnitin is enabled, retrofit any old submissions' documents
-                     */
-                    if ((new Turnitin\Helper(Loader::getInstance()))->isConfigured()) {
-                        (new Turnitin\Retrofit(Turnitin\Group\Mapper::getInstance(), Turnitin\File\Mapper::getInstance(), $this->submissionFileMapper, SubmissionBoxMapper::getInstance()))->retrofit($this->assessment->getId());
-                    }
-                }
-            }
-
             $returnUrl = $this->router->generate('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $this->assessment->getId()]);
         }
 
@@ -253,35 +236,46 @@ class Transactor
             /* If turnitin is enabled, create a group attachment for each file
              */
             if ((new Turnitin\Helper(Loader::getInstance()))->isConfigured()) {
-                /* Note that $this->assessment and $assessment files do not have a primary id
-                 * when you first create a Due Work, which means you have to obtain them by
-                 * alternative means.
+                /* Due Work has a special thing going on where it can upload to Plagscan/Turnitin
                  *
-                 * new \Alaress_Probe($this->assessment->getAttachedFiles());
-                 *
-                 * TODO There should be an easier way to do this, but idk,
-                 *  something is going funny in the swamp
+                 * If Similarity Check was previously disabled, but has now been enabled,
+                 * Then attempt to retrofit all the previous submissions
                  */
-                $submissionBox = $this->submissionBoxMapper->findOneByColumn('assessment_id', $this->assessment->getId(), [ 'cache' => false ]);
+                if (!$before['assessment']['similarityCheckEnabled']) {
+                    /* If turnitin is enabled, retrofit any old submissions' documents
+                     */
+                    (new Turnitin\Retrofit(Turnitin\Group\Mapper::getInstance(), Turnitin\File\Mapper::getInstance(), $this->submissionFileMapper, SubmissionBoxMapper::getInstance()))->retrofit($this->assessment->getId());
+                } else {
+                    /* Note that $this->assessment and $assessment files do not have a primary id
+                     * when you first create a Due Work, which means you have to obtain them by
+                     * alternative means.
+                     *
+                     * new \Alaress_Probe($this->assessment->getAttachedFiles());
+                     *
+                     * TODO There should be an easier way to do this, but idk,
+                     *  something is going funny in the swamp
+                     */
+                    $submissionBox = $this->submissionBoxMapper->findOneByColumn('assessment_id', $this->assessment->getId(), [ 'cache' => false ]);
 
-                /* Create a turnitin_group queue record if one doesn't already exist
-                 * Upon save, set its status to Pending; we need to find out what files
-                 * needed to be micromanaged into turnitin
-                 */
-                try {
-                    $turnitinGroup = $this->turnitinGroupMapper->findOneByColumn('submission_box_id', $submissionBox->getId());
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $turnitinGroup = $this->turnitinGroupMapper->createModel()
-                        ->setSubmissionBoxId($submissionBox->getId());
+                    /* Create a turnitin_group queue record if one doesn't already exist
+                     * Upon save, set its status to Pending; we need to find out what files
+                     * needed to be micromanaged into turnitin
+                     */
+                    try {
+                        $turnitinGroup = $this->turnitinGroupMapper->findOneByColumn('submission_box_id', $submissionBox->getId());
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $turnitinGroup = $this->turnitinGroupMapper->createModel()
+                            ->setSubmissionBoxId($submissionBox->getId());
+                    }
+
+                    /* Set status to Pending; it needs to be processed asynchronously elsewhere
+                     * because we don't know what changed, and there are a lot of api shenanigans
+                     * to do
+                     */
+                    $turnitinGroup->setStatus(Turnitin\Group\Model::STATUS_TRANSMIT_PENDING);
+
+                    $this->turnitinGroupMapper->save($turnitinGroup);
                 }
-
-                /* Set status to Pending; it needs to be processed asynchronously elsewhere
-                 * because we don't know what changed, and there are a lot of api shenanigans
-                 * to do
-                 */
-                $turnitinGroup->setStatus(Turnitin\Group\Model::STATUS_TRANSMIT_PENDING);
-
-                $this->turnitinGroupMapper->save($turnitinGroup);
             }
         }
 
