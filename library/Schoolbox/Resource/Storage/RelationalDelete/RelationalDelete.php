@@ -13,7 +13,7 @@ use Eportfolio\CoverPhotoMapper;
 use Psr\Log\LoggerInterface;
 
 /**
- * Delete storage files and it's relationships with other entites.
+ * Delete storage files and it's relationships with other entities.
  *
  * @package Schoolbox\Resource\Storage\RelationalDelete
  */
