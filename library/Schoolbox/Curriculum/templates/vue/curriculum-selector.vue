@@ -10,11 +10,11 @@ import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 import { useSearchResultsStore } from './store/csSearchResultsStore';
 import { useModalStore } from './store/csModalStore';
 import { useModalActiveCodesStore } from './store/csModalActiveCodesStore';
-import CsHeading from './cs-heading.vue';
 import CsSearchInput from './cs-search-input.vue';
 import CsSelectedCodes from './cs-selected-codes.vue';
 import CsSearchResults from './cs-search-results.vue';
 import CsModal from './modal/cs-modal.vue';
+import CsActiveSelectedCodeModal from './cs-active-selected-code-modal.vue';
 
 
 const props = defineProps({
@@ -32,7 +32,15 @@ const props = defineProps({
     selectedCodes: {
         type: Array,
         required: false,
-        defalt: [],
+        default: [],
+    },
+    /**
+     * can only view the currently selected codes, not edit them 
+     */
+    isReadOnly: {
+        type: Boolean,
+        required: false,
+        default: true,
     },
 });
 
@@ -42,41 +50,41 @@ const curriculumSelectorEl = ref(null);
  * Start loading the curriculum data
  */
 onMounted(() => {
-    if (STORYBOOK_ENV) {
-        resetForStorybook();
+    checkForStorybook();
+    const store = useStore();
+    if (!props.isReadOnly && props.dataEndpoint !== '') {
+        store.load(props.dataEndpoint);
     }
-    if (props.dataEndpoint !== '') {
-        useStore().load(props.dataEndpoint);
-    }
-    if (props.selectedCodes.length > 0) {
+    if (props.selectedCodes.length > 0) { //add in any codes that have been selected previously
         useSelectedCodesStore().add(props.selectedCodes);
     }
+    store.isReadOnly = props.isReadOnly;
 });
 
 /**
  * When switching between stories, we need to reset the data models
  * as they persist between the stories otherwise
  */
-function resetForStorybook () {
-    useSelectedCodesStore().$reset();
-    useSearchResultsStore().$reset();
-    useModalStore().$reset();
-    useModalActiveCodesStore().$reset();
-    useStore().$reset(); 
+function checkForStorybook () {
+    if (STORYBOOK_ENV) {
+        useSelectedCodesStore().$reset();
+        useSearchResultsStore().$reset();
+        useModalStore().$reset();
+        useModalActiveCodesStore().$reset();
+        useStore().$reset(); 
+    }
 }
 
 </script>
 
 <template>
-   <div class="row" ref="curriculumSelectorEl">
-        <div class="small-12 columns">
-            <cs-heading />
-            <cs-selected-codes />
-            <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
-            <cs-search-results />
-        </div>
+   <div ref="curriculumSelectorEl">
+        <cs-selected-codes />
+        <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
+        <cs-search-results />
     </div>
     <cs-modal />
+    <cs-active-selected-code-modal />
 </template>
 
 <style lang="scss" scoped>

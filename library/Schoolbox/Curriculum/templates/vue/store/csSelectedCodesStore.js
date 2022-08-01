@@ -9,6 +9,7 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
 
     state: () => ({
         codes: [], //the currently selected codes
+        activeCode: null, //to show extra info on a selected code in a modal
     }),
 
     getters: {
@@ -29,6 +30,15 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
          */
         hasCodes () {
             return this.codes.length > 0;
+        },
+
+        /**
+         * To show further info on a selected code
+         * 
+         * @return { Boolean }
+         */
+        hasActiveCode () {
+            return this.activeCode !== null ? true : false;
         },
 
     },
@@ -79,6 +89,16 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
             this.codes  = [];
         },
         
+        /**
+         * set the active code, which would prompt the cs-active-selected-code-modal to open
+         * and if it's set to null we can listen for it to be set again
+         * 
+         * @param { Object }
+         */
+        setActiveCode (code) {
+            this.activeCode = code;
+        },
+
     },
    
 })

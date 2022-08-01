@@ -6,6 +6,7 @@
  */
 
 import { computed } from 'vue';
+import { useStore } from './store/curriculumSelectorStore';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 
 
@@ -19,14 +20,18 @@ const props = defineProps({
         default: () => {
             return {
                 id: 0,
-                name: 'name',
+                code: '',
+                name: '',
+                breadcrumb: '',
             }
         }
     },
 });
 
+const store = useStore();
+
 /**
- * Add in the code if it's available otherwise just show the title
+ * Just show the code, or just the name if it's available
  *
  * @returns { String }
  */
@@ -39,13 +44,11 @@ const title = computed(() => {
 });
 
 /**
- * Add in the code if it's available otherwise just show the title
- *
- * @returns { String }
+ * To open a modal that shows further info on the selected code
  */
-const titleAttr = computed(() => {
-    return `${props.code.breadcrumb}>${props.code.name}`;
-});
+function onTitleSelected () {
+    useSelectedCodesStore().setActiveCode (props.code);
+}
 
 /**
  * To remove from the selected list
@@ -57,9 +60,9 @@ function onRemoveSelected () {
 </script>
 
 <template>
-   <div class="selected-code sb-tooltip sb-tooltip--bottom" :title="titleAttr">
-        <span>{{ title }}</span>
-        <button class="remove-button icon-close" :aria-label="`Remove ${props.code.name}`" @click.prevent="onRemoveSelected" @keyup.enter="onRemoveSelected"></button>
+   <div class="selected-code sb-tooltip sb-tooltip--bottom" :title="props.code.name">
+        <button class="title-button" @click.prevent="onTitleSelected" @keyup.enter="onTitleSelected" :title="`View ${props.code.name}`">{{ title }}</button>
+        <button v-if="!store.isReadOnly" class="remove-button icon-close" :title="`Remove ${props.code.name}`" @click.prevent="onRemoveSelected" @keyup.enter="onRemoveSelected"></button>
     </div>
 </template>
 
@@ -70,10 +73,18 @@ function onRemoveSelected () {
     color: #000;
     display: flex;
     font-size: 0.8125rem;
+    gap: 0.5rem;
     min-height: auto;
     padding: 5px 10px;
     text-align: left;
     transition: all 0.3s;
+}
+
+.title-button {
+    background: var(--body-background);
+    margin: 0;
+    min-height: 0;
+    padding: 0;
 }
 
 .remove-button {
@@ -81,7 +92,6 @@ function onRemoveSelected () {
     border-radius: 1rem;
     flex: 0 0 1rem;
     height: 1rem;
-    margin-left: 0.5rem;
     min-height: 0;
     margin-top: 3px;
     padding: 0;

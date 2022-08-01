@@ -4,11 +4,23 @@
  * To list all the currently selected Curriculum codes
  */
 
+import { computed } from 'vue';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 import CsSelectedCode from './cs-selected-code.vue';
 
 
 const selectedCodesStore = useSelectedCodesStore();
+
+/**
+ * Add a comma separated string of the ids of the selected codes 
+ * for use in forms
+ *
+ * @returns { String }
+ */
+const curriculumCodes = computed(() => {
+    const justIds = selectedCodesStore.codes.map((code) => code.id);
+    return justIds.join(',');
+});
 
 </script>
 
@@ -21,6 +33,7 @@ const selectedCodesStore = useSelectedCodesStore();
         >
         </cs-selected-code>
     </div>
+    <input id="curriculumCodes[]" name="curriculumCodes[]" type="hidden" tabindex="-1" :value="curriculumCodes" />
 </template>
 
 <style lang="scss" scoped>

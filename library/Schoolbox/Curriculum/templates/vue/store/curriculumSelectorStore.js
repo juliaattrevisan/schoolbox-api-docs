@@ -12,7 +12,7 @@ export const useStore = defineStore('curriculumSelectorStore', {
         isLoading: true, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place, like updating a member access
-        toastEl: null, //so we don't need to pass it all around as a prop
+        isReadOnly: true, //can only view the currently selected codes, not edit them 
     }),
 
     getters: {

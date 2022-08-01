@@ -130,7 +130,7 @@ const highlightBreadcrumbSearch = computed(() => {
 function highlightSearchInElement (toHighlight) {
     let highlighted = toHighlight;
     modalActiveCodesStore.queryWordList.forEach((wordInSearch) => {
-        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^>]*>)`, 'ig'), (match) => {
+        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
             return `<mark>${match}</mark>`;
         });
     });
@@ -145,9 +145,9 @@ function highlightSearchInElement (toHighlight) {
 const containerClass = computed(() => {
     if (modalActiveCodesStore.isSearchActive) { //don't style when using search, as all the codes are on one level
         return '';
-    } else if (modalActiveCodesStore.isOnFirstNode && props.depth === 0 || modalActiveCodesStore.isOnSecondNode && props.depth === 0) {
+    } else if (modalActiveCodesStore.isOnFirstNode && props.depth === 0 || modalActiveCodesStore.isOnSecondNode && props.depth === 0) { 
         return 'parent-container';
-    } else if (modalActiveCodesStore.isOnFirstNode && props.depth === 1 || modalActiveCodesStore.isOnSecondNode && props.depth === 1) {
+    } else if (modalActiveCodesStore.isOnFirstNode && props.depth === 1 || modalActiveCodesStore.isOnSecondNode && props.depth === 1 && props.code.children.length > 0) {
         return 'first-child-container-with-border';
     } else if (modalActiveCodesStore.isOnThirdNode && props.depth === 0) { 
         return 'first-child-container';

@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * The modal that's used to select curriculum
+ * The modal that's used to help select curriculum
  */
 
 import { ref, watch } from 'vue';

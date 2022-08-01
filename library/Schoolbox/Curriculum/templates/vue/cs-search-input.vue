@@ -103,7 +103,7 @@ function onBrowseSelected () {
 </script>
 
 <template>
-    <div class="input-group">
+    <div v-if="!store.isReadOnly" class="input-group">
         <input
             v-if="isSelectorActive"
             v-model="searchResultsStore.query"
@@ -115,7 +115,6 @@ function onBrowseSelected () {
             @input="$event.target.composing = false"
         />
         <button v-if="store.hasLoadedOk" class="button icon-curriculum" title="Browse and select from the Curriculum" @click.prevent="onBrowseSelected">Browse</button>
-        <input name="curriculumCodes[]" type="hidden" tabindex="-1" value="" />
     </div>
 </template>
 

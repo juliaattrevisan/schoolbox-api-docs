@@ -264,7 +264,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          * @return { Array }
          */
         searchResults () {
-            return this.codesFlattened.filter(this.searchForMatches);
+            return this.codesFlattened.filter(this.filterResults);
         },
 
         /**
@@ -315,7 +315,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          *
          * @return { Boolean } true if found
          */
-         filterResults (code) {
+        filterResults (code) {
             return searchForMatches(code, this.queryWordList)
         },
 

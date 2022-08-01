@@ -75,7 +75,7 @@ const highlightBreadcrumbSearch = computed(() => {
 function highlightSearchInElement (toHighlight) {
     let highlighted = toHighlight;
     searchResultsStore.queryWordList.forEach((wordInSearch) => {
-        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^>]*>)`, 'ig'), (match) => {
+        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
             return `<mark>${match}</mark>`;
         });
     });
