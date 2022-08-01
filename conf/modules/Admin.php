@@ -120,7 +120,8 @@ class Admin extends ModuleLoader
         $this->loadModule($di, \Schoolbox\Admin\EmailDKIM\Module::class, '/adminv2/email-dkim');
 
         // Rubrics
-        $this->loadModule($di, \Schoolbox\Admin\Rubrics\ResultSets\Module::class, '/adminv2/rubric-results-sets');
-        $this->loadModule($di, \Schoolbox\Admin\Rubrics\ResultSet\Module::class, '/adminv2/rubric-results-set');
+        $this->loadModule($di, \Schoolbox\Admin\Rubrics\ResultSets\Module::class, '/adminv2/rubric-results-sets'); // TODO Remove this once /advminv2/rubric-result-set is working.
+        $this->loadModule($di, \Schoolbox\Admin\Rubrics\ResultSet\Module::class, '/adminv2/rubric-results-set');   // TODO Remove this once /advminv2/rubric-result-set is working.
+        $this->loadModule($di, \Schoolbox\Admin\RubricResultSet\Module::class, '/adminv2/rubric-result-set');
     }
 }
