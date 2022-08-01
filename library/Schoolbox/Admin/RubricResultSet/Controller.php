@@ -80,8 +80,9 @@ class Controller extends Base
                     'rubricResultRows'        => [],
                     'toastPopupMessage'       => '',
                     'toastPopupMessageType'   => '',
-                    'allBreadcrumbs'          => (
-                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getCreate'))
+                    'allBreadcrumbs'          => array_merge(
+                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList')),
+                        [['Create', '']]
                     )
                 ]
             ]
@@ -113,8 +114,9 @@ class Controller extends Base
                     'rubricResultRows'        => $this->mapper->findRubricResultRows((int)$resultSetId),
                     'toastPopupMessage'       => $toastPopupMessage,
                     'toastPopupMessageType'   => $toastPopupMessageType,
-                    'allBreadcrumbs'          => (
-                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getUpdate'))
+                    'allBreadcrumbs'          => array_merge(
+                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList')),
+                        [['Update', '']]
                     )
                 ]
             ]
