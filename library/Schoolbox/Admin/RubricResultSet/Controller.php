@@ -64,6 +64,22 @@ class Controller extends Base
     }
 
     /**
+     * @throws RouteNotFound
+     */
+    public function getCreate(): void
+    {
+        $this->getUpdate(null);
+    }
+
+    /**
+     * @throws RouteNotFound
+     */
+    public function postCreate(): void
+    {
+        $this->postUpdate();
+    }
+
+    /**
      * Load templates/index.twig using data obtained in this function.
      * @throws RouteNotFound
      */
@@ -76,7 +92,7 @@ class Controller extends Base
                     'MAX_ROWS_PER_RESULT_SET' => self::MAX_ROWS_PER_RESULT_SET,
                     'pageCurrent'             => $this->router->generate('adminRubricResultSet.getList'),
                     'resultSetId'             => $resultSetId,
-                    'rubricResultRows'        => (($resultSetId === null)? []: $this->mapper->findRubricResultRows($resultSetId)),
+                    'rubricResultRows'        => (($resultSetId === null) ? [] : $this->mapper->findRubricResultRows($resultSetId)),
                     'allBreadcrumbs'          => array_merge(
                         (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList')),
                         [['Update', '']]
@@ -87,40 +103,7 @@ class Controller extends Base
     }
 
     /**
-     * Load templates/index.twig using data obtained in this function.
-     * @throws RouteNotFound
-     */
-    public function getCreate(): void
-    {
-        $this->getUpdate(null);
-//        $this->getResponse()->content->set(
-//            [
-//                // Same template and data schema as for getUpdate().
-//                'template' => '@adminRubricResultSet/create.twig',
-//                'data'     => [
-//                    'MAX_ROWS_PER_RESULT_SET' => self::MAX_ROWS_PER_RESULT_SET,
-//                    'pageCurrent'             => $this->router->generate('adminRubricResultSet.getList'),
-//                    'resultSetId'             => null,
-//                    'rubricResultRows'        => [],
-//                    'allBreadcrumbs'          => array_merge(
-//                        (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList')),
-//                        [['Create', '']]
-//                    )
-//                ]
-//            ]
-//        );
-    }
-
-    /**
-     * @throws RouteNotFound
-     */
-    public function postCreate(): void
-    {
-        $this->postUpdate();
-    }
-
-    /**
-     * Save $_POSTed data to database, then redirect to getList().
+     * Save $_POSTed data to database, then redirect to getList.
      * @throws RouteNotFound
      */
     public function postUpdate(): void

@@ -35,7 +35,7 @@ class Module extends BaseModule
         $this->register('POST', '/create', 'postCreate', $perms);
         $this->register('GET', '/{resultSetId}/update', 'getUpdate', $perms);
         $this->register('POST', '/{resultSetId}/update', 'postUpdate', $perms);
-        $this->register('GET', '/{resultSetId}/delete', 'getDelete', $perms); // TODO: Change to post.
+        $this->register('POST', '/{resultSetId}/delete', 'postDelete', $perms);
         $this->register('GET', '', 'getList', $perms);
     }
 
