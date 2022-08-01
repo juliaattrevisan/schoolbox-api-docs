@@ -75,7 +75,7 @@ class Controller extends Base
                 'template' => '@adminRubricResultSet/create.twig',
                 'data'     => [
                     'MAX_ROWS_PER_RESULT_SET' => self::MAX_ROWS_PER_RESULT_SET,
-                    'pageCurrent'             => $this->router->generate('adminRubricResultSet.getCreate'),
+                    'pageCurrent'             => $this->router->generate('adminRubricResultSet.getList'),
                     'resultSetId'             => null,
                     'rubricResultRows'        => [],
                     'toastPopupMessage'       => '',
@@ -109,7 +109,7 @@ class Controller extends Base
                 'template' => '@adminRubricResultSet/create.twig',
                 'data'     => [
                     'MAX_ROWS_PER_RESULT_SET' => self::MAX_ROWS_PER_RESULT_SET,
-                    'pageCurrent'             => $this->router->generate('adminRubricResultSet.getUpdate'),
+                    'pageCurrent'             => $this->router->generate('adminRubricResultSet.getList'),
                     'resultSetId'             => $resultSetId,
                     'rubricResultRows'        => $this->mapper->findRubricResultRows((int)$resultSetId),
                     'toastPopupMessage'       => $toastPopupMessage,
