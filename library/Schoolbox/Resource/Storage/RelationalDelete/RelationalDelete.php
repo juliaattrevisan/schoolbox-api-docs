@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\RelationalDelete;
 
+use Component\Eportfolio\FileListMapper;
 use Eportfolio\CoverPhotoMapper;
 use Schoolbox\Resource\Storage;
 use Psr\Log\LoggerInterface;
@@ -117,7 +118,8 @@ class RelationalDelete implements IRelationalDelete
             ),
             new \Component\Eportfolio\RelationalDelete(
                 \Schoolbox\Resource\My\File\Mapper::getInstance(),
-                $this->logger
+                $this->logger,
+                FileListMapper::getInstance(),
             ),
 
             // Pastoral
@@ -145,7 +147,8 @@ class RelationalDelete implements IRelationalDelete
             // Plagscan
             new \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\RelationalDelete(
                 \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::getInstance(),
-                $this->logger
+                $this->logger,
+                \Database::getInstance(),
             ),
 
             // Assessments
@@ -281,7 +284,8 @@ class RelationalDelete implements IRelationalDelete
             // EOTC Meta data
             new \EOTC\RelationalDelete(
                 \EOTC\EventMetadataMapper::getInstance(),
-                $this->logger
+                $this->logger,
+                \Database::getInstance(),
             ),
         ];
     }

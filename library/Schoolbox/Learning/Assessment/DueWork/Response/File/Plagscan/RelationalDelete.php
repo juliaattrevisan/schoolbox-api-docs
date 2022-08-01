@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
+use Alaress\IDatabase;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage\RelationalDelete\Deletable;
@@ -26,11 +27,11 @@ class RelationalDelete extends Deletable
      * @param Mapper          $mapper
      * @param LoggerInterface $logger
      */
-    public function __construct(Mapper $mapper, LoggerInterface $logger)
+    public function __construct(Mapper $mapper, LoggerInterface $logger, IDatabase $database)
     {
         parent::__construct($mapper, $logger, 'storage_hash');
 
-        $this->database = \Database::getInstance();
+        $this->database = $database;
     }
 
     /**

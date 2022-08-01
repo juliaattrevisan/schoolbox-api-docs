@@ -29,11 +29,11 @@ class RelationalDelete extends Deletable
      * @param Mapper          $mapper
      * @param LoggerInterface $logger
      */
-    public function __construct(Mapper $mapper, LoggerInterface $logger)
+    public function __construct(Mapper $mapper, LoggerInterface $logger, IDatabase $database)
     {
         parent::__construct($mapper, $logger);
 
-        $this->database = $this->mapper->getDatabase();
+        $this->database = $database;
     }
 
     /**
