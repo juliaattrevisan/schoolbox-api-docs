@@ -89,13 +89,13 @@ class Controller extends Base
             [
                 'template' => '@adminRubricResultSet/create.twig',
                 'data'     => [
-                    'MAX_ROWS_PER_RESULT_SET' => self::MAX_ROWS_PER_RESULT_SET,
-                    'pageCurrent'             => $this->router->generate('adminRubricResultSet.getList'),
-                    'resultSetId'             => $resultSetId,
-                    'rubricResultRows'        => (($resultSetId === null) ? [] : $this->mapper->findRubricResultRows($resultSetId)),
-                    'allBreadcrumbs'          => array_merge(
+                    'maxRowsPerResultSet' => self::MAX_ROWS_PER_RESULT_SET,
+                    'pageCurrent'         => $this->router->generate('adminRubricResultSet.getList'),
+                    'resultSetId'         => $resultSetId,
+                    'rubricResultRows'    => (($resultSetId === null) ? [] : $this->mapper->findRubricResultRows($resultSetId)),
+                    'allBreadcrumbs'      => array_merge(
                         (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList')),
-                        [['Update', '']]
+                        [['Update']]
                     )
                 ]
             ]

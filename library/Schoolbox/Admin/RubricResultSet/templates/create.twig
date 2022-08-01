@@ -35,7 +35,7 @@ label.rubric-result-set-row-label > span.input-container {
         let nRows           = document.getElementsByClassName('rubric-value-span').length;
 
         if (nRows > 0) {
-            if (nRows > {{ MAX_ROWS_PER_RESULT_SET }}) {
+            if (nRows > {{ maxRowsPerResultSet }}) {
                 // We limit the number of rows here to an arbitrarily chosen sensible value.
                 return;
             }
@@ -78,7 +78,7 @@ label.rubric-result-set-row-label > span.input-container {
         rowLi.remove();
         renumberRows();
 
-        if (document.getElementById('rows-container-ul').children.length == 0) {
+        if (document.getElementById('rows-container-ul').children.length === 0) {
             document.getElementById('empty-state-island-div').style.display = ''; // Show empty state box.
             togglePlusAndSaveButtons(false);
         } else {
@@ -105,26 +105,30 @@ label.rubric-result-set-row-label > span.input-container {
     }
 
     /**
-     *
+     * Show or hide the plus and save buttons depending on the supplied boolean.
      */
     function togglePlusAndSaveButtons(boolShow) {
         let displayValue = ((boolShow)? '': 'none');
         document.getElementById('save-button'              ).style.display = displayValue;
         document.getElementById('plus-button-container-div').style.display = displayValue;
     }
-</script>
-<script>
-    // This script block uses JQuery.
 
-    $(function() {
-        $('#rubricResultSetForm').alaressValidate();
+    $(
+        /**
+         * Configure validation on page load.
+         */
+        function () {
+            $('#rubricResultSetForm').alaressValidate();
 
-        $('#rubricResultSetForm input').each(function(index, element) {
-            if (element.getAttribute('type') != 'hidden') {
-                $(element).rules('add', {requiredNotBlank: true});
-            }
-        });
-    });
+            $('#rubricResultSetForm input').each(
+                function(index, element) {
+                    if (element.getAttribute('type') !== 'hidden') {
+                        $(element).rules('add', {requiredNotBlank: true});
+                    }
+                }
+            );
+        }
+    );
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -133,7 +137,7 @@ label.rubric-result-set-row-label > span.input-container {
     <div class="admin-content">
         <!-- Main content section starts here. -->
         <div class="row">
-            <div id="empty-state-island-div" class="small-12 island"{% if rubricResultRows %}style="display:none"{% endif %}>
+            <div id="empty-state-island-div" class="small-12 island"{% if rubricResultRows %} style="display:none"{% endif %}>
                 <div class="empty-state">
                     <i class="icon-list"></i>
                     <p>This rubrics result set is empty.</p>
@@ -165,13 +169,13 @@ label.rubric-result-set-row-label > span.input-container {
                                 </li>
                             {% endfor %}
                         </ul>
-                        <div id="plus-button-container-div" class="component-action"{% if not rubricResultRows %}style="display:none"{% endif %}>
+                        <div id="plus-button-container-div" class="component-action"{% if not rubricResultRows %} style="display:none"{% endif %}>
                             <section>
                                 <a class="button" onclick="onClickPlusButton()">Add Row</a>
                             </section>
                         </div>
                     </section>
-                    <input id="save-button" type="submit" value="Save"{% if not rubricResultRows %}style="display:none"{% endif %}>
+                    <input id="save-button" type="submit" value="Save"{% if not rubricResultRows %} style="display:none"{% endif %}>
                 </form>
             </div>
         </div>

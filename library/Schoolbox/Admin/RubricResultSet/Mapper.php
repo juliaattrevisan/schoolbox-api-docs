@@ -54,9 +54,8 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param array $items
+     * @param int $resultSetId
      * @return void
-     * @throws Exception
      */
     public function deleteRubricResultSet(int $resultSetId): void
     {
@@ -84,7 +83,8 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param int|null $resultSetIdOrNull (Supply -1 to create a new rubric result set.  MAX(resultset_id)+1 will be used.)
+     * @param int|null $resultSetIdOrNull
+     *    (Supply null to create a new rubric result set.  COALESCE(MAX(resultset_id)+1, 1) will be used for the new resultSetId.)
      * @param array $labelsInOrder
      * @return int ($resultSetIdOrNull)
      */
