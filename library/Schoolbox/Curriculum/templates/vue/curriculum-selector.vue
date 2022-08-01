@@ -23,27 +23,47 @@ const props = defineProps({
      */
     dataEndpoint: {
         type: String,
-        required: true,
+        required: false,
+        default: '',
+    },
+    /**
+     * the codes already previously selected
+     */
+    selectedCodes: {
+        type: Array,
+        required: false,
+        defalt: [],
     },
 });
 
-const store = useStore();
 const curriculumSelectorEl = ref(null); 
 
 /**
  * Start loading the curriculum data
- * 
- * @TODO - move this storybook resets into something else... 
  */
 onMounted(() => {
+    if (STORYBOOK_ENV) {
+        resetForStorybook();
+    }
+    if (props.dataEndpoint !== '') {
+        useStore().load(props.dataEndpoint);
+    }
+    if (props.selectedCodes.length > 0) {
+        useSelectedCodesStore().add(props.selectedCodes);
+    }
+});
+
+/**
+ * When switching between stories, we need to reset the data models
+ * as they persist between the stories otherwise
+ */
+function resetForStorybook () {
     useSelectedCodesStore().$reset();
     useSearchResultsStore().$reset();
     useModalStore().$reset();
     useModalActiveCodesStore().$reset();
-    store.$reset(); //ensure the store state is as it's initially set, this is just for Storybook when switching between stories
-    store.load(props.dataEndpoint);
-});
-
+    useStore().$reset(); 
+}
 
 </script>
 

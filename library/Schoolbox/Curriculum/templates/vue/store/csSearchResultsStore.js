@@ -75,7 +75,7 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
          * @return { Array }
          */
         results () {
-            const fullResults = this.codesFlattened.filter(this.searchForMatches);
+            const fullResults = this.codesFlattened.filter(this.filterResults);
             if (fullResults.length > CAPPED_RESULTS_LENGTH) { //too many results, so cap them
                 this.isResultsCapped = true; //to display the results are capped note
                 this.resultsNotShownCount = fullResults.length - CAPPED_RESULTS_LENGTH; //and how many are actually capped
@@ -107,20 +107,8 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
          *
          * @return { Boolean } true if found
          */
-        searchForMatches (code) {
-            let wordMatchCount = 0;
-            this.queryWordList.forEach(wordInSearch => {
-                if (code.code?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-                    wordMatchCount++;
-                }
-                if (code.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-                    wordMatchCount++;
-                }
-                if (code.breadcrumb?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-                    wordMatchCount++;
-                }
-            });
-            return wordMatchCount > 0 ? true : false; //if there's any matches
+        filterResults (code) {
+            return searchForMatches(code, this.queryWordList)
         },
 
         /**
@@ -162,7 +150,7 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
  * 
  * @param { Object }
  */
-function flattenCodes (obj) {
+export function flattenCodes (obj) {
     let array = [obj];
     if (obj.children && obj.children.length > 0) {
         obj.children.forEach((child) => {
@@ -171,4 +159,29 @@ function flattenCodes (obj) {
         obj.children = []; 
     }
     return array;
+}
+
+/**
+ * find all those results that match any search words
+ * within the the code, name or breadcrumb fields
+ *
+ * @params { Object }
+ * @params { Array }
+ *
+ * @return { Boolean } true if found
+ */
+export function searchForMatches (code, queryWordList) {
+    let wordMatchCount = 0;
+    queryWordList.forEach(wordInSearch => {
+        if (code.code?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+            wordMatchCount++;
+        }
+        if (code.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+            wordMatchCount++;
+        }
+        if (code.breadcrumb?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+            wordMatchCount++;
+        }
+    });
+    return wordMatchCount > 0 ? true : false; //if there's any matches
 }

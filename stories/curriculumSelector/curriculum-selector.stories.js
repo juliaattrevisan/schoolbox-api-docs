@@ -8,6 +8,7 @@ import { data as allCurriculumData } from './dataCurriculumSelector';
 import { data as vicCurriculumData } from './dataVicCurriculum';
 
 const dataEndpoint = '/curriculumData'; 
+const selectedCodes = []; 
 
 const mswHandlers = [
     rest.get(dataEndpoint, (req, res, ctx) => {
@@ -20,6 +21,7 @@ const mswHandlers = [
 export default {
     args: {
         dataEndpoint: dataEndpoint,
+        selectedCodes: selectedCodes,
     },
     component: CurriculumSelector,
     decorators: [
@@ -98,13 +100,11 @@ SingleCurriculumGroup.parameters = {
     }
 }
 
-export const SearchExamples = Template.bind({});
-SearchExamples.decorators = [
-    () => ({ 
-        template: `
-        <story />
-        <p>Paste Codes: GCCCT-ALR, GCCCT-DCDCA, GCCCT-EPO, GCN-RUPR, GCN-IPR, GCN-APR</p>
-        <p>Search Terms: self-awareness</p>
-        `
-    })
-]
+export const PreSelectedCodes = Template.bind({});
+PreSelectedCodes.args = {
+    ...Default.args,
+    selectedCodes: [
+        { "id":26, "name":"Generate solutions to challenges and learning area tasks", "code":"GCICT-GSCLAT", "description":"", "reference":null, "children":[], "area":null, "level":null, "breadcrumb":"" },
+        { "id":45, "name":"Challenge stereotypes and prejudices", "code":"GCIU-CSP", "description":"", "reference":null, "children":[], "area":null, "level":null, "breadcrumb":"" }
+    ],
+}

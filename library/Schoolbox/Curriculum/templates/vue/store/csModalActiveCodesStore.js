@@ -5,6 +5,7 @@
 
 import { defineStore } from 'pinia';
 import { useCodesStore } from './csCodesStore';
+import { flattenCodes, searchForMatches } from './csSearchResultsStore';
 import cloneDeep from 'lodash/cloneDeep';
 
 const UNSET_ID = 0; 
@@ -263,7 +264,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          * @return { Array }
          */
         searchResults () {
-            return this.codesFlattened.filter(this.searchForCodeAndName);
+            return this.codesFlattened.filter(this.searchForMatches);
         },
 
         /**
@@ -308,26 +309,14 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * find all those results that match any search words
-         * within the the code or name fields
+         * within the the code, name or breadcrumb fields
          *
          * @params { Object }
          *
          * @return { Boolean } true if found
          */
-        searchForCodeAndName (code) {
-            let wordMatchCount = 0;
-            this.queryWordList.forEach(wordInSearch => {
-                if (code.code?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-                    wordMatchCount++;
-                }
-                if (code.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-                    wordMatchCount++;
-                }
-                if (code.breadcrumb?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-                    wordMatchCount++;
-                }
-            });
-            return wordMatchCount > 0 ? true : false; //if there's any matches
+         filterResults (code) {
+            return searchForMatches(code, this.queryWordList)
         },
 
         /**
@@ -353,21 +342,4 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         name: '-',
         children: [], 
     }
-}
-
-/**
- * The codes are nested with children:[], so we pull them all
- * out into a single level when searching 
- * 
- * @param { Object }
- */
- function flattenCodes (obj) {
-    let array = [obj];
-    if (obj.children && obj.children.length > 0) {
-        obj.children.forEach((child) => {
-            array = [...array, ...flattenCodes(child)];
-        });
-        obj.children = []; 
-    }
-    return array;
 }
