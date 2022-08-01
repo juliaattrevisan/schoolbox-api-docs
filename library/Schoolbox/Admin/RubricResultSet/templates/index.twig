@@ -49,27 +49,6 @@ div.clear-floats
     <div class="admin-content">
         <!-- Main content section starts here. -->
         <div class="row">
-            <div class="small-12 island">
-                <section>
-                    <header class="list-header actions-small-0">
-                    </header>
-                    <div class="small-12 medium-12 column">
-                        <p>
-                            Edit rubric result set templates here.
-                        </p>
-                        <p>
-                            Each set should be a discrete list of items of a single measurement;
-                            for example, 'Very Good' and 'Yes' should not be in the same set.
-                        </p>
-                        <p>
-                            Deleting or modifying a result set here will not affect any previous use of that result set elsewhere in Schoolbox.
-                            This is because the result sets here are just templates that are copied to create new result sets on rubrics.
-                        </p>
-                    </div>
-                <section>
-            </div>
-        </div>
-        <div class="row">
             {% if not rubricsByResultSetId %}
                 <div id="empty-state-island-div" class="small-12 island">
                     <div class="empty-state">
@@ -81,7 +60,7 @@ div.clear-floats
             {% else %}
                 <div id="rubric-rows-island-div" class="small-12 island">
                     <div class="create-new-button-container-div">
-                        <a class='button icon-add' href="/adminv2/rubric-result-set/create">Create new result set</a>
+                        <a class='button icon-add' href="/adminv2/rubric-result-set/create"></a>
                     </div>
                     <section>
                         <header class="list-header actions-small-0">
