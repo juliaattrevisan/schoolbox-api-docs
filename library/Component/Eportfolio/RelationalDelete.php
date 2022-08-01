@@ -11,9 +11,8 @@ namespace Component\Eportfolio;
 
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\RelationalDelete\Deletable;
-use Schoolbox\Resource\Storage\RelationalDelete\IRelationalDelete;
 
-class RelationalDelete extends Deletable implements IRelationalDelete
+class RelationalDelete extends Deletable
 {
     /**
      * @inheritDoc

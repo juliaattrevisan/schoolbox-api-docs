@@ -9,10 +9,9 @@ declare(strict_types=1);
 
 namespace SocialStream\Cache;
 
-use Schoolbox\Resource\Storage\RelationalDelete\IRelationalDelete;
 use Schoolbox\Resource\Storage\RelationalDelete\Nullable;
 
-class RelationalDelete extends Nullable implements IRelationalDelete
+class RelationalDelete extends Nullable
 {
     /**
      * @var string
