@@ -75,9 +75,10 @@ function initColourPickers () {
         allowEmpty: true,
     });
     $(COLOUR_PICKERS_SELECTOR).on('change.spectrum, move.spectrum', (event, colour) => { 
-        if (colour instanceof tinycolor) { //only apply when there's a colour, not when the colour is cleared
-            onColourChange(event.currentTarget, colour);
-        }
+        //apply when there's a colour selected, otherwise set the colour as black transparent,
+        //as the 'Clear Color Selection' button has been seleced
+        const colourAsRGB = colour instanceof tinycolor ? colour.toRgbString() : 'rgba(0, 0, 0, 0)';
+        onColourChange(event.currentTarget, colourAsRGB);
     });
 }
 
@@ -86,11 +87,10 @@ function initColourPickers () {
  * ensure the new value is saved within the COLOURS object
  * 
  * @param { Element }
- * @param { Object }
+ * @param { String }
  */
-function onColourChange (element, colour) {
+function onColourChange (element, colourAsRGB) {
     const elementId = element.id;
-    const colourAsRGB = colour.toRgbString(); //to apply to the set style
     const selectedColumnCheckboxes = getSelectedColumnCheckboxes();
     for (let i = 0; i < selectedColumnCheckboxes.length; i++) { //run though each selected column and apply the colour change
         const colourId = `${selectedColumnCheckboxes[i].id}_${elementId}`; //for example 'top_head_font'
