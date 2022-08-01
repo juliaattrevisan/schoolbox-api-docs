@@ -8,8 +8,6 @@
  * 
  */
 
-import UpdateHomepageEvents from '../updateHomepageEvents';
-
 const COLOUR_PICKERS_SELECTOR = '[data-colorpicker]';
 const COLOURS = colours; //is a global variable from templates/core/homepage/index.html
 
@@ -172,7 +170,9 @@ export function undoColourChanges () {
  */
 function updateAllColours (colourList) {
     for (const [key, value] of Object.entries(colourList)) { //loop through the key/value pairs to revert all colours back
-        updateColour(key, value); //in this case key is 'top_head_font' and value could be 'rgba()'
+        //need to ensure assigned colour is always rgb, as if we are moving from rgba to hex, the alpha will not convert
+        const colourAsRGB = tinycolor(value).toRgbString(); 
+        updateColour(key, colourAsRGB); //in this case key is 'top_head_font' and value could be 'rgba()'
     }
     displayDefaultColourPickerColours(); //update the colour pickers to reflect the reset
 }
