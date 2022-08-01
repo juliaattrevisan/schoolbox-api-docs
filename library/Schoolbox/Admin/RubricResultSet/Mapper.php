@@ -92,21 +92,12 @@ class Mapper extends BaseMapper
     {
         if ($resultSetIdOrNull === null) {
             $stmt = $this->database->prepare(
-                'SELECT resultset_id
-                FROM rubric_result
-                ORDER BY resultset_id DESC
-                LIMIT 1'
+                'SELECT COALESCE(MAX(resultset_id)+1, 1) AS resultSetId
+                FROM rubric_result'
             );
             $stmt->execute();
 
-            $rows = $stmt->fetchAll();
-
-            if (count($rows) === 0) {
-                $resultSetId = 1;
-            } else {
-                $maxResultSetId = (int)$rows[0]['resultset_id'];
-                $resultSetId    = $maxResultSetId + 1;
-            }
+            $resultSetId = $stmt->fetchColumn();
         } else {
             $resultSetId = $resultSetIdOrNull;
         }
@@ -134,10 +125,9 @@ class Mapper extends BaseMapper
                 continue;
             }
 
-            /* Forcibly truncate $label values, so they don't exceed Model::LABEL_MAXLENGTH chars.
-             * This is the maximum width allowed in our db schema and will cause sentry errors
-             * unless we forcibly ensure that it doesn't exceed the space available
-             */
+            // Forcibly truncate $label values, so they don't exceed Model::LABEL_MAXLENGTH chars.
+            // This is the maximum width allowed in our db schema and will cause sentry errors
+            // unless we forcibly ensure that it doesn't exceed the space available
             $truncatedLabel = mb_substr($label, 0, Model::LABEL_MAXLENGTH, 'UTF-8');
 
             $sqlInsertStmt->execute(
