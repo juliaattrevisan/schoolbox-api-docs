@@ -10,6 +10,7 @@ import { useStore } from './store/manageGroupStore';
 import { useMembersStore } from './store/manageGroupMembersStore';
 import { useSettingsStore } from './store/manageGroupSettingsStore';
 import { useDisbandStore } from './store/manageGroupDisbandStore';
+import Endpoints from './manageGroupEndpoints';
 
 
 const store = useStore();
@@ -36,14 +37,14 @@ function onUpdateSettingsSelected () {
  *
  */
 function onEmailGroupSelected () {
-
+    window.location.href = Endpoints.SEND_EMAIL + '?folderId=105';
 }
 
 /**
  *
  */
 function onEmailGroupParentsSelected () {
-
+    window.location.href = Endpoints.SEND_EMAIL + '?folderId=105&role=parent';
 }
 
 /**

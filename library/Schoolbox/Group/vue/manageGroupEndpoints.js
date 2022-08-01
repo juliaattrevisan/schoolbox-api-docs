@@ -11,4 +11,5 @@ export default Object.seal({
     ADD_MEMBERS: '',
     UPDATE_SETTINGS: '',
     DISBAND_GROUP: '',
+    SEND_EMAIL: '',
 });

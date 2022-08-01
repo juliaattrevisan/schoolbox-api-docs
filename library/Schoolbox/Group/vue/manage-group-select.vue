@@ -11,6 +11,7 @@ import { useMembersStore } from './store/manageGroupMembersStore';
 import { useRemoveMembersStore } from './store/manageGroupRemoveMembersStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
 import ManageGroupSelectAccess from './manage-group-select-access.vue';
+import Endpoints from './manageGroupEndpoints';
 
 
 const store = useStore(); //to disable butons on processing
@@ -86,7 +87,7 @@ function onClearMemberSelection () {
  * Email the selected group members
  */
 function onEmailMembersSelected () {
-    console.warn('onEmailMembersSelected');
+    window.location.href = Endpoints.SEND_EMAIL + '?folderId=105&userIds=';
 }
 
 /**

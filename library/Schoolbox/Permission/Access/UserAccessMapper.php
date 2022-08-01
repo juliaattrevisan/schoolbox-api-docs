@@ -42,7 +42,6 @@ use function in_array;
  */
 class UserAccessMapper extends Mapper
 {
-
     /**
      * @return void
      */
@@ -96,7 +95,6 @@ class UserAccessMapper extends Mapper
         }
     }
 
-
     /**
      * Determine whether $folder has a $user of type 3
      *
@@ -117,6 +115,7 @@ class UserAccessMapper extends Mapper
 
         return false;
     }
+
     /**
      * Determine whether $user owns $folder
      *
@@ -266,9 +265,9 @@ class UserAccessMapper extends Mapper
     /**
      * @param FolderModel       $folder
      * @param GenericCollection $users
-     * @return GenericCollection
+     * @return Collection
      */
-    public function findForFolderUser(Model $folder, GenericCollection $users): GenericCollection
+    public function findForFolderUser(Model $folder, GenericCollection $users): Collection
     {
         $users = $users->indexBy('id');
         return $this->findByColumnList(

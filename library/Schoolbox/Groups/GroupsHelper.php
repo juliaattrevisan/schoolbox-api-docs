@@ -12,7 +12,6 @@ namespace Schoolbox\Groups;
 use Alaress\Color\ColorFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverride;
@@ -34,11 +33,15 @@ class GroupsHelper
     public const NOTENROLED = 'notEnroled';
     public const PENDING    = 'pending';
 
-    private GroupMapper            $groupMapper;
-    private UserAccessMapper       $userAccessMapper;
-    private FolderMapper           $folderMapper;
+    private GroupMapper $groupMapper;
+
+    private UserAccessMapper $userAccessMapper;
+
+    private FolderMapper $folderMapper;
+
     private Timetable_ColourMapper $timetableColourMapper;
-    private RerouteOverrideMapper  $reRouteOverrideMapper;
+
+    private RerouteOverrideMapper $reRouteOverrideMapper;
 
     /**
      * constructor for dependency injection
@@ -95,7 +98,6 @@ class GroupsHelper
      *
      * @param User                   $user
      * @param GenericCollection      $accesses
-     * @param GenericCollection|null $folders
      */
     public function populateNotification(User $user, GenericCollection $accesses)
     {

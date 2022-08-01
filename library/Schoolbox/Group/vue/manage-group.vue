@@ -61,6 +61,13 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    /**
+     * the endpoint to send email
+     */
+    sendEmailEndpoint: {
+        type: String,
+        required: true,
+    },
 });
 
 const store = useStore();
@@ -77,6 +84,7 @@ onBeforeMount(() => {
     Endpoints.ADD_MEMBERS = props.addMembersEndpoint;
     Endpoints.UPDATE_SETTINGS = props.updateSettingsEndpoint;
     Endpoints.DISBAND_GROUP = props.disbandGroupEndpoint;
+    Endpoints.SEND_EMAIL = props.sendEmailEndpoint;
 });
 
 /**

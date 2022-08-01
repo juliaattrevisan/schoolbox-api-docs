@@ -127,5 +127,4 @@ class Module extends BaseModule
 
         return $mapper;
     }
-
 }

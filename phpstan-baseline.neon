@@ -6151,11 +6151,6 @@ parameters:
 			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
 
 		-
-			message: "#^Variable \\$roleMapper in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Permission/Access/UserAccessMapper.php
-
-		-
 			message: "#^Property Schoolbox\\\\Picker\\\\DateTime\\\\Controller\\:\\:\\$userMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Picker/DateTime/Controller.php
@@ -6254,11 +6249,6 @@ parameters:
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 7
 			path: library/Schoolbox/Realtime/Controller.php
-
-		-
-			message: "#^Method Schoolbox\\\\Realtime\\\\Message\\\\RerouteOverrideMapper\\:\\:isRouteMuted\\(\\) should return string but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Message/RerouteOverrideMapper.php
 
 		-
 			message: "#^Method Schoolbox\\\\Realtime\\\\Message\\\\RoutePermission\\:\\:getRole\\(\\) should return Schoolbox\\\\Role but returns int\\.$#"

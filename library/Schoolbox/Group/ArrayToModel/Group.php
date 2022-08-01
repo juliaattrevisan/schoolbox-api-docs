@@ -10,15 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Group\ArrayToModel;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
-use Schoolbox\Groups\GroupsHelper;
-use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 
 /**
- * Translator for translating an array representation of learning moment
- * evidence into a model.
- *
- * Used when translating JSON passed in a request body into a model, so that it
- * may be persisted.
+ * Translator for translating an array representation of group into a model.
  */
 class Group extends Base
 {
@@ -31,21 +25,15 @@ class Group extends Base
             $model = new \Schoolbox\Resource\Group();
         }
 
-        $fields = [
-            'access'        => [
-                'type'   => 'enum',
-                'values' => ['admin', 'write', 'read'],
-            ],
-            'isNotificationsEnabled'   => [
-                'type' => 'boolean',
-            ],
-            'isForceFollow' => [
-                'type' => 'boolean',
-            ],
-        ];
+        $notificationEnabled = $array['settings']['isNotificationsEnabled'] ?? false;
+        $forceFollow         = $array['settings']['isForceFollow'] ?? false;
+        $type                =
+            \Schoolbox\Resource\Group::TYPE_NAME_TO_VAL[$array['settings']['access'] ?? '']
+            ?? \Schoolbox\Resource\Group::PRIVATE_GROUP;
 
-        $model->setType();
+        $model->setNotificationDisabled(!$notificationEnabled)
+              ->setForceFollow($forceFollow && $notificationEnabled)
+              ->setType($type);
         return $model;
-
     }
 }

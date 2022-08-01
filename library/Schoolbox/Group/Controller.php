@@ -37,8 +37,6 @@ class Controller extends Base
 
     private UserAccessMapper $userAccessMapper;
 
-    private FolderMapper $folderMapper;
-
     private RerouteOverrideMapper $rerouteOverrideMapper;
 
     private GroupsHelper $groupsHelper;
@@ -54,7 +52,6 @@ class Controller extends Base
         $this->userMapper            = $userMapper;
         $this->groupMapper           = $groupMapper;
         $this->userAccessMapper      = $userAccessMapper;
-        $this->folderMapper          = $folderMapper;
         $this->rerouteOverrideMapper = $rerouteOverrideMapper;
         $this->groupsHelper          = new GroupsHelper(
             $groupMapper,
@@ -105,11 +102,11 @@ class Controller extends Base
             );
         $data['groupId']      = $folder->getId();
         $data['settings']     = [
-            'access'                 => $group->getTypeString(),
+            'access'                 => $group ? $group->getTypeString() : '',
             'isNotificationsEnabled' => $groupMessagesEnabled,
-            'isForceFollow'          => $group->getForceFollow(),
+            'isForceFollow'          => $group && $group->getForceFollow(),
         ];
-        $data['members']      = $this->groupsHelper->getGroupUsers($group);
+        $data['members']      = $group ? $this->groupsHelper->getGroupUsers($group) : [];
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput($data)
@@ -125,7 +122,7 @@ class Controller extends Base
     public function removeMembers(Folder $folder)
     {
         $requestBody = json_decode(json_encode($this->request->content->get()), true);
-        $userIds     = array_map('intval', explode(',', $requestBody['members']));
+        $userIds     = array_map('intval', explode(',', $requestBody['members'] ?? []));
 
         $users        = $this->userMapper->findByColumnList(['id' => $userIds]);
         $userAccesses = $this->userAccessMapper->findForFolderUser($folder, $users);
@@ -135,7 +132,7 @@ class Controller extends Base
             $this->getResponse()->content->set(
                 $this->buildJsonOutput(['success' => false])
             );
-            exit;
+            return;
         }
 
         $this->getResponse()->content->set(
@@ -167,7 +164,7 @@ class Controller extends Base
             $this->getResponse()->content->set(
                 $this->buildJsonOutput(['success' => false])
             );
-            exit;
+            return;
         }
 
         $this->getResponse()->content->set(
@@ -175,22 +172,53 @@ class Controller extends Base
         );
     }
 
+    /**
+     * @param Folder $folder
+     * @return void
+     * @throws MapperException
+     */
     public function addMembers(Folder $folder)
     {
-//        $requestBody = json_decode(json_encode($this->request->content->get()), true);
-//        $userIds     = array_map('intval', explode(',', $requestBody['members']));
-//
-//        $users        = $this->userMapper->findByColumnList(['id' => $userIds]);
-//        $userAccesses = $this->userAccessMapper->findForFolderUser($folder, $users);
-//
-//        $newAccesses = $userAccesses->map(function ($userAccess) use ($requestBody) {
-//            return (new ArrayToModel())($requestBody, $userAccess);
-//        });
-//        $this->userAccessMapper->save($newAccesses);
-//
-//        $this->getResponse()->content->set(
-//            $this->buildJsonOutput(['success' => true])
-//        );
+        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+        $userIds     = array_map('intval', $requestBody['members']);
+
+        $users            = $this->userMapper->findByColumnList(['id' => $userIds]);
+        $existingAccesses = $this->userAccessMapper->findForFolderUser($folder, $users)->indexByCallback(
+            static function ($ua) {
+                /** @var UserAccess $ua */
+                return $ua->getUser()->getId();
+            }
+        );
+
+        $newAccesses = $this->userAccessMapper->createCollection();
+        foreach ($users as $user) {
+            if ($existingAccesses->offsetExists($user->getId())) {
+                continue;
+            }
+            $userAccess = $this->userAccessMapper->createModel()
+                                                 ->setUser($user)
+                                                 ->setFavourite(true)
+                                                 ->setServiceIdentifier($folder->getId())
+                                                 ->setService(UserAccess::SERVICE_HOMEPAGE)
+                                                 ->setAccessLevel(UserAccess::ACCESS_READ);
+            $newAccesses->add($userAccess);
+        }
+
+        if ($newAccesses->count() > 0) {
+            if (!$folder->getGroup()) {
+                $group = $this->groupMapper->createModel()
+                                           ->setFolder($folder)
+                                           ->setNotificationDisabled(false)
+                                           ->setForceFollow(false)
+                                           ->setType(Group::PRIVATE_GROUP);
+                $this->groupMapper->save($group);
+            }
+            $this->userAccessMapper->save($newAccesses);
+        }
+
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput(['success' => true])
+        );
     }
 
     /**
@@ -205,9 +233,9 @@ class Controller extends Base
         // access, isNotificationsEnabled, isForceFollow
         $requestBody = json_decode(json_encode($this->request->content->get()), true);
 
-        $folder->getGroup()->setNotificationDisabled(!$requestBody['settings']['isNotificationsEnabled'])
-               ->setForceFollow($requestBody['settings']['isForceFollow'] && $requestBody['settings']['isNotificationsEnabled'])
-               ->setType(Group::TYPE_NAME_TO_VAL[$requestBody['settings']['access']]);
+        /** @var Group $group */
+        $group = (new ArrayToModel\Group())($requestBody, $folder->getGroup());
+        $folder->setGroup($group);
         $this->groupMapper->save($folder->getGroup());
 
         $this->groupsHelper->setNotification(
