@@ -52,12 +52,6 @@ class EDiary implements IStrategy
     /**
      * @var GenericCollection
      */
-    private GenericCollection $campuses;
-
-
-    /**
-     * @var GenericCollection
-     */
     private GenericCollection $eventTypes;
 
 
@@ -122,7 +116,6 @@ class EDiary implements IStrategy
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
      * @param array                                      $api
-     * @param GenericCollection                          $campuses
      * @param GenericCollection                          $eventTypes
      * @param \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper
      * @param \Schoolbox\External\Profile\Staff\Mapper   $staffProfileMapper
@@ -137,7 +130,6 @@ class EDiary implements IStrategy
         LoggerInterface $log,
         bool $perform,
         array $api,
-        GenericCollection $campuses,
         GenericCollection $eventTypes,
         \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper,
         \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper,
@@ -151,7 +143,6 @@ class EDiary implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
-        $this->campuses = $campuses;
         $this->eventTypes = $eventTypes;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;

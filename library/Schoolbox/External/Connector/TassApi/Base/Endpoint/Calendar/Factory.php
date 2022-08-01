@@ -286,7 +286,6 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
-                $campuses,
                 $eventTypes,
                 $this->studentProfileMapper,
                 $this->staffProfileMapper,
