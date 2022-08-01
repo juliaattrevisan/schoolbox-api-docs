@@ -122,7 +122,7 @@ class Controller extends Base
     public function removeMembers(Folder $folder)
     {
         $requestBody = json_decode(json_encode($this->request->content->get()), true);
-        $userIds     = array_map('intval', explode(',', $requestBody['members'] ?? []));
+        $userIds     = array_map('intval', $requestBody['members']);
 
         $users        = $this->userMapper->findByColumnList(['id' => $userIds]);
         $userAccesses = $this->userAccessMapper->findForFolderUser($folder, $users);
@@ -150,7 +150,7 @@ class Controller extends Base
     public function updateMembers(Folder $folder)
     {
         $requestBody = json_decode(json_encode($this->request->content->get()), true);
-        $userIds     = array_map('intval', explode(',', $requestBody['members']));
+        $userIds     = array_map('intval', $requestBody['members']);
 
         $users        = $this->userMapper->findByColumnList(['id' => $userIds]);
         $userAccesses = $this->userAccessMapper->findForFolderUser($folder, $users);
@@ -195,12 +195,10 @@ class Controller extends Base
             if ($existingAccesses->offsetExists($user->getId())) {
                 continue;
             }
-            $userAccess = $this->userAccessMapper->createModel()
-                                                 ->setUser($user)
-                                                 ->setFavourite(true)
-                                                 ->setServiceIdentifier($folder->getId())
-                                                 ->setService(UserAccess::SERVICE_HOMEPAGE)
-                                                 ->setAccessLevel(UserAccess::ACCESS_READ);
+            /** @var UserAccess $userAccess */
+            $userAccess = (new ArrayToModel\UserAccess())($requestBody);
+            $userAccess->setUser($user)
+                       ->setServiceIdentifier($folder->getId());
             $newAccesses->add($userAccess);
         }
 

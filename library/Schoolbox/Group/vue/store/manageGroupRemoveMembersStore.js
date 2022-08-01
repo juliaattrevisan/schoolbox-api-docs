@@ -78,7 +78,7 @@ function getFormData () {
     return JSON.stringify(
         {
             groupId: store.groupId,
-            members: membersToRemoveIdList.join(',')
+            members: membersToRemoveIdList
         },
     );
 }

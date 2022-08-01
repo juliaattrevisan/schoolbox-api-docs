@@ -96,7 +96,7 @@ class Controller extends Base
         // Check article visibility, if current user is not superuser or doesn't have news permission
         if (
             !$this->getUser()->isSuperuser()
-            && $this->userAccessMapper->findServiceForUser($this->getUser(), UserAccess::SERVICE_NEWS)->count() === 0
+            && $this->userAccessMapper->findServiceForUser($this->getUser(), UserAccess::SERVICE_NEWS, false)->count() === 0
         ) {
             // get safe saved articles
             $userFeed   = new UserFeed($this->newsMapper, $this->articleResolver);

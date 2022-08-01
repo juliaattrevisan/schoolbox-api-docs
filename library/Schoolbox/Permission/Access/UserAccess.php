@@ -124,17 +124,17 @@ class UserAccess implements IModel
     public const MEMBERSHIP_ADMIN = 'admin';
 
     public const ACCESS_NAME_TO_LEVEL = [
+        self::MEMBERSHIP_NONE  => self::ACCESS_DENY,
+        self::MEMBERSHIP_READ  => self::ACCESS_READ,
+        self::MEMBERSHIP_WRITE => self::ACCESS_WRITE,
+        self::MEMBERSHIP_ADMIN => self::ACCESS_FULL,
+    ];
+
+    public const ACCESS_LEVEL_TO_NAME = [
         self::ACCESS_DENY  => self::MEMBERSHIP_NONE,
         self::ACCESS_READ  => self::MEMBERSHIP_READ,
         self::ACCESS_WRITE => self::MEMBERSHIP_WRITE,
         self::ACCESS_FULL  => self::MEMBERSHIP_ADMIN,
-    ];
-
-    public const ACCESS_LEVEL_TO_NAME = [
-        UserAccess::ACCESS_DENY  => UserAccess::MEMBERSHIP_NONE,
-        UserAccess::ACCESS_READ  => UserAccess::MEMBERSHIP_READ,
-        UserAccess::ACCESS_WRITE => UserAccess::MEMBERSHIP_WRITE,
-        UserAccess::ACCESS_FULL  => UserAccess::MEMBERSHIP_ADMIN,
     ];
 
     /** @var User */

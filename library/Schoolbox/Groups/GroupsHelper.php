@@ -71,7 +71,7 @@ class GroupsHelper
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->userAccessMapper->findAllGroupsForUser($user)->indexBy('serviceIdentifier');
+        $userPerms = $this->userAccessMapper->findAllGroupsForUser($user, false)->indexBy('serviceIdentifier');
         $folders   = $this->folderMapper->findByColumn('id', $userPerms->keys())->indexBy('id');
 
         $accesses = $this->userAccessMapper->createCollection();
@@ -205,7 +205,7 @@ class GroupsHelper
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->userAccessMapper->findAllGroupsForUser($user)->indexBy('serviceIdentifier');
+        $userPerms = $this->userAccessMapper->findAllGroupsForUser($user, true)->indexBy('serviceIdentifier');
 
         $groupsArr = $this->groupMapper->getAvailableGroupIds($user);
         //combine to show list of all groups, both available to the user, and those they are enroled in

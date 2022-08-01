@@ -241,11 +241,12 @@ class UserAccessMapper extends Mapper
      * Find all UserAccess instances for a User
      *
      * @param User $user
+     * @param bool $includePending
      * @return GenericCollection
      */
-    public function findAllGroupsForUser(User $user): GenericCollection
+    public function findAllGroupsForUser(User $user, bool $includePending): GenericCollection
     {
-        return $this->findServiceForUser($user, UserAccess::SERVICE_HOMEPAGE);
+        return $this->findServiceForUser($user, UserAccess::SERVICE_HOMEPAGE, $includePending);
     }
 
     /**
@@ -289,18 +290,24 @@ class UserAccessMapper extends Mapper
      *
      * @param User $user
      * @param int  $service
+     * @param bool $includeNone
      * @return GenericCollection
      */
-    public function findServiceForUser(User $user, int $service): GenericCollection
+    public function findServiceForUser(User $user, int $service, bool $includeNone): GenericCollection
     {
         $access = $this->createCollection();
 
-        // start with the userAccess table (filtering away access level 0)
-        $internal = $this->findByColumnList([
+        $params = [
             'uid' => $user->getId(),
-            'type' => [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL],
             'service' => $service,
-        ])->map(function ($ua) use ($user) {
+        ];
+
+        if (!$includeNone) {
+            $params['type'] = [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL];
+        }
+
+        // start with the userAccess table (filtering away access level 0)
+        $internal = $this->findByColumnList($params)->map(function ($ua) use ($user) {
             /** @var UserAccess $ua */
             // don't needlessly hold stub replicas of the user in memory
             return $ua->setUser($user);

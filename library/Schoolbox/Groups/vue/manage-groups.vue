@@ -55,7 +55,7 @@ export default {
 
         /**
          * Whether to show the empty state
-         * 
+         *
          * @returns { Number }
          */
         isGroupsEmpty () {
@@ -69,12 +69,12 @@ export default {
         this.checkForValidHash();
     },
 
-    methods: { 
+    methods: {
 
         /**
          * The hash is used for initial group selection display, so we can land straight
-         * on my favourite groups, groups pending membership etc 
-         * 
+         * on my favourite groups, groups pending membership etc
+         *
          * @param { String }
          */
         checkForValidHash () {
@@ -82,12 +82,12 @@ export default {
             const isHashValid = Object.values(selectionTypes).includes(hash); //check if the hash is one of the valid selectionTypes
             if (isHashValid) {
                 this.selectedGroups = hash; //only update if valid, otherwise just leave as is
-            } 
+            }
         },
 
         /**
          * A <select> change has taken place
-         * 
+         *
          * @param { String }
          */
         onGroupsSelected (groupsSelection) {
@@ -98,7 +98,7 @@ export default {
 
         /**
          * Both the current <select> status and search query considered to show the current group list
-         * 
+         *
          * @param { Array }
          * @param { Boolean }
          */
@@ -114,13 +114,13 @@ export default {
          */
         checkForDropdowns () {
             this.$nextTick(() => {
-                $(document).foundation('dropdown', 'reflow');
+//                $(document).foundation('dropdown', 'reflow');
             });
         },
 
         /**
          * Notify that a group edit action has started taking place
-         * 
+         *
          * @param { String }
          */
         onGroupEditStart (text) {
@@ -128,8 +128,8 @@ export default {
         },
 
         /**
-         * A group edit action was successful 
-         * 
+         * A group edit action was successful
+         *
          * @param { String }
          */
         onGroupEditSuccess (text) {
@@ -138,7 +138,7 @@ export default {
 
         /**
          * A group edit action has an error
-         * 
+         *
          * @param { String }
          */
         onGroupEditError (text) {
@@ -153,21 +153,21 @@ export default {
 
 <template>
     <div>
-        <manage-groups-heading 
-            :groups="groups" 
-            :selected-groups="selectedGroups" 
+        <manage-groups-heading
+            :groups="groups"
+            :selected-groups="selectedGroups"
             @on-groups-selected="onGroupsSelected"
             @on-groups-filtered="onGroupsFiltered"
         />
-        <manage-groups-empty 
-            v-if="isGroupsEmpty" 
+        <manage-groups-empty
+            v-if="isGroupsEmpty"
             :selected-groups="selectedGroups"
             :is-search-active="isSearchActive"
         />
         <div v-else class="row group-items">
-            <manage-groups-item 
-                v-for="group in filteredGroups" 
-                :key="group.id" 
+            <manage-groups-item
+                v-for="group in filteredGroups"
+                :key="group.id"
                 :endpoint-add="endpointAdd"
                 :endpoint-delete="endpointDelete"
                 :endpoint-notify="endpointNotify"

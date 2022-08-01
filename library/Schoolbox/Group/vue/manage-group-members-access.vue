@@ -132,7 +132,7 @@ rejectMembersStore.$onAction(({ name, args, after, onError }) => {
 </script>
 
 <template>
-    <ul v-if="props.member.accessType === 'waiting'" class="flex-list">
+    <ul v-if="props.member.accessType === 'none'" class="flex-list">
         <li>
             <button
                 class="button expand icon-add"

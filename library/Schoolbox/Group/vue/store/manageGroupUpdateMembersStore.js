@@ -106,7 +106,7 @@ function getFormData (selectedMembers, accessType) {
     const membersToUpdateIdList = selectedMembers.map(row => row.id);
     return JSON.stringify({
         groupId: store.groupId,
-        members: membersToUpdateIdList.join(','),
+        members: membersToUpdateIdList,
         accessType: accessType,
     });
 }

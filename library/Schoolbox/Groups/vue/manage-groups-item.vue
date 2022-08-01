@@ -206,12 +206,12 @@ export default {
                 } else if (responseData.status === 400) {
                     this.$emit('on-edit-error', responseData.title);
                 } else {
-                    this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLED;
                     this.$emit('on-edit-success', 'Group left');
-                    if (this.group.isFavourite) { //assumed that wouldn't be a favourite group if re-added
+                    if ((this.group.enrolmentStatus !== enrolmentTypes.NOT_ENROLED) && this.group.isFavourite) { //assumed that wouldn't be a favourite group if re-added
                         this.group.isFavourite = false;
                         removeGroupFromSideMenu(this.group.id);
                     }
+                    this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLED;
                 }
             } catch (error) {
                 console.warn(error);

@@ -36,7 +36,7 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
                     const newMembers = responseJson.newMembers.map((newMember) => { //add in some additional properties
                         return {
                             ...newMember,
-                            displayPriority: 2, //to show at the very top of the display table
+                            displayPriority: 4, //to show at the very top of the display table
                             isNew: true, //to highlight new members just added
                             justUpdated: false, //to highlight members that have just been changed
                         }
@@ -69,11 +69,6 @@ function getFormData () {
     const store = useStore();
     return JSON.stringify({
         groupId: store.groupId,
-        members: [
-            { "userId": 200 },
-            { "userId": 201 },
-            { "userId": 202 },
-            { "userId": 203 },
-        ]
+        members: [60, 64, 46]
     });
 }
