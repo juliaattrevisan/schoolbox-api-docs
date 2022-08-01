@@ -1,7 +1,8 @@
 <script setup>
 
 /**
- * 
+ * To list all the current search results, also include a select all
+ * button to easily add/remove all search results
  */
 
 import { computed  } from 'vue';

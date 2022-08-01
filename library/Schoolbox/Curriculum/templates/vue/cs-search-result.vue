@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * 
+ * A single search result that be selected / unselected with a checkbox status
  */
 
 import { computed } from 'vue';
@@ -47,9 +47,7 @@ const title = computed(() => {
  *
  * @returns { HTML }
  */
-const highlightTitleSearch = computed(() => {
-    return highlightSearchInElement(title.value);
-});
+const highlightTitleSearch = computed(() => highlightSearchInElement(title.value));
 
 /**
  * To highlight any search selections in the breadcrumbs
@@ -66,7 +64,7 @@ const highlightBreadcrumbSearch = computed(() => {
 
 /**
  * To highlight where the search string matches within the settings result
- * (?![^>]*>) is used to check we are not inside an element node 
+ * (?![^mark>]*mark>) is used to check we are not inside an element node 
  *
  * @params { String } the string to find all instanced of the current search string in
  *
@@ -97,11 +95,7 @@ const isCodeSelected = computed(() => {
  * the code is currently selected
  */
 function onSelected () {
-    if (isCodeSelected.value) {
-        selectedCodesStore.remove(props.result);
-    } else {
-        selectedCodesStore.add(props.result);
-    }
+    isCodeSelected.value ? selectedCodesStore.remove(props.result) : selectedCodesStore.add(props.result);
 }
 
 </script>

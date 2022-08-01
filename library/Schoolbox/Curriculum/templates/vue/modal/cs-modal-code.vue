@@ -26,7 +26,7 @@ const props = defineProps({
         }
     },
     /**
-     * to gradually and more paddingLeft to indicate node level depth
+     * to gradually add more paddingLeft to indicate node level depth
      */
     depth: {
         type: Number, 
@@ -52,8 +52,8 @@ const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.5rem)`);
 const pointerEvents = computed(() => props.code.isFirstLevel ? 'none' : 'auto');
 
 /**
- * To determine whether the checkbox is currently selected based on whether it's 
- * in the selected list
+ * To determine whether the checkbox is currently selected based 
+ * on whether it's in the selected list
  *
  * @returns { Boolean }
  */
@@ -62,15 +62,10 @@ const isCodeSelected = computed(() => {
 });
 
 /**
- * To determine the display of the checkbox based on whether
- * the code is currently selected
+ * Add or remove the code from the current modal selection
  */
 function onSelected () {
-    if (isCodeSelected.value) {
-        modalSelectedCodesStore.remove(props.code);
-    } else {
-        modalSelectedCodesStore.add(props.code);
-    }
+    isCodeSelected.value ? modalSelectedCodesStore.remove(props.code) : modalSelectedCodesStore.add(props.code);
 }
 
 /**

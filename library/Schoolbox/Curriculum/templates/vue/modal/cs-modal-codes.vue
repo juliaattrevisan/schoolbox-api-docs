@@ -10,6 +10,7 @@ import { useCodesStore } from '../store/csCodesStore';
 import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
 import CsModalCode from './cs-modal-code.vue'
 
+
 const codesStore = useCodesStore();
 const modalActiveCodesStore = useModalActiveCodesStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
@@ -41,7 +42,8 @@ function onClearSearchSelected () {
 }
 
 /**
- * to scroll back to top on any selection change
+ * to scroll back to top on any selection change, otherwise the 
+ * scroll may be at the bottom on change, which is a bit odd
  */
 watch(() => modalActiveCodesStore.codesWithSearch, () => {
     if (codesContainerEl.value) { //may not always exists in the dom

@@ -1,8 +1,8 @@
 <script setup>
 
 /**
- * A selected Curriculum code, it that can be deleted and further details 
- * revealed via a tooltip
+ * A selected Curriculum code, it can be deleted and 
+ * further details revealed via a modal
  */
 
 import { computed } from 'vue';
@@ -12,7 +12,7 @@ import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 
 const props = defineProps({
     /**
-     * the curriculum code
+     * the selected curriculum code
      */
     code: {
         type: Object,
@@ -60,7 +60,7 @@ function onRemoveSelected () {
 </script>
 
 <template>
-   <div class="selected-code sb-tooltip sb-tooltip--bottom" :title="props.code.name">
+   <div class="selected-code">
         <button class="title-button" @click.prevent="onTitleSelected" @keyup.enter="onTitleSelected" :title="`View ${props.code.name}`">{{ title }}</button>
         <button v-if="!store.isReadOnly" class="remove-button icon-close" :title="`Remove ${props.code.name}`" @click.prevent="onRemoveSelected" @keyup.enter="onRemoveSelected"></button>
     </div>

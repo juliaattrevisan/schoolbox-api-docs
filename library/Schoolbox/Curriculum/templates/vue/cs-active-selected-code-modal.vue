@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * to show further info on a modal that's been selected
+ * to show further info in a modal on a code that's been selected
  */
 
 import { ref, computed, watch } from 'vue';

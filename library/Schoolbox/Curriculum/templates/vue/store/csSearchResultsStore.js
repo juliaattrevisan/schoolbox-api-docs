@@ -7,6 +7,7 @@ import { useCodesStore } from './csCodesStore';
 import { useSelectedCodesStore } from './csSelectedCodesStore';
 import cloneDeep from 'lodash/cloneDeep';
 
+
 const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
 const CAPPED_RESULTS_LENGTH = 50; //the maximum amount of results to show
 

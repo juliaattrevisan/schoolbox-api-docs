@@ -1,7 +1,8 @@
 <script setup>
 
 /**
- * 
+ * Toggle the selection of currently listed search results so can select
+ * multiple search results at once
  */
 
 import { computed } from 'vue';
@@ -13,7 +14,8 @@ const searchResultsStore = useSearchResultsStore();
 const selectedCodesStore = useSelectedCodesStore();
 
 /**
- * To determine the behaviour of the 'Select all classes' button
+ * To determine the behaviour of the 'Select all' button, whether to 
+ * add all codes or remove all codes
  * 
  * @returns { Boolean } 
  */
@@ -29,7 +31,8 @@ const isAllResultsSelected = computed(() => {
 });
 
 /**
- * To add the 'indeterminate' class to the select all checkbox
+ * To add the 'indeterminate' class to the select all checkbox to show some 
+ * in the search results are already selected
  * 
  * @returns { Boolean } 
  */
@@ -49,19 +52,13 @@ const isSomeResultsSelected = computed(() => {
  *
  * @returns { Boolean } 
  */
-const isChecked = computed(() => {
-    return isAllResultsSelected.value ? true : false;
-});
+const isChecked = computed(() => isAllResultsSelected.value ? true : false);
 
 /**
  * dispatch to parent so can move to relevant settings page
  */
 function onSelectAll () {
-    if (isChecked.value) {
-        removeAllResults();
-    } else {
-        addAllResults();
-    }
+    isChecked.value ? removeAllResults() : addAllResults();
 }
 
 /**

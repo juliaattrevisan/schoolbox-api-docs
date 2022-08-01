@@ -7,6 +7,7 @@ import { rest } from 'msw';
 import { data as allCurriculumData } from './dataCurriculumSelector';
 import { data as vicCurriculumData } from './dataVicCurriculum';
 
+
 const dataEndpoint = '/curriculumData'; 
 const selectedCodes = []; 
 

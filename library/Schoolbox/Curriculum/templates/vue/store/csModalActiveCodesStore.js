@@ -1,6 +1,6 @@
 /** 
- * Manages the currently active codes, those filtered by both <select> and 
- * also the search <input>
+ * Manages the currently active codes in the modal, 
+ * those filtered by both <select> and also the search <input>
  */
 
 import { defineStore } from 'pinia';

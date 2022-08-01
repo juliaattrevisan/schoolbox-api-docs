@@ -114,7 +114,14 @@ function onBrowseSelected () {
             :placeholder="inputPlaceholder"
             @input="$event.target.composing = false"
         />
-        <button v-if="store.hasLoadedOk" class="button icon-curriculum" title="Browse and select from the Curriculum" @click.prevent="onBrowseSelected">Browse</button>
+        <button 
+            v-if="store.hasLoadedOk" 
+            class="button icon-curriculum" 
+            title="Browse and select from the Curriculum" 
+            @click.prevent="onBrowseSelected" 
+            @keyup.enter="onBrowseSelected">
+            Browse
+        </button>
     </div>
 </template>
 

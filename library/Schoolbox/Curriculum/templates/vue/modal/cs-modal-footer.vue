@@ -48,7 +48,7 @@ const isSaveDisabled = computed(() => selectedCodesStore.hasNoCodes && modalSele
 </script>
 
 <template>
-   <ul class="flex-list buttons">
+    <ul class="flex-list buttons">
         <li><button @click.prevent="onCancelled" class="button" :disabled="false">Cancel</button></li>
         <li><button @click.prevent="onSelected" class="button submit" :disabled="isSaveDisabled">{{ saveText }}</button></li>
     </ul>
