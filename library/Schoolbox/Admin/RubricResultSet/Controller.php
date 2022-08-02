@@ -88,7 +88,7 @@ class Controller extends Base
     }
 
     /**
-     * Load templates/index.twig using data obtained in this function.
+     * Shows a list of labels belonging to a particular rubric result set.
      * @param int|null $resultSetId
      * @throws RouteNotFound
      */
