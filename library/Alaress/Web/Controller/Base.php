@@ -10,16 +10,17 @@
 
 namespace Alaress\Web\Controller;
 
-use Alaress\Module\Module;
 use Alaress\Module\Registry;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
 use Aura\Session\SegmentInterface;
+use Aura\Web\Exception\InvalidStatusCode;
 use Aura\Web\Request;
 use Aura\Web\Response;
 use Aura\Router\Router;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
+use Crell\ApiProblem\ApiProblem;
 use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -591,6 +592,24 @@ abstract class Base
                 ]
             ]
         ]);
+    }
+
+    /**
+     * @param string $message
+     * @param int    $code
+     * @return void
+     */
+    protected function sendJsonError(string $message, int $code)
+    {
+        $problem = (new ApiProblem($message))
+            ->setStatus($code)
+            ->asArray();
+        try {
+            $this->getResponse()->status->setCode($code);
+        } catch (InvalidStatusCode $e) {
+            // noop
+        }
+        $this->getResponse()->content->set($this->buildJsonOutput($problem));
     }
 
     /**

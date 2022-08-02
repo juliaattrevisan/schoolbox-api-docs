@@ -129,9 +129,7 @@ class Controller extends Base
         try {
             $this->userAccessMapper->delete($userAccesses);
         } catch (MapperException $e) {
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput(['success' => false])
-            );
+            $this->sendJsonError('Failed to remove member: ' . $e->getMessage(), 400);
             return;
         }
 
@@ -161,9 +159,7 @@ class Controller extends Base
         try {
             $this->userAccessMapper->save($userAccesses);
         } catch (MapperException $e) {
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput(['success' => false])
-            );
+            $this->sendJsonError('Failed to update member: ' . $e->getMessage(), 400);
             return;
         }
 

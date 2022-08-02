@@ -216,22 +216,4 @@ class Controller extends Base
             $this->sendJsonError('Unable to remove the user from the group.', 400);
         }
     }
-
-    /**
-     * @param string $message
-     * @param int    $code
-     * @return void
-     */
-    private function sendJsonError(string $message, int $code)
-    {
-        $problem = (new ApiProblem($message))
-            ->setStatus($code)
-            ->asArray();
-        try {
-            $this->getResponse()->status->setCode($code);
-        } catch (InvalidStatusCode $e) {
-            // noop
-        }
-        $this->getResponse()->content->set($this->buildJsonOutput($problem));
-    }
 }
