@@ -388,122 +388,129 @@ class Classes implements IStrategy
 
         $semester = (new SemesterDetector($this->log, $this->dateLocalFormat))->detect($this->api[DSN::MODULE_LMS_INTEGRATION]->getOptions());
 
+        /* No semester detected? Exit early, there's nothing to do
+         * We need the $semester value to fetch data from tass
+         *
+         * (I don't think it's possible to have $semester be zero though)
+         */
+        if (null === $semester) {
+            return;
+        }
+
         /* Pummel my way through each person's timetable, using $classIdentifiers as a way
          * to identify the classes that need special treatment due to Yard Duties etc.
          */
-        if ($semester) {
-            foreach ($staff as $externalId => $person) {
-                /* Only import data for externalIds in $watchlist, if provided
-                 */
-                if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
-                    continue;
-                }
+        foreach ($staff as $externalId => $person) {
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
+                continue;
+            }
 
-                /* Hit That Api to find every student's timetable and cache it somewhere
-                 * We'll need to operate on it all again later anyway
-                 */
-                $data = $this->api[DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeacherTimetable', [
-                    'teacher_code' => $externalId,
-                    'year_num' => $year,
-                    'semester' => $semester
-                ]);
+            /* Hit That Api to find every student's timetable and cache it somewhere
+             * We'll need to operate on it all again later anyway
+             */
+            $data = $this->api[DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeacherTimetable', [
+                'teacher_code' => $externalId,
+                'year_num' => $year,
+                'semester' => $semester
+            ]);
 
-                /* Check that the given $externalId had any timetable data at all
-                 */
-                if (!(isset($data['teacher_timetable']) && \count($data['teacher_timetable']))) {
-                    $this->log->warning(sprintf(
-                        'Timetable not found for %s (%s).',
-                        trim("{$person['firstname']} {$person['lastname']}"),
-                        $externalId
-                    ));
+            /* Check that the given $externalId had any timetable data at all
+             */
+            if (!(isset($data['teacher_timetable']) && \count($data['teacher_timetable']))) {
+                $this->log->warning(sprintf(
+                    'Timetable not found for %s (%s).',
+                    trim("{$person['firstname']} {$person['lastname']}"),
+                    $externalId
+                ));
 
-                    continue;
-                }
+                continue;
+            }
 
-                /* Otherwise, continue on with the first timetable element
-                 * (Not sure how many they can actually have in production)
-                 */
-                foreach ($data['teacher_timetable'] as $timetable) {
+            /* Otherwise, continue on with the first timetable element
+             * (Not sure how many they can actually have in production)
+             */
+            foreach ($data['teacher_timetable'] as $timetable) {
 //                /* Only import data for externalIds in $watchlist, if provided
 //                 */
 //                if ($this->isOnWatchlist((string)$externalId, $watchlist)) {
 //                    print_r($timetable);
 //                }
 
-                    $this->process($person, $timetable, true);
-                }
-                /* Example $timetable extract
-
-                    Array
-                    (
-                        [DESC_TEXT] => Primary School Timetable 2022/1
-                        [DAYS] => Array
-                            (
-                                [1] => Array
-                                    (
-                                        [PERIODS] => Array
-                                            (
-                                                [1] => Array
-                                                    (
-                                                        [SUBJECTS] => Array
-                                                            (
-                                                                [0] => Array
-                                                                    (
-                                                                        [SUB_CODE] => 5130
-                                                                        [SUB_SHORT] => Y1Roll
-                                                                        [HASOVERRIDE] => 0
-                                                                        [ROOM_CODE] => GBH
-                                                                        [TCH_CODE] => ABR
-                                                                        [SUBTAB_YEAR_GRP_DESC] => 1
-                                                                        [CLASS] => A
-                                                                        [YEAR_GRP] =>
-                                                                        [SUB_DESC] => Primary Y1 Rollcall
-                                                                        [SUB_ABREV] =>
-                                                                        [LINE_CODE] =>
-                                                                        [SUBTAB_YEAR_GRP] => 1
-                                                                    )
-
-                                                            )
-
-                                                        [PRD_END] => 1900-01-01 08:49:00.0
-                                                        [PRD_CODE] => 1
-                                                        [PRD_START] => 1900-01-01 08:00:00.0
-                                                        [PRD_DESC] => Rollcall
-                                                    )
-
-                                                [9] => Array
-                                                    (
-                                                        [SUBJECTS] => Array
-                                                            (
-                                                                [0] => Array
-                                                                    (
-                                                                        [SUB_CODE] => 5130
-                                                                        [SUB_SHORT] => Y1Roll
-                                                                        [HASOVERRIDE] => 0
-                                                                        [ROOM_CODE] => GBH
-                                                                        [TCH_CODE] => ABR
-                                                                        [SUBTAB_YEAR_GRP_DESC] => 1
-                                                                        [CLASS] => A
-                                                                        [YEAR_GRP] =>
-                                                                        [SUB_DESC] => Primary Y1 Rollcall
-                                                                        [SUB_ABREV] =>
-                                                                        [LINE_CODE] =>
-                                                                        [SUBTAB_YEAR_GRP] => 1
-                                                                    )
-
-                                                            )
-
-                                                        [PRD_END] => 1900-01-01 13:44:00.0
-                                                        [PRD_CODE] => 9
-                                                        [PRD_START] => 1900-01-01 13:17:00.0
-                                                        [PRD_DESC] => Lunch Play
-                                                    )
-
-                                            )
-
-                                    )
-                */
+                $this->process($person, $timetable, true);
             }
+            /* Example $timetable extract
+
+                Array
+                (
+                    [DESC_TEXT] => Primary School Timetable 2022/1
+                    [DAYS] => Array
+                        (
+                            [1] => Array
+                                (
+                                    [PERIODS] => Array
+                                        (
+                                            [1] => Array
+                                                (
+                                                    [SUBJECTS] => Array
+                                                        (
+                                                            [0] => Array
+                                                                (
+                                                                    [SUB_CODE] => 5130
+                                                                    [SUB_SHORT] => Y1Roll
+                                                                    [HASOVERRIDE] => 0
+                                                                    [ROOM_CODE] => GBH
+                                                                    [TCH_CODE] => ABR
+                                                                    [SUBTAB_YEAR_GRP_DESC] => 1
+                                                                    [CLASS] => A
+                                                                    [YEAR_GRP] =>
+                                                                    [SUB_DESC] => Primary Y1 Rollcall
+                                                                    [SUB_ABREV] =>
+                                                                    [LINE_CODE] =>
+                                                                    [SUBTAB_YEAR_GRP] => 1
+                                                                )
+
+                                                        )
+
+                                                    [PRD_END] => 1900-01-01 08:49:00.0
+                                                    [PRD_CODE] => 1
+                                                    [PRD_START] => 1900-01-01 08:00:00.0
+                                                    [PRD_DESC] => Rollcall
+                                                )
+
+                                            [9] => Array
+                                                (
+                                                    [SUBJECTS] => Array
+                                                        (
+                                                            [0] => Array
+                                                                (
+                                                                    [SUB_CODE] => 5130
+                                                                    [SUB_SHORT] => Y1Roll
+                                                                    [HASOVERRIDE] => 0
+                                                                    [ROOM_CODE] => GBH
+                                                                    [TCH_CODE] => ABR
+                                                                    [SUBTAB_YEAR_GRP_DESC] => 1
+                                                                    [CLASS] => A
+                                                                    [YEAR_GRP] =>
+                                                                    [SUB_DESC] => Primary Y1 Rollcall
+                                                                    [SUB_ABREV] =>
+                                                                    [LINE_CODE] =>
+                                                                    [SUBTAB_YEAR_GRP] => 1
+                                                                )
+
+                                                        )
+
+                                                    [PRD_END] => 1900-01-01 13:44:00.0
+                                                    [PRD_CODE] => 9
+                                                    [PRD_START] => 1900-01-01 13:17:00.0
+                                                    [PRD_DESC] => Lunch Play
+                                                )
+
+                                        )
+
+                                )
+            */
         }
     }
 
