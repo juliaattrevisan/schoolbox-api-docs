@@ -22,8 +22,6 @@ use Schoolbox\External\Importer\Endpoint\Status\IStatus;
  */
 class Status implements IStatus
 {
-
-
     /**
      * @var string
      */
@@ -37,15 +35,23 @@ class Status implements IStatus
 
 
     /**
+     * @var bool
+     */
+    private bool $includePhoto;
+
+
+    /**
      * Status constructor.
      *
      * @param string $host
      * @param string $key
+     * @param bool   $includePhoto
      */
-    public function __construct(string $host, string $key)
+    public function __construct(string $host, string $key, bool $includePhoto)
     {
         $this->host = $host;
         $this->key = $key;
+        $this->includePhoto = $includePhoto;
     }
 
 
@@ -88,10 +94,11 @@ class Status implements IStatus
      * @return array
      * @throws InvalidArgumentException
      * @throws \External\Tass\Api\Exception\InvalidApiKey
+     * @throws \JsonException
      */
     public function getReport(): array
     {
-        $specification = new Specification($this->host, $this->key);
+        $specification = new Specification($this->host, $this->key, $this->includePhoto);
 
         try {
             return $specification->check();

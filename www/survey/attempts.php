@@ -86,6 +86,7 @@ if (is_array($allAttempts) && count($allAttempts)) {
             $finishDate      = new Alaress_Date_Format($currentAttempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
             $finishDateValue = $finishDate->getShort();
         } else {
+            $finishDate = null;
             $finishDateValue = 'Unfinished';
         }
 

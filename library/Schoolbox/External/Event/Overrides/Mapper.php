@@ -44,7 +44,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('sis_event_user_overrides');
+        $this->hasTable('sis_class_user_overrides');
         $this->hasModel(Model::class);
         $this->uses('event_id', self::TYPE_INTEGER);
         $this->uses('external_id', self::TYPE_STRING);

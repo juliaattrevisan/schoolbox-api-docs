@@ -83,7 +83,7 @@
 
     'getIndexRoute': routeLookup('commsNews.getIndex'),
     'getArticlesRoute': getArticlesRoute is defined ? getArticlesRoute : routeLookup('commsNews.getListForIndex'),
-    'getSavedArticlesRoute': routeLookup('commsNewsSaveForLater.getList'),
+    'getSavedArticlesRoute': config.save_for_later ? routeLookup('commsNewsSaveForLater.getList') : null,
 
     'configSaveForLater': config.save_for_later,
     'configSearchTypeLimit': config.search_type_limit,

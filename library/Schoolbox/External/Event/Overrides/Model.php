@@ -19,7 +19,7 @@ class Model
 
 
     /**
-     * These consts correspond to the enum values in sis_event_user_overrides
+     * These consts correspond to the enum values in sis_class_user_overrides
      */
     public const CLEAR = 'clear';
     public const ADD = 'add';

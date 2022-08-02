@@ -103,6 +103,8 @@ class Helper
                     'id' => $row['project'],
                 ];
             }
+            //get the rubric for the assessment
+            $rubric = $this->getRubric($row['id']);
             if (!isset($output[$row['id']])) {
                 $output[$row['id']] = [
                     'id'               => $row['id'],
@@ -117,6 +119,7 @@ class Helper
                     'project'          => $project,
                     'weighted'         => $weighted,
                     'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
+                    'rubric'           => $rubric,
                     'participants'     => null,
                 ];
             }
@@ -328,7 +331,8 @@ WHERE
     staff.title as `staffTitle`,
     staff.firstname as `staffFirstname`,
     staff.lastname as `staffLastname`,
-    staff.synergy_id as `staffExternalId`
+    staff.synergy_id as `staffExternalId`,
+    v_most_recent_feedback.feedback_id as `feedbackID`
 FROM v_assessment_relation
          INNER JOIN assessment on v_assessment_relation.assessment_id = assessment.id
          LEFT JOIN v_most_recent_feedback on assessment.id = v_most_recent_feedback.assessment_id
@@ -348,6 +352,7 @@ v_most_recent_feedback.review_route = 'instructor' AND
         $statement->execute();
         $feedbackItems = [];
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $rubric = $this->getRubricFeedback($row['id'], $row['feedbackID']);
             if (!isset($feedbackItems[$row['id']])) {
                 $feedbackItems[$row['id']] = [];
             }
@@ -370,7 +375,8 @@ v_most_recent_feedback.review_route = 'instructor' AND
                         'firstName'  => $row['staffFirstname'],
                         'lastName'   => $row['staffLastname'],
                         'externalId' => $row['staffExternalId'],
-                    ]
+                    ],
+                    'rubric'        => $rubric,
                 ];
         }
         return $feedbackItems;
@@ -434,5 +440,171 @@ v_most_recent_feedback.review_route = 'instructor' AND
             }
         }
         return $this->folderCodes[$folderId] ?? null;
+    }
+
+    /**
+     * get full rubric template
+     * @param string $assessmentId
+     * @return array|null
+     */
+    public function getRubric(string $assessmentId): ?array
+    {
+        $statement = $this->mapper->getDatabase()->prepare("
+        SELECT
+            rd.id as `descriptor_id`,
+            rd.max_value as `descriptor_max_value`,
+            rd.description as `descriptor_descriptor`,
+            rl.sequence as `descriptor_sequence`,
+            t.*
+        FROM v_rubric t
+                INNER JOIN rubric_descriptor rd ON t.indicator_id = rd.rubric_indicator_id
+                INNER JOIN rubric_level rl on rd.level_id = rl.id
+        WHERE assessment_id =  :assessmentID
+        ");
+        $statement->execute(['assessmentID' => $assessmentId]);
+        $output = [];
+        //if assessment has no rubric, return null
+        if (0 === $statement->rowCount()) {
+            return null;
+        }
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            //build the capability if it does not already exist
+            if (!isset($output['capabilities'][$row['capability_id']])) {
+                $output['capabilities'][$row['capability_id']] = [
+                    'id'            => (int)$row['capability_id'],
+                    'name'          => $row['capability_name'],
+                    'maxValue'     => (float)$row['capability_max_value'],
+                    'indicators'    => []
+                ];
+            }
+            //capability should already exist, so lets build the indicator for that capability
+            if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
+                $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
+                    'id'            => (int)$row['indicator_id'],
+                    'name'          => $row['indicator_name'],
+                    'maxValue'      => (float)$row['indicator_max_value'],
+                    'descriptors'   => []
+                ];
+            }
+            //indicator should already exist, so lets build the descriptor for that indicator for that capability
+            if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']])) {
+                $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptors'][$row['descriptor_id']] = [
+                    'id'            => (int)$row['descriptor_id'],
+                    'description'   => $row['descriptor_descriptor'],
+                    'maxValue'      => (float)$row['descriptor_max_value'],
+                    'sequence'      => (int)$row['descriptor_sequence']
+                ];
+            }
+        }
+        //clean the data, remove the numeric array keys
+        foreach ($output['capabilities'] as $capKey => $capArr) {
+            foreach ($capArr['indicators'] as $indKey => $indArr) {
+                $output['capabilities'][$capKey]['indicators'][$indKey]['descriptors'] = array_values($indArr['descriptors']);
+            }
+            //grab the original array indicators values which above has changed, not the old ones from the foreach loop that have numeric keys
+            $output['capabilities'][$capKey]['indicators'] = array_values($output['capabilities'][$capKey]['indicators']);
+        }
+        $output['capabilities'] = array_values($output['capabilities']);
+        return $output;
+    }
+
+    /**
+     * get feedback rubric
+     *
+     * @param string $assessmentId
+     * @param int    $feedbackID
+     * @return null|array
+     */
+    public function getRubricFeedback(string $assessmentId, int $feedbackID): ?array
+    {
+        $statement = $this->mapper->getDatabase()->prepare("
+        select `sb`.`assessment_id`                                  AS `assessment_id`,
+           `vr`.`capability_mark_type_id`                        AS `capability_mark_type_id`,
+           `vr`.`capability_grade_group_id`                      AS `capability_grade_group_id`,
+           `sr`.`owner`                                          AS `student_id`,
+           `sr`.`marker`                                         AS `marker_id`,
+           `sr`.`id`                                             AS `feedback_id`,
+           `sr`.`published_at`                                   AS `feedback_date`,
+           `sr`.`review_route`                                   AS `feedback_type`,
+           `vr`.`capability_id`                                  AS `capability_id`,
+           `vr`.`capability_name`                                AS `capability_name`,
+           `vr`.`capability_max_value`                           AS `capability_max_value`,
+           if(`rcm`.`valid`, `rcm`.`value`, NULL)                AS `capability_mark`,
+           if(`rcm`.`valid`, `rcm`.`human_readable_value`, NULL) AS `capability_human_readable_mark`,
+           `vr`.`indicator_id`                                   AS `indicator_id`,
+           `vr`.`indicator_name`                                 AS `indicator_name`,
+           `vr`.`indicator_max_value`                            AS `indicator_max_value`,
+           if(`rim`.`valid`, `rim`.`value`, NULL)                AS `indicator_mark`,
+           `rim`.`descriptor_id`                                 AS `descriptor_id`,
+           `rim`.`descriptor_name`                               AS `descriptor_name`,
+           `rd`.`max_value`                                      AS `descriptor_max_value`,
+           `rd`.`description`                                    AS `descriptor_descriptor`,
+           `rl`.`sequence`                                       AS `descriptor_sequence`
+        from ((((`v_rubric` `vr`
+            join `submission_box` `sb`on (`vr`.`assessment_id` = `sb`.`assessment_id`))
+            join `submission_return` `sr` on (`sb`.`id` = `sr`.`box_id`))
+            join `rubric_capability_mark` `rcm` on (`rcm`.`return_id` = `sr`.`id` and `rcm`.`rubric_capability_id` =
+                                                     `vr`.`capability_id`))
+            left join `v_rubric_indicator_mark_extend` `rim` on (`rim`.`rubric_indicator_id` = `vr`.`indicator_id` and `rcm`.`id` = `rim`.`rubric_capability_mark_id`))
+            INNER JOIN `rubric_descriptor` `rd` on `rim`.`descriptor_id` = `rd`.`id`
+            INNER JOIN `rubric_level` `rl` on `rd`.`level_id` = `rl`.`id`
+        where `sr`.`deleted_at` is null
+            and `sr`.`published_at` is not null
+            and (`rcm`.`valid` is true or `rim`.`valid` is true)
+            and
+                `sb`.`assessment_id` = :assessmentID
+            AND
+                `sr`.`review_route` = 'instructor'
+            AND
+                `sr`.`id` = :feedbackID
+        order by `sb`.`assessment_id`, `sr`.`owner`, `sr`.`published_at`, `vr`.`capability_sequence`, `vr`.`capability_id`,
+            `vr`.`indicator_sequence`, `vr`.`indicator_id`
+        ");
+        $statement->execute(
+            [
+                'assessmentID'  => $assessmentId,
+                'feedbackID'    => $feedbackID,
+            ]
+        );
+        $output = [];
+        //if assessment has no rubric, return null
+        if (0 === $statement->rowCount()) {
+            return null;
+        }
+        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            //build the capability if it does not already exist
+            if (!isset($output['capabilities'][$row['capability_id']])) {
+                $output['capabilities'][$row['capability_id']] = [
+                    'id'                    => (int)$row['capability_id'],
+                    'name'                  => $row['capability_name'],
+                    'value'                 => (float)$row['capability_mark'],
+                    'maxValue'              => (float)$row['capability_max_value'],
+                    'mark'                  => $row['capability_human_readable_mark'],
+                    'indicators'            => []
+                ];
+            }
+            //capability should already exist, so lets build the indicator for that capability
+            if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
+                $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
+                    'id'            => (int)$row['indicator_id'],
+                    'name'          => $row['indicator_name'],
+                    'maxValue'      => (float)$row['indicator_max_value'],
+                    'value'         => (float)$row['indicator_mark'],
+                    'descriptor'    => [
+                        'id'            => (int)$row['descriptor_id'],
+                        'description'   => $row['descriptor_name'],
+                        'maxValue'      => (float)$row['descriptor_max_value'],
+                        'sequence'      => (int)$row['descriptor_sequence']
+                    ]
+                ];
+            }
+        }
+        //clean the data, remove the numeric array keys
+        foreach ($output['capabilities'] as $capKey => $capArr) {
+            //grab the original array indicators values which above has changed, not the old ones from the foreach loop that have numeric keys
+            $output['capabilities'][$capKey]['indicators'] = array_values($output['capabilities'][$capKey]['indicators']);
+        }
+        $output['capabilities'] = array_values($output['capabilities']);
+        return $output;
     }
 }

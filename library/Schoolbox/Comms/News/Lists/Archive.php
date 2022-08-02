@@ -38,7 +38,6 @@ use function in_array;
  */
 class Archive extends Base
 {
-
     /**
      * Note: This is now used only in News Archive
      *
@@ -83,7 +82,7 @@ class Archive extends Base
             $articleIdFilter = $folderFeed->find($params->getFolderId(), false);
         } else {
             $userFeed = new UserFeed($this->newsMapper, $this->articleResolver);
-            $articleIdFilter = $userFeed->find($user, Model::STATE_PUBLIC);
+            $articleIdFilter = $userFeed->find($user, Model::STATE_PUBLIC, false);
         }
 
         // Find all years and months that have articles so we can populate the sidebar

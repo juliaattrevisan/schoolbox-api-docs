@@ -23,4 +23,12 @@ class MockAdapter implements IPurifier
     {
         return $input;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function purifyAbsoluteUri(?string $input, string $domain): ?string
+    {
+        return $input;
+    }
 }

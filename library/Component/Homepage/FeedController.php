@@ -13,7 +13,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_FeedController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var Feed
      */

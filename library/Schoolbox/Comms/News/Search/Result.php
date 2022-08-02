@@ -188,7 +188,7 @@ class Result extends Base
         /* Is $user in the audience of the article?
          * (I assume that this should fetch only public articles?)
          */
-        $articleIds = $articleResolver->findArticlesForUser($user, Model::STATE_PUBLIC);
+        $articleIds = $articleResolver->findArticlesForUser($user, Model::STATE_PUBLIC, false);
 
         /* Does $user have the News Moderator service permission?
          */

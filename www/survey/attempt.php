@@ -209,10 +209,11 @@ foreach ($allPercentageComplete as $currentPercentageComplete) {
  */
 $nextSection = $sectionHandler->getAfter($this->arg[0], $section['sequence']);
 $prevSection = $sectionHandler->getBefore($this->arg[0], $section['sequence']);
+
 /* If there is no next section and no previous section, this was a one-section
  * assessment and should only have the Finish button
  */
-if (!($nextSection && is_numeric($nextSection['section_id'])) && !($prevSection && is_numeric($prevSection['section_id']))) {
+if (!$nextSection && !$prevSection) {
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
     $this->parse('endAssess_block', 'endAssess');
@@ -220,10 +221,10 @@ if (!($nextSection && is_numeric($nextSection['section_id'])) && !($prevSection 
     /* If there is no next section, then provide the finish link and parse out the
      * previous button if applicable
      */
-    if (is_numeric($nextSection['section_id'])) {
-        $this->setVar(array(
-                'NEXT_SECTION_ID' => $nextSection['section_id'],
-            ));
+    if ($nextSection) {
+        $this->setVar([
+            'NEXT_SECTION_ID' => $nextSection['section_id'],
+        ]);
         $this->parse('nextSection_block', 'nextSection');
         $this->setVar('endAssess_block', '');
     } else {
@@ -233,10 +234,11 @@ if (!($nextSection && is_numeric($nextSection['section_id'])) && !($prevSection 
 
     /* Conditions where the previous button is available
      */
-    if (is_numeric($prevSection['section_id'])) {
-        $this->setVar(array(
-                'PREV_SECTION_ID' => $prevSection['section_id'],
-            ));
+    if ($prevSection) {
+        $this->setVar([
+            'PREV_SECTION_ID' => $prevSection['section_id'],
+        ]);
+
         $this->parse('prevSection_block', 'prevSection');
     } else {
         $this->setVar('prevSection_block', '');

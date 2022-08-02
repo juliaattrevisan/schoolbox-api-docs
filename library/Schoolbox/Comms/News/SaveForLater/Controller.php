@@ -13,17 +13,20 @@ namespace Schoolbox\Comms\News\SaveForLater;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Audience\ArticleResolver;
+use Schoolbox\Comms\News\Lists\UserFeed;
 use Schoolbox\Comms\News\Lookup\ReadMore;
-use Schoolbox\Comms\News\ValidHasReadMore;
+use Schoolbox\Comms\News\Model;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use PDOException;
 use UnexpectedValueException;
 
 class Controller extends Base
 {
-
     /**
      * @var Mapper
      */
@@ -40,6 +43,10 @@ class Controller extends Base
      */
     private News\File\Mapper $fileMapper;
 
+    /** @var ArticleResolver */
+    private ArticleResolver $articleResolver;
+
+    private UserAccessMapper $userAccessMapper;
 
     /**
      * Controller constructor.
@@ -47,33 +54,69 @@ class Controller extends Base
      * @param Mapper           $saveForLaterMapper
      * @param News\Mapper      $newsMapper
      * @param News\File\Mapper $fileMapper
+     * @param ArticleResolver  $articleResolver
+     * @param UserAccessMapper $userAccessMapper
      */
-    public function __construct(Mapper $saveForLaterMapper, News\Mapper $newsMapper, News\File\Mapper $fileMapper)
-    {
+    public function __construct(
+        Mapper $saveForLaterMapper,
+        News\Mapper $newsMapper,
+        News\File\Mapper $fileMapper,
+        ArticleResolver $articleResolver,
+        UserAccessMapper $userAccessMapper
+    ) {
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->newsMapper         = $newsMapper;
         $this->fileMapper         = $fileMapper;
+        $this->articleResolver    = $articleResolver;
+        $this->userAccessMapper   = $userAccessMapper;
     }
 
 
     /**
      * A list of articles that you saved for later
      *
-     * @api GET /news/saved
      * @throws PDOException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
+     * @api GET /news/saved
      */
     public function getList(): void
     {
-        $articles = (new Lists($this->saveForLaterMapper, $this->newsMapper))->findForUser($this->getUser()->getId());
-        $params = new News\Querystring($this->getRequest()->query);
-        $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
-
+        $ids             = $this->saveForLaterMapper->findSavedIdsForUser($this->getUser()->getId());
+        $savedArticleIds = array_map('intval', $ids);
         if ($this->isXhrRequest()) {
-            $this->getResponse()->content->set($this->buildJsonOutput($articles->getPropertyValues('id')));
+            // this is for turning on saved icon in news feed
+            // this may contain non-accessible article ids, but should not be a problem
+            $this->getResponse()->content->set($this->buildJsonOutput($savedArticleIds));
             return;
         }
+
+        $articleIds = $savedArticleIds;
+
+        // Check article visibility, if current user is not superuser or doesn't have news permission
+        if (
+            !$this->getUser()->isSuperuser()
+            && $this->userAccessMapper->findServiceForUser($this->getUser(), UserAccess::SERVICE_NEWS)->count() === 0
+        ) {
+            // get safe saved articles
+            $userFeed   = new UserFeed($this->newsMapper, $this->articleResolver);
+            $articleIds = $userFeed->find($this->getUser(), Model::STATE_PUBLIC, true);
+
+            // check saved articles but not in the feed
+            $idsToCheck = array_diff($savedArticleIds, $articleIds);
+            if (!empty($idsToCheck)) {
+                $articleIds = array_merge(
+                    $articleIds,
+                    $this->newsMapper->findArticleIdsForRole($this->getUser()->getRole(), $idsToCheck)
+                );
+            }
+
+            // TODO: there may remain viewable articles
+        }
+
+        $params = new News\Querystring($this->getRequest()->query);
+        $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
+        $articles = $this->newsMapper->findByColumn('id', $articleIds);
 
         $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
 
@@ -97,14 +140,14 @@ class Controller extends Base
 
         $data = array_merge(
             [
-                'articles' => $articles,
+                'articles'         => $articles,
                 'attachmentCounts' => $attachmentCounts,
-                'referrer' => $params->getReferrer(),
-                'readMores' => $readMores,
-                'fallbackImage' => [
+                'referrer'         => $params->getReferrer(),
+                'readMores'        => $readMores,
+                'fallbackImage'    => [
                     'type' => $this->getConfigLoader()->get('comms_news_article_list_fallback_image'),
-                    'hash' => $this->getConfigLoader()->get('skin_logo_large')
-                ]
+                    'hash' => $this->getConfigLoader()->get('skin_logo_large'),
+                ],
             ],
             $sidebar->generate()
         );

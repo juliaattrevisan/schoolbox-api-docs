@@ -18,7 +18,6 @@ use Schoolbox\GenericCollection;
  */
 class EventUsers
 {
-
     /**
      * @var Mapper
      */
@@ -130,9 +129,25 @@ class EventUsers
             AND se.classification = :classification
             AND se.start_at >= :startDatetime
             AND se.finish_at <= :finishDatetime
+            
+            UNION
+            
+            SELECT DISTINCT
+                {$this->eventMapper->getColumnString('se')},
+                {$folderColumnString}, 
+                {$folderCodeColumnString}
+            FROM {$this->eventMapper->getTable()} se
+            INNER JOIN sis_event_user seu ON se.id = seu.event_id
+            LEFT JOIN folder_code fc ON se.code = fc.code AND fc.deleted_at IS NULL
+            LEFT JOIN folder f ON fc.folder_id = f.id AND f.deleted_at IS NULL
+            WHERE se.classification = :classification
+            AND se.start_at >= :startDatetime
+            AND se.finish_at <= :finishDatetime
+            AND seu.external_id = :externalId
         ";
 
         $params = array_merge([
+            'externalId' => $user->getExternalId(),
             'startDatetime' => $startDatetime,
             'finishDatetime' => $finishDatetime,
             'classification' => Model::CLASSIFICATION_EVENT

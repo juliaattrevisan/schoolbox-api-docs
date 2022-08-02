@@ -69,3 +69,10 @@ CREATE TABLE `sis_event_campus` (
       ON UPDATE NO ACTION
   )
   COLLATE=utf8mb4_unicode_ci;
+
+-- Add some keys
+
+ALTER TABLE `sis_event`
+ADD INDEX `guid` (`guid` ASC) VISIBLE,
+ADD INDEX `type` (`type` ASC) VISIBLE;
+;

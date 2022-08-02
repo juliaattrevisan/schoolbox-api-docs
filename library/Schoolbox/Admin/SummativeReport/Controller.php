@@ -943,7 +943,7 @@ class Controller extends ConfigController
 
         //if report list is empty, display nice error message
         if (0 === count($reports)) {
-            throw new Exception("There are currently no students in the report list to preview");
+            throw new Exception("There are currently no reports to preview that match the criteria selected.");
         } else {
             //if reports exist.
             //redirect user to report preview

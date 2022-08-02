@@ -91,11 +91,13 @@ class Prepare implements IStrategy
                 {$this->eventMapper->getTable()}
                 SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
                 WHERE {$this->eventMapper->getTable()}.`source` = :source
+                AND classification = :classification
             ";
 
             $statement = $this->eventMapper->getDatabase()->prepare($query);
             $statement->execute([
-                'source' => $this->source
+                'source' => $this->source,
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_EVENT
             ]);
 
             $this->log->debug(sprintf(

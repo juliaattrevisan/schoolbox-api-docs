@@ -12,7 +12,6 @@
  */
 abstract class Evaluation_Question extends DeprecatedModel
 {
-
     /**
      * @var string
      */
@@ -229,7 +228,7 @@ abstract class Evaluation_Question extends DeprecatedModel
      */
     public function reorderQuestions(int $quizId, int $sectionId, array $allIds): void
     {
-        if (is_array($allIds) && count($allIds)) {
+        if (\count($allIds)) {
             $sequence = 1;
 
             foreach ($allIds as $currentId) {
@@ -247,7 +246,10 @@ abstract class Evaluation_Question extends DeprecatedModel
                     UPDATE {$this->_table}
                     JOIN assess_section on assess_section.section_id = {$this->_table}.section_id
                     SET {$this->_table}.sequence = {$sequence}
-                    WHERE question_id = {$currentId} AND {$this->_table}.section_id = {$sectionId} AND assess_id = {$quizId}
+                    WHERE question_id = {$currentId} 
+                    AND {$this->_table}.section_id = {$sectionId} 
+                    AND assess_id = {$quizId}
+                    AND {$this->_table}.deleted_at IS NULL
                 ");
 
                 $sequence++;

@@ -953,10 +953,11 @@ abstract class Kernel
                     $twig = new Environment($di->get('templateEngine:loader'), $options);
 
                     // HTML Purifier filter - known to output safe HTML
+                    $scrubAdapter = new ScrubAdapter();
                     $twig->addFilter(
                         new TwigFilter(
                             'purify',
-                            [Scrub::class, 'html'],
+                            [$scrubAdapter, 'purify'],
                             ['is_safe' => ['html']]
                         )
                     );

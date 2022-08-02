@@ -11,6 +11,9 @@ namespace Schoolbox\Learning\Turnitin;
 
 use PDOException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Learning\Turnitin;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
@@ -19,7 +22,7 @@ use UnexpectedValueException;
  *
  * For an assessment id, find all the student_submission_file_id's that don't have a corresponding
  * turnitin_report row and create one for them, setting the status to Pending. This applies to
- * all the student_sbmission_file_ids from the most recent submission that a student made to this
+ * all the student_submission_file_ids from the most recent submission that a student made to this
  * Due Work (it won't retroactively upload absolutely everything, just their most recent submission)
  *
  * @package Schoolbox\Learning\Turnitin
@@ -30,31 +33,96 @@ class Retrofit
 
 
     /**
+     * For the given $assessmentId, find the most recent student_submission records
+     * and from there, find all the student_submission_file_id values
+     *
+     * Once you have those, reduce the set to ones which don't already have a turnitin_report
+     * row in the db. Once it gets into turnitin_report, the async tools will take over the
+     * transmission responsibilities etc.
+     */
+    private const MOST_RECENT_SUBMISSION = "
+        SELECT ssf.*
+        FROM assessment a
+        INNER JOIN submission_box sb ON a.id = sb.assessment_id
+        INNER JOIN (
+            SELECT student_submission.box_id, student_submission.owner, MAX(submitted_at) as maxdate
+            FROM student_submission
+            GROUP BY box_id, owner
+        ) maxdates ON sb.id = maxdates.box_id
+        INNER JOIN student_submission ss ON maxdates.owner = ss.owner AND maxdate = ss.submitted_at
+        INNER JOIN student_submission_file ssf ON ss.id = ssf.student_submission_id
+        INNER JOIN storage s ON ssf.hash = s.hash
+        LEFT JOIN turnitin_report tr ON ssf.id = tr.student_submission_file_id
+        WHERE a.id = :assessmentId
+        AND tr.id IS NULL
+        ORDER BY ssf.id
+    ";
+
+
+    /**
+     * Retroactively stage every submission made by all students in a given submission box
+     * This counters a usage we witnessed in a school where a singular Due Work's submissions
+     * actually represented multiple different parts of an assessment; they weren't multiple
+     * attempts at doing the same thing. In this scenario you needed to transfer all to turnitin
+     */
+    private const ALL_SUBMISSIONS = "
+        SELECT ssf.*
+        FROM assessment a
+        INNER JOIN submission_box sb ON a.id = sb.assessment_id
+        INNER JOIN student_submission ss ON sb.id = ss.box_id
+        INNER JOIN student_submission_file ssf ON ss.id = ssf.student_submission_id
+        INNER JOIN storage s ON ssf.hash = s.hash
+        LEFT JOIN turnitin_report tr ON ssf.id = tr.student_submission_file_id
+        WHERE a.id = :assessmentId
+        AND tr.id IS NULL
+        ORDER BY ssf.id
+    ";
+
+
+    /**
+     * @var Turnitin\Group\Mapper
+     */
+    private Turnitin\Group\Mapper $turnitinGroupMapper;
+
+
+    /**
      * @var File\Mapper
      */
     private File\Mapper $turnitinFileMapper;
 
 
     /**
-     * @var \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper
+     * @var SubmissionBox\Submission\SingleFile\Mapper
      */
-    private \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper;
+    private SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper;
+
+
+    /**
+     * @var SubmissionBoxMapper
+     */
+    private SubmissionBoxMapper $submissionBoxMapper;
 
 
     /**
      * Retrofit constructor.
      *
-     * @param File\Mapper                                                                $turnitinFileMapper
-     * @param \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper
-     * @param LoggerInterface|null                                                       $log
+     * @param Turnitin\Group\Mapper                      $turnitinGroupMapper
+     * @param File\Mapper                                $turnitinFileMapper
+     * @param SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper
+     * @param SubmissionBoxMapper                        $submissionBoxMapper
+     * @param LoggerInterface|null                       $log
      */
     public function __construct(
+        Turnitin\Group\Mapper $turnitinGroupMapper,
         File\Mapper $turnitinFileMapper,
-        \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper,
+        SubmissionBox\Submission\SingleFile\Mapper $singleFileMapper,
+        SubmissionBoxMapper $submissionBoxMapper,
         ?LoggerInterface $log = null
     ) {
+        $this->turnitinGroupMapper = $turnitinGroupMapper;
         $this->turnitinFileMapper = $turnitinFileMapper;
         $this->singleFileMapper = $singleFileMapper;
+        $this->submissionBoxMapper = $submissionBoxMapper;
         $this->log = $log;
     }
 
@@ -63,39 +131,90 @@ class Retrofit
      * Retrofit all the student_submission_file_id's for $assessmentId that don't already
      * have a turnitin_report row associated
      *
-     * @param int $assessmentId
+     * @param int  $assessmentId
+     * @param bool $retrofitAll
      * @return void
-     * @throws PDOException
      * @throws Exception
+     * @throws Exception\Deleted
+     * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function retrofit(int $assessmentId): void
+    public function retrofit(int $assessmentId, bool $retrofitAll = false): void
     {
-        /* For the given $assessmentId, find the most recent student_submission records
-         * and from there, find all the student_submission_file_id values
-         *
-         * Once you have those, reduce the set to ones which don't already have a turnitin_report
-         * row in the db. Once it gets into turnitin_report, the async tools will take over the
-         * transmission responsibilities etc.
+        /* For the given $assessmentId, find the submission_box.id
          */
-        $query = '
-            SELECT ssf.*
-            FROM assessment a
-            INNER JOIN submission_box sb ON a.id = sb.assessment_id
-            INNER JOIN (
-                SELECT student_submission.box_id, student_submission.owner, MAX(submitted_at) as maxdate
-                FROM student_submission
-                GROUP BY box_id, owner
-            ) maxdates ON sb.id = maxdates.box_id
-            INNER JOIN student_submission ss ON maxdates.owner = ss.owner AND maxdate = ss.submitted_at
-            INNER JOIN student_submission_file ssf ON ss.id = ssf.student_submission_id
-            INNER JOIN storage s ON ssf.hash = s.hash
-            LEFT JOIN turnitin_report tr ON ssf.id = tr.student_submission_file_id
-            WHERE a.id = :assessmentId
-            AND tr.id IS NULL
-            ORDER BY ssf.id
-        ';
+        $submissionBox = $this->submissionBoxMapper->findOneByColumn('assessment_id', $assessmentId);
 
+        /* See if there's a turnitin_group for it
+         * If there isn't, create one
+         */
+        try {
+            $turnitinGroup = $this->turnitinGroupMapper->findOneByColumn('submission_box_id', $submissionBox->getId());
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $turnitinGroup = $this->turnitinGroupMapper->createModel()
+                ->setSubmissionBoxId($submissionBox->getId());
+        }
+
+        /* Set status to Pending; it needs to be processed asynchronously elsewhere
+         * because we don't know what changed, and there are a lot of api shenanigans
+         * to do
+         */
+        $turnitinGroup->setStatus(Turnitin\Group\Model::STATUS_TRANSMIT_PENDING);
+
+        $this->turnitinGroupMapper->save($turnitinGroup);
+
+        $this->logInfo(sprintf(
+            'Turnitin group %s with submission box id %s was staged for GroupTool crontab with status [%s]',
+            $turnitinGroup->getId(),
+            $turnitinGroup->getSubmissionBoxId(),
+            $turnitinGroup->getStatus()
+        ));
+
+        /* For a given turnitin_group record,
+         * Find all its attachments and create turnitin_group_attachment records
+         * (You can do this by giving Turnitin/Group/Process/Group.php the turnitin_group record)
+         *
+         * The crontab already does this step for us so we could count on that.
+         * Alternatively, inject the dependencies and run the GroupTool directly,
+         * guaranteeing that they process before staging each student submission's file
+         * (That's a bit slower and might not be necessary)
+         */
+
+        if ($retrofitAll) {
+            /* Alternatively, load them all (there's a specific use case at particular schools
+             * for which this is helpful)
+             */
+            $this->execute(self::ALL_SUBMISSIONS, $assessmentId);
+        } else {
+            /* For the given $assessmentId, find the most recent student_submission records
+             * and from there, find all the student_submission_file_id values
+             *
+             * Once you have those, reduce the set to ones which don't already have a turnitin_report
+             * row in the db. Once it gets into turnitin_report, the async tools will take over the
+             * transmission responsibilities etc.
+             *
+             * Note: For each of the submissions found, find each of the files associated with it
+             * and send them up to turnitin. You might be able to trust that each file's
+             * submitted_at timestamp is identical for all the files in the same submission
+             */
+            $this->execute(self::MOST_RECENT_SUBMISSION, $assessmentId);
+        }
+    }
+
+
+    /**
+     * Retrofit all the student_submission_file_id's for $assessmentId that don't already
+     * have a turnitin_report row associated
+     *
+     * @param string $query
+     * @param int    $assessmentId
+     * @return void
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function execute(string $query, int $assessmentId): void
+    {
         $statement = $this->turnitinFileMapper->getDatabase()->prepare($query);
         $statement->execute([
             'assessmentId' => $assessmentId,

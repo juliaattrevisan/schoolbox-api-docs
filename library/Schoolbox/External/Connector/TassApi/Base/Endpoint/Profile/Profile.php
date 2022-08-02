@@ -35,6 +35,12 @@ use UnexpectedValueException;
  */
 class Profile implements IStrategy
 {
+    /**
+     * Used in the profile category field to identify teacher or employee users coming from TASS into the staff table
+     */
+    public const EMPLOYEE = 'employee';
+    public const TEACHER = 'teacher';
+
 
     /**
      * Value of the school_details.boarder field corresponding to a Boarder
@@ -61,13 +67,6 @@ class Profile implements IStrategy
      * overwriting student profiles. To prevent them matching up like that, we chuck a letter in
      */
     private const EMPLOYEE_PREFIX = 'E';
-
-
-    /**
-     * Used in the profile category field to identify teacher or employee users coming from TASS into the staff table
-     */
-    public const EMPLOYEE = 'employee';
-    public const TEACHER = 'teacher';
 
 
     /**

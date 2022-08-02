@@ -11,7 +11,6 @@
  */
 abstract class Evaluation_Answer_Multi extends Evaluation_Answer
 {
-
     /**
      * Javascript class to use when creating UI
      *
@@ -379,11 +378,14 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
+        /* If a question was added after the attempt was made by the student,
+         * then $response['response'] might not even exist
+         */
         if (!$response) {
             return [
                 'response' => '',
-                'comment'  => '',
-                'mark'     => '',
+                'comment' => '',
+                'mark' => ''
             ];
         }
 
@@ -452,9 +454,14 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
-        $data = unserialize($response['response']);
+        /* If a question was added after the attempt was made by the student,
+         * then $response['response'] might not even exist; return empty array
+         */
+        if ($response) {
+            return unserialize($response['response']);
+        }
 
-        return $data;
+        return [];
     }
 
     /**
