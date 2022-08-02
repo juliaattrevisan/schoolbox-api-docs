@@ -36,7 +36,7 @@ class Controller extends Base
     }
 
     /**
-     * Load templates/index.twig using data obtained in this function.
+     * Show a list of rubric result sets.
      * @throws RouteNotFound
      */
     public function getList(): void
