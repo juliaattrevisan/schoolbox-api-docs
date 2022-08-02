@@ -26,7 +26,6 @@ use Schoolbox\Mapper as BaseMapper;
  */
 class Mapper extends BaseMapper
 {
-
     protected function mapping(): void
     {
         $this->hasTable('student_submission_file_kami');

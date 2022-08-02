@@ -21,8 +21,10 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 class RelationalDelete extends Deletable
 {
     private Turnitin\File\Mapper $turnitinReportMapper;
-    private Plagscan\Mapper      $plagscanDocumentMapper;
-    private Kami\Mapper          $kamiMapper;
+
+    private Plagscan\Mapper $plagscanDocumentMapper;
+
+    private Kami\Mapper $kamiMapper;
 
     public function __construct(
         Submission\SingleFile\Mapper $mapper,
