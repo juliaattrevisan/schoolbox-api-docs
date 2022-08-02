@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Quoter\IQuoter;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Resource\Storage;
@@ -23,6 +22,7 @@ use Schoolbox\Mapper as BaseMapper;
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] findByPredicates(Builder $pb, array $options = [])
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends BaseMapper
 {
