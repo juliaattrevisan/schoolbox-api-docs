@@ -607,9 +607,7 @@ $select-hover-bg-color: tint($warning-color, 50%);
 
     /* HTML5 Number spinners settings */
     input[type="number"]
-    input[type="text"],
-    input[inputmode="numeric"],
-    {
+    input[inputmode="numeric"] {
       @include html5number(moz, $input-number-spinners);
     }
       input[type="text"]::-webkit-inner-spin-button,
