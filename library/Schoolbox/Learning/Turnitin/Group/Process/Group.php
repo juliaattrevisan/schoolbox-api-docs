@@ -85,6 +85,12 @@ class Group
 
 
     /**
+     * @var \Schoolbox\Resource\Storage\FilesystemProxy
+     */
+    private \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy;
+
+
+    /**
      * Constructor.
      *
      * @param string                                               $instanceIdentifier
@@ -94,6 +100,7 @@ class Group
      * @param SubmissionBoxMapper                                  $submissionBoxMapper
      * @param SubmissionBox\SingleFile\Mapper                      $submissionBoxFileMapper
      * @param \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy
+     * @param \Schoolbox\Resource\Storage\FilesystemProxy          $filesystemProxy
      * @param LoggerInterface|null                                 $log
      */
     public function __construct(
@@ -104,6 +111,7 @@ class Group
         SubmissionBoxMapper $submissionBoxMapper,
         SubmissionBox\SingleFile\Mapper $submissionBoxFileMapper,
         \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
+        \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy,
         ?LoggerInterface $log = null
     ) {
         $this->instanceIdentifier = $instanceIdentifier;
@@ -113,6 +121,7 @@ class Group
         $this->submissionBoxMapper = $submissionBoxMapper;
         $this->submissionBoxFileMapper = $submissionBoxFileMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
+        $this->filesystemProxy = $filesystemProxy;
         $this->log = $log;
     }
 
@@ -448,7 +457,7 @@ class Group
 
         $payload = [
             'filename' => $submissionBoxFile->getBasename(),
-            'contents' => $submissionBoxFile->read()
+            'contents' => $this->filesystemProxy->read($submissionBoxFile)
         ];
 
         try {

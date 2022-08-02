@@ -205,6 +205,9 @@ HELP;
         /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
+        /** @var \Schoolbox\Resource\Storage\FilesystemProxy $filesystemProxy */
+        $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+
         /* Set up a record processor
          */
         $processor = (new Turnitin\Group\Process\Group(
@@ -215,6 +218,7 @@ HELP;
             SubmissionBoxMapper::getInstance(),
             SubmissionBox\SingleFile\Mapper::getInstance(),
             $assessmentMapperProxy,
+            $filesystemProxy,
             $this->getLogger()
         ));
 
