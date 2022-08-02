@@ -14,8 +14,12 @@ namespace Schoolbox\Admin\RubricResultSet;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use JetBrains\PhpStorm\NoReturn;
 use Schoolbox\Admin\Navigation\Subnav;
 
+/**
+ *
+ */
 class Controller extends Base
 {
     // The number of rows corresponds to the number of levels in a rubric grid.
@@ -29,6 +33,7 @@ class Controller extends Base
 
     /**
      * Controller constructor.
+     * @param Mapper $mapper
      */
     public function __construct(Mapper $mapper)
     {
@@ -57,12 +62,11 @@ class Controller extends Base
 
     /**
      * Delete the result set defined by $resultSetId.
-     * @throws RouteNotFound
+     * @param $resultSetId
      */
-    public function deleteResultSet($resultSetId): void
+    #[NoReturn] public function deleteResultSet($resultSetId): void
     {
         $this->mapper->deleteSet((int)$resultSetId);
-        $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubricResultSet.getList'));
         header('HTTP/1.0 200 OK');
         die;
     }
@@ -85,6 +89,7 @@ class Controller extends Base
 
     /**
      * Load templates/index.twig using data obtained in this function.
+     * @param int|null $resultSetId
      * @throws RouteNotFound
      */
     public function getUpdate(?int $resultSetId): void
