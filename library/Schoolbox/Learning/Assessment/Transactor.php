@@ -241,7 +241,7 @@ class Transactor
                  * If Similarity Check was previously disabled, but has now been enabled,
                  * Then attempt to retrofit all the previous submissions
                  */
-                if (!$before['assessment']['similarityCheckEnabled']) {
+                if (isset($before['assessment']) && !$before['assessment']['similarityCheckEnabled']) {
                     /* If turnitin is enabled, retrofit any old submissions' documents
                      */
                     (new Turnitin\Retrofit(Turnitin\Group\Mapper::getInstance(), Turnitin\File\Mapper::getInstance(), $this->submissionFileMapper, SubmissionBoxMapper::getInstance()))->retrofit($this->assessment->getId());
