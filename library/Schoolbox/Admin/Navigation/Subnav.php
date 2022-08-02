@@ -401,24 +401,6 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the 3rd party LTI integrations that you wish to make available for use in the LTI component.',
                     ],
-                    '/adminv2/rubric-results-sets' => [ // TODO: Remove once /adminv2/rubric-result-set is working.
-                        'name'        => 'Rubrics Result Sets',
-                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
-                        'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.',
-                        'children'    => []
-                    ],
-                    '/adminv2/rubric-results-set/{resultSetId}' => [ // TODO: Remove once /adminv2/rubric-result-set is working.
-                        'name'        => 'Rubrics Result Set',
-                        'visible'     => false,
-                        'children'    => [],
-                        'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.'
-                    ],
-                    '/adminv2/rubric-results-set/create' => [ // TODO: Remove once /adminv2/rubric-result-set is working.
-                        'name'        => 'Create Rubrics Result Set',
-                        'visible'     => false,
-                        'children'    => [],
-                        'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.'
-                    ],
                     '/adminv2/rubric-result-set' => [
                         'name'        => 'Rubric Result Sets',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
