@@ -612,7 +612,7 @@ class Transmit
         $this->changeState(
             $model,
             sprintf(
-                'Report %s: setting up turnitin Submission File Contents for submission file %s %sl; setting status [%s]',
+                'Report %s: setting up turnitin Submission File Contents for submission file %s %s; setting status [%s]',
                 $model->getId(),
                 $ssf->getId(),
                 $ssf->getBasename(),
