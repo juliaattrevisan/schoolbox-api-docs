@@ -196,7 +196,7 @@ class UserResolver implements IUserResolver
         // * dimensions not targeted to self.
         // We must apply the relationship modifier before removing muted users
         if ($excludeMuted && $relationship !== Model::RELATIONSHIP_SELF && $this->hasFolderDimension($dimensions)) {
-            return $this->buildMutedRelatedDimensionsQuery($userTableAlias, $subQueryId, $relationship, $dimensions);
+            return $this->buildMutedRelatedDimensionsQuery($userTableAlias, $subQueryId, $relationship, $dimensions, $excludeMuted);
         }
 
         return $this->buildNormalCaseDimensionsQuery($userTableAlias, $subQueryId, $relationship, $dimensions, $excludeMuted);
@@ -267,6 +267,7 @@ class UserResolver implements IUserResolver
      * @param int    $subQueryId
      * @param string $relationship A non-self modifier
      * @param array  $dimensions
+     * @param bool   $excludeMuted
      * @return array
      * @throws Database\Exception
      * @throws DefinitionException
@@ -275,7 +276,8 @@ class UserResolver implements IUserResolver
         string $userTableAlias,
         int $subQueryId,
         string $relationship,
-        array $dimensions
+        array $dimensions,
+        bool $excludeMuted
     ): array {
         if ($relationship === Model::RELATIONSHIP_SELF || !$this->hasFolderDimension($dimensions)) {
             throw new InvalidArgumentException("Params do not contain a folder dimension with non-self relationship modifier");
@@ -308,7 +310,7 @@ class UserResolver implements IUserResolver
         // Folder dimensions must be handled per dimension
         foreach ($folderDimensions as $folderDimension) {
             // Need to handle each folder dimension individually
-            $relatedUsers[] = $this->getNonMutedFolderRelatedUsers($relationship, $folderDimension->getValues());
+            $relatedUsers[] = $this->getNonMutedFolderRelatedUsers($relationship, $folderDimension->getValues(), $excludeMuted);
         }
 
         $relatedUsers = array_intersect(...$relatedUsers);
@@ -341,7 +343,7 @@ class UserResolver implements IUserResolver
      * @param null[]|string[] $folderIds
      * @return array
      */
-    private function getNonMutedFolderRelatedUsers(string $relationship, array $folderIds): array
+    private function getNonMutedFolderRelatedUsers(string $relationship, array $folderIds, bool $excludeMuted): array
     {
         /** @var Segment\Strategy\Folder $strategy */
         $strategy        = $this->strategyFactory->makeSimpleStrategy(Segment\Strategy\Folder::getEntityType());
@@ -355,6 +357,10 @@ class UserResolver implements IUserResolver
         }
         $allRelatedUsers = [];
         foreach ($folderIds as $folderId) {
+            if ($excludeMuted && $mutedFolders[$folderId] && $mutedFolders[$folderId] === ['0']) {
+                // if notification is disabled, skip this folder
+                continue;
+            }
             $userResSql        = $strategy->getUserResolutionSql('user', "", [$folderId], false);
             $join              = $userResSql->getJoin();
             $pb                = $userResSql->getPb();

@@ -234,7 +234,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     $i++;
                 }
 
-                $this->setVar("REPLYTO", $this->getUser()->getFormattedEmailDisplay());
+                $this->setVar("REPLYTO", $this->getUser()->getEmail());
                 $this->setVar("EMAILALL", implode(Mailer::implodeGlue(), array_unique($emailall)));
 
                 if ($this->getConfigLoader()->get(\Schoolbox\Config\ConfigMapper::NAME_MAIL_ENABLED) && $this->getUser()->hasEmail()) {

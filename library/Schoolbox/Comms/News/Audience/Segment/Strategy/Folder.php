@@ -485,7 +485,7 @@ class Folder extends SimpleStrategy
         }
         $mutedUsersPerFolder = [];
 
-        $pb          = (new Builder(new Quoter(), 'msg_reroute_override'))
+        $pb = (new Builder(new Quoter(), 'msg_reroute_override'))
             ->in('msg_route_key', array_map(static function (string $folderId) {
                 return sprintf('service.%s.%s', UserAccess::SERVICE_HOMEPAGE, $folderId);
             }, $filtered))
@@ -498,7 +498,15 @@ class Folder extends SimpleStrategy
         ";
         $query = $this->folderMapper->getDatabase()->query($sql, $pb->getParams());
         while ([$folderId, $userId] = $query->fetch(PDO::FETCH_NUM)) {
-            $mutedUsersPerFolder[$folderId][] = $userId;
+            $folderId = (string)$folderId;
+            if ($userId === '0') {
+                // Notification is disabled for this folder. Reset to '0' only.
+                $mutedUsersPerFolder[$folderId] = ['0'];
+            } elseif (!in_array('0', $mutedUsersPerFolder[$folderId] ?? [])) {
+                // If notification is enabled, add current muted user
+                $mutedUsersPerFolder[$folderId] ??= [];
+                $mutedUsersPerFolder[$folderId][] = $userId;
+            }
         }
         return $mutedUsersPerFolder;
     }
@@ -571,6 +579,18 @@ class Folder extends SimpleStrategy
         $quoter = new Quoter();
 
         $mutedUsersPerFolder = $excludeMuted ? $this->getMutedUsersPerFolder($nnianFolderIds) : [];
+
+        if ($excludeMuted) {
+            $mutedFolderIds = [];
+            // Get notification disabled folders
+            foreach ($mutedUsersPerFolder as $folderId => $userIds) {
+                if ($userIds === ['0']) {
+                    $mutedFolderIds[] = $folderId;
+                }
+            }
+            // Remove notification disabled folders from target folders
+            $nnianFolderIds = array_diff($nnianFolderIds, $mutedFolderIds);
+        }
 
         // Get group users, regardless of whether they have read/write/mod perms. (but not deny)
         $groupJoin = $targetNull ? 'LEFT' : '';
