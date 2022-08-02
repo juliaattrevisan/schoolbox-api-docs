@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Groups;
 
 use Alaress\Color\ColorFactory;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
@@ -96,10 +97,10 @@ class GroupsHelper
      * by default the user will receive notifications for all groups they are a member of, unless they mute them
      * (if those groups are not set to force follow)
      *
-     * @param User                   $user
-     * @param GenericCollection      $accesses
+     * @param User       $user
+     * @param Collection $accesses
      */
-    public function populateNotification(User $user, GenericCollection $accesses)
+    public function populateNotification(User $user, Collection $accesses)
     {
         $rerouteOverrides = $this->reRouteOverrideMapper->getMutedFolders($user->getId());
 
@@ -291,17 +292,23 @@ class GroupsHelper
      * these no homepage groups are usually used for notifications, and are sis controlled
      * @param User  $user
      * @param Group $group
-     * @return UserAccess
+     * @return UserAccess|null
      */
-    public function getGroup(User $user, Group $group): UserAccess
+    public function getGroup(User $user, Group $group): ?UserAccess
     {
         // Get the group the user is currently a member, their enrolment type and favourite status
-        $userPerm = $this->userAccessMapper->findForFolderUser(
+        $userPerms = $this->userAccessMapper->findForFolderUser(
             $group->getFolder(),
             (new GenericCollection(User::class))->add($user)
-        );
-        $userPerm->first()->setFolder($group->getFolder());
-        $userPerms = $this->userAccessMapper->createCollection()->add($userPerm);
+        )->map(static function ($ua) use ($group) {
+            /** @var UserAccess $ua */
+            return $ua->setFolder($group->getFolder());
+        });
+
+        if ($userPerms->count() === 0) {
+            return null;
+        }
+
         $this->populateNotification($user, $userPerms);
         return $userPerms->first();
     }

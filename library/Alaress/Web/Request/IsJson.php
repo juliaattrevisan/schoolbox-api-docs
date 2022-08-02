@@ -15,7 +15,6 @@ use TypeError;
 
 class IsJson extends Specification\Leaf
 {
-
     /**
      * Returns whether the candidate audience specification satisfies this specification
      *
@@ -32,6 +31,7 @@ class IsJson extends Specification\Leaf
                 )
             );
         }
-        return strpos($candidate->headers->get('accept'), 'application/json') !== false;
+        return strpos($candidate->headers->get('accept'), 'application/json') !== false
+            || strpos($candidate->headers->get('content-type'), 'application/json') !== false;
     }
 }

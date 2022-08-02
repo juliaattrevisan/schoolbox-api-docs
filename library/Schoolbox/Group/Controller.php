@@ -66,7 +66,7 @@ class Controller extends Base
      * Group management page
      * @param Folder $folder
      * @return void
-     * @api   /group/modify/{folderId}
+     * @api   GET /group/modify/{folderId}
      * @since 22.1
      */
     public function getModify(Folder $folder)
@@ -90,7 +90,7 @@ class Controller extends Base
      * Get group users in json
      * @param Folder $folder
      * @return void
-     * @api   /group/getData
+     * @api   GET /group/getData/{folderId}
      * @since 22.1
      */
     public function getData(Folder $folder)
@@ -116,7 +116,7 @@ class Controller extends Base
     /**
      * @param Folder $folder
      * @return void
-     * @api   /group/removeMembers/{folderId}
+     * @api   DELETE /group/removeMembers/{folderId}
      * @since 22.1
      */
     public function removeMembers(Folder $folder)
@@ -144,7 +144,7 @@ class Controller extends Base
      * Update group members
      * @param Folder $folder
      * @return void
-     * @api   /group/updateMembers/{folderId}
+     * @api   PATCH /group/updateMembers/{folderId}
      * @since 22.1
      */
     public function updateMembers(Folder $folder)
@@ -176,6 +176,8 @@ class Controller extends Base
      * @param Folder $folder
      * @return void
      * @throws MapperException
+     * @api   POST /group/addMembers/{folderId}
+     * @since 22.1
      */
     public function addMembers(Folder $folder)
     {
@@ -224,7 +226,7 @@ class Controller extends Base
      * @return void
      * @throws MapperException
      * @since 22.1
-     * @api   /group/updateMembers/{folderId}
+     * @api   PATCH /group/updateMembers/{folderId}
      */
     public function updateSettings(Folder $folder)
     {
@@ -250,6 +252,8 @@ class Controller extends Base
     /**
      * @param Folder $folder
      * @return void
+     * @api   POST /group/disband/{folderId}
+     * @since 22.1
      */
     public function disband(Folder $folder)
     {

@@ -65,8 +65,8 @@ class Controller extends Base
      */
     public function apiMembership(User $user)
     {
-        $accesses = $this->groupsHelper->getCurrentGroups($user);
-        $output   = $accesses->map(new ModelToArray());
+        $userAccesses = $this->groupsHelper->getCurrentGroups($user);
+        $output       = $userAccesses->map(new ModelToArray());
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
@@ -84,13 +84,12 @@ class Controller extends Base
      */
     public function apiMembershipGet(User $user, Group $group)
     {
-        try {
-            $userGroup = $this->groupsHelper->getGroup($user, $group);
-        } catch (MapperException $e) {
+        $userAccess = $this->groupsHelper->getGroup($user, $group);
+        if (!$userAccess) {
             $this->sendJsonError('User is not enroled in the group', 404);
             return;
         }
-        $output = (new ModelToArray())($userGroup);
+        $output = (new ModelToArray())($userAccess);
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
@@ -105,19 +104,16 @@ class Controller extends Base
      */
     public function apiMembershipAdd(User $user, Group $group)
     {
-        try {
-            $userAccess = $this->groupsHelper->getGroup($user, $group);
-            if ($userAccess->getAccessLevel() !== 0) {
-                $this->sendJsonError('User is already enroled in the group', 409);
-                return;
-            }
-        } catch (MapperException $e) {
-            $userAccess = (new UserAccess())
-                ->setServiceIdentifier($group->getFolder()->getId())
-                ->setUser($user)
-                ->setFolder($group->getFolder())
-                ->setService(UserAccess::SERVICE_HOMEPAGE);
+        $userAccess = $this->groupsHelper->getGroup($user, $group);
+        if ($userAccess && $userAccess->getAccessLevel() !== 0) {
+            $this->sendJsonError('User is already enroled in the group', 409);
+            return;
         }
+        $userAccess = (new UserAccess())
+            ->setServiceIdentifier($group->getFolder()->getId())
+            ->setUser($user)
+            ->setFolder($group->getFolder())
+            ->setService(UserAccess::SERVICE_HOMEPAGE);
 
         $this->processGroupPostData($userAccess, $user, $group);
     }
@@ -132,9 +128,8 @@ class Controller extends Base
      */
     public function apiMembershipPut(User $user, Group $group)
     {
-        try {
-            $userAccess = $this->groupsHelper->getGroup($user, $group);
-        } catch (MapperException $e) {
+        $userAccess = $this->groupsHelper->getGroup($user, $group);
+        if (!$userAccess) {
             $this->sendJsonError('User does not exist in the group', 409);
             return;
         }
@@ -151,16 +146,16 @@ class Controller extends Base
      */
     public function apiMembershipPatch(User $user, Group $group)
     {
-        try {
-            $userAccess = $this->groupsHelper->getGroup($user, $group);
-        } catch (MapperException $e) {
-            $this->sendJsonError('User is not enroled in the group', 404);
+        $userAccess = $this->groupsHelper->getGroup($user, $group);
+        if (!$userAccess) {
+            $this->sendJsonError('User does not exist in the group', 409);
             return;
         }
         $this->processGroupPostData($userAccess, $user, $group);
     }
 
     /**
+     * Apply post data to given userAccess and persist
      * @param UserAccess $userAccess
      * @param User       $user
      * @param Group      $group
@@ -203,14 +198,13 @@ class Controller extends Base
 
     /**
      * Deletes a user's group membership
-     * @api  DELETE /user/{userId}/group
+     * @api  DELETE /user/{userId}/group/{groupId}
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipDelete
      */
     public function apiMembershipDelete(User $user, Group $group)
     {
-        try {
-            $userAccess = $this->groupsHelper->getGroup($user, $group);
-        } catch (MapperException $e) {
+        $userAccess = $this->groupsHelper->getGroup($user, $group);
+        if (!$userAccess) {
             $this->sendJsonError('User is not enroled in the group', 404);
             return;
         }
