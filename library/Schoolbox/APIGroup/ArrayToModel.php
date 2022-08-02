@@ -9,14 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\APIGroup;
 
-use Schoolbox\API\Translator\ArrayToModel\Base;
 use Schoolbox\Groups\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Translator for translating an array representation of user access into a model.
  */
-class ArrayToModel extends Base
+class ArrayToModel
 {
     /**
      * Translate the array representation of the group access into a model.
@@ -74,7 +73,7 @@ class ArrayToModel extends Base
 
         // combining enrolementStatus and membership
         $accessLevel = 0;
-        if ($array['enrolmentStatus'] === 'enroled') {
+        if ($array['enrolmentStatus'] === GroupsHelper::ENROLED) {
             $accessLevel = UserAccess::ACCESS_NAME_TO_LEVEL[$array['membership']];
         }
         $model->setAccessLevel($accessLevel);

@@ -87,7 +87,7 @@ function onClearMemberSelection () {
  * Email the selected group members
  */
 function onEmailMembersSelected () {
-    window.location.href = Endpoints.SEND_EMAIL + '?folderId=105&userIds=';
+    window.location.href = `${Endpoints.SEND_EMAIL}?folderId=${store.groupId}&userIds=${membersStore.selectedMemberIds.join(',')}`;
 }
 
 /**

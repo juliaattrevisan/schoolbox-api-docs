@@ -59,7 +59,6 @@ export const useMembersStore = defineStore('manageGroupMembers', {
         selectedMembers () {
             return this.groupMembers.filter((member) => this.selectedMemberIds.includes(member.id));
         },
-
     },
 
     actions: {
@@ -73,7 +72,7 @@ export const useMembersStore = defineStore('manageGroupMembers', {
             const groupMembers = members.map((groupMember) => { //add in some additional properties
                 return {
                     ...groupMember,
-                    displayPriority: groupMember.accessType === 'waiting' ? 1 : 0, //waiting list members are put at the top of the table
+                    displayPriority: groupMember.accessType === 'none' ? 1 : 0, //waiting list members are put at the top of the table
                     isNew: false, //to highlight new members just added
                     justUpdated: false, //to highlight members that have just been changed
                 }
