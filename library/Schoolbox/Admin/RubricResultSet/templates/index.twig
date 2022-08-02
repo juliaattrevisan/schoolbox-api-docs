@@ -32,7 +32,13 @@ function onClickDeleteRow(resultSetId)
         {
             confirmEvent: function ()
             {
-                $.post('/adminv2/rubric-result-set/' + resultSetId + '/delete').done(function () {location.reload();});
+                $.ajax(
+                    {
+                        url: '/adminv2/rubric-result-set/' + resultSetId,
+                        type: 'DELETE',
+                        success: function () {location.reload();}
+                    }
+                );
             }
         }
     );
