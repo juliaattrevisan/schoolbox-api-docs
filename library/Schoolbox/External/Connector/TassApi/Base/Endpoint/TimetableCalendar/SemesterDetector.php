@@ -100,7 +100,7 @@ class SemesterDetector
              */
             $startDate = (new \Alaress_Date_Format($start, $this->dateLocalFormat))->startOfDay();
 
-            /* If it is, return that $pair's index+1, since:
+            /* If $startDate is in the past, return that $startVal's index+1, since:
              *     tap1start is index 0 in ACADEMIC_PERIOD_KEYS
              *     but it corresponds to "semester 1" in tass.
              */
