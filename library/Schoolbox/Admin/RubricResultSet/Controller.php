@@ -18,6 +18,8 @@ use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base
 {
+    // The number of rows corresponds to the number of levels in a rubric grid.
+    // Our ui limits it arbitrarily to 11, despite the schema design permitting you to have more than that.
     private const MAX_ROWS_PER_RESULT_SET = 11;
 
     /**
