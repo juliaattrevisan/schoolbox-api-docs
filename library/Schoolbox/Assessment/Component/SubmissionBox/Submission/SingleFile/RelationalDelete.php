@@ -30,9 +30,8 @@ class RelationalDelete extends Deletable
         Turnitin\File\Mapper $turnitinReportMapper,
         Plagscan\Mapper $plagscanDocumentMapper,
         Kami\Mapper $kamiMapper,
-        string $hashColumn = 'hash'
     ) {
-        parent::__construct($mapper, $logger, $hashColumn);
+        parent::__construct($mapper, $logger);
         $this->turnitinReportMapper   = $turnitinReportMapper;
         $this->plagscanDocumentMapper = $plagscanDocumentMapper;
         $this->kamiMapper             = $kamiMapper;
