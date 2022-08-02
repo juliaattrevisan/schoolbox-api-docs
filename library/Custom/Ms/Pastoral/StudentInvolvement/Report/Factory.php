@@ -277,7 +277,7 @@ class Factory
         $subjectData = $this->gateway->getSubject($year, $subjectCode, true);
         if (
             ($folder && self::isSubjectLateralLearning($folder->getName()))
-            || self::isSubjectLateralLearning($subjectData['sub_desc'])
+            || self::isSubjectLateralLearning($subjectData['sub_desc'] ?? '')
         ) {
             return $this->buildLateralLearning(
                 $subjectData,
