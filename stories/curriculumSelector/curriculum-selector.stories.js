@@ -5,7 +5,7 @@
 import CurriculumSelector from '../../library/Schoolbox/Curriculum/templates/vue/curriculum-selector.vue';
 import { rest } from 'msw';
 import { data as allCurriculumData } from './dataCurriculumSelector';
-import { data as vicCurriculumData } from './dataVicCurriculum';
+import { data as generalCurriculumData } from './dataGeneralCurriculum';
 
 
 const dataEndpoint = '/curriculumData'; 
@@ -98,7 +98,7 @@ SingleCurriculumGroup.parameters = {
         handlers: [ 
             rest.get(dataEndpoint, (req, res, ctx) => {
                 return res( 
-                    ctx.json(vicCurriculumData)
+                    ctx.json(generalCurriculumData)
                 ) 
             }),
             ...mswHandlers,

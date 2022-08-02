@@ -222,6 +222,10 @@ const containerClass = computed(() => {
     } 
 }
 
+.checklist {
+    flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it
+}
+
 ul {
     list-style: none; //don't use any dots
     margin: 0; //and spacing is controlled by props.depth
