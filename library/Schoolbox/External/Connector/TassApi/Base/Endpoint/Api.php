@@ -26,7 +26,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer\BrokenPayloadCod
  */
 class Api implements IApi
 {
-
     /**
      * Tass API Version Number
      *
@@ -192,13 +191,11 @@ class Api implements IApi
      * @param array  $params
      * @param int    $version
      * @return array|null
-     * @throws DomainException
      * @throws RuntimeException
      * @throws \JsonException
      */
     public function retrieveDocument(string $method, array $params, int $version = self::VERSION_3): ?array
     {
-
         /* Record endpoint usage
          */
         $this->apiUsage->record($method);
@@ -237,7 +234,6 @@ class Api implements IApi
      * @param array  $params
      * @param array  $queryArgs
      * @return mixed|void
-     * @throws DomainException
      * @throws RuntimeException
      * @throws \JsonException
      */
@@ -289,13 +285,23 @@ class Api implements IApi
                 return $contents;
             }
 
-            /* We got a response but it's broken
-             * Take a little nap before trying again
-             * (We suspect that it might be timing related, or network traffic)
+            /* HTTP 401 Unauthorized is not likely to be a transient issue
+             * Skip retrying any other likely nontransient issues by adding
+             * their http status codes to this array
              */
-            $fails++;
+            $nonTransient = [401];
 
-            sleep(self::NAP_TIMEOUT);
+            if (in_array($response->getStatusCode(), $nonTransient, true)) {
+                $fails = self::NUM_RETRY;
+            } else {
+                /* We got a response but it's broken
+                 * Take a little nap before trying again
+                 * (We suspect that it might be timing related, or network traffic)
+                 */
+                $fails++;
+
+                sleep(self::NAP_TIMEOUT);
+            }
 
             /* We tried multiple times and failed multiple times
              * This might as well have died

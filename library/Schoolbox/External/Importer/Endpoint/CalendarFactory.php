@@ -24,7 +24,6 @@ use Schoolbox\RoleMapper;
  */
 class CalendarFactory implements IFactory
 {
-
     /**
      * The family of importers that we can spawn
      */
@@ -99,11 +98,14 @@ class CalendarFactory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
+                    \Schoolbox\External\Profile\Student\Mapper::getInstance(),
+                    \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
                     \Schoolbox\CampusMapper::getInstance(),
                     \Schoolbox\Calendar\EventTypeMapper::getInstance(),
                     \Schoolbox\External\Event\Mapper::getInstance(),
                     \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
                     \Schoolbox\External\Event\Campus\Mapper::getInstance(),
+                    \Schoolbox\External\Event\User\Mapper::getInstance(),
                     RoleMapper::getInstance()
                 ))->produce();
 
