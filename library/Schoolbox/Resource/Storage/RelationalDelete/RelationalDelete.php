@@ -11,6 +11,8 @@ namespace Schoolbox\Resource\Storage\RelationalDelete;
 
 use Component\Eportfolio\FileListMapper;
 use Eportfolio\CoverPhotoMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
+use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Resource\Storage;
 use Psr\Log\LoggerInterface;
@@ -146,10 +148,10 @@ class RelationalDelete implements IRelationalDelete
             ),
 
             // Plagscan
-            new \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\RelationalDelete(
-                \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::getInstance(),
+            new Deletable(
+                Plagscan\Mapper::getInstance(),
                 $this->logger,
-                \Database::getInstance(),
+                'storage_hash',
             ),
 
             // Student Submission File
@@ -157,6 +159,8 @@ class RelationalDelete implements IRelationalDelete
                 \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
                 $this->logger,
                 Turnitin\File\Mapper::getInstance(),
+                Plagscan\Mapper::getInstance(),
+                Kami\Mapper::getInstance(),
             ),
 
             // Submission box file
