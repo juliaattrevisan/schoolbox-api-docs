@@ -28,10 +28,10 @@ class SemesterDetector
      * A set of option related to our ability to detect Current Semester
      */
     private const ACADEMIC_PERIOD_KEYS = [
-        ['tap1start', 'tap1end'],
-        ['tap2start', 'tap2end'],
-        ['tap3start', 'tap3end'],
-        ['tap4start', 'tap4end']
+        'tap1start',
+        'tap2start',
+        'tap3start',
+        'tap4start'
     ];
 
 
@@ -73,56 +73,72 @@ class SemesterDetector
      * Check each of the pairs until we find the first match where: Start <= Now <= End
      *
      * @param array $options
-     * @return int
+     * @return null|int
      * @throws \InvalidArgumentException
      */
-    public function detect(array $options): int
+    public function detect(array $options): ?int
     {
         $now = \Alaress_Date_Format::now();
+        $semester = null;
+        $found = false;
 
-        foreach (self::ACADEMIC_PERIOD_KEYS as $index => $pair) {
+        foreach (self::ACADEMIC_PERIOD_KEYS as $index => $startVal) {
             /* If both were defined, check Start <= Now <= End
              * This returns the first semester that fulfils the date requirements
              *
              * Otherwise, continue trying
              */
-            [$startKey, $endKey] = $pair;
+            $start = trim((string)($options[$startVal] ?? null));
 
-            $start = trim((string)($options[$startKey] ?? null));
-            $end = trim((string)($options[$endKey] ?? null));
-
-            /* One of the pairs is inconclusive - keep going
+            /* One of the dates is inconclusive - keep going
              */
-            if ('' === $start || '' === $end) {
+            if ('' === $start) {
                 continue;
             }
 
             /* Check Alaress Date Format boundaries
              */
             $startDate = (new \Alaress_Date_Format($start, $this->dateLocalFormat))->startOfDay();
-            $endDate = (new \Alaress_Date_Format($end, $this->dateLocalFormat))->endOfDay();
 
-            /* If it is, return that $pair's index+1, since:
-             *     (tap1start, tap1end) is index 0 in ACADEMIC_PERIOD_KEYS
+            /* If $startDate is in the past, return that $startVal's index+1, since:
+             *     tap1start is index 0 in ACADEMIC_PERIOD_KEYS
              *     but it corresponds to "semester 1" in tass.
              */
-            if ($now->between($startDate, $endDate)) {
+            if ($now->gte($startDate)) {
                 $semester = $index + 1;
-
-                $this->log->debug(sprintf(
-                    'Detected TASS Academic Period %s via DSN options; using that as semester value',
-                    $semester
-                ));
-
-                return $semester;
             }
+
+            /* We found at least one date in the set
+             */
+            $found = true;
+        }
+
+        /* If we found a semester index using the tass Academic Periods,
+         * return that date's corresponding index
+         */
+        if ($semester) {
+            $this->log->debug(sprintf(
+                'Detected TASS Academic Period %s via DSN options; using that as semester value',
+                $semester
+            ));
+
+            return $semester;
+        }
+
+        /* There was at least one date in the set, but it's in the future
+         * Exit early with null, which causes timetable import to skip
+         */
+        if ($found) {
+            $this->log->debug('All user-provided semester dates are in the future - skipping timetable imports.');
+
+            return null;
         }
 
         /* If none of the Academic Periods help us figure out what semester
          * we're currently in, fall back to the default presumptive behaviour of
          * guessing that Jan-Jun is Semester 1, and everything else is semester 2
          */
-        $semester = $this->getCurrentSemester();
+        $semester = $this->guessCurrentSemester();
 
         $this->log->debug(sprintf(
             'Detecting semester %s with classic assumption; using that as semester value',
@@ -132,13 +148,14 @@ class SemesterDetector
         return $semester;
     }
 
+
     /**
      * Returns 1 if we are currently in first semester, defined by being in January-June inclusive
      * Otherwise semester 2
      *
      * @return int
      */
-    private function getCurrentSemester(): int
+    private function guessCurrentSemester(): int
     {
         return (int)date('n') <= 6 ? 1 : 2;
     }

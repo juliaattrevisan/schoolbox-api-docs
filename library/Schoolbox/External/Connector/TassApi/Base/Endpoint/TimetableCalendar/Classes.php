@@ -388,6 +388,15 @@ class Classes implements IStrategy
 
         $semester = (new SemesterDetector($this->log, $this->dateLocalFormat))->detect($this->api[DSN::MODULE_LMS_INTEGRATION]->getOptions());
 
+        /* No semester detected? Exit early, there's nothing to do
+         * We need the $semester value to fetch data from tass
+         *
+         * (I don't think it's possible to have $semester be zero though)
+         */
+        if (null === $semester) {
+            return;
+        }
+
         /* Pummel my way through each person's timetable, using $classIdentifiers as a way
          * to identify the classes that need special treatment due to Yard Duties etc.
          */
@@ -431,7 +440,6 @@ class Classes implements IStrategy
 
                 $this->process($person, $timetable, true);
             }
-
             /* Example $timetable extract
 
                 Array
