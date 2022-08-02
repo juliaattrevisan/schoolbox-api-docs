@@ -1,38 +1,10 @@
-<style>
-span.rubric-value-span {
-    display: inline-block;
-    width: 10px;
-}
-
-input.rubric-wide-input {
-    display: inline-block;
-    margin-left: 10px;
-    width: 95%;
-}
-
-label.rubric-result-set-row-label {
-    white-space: nowrap;
-}
-
-label.rubric-result-set-row-label > span.rubric-value-span,
-label.rubric-result-set-row-label > a.delete-row-button {
-    /* These styles are important when the validation message appears below the input field. */
-    padding-top: 0.5rem;
-    vertical-align: top;
-}
-
-label.rubric-result-set-row-label > span.input-container {
-    display: inline-block;
-    width: 97%;
-}
-</style>
 <script>
     /**
      * When the plus button is clicked, we add a new row to the form.
      */
     function onClickPlusButton() {
-        let rowsContainerUl = document.getElementById('rows-container-ul');
-        let nRows           = document.getElementsByClassName('rubric-value-span').length;
+        let rowsContainer = document.getElementById('rows-container');
+        let nRows         = rowsContainer.children.length;
 
         if (nRows > 0) {
             if (nRows > {{ maxRowsPerResultSet }}) {
@@ -42,21 +14,18 @@ label.rubric-result-set-row-label > span.input-container {
         }
 
         let newRowHtml = (
-            "<li id='row-li-" + nRows + "'>\n" +
-            "    <div class='small-12 medium-12 column'>\n" +
-            "        <label class='rubric-result-set-row-label'>\n" +
-            "            <span class='rubric-value-span' data-role='value'>" + nRows + "</span>\n" +
-            "            <span class='input-container'>\n" +
-            "                <!-- This input-container span is necessary in order to contain the input and the validation message span that will be added if the field contains invalid data. -->\n" +
-            "                <input class='rubric-wide-input' type='text' name='rubricResultLabels[" + nRows + "]' maxlength='64' required/>\n" +
-            "            </span>\n" +
-            "            <a class='delete-row-button icon-delete' onclick='onClickDeleteRow(" + nRows + ")'></a>\n" +
-            "        </label>\n" +
+            // This HTML must match that inside the inner loop in the HTML template below.
+            "<div id='row-div-" + nRows + "' class='small-12 columns actions-small-1'>\n" +
+            "    <div class='list-item'>\n" +
+            "        <input type='text' name='rubricResultLabels[" + nRows + "]' maxlength='64' required/>\n" +
             "    </div>\n" +
-            "</li>\n"
+            "    <nav>\n" +
+            "        <a class='icon-delete' title='Delete rubric result set item' onclick='onClickDeleteRow(" + nRows + ")'></a>\n" +
+            "    </nav>\n" +
+            "</div>\n"
         );
 
-        rowsContainerUl.insertAdjacentHTML('beforeend', newRowHtml);
+        rowsContainer.insertAdjacentHTML('beforeend', newRowHtml);
 
         // Add validation rules to new input.
         $('input[name="rubricResultLabels[' + String(nRows) + ']"').rules('add', {requiredNotBlank: true});
@@ -70,11 +39,11 @@ label.rubric-result-set-row-label > span.input-container {
      * We also must update the numbers on the left of the new form rows so there are no gaps.
      */
     function onClickDeleteRow(rowValue) {
-        let rowLi = document.getElementById('row-li-' + rowValue);
+        let rowLi = document.getElementById('row-div-' + rowValue);
         rowLi.remove();
         renumberRows();
 
-        if (document.getElementById('rows-container-ul').children.length === 0) {
+        if (document.getElementById('rows-container').children.length === 0) {
             document.getElementById('empty-state-island-div').style.display = ''; // Show empty state box.
             togglePlusAndSaveButtons(false);
         } else {
@@ -87,16 +56,13 @@ label.rubric-result-set-row-label > span.input-container {
      * so that the number of each row is one more than the number on the row directly above.
      */
     function renumberRows() {
-        let spans = document.getElementsByClassName('rubric-value-span');
+        let divs = document.getElementById('rows-container').children;
 
-        for (let i = 0; i < spans.length; ++i) {
-            let span = spans[i];
+        for (let i = 0; i < divs.length; ++i) {
+            let div    = divs[i];
+            let inputs = div.querySelectorAll('input');
 
-            span.innerHTML = String(i); // Cast to avoid warning.
-
-            // Must also rename the text input.
-            let labelTextInput = span.nextElementSibling;
-            labelTextInput.setAttribute('name', 'rubricResultLabels[' + i + ']');
+            inputs[0].setAttribute('name', 'rubricResultLabels[' + i + ']');
         }
     }
 
@@ -107,6 +73,7 @@ label.rubric-result-set-row-label > span.input-container {
         let displayValue = ((boolShow)? '': 'none');
         document.getElementById('save-button'              ).style.display = displayValue;
         document.getElementById('plus-button-container-div').style.display = displayValue;
+        document.getElementById('rows-container'           ).style.display = displayValue;
     }
 
     $(
@@ -144,23 +111,18 @@ label.rubric-result-set-row-label > span.input-container {
                 <form id="rubricResultSetForm" method="post" action="/adminv2/rubric-result-set/create">
                     <input type='hidden' name='resultSetIdOrBlank' value='{{ resultSetId }}'/>
                     <section>
-                        <ul id="rows-container-ul" class="information-list unsortable">
+                        <fieldset id="rows-container" class="content"{% if not rubricResultRows %} style="display:none"{% endif %}>
                             {% for row in rubricResultRows %}
-                                <li id="row-li-{{ row.value|purify }}">
-                                    <div class="small-12 medium-12 column">
-                                        <label class="rubric-result-set-row-label">
-                                            <span class="rubric-value-span" data-role="value">{{ row.value|purify }}</span>
-                                            <!-- A sensible maxlength of 64 chars was chosen arbitrarily for the input below.  The database field can handle more. -->
-                                            <span class="input-container">
-                                                <!-- This input-container span is necessary in order to contain the input and the validation message span that will be added if the field contains invalid data. -->
-                                                <input class="rubric-wide-input" type="text" name="rubricResultLabels[{{ row.value|purify }}]" value="{{ row.label|purify }}" maxlength="64" required/>
-                                            </span>
-                                            <a class='delete-row-button icon-delete' onclick='onClickDeleteRow({{ row.value|purify }})'></a>
-                                        </label>
+                                <div id="row-div-{{ row.value|purify }}" class="small-12 columns actions-small-1">
+                                    <div class="list-item">
+                                        <input type="text" name="rubricResultLabels[{{ row.value|purify }}]" value="{{ row.label|purify }}" maxlength="64" required/>
                                     </div>
-                                </li>
+                                    <nav>
+                                        <a class="icon-delete" title="Delete rubric result set item" onclick='onClickDeleteRow({{ row.value|purify }})'></a>
+                                    </nav>
+                                </div>
                             {% endfor %}
-                        </ul>
+                        </fieldset>
                         <div id="plus-button-container-div" class="component-action"{% if not rubricResultRows %} style="display:none"{% endif %}>
                             <section>
                                 <a class="button" onclick="onClickPlusButton()">Add Row</a>
