@@ -2,7 +2,7 @@
     /**
      * When the plus button is clicked, we add a new row to the form.
      */
-    function onClickPlusButton() {
+    function onClickAddRow() {
         let rowsContainer = document.getElementById('rows-container');
         let nRows         = rowsContainer.children.length;
 
@@ -104,7 +104,7 @@
                 <div class="empty-state">
                     <i class="icon-list"></i>
                     <p>This rubrics result set is empty.</p>
-                    <p><a onclick="onClickPlusButton()">Add a row</a></p>
+                    <p><a onclick="onClickAddRow()">Add a row</a></p>
                 </div>
             </div>
             <div class="small-12 island">
@@ -125,7 +125,7 @@
                         </fieldset>
                         <div id="plus-button-container-div" class="component-action"{% if not rubricResultRows %} style="display:none"{% endif %}>
                             <section>
-                                <a class="button" onclick="onClickPlusButton()">Add Row</a>
+                                <a class="button" onclick="onClickAddRow()">Add Row</a>
                             </section>
                         </div>
                     </section>
