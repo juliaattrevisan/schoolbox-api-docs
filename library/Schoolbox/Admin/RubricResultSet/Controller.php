@@ -59,7 +59,7 @@ class Controller extends Base
      */
     public function deleteResultSet($resultSetId): void
     {
-        $this->mapper->deleteRubricResultSet((int)$resultSetId);
+        $this->mapper->deleteSet((int)$resultSetId);
         $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubricResultSet.getList'));
         header('HTTP/1.0 200 OK');
         die;
@@ -94,7 +94,7 @@ class Controller extends Base
                     'maxRowsPerResultSet' => self::MAX_ROWS_PER_RESULT_SET,
                     'pageCurrent'         => $this->router->generate('adminRubricResultSet.getList'),
                     'resultSetId'         => $resultSetId,
-                    'rubricResultRows'    => (($resultSetId === null) ? [] : $this->mapper->findRubricResultRows($resultSetId)),
+                    'rubricResultRows'    => (($resultSetId === null) ? [] : $this->mapper->findRows($resultSetId)),
                     'allBreadcrumbs'      => array_merge(
                         (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList')),
                         [['Update']]
@@ -125,7 +125,7 @@ class Controller extends Base
         }
 
         $resultSetIdOrNull = (($postedData['resultSetIdOrBlank'] === '') ? null : (int)$postedData['resultSetIdOrBlank']);
-        $this->mapper->createOrOverwriteRubricResultSet($resultSetIdOrNull, $indexedLabels);
+        $this->mapper->createOrOverwriteSet($resultSetIdOrNull, $indexedLabels);
 
         $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubricResultSet.getList'));
     }

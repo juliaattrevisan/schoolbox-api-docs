@@ -24,7 +24,7 @@ div.clear-floats
 }
 </style>
 <script>
-function onClickDeleteRow(resultSetId)
+function deleteRow(resultSetId)
 {
     let aJq = $('#delete-row-a');
 
@@ -79,7 +79,7 @@ function onClickDeleteRow(resultSetId)
                                             {% endfor %}
                                             <span class="buttons-container-span">
                                                 <a class="edit-row-button icon-modify" href="/adminv2/rubric-result-set/{{ resultSetId }}/update"></a>
-                                                <a id="delete-row-a" class="delete-row-button icon-delete" onclick="return onClickDeleteRow({{ resultSetId }})"></a>
+                                                <a id="delete-row-a" class="delete-row-button icon-delete" onclick="return deleteRow({{ resultSetId }})"></a>
                                             </span>
                                             <div class="clear-floats"></div>
                                         </label>

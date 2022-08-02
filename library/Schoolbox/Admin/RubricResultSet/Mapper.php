@@ -57,7 +57,7 @@ class Mapper extends BaseMapper
      * @param int $resultSetId
      * @return void
      */
-    public function deleteRubricResultSet(int $resultSetId): void
+    public function deleteSet(int $resultSetId): void
     {
         $stmt = $this->database->prepare(
             "DELETE FROM rubric_result
@@ -74,7 +74,7 @@ class Mapper extends BaseMapper
      * @param int $resultSetId
      * @return array
      */
-    public function findRubricResultRows(int $resultSetId): array
+    public function findRows(int $resultSetId): array
     {
         $stmt = $this->database->prepare('SELECT * FROM rubric_result WHERE resultset_id = :resultSetId');
         $stmt->execute(array('resultSetId' => $resultSetId));
@@ -88,7 +88,7 @@ class Mapper extends BaseMapper
      * @param array $labelsInOrder
      * @return int ($resultSetIdOrNull)
      */
-    public function createOrOverwriteRubricResultSet(?int $resultSetIdOrNull, array $labelsInOrder): int
+    public function createOrOverwriteSet(?int $resultSetIdOrNull, array $labelsInOrder): int
     {
         if ($resultSetIdOrNull === null) {
             $stmt = $this->database->prepare(
