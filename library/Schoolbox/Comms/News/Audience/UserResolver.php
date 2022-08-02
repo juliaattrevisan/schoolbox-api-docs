@@ -357,7 +357,7 @@ class UserResolver implements IUserResolver
         }
         $allRelatedUsers = [];
         foreach ($folderIds as $folderId) {
-            if ($excludeMuted && $mutedFolders[$folderId] && $mutedFolders[$folderId] === ['0']) {
+            if ($excludeMuted && $mutedFolders[$folderId] && $mutedFolders[$folderId] === Segment\Strategy\Folder::MUTED) {
                 // if notification is disabled, skip this folder
                 continue;
             }

@@ -43,7 +43,6 @@ use function sprintf;
 
 class Folder extends SimpleStrategy
 {
-
     /** @var bool */
     private $canTargetTeachersOfUsersInFolder;
 
@@ -69,6 +68,10 @@ class Folder extends SimpleStrategy
      */
     private $knownUserSubjects;
 
+    /**
+     * User arrays to represent muted folder
+     */
+    const MUTED = ['0'];
 
     /**
      * @return string
@@ -501,10 +504,10 @@ class Folder extends SimpleStrategy
             $folderId = (string)$folderId;
             if ($userId === '0') {
                 // Notification is disabled for this folder. Reset to '0' only.
-                $mutedUsersPerFolder[$folderId] = ['0'];
-            } elseif (!in_array('0', $mutedUsersPerFolder[$folderId] ?? [])) {
+                $mutedUsersPerFolder[$folderId] = self::MUTED;
+            } elseif (!isset($mutedUsersPerFolder[$folderId]) || $mutedUsersPerFolder[$folderId] !== self::MUTED) {
                 // If notification is enabled, add current muted user
-                $mutedUsersPerFolder[$folderId] ??= [];
+                $mutedUsersPerFolder[$folderId]   ??= [];
                 $mutedUsersPerFolder[$folderId][] = $userId;
             }
         }
@@ -584,7 +587,7 @@ class Folder extends SimpleStrategy
             $mutedFolderIds = [];
             // Get notification disabled folders
             foreach ($mutedUsersPerFolder as $folderId => $userIds) {
-                if ($userIds === ['0']) {
+                if ($userIds === self::MUTED) {
                     $mutedFolderIds[] = $folderId;
                 }
             }
