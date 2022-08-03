@@ -72,6 +72,7 @@ class Controller extends Base
      * @since 22.1
      *
      * @return void
+     * @throws MapperException if somehow the node can't be created
      */
     public function postNode(): void
     {
@@ -86,6 +87,7 @@ class Controller extends Base
      *
      * @param Node\Model $node
      * @return void
+     * @throws MapperException if somehow the node can't be updated
      */
     public function putNode(Node\Model $node): void
     {
@@ -100,6 +102,7 @@ class Controller extends Base
      *
      * @param Node\Model $node
      * @return void
+     * @throws MapperException if somehow the node can't be updated
      */
     public function patchNode(Node\Model $node): void
     {
@@ -109,15 +112,18 @@ class Controller extends Base
     /**
      * Endpoint for deleting a curriculum node.
      *
+     * @param Node\Model $node
+     * @return void
+     * @throws MapperException if somehow the node can't be deleted
      * @api   DELETE /api/curriculum/{id}
      * @since 22.1
      *
-     * @param Node\Model $node
-     * @return void
+     * @noinspection PhpDocMissingThrowsInspection - this can't throw an invalid with a 204
      */
     public function deleteNode(Node\Model $node): void
     {
         $this->nodeMapper->delete($node);
+        /** @noinspection PhpUnhandledExceptionInspection - this can't throw an invalid with a 204 */
         $this->response->status->setCode(204);
     }
 
@@ -128,7 +134,7 @@ class Controller extends Base
      * @param Node\Model|null $previous If null, create a new node: otherwise,
      *                                  update the fields in `$previous`.
      * @return Node\Model
-     * @throws MapperException if somehow the model couldn't be saved
+     * @throws MapperException if somehow the node can't be saved
      */
     private function persistNode(?Node\Model $previous): Node\Model
     {
