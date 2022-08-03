@@ -138,7 +138,7 @@ class Controller extends Base
 
         $this->mapper->createOrOverwriteSet(
             // Either an integer or null is expected by the function, so convert before passing parameter.
-            (($postedData['resultSetIdOrBlank'] === '') ? null : (int)$postedData['resultSetIdOrBlank']),
+            (($postedData['resultSetId'] === '') ? null : (int)$postedData['resultSetId']),
             $indexedLabels
         );
 
