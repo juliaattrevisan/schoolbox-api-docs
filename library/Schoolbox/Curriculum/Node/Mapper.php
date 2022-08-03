@@ -14,7 +14,7 @@ use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use UnexpectedValueException;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Mapper for curriculum nodes
@@ -79,6 +79,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
      * @param Model      $model
      * @param Model|null $previous
      * @return bool
+     * @throws MapperException
      */
     public function assertHeritage(Model $model, Model $previous = null): bool
     {
@@ -92,7 +93,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             while (isset($parentId)) {
                 $ancestry[] = $parentId;
                 if ($parentId === $model->getId()) {
-                    throw new UnexpectedValueException(
+                    throw new MapperException(
                         sprintf(
                             "Ancestry loop detected: node #%d would be its own ancestor [%s]",
                             $model->getId(),
