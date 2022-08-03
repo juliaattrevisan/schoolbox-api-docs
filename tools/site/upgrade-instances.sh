@@ -132,12 +132,12 @@ function parse_global_vars(){
 }
 
 function update_schoolbox_update_error_fact_file(){
-  tmp_file_dir="/tmp/facter/schoolbox_update_error";
+  tmp_files_path="/tmp/facter/schoolbox_*_update.json";
   fact_file="/etc/facter/facts.d/schoolbox_update.json";
   log "Updating fact file for schoolbox_update_error";
 
   #merge all json files in the tmp file directory then write to fact file
-  jq -s 'reduce .[] as $instance ({}; . * $instance)' $tmp_file_dir/*.json > $fact_file;
+  jq -s 'reduce .[] as $instance ({}; . * $instance)' $tmp_files_path > $fact_file;
 }
 
 # Ensures data-dirs exist (all hosts) then runs SQL updates (primary hosts only)
