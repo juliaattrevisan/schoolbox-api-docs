@@ -44,9 +44,21 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      */
     public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
-        $timetableDef = [];
+        $timetableDef = [
+            'desc'        => [],
+            'start'       => [],
+            'end'         => [],
+            'number'      => [],
+            'sequence'    => [],
+            'periodCount' => 0,
+            'dayCount'    => 0,
+        ];
 
         $timetableDefinition = $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
+
+        if (!$timetableDefinition) {
+            return $timetableDef;
+        }
 
         if ($day == 0) {
             $day = 1;
@@ -208,7 +220,10 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $classList  = $this->getClassUsers($externalUserId);
 
         $timetableDefinition = $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
-        $dayCount            = $timetableDefinition['cycle_length'];
+        if (!$timetableDefinition) {
+            return [];
+        }
+        $dayCount = $timetableDefinition['cycle_length'];
 
         $periodListAdaption = [];
 
