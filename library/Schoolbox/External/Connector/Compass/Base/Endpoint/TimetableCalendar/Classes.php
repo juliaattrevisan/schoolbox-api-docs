@@ -141,6 +141,12 @@ class Classes implements IStrategy
 
 
     /**
+     * @var \Schoolbox\External\Event\Overrides\Mapper
+     */
+    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+
+
+    /**
      * @var ClassEntryMapper
      */
     private ClassEntryMapper $classEntryMapper;
@@ -183,20 +189,22 @@ class Classes implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface        $log
-     * @param bool                   $perform
-     * @param IApi                   $api
-     * @param Mapper                 $eventMapper
-     * @param ClassEntryMapper       $classEntryMapper
-     * @param ClassInvolvementMapper $classInvolvementMapper
-     * @param string                 $fromDate
-     * @param string                 $toDate
+     * @param LoggerInterface                            $log
+     * @param bool                                       $perform
+     * @param IApi                                       $api
+     * @param Mapper                                     $eventMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+     * @param ClassEntryMapper                           $classEntryMapper
+     * @param ClassInvolvementMapper                     $classInvolvementMapper
+     * @param string                                     $fromDate
+     * @param string                                     $toDate
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         IApi $api,
         \Schoolbox\External\Event\Mapper $eventMapper,
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         string $fromDate,
@@ -206,6 +214,7 @@ class Classes implements IStrategy
         $this->perform = $perform;
         $this->api = $api;
         $this->eventMapper = $eventMapper;
+        $this->overridesMapper = $overridesMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
 
@@ -700,16 +709,14 @@ class Classes implements IStrategy
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
          */
-        $overridesMapper = \Schoolbox\External\Event\Overrides\Mapper::getInstance();
-
-        $override = $overridesMapper->createModel()
+        $override = $this->overridesMapper->createModel()
             ->setEventId($event->getId())
             ->setExternalId($teacher['externalId'])
             ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
             ->setSequence(1);
 
         if ($this->perform) {
-            $overridesMapper->save($override);
+            $this->overridesMapper->save($override);
         }
     }
 
