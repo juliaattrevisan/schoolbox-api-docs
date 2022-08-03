@@ -736,11 +736,6 @@ parameters:
 			path: library/Calendar/Event/Type/EOTC/Event.php
 
 		-
-			message: "#^Return type \\(string\\) of method Calendar\\\\Event\\\\Type\\\\EOTC\\\\Event\\:\\:getAttendance\\(\\) should be compatible with return type \\(bool\\) of method Calendar\\\\Event\\\\Type\\\\Day\\\\Event\\:\\:getAttendance\\(\\)$#"
-			count: 1
-			path: library/Calendar/Event/Type/EOTC/Event.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Calendar/Event/Type/EventBase.php
@@ -1476,22 +1471,7 @@ parameters:
 			path: library/EOTC/EventConnector.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/EOTC/EventConnector.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 3
-			path: library/EOTC/EventMapper.php
-
-		-
 			message: "#^Instanceof between Schoolbox\\\\Calendar\\\\Relation\\\\Role and Schoolbox\\\\Role will always evaluate to false\\.$#"
-			count: 1
-			path: library/EOTC/EventMapper.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/EOTC/EventMapper.php
 
@@ -2931,27 +2911,7 @@ parameters:
 			path: library/Schoolbox/Calendar/Event.php
 
 		-
-			message: "#^Method Schoolbox\\\\Calendar\\\\Event\\:\\:getFolderCollection\\(\\) should return Schoolbox\\\\Collection but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
-			message: "#^Method Schoolbox\\\\Calendar\\\\Event\\:\\:getGuests\\(\\) should return iterable\\<int\\>&Schoolbox\\\\Collection but returns iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
 			message: "#^Method Schoolbox\\\\Calendar\\\\Event\\:\\:getRoleCollection\\(\\) should return iterable\\<Schoolbox\\\\Calendar\\\\Relation\\\\Role\\>&Schoolbox\\\\Collection but returns iterable\\<Schoolbox\\\\Role\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
-			message: "#^Method Schoolbox\\\\Calendar\\\\Event\\:\\:getUserCollection\\(\\) should return iterable\\<Schoolbox\\\\Calendar\\\\Relation\\\\Personal\\>&Schoolbox\\\\Collection but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event.php
 
@@ -2961,22 +2921,7 @@ parameters:
 			path: library/Schoolbox/Calendar/Event.php
 
 		-
-			message: "#^Property Schoolbox\\\\Calendar\\\\Event\\:\\:\\$folderCollection \\(null\\) does not accept Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
-			message: "#^Property Schoolbox\\\\Calendar\\\\Event\\:\\:\\$guests \\(iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\Collection\\) does not accept iterable\\<int\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
 			message: "#^Property Schoolbox\\\\Calendar\\\\Event\\:\\:\\$roleCollection \\(iterable\\<Schoolbox\\\\Role\\>&Schoolbox\\\\Collection\\) does not accept iterable\\<Schoolbox\\\\Calendar\\\\Relation\\\\Role\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
-			message: "#^Property Schoolbox\\\\Calendar\\\\Event\\:\\:\\$userCollection \\(null\\) does not accept iterable\\<Schoolbox\\\\Calendar\\\\Relation\\\\Personal\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event.php
 
@@ -3039,11 +2984,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Calendar\\\\EventRecurrence\\:\\:\\$until \\(Alaress_Date_Format\\) does not accept string\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/EventRecurrence.php
-
-		-
-			message: "#^Call to function is_object\\(\\) with null will always evaluate to false\\.$#"
-			count: 3
-			path: library/Schoolbox/Calendar/EventRecurrenceMapper.php
 
 		-
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method Schoolbox\\\\Calendar\\\\Relation\\\\CampusMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"

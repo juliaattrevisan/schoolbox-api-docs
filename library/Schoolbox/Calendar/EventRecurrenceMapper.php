@@ -22,7 +22,6 @@ use Traversable;
 
 class EventRecurrenceMapper
 {
-
     const EFFICACY_SELF = 'self';
     const EFFICACY_SERIES = 'series';
 

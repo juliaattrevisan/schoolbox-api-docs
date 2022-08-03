@@ -21,7 +21,6 @@ use Schoolbox\User;
  */
 class Event extends Calendar\Event
 {
-
     /**
      * Metadata for this event
      *

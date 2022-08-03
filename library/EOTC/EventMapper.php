@@ -32,7 +32,6 @@ use Schoolbox\UserMapper;
  */
 class EventMapper extends CalendarEventMapper
 {
-
     /**
      * Calls for the core mapping of events, then extends it
      */
