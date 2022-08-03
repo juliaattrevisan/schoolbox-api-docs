@@ -126,11 +126,10 @@ class Mapper extends BaseMapper
                 continue;
             }
 
-            // Forcibly truncate $label values, so they don't exceed Model::LABEL_MAXLENGTH chars.
-            // This is the maximum width allowed in our db schema and will cause sentry errors
-            // unless we forcibly ensure that it doesn't exceed the space available.
+            // Truncate label to the maximum allowed number of characters.
+            // Note the limit is applied as a maxlength restriction on the input too, so no data will be lost in normal circumstances.
             // Trim here also to prevent whitespace-surrounded data from entering the database.
-            $truncatedLabel = mb_substr(trim((string)$label), 0, Model::LABEL_MAXLENGTH, 'UTF-8');
+            $truncatedLabel = mb_substr(trim((string)$label), 0, Controller::MAX_CHARS_PER_LABEL, 'UTF-8');
 
             $sqlInsertStmt->execute(
                 [
