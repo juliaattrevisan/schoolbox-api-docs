@@ -102,7 +102,7 @@ class Event extends Day\Event
     /**
      * Set attendance
      *
-     * @param string $attendance
+     * @param mixed $attendance
      */
     public function setAttendance($attendance)
     {
@@ -112,7 +112,7 @@ class Event extends Day\Event
     /**
      * Get attendance
      *
-     * @return string
+     * @return mixed
      */
     public function getAttendance()
     {

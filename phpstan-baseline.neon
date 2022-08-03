@@ -1406,11 +1406,6 @@ parameters:
 			path: library/EOTC/ActivityLog/Log.php
 
 		-
-			message: "#^Return type \\(EOTC\\\\EventMetadata\\) of method EOTC\\\\Event\\:\\:getMetadata\\(\\) should be compatible with return type \\(null\\) of method Schoolbox\\\\Calendar\\\\Event\\:\\:getMetadata\\(\\)$#"
-			count: 1
-			path: library/EOTC/Event.php
-
-		-
 			message: "#^Call to an undefined method Calendar\\\\Event\\\\Type\\\\EOTC\\\\Event\\:\\:getAuthor\\(\\)\\.$#"
 			count: 2
 			path: library/EOTC/EventConnector.php
