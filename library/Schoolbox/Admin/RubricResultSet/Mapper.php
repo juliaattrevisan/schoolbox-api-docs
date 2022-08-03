@@ -65,7 +65,7 @@ class Mapper extends BaseMapper
             WHERE resultset_id = :resultSetId"
         );
 
-        $stmt->execute(array('resultSetId' => $resultSetId));
+        $stmt->execute(['resultSetId' => $resultSetId]);
     }
 
     /**
@@ -78,7 +78,7 @@ class Mapper extends BaseMapper
     public function findRows(int $resultSetId): array
     {
         $stmt = $this->database->prepare("SELECT * FROM {$this->getTable()} WHERE resultset_id = :resultSetId");
-        $stmt->execute(array('resultSetId' => $resultSetId));
+        $stmt->execute(['resultSetId' => $resultSetId]);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -107,7 +107,7 @@ class Mapper extends BaseMapper
             "DELETE FROM {$this->getTable()}
             WHERE resultset_id = :resultSetId"
         );
-        $stmt->execute(array('resultSetId' => $resultSetId));
+        $stmt->execute(['resultSetId' => $resultSetId]);
 
         $counter       = 0;
         $sqlInsertStmt = $this->database->prepare(
@@ -133,11 +133,11 @@ class Mapper extends BaseMapper
             $truncatedLabel = mb_substr(trim($label), 0, Model::LABEL_MAXLENGTH, 'UTF-8');
 
             $sqlInsertStmt->execute(
-                array(
+                [
                     'resultSetId' => $resultSetId,
                     'value'       => $counter++,
                     'label'       => $truncatedLabel
-                )
+                ]
             );
         }
 
