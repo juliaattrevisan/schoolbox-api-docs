@@ -95,7 +95,12 @@
                 </div>
             </div>
             <div id="form-container" class="small-12 island"{% if not rubricResultRows %} style="display:none"{% endif %}>
-                <form id="rubric-result-set-form" method="post" action="/adminv2/rubric-result-set/create">
+                {% if (resultSetId ?? null) %}
+                    {% set formAction = routeLookup('adminRubricResultSet.postUpdate', {resultSetId: resultSetId}) %}
+                {% else %}
+                    {% set formAction = routeLookup('adminRubricResultSet.postCreate') %}
+                {% endif %}
+                <form id="rubric-result-set-form" method="post" action="{{ formAction }}">
                     <input type='hidden' name='resultSetIdOrBlank' value='{{ resultSetId }}'/>
                     <section>
                         <fieldset id="rows-container" class="content">
