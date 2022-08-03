@@ -11,7 +11,7 @@
 <script>
     function deleteRow(resultSetId)
     {
-        let aJq = $('*.delete-row-button');
+        let aJq = $('#delete-row-button-' + resultSetId);
 
         aJq.confirmDialog(
             {
@@ -66,7 +66,7 @@
                                     </div>
                                     <nav>
                                         <a href="{{ routeLookup('adminRubricResultSet.getUpdate', {resultSetId: resultSetId}) }}" class="icon-modify" title="Modify"></a>
-                                        <a onclick="return deleteRow({{ resultSetId }})" class="delete-row-button icon-delete" title="Delete"></a>
+                                        <a onclick="return deleteRow({{ resultSetId }})" id="delete-row-button-{{ resultSetId }}" class="icon-delete" title="Delete"></a>
                                     </nav>
                                 </li>
                             {% endfor %}
