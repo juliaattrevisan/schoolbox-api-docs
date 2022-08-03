@@ -1,13 +1,7 @@
 <?php
 
 /**
- * Model for curriculum learning nodes.
- *
- * A node represents a generic concept within a curriculum: it can represent
- * the root of the curriculum, a learning outcome or any point between.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
@@ -15,141 +9,85 @@ namespace Schoolbox\Curriculum\Node;
 
 use Alaress_Date_Format;
 use JsonSerializable;
-use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits;
 
+/**
+ * Model for curriculum learning nodes.
+ *
+ * A node represents a generic concept within a curriculum: it can represent
+ * the root of the curriculum, a learning outcome or any point between.
+ */
 class Model implements ISoftDeletable, JsonSerializable
 {
-    /**
-     * Primary key
-     *
-     * @var int
-     */
-    protected $id;
+    use Traits\Model\Id;
+    use Traits\Model\CreatedAtDate;
+    use Traits\Model\DeletedAtDate;
 
     /**
      * This node's parent (if there is one)
      *
-     * @var Model
+     * @var Model|null
      */
-    protected $parent;
+    protected ?Model $parent;
 
     /**
      * This node's children (if it has any)
      *
-     * @var Collection|Model[]
+     * @var GenericCollection<Model>
      */
-    protected $children;
+    protected GenericCollection $children;
 
     /**
-     * The learning level this node is associated with
-     *
-     * @var LearningLevel\Model
+     * The learning level this node is associated with, if any.
      */
-    protected $learningLevel;
+    protected ?LearningLevel\Model $learningLevel;
 
     /**
-     * The learning area this node is associated with
-     *
-     * @var LearningArea\Model
+     * The learning area this node is associated with, if any.
      */
-    protected $learningArea;
+    protected ?LearningArea\Model $learningArea;
 
     /**
      * User-friendly name
-     *
-     * @var string
      */
-    protected $name = '';
+    protected string $name = '';
 
     /**
      * Curriculum code (if this node has one)
-     *
-     * @var string
      */
-    protected $code = '';
+    protected string $code = '';
 
     /**
      * Reference used by the browser for fetching outcomes.
-     * Possibly a URI used in a RDF query.
-     *
-     * @var string
+     * Possibly a URI used in an RDF query.
      */
-    protected $reference;
+    protected ?string $reference = null;
 
     /**
      * User-friendly description
-     *
-     * @var string
      */
-    protected $description = '';
+    protected string $description = '';
 
     /**
      * The order in the tree structure that this node exists
-     *
-     * @var int
      */
-    protected $order = 0;
+    protected int $order = 0;
 
     /**
-     * @var Alaress_Date_Format
+     * When was this modified?
      */
-    protected $createdAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $modifiedAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $deletedAt;
+    protected Alaress_Date_Format $modifiedAt;
 
     /**
      * Constructor: build this element with a new, empty collection.
      */
     public function __construct()
     {
-        $this->setChildren(new Collection());
-    }
-
-    /**
-     * @param  Alaress_Date_Format $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param  Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
+        $this->children = new GenericCollection(self::class);
     }
 
     /**
@@ -168,24 +106,6 @@ class Model implements ISoftDeletable, JsonSerializable
     public function getDescription()
     {
         return $this->description;
-    }
-
-    /**
-     * @param  int $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 
     /**
@@ -343,7 +263,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @return Collection|Model[]
+     * @return GenericCollection<Model>
      */
     public function getChildren()
     {
@@ -351,23 +271,13 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @param  Collection|Model[] $children
+     * @param  GenericCollection<Model> $children
      * @return $this
      */
-    public function setChildren($children)
+    public function setChildren(GenericCollection $children)
     {
         $this->children = $children;
         return $this;
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
     }
 
     /**
