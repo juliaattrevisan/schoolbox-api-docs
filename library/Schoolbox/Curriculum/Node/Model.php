@@ -91,10 +91,10 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @param  string $description
+     * @param string $description
      * @return $this
      */
-    public function setDescription($description)
+    public function setDescription(string $description): self
     {
         $this->description = $description;
         return $this;
@@ -103,16 +103,16 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return $this->description;
     }
 
     /**
-     * @param  Alaress_Date_Format $modifiedAt
+     * @param Alaress_Date_Format $modifiedAt
      * @return $this
      */
-    public function setModifiedAt($modifiedAt)
+    public function setModifiedAt(Alaress_Date_Format $modifiedAt): self
     {
         $this->modifiedAt = $modifiedAt;
         return $this;
@@ -121,16 +121,16 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * @return Alaress_Date_Format
      */
-    public function getModifiedAt()
+    public function getModifiedAt(): Alaress_Date_Format
     {
         return $this->modifiedAt;
     }
 
     /**
-     * @param  string $name
+     * @param string $name
      * @return $this
      */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
         return $this;
@@ -139,24 +139,24 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getReference()
+    public function getReference(): ?string
     {
         return $this->reference;
     }
 
     /**
-     * @param  string $reference
+     * @param string|null $reference
      * @return $this
      */
-    public function setReference($reference)
+    public function setReference(?string $reference): self
     {
         $this->reference = $reference;
         return $this;
@@ -165,52 +165,52 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return $this->code;
     }
 
     /**
-     * @param  string $code
+     * @param string $code
      * @return $this
      */
-    public function setCode($code)
+    public function setCode(string $code): self
     {
         $this->code = $code;
         return $this;
     }
 
     /**
-     * @return LearningArea\Model
+     * @return LearningArea\Model|null
      */
-    public function getLearningArea()
+    public function getLearningArea(): ?LearningArea\Model
     {
         return $this->learningArea;
     }
 
     /**
-     * @param  LearningArea\Model $learningArea
+     * @param LearningArea\Model|null $learningArea
      * @return $this
      */
-    public function setLearningArea($learningArea)
+    public function setLearningArea(?LearningArea\Model $learningArea): self
     {
         $this->learningArea = $learningArea;
         return $this;
     }
 
     /**
-     * @return LearningLevel\Model
+     * @return LearningLevel\Model|null
      */
-    public function getLearningLevel()
+    public function getLearningLevel(): ?LearningLevel\Model
     {
         return $this->learningLevel;
     }
 
     /**
-     * @param  LearningLevel\Model $learningLevel
+     * @param LearningLevel\Model|null $learningLevel
      * @return $this
      */
-    public function setLearningLevel($learningLevel)
+    public function setLearningLevel(?LearningLevel\Model $learningLevel): self
     {
         $this->learningLevel = $learningLevel;
         return $this;
@@ -219,34 +219,34 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * @return int
      */
-    public function getOrder()
+    public function getOrder(): int
     {
         return $this->order;
     }
 
     /**
-     * @param  int $order
+     * @param int $order
      * @return $this
      */
-    public function setOrder($order)
+    public function setOrder(int $order): self
     {
         $this->order = $order;
         return $this;
     }
 
     /**
-     * @return Model
+     * @return Model|null
      */
-    public function getParent()
+    public function getParent(): ?Model
     {
         return $this->parent;
     }
 
     /**
-     * @param  Model $parent
+     * @param Model|null $parent
      * @return $this
      */
-    public function setParent($parent)
+    public function setParent(?Model $parent): self
     {
         $this->parent = $parent;
         return $this;
@@ -256,25 +256,25 @@ class Model implements ISoftDeletable, JsonSerializable
      * @param  Model $child
      * @return $this
      */
-    public function addChild($child)
+    public function addChild(Model $child)
     {
         $this->getChildren()->add($child);
         return $this;
     }
 
     /**
-     * @return GenericCollection<Model>
+     * @return GenericCollection
      */
-    public function getChildren()
+    public function getChildren(): GenericCollection
     {
         return $this->children;
     }
 
     /**
-     * @param  GenericCollection<Model> $children
+     * @param GenericCollection $children
      * @return $this
      */
-    public function setChildren(GenericCollection $children)
+    public function setChildren(GenericCollection $children): self
     {
         $this->children = $children;
         return $this;
@@ -286,7 +286,7 @@ class Model implements ISoftDeletable, JsonSerializable
      * @param string $delimiter
      * @return string
      */
-    public function buildBreadcrumb($delimiter)
+    public function buildBreadcrumb(string $delimiter)
     {
         $parts   = [];
         $current = $this;
