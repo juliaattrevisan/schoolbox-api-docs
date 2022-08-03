@@ -118,7 +118,7 @@ class Controller extends Base
     public function postUpdate(): void
     {
         $postedData    = $this->getRequest()->post->getArrayCopy();
-        $indexedLabels = array();
+        $indexedLabels = [];
         $labelsCount   = 0;
 
         foreach ($postedData['rubricResultLabels'] as $value => $label) {
@@ -131,8 +131,11 @@ class Controller extends Base
             }
         }
 
-        $resultSetIdOrNull = (($postedData['resultSetIdOrBlank'] === '') ? null : (int)$postedData['resultSetIdOrBlank']);
-        $this->mapper->createOrOverwriteSet($resultSetIdOrNull, $indexedLabels);
+        $this->mapper->createOrOverwriteSet(
+            // Either an integer or null is expected by the function, so convert before passing parameter.
+            (($postedData['resultSetIdOrBlank'] === '') ? null : (int)$postedData['resultSetIdOrBlank']),
+            $indexedLabels
+        );
 
         $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubricResultSet.getList'));
     }
