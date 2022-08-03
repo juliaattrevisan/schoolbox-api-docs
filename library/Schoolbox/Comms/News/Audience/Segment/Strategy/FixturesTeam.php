@@ -72,6 +72,13 @@ class FixturesTeam extends SimpleStrategy
             );
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function canAudienceToEntityValue(User $user, ?string $entityValue): bool
+    {
+        return $this->canModerate($user, $entityValue);
+    }
 
     /**
      * @@inheritdoc
