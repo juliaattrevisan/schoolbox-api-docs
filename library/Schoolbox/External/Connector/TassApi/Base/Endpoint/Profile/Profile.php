@@ -20,6 +20,7 @@ use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Phone;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper\Exception;
@@ -340,6 +341,12 @@ class Profile implements IStrategy
         foreach ($students['students'] as $student) {
             $externalId = trim((string)$student['general_details']['student_code']);
             $academicHouse = trim((string)$student['school_details']['house']);
+
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isOnWatchlist($externalId)) {
+                continue;
+            }
 
             /* TASS API sometimes won't have this field (optional in its return payload)
              * Disgusting
