@@ -12,11 +12,6 @@
         display: inline-block;
         float: right;
     }
-
-    div.clear-floats
-    {
-        clear: both;
-    }
 </style>
 <script>
     function deleteRow(resultSetId)
@@ -78,7 +73,6 @@
                                                 <a class="edit-row-button icon-modify" href="{{ routeLookup('adminRubricResultSet.getUpdate', {resultSetId: resultSetId}) }}"></a>
                                                 <a id="delete-row-button" class="delete-row-button icon-delete" onclick="return deleteRow({{ resultSetId }})"></a>
                                             </span>
-                                            <div class="clear-floats"></div>
                                         </label>
                                     </div>
                                 </li>
