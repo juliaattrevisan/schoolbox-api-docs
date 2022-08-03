@@ -658,6 +658,17 @@ class Classes implements IStrategy
              */
             $teacher = $staffLookup[$teacherCompassIds];
 
+            /* FIXME Multiple teachers might exist here
+             *  It might be possible that $teacherCompassIds is a comma-separated string
+             *  of multiple compass person identifiers. I haven't seen it in practice yet but
+             *  Compass guy said it *might be possible*. If that's the case, explode on ',' and
+             *  then process each person individually
+             *
+             * foreach ($ids as $id) {
+             *     saveStaffInvolvement($staffLookup[$id])
+             * }
+             */
+
             $this->log->debug(sprintf(
                 'Creating new Override record for Activity %s Instance on %s for %s',
                 $activityName,
