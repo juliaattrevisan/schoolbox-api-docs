@@ -82,16 +82,13 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
      */
     public function assertHeritage(Model $model, Model $previous = null): bool
     {
-        if (
-            $previous
-            && $model->getParent()
-            && $previous->getParent()
-            && $model->getParent()->getId() !== $previous->getParent()->getId()
-        ) {
+        // Only need to check if the model's parentage has changed
+        $parentId         = $model->getParent()?->getId();
+        $previousParentId = $previous?->getParent()?->getId();
+        if ($parentId && $previousParentId !== $parentId) {
             // Check parentage, all the way up to the top:
             // If I find myself: error out
             $ancestry = [$model->getId()];
-            $parentId = $model->getParent()->getId();
             while (isset($parentId)) {
                 $ancestry[] = $parentId;
                 if ($parentId === $model->getId()) {
