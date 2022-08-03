@@ -4,7 +4,7 @@
      */
     function addRow() {
         let rowsContainer = document.getElementById('rows-container');
-        let nRows         = rowsContainer.children.length;
+        let nRows = rowsContainer.children.length;
 
         // Use parseInt('') to protect against possibility of null or empty string value.
         if (nRows >= parseInt('{{ maxRowsPerResultSet }}')) {
@@ -34,7 +34,7 @@
         // Add validation rules to new input.
         $('input[name="rubricResultLabels[' + String(nRows) + ']"').rules('add', {requiredNotBlank: true});
 
-        document.getElementById('form-container'    ).style.display = ''    ; // Show form.
+        document.getElementById('form-container').style.display = ''; // Show form.
         document.getElementById('empty-state-island').style.display = 'none'; // Hide empty state box.
     }
 
@@ -48,8 +48,8 @@
         renumberRows();
 
         if (document.getElementById('rows-container').children.length === 0) {
-            document.getElementById('empty-state-island').style.display = ''    ; // Show empty state box.
-            document.getElementById('form-container'    ).style.display = 'none'; // Hide form.
+            document.getElementById('empty-state-island').style.display = ''; // Show empty state box.
+            document.getElementById('form-container').style.display = 'none'; // Hide form.
         }
 
         // Enable the add-row button in case it was previously disabled, and return button text to original value.
@@ -66,7 +66,7 @@
         let divs = document.getElementById('rows-container').children;
 
         for (let i = 0; i < divs.length; ++i) {
-            let div    = divs[i];
+            let div = divs[i];
             let inputs = div.querySelectorAll('input');
 
             inputs[0].setAttribute('name', 'rubricResultLabels[' + i + ']');
@@ -74,17 +74,17 @@
     }
 
     $(
-        /**
-         * Configure validation.
-         */
-        function () {
-            $('#rubric-result-set-form').alaressValidate();
-            $('#rows-container input').each(
-                function (index, element) {
-                    $(element).rules('add', {requiredNotBlank: true});
-                }
-            );
-        }
+            /**
+             * Configure validation.
+             */
+            function () {
+                $('#rubric-result-set-form').alaressValidate();
+                $('#rows-container input').each(
+                        function (index, element) {
+                            $(element).rules('add', {requiredNotBlank: true});
+                        }
+                );
+            }
     );
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -94,14 +94,16 @@
     <div class="admin-content">
         <!-- Main content section starts here. -->
         <div class="row">
-            <div id="empty-state-island" class="small-12 island"{% if rubricResultRows %} style="display:none"{% endif %}>
+            <div id="empty-state-island"
+                 class="small-12 island"{% if rubricResultRows %} style="display:none"{% endif %}>
                 <div class="empty-state">
                     <i class="icon-list"></i>
                     <p>This rubrics result set is empty.</p>
                     <p><a onclick="addRow()">Add a row</a></p>
                 </div>
             </div>
-            <div id="form-container" class="small-12 island"{% if not rubricResultRows %} style="display:none"{% endif %}>
+            <div id="form-container"
+                 class="small-12 island"{% if not rubricResultRows %} style="display:none"{% endif %}>
                 {% if (resultSetId ?? null) %}
                     {% set formAction = routeLookup('adminRubricResultSet.postUpdate', {resultSetId: resultSetId}) %}
                 {% else %}
@@ -114,10 +116,13 @@
                             {% for row in rubricResultRows %}
                                 <div id="row-{{ row.value|purify }}" class="small-12 columns actions-small-1">
                                     <div class="list-item">
-                                        <input type="text" name="rubricResultLabels[{{ row.value|purify }}]" value="{{ row.label|purify }}" maxlength="{{ maxCharsPerLabel }}" required/>
+                                        <input type="text" name="rubricResultLabels[{{ row.value|purify }}]"
+                                               value="{{ row.label|purify }}" maxlength="{{ maxCharsPerLabel }}"
+                                               required/>
                                     </div>
                                     <nav>
-                                        <a class="icon-delete" title="Delete rubric result set item" onclick='removeRow({{ row.value|purify }})'></a>
+                                        <a class="icon-delete" title="Delete rubric result set item"
+                                           onclick='removeRow({{ row.value|purify }})'></a>
                                     </nav>
                                 </div>
                             {% endfor %}

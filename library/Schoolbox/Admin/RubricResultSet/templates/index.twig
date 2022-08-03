@@ -1,6 +1,5 @@
 <style>
-    span.result-rubric-label
-    {
+    span.result-rubric-label {
         background-color: #a0d3e8; /* Color $info-color from pantry colours page */
         display: inline-block;
         margin-bottom: 0.2rem;
@@ -9,26 +8,31 @@
     }
 </style>
 <script>
-    function deleteRow(resultSetId)
-    {
-        let aJq = $('#delete-row-button-' + resultSetId);
-
-        aJq.confirmDialog(
-            {
-                confirmEvent: function ()
-                {
-                    $.ajax(
-                        {
-                            url: '/adminv2/rubric-result-set/' + resultSetId,
-                            type: 'DELETE',
-                            success: function () {location.reload();}
-                        }
-                    );
-                }
-            }
+    function deleteRowAfterConfirmation(resultSetId) {
+        $('#delete-row-button-' + resultSetId).confirmDialog(
+            {confirmEvent: function () {deleteRowViaAjax(resultSetId);}}
         );
 
         return false;
+    }
+
+    function deleteRowViaAjax(resultSetId) {
+        let toasterJq = $('#toaster');
+        toasterJq.toastActivate({text: 'Deleting...'});
+
+        $.ajax(
+            {
+                url: '/adminv2/rubric-result-set/' + resultSetId,
+                type: 'DELETE',
+                success: function () {
+                    toasterJq.toastTimeout({text: 'Success!', css: 'success'});
+                    $('#delete-row-button-' + resultSetId).closest('li').remove();
+                },
+                error: function () {
+                    toasterJq.toastTimeout({text: 'Delete failed', css: 'alert'});
+                }
+            }
+        );
     }
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -50,7 +54,8 @@
                 <div class="small-12 island">
                     <div class="row actions-small-1">
                         <nav>
-                            <a class='icon-add' href="{{ routeLookup('adminRubricResultSet.getCreate') }}" title="Add new result set"></a>
+                            <a class='icon-add' href="{{ routeLookup('adminRubricResultSet.getCreate') }}"
+                               title="Add new result set"></a>
                         </nav>
                     </div>
                     <section>
@@ -65,8 +70,11 @@
                                         </p>
                                     </div>
                                     <nav>
-                                        <a href="{{ routeLookup('adminRubricResultSet.getUpdate', {resultSetId: resultSetId}) }}" class="icon-modify" title="Modify"></a>
-                                        <a onclick="return deleteRow({{ resultSetId }})" id="delete-row-button-{{ resultSetId }}" class="icon-delete" title="Delete"></a>
+                                        <a href="{{ routeLookup('adminRubricResultSet.getUpdate', {resultSetId: resultSetId}) }}"
+                                           class="icon-modify" title="Modify"></a>
+                                        <a onclick="return deleteRowAfterConfirmation({{ resultSetId }})"
+                                           id="delete-row-button-{{ resultSetId }}" class="icon-delete"
+                                           title="Delete"></a>
                                     </nav>
                                 </li>
                             {% endfor %}
@@ -75,6 +83,7 @@
                 </div>
             {% endif %}
         </div>
+        <div id='toaster' class="toast" data-toast>></div>
         <!-- Main content section ends here. -->
     </div>
 </div>
