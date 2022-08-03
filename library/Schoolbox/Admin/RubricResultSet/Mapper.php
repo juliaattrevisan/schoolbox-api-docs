@@ -130,7 +130,7 @@ class Mapper extends BaseMapper
             // This is the maximum width allowed in our db schema and will cause sentry errors
             // unless we forcibly ensure that it doesn't exceed the space available.
             // Trim here also to prevent whitespace-surrounded data from entering the database.
-            $truncatedLabel = mb_substr(trim($label), 0, Model::LABEL_MAXLENGTH, 'UTF-8');
+            $truncatedLabel = mb_substr(trim((string)$label), 0, Model::LABEL_MAXLENGTH, 'UTF-8');
 
             $sqlInsertStmt->execute(
                 [
