@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 
 
@@ -90,7 +91,7 @@ class CommRuleFamily
      * @param string $externalId
      * @return array
      */
-    public function findFamily(string $externalId): array
+    public function find(string $externalId): array
     {
         $commRules = $this->api[DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
             'code' => $externalId,
@@ -100,25 +101,102 @@ class CommRuleFamily
 
         $stack = [];
 
-        foreach ($commRules['commrules'][0]['addresses'] as $current) {
-            if ('' !== trim((string)$current['address_person_posn'])) {
-                /* Because tass fields in a random haphazard order
-                 */
-                $sorted = $current;
-                ksort($sorted);
+        foreach ($commRules['commrules'][0]['addresses'] as $commRule) {
+            /* Not a parent? continue to the next comm rule
+             */
+            if ('' === trim((string)$commRule['address_person_posn'])) {
+                continue;
+            }
 
-                /* Compare the names - it's the only way to know whose phone numbers
-                 * and email are contained in this struct
-                 *
-                 * Take a guess with the f_ prefixes first - if it matches the
-                 * addressee, then this is the Father and we use the P prefix
-                 * for their external id
-                 *
-                 * Otherwise, it's the mother, and we use the Mother's spouse prefix
-                 * for their external id
+            /* Because tass fields in a random haphazard order
+             */
+            $sorted = $commRule;
+            ksort($sorted);
+
+            /* Compare the names - it's the only way to know whose phone numbers
+             * and email are contained in this struct
+             *
+             * Take a guess with the f_ prefixes first - if it matches the
+             * addressee, then this is the Father and we use the P prefix
+             * for their external id
+             *
+             * Otherwise, it's the mother, and we use the Mother's spouse prefix
+             * for their external id
+             */
+            $possibleNames = [
+                sprintf(
+                    '%s %s',
+                    $commRule['f_preferred_name'],
+                    $commRule['f_surname'],
+                ) => [
+                    'node' => self::FATHER_NODE,
+                    'firstname' => $commRule['f_preferred_name'],
+                    'surname' => $commRule['f_surname']
+                ],
+                sprintf(
+                    '%s %s',
+                    $commRule['f_first_name'],
+                    $commRule['f_surname'],
+                ) => [
+                    'node' => self::FATHER_NODE,
+                    'firstname' => $commRule['f_first_name'],
+                    'surname' => $commRule['f_surname']
+                ],
+                sprintf(
+                    '%s %s',
+                    $commRule['m_preferred_name'],
+                    $commRule['m_surname'],
+                ) => [
+                    'node' => self::MOTHER_NODE,
+                    'firstname' => $commRule['m_preferred_name'],
+                    'surname' => $commRule['m_surname']
+                ],
+                sprintf(
+                    '%s %s',
+                    $commRule['m_first_name'],
+                    $commRule['m_surname'],
+                ) => [
+                    'node' => self::MOTHER_NODE,
+                    'firstname' => $commRule['m_first_name'],
+                    'surname' => $commRule['m_surname']
+                ],
+            ];
+
+            /* Take a guess, I guess, and see if it matches up
+             */
+            foreach ($possibleNames as $possibleName => $fields) {
+                /* Not this person? Keep going
                  */
+                if ($commRule['addressee'] !== $possibleName) {
+                    continue;
+                }
+
+                /* Otherwise, close enough - cram on a prefix as per tradition
+                 * and pile them into the Family stack.
+                 */
+                $externalId = $this->deriveExternalId($fields['node'], (string)$commRule['parent_code']);
+
+                /* Pile it in to the stack
+                 */
+                $stack[$externalId] = [
+                    'firstname' => $fields['firstname'],
+                    'surname' => $fields['surname'],
+                    'mobile' => (new FirstMeaningfulValue())->find([
+                        $commRule['mobile_phone_1'],
+                        $commRule['mobile_phone_2']
+                    ]),
+                    'home' => $commRule['home_phone'],
+                    'work' => $commRule['business_phone'],
+                    'email' => (new FirstMeaningfulValue())->find([
+                        $commRule['email'],
+                        $commRule['email_2']
+                    ]),
+                    'relationship' => $commRule['relationship'],
+                ];
             }
         }
+
+        return $stack;
     }
 
 
@@ -128,10 +206,9 @@ class CommRuleFamily
      *
      * @param string $node
      * @param string $identifier
-     * @param string $sfaNum
      * @return string
      */
-    private function deriveExternalId(string $node, string $identifier, string $sfaNum): string
+    private function deriveExternalId(string $node, string $identifier): string
     {
         /* Do some funny prefix stuff for parents
          */

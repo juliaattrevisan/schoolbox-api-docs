@@ -19,6 +19,7 @@ use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\CommRuleFamily;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Phone;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -284,12 +285,12 @@ class Profile implements IStrategy
 
         $this->importStudents();
 
-        /* Import staff profile data
-         */
-        $this->log->info('Processing staff.');
-        $this->log->info('Downloading staff data (this might take a while)');
-
-        $this->importStaff();
+//        /* Import staff profile data
+//         */
+//        $this->log->info('Processing staff.');
+//        $this->log->info('Downloading staff data (this might take a while)');
+//
+//        $this->importStaff();
     }
 
 
@@ -305,27 +306,27 @@ class Profile implements IStrategy
             $this->communicationTypes
         ));
 
-        $families = (new Lookup\Family(
-            $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
-            $this->spousePrefix,
-            $this->addnumFather,
-            $this->addnumMother,
-            (new Phone(
-                $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
-                $this->fatherAddressDescription,
-                $this->motherAddressDescription,
-                $this->communicationTypes
-            ))->generate()
-        ))->generate();
-
-        /* Also alert any broken tass api payloads that we detected in lookups
-         */
-        foreach ($families['unknown'] as $unknown) {
-            $this->log->warning(sprintf(
-                'Cannot identify father/mother records for family record %s',
-                $unknown
-            ));
-        }
+//        $families = (new Lookup\Family(
+//            $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
+//            $this->spousePrefix,
+//            $this->addnumFather,
+//            $this->addnumMother,
+//            (new Phone(
+//                $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
+//                $this->fatherAddressDescription,
+//                $this->motherAddressDescription,
+//                $this->communicationTypes
+//            ))->generate()
+//        ))->generate();
+//
+//        /* Also alert any broken tass api payloads that we detected in lookups
+//         */
+//        foreach ($families['unknown'] as $unknown) {
+//            $this->log->warning(sprintf(
+//                'Cannot identify father/mother records for family record %s',
+//                $unknown
+//            ));
+//        }
 
         /* Process each current student, and their parents too.
            The includephoto parameter is available for both:
@@ -538,23 +539,9 @@ class Profile implements IStrategy
 
             /* Time for importing parents
              */
-            $this->importParentsOfStudent($studentBaseProfile, $families);
-        }
+            $family = (new CommRuleFamily($this->api, $this->spousePrefix))->find($externalId);
 
-        /* Show some basic diagnostics
-         */
-        $this->log->info(sprintf(
-            'Nuclear families: %s. Split families: %s',
-            $families['count']['nuclear'],
-            $families['count']['split']
-        ));
-
-        if ($families['count']['unknown']) {
-            $this->log->warning(sprintf(
-                'Unidentifiable data: %s (%s)',
-                $families['count']['unknown'],
-                implode(', ', $families['unknown'])
-            ));
+            $this->importParentsOfStudent($studentBaseProfile, $family);
         }
     }
 
