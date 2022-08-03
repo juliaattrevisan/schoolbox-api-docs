@@ -38,6 +38,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $this->uses('code', self::TYPE_STRING);
         $this->uses('order', self::TYPE_INTEGER);
         $this->uses('description', self::TYPE_STRING);
+        $this->uses('enabled', self::TYPE_BOOLEAN);
         $this->uses('reference', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

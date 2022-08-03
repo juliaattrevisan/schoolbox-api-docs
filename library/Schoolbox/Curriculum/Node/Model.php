@@ -73,6 +73,11 @@ class Model implements ISoftDeletable, JsonSerializable
     protected string $description = '';
 
     /**
+     * Is this node enabled?
+     */
+    private bool $enabled = true;
+
+    /**
      * The order in the tree structure that this node exists
      */
     protected int $order = 0;
@@ -277,6 +282,24 @@ class Model implements ISoftDeletable, JsonSerializable
     public function setChildren(GenericCollection $children): self
     {
         $this->children = $children;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param bool $enabled
+     * @return $this
+     */
+    public function setEnabled(bool $enabled): self
+    {
+        $this->enabled = $enabled;
         return $this;
     }
 
