@@ -7,7 +7,7 @@
         let nRows         = rowsContainer.children.length;
 
         // Use parseInt('') to protect against possibility of null or empty string value.
-        if (nRows > parseInt('{{ maxRowsPerResultSet }}')) {
+        if (nRows >= parseInt('{{ maxRowsPerResultSet }}')) {
             // We limit the number of rows here to an arbitrarily chosen sensible value.
             return;
         }
@@ -25,6 +25,11 @@
         );
 
         rowsContainer.insertAdjacentHTML('beforeend', newRowHtml);
+
+        if (parseInt('{{ maxRowsPerResultSet }}') == nRows + 1) {
+            // We have added the maximum number of rows, so we disable the add row button.
+            $('#add-row-button').addClass('disabled').html('Max rows reached');
+        }
 
         // Add validation rules to new input.
         $('input[name="rubricResultLabels[' + String(nRows) + ']"').rules('add', {requiredNotBlank: true});
@@ -45,9 +50,11 @@
         if (document.getElementById('rows-container').children.length === 0) {
             document.getElementById('empty-state-island').style.display = ''    ; // Show empty state box.
             document.getElementById('form-container'    ).style.display = 'none'; // Hide form.
-        } else {
-            document.getElementById('form-container').style.display = ''; // Show form.
         }
+
+        // Enable the add-row button in case it was previously disabled, and return button text to original value.
+        // Disabling and button text changing occurs in addRow() when the maximum number of rows is reached.
+        $('#add-row-button').removeClass('disabled').html('Add Row');
     }
 
     /**
@@ -117,7 +124,7 @@
                         </fieldset>
                         <div class="component-action">
                             <section>
-                                <a class="button" onclick="addRow()">Add Row</a>
+                                <a id="add-row-button" class="button" onclick="addRow()">Add Row</a>
                             </section>
                         </div>
                     </section>
