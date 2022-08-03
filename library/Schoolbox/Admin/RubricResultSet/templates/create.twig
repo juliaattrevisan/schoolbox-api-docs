@@ -72,12 +72,9 @@
          */
         function () {
             $('#rubric-result-set-form').alaressValidate();
-
-            $('#rubric-result-set-form input').each(
-                function(index, element) {
-                    if (element.getAttribute('type') !== 'hidden') {
-                        $(element).rules('add', {requiredNotBlank: true});
-                    }
+            $('#rows-container input').each(
+                function (index, element) {
+                    $(element).rules('add', {requiredNotBlank: true});
                 }
             );
         }
