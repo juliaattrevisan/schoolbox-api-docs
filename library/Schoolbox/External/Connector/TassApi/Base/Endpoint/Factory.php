@@ -89,40 +89,6 @@ class Factory
 
 
     /**
-     * Set in admin, corresponds to external_tass_addnum_father
-     *
-     * @var int
-     */
-    private int $addnumFather;
-
-
-    /**
-     * Set in admin, corresponds to external_tass_addnum_mother
-     *
-     * @var int
-     */
-    private int $addnumMother;
-
-
-    /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a father specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $fatherAddressDescription;
-
-
-    /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a mother specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $motherAddressDescription;
-
-
-    /**
      * TASS communication rules type codes (in comma separated format) for all guardian relationships
      * that can be associated with students
      * @var string|null
@@ -212,10 +178,6 @@ class Factory
      * @param string                                     $dateLocalFormat
      * @param bool                                       $includePhoto
      * @param string                                     $spousePrefix
-     * @param int                                        $addnumFather
-     * @param int                                        $addnumMother
-     * @param string                                     $fatherAddressDescription
-     * @param string                                     $motherAddressDescription
      * @param string|null                                $communicationTypes
      * @param UserProfile\Mapper                         $baseProfileMapper
      * @param UserProfile\Student\Mapper                 $studentProfileMapper
@@ -238,10 +200,6 @@ class Factory
         string $dateLocalFormat,
         bool $includePhoto,
         string $spousePrefix,
-        int $addnumFather,
-        int $addnumMother,
-        string $fatherAddressDescription,
-        string $motherAddressDescription,
         ?string $communicationTypes,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
@@ -265,10 +223,6 @@ class Factory
         $this->dateLocalFormat = $dateLocalFormat;
         $this->includePhoto = $includePhoto;
         $this->spousePrefix = $spousePrefix;
-        $this->addnumFather = $addnumFather;
-        $this->addnumMother = $addnumMother;
-        $this->fatherAddressDescription = $fatherAddressDescription;
-        $this->motherAddressDescription = $motherAddressDescription;
         $this->communicationTypes = $communicationTypes;
 
         /* Profile pieces
@@ -337,10 +291,6 @@ class Factory
                 $api,
                 $this->includePhoto,
                 $this->spousePrefix,
-                $this->addnumFather,
-                $this->addnumMother,
-                $this->fatherAddressDescription,
-                $this->motherAddressDescription,
                 $this->communicationTypes,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,

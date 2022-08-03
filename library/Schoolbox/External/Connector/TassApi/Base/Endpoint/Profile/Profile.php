@@ -20,7 +20,6 @@ use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\CommRuleFamily;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Phone;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -107,40 +106,6 @@ class Profile implements IStrategy
 
 
     /**
-     * Set in admin, corresponds to external_tass_addnum_father
-     *
-     * @var int
-     */
-    private int $addnumFather;
-
-
-    /**
-     * Set in admin, corresponds to external_tass_addnum_mother
-     *
-     * @var int
-     */
-    private int $addnumMother;
-
-
-    /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a father specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $fatherAddressDescription;
-
-
-    /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a mother specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $motherAddressDescription;
-
-
-    /**
      * TASS communication rules type codes (in comma separated format) for all guardian relationships
      * that can be associated with students
      *
@@ -215,10 +180,6 @@ class Profile implements IStrategy
      * @param Api[]                           $api
      * @param bool                            $includePhoto
      * @param string                          $spousePrefix
-     * @param int                             $addnumFather
-     * @param int                             $addnumMother
-     * @param string                          $fatherAddressDescription
-     * @param string                          $motherAddressDescription
      * @param string                          $communicationTypes
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
@@ -233,10 +194,6 @@ class Profile implements IStrategy
         array $api,
         bool $includePhoto,
         string $spousePrefix,
-        int $addnumFather,
-        int $addnumMother,
-        string $fatherAddressDescription,
-        string $motherAddressDescription,
         string $communicationTypes,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
@@ -250,10 +207,6 @@ class Profile implements IStrategy
         $this->api = $api;
         $this->includePhoto = $includePhoto;
         $this->spousePrefix = $spousePrefix;
-        $this->addnumFather = $addnumFather;
-        $this->addnumMother = $addnumMother;
-        $this->fatherAddressDescription = $fatherAddressDescription;
-        $this->motherAddressDescription = $motherAddressDescription;
 
         /* If $communicationTypes is an empty string, default it to "tkco"
          * which is the default communication rule specified by TASS The Organisation
@@ -305,28 +258,6 @@ class Profile implements IStrategy
             'Fetching data using TASS Communication Rules: %s',
             $this->communicationTypes
         ));
-
-//        $families = (new Lookup\Family(
-//            $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
-//            $this->spousePrefix,
-//            $this->addnumFather,
-//            $this->addnumMother,
-//            (new Phone(
-//                $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
-//                $this->fatherAddressDescription,
-//                $this->motherAddressDescription,
-//                $this->communicationTypes
-//            ))->generate()
-//        ))->generate();
-//
-//        /* Also alert any broken tass api payloads that we detected in lookups
-//         */
-//        foreach ($families['unknown'] as $unknown) {
-//            $this->log->warning(sprintf(
-//                'Cannot identify father/mother records for family record %s',
-//                $unknown
-//            ));
-//        }
 
         /* Process each current student, and their parents too.
            The includephoto parameter is available for both:

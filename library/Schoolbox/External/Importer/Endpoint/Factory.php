@@ -197,10 +197,6 @@ class Factory implements IFactory
                     Loader::getInstance()->get('date_local'),
                     Loader::getInstance()->get('photo_sis_import'),
                     trim((string)Loader::getInstance()->get('external_tass_spouse_prefix')),
-                    (int)Loader::getInstance()->get('external_tass_addnum_father'),
-                    (int)Loader::getInstance()->get('external_tass_addnum_mother'),
-                    (string)Loader::getInstance()->get('external_tass_address_description_father'),
-                    (string)Loader::getInstance()->get('external_tass_address_description_mother'),
                     trim((string)Loader::getInstance()->get('external_tass_commrules_typecode')),
                     /* Profile pieces
                      */
