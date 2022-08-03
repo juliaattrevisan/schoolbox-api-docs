@@ -16,7 +16,7 @@
             // This HTML must match that inside the inner loop in the HTML template below.
             "<div id='row-div-" + nRows + "' class='small-12 columns actions-small-1'>\n" +
             "    <div class='list-item'>\n" +
-            "        <input type='text' name='rubricResultLabels[" + nRows + "]' maxlength='64' required/>\n" +
+            "        <input type='text' name='rubricResultLabels[" + nRows + "]' maxlength='{{ maxCharsPerLabel }}' required/>\n" +
             "    </div>\n" +
             "    <nav>\n" +
             "        <a class='icon-delete' title='Delete rubric result set item' onclick='removeRow(" + nRows + ")'></a>\n" +
@@ -105,7 +105,7 @@
                             {% for row in rubricResultRows %}
                                 <div id="row-div-{{ row.value|purify }}" class="small-12 columns actions-small-1">
                                     <div class="list-item">
-                                        <input type="text" name="rubricResultLabels[{{ row.value|purify }}]" value="{{ row.label|purify }}" maxlength="64" required/>
+                                        <input type="text" name="rubricResultLabels[{{ row.value|purify }}]" value="{{ row.label|purify }}" maxlength="{{ maxCharsPerLabel }}" required/>
                                     </div>
                                     <nav>
                                         <a class="icon-delete" title="Delete rubric result set item" onclick='removeRow({{ row.value|purify }})'></a>

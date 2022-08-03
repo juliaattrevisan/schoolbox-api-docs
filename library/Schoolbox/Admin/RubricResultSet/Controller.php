@@ -26,6 +26,10 @@ class Controller extends Base
     // Our ui limits it arbitrarily to 11, despite the schema design permitting you to have more than that.
     private const MAX_ROWS_PER_RESULT_SET = 11;
 
+    // This limit has been arbitrarily chosen.  The database schema allows many more characters, but rubric result
+    // labels should only be a few words, so a sensible limit is enforced at the client and server sides.
+    private const MAX_CHARS_PER_LABEL = 64;
+
     /**
      * @var Mapper
      */
@@ -98,6 +102,7 @@ class Controller extends Base
             [
                 'template' => '@adminRubricResultSet/create.twig',
                 'data'     => [
+                    'maxCharsPerLabel'    => self::MAX_CHARS_PER_LABEL,
                     'maxRowsPerResultSet' => self::MAX_ROWS_PER_RESULT_SET,
                     'pageCurrent'         => $this->router->generate('adminRubricResultSet.getList'),
                     'resultSetId'         => $resultSetId,
