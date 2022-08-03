@@ -196,7 +196,7 @@ update_puppet_facts(){
   mkdir -p /etc/facter/facts.d/ >/dev/null 2>&1;
   mkdir -p /tmp/facter/ >/dev/null 2>&1;
   fact_file="/etc/facter/facts.d/schoolbox_update.json";
-  tmp_fact_file="/tmp/facter/schoolbox_$INSTANCE_ID_update.json";
+  tmp_fact_file="/tmp/facter/schoolbox_${INSTANCE_ID}_update.json";
   if [ $error_int -ne 0 ]; then
     error_msg=$(echo "$error_msg" | cut -d',' -f2-100);
 
