@@ -25,7 +25,7 @@ class Watchlist
     /**
      * Filter to specific people; set to null to disable filtering
      */
-    private const WATCHLIST = ['279793', '279794', '314799'];
+    private const WATCHLIST = null;
 
 
     /**
