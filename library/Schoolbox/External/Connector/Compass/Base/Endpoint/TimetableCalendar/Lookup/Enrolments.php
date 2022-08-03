@@ -105,17 +105,6 @@ class Enrolments
                     $stack['students'][] = (string)$student['student']['code'];
                 }
             }
-
-            /* Now mine out a teacher, if specified
-             *
-             * TODO: There's potential support for Multiple Teachers by inspecting the
-             *  'sessions' array and mining out teachers from that, on a per-class instance basis.
-             *  That might let you have a different teacher on a given instance of this Activity in
-             *  the calendar representation - there doesn't seem to be any of that happening yet tho
-             */
-            if ('' !== (string)$enrolment['leadTeacherCode']) {
-                $stack['teachers'][] = (string)$enrolment['leadTeacherCode'];
-            }
         }
 
         return $stack;

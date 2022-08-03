@@ -329,7 +329,7 @@ class Classes implements IStrategy
                      */
                     if (self::ACADEMIC_ACTIVITY_TYPE === $activityType) {
                         try {
-                            $enrolments = $enrolmentsLookup->generate($activity['name'], (string)$academicGroupCode);
+                            $studentEnrolments = $enrolmentsLookup->generate($activity['name'], (string)$academicGroupCode);
                         } catch (\RuntimeException $e) {
                             $this->log->warning($e->getMessage());
 
@@ -345,16 +345,15 @@ class Classes implements IStrategy
                     } else {
                         /* Find them via attendees struct
                          */
-                        $enrolments = $attendeesLookup->generate($activity);
+                        $studentEnrolments = $attendeesLookup->generate($activity);
                     }
 
                     $this->log->info(sprintf(
-                        'Schedule %s: fetched enrolments for activity %s starting on %s: %s students, %s teachers',
+                        'Schedule %s: fetched enrolments for activity %s starting on %s: %s students',
                         $schedule['name'],
                         $activity['name'],
                         $activity['start'],
-                        \count($enrolments['students']),
-                        \count($enrolments['teachers'])
+                        \count($studentEnrolments['students'])
                     ));
 
                     /* These are instances of classes that occur throughout the year/timetable cycle
@@ -422,7 +421,7 @@ class Classes implements IStrategy
                             $activity['name']
                         ));
 
-                        $this->processClass($activity, $activityInstance, $enrolments);
+                        $this->processClass($activity, $activityInstance, $studentEnrolments);
                     }
                 }
             }
@@ -436,13 +435,13 @@ class Classes implements IStrategy
      *
      * @param array $activity
      * @param array $activityInstance
-     * @param array $enrolments
+     * @param array $studentEnrolments
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processClass(array $activity, array $activityInstance, array $enrolments): void
+    private function processClass(array $activity, array $activityInstance, array $studentEnrolments): void
     {
 
         /* Save sis_event record
@@ -455,7 +454,7 @@ class Classes implements IStrategy
 
         /* Save the involvements
          */
-        $this->createInvolvements($activity, $activityInstance, $enrolments, $event, $classEntry);
+        $this->createInvolvements($activity, $activityInstance, $studentEnrolments, $event, $classEntry);
     }
 
 
@@ -577,7 +576,7 @@ class Classes implements IStrategy
      *
      * @param array                           $activity
      * @param array                           $activityInstance
-     * @param array                           $enrolments
+     * @param array                           $studentEnrolments
      * @param \Schoolbox\External\Event\Model $event
      * @param ClassEntry                      $classEntry
      * @return void
@@ -588,7 +587,7 @@ class Classes implements IStrategy
     private function createInvolvements(
         array $activity,
         array $activityInstance,
-        array $enrolments,
+        array $studentEnrolments,
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry
     ): void {
@@ -599,13 +598,13 @@ class Classes implements IStrategy
         /* Save sis_class_user involvements
          * This is the teacher(s)
          */
-        if (!\count($enrolments['teachers'])) {
+        if (!\count($studentEnrolments['teachers'])) {
             $this->log->debug(sprintf(
                 '%s: no staff involved',
                 $activityName
             ));
         } else {
-            foreach ($enrolments['teachers'] as $externalId) {
+            foreach ($studentEnrolments['teachers'] as $externalId) {
                 $name = sprintf(
                     'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
                     $activityName,
@@ -620,13 +619,13 @@ class Classes implements IStrategy
         /* Save sis_class_user involvements
          * This is the student(s)
          */
-        if (!\count($enrolments['students'])) {
+        if (!\count($studentEnrolments['students'])) {
             $this->log->debug(sprintf(
                 '%s: no students involved',
                 $activityName
             ));
         } else {
-            foreach ($enrolments['students'] as $externalId) {
+            foreach ($studentEnrolments['students'] as $externalId) {
                 $name = sprintf(
                     'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
                     $activityName,
