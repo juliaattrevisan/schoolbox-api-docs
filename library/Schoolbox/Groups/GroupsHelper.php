@@ -340,7 +340,8 @@ class GroupsHelper
                 'userId'     => $member->getId(),
                 'accessType' => UserAccess::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()],
                 'role'       => $member->getRole()->getName(),
-                'meta'       => ($member->getYear() && $member->getYear()->getName()) ? $member->getYear()->getLongName() : '',
+                'campus'     => implode(', ', $member->getCampusCollection()->getPropertyValues('name')),
+                'yearLevel'  => ($member->getYear() && $member->getYear()->getName()) ? $member->getYear()->getLongName() : '',
             ];
         }
         return $members;

@@ -8,10 +8,12 @@ import { ref, computed, watch } from 'vue';
 import { useStore } from './store/manageGroupStore';
 import { useRemoveMembersStore } from './store/manageGroupRemoveMembersStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
+import {useMembersStore} from "./store/manageGroupMembersStore";
 
 
 const store = useStore();
 const removeMembersStore = useRemoveMembersStore();
+const membersStore = useMembersStore(); //to keep track of selectedMembers
 const removeModalEl = ref(null);
 
 /**
@@ -86,6 +88,14 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
+        <p v-if="membersStore.selectedMemberIds.length > 1">{{ membersStore.selectedMemberIds.length }} users selected</p>
+        <p v-else-if="membersStore.selectedMemberIds.length = 1">1 user selected</p>
+        <p v-if="membersStore.selectedGroupAdminIds.length > 1">including {{ membersStore.selectedGroupAdminIds.length }} group admins</p>
+        <p v-else-if="membersStore.selectedGroupAdminIds.length = 1">including 1 group admin</p>
+        <div v-if="(membersStore.selectedGroupAdminIds.length > 0) && (membersStore.selectedGroupAdminIds.length = membersStore.currentGroupAdminIds.length)"
+        class="alert-box warning">
+            All the group admins will be removed.
+        </div>
         <p>Are you sure you wish to remove the selected members?</p>
         <ul class="flex-list buttons">
             <li><button @click.prevent="onRemoveSelected" class="button submit" :disabled="removeMembersStore.isProcessing">{{ removeButtonText }}</button></li>

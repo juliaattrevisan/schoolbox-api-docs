@@ -372,7 +372,7 @@ export default {
                                 <a :href="`/statistics/homepage/${group.id}`" class="icon-report" title="View Statistics">View Statistics</a>
                             </li>
                             <li v-if="group.isAccessAdmin">
-                                <a :href="`/group/modify/${group.id}`" class="icon-group" title="Modify Group">Modify Group</a>
+                                <a :href="`/group/modify/${group.id}`" class="icon-group" title="Manage Group">Manage Group</a>
                             </li>
                         </ul>
                     </template>

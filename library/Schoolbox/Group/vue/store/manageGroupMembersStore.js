@@ -59,6 +59,22 @@ export const useMembersStore = defineStore('manageGroupMembers', {
         selectedMembers () {
             return this.groupMembers.filter((member) => this.selectedMemberIds.includes(member.id));
         },
+
+        /**
+         * To get current group admin id list
+         * @returns { Array }
+         */
+        currentGroupAdminIds() {
+            return this.groupMembers.filter((member) => member.accessType === AccessTypes.ADMIN).map((member) => member.id);
+        },
+
+        /**
+         * To get group admin id list in selected members
+         * @returns { Array }
+         */
+        selectedGroupAdminIds() {
+            return this.selectedMemberIds.filter((id) => this.currentGroupAdminIds.includes(id));
+        }
     },
 
     actions: {
