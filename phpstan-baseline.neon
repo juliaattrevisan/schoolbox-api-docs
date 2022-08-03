@@ -3361,11 +3361,6 @@ parameters:
 			path: library/Schoolbox/Config/Loader.php
 
 		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Controller.php
-
-		-
 			message: "#^Variable \\$rootNode in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Curriculum/Import/Controller.php
