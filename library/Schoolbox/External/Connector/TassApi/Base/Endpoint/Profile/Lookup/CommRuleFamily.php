@@ -218,10 +218,53 @@ class CommRuleFamily
             $externalId = "{$this->spousePrefix}{$identifier}";
         }
 
-        /* TODO sfa_num suffix
-         *  We lose sfa_num here though, unless we api them in getParents to find sfa_num specifically
-         *  But what does that mean for a school, if we don't use it anymore?
+        /* sfa_num suffix
+         * We lose sfa_num here though, unless we api them in getParents to find sfa_num specifically
+         * But what does that mean for a school, if we don't use it anymore?
          */
+        $parent = $this->api[DSN::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getParents', [
+            'user_code' => $identifier,
+        ]);
+
+        /* ffs
+         *
+         * If this sfa_num exists here, this isn't a split family
+         * It's a nukular one, and we don't need to append anything
+         *
+         * Otherwise it appears as a set underneath $identifier
+         * Disgusting.
+         *
+            Array (nukular)
+            (
+                [__tassversion] => 01.057.6.001
+                [parents] => Array
+                    (
+                        [0] => Array
+                            (
+                                [146865] => Array
+                                    (
+                                        [sfa_num] =>
+
+            Array (split)
+            (
+                [__tassversion] => 01.057.6.001
+                [parents] => Array
+                    (
+                        [0] => Array
+                            (
+                                [172328] => Array
+                                    (
+                                        [0] => Array
+                                            (
+                                                [sfa_num] => 1
+         *
+         */
+        if (!isset($parent['parents'][0][$identifier]['sfa_num'])) {
+            $sfaNum = trim((string)$parent['parents'][0][$identifier][0]['sfa_num']);
+
+            return "{$externalId}{$sfaNum}";
+        }
+
         return $externalId;
     }
 }
