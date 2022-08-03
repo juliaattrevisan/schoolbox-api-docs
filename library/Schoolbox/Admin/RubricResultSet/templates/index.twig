@@ -1,16 +1,11 @@
 <style>
     span.result-rubric-label
     {
+        background-color: #a0d3e8; /* Color $info-color from pantry colours page */
         display: inline-block;
         margin-bottom: 0.2rem;
         margin-right: 0.2rem;
         padding: 0.5rem;
-    }
-
-    span.buttons-container
-    {
-        display: inline-block;
-        float: right;
     }
 </style>
 <script>
@@ -61,20 +56,18 @@
                     <section>
                         <ul class="information-list unsortable">
                             {% for resultSetId, rubrics in rubricsByResultSetId %}
-                                <li>
-                                    <div class="small-12 medium-12 column">
-                                        <label>
+                                <li class="actions-small-2">
+                                    <div class="list-item">
+                                        <p class="content">
                                             {% for rubric in rubrics %}
-                                                <span class="result-rubric-label gainsboro">
-                                                    {{ rubric.label|purify }}
-                                                </span>
+                                                <span class="result-rubric-label">{{ rubric.label|purify }}</span>
                                             {% endfor %}
-                                            <span class="buttons-container">
-                                                <a class="edit-row-button icon-modify" href="{{ routeLookup('adminRubricResultSet.getUpdate', {resultSetId: resultSetId}) }}"></a>
-                                                <a id="delete-row-button" class="delete-row-button icon-delete" onclick="return deleteRow({{ resultSetId }})"></a>
-                                            </span>
-                                        </label>
+                                        </p>
                                     </div>
+                                    <nav>
+                                        <a href="{{ routeLookup('adminRubricResultSet.getUpdate', {resultSetId: resultSetId}) }}" class="icon-modify" title="Modify"></a>
+                                        <a onclick="return deleteRow({{ resultSetId }})" class="delete-row-button icon-delete" title="Delete"></a>
+                                    </nav>
                                 </li>
                             {% endfor %}
                         </ul>
