@@ -381,7 +381,7 @@ class Event implements ISoftDeletable
         }
 
         $this->setStartDateTime($selectedDate);
-        $this->setEndDateTime($selectedDate);
+        $this->setEndDateTime(clone $selectedDate); // Clone so that start and end do not refer to the same date object.
     }
 
 
