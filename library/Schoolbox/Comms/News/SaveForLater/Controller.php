@@ -12,7 +12,6 @@ namespace Schoolbox\Comms\News\SaveForLater;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\WebRequest\RequestUriParser;
-use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Lists\UserFeed;
@@ -117,7 +116,7 @@ class Controller extends Base
 
         $params = new News\Querystring($this->getRequest()->query);
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
-        $articles = $this->newsMapper->findByColumn('id', $articleIds)->sortBy('publishAt', Collection::ORDER_DESCENDING);
+        $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order' => ['publish_at' => 'desc']]);
         $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), RequestUriParser::parseUrlPath($this->request->server->getArrayCopy()));
 
         /* Attachment counts for each article in this set
