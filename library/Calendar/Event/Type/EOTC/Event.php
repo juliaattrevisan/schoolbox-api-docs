@@ -14,7 +14,6 @@ use Calendar\Event\Type\Day;
 
 class Event extends Day\Event
 {
-
     /* Attendance flag
      */
     private $attendance = 0;
@@ -53,10 +52,9 @@ class Event extends Day\Event
             } else {
                 $eventLevel .= ' campus' . $this->getCampusList();
             }
-        }
-        /* EOTC events are always campus, and aren't assigned to groups
-         */
-        else {
+        } else {
+            /* EOTC events are always campus, and aren't assigned to groups
+             */
             $eventLevel = 'personal';
         }
 

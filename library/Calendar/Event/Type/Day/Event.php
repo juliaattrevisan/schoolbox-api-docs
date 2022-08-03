@@ -18,7 +18,6 @@ use Calendar\Event\Type\EventInterface;
 
 class Event extends EventBase
 {
-
     /**
      * These constants define the levels of access an day event can be
      */

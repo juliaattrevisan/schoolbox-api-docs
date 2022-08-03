@@ -731,11 +731,6 @@ parameters:
 			path: library/Calendar/Event/Type/Day/Event.php
 
 		-
-			message: "#^Parameter \\#1 \\$attendance \\(string\\) of method Calendar\\\\Event\\\\Type\\\\EOTC\\\\Event\\:\\:setAttendance\\(\\) should be compatible with parameter \\$attendance \\(bool\\) of method Calendar\\\\Event\\\\Type\\\\Day\\\\Event\\:\\:setAttendance\\(\\)$#"
-			count: 1
-			path: library/Calendar/Event/Type/EOTC/Event.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Calendar/Event/Type/EventBase.php
