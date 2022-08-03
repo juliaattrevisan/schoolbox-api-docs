@@ -22,7 +22,8 @@ class Mapper extends BaseMapper
     protected function mapping(): void
     {
         // The rubric_result table has a compound primary key (resultset_id, value), so the base mapper functions are
-        // not very useful, and so this function has been deliberately left empty.
+        // not very useful.  We can still use the table name set here in SQL queries however.
+        $this->hasTable('rubric_result');
     }
 
     /**
@@ -33,7 +34,7 @@ class Mapper extends BaseMapper
      */
     public function findSets(): array
     {
-        $pdoStatement = $this->database->prepare('SELECT * FROM rubric_result');
+        $pdoStatement = $this->database->prepare("SELECT * FROM {$this->getTable()}");
         $pdoStatement->execute();
 
         $rows = $pdoStatement->fetchAll(PDO::FETCH_ASSOC);
@@ -60,7 +61,7 @@ class Mapper extends BaseMapper
     public function deleteSet(int $resultSetId): void
     {
         $stmt = $this->database->prepare(
-            "DELETE FROM rubric_result
+            "DELETE FROM {$this->getTable()}
             WHERE resultset_id = :resultSetId"
         );
 
@@ -76,7 +77,7 @@ class Mapper extends BaseMapper
      */
     public function findRows(int $resultSetId): array
     {
-        $stmt = $this->database->prepare('SELECT * FROM rubric_result WHERE resultset_id = :resultSetId');
+        $stmt = $this->database->prepare("SELECT * FROM {$this->getTable()} WHERE resultset_id = :resultSetId");
         $stmt->execute(array('resultSetId' => $resultSetId));
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -92,8 +93,8 @@ class Mapper extends BaseMapper
     {
         if ($resultSetIdOrNull === null) {
             $stmt = $this->database->prepare(
-                'SELECT COALESCE(MAX(resultset_id)+1, 1) AS resultSetId
-                FROM rubric_result'
+                "SELECT COALESCE(MAX(resultset_id)+1, 1) AS resultSetId
+                FROM {$this->getTable()}"
             );
             $stmt->execute();
 
@@ -103,14 +104,14 @@ class Mapper extends BaseMapper
         }
 
         $stmt = $this->database->prepare(
-            "DELETE FROM rubric_result
+            "DELETE FROM {$this->getTable()}
             WHERE resultset_id = :resultSetId"
         );
         $stmt->execute(array('resultSetId' => $resultSetId));
 
         $counter       = 0;
         $sqlInsertStmt = $this->database->prepare(
-            "INSERT INTO rubric_result SET
+            "INSERT INTO {$this->getTable()} SET
             resultset_id = :resultSetId,
             value = :value,
             label = :label"
