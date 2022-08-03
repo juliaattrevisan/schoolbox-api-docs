@@ -15,7 +15,6 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Attendees;
-use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Staff;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -651,16 +650,13 @@ class Classes implements IStrategy
             $teacher = $staffLookup[$teacherCompassIds];
 
             $this->log->debug(sprintf(
-                'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
+                'Creating new Override record for Activity %s Instance on %s for %s',
                 $activityName,
                 $activityInstance['start'],
                 $teacher['externalId']
             ));
 
-            /* We use the Overrides system to specify a particular person's involvement
-             * in a particular sis_event instance, rather than being associated with all
-             */
-
+            $this->saveStaffInvolvement($teacher, $event);
         }
 
         /* Save sis_class_user involvements
@@ -680,8 +676,40 @@ class Classes implements IStrategy
                     $externalId
                 );
 
-                $this->saveInvolvement($event, $classEntry, $name, $externalId);
+                $this->saveStudentInvolvement($event, $classEntry, $name, $externalId);
             }
+        }
+    }
+
+
+    /**
+     * Save staff involvement as an override, which allows each class
+     * to have different teachers depending on their associated sis_event
+     *
+     * @param array                           $teacher
+     * @param \Schoolbox\External\Event\Model $event
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function saveStaffInvolvement(
+        array $teacher,
+        \Schoolbox\External\Event\Model $event
+    ): void {
+        /* We use the Overrides system to specify a particular person's involvement
+         * in a particular sis_event instance, rather than being associated with all
+         */
+        $overridesMapper = \Schoolbox\External\Event\Overrides\Mapper::getInstance();
+
+        $override = $overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId($teacher['externalId'])
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
+            ->setSequence(1);
+
+        if ($this->perform) {
+            $overridesMapper->save($override);
         }
     }
 
@@ -699,7 +727,7 @@ class Classes implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function saveInvolvement(
+    private function saveStudentInvolvement(
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry,
         string $name,
