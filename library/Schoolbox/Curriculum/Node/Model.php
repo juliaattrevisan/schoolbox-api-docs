@@ -32,7 +32,7 @@ class Model implements ISoftDeletable, JsonSerializable
      *
      * @var Model|null
      */
-    protected ?Model $parent;
+    protected ?Model $parent = null;
 
     /**
      * This node's children (if it has any)
@@ -44,12 +44,12 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * The learning level this node is associated with, if any.
      */
-    protected ?LearningLevel\Model $learningLevel;
+    protected ?LearningLevel\Model $learningLevel = null;
 
     /**
      * The learning area this node is associated with, if any.
      */
-    protected ?LearningArea\Model $learningArea;
+    protected ?LearningArea\Model $learningArea = null;
 
     /**
      * User-friendly name
