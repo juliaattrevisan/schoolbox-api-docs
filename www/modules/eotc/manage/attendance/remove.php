@@ -1,13 +1,12 @@
 <?php
 
 /**
- * ${NAME}
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
+/** @var SitePage $this */
 $authenticator = new \EOTC\Authenticator($this);
 
 $event = false;

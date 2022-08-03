@@ -118,7 +118,7 @@ class Event extends Calendar\Event
     /**
      * Get metadata
      *
-     * @return EventMetadata
+     * @return EventMetadata|null
      */
     public function getMetadata()
     {

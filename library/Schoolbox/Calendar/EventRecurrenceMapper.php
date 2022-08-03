@@ -13,6 +13,7 @@ namespace Schoolbox\Calendar;
 use Alaress\Date\Interval;
 use Alaress_Date_Format;
 use DateTime;
+use EOTC\EventMetadata;
 use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -113,23 +114,23 @@ class EventRecurrenceMapper
      * Totally custom save method
      *
      * @param Event               $event
-     * @param string              $efficacy
-     * @param string              $repeatSetting
-     * @param Alaress_Date_Format $until
+     * @param string|null              $efficacy
+     * @param string|null              $repeatSetting
+     * @param Alaress_Date_Format|null $until
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
-     * @param int                 $access
+     * @param int|null                 $access
      * @param EventRelations      $eventRelations
      * @throws MapperException
      */
     public function save(
         Event $event,
-        $efficacy,
-        $repeatSetting,
-        $until,
+        ?string $efficacy,
+        ?string $repeatSetting,
+        ?Alaress_Date_Format $until,
         Alaress_Date_Format $startDate,
         Alaress_Date_Format $endDate,
-        $access,
+        ?int $access,
         EventRelations $eventRelations
     ) {
 
@@ -171,7 +172,7 @@ class EventRecurrenceMapper
             if ($efficacy == self::EFFICACY_SERIES) {
                 $this->persistSeries($event, $eventRelations, $access, $startDate, $endDate);
             } elseif ($efficacy == self::EFFICACY_SELF) {
-                $this->persistSingle($event, $eventRelations, $access, $eventRecurrence);
+                $this->persistSingle($event, $eventRelations, $access, $eventRecurrence, (bool)$previous->getSeriesId());
             }
         } else {
             // this is a new object
@@ -284,15 +285,17 @@ class EventRecurrenceMapper
      *
      * @param Event           $event
      * @param EventRelations  $eventRelations
-     * @param int             $access
+     * @param int|null        $access
      * @param EventRecurrence $eventRecurrence
+     * @param bool            $recreateMetadata
      * @throws MapperException
      */
     protected function persistSingle(
         Event $event,
         EventRelations $eventRelations,
-        $access,
-        EventRecurrence $eventRecurrence
+        ?int $access,
+        EventRecurrence $eventRecurrence,
+        bool $recreateMetadata
     ) {
         // Modify an existing event and add recurring incidents
         // If there's any recurrence: update first only, and create the
@@ -312,8 +315,12 @@ class EventRecurrenceMapper
         $event->setAccess($access);
 
         $eventMetadata = $event->getMetadata();
-        if (is_object($eventMetadata)) {
+        if ($eventMetadata instanceof EventMetadata) {
             $metadata = clone $eventMetadata;
+            if ($recreateMetadata) {
+                $this->eventMapper->deleteMetadataRelations($event);
+                $metadata->setId(null);
+            }
         } else {
             $metadata = $eventMetadata;
         }
