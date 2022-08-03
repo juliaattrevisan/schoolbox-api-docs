@@ -29,6 +29,7 @@ class ModelToArray
             'code'          => $node->getCode(),
             'reference'     => $node->getReference(),
             'description'   => $node->getDescription(),
+            'enabled'       => $node->getEnabled(),
             'parent'        => $node->getParent()
                 ? ['id' => $node->getParent()->getId()]
                 : null,

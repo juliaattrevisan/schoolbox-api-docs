@@ -30,6 +30,7 @@ class ArrayToModel extends Base
         $model = $this->setScalar($array, 'code', $model, 'setCode');
         $model = $this->setScalar($array, 'reference', $model, 'setReference');
         $model = $this->setScalar($array, 'description', $model, 'setDescription');
+        $model = $this->setScalar($array, 'enabled', $model, 'setEnabled');
         $model = $this->setModel(
             $array,
             'parent',
