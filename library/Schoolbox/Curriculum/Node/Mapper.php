@@ -14,6 +14,7 @@ use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use UnexpectedValueException;
 
 /**
  * Mapper for curriculum nodes
@@ -41,6 +42,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertHeritage']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteChildren'));
     }
 
@@ -68,6 +70,52 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
                 ->setOrder($i++);
             $this->saveTree($child);
         }
+    }
+
+    /**
+     * Pre-save callback: ensure that this node's parent is not being set to
+     * itself or one of its own children.
+     *
+     * @param Model      $model
+     * @param Model|null $previous
+     * @return bool
+     */
+    public function assertHeritage(Model $model, Model $previous = null): bool
+    {
+        if (
+            $previous
+            && $model->getParent()
+            && $previous->getParent()
+            && $model->getParent()->getId() !== $previous->getParent()->getId()
+        ) {
+            // Check parentage, all the way up to the top:
+            // If I find myself: error out
+            $ancestry = [$model->getId()];
+            $parentId = $model->getParent()->getId();
+            while (isset($parentId)) {
+                $ancestry[] = $parentId;
+                if ($parentId === $model->getId()) {
+                    throw new UnexpectedValueException(
+                        sprintf(
+                            "Ancestry loop detected: node #%d would be its own ancestor [%s]",
+                            $model->getId(),
+                            implode(' > ', $ancestry),
+                        )
+                    );
+                }
+                // Get next parent
+                $result = $this->findScalarByPredicates(
+                    'curriculum_node_parent_id',
+                    $this->getPredicateBuilder()->equals('id', $parentId),
+                );
+                if (empty($result)) {
+                    $parentId = null;
+                } else {
+                    [$parentId] = $result;
+                }
+            }
+        }
+        return true;
     }
 
     /**
