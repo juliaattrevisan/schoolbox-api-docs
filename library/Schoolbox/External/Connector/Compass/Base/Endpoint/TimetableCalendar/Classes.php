@@ -15,6 +15,8 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Attendees;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Staff;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
@@ -421,7 +423,7 @@ class Classes implements IStrategy
                             $activity['name']
                         ));
 
-                        $this->processClass($activity, $activityInstance, $studentEnrolments);
+                        $this->processClass($activity, $activityInstance, $studentEnrolments, $staffLookup);
                     }
                 }
             }
@@ -436,13 +438,18 @@ class Classes implements IStrategy
      * @param array $activity
      * @param array $activityInstance
      * @param array $studentEnrolments
+     * @param array $staffLookup
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processClass(array $activity, array $activityInstance, array $studentEnrolments): void
-    {
+    private function processClass(
+        array $activity,
+        array $activityInstance,
+        array $studentEnrolments,
+        array $staffLookup
+    ): void {
 
         /* Save sis_event record
          */
@@ -454,7 +461,7 @@ class Classes implements IStrategy
 
         /* Save the involvements
          */
-        $this->createInvolvements($activity, $activityInstance, $studentEnrolments, $event, $classEntry);
+        $this->createInvolvements($activity, $activityInstance, $studentEnrolments, $staffLookup, $event, $classEntry);
     }
 
 
@@ -577,6 +584,7 @@ class Classes implements IStrategy
      * @param array                           $activity
      * @param array                           $activityInstance
      * @param array                           $studentEnrolments
+     * @param array                           $staffLookup
      * @param \Schoolbox\External\Event\Model $event
      * @param ClassEntry                      $classEntry
      * @return void
@@ -588,6 +596,7 @@ class Classes implements IStrategy
         array $activity,
         array $activityInstance,
         array $studentEnrolments,
+        array $staffLookup,
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry
     ): void {
@@ -595,29 +604,67 @@ class Classes implements IStrategy
          */
         $activityName = trim((string)$activity['name']);
 
-        /* Save sis_class_user involvements
-         * This is the teacher(s)
+        /* Each instance potentially has a replacement teacher
+         * Replacement teachers take precedence over the usual teacher
+         *
+         * Instance teachers are defined in this order or precedence,
+         * because Compass reasons:
+         *
+         * instance[coveringCompassPersonId]
+         * instance[managingCompassPersonId]
+         * activity[managerCompassPersonId]
+         *
+         * Use a local cache because we need to look them up with yet another
+         * api call to find their external id, so we can trade space for time
          */
-        if (!\count($studentEnrolments['teachers'])) {
-            $this->log->debug(sprintf(
+        $teacherCompassIds = (new FirstMeaningfulValue())->find([
+            $activityInstance['coveringCompassPersonId'],
+            $activityInstance['managingCompassPersonId'],
+            $activity['managerCompassPersonId']
+        ]);
+
+        /* No identifiable teachers in any of the fields
+         * That is a bit unorthodox, but maybe possible in compass
+         *
+         * Probably never happens, so if it does, is extremely weird
+         * Warn the user
+         */
+        if ('' === $teacherCompassIds) {
+            $this->log->warning(sprintf(
                 '%s: no staff involved',
                 $activityName
             ));
+        } else if (!isset($staffLookup[$teacherCompassIds])) {
+            /* If we can't figure out who $teacherCompassIds is,
+             * warn the user - that probably shouldn't happen
+             * and might be a problem in compass
+             */
+            $this->log->warning(sprintf(
+                '%s: unknown staff involved with compass identifier %s',
+                $activityName,
+                $teacherCompassIds
+            ));
         } else {
-            foreach ($studentEnrolments['teachers'] as $externalId) {
-                $name = sprintf(
-                    'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
-                    $activityName,
-                    $activityInstance['start'],
-                    $externalId
-                );
+            /* Otherwise there's always at least one guy
+             * and we know who it is - carry onwards
+             */
+            $teacher = $staffLookup[$teacherCompassIds];
 
-                $this->saveInvolvement($event, $classEntry, $name, $externalId);
-            }
+            $this->log->debug(sprintf(
+                'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
+                $activityName,
+                $activityInstance['start'],
+                $teacher['externalId']
+            ));
+
+            /* We use the Overrides system to specify a particular person's involvement
+             * in a particular sis_event instance, rather than being associated with all
+             */
+
         }
 
         /* Save sis_class_user involvements
-         * This is the student(s)
+         * This is the student(s) and they're associated with all instances
          */
         if (!\count($studentEnrolments['students'])) {
             $this->log->debug(sprintf(
