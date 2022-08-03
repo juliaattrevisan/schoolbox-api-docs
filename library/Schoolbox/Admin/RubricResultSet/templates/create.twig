@@ -6,11 +6,10 @@
         let rowsContainer = document.getElementById('rows-container');
         let nRows         = rowsContainer.children.length;
 
-        if (nRows > 0) {
-            if (nRows > {{ maxRowsPerResultSet }}) {
-                // We limit the number of rows here to an arbitrarily chosen sensible value.
-                return;
-            }
+        // Use parseInt('') to protect against possibility of null or empty string value.
+        if (nRows > parseInt('{{ maxRowsPerResultSet }}')) {
+            // We limit the number of rows here to an arbitrarily chosen sensible value.
+            return;
         }
 
         let newRowHtml = (
