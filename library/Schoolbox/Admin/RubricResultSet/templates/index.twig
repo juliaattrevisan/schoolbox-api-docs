@@ -1,50 +1,50 @@
 <style>
-div.create-new-button-container
-{
-    text-align: right;
-}
+    div.create-new-button-container
+    {
+        text-align: right;
+    }
 
-span.result-rubric-label-span
-{
-    display: inline-block;
-    margin-bottom: 0.2rem;
-    margin-right: 0.2rem;
-    padding: 0.5rem;
-}
+    span.result-rubric-label
+    {
+        display: inline-block;
+        margin-bottom: 0.2rem;
+        margin-right: 0.2rem;
+        padding: 0.5rem;
+    }
 
-span.buttons-container-span
-{
-    display: inline-block;
-    float: right;
-}
+    span.buttons-container
+    {
+        display: inline-block;
+        float: right;
+    }
 
-div.clear-floats
-{
-    clear: both;
-}
+    div.clear-floats
+    {
+        clear: both;
+    }
 </style>
 <script>
-function deleteRow(resultSetId)
-{
-    let aJq = $('#delete-row-button');
+    function deleteRow(resultSetId)
+    {
+        let aJq = $('#delete-row-button');
 
-    aJq.confirmDialog(
-        {
-            confirmEvent: function ()
+        aJq.confirmDialog(
             {
-                $.ajax(
-                    {
-                        url: '/adminv2/rubric-result-set/' + resultSetId,
-                        type: 'DELETE',
-                        success: function () {location.reload();}
-                    }
-                );
+                confirmEvent: function ()
+                {
+                    $.ajax(
+                        {
+                            url: '/adminv2/rubric-result-set/' + resultSetId,
+                            type: 'DELETE',
+                            success: function () {location.reload();}
+                        }
+                    );
+                }
             }
-        }
-    );
+        );
 
-    return false;
-}
+        return false;
+    }
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -73,11 +73,11 @@ function deleteRow(resultSetId)
                                     <div class="small-12 medium-12 column">
                                         <label>
                                             {% for rubric in rubrics %}
-                                                <span class="result-rubric-label-span gainsboro">
+                                                <span class="result-rubric-label gainsboro">
                                                     {{ rubric.label|purify }}
                                                 </span>
                                             {% endfor %}
-                                            <span class="buttons-container-span">
+                                            <span class="buttons-container">
                                                 <a class="edit-row-button icon-modify" href="/adminv2/rubric-result-set/{{ resultSetId }}/update"></a>
                                                 <a id="delete-row-button" class="delete-row-button icon-delete" onclick="return deleteRow({{ resultSetId }})"></a>
                                             </span>

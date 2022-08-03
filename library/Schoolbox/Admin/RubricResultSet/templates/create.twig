@@ -14,7 +14,7 @@
 
         let newRowHtml = (
             // This HTML must match that inside the inner loop in the HTML template below.
-            "<div id='row-div-" + nRows + "' class='small-12 columns actions-small-1'>\n" +
+            "<div id='row-" + nRows + "' class='small-12 columns actions-small-1'>\n" +
             "    <div class='list-item'>\n" +
             "        <input type='text' name='rubricResultLabels[" + nRows + "]' maxlength='{{ maxCharsPerLabel }}' required/>\n" +
             "    </div>\n" +
@@ -29,8 +29,8 @@
         // Add validation rules to new input.
         $('input[name="rubricResultLabels[' + String(nRows) + ']"').rules('add', {requiredNotBlank: true});
 
-        document.getElementById('form-container-div'    ).style.display = ''    ; // Show form.
-        document.getElementById('empty-state-island-div').style.display = 'none'; // Hide empty state box.
+        document.getElementById('form-container'    ).style.display = ''    ; // Show form.
+        document.getElementById('empty-state-island').style.display = 'none'; // Hide empty state box.
     }
 
     /**
@@ -38,15 +38,15 @@
      * We also must update the numbers on the left of the new form rows so there are no gaps.
      */
     function removeRow(rowValue) {
-        let rowLi = document.getElementById('row-div-' + rowValue);
+        let rowLi = document.getElementById('row-' + rowValue);
         rowLi.remove();
         renumberRows();
 
         if (document.getElementById('rows-container').children.length === 0) {
-            document.getElementById('empty-state-island-div').style.display = ''; // Show empty state box.
-            document.getElementById('form-container-div').style.display = 'none'; // Hide form.
+            document.getElementById('empty-state-island').style.display = ''    ; // Show empty state box.
+            document.getElementById('form-container'    ).style.display = 'none'; // Hide form.
         } else {
-            document.getElementById('form-container-div').style.display = ''; // Show form.
+            document.getElementById('form-container').style.display = ''; // Show form.
         }
     }
 
@@ -71,9 +71,9 @@
          * Configure validation.
          */
         function () {
-            $('#rubricResultSetForm').alaressValidate();
+            $('#rubric-result-set-form').alaressValidate();
 
-            $('#rubricResultSetForm input').each(
+            $('#rubric-result-set-form input').each(
                 function(index, element) {
                     if (element.getAttribute('type') !== 'hidden') {
                         $(element).rules('add', {requiredNotBlank: true});
@@ -90,20 +90,20 @@
     <div class="admin-content">
         <!-- Main content section starts here. -->
         <div class="row">
-            <div id="empty-state-island-div" class="small-12 island"{% if rubricResultRows %} style="display:none"{% endif %}>
+            <div id="empty-state-island" class="small-12 island"{% if rubricResultRows %} style="display:none"{% endif %}>
                 <div class="empty-state">
                     <i class="icon-list"></i>
                     <p>This rubrics result set is empty.</p>
                     <p><a onclick="addRow()">Add a row</a></p>
                 </div>
             </div>
-            <div id="form-container-div" class="small-12 island"{% if not rubricResultRows %} style="display:none"{% endif %}>
-                <form id="rubricResultSetForm" method="post" action="/adminv2/rubric-result-set/create">
+            <div id="form-container" class="small-12 island"{% if not rubricResultRows %} style="display:none"{% endif %}>
+                <form id="rubric-result-set-form" method="post" action="/adminv2/rubric-result-set/create">
                     <input type='hidden' name='resultSetIdOrBlank' value='{{ resultSetId }}'/>
                     <section>
                         <fieldset id="rows-container" class="content">
                             {% for row in rubricResultRows %}
-                                <div id="row-div-{{ row.value|purify }}" class="small-12 columns actions-small-1">
+                                <div id="row-{{ row.value|purify }}" class="small-12 columns actions-small-1">
                                     <div class="list-item">
                                         <input type="text" name="rubricResultLabels[{{ row.value|purify }}]" value="{{ row.label|purify }}" maxlength="{{ maxCharsPerLabel }}" required/>
                                     </div>
@@ -113,13 +113,13 @@
                                 </div>
                             {% endfor %}
                         </fieldset>
-                        <div id="plus-button-container-div" class="component-action">
+                        <div class="component-action">
                             <section>
                                 <a class="button" onclick="addRow()">Add Row</a>
                             </section>
                         </div>
                     </section>
-                    <input id="save-button" type="submit" value="Save">
+                    <input type="submit" value="Save">
                 </form>
             </div>
         </div>
