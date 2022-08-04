@@ -20,6 +20,8 @@ class Controller extends Base
 {
     private const MAX_ANCESTORS   = 50;
     private const MAX_DESCENDANTS = 50;
+    private const MIN_LIMIT       = 1;
+    private const DEFAULT_LIMIT   = 10;
     private const MAX_LIMIT       = 50;
 
     /**
@@ -233,7 +235,7 @@ class Controller extends Base
     {
         return min(
             self::MAX_LIMIT,
-            max(0, $this->request->query->getInt('limit', 0)),
+            max(self::MIN_LIMIT, $this->request->query->getInt('limit', self::DEFAULT_LIMIT)),
         );
     }
 
