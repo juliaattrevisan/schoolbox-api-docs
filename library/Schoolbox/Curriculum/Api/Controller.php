@@ -42,6 +42,13 @@ class Controller extends Base
      */
     public function getNode(Node\Model $node): void
     {
+        // Need to know how many levels to go up and down
+        // ancestors: int
+        // descendants: int
+        $ancestors   = max(0, $this->request->query->getInt('ancestors', 0));
+        $descendants = max(0, $this->request->query->getInt('descendants', 0));
+        $node = $this->nodeMapper->loadAncestors($node, 'parent', $ancestors);
+        $node = $this->nodeMapper->loadDescendants($node, 'parent', 'children', $descendants);
         $this->respondWithNode($node);
     }
 
