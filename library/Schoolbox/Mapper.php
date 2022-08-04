@@ -844,12 +844,12 @@ abstract class Mapper implements IMapper, Serializable
      *
      * Attempts to perform this action in as few queries as possible.
      *
-     * @param mixed  $object
+     * @template T
+     * @param T      $object
      * @param string $parentField
      * @param int    $maxDepth
      * @param int    $currentDepth
-     *
-     * @return mixed
+     * @return T
      */
     public function loadAncestors(
         mixed $object,
@@ -908,13 +908,13 @@ abstract class Mapper implements IMapper, Serializable
      *
      * Attempts to perform this action in as few queries as possible.
      *
-     * @param mixed  $object
+     * @template T
+     * @param T      $object
      * @param string $parentField
      * @param string $childField
      * @param int    $maxDepth
      * @param int    $currentDepth
-     *
-     * @return object
+     * @return T
      */
     public function loadDescendants(
         mixed $object,
