@@ -121,15 +121,12 @@ class Controller extends Base
     {
         $postedData    = $this->getRequest()->post->getArrayCopy();
         $indexedLabels = [];
-        $labelsCount   = 0;
 
         foreach ($postedData['rubricResultLabels'] as $value => $label) {
-            $indexedLabels[$value] = $label;
-
-            if (++$labelsCount > self::MAX_ROWS_PER_RESULT_SET) {
-                // The client should not send more than self::MAX_ROWS_PER_RESULT_SET to be saved.
-                // In any case, we apply this limit at the server, and if it is surpassed we just ignore the excess rows.
-                break;
+            // The client should not send more than self::MAX_ROWS_PER_RESULT_SET to be saved.
+            // In any case, we apply this limit at the server, and if it is surpassed we just ignore the excess rows.
+            if (count($indexedLabels) < self::MAX_ROWS_PER_RESULT_SET) {
+                $indexedLabels[$value] = $label;
             }
         }
 
