@@ -66,6 +66,9 @@ class ApiClient
         try {
             $requestUrl    = self::API_LATEST_RELEASE_URL;
             $response      = $this->makeRequest($requestUrl);
+            if (!isset($response['name'])) {
+                throw new DomainException('Instance Registry API latest release missing');
+            }
             $latestRelease = $response['name'];
         } catch (Exception $e) {
             throw new DomainException('Instance Registry API latest release missing');
