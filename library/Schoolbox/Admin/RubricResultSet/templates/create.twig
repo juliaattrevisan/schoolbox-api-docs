@@ -1,18 +1,29 @@
 <script>
+    $(
+        function () {
+            // Configure validation.
+            $('#rubric-result-set-form').alaressValidate();
+            $('#rows-container input').each(
+                function (index, element) {
+                    $(element).rules('add', {requiredNotBlank: true});
+                }
+            );
+
+            if ($('#rows-container').children().length >= parseInt('{{ maxRowsPerResultSet }}')) {
+                disableAddRowButton();
+            }
+        }
+    );
+
     /**
      * Add a new row to the form.
+     * This function should only be called if the current number of rows is less than the maximum allowed ({{ maxRowsPerResultSet }}).
+     * If the maximum number of rows is reached after adding a row, the add-row-button becomes disabled.
      */
     function addRow() {
         let rowsContainer = document.getElementById('rows-container');
-        let nRows = rowsContainer.children.length;
-
-        // Use parseInt('') to protect against possibility of null or empty string value.
-        if (nRows >= parseInt('{{ maxRowsPerResultSet }}')) {
-            // We limit the number of rows here to an arbitrarily chosen sensible value.
-            return;
-        }
-
-        let newRowHtml = (
+        let nRows         = rowsContainer.children.length;
+        let newRowHtml    = (
             // This HTML must match that inside the inner loop in the HTML template below.
             "<div id='row-" + nRows + "' class='small-12 columns actions-small-1'>\n" +
             "    <div class='list-item'>\n" +
@@ -25,10 +36,10 @@
         );
 
         rowsContainer.insertAdjacentHTML('beforeend', newRowHtml);
+        ++nRows; // We have just added a row.
 
-        if (parseInt('{{ maxRowsPerResultSet }}') == nRows + 1) {
-            // We have added the maximum number of rows, so we disable the add row button.
-            $('#add-row-button').addClass('disabled').html('Max rows reached');
+        if (nRows >= parseInt('{{ maxRowsPerResultSet }}')) {
+            disableAddRowButton();
         }
 
         // Add validation rules to new input.
@@ -54,7 +65,7 @@
 
         // Enable the add-row button in case it was previously disabled, and return button text to original value.
         // Disabling and button text changing occurs in addRow() when the maximum number of rows is reached.
-        $('#add-row-button').removeClass('disabled').html('Add Row');
+        enableAddRowButton();
     }
 
     /**
@@ -73,19 +84,17 @@
         }
     }
 
-    $(
-            /**
-             * Configure validation.
-             */
-            function () {
-                $('#rubric-result-set-form').alaressValidate();
-                $('#rows-container input').each(
-                        function (index, element) {
-                            $(element).rules('add', {requiredNotBlank: true});
-                        }
-                );
-            }
-    );
+    function disableAddRowButton() {
+        let el = document.getElementById('add-row-button');
+        el.classList.add('disabled');
+        el.innerHTML = 'Max Rows Reached';
+    }
+
+    function enableAddRowButton() {
+        let el = document.getElementById('add-row-button');
+        el.classList.remove('disabled');
+        el.innerHTML = 'Add Row';
+    }
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
