@@ -43,7 +43,6 @@ use function sprintf;
 
 class Folder extends SimpleStrategy
 {
-
     /** @var bool */
     private $canTargetTeachersOfUsersInFolder;
 
@@ -69,6 +68,10 @@ class Folder extends SimpleStrategy
      */
     private $knownUserSubjects;
 
+    /**
+     * User arrays to represent muted folder
+     */
+    public const MUTED = ['0'];
 
     /**
      * @return string
@@ -485,7 +488,7 @@ class Folder extends SimpleStrategy
         }
         $mutedUsersPerFolder = [];
 
-        $pb          = (new Builder(new Quoter(), 'msg_reroute_override'))
+        $pb = (new Builder(new Quoter(), 'msg_reroute_override'))
             ->in('msg_route_key', array_map(static function (string $folderId) {
                 return sprintf('service.%s.%s', UserAccess::SERVICE_HOMEPAGE, $folderId);
             }, $filtered))
@@ -498,7 +501,15 @@ class Folder extends SimpleStrategy
         ";
         $query = $this->folderMapper->getDatabase()->query($sql, $pb->getParams());
         while ([$folderId, $userId] = $query->fetch(PDO::FETCH_NUM)) {
-            $mutedUsersPerFolder[$folderId][] = $userId;
+            $folderId = (string)$folderId;
+            if ($userId === '0') {
+                // Notification is disabled for this folder. Reset to '0' only.
+                $mutedUsersPerFolder[$folderId] = self::MUTED;
+            } elseif (!isset($mutedUsersPerFolder[$folderId]) || $mutedUsersPerFolder[$folderId] !== self::MUTED) {
+                // If notification is enabled, add current muted user
+                $mutedUsersPerFolder[$folderId]   ??= [];
+                $mutedUsersPerFolder[$folderId][] = $userId;
+            }
         }
         return $mutedUsersPerFolder;
     }
@@ -571,6 +582,18 @@ class Folder extends SimpleStrategy
         $quoter = new Quoter();
 
         $mutedUsersPerFolder = $excludeMuted ? $this->getMutedUsersPerFolder($nnianFolderIds) : [];
+
+        if ($excludeMuted) {
+            $mutedFolderIds = [];
+            // Get notification disabled folders
+            foreach ($mutedUsersPerFolder as $folderId => $userIds) {
+                if ($userIds === self::MUTED) {
+                    $mutedFolderIds[] = $folderId;
+                }
+            }
+            // Remove notification disabled folders from target folders
+            $nnianFolderIds = array_diff($nnianFolderIds, $mutedFolderIds);
+        }
 
         // Get group users, regardless of whether they have read/write/mod perms. (but not deny)
         $groupJoin = $targetNull ? 'LEFT' : '';

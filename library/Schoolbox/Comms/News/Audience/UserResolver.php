@@ -344,17 +344,21 @@ class UserResolver implements IUserResolver
     private function getNonMutedFolderRelatedUsers(string $relationship, array $folderIds): array
     {
         /** @var Segment\Strategy\Folder $strategy */
-        $strategy        = $this->strategyFactory->makeSimpleStrategy(Segment\Strategy\Folder::getEntityType());
+        $strategy     = $this->strategyFactory->makeSimpleStrategy(Segment\Strategy\Folder::getEntityType());
+        $mutedFolders = [];
         try {
             $nnianFolderIds = $strategy->findNnianFolderIds($folderIds);
             $mutedFolders   = $strategy->getMutedUsersPerFolder($nnianFolderIds);
         } catch (Exception $e) {
             // rather than stopping notification, report the issue and proceed
             trigger_error('Failed to get muted folders for ' . implode(',', $folderIds) . ': ' . $e->getMessage(), E_USER_WARNING);
-            $mutedFolders = [];
         }
         $allRelatedUsers = [];
         foreach ($folderIds as $folderId) {
+            if (isset($mutedFolders[$folderId]) && $mutedFolders[$folderId] === Segment\Strategy\Folder::MUTED) {
+                // if notification is disabled, skip this folder
+                continue;
+            }
             $userResSql        = $strategy->getUserResolutionSql('user', "", [$folderId], false);
             $join              = $userResSql->getJoin();
             $pb                = $userResSql->getPb();

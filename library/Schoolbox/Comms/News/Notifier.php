@@ -531,7 +531,8 @@ class Notifier extends AbstractModuleNotifier
             return $envelope;
         }
 
-        $recipientIds = $this->audienceResolver->findUsersForArticle($article, true);
+        // get recipients respecting mute setting, unless this article is a priority news
+        $recipientIds = $this->audienceResolver->findUsersForArticle($article, !$article->getSticky());
 
         if (empty($recipientIds)) {
             // no recipients? do nothing
