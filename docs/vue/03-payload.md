@@ -57,7 +57,7 @@ To see the output, `npm run build` and visit the Greenhouse url.
 
 ## 3.3 Add more payload args
 
-You can add more args to provide pieces of info to the `user-list` component. See below for some examples. Non-scalar data should be json_encoded, scalars can be provided as-is; however, note the usage of apostrophes in the `:datetime` attribute below.  Modify your container.twig file so that it looks like this:
+You can add more args to provide pieces of info to the `user-list` component. See below for some examples. Non-scalar data should be json_encoded, scalars can be provided as-is; however, note the usage of apostrophes in the `:datetime` attribute below.  Experiment with this idea by modifying your container.twig file so that it looks like below.  The props object in the user-list.vue file will need to be modified also (instructions follow).
 
 ```html
 <h1>Container for Vue initialisation</h1>
@@ -85,7 +85,7 @@ You can add more args to provide pieces of info to the `user-list` component. Se
 >
 > `:datetime="'some value'"` is synonymous with`var datetime = 'some value'`, which works. Keep this in mind because it applies throughout all Vue templates too.
 
-Define them in the `props` object.
+Define them in the `props` object (in the user-list.vue file).
 At a minimum, define the type of each property and whether it's required
 
 ```js
@@ -113,7 +113,7 @@ props: {
 },
 ```
 
-Then render them out:
+Then render them out (at the bottom of the user-list.vue page, inside the <template> block):
 
 ```html
 <p>
