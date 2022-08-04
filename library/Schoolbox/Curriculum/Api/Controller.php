@@ -93,7 +93,7 @@ class Controller extends Base
         );
         $this->response->content->set(
             $this->buildJsonOutput(
-                $tree->map(new ModelToArray(self::MAX_DESCENDANTS, self::MAX_ANCESTORS))
+                $tree->map(new ModelToArray(0, self::MAX_DESCENDANTS))
             ),
         );
     }
