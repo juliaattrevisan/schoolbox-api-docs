@@ -86,7 +86,7 @@ export default {
             required: true
         }
         nameLength: {
-            type: Number,
+            type: String,
             required: true
         }
     },
