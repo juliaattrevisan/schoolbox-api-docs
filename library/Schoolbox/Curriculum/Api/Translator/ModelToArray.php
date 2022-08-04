@@ -21,7 +21,12 @@ class ModelToArray
      * Constructor
      *
      * @param int $ancestorCount   How many levels of ancestor get translated?
+     *                             Any levels of ancestor above this get only a
+     *                             stub record (with no further ancestor)
+     *                             translated.
      * @param int $descendantCount How many levels of descendant get translated?
+     *                             Any levels of descendant below this are not
+     *                             translated at all.
      */
     public function __construct(
         private int $ancestorCount,
@@ -44,8 +49,12 @@ class ModelToArray
      *
      * @param Model $node
      * @param int   $ancestorCount   Number of levels of ancestors to translate.
+     *                               If this is zero, translate only a stub
+     *                               record for the parent.
      * @param int   $descendantCount Number of levels of descendants to
      *                               translate.
+     *                               If this is zero, do not translate
+     *                               descendants at all.
      * @return array
      */
     private function translate(Model $node, int $ancestorCount, int $descendantCount): array
@@ -53,10 +62,10 @@ class ModelToArray
         $parent = null;
         if ($node->getParent()) {
             if ($ancestorCount > 0) {
-                // Parents never have children hydrated
+                // Translate the parent, but never with its children
                 $parent = $this->translate($node->getParent(), $ancestorCount - 1, 0);
             } else {
-                // Hydrate a stub value for the parent
+                // Translate a stub only for the parent
                 $parent = ['id' => $node->getParent()->getId()];
             }
         }
@@ -65,7 +74,7 @@ class ModelToArray
         if ($descendantCount > 0) {
             $children = [];
             foreach ($node->getChildren() as $child) {
-                // Children never have their parent hydrated
+                // Translate the children, but never with the full parent record
                 $children[] = $this->translate($child, 0, $descendantCount - 1);
             }
         }
