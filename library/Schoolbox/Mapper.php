@@ -846,6 +846,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @param mixed  $object
      * @param string $parentField
+     * @param int    $maxDepth
      * @param int    $currentDepth
      *
      * @return mixed
@@ -853,10 +854,11 @@ abstract class Mapper implements IMapper, Serializable
     public function loadAncestors(
         mixed $object,
         string $parentField = 'parent',
+        int $maxDepth = 50,
         int $currentDepth = 1,
     ) {
-        // Recursive relation protection
-        if ($currentDepth >= 50) {
+        // Do not find more than $maxDepth descendants
+        if ($currentDepth > $maxDepth) {
             return $object;
         }
         $collection = $this->getModelAsCollection($object);
@@ -884,6 +886,7 @@ abstract class Mapper implements IMapper, Serializable
                 $this->loadAncestors(
                     $this->findByColumn($this->getIdentifierColumn(), $parentIds),
                     $parentField,
+                    $maxDepth,
                     $currentDepth + 1
                 ) as $parent
             ) {
@@ -908,6 +911,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param mixed  $object
      * @param string $parentField
      * @param string $childField
+     * @param int    $maxDepth
      * @param int    $currentDepth
      *
      * @return object
@@ -916,10 +920,11 @@ abstract class Mapper implements IMapper, Serializable
         mixed $object,
         string $parentField = 'parent',
         string $childField = 'children',
+        int $maxDepth = 50,
         int $currentDepth = 1,
     ) {
         // Recursive relation protection
-        if ($currentDepth > 50) {
+        if ($currentDepth > $maxDepth) {
             return $object;
         }
 
@@ -945,6 +950,7 @@ abstract class Mapper implements IMapper, Serializable
                     $this->findByColumn($this->getMap()->getOffset($parentField)['column'], $ids),
                     $parentField,
                     $childField,
+                    $maxDepth,
                     $currentDepth + 1
                 ) as $child
             ) {
