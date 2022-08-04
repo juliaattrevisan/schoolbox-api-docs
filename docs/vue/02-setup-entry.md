@@ -29,15 +29,14 @@ The `UserList` component we're about to build requires its own javascript stuff 
 Create `library/Schoolbox/Greenhouse/templates/userList.js` and put this inside, which will tell vue how to initialise our `UserList` component into its container element.
 
 ```js
-import Vue from 'vue';
+import { createApp } from 'vue';
 import UserList from './user-list';
 
-new Vue({
-    el: '#user-list-container',
-    components: {
-        UserList
+createApp({
+	components: {
+		UserList
     }
-});
+}).mount('#user-list-container');
 ```
 
 -   The `el` arg is the container element's id which we previously named `#user-list-container`.
@@ -68,7 +67,7 @@ Add `library/Schoolbox/Greenhouse/templates/user-list.vue` and paste this massiv
  * To display a list of users 
  */
 
-import Toast from '@vue/components/toast';
+import Toast from '@schoolboxVue/components/toast';
 
 export default {
 
