@@ -18,7 +18,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Group\GroupsHelper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;

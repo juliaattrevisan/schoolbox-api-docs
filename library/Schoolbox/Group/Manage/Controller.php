@@ -11,7 +11,7 @@ namespace Schoolbox\Group;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Group\ArrayToModel;
-use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Group\GroupsHelper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;

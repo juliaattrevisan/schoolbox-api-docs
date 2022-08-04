@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Group\ArrayToModel;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
-use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Group\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 
 /**

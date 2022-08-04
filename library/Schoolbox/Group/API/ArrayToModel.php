@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\APIGroup;
 
-use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Group\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccess;
 
 /**

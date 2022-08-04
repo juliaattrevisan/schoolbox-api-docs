@@ -7,7 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Groups;
+namespace Schoolbox\Group;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Crell\ApiProblem\ApiProblem;

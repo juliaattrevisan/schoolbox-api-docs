@@ -10,7 +10,7 @@
 namespace Config\Modules;
 
 use Psr\Container\ContainerInterface;
-use Schoolbox\Groups\Module;
+use Schoolbox\Group\Module;
 
 class Groups implements ModuleConfigInterface
 {

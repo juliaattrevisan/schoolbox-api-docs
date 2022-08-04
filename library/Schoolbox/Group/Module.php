@@ -8,7 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Groups;
+namespace Schoolbox\Group;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;

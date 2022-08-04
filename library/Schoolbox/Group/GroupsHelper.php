@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Groups;
+namespace Schoolbox\Group;
 
 use Alaress\Color\ColorFactory;
 use Schoolbox\Collection;

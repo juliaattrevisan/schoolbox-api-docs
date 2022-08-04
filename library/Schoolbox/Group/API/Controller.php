@@ -13,7 +13,7 @@ namespace Schoolbox\APIGroup;
 use Alaress\Web\Controller\Base;
 use Aura\Web\Exception\InvalidStatusCode;
 use Crell\ApiProblem\ApiProblem;
-use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Group\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
