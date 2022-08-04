@@ -57,12 +57,12 @@ To see the output, `npm run build` and visit the Greenhouse url.
 
 ## 3.3 Add more payload args
 
-You can add more args to provide pieces of info to the `user-list` component. See below for some examples. Non-scalar data should be json_encoded, scalars can be provided as-is; however, note the usage of apostrophes in the `:datetime` attribute below.
+You can add more args to provide pieces of info to the `user-list` component. See below for some examples. Non-scalar data should be json_encoded, scalars can be provided as-is; however, note the usage of apostrophes in the `:datetime` attribute below.  (The code snippet below should be added to the container.twig file.)
 
 ```html
-{% set hardcodedPayload = { 'cat': 'Navarre', 'dog': 'Benji', 'horse': 'Mr. Ed', 'elephant': 'Dumbo' } %} {% set
-stuartMahon = { 'fullname': 'Stuart Mahon', 'firstname': 'stu', 'lastname': 'mahon' } %} {% set datetime =
-'now'|date('Y-m-d H:i:s') %}
+{% set hardcodedPayload = { 'cat': 'Navarre', 'dog': 'Benji', 'horse': 'Mr. Ed', 'elephant': 'Dumbo' } %}
+{% set stuartMahon = { 'fullname': 'Stuart Mahon', 'firstname': 'stu', 'lastname': 'mahon' } %}
+{% set datetime = 'now'|date('Y-m-d H:i:s') %}
 
 <div id="user-list-container">
     <user-list
