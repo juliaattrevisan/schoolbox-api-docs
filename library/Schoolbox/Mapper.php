@@ -844,9 +844,6 @@ abstract class Mapper implements IMapper, Serializable
      *
      * Attempts to perform this action in as few queries as possible.
      *
-     * @deprecated figure if this is actually required: this is complicated and
-     *             seems expensive for something done on every curriculum load
-     *
      * @param mixed  $object
      * @param string $parentField
      * @param int    $currentDepth
@@ -854,9 +851,9 @@ abstract class Mapper implements IMapper, Serializable
      * @return mixed
      */
     public function loadAncestors(
-        $object,
-        $parentField = 'parent',
-        $currentDepth = 1
+        mixed $object,
+        string $parentField = 'parent',
+        int $currentDepth = 1,
     ) {
         // Recursive relation protection
         if ($currentDepth >= 50) {
@@ -908,9 +905,6 @@ abstract class Mapper implements IMapper, Serializable
      *
      * Attempts to perform this action in as few queries as possible.
      *
-     * @deprecated figure if this is actually required: this is complicated and
-     *             used only once
-     *
      * @param mixed  $object
      * @param string $parentField
      * @param string $childField
@@ -919,10 +913,10 @@ abstract class Mapper implements IMapper, Serializable
      * @return object
      */
     public function loadDescendants(
-        $object,
-        $parentField = 'parent',
-        $childField = 'children',
-        $currentDepth = 1
+        mixed $object,
+        string $parentField = 'parent',
+        string $childField = 'children',
+        int $currentDepth = 1,
     ) {
         // Recursive relation protection
         if ($currentDepth > 50) {
