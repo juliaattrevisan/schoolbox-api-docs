@@ -76,6 +76,26 @@ class Controller extends Base
     }
 
     /**
+     * Fetch an entire tree of curriculum nodes.
+     *
+     * @api   GET /api/curriculum/tree
+     * @since 22.1
+     */
+    public function getTree(): void
+    {
+        $tree = $this->nodeMapper->getCollectionAsTree(
+            $this->nodeMapper->findAll(),
+            'parent',
+            'children',
+        );
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $tree->map(new ModelToArray(self::MAX_DESCENDANTS, self::MAX_ANCESTORS))
+            ),
+        );
+    }
+
+    /**
      * Endpoint for creating a curriculum node.
      *
      * @api   POST /api/curriculum/{id}

@@ -43,11 +43,12 @@ class Module extends BaseModule
             ];
         };
         $this->register(self::METHOD_GET, '', 'searchNode', $hasApiAccess);
-        $this->register(self::METHOD_GET, '/{id}', 'getNode', $hasApiAccess, $preload);
+        $this->register(self::METHOD_GET, '/{id:\\d+}', 'getNode', $hasApiAccess, $preload);
+        $this->register(self::METHOD_GET, '/tree', 'getTree', $hasApiAccess);
         $this->register(self::METHOD_POST, '', 'postNode', $hasApiAccess);
-        $this->register(self::METHOD_PUT, '/{id}', 'putNode', $hasApiAccess, $preload);
-        $this->register(self::METHOD_PATCH, '/{id}', 'patchNode', $hasApiAccess, $preload);
-        $this->register(self::METHOD_DELETE, '/{id}', 'deleteNode', $hasApiAccess, $preload);
+        $this->register(self::METHOD_PUT, '/{id:\\d+}', 'putNode', $hasApiAccess, $preload);
+        $this->register(self::METHOD_PATCH, '/{id:\\d+}', 'patchNode', $hasApiAccess, $preload);
+        $this->register(self::METHOD_DELETE, '/{id:\\d+}', 'deleteNode', $hasApiAccess, $preload);
     }
 
     /**
