@@ -30,7 +30,7 @@ Note that `payloadSize` wasn't in our original data payload; it only exists as a
 
 These are basically javascript functions that you can arbitrarily execute. They can pretty much do anything you need.
 
-In this case, we'll an integer to show a user's fullname length to our `UserList` component:
+In this case, we'll add the length of a user's fullname to our `UserList` component:
 
 ```js
 methods: {
