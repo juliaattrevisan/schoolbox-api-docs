@@ -35,22 +35,39 @@ class ModelToArray
      */
     public function __invoke(Model $node): array
     {
-        // Determine how to hydrate parents and children.
-        // Children: don't have parents fully hydrated (just the ID)
-        // Parents: don't have children hydrated at all
+        return $this->translate($node, $this->ancestorCount, $this->descendantCount);
+    }
+
+    /**
+     * Internal method for translating this node, as well as recursively
+     * translating its ancestors and descendants.
+     *
+     * @param Model $node
+     * @param int   $ancestorCount   Number of levels of ancestors to translate.
+     * @param int   $descendantCount Number of levels of descendants to
+     *                               translate.
+     * @return array
+     */
+    private function translate(Model $node, int $ancestorCount, int $descendantCount): array
+    {
         $parent = null;
         if ($node->getParent()) {
-            if ($this->ancestorCount > 0) {
-                $parentTranslator = new self($this->ancestorCount - 1, 0);
-                $parent           = $parentTranslator($node->getParent());
+            if ($ancestorCount > 0) {
+                // Parents never have children hydrated
+                $parent = $this->translate($node->getParent(), $ancestorCount - 1, 0);
             } else {
-                $parent           = ['id' => $node->getParent()->getId()];
+                // Hydrate a stub value for the parent
+                $parent = ['id' => $node->getParent()->getId()];
             }
         }
+
         $children = null;
-        if ($this->descendantCount > 0) {
-            $childTranslator = new self(0, $this->descendantCount - 1);
-            $children        = $node->getChildren()->map($childTranslator);
+        if ($descendantCount > 0) {
+            $children = [];
+            foreach ($node->getChildren() as $child) {
+                // Children never have their parent hydrated
+                $children[] = $this->translate($child, 0, $descendantCount - 1);
+            }
         }
 
         return [
