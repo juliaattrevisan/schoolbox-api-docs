@@ -12,6 +12,7 @@
 namespace News;
 
 use AcceptanceTester;
+use Codeception\Util\Locator;
 use Exception;
 use Page\News\Form;
 use Page\News\Index;
@@ -66,7 +67,7 @@ class CreateAndVerifyCest
     public function _after(AcceptanceTester $i): void
     {
         $i->amGoingTo("update delete_at for the news article so it does not impact the news tests");
-        $i->updateInDatabase('comms_news_article', ['deleted_at' => "2020-01-15 11:22:34"], ['title like' => "Acceptance Test News Article Testing%"]);
+        //$i->updateInDatabase('comms_news_article', ['deleted_at' => "2020-01-15 11:22:34"], ['title like' => "Acceptance Test News%"]);
     }
 
     /**
@@ -203,9 +204,9 @@ class CreateAndVerifyCest
      */
     public function newsAudienceTest(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage)
     {
-        $i->amGoingTo("Fill in form values with composite audience: 4 roles and 2 campuses + team and role");
+        $i->amGoingTo("Fill in form values with composite audience: 4 roles and 2 campuses + team and year level");
         $timestamp = time();
-        $headline     = "Acceptance Test News Audience Article Testing " . $timestamp;
+        $headline     = "Acceptance Test News Composite Audience Article Testing " . $timestamp;
         $publish   = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
         $expiry    = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
         $formPage
@@ -215,6 +216,71 @@ class CreateAndVerifyCest
         $formPage
             ->createCompositeAudience('Role', 'Campus', ['primary-IjEi','primary-IjIi','primary-Ijci', 'primary-IjQi', 'secondary-IjEi','secondary-IjIi']);
         $formPage->seeRoles(['2 Campuses & 4 Roles']);
-    }
+        $i->amGoingTo('check the draft article presents the proper audience: 4 roles and 2 campuses + 1 team and 1 year level');
+        $i->amOnPage('/news/me?status=Drafted');
+        $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Composite Audience Article Testing');
+        $i->click($element);
+        $i->canSee('2 Campuses & 4 Roles');
+        $i->canSee('1 Team & 1 Year Level');
+        $i->amGoingTo('check the modify article page presents the proper audience: 4 roles and 2 campuses + 1 team and 1 year level');
+        $itemPage->modifyArticle();
+        $formPage->seeRoles(['2 Campuses & 4 Roles']);
+        $formPage->seeRoles(['1 Team & 1 Year Level']);
 
+        $i->amGoingTo("Fill in form values with selecting audience: campus Primary + class 9A Eng (group members and parents)");
+        $formPage->removeAudience(['2 Campuses & 4 Roles','1 Team & 1 Year Level']);
+        $formPage->selectAudienceOption('Campuses', 'Primary', []);
+        $formPage->selectAudienceOption('Classes & Groups', '9A English (9ENGA)', ['audience-select-parents']);
+        $i->amGoingTo('check the modify article page presents the proper audience: Primary and 9A English (9ENGA) Inc parents of students');
+        $formPage->seeRoles(['Primary']);
+        $formPage->seeRoles(['9A English (9ENGA)']);
+        $i->canSee('Class/Group');
+        $i->canSee('(Inc. parents of students)');
+        $i->amGoingTo('check the draft article presents the proper audience: Primary and 9A English (9ENGA) Inc parents of students');
+        $i->amOnPage('/news/me?status=Drafted');
+        $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Composite Audience Article Testing');
+        $i->click($element);
+        $i->canSee('9A English (9ENGA) (Inc. parents of students)');
+        $i->canSee('(Inc. parents of students)');
+
+        $i->amGoingTo('Fill in form values by typing an audience: Jana Reed, Tim Reed and Jenni Reed');
+        $itemPage->modifyArticle();
+        $formPage->removeAudience(['9A English (9ENGA)','Primary']);
+        $formPage->fillUsers(['Jenni','Jana','Tim','Demo 1','Primary']);
+        $i->canSee('Jana Reed (Middle Student)');
+        $i->canSee('Tim Reed (Senior Student)');
+        $i->canSee('Jenni Reed (Parent)');
+        $i->canSee('Demo Class Page 1 (DEMO1)');
+        $i->canSee('Primary');
+        $i->amGoingTo('check the draft article presents the proper audience: Primary and Demo class 1');
+        $i->amOnPage('/news/me?status=Drafted');
+        $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Composite Audience Article Testing');
+        $i->click($element);
+        $i->canSee('Demo Class Page 1 (DEMO1)');
+        $i->canSee('Primary');
+
+        $i->amGoingTo('Fill in form values by selecting audience via bricks and composite: year level + house and Teams Raiders');
+        $itemPage->modifyArticle();
+        $formPage->removeAudience(['Jana Reed','Tim Reed','Jenni Reed','Primary','Demo Class Page 1 (DEMO1)']);
+        $formPage->selectAudienceOption('Year Levels', 'Year 9', ['audience-select-parents']);
+        $formPage->createCompositeAudience('House', 'Team', ['primary-IjEi','secondary-IjIi']);
+        $i->canSee('1 Team & 1 House');
+        $i->canSee('Year 9');
+        $i->canSee('Composite Audience (view details)');
+        $i->canSee('Year Level');
+        $i->canSee('Inc. parents of students');
+        $i->amGoingTo('check the draft article presents the proper audience: Primary and Demo class 1');
+        $i->amOnPage('/news/me?status=Drafted');
+        $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Composite Audience Article Testing');
+        $i->click($element);
+        $i->canSee('1 Team & 1 House');
+        $i->canSee('Year 9');
+        $i->canSee('Inc. parents of students');
+        $i->amGoingTo('Publish the news article and ensure the audience remains the same');
+        $itemPage->modifyArticle();
+        $formPage->submit();
+        $i->canSee('1 Team & 1 House');
+        $i->canSee('Year 9');
+        $i->canSee('Inc. parents of students');
+    }
 }

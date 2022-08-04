@@ -200,6 +200,35 @@ class Form
         $this->tester->canSee($topic, 'div.item');
         return $this;
     }
+
+    /**
+     * this is to click an audience type: Campus, Teams, Classes, Roles etc
+     * @param string $audienceBrick
+     * @param string $audienceType
+     * @param array $checkboxOption
+     * @return Form
+     */
+    public function selectAudienceOption(string $audienceBrick, string $audienceType, array $checkboxOption): self
+    {
+            $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
+            $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
+            $this->tester->waitForText('Roles');
+            $element = Locator::contains('button.button-block', $audienceBrick);
+            $this->tester->clickWithLeftButton($element);
+            $this->tester->executeJS(
+                "var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
+            scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;"
+            );
+            $this->tester->waitForText($audienceType, 5);
+            $audience_element = Locator::contains('div.checklist-wrapper', $audienceType);
+            $this->tester->clickWithLeftButton($audience_element);
+            $this->tickCheckboxes($checkboxOption);
+            $this->tester->click('button.button.submit');
+            sleep(2);
+             return $this;
+    }
+
+
     /**
      * @param array $roles
      * @return Form
@@ -381,5 +410,16 @@ class Form
             $expiryDate->getUsingFormat(Common::FORMAT_INPUT_DATETIME)
         );
         return $this;
+    }
+
+    /**
+     * tick the checkboxes
+     * @param array $titles
+     */
+    public function removeAudience(array $titles): void
+    {
+        foreach ($titles as &$title) {
+            $this->tester->click('a[title="Remove ' . $title . ' from audience"]');
+        }
     }
 }
