@@ -1,19 +1,18 @@
 <script>
-    $(
-        function () {
-            // Configure validation.
-            $('#rubric-result-set-form').alaressValidate();
-            $('#rows-container input').each(
-                function (index, element) {
-                    $(element).rules('add', {requiredNotBlank: true});
-                }
-            );
-
-            if ($('#rows-container').children().length >= parseInt('{{ maxRowsPerResultSet }}')) {
-                disableAddRowButton();
+    $(function () {
+        // Configure validation.
+        $('#rubric-result-set-form').alaressValidate();
+        $('#rows-container input').each(
+            function (index, element) {
+                $(element).rules('add', {requiredNotBlank: true});
             }
+        );
+
+        // There may already be too many rows in the result set, so we
+        if ($('#rows-container').children().length >= parseInt('{{ maxRowsPerResultSet }}')) {
+            disableAddRowButton();
         }
-    );
+    });
 
     /**
      * Add a new row to the form.
