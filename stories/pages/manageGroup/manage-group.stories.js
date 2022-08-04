@@ -1,5 +1,5 @@
 
-import ManageGroup from '../../../library/Schoolbox/Group/vue/manage-group';
+import ManageGroup from '../../../library/Schoolbox/Groups/Manage/vue/manage-group';
 import { rest } from 'msw';
 import { data } from './dataManageGroup';
 // import { largeData } from '../../classSelector/largeDataClassSelectoreDataClassSelector';

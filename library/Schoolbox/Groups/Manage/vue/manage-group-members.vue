@@ -243,7 +243,7 @@ function updateSelectedMembers () {
 <style lang="scss">
 
 @import '@schoolboxVue/components/vueTables2/vueTables2';
-@import '../../../../www/static/css/core/base/colors';
+@import '../../../../../www/static/css/core/base/colors';
 
 .VueTables {
     margin-bottom: 150px; //to allow space for the bottom-drawer so it can't cut off the bottom of the table
