@@ -13,7 +13,7 @@ namespace Schoolbox\APIUser;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use HouseMapper;
-use Schoolbox\APIGroup\ModelToArray;
+use Schoolbox\Group\API\ModelToArray;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
