@@ -71,7 +71,7 @@ class Folder extends SimpleStrategy
     /**
      * User arrays to represent muted folder
      */
-    const MUTED = ['0'];
+    public const MUTED = ['0'];
 
     /**
      * @return string
