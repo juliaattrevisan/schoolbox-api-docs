@@ -18,8 +18,9 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Controller extends Base
 {
-    private const MAX_ANCESTORS = 50;
+    private const MAX_ANCESTORS   = 50;
     private const MAX_DESCENDANTS = 50;
+    private const MAX_LIMIT       = 50;
 
     /**
      * Constructor
@@ -63,8 +64,8 @@ class Controller extends Base
         $descendantCount = $this->determineDescendantCount();
         $results         = $this->nodeMapper->findByKeyword(
             trim($this->request->query->get('query') ?? ''),
-            0,
-            0,
+            $this->determineLimit(),
+            $this->determineOffset(),
             $ancestorCount,
             $descendantCount,
         );
@@ -219,5 +220,30 @@ class Controller extends Base
             self::MAX_DESCENDANTS,
             max(0, $this->request->query->getInt('descendants', 0)),
         );
+    }
+
+    /**
+     * How many results may this API retrieve?
+     *
+     * Bound to between 0 and `self::MAX_LIMIT`.
+     *
+     * @return int
+     */
+    private function determineLimit(): int
+    {
+        return min(
+            self::MAX_LIMIT,
+            max(0, $this->request->query->getInt('limit', 0)),
+        );
+    }
+
+    /**
+     * Which is the first result this API should retrieve?
+     *
+     * @return int
+     */
+    private function determineOffset(): int
+    {
+        return max(0, $this->request->query->getInt('offset', 0));
     }
 }
