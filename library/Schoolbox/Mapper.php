@@ -1714,7 +1714,10 @@ abstract class Mapper implements IMapper, Serializable
 
             $query     = "UPDATE `{$this->getTable()}` SET {$this->database->getQuoter()->quoteIdentifier($field)} = :value WHERE " . implode(' AND ', $pb->getWhere());
             $statement = $this->database->prepare($query);
-            $statement->bindValue('value', $value);
+            $statement->bindValue(
+                'value',
+                $this->getColumnScalarHydrator($field)->dehydrate($value),
+            );
             foreach ($pb->getParams() as $key => $id) {
                 $statement->bindValue($key, $id);
             }
