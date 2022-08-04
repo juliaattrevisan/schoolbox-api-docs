@@ -57,9 +57,12 @@ To see the output, `npm run build` and visit the Greenhouse url.
 
 ## 3.3 Add more payload args
 
-You can add more args to provide pieces of info to the `user-list` component. See below for some examples. Non-scalar data should be json_encoded, scalars can be provided as-is; however, note the usage of apostrophes in the `:datetime` attribute below.  (The code snippet below should be added to the container.twig file.)
+You can add more args to provide pieces of info to the `user-list` component. See below for some examples. Non-scalar data should be json_encoded, scalars can be provided as-is; however, note the usage of apostrophes in the `:datetime` attribute below.  Modify your container.twig file so that it looks like this:
 
 ```html
+<h1>Container for Vue initialisation</h1>
+<p>Our vue component gets initialised here</p>
+
 {% set hardcodedPayload = { 'cat': 'Navarre', 'dog': 'Benji', 'horse': 'Mr. Ed', 'elephant': 'Dumbo' } %}
 {% set stuartMahon = { 'fullname': 'Stuart Mahon', 'firstname': 'stu', 'lastname': 'mahon' } %}
 {% set datetime = 'now'|date('Y-m-d H:i:s') %}
@@ -71,6 +74,9 @@ You can add more args to provide pieces of info to the `user-list` component. Se
         :datetime="'{{ datetime }}'"
     ></user-list>
 </div>
+
+<!-- You need this; spawns after you "npm run build" or "npm run watch" for the first time -->
+<script src="{{ CDN_PREFIX }}/js/bundle/userList.js"></script>
 ```
 
 > When you pass scalar values, sometimes you need to wrap them inside apostrophes.
