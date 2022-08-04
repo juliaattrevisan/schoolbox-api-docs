@@ -8,7 +8,6 @@
 namespace Schoolbox\Curriculum\Api;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Curriculum\Api\Translator\ArrayToModel;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray;
 use Schoolbox\Curriculum\Node;
@@ -19,15 +18,16 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Controller extends Base
 {
+    private const MAX_ANCESTORS = 50;
+    private const MAX_DESCENDANTS = 50;
+
     /**
      * Constructor
      *
-     * @param Node\Mapper     $nodeMapper      Curriculum node mapper
-     * @param ArticleResolver $articleResolver Article resolver: required in search for some reason?
+     * @param Node\Mapper $nodeMapper Curriculum node mapper
      */
     public function __construct(
         private Node\Mapper $nodeMapper,
-        private ArticleResolver $articleResolver
     ) {
     }
 
@@ -42,8 +42,8 @@ class Controller extends Base
      */
     public function getNode(Node\Model $node): void
     {
-        $ancestorCount   = max(0, $this->request->query->getInt('ancestors', 0));
-        $descendantCount = max(0, $this->request->query->getInt('descendants', 0));
+        $ancestorCount   = $this->determineAncestorCount();
+        $descendantCount = $this->determineDescendantCount();
         $node = $this->nodeMapper->loadAncestors($node, 'parent', $ancestorCount);
         $node = $this->nodeMapper->loadDescendants($node, 'parent', 'children', $descendantCount);
         $this->respondWithNode($node, $ancestorCount, $descendantCount);
@@ -59,13 +59,19 @@ class Controller extends Base
      */
     public function searchNode(): void
     {
-        $results = $this->nodeMapper->search(
-            $this->articleResolver,
-            $this->getUser(),
+        $ancestorCount   = $this->determineAncestorCount();
+        $descendantCount = $this->determineDescendantCount();
+        $results         = $this->nodeMapper->findByKeyword(
             trim($this->request->query->get('query') ?? ''),
+            0,
+            0,
+            $ancestorCount,
+            $descendantCount,
         );
         $this->response->content->set(
-            $this->buildJsonOutput($results->map(new ModelToArray(0, 0)))
+            $this->buildJsonOutput(
+                $results->map(new ModelToArray($ancestorCount, $descendantCount))
+            ),
         );
     }
 
@@ -162,6 +168,36 @@ class Controller extends Base
         $translator = new ModelToArray($ancestorCount, $descendantCount);
         $this->response->content->set(
             $this->buildJsonOutput($translator($node))
+        );
+    }
+
+    /**
+     * How many levels of ancestors may this API retrieve?
+     *
+     * Bound to between 0 and `self::MAX_ANCESTORS`.
+     *
+     * @return int
+     */
+    private function determineAncestorCount(): int
+    {
+        return min(
+            self::MAX_ANCESTORS,
+            max(0, $this->request->query->getInt('ancestors', 0)),
+        );
+    }
+
+    /**
+     * How many levels of descendants may this API retrieve?
+     *
+     * Bound to between 0 and `self::MAX_DESCENDANTS`.
+     *
+     * @return int
+     */
+    private function determineDescendantCount(): int
+    {
+        return min(
+            self::MAX_DESCENDANTS,
+            max(0, $this->request->query->getInt('descendants', 0)),
         );
     }
 }

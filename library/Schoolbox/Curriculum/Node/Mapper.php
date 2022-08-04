@@ -189,6 +189,12 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $sortProperty = '',
         $sortDirection = 'DESC'
     ) {
+        // Load all ancestors, no descendants
+        return $this->findByKeyword($keyword, $limit, $offset, 50, 0);
+    }
+
+    public function findByKeyword($keyword, $limit, $offset, $ancestors, $descendants)
+    {
         $query = "
             SELECT
                 {$this->getColumnString('n')}
@@ -219,11 +225,13 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         }
 
         $statement->execute();
-        $result = $this->hydrateList($statement, 'n')
-            ->map(function (Model $model) {
-                return $this->loadAncestors($model, 'parent');
+        return $this->hydrateList($statement, 'n')
+            ->map(function (Model $model) use ($ancestors) {
+                return $this->loadAncestors($model, 'parent', $ancestors);
+            })
+            ->map(function (Model $model) use ($descendants) {
+                return $this->loadDescendants($model, 'parent', 'children', $descendants);
             });
-        return $result;
     }
 
     /**

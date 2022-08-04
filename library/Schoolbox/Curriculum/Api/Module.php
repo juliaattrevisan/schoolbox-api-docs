@@ -57,7 +57,6 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(NodeMapper::class),
-            $this->injector->get('commsNewsArticleResolver'),
         );
     }
 }
