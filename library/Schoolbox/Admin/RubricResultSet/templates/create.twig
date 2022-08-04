@@ -8,7 +8,7 @@
             }
         );
 
-        // There may already be too many rows in the result set, so we
+        // There may already be too many rows in the result set, so we check for that on page load.
         if ($('#rows-container').children().length >= parseInt('{{ maxRowsPerResultSet }}')) {
             disableAddRowButton();
         }
@@ -83,12 +83,18 @@
         }
     }
 
+    /**
+     * Disable the add-row button and change its label.
+     */
     function disableAddRowButton() {
         let el = document.getElementById('add-row-button');
         el.classList.add('disabled');
         el.innerHTML = 'Max Rows Reached';
     }
 
+    /**
+     * Enable the add-row button and revert its label back to 'Add Row'.
+     */
     function enableAddRowButton() {
         let el = document.getElementById('add-row-button');
         el.classList.remove('disabled');
