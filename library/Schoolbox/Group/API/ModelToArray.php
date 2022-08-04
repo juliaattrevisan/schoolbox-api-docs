@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\APIGroup;
+namespace Schoolbox\Group\API;
 
 use Schoolbox\Group\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccess;

@@ -212,8 +212,8 @@ module.exports = {
         classSelector: './library/Schoolbox/Assessment/Course/templates/vue/classSelector.js',
 
         // Groups
-        manageGroups: './library/Schoolbox/Groups/vue/manageGroups.js',
-        manageGroup: './library/Schoolbox/Group/vue/manageGroup.js',
+        manageGroups: './library/Schoolbox/Group/vue/manageGroups.js',
+        manageGroup: './library/Schoolbox/Group/Manage/vue/manageGroup.js',
 
         // QR codes
         manageQrCodes: './library/Schoolbox/Qrcode/vue/manageQrCodes.js',

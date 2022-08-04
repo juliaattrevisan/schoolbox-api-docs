@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Group;
+namespace Schoolbox\Group\Manage;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Group\ArrayToModel;
+use Schoolbox\Group\Manage\ArrayToModel;
 use Schoolbox\Group\GroupsHelper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;

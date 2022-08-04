@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Group\ArrayToModel;
+namespace Schoolbox\Group\Manage\ArrayToModel;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
 

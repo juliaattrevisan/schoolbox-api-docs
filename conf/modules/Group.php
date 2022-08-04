@@ -11,7 +11,7 @@ namespace Config\Modules;
 
 use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
-use Schoolbox\Group\Module;
+use Schoolbox\Group as GroupModule;
 
 class Group extends ModuleLoader
 {
@@ -20,6 +20,7 @@ class Group extends ModuleLoader
      */
     public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($di, Module::class, "/group");
+        $this->loadModule($di, GroupModule\Module::class, '/groups');
+        $this->loadModule($di, GroupModule\Manage\Module::class, '/group');
     }
 }

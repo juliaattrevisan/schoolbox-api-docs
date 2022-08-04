@@ -24,7 +24,7 @@ class API extends ModuleLoader
 
         $this->loadModule($di, Schoolbox\Admin\API\Module::class, '/api/admin');
 
-        $this->loadModule($di, Schoolbox\APIGroup\Module::class, '/api/user');
+        $this->loadModule($di, Schoolbox\Group\API\Module::class, '/api/user');
 
         $this->loadModule($di, Schoolbox\APIUser\Module::class, '/api/user');
 

@@ -8,11 +8,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\APIGroup;
+namespace Schoolbox\Group\API;
 
 use Alaress\Web\Controller\Base;
-use Aura\Web\Exception\InvalidStatusCode;
-use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Group\GroupsHelper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Group;
+namespace Schoolbox\Group\Manage;
 
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule\All;
