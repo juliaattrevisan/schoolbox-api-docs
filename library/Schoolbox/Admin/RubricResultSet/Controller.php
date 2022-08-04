@@ -106,7 +106,7 @@ class Controller extends Base
                     'rubricResultRows'    => (($resultSetId === null) ? [] : $this->mapper->findRows($resultSetId)),
                     'allBreadcrumbs'      => array_merge(
                         (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminRubricResultSet.getList')),
-                        [[(($resultSetId === null)? 'Create': 'Update')]]
+                        [[(($resultSetId === null) ? 'Create' : 'Update')]]
                     )
                 ]
             ]
