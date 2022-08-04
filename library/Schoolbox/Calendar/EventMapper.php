@@ -656,6 +656,15 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     }
 
     /**
+     * @param mixed $event
+     * @return void
+     */
+    public function deleteMetadataRelations($event)
+    {
+        // noop
+    }
+
+    /**
      * Deletes event folder association of this folder and soft deletes event which are only for this folder
      *
      * @param int $fid

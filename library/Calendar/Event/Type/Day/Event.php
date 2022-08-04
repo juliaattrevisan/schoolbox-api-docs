@@ -18,7 +18,6 @@ use Calendar\Event\Type\EventInterface;
 
 class Event extends EventBase
 {
-
     /**
      * These constants define the levels of access an day event can be
      */
@@ -85,8 +84,9 @@ class Event extends EventBase
     protected $isTask = false;
 
     /**
-     * Wether the event can be attended
-     * @var bool
+     * Whether the event can be attended
+     * Should be bool, but setting this to mixed to make phpstan happy
+     * @var mixed
      */
     private $attendance = false;
 
@@ -168,7 +168,7 @@ class Event extends EventBase
     /**
      * Set attendance
      *
-     * @param bool $attendance
+     * @param mixed $attendance
      */
     public function setAttendance($attendance)
     {
@@ -178,7 +178,7 @@ class Event extends EventBase
     /**
      * Get attendance
      *
-     * @return bool
+     * @return mixed
      */
     public function getAttendance()
     {

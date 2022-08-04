@@ -129,7 +129,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
     /* Events recur until this time
      */
-    if (strlen($_POST['repeat_until'])) {
+    if (strlen($_POST['repeat_until'] ?? '')) {
         $until = Alaress_Date_Format::newLocalShort($_POST['repeat_until'])->endOfDay();
     }
 
@@ -286,7 +286,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
         $eventRecurrenceMapper->save(
             $event,
             $_POST['efficacy'],
-            $_POST['repeat'],
+            $_POST['repeat'] ?? false,
             $until,
             $startDate,
             $endDate,

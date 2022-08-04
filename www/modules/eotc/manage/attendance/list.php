@@ -15,6 +15,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\RoleMapper;
 
+/** @var SitePage $this */
 $authenticator = new Authenticator($this);
 
 /** @var EOTCEvent $event */

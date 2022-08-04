@@ -10,6 +10,7 @@ namespace Schoolbox\Calendar;
 
 use Alaress_Date_Format;
 use DateTime;
+use EOTC\EventMetadata;
 use InvalidArgumentException;
 use OutOfBoundsException;
 use Schoolbox\Campus;
@@ -215,14 +216,14 @@ class Event implements ISoftDeletable
     /**
      * Any associated users (Type 1)
      *
-     * @var null
+     * @var Collection|Relation\Personal[] $userCollection
      */
     protected $userCollection;
 
     /**
      * Any associated folders (Type 2)
      *
-     * @var null
+     * @var Collection $folderCollection
      */
     protected $folderCollection;
 
@@ -237,7 +238,7 @@ class Event implements ISoftDeletable
     /**
      * Associated guests
      *
-     * @var Collection|User[]
+     * @var Collection|int[]
      */
     protected $guests;
 
@@ -246,7 +247,7 @@ class Event implements ISoftDeletable
      * The date when the event was published (made visible to users)
      * An instance Alaress_Date_Format()
      *
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
     protected $publishDateTime;
 
@@ -1005,7 +1006,7 @@ class Event implements ISoftDeletable
      *
      * TODO extricate EOTC events from regular events, and remove this
      *
-     * @return null
+     * @return EventMetadata|null
      */
     public function getMetadata()
     {

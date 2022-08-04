@@ -21,7 +21,6 @@ use Schoolbox\User;
  */
 class Event extends Calendar\Event
 {
-
     /**
      * Metadata for this event
      *
@@ -118,7 +117,7 @@ class Event extends Calendar\Event
     /**
      * Get metadata
      *
-     * @return EventMetadata
+     * @return EventMetadata|null
      */
     public function getMetadata()
     {

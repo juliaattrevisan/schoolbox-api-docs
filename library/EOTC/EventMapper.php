@@ -32,7 +32,6 @@ use Schoolbox\UserMapper;
  */
 class EventMapper extends CalendarEventMapper
 {
-
     /**
      * Calls for the core mapping of events, then extends it
      */
@@ -430,8 +429,8 @@ class EventMapper extends CalendarEventMapper
      *
      * Therefore can't rely on postSave correctly assigning people/relations
      *
-     * @param EventMetadata $metadata
-     * @param Event         $event
+     * @param EventMetadata|null $metadata
+     * @param Event|null $event
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
