@@ -163,6 +163,8 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
                 ),
                 'enabled',
                 false,
+                self::CALLBACK_PRESAVE,
+                self::CALLBACK_POSTSAVE,
             );
         }
     }
