@@ -42,14 +42,11 @@ class Controller extends Base
      */
     public function getNode(Node\Model $node): void
     {
-        // Need to know how many levels to go up and down
-        // ancestors: int
-        // descendants: int
-        $ancestors   = max(0, $this->request->query->getInt('ancestors', 0));
-        $descendants = max(0, $this->request->query->getInt('descendants', 0));
-        $node = $this->nodeMapper->loadAncestors($node, 'parent', $ancestors);
-        $node = $this->nodeMapper->loadDescendants($node, 'parent', 'children', $descendants);
-        $this->respondWithNode($node);
+        $ancestorCount   = max(0, $this->request->query->getInt('ancestors', 0));
+        $descendantCount = max(0, $this->request->query->getInt('descendants', 0));
+        $node = $this->nodeMapper->loadAncestors($node, 'parent', $ancestorCount);
+        $node = $this->nodeMapper->loadDescendants($node, 'parent', 'children', $descendantCount);
+        $this->respondWithNode($node, $ancestorCount, $descendantCount);
     }
 
     /**
@@ -68,7 +65,7 @@ class Controller extends Base
             trim($this->request->query->get('query') ?? ''),
         );
         $this->response->content->set(
-            $this->buildJsonOutput($results->map(new ModelToArray()))
+            $this->buildJsonOutput($results->map(new ModelToArray(0, 0)))
         );
     }
 
@@ -83,7 +80,7 @@ class Controller extends Base
      */
     public function postNode(): void
     {
-        $this->respondWithNode($this->persistNode(null));
+        $this->respondWithNode($this->persistNode(null), 0, 0);
     }
 
     /**
@@ -98,7 +95,7 @@ class Controller extends Base
      */
     public function putNode(Node\Model $node): void
     {
-        $this->respondWithNode($this->persistNode((new Node\Model())->setId($node->getId())));
+        $this->respondWithNode($this->persistNode((new Node\Model())->setId($node->getId())), 0, 0);
     }
 
     /**
@@ -113,7 +110,7 @@ class Controller extends Base
      */
     public function patchNode(Node\Model $node): void
     {
-        $this->respondWithNode($this->persistNode($node));
+        $this->respondWithNode($this->persistNode($node), 0, 0);
     }
 
     /**
@@ -156,11 +153,13 @@ class Controller extends Base
      * Output a node in the response.
      *
      * @param Node\Model $node
+     * @param int        $ancestorCount
+     * @param int        $descendantCount
      * @return void
      */
-    private function respondWithNode(Node\Model $node): void
+    private function respondWithNode(Node\Model $node, int $ancestorCount, int $descendantCount): void
     {
-        $translator = new ModelToArray();
+        $translator = new ModelToArray($ancestorCount, $descendantCount);
         $this->response->content->set(
             $this->buildJsonOutput($translator($node))
         );

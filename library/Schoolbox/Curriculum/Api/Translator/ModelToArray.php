@@ -18,11 +18,26 @@ use Schoolbox\Curriculum\Node\Model;
 class ModelToArray
 {
     /**
+     * Constructor
+     *
+     * @param int $ancestorCount   How many levels of ancestor get translated?
+     * @param int $descendantCount How many levels of descendant get translated?
+     */
+    public function __construct(
+        private int $ancestorCount,
+        private int $descendantCount,
+    ) {
+    }
+
+    /**
      * @param Model $node
      * @return array
      */
     public function __invoke(Model $node): array
     {
+        // Determine how to hydrate parents and children.
+        // Children: don't have parents fully hydrated (just the ID)
+        // Parents: don't have children hydrated at all
         return [
             'id'            => $node->getId(),
             'name'          => $node->getName(),
@@ -33,7 +48,7 @@ class ModelToArray
             'parent'        => $node->getParent()
                 ? ['id' => $node->getParent()->getId()]
                 : null,
-            'children'      => [],
+            'children'      => $node->getChildren()->map($this),
             'learningArea'  => $node->getLearningArea()
                 ? ['id' => $node->getLearningArea()->getId()]
                 : null,
