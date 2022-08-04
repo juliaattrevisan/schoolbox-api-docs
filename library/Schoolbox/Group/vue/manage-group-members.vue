@@ -221,7 +221,7 @@ function updateSelectedMembers () {
                             <img src="/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${data.row.firstName} portrait`">
                             {{ data.row.firstName }} {{ data.row.lastName }}
                         </div>
-                        <p class="meta">{{ data.row.role }}, {{ data.row.campus }}, {{ data.row.yearLevel }}</p>
+                        <p class="meta">{{ data.row.role }}, {{ data.row.campus }}{{ data.row.yearLevel ? ', ' + data.row.yearLevel : '' }}</p>
                     </div>
                 </template>
                 <template #accessType="data">

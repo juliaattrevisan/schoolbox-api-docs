@@ -87,15 +87,15 @@ function onModalClosed () {
         :close-on-background-click="false"
         @closed="onModalClosed"
     >
-        <h2>Please Confirm</h2>
-        <p v-if="membersStore.selectedMemberIds.length > 1">{{ membersStore.selectedMemberIds.length }} users selected</p>
-        <p v-else-if="membersStore.selectedMemberIds.length = 1">1 user selected</p>
-        <p v-if="membersStore.selectedGroupAdminIds.length > 1">including {{ membersStore.selectedGroupAdminIds.length }} group admins</p>
-        <p v-else-if="membersStore.selectedGroupAdminIds.length = 1">including 1 group admin</p>
-        <div v-if="(membersStore.selectedGroupAdminIds.length > 0) && (membersStore.selectedGroupAdminIds.length = membersStore.currentGroupAdminIds.length)"
-        class="alert-box warning">
-            All the group admins will be removed.
-        </div>
+        <h2>Removing member(s) from {{ store.groupName }}, please confirm?</h2>
+        <p v-if="membersStore.selectedNonAdminCount > 0">
+            You are about to remove <b>{{ membersStore.selectedNonAdminCount }} member(s)</b> from the
+            {{ store.groupName }} group.
+        </p>
+        <p v-if="membersStore.selectedGroupAdminCount > 0">
+                <span class="alert"><b>Warning: You are removing {{ membersStore.selectedGroupAdminCount }} group
+                    {{ membersStore.selectedGroupAdminCount > 1 ? 'admins' : 'admin' }},
+                    they will no longer be able to manage the group.</b></span></p>
         <p>Are you sure you wish to remove the selected members?</p>
         <ul class="flex-list buttons">
             <li><button @click.prevent="onRemoveSelected" class="button submit" :disabled="removeMembersStore.isProcessing">{{ removeButtonText }}</button></li>

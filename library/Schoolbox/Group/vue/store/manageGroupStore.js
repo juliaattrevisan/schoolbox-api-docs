@@ -16,6 +16,7 @@ export const useStore = defineStore('manageGroup', {
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place, like updating a member access
         groupId: 0, //the id of the group
+        groupName: '',
         toastEl: null, //so we don't need to pass it all around as a prop
     }),
 
@@ -45,6 +46,7 @@ export const useStore = defineStore('manageGroup', {
                 if (response.ok) {
                     const responseJson = await response.json();
                     this.groupId = responseJson.groupId;
+                    this.groupName = responseJson.groupName;
                     const settingsStore = useSettingsStore();
                     settingsStore.loadSettings(responseJson.settings);
                     const membersStore = useMembersStore();

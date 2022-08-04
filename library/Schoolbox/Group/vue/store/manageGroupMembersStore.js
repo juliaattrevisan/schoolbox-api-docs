@@ -69,11 +69,19 @@ export const useMembersStore = defineStore('manageGroupMembers', {
         },
 
         /**
-         * To get group admin id list in selected members
-         * @returns { Array }
+         * To get number of group admins in selected members
+         * @returns { int }
          */
-        selectedGroupAdminIds() {
-            return this.selectedMemberIds.filter((id) => this.currentGroupAdminIds.includes(id));
+        selectedGroupAdminCount() {
+            return this.selectedMemberIds.filter((id) => this.currentGroupAdminIds.includes(id)).length;
+        },
+
+        /**
+         * To get number of non group admins in selected members
+         * @returns { int }
+         */
+        selectedNonAdminCount() {
+            return this.selectedMemberIds.length - this.selectedGroupAdminCount;
         }
     },
 

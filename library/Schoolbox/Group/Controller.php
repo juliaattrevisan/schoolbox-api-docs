@@ -101,6 +101,7 @@ class Controller extends Base
                 "service." . UserAccess::SERVICE_HOMEPAGE . ".{$folder->getId()}"
             );
         $data['groupId']      = $folder->getId();
+        $data['groupName']    = $folder->getNameWithCodes();
         $data['settings']     = [
             'access'                 => $group ? $group->getTypeString() : '',
             'isNotificationsEnabled' => $groupMessagesEnabled,
