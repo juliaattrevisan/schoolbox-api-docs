@@ -173,8 +173,6 @@ class External_Liss_Server
                 $cycleIdentifier
             ));
 
-            $now = new Alaress_Date_Format();
-
             /* Assume some basic ideas about this new cycle because we haven't
              * seen anything warranting changing them yet
              *      a) It starts on Day 1
@@ -185,8 +183,8 @@ class External_Liss_Server
             $cycle = $cycleMapper->createModel()
                 ->setTitle($cycleIdentifier)
                 ->setCycleIdentifier($cycleIdentifier)
-                ->setStart($now->startOfYear())
-                ->setFinish($now->endOfYear())
+                ->setStart(Alaress_Date_Format::now()->startOfYear())
+                ->setFinish(Alaress_Date_Format::now()->endOfYear())
 
                 /* TODO: Undo these hardcoded values at some point
                  */
