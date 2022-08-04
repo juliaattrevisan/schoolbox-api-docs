@@ -84,14 +84,15 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param int|null $resultSetIdOrNull
+     * @param int|null $resultSetId
      *    (Supply null to create a new rubric result set.  COALESCE(MAX(resultset_id)+1, 1) will be used for the new resultSetId.)
      * @param array $labelsInOrder
-     * @return int ($resultSetIdOrNull)
+     * @return int ($resultSetId)
      */
-    public function createOrOverwriteSet(?int $resultSetIdOrNull, array $labelsInOrder): int
+    public function createOrOverwriteSet(?int $resultSetId, array $labelsInOrder): int
     {
-        if ($resultSetIdOrNull === null) {
+        if ($resultSetId === null) {
+            // We are creating a new result set, so we must choose a resultSetId.
             $stmt = $this->database->prepare(
                 "SELECT COALESCE(MAX(resultset_id)+1, 1) AS resultSetId
                 FROM {$this->getTable()}"
@@ -99,8 +100,6 @@ class Mapper extends BaseMapper
             $stmt->execute();
 
             $resultSetId = $stmt->fetchColumn();
-        } else {
-            $resultSetId = $resultSetIdOrNull;
         }
 
         $stmt = $this->database->prepare(
