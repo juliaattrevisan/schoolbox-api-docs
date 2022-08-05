@@ -37,9 +37,18 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function get_logs($category_id, $last_poll = null, $not_user_id = 0)
     {
-        $query = "SELECT title, firstname, lastname, synergy_id AS user_ext_id, c.*
-                  FROM {$this->_table} c LEFT JOIN user ON c.user_id = user.id
-                  WHERE `category_id` = $category_id";
+        $query = "
+            SELECT
+                title,
+                firstname,
+                preferred_name,
+                lastname,
+                synergy_id AS user_ext_id,
+                c.*
+            FROM {$this->_table} c
+            LEFT JOIN user ON c.user_id = user.id
+            WHERE `category_id` = $category_id
+        ";
 
         if (!empty($not_user_id)) {
             $query .= " AND `user_id` != $not_user_id";
@@ -131,7 +140,14 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         // retrieve users as well as their membership. If no staff present, deactivate the chat.
         $time  = new DateTime(self::CHAT_POLL_EXPIRY);
         $query = "
-            SELECT title, firstname, lastname, synergy_id AS user_ext_id, group_type, chat_poll.*
+            SELECT
+                title,
+                firstname,
+                preferred_name,
+                lastname,
+                synergy_id AS user_ext_id,
+                group_type,
+                chat_poll.*
             FROM chat_poll
             LEFT JOIN `user` ON chat_poll.user_id = user.id
             LEFT JOIN `groups` ON user.`group_id` = `groups`.`id`

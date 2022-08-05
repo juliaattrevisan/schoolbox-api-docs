@@ -109,7 +109,7 @@ class Feed
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT f.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
+        $query = "SELECT f.id, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
 						af.description as type, inline, c.name as cat_name, c.id as cat_id
 				  FROM file f
 				  LEFT JOIN storage s on f.hash = s.hash
@@ -159,7 +159,7 @@ class Feed
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT l.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', UNIX_TIMESTAMP(l.submitted) submitted, description as name, url, c.name as cat_name, c.id as cat_id
+        $query = "SELECT l.id, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', UNIX_TIMESTAMP(l.submitted) submitted, description as name, url, c.name as cat_name, c.id as cat_id
 				  FROM link l
 				  LEFT JOIN user u ON u.id = l.owner
 				  LEFT JOIN folder c ON c.id = l.category
@@ -232,7 +232,7 @@ class Feed
         $query = "
           SELECT
               assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
-              u.title, u.firstname, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
+              u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
               c.name as cat_name, c.id as cat_id
           FROM assess
           JOIN assessment a on assess.assessment_id = a.id
@@ -291,7 +291,7 @@ class Feed
         $query = "
           SELECT
               assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
-              u.title, u.firstname, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
+              u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
               c.name as cat_name, c.id as cat_id
           FROM assess
           LEFT JOIN user u ON assess.user_id = u.id
@@ -336,7 +336,7 @@ class Feed
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT c.id, c.name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', pc.name as cat_name, pc.id as cat_id
+        $query = "SELECT c.id, c.name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', pc.name as cat_name, pc.id as cat_id
 					FROM cmsLog
 					JOIN folder c ON objectId = c.id
 					JOIN user u ON user = u.id
@@ -376,7 +376,7 @@ class Feed
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
+        $query = "SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
 					FROM forumThread f
                     JOIN user u ON u.id = f.userID
                     LEFT JOIN folder c ON c.id = f.categoryID
@@ -422,7 +422,7 @@ class Feed
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
+        $query = "SELECT w.wikiID, heading, w.categoryID, w.slug, UNIX_TIMESTAMP(r.created) submitted, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', c.name as cat_name, c.id as cat_id
 					FROM wikiRevision r
 						JOIN wiki w ON w.wikiID = r.wikiID
 						JOIN user u ON u.id = r.userID
@@ -470,7 +470,7 @@ class Feed
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, u.deleted_at as 'u.deleted_at', b.id AS blogID, heading, UNIX_TIMESTAMP(b.created_at) AS submitted, c.name as cat_name, c.id as cat_id
+        $query = "SELECT u.id AS uid, u.title, u.firstname, u.preferred_name, u.lastname, synergy_id as external_id, u.deleted_at as 'u.deleted_at', b.id AS blogID, heading, UNIX_TIMESTAMP(b.created_at) AS submitted, c.name as cat_name, c.id as cat_id
 			FROM user u
 			JOIN blog b
 			ON u.id = b.owner_id
@@ -519,7 +519,7 @@ class Feed
 
         $where = $this->getFilterFromCategoryId($folderId);
 
-        $query = "SELECT u.id AS uid, u.title, u.firstname, u.lastname, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
+        $query = "SELECT u.id AS uid, u.title, u.firstname, u.preferred_name, u.lastname, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
             UNIX_TIMESTAMP(bc.created_at) AS submitted, b.id AS blogID, heading, folder_id, c.name as cat_name, c.id as cat_id
 			FROM `user` u
 			JOIN blog_comment bc ON u.id = bc.owner_id

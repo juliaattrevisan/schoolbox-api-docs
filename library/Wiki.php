@@ -106,7 +106,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             $orderBySQL = 'ORDER BY ' . $orderBy;
         }
 
-        $query = "SELECT r.*, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname,
+        $query = "SELECT r.*, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.preferred_name, u.lastname,
                   w.locked, w.categoryID, w.slug
                   FROM wiki w
                   LEFT JOIN " . $this->_revisionTable . " r ON r.revisionID = (SELECT r.revisionID FROM " . $this->_revisionTable . " r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)

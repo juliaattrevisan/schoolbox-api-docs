@@ -404,7 +404,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function formatName($format = null)
     {
-
         // Check for custom format
         if (empty($format)) {
             $format = $this->getConfigLoader()->get('name_format');
