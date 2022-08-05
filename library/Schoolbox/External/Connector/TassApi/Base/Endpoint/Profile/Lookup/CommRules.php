@@ -38,7 +38,6 @@ class CommRules
     public function __construct(array $api)
     {
         $this->api = $api;
-
     }
 
 

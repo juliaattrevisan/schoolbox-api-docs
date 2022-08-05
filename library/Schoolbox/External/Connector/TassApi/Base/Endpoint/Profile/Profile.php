@@ -217,7 +217,7 @@ class Profile implements IStrategy
          */
 //        $familiesLookup = null;
         $commRulesLookup = null;
-        
+
         if (!count(Watchlist::WATCHLIST)) {
 //            /* Grab all the parents' data in one big request
 //             * We need this for the sfa_num for each identifier
