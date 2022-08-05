@@ -330,7 +330,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     public function getUser($attempt_id)
     {
         $query = "
-            SELECT `user`.firstname, `user`.lastname
+            SELECT `user`.firstname, `user`.preferred_name, `user`.lastname
             FROM assess_attempt
             LEFT JOIN `user` ON assess_attempt.user_id = `user`.id
             WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
