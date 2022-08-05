@@ -14,7 +14,6 @@ namespace Schoolbox\Admin\RubricResultSet;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use JetBrains\PhpStorm\NoReturn;
 use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base
@@ -65,7 +64,7 @@ class Controller extends Base
      * Delete the result set defined by $resultSetId.
      * @param int|null $resultSetId
      */
-    #[NoReturn] public function deleteResultSet(?int $resultSetId): void
+    public function deleteResultSet(?int $resultSetId): void
     {
         $this->mapper->deleteSet((int)$resultSetId);
     }
