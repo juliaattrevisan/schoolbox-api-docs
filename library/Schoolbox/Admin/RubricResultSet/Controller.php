@@ -63,9 +63,9 @@ class Controller extends Base
 
     /**
      * Delete the result set defined by $resultSetId.
-     * @param $resultSetId
+     * @param int|null $resultSetId
      */
-    #[NoReturn] public function deleteResultSet($resultSetId): void
+    #[NoReturn] public function deleteResultSet(?int $resultSetId): void
     {
         $this->mapper->deleteSet((int)$resultSetId);
     }
@@ -75,6 +75,7 @@ class Controller extends Base
      */
     public function getCreate(): void
     {
+        // A getCreate request is equivalent to a getUpdate request with resultSetId set to null.
         $this->getUpdate(null);
     }
 
@@ -83,7 +84,8 @@ class Controller extends Base
      */
     public function postCreate(): void
     {
-        $this->postUpdate();
+        // A postCreate request is equivalent to a postUpdate request with resultSetId set to null.
+        $this->postUpdate(null);
     }
 
     /**
@@ -113,9 +115,10 @@ class Controller extends Base
 
     /**
      * Save $_POSTed data to database, then redirect to getList.
+     * @param int|null $resultSetId
      * @throws RouteNotFound
      */
-    public function postUpdate(): void
+    public function postUpdate(?int $resultSetId): void
     {
         $postedData    = $this->getRequest()->post->getArrayCopy();
         $indexedLabels = [];
@@ -128,11 +131,7 @@ class Controller extends Base
             }
         }
 
-        $this->mapper->createOrOverwriteSet(
-            // Either an integer or null is expected by the function, so convert before passing parameter.
-            (($postedData['resultSetId'] === '') ? null : (int)$postedData['resultSetId']),
-            $indexedLabels
-        );
+        $this->mapper->createOrOverwriteSet($resultSetId, $indexedLabels); // If $resultSetId is null, a new set will be created.
 
         $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubricResultSet.getList'));
     }

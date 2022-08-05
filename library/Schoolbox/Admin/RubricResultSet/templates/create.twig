@@ -124,7 +124,6 @@
                     {% set formAction = routeLookup('adminRubricResultSet.postCreate') %}
                 {% endif %}
                 <form id="rubric-result-set-form" method="post" action="{{ formAction }}">
-                    <input type='hidden' name='resultSetId' value='{{ resultSetId }}'/>
                     <section>
                         <fieldset id="rows-container" class="content">
                             {% for row in rubricResultRows %}
