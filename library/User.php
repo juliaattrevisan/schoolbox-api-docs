@@ -430,13 +430,12 @@ class User extends DeprecatedModel
     /**
      * Format a name from a user object
      *
-     * @param  array $userInfo
+     * @param array  $userInfo
      * @param string $format
-     * @param bool   $useNonBreakingSpace
      *
      * @return mixed|null|string
      */
-    public function formatName($userInfo, $format = null, $useNonBreakingSpace = false)
+    public function formatName($userInfo, $format = null)
     {
         // Check for custom format
         if (empty($format)) {
@@ -458,12 +457,7 @@ class User extends DeprecatedModel
             $format = str_replace($tag, $value, $format);
         }
         if ($format = trim($format)) {
-            if ($useNonBreakingSpace) {
-                $format = preg_replace("#[\s]#", '&nbsp;', $format);
-            }
             return $format;
-        } elseif ($useNonBreakingSpace) {
-            return 'Unknown&nbsp;User';
         } else {
             return 'Unknown User';
         }
