@@ -208,13 +208,6 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-        /* Grab all the parents' data in one big request
-         * We need this for the sfa_num for each identifier
-         */
-        $this->log->info('Downloading parent data (this might take a while)');
-
-        $families = (new Lookup\Parents($this->api))->generate();
-
         /* If the watchlist const is empty, preload all commrules
          *
          * Otherwise, pass null and let importParentsOfStudent() fetch
@@ -222,12 +215,23 @@ class Profile implements IStrategy
          * calls when you import normally - when you use a watchlist, you'll
          * end up getting comm rules just for those guys on the watchlist)
          */
+        $familiesLookup = null;
         $commRulesLookup = null;
         
         if (!count(Watchlist::WATCHLIST)) {
+            /* Grab all the parents' data in one big request
+             * We need this for the sfa_num for each identifier
+             */
+            $this->log->info('Downloading parent data (this might take a while)');
+
+            $familiesLookup = (new Lookup\Parents($this->api))->generate();
+
             $this->log->info('Downloading all student commrules (this might take a while)');
 
             $commRulesLookup = (new Lookup\CommRules($this->api))->generate();
+        } else {
+            $this->log->debug('Downloading parent data for people on the watchlist');
+            $this->log->debug('Downloading student commrules for people on the watchlist');
         }
 
         /* Process each current student, and their parents too.
@@ -441,7 +445,7 @@ class Profile implements IStrategy
                 $this->studentProfileMapper->save($studentProfile);
             }
 
-            $this->importParentsOfStudent($studentBaseProfile, $commRulesLookup, $families);
+            $this->importParentsOfStudent($studentBaseProfile, $commRulesLookup, $familiesLookup);
         }
     }
 
@@ -602,19 +606,19 @@ class Profile implements IStrategy
      *
      * @param Model      $studentBaseProfile
      * @param array|null $commRulesLookup
-     * @param array      $families
+     * @param array|null $familiesLookup
      * @throws DefinitionException
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, ?array $commRulesLookup, array $families): void
+    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, ?array $commRulesLookup, ?array $familiesLookup): void
     {
         $studentId = $studentBaseProfile->getExternalId();
 
         /* Time for importing parents
          */
-        $family = (new Lookup\CommRuleFamily($this->api, $this->spousePrefix))->find($studentId, $commRulesLookup, $families);
+        $family = (new Lookup\CommRuleFamily($this->api, $this->spousePrefix))->find($studentId, $commRulesLookup, $familiesLookup);
 
         /* No parents? No trabajo
          */

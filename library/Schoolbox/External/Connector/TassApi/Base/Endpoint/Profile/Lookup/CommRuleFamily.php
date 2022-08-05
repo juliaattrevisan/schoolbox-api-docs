@@ -96,10 +96,10 @@ class CommRuleFamily
      *
      * @param string     $externalId
      * @param array|null $commRulesLookup
-     * @param array      $families
+     * @param array|null $familiesLookup
      * @return array
      */
-    public function find(string $externalId, ?array $commRulesLookup, array $families): array
+    public function find(string $externalId, ?array $commRulesLookup, ?array $familiesLookup): array
     {
         if (null === $commRulesLookup) {
             $commRules = $this->api[DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
@@ -188,7 +188,7 @@ class CommRuleFamily
                 /* Otherwise, close enough - cram on a prefix as per tradition
                  * and pile them into the Family stack.
                  */
-                $externalId = $this->deriveExternalId($fields['node'], (string)$commRule['parent_code'], $families);
+                $externalId = $this->deriveExternalId($fields['node'], (string)$commRule['parent_code'], $familiesLookup);
 
                 /* Pile it in to the stack
                  */
@@ -218,12 +218,12 @@ class CommRuleFamily
      * Apply parent prefix based on their spouseness and suffix based on their sfa_num value
      * I guess sfa_num stands for Split Family Access number or something
      *
-     * @param string $node
-     * @param string $identifier
-     * @param array  $families
+     * @param string     $node
+     * @param string     $identifier
+     * @param array|null $familiesLookup
      * @return string
      */
-    private function deriveExternalId(string $node, string $identifier, array $families): string
+    private function deriveExternalId(string $node, string $identifier, ?array $familiesLookup): string
     {
         /* Do some funny prefix stuff for parents
          */
@@ -239,7 +239,11 @@ class CommRuleFamily
          *
          * TODO But...do we actually need it, or is it some jank from live tass connector...?
          */
-        $sfaNum = $families[$externalId]['sfa_num'] ?? '';
+        if (null === $familiesLookup) {
+            $sfaNum = (new Parents($this->api))->findById($identifier);
+        } else {
+            $sfaNum = $familiesLookup[$externalId]['sfa_num'] ?? '';
+        }
 
         return "{$externalId}{$sfaNum}";
     }

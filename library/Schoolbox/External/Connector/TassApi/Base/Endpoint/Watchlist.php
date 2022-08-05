@@ -25,7 +25,7 @@ class Watchlist
     /**
      * Filter to specific people; set to empty array to disable filtering
      */
-    public const WATCHLIST = [];
+    public const WATCHLIST = ['314799'];
 
 
     /**

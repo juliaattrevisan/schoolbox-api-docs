@@ -111,4 +111,36 @@ class Parents
 
         return $families;
     }
+
+
+    /**
+     * Find the getParents record for a particular parent identified by $identifier
+     * (That's usually synonymous with their externalid)
+     *
+     * @param string $identifier
+     * @return string
+     */
+    public function findById(string $identifier): string
+    {
+        $sfaNum = '';
+
+        $parents = $this->api[DSN::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getParents', [
+            'user_code' => $identifier,
+        ]);
+
+        foreach ($parents['parents'] as $parent) {
+            foreach ($parent as $externalId => $data) {
+                if (!isset($data['sfa_num'])) {
+                    /* Might be more than one element, but I haven't seen it
+                     * do that anywhere yet
+                     */
+                    $sfaNum = trim((string)$data[0]['sfa_num']);
+                } else {
+                    $sfaNum = $data['sfa_num'];
+                }
+            }
+        }
+
+        return $sfaNum;
+    }
 }
