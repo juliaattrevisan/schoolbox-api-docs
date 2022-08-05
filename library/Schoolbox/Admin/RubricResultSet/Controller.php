@@ -68,8 +68,6 @@ class Controller extends Base
     #[NoReturn] public function deleteResultSet($resultSetId): void
     {
         $this->mapper->deleteSet((int)$resultSetId);
-        header('HTTP/1.0 200 OK');
-        die;
     }
 
     /**
