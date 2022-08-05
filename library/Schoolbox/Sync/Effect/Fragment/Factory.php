@@ -54,6 +54,7 @@ class Factory
 
         'title' => 'Title' ,
         'firstname' => 'Firstname',
+        'preferredName' => 'Preferred Name',
         'lastname' => 'Surname',
         'year' => 'Year Level',
         'positionTitle' => 'Position Title',
