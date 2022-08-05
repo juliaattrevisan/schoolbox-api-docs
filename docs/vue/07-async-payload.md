@@ -106,6 +106,7 @@ mounted () {
 
 }
 ```
+The props section should be empty.
 
 In `user-list.vue`,
 
