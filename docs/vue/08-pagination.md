@@ -3,7 +3,7 @@
 Sometimes you're working with a large data se and it's not nice to show it all at the same time. We can paginate it using a third party component `VuejsPaginate`.
 
 This is already included in a special minified file `schoolbox-vue.min.js` which is secretly compiled elsewhere. You can just use it, for now, like this:
-(if you can't find the file, try "import Paginate from 'vuejs-paginate-next';")
+(if you can't find the file, try "import VuejsPaginate from 'vuejs-paginate-next';")
 
 ```html
 <!-- You need this; spawns after you "npm run build" for the first time -->
