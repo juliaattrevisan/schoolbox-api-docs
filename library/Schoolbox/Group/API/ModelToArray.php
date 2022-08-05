@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Group\API;
 
 use Schoolbox\Group\GroupsHelper;
+use Schoolbox\Group\UserGroupAccess;
 use Schoolbox\Permission\Access\UserAccess;
 
 /**
@@ -21,10 +22,10 @@ use Schoolbox\Permission\Access\UserAccess;
 class ModelToArray
 {
     /**
-     * @param UserAccess $access
+     * @param UserGroupAccess $access
      * @return array
      */
-    public function __invoke(UserAccess $access): array
+    public function __invoke(UserGroupAccess $access): array
     {
         $group = $access->getFolder()->getGroup();
         if (!$group) {

@@ -12,6 +12,7 @@ namespace Schoolbox\Group\API;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Group\GroupsHelper;
+use Schoolbox\Group\UserGroupAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -107,7 +108,7 @@ class Controller extends Base
             $this->sendJsonError('User is already enroled in the group', 409);
             return;
         }
-        $userAccess = (new UserAccess())
+        $userAccess = (new UserGroupAccess())
             ->setServiceIdentifier($group->getFolder()->getId())
             ->setUser($user)
             ->setFolder($group->getFolder())
@@ -154,17 +155,17 @@ class Controller extends Base
 
     /**
      * Apply post data to given userAccess and persist
-     * @param UserAccess $userAccess
+     * @param UserGroupAccess $userAccess
      * @param User       $user
      * @param Group      $group
      * @return void
      */
-    private function processGroupPostData(UserAccess $userAccess, User $user, Group $group)
+    private function processGroupPostData(UserGroupAccess $userAccess, User $user, Group $group)
     {
         $post = json_decode(json_encode($this->request->content->get()), true);
 
         try {
-            /** @var UserAccess $newAccess */
+            /** @var UserGroupAccess $newAccess */
             $newAccess = (new ArrayToModel())($post ?? [], $userAccess);
         } catch (\Exception $e) {
             $this->sendJsonError($e->getMessage(), 401);

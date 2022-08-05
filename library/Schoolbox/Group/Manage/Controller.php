@@ -95,19 +95,15 @@ class Controller extends Base
      */
     public function getData(Folder $folder)
     {
-        $group                = $folder->getGroup();
-        $groupMessagesEnabled = !$this->rerouteOverrideMapper
-            ->isRouteMuted(
-                "service." . UserAccess::SERVICE_HOMEPAGE . ".{$folder->getId()}"
-            );
-        $data['groupId']      = $folder->getId();
-        $data['groupName']    = $folder->getNameWithCodes();
-        $data['settings']     = [
+        $group             = $folder->getGroup();
+        $data['groupId']   = $folder->getId();
+        $data['groupName'] = $folder->getNameWithCodes();
+        $data['settings']  = [
             'access'                 => $group ? $group->getTypeString() : '',
-            'isNotificationsEnabled' => $groupMessagesEnabled,
+            'isNotificationsEnabled' => $this->groupsHelper->groupNotificationEnabled($folder->getId()),
             'isForceFollow'          => $group && $group->getForceFollow(),
         ];
-        $data['members']      = $group ? $this->groupsHelper->getGroupUsers($group) : [];
+        $data['members']   = $group ? $this->groupsHelper->getGroupUsers($group) : [];
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput($data)
@@ -115,6 +111,7 @@ class Controller extends Base
     }
 
     /**
+     * Remove members from a group
      * @param Folder $folder
      * @return void
      * @api   DELETE /group/removeMembers/{folderId}

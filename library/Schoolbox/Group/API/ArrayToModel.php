@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Group\API;
 
 use Schoolbox\Group\GroupsHelper;
+use Schoolbox\Group\UserGroupAccess;
 use Schoolbox\Permission\Access\UserAccess;
 
 /**
@@ -23,7 +24,7 @@ class ArrayToModel
     public function __invoke(array $array, ?object $model = null): object
     {
         if (!isset($model)) {
-            $model = new UserAccess();
+            $model = new UserGroupAccess();
         }
 
         $fields = [

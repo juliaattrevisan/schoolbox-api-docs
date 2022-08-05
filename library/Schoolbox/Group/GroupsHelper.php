@@ -70,22 +70,21 @@ class GroupsHelper
      */
     public function getCurrentGroups(User $user): GenericCollection
     {
-        //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->userAccessMapper->findAllGroupsForUser($user, false)->indexBy('serviceIdentifier');
-        $folders   = $this->folderMapper->findByColumn('id', $userPerms->keys())->indexBy('id');
+        return $this->getUserGroupAccessList($user, null, false);
+    }
 
-        $accesses = $this->userAccessMapper->createCollection();
-        foreach ($userPerms as $userPerm) {
-            /** @var Folder|null $folder */
-            $folder = $folders->offsetGet($userPerm->getServiceIdentifier());
-            if ($folder && $folder->getGroup()) {
-                $userPerm->setFolder($folder);
-                $accesses->add($userPerm);
-            }
-        }
-        $this->populateNotification($user, $accesses);
-        return $accesses;
+    /**
+     * Whether group notification is enabled
+     * @param int $folderId
+     * @return bool
+     */
+    public function groupNotificationEnabled(int $folderId): bool
+    {
+        return !$this->reRouteOverrideMapper
+            ->isRouteMuted(
+                "service." . UserAccess::SERVICE_HOMEPAGE . ".{$folderId}"
+            );
     }
 
     /**
@@ -100,7 +99,7 @@ class GroupsHelper
      * @param User       $user
      * @param Collection $accesses
      */
-    public function populateNotification(User $user, Collection $accesses)
+    private function populateNotification(User $user, Collection $accesses)
     {
         $rerouteOverrides = $this->reRouteOverrideMapper->getMutedFolders($user->getId());
 
@@ -110,7 +109,7 @@ class GroupsHelper
         ];
 
         // following
-        /** @var UserAccess $access */
+        /** @var UserGroupAccess $access */
         foreach ($accesses as $access) {
             $disabled = in_array($access->getFolder()->getId(), $muted['disabled']);
             $follow   = !in_array($access->getFolder()->getId(), $muted['unfollow']) && !$disabled;
@@ -206,28 +205,22 @@ class GroupsHelper
     {
         //check if user is currently member
         // Get the groups the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->userAccessMapper->findAllGroupsForUser($user, true)->indexBy('serviceIdentifier');
+        $userPerms = $this->getUserGroupAccessList($user, null, false);
 
-        $groupsArr = $this->groupMapper->getAvailableGroupIds($user);
-        //combine to show list of all groups, both available to the user, and those they are enroled in
-        $groupIds = array_unique(array_merge($userPerms->keys(), $groupsArr));
+        // Gather folders of joined groups
+        $joinedFolders = $userPerms->map(static function ($userGroupAccess) {
+            /** @var UserGroupAccess $userGroupAccess */
+            return $userGroupAccess->getFolder();
+        });
+
+        $availableFolderIds = $this->groupMapper->getAvailableGroupIds($user);
+        $availableFolderIds = array_diff($availableFolderIds, $joinedFolders->getPropertyValues('id'));
+        $availableFolders   = $this->folderMapper->findByColumnList(['id' => $availableFolderIds])->indexBy('id');
 
         //folder colours helper
         $folderColours = new FolderColour($this->timetableColourMapper, new ColorFactory());
 
-        //build the folder list object with hydration
-        $folders = $this->folderMapper->findByColumnList(['id' => $groupIds])->indexBy('id');
-
-        //build notifications (will notify by default, the user will have to opt out)
-        foreach ($userPerms->keys() as $folderId) {
-            $folder = $folders->offsetGet($folderId);
-            if ($folder) {
-                $userPerms->offsetGet($folderId)->setFolder($folders->offsetGet($folderId));
-            } else {
-                $userPerms->offsetUnset($folderId);
-            }
-        }
-        $this->populateNotification($user, $userPerms);
+        $folders = $availableFolders->merge($joinedFolders);
 
         // build output array
         $possibleGroups = [];
@@ -240,7 +233,7 @@ class GroupsHelper
             if (null === $folder->getGroup()) {
                 continue;
             }
-            /** @var UserAccess|null $userPerm */
+            /** @var UserGroupAccess|null $userPerm */
             $userPerm = $userPerms->offsetGet($folder->getId());
 
             //nullable image cause something to have no defaults...
@@ -292,24 +285,15 @@ class GroupsHelper
      * these no homepage groups are usually used for notifications, and are sis controlled
      * @param User  $user
      * @param Group $group
-     * @return UserAccess|null
+     * @return UserGroupAccess|null
      */
-    public function getGroup(User $user, Group $group): ?UserAccess
+    public function getGroup(User $user, Group $group): ?UserGroupAccess
     {
         // Get the group the user is currently a member, their enrolment type and favourite status
-        $userPerms = $this->userAccessMapper->findForFolderUser(
-            $group->getFolder(),
-            (new GenericCollection(User::class))->add($user)
-        )->map(static function ($ua) use ($group) {
-            /** @var UserAccess $ua */
-            return $ua->setFolder($group->getFolder());
-        });
-
+        $userPerms = $this->getUserGroupAccessList($user, $group->getFolder(), true);
         if ($userPerms->count() === 0) {
             return null;
         }
-
-        $this->populateNotification($user, $userPerms);
         return $userPerms->first();
     }
 
@@ -345,5 +329,55 @@ class GroupsHelper
             ];
         }
         return $members;
+    }
+
+    /**
+     * Returns user group list, with notification settings indexed by group folder id
+     * @param User        $user
+     * @param Folder|null $folder if null, returns all folders
+     * @param bool        $excludePending
+     * @return GenericCollection
+     */
+    private function getUserGroupAccessList(User $user, ?Folder $folder, bool $excludePending): GenericCollection
+    {
+        $param = [
+            'uid'     => $user->getId(),
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+        ];
+
+        if ($excludePending) {
+            $param['type'] = [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL];
+        }
+
+        if ($folder) {
+            $param['sid'] = $folder->getId();
+        }
+
+        $userAccesses = $this->userAccessMapper->findByColumnList($param);
+
+        if ($folder) {
+            $folders = $this->folderMapper->createCollection()->add($folder);
+        } else {
+            $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'))->indexBy('id');
+        }
+        $folders = $folders->indexBy('id');
+
+        $userGroupAccesses = UserGroupAccess::createCollection();
+        foreach ($userAccesses as $userAccess) {
+            /** @var Folder|null $folder */
+            $folder = $folders->offsetGet($userAccess->getServiceIdentifier());
+            if ($folder && $folder->getGroup()) {
+                $userGroupAccess = (new UserGroupAccess())
+                    ->setServiceIdentifier($userAccess->getServiceIdentifier())
+                    ->setService($userAccess->getService())
+                    ->setAccessLevel($userAccess->getAccessLevel())
+                    ->setFavourite($userAccess->getFavourite())
+                    ->setUser($user)
+                    ->setFolder($folder);
+                $userGroupAccesses->offsetSet($folder->getId(), $userGroupAccess);
+            }
+        }
+        $this->populateNotification($user, $userGroupAccesses);
+        return $userGroupAccesses;
     }
 }

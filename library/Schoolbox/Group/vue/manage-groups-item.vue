@@ -207,7 +207,7 @@ export default {
                     this.$emit('on-edit-error', responseData.title);
                 } else {
                     this.$emit('on-edit-success', 'Group left');
-                    if ((this.group.enrolmentStatus !== enrolmentTypes.NOT_ENROLED) && this.group.isFavourite) { //assumed that wouldn't be a favourite group if re-added
+                    if ((this.group.enrolmentStatus === enrolmentTypes.ENROLED) && this.group.isFavourite) { //assumed that wouldn't be a favourite group if re-added
                         this.group.isFavourite = false;
                         removeGroupFromSideMenu(this.group.id);
                     }

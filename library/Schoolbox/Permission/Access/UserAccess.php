@@ -11,7 +11,6 @@ namespace Schoolbox\Permission\Access;
 
 use Schoolbox\IModel;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class UserAccess implements IModel
@@ -116,12 +115,12 @@ class UserAccess implements IModel
      * Value for $this->accessLevel:
      * $this->user has moderate access to resource in $this->service.
      */
-    public const ACCESS_FULL      = 3;
+    public const ACCESS_FULL = 3;
 
-    public const MEMBERSHIP_WRITE = 'write';
-    public const MEMBERSHIP_NONE  = 'none';
-    public const MEMBERSHIP_READ  = 'read';
     public const MEMBERSHIP_ADMIN = 'admin';
+    public const MEMBERSHIP_WRITE = 'write';
+    public const MEMBERSHIP_READ  = 'read';
+    public const MEMBERSHIP_NONE  = 'none';
 
     public const ACCESS_NAME_TO_LEVEL = [
         self::MEMBERSHIP_NONE  => self::ACCESS_DENY,
@@ -152,14 +151,6 @@ class UserAccess implements IModel
     /** @var bool */
     protected bool $favourite = false;
 
-    /** @var Folder|null folder of the sid */
-    private ?Folder $folder = null;
-
-    /**
-     * This is to present notification actually set in msg_reroute_override
-     * @var bool
-     */
-    private bool $following = false;
 
     /**
      * Returns the set of all known access levels
@@ -170,6 +161,7 @@ class UserAccess implements IModel
     {
         return [self::ACCESS_DENY, self::ACCESS_READ, self::ACCESS_WRITE, self::ACCESS_FULL,];
     }
+
 
 
     /**
@@ -313,41 +305,5 @@ class UserAccess implements IModel
     public function getFavourite(): bool
     {
         return $this->favourite;
-    }
-
-    /**
-     * @return Folder|null
-     */
-    public function getFolder(): ?Folder
-    {
-        return $this->folder;
-    }
-
-    /**
-     * @param Folder $folder
-     * @return $this
-     */
-    public function setFolder(Folder $folder): self
-    {
-        $this->folder = $folder;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getFollowing(): bool
-    {
-        return $this->following;
-    }
-
-    /**
-     * @param bool $following
-     * @return $this
-     */
-    public function setFollowing(bool $following): self
-    {
-        $this->following = $following;
-        return $this;
     }
 }

@@ -25,6 +25,7 @@ use Schoolbox\User;
  * @package Schoolbox\Resource
  * @method Group createModel($idValue = null)
  * @method Group hydrate(array $row, $alias = '', $callback = null)
+ * @method Group findById($idValue)
  * @method Group[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
 class GroupMapper extends Mapper

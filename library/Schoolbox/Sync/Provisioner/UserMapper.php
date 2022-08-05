@@ -46,7 +46,7 @@ class UserMapper extends SchoolboxMapper
     {
         /** @var UserAccessMapper $userAccessMapper */
         $userAccessMapper = $this->getJoinMapper('userAccess');
-        return $userAccessMapper->findAllGroupsForUser($user, false);
+        return $userAccessMapper->findAllGroupsForUser($user);
     }
 
 
