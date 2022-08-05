@@ -110,7 +110,7 @@ class CommRuleFamily
 
             $addresses = $commRules['commrules'][0]['addresses'];
         } else {
-            $addresses = $commRulesLookup[$externalId];
+            $addresses = $commRulesLookup[$externalId] ?? [];
         }
 
         $stack = [];
