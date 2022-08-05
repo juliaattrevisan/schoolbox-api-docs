@@ -445,7 +445,7 @@ class Profile implements IStrategy
                 $this->studentProfileMapper->save($studentProfile);
             }
 
-            $this->importParentsOfStudent($studentBaseProfile, $commRulesLookup, $familiesLookup);
+            $this->importParentsOfStudent($studentBaseProfile, $commRulesLookup, null);
         }
     }
 
