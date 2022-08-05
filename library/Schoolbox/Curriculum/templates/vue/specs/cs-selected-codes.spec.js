@@ -31,3 +31,15 @@ test('should display when there is codes', async () => {
     await nextTick(); //need to ensure the DOM has updated first prior to checking
     expect(wrapper.findAll('[data-test-code]').length).toBe(2); //should be two items in the dom now
 });
+
+test('should not display when had codes but has been emptied', async () => {
+    const selectedCodesStore = useSelectedCodesStore();
+    selectedCodesStore.add([ 
+        { id: 1, code: 'C1', name: 'Code 1' }, 
+        { id: 2, code: 'C2', name: 'Code 2' }, 
+    ]);
+    expect(selectedCodesStore.hasCodes).toBe(true); //should have codes now
+    selectedCodesStore.empty();
+    expect(selectedCodesStore.hasNoCodes).toBe(true); //and now no codes
+    expect(wrapper.find('[data-test-container]').exists()).toBe(false);
+});
