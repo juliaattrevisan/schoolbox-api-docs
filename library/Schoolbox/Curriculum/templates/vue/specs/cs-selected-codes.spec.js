@@ -29,7 +29,7 @@ test('should display when there is codes', async () => {
     ]);
     expect(selectedCodesStore.hasCodes).toBe(true); //should have codes now
     await nextTick(); //need to ensure the DOM has updated first prior to checking
-    expect(wrapper.findAll('[data-test-code]').length).toBe(2); //should be two items in the dom now
+    expect(wrapper.findAll('[data-test-code]')).toHaveLength(2); //should be two items in the dom now
 });
 
 test('should not display when had codes but has been emptied', async () => {

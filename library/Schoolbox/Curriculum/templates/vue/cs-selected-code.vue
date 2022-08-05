@@ -47,7 +47,7 @@ const title = computed(() => {
  * To open a modal that shows further info on the selected code
  */
 function onTitleSelected () {
-    useSelectedCodesStore().setActiveCode (props.code);
+    useSelectedCodesStore().setActiveCode(props.code);
 }
 
 /**
@@ -61,8 +61,21 @@ function onRemoveSelected () {
 
 <template>
    <div class="selected-code">
-        <button class="title-button" @click.prevent="onTitleSelected" @keyup.enter="onTitleSelected" :title="`View ${props.code.name}`">{{ title }}</button>
-        <button v-if="!store.isReadOnly" class="remove-button icon-close" :title="`Remove ${props.code.name}`" @click.prevent="onRemoveSelected" @keyup.enter="onRemoveSelected"></button>
+        <button 
+            class="title-button" 
+            :title="`View ${props.code.name}`"
+            @click.prevent="onTitleSelected" 
+            @keyup.enter="onTitleSelected" >
+            {{ title }}
+        </button>
+        <button 
+            v-if="!store.isReadOnly" 
+            class="remove-button icon-close" 
+            :title="`Remove ${props.code.name}`" 
+            @click.prevent="onRemoveSelected" 
+            @keyup.enter="onRemoveSelected" 
+            data-test-remove-button>
+        </button>
     </div>
 </template>
 
