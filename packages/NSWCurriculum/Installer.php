@@ -169,7 +169,7 @@ class Installer implements IPackageInstall
                 $this->curriculumNodeMapper->save($node);
 
                 // Store the inserted ID so we can link children to it
-                $this->parentLookup[$parent['id']] = $node->getId();
+                $this->parentLookup[$parent['id']] = $node;
 
                 /* Because NULL string is not the same as a NULL data type
                  * and people are going to forget to clear this in the csv
@@ -223,6 +223,6 @@ class Installer implements IPackageInstall
         $this->curriculumNodeMapper->save($node);
 
         // Store the inserted ID so we can link children to it
-        $this->parentLookup[$row['id']] = $node->getId();
+        $this->parentLookup[$row['id']] = $node;
     }
 }

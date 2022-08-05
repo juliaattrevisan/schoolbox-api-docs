@@ -76,7 +76,7 @@ class Installer implements IPackageInstall
             $curriculumMapper->save($node);
 
             // Store the inserted ID so we can link children to it
-            $parentLookup[$row['id']] = $node->getId();
+            $parentLookup[$row['id']] = $node;
         }
     }
 }
