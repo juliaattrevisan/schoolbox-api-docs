@@ -375,6 +375,18 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
+     * The user's given name is preferentially their preferred name, otherwise
+     * their first name.
+     *
+     * @return string|null
+     */
+    public function getGivenName()
+    {
+        return $this->preferredName ?: $this->firstname;
+    }
+
+
+    /**
      * @return string
      */
     public function getFullName()
