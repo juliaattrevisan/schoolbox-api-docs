@@ -23,9 +23,9 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
 class Watchlist
 {
     /**
-     * Filter to specific people; set to null to disable filtering
+     * Filter to specific people; set to empty array to disable filtering
      */
-    private const WATCHLIST = null;
+    public const WATCHLIST = [];
 
 
     /**
@@ -38,10 +38,13 @@ class Watchlist
     {
         /* "Everyone is on the watchlist"
          */
-        if (null === self::WATCHLIST) {
+        if (!\count(self::WATCHLIST)) {
             return true;
         }
 
-        return self::WATCHLIST && in_array($externalId, self::WATCHLIST, false);
+        /* Third art set to false for storm, who hates
+         * any setting other than true
+         */
+        return in_array($externalId, self::WATCHLIST, false);
     }
 }

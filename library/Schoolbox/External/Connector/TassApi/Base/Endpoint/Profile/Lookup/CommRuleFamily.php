@@ -31,6 +31,7 @@ class CommRuleFamily
      */
     private array $api;
 
+
     /**
      * These are prefixes in array keys when you get a commrule payload
      *
@@ -93,21 +94,28 @@ class CommRuleFamily
     /**
      * Find the parents of $externalId
      *
-     * @param string $externalId
-     * @param array  $families
+     * @param string     $externalId
+     * @param array|null $commRulesLookup
+     * @param array      $families
      * @return array
      */
-    public function find(string $externalId, array $families): array
+    public function find(string $externalId, ?array $commRulesLookup, array $families): array
     {
-        $commRules = $this->api[DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
-            'code' => $externalId,
-            'currentstatus' => 'current',
-            'commtype' => 'all'
-        ]);
+        if (null === $commRulesLookup) {
+            $commRules = $this->api[DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
+                'code' => $externalId,
+                'currentstatus' => 'current',
+                'commtype' => 'all'
+            ]);
+
+            $addresses = $commRules['commrules'][0]['addresses'];
+        } else {
+            $addresses = $commRulesLookup[$externalId];
+        }
 
         $stack = [];
 
-        foreach ($commRules['commrules'][0]['addresses'] as $commRule) {
+        foreach ($addresses as $commRule) {
             /* Not a parent? continue to the next comm rule
              */
             if ('' === trim((string)$commRule['address_person_posn'])) {

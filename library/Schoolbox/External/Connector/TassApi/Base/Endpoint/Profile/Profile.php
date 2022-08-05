@@ -194,15 +194,11 @@ class Profile implements IStrategy
          * Import their specific parents' profile data
          */
         $this->log->info('Processing students and their parents.');
-        $this->log->info('Downloading student and parent data (this might take a while)');
-
         $this->importStudents();
 
 //        /* Import staff profile data
 //         */
 //        $this->log->info('Processing staff.');
-//        $this->log->info('Downloading staff data (this might take a while)');
-//
 //        $this->importStaff();
     }
 
@@ -215,7 +211,24 @@ class Profile implements IStrategy
         /* Grab all the parents' data in one big request
          * We need this for the sfa_num for each identifier
          */
+        $this->log->info('Downloading parent data (this might take a while)');
+
         $families = (new Lookup\Parents($this->api))->generate();
+
+        /* If the watchlist const is empty, preload all commrules
+         *
+         * Otherwise, pass null and let importParentsOfStudent() fetch
+         * the comm rules on-demand (this saves you billions of little api
+         * calls when you import normally - when you use a watchlist, you'll
+         * end up getting comm rules just for those guys on the watchlist)
+         */
+        $commRulesLookup = null;
+        
+        if (!count(Watchlist::WATCHLIST)) {
+            $this->log->info('Downloading all student commrules (this might take a while)');
+
+            $commRulesLookup = (new Lookup\CommRules($this->api))->generate();
+        }
 
         /* Process each current student, and their parents too.
            The includephoto parameter is available for both:
@@ -223,6 +236,8 @@ class Profile implements IStrategy
               https://github.com/TheAlphaSchoolSystemPTYLTD/student-details/blob/master/getStudentsDetails.md
            Using getStudents for now, so that we don't have to make a call for each student.
          */
+        $this->log->info('Downloading student data (this might take a while)');
+
         $students = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current',
             'includephoto'  => $this->includePhoto
@@ -426,7 +441,7 @@ class Profile implements IStrategy
                 $this->studentProfileMapper->save($studentProfile);
             }
 
-            $this->importParentsOfStudent($studentBaseProfile, $families);
+            $this->importParentsOfStudent($studentBaseProfile, $commRulesLookup, $families);
         }
     }
 
@@ -585,20 +600,21 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param Model $studentBaseProfile
-     * @param array $families
+     * @param Model      $studentBaseProfile
+     * @param array|null $commRulesLookup
+     * @param array      $families
+     * @throws DefinitionException
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
-     * @throws DefinitionException
      */
-    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $families): void
+    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, ?array $commRulesLookup, array $families): void
     {
         $studentId = $studentBaseProfile->getExternalId();
 
         /* Time for importing parents
          */
-        $family = (new Lookup\CommRuleFamily($this->api, $this->spousePrefix))->find($studentId, $families);
+        $family = (new Lookup\CommRuleFamily($this->api, $this->spousePrefix))->find($studentId, $commRulesLookup, $families);
 
         /* No parents? No trabajo
          */
@@ -854,6 +870,8 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
+        $this->log->info('Downloading staff data (this might take a while)');
+
         $staffs = $this->findStaff();
 
         foreach ($staffs as $staff) {
