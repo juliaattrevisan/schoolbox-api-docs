@@ -25,11 +25,12 @@ const curriculumCodes = computed(() => {
 </script>
 
 <template>
-    <div v-if="selectedCodesStore.hasCodes" class="selected-codes-container">
+    <div v-if="selectedCodesStore.hasCodes" class="selected-codes-container" data-test-container>
         <cs-selected-code
             v-for="code in selectedCodesStore.codes"
             :key="code.id"
             :code="code"
+            data-test-code
         >
         </cs-selected-code>
     </div>

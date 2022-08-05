@@ -12,7 +12,7 @@ beforeEach(() => {
             plugins: [createTestingPinia()],
         },
         props: {
-            curriculumSelectorEl: null
+            curriculumSelectorEl: null //is a ref() containing a HTMLElement
         }
     });
 });
@@ -21,34 +21,42 @@ test('component should not be visible when curriculum selector is read only', ()
     expect(wrapper.find('input').exists()).toBe(false);
 });
 
-test('do not display browse button until curriculum codes are loaded', () => {
-    expect(wrapper.find('button').exists()).toBe(false);
+describe('search input', () => { //describe is just used to group tests together
+    
+    test('should be disabled if there is a load error', async () => {
+        const store = useStore();
+        store.$patch( { isReadOnly: false, isLoading: false, hasLoadError: true } );
+        await nextTick(); //need to ensure the DOM has updated first prior to checking
+        expect(wrapper.find('input').attributes().readonly).toBeDefined();
+    });
+
+    test('should display when load is successful', async () => {
+        const store = useStore();
+        store.$patch( { isReadOnly: false, isLoading: false } );
+        await nextTick(); //need to ensure the DOM has updated first prior to checking
+        expect(wrapper.find('input').attributes().readonly).toBeUndefined();
+    });
+
 });
 
-test('do not display browse button if theres a load error', async () => {
-    const store = useStore();
-    store.$patch( { isReadOnly: false, isLoading: false, hasLoadError: true } );
-    await nextTick(); //need to ensure the DOM has updated first prior to checking
-    expect(wrapper.find('button').exists()).toBe(false);
-});
+describe('browse button', () => {
 
-test('display browse button when curriculum codes are loaded', async () => {
-    const store = useStore();
-    store.$patch( { isReadOnly: false, isLoading: false } );
-    await nextTick(); //need to ensure the DOM has updated first prior to checking
-    expect(wrapper.find('button').exists()).toBe(true);
-});
+    test('should not display while loading', () => {
+        expect(wrapper.find('button').exists()).toBe(false);
+    });
+    
+    test('should not display if there is a load error', async () => {
+        const store = useStore();
+        store.$patch( { isReadOnly: false, isLoading: false, hasLoadError: true } );
+        await nextTick(); //need to ensure the DOM has updated first prior to checking
+        expect(wrapper.find('button').exists()).toBe(false);
+    });
+    
+    test('should display when load is successful', async () => {
+        const store = useStore();
+        store.$patch( { isReadOnly: false, isLoading: false } );
+        await nextTick(); //need to ensure the DOM has updated first prior to checking
+        expect(wrapper.find('button').exists()).toBe(true);
+    });
 
-test('search input should be enabled if there is a load error', async () => {
-    const store = useStore();
-    store.$patch( { isReadOnly: false, isLoading: false } );
-    await nextTick(); //need to ensure the DOM has updated first prior to checking
-    expect(wrapper.find('input').attributes().readonly).toBeUndefined();
-});
-
-test('search input should be readonly if there is a load error', async () => {
-    const store = useStore();
-    store.$patch( { isReadOnly: false, isLoading: false, hasLoadError: true } );
-    await nextTick(); //need to ensure the DOM has updated first prior to checking
-    expect(wrapper.find('input').attributes().readonly).toBeDefined();
 });
