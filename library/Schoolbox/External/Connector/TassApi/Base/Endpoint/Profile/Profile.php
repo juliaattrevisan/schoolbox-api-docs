@@ -215,22 +215,22 @@ class Profile implements IStrategy
          * calls when you import normally - when you use a watchlist, you'll
          * end up getting comm rules just for those guys on the watchlist)
          */
-        $familiesLookup = null;
+//        $familiesLookup = null;
         $commRulesLookup = null;
         
         if (!count(Watchlist::WATCHLIST)) {
-            /* Grab all the parents' data in one big request
-             * We need this for the sfa_num for each identifier
-             */
-            $this->log->info('Downloading parent data (this might take a while)');
-
-            $familiesLookup = (new Lookup\Parents($this->api))->generate();
+//            /* Grab all the parents' data in one big request
+//             * We need this for the sfa_num for each identifier
+//             */
+//            $this->log->info('Downloading parent data (this might take a while)');
+//
+//            $familiesLookup = (new Lookup\Parents($this->api))->generate();
 
             $this->log->info('Downloading all student commrules (this might take a while)');
 
             $commRulesLookup = (new Lookup\CommRules($this->api))->generate();
         } else {
-            $this->log->debug('Downloading parent data for people on the watchlist');
+//            $this->log->debug('Downloading parent data for people on the watchlist');
             $this->log->debug('Downloading student commrules for people on the watchlist');
         }
 

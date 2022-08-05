@@ -233,18 +233,20 @@ class CommRuleFamily
             $externalId = "{$this->spousePrefix}{$identifier}";
         }
 
-        /* sfa_num suffix
-         * We lose sfa_num here though, unless we api them in getParents to find sfa_num specifically
-         * But what does that mean for a school, if we don't use it anymore?
-         *
-         * TODO But...do we actually need it, or is it some jank from live tass connector...?
-         */
-        if (null === $familiesLookup) {
-            $sfaNum = (new Parents($this->api))->findById($identifier);
-        } else {
-            $sfaNum = $familiesLookup[$externalId]['sfa_num'] ?? '';
-        }
+//        /* sfa_num suffix
+//         * We lose sfa_num here though, unless we api them in getParents to find sfa_num specifically
+//         * But what does that mean for a school, if we don't use it anymore?
+//         *
+//         * TODO But...do we actually need it, or is it some jank from live tass connector...?
+//         */
+//        if (null === $familiesLookup) {
+//            $sfaNum = (new Parents($this->api))->findById($identifier);
+//        } else {
+//            $sfaNum = $familiesLookup[$externalId]['sfa_num'] ?? '';
+//        }
+//
+//        return "{$externalId}{$sfaNum}";
 
-        return "{$externalId}{$sfaNum}";
+        return $externalId;
     }
 }
