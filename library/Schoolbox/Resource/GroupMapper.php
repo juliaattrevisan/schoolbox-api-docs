@@ -6,6 +6,8 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Resource;
 
 use PDOStatement;
@@ -30,7 +32,6 @@ use Schoolbox\User;
  */
 class GroupMapper extends Mapper
 {
-
     protected function mapping()
     {
         $this->hasModel(Group::class);

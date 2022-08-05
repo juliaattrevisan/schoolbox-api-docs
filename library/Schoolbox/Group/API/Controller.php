@@ -108,12 +108,13 @@ class Controller extends Base
             $this->sendJsonError('User is already enroled in the group', 409);
             return;
         }
-        $userAccess = (new UserGroupAccess())
-            ->setServiceIdentifier($group->getFolder()->getId())
-            ->setUser($user)
-            ->setFolder($group->getFolder())
-            ->setService(UserAccess::SERVICE_HOMEPAGE);
-
+        if (!$userAccess) {
+            $userAccess = new UserGroupAccess();
+            $userAccess->setServiceIdentifier($group->getFolder()->getId())
+                       ->setUser($user)
+                       ->setFolder($group->getFolder())
+                       ->setService(UserAccess::SERVICE_HOMEPAGE);
+        }
         $this->processGroupPostData($userAccess, $user, $group);
     }
 

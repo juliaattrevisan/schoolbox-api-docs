@@ -7,6 +7,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Group;
 
 use Alaress\Web\Controller\Base as BaseController;
@@ -22,9 +24,11 @@ use Timetable_ColourMapper;
 
 class Controller extends BaseController
 {
-    private GroupMapper      $groupMapper;
+    private GroupMapper $groupMapper;
+
     private UserAccessMapper $userAccessMapper;
-    private GroupsHelper     $groupsHelper;
+
+    private GroupsHelper $groupsHelper;
 
     /**
      * constructor for dependency injection
@@ -87,7 +91,7 @@ class Controller extends BaseController
     public function postMyGroupAdd(): void
     {
         //grab the post / user and group objects to make things easier
-        $groupFolderId = $this->request->post->get('group');
+        $groupFolderId = (int)$this->request->post->get('group');
         $user          = $this->getUser();
         $group         = $this->getGroup($groupFolderId);
         if (null === $group) {
@@ -150,7 +154,7 @@ class Controller extends BaseController
     public function postMyGroupDelete(): void
     {
         //grab the post / user and group objects to make things easier
-        $groupFolderId = $this->request->post->get('group');
+        $groupFolderId = (int)$this->request->post->get('group');
         $user          = $this->getUser();
         $group         = $this->getGroup($groupFolderId);
         if (null === $group) {
@@ -193,7 +197,7 @@ class Controller extends BaseController
     public function postMyGroupNotify(): void
     {
         //grab the post / user and group objects to make things easier
-        $groupFolderId    = $this->request->post->get('group');
+        $groupFolderId    = (int)$this->request->post->get('group');
         $isNotificationOn = (bool)$this->request->post->get('isNotificationsOn');
         $user             = $this->getUser();
         $group            = $this->getGroup($groupFolderId);
@@ -238,7 +242,7 @@ class Controller extends BaseController
     public function postMyGroupFavourite(): void
     {
         //grab the post / user and group objects to make things easier
-        $groupFolderId = $this->request->post->get('group');
+        $groupFolderId = (int)$this->request->post->get('group');
         $isFavourite   = (bool)$this->request->post->get('isFavourite');
         $user          = $this->getUser();
         $group         = $this->getGroup($groupFolderId);
@@ -270,10 +274,10 @@ class Controller extends BaseController
      * grab group objects with error checking:
      * does the group actually exist?
      *
-     * @param null|int $groupId
+     * @param int $groupId
      * @return Group|null
      */
-    private function getGroup(?int $groupId): ?Group
+    private function getGroup(int $groupId): ?Group
     {
         try {
             return $this->groupMapper->findById($groupId);

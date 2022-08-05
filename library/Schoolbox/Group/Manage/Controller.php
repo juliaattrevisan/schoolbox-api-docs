@@ -37,8 +37,6 @@ class Controller extends Base
 
     private UserAccessMapper $userAccessMapper;
 
-    private RerouteOverrideMapper $rerouteOverrideMapper;
-
     private GroupsHelper $groupsHelper;
 
     public function __construct(
@@ -52,7 +50,6 @@ class Controller extends Base
         $this->userMapper            = $userMapper;
         $this->groupMapper           = $groupMapper;
         $this->userAccessMapper      = $userAccessMapper;
-        $this->rerouteOverrideMapper = $rerouteOverrideMapper;
         $this->groupsHelper          = new GroupsHelper(
             $groupMapper,
             $userAccessMapper,
