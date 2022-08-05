@@ -101,6 +101,7 @@ class UserMapper extends Mapper
         $this->uses('password', self::TYPE_STRING);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('firstname', self::TYPE_STRING);
+        $this->uses('preferred_name', self::TYPE_STRING);
         $this->uses('lastname', self::TYPE_STRING);
         $this->uses('local_email', self::TYPE_BOOLEAN);
         $this->uses('alt_email', self::TYPE_STRING);

@@ -49,13 +49,23 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     private $title;
 
     /**
-     * The user's first name.
+     * The user's legal first name.
+     *
+     * As of the introduction of `$this->preferredName`: where this is set and
+     * `$preferredName` is not, this is both the legal and preferred name.
      *
      * It's expected but not mandatory that it is not null.
      *
      * @var string|null
      */
     private ?string $firstname = null;
+
+    /**
+     * The user's preferred name, as distinct from their legal first name.
+     *
+     * @var string|null
+     */
+    private ?string $preferredName = null;
 
     /**
      * The user's last name (a.k.a. surname).
@@ -601,6 +611,25 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function getFirstname(): ?string
     {
         return $this->firstname;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPreferredName(): ?string
+    {
+        return $this->preferredName;
+    }
+
+
+    /**
+     * @param string|null $preferredName
+     * @return $this
+     */
+    public function setPreferredName(?string $preferredName): self
+    {
+        $this->preferredName = $preferredName;
+        return $this;
     }
 
 
