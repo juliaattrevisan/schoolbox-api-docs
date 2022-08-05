@@ -441,6 +441,11 @@ class User extends DeprecatedModel
         if (empty($format)) {
             $format = Config::get('name_format');
         }
+
+        // Modify $userInfo to something which matches possible format
+        $userInfo['preferredname'] ??= $userInfo['preferred_name'] ?? '';
+        $userInfo['givenname'] = $userInfo['preferredname'] ?? $userInfo['firstname'] ?? '';
+
         /* Replace tags */
         preg_match_all('|{\w+}|', $format, $tags);
         if (empty($tags) || empty($userInfo)) {
