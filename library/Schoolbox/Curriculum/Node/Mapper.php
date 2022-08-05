@@ -14,6 +14,7 @@ use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Mapper for curriculum nodes
@@ -37,11 +38,14 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $this->uses('code', self::TYPE_STRING);
         $this->uses('order', self::TYPE_INTEGER);
         $this->uses('description', self::TYPE_STRING);
+        $this->uses('enabled', self::TYPE_BOOLEAN);
         $this->uses('reference', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteChildren'));
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertHeritage']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'disableChildren']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteChildren']);
     }
 
     /**
@@ -71,6 +75,50 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     }
 
     /**
+     * Pre-save callback: ensure that this node's parent is not being set to
+     * itself or one of its own children.
+     *
+     * @param Model      $model
+     * @param Model|null $previous
+     * @return bool
+     * @throws MapperException
+     */
+    public function assertHeritage(Model $model, Model $previous = null): bool
+    {
+        // Only need to check if the model's parentage has changed
+        $parentId         = $model->getParent()?->getId();
+        $previousParentId = $previous?->getParent()?->getId();
+        if ($parentId && $previousParentId !== $parentId) {
+            // Check parentage, all the way up to the top:
+            // If I find myself: error out
+            $ancestry = [$model->getId()];
+            while (isset($parentId)) {
+                $ancestry[] = $parentId;
+                if ($parentId === $model->getId()) {
+                    throw new MapperException(
+                        sprintf(
+                            "Ancestry loop detected: node #%d would be its own ancestor [%s]",
+                            $model->getId(),
+                            implode(' > ', $ancestry),
+                        )
+                    );
+                }
+                // Get next parent
+                $result = $this->findScalarByPredicates(
+                    'curriculum_node_parent_id',
+                    $this->getPredicateBuilder()->equals('id', $parentId),
+                );
+                if (empty($result)) {
+                    $parentId = null;
+                } else {
+                    [$parentId] = $result;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * Soft-deletes all child nodes of the given node.
      *
      * @param Model $model
@@ -89,6 +137,37 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         );
     }
 
+    /**
+     * Post-save callback: if this node is no longer enabled, disable all child
+     * nodes of the given node.
+     *
+     * Note the reverse doesn't apply: enabling a node which was disabled
+     * doesn't re-enable its children. This is because the node might have
+     * children which should remain disabled.
+     *
+     * This method applies recursively to each node's children: the action of
+     * disabling a node will call this method on the children.
+     *
+     * @param Model      $model
+     * @param Model|null $previous
+     */
+    public function disableChildren(Model $model, Model $previous = null)
+    {
+        $isEnabled  = $model->getEnabled();
+        $wasEnabled = $previous?->getEnabled() ?? true;
+        if (!$isEnabled && $wasEnabled) {
+            $this->updateAll(
+                $this->findByColumn(
+                    'curriculum_node_parent_id',
+                    $model->getId(),
+                ),
+                'enabled',
+                false,
+                self::CALLBACK_PRESAVE,
+                self::CALLBACK_POSTSAVE,
+            );
+        }
+    }
 
     /**
      * @param ArticleResolver $articleResolver
@@ -110,6 +189,12 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $sortProperty = '',
         $sortDirection = 'DESC'
     ) {
+        // Load all ancestors, no descendants
+        return $this->findByKeyword($keyword, $limit, $offset, 50, 0);
+    }
+
+    public function findByKeyword($keyword, $limit, $offset, $ancestors, $descendants)
+    {
         $query = "
             SELECT
                 {$this->getColumnString('n')}
@@ -140,11 +225,13 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         }
 
         $statement->execute();
-        $result = $this->hydrateList($statement, 'n')
-            ->map(function (Model $model) {
-                return $this->loadAncestors($model, 'parent');
+        return $this->hydrateList($statement, 'n')
+            ->map(function (Model $model) use ($ancestors) {
+                return $this->loadAncestors($model, 'parent', $ancestors);
+            })
+            ->map(function (Model $model) use ($descendants) {
+                return $this->loadDescendants($model, 'parent', 'children', $descendants);
             });
-        return $result;
     }
 
     /**

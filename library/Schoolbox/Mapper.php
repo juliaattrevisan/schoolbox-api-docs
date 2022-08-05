@@ -844,22 +844,21 @@ abstract class Mapper implements IMapper, Serializable
      *
      * Attempts to perform this action in as few queries as possible.
      *
-     * @deprecated figure if this is actually required: this is complicated and
-     *             seems expensive for something done on every curriculum load
-     *
-     * @param mixed  $object
+     * @template T
+     * @param T      $object
      * @param string $parentField
+     * @param int    $maxDepth
      * @param int    $currentDepth
-     *
-     * @return mixed
+     * @return T
      */
     public function loadAncestors(
-        $object,
-        $parentField = 'parent',
-        $currentDepth = 1
+        mixed $object,
+        string $parentField = 'parent',
+        int $maxDepth = 50,
+        int $currentDepth = 1,
     ) {
-        // Recursive relation protection
-        if ($currentDepth >= 50) {
+        // Do not find more than $maxDepth descendants
+        if ($currentDepth > $maxDepth) {
             return $object;
         }
         $collection = $this->getModelAsCollection($object);
@@ -887,6 +886,7 @@ abstract class Mapper implements IMapper, Serializable
                 $this->loadAncestors(
                     $this->findByColumn($this->getIdentifierColumn(), $parentIds),
                     $parentField,
+                    $maxDepth,
                     $currentDepth + 1
                 ) as $parent
             ) {
@@ -908,24 +908,23 @@ abstract class Mapper implements IMapper, Serializable
      *
      * Attempts to perform this action in as few queries as possible.
      *
-     * @deprecated figure if this is actually required: this is complicated and
-     *             used only once
-     *
-     * @param mixed  $object
+     * @template T
+     * @param T      $object
      * @param string $parentField
      * @param string $childField
+     * @param int    $maxDepth
      * @param int    $currentDepth
-     *
-     * @return object
+     * @return T
      */
     public function loadDescendants(
-        $object,
-        $parentField = 'parent',
-        $childField = 'children',
-        $currentDepth = 1
+        mixed $object,
+        string $parentField = 'parent',
+        string $childField = 'children',
+        int $maxDepth = 50,
+        int $currentDepth = 1,
     ) {
         // Recursive relation protection
-        if ($currentDepth > 50) {
+        if ($currentDepth > $maxDepth) {
             return $object;
         }
 
@@ -951,6 +950,7 @@ abstract class Mapper implements IMapper, Serializable
                     $this->findByColumn($this->getMap()->getOffset($parentField)['column'], $ids),
                     $parentField,
                     $childField,
+                    $maxDepth,
                     $currentDepth + 1
                 ) as $child
             ) {
@@ -1071,6 +1071,9 @@ abstract class Mapper implements IMapper, Serializable
             $value = $hydrator->hydrate($value, $join_mapper);
             // Attempting to set a model value to NULL will likely break,
             // and won't do anything because it will be NULL on hydrate anyway.
+            // TODO reconsider this? This was introduced in SA-1605 way back in
+            //      2017 when type safety wasn't really a thing.
+            //      NULL is a valid value for a model, if there is no relation.
             if (!isset($value) && $hydrator instanceof ModelColumn) {
                 return $this;
             }
@@ -1711,7 +1714,10 @@ abstract class Mapper implements IMapper, Serializable
 
             $query     = "UPDATE `{$this->getTable()}` SET {$this->database->getQuoter()->quoteIdentifier($field)} = :value WHERE " . implode(' AND ', $pb->getWhere());
             $statement = $this->database->prepare($query);
-            $statement->bindValue('value', $value);
+            $statement->bindValue(
+                'value',
+                $this->getColumnScalarHydrator($field)->dehydrate($value),
+            );
             foreach ($pb->getParams() as $key => $id) {
                 $statement->bindValue($key, $id);
             }
