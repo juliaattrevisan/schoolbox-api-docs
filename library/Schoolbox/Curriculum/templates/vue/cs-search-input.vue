@@ -13,7 +13,6 @@ import { useSearchResultsStore } from './store/csSearchResultsStore';
 const store = useStore();
 const modalStore = useModalStore();
 const searchResultsStore = useSearchResultsStore();
-const isSelectorActive = ref(true);
 const queryInputEl = ref(null); //to deterch if the search input is currently active
 
 
@@ -22,7 +21,6 @@ const props = defineProps({
      * the parent DOM element, to detect mouse events
      */
     curriculumSelectorEl: {
-        // type: Object,
         required: true,
     },
 });
@@ -105,7 +103,6 @@ function onBrowseSelected () {
 <template>
     <div v-if="!store.isReadOnly" class="input-group">
         <input
-            v-if="isSelectorActive"
             v-model="searchResultsStore.query"
             ref="queryInputEl"
             type="text"
