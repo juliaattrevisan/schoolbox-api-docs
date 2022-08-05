@@ -101,6 +101,13 @@ class CommRuleFamily
      */
     public function find(string $externalId, ?array $commRulesLookup, ?array $familiesLookup): array
     {
+        /* We didn't collect all the commrules earlier in a big request
+         * so start getting them for the $externalId specified
+         *
+         * Otherwise, if we collecetd all the commrules earlier, just
+         * use that instead - if it doesn't exist, presume no rules
+         * and exit without deciding any parents (is that possible...?)
+         */
         if (null === $commRulesLookup) {
             $commRules = $this->api[DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
                 'code' => $externalId,
