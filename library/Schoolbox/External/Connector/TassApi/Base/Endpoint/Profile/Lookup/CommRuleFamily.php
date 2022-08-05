@@ -12,7 +12,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 
-
 /**
  * For a given student externalId, figure out who the family members are
  * and put their information in a convenient struct
@@ -69,6 +68,12 @@ class CommRuleFamily
 
 
     /**
+     * A custom spouse prefix, or the default one if unspecified
+     */
+    private string $spousePrefix;
+
+
+    /**
      * Constructor
      *
      * @param array  $api
@@ -89,9 +94,10 @@ class CommRuleFamily
      * Find the parents of $externalId
      *
      * @param string $externalId
+     * @param array  $families
      * @return array
      */
-    public function find(string $externalId): array
+    public function find(string $externalId, array $families): array
     {
         $commRules = $this->api[DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
             'code' => $externalId,
@@ -174,7 +180,7 @@ class CommRuleFamily
                 /* Otherwise, close enough - cram on a prefix as per tradition
                  * and pile them into the Family stack.
                  */
-                $externalId = $this->deriveExternalId($fields['node'], (string)$commRule['parent_code']);
+                $externalId = $this->deriveExternalId($fields['node'], (string)$commRule['parent_code'], $families);
 
                 /* Pile it in to the stack
                  */
@@ -206,9 +212,10 @@ class CommRuleFamily
      *
      * @param string $node
      * @param string $identifier
+     * @param array  $families
      * @return string
      */
-    private function deriveExternalId(string $node, string $identifier): string
+    private function deriveExternalId(string $node, string $identifier, array $families): string
     {
         /* Do some funny prefix stuff for parents
          */
@@ -221,50 +228,11 @@ class CommRuleFamily
         /* sfa_num suffix
          * We lose sfa_num here though, unless we api them in getParents to find sfa_num specifically
          * But what does that mean for a school, if we don't use it anymore?
+         *
+         * TODO But...do we actually need it, or is it some jank from live tass connector...?
          */
-        $parent = $this->api[DSN::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getParents', [
-            'user_code' => $identifier,
-        ]);
+        $sfaNum = $families[$externalId]['sfa_num'] ?? '';
 
-        /* ffs
-         *
-         * If this sfa_num exists here, this isn't a split family
-         * It's a nukular one, and we don't need to append anything
-         *
-         * Otherwise it appears as a set underneath $identifier
-         * Disgusting.
-         *
-            Array (nukular)
-            (
-                [__tassversion] => 01.057.6.001
-                [parents] => Array
-                    (
-                        [0] => Array
-                            (
-                                [146865] => Array
-                                    (
-                                        [sfa_num] =>
-
-            Array (split)
-            (
-                [__tassversion] => 01.057.6.001
-                [parents] => Array
-                    (
-                        [0] => Array
-                            (
-                                [172328] => Array
-                                    (
-                                        [0] => Array
-                                            (
-                                                [sfa_num] => 1
-         *
-         */
-        if (!isset($parent['parents'][0][$identifier]['sfa_num'])) {
-            $sfaNum = trim((string)$parent['parents'][0][$identifier][0]['sfa_num']);
-
-            return "{$externalId}{$sfaNum}";
-        }
-
-        return $externalId;
+        return "{$externalId}{$sfaNum}";
     }
 }

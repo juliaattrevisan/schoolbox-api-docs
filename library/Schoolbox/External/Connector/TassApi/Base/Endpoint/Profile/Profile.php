@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile;
 
 use Alaress_Date_Format;
-use DomainException;
 use InvalidArgumentException;
 use PDOException;
 use Psr\Log\LoggerInterface;
@@ -19,10 +18,12 @@ use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\CommRuleFamily;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Model;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use UnexpectedValueException;
@@ -189,7 +190,6 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
-
         /* Import students' profile data
          * Import their specific parents' profile data
          */
@@ -212,6 +212,11 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
+        /* Grab all the parents' data in one big request
+         * We need this for the sfa_num for each identifier
+         */
+        $families = (new Lookup\Parents($this->api))->generate();
+
         /* Process each current student, and their parents too.
            The includephoto parameter is available for both:
               https://github.com/TheAlphaSchoolSystemPTYLTD/lms-integration/blob/master/getStudents.md
@@ -421,7 +426,7 @@ class Profile implements IStrategy
                 $this->studentProfileMapper->save($studentProfile);
             }
 
-            $this->importParentsOfStudent($studentBaseProfile);
+            $this->importParentsOfStudent($studentBaseProfile, $families);
         }
     }
 
@@ -580,19 +585,20 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param UserProfile\Model $studentBaseProfile
+     * @param Model $studentBaseProfile
+     * @param array $families
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws DefinitionException
      */
-    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile): void
+    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $families): void
     {
         $studentId = $studentBaseProfile->getExternalId();
 
         /* Time for importing parents
          */
-        $family = (new CommRuleFamily($this->api, $this->spousePrefix))->find($studentId);
+        $family = (new Lookup\CommRuleFamily($this->api, $this->spousePrefix))->find($studentId, $families);
 
         /* No parents? No trabajo
          */
