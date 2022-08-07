@@ -45,13 +45,14 @@ class ModelToArrayTest extends TestCase
         ->setConfigLoader($configLoader);
 
         $emptyResponse = [
-            'id'        => null,
-            '_links'    => [],
-            'title'     => null,
-            'firstName' => null,
-            'lastName'  => null,
-            'fullName'  => 'Unknown User',
-            'isDeleted' => false,
+            'id'            => null,
+            '_links'        => [],
+            'title'         => null,
+            'firstName'     => null,
+            'preferredName' => null,
+            'lastName'      => null,
+            'fullName'      => 'Unknown User',
+            'isDeleted'     => false,
         ];
         yield 'empty fields' => [
             clone $emptyUser,
@@ -82,6 +83,7 @@ class ModelToArrayTest extends TestCase
             ->setEnabled(true)
             ->setTitle('Mr')
             ->setFirstname('John')
+            ->setPreferredName('Jack')
             ->setLastname('Doe')
             ->setLocalEmail(false)
             ->setAltEmail('mrjohndoe@mail.com')
@@ -102,16 +104,17 @@ class ModelToArrayTest extends TestCase
         yield 'populated fields' => [
             $populatedUser,
             [
-                'id'        => 1,
-                '_links'    => [
+                'id'            => 1,
+                '_links'        => [
                     'profile' => '/search/user/1',
                     'avatar'  => '/portrait.php?id=1&size=square64',
                 ],
-                'title'     => 'Mr',
-                'firstName' => 'John',
-                'lastName'  => 'Doe',
-                'fullName'  => 'Mr John Doe',
-                'isDeleted' => false,
+                'title'         => 'Mr',
+                'firstName'     => 'John',
+                'preferredName' => 'Jack',
+                'lastName'      => 'Doe',
+                'fullName'      => 'Mr John Doe',
+                'isDeleted'     => false,
             ],
         ];
 
