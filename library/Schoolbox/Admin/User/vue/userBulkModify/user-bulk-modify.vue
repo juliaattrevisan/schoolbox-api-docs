@@ -68,7 +68,7 @@ export default {
             hasLoadError: false, //display load error
             rows: [],
             selectedRows: [], //keep track of which rows could be modified
-            tableColumns: ['firstname', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token', 'eportfolio_enabled'],
+            tableColumns: ['firstname', 'preferred_name', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token', 'eportfolio_enabled'],
             tableOptions: {
                 customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
@@ -119,6 +119,7 @@ export default {
                 debounce: 100, //faster debounce as data is stored on the client side,
                 headings: {
                     firstname: 'First Name',
+                    preferred_name: 'Preferred Name',
                     lastname: 'Surname',
                     external_id: 'External ID',
                     campuses: 'Campuses',

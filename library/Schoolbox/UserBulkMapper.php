@@ -73,6 +73,7 @@ class UserBulkMapper extends UserMapper
             SELECT
                 u.id,
                 u.firstname,
+                u.preferred_name,
                 u.lastname,
                 u.synergy_id as external_id,
                 u.eportfolio_enabled,
