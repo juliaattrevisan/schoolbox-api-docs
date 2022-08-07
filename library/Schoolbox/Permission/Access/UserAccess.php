@@ -163,7 +163,6 @@ class UserAccess implements IModel
     }
 
 
-
     /**
      * Return all possible services
      *
@@ -212,9 +211,9 @@ class UserAccess implements IModel
 
     /**
      * @param User $user
-     * @return self
+     * @return static
      */
-    public function setUser($user)
+    public function setUser($user): self
     {
         $this->user = $user;
         return $this;
@@ -232,9 +231,9 @@ class UserAccess implements IModel
 
     /**
      * @param int $service
-     * @return self
+     * @return static
      */
-    public function setService($service)
+    public function setService($service): self
     {
         $this->service = $service;
         return $this;
@@ -252,9 +251,9 @@ class UserAccess implements IModel
 
     /**
      * @param int $sid
-     * @return self
+     * @return static
      */
-    public function setServiceIdentifier($sid)
+    public function setServiceIdentifier($sid): self
     {
         $this->sid = $sid;
         return $this;
@@ -272,9 +271,9 @@ class UserAccess implements IModel
 
     /**
      * @param int $level
-     * @return self
+     * @return static
      */
-    public function setAccessLevel($level)
+    public function setAccessLevel($level): self
     {
         $this->accessLevel = $level;
         return $this;
@@ -291,7 +290,7 @@ class UserAccess implements IModel
 
     /**
      * @param bool $favourite
-     * @return self
+     * @return static
      */
     public function setFavourite(bool $favourite): self
     {
