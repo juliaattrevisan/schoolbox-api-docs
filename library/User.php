@@ -302,6 +302,7 @@ class User extends DeprecatedModel
                 user.id AS uid,
                 title,
                 firstname,
+                preferred_name,
                 lastname,
                 username,
                 `groups`.name AS gname,
@@ -323,6 +324,8 @@ class User extends DeprecatedModel
                 $param = $this->db->quote($keyword);
                 $query .= "( synergy_id = $param  ) ";
             } else {
+                // TODO account for preferred name:
+                //      alternately remove and replace with API search
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
                     $firstName = $this->db->escapeForLike($name[1]);
                     $lastName  = $this->db->escapeForLike($name[2]);
