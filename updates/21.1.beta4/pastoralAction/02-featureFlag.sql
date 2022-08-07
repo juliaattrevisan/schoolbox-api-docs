@@ -8,7 +8,8 @@ VALUES ('pastoral_action_enable',
         NULL,
         (SELECT id FROM lu_config_type WHERE type = 'Pastoral Care'),
         'true',
-        'false',
+        -- hide if not wellbeing,elite
+        (IF((SELECT * FROM (SELECT COUNT(*) FROM config WHERE name = 'site_plan' AND value NOT IN ('wellbeing','elite')) t1), 'true', 'false')),
         'true',
         'settings',
         (SELECT max(sequence) + 1

@@ -57,7 +57,10 @@ $app = new class extends CliTool\App {
         $irApiKey = exec("/usr/local/bin/schoolbox-instance-registry --api-key 2>/dev/null");
         if (empty($irApiKey)) {
             $siteType = $this->getConfig()->get('site_type');
-            if ($siteType === Instance::SITE_TYPE_DEVELOPMENT) {
+            // We can't use the Instance::SITE_TYPE_DEVELOPMENT const for two reasons:
+            // 1. Need this to reflect the value that was accurate when this version was current
+            // 2. vagrant provisioning sets the site_type to current value before executing upgrades.
+            if (INSTANCE_ID === 'vagrantx' || in_array($siteType, ['dev', 'vagrant'], true)) {
                 $this->getLogger()->debug("No IR API_KEY and instance is development. That's fine. Exiting.");
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }

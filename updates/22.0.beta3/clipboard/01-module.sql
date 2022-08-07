@@ -10,7 +10,8 @@ VALUES
         'If ON, Fixtures data will be imported from Clipboard; all Fixtures management should be performed in Clipboard.',
         (SELECT id FROM lu_config_field WHERE field = 'boolean'),
         (SELECT id FROM lu_config_type WHERE type = 'Modules'),
-        'true',
+        -- editable if wellbeing,elite,portalplus
+        (IF((SELECT * FROM (SELECT COUNT(*) FROM config WHERE name = 'site_plan' AND COALESCE(value,'') IN ('wellbeing','elite','portalplus')) t1), 'true', 'false')),
         'false',
         'false',
         'settings',
