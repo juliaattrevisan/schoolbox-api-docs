@@ -1,3 +1,4 @@
+{% autoescape 'js' %}
 <script>
     $(function () {
         // Configure validation.
@@ -101,6 +102,7 @@
         el.innerHTML = 'Add Row';
     }
 </script>
+{% endautoescape %}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs | merge([[resultSetId is null ? 'Create': 'Update']])) }}
 <div class="admin-container row">
