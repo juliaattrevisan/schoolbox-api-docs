@@ -195,6 +195,8 @@
         options.mentions.push({
             feed: [
                 'firstname',
+                'givenname',
+                'preferredname',
                 'surname',
                 'fullname',
                 'house',
@@ -222,6 +224,8 @@
             feed: [
                 'title',
                 'firstname',
+                'givenname',
+                'preferredname',
                 'surname',//surname as that is the language we are using in admin user modify
                 'fullname',
                 'email',
