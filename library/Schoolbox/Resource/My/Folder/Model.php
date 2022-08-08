@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Resource\My\Folder;
 
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Browser\NodeInterface;
 use Schoolbox\User;
@@ -20,8 +22,9 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Resource\My\Folder
  */
-class Model extends AbstractFolder
+class Model extends AbstractFolder implements ISoftDeletable
 {
+    use DeletedAtDate;
 
     /** @var User */
     protected $owner;

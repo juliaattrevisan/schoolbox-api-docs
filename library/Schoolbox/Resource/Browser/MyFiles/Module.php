@@ -32,9 +32,14 @@ class Module extends AbstractModule
      */
     protected function registerRoutes(): void
     {
-        $preloadFile   = function ($params) {
+        $preloadFile = function ($params) {
             return $this->preloadFile($params);
         };
+
+        $preloadFolder = function ($params) {
+            return $this->preloadFolder($params);
+        };
+
         $hasFileAccess =
             new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -52,7 +57,26 @@ class Module extends AbstractModule
                     })
                 )
             );
+
+        $hasFolderAccess =
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\Callback(function (array $params, User $user): bool {
+                        if (
+                            isset($params['folder'])
+                            && $params['folder'] instanceof My\Folder\Model
+                            && $params['folder']->getOwner()->getId() === $user->getId()
+                        ) {
+                            return true;
+                        }
+                        throw new Unauthorized();
+                    })
+                )
+            );
         $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasFileAccess, $preloadFile);
+        $this->register('POST', '/{folderId:\d+}/files', 'postFiles', $hasFolderAccess, $preloadFolder);
     }
 
     /**
@@ -98,6 +122,29 @@ class Module extends AbstractModule
 
         return [
             'file' => $file,
+        ];
+    }
+
+    /**
+     * Preload a folder object
+     *
+     * @param array $params
+     * @return array
+     * @throws MapperException\NotFound
+     */
+    private function preloadFolder(array $params): array
+    {
+        try {
+            $folder = $this->getMapperFactory()->get(My\Folder\Mapper::class)->findById($params['folderId']);
+        } catch (MapperException $e) {
+            throw new MapperException\NotFound();
+        }
+        if (!$folder instanceof My\Folder\Model) {
+            throw new MapperException\NotFound();
+        }
+
+        return [
+            'folder' => $folder,
         ];
     }
 }

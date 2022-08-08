@@ -67,7 +67,7 @@ abstract class AbstractFolder implements IFolder
     /**
      * Set id
      *
-     * @param  int $id
+     * @param  int|string $id
      * @return $this
      */
     public function setId($id)
@@ -79,7 +79,7 @@ abstract class AbstractFolder implements IFolder
     /**
      * Get id
      *
-     * @return int
+     * @return int|string
      */
     public function getId()
     {
