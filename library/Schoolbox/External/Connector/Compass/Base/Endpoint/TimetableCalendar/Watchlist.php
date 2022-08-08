@@ -14,7 +14,6 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar;
  */
 class Watchlist
 {
-
     /**
      * Decide if $activityCode is on the $watchlist
      *
@@ -28,7 +27,7 @@ class Watchlist
             return true;
         }
 
-        return (in_array($activityCode, $watchlist, false));
+        return in_array($activityCode, $watchlist, false);
     }
 
 
@@ -61,7 +60,7 @@ class Watchlist
         /* sort instances ffs, because instances occur in a random haphazard order
          * but are actually chronologically ordered
          */
-        usort($stack, static function($a, $b) {
+        usort($stack, static function ($a, $b) {
             if ($a['start'] < $b['start']) {
                 return -1;
             }

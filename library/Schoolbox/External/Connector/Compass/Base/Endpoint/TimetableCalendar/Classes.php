@@ -25,7 +25,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  */
 class Classes implements IStrategy
 {
-
     /**
      * RunningStatus determines whether an activity and/or its instance is actually running
      * 0 is cancelled; 1 is running; 2 is draft.
