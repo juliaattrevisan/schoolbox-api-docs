@@ -135,7 +135,7 @@ class Controller extends Base
             }
         }
 
-        $this->mapper->createOrOverwriteSet($resultSetId, $indexedLabels); // If $resultSetId is null, a new set will be created.
+        $this->mapper->saveSet($resultSetId, $indexedLabels); // If $resultSetId is null, a new set will be created.
 
         $this->getResponse()->redirect->to($this->getRouter()->generate('adminRubricResultSet.getList'));
     }

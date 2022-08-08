@@ -89,7 +89,7 @@ class Mapper extends BaseMapper
      * @param array $labelsInOrder
      * @return int ($resultSetId)
      */
-    public function createOrOverwriteSet(?int $resultSetId, array $labelsInOrder): int
+    public function saveSet(?int $resultSetId, array $labelsInOrder): int
     {
         if ($resultSetId === null) {
             // We are creating a new result set, so we must choose a resultSetId.
