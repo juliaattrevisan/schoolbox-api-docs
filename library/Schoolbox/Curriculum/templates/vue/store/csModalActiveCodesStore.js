@@ -272,13 +272,13 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          * @return { Array }
          */
         codes () {
-            if (this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode && this.hasSelectedFourthNode) {
+            if (this.isOnFourthNode) {
                 return [this.selectedFourthNode];
-            } else if (this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode) {
+            } else if (this.isOnThirdNode) {
                 return [this.selectedThirdNode];
-            } else if (this.hasSelectedFirstNode && this.hasSelectedSecondNode) {
+            } else if (this.isOnSecondNode) {
                 return [this.selectedSecondNode];
-            } else if (this.hasSelectedFirstNode) {
+            } else if (this.isOnFirstNode) {
                 return [this.selectedFirstNode];
             } else {
                 return [];

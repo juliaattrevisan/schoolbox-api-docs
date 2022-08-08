@@ -45,6 +45,14 @@ const modalSelectedCodesStore = useModalSelectedCodesStore();
 const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.5rem)`);
 
 /**
+ * Only show the selected node and its direct children until we are on the fourth node
+ * This is so we don't flood the DOM with very large Curriculum renders
+ *
+ * @returns { Boolean }
+ */
+const isVisible = computed(() => props.depth <= 1 || modalActiveCodesStore.isOnFourthNode);
+
+/**
  * The top level node can't be selected, so disable it
  *
  * @returns { String }
@@ -140,12 +148,8 @@ function highlightSearchInElement (toHighlight) {
 const containerClass = computed(() => {
     if (modalActiveCodesStore.isSearchActive) { //don't style when using search, as all the codes are on one level
         return '';
-    } else if (modalActiveCodesStore.isOnFirstNode && props.depth === 0 || modalActiveCodesStore.isOnSecondNode && props.depth === 0) { 
+    } else if (props.depth === 0) { 
         return 'parent-container';
-    } else if (modalActiveCodesStore.isOnFirstNode && props.depth === 1 || modalActiveCodesStore.isOnSecondNode && props.depth === 1 && props.code.children.length > 0) {
-        return 'first-child-container-with-border';
-    } else if (modalActiveCodesStore.isOnThirdNode && props.depth === 0) { 
-        return 'first-child-container';
     } else {
         '';
     }
@@ -154,7 +158,7 @@ const containerClass = computed(() => {
 </script>
 
 <template>
-   <li :class="containerClass">
+   <li v-if="isVisible" :class="containerClass">
         <button 
             class="code-button" 
             :style="{ paddingLeft: paddingLeft, pointerEvents: pointerEvents }" 
@@ -189,22 +193,8 @@ const containerClass = computed(() => {
 
 .parent-container {
     > button span { 
-        font-size: 1.25rem;
-        font-weight: bold;
-    }
-}
-.first-child-container {
-    > button span { 
         font-size: 1.0625rem;
         font-weight: bold;
-    }
-}
-
-.first-child-container-with-border {
-    @extend .first-child-container;
-    border-top: 2px solid #aaa;
-    > button {
-        padding-top: 0.75rem;
     }
 }
 
