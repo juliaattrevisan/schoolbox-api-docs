@@ -356,11 +356,13 @@ WHERE
         `sr1`.`norm_mark`    AS `norm_mark`,
         `student`.`title` as `studentTitle`,
         `student`.`firstname` as `studentFirstname`,
+        `student`.`preferred_name` as `studentPreferredName`,
         `student`.`lastname` as `studentLastname`,
         `student`.`synergy_id` as `studentExternalId`,
         `staff`.`id` as `staffId`,
         `staff`.`title` as `staffTitle`,
         `staff`.`firstname` as `staffFirstname`,
+        `staff`.`preferred_name` as `staffPreferredName`,
         `staff`.`lastname` as `staffLastname`,
         `staff`.`synergy_id` as `staffExternalId`
  from ((`submission_return` `sr1`
@@ -391,11 +393,13 @@ union
         (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
         `student`.`title` as `studentTitle`,
         `student`.`firstname` as `studentFirstname`,
+        `student`.`preferred_name` as `studentPreferredName`,
         `student`.`lastname` as `studentLastname`,
         `student`.`synergy_id` as `studentExternalId`,
         `staff`.`id` as `staffId`,
         `staff`.`title` as `staffTitle`,
         `staff`.`firstname` as `staffFirstname`,
+        `staff`.`preferred_name` as `staffPreferredName`,
         `staff`.`lastname` as `staffLastname`,
         `staff`.`synergy_id` as `staffExternalId`
  from ((`assess_attempt` `aa1`
@@ -425,11 +429,13 @@ union
         null                    AS `norm_mark`,
         `student`.`title` as `studentTitle`,
         `student`.`firstname` as `studentFirstname`,
+        `student`.`preferred_name` as `studentPreferredName`,
         `student`.`lastname` as `studentLastname`,
         `student`.`synergy_id` as `studentExternalId`,
         `staff`.`id` as `staffId`,
         `staff`.`title` as `staffTitle`,
         `staff`.`firstname` as `staffFirstname`,
+        `staff`.`preferred_name` as `staffPreferredName`,
         `staff`.`lastname` as `staffLastname`,
         `staff`.`synergy_id` as `staffExternalId`
  from ((`task_completion` `tc1`
@@ -459,11 +465,13 @@ union
         (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
         `student`.`title` as `studentTitle`,
         `student`.`firstname` as `studentFirstname`,
+        `student`.`preferred_name` as `studentPreferredName`,
         `student`.`lastname` as `studentLastname`,
         `student`.`synergy_id` as `studentExternalId`,
         `staff`.`id` as `staffId`,
         `staff`.`title` as `staffTitle`,
         `staff`.`firstname` as `staffFirstname`,
+        `staff`.`preferred_name` as `staffPreferredName`,
         `staff`.`lastname` as `staffLastname`,
         `staff`.`synergy_id` as `staffExternalId`
  from ((`lti_assessment_score` `sc1`
@@ -492,26 +500,28 @@ order by `assessment_id`, `student_id`;
             }
             $rubric = $this->getRubricFeedback($row['assessment_id'], $row['feedback_id']);
             $feedbackItems[$row['assessment_id']][$row['student_id']] = [
-                    'learner'        => [
-                        'id'         => $row['student_id'],
-                        'title'      => $row['studentTitle'],
-                        'firstName'  => $row['studentFirstname'],
-                        'lastName'   => $row['studentLastname'],
-                        'externalId' => $row['studentExternalId'],
-                    ],
-                    'mark'           => $row['mark'],
-                    'normalisedMark' => $row['norm_mark'],
-                    'comment'        => $row['comment'],
-                    'date'           => (new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
-                    'instructor'     => [
-                        'id'         => $row['staffId'],
-                        'title'      => $row['staffTitle'],
-                        'firstName'  => $row['staffFirstname'],
-                        'lastName'   => $row['staffLastname'],
-                        'externalId' => $row['staffExternalId'],
-                    ],
-                    'rubric'        => $rubric,
-                ];
+                'learner'        => [
+                    'id'            => $row['student_id'],
+                    'title'         => $row['studentTitle'],
+                    'firstName'     => $row['studentFirstname'],
+                    'preferredName' => $row['studentPreferredName'],
+                    'lastName'      => $row['studentLastname'],
+                    'externalId'    => $row['studentExternalId'],
+                ],
+                'mark'           => $row['mark'],
+                'normalisedMark' => $row['norm_mark'],
+                'comment'        => $row['comment'],
+                'date'           => (new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
+                'instructor'     => [
+                    'id'            => $row['staffId'],
+                    'title'         => $row['staffTitle'],
+                    'firstName'     => $row['staffFirstname'],
+                    'preferredName' => $row['staffPreferredName'],
+                    'lastName'      => $row['staffLastname'],
+                    'externalId'    => $row['staffExternalId'],
+                ],
+                'rubric'         => $rubric,
+            ];
         }
         return $feedbackItems;
     }

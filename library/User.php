@@ -460,7 +460,7 @@ class User extends DeprecatedModel
         if (isset($userInfo['preferred_name']) && !isset($userInfo['preferredname'])) {
             $userInfo['preferredname'] = $userInfo['preferred_name'];
         }
-        $userInfo['givenname'] = ($userInfo['preferredname'] !== '')
+        $userInfo['givenname'] = (($userInfo['preferredname'] ?? '') !== '')
             ? $userInfo['preferredname']
             : ($userInfo['firstname'] ?? '');
 

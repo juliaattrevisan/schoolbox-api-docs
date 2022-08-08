@@ -38,39 +38,6 @@ class Calendar extends DeprecatedModel
     }
 
     /**
-     * Get a list of upcoming events with a summary tally of attendances
-     * for both Pending and Approved statuses
-     *
-     * @return array|bool
-     */
-    public function getUpcomingEventAttendance()
-    {
-        $query = "
-			SELECT
-				event.id,
-				event.title,
-				event.start_datetime,
-				event.end_datetime,
-				event.location,
-				event.owner,
-				user.firstname,
-				user.lastname,
-				SUM(IF(event_attendance.status = 1, 1, 0)) AS numPending,
-				SUM(IF(event_attendance.status = 2, 1, 0)) AS numApproved
-			FROM event
-			LEFT JOIN event_attendance ON event.id = event_attendance.event_id
-			LEFT JOIN `user` ON event.owner = user.id
-			WHERE attendance = 1
-			AND event.deleted_at IS NULL
-			AND publish_date < NOW()
-			GROUP BY event.id
-			ORDER BY event.start_datetime DESC
-		";
-
-        return $this->db->getAll($query);
-    }
-
-    /**
      * Get a list of people who are attending/pending for a particular
      * event attendance
      *

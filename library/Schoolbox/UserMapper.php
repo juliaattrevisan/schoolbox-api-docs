@@ -561,7 +561,12 @@ class UserMapper extends Mapper
         $yearLevelMapper = \Schoolbox\YearLevel\Mapper::getInstance();
 
         $pb = $this->getPredicateBuilder();
-        $pb->any($this->getPredicateBuilder()->like('u.firstname', "%$name%")->like('u.lastname', "%$name%"));
+        $pb->any(
+            $this->getPredicateBuilder()
+                 ->like('u.firstname', "%$name%")
+                 ->like('u.preferred_name', "%$name%")
+                 ->like('u.lastname', "%$name%")
+        );
         $pb->in('u.group_id', $permittedValues);
 
         $query = "
@@ -635,8 +640,10 @@ class UserMapper extends Mapper
 
                     $foundValidKeyword = true;
 
-                    $pb->like('firstname', "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%")
-                        ->like('lastname', "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%");
+                    $searchLike = "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%";
+                    $pb->like('firstname', $searchLike)
+                       ->like('preferred_name', $searchLike)
+                       ->like('lastname', $searchLike);
                 }
             }
 

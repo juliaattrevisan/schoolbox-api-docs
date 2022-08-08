@@ -1475,6 +1475,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             'externalId',
             'title',
             'firstname',
+            'preferredName',
             'lastname',
             'fullName',
         ];

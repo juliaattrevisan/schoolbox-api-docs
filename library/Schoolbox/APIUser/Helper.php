@@ -60,7 +60,7 @@ class Helper
         if (0 !== $cursor) {
             $query .= " AND user.id > :cursor ";
         }
-        $query .= "ORDER BY user.id, lyl.sequence, lastname, firstname";
+        $query .= "ORDER BY user.id, lyl.sequence, lastname, given_name";
         if (0 !== $limit) {
             $query .= " LIMIT :limit";
         }
@@ -101,6 +101,7 @@ class Helper
                 user.id AS uid,
                 title,
                 firstname,
+                preferred_name,
                 lastname,
                 username,
                 `groups`.name AS gname,
@@ -125,10 +126,10 @@ class Helper
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
                     $params['firstName'] = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[1]) . '%';
                     $params['lastName']  = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[2]) . '%';
-                    $where .= "AND ( firstname like :firstName and lastname like :lastName ) ";
+                    $where .= "AND ( given_name like :firstName and lastname like :lastName ) ";
                 } else {
                     $params['username'] = $params['lastName'] = $params['firstName'] = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($keyword) . '%';
-                    $where .= "AND ( firstname like :firstName or lastname like :lastName or username like :username ) ";
+                    $where .= "AND ( given_name like :firstName or lastname like :lastName or username like :username ) ";
                 }
             }
         }

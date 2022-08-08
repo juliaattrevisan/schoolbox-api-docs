@@ -40,7 +40,7 @@ class Assess_Attempt extends Evaluation_Attempt
             WHERE aq.question_id = '{$this->db->quote($questionId)}'
             AND   ar.attempt_id IN ({$this->buildReviewableAttemptsForQuery($attempts)})
             AND ar.deleted_at IS NULL
-            ORDER BY u.lastname ASC, u.firstname ASC, u.id ASC
+            ORDER BY u.lastname ASC, u.given_name ASC, u.id ASC
         ";
 
         return $this->db->getAll($query);
