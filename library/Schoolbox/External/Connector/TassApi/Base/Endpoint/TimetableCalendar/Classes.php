@@ -22,7 +22,6 @@ use Schoolbox\External\Event\Overrides\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
 
-
 /**
  * Import all the timetables for everyone.
  */
