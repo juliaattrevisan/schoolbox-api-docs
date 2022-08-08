@@ -646,13 +646,21 @@ class Controller extends Base
             $this->getUser(),
             [$item->getId()]
         );
-        $source
-            ->setStatus($this->getRequest()->query['status']);
+
+        // When no event types are selected in the modal, query['status'] is not set.
+        // We set it to an empty array here so we can handle the case of no event types selected.
+        // When no event types are selected, no events should show on the calendar.
+        $query = $this->getRequest()->query;
+        if (!isset($query['status'])) {
+            $query['status'] = [];
+        }
+
+        $source->setStatus($query['status']);
 
         $calendar = new Renderer(
             $source,
-            (int)$this->getRequest()->query['start'],
-            (int)$this->getRequest()->query['end'],
+            (int)$query['start'],
+            (int)$query['end'],
             $this->getUser(),
             $this->getAuthorizer(),
             $this->getRouter(),
@@ -673,10 +681,7 @@ class Controller extends Base
                 [$item->getRoomCode() => $item->getId()]
             );
 
-            $roomEvents = $roomSource->getEvents(
-                $this->getRequest()->query['start'],
-                $this->getRequest()->query['end']
-            );
+            $roomEvents = $roomSource->getEvents($query['start'], $query['end']);
 
             foreach ($roomEvents as $event) {
                 $renderer = new Javascript(
