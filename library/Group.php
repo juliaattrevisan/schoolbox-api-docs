@@ -197,23 +197,6 @@ class Group extends DeprecatedModel
         }
     }
 
-    public function getMemberList($relationID)
-    {
-        $query = "SELECT title, firstname, lastname, uid, synergy_id, type, group_id, local_email, alt_email, username
-				  FROM userAccess, user
-				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type < " . UserAccess::ACCESS_FULL . " AND type > " . UserAccess::ACCESS_DENY . " AND user.deleted_at IS NULL
-				  ORDER BY lastname, firstname";
-        return $this->db->getAll($query);
-    }
-
-    public function getWaitingList($relationID)
-    {
-        $query = "SELECT title, firstname, preferred_name, lastname, uid, synergy_id
-				  FROM userAccess, user
-				  WHERE service = " . $this->_service . " AND sid = $relationID AND type = " . UserAccess::ACCESS_DENY . " AND user.id = uid AND user.deleted_at IS NULL
-				  ORDER BY lastname, firstname";
-        return $this->db->getAll($query);
-    }
 
     public function isUser($relationID, $userID)
     {
