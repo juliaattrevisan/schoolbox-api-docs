@@ -102,7 +102,7 @@
     }
 </script>
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbsArray(allBreadcrumbs) }}
+{{ bread.crumbsArray(allBreadcrumbs | merge([[resultSetId is null ? 'Create': 'Update']])) }}
 <div class="admin-container row">
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
