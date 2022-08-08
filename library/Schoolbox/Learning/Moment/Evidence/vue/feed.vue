@@ -408,7 +408,7 @@ export default {
 
                 <template v-else>
                     <!-- Parent or student -->
-                    <p>{{ config.student.firstname }} doesn't have any activity yet.</p>
+                    <p>{{ config.student.givenName }} doesn't have any activity yet.</p>
 
                     <!-- What can the current user do? -->
 
@@ -444,7 +444,7 @@ export default {
 
                     <!-- Can't share moments? -->
                     <p v-else>
-                        When {{ config.student.firstname }} or their teacher shares learning, it will appear here.
+                        When {{ config.student.givenName }} or their teacher shares learning, it will appear here.
                     </p>
 
                 </template>
