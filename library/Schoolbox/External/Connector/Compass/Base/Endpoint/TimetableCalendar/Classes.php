@@ -618,18 +618,44 @@ class Classes implements IStrategy
          * Instance teachers are defined in this order or precedence,
          * because Compass reasons:
          *
+         * instance[attendees][coveringCompassPersonId]
+         *     these are additional teacher ids on top of the next three
+         *     and seem to be some kind of rostered substitute from edval
+         * instance[attendees][compassPersonId]
+         *     this is seemingly the same as at least one of the following fields
          * instance[coveringCompassPersonId]
          * instance[managingCompassPersonId]
+         *     this is the "usual guy" teaching the class
          * activity[managerCompassPersonId]
+         *     this is also the "usual guy" teaching the class, but with a different
+         *     array key (for shiggles, presumably)
+         * leadTeacherCode
+         *     There's a sixth place - it's found in Standard Class Details but we
+         *     were told by Nick Swan to avoid using it in favour of the five aforementioned
+         *     (I recognise that's hearsay, but it also happens to be true)
          *
          * Use a local cache because we need to look them up with yet another
          * api call to find their external id, so we can trade space for time
          */
-        $teacherCompassIds = (new FirstMeaningfulValue())->find([
+        $attendeeTeacherIds = [];
+
+        foreach ($activityInstance['attendees'] as $attendeeTeacher) {
+            $attendeeTeacherIds[] = (new FirstMeaningfulValue())->find([
+                $attendeeTeacher['coveringCompassPersonId'],
+                $attendeeTeacher['compassPersonId']
+            ]);
+        }
+
+        $instanceTeaherIds = [
             $activityInstance['coveringCompassPersonId'],
             $activityInstance['managingCompassPersonId'],
             $activity['managerCompassPersonId']
-        ]);
+        ];
+
+        /* Some where amongst this molasses of data is at least one teacher
+         * who is teaching this class. Disgusting.
+         */
+        $teacherCompassIds = (new FirstMeaningfulValue())->find(array_merge($attendeeTeacherIds, $instanceTeaherIds));
 
         /* No identifiable teachers in any of the fields
          * That is a bit unorthodox, but maybe possible in compass
@@ -670,10 +696,11 @@ class Classes implements IStrategy
              */
 
             $this->log->debug(sprintf(
-                'Creating new Override record for Activity %s Instance on %s for %s',
+                'Creating new Override record for Activity %s Instance on %s for %s (compassId %s)',
                 $activityName,
                 $activityInstance['start'],
-                $teacher['externalId']
+                $teacher['externalId'],
+                $teacherCompassIds
             ));
 
             $this->saveStaffInvolvement($teacher, $event);
