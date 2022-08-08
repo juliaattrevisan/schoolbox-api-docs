@@ -45,19 +45,35 @@ const modalSelectedCodesStore = useModalSelectedCodesStore();
 const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.5rem)`);
 
 /**
+ * If there's a code available, which means it can be selected
+ *
+ * @returns { Boolean }
+ */
+const hasCode = computed(() => props.code.code && props.code.code !== '');
+
+/**
+ * To help distinguish those codes that aren't selectable, we remove
+ * the default button colour
+ *
+ * @returns { Boolean }
+ */
+const isDisabled = computed(() => {
+    if (props.depth === 0 && !modalActiveCodesStore.isSearchActive) {
+        return true;
+    } else if (!hasCode.value && modalActiveCodesStore.isOnFourthNode) {
+        return true;
+    } else {
+        return false;
+    }
+});
+
+/**
  * Only show the selected node and its direct children until we are on the fourth node
  * This is so we don't flood the DOM with very large Curriculum renders
  *
  * @returns { Boolean }
  */
 const isVisible = computed(() => props.depth <= 1 || modalActiveCodesStore.isOnFourthNode);
-
-/**
- * The top level node can't be selected, so disable it
- *
- * @returns { String }
- */
-const pointerEvents = computed(() => props.code.isFirstLevel ? 'none' : 'auto');
 
 /**
  * To determine whether the checkbox is currently selected based 
@@ -70,10 +86,16 @@ const isCodeSelected = computed(() => {
 });
 
 /**
- * Add or remove the code from the current modal selection
+ * Add or remove the code from the current modal selection, 
+ * or if there's no code, use the code to traverse to the next nodel level
+ * as an alternative to using the selects in cs-modal-header-select
  */
 function onSelected () {
-    isCodeSelected.value ? modalSelectedCodesStore.remove(props.code) : modalSelectedCodesStore.add(props.code);
+    if (hasCode.value) {
+        isCodeSelected.value ? modalSelectedCodesStore.remove(props.code) : modalSelectedCodesStore.add(props.code);
+    } else {
+        modalActiveCodesStore.setNextSecondNode(props.code.id);
+    }
 }
 
 /**
@@ -89,10 +111,10 @@ const hasChildren = computed(() => props.code.children && props.code.children.le
  * @returns { String }
  */
 const title = computed(() => {
-    if (props.code.code && props.code.code !== '') {
+    if (hasCode.value) {
         return `[${props.code.code}] ${props.code.name}`;
     } else {
-        return props.code.name;
+        return `${props.code.name}`;
     }
 });
 
@@ -160,12 +182,13 @@ const containerClass = computed(() => {
 <template>
    <li v-if="isVisible" :class="containerClass">
         <button 
-            class="code-button" 
-            :style="{ paddingLeft: paddingLeft, pointerEvents: pointerEvents }" 
+            :class="`code-button`" 
+            :style="{ paddingLeft: paddingLeft }" 
+            :disabled="isDisabled"
             @click.prevent="onSelected"
             @keyup.enter="onSelected"
         >
-            <div class="checklist" v-if="!props.code.isFirstLevel">
+            <div class="checklist" v-if="hasCode">
                 <input 
                     :id="`checkbox-${props.code.id}`"
                     type="checkbox"
@@ -210,7 +233,16 @@ const containerClass = computed(() => {
     &:hover {
         background: var(--content-ui-hover);
     } 
+    &:disabled {
+        color: #222222;
+        opacity: 1;
+    }
 }
+
+// .code-button:: { 
+    
+//     pointer-events: none;
+// }
 
 .checklist {
     flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it

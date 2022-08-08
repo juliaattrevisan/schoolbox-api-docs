@@ -349,17 +349,33 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
     actions: {
 
         /**
+         * 
+         */
+        setNextSecondNode (id) {
+            if (this.isOnThirdNode) {
+                this.selectedFourthNodeId = id;
+            } else if (this.isOnSecondNode) {
+                this.selectedThirdNodeId = id;
+            } else if (this.isOnFirstNode) {
+                this.selectedSecondNodeId = id;
+            } 
+        },
+
+        /**
          * to reset the selected second node, reverting the node to empty 
          */
         resetSelectedSecondNode () {
             this.selectedSecondNodeId = UNSET_ID;
+            this.resetSelectedThirdNode();
+            this.resetSelectedFourthNode();
         },
 
         /**
-         * to reset the selected thurd node, reverting the node to empty 
+         * to reset the selected third node, reverting the node to empty 
          */
         resetSelectedThirdNode () {
             this.selectedThirdNodeId = UNSET_ID;
+            this.resetSelectedFourthNode();
         },
 
         /**

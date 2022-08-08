@@ -5,7 +5,6 @@ export const data = [
         "code":"",
         "description":"",
         "reference":null,
-        "isFirstLevel": true,
         "children":[
             {
                 "id":2,
