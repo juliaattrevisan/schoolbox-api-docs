@@ -98,15 +98,13 @@ class GarbageCollector
             $this->list[] = $hash;
         }
 
-        $hashes = $this->list;
-
         $this->log->info('Starting with ' . count($this->list) . ' files');
 
         // iterate the checks, and retain the intersection each time
         foreach ($this->checks as $check) {
             $this->log->notice('Applying ' . get_class($check), ['char' => '+']);
-            $staleHashes = $check->getStale($hashes);
-            $this->log->info('Retained ' . count($staleHashes) . ' stale');
+            $this->list = $check->getStale($this->list);
+            $this->log->info('Retained ' . count($this->list) . ' stale');
         }
 
         return $this->list;

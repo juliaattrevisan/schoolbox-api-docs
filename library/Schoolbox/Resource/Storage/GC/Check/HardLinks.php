@@ -21,55 +21,42 @@ class HardLinks extends DbCheck
     {
         // all the places hard links occur
         $queries = [
-            "SELECT hash FROM blog_image 
-             WHERE deleted_at IS NULL",
+            "SELECT hash FROM blog_image",
 
-            "SELECT hash FROM eportfolio_component_blog_image 
-             WHERE deleted_at IS NULL",
+            "SELECT hash FROM eportfolio_component_blog_image",
 
             "SELECT imagehash FROM eportfolio_coverphoto
-             WHERE imagehash IS NOT NULL
-             AND deleted_at IS NULL",
+             WHERE imagehash IS NOT NULL",
 
             "SELECT hash FROM dropbox
-             WHERE hash IS NOT NULL
-             AND deleted_at IS NULL",
+             WHERE hash IS NOT NULL",
 
             "SELECT hash FROM file
-             WHERE hash IS NOT NULL
-             AND deleted_at IS NULL",
+             WHERE hash IS NOT NULL",
 
-            "SELECT image_hash FROM folder 
-             WHERE image_hash IS NOT NULL 
-             AND deleted_at IS NULL",
+            "SELECT image_hash FROM folder
+             WHERE image_hash IS NOT NULL",
 
             "SELECT hash FROM myFile
-             WHERE hash IS NOT NULL
-             AND deleted_at IS NULL",
+             WHERE hash IS NOT NULL",
 
-            "SELECT hash FROM pastoral_attachment
-             WHERE deleted_at IS NULL",
+            "SELECT hash FROM pastoral_attachment",
 
             "SELECT image_hash FROM resource
-             WHERE image_hash IS NOT NULL
-             AND deleted_at IS NULL",
+             WHERE image_hash IS NOT NULL",
 
             "SELECT cache_hash FROM socialstream_post
-             WHERE cache_hash IS NOT NULL
-             AND deleted_at IS NULL",
+             WHERE cache_hash IS NOT NULL",
 
-            "SELECT hash FROM student_submission_file
-             WHERE deleted_at IS NULL",
+            "SELECT hash FROM student_submission_file",
 
             "SELECT storage_id
              FROM submission_box_file",
 
-            "SELECT hash FROM submission_return_file
-             WHERE deleted_at IS NULL",
+            "SELECT hash FROM submission_return_file",
 
             "SELECT background_image_hash FROM tile
-             WHERE background_image_hash IS NOT NULL
-             AND deleted_at IS NULL",
+             WHERE background_image_hash IS NOT NULL",
 
             "SELECT hash FROM ups_log
              WHERE hash IS NOT NULL",
