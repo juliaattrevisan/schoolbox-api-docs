@@ -19,6 +19,7 @@ use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder\Model;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -41,7 +42,6 @@ use function in_array;
  */
 class UserAccessMapper extends Mapper
 {
-
     /**
      * @return void
      */
@@ -95,7 +95,6 @@ class UserAccessMapper extends Mapper
         }
     }
 
-
     /**
      * Determine whether $folder has a $user of type 3
      *
@@ -116,6 +115,7 @@ class UserAccessMapper extends Mapper
 
         return false;
     }
+
     /**
      * Determine whether $user owns $folder
      *
@@ -146,7 +146,7 @@ class UserAccessMapper extends Mapper
      *
      * @param User $user
      * @param bool $includeSynergy
-     * @return GenericCollection|UserAccess[]
+     * @return GenericCollection
      */
     public function findAllForUser(User $user, $includeSynergy = true): GenericCollection
     {
@@ -241,11 +241,46 @@ class UserAccessMapper extends Mapper
      * Find all UserAccess instances for a User
      *
      * @param User $user
-     * @return Collection
+     * @return GenericCollection
      */
-    public function findAllGroupsForUser(User $user)
+    public function findAllGroupsForUser(User $user): GenericCollection
     {
         return $this->findServiceForUser($user, UserAccess::SERVICE_HOMEPAGE);
+    }
+
+    /**
+     * @param FolderModel $folder
+     * @return GenericCollection
+     */
+    public function findForFolder(Model $folder): GenericCollection
+    {
+        return $this->findByColumnList(
+            [
+                'service' => UserAccess::SERVICE_HOMEPAGE,
+                'sid'     => $folder->getId(),
+            ]
+        );
+    }
+
+    /**
+     * @param FolderModel       $folder
+     * @param GenericCollection $users
+     * @return Collection
+     */
+    public function findForFolderUser(Model $folder, GenericCollection $users): Collection
+    {
+        $users = $users->indexBy('id');
+        return $this->findByColumnList(
+            [
+                'uid'     => $users->getPropertyValues('id'),
+                'service' => UserAccess::SERVICE_HOMEPAGE,
+                'sid'     => $folder->getId(),
+            ]
+        )->map(function ($ua) use ($users) {
+            /** @var UserAccess $ua */
+            // don't needlessly hold stub replicas of the user in memory
+            return $ua->setUser($users->offsetGet($ua->getUser()->getId()));
+        });
     }
 
 
@@ -254,11 +289,11 @@ class UserAccessMapper extends Mapper
      *
      * @param User $user
      * @param int  $service
-     * @return Collection|UserAccess[]
+     * @return GenericCollection
      */
-    public function findServiceForUser(User $user, $service)
+    public function findServiceForUser(User $user, int $service): GenericCollection
     {
-        $access = new Collection();
+        $access = $this->createCollection();
 
         // start with the userAccess table (filtering away access level 0)
         $internal = $this->findByColumnList([
@@ -271,9 +306,7 @@ class UserAccessMapper extends Mapper
             return $ua->setUser($user);
         });
 
-        $access = $access->merge($internal);
-
-        return $access;
+        return $access->merge($internal);
     }
 
     /**
@@ -358,11 +391,9 @@ class UserAccessMapper extends Mapper
             throw new InvalidArgumentException("Unrecognised access level type: $accessType");
         }
 
-        /**
-         * @var UserMapper $userMapper
-         * @var RoleMapper $roleMapper
-         */
+        /** @var UserMapper $userMapper */
         $userMapper     = $this->getJoinMapper('user');
+        /** @var RoleMapper $roleMapper */
         $roleMapper     = $this->getJoinMapper('user.role');
         $userCollection = $userMapper->createCollection();
 

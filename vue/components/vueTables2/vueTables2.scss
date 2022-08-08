@@ -48,14 +48,27 @@ $cdn-prefix: "/static";
     }
 }
 
+$font-family-icon: 'schoolbox';
+.sort-icon {
+    font-family: $font-family-icon;
+    font-size: 0.75rem;
+}
 .VueTables .glyphicon-sort:before {
-    content: url("#{$cdn-prefix}/images/svg/sortable.svg");
+    @extend .sort-icon;
+    content: '\e800';
 }
 .VueTables .glyphicon-chevron-up:before {
-    content: url("#{$cdn-prefix}/images/svg/sort-up.svg");
+    @extend .sort-icon;
+    content: '\e920';
 }
 .VueTables .glyphicon-chevron-down:before {
-    content: url("#{$cdn-prefix}/images/svg/sort-down.svg");
+    @extend .sort-icon;
+    content: '\e621';
+}
+
+.VueTables__select-all,
+.VueTables__select-single {
+    width: 3rem; //it only contains a checkbox, so we don't need it to stretch too far
 }
 
 .VueTables__table-footer {

@@ -15,7 +15,6 @@ use TypeError;
 
 class IsJson extends Specification\Leaf
 {
-
     /**
      * Returns whether the candidate audience specification satisfies this specification
      *

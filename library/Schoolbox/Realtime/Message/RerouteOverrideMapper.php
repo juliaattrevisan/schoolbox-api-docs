@@ -18,10 +18,10 @@ use Schoolbox\Permission\Access\UserAccess;
  * Class RerouteOverrideMapper
  *
  * @package Schoolbox\Realtime\Message
+ * @method RerouteOverride createModel($idValue = null)
  */
 class RerouteOverrideMapper extends Mapper
 {
-
     /**
      * @return bool
      * @throws Mapper\DefinitionException
@@ -170,7 +170,7 @@ class RerouteOverrideMapper extends Mapper
      * @param string $routeKey
      * @param int    $userId If supplied, the user to check.
      *
-     * @return string
+     * @return int
      * @throws \PDOException
      */
     public function isRouteMuted($routeKey, $userId = null)

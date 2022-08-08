@@ -149,7 +149,7 @@ module.exports = {
             ],
             dependOn: 'main' //ensures jQuery is loaded prior
         },
-        
+
         // Libraries
         clipboard: './www/static/js/clipboard/clipboard.js',
         strtotime: './www/static/js/alaress-datetime-picker/strtotime.js',
@@ -212,7 +212,8 @@ module.exports = {
         classSelector: './library/Schoolbox/Assessment/Course/templates/vue/classSelector.js',
 
         // Groups
-        manageGroups: './library/Schoolbox/Groups/vue/manageGroups.js',
+        manageGroups: './library/Schoolbox/Group/vue/manageGroups.js',
+        manageGroup: './library/Schoolbox/Group/Manage/vue/manageGroup.js',
 
         // QR codes
         manageQrCodes: './library/Schoolbox/Qrcode/vue/manageQrCodes.js',
@@ -230,7 +231,7 @@ module.exports = {
 
         //Canvas
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
-        
+
         //Sass
         core: './www/static/css/core/core.scss',
         editor: './www/static/css/core/editor.scss',

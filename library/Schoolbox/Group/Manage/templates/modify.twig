@@ -1,0 +1,14 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+<div id="manage-group-container">
+    <manage-group
+            group-data-endpoint="{{ routeLookupIfAuthorized('group.getData', {'folderId': folder.id, 'folder': folder}) }}"
+            remove-members-endpoint="{{ routeLookupIfAuthorized('group.removeMembers', {'folderId': folder.id, 'folder': folder}) }}"
+            update-members-endpoint="{{ routeLookupIfAuthorized('group.updateMembers', {'folderId': folder.id, 'folder': folder}) }}"
+            add-members-endpoint="{{ routeLookupIfAuthorized('group.addMembers', {'folderId': folder.id, 'folder': folder}) }}"
+            update-settings-endpoint="{{ routeLookupIfAuthorized('group.updateSettings', {'folderId': folder.id, 'folder': folder}) }}"
+            disband-group-endpoint="{{ routeLookupIfAuthorized('group.disband', {'folderId': folder.id, 'folder': folder}) }}"
+            send-email-endpoint="{{ routeLookupIfAuthorized('mail.getCreateMail') }}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/manageGroup.js?v={{ config.site_version }}"></script>

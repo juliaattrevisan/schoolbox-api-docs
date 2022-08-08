@@ -14,7 +14,6 @@ namespace Schoolbox\Resource;
 
 class Group
 {
-
     /**
      * The three types of groups you can join:
      *
@@ -25,6 +24,12 @@ class Group
     public const PRIVATE_GROUP = 1;
     public const MODERATED_GROUP = 2;
     public const FREE_GROUP = 3;
+
+    public const TYPE_NAME_TO_VAL = [
+        'private'   => self::PRIVATE_GROUP,
+        'moderated' => self::MODERATED_GROUP,
+        'free'      => self::FREE_GROUP,
+    ];
 
     /**
      * The type of group
@@ -42,6 +47,12 @@ class Group
      * @var bool
      */
     protected $forceFollow;
+
+    /**
+     * This is to present notification actually set in msg_reroute_override
+     * @var bool
+     */
+    private bool $notificationDisabled = false;
 
     /**
      * Test if group is private
@@ -150,5 +161,23 @@ class Group
             default:
                 return 'error';
         }
+    }
+
+    /**
+     * @param bool $notificationDisabled
+     * @return self
+     */
+    public function setNotificationDisabled(bool $notificationDisabled): self
+    {
+        $this->notificationDisabled = $notificationDisabled;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getNotificationDisabled(): bool
+    {
+        return $this->notificationDisabled;
     }
 }

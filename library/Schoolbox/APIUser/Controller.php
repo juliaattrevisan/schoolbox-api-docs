@@ -13,12 +13,12 @@ namespace Schoolbox\APIUser;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use HouseMapper;
+use Schoolbox\Group\API\ModelToArray;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Groups\GroupsHelper;
+use Schoolbox\Group\GroupsHelper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -26,7 +26,6 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\APIGroup\ModelToArray as GroupArray;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -97,9 +96,8 @@ class Controller extends Base
          * we are not using User::getAccessList(), as that will also include SIS group folders,
          * that the user is unable to change membership of, or other details.
          */
-        $users_groups = $this->groupsHelper->getCurrentGroups($user, false);
-        $apiGroups = new Collection($users_groups);
-        $groupsArr = $apiGroups->map(new GroupArray());
+        $apiGroups = $this->groupsHelper->getCurrentGroups($user);
+        $groupsArr = $apiGroups->map(new ModelToArray());
 
         //load parents and students / children for export.
         $user->loadParents()
@@ -389,9 +387,8 @@ class Controller extends Base
 
         //get hydrated user, or the campus/role/house wont have names, just ids...
         $updatedUser = $this->userMapper->findById($model->getId());
-        $users_groups = $this->groupsHelper->getCurrentGroups($updatedUser, false);
-        $apiGroups = new Collection($users_groups);
-        $groupsArr = $apiGroups->map(new GroupArray());
+        $apiGroups = $this->groupsHelper->getCurrentGroups($updatedUser);
+        $groupsArr = $apiGroups->map(new ModelToArray());
         /**
          * build the whole thing
          */
@@ -442,9 +439,8 @@ class Controller extends Base
          */
         $users = $this->userMapper->findByColumn('id', $userIds);
         foreach ($users as $user) {
-            $users_groups = $this->groupsHelper->getCurrentGroups($user, false);
-            $apiGroups = new Collection($users_groups);
-            $groupsArr = $apiGroups->map(new GroupArray());
+            $apiGroups = $this->groupsHelper->getCurrentGroups($user);
+            $groupsArr = $apiGroups->map(new ModelToArray());
 
             //load parents and students / children for export.
             $user->loadParents()

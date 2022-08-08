@@ -6,6 +6,8 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Resource;
 
 use PDOStatement;
@@ -25,11 +27,11 @@ use Schoolbox\User;
  * @package Schoolbox\Resource
  * @method Group createModel($idValue = null)
  * @method Group hydrate(array $row, $alias = '', $callback = null)
+ * @method Group findById($idValue)
  * @method Group[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
 class GroupMapper extends Mapper
 {
-
     protected function mapping()
     {
         $this->hasModel(Group::class);

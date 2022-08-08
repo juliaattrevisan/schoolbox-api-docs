@@ -117,6 +117,25 @@ class UserAccess implements IModel
      */
     public const ACCESS_FULL = 3;
 
+    public const MEMBERSHIP_ADMIN = 'admin';
+    public const MEMBERSHIP_WRITE = 'write';
+    public const MEMBERSHIP_READ  = 'read';
+    public const MEMBERSHIP_NONE  = 'none';
+
+    public const ACCESS_NAME_TO_LEVEL = [
+        self::MEMBERSHIP_NONE  => self::ACCESS_DENY,
+        self::MEMBERSHIP_READ  => self::ACCESS_READ,
+        self::MEMBERSHIP_WRITE => self::ACCESS_WRITE,
+        self::MEMBERSHIP_ADMIN => self::ACCESS_FULL,
+    ];
+
+    public const ACCESS_LEVEL_TO_NAME = [
+        self::ACCESS_DENY  => self::MEMBERSHIP_NONE,
+        self::ACCESS_READ  => self::MEMBERSHIP_READ,
+        self::ACCESS_WRITE => self::MEMBERSHIP_WRITE,
+        self::ACCESS_FULL  => self::MEMBERSHIP_ADMIN,
+    ];
+
     /** @var User */
     protected $user;
 
@@ -142,7 +161,6 @@ class UserAccess implements IModel
     {
         return [self::ACCESS_DENY, self::ACCESS_READ, self::ACCESS_WRITE, self::ACCESS_FULL,];
     }
-
 
 
     /**
@@ -193,9 +211,9 @@ class UserAccess implements IModel
 
     /**
      * @param User $user
-     * @return self
+     * @return static
      */
-    public function setUser($user)
+    public function setUser($user): self
     {
         $this->user = $user;
         return $this;
@@ -213,9 +231,9 @@ class UserAccess implements IModel
 
     /**
      * @param int $service
-     * @return self
+     * @return static
      */
-    public function setService($service)
+    public function setService($service): self
     {
         $this->service = $service;
         return $this;
@@ -233,9 +251,9 @@ class UserAccess implements IModel
 
     /**
      * @param int $sid
-     * @return self
+     * @return static
      */
-    public function setServiceIdentifier($sid)
+    public function setServiceIdentifier($sid): self
     {
         $this->sid = $sid;
         return $this;
@@ -253,9 +271,9 @@ class UserAccess implements IModel
 
     /**
      * @param int $level
-     * @return self
+     * @return static
      */
-    public function setAccessLevel($level)
+    public function setAccessLevel($level): self
     {
         $this->accessLevel = $level;
         return $this;
@@ -272,7 +290,7 @@ class UserAccess implements IModel
 
     /**
      * @param bool $favourite
-     * @return self
+     * @return static
      */
     public function setFavourite(bool $favourite): self
     {
