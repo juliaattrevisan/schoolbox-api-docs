@@ -400,8 +400,7 @@
                     .replace(/{NAME}/g,         window.modalInternalUserCache[id].name)
                     .replace(/{ID}/g,           window.modalInternalUserCache[id].id)
                     .replace(/{ROLE}/g,         window.modalInternalUserCache[id].role)
-                    .replace(/{FIRSTNAME}/g,    window.modalInternalUserCache[id].first_name)
-                    .replace(/{LASTNAME}/g,     window.modalInternalUserCache[id].last_name)
+                    .replace(/{FULL_NAME}/g,    window.modalInternalUserCache[id].full_name)
                     .replace(/{EXTERNALID}/g,   window.modalInternalUserCache[id].external_id);
 
                 {# Remove the search result from the list #}

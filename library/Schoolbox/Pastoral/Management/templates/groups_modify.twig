@@ -177,8 +177,7 @@
                     .replace(/{NAME}/g, user.first_name + ' ' + user.last_name)
                     .replace(/{ID}/g, user.id)
                     .replace(/{ROLE}/g, user.role)
-                    .replace(/{FIRSTNAME}/g, user.first_name)
-                    .replace(/{LASTNAME}/g, user.last_name)
+                    .replace(/{FULL_NAME}/g, user.full_name)
                     .replace(/{EXTERNALID}/g, user.external_id);
 
                 membersList.html(membersList.html() + html);
