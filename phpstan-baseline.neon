@@ -1216,6 +1216,11 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
 
 		-
+			message: "#^Strict comparison using \\=\\=\\= between null and int|string will always evaluate to false\\.$#"
+			count: 1
+			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
+
+		-
 			message: "#^PHPDoc tag @return with type array\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>\\|\\(iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\GenericCollection\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
