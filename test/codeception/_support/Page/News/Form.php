@@ -197,9 +197,38 @@ class Form
      */
     public function seeTopic(string $topic): self
     {
-        $this->tester->canSee($topic,'div.item');
+        $this->tester->canSee($topic, 'div.item');
         return $this;
     }
+
+    /**
+     * this is to click an audience type: Campus, Teams, Classes, Roles etc
+     * @param string $audienceBrick
+     * @param string $audienceType
+     * @param array $checkboxOption
+     * @return Form
+     */
+    public function selectAudienceOption(string $audienceBrick, string $audienceType, array $checkboxOption): self
+    {
+            $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
+            $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
+            $this->tester->waitForText('Roles');
+            $element = Locator::contains('button.button-block', $audienceBrick);
+            $this->tester->clickWithLeftButton($element);
+            $this->tester->executeJS(
+                "var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
+            scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;"
+            );
+            $this->tester->waitForText($audienceType, 5);
+            $audience_element = Locator::contains('div.checklist-wrapper', $audienceType);
+            $this->tester->clickWithLeftButton($audience_element);
+            $this->tickCheckboxes($checkboxOption);
+            $this->tester->click('button.button.submit');
+            sleep(2);
+             return $this;
+    }
+
+
     /**
      * @param array $roles
      * @return Form
@@ -207,7 +236,6 @@ class Form
     public function fillRoles(array $roles): self
     {
         foreach ($roles as &$role) {
-
             $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
             $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
             $this->tester->waitForText('Roles');
@@ -222,10 +250,8 @@ class Form
             $this->tester->clickWithLeftButton($teacher_element);
             $this->tester->click('button.button.submit');
             sleep(2);
-
         }
         return $this;
-
     }
 
     /**
@@ -248,7 +274,6 @@ class Form
     {
 
         foreach ($campuses as &$campus) {
-
             $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
             $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
             $this->tester->waitForText('Year Levels');
@@ -285,7 +310,6 @@ class Form
     public function fillUsers(array $users): self
     {
         foreach ($users as &$user) {
-
             $this->tester->click('input#audience-search-selectized');
             $user_chars = str_split($user);
             foreach ($user_chars as &$user_char) {
@@ -302,10 +326,42 @@ class Form
      */
     public function seeUsers(array $users): self
     {
-        foreach ($users as &$user)  {
+        foreach ($users as &$user) {
             $this->tester->canSee($user);
         }
         return $this;
+    }
+
+    /**
+     * @param string $audienceType1
+     * @param string $audienceType2
+     * @param array $checkboxes
+     * @return Form
+     */
+    public function createCompositeAudience(string $audienceType1, string $audienceType2, array $checkboxes): self
+    {
+            $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
+            $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
+            $this->tester->waitForText('Roles');
+            $this->tester->click('Create Composite Audience');
+            $this->tester->waitForText("Choose audience types and select the appropriate tickboxes to create a composite audience. E.g. Parents and Students only in the Senior Campus.");
+            $this->tester->selectOption('//*[@id="audience-browse"]/div[3]/div[2]/div[1]/legend/select', $audienceType1);
+            $this->tester->selectOption('//*[@id="audience-browse"]/div[3]/div[2]/div[2]/legend/select', $audienceType2);
+            $this->tickCheckboxes($checkboxes);
+            $this->tester->click(Locator::lastElement('button.button.submit'));
+            sleep(2);
+            return $this;
+    }
+
+    /**
+     * tick the checkboxes
+     * @param array $checkboxes
+     */
+    public function tickCheckboxes(array $checkboxes): void
+    {
+        foreach ($checkboxes as &$checkbox) {
+            $this->tester->click('label[for="' . $checkbox . '"]');
+        }
     }
 
     /**
@@ -354,5 +410,16 @@ class Form
             $expiryDate->getUsingFormat(Common::FORMAT_INPUT_DATETIME)
         );
         return $this;
+    }
+
+    /**
+     * tick the checkboxes
+     * @param array $titles
+     */
+    public function removeAudience(array $titles): void
+    {
+        foreach ($titles as &$title) {
+            $this->tester->click('a[title="Remove ' . $title . ' from audience"]');
+        }
     }
 }
