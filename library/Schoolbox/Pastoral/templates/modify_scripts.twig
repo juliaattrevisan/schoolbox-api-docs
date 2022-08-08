@@ -270,8 +270,7 @@
                 {% if audience.user %}
                 window.modalUserAdded({
                     'id': {{ audience.user.id }},
-                    'first_name': "{{ audience.user.firstname }}",
-                    'last_name': "{{ audience.user.lastname }}",
+                    'full_name': "{{ audience.user.full_name }}",
                     'role': "{{ audience.user.role.name }}",
                 }, "{{ audience.access }}", visibilityLocked);
                 {% endif %}
