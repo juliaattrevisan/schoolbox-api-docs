@@ -1,9 +1,6 @@
 <?php
 
 /**
- * Rubrics Mapper
- *
- * @author    Tom McDonnell <tom.mcdonnell@alaress.com.au>
  * @copyright Copyright 2022, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
