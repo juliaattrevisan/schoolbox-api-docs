@@ -380,16 +380,33 @@ class Classes implements IStrategy
                      * I recognise that forward planning might be a thing, but still
                      */
                     foreach ($activity['instances'] as $activityInstance) {
-                        /* Has to be officially running
+                        /* Check if this instance is running
+                         * Multiple levels of investigation required.
+                         * This is an obscure logic path that is extremely poorly documented
+                         *
+                         * If runningStatus is 0, it might have been cancelled only for
+                         * the original teacher. If that's the case, dig deeper to find
+                         * out for sure - it might NOT be cancelled for the replacement
                          */
                         if (self::IS_RUNNING !== (int)$activityInstance['runningStatus']) {
-                            $this->log->debug(sprintf(
-                                'Activity %s Instance on %s is not running; skipping',
-                                $activity['name'],
-                                $activityInstance['start']
-                            ));
+                            /* Replacement teachers can be found inside $activityInstance[attendees]
+                             * in a node called coveringCompassPersonId. Check that there are
+                             * meaningful contents inside the attendees node...
+                             */
+                            if (\count($activityInstance['attendees'])) {
+                                /* Then compare the 0th element's contents
+                                 * (I haven't seen it contain more than one element)
+                                 */
+                                if ('' === trim((string)$activityInstance['attendees'][0]['coveringCompassPersonId'])) {
+                                    $this->log->debug(sprintf(
+                                        'Activity %s Instance on %s is not running; skipping',
+                                        $activity['name'],
+                                        $activityInstance['start']
+                                    ));
 
-                            continue;
+                                    continue;
+                                }
+                            }
                         }
 
                         /* Must start today, or in the future
