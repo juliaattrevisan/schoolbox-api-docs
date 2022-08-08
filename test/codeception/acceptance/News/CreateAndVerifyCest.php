@@ -14,6 +14,9 @@ namespace News;
 use AcceptanceTester;
 use Codeception\Util\Locator;
 use Exception;
+use Page\Homepage;
+use Page\Folder\CreateFolder;
+use Page\Group\ManageGroup;
 use Page\News\Form;
 use Page\News\Index;
 use Page\News\Item;
@@ -51,7 +54,7 @@ class CreateAndVerifyCest
      *
      * get logged in
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->login('alaress', 'alaress');
@@ -67,7 +70,7 @@ class CreateAndVerifyCest
     public function _after(AcceptanceTester $i): void
     {
         $i->amGoingTo("update delete_at for the news article so it does not impact the news tests");
-        //$i->updateInDatabase('comms_news_article', ['deleted_at' => "2020-01-15 11:22:34"], ['title like' => "Acceptance Test News%"]);
+        $i->updateInDatabase('comms_news_article', ['deleted_at' => "2020-01-15 11:22:34"], ['title like' => "Acceptance Test News%"]);
     }
 
     /**
@@ -76,7 +79,7 @@ class CreateAndVerifyCest
      * @param Index            $indexPage
      * @param Item             $itemPage
      */
-    public function createNews(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage)
+    public function createNews(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage): void
     {
         $i->amGoingTo("Fill in form values");
         $timestamp = time();
@@ -202,13 +205,11 @@ class CreateAndVerifyCest
      * @param Index            $indexPage
      * @param Item             $itemPage
      */
-    public function newsAudienceTest(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage)
+    public function newsAudienceTest(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage): void
     {
         $i->amGoingTo("Fill in form values with composite audience: 4 roles and 2 campuses + team and year level");
         $timestamp = time();
         $headline     = "Acceptance Test News Composite Audience Article Testing " . $timestamp;
-        $publish   = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
-        $expiry    = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
         $formPage
             ->fillHeadline($headline)
             ->createCompositeAudience('Team', 'Year Level', ['primary-IjEi', 'secondary-Ijki']);
@@ -220,67 +221,134 @@ class CreateAndVerifyCest
         $i->amOnPage('/news/me?status=Drafted');
         $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Composite Audience Article Testing');
         $i->click($element);
-        $i->canSee('2 Campuses & 4 Roles');
-        $i->canSee('1 Team & 1 Year Level');
+        $formPage->seeRoles(['2 Campuses & 4 Roles','1 Team & 1 Year Level']);
         $i->amGoingTo('check the modify article page presents the proper audience: 4 roles and 2 campuses + 1 team and 1 year level');
         $itemPage->modifyArticle();
-        $formPage->seeRoles(['2 Campuses & 4 Roles']);
-        $formPage->seeRoles(['1 Team & 1 Year Level']);
+        $formPage->seeRoles(['2 Campuses & 4 Roles','1 Team & 1 Year Level']);
 
         $i->amGoingTo("Fill in form values with selecting audience: campus Primary + class 9A Eng (group members and parents)");
         $formPage->removeAudience(['2 Campuses & 4 Roles','1 Team & 1 Year Level']);
         $formPage->selectAudienceOption('Campuses', 'Primary', []);
         $formPage->selectAudienceOption('Classes & Groups', '9A English (9ENGA)', ['audience-select-parents']);
         $i->amGoingTo('check the modify article page presents the proper audience: Primary and 9A English (9ENGA) Inc parents of students');
-        $formPage->seeRoles(['Primary']);
-        $formPage->seeRoles(['9A English (9ENGA)']);
-        $i->canSee('Class/Group');
-        $i->canSee('(Inc. parents of students)');
+        $formPage->seeRoles(['Primary','9A English (9ENGA)','Class/Group','(Inc. parents of students)']);
         $i->amGoingTo('check the draft article presents the proper audience: Primary and 9A English (9ENGA) Inc parents of students');
         $i->amOnPage('/news/me?status=Drafted');
         $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Composite Audience Article Testing');
         $i->click($element);
-        $i->canSee('9A English (9ENGA) (Inc. parents of students)');
-        $i->canSee('(Inc. parents of students)');
+        $formPage->seeRoles(['9A English (9ENGA) (Inc. parents of students)','(Inc. parents of students)']);
 
         $i->amGoingTo('Fill in form values by typing an audience: Jana Reed, Tim Reed and Jenni Reed');
         $itemPage->modifyArticle();
         $formPage->removeAudience(['9A English (9ENGA)','Primary']);
         $formPage->fillUsers(['Jenni','Jana','Tim','Demo 1','Primary']);
-        $i->canSee('Jana Reed (Middle Student)');
-        $i->canSee('Tim Reed (Senior Student)');
-        $i->canSee('Jenni Reed (Parent)');
-        $i->canSee('Demo Class Page 1 (DEMO1)');
-        $i->canSee('Primary');
+        $formPage->seeRoles(['Jana Reed (Middle Student)','Tim Reed (Senior Student)','Jenni Reed (Parent)','Demo Class Page 1 (DEMO1)','Primary']);
         $i->amGoingTo('check the draft article presents the proper audience: Primary and Demo class 1');
         $i->amOnPage('/news/me?status=Drafted');
         $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Composite Audience Article Testing');
         $i->click($element);
-        $i->canSee('Demo Class Page 1 (DEMO1)');
-        $i->canSee('Primary');
+        $formPage->seeRoles(['Demo Class Page 1 (DEMO1)','Primary']);
 
         $i->amGoingTo('Fill in form values by selecting audience via bricks and composite: year level + house and Teams Raiders');
         $itemPage->modifyArticle();
         $formPage->removeAudience(['Jana Reed','Tim Reed','Jenni Reed','Primary','Demo Class Page 1 (DEMO1)']);
         $formPage->selectAudienceOption('Year Levels', 'Year 9', ['audience-select-parents']);
         $formPage->createCompositeAudience('House', 'Team', ['primary-IjEi','secondary-IjIi']);
-        $i->canSee('1 Team & 1 House');
-        $i->canSee('Year 9');
-        $i->canSee('Composite Audience (view details)');
-        $i->canSee('Year Level');
-        $i->canSee('Inc. parents of students');
+        $formPage->seeRoles(['1 Team & 1 House','Year 9','Composite Audience (view details)','Year Level','Inc. parents of students']);
         $i->amGoingTo('check the draft article presents the proper audience: Primary and Demo class 1');
         $i->amOnPage('/news/me?status=Drafted');
         $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Composite Audience Article Testing');
         $i->click($element);
-        $i->canSee('1 Team & 1 House');
-        $i->canSee('Year 9');
-        $i->canSee('Inc. parents of students');
+        $formPage->seeRoles(['1 Team & 1 House','Year 9','Inc. parents of students']);
         $i->amGoingTo('Publish the news article and ensure the audience remains the same');
         $itemPage->modifyArticle();
         $formPage->submit();
-        $i->canSee('1 Team & 1 House');
-        $i->canSee('Year 9');
-        $i->canSee('Inc. parents of students');
+        $formPage->seeRoles(['1 Team & 1 House','Year 9','Inc. parents of students']);
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @param Form             $formPage
+     * @param Index            $indexPage
+     * @param Item             $itemPage
+     * @throws Exception
+     */
+    public function newsAudienceViaClassPageTest(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage): void
+    {
+
+        $this->createFolder($i);
+        $i->amGoingTo("Navigate to the class page");
+        $i->click('News Folder Test');
+        $homepage = new Homepage($i);
+        $homepage->addComponent(Homepage::ELEMENT_ADD_COMPONENT_SECTION_INFORMATION, 'News');
+        // Enter content into the new component
+        $layout   = Homepage::ELEMENT_COMPONENT_LAYOUT_TOP;
+        $position = 1;
+        $homepage->clickComponentEmptyStateLink($layout, $position);
+        $timestamp = time();
+        $headline     = "Acceptance Test News Audience Article via Class Page Testing " . $timestamp;
+        $formPage
+            ->fillHeadline($headline)
+            ->seeRoles(['News Folder Test']);
+        $i->waitForElementClickable($formPage::FORM_SAVE);
+        $i->amGoingTo("check the draft article presents the proper audience: News Folders Test");
+        $i->amOnPage('/news/me?status=Drafted');
+        $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Audience Article via Class Page Testing');
+        $i->click($element);
+        $i->canSee('News Folder Test');
+        $i->amGoingTo("check the modify article page presents the proper audience: News Folders Test");
+        $itemPage->modifyArticle();
+        $formPage->seeRoles(['News Folder Test']);
+        $i->amGoingTo("Add new audience to the news article: Eden Reed and Teacher role");
+        $formPage->selectAudienceOption('Roles', 'Teacher', []);
+        $formPage->fillUsers(['Eden Reed']);
+        $i->amGoingTo("Check the audience is properly presented: News Folders, Eden Reed and Teacher");
+        $formPage->seeRoles(['News Folder Test','Teacher','Eden Reed (Junior Student)']);
+        $i->amGoingTo('check the draft article presents the proper audience: News Folders and Teacher');
+        $i->amOnPage('/news/me?status=Drafted');
+        $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Audience Article via Class Page Testing');
+        $i->click($element);
+        $formPage->seeRoles(['News Folder Test','Teacher']);
+        $i->amGoingTo("check the modify article page presents the proper audience: News Folders, Eden Reed and Teacher");
+        $itemPage->modifyArticle();
+        $formPage->seeRoles(['News Folder Test','Teacher','Eden Reed']);
+        $formPage->submit();
+        $formPage->seeRoles(['News Folder Test','Teacher','PUBLISHED']);
+    }
+
+
+    /**
+     * Convenience helper to create a folder
+     * @param AcceptanceTester $i
+     * @throws Exception
+     */
+    private function createFolder(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("Create a folder page to create articles for that audience");
+        $createFolder = new createFolder($i);
+        $manageGroup = new ManageGroup($i);
+
+        $folderName = "News Folder Test";
+        $homepageTemplateOption = "Class";
+
+        $i->amOnPage($createFolder::URL);
+        $createFolder->waitCreateFolderTitleToBePresented();
+        $createFolder->typeName($folderName);
+        $createFolder->setHomepageTemplate($homepageTemplateOption);
+        $createFolder->setAccessPermission('groupWrite1');
+        $createFolder->setAccessPermission('groupWrite2');
+        $i->amGoingTo("give senior student write permission");
+        $createFolder->setAccessPermission('groupWrite3');
+        $createFolder->setAccessPermission('groupWrite4');
+        $i->amGoingTo("give junior student write permission");
+        $createFolder->setAccessPermission('groupRead5');
+        $i->amGoingTo("give middle student write permission");
+        $createFolder->setAccessPermission('groupNone6');
+        $createFolder->clickCreateGroupToggle();
+        $createFolder->clickCreateFolderButton();
+        $manageGroup->waitManageGroupTitleToBePresented();
+        $manageGroup->clickTab('settings');
+        $manageGroup->setAccessPermission('type-3');
+        $manageGroup->clickSubmitButton();
     }
 }
