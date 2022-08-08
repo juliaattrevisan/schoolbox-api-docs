@@ -22,7 +22,6 @@ use Schoolbox\ResourceBooking\Item;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * @inheritDoc
      */
