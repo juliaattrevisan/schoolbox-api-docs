@@ -264,10 +264,19 @@ class Classes implements IStrategy
 
         /* Quartic n^4 complexity, but I can't think of a convenient way to improve this
          */
+        $watchlist = new Watchlist();
+
         foreach ($academicGroupSchedules as $academicGroupCode => $schedules) {
             foreach ($schedules['schedules'] as $schedule) {
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
+
+                    if ($watchlist->isOnWatchlist($activity['name'], ['8HEAC'])) {
+                        print_r($activity['name']);
+                        print_r($watchlist->translate($activity['instances'], $staffLookup));
+                    } else {
+                        continue;
+                    }
 
                     /* We only care about certain activities.
                      *
