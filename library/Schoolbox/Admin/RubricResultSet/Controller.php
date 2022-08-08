@@ -27,21 +27,17 @@ class Controller extends Base
     public const MAX_CHARS_PER_LABEL = 64;
 
     /**
-     * @var Mapper
-     */
-    private Mapper $mapper;
-
-    /**
      * Controller constructor.
      * @param Mapper $mapper
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(private Mapper $mapper)
     {
-        $this->mapper = $mapper;
     }
 
     /**
      * Show a list of rubric result sets.
+     * @api GET /adminv2/rubric-result-set
+     * @since 22.1
      * @throws RouteNotFound
      */
     public function getList(): void
@@ -62,6 +58,8 @@ class Controller extends Base
 
     /**
      * Delete the result set defined by $resultSetId.
+     * @api DELETE /adminv2/rubric-result-set/{resultSetId}
+     * @since 22.1
      * @param int|null $resultSetId
      */
     public function deleteResultSet(?int $resultSetId): void
@@ -70,6 +68,8 @@ class Controller extends Base
     }
 
     /**
+     * @api GET /adminv2/rubric-result-set/create
+     * @since 22.1
      * @throws RouteNotFound
      */
     public function getCreate(): void
@@ -79,6 +79,8 @@ class Controller extends Base
     }
 
     /**
+     * @api POST /adminv2/rubric-result-set/create
+     * @since 22.1
      * @throws RouteNotFound
      */
     public function postCreate(): void
@@ -89,6 +91,8 @@ class Controller extends Base
 
     /**
      * Shows a list of labels belonging to a particular rubric result set.
+     * @api GET /adminv2/rubric-result-set/{resultSetId}
+     * @since 22.1
      * @param int|null $resultSetId
      * @throws RouteNotFound
      */
@@ -114,6 +118,8 @@ class Controller extends Base
 
     /**
      * Save $_POSTed data to database, then redirect to getList.
+     * @api POST /adminv2/rubric-result-set/{resultSetId}
+     * @since 22.1
      * @param int|null $resultSetId
      * @throws RouteNotFound
      */
