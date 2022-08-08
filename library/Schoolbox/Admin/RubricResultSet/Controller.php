@@ -13,6 +13,9 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
 
+/**
+ * RubricResultSet controller class.
+ */
 class Controller extends Base
 {
     // The number of rows corresponds to the number of levels in a rubric grid.

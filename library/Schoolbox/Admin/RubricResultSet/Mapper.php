@@ -11,6 +11,9 @@ use PDO;
 use Schoolbox\Assessment\Rubric\DataModel\Result\Model;
 use Schoolbox\Mapper as BaseMapper;
 
+/**
+ * RubricResultSet mapper class.
+ */
 class Mapper extends BaseMapper
 {
     /**

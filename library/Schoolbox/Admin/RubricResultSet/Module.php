@@ -13,6 +13,9 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 
+/**
+ * RubricResultSet module class.
+ */
 class Module extends BaseModule
 {
     /** @var string */
