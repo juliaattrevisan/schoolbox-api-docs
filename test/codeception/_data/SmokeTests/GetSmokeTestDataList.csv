@@ -134,10 +134,10 @@ Admin,"LMS LMS Policy",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/set
 Admin,"LMS LMS Policy",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy,401
 Admin,"LMS LMS Policy",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy,401
 Admin,"LMS LMS Policy",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy,401
-Admin,"Setup rubric result set",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,200
-Admin,"Setup rubric result set",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,401
-Admin,"Setup rubric result set",Student,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,401
-Admin,"Setup rubric result set",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,401
+Admin,"Setup rubric result set",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-result-set,200
+Admin,"Setup rubric result set",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-result-set,401
+Admin,"Setup rubric result set",Student,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-result-set,401
+Admin,"Setup rubric result set",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-result-set,401
 Admin,"Configure terms",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/terms,200
 Admin,"Configure terms",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401
 Admin,"Configure terms",Student,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401

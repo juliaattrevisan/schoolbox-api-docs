@@ -32,7 +32,7 @@ Admin,Rollover folders,https://vagrant.dev.schoolbox.cloud/adminv2/rollover
 Admin,Summative Report,https://vagrant.dev.schoolbox.cloud/adminv2/summative-report
 Admin,Setup grades,https://vagrant.dev.schoolbox.cloud/adminv2/grades
 Admin,LMS LMS Policy,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy
-Admin,Setup rubric result set,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results
+Admin,Setup rubric result set,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-result-set
 Admin,Configure terms,https://vagrant.dev.schoolbox.cloud/adminv2/terms
 Admin,Bulk Course Import, https://vagrant.dev.schoolbox.cloud/adminv2/bulkCourseImport
 Admin,Configure course builder,https://vagrant.dev.schoolbox.cloud/adminv2/course-builder
