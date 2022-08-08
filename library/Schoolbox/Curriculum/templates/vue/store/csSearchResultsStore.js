@@ -51,6 +51,7 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
                 let flatChildren = [];
                 const codesClone = cloneDeep(this.codes); //cloneDeep is from lodash.js
                 codesClone.forEach((obj) => flatChildren = [...flatChildren, ...flattenCodes(obj)]);
+                flatChildren = flatChildren.filter((code) => code.code != ''); //only show those with a code, as those without can't be selected
                 return flatChildren;
             } else {
                 return [];

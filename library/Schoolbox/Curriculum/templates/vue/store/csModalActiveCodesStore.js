@@ -296,6 +296,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
                 let flatChildren = [];
                 const codesClone = cloneDeep(this.codes); //cloneDeep is from lodash.js
                 codesClone.forEach((obj) => flatChildren = [...flatChildren, ...flattenCodes(obj)]);
+                flatChildren = flatChildren.filter((code) => code.code != ''); //only show those with a code, as those without can't be selected
                 return flatChildren;
             } else {
                 return [];
@@ -349,7 +350,8 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
     actions: {
 
         /**
-         * 
+         * Can traverse through the codes via direct selection of a cs-modal-code when 
+         * it doesn't have a code. 
          */
         setNextSecondNode (id) {
             if (this.isOnThirdNode) {
