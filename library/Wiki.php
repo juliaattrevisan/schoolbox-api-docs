@@ -240,7 +240,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         $limit    = intval($limit);
         $sort_dir = (strtolower($sort_dir) === 'desc' ? 'desc' : 'asc');
 
-        $query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
+        $query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.preferred_name, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                         FROM `wikiRevision`
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
