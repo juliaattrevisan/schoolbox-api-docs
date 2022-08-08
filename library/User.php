@@ -448,15 +448,22 @@ class User extends DeprecatedModel
             $format = Config::get('name_format');
         }
 
-        // Modify $userInfo to something which matches possible format
-        $userInfo['preferredname'] ??= $userInfo['preferred_name'] ?? '';
-        $userInfo['givenname'] = $userInfo['preferredname'] ?? $userInfo['firstname'] ?? '';
-
         /* Replace tags */
         preg_match_all('|{\w+}|', $format, $tags);
         if (empty($tags) || empty($userInfo)) {
             return 'Unknown User';
         }
+
+        // Modify $userInfo to something which matches possible format:
+        // * "preferred_name" and "preferredname" are the same
+        // * "givenname" is "preferredname" if set, otherwise "firstname"
+        if (isset($userInfo['preferred_name']) && !isset($userInfo['preferredname'])) {
+            $userInfo['preferredname'] = $userInfo['preferred_name'];
+        }
+        $userInfo['givenname'] = ($userInfo['preferredname'] !== '')
+            ? $userInfo['preferredname']
+            : ($userInfo['firstname'] ?? '');
+
         foreach ($tags[0] as $tag) {
             $key = trim($tag, '{}');
 

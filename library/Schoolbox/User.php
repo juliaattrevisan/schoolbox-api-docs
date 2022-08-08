@@ -382,7 +382,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function getGivenName()
     {
-        return $this->preferredName ?: $this->firstname;
+        return ($this->preferredName !== '')
+            ? $this->preferredName
+            : $this->firstname;
     }
 
 
