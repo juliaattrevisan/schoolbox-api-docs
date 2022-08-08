@@ -38,6 +38,8 @@ $alert-close-opacity-hover: 1;
 $alert-close-padding: rem-calc(($base-font-size - 5));
 $alert-close-background: inherit !default;
 
+
+
 // We use this to control border radius
 $alert-radius: $global-radius;
 
@@ -139,7 +141,8 @@ $alert-default-background: css-darken($body-bg, 10%);
     background-color: $alert-default-background;
     color: $body-bg-contrast;
     -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    padding-right: 2.5rem;
+
     a {
         &:not(.close) {
             color: inherit;
