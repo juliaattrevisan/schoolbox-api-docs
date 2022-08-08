@@ -17,6 +17,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -62,6 +63,12 @@ class Factory
      * @var string
      */
     private string $key;
+
+
+    /**
+     * @var array
+     */
+    private array $watchlist;
 
 
     /**
@@ -167,10 +174,11 @@ class Factory
      * @param bool                                       $perform
      * @param string                                     $host
      * @param string                                     $key
+     * @param array                                      $watchlist
      * @param string                                     $dateLocalFormat
      * @param bool                                       $includePhoto
      * @param string                                     $spousePrefix
-     * @param UserProfile\Mapper                         $baseProfileMapper
+     * @param Mapper                                     $baseProfileMapper
      * @param UserProfile\Student\Mapper                 $studentProfileMapper
      * @param UserProfile\Parent\Mapper                  $parentProfileMapper
      * @param UserProfile\Staff\Mapper                   $staffProfileMapper
@@ -188,6 +196,7 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        array $watchlist,
         string $dateLocalFormat,
         bool $includePhoto,
         string $spousePrefix,
@@ -210,6 +219,7 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->watchlist = $watchlist;
         $this->dateLocalFormat = $dateLocalFormat;
         $this->includePhoto = $includePhoto;
         $this->spousePrefix = $spousePrefix;
@@ -278,6 +288,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $this->watchlist,
                 $this->includePhoto,
                 $this->spousePrefix,
                 $this->baseProfileMapper,
@@ -311,6 +322,7 @@ class Factory
                 $this->perform,
                 $api,
                 $lookup,
+                $this->watchlist,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper
             ))
@@ -319,6 +331,7 @@ class Factory
                 $this->perform,
                 $api,
                 $lookup,
+                $this->watchlist,
                 $this->dateLocalFormat,
                 $this->eventMapper,
                 $this->classEntryMapper,

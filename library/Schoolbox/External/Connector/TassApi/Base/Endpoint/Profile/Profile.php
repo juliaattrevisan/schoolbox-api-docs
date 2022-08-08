@@ -16,12 +16,12 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -92,6 +92,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var array
+     */
+    private array $watchlist;
+
+
+    /**
      * Set in Admin. This var deconflicts shared usernames by putting a letter in front,
      * because tass doesn't treat parents independently of families.
      *
@@ -135,20 +141,23 @@ class Profile implements IStrategy
      */
     private bool $includePhoto;
 
+
     /**
      * @var StorageMapper
      */
     private StorageMapper $storageMapper;
+
 
     /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
-     * @param Api[]                           $api
+     * @param array                           $api
+     * @param array                           $watchlist
      * @param bool                            $includePhoto
      * @param string                          $spousePrefix
-     * @param UserProfile\Mapper              $baseProfileMapper
+     * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
@@ -159,6 +168,7 @@ class Profile implements IStrategy
         LoggerInterface $log,
         bool $perform,
         array $api,
+        array $watchlist,
         bool $includePhoto,
         string $spousePrefix,
         UserProfile\Mapper $baseProfileMapper,
@@ -171,6 +181,7 @@ class Profile implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->watchlist = $watchlist;
         $this->includePhoto = $includePhoto;
         $this->spousePrefix = $spousePrefix;
 
@@ -218,7 +229,7 @@ class Profile implements IStrategy
 //        $familiesLookup = null;
         $commRulesLookup = null;
 
-        if (!count(Watchlist::WATCHLIST)) {
+        if (!count($this->watchlist)) {
 //            /* Grab all the parents' data in one big request
 //             * We need this for the sfa_num for each identifier
 //             */
@@ -253,7 +264,7 @@ class Profile implements IStrategy
 
             /* Only import data for externalIds in $watchlist, if provided
              */
-            if (!(new Watchlist())->isOnWatchlist($externalId)) {
+            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
                 continue;
             }
 
