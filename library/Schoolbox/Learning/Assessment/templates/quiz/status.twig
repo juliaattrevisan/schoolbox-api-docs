@@ -133,7 +133,7 @@
                 <p class="meta">
                     <span title="{{ pTooltip }}" data-status class="progress-tick tiny {{ pStatusClass }}"></span>
                     <span data-status-label>{{ pStatusText }}</span>
-                    {% if pActionSummary %}<span class="pipe meta"><a href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">View {{ responseHistory }}</a></span>{% endif %}
+                    {% if pActionSummary %}<span class="pipe meta"><a href="{{ pActionSummary }}" title="View {{ participant.user.givenName }}'s history">View {{ responseHistory }}</a></span>{% endif %}
                 </p>
             </div>
             {% if participant.allResponses | length %}

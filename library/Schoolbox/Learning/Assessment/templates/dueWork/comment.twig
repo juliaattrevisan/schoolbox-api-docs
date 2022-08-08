@@ -21,7 +21,7 @@
 {% elseif blindMode %}
     {% set placeholder = 'Feedback' %}
 {% else %}
-    {% set placeholder = 'Feedback for ' ~ participant.user.firstName %}
+    {% set placeholder = 'Feedback for ' ~ participant.user.givenName %}
 {% endif %}
 
 <label>Comment
