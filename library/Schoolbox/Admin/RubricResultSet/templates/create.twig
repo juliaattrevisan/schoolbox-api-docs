@@ -129,15 +129,15 @@
                     <section>
                         <fieldset id="rows-container" class="content">
                             {% for row in rubricResultRows %}
-                                <div id="row-{{ row.value|purify }}" class="small-12 columns actions-small-1">
+                                <div id="row-{{ row.value|escape('html_attr')}}" class="small-12 columns actions-small-1">
                                     <div class="list-item">
-                                        <input type="text" name="rubricResultLabels[{{ row.value|purify }}]"
-                                               value="{{ row.label|purify }}" maxlength="{{ maxCharsPerLabel }}"
+                                        <input type="text" name="rubricResultLabels[{{ row.value }}]"
+                                               value="{{ row.label|escape('html_attr') }}" maxlength="{{ maxCharsPerLabel }}"
                                                required/>
                                     </div>
                                     <nav>
                                         <a class="icon-delete" title="Delete rubric result set item"
-                                           onclick='removeRow({{ row.value|purify }})'></a>
+                                           onclick='removeRow({{ row.value }})'></a>
                                     </nav>
                                 </div>
                             {% endfor %}
