@@ -457,9 +457,10 @@ v_most_recent_feedback.review_route = 'instructor' AND
             rl.sequence as `descriptor_sequence`,
             t.*
         FROM v_rubric t
-                INNER JOIN rubric_descriptor rd ON t.indicator_id = rd.rubric_indicator_id
-                INNER JOIN rubric_level rl on rd.level_id = rl.id
-        WHERE assessment_id =  :assessmentID
+                 INNER JOIN submission_box sb on t.assessment_id = sb.assessment_id
+                 INNER JOIN rubric_descriptor rd ON t.indicator_id = rd.rubric_indicator_id
+                 INNER JOIN rubric_level rl on (rd.level_id = rl.id and sb.id = rl.box_id)
+        WHERE t.assessment_id =  :assessmentID
         ");
         $statement->execute(['assessmentID' => $assessmentId]);
         $output = [];
