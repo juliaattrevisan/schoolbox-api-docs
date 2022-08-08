@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Resource;
 
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress\Color\Color;
@@ -21,6 +22,8 @@ use Alaress\Color\Color;
  */
 abstract class AbstractFolder implements IFolder
 {
+    use DeletedAtDate;
+
     /**
      * Identifier
      *

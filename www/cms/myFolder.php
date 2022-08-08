@@ -6,10 +6,15 @@ $folderHandler = new MyFolder();
 $userMapper = new Schoolbox\UserMapper();
 $folderMapper = new Schoolbox\Resource\My\Folder\Mapper();
 
+/** @var SitePage $this */
 if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     try {
         /** @var Schoolbox\Resource\My\Folder\Model $folder */
         $folder = $folderMapper->findById($this->arg[0]);
+        // if folder exists and owner is different
+        if ((int)$folder->getOwner()->getId() !== (int)$_SESSION['id']) {
+            $this->error(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
+        }
         try {
             $folder->setOwner($userMapper->findById($folder->getOwner()->getId()));
         } catch (\Schoolbox\Mapper\Exception $e) {
@@ -81,6 +86,10 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         try {
             /** @var Schoolbox\Resource\My\Folder\Model $folder */
             $folder = $folderMapper->findById($this->arg[1]);
+            // if folder exists and owner is different
+            if ((int)$folder->getOwner()->getId() !== (int)$_SESSION['id']) {
+                $this->error(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
+            }
             try {
                 $folder->setOwner($userMapper->findById($folder->getOwner()->getId()));
             } catch (\Schoolbox\Mapper\Exception $e) {

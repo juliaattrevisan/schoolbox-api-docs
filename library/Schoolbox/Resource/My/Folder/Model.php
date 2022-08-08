@@ -24,8 +24,6 @@ use Schoolbox\User;
  */
 class Model extends AbstractFolder implements ISoftDeletable
 {
-    use DeletedAtDate;
-
     /** @var User */
     protected $owner;
 
