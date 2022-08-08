@@ -47,7 +47,7 @@ class Base extends AchievementReportBase
                 ShortHeading,
                 HdgAbbrev1,
                 ResultNumeric,
-                Comment,
+                -- Comment,
                 StaffMailNamePrimary,
                 StaffEmail
             FROM
@@ -59,6 +59,7 @@ class Base extends AchievementReportBase
         ";
 
         $rows     = $this->db->executeQuery($query, $params)->fetchAll();
+        $comments = $this->getComments();
         $mypData  = [];
         $headings = [];
         foreach ($rows as $row) {
@@ -92,21 +93,10 @@ class Base extends AchievementReportBase
                 $mypData[$classCode] = [
                     'topics'     => [],
                     'overview'   => $row['Overview'],
-                    'comments'   => [],
+                    'comments'   => $comments[$classCode] ?? [],
                     'staffName'  => $staffName,
                     'staffEmail' => $staffEmail,
                 ];
-            }
-            if (!in_array(trim($row['Comment']), array_column($mypData[$classCode]['comments'], 'comment'))) {
-                $mypData[$classCode]['comments'][] =
-                    [
-                        'comment'    => trim($row['Comment']),
-                        'staffName'  => $staffName,
-                        'staffEmail' => $staffEmail,
-                    ];
-                uasort($mypData[$classCode]['comments'], static function (array $a, array $b) {
-                    return strnatcasecmp($a['comment'], $b['comment']);
-                });
             }
             if (!key_exists($topicHeading, $mypData[$classCode]['topics'])) {
                 $mypData[$classCode]['topics'][$topicHeading] = [];
@@ -126,6 +116,52 @@ class Base extends AchievementReportBase
             'data'     => $mypData,
             'headings' => $headings,
         ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getComments(): array
+    {
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+            'year'       => $this->year,
+            'resultType' => 'MYPGRADE',
+        ];
+
+        $query = '
+            SELECT
+--                StudentYear,
+                Term,
+                ClassCode,
+--                CourseDescription,
+                Comment,
+                ClassTeacher1,
+                ClassTeacher1Email,
+--                ClassTeacher2,
+--                ClassTeacher2Email,
+--                ClassTeacher3,
+--                ClassTeacher3Email,
+                ResultType
+            FROM dbo.uvSchoolBoxReportComments
+            WHERE id = :externalId
+            AND StudentYear = :year
+            AND ResultType = :resultType
+            ORDER BY ClassCode, Term
+        ';
+        $rows  = $this->db->executeQuery($query, $params)->fetchAll();
+
+        $commentData = [];
+        foreach ($rows as $row) {
+            $commentData[$row['ClassCode']]   ??= [];
+            $commentData[$row['ClassCode']][] =
+                [
+                    'comment'    => trim($row['Comment']),
+                    'staffName'  => $row['ClassTeacher1'],
+                    'staffEmail' => $row['ClassTeacher1Email'],
+                ];
+        }
+        return $commentData;
     }
 
     /**
