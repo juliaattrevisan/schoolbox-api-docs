@@ -83,6 +83,8 @@ class Manager
     // If file is GIF and larger than this, only allow 1 simultaneous execution
     private const MUTEX_FILESIZE_LIMIT_BYTES = 1000000;
 
+    private const IDENTIFY_BIN = 'identify';
+
     /**  @var int[] */
     private array $workerPids = [];
 
@@ -709,7 +711,7 @@ class Manager
             if ($this->localStorageDir !== null) {
                 // If using local storage
                 $path        = FilesystemProxy::getPathFromHash($hash);
-                $cmd         = "/usr/bin/identify -format '%n\\n' {$this->localStorageDir}/$path | head -n 1";
+                $cmd         = self::IDENTIFY_BIN . " -format '%n\\n' {$this->localStorageDir}/$path | head -n 1";
                 $countLayers = (int)exec($cmd, $output, $exitCode);
                 if ($exitCode) {
                     $this->logger->error("Unable to determine image layer count, assuming multiple layers");
