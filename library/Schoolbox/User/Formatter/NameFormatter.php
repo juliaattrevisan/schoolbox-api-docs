@@ -41,30 +41,38 @@ class NameFormatter
      */
     public function formatObject(User $user): string
     {
-        $format = $this->format;
-
-        /* Replace tags */
-        preg_match_all('|{\w+}|', $format, $tags);
-
-        foreach ($tags[0] as $tag) {
-            $key  = trim($tag, '{}');
-            $func = 'get' . ucfirst($key);
-            $value = '';
-            if (method_exists($user, $func)) {
-                if (is_string($user->$func())) {
-                    $value = $user->$func();
-                } else {
-                    $value = '';
-                }
-            }
-            $format = str_replace($tag, $value, $format);
-        }
-
-        if ($format = trim($format)) {
-            return $format;
-        } else {
-            return 'Unknown User';
-        }
+        return $this->formatArray([
+            'title'          => $user->getTitle(),
+            'firstname'      => $user->getFirstname(),
+            'preferredname'  => $user->getPreferredName(),
+            'preferred_name' => $user->getPreferredName(),
+            'givenname'      => $user->getGivenName(),
+            'lastname'       => $user->getLastname(),
+        ]);
+//        $format = $this->format;
+//
+//        /* Replace tags */
+//        preg_match_all('|{\w+}|', $format, $tags);
+//
+//        foreach ($tags[0] as $tag) {
+//            $key  = trim($tag, '{}');
+//            $func = 'get' . ucfirst($key);
+//            $value = '';
+//            if (method_exists($user, $func)) {
+//                if (is_string($user->$func())) {
+//                    $value = $user->$func();
+//                } else {
+//                    $value = '';
+//                }
+//            }
+//            $format = str_replace($tag, $value, $format);
+//        }
+//
+//        if ($format = trim($format)) {
+//            return $format;
+//        } else {
+//            return 'Unknown User';
+//        }
     }
 
     /**
@@ -72,7 +80,15 @@ class NameFormatter
      *
      * Intended as a replacement for `\User::formatName`.
      *
-     * @param array $userInfo
+     * @param array $userInfo An array representation of a user, with the
+     *                        following possible keys:
+     *                        * title:          the user's title, if they have one
+     *                        * firstname:      the user's legal first name
+     *                        * preferredname:  the user's preferred name, if they have one
+     *                        * preferred_name: alias of "preferredname"
+     *                        * givenname:      the user's preferred name, if they have one: otherwise their first name
+     *                        *                 (derived from "preferredname" and "firstname" if not explicitly set)
+     *                        * lastname:       the user's surname
      * @return string
      */
     public function formatArray(array $userInfo): string
