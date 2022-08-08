@@ -386,7 +386,7 @@ class Classes implements IStrategy
                             $this->log->debug(sprintf(
                                 'Activity %s Instance on %s is not running; skipping',
                                 $activity['name'],
-                                $activity['start']
+                                $activityInstance['start']
                             ));
 
                             continue;
@@ -637,25 +637,21 @@ class Classes implements IStrategy
          * Use a local cache because we need to look them up with yet another
          * api call to find their external id, so we can trade space for time
          */
-        $attendeeTeacherIds = [];
+        $teacherIds = [];
 
         foreach ($activityInstance['attendees'] as $attendeeTeacher) {
-            $attendeeTeacherIds[] = (new FirstMeaningfulValue())->find([
-                $attendeeTeacher['coveringCompassPersonId'],
-                $attendeeTeacher['compassPersonId']
-            ]);
+            $teacherIds[] = $attendeeTeacher['coveringCompassPersonId'];
+            $teacherIds[] = $attendeeTeacher['compassPersonId'];
         }
 
-        $instanceTeaherIds = [
-            $activityInstance['coveringCompassPersonId'],
-            $activityInstance['managingCompassPersonId'],
-            $activity['managerCompassPersonId']
-        ];
+        $teacherIds[] = $activityInstance['coveringCompassPersonId'];
+        $teacherIds[] = $activityInstance['managingCompassPersonId'];
+        $teacherIds[] = $activity['managerCompassPersonId'];
 
         /* Some where amongst this molasses of data is at least one teacher
          * who is teaching this class. Disgusting.
          */
-        $teacherCompassIds = (new FirstMeaningfulValue())->find(array_merge($attendeeTeacherIds, $instanceTeaherIds));
+        $teacherCompassIds = (new FirstMeaningfulValue())->find($teacherIds);
 
         /* No identifiable teachers in any of the fields
          * That is a bit unorthodox, but maybe possible in compass
