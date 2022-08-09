@@ -31,7 +31,7 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
             membersStore.refreshMembers(); //to set any previously isNew or justUpdated to false
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
-                    method: 'PATCH',
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -65,7 +65,7 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
             membersStore.refreshMembers(); //to set any previously isNew or justUpdated to false
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
-                    method: 'PATCH',
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },

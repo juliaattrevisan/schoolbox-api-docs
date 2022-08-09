@@ -64,7 +64,7 @@ class Module extends BaseModule
         $this->register(self::METHOD_GET, '/modify/{folderId:\d+}', 'getModify', $perm, $preloadFolder);
         $this->register(self::METHOD_GET, '/getData/{folderId:\d+}', 'getData', $perm, $preloadFolder);
         $this->register(self::METHOD_DELETE, '/removeMembers/{folderId:\d+}', 'removeMembers', $perm, $preloadFolder);
-        $this->register(self::METHOD_PATCH, '/updateMembers/{folderId:\d+}', 'updateMembers', $perm, $preloadFolder);
+        $this->register(self::METHOD_POST, '/updateMembers/{folderId:\d+}', 'updateMembers', $perm, $preloadFolder);
         $this->register(self::METHOD_POST, '/addMembers/{folderId:\d+}', 'addMembers', $perm, $preloadFolder);
         $this->register(self::METHOD_POST, '/updateSettings/{folderId:\d+}', 'updateSettings', $perm, $preloadFolder);
         $this->register(self::METHOD_POST, '/disband/{folderId:\d+}', 'disband', $perm, $preloadFolder);
