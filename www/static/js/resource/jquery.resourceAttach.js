@@ -192,6 +192,24 @@
                 this.on('queuecomplete', function () {
                     submit.prop('disabled', false);
                 });
+
+                this.on('thumbnail', function (file, dataUrl) {
+                    if (file.previewElement) {
+                        file.previewElement.classList.remove("dz-file-preview");
+
+                        file.previewElement.querySelectorAll("[data-dz-thumbnail]").forEach((element) => {
+                            element.alt = file.name;
+                            element.src = dataUrl;
+                            if (dataUrl.target) { //if dataUrl is an event, lets reset the image back to the file.icon value
+                                element.src = file.icon;
+                            }
+                        });
+
+                        return setTimeout(function () {
+                            return file.previewElement.classList.add("dz-image-preview");
+                        }, 1);
+                    }
+                });
             },
 
             removedfile: function (_file) {
