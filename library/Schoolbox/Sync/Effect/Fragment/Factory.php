@@ -23,7 +23,6 @@ use Schoolbox\Config\Loader as ConfigLoader;
  */
 class Factory
 {
-
     /**
      * Various types
      */

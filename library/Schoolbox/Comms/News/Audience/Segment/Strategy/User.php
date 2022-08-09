@@ -16,11 +16,8 @@ use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 
-use function implode;
-
 class User extends SimpleStrategy
 {
-
     /**
      * @return string
      */

@@ -28,7 +28,6 @@ use Schoolbox\UserMapper;
 
 class CommentNotifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_COMMENTED = 'commented';
 
     /** @var FolderMapper */

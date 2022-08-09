@@ -19,7 +19,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 class Renderer extends Handler
 {
-
     /**
      * Type (e.g. 'link', 'blog', etc)
      *

@@ -16,7 +16,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 {
-
     /**
      * The template file to use
      *

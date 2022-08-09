@@ -33,7 +33,6 @@ use Schoolbox\UserMapper;
 
 class Notifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_ATTEMPTED = 'attempted';
     const TRIGGER_MARKED    = 'marked';
 

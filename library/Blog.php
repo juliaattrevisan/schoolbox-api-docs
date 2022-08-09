@@ -2,7 +2,6 @@
 
 class Blog extends DeprecatedModel
 {
-
     /**
      * @deprecated
      */

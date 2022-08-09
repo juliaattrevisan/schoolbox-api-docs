@@ -45,7 +45,6 @@ use UnexpectedValueException;
  */
 class UserMapper extends Mapper
 {
-
     // The username of the special 'Alaress Admin' user used by Schoolbox staff
     public const USERNAME_ALARESS_ADMIN = 'alaress';
 

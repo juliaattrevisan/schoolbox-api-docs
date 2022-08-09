@@ -10,7 +10,6 @@ use Schoolbox\Permission\Access\Access;
 
 class Feed
 {
-
     /** @var Schoolbox\User */
     private $user;
 

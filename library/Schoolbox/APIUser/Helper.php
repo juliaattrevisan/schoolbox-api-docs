@@ -3,12 +3,10 @@
 namespace Schoolbox\APIUser;
 
 use PDO;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 
 class Helper
 {
-
     protected UserMapper $userMapper;
 
     /**

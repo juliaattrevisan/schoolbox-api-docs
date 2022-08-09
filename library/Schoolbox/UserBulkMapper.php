@@ -19,7 +19,6 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class UserBulkMapper extends UserMapper
 {
-
     /**
      * Value of "Unchanged" option
      *

@@ -8,7 +8,6 @@
  */
 class Report_Login extends Report_Abstract implements Report_IReport
 {
-
     private $groupID = null;
     private $dataSet;
     private $dataCount;

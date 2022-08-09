@@ -31,7 +31,6 @@ use Schoolbox\User;
 
 class Notifier extends AbstractModuleNotifier implements SourceInterface
 {
-
     const TRIGGER_COMMENTED = 'commented';
     const TRIGGER_FOLLOWED = 'followed';
 

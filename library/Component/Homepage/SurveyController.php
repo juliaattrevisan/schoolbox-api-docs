@@ -11,7 +11,6 @@ use Schoolbox\UserMapper;
 
 class Component_Homepage_SurveyController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Prepares data for the render function. Business logic.
      *

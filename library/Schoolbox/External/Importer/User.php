@@ -33,7 +33,6 @@ use Schoolbox\YearLevel;
  */
 class User extends AbstractImporter
 {
-
     /**
      * @var Service
      */
