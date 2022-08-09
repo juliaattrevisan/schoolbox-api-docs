@@ -821,14 +821,14 @@ class Calendar extends DeprecatedModel
             error(34);
         }
 
-        $groupList  = $event['groupList'];
-        $campusList = $event['campusList'];
+        $groupList  = $event['groupList'] ?? null;
+        $campusList = $event['campusList'] ?? null;
 
         unset($event['groupList']);
         unset($event['campusList']);
 
         /* Clear attendance if it has changed from true to false */
-        if ($event['attendance'] < $cleanEvent['attendance']) {
+        if (($event['attendance'] ?? null) < $cleanEvent['attendance']) {
             $this->removeAttendanceByEvent($event['id']);
         }
 
