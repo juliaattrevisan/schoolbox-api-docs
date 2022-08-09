@@ -5,7 +5,8 @@
 import CurriculumSelector from '../../library/Schoolbox/Curriculum/templates/vue/curriculum-selector.vue';
 import { rest } from 'msw';
 import { data as allCurriculumData } from './dataCurriculumSelector';
-import { data as generalCurriculumData } from './dataGeneralCurriculum';
+import { data as vicCurriculumData } from './dataVicCurriculum';
+import { data as nswCurriculumData } from './dataNswCurriculum';
 
 
 const dataEndpoint = '/curriculumData'; 
@@ -92,31 +93,6 @@ LoadError.parameters = {
     }
 }
 
-export const SingleCurriculumGroup = Template.bind({});
-SingleCurriculumGroup.parameters = {
-    msw: {
-        handlers: [ 
-            rest.get(dataEndpoint, (req, res, ctx) => {
-                return res( 
-                    ctx.json(generalCurriculumData)
-                ) 
-            }),
-            ...mswHandlers,
-        ]
-    }
-}
-
-export const SearchExamples = Template.bind({});
-SearchExamples.decorators = [
-    () => ({ 
-        template: `
-        <story />
-        <p style="margin-top: 1rem;">Paste Codes: GCCCT-ALR, GCCCT-DCDCA, GCCCT-EPO, GCN-RUPR, GCN-IPR, GCN-APR</p>
-        <p>Search Terms: self-awareness</p>
-        `
-    })
-];
-
 export const PreSelectedCodes = Template.bind({});
 PreSelectedCodes.args = {
     ...Default.args,
@@ -135,4 +111,43 @@ isReadOnly.args = {
         { "id":108, "name":"Listen and respond to learning area texts", "code":"GCL-LRLAT", "description":"", "reference":null, "children":[ ], "area":null, "level":null, "breadcrumb":"General Capabilities > Literacy > Comprehending texts through listening, reading and viewing" },
     ],
     isReadOnly: true,
+}
+
+export const SearchExamples = Template.bind({});
+SearchExamples.decorators = [
+    () => ({ 
+        template: `
+        <story />
+        <p style="margin-top: 1rem;">Paste Codes: GCCCT-ALR, GCCCT-DCDCA, GCCCT-EPO, GCN-RUPR, GCN-IPR, GCN-APR</p>
+        <p>Search Terms: self-awareness</p>
+        `
+    })
+];
+
+export const VicCurriculum = Template.bind({});
+VicCurriculum.parameters = {
+    msw: {
+        handlers: [ 
+            rest.get(dataEndpoint, (req, res, ctx) => {
+                return res( 
+                    ctx.json(vicCurriculumData)
+                ) 
+            }),
+            ...mswHandlers,
+        ]
+    }
+}
+
+export const NswCurriculum = Template.bind({});
+NswCurriculum.parameters = {
+    msw: {
+        handlers: [ 
+            rest.get(dataEndpoint, (req, res, ctx) => {
+                return res( 
+                    ctx.json(nswCurriculumData)
+                ) 
+            }),
+            ...mswHandlers,
+        ]
+    }
 }

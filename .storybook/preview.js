@@ -24,8 +24,8 @@ app.use(ClientTable); //so can use v-tables-3-select-rows in stories
 app.use(createPinia()); //so can use pinia in stories
 
 export const parameters = {
-    layout: 'fullscreen', //allow the component to expand to the full width and height of the Canvas
     chromatic: { 
         pauseAnimationAtEnd: true // Notifies Chromatic to pause the animations when they finish at a global level.
     }, 
+    layout: 'fullscreen', //allow the component to expand to the full width and height of the Canvas
 }
