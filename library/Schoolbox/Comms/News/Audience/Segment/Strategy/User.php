@@ -69,7 +69,9 @@ class User extends SimpleStrategy
      */
     public function getAudiencingSql(\Schoolbox\User $user, string $searchPlaceholder = null): ?string
     {
-        $keywordFilter = null === $searchPlaceholder ? '' : "AND (firstname LIKE :{$searchPlaceholder} OR lastname LIKE :{$searchPlaceholder})";
+        $keywordFilter = null === $searchPlaceholder
+            ? ''
+            : "AND (firstname LIKE :{$searchPlaceholder} OR preferred_name LIKE :{$searchPlaceholder} OR lastname LIKE :{$searchPlaceholder})";
 
         $entityType = self::getEntityType();
         return "
