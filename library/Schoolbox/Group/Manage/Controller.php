@@ -137,7 +137,7 @@ class Controller extends Base
      * Update group members
      * @param Folder $folder
      * @return void
-     * @api   POST /group/updateMembers/{folderId}
+     * @api   PATCH /group/updateMembers/{folderId}
      * @since 22.1
      */
     public function updateMembers(Folder $folder)
