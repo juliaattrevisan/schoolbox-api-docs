@@ -52,13 +52,13 @@ const curriculumSelectorEl = ref(null);
 onMounted(() => {
     checkForStorybook();
     const store = useStore();
-    if (!props.isReadOnly && props.dataEndpoint !== '') {
+    store.isReadOnly = props.isReadOnly;
+    if (!store.isReadOnly && props.dataEndpoint !== '') { //only load when we need to
         store.load(props.dataEndpoint);
     }
     if (props.selectedCodes.length > 0) { //add in any codes that have been selected previously
         useSelectedCodesStore().add(props.selectedCodes);
     }
-    store.isReadOnly = props.isReadOnly;
 });
 
 /**

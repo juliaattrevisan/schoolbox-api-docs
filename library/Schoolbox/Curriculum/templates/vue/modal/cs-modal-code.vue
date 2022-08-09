@@ -42,7 +42,7 @@ const modalSelectedCodesStore = useModalSelectedCodesStore();
  *
  * @returns { Number }
  */
-const paddingLeft = computed(() => `calc(${props.depth * 2}rem)`);
+const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.5rem)`);
 
 /**
  * If there's a code available, which means it can be selected
@@ -52,15 +52,15 @@ const paddingLeft = computed(() => `calc(${props.depth * 2}rem)`);
 const hasCode = computed(() => props.code.code && props.code.code !== '');
 
 /**
- * To help distinguish those codes that aren't selectable, we remove
- * the default button colour
+ * To help distinguish those codes that aren't selectable, 
+ * we disable and remove the default button colour
  *
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    if (props.depth === 0 && !modalActiveCodesStore.isSearchActive) {
+    if (!hasCode.value && props.depth === 0 && !modalActiveCodesStore.isSearchActive) {
         return true;
-    } else if (!hasCode.value && modalActiveCodesStore.isOnFourthNode) {
+    } else if (!hasCode.value && modalActiveCodesStore.isOnFourthNode) { //cant select any further down from the fourth level
         return true;
     } else {
         return false;

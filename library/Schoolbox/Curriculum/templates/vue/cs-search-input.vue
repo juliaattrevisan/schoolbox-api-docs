@@ -4,7 +4,7 @@
  * To search for codes or select the browse button to open the modal
  */
 
-import { ref, computed, onMounted } from 'vue'; 
+import { ref, computed, onMounted, onUnmounted } from 'vue'; 
 import { useStore } from './store/curriculumSelectorStore'; 
 import { useModalStore } from './store/csModalStore'; 
 import { useSearchResultsStore } from './store/csSearchResultsStore'; 
@@ -42,32 +42,50 @@ const inputPlaceholder = computed(() => {
 });
 
 /**
- * enable relevant keyboard and mouse events
+ * add relevant keyboard and mouse events
  */
 onMounted(() => {
-    initKeyboardEvents();
-    initMouseEvents();
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+    document.addEventListener('click', onMouseClick);
 });
 
 /**
- * to be able to select by enter and navigate by up/down arrows
+ * remove relevant keyboard and mouse events
  */
-function initKeyboardEvents () {
-    document.addEventListener('keydown', (event) => { //prevent the <form> from being submitted on enter
-        if (event.key === 'Enter' && document.activeElement === queryInputEl.value) {
-            event.preventDefault();
-        }
-    });
-    document.addEventListener('keyup', (event) => {
-        const keyName = event.key;
-        const keyOptions = {
-            'Enter': () => onEnterKeySelected(),
-        }
-        if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
-            event.preventDefault();
-            keyOptions[keyName]();
-        }
-    });
+onUnmounted(() => {
+    document.removeEventListener('keydown', onKeyDown);
+    document.removeEventListener('keyup', onKeyUp);
+    document.removeEventListener('click', onMouseClick);
+});
+
+/**
+ * prevent the <form> from being submitted on enter
+ * 
+ * @param { Event }
+ */
+function onKeyDown (event) {
+    if (event.key === 'Enter' && document.activeElement === queryInputEl.value) {
+        event.preventDefault();
+    }
+}
+
+/**
+ * so we can select enter when adding codes
+ * useful if we copy/paste a bunch of codes,
+ * then we can just select enter to add them all
+ * 
+ * @param { Event }
+ */
+function onKeyUp (event) {
+    const keyName = event.key;
+    const keyOptions = {
+        'Enter': () => onEnterKeySelected(),
+    }
+    if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
+        event.preventDefault();
+        keyOptions[keyName]();
+    }
 }
 
 /**
@@ -82,13 +100,13 @@ function onEnterKeySelected () {
 /**
  * to be able to close the search results
  * when selection outside is made
+ * 
+ * @param { Event }
  */
-function initMouseEvents () {
-    document.addEventListener('click', (event) => {
-        if (props.curriculumSelectorEl && !props.curriculumSelectorEl.contains(event.target)) {
-            searchResultsStore.clear();
-        }
-    });
+function onMouseClick (event) {
+    if (searchResultsStore.isSearchActive && props.curriculumSelectorEl && !props.curriculumSelectorEl.contains(event.target)) {
+        searchResultsStore.clear();
+    }
 }
 
 /**
