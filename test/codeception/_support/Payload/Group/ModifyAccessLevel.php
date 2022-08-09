@@ -30,7 +30,6 @@ class ModifyAccessLevel extends GroupMember
     public function setMemberAccessLevel(int $user_id, int $accessLevel): void
     {
         $this->setFormParam("accessTypes[{$user_id}]", ['userId' => $user_id, 'accessType' => UserAccess::ACCESS_LEVEL_TO_NAME[$accessLevel]]);
-        $this->getMethod();
     }
 
     /** @inheritDoc */
