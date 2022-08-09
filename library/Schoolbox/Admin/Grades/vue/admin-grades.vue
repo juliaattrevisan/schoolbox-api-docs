@@ -253,7 +253,7 @@ export default {
                 <tr v-for="(level, levelIndex) in group.levels" :key="levelIndex">
                     <td>
                         <input :name="'group.' + String(groupIndex) + '.level.' + String(levelIndex) + '.lowerBound'"
-                               type="text"
+                               type="number"
                                inputmode="numeric"
                                min="0"
                                max="100"
@@ -266,7 +266,7 @@ export default {
                     </td>
                     <td>
                         <input :name="'group.' + String(groupIndex) + '.level.' + String(levelIndex) + '.rawGrade'"
-                               type="text"
+                               type="number"
                                inputmode="numeric"
                                min="0"
                                max="100"
