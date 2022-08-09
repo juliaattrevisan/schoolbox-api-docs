@@ -200,8 +200,8 @@
                         file.previewElement.querySelectorAll("[data-dz-thumbnail]").forEach((element) => {
                             element.alt = file.name;
                             element.src = dataUrl;
-                            if (dataUrl.target) { //if dataUrl is an event, lets reset the image back to the file.icon value
-                                element.src = file.icon;
+                            if (dataUrl.target) { //if dataUrl is an event, this is probably an issue with CORS, so lets try again
+                                element.src = dataUrl.target.src;
                             }
                         });
 
