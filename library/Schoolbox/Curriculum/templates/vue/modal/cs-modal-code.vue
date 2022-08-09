@@ -183,7 +183,6 @@ const containerClass = computed(() => {
    <li v-if="isVisible" :class="containerClass">
         <button 
             :class="`code-button`" 
-            :style="{ paddingLeft: paddingLeft }" 
             :disabled="isDisabled"
             @click.prevent="onSelected"
             @keyup.enter="onSelected"
@@ -226,23 +225,22 @@ const containerClass = computed(() => {
     display: flex;
     font-size: 1rem;
     margin: 0;
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 0.75rem 0.5rem v-bind(paddingLeft); //increment the padding left based on the node depth
     text-align: left;
     transition: background 0.2s;
     width: 100%;
     &:hover {
         background: var(--content-ui-hover);
     } 
-    &:disabled {
+    &:disabled { 
         color: #222222;
         opacity: 1;
     }
+    @media (max-width: 700px) {
+        font-size: 0.8rem;
+        padding: 0.25rem; 
+    }
 }
-
-// .code-button:: { 
-    
-//     pointer-events: none;
-// }
 
 .checklist {
     flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it

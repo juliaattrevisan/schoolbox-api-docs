@@ -73,12 +73,15 @@ const showFourthNodeSelect = computed(() => modalActiveCodesStore.hasSelectedThi
    </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+
+$minColWidth: 15rem;
 
 .other-nodes-container {
     display: grid;
     gap: 0.5rem;
-    grid-template-columns: repeat(3, 1fr);
+    //allow the columns to just fill so we maximise space regargless of how many are currently visible
+    grid-template-columns: repeat(auto-fit, minmax($minColWidth, 1fr)); 
 }
 
 </style>

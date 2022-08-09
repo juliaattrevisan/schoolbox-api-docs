@@ -5,7 +5,6 @@
  * further details revealed via a modal
  */
 
-import { computed } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 
@@ -32,19 +31,6 @@ const store = useStore();
 const selectedCodesStore = useSelectedCodesStore();
 
 /**
- * Just show the code, or just the name if it's available
- *
- * @returns { String }
- */
-const title = computed(() => {
-    if (props.code.code && props.code.code != '') {
-        return props.code.code;
-    } else {
-        return props.code.name;
-    }
-});
-
-/**
  * To open a modal that shows further info on the selected code
  */
 function onTitleSelected () {
@@ -68,7 +54,7 @@ function onRemoveSelected () {
             @click.prevent="onTitleSelected" 
             @keyup.enter="onTitleSelected"
             data-test-title-button>
-            {{ title }}
+            {{ props.code.code }}
         </button>
         <button 
             v-if="!store.isReadOnly" 
