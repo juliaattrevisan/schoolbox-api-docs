@@ -404,8 +404,8 @@ class Controller extends Base
         $auditRecord->setUser($this->getUser());
         $this->pastoralAuditMapper->save($auditRecord);
 
-        $typeId    = is_numeric($get['type']) ? (int)$get['type'] : null;
-        $subtypeId = is_numeric($get['subtype']) ? (int)$get['subtype'] : null;
+        $typeId    = filter_var($get['type'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $subtypeId = filter_var($get['subtype'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
 
         // Limit the number of pastoral records to display on each page of pastoral records
         $resultsPerPage = (int)$this->config->get('pastoral_page_size');
@@ -441,19 +441,20 @@ class Controller extends Base
             [
                 'template' => '@pastoral/student_linked.twig',
                 'data'     => [
-                    'user'            => $this->getUser(),
-                    'recordCount'     => $recordCount,
-                    'records'         => $pageRecords,
-                    'student'         => $student,
-                    'linkedStudent'   => $linkedStudent,
-                    'pageCurrent'     => $pageCurrent,
-                    'types'           => $this->pastoralTypeMapper->findAll(),
-                    'subtypes'        => $this->pastoralSubTypeMapper->findAll(),
-                    'linkedStudents'  => $linkedCounts,
-                    'typeSelected'    => $typeId,
-                    'subtypeSelected' => $subtypeId,
-                    'resultsPerPage'  => $resultsPerPage,
-                    'pagesToDisplay'  => $maxPage,
+                    'user'                => $this->getUser(),
+                    'recordCount'         => $recordCount,
+                    'records'             => $pageRecords,
+                    'student'             => $student,
+                    'linkedStudent'       => $linkedStudent,
+                    'pageCurrent'         => $pageCurrent,
+                    'types'               => $this->pastoralTypeMapper->findAll(),
+                    'subtypes'            => $this->pastoralSubTypeMapper->findAll(),
+                    'linkedStudents'      => $linkedCounts,
+                    'typeSelected'        => $typeId,
+                    'subtypeSelected'     => $subtypeId,
+                    'resultsPerPage'      => $resultsPerPage,
+                    'pagesToDisplay'      => $maxPage,
+                    'countSummaryByMonth' => ['recordCount' => 0],
                 ],
                 'title'    => 'Linked Records',
             ]
