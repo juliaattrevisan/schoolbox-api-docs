@@ -271,7 +271,7 @@ class Calendar extends DeprecatedModel
 				e.location, e.attendance, e.detail, e.publish_date, e.allday,
 				DATE_FORMAT(e.start_datetime, '" . Config::get('calendar_time_format') . "') startTime,
 				DATE_FORMAT(e.end_datetime, '" . Config::get('calendar_time_format') . "') endTime,
-				u.title AS userTitle, u.firstname, u.lastname
+				u.title AS userTitle, u.firstname, u.preferred_name, u.lastname
 			FROM {$this->_table} e
 			LEFT JOIN user u ON u.id = e.owner
 			WHERE e.{$this->_index} = $eventID
@@ -348,7 +348,7 @@ class Calendar extends DeprecatedModel
                 TIME_TO_SEC(end_datetime) as endTimestamp,
                 start_datetime, end_datetime,
                 type, event.title, access, location, detail,
-                user.id as uid, user.title AS userTitle, firstname, lastname,
+                user.id as uid, user.title AS userTitle, firstname, preferred_name, lastname,
                 eventType, eventColour,
                 MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword') AS `score`
             FROM event
@@ -589,6 +589,7 @@ class Calendar extends DeprecatedModel
                 user.id as uid,
                 user.title as userTitle,
                 firstname,
+                preferred_name,
                 lastname,
                 eventType,
                 event.variant AS eventVariant,
@@ -635,7 +636,11 @@ class Calendar extends DeprecatedModel
             foreach ($allEvents as $currentEvent) {
                 $event = new Event();
 
-                $event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
+                $event->setAuthorName(
+                    (new User\Formatter\Factory())->buildFromNothing()->formatArray(
+                        ['title' => ''] + $currentEvent
+                    )
+                );
                 $event->setAuthorId($currentEvent['uid']);
                 $event->setEventId($currentEvent['id']);
                 $event->setStartTime(
