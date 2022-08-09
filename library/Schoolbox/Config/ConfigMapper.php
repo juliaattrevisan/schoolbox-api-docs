@@ -210,6 +210,8 @@ class ConfigMapper extends Mapper
 
     public const NAME_GROUP_STAFF_ONLY = 'group_staff_only';
 
+    public const NAME_NAME_FORMAT = 'name_format';
+
     /**
      * Config settings which may affect the behaviour of the router daemon.
      *

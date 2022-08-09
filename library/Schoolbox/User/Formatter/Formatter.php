@@ -14,7 +14,7 @@ use Schoolbox\User;
 /**
  * Helper for formatting a user's name.
  */
-class NameFormatter
+class Formatter
 {
     /**
      * Constructor
