@@ -39,17 +39,6 @@ class User extends DeprecatedModel
         return $this->userNotifier;
     }
 
-    public function getAllInCategory($categoryID)
-    {
-        $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id
-                  FROM user, userAccess
-                  WHERE id = uid AND service = '" . UserAccess::SERVICE_HOMEPAGE . "' AND sid = '" . $categoryID . "'
-                  AND type > 0
-                  AND user.deleted_at IS NULL
-                  ORDER BY lastname, firstname";
-        return $this->db->getAll($query);
-    }
-
     public function getByID($id)
     {
         $query = "SELECT user.id as uid, title, firstname, preferred_name, lastname, username, `groups`.name AS gname, group_id, lu_year_level.name AS year, `key`, hash, eportfolio_enabled,
