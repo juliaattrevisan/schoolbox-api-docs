@@ -109,8 +109,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                                 'SURVEY_DESCRIPTION'    => Scrub::html($currentSurvey['description']),
                                 'SURVEY_CREATED'        => $createdTime->getRelativeTime(),
                                 'SURVEY_USER_ID'        => $author->getId(),
-                                'SURVEY_USER_FIRSTNAME' => $author->getFirstname(),
-                                'SURVEY_USER_LASTNAME'  => $author->getLastname(),
+                                'SURVEY_USER_FULLNAME'  => $author->getFullName(),
                             ]
                         );
 
