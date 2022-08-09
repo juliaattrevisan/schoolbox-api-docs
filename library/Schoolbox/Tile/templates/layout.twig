@@ -233,7 +233,7 @@
                          data-hide-watch-value="grid">
                         <label for="grid_width">px</label>
                         <input id="grid_width"
-                               type="text"
+                               type="number"
                                inputmode="numeric"
                                name="grid_width"
                                value="{{ item.gridWidth|e('html_attr') }}"
@@ -246,6 +246,7 @@
                         <label for="grid_padding">px padding</label>
                         <input id="grid_padding"
                                type="number"
+                               inputmode="numeric"
                                name="grid_padding"
                                value="{{ item.gridPadding|e('html_attr') }}"
                                class="layout-width"
@@ -257,7 +258,7 @@
                          data-hide-watch-value="column">
                         <label for="column_count">tiles/row</label>
                         <input id="column_count"
-                               type="text"
+                               type="number"
                                inputmode="numeric"
                                name="column_count"
                                value="{{ item.columnCount|e('html_attr') }}"
@@ -269,7 +270,7 @@
                          data-hide-watch-value="column">
                         <label for="column_padding">% padding</label>
                         <input id="column_padding"
-                               type="text"
+                               type="number"
                                inputmode="numeric"
                                name="column_padding"
                                value="{{ item.columnPadding|e('html_attr') }}"
