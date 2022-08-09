@@ -15,6 +15,7 @@ use Calendar\Api\ModuleChecker;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 
 /**
  * @method Calendar_Api_Config_Record createModel()
@@ -146,19 +147,52 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      * Retrieves a list of sources for the calendar.
      *
      * @param ModuleChecker $moduleChecker
+     * @param User          $user
      * @return array
      *   name: a name for this source
      *   id:   a comma-separated list of source IDs
      */
-    public function getSourceListForCalendar(ModuleChecker $moduleChecker): array
+    public function getSourceListForCalendar(ModuleChecker $moduleChecker, User $user): array
     {
-        $configs = $this->getAllConfigRecords();
-        $sourceList = [];
+        $configs             = $this->getAllConfigRecords();
+        $sourceList          = [];
+        $userCampusIdsAsKeys = [];
+
+        // Get user campusIds for easy lookup below.
+        foreach ($user->getCampusCollection() as $item) {
+            $userCampusIdsAsKeys[$item->getId()] = null;
+        }
 
         foreach ($configs as $record) {
             $config = $record->decodeConfig();
             try {
-                if ($moduleChecker->isEnabled($config)) {
+                if (!$moduleChecker->isEnabled($config)) {
+                    continue;
+                }
+
+                $boolAddRecord = false;
+
+                if ($record->connectorClass !== 'Vcal') {
+                    $boolAddRecord = true;
+                }
+                else {
+                    // Only add record to sourceList if user is in an allowed campus and has an allowed role.
+                    foreach ($config->getCampus() as $campusId) {
+                        if (!array_key_exists($campusId, $userCampusIdsAsKeys)) {
+                            continue;
+                        }
+
+                        foreach ($config->getGroups() as $roleId) { // Roles are called groups in the $config object.
+                            if ($user->getRole()->getId() !== (int)$roleId) {
+                                continue;
+                            }
+
+                            $boolAddRecord = true;
+                        }
+                    }
+                }
+
+                if ($boolAddRecord) {
                     $sourceList[] = [
                         'id'   => (int)$record->getId(),
                         'name' => $config->getLabel()
