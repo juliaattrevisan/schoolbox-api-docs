@@ -147,7 +147,8 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                     }
                 }
             } else {
-                $person = "{$user['firstname']} {$user['lastname']} - ";
+                $fullName = $userHandler->formatName($user);
+                $person = "{$fullName} - ";
 
                 if ($user['year']) {
                     $person .= "Year {$user['year']}, ";
@@ -168,7 +169,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                     'id' => $userId,
                     'first_name' => $user['firstname'],
                     'last_name' => $user['lastname'],
-                    'full_name' => $userHandler->formatName($user),
+                    'full_name' => $fullName,
                     'role' => $user['gname'],
                     'role_id' => $user['gid'],
                     'roleType' => $user['gtype'],
