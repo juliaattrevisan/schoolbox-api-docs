@@ -124,12 +124,23 @@ class Helper
                 $where .= "AND ( synergy_id = :externalId  ) ";
             } else {
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
-                    $params['firstName'] = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[1]) . '%';
-                    $params['lastName']  = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[2]) . '%';
-                    $where .= "AND ( given_name like :firstName and lastname like :lastName ) ";
+                    $params['firstName'] = $params['preferredName'] =
+                        '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[1]) . '%';
+                    $params['lastName']  =
+                        '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($name[2]) . '%';
+                    $where .= "AND (
+                        (firstname like :firstName or preferred_name like :preferredName)
+                        and lastname like :lastName
+                    ) ";
                 } else {
-                    $params['username'] = $params['lastName'] = $params['firstName'] = '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($keyword) . '%';
-                    $where .= "AND ( given_name like :firstName or lastname like :lastName or username like :username ) ";
+                    $params['username'] = $params['lastName'] = $params['firstName'] = $params['preferredName'] =
+                        '%' . $this->userMapper->getDatabase()->getQuoter()->escapeForLike($keyword) . '%';
+                    $where .= "AND (
+                        firstname like :firstName
+                        or preferred_name like :preferredName
+                        or lastname like :lastName
+                        or username like :username
+                    ) ";
                 }
             }
         }
