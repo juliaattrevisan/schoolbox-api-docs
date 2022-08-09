@@ -47,10 +47,10 @@ class Controller extends Base
         \Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $rerouteOverrideMapper,
     ) {
-        $this->userMapper            = $userMapper;
-        $this->groupMapper           = $groupMapper;
-        $this->userAccessMapper      = $userAccessMapper;
-        $this->groupsHelper          = new GroupsHelper(
+        $this->userMapper       = $userMapper;
+        $this->groupMapper      = $groupMapper;
+        $this->userAccessMapper = $userAccessMapper;
+        $this->groupsHelper     = new GroupsHelper(
             $groupMapper,
             $userAccessMapper,
             $folderMapper,
@@ -143,13 +143,16 @@ class Controller extends Base
     public function updateMembers(Folder $folder)
     {
         $requestBody = json_decode(json_encode($this->request->content->get()), true);
-        $userIds     = array_map('intval', $requestBody['members']);
+        $newAccesses = array_combine(
+            array_map('intval', array_column($requestBody['accessTypes'], 'userId')),
+            $requestBody['accessTypes']
+        );
 
-        $users        = $this->userMapper->findByColumnList(['id' => $userIds]);
+        $users        = $this->userMapper->findByColumnList(['id' => array_keys($newAccesses)]);
         $userAccesses = $this->userAccessMapper->findForFolderUser($folder, $users);
 
-        $userAccesses->map(function ($userAccess) use ($requestBody) {
-            return (new ArrayToModel\UserAccess())($requestBody, $userAccess);
+        $userAccesses->map(function ($userAccess) use ($newAccesses) {
+            return (new ArrayToModel\UserAccess())($newAccesses[$userAccess->getUser()->getId()], $userAccess);
         });
         try {
             $this->userAccessMapper->save($userAccesses);

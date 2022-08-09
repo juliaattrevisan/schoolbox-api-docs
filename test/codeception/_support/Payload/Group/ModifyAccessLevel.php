@@ -9,10 +9,24 @@ declare(strict_types=1);
 
 namespace Payload\Group;
 
+use Schoolbox\Permission\Access\UserAccess;
+
 class ModifyAccessLevel extends GroupMember
 {
+    public function getMethod(): string
+    {
+        return 'PATCH';
+    }
+
     public function setMemberAccessLevel(int $user_id, int $accessLevel): void
     {
-        $this->setFormParam('accessLevel[' . $user_id . ']', $accessLevel);
+        $this->setFormParam("accessTypes[{$user_id}]", ['userId' => $user_id, 'accessType' => UserAccess::ACCESS_LEVEL_TO_NAME[$accessLevel]]);
+        $this->getMethod();
+    }
+
+    /** @inheritDoc */
+    protected function getUrl(): string
+    {
+        return "/group/updateMembers/{$this->folderId}";
     }
 }
