@@ -481,17 +481,17 @@ function renderDryRunForm(string $yearLevel, string $year, string $semester): vo
         <table style="border: 1px solid black;">
             <tr>
                 <td>Year Level: (eg '11')</td>
-                <td><input type="text" inputmode="numeric" name="yearLevel" title="Year Level" value="<?php echo $yearLevel; ?>"
+                <td><input type="number" inputmode="numeric" name="yearLevel" title="Year Level" value="<?php echo $yearLevel; ?>"
                            min="<?php echo YEAR_LEVEL_MIN; ?>" max="<?php echo YEAR_LEVEL_MAX; ?>" required></td>
             </tr>
             <tr>
                 <td>Year: (eg '2019')</td>
-                <td><input type="text" inputmode="numeric" name="year" title="Year" value="<?php echo $year; ?>"
+                <td><input type="number" inputmode="numeric" name="year" title="Year" value="<?php echo $year; ?>"
                            min="<?php echo YEAR_MIN; ?>" max="<?php echo YEAR_MAX; ?>" required></td>
             </tr>
             <tr>
                 <td>Semester: (eg '2')</td>
-                <td><input type="text" inputmode="numeric" name="semester" title="Semester" value="<?php echo $semester; ?>" min="1"
+                <td><input type="number" inputmode="numeric" name="semester" title="Semester" value="<?php echo $semester; ?>" min="1"
                            max="2" required></td>
             </tr>
             <tr>
