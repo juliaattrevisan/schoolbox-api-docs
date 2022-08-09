@@ -13,6 +13,15 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class ModifyAccessLevel extends GroupMember
 {
+    /**
+     * Set the 'Accept' header of the request
+     * @param string $type
+     */
+    public function setAccepts(string $type)
+    {
+        $this->setHeader('Accept', 'application/json');
+    }
+
     public function getMethod(): string
     {
         return 'PATCH';
