@@ -56,7 +56,7 @@ const showFourthNodeSelect = computed(() => modalActiveCodesStore.hasSelectedThi
 
 <template>
     <div class="first-node-container">
-        <select v-model="modalActiveCodesStore.selectedFirstNodeId" @change="onFirstNodeChanged" :disabled="modalActiveCodesStore.hasSingleCurriculumGroup">
+        <select v-model="modalActiveCodesStore.selectedFirstNodeId" @change="onFirstNodeChanged" :disabled="modalActiveCodesStore.hasSingleGroup">
             <option v-for="node in modalActiveCodesStore.firstNodes" :key="node.id" :value="node.id">{{ node.name }}</option>
         </select>
     </div>

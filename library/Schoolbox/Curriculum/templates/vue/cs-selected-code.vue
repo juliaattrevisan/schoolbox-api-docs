@@ -29,6 +29,7 @@ const props = defineProps({
 });
 
 const store = useStore();
+const selectedCodesStore = useSelectedCodesStore();
 
 /**
  * Just show the code, or just the name if it's available
@@ -47,14 +48,14 @@ const title = computed(() => {
  * To open a modal that shows further info on the selected code
  */
 function onTitleSelected () {
-    useSelectedCodesStore().setActiveCode(props.code);
+    selectedCodesStore.setActiveCode(props.code);
 }
 
 /**
  * To remove from the selected list
  */
 function onRemoveSelected () {
-    useSelectedCodesStore().remove(props.code);
+    selectedCodesStore.remove(props.code);
 }
 
 </script>
@@ -65,7 +66,8 @@ function onRemoveSelected () {
             class="title-button" 
             :title="`View ${props.code.name}`"
             @click.prevent="onTitleSelected" 
-            @keyup.enter="onTitleSelected" >
+            @keyup.enter="onTitleSelected"
+            data-test-title-button>
             {{ title }}
         </button>
         <button 

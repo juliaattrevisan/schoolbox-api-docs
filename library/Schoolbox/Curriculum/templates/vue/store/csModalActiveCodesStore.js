@@ -29,7 +29,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          * 
          * @return { Boolean }
          */
-        hasSingleCurriculumGroup () {
+        hasSingleGroup () {
             const codesStore = useCodesStore();
             if (codesStore.codes.length === 1) {
                 this.selectedFirstNodeId = codesStore.codes[0].id;
@@ -47,7 +47,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          */
         firstNodes () {
             const codesStore = useCodesStore();
-            if (this.hasSingleCurriculumGroup) {
+            if (this.hasSingleGroup) {
                 return [...codesStore.codes];
             } else {
                 return [ 
@@ -81,7 +81,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          * @return { Boolean }
          */
         hasSecondNodes () {
-            return this.selectedFirstNode.children.length > 1 ? true : false;
+            return this.selectedFirstNode.children.length > 0 ? true : false;
         },
 
         /**
@@ -121,7 +121,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          * @return { Boolean }
          */
         hasThirdNodes () {
-            return this.selectedSecondNode.children.length > 1 ? true : false;
+            return this.selectedSecondNode.children.length > 0 ? true : false;
         },
 
         /**
@@ -161,7 +161,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          * @return { Boolean }
          */
         hasFourthNodes () {
-            return this.selectedThirdNode.children.length > 1 ? true : false;
+            return this.selectedThirdNode.children.length > 0 ? true : false;
         },
 
         /**

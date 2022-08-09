@@ -42,7 +42,7 @@ const modalSelectedCodesStore = useModalSelectedCodesStore();
  *
  * @returns { Number }
  */
-const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.5rem)`);
+const paddingLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * If there's a code available, which means it can be selected
