@@ -56,6 +56,7 @@ class Renderer extends Handler
                 try {
                     $folder = $folderMapper->findCheaplyById($wiki['categoryID']);
 
+                    $wiki['breadcrumb'] ??= '';
                     foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
                         $wiki['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
                     }
