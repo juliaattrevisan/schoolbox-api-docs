@@ -509,13 +509,14 @@ class Controller extends Base
                 . $tokenReplacer->replace(
                     $signature,
                     [
-                        '[title]'     => $this->getUser()->getTitle(),
-                        '[firstname]' => $this->getUser()->getFirstname(),
-                        '[surname]'   => $this->getUser()->getLastname(),
-                        //surname as that is the language we are using in admin user modify
-                        '[fullname]'  => $this->getUser()->getFullName(),
-                        '[email]'     => sprintf('<a href="mailto:%s">%s</a>', $this->getUser()->getEmail(), $this->getUser()->getEmail()),
-                        '[position]'  => $this->getUser()->getPositionTitle(),
+                        '[title]'         => $this->getUser()->getTitle(),
+                        '[firstname]'     => $this->getUser()->getFirstname(),
+                        '[surname]'       => $this->getUser()->getLastname(),
+                        '[givenname]'     => $this->getUser()->getGivenName(),
+                        '[preferredname]' => $this->getUser()->getPreferredName(),
+                        '[fullname]'      => $this->getUser()->getFullName(),
+                        '[email]'         => sprintf('<a href="mailto:%s">%s</a>', $this->getUser()->getEmail(), $this->getUser()->getEmail()),
+                        '[position]'      => $this->getUser()->getPositionTitle(),
                     ]
                 );
         }

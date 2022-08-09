@@ -378,6 +378,7 @@ class Mapper extends \Schoolbox\Mapper
 
         $pb = $this->getPredicateBuilder()
             ->like('user.firstname', "%{$keyword}%")
+            ->like('user.preferred_name', "%{$keyword}%")
             ->like('user.lastname', "%{$keyword}%")
             ->like('user.username', "%{$keyword}%")
             ->like('user.synergy_id', "%{$keyword}%");
@@ -388,6 +389,7 @@ class Mapper extends \Schoolbox\Mapper
             SELECT DISTINCT
                 `user`.id,
                 `user`.firstname,
+                `user`.preferred_name,
                 `user`.lastname,
                 lyl.name AS year,
                 `groups`.name AS role,

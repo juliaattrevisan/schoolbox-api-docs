@@ -875,7 +875,7 @@ class Mapper extends BaseMapper
         foreach ($order as $orderCurrent) {
             switch ($orderCurrent) {
                 case 'student':
-                    $orderParts[] = "`s`.lastname, `s`.firstname";
+                    $orderParts[] = "`s`.lastname, `s`.given_name";
                     break;
                 case 'severity':
                     $orderParts[] = "`sv`.sequence";
@@ -896,7 +896,7 @@ class Mapper extends BaseMapper
                     $orderParts[] = "`sy`.sequence asc";
                     break;
                 case 'author':
-                    $orderParts[] = "`o`.lastname, `o`.firstname";
+                    $orderParts[] = "`o`.lastname, `o`.given_name";
                     break;
                 case 'house':
                     $orderParts[] = "`s`.`house`";

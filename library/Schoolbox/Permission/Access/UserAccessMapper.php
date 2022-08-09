@@ -465,7 +465,7 @@ class UserAccessMapper extends Mapper
                 INNER JOIN {$userMapper->getJoinSql('role','u', 'g', true)}
                 {$userAccessJoinType} JOIN {$this->table} ua ON ua.uid = u.id
             WHERE {$whereClause}
-            ORDER BY ua.type DESC, u.lastname, u.firstname
+            ORDER BY ua.type DESC, u.lastname, u.given_name
         ";
 
         $stmt = $this->database->prepare($query);
