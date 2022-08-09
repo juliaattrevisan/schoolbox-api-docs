@@ -57,7 +57,7 @@ class User extends DeprecatedModel
 
     public function getByUsername($username)
     {
-        $query = "SELECT user.id as uid, title, firstname, lastname, username, `groups`.name AS gname, group_id, lyl.name AS year, eportfolio_enabled,`key`, hash,
+        $query = "SELECT user.id as uid, title, firstname, preferred_name, lastname, username, `groups`.name AS gname, group_id, lyl.name AS year, eportfolio_enabled,`key`, hash,
                         position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, webmail, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler, calendar_view, enabled
                 FROM user
                     LEFT JOIN `groups` ON user.group_id = `groups`.id
@@ -210,7 +210,7 @@ class User extends DeprecatedModel
             LEFT JOIN `lu_year_level` ON `user`.year_id = `lu_year_level`.id AND `lu_year_level`.deleted_at IS NULL
             WHERE $wherePart
         ";
-        $query .= " ORDER BY lastname, firstname ASC
+        $query .= " ORDER BY lastname, given_name ASC
                         LIMIT $offset, $limit;";
         // retreive count
         $count_query = "SELECT COUNT(*) FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id WHERE $wherePart";
@@ -254,19 +254,25 @@ class User extends DeprecatedModel
         $query = "SELECT user.*, `groups`.name AS group_name
                     FROM `user`
                     LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-                    WHERE ( firstname = '$keyword'
-                    OR lastname = '$keyword'
-                    OR username = '$keyword' )
+                    WHERE (
+                        firstname = '$keyword'
+                        OR preferred_name = '$keyword'
+                        OR lastname = '$keyword'
+                        OR username = '$keyword'
+                    )
                     $wherePart
-                    ORDER BY lastname, firstname ASC
+                    ORDER BY lastname, given_name ASC
                     LIMIT $offset, $limit;";
         // retreive count
         $count_query = "SELECT COUNT(*)
                                 FROM `user`
                                 LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-                                WHERE ( firstname = '$keyword'
-                                OR lastname = '$keyword'
-                                OR username = '$keyword' )
+                                WHERE (
+                                    firstname = '$keyword'
+                                    OR preferred_name = '$keyword'
+                                    OR lastname = '$keyword'
+                                    OR username = '$keyword'
+                                )
                                 $wherePart";
         $count       = $this->db->getOne($count_query);
         return $this->db->getAll($query);
@@ -318,10 +324,19 @@ class User extends DeprecatedModel
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
                     $firstName = $this->db->escapeForLike($name[1]);
                     $lastName  = $this->db->escapeForLike($name[2]);
-                    $query .= "( firstname like '%{$firstName}%' and lastname like '%{$lastName}%' ) ";
+                    $query .= "
+                        ( firstname like '%{$firstName}%' and lastname like '%{$lastName}%' )
+                        or
+                        ( preferred_name like '%{$firstName}%' and lastname like '%{$lastName}%' )
+                    ";
                 } else {
                     $param = $this->db->escapeForLike($keyword);
-                    $query .= "( firstname like '%$param%' or lastname like '%$param%' or username like '%$param%' ) ";
+                    $query .= "(
+                        firstname like '%$param%'
+                        or preferred_name like '%$param%'
+                        or lastname like '%$param%'
+                        or username like '%$param%'
+                    ) ";
                 }
             }
             if (is_array($group)) {
@@ -353,7 +368,7 @@ class User extends DeprecatedModel
         if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
             $query .= ' AND ' . $searchFilter;
         }
-        $query .= "ORDER BY group_id, lyl.sequence, lastname, firstname";
+        $query .= "ORDER BY group_id, lyl.sequence, lastname, given_name";
         if (is_numeric($limit)) {
             $query .= " LIMIT $limit";
         }
