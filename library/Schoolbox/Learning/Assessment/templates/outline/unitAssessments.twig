@@ -31,7 +31,8 @@
         {# What action-tot routes are available to this user? #}
         {% if readOnly %}
             {# If readonly mode: show no tot #}
-            {% set isActionRoutes = false %}
+            {% set hasAssessmentRoutes = false %}
+            {% set hasCourseRoutes = false %}
         {% else %}
             {# If write mode: show tot only if there's at least one action #}
             {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
@@ -42,11 +43,13 @@
             {% endif %}
             {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
             {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
-            {% set isActionRoutes = statusRoute or modifyRoute or deleteRoute or similarityReportRoute %}
+            {% set hasAssessmentRoutes = statusRoute or modifyRoute or deleteRoute or similarityReportRoute %}
+            {% set saveToCourseRoute = '#' %}
+            {% set hasCourseRoutes = true %}
         {% endif %}
 
         <li class="interact" data-unit-assessment="{{ assessment.id }}">
-            <div{% if isActionRoutes or isParticipant %} class="actions-small-1"{% endif %}>
+            <div{% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %} class="actions-small-1"{% endif %}>
                 {% if canWrite %}
                     <div class="grip compact"></div>
                 {% endif %}
@@ -86,9 +89,9 @@
                     </div>
                 </div>
 
-                {% if isActionRoutes or isParticipant %}
+                {% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %}
                     <nav>
-                        {% if isActionRoutes %}
+                        {% if hasAssessmentRoutes or hasCourseRoutes %}
                             <a href="#" class="icon-more" data-dropdown="options-task{{ assessment.id }}" aria-expanded="false" title="Actions"></a>
                         {% elseif isParticipant %}
                             {% include '@learningAssessment/fragments/progressTick.twig' with {
@@ -100,12 +103,19 @@
                     </nav>
                 {% endif %}
 
-                {% if isActionRoutes %}
+                {% if hasAssessmentRoutes or hasCourseRoutes %}
                     <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
-                        {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
-                        {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report">Similarity Report</a></li>{% endif %}
-                        {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>{% endif %}
-                        {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
+                        {% if hasAssessmentRoutes %}
+                            <li class="separator">Assessment</li>
+                            {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                            {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report">Similarity Report</a></li>{% endif %}
+                            {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>{% endif %}
+                            {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
+                        {% endif %}
+                        {% if hasCourseRoutes %}
+                            <li class="separator">Course</li>
+                            {% if saveToCourseRoute %}<li><a href="{{ saveToCourseRoute }}" class="icon-progress">Save to Course...</a></li>{% endif %}
+                        {% endif %}
                     </ul>
                 {% endif %}
             </div>
