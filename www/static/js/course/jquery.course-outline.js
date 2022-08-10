@@ -150,6 +150,37 @@
             }
         );
 
+
+        // Save to course:
+        // create a dialog
+        component.on('click.courseInstance', '[data-action=save-to-course]', function (event) {
+            event.preventDefault();
+
+            let $element = $(this),
+                $header,
+                $text;
+
+            // Header differs on whether:
+            // * this has a spec assessment
+            // * this is a project
+            $header = 'Are you sure you wish to write this assessment back to its course?';
+            if ($element.attr('data-spec-assessment-id')) {
+                $text = '<span class=\"warning alert-box\">The original assessment "" in the unit will be replaced with this assessment.</span>'
+            } else {
+                $text = '<span class=\"alert-box\">This assessment does not yet exist in the unit; it will be added.</span>'
+            }
+
+            $element.confirmDialog({
+                header: $header,
+                text: $text,
+                format: 'html',
+                confirmLabel: 'Yes',
+                cancelLabel: 'No',
+            });
+        });
+
+
+
         // Student updating progress or clicking task name
         component.on(
             'click.courseInstance',

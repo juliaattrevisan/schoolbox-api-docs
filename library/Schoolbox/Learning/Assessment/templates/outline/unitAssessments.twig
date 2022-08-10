@@ -114,7 +114,16 @@
                         {% endif %}
                         {% if hasCourseRoutes %}
                             <li class="separator">Course</li>
-                            {% if saveToCourseRoute %}<li><a href="{{ saveToCourseRoute }}" class="icon-progress">Save to Course...</a></li>{% endif %}
+                            {% if saveToCourseRoute %}
+                                <li>
+                                    <a href="{{ saveToCourseRoute }}"
+                                       class="icon-export"
+                                       data-action="save-to-course"
+                                       data-spec-assessment-id="{{ assessment.specificationAssessment.id ?? null }}"
+                                       data-spec-assessment-title="{{ assessment.specificationAssessment.title ?? null }}"
+                                    >Save to Course...</a>
+                                </li>
+                            {% endif %}
                         {% endif %}
                     </ul>
                 {% endif %}
