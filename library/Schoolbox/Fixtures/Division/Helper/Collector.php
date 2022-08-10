@@ -75,7 +75,7 @@ class Collector
         // Load players into division
         // TODO add players into division model as a M2M join
         /** @var DivisionUser[] $players */
-        $players = $this->getDivisionUserMapper()->findByColumn('division_id', $division->getId(), ['order' => ['sequence' => 'desc']]);
+        $players = $this->getDivisionUserMapper()->findByColumn('division_id', $division->getId(), ['order' => ['sequence' => 'asc']]);
         $division->setPlayers(new GenericCollection(User::class));
         foreach ($players as $player) {
             $division->getPlayers()->add($player->getUser());
@@ -105,7 +105,7 @@ class Collector
         $teamPlayers = $this->getTeamPlayerMapper()->findByColumn(
             'team_id',
             $teams->getColumnValues('id'),
-            ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]
+            ['order' => ['team_id' => 'asc', 'sequence' => 'asc']]
         );
         foreach ($teamPlayers as $teamPlayer) {
             $teamPlayerTeamId = $teamPlayer->getTeam()->getId();
