@@ -38,29 +38,27 @@
 
         <li v-bind:class="{sticky: article.sticky, unread: !article.viewedAt, read: article.viewedAt}" v-for="article in currentArticles">
             <div class="small-12 card reversed wrap-down">
-                <template>
-                    <template v-if="article.featureImage">
+                <template v-if="article.featureImage">
+                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                        <img v-if="isCompactMode" :src="article.featureImage._links.image.href + '&size=square64'" class="thumbnail" alt="feature image">
+                        <img v-else :src="article.featureImage._links.image.href + '&size=constrain200'" alt="feature image">
+                    </a>
+                </template>
+                <template v-else-if="fallbackImage === 'author'">
+                    <div v-if="!isCompactMode" class="card-feature-avatar">
                         <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                            <img v-if="isCompactMode" :src="article.featureImage._links.image.href + '&size=square64'" class="thumbnail" alt="feature image">
-                            <img v-else :src="article.featureImage._links.image.href + '&size=constrain200'" alt="feature image">
+                            <img :src="article.author._links.avatar.href + '&size=square64'" alt="author portrait">
                         </a>
-                    </template>
-                    <template v-else-if="fallbackImage === 'author'">
-                        <div v-if="!isCompactMode" class="card-feature-avatar">
-                            <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                                <img :src="article.author._links.avatar.href + '&size=square64'" alt="author portrait">
-                            </a>
-                        </div>
-                        <a v-if="isCompactMode" :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                            <img :src="article.author._links.avatar.href + '&size=square64'" class="thumbnail" alt="author portrait">
-                        </a>
-                    </template>
-                    <template v-else-if="fallbackImage === 'school-logo'">
-                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                            <img v-if="isCompactMode" :src="'/images/logo.php?logo=skin_logo_large&size=favicon'" class="thumbnail" alt="school logo">
-                            <img v-else :src="'/images/logo.php?logo=skin_logo_large&size=normal'" alt="school logo">
-                        </a>
-                    </template>
+                    </div>
+                    <a v-if="isCompactMode" :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                        <img :src="article.author._links.avatar.href + '&size=square64'" class="thumbnail" alt="author portrait">
+                    </a>
+                </template>
+                <template v-else-if="fallbackImage === 'school-logo'">
+                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                        <img v-if="isCompactMode" :src="'/images/logo.php?logo=skin_logo_large&size=favicon'" class="thumbnail" alt="school logo">
+                        <img v-else :src="'/images/logo.php?logo=skin_logo_large&size=normal'" alt="school logo">
+                    </a>
                 </template>
                 <div class="card-actions">
                     <h3><a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.title }}</a></h3>
