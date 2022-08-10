@@ -577,8 +577,16 @@ class Classes implements IStrategy
          */
         $activityName = trim((string)$activity['name']);
 
-        if (isset($this->classEntries[$event->getCode()])) {
-            $classEntry = $this->classEntries[$event->getCode()];
+        /* Constraints in the schema are case insensitive, unlike
+         * these array keys - class codes sometimes appear like
+         * "Speech Therapy" and "Speech therapy" so inserting them
+         * twice will cause it to pack a sad. The classEntries array
+         * treats these as unique whereas the db didn't
+         */
+        $existingKey = strtolower($event->getCode());
+
+        if (isset($this->classEntries[$existingKey])) {
+            $classEntry = $this->classEntries[$existingKey];
         } else {
             $classEntry = $this->classEntryMapper->createModel()
                 ->setName($activityName)
@@ -588,7 +596,7 @@ class Classes implements IStrategy
                 $this->classEntryMapper->save($classEntry);
             }
 
-            $this->classEntries[$event->getCode()] = $classEntry;
+            $this->classEntries[strtolower($event->getCode())] = $classEntry;
         }
 
         return $classEntry;
