@@ -383,6 +383,7 @@ class Classes implements IStrategy
                      *
                      * 1. The only activity instances that matter are runningStatus 1. 0 is cancelled
                      * and 1 is draft, neither of which we really would care about
+                     * (Cancelled status makes it go away from the compass ui altogether)
                      *
                      * 2. The instance has to be occurring either today, or in the future. Not sure
                      * there is much value importing things that happened yonks ago
@@ -391,39 +392,22 @@ class Classes implements IStrategy
                      * otherwise we're going to be importing a boatload of data we might not need.
                      * I recognise that forward planning might be a thing, but still
                      */
-                    foreach ($combinedInstances as $activityInstance) {
-                        /* Check if this instance is running
-                         * Multiple levels of investigation required.
-                         * This is an obscure logic path that is extremely poorly documented
-                         *
-                         * If runningStatus is 0, it might have been cancelled only for
-                         * the original teacher. If that's the case, dig deeper to find
-                         * out for sure - it might NOT be cancelled for the replacement
+                    foreach ($combinedInstances as $combinedInstance) {
+                        /* Has to be officially running
                          */
-                        if (self::IS_RUNNING !== (int)$activityInstance['runningStatus']) {
-                            /* Replacement teachers can be found inside $activityInstance[attendees]
-                             * in a node called coveringCompassPersonId. Check that there are
-                             * meaningful contents inside the attendees node...
-                             */
-                            if (\count($activityInstance['attendees'])) {
-                                /* Then compare the 0th element's contents
-                                 * (I haven't seen it contain more than one element)
-                                 */
-                                if ('' === trim((string)$activityInstance['attendees'][0]['coveringCompassPersonId'])) {
-                                    $this->log->debug(sprintf(
-                                        'Activity %s Instance on %s is not running; skipping',
-                                        $activity['name'],
-                                        $activityInstance['start']
-                                    ));
+                        if (self::IS_RUNNING !== (int)$combinedInstance['runningStatus']) {
+                            $this->log->debug(sprintf(
+                                'Activity %s Instance on %s is not running; skipping',
+                                $activity['name'],
+                                $activity['start']
+                            ));
 
-                                    continue;
-                                }
-                            }
+                            continue;
                         }
 
                         /* Must start today, or in the future
                          */
-                        $start = \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['start']));
+                        $start = \Alaress_Date_Format::newFromTimestamp(strtotime($combinedInstance['start']));
 
                         /* Fetch PAST_THRESHOLD days into the past, so people can see where they've been
                          */
@@ -431,7 +415,7 @@ class Classes implements IStrategy
                             $this->log->debug(sprintf(
                                 'Activity %s Instance on %s is too far in the past; skipping',
                                 $activity['name'],
-                                $activityInstance['start']
+                                $combinedInstance['start']
                             ));
 
                             continue;
@@ -443,7 +427,7 @@ class Classes implements IStrategy
                             $this->log->debug(sprintf(
                                 'Activity %s Instance on %s is too far into the future; skipping',
                                 $activity['name'],
-                                $activityInstance['start']
+                                $combinedInstance['start']
                             ));
 
                             continue;
@@ -455,12 +439,12 @@ class Classes implements IStrategy
                         $this->log->info(sprintf(
                             'Manufacturing event for Activity %s Instance on %s which originated in schedule %s; using import identifier %s as folder code',
                             $activity['name'],
-                            $activityInstance['start'],
+                            $combinedInstance['start'],
                             $schedule['name'],
                             $activity['name']
                         ));
 
-                        $this->processClass($activity, $activityInstance, $enrolments, $staffLookup);
+                        $this->processClass($activity, $combinedInstance, $enrolments, $staffLookup);
                     }
                 }
             }
