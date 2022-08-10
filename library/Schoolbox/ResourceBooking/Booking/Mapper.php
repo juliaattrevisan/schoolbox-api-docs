@@ -22,7 +22,6 @@ use Schoolbox\ResourceBooking\Item;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * @inheritDoc
      */
@@ -178,10 +177,6 @@ class Mapper extends BaseMapper
      */
     public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $extra = array(), ?array $allowedEventTypes = null)
     {
-        if (empty($statusIds)) {
-            $statusIds = array(Status\Model::STATUS_PENDING, Status\Model::STATUS_APPROVED);
-        }
-
         // Just search on date for now.
         // Events: any event whose start <= endWindow, or end >= startWindow
         // Timestamp is passed as the start and end of a given day in the
@@ -233,7 +228,7 @@ class Mapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('resource.category', 'i', 'ic')}
             LEFT  JOIN {$this->getJoinSql('resource.image',    'i', 'im')}
             WHERE b.deleted_at IS NULL
-            AND   s.id IN {$this->getArrayPlaceholders($statusIds, 'status')}
+            AND   " . ((count($statusIds) === 0) ? 'FALSE' : "s.id IN {$this->getArrayPlaceholders($statusIds, 'status')}") . "
             AND NOT (e.end_datetime < :startWindow OR e.start_datetime > :endWindow)
         ";
         if (!empty($extra['resource_id'])) {
