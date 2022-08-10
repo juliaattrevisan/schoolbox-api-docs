@@ -647,15 +647,12 @@ class Controller extends Base
             [$item->getId()]
         );
 
+        $query = $this->getRequest()->query;
+
         // When no event types are selected in the modal, query['status'] is not set.
         // We set it to an empty array here so we can handle the case of no event types selected.
         // When no event types are selected, no events should show on the calendar.
-        $query = $this->getRequest()->query;
-        if (!isset($query['status'])) {
-            $query['status'] = [];
-        }
-
-        $source->setStatus($query['status']);
+        $source->setStatus($query['status'] ?? []);
 
         $calendar = new Renderer(
             $source,
