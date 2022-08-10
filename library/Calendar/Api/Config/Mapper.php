@@ -15,6 +15,7 @@ use Calendar\Api\ModuleChecker;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 
 /**
  * @method Calendar_Api_Config_Record createModel()
@@ -123,7 +124,6 @@ class Calendar_Api_Config_Mapper extends BaseMapper
         return $stack;
     }
 
-
     /**
      * The provided eventType and connectorClass combination is an active source
      * in Calendar subscription
@@ -146,19 +146,30 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      * Retrieves a list of sources for the calendar.
      *
      * @param ModuleChecker $moduleChecker
+     * @param User          $user
      * @return array
      *   name: a name for this source
      *   id:   a comma-separated list of source IDs
      */
-    public function getSourceListForCalendar(ModuleChecker $moduleChecker): array
+    public function getSourceListForCalendar(ModuleChecker $moduleChecker, User $user): array
     {
-        $configs = $this->getAllConfigRecords();
+        $configs    = $this->getAllConfigRecords();
         $sourceList = [];
 
         foreach ($configs as $record) {
             $config = $record->decodeConfig();
             try {
-                if ($moduleChecker->isEnabled($config)) {
+                if (!$moduleChecker->isEnabled($config)) {
+                    continue;
+                }
+
+                if (
+                    !$config instanceof Calendar_Api_Config_Connector_Vcal ||
+                    $config->hasPermissions(
+                        $user->getCampusCollection()->getColumnValues('id'),
+                        $user->getRole()->getId()
+                    )
+                ) {
                     $sourceList[] = [
                         'id'   => (int)$record->getId(),
                         'name' => $config->getLabel()

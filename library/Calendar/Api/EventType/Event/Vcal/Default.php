@@ -21,7 +21,6 @@ use Schoolbox\Calendar\EventTypeMapper;
  */
 class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_Abstract
 {
-
     /**
      * This indicates the event was cancelled
      */
@@ -327,7 +326,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $event->setAccess('');
         $event->setEventType($metaDetails['eventType']);
         $event->setColour($metaDetails['eventColour']);
-        $event->setCampusList(implode(',', $decodedConfig->getCampus()));
+        $event->setCampusList(implode(',', $decodedConfig->getCampusIds()));
         $event->setDetail(nl2br("{$currentEvent->DESCRIPTION}"));
         $event->setLocation("{$currentEvent->LOCATION}");
         $event->setPublishDate('');
