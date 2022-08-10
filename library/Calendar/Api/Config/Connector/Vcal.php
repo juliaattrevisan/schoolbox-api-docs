@@ -172,7 +172,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      *
      * @param array $campusIds
      */
-    public function setCampusIds(Array $campusIds): void
+    public function setCampusIds(array $campusIds): void
     {
         $this->campusIds = $campusIds;
     }
@@ -192,7 +192,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      *
      * @param array $groupIds
      */
-    public function setGroupIds(Array $groupIds): void
+    public function setGroupIds(array $groupIds): void
     {
         $this->groupIds = $groupIds;
     }
