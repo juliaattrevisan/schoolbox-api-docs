@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -37,7 +38,6 @@ class Module extends BaseModule
             return $this->preloadFolder($params);
         };
 
-
         $this->register('GET', '/{homepageId}', 'getPastoralClassReport', $perms, $preload);
     }
 
@@ -52,7 +52,7 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
