@@ -77,7 +77,7 @@ class Translator
         $teamPlayers = $this->getTeamPlayerMapper()->findByColumn(
             'team_id',
             $team->getId(),
-            ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]
+            ['order' => ['team_id' => 'asc', 'sequence' => 'asc']]
         );
         $team->setPlayers(new GenericCollection(User::class));
         foreach ($teamPlayers as $teamPlayer) {
