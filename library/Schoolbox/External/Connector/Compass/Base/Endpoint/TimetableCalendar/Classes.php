@@ -268,7 +268,7 @@ class Classes implements IStrategy
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
 
-//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['7SPOA'])) {
+//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Year 7/8 Sport- Term 3'])) {
 //                        continue;
 //                    }
 
@@ -544,8 +544,9 @@ class Classes implements IStrategy
         /* Save it and remember what we saw in case we need to reuse this later
          */
         $this->log->debug(sprintf(
-            'Creating new timetable event %s - %s, %s, %s-%s',
+            'Creating new timetable event %s (%s) on day %s, period %s, %s-%s',
             $event->getTitle(),
+            $event->getCode(),
             $event->getDay(),
             $event->getPeriod(),
             $event->getStartAt()->getDatabase(),
@@ -720,14 +721,7 @@ class Classes implements IStrategy
             ));
         } else {
             foreach ($enrolments['students'] as $externalId) {
-                $name = sprintf(
-                    'Creating new ClassInvolvement record for Activity %s Instance on %s for %s',
-                    $activityName,
-                    $activityInstance['start'],
-                    $externalId
-                );
-
-                $this->saveStudentInvolvement($event, $classEntry, $name, $externalId);
+                $this->saveStudentInvolvement($event, $classEntry, $externalId, $externalId);
             }
         }
     }
@@ -784,8 +778,7 @@ class Classes implements IStrategy
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
             $this->log->debug(sprintf(
-                'Reusing previous class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
-                $name,
+                'Reusing previous class involvement for %s in timetable event %s - %s, %s, %s-%s',
                 $externalId,
                 $event->getTitle(),
                 $event->getDay(),
@@ -805,8 +798,7 @@ class Classes implements IStrategy
             $this->classInvolvements[$classEntry->getId()][$externalId] = true;
 
             $this->log->debug(sprintf(
-                'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
-                $name,
+                'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
                 $externalId,
                 $event->getTitle(),
                 $event->getDay(),
