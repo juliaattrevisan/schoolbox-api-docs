@@ -52,6 +52,8 @@ class Enrolments
      * $academicGroupCode was derived earlier from your Academic Groups lookup. It usually corresponds
      * to a year.
      *
+     * Additional teachers of a class are found in this Sessions array node, which we need elsewhere
+     *
      * @param string $activityCode
      * @param string $academicGroupCode
      * @return array
@@ -60,7 +62,7 @@ class Enrolments
     {
         $stack = [
             'students' => [],
-            'teachers' => []
+            'sessions' => [],
         ];
 
         /* Get a list of all the guys involved in this $activity
@@ -104,6 +106,15 @@ class Enrolments
                     $stack['students'][] = (string)$student['student']['code'];
                 }
             }
+
+            /* Augment $stack with a bunch of teachers, believe it or not
+             *
+             * Additional teachers of a class are found in Sessions which
+             * is somehow found here. We need to combine these sessions
+             * with the activity instances that are running, in order to
+             * find all the teachers of a class (jesus)
+             */
+            $stack['sessions'] = $enrolment['sessions'];
         }
 
         return $stack;
