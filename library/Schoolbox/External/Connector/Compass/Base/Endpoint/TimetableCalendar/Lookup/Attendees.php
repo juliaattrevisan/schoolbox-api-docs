@@ -18,7 +18,6 @@ use Psr\Log\LoggerInterface;
  */
 class Attendees
 {
-
     /**
      * @var LoggerInterface
      */
