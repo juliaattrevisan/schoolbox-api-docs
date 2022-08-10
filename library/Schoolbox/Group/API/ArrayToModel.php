@@ -21,7 +21,7 @@ class ArrayToModel
     /**
      * Translate the array representation of the group access into a model.
      */
-    public function __invoke(array $array, ?object $model = null): object
+    public function __invoke(array $array, ?object $model, bool $strict): object
     {
         if (!isset($model)) {
             $model = new UserGroupAccess();
@@ -52,8 +52,8 @@ class ArrayToModel
         ];
 
         foreach ($fields as $name => $attributes) {
-            if (!isset($array[$name])) {
-                $errors[] = "{$name} is not set.";
+            if ($strict && !isset($array[$name])) {
+                $errors[] = "{$name} is not set";
                 continue;
             }
             switch ($attributes['type']) {
@@ -69,17 +69,21 @@ class ArrayToModel
         }
 
         if (!empty($errors)) {
-            throw new \InvalidArgumentException(implode(',', $errors));
+            throw new \InvalidArgumentException(implode(', ', $errors));
         }
 
         // combining enrolementStatus and membership
-        $accessLevel = 0;
-        if ($array['enrolmentStatus'] === GroupsHelper::ENROLED) {
-            $accessLevel = UserAccess::ACCESS_NAME_TO_LEVEL[$array['membership']];
+        if (isset($array['enrolmentStatus']) && $array['enrolmentStatus'] == GroupsHelper::PENDING) {
+            $model->setAccessLevel(UserAccess::ACCESS_AWAITING_AUTHORISATION);
+        } elseif (isset($array['membership'])) {
+            $model->setAccessLevel(UserAccess::ACCESS_NAME_TO_LEVEL[$array['membership']]);
         }
-        $model->setAccessLevel($accessLevel);
-        $model->setFavourite((bool)$array['isFavourite']);
-        $model->setFollowing((bool)$array['isNotificationsOn']);
+        if (isset($array['isFavourite'])) {
+            $model->setFavourite((bool)$array['isFavourite']);
+        }
+        if (isset($array['isNotificationsOn'])) {
+            $model->setFollowing((bool)$array['isNotificationsOn']);
+        }
         return $model;
     }
 }

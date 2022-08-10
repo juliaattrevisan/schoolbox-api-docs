@@ -260,7 +260,7 @@
 
             {# Only show 'Modify Group' in the jelly-tot if we are actually editing a group #}
             {% if folder.isGroup and userAccess == moderate %}
-                <li><a class="icon-group" href="{{ routeLookup('group.getModify', {folderId: group.id, folder: group}) }}" title="Manage individual user access to this folder">Manage Group</a></li>
+                <li><a class="icon-group" href="{{ routeLookup('group.getModify', {folderId: folder.id, folder: folder}) }}" title="Manage individual user access to this folder">Manage Group</a></li>
             {% endif %}
 
             <li><a class="icon-delete" data-interaction="delete">Delete Folder</a></li>
