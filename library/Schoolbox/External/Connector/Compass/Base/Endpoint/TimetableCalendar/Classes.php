@@ -270,12 +270,12 @@ class Classes implements IStrategy
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
 
-                    if ($watchlist->isOnWatchlist($activity['name'], ['8HEAC'])) {
+//                    if ($watchlist->isOnWatchlist($activity['name'], ['8HEAC'])) {
 //                        print_r($activity['name']);
 //                        print_r($watchlist->translate($activity['instances'], $staffLookup));
-                    } else {
-                        continue;
-                    }
+//                    } else {
+//                        continue;
+//                    }
 
                     /* We only care about certain activities.
                      *

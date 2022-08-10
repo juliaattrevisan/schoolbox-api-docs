@@ -56,7 +56,8 @@ class Attendees
          */
         $enrolments = [
             'students' => [],
-            'teachers' => []
+            'teachers' => [],
+            'sessions' => [],
         ];
 
         foreach ($activity['instances'] as $activityInstance) {

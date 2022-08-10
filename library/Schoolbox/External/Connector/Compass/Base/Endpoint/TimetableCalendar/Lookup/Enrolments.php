@@ -62,6 +62,7 @@ class Enrolments
     {
         $stack = [
             'students' => [],
+            'teachers' => [],
             'sessions' => [],
         ];
 
