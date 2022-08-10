@@ -127,7 +127,7 @@
                     {% endif %}
                         {% if not data.hidden %}
                             <div class="small-12 columns">
-                                <label id="{{ data.name }}" for="{{ data.name }}-field">
+                                <label id="{{ data.name }}" for="{{ data.name }}-field" class="inline-block">
                                     <span {{ data.required and data.editable ? 'class="required-with-tip"' }}>{{ data.title }}</span>
                                     <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="{{ data.description|replace({'<': '&lt;'}) }}">?</span>
                                 </label>

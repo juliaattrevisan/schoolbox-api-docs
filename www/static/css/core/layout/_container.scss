@@ -98,5 +98,11 @@
                 padding: 0;
             }
         }
+
+        label {
+            &.inline-block {
+                display: inline-block;
+            }
+        }
     }
 }
