@@ -28,6 +28,8 @@
             {% set completionGradient = (completionCount / studentCount) * 100 %}
         {% endif %}
 
+        {% set specAssessment = assessment.specificationAssessment ?? null %}
+
         {# What action-tot routes are available to this user? #}
         {% if readOnly %}
             {# If readonly mode: show no tot #}
@@ -44,8 +46,32 @@
             {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
             {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
             {% set hasAssessmentRoutes = statusRoute or modifyRoute or deleteRoute or similarityReportRoute %}
-            {% set saveToCourseRoute = '#' %}
+
+            {# Save to course: if spec assessment exists, this is a PUT: otherwise a POST #}
             {% set hasCourseRoutes = true %}
+            {% if specAssessment %}
+                {% set saveToCourseRoute = routeLookupIfAuthorized(
+                    'courseExport.postAssessmentIntoUnit',
+                    {
+                        assessmentId: assessment.id,
+                        assessment: assessment,
+                        unitSpecId: unit.specification.id,
+                        unitSpec: unit.specification,
+                    }
+                ) %}
+                {% set saveToCourseMethod = 'POST' %}
+            {% else %}
+                {% set saveToCourseRoute = routeLookupIfAuthorized(
+                    'courseExport.putAssessmentIntoUnit',
+                    {
+                        assessmentId: assessment.id,
+                        assessment: assessment,
+                        unitSpecId: unit.specification.id,
+                        unitSpec: unit.specification,
+                    }
+                ) %}
+                {% set saveToCourseMethod = 'PUT' %}
+            {% endif %}
         {% endif %}
 
         <li class="interact" data-unit-assessment="{{ assessment.id }}">
@@ -119,8 +145,9 @@
                                     <a href="{{ saveToCourseRoute }}"
                                        class="icon-export"
                                        data-action="save-to-course"
-                                       data-spec-assessment-id="{{ assessment.specificationAssessment.id ?? null }}"
-                                       data-spec-assessment-title="{{ assessment.specificationAssessment.title ?? null }}"
+                                       data-method="{{ saveToCourseMethod }}"
+                                       data-spec-assessment-id="{{ specAssessment.id ?? null }}"
+                                       data-spec-assessment-title="{{ specAssessment.title ?? null }}"
                                     >Save to Course...</a>
                                 </li>
                             {% endif %}

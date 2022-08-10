@@ -181,6 +181,27 @@
                 format: 'html',
                 confirmLabel: 'Yes',
                 cancelLabel: 'No',
+                confirmEvent: function () {
+                    let toaster = component.find('[data-alert]'),
+                        ajaxParams = {
+                            url: $element.attr('href'),
+                            method: $element.attr('data-method'),
+                        };
+                    toaster.toastActivate({text: 'Writing assessment to course...'});
+                    $.ajax(ajaxParams)
+                        .done(function() {
+                            toaster.toastTimeout({
+                                text: 'Assessment written to course.',
+                                css: 'pop success'
+                            });
+                        })
+                        .fail(function () {
+                            toaster.toastTimeout({
+                                text: 'Could not write assessment to course.',
+                                css: 'pop alert'
+                            });
+                        });
+                }
             });
         });
 
