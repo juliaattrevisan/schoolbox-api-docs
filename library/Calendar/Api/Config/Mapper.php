@@ -172,7 +172,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
 
                 $boolAddRecord = false;
 
-                if ($record->connectorClass !== 'Vcal') {
+                if (!$config instanceof Calendar_Api_Config_Connector_Vcal) {
                     $boolAddRecord = true;
                 }
                 else {
