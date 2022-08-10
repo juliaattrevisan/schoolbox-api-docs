@@ -88,7 +88,7 @@ class Schedules
              * such as us.
              */
             foreach ($schedules as $schedule) {
-                if ($schedule['allowImport']) {
+                if (($schedule['name'] === 'Events/Excursions')) {
                     $this->log->info(sprintf(
                         'Schedule %s with %s activities allows import',
                         $schedule['name'],

@@ -247,8 +247,19 @@ class Classes implements IStrategy
         /* Generate a list of staff members
          */
         $this->log->debug('Preloading staff compassPersonIds for non-academic classes...');
+
         $staffLookup = (new Lookup\Staff($this->api))->generate($this->lBound, $this->uBound);
-        $attendeesLookup = new Attendees($this->log, $staffLookup);
+
+        /* Generate a list of students
+         */
+        $this->log->debug('Preloading student compassPersonIds for non-academic classes...');
+
+        $studentLookup = (new Lookup\Student($this->api))->generate($this->lBound, $this->uBound);
+
+        /* Gotta use this to figure out who everyone is, given
+         * a compass person id (disgusting)
+         */
+        $attendeesLookup = new Attendees($this->log, $staffLookup, $studentLookup);
 
         /* We'll need this for later
          */
@@ -268,9 +279,9 @@ class Classes implements IStrategy
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
 
-//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Year 7/8 Sport- Term 3'])) {
-//                        continue;
-//                    }
+                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Muay Thai excursion'])) {
+                        continue;
+                    }
 
                     /* We only care about certain activities.
                      *
@@ -719,6 +730,21 @@ class Classes implements IStrategy
             $this->saveStaffInvolvement($teacher, $event);
         }
 
+        /* Alternatively, this might also have additional participating teachers
+         */
+        if (!\count($enrolments['teachers'])) {
+            $this->log->debug(sprintf(
+                '%s: no additional teachers involved',
+                $activityName
+            ));
+        } else {
+            foreach ($enrolments['teachers'] as $externalId) {
+                $this->saveStaffInvolvement([
+                    'externalId' => $externalId
+                ], $event);
+            }
+        }
+
         /* Save sis_class_user involvements
          * This is the student(s) and they're associated with all instances
          */
@@ -758,6 +784,16 @@ class Classes implements IStrategy
             ->setExternalId($teacher['externalId'])
             ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
             ->setSequence(1);
+
+        $this->log->debug(sprintf(
+            'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+            $teacher['externalId'],
+            $event->getTitle(),
+            $event->getDay(),
+            $event->getPeriod(),
+            $event->getStartAt()->getDatabase(),
+            $event->getFinishAt()->getDatabase()
+        ));
 
         if ($this->perform) {
             $this->overridesMapper->save($override);
