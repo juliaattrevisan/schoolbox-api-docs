@@ -77,7 +77,7 @@ class Attendees
                 /* These person is the main person teaching this activity
                  */
                 if (isset($this->staffLookup[$compassPersonId]['externalId'])) {
-                    $enrolments['teachers'][] = $this->staffLookup[$compassPersonId]['externalId'];
+                    $enrolments['teachers'][$compassPersonId] = $this->staffLookup[$compassPersonId]['externalId'];
 
                     $this->log->debug(sprintf(
                         'Activity %s starting on %s has attendee compassPersonId %s, %s %s',
@@ -112,7 +112,7 @@ class Attendees
             if (isset($this->staffLookup[$compassPersonId]['externalId'])) {
                 /* Staff can attend events
                  */
-                $enrolments['teachers'][] = $this->staffLookup[$compassPersonId]['externalId'];
+                $enrolments['teachers'][$compassPersonId] = $this->staffLookup[$compassPersonId]['externalId'];
 
                 $this->log->debug(sprintf(
                     'Activity %s starting on %s has attendee compassPersonId %s, %s %s',
@@ -125,7 +125,7 @@ class Attendees
             } elseif (isset($this->studentLookup[$compassPersonId]['externalId'])) {
                 /* Students can attend events
                  */
-                $enrolments['students'][] = $this->studentLookup[$compassPersonId]['externalId'];
+                $enrolments['students'][$compassPersonId] = $this->studentLookup[$compassPersonId]['externalId'];
 
                 $this->log->debug(sprintf(
                     'Activity %s starting on %s has attendee compassPersonId %s, %s %s',
