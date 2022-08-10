@@ -271,8 +271,8 @@ class Classes implements IStrategy
                     $activityType = (int)$activity['activityType'];
 
                     if ($watchlist->isOnWatchlist($activity['name'], ['8HEAC'])) {
-                        print_r($activity['name']);
-                        print_r($watchlist->translate($activity['instances'], $staffLookup));
+//                        print_r($activity['name']);
+//                        print_r($watchlist->translate($activity['instances'], $staffLookup));
                     } else {
                         continue;
                     }
@@ -374,14 +374,9 @@ class Classes implements IStrategy
                         \count($enrolments['students'])
                     ));
 
-                    /* Recombine $enrolments['sessions'] with each $activityInstance
-                     * The combination of these allows us to find another place where
-                     * teachers of a class could be defined
-                     *
-                     * The only way to marry the two together is by start/finish
+                    /* Combine sessions and instances
                      */
-
-print_r($enrolments['sessions']);
+                    $combinedInstances = (new RecombineSessions())->recombine($activity['instances'], $enrolments['sessions']);
 
                     /* These are instances of classes that occur throughout the year/timetable cycle
                      * We only care about a certain subset of these instances.
@@ -396,7 +391,7 @@ print_r($enrolments['sessions']);
                      * otherwise we're going to be importing a boatload of data we might not need.
                      * I recognise that forward planning might be a thing, but still
                      */
-                    foreach ($activity['instances'] as $activityInstance) {
+                    foreach ($combinedInstances as $activityInstance) {
                         /* Check if this instance is running
                          * Multiple levels of investigation required.
                          * This is an obscure logic path that is extremely poorly documented
