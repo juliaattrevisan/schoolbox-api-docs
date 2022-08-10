@@ -19,6 +19,9 @@ class Controller extends Base
     /**
      * Post `$assessment` into `$unitSpec`.
      *
+     * If `$assessment` exists within an implementation of `$unitSpec`:
+     * associate `$assessment` with `$unitSpec`.
+     *
      * This will always create a new assessment within `$unitSpec`, regardless
      * of whether one already exists.
      *
@@ -28,12 +31,13 @@ class Controller extends Base
      * @param CourseSpecification\Unit\Model $unitSpec
      * @param IAssessable                    $assessment
      * @return void
-     *
      */
     public function postAssessmentIntoUnit(
         CourseSpecification\Unit\Model $unitSpec,
         IAssessable $assessment,
     ): void {
+        // Should this only work with assessments within an implementation?
+        // Output the new spec assessment
     }
 
 
@@ -55,5 +59,6 @@ class Controller extends Base
         CourseSpecification\Unit\Model $unitSpec,
         IAssessable $assessment,
     ): void {
+        // Output the updated spec assessment
     }
 }
