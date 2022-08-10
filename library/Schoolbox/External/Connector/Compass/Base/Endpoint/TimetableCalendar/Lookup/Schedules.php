@@ -19,7 +19,6 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
  */
 class Schedules
 {
-
     /**
      * @var LoggerInterface
      */
