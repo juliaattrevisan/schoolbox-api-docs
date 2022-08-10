@@ -124,7 +124,6 @@ class Calendar_Api_Config_Mapper extends BaseMapper
         return $stack;
     }
 
-
     /**
      * The provided eventType and connectorClass combination is an active source
      * in Calendar subscription
@@ -154,14 +153,8 @@ class Calendar_Api_Config_Mapper extends BaseMapper
      */
     public function getSourceListForCalendar(ModuleChecker $moduleChecker, User $user): array
     {
-        $configs             = $this->getAllConfigRecords();
-        $sourceList          = [];
-        $userCampusIdsAsKeys = [];
-
-        // Get user campusIds for easy lookup below.
-        foreach ($user->getCampusCollection() as $item) {
-            $userCampusIdsAsKeys[$item->getId()] = null;
-        }
+        $configs    = $this->getAllConfigRecords();
+        $sourceList = [];
 
         foreach ($configs as $record) {
             $config = $record->decodeConfig();
@@ -170,29 +163,13 @@ class Calendar_Api_Config_Mapper extends BaseMapper
                     continue;
                 }
 
-                $boolAddRecord = false;
-
-                if (!$config instanceof Calendar_Api_Config_Connector_Vcal) {
-                    $boolAddRecord = true;
-                }
-                else {
-                    // Only add record to sourceList if user is in an allowed campus and has an allowed role.
-                    foreach ($config->getCampus() as $campusId) {
-                        if (!array_key_exists($campusId, $userCampusIdsAsKeys)) {
-                            continue;
-                        }
-
-                        foreach ($config->getGroups() as $roleId) { // Roles are called groups in the $config object.
-                            if ($user->getRole()->getId() !== (int)$roleId) {
-                                continue;
-                            }
-
-                            $boolAddRecord = true;
-                        }
-                    }
-                }
-
-                if ($boolAddRecord) {
+                if (
+                    !$config instanceof Calendar_Api_Config_Connector_Vcal ||
+                    $config->hasPermissions(
+                        $user->getCampusCollection()->getColumnValues('id'),
+                        $user->getRole()->getId()
+                    )
+                ) {
                     $sourceList[] = [
                         'id'   => (int)$record->getId(),
                         'name' => $config->getLabel()
