@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Pastoral\Class;
+namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;

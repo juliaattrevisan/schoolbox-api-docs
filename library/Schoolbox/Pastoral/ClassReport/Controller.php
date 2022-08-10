@@ -5,7 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Pastoral\Class;
+namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Resource\Folder\Model as FolderModel;

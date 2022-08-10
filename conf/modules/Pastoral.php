@@ -13,7 +13,7 @@ namespace Config\Modules;
 use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Pastoral\Class\Module as PastoralClassModule;
+use Schoolbox\Pastoral\ClassReport\Module as PastoralClassModule;
 use Schoolbox\Pastoral\Module as PastoralModule;
 use Schoolbox\Pastoral\ReportBuilder\Module as PastoralReportBuilderModule;
 use Schoolbox\Pastoral\Management\Module as PastoralManagementModule;
