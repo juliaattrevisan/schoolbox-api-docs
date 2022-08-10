@@ -52,9 +52,11 @@ class Watchlist
             $i['managingCompassPersonId'] = $staffLookup[$instance['managingCompassPersonId']] ?? $instance['managingCompassPersonId'];
             $i['coveringCompassPersonId'] = $staffLookup[$instance['coveringCompassPersonId']] ?? $instance['coveringCompassPersonId'];
 
-            if (\count($i['attendees'])) {
-                $i['attendees'][0]['compassPersonId'] = $staffLookup[$instance['attendees'][0]['compassPersonId']] ?? $instance['attendees'][0]['compassPersonId'];
-                $i['attendees'][0]['coveringCompassPersonId'] = $staffLookup[$instance['attendees'][0]['coveringCompassPersonId']] ?? $instance['attendees'][0]['coveringCompassPersonId'];
+            foreach ($instance['attendees'] as $attendee) {
+                $i['attendees'][] = [
+                    'compassPersonId' => $staffLookup[$attendee['compassPersonId']] ?? $attendee['compassPersonId'],
+                    'coveringCompassPersonId' => $staffLookup[$attendee['coveringCompassPersonId']] ?? $attendee['coveringCompassPersonId'],
+                ];
             }
 
             $stack[] = $i;
