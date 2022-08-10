@@ -16,7 +16,10 @@ use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model;
 
 class Module extends BaseModule
 {
@@ -33,7 +36,17 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $perms   = new Rule\IsLoggedIn();
+        $perms = new Rule\HasHomepageAccess(
+            UserAccess::ACCESS_WRITE,
+            function (array $params = []) {
+                if ($params['homepageFolder'] instanceof Model) {
+                    return $params['homepageFolder']->getId();
+                }
+                return null;
+            },
+            Access::getInstance()
+        );
+
         $preload = function ($params) {
             return $this->preloadFolder($params);
         };
