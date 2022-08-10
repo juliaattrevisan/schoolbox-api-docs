@@ -114,7 +114,26 @@ class Enrolments
              * with the activity instances that are running, in order to
              * find all the teachers of a class (jesus)
              */
-            $stack['sessions'] = $enrolment['sessions'];
+            $sessions = $enrolment['sessions'];
+
+            /* sort sessions ffs, because instances occur in a random haphazard order
+             * but are actually chronologically ordered
+             */
+            usort($sessions, static function ($a, $b) {
+                if ($a['start'] < $b['start']) {
+                    return -1;
+                }
+
+                if ($a['start'] === $b['start']) {
+                    return 0;
+                }
+
+                return 1;
+            });
+
+            /* Ram it in here with everything else
+             */
+            $stack['sessions'] = $sessions;
         }
 
         return $stack;

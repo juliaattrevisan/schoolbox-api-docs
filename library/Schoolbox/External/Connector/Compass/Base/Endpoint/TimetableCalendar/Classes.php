@@ -270,12 +270,12 @@ class Classes implements IStrategy
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
 
-//                    if ($watchlist->isOnWatchlist($activity['name'], ['7CSTB'])) {
-//                        print_r($activity['name']);
-//                        print_r($watchlist->translate($activity['instances'], $staffLookup));
-//                    } else {
-//                        continue;
-//                    }
+                    if ($watchlist->isOnWatchlist($activity['name'], ['8HEAC'])) {
+                        print_r($activity['name']);
+                        print_r($watchlist->translate($activity['instances'], $staffLookup));
+                    } else {
+                        continue;
+                    }
 
                     /* We only care about certain activities.
                      *
@@ -373,6 +373,15 @@ class Classes implements IStrategy
                         $activity['start'],
                         \count($enrolments['students'])
                     ));
+
+                    /* Recombine $enrolments['sessions'] with each $activityInstance
+                     * The combination of these allows us to find another place where
+                     * teachers of a class could be defined
+                     *
+                     * The only way to marry the two together is by start/finish
+                     */
+
+print_r($enrolments['sessions']);
 
                     /* These are instances of classes that occur throughout the year/timetable cycle
                      * We only care about a certain subset of these instances.
