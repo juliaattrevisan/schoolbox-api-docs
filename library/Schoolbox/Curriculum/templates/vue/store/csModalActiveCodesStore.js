@@ -353,7 +353,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
          * Can traverse through the codes via direct selection of a cs-modal-code when 
          * it doesn't have a code. 
          */
-        setNextSecondNode (id) {
+        setNextSelectedNode (id) {
             if (this.isOnThirdNode) {
                 this.selectedFourthNodeId = id;
             } else if (this.isOnSecondNode) {
