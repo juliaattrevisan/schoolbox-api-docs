@@ -264,11 +264,11 @@ class Mapper extends BaseMapper
      *
      * @param int $assessmentId
      * @return void
+     * @throws BaseMapper\Exception if the quiz is deleted or doesn't exist
      */
     public function deleteQuizConstituents(int $assessmentId): void
     {
-        $sectionMapper = $this->getJoinMapper('sections');
-        $sectionMapper->deleteByColumn('quiz.assessment_id', $assessmentId);
+        $this->softDeleteSections($this->findOneByColumn('assessment_id', $assessmentId));
     }
 
     /**
