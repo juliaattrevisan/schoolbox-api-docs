@@ -206,6 +206,7 @@ class Factory implements IFactory
                     Loader::getInstance()->get('date_local'),
                     Loader::getInstance()->get('photo_sis_import'),
                     trim((string)Loader::getInstance()->get('external_tass_spouse_prefix')),
+                    trim((string)Loader::getInstance()->get('external_tass_commrules_typecode')),
                     /* Profile pieces
                      */
                     UserProfile\Mapper::getInstance(),

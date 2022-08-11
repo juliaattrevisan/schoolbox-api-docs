@@ -72,6 +72,12 @@ class Profile implements IStrategy
 
 
     /**
+     * Default TASS Communication Rule
+     */
+    private const DEFAULT_COMMUNICATION_RULE = 'all';
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -104,6 +110,33 @@ class Profile implements IStrategy
      * @var string
      */
     private string $spousePrefix;
+
+
+    /**
+     * TASS communication rules type codes (in comma separated format) for all guardian relationships
+     * that can be associated with students
+     *
+     * Communication Rules ("commrules") decide who can actually be a parent of a student. In TASS
+     * there's about a dozen tickboxes which can be turned on or off, for a given parent. Some schools
+     * use TKCO tickbox to decide who can be a parent; other schools use another tickbox. This is
+     * configurable in admin under "TASS Communication Rules Type Code Filter."
+     *
+     * The tass api getParents endpoint gives you a list of people who are allegedly parents of students.
+     * However, this list does not care about commrules. The getCommunicationRulesDetails endpoint
+     * tells you, though - so to decide who is meant to come out of suds as a parent of a student,
+     * you need to:
+     *
+     * a) get the list of potential parents from getParents endpoint
+     * b) get the list of commrules for those potential parents, from the getCommunicationRulesDetails endpoint
+     * c) if a parent has a commrule found in (b), then they can be a parent as listed in (a)
+     *    otherwise, they should be unlisted from (a)
+     *
+     * $communicationTypes uses "tkco" as a default, if empty in admin
+     * Otherwise, use the csv string provided there
+     *
+     * @var string
+     */
+    private string $communicationTypes;
 
 
     /**
@@ -157,6 +190,7 @@ class Profile implements IStrategy
      * @param array                           $watchlist
      * @param bool                            $includePhoto
      * @param string                          $spousePrefix
+     * @param string                          $communicationTypes
      * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -171,6 +205,7 @@ class Profile implements IStrategy
         array $watchlist,
         bool $includePhoto,
         string $spousePrefix,
+        string $communicationTypes,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -184,6 +219,10 @@ class Profile implements IStrategy
         $this->watchlist = $watchlist;
         $this->includePhoto = $includePhoto;
         $this->spousePrefix = $spousePrefix;
+
+        /* Decide default communication rule identifiers
+         */
+        $this->communicationTypes = '' === $communicationTypes ? self::DEFAULT_COMMUNICATION_RULE : $communicationTypes;
 
         /* Various mappers
          */
@@ -219,6 +258,13 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
+        /* Build some lookups to save on traversal and api banging
+         */
+        $this->log->debug(sprintf(
+            'Fetching data using TASS Communication Rules: %s',
+            $this->communicationTypes
+        ));
+
         /* If the watchlist const is empty, preload all commrules
          *
          * Otherwise, pass null and let importParentsOfStudent() fetch
@@ -239,7 +285,7 @@ class Profile implements IStrategy
 
             $this->log->info('Downloading all student commrules (this might take a while)');
 
-            $commRulesLookup = (new Lookup\CommRules($this->api))->generate();
+            $commRulesLookup = (new Lookup\CommRules($this->api, $this->communicationTypes))->generate();
         } else {
 //            $this->log->debug('Downloading parent data for people on the watchlist');
             $this->log->debug('Downloading student commrules for people on the watchlist');
@@ -629,7 +675,7 @@ class Profile implements IStrategy
 
         /* Time for importing parents
          */
-        $family = (new Lookup\CommRuleFamily($this->api, $this->spousePrefix))->find($studentId, $commRulesLookup, $familiesLookup);
+        $family = (new Lookup\CommRuleFamily($this->api, $this->spousePrefix, $this->communicationTypes))->find($studentId, $commRulesLookup, $familiesLookup);
 
         /* No parents? No trabajo
          */

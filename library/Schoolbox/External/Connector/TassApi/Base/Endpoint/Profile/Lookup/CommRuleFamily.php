@@ -83,12 +83,21 @@ class CommRuleFamily
 
 
     /**
+     * A set of tass communication rule identifiers
+     *
+     * @var string
+     */
+    private string $communicationTypes;
+
+
+    /**
      * Constructor
      *
      * @param array  $api
      * @param string $spousePrefix
+     * @param string $communicationTypes
      */
-    public function __construct(array $api, string $spousePrefix)
+    public function __construct(array $api, string $spousePrefix, string $communicationTypes)
     {
         $this->api = $api;
 
@@ -96,6 +105,8 @@ class CommRuleFamily
          * Shanked from that Tass Helper class
          */
         $this->spousePrefix = '' !== $spousePrefix ? $spousePrefix : self::DEFAULT_SPOUSE_PREFIX;
+
+        $this->communicationTypes = $communicationTypes;
     }
 
 
@@ -120,7 +131,7 @@ class CommRuleFamily
             $commRules = $this->api[DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
                 'code' => $externalId,
                 'currentstatus' => 'current',
-                'commtype' => 'all'
+                'commtype' => $this->communicationTypes
             ]);
 
             $addresses = $commRules['commrules'][0]['addresses'];

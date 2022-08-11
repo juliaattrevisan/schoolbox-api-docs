@@ -31,13 +31,23 @@ class CommRules
 
 
     /**
+     * A set of tass communication rule identifiers
+     *
+     * @var string
+     */
+    private string $communicationTypes;
+
+
+    /**
      * Constructor.
      *
-     * @param array $api
+     * @param array  $api
+     * @param string $communicationTypes
      */
-    public function __construct(array $api)
+    public function __construct(array $api, string $communicationTypes)
     {
         $this->api = $api;
+        $this->communicationTypes = $communicationTypes;
     }
 
 
@@ -52,7 +62,7 @@ class CommRules
 
         $commRules = $this->api[DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
-            'commtype' => 'all'
+            'commtype' => $this->communicationTypes
         ]);
 
         foreach ($commRules['commrules'] as $data) {
