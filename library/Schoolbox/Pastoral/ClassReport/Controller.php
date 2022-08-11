@@ -20,7 +20,7 @@ class Controller extends Base
     }
 
     /**
-     * @api GET /pastoral/class/{homepageId}
+     * @api GET /pastoral/class/{folderId}
      * @since 22.1
      */
     public function getReport(FolderModel $folder): void

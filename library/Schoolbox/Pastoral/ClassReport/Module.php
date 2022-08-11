@@ -59,7 +59,7 @@ class Module extends BaseModule
             return $this->preloadFolder($params);
         };
 
-        $this->register('GET', '/{homepageId}', 'getReport', $perms, $preload);
+        $this->register('GET', '/{folderId}', 'getReport', $perms, $preload);
     }
 
     /**
@@ -85,7 +85,7 @@ class Module extends BaseModule
     private function preloadFolder(array $params): array
     {
         try {
-            $folder = $this->getFolderMapper()->findById($params['homepageId']);
+            $folder = $this->getFolderMapper()->findById($params['folderId']);
         } catch (MapperException $e) {
             throw new NotFound();
         }
