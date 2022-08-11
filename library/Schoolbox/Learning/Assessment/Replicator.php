@@ -59,26 +59,26 @@ class Replicator
      * if the source Assessments are Specifications. This avoids needing to pass the dates in
      * a custom DTO.
      *
-     * @param IAssessable       $assessmentSpec the assessments to replicate
-     * @param AssessmentContext $destination    the location into which to replicate the assessments
-     * @param User              $newOwner       who should own the newly created assessment
-     * @param null|int          $sequence       enable explicit sequence setting
+     * @param IAssessable       $source             the assessment to replicate
+     * @param AssessmentContext $destinationContext the location into which to replicate the assessment
+     * @param User              $newOwner           who should own the newly created assessment
+     * @param null|int          $sequence           enable explicit sequence setting
      * @return IAssessable if any part of the replication fails
      * @throws \InvalidArgumentException If Destination Quiz already has Sections
      * @throws \UnexpectedValueException
      */
     public function replicateInNewContext(
-        IAssessable $assessmentSpec,
-        AssessmentContext $destination,
+        IAssessable $source,
+        AssessmentContext $destinationContext,
         User $newOwner,
         int $sequence = null
     ): IAssessable {
-        $newAssessment = $assessmentSpec->cloneForCopy();
-        $newAssessment->setContext($destination);
+        $newAssessment = $source->cloneForCopy();
+        $newAssessment->setContext($destinationContext);
 
         // If copying the assessment into a spec:
         // clear its dates
-        if ($destination->isSpecificationContext()) {
+        if ($destinationContext->isSpecificationContext()) {
             // Cleanse incoming assessment
             $nullDate      = new \Alaress_Date_NullDate();
             $newAssessment = $newAssessment
@@ -88,20 +88,20 @@ class Replicator
                 ->setCloseAt($nullDate);
         }
 
-        $destination->getAssessables()->add($newAssessment);
+        $destinationContext->getAssessables()->add($newAssessment);
         $newAssessment->setCreator($newOwner);
         if (null !== $sequence) {
             $newAssessment->setSequence($sequence);
         }
 
         $this->assessmentMapperProxy->save($newAssessment, $newOwner);
-        $destination->getAssessables()->add($newAssessment);
+        $destinationContext->getAssessables()->add($newAssessment);
 
         // Copy DueWork Rubrics
-        $this->replicateDueWorkRubric($assessmentSpec, $newAssessment);
+        $this->replicateDueWorkRubric($source, $newAssessment);
 
         // Copy Quiz Sections/Questions/Solutions
-        $this->replicateQuizConstituents($assessmentSpec, $newAssessment);
+        $this->replicateQuizConstituents($source, $newAssessment);
 
         return $newAssessment;
     }
