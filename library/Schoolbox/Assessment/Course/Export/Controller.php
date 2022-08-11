@@ -70,6 +70,7 @@ class Controller extends Base
             $this->assessmentDataSource->save($assessment, $this->getUser());
         }
 
+        // TODO return the same format as the assessment API?
         $this->response->content->set(
             $this->buildJsonOutput([
                 'id' => $newAssessment->getId(),
@@ -99,6 +100,7 @@ class Controller extends Base
         UnitSpec\Model $unitSpec,
         IAssessable $assessment,
     ): void {
+        // How to manage this?
 //        $this->replicator->replicateInNewContext(
 //            $assessment,
 //            $unitSpec,
