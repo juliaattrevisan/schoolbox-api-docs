@@ -51,17 +51,6 @@
             {% set hasCourseRoutes = true %}
             {% if specAssessment %}
                 {% set saveToCourseRoute = routeLookupIfAuthorized(
-                    'courseExport.postAssessmentIntoUnit',
-                    {
-                        assessmentId: assessment.id,
-                        assessment: assessment,
-                        unitSpecId: unit.specification.id,
-                        unitSpec: unit.specification,
-                    }
-                ) %}
-                {% set saveToCourseMethod = 'POST' %}
-            {% else %}
-                {% set saveToCourseRoute = routeLookupIfAuthorized(
                     'courseExport.putAssessmentIntoUnit',
                     {
                         assessmentId: assessment.id,
@@ -71,6 +60,17 @@
                     }
                 ) %}
                 {% set saveToCourseMethod = 'PUT' %}
+            {% else %}
+                {% set saveToCourseRoute = routeLookupIfAuthorized(
+                    'courseExport.postAssessmentIntoUnit',
+                    {
+                        assessmentId: assessment.id,
+                        assessment: assessment,
+                        unitSpecId: unit.specification.id,
+                        unitSpec: unit.specification,
+                    }
+                ) %}
+                {% set saveToCourseMethod = 'POST' %}
             {% endif %}
         {% endif %}
 
