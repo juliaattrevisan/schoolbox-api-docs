@@ -269,9 +269,9 @@ table.rb {
             border-right-width: 1px;
         }
     }
-    ::placeholder { 
-        color: gray; 
-        font-weight: normal; 
+    ::placeholder {
+        color: gray;
+        font-weight: normal;
     }
 }
 .rb-criterion {
@@ -507,4 +507,11 @@ select.letter-grade-select {
     }
 }
 
-
+// This was added for the RubricResultSet index.twig template.
+ span.result-rubric-label {
+     background-color: var(--body-background);
+     display: inline-block;
+     margin-bottom: 0.2rem;
+     margin-right: 0.2rem;
+     padding: 0.5rem;
+ }
