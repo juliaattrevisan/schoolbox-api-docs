@@ -50,18 +50,10 @@ class Controller extends Base
         UnitSpec\Model $unitSpec,
         IAssessable $assessment,
     ): void {
-        // Cleanse incoming assessment
-        $nullDate         = new \Alaress_Date_NullDate();
-        $clonedAssessment = $assessment->cloneForCopy()
-            ->setPublishAt($nullDate)
-            ->setOpenAt($nullDate)
-            ->setDueAt($nullDate)
-            ->setCloseAt($nullDate);
-
         // How to handle projects?
         // Just manually I suppose?
         $newAssessment = $this->replicator->replicateInNewContext(
-            $clonedAssessment,
+            $assessment,
             $unitSpec,
             $this->getUser(),
         );

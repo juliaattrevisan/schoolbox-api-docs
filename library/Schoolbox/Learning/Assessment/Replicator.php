@@ -75,6 +75,19 @@ class Replicator
     ): IAssessable {
         $newAssessment = $assessmentSpec->cloneForCopy();
         $newAssessment->setContext($destination);
+
+        // If copying the assessment into a spec:
+        // clear its dates
+        if ($destination->isSpecificationContext()) {
+            // Cleanse incoming assessment
+            $nullDate      = new \Alaress_Date_NullDate();
+            $newAssessment = $newAssessment
+                ->setPublishAt($nullDate)
+                ->setOpenAt($nullDate)
+                ->setDueAt($nullDate)
+                ->setCloseAt($nullDate);
+        }
+
         $destination->getAssessables()->add($newAssessment);
         $newAssessment->setCreator($newOwner);
         if (null !== $sequence) {
