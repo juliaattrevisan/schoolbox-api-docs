@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 
 /**
@@ -61,7 +62,10 @@ class Controller extends Base
         // If `$assessment` exists within an implementation of `$unitSpec`:
         // associate `$assessment` with `$unitSpec`.
         $baseContext = $assessment->getBaseContext();
-        if ($baseContext instanceof UnitSpec\Model && $unitSpec->getId() === $baseContext->getId()) {
+        if (
+            $baseContext instanceof UnitImplementation\Model
+            && $unitSpec->getId() === $baseContext->getSpecification()->getId()
+        ) {
             $assessment->setSpecificationAssessment($newAssessment);
             $this->assessmentDataSource->save($assessment, $this->getUser());
         }
