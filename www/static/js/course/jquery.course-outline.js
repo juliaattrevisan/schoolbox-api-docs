@@ -165,9 +165,14 @@
             // * this is a project
             header = 'Are you sure you wish to write this assessment back to its course?';
             if ($element.attr('data-spec-assessment-id')) {
-                text = '<div><span class=\"warning alert-box\">' +
-                    'The original assessment <strong data-spec-assessment-title></strong> in the course will be replaced with this assessment.' +
-                    '</span></div>'
+                text = '<div>' +
+                    '<div class=\"warning alert-box\">' +
+                    '<p>The original assessment <strong data-spec-assessment-title></strong> ' +
+                    'in the course will be replaced with this assessment.</p>' +
+                    '<p>Any other imports of the original assessment will <strong>not</strong> ' +
+                    'be updated.</p>' +
+                    '</div>' +
+                    '</div>'
                 let $text = $(text);
                 $text.find('[data-spec-assessment-title]').text($element.attr('data-spec-assessment-title'));
                 text = $text.html();
