@@ -98,10 +98,10 @@ class Replicator
         $destination->getAssessables()->add($newAssessment);
 
         // Copy DueWork Rubrics
-        $this->replicateDueWorkRubric($newAssessment);
+        $this->replicateDueWorkRubric($assessmentSpec, $newAssessment);
 
         // Copy Quiz Sections/Questions/Solutions
-        $this->replicateQuizConstituents($newAssessment);
+        $this->replicateQuizConstituents($assessmentSpec, $newAssessment);
 
         return $newAssessment;
     }
@@ -113,33 +113,31 @@ class Replicator
      *
      * Can handle when $assessable is a Quiz, or any level of Project (via Recursion)
      *
-     * @param IAssessable $assessable
+     * @param IAssessable $source
+     * @param IAssessable $destination
+     * @return void
      * @throws \InvalidArgumentException If Destination Quiz already has Sections
      */
-    protected function replicateQuizConstituents(IAssessable $assessable)
+    protected function replicateQuizConstituents(IAssessable $source, IAssessable $destination): void
     {
-        if (!$assessable instanceof Quiz) {
+        if (!($source instanceof Quiz && $destination instanceof Quiz)) {
             return;
         }
-
-        $specId = $assessable->getSpecificationAssessment()->getId();
-        $implId = $assessable->getId();
-        $this->quizMapper->copyQuizConstituents($specId, $implId);
+        $this->quizMapper->copyQuizConstituents($source->getId(), $destination->getId());
     }
 
     /**
      * Correctly clone a DueWork Rubric
      *
-     * @param IAssessable $assessable
+     * @param IAssessable $source
+     * @param IAssessable $destination
+     * @return void
      */
-    protected function replicateDueWorkRubric(IAssessable $assessable)
+    protected function replicateDueWorkRubric(IAssessable $source, IAssessable $destination): void
     {
-        if (!$assessable instanceof DueWork) {
+        if (!($source instanceof DueWork && $destination instanceof DueWork)) {
             return;
         }
-
-        $specId = $assessable->getSpecificationAssessment()->getId();
-        $implId = $assessable->getId();
-        $this->rubricMapper->copyRubric($specId, $implId);
+        $this->rubricMapper->copyRubric($source->getId(), $destination->getId());
     }
 }
