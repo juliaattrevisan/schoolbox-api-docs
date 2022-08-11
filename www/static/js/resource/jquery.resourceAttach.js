@@ -146,6 +146,7 @@
 
                     self.renderFile({
                         previewElement: file.previewElement,
+                        icon: file.icon,
                         type: file.type
                     });
                     azone.trigger('addedfile.attachzone', [file]);
@@ -190,6 +191,24 @@
                 // Re-enable form submission when upload is done
                 this.on('queuecomplete', function () {
                     submit.prop('disabled', false);
+                });
+
+                this.on('thumbnail', function (file, dataUrl) {
+                    if (file.previewElement) {
+                        file.previewElement.classList.remove("dz-file-preview");
+
+                        file.previewElement.querySelectorAll("[data-dz-thumbnail]").forEach((element) => {
+                            element.alt = file.name;
+                            element.src = dataUrl;
+                            if (dataUrl.target) { //if dataUrl is an event, this is probably an issue with CORS, so lets try again
+                                element.src = dataUrl.target.src;
+                            }
+                        });
+
+                        return setTimeout(function () {
+                            return file.previewElement.classList.add("dz-image-preview");
+                        }, 1);
+                    }
                 });
             },
 
@@ -529,8 +548,12 @@
                 name: list[i].title,
                 type: list[i].mimeType,
                 size: list[i].filesize,
-                hash: list[i].hash
+                hash: list[i].hash,
+                icon: '/ajax/mime/' + list[i].mimeType
             };
+            if (list[i].file && list[i].file.imageUrl) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
+                data.icon = list[i].file.imageUrl;
+            }
 
             if (this.dropzone) { //from the Upload files modal option
 
@@ -676,7 +699,9 @@
             elem.find('input[data-az-attachment]').val(hash);
         }
 
-        if (file.type) {
+        if (file.icon) {
+            elem.find('img[data-dz-thumbnail]').attr('src', file.icon);
+        } else if (file.type) {
             elem.find('img[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
         }
     };

@@ -57,7 +57,9 @@ $(function () {
                 */
                 this.on('addedfile', function (file) {
                     var img = $(file.previewElement).find('img[data-dz-thumbnail]');
-                    img.attr('src', '/ajax/mime/' + file.type);
+                    img.attr('src', '{CDN_PREFIX}/images/mime'.concat('/', file.type.replaceAll('/','-')).concat('.','svg'));
+                    //when the image errors out, if the mimetype does not exist (exactly), then don't error just show the default image
+                    img.attr('onerror', "this.onerror=null;this.src='{CDN_PREFIX}/images/mime/none.svg';");
                 });
 
                 /* Remove a file from the staging area
@@ -96,7 +98,7 @@ $(function () {
                     }
 
                     file.hash = data.hash;
-                    file.imageUrl = data.meta.file._links.image;
+                    file.imageUrl = data.meta.file._links.icon;
 
                 });
 
