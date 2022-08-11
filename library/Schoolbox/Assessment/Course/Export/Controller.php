@@ -8,14 +8,28 @@
 namespace Schoolbox\Assessment\Course\Export;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
+use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 
 /**
  * Controller for exporting assessments into courses.
  */
 class Controller extends Base
 {
+    /**
+     * Constructor
+     *
+     * @param AssessmentDataSource $assessmentDataSource Required for updating existing assessment
+     * @param Replicator           $replicator           Required for replicating assessments
+     */
+    public function __construct(
+        private AssessmentDataSource $assessmentDataSource,
+        private Replicator $replicator,
+    ) {
+    }
+
     /**
      * Post `$assessment` into `$unitSpec`.
      *
@@ -28,16 +42,43 @@ class Controller extends Base
      * @api POST /course/export/unitspecs/{unitSpecId}/assessment/{assessmentId}
      * @since 22.1
      *
-     * @param CourseSpecification\Unit\Model $unitSpec
-     * @param IAssessable                    $assessment
+     * @param UnitSpec\Model $unitSpec
+     * @param IAssessable    $assessment
      * @return void
      */
     public function postAssessmentIntoUnit(
-        CourseSpecification\Unit\Model $unitSpec,
+        UnitSpec\Model $unitSpec,
         IAssessable $assessment,
     ): void {
-        // Should this only work with assessments within an implementation?
-        // Output the new spec assessment
+        // Cleanse incoming assessment
+        $nullDate         = new \Alaress_Date_NullDate();
+        $clonedAssessment = $assessment->cloneForCopy()
+            ->setPublishAt($nullDate)
+            ->setOpenAt($nullDate)
+            ->setDueAt($nullDate)
+            ->setCloseAt($nullDate);
+
+        // How to handle projects?
+        // Just manually I suppose?
+        $newAssessment = $this->replicator->replicateInNewContext(
+            $clonedAssessment,
+            $unitSpec,
+            $this->getUser(),
+        );
+
+        // If `$assessment` exists within an implementation of `$unitSpec`:
+        // associate `$assessment` with `$unitSpec`.
+        $baseContext = $assessment->getBaseContext();
+        if ($baseContext instanceof UnitSpec\Model && $unitSpec->getId() === $baseContext->getId()) {
+            $assessment->setSpecificationAssessment($newAssessment);
+            $this->assessmentDataSource->save($assessment, $this->getUser());
+        }
+
+        $this->response->content->set(
+            $this->buildJsonOutput([
+                'id' => $newAssessment->getId(),
+            ]),
+        );
     }
 
 
@@ -48,17 +89,24 @@ class Controller extends Base
      * attempt to override the existing spec assessment with whatever is in
      * `$assessment`: otherwise, this should return an error.
      *
+     * If the spec assessment has been deleted: should it be restored or a new
+     * one created? not sure.
+     *
      * @api PUT /course/export/unitspecs/{unitSpecId}/assessment/{assessmentId}
      * @since 22.1
      *
-     * @param CourseSpecification\Unit\Model $unitSpec
-     * @param IAssessable                    $assessment
+     * @param UnitSpec\Model $unitSpec
+     * @param IAssessable    $assessment
      * @return void
      */
     public function putAssessmentIntoUnit(
-        CourseSpecification\Unit\Model $unitSpec,
+        UnitSpec\Model $unitSpec,
         IAssessable $assessment,
     ): void {
-        // Output the updated spec assessment
+//        $this->replicator->replicateInNewContext(
+//            $assessment,
+//            $unitSpec,
+//            $this->getUser(),
+//        );
     }
 }

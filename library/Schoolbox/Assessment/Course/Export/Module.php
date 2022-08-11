@@ -12,9 +12,12 @@ use Alaress\Web\Controller\Base;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -94,7 +97,14 @@ class Module extends \Alaress\Module\Module
      */
     public function buildController(): Base
     {
-        return new Controller();
+        return new Controller(
+            $this->getAssessmentDataSource(),
+            new Replicator(
+                $this->getAssessmentDataSource(),
+                $this->getMapperFactory()->get(Mapper::class),
+                $this->getMapperFactory()->get(RubricDataSource::class),
+            ),
+        );
     }
 
     /**
