@@ -10,6 +10,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\UserMapper;
 
@@ -42,12 +43,23 @@ $app = new class extends CliTool\App
      */
     private const OPT_LONG_FILE = 'file:';
 
+
+    /**
+     * A csv of externalIds which some strategies use to filter imported data.
+     * If you specify externalIds here, importers which implement this will only
+     * import data relevant to those externalIds. Not all importers implement it.
+     */
+    private const OPT_LONG_WATCHLIST = 'watchlist:';
+
+
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_FILE,
+            self::OPT_LONG_WATCHLIST,
         ];
     }
 
@@ -70,8 +82,9 @@ This is used by UPS to create user accounts.
 
 This also imports timetable data from third party endpoint into local schema.
 
-Usage: sisImporter.php [--file] [--perform]
+Usage: sisImporter.php [--file] [--watchlist] [--perform]
         --perform       Persist changes
+        --watchlist     A csv of externalIds e.g. 123,456,789
         --file          Optional path to a locally-cached xml file e.g. ../../../www/test.xml
                         Absence of this arg will cause the tool to access the api endpoint instead
 
@@ -95,6 +108,11 @@ HELP;
         $type        = $this->getConfig()->get('schooldata_import_data_source');
         $file        = $this->getOpt(self::OPT_LONG_FILE);
         $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
+
+        /* Figure out what was specified in the Watchlist
+         * Empty strings and spaces are filtered away etc.
+         */
+        $watchlist   = (new Watchlist())->filter((string)$this->getOpt(self::OPT_LONG_WATCHLIST));
 
         /* You haven't specified a SUDS Data Source in Admin.
          */
@@ -144,7 +162,7 @@ NULLTYPE;
 
         /* Execute scheduler
          */
-        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
+        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), $watchlist);
 
         $randomMapper = UserMapper::getInstance();
 

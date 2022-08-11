@@ -150,7 +150,7 @@ HELP;
 
         /* Execute scheduler: sis stuff
          */
-        $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
+        $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), []);
 
         (new Endpoint\Scheduler(
             $randomMapper->getDatabase(),

@@ -14,6 +14,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 /**
@@ -35,12 +36,6 @@ class AdditionalSubjects implements IStrategy
      */
     private const ENDPOINT_STUDENTSUBJECTS = 'getStudentSubjects';
     private const ENDPOINT_TEACHERSUBJECTS = 'getTeacherSubjects';
-
-
-    /**
-     * Filter to specific people; set to null to disable filtering
-     */
-    private const WATCHLIST = null;
 
 
     /**
@@ -82,12 +77,19 @@ class AdditionalSubjects implements IStrategy
 
 
     /**
+     * @var array
+     */
+    private array $watchlist;
+
+
+    /**
      * TimetableClass constructor.
      *
      * @param LoggerInterface        $log
      * @param bool                   $perform
-     * @param Api[]                  $api
+     * @param array                  $api
      * @param Lookup                 $lookup
+     * @param array                  $watchlist
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      */
@@ -96,6 +98,7 @@ class AdditionalSubjects implements IStrategy
         bool $perform,
         array $api,
         Lookup $lookup,
+        array $watchlist,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper
     ) {
@@ -103,6 +106,7 @@ class AdditionalSubjects implements IStrategy
         $this->perform = $perform;
         $this->api = $api;
         $this->lookup = $lookup;
+        $this->watchlist = $watchlist;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
     }
@@ -122,8 +126,8 @@ class AdditionalSubjects implements IStrategy
      */
     public function import(): void
     {
-        $this->importStudentAdditionalSubjects(self::WATCHLIST);
-        $this->importStaffAdditionalSubjects(self::WATCHLIST);
+        $this->importStudentAdditionalSubjects();
+        $this->importStaffAdditionalSubjects();
     }
 
 
@@ -137,7 +141,7 @@ class AdditionalSubjects implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStudentAdditionalSubjects(?array $watchlist = null): void
+    private function importStudentAdditionalSubjects(): void
     {
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
@@ -152,7 +156,7 @@ class AdditionalSubjects implements IStrategy
         foreach ($users as $externalId => $userData) {
             /* Only import data for externalIds in $watchlist, if provided
              */
-            if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
+            if (!(new Watchlist())->isOnWatchlist((string)$externalId, $this->watchlist)) {
                 continue;
             }
 
@@ -280,7 +284,7 @@ class AdditionalSubjects implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStaffAdditionalSubjects(?array $watchlist = null): void
+    private function importStaffAdditionalSubjects(): void
     {
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
@@ -293,7 +297,7 @@ class AdditionalSubjects implements IStrategy
         foreach ($users as $externalId => $userData) {
             /* Only import data for externalIds in $watchlist, if provided
              */
-            if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
+            if (!(new Watchlist())->isOnWatchlist((string)$externalId, $this->watchlist)) {
                 continue;
             }
 
@@ -382,23 +386,5 @@ class AdditionalSubjects implements IStrategy
                 }
             }
         }
-    }
-
-    /**
-     * Decide if $externalId is in $watchlist, which is a set of externalIds
-     *
-     * @param string|null $externalId
-     * @param array|null  $watchlist
-     * @return bool
-     */
-    private function isOnWatchlist(?string $externalId, ?array $watchlist): bool
-    {
-        /* "Everyone is on the watchlist"
-         */
-        if (null === $watchlist) {
-            return true;
-        }
-
-        return $watchlist && in_array($externalId, $watchlist, false);
     }
 }

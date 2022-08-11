@@ -16,8 +16,11 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\Watchlist;
+use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Overrides\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Import all the timetables for everyone.
@@ -43,12 +46,6 @@ class Classes implements IStrategy
      * just "in the past"
      */
     private const PAST_THRESHOLD = 30;
-
-
-    /**
-     * Filter to specific people; set to null to disable filtering
-     */
-    private const WATCHLIST = null;
 
 
     /**
@@ -144,6 +141,12 @@ class Classes implements IStrategy
     private array $eventEntries = [];
 
 
+    /**
+     * @var array
+     */
+    private array $watchlist;
+
+
 //    /**
 //     * A caching mechanism to prevent dupe CLEAR overrides actions
 //     *
@@ -153,7 +156,6 @@ class Classes implements IStrategy
 //     */
 //    private array $overridesEntries = [];
 
-
     /**
      * Constructor
      *
@@ -161,8 +163,9 @@ class Classes implements IStrategy
      * @param bool                                       $perform
      * @param array                                      $api
      * @param Lookup                                     $lookup
+     * @param array                                      $watchlist
      * @param string                                     $dateLocalFormat
-     * @param \Schoolbox\External\Event\Mapper           $eventMapper
+     * @param Mapper                                     $eventMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
@@ -172,6 +175,7 @@ class Classes implements IStrategy
         bool $perform,
         array $api,
         Lookup $lookup,
+        array $watchlist,
         string $dateLocalFormat,
         \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
@@ -182,6 +186,7 @@ class Classes implements IStrategy
         $this->perform = $perform;
         $this->api = $api;
         $this->lookup = $lookup;
+        $this->watchlist = $watchlist;
         $this->dateLocalFormat = $dateLocalFormat;
         $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
@@ -201,41 +206,21 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-        $this->importStudentTimetables(self::WATCHLIST);
-        $this->importStaffTimetables(self::WATCHLIST);
-    }
-
-
-    /**
-     * Decide if $externalId is in $watchlist, which is a set of externalIds
-     *
-     * @param string|null $externalId
-     * @param array|null  $watchlist
-     * @return bool
-     */
-    private function isOnWatchlist(?string $externalId, ?array $watchlist): bool
-    {
-        /* "Everyone is on the watchlist"
-         */
-        if (null === $watchlist) {
-            return true;
-        }
-
-        return $watchlist && in_array($externalId, $watchlist, false);
+        $this->importStudentTimetables();
+        $this->importStaffTimetables();
     }
 
 
     /**
      * Import all student timetables.
      *
-     * @param array|null $watchlist
      * @return void
+     * @throws Exception
      * @throws \InvalidArgumentException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importStudentTimetables(?array $watchlist = null): void
+    private function importStudentTimetables(): void
     {
         /* Students
          * Find all the external ids
@@ -245,7 +230,7 @@ class Classes implements IStrategy
         foreach ($students as $externalId => $person) {
             /* Only import data for externalIds in $watchlist, if provided
              */
-            if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
+            if (!(new Watchlist())->isOnWatchlist((string)$externalId, $this->watchlist)) {
                 continue;
             }
 
@@ -277,8 +262,8 @@ class Classes implements IStrategy
             foreach ($data['student_timetable'] as $timetable) {
 //                /* Only import data for externalIds in $watchlist, if provided
 //                 */
-//                if ($this->isOnWatchlist((string)$externalId, $watchlist)) {
-//                    print_r($timetable);
+//                if (!(new Watchlist())->isOnWatchlist((string)$externalId, $this->watchlist)) {
+//                    continue;
 //                }
 
                 $this->process($person, $timetable, false);
@@ -366,14 +351,13 @@ class Classes implements IStrategy
     /**
      * Import all student timetables.
      *
-     * @param array|null $watchlist
      * @return void
      * @throws \InvalidArgumentException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \UnexpectedValueException
      */
-    private function importStaffTimetables(?array $watchlist = null): void
+    private function importStaffTimetables(): void
     {
         /* Staff
          * Find all the external ids
@@ -403,7 +387,7 @@ class Classes implements IStrategy
         foreach ($staff as $externalId => $person) {
             /* Only import data for externalIds in $watchlist, if provided
              */
-            if (!$this->isOnWatchlist((string)$externalId, $watchlist)) {
+            if (!(new Watchlist())->isOnWatchlist((string)$externalId, $this->watchlist)) {
                 continue;
             }
 
@@ -434,8 +418,8 @@ class Classes implements IStrategy
             foreach ($data['teacher_timetable'] as $timetable) {
 //                /* Only import data for externalIds in $watchlist, if provided
 //                 */
-//                if ($this->isOnWatchlist((string)$externalId, $watchlist)) {
-//                    print_r($timetable);
+//                if (!(new Watchlist())->isOnWatchlist((string)$externalId, $this->watchlist)) {
+//                    continue;
 //                }
 
                 $this->process($person, $timetable, true);
