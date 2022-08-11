@@ -48,7 +48,6 @@
             {% set hasAssessmentRoutes = statusRoute or modifyRoute or deleteRoute or similarityReportRoute %}
 
             {# Save to course: if spec assessment exists, this is a PUT: otherwise a POST #}
-            {% set hasCourseRoutes = true %}
             {% if specAssessment %}
                 {% set saveToCourseRoute = routeLookupIfAuthorized(
                     'courseExport.putAssessmentIntoUnit',
@@ -72,6 +71,7 @@
                 ) %}
                 {% set saveToCourseMethod = 'POST' %}
             {% endif %}
+            {% set hasCourseRoutes = saveToCourseRoute is not empty %}
         {% endif %}
 
         <li class="interact" data-unit-assessment="{{ assessment.id }}">
