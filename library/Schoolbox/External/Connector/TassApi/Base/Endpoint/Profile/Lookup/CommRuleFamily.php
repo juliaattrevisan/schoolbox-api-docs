@@ -172,7 +172,7 @@ class CommRuleFamily
                     $commRule["{$nodePrefix}_preferred_name"],
                     $commRule["{$nodePrefix}_first_name"]
                 ]),
-                'surname' =>  $commRule['f_surname'],
+                'surname' =>  $commRule["{$nodePrefix}_surname"],
                 'mobile' => (new FirstMeaningfulValue())->find([
                     $commRule['mobile_phone_1'],
                     $commRule['mobile_phone_2']
