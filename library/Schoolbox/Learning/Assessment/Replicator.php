@@ -135,15 +135,17 @@ class Replicator
                 ->setCloseAt($nullDate);
         }
 
+        // Delete quiz constituents and rubric
+        $this->deleteDueWorkRubric($updatedDestination);
+        $this->deleteQuizConstituents($updatedDestination);
+
         // Save
         $this->assessmentMapperProxy->save($updatedDestination, $newOwner);
 
         // Copy DueWork Rubrics
-        // TODO clear first
         $this->replicateDueWorkRubric($source, $updatedDestination);
 
         // Copy Quiz Sections/Questions/Solutions
-        $this->deleteQuizConstituents($updatedDestination);
         $this->replicateQuizConstituents($source, $updatedDestination);
 
         return $updatedDestination;
@@ -160,7 +162,7 @@ class Replicator
      * @return void
      * @throws \InvalidArgumentException If Destination Quiz already has Sections
      */
-    protected function replicateQuizConstituents(IAssessable $source, IAssessable $destination): void
+    private function replicateQuizConstituents(IAssessable $source, IAssessable $destination): void
     {
         if (!($source instanceof Quiz && $destination instanceof Quiz)) {
             return;
@@ -175,7 +177,7 @@ class Replicator
      * @param IAssessable $assessment
      * @return void
      */
-    protected function deleteQuizConstituents(IAssessable $assessment): void
+    private function deleteQuizConstituents(IAssessable $assessment): void
     {
         if (!$assessment instanceof Quiz) {
             return;
@@ -190,11 +192,26 @@ class Replicator
      * @param IAssessable $destination
      * @return void
      */
-    protected function replicateDueWorkRubric(IAssessable $source, IAssessable $destination): void
+    private function replicateDueWorkRubric(IAssessable $source, IAssessable $destination): void
     {
         if (!($source instanceof DueWork && $destination instanceof DueWork)) {
             return;
         }
         $this->rubricMapper->copyRubric($source->getId(), $destination->getId());
+    }
+
+    /**
+     * Delete the rubric from `$assessment`, in preparation for a new rubric to
+     * be copied into it.
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    private function deleteDueWorkRubric(IAssessable $assessment): void
+    {
+        if (!$assessment instanceof DueWork) {
+            return;
+        }
+        $this->rubricMapper->deleteRubric($assessment->getId());
     }
 }

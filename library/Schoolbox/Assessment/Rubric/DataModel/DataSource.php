@@ -1563,6 +1563,30 @@ class DataSource
         return true;
     }
 
+    /**
+     * Deletes all traces of a rubric from the due work identified by
+     * `$assessmentId`. This includes:
+     * * capability and indicator usages
+     * * levels
+     * * descriptors on levels
+     *
+     * @param int $assessmentId
+     * @return void
+     */
+    public function deleteRubric(int $assessmentId): void
+    {
+        $capabilityUsageMapper = CapabilityUsageMapper::getInstance();
+        $capabilityUsageMapper->deleteByColumn('submission_box.assessment_id', $assessmentId);
+
+        $indicatorUsageMapper = IndicatorUsageMapper::getInstance();
+        $indicatorUsageMapper->deleteByColumn('submission_box.assessment_id', $assessmentId);
+
+        $levelMapper = LevelMapper::getInstance();
+        $levelMapper->deleteByColumn('box.assessment_id', $assessmentId);
+
+        $descriptorMapper = DescriptorMapper::getInstance();
+        $descriptorMapper->deleteByColumn('level.box.assessment_id', $assessmentId);
+    }
 
 
     /**
