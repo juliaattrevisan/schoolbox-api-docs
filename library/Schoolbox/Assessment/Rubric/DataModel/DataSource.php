@@ -1575,17 +1575,21 @@ class DataSource
      */
     public function deleteRubric(int $assessmentId): void
     {
+        $boxMapper = SubmissionBoxMapper::getInstance();
+        $box       = $boxMapper->findOneByColumn('assessment_id', $assessmentId);
+
         $capabilityUsageMapper = CapabilityUsageMapper::getInstance();
-        $capabilityUsageMapper->deleteByColumn('submission_box.assessment_id', $assessmentId);
+        $capabilityUsageMapper->deleteByColumn('submission_box_id', $box->getId());
 
         $indicatorUsageMapper = IndicatorUsageMapper::getInstance();
-        $indicatorUsageMapper->deleteByColumn('submission_box.assessment_id', $assessmentId);
+        $indicatorUsageMapper->deleteByColumn('submission_box_id', $box->getId());
 
         $levelMapper = LevelMapper::getInstance();
-        $levelMapper->deleteByColumn('box.assessment_id', $assessmentId);
+        $levels      = $levelMapper->findByColumn('box_id', $box->getId());
+        $levelMapper->delete($levels);
 
         $descriptorMapper = DescriptorMapper::getInstance();
-        $descriptorMapper->deleteByColumn('level.box.assessment_id', $assessmentId);
+        $descriptorMapper->deleteByColumn('level_id', $levels->getPropertyValues('id'));
     }
 
 
