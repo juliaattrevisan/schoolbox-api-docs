@@ -1,7 +1,6 @@
 <?php
 
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -17,7 +16,6 @@ use Schoolbox\Resource\Folder;
  */
 class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var Term\Mapper
      */
@@ -223,7 +221,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         ];
         if (
             ($isClassPage || $isGroupPage)
-            &&  $this->getConfigLoader()->get(ConfigMapper::NAME_QR_LOGIN_ENABLED)
+            && $this->getConfigLoader()->get(ConfigMapper::NAME_QR_LOGIN_ENABLED)
             && $authorizer->isPathAuthorizedForUser('qrcode.getListPage', $qrcodeParams, $this->getUser())
         ) {
             $this->setVar(
@@ -282,7 +280,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
          * - folder is current class, group, unit or course (ignore ex-classes)
          * - user is staff, and
          * - has WRITE+ perm
-         * (same for class_pastoral_report_link_block)
          */
         if (
             ($isClassPage || $isGroupPage || $isUnitPage || $isCoursePage)
@@ -291,10 +288,18 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             && $this->getUser()->getRole()->isStaff()
         ) {
             $this->parse('manage_criteria_block', 'manage_criteria');
-            $this->parse('class_pastoral_report_link_block', 'class_pastoral_report_link');
             $hasClassActions = true;
         } else {
             $this->setVar('manage_criteria_block');
+        }
+
+        /*
+         * Render the class_pastoral_report_link_block if the user is authorised to access the link destination.
+         */
+        if ($authorizer->isPathAuthorizedForUser('pastoralClassReportModule.getReport', $qrcodeParams, $this->getUser())) {
+            $this->parse('class_pastoral_report_link_block', 'class_pastoral_report_link');
+            $hasClassActions = true;
+        } else {
             $this->setVar('class_pastoral_report_link_block');
         }
 

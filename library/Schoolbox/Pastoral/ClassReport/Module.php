@@ -15,18 +15,20 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model;
+use Schoolbox\Role;
 
 class Module extends BaseModule
 {
     /**
      * @var string $basename Module basename
      */
-    protected $basename = 'pastoralClass';
+    protected $basename = 'pastoralClassReportModule';
 
     /**
      * Hook method for setting up routes via self::register()
@@ -36,22 +38,28 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $perms = new Rule\HasHomepageAccess(
-            UserAccess::ACCESS_WRITE,
-            function (array $params = []) {
-                if ($params['homepageFolder'] instanceof Model) {
-                    return $params['homepageFolder']->getId();
-                }
-                return null;
-            },
-            Access::getInstance()
+        $perms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsConfigOn(ConfigMapper::NAME_PASTORAL_ENABLED, $this->getConfig()),
+            new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF),
+            new Rule\HasHomepageAccess(
+                UserAccess::ACCESS_WRITE,
+                function (array $params = []) {
+                    if ($params['homepageFolder'] instanceof Model) {
+                        return $params['homepageFolder']->getId();
+                    } else {
+                        return null;
+                    }
+                },
+                Access::getInstance()
+            )
         );
 
         $preload = function ($params) {
             return $this->preloadFolder($params);
         };
 
-        $this->register('GET', '/{homepageId}', 'getPastoralClassReport', $perms, $preload);
+        $this->register('GET', '/{homepageId}', 'getReport', $perms, $preload);
     }
 
     /**

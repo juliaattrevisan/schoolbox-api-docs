@@ -23,13 +23,13 @@ class Controller extends Base
      * @api GET /pastoral/class/{homepageId}
      * @since 22.1
      */
-    public function getPastoralClassReport(FolderModel $homepageFolder): void
+    public function getReport(FolderModel $homepageFolder): void
     {
         $classCode = $homepageFolder->getCodeString();
 
         $this->getResponse()->content->set(
             [
-                'template' => '@pastoralClass/index.twig',
+                'template' => '@pastoralClassReportModule/index.twig',
                 'data'     => [
                     'folder'      => $homepageFolder,
                     'pageTitle'   => "Homepage ($classCode)"
