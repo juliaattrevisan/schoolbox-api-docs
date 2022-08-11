@@ -286,9 +286,14 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         /*
-         * Render the class_pastoral_report_link_block if the user is authorised to access the link destination.
+         * Render the class_pastoral_report_link_block if:
+         *  * the page is a class page AND
+         *  * the user is authorised to access the link destination
          */
-        if ($authorizer->isPathAuthorizedForUser('pastoralClassReportModule.getReport', $folderParams, $this->getUser())) {
+        if (
+            $isClassPage &&
+            $authorizer->isPathAuthorizedForUser('pastoralClassReportModule.getReport', $folderParams, $this->getUser())
+        ) {
             $this->setVar(
                 'PASTORAL_CLASS_REPORT_LINK',
                 $this->getRouter()->generate('pastoralClassReportModule.getReport', $folderParams)
