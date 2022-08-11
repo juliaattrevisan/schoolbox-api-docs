@@ -61,6 +61,14 @@ class CommRuleFamily
 
 
     /**
+     * This is used to identify a father/mother in a joint record sigh
+     * Confusingly, the inverse of FATHER_ and MOTHER_NODE
+     */
+    private const GENDER_FEMALE = 'F';
+    private const GENDER_MALE = 'M';
+
+
+    /**
      * Default spouse prefix
      *
      * @var string
@@ -134,87 +142,38 @@ class CommRuleFamily
             $sorted = $commRule;
             ksort($sorted);
 
-            /* Compare the names - it's the only way to know whose phone numbers
-             * and email are contained in this struct
-             *
-             * Take a guess with the f_ prefixes first - if it matches the
-             * addressee, then this is the Father and we use the P prefix
-             * for their external id
-             *
-             * Otherwise, it's the mother, and we use the Mother's spouse prefix
-             * for their external id
+            /* Use the address_person_gender field to decide whether this
+             * joint data is for the f_ or the m_ person - ultra-disgusting.
              */
-            $possibleNames = [
-                sprintf(
-                    '%s %s',
-                    $commRule['f_preferred_name'],
-                    $commRule['f_surname'],
-                ) => [
-                    'node' => self::FATHER_NODE,
-                    'firstname' => $commRule['f_preferred_name'],
-                    'surname' => $commRule['f_surname']
-                ],
-                sprintf(
-                    '%s %s',
-                    $commRule['f_first_name'],
-                    $commRule['f_surname'],
-                ) => [
-                    'node' => self::FATHER_NODE,
-                    'firstname' => $commRule['f_first_name'],
-                    'surname' => $commRule['f_surname']
-                ],
-                sprintf(
-                    '%s %s',
-                    $commRule['m_preferred_name'],
-                    $commRule['m_surname'],
-                ) => [
-                    'node' => self::MOTHER_NODE,
-                    'firstname' => $commRule['m_preferred_name'],
-                    'surname' => $commRule['m_surname']
-                ],
-                sprintf(
-                    '%s %s',
-                    $commRule['m_first_name'],
-                    $commRule['m_surname'],
-                ) => [
-                    'node' => self::MOTHER_NODE,
-                    'firstname' => $commRule['m_first_name'],
-                    'surname' => $commRule['m_surname']
-                ],
-            ];
-
-            /* Take a guess, I guess, and see if it matches up
-             */
-            foreach ($possibleNames as $possibleName => $fields) {
-                /* Not this person? Keep going
-                 */
-                if ($commRule['addressee'] !== $possibleName) {
-                    continue;
-                }
-
-                /* Otherwise, close enough - cram on a prefix as per tradition
-                 * and pile them into the Family stack.
-                 */
-                $externalId = $this->deriveExternalId($fields['node'], (string)$commRule['parent_code'], $familiesLookup);
-
-                /* Pile it in to the stack
-                 */
-                $stack[$externalId] = [
-                    'firstname' => $fields['firstname'],
-                    'surname' => $fields['surname'],
-                    'mobile' => (new FirstMeaningfulValue())->find([
-                        $commRule['mobile_phone_1'],
-                        $commRule['mobile_phone_2']
-                    ]),
-                    'home' => $commRule['home_phone'],
-                    'work' => $commRule['business_phone'],
-                    'email' => (new FirstMeaningfulValue())->find([
-                        $commRule['email'],
-                        $commRule['email_2']
-                    ]),
-                    'relationship' => $commRule['relationship'],
-                ];
+            if (strtoupper($sorted['address_person_gender']) === self::GENDER_MALE) {
+                $nodePrefix = self::FATHER_NODE;
+            } else {
+                $nodePrefix = self::MOTHER_NODE;
             }
+
+            /* Cram on a prefix as per tradition
+             * and pile them into the Family stack.
+             */
+            $externalId = $this->deriveExternalId($nodePrefix, (string)$commRule['parent_code'], $familiesLookup);
+
+            $stack[$externalId] = [
+                'firstname' => (new FirstMeaningfulValue())->find([
+                    $commRule["{$nodePrefix}_preferred_name"],
+                    $commRule["{$nodePrefix}_first_name"]
+                ]),
+                'surname' =>  $commRule['f_surname'],
+                'mobile' => (new FirstMeaningfulValue())->find([
+                    $commRule['mobile_phone_1'],
+                    $commRule['mobile_phone_2']
+                ]),
+                'home' => $commRule['home_phone'],
+                'work' => $commRule['business_phone'],
+                'email' => (new FirstMeaningfulValue())->find([
+                    $commRule['email'],
+                    $commRule['email_2']
+                ]),
+                'relationship' => $commRule['relationship'],
+            ];
         }
 
         return $stack;
