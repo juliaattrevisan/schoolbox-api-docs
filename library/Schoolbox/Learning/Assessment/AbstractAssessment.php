@@ -221,7 +221,12 @@ abstract class AbstractAssessment implements IAssessable
     {
         $clone = clone $this;
         $clone->setId(null);
-        $clone->setSpecificationAssessment($this);
+
+        // Non-specs may now be used as the basis for a clone.
+        if ($this->isSpecification()) {
+            $clone->setSpecificationAssessment($this);
+        }
+
         $clone->setSequence(null);
         $clone->setCreatedAt(null);
 
