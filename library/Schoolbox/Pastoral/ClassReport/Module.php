@@ -59,9 +59,7 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller(
-            $this->getMapperFactory()->get(FolderMapper::class)
-        );
+        return new Controller();
     }
 
     /**

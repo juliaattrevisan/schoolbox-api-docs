@@ -9,23 +9,14 @@ namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Controller extends Base
 {
     /**
      * Constructor
      */
-    public function __construct(private FolderMapper $folderMapper)
+    public function __construct()
     {
-    }
-
-    /**
-     * @return FolderMapper
-     */
-    public function getFolderMapper(): FolderMapper
-    {
-        return $this->folderMapper;
     }
 
     /**
