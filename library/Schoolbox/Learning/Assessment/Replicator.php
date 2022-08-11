@@ -76,10 +76,8 @@ class Replicator
         $newAssessment = $source->cloneForCopy();
         $newAssessment->setContext($destinationContext);
 
-        // If copying the assessment into a spec:
-        // clear its dates
+        // If copying the assessment into a spec: clear its dates
         if ($destinationContext->isSpecificationContext()) {
-            // Cleanse incoming assessment
             $nullDate      = new \Alaress_Date_NullDate();
             $newAssessment = $newAssessment
                 ->setPublishAt($nullDate)
@@ -106,6 +104,50 @@ class Replicator
         return $newAssessment;
     }
 
+    /**
+     * Overwrite `$destination` with appropriate fields from `$source`.
+     *
+     * @param IAssessable $source
+     * @param IAssessable $destination
+     * @param User        $newOwner
+     * @return IAssessable
+     */
+    public function overwrite(
+        IAssessable $source,
+        IAssessable $destination,
+        User $newOwner,
+    ): IAssessable {
+        // Get fields from destination:
+        $updatedDestination = $source->cloneForCopy();
+        $updatedDestination
+            ->setId($destination->getId())
+            ->setSpecificationAssessment($destination->getSpecificationAssessment())
+            ->setContext($destination->getContext())
+            ->setSequence($destination->getSequence());
+
+        // If copying the assessment into a spec: clear its dates
+        if ($destination->isSpecification()) {
+            $nullDate           = new \Alaress_Date_NullDate();
+            $updatedDestination = $updatedDestination
+                ->setPublishAt($nullDate)
+                ->setOpenAt($nullDate)
+                ->setDueAt($nullDate)
+                ->setCloseAt($nullDate);
+        }
+
+        // Save
+        $this->assessmentMapperProxy->save($updatedDestination, $newOwner);
+
+        // Copy DueWork Rubrics
+        // TODO clear first
+        $this->replicateDueWorkRubric($source, $updatedDestination);
+
+        // Copy Quiz Sections/Questions/Solutions
+        // TODO clear first
+        $this->replicateQuizConstituents($source, $updatedDestination);
+
+        return $updatedDestination;
+    }
 
 
     /**

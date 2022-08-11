@@ -92,35 +92,17 @@ class Controller extends Base
      * @api PUT /course/export/unitspecs/{unitSpecId}/assessment/{assessmentId}
      * @since 22.1
      *
-     * @param UnitSpec\Model $unitSpec
-     * @param IAssessable    $assessment
+     * @param IAssessable $assessment
      * @return void
      */
     public function putAssessmentIntoUnit(
-        UnitSpec\Model $unitSpec,
         IAssessable $assessment,
     ): void {
-        // Find the base assessment
-        $specAssessment = $assessment->getSpecificationAssessment();
-
-        // TODO put this in its own class, with the replicator's
-        //      replicateDueWorkRubric and replicateQuizConstituents
-        $updatedSpecAssessment = $assessment->cloneForCopy();
-        $updatedSpecAssessment
-            ->setId($specAssessment->getId())
-            ->setSpecificationAssessment(null)
-            ->setContext($unitSpec);
-
-        // Cleanse incoming assessment
-        $nullDate              = new \Alaress_Date_NullDate();
-        $updatedSpecAssessment = $updatedSpecAssessment
-            ->setPublishAt($nullDate)
-            ->setOpenAt($nullDate)
-            ->setDueAt($nullDate)
-            ->setCloseAt($nullDate);
-
-        $this->assessmentDataSource->save($updatedSpecAssessment, $this->getUser());
-
+        $updatedSpecAssessment = $this->replicator->overwrite(
+            $assessment,
+            $assessment->getSpecificationAssessment(),
+            $this->getUser(),
+        );
 
         // TODO return the same format as the assessment API?
         $this->response->content->set(
