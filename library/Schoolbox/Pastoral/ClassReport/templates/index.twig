@@ -1,5 +1,8 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbsArray(breadcrumbs) }}
+{{ bread.crumbs(
+    [folder.nameWithCodes, 'homepage/' ~ folder.id],
+    [locale.pastoralCare.proper ~ ' Report']
+) }}
 
 <div class="row actions-small-5">
     <div class="list-item">

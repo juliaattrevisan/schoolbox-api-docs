@@ -31,10 +31,8 @@ class Controller extends Base
             [
                 'template' => '@pastoralClass/index.twig',
                 'data'     => [
-                    'pageTitle' => "Homepage ($classCode)",
-                    'breadcrumbs' => [
-                        ["Homepage ($classCode)", "homepage/{$homepageFolder->getId()}"], ['Pastoral Report']
-                    ]
+                    'folder'      => $homepageFolder,
+                    'pageTitle'   => "Homepage ($classCode)"
                 ]
             ]
         );
