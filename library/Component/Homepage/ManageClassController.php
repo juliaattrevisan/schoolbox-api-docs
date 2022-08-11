@@ -106,6 +106,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'rubric_markbook_link', 'rubric_markbook_link_block');
         $this->setBlock($templateHandle, 'course_markbook_link', 'course_markbook_link_block');
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
+        $this->setBlock($templateHandle, 'class_pastoral_report_link', 'class_pastoral_report_link_block');
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
         $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
         $this->setBlock($templateHandle, 'analytics_section', 'analytics_section_block');
@@ -281,6 +282,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
          * - folder is current class, group, unit or course (ignore ex-classes)
          * - user is staff, and
          * - has WRITE+ perm
+         * (same for class_pastoral_report_link_block)
          */
         if (
             ($isClassPage || $isGroupPage || $isUnitPage || $isCoursePage)
@@ -289,9 +291,11 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             && $this->getUser()->getRole()->isStaff()
         ) {
             $this->parse('manage_criteria_block', 'manage_criteria');
+            $this->parse('class_pastoral_report_link_block', 'class_pastoral_report_link');
             $hasClassActions = true;
         } else {
             $this->setVar('manage_criteria_block');
+            $this->setVar('class_pastoral_report_link_block');
         }
 
         // Output course modify link if course page
