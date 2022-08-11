@@ -102,14 +102,21 @@ PreSelectedCodes.args = {
     ],
 }
 
-export const isReadOnly = Template.bind({});
-isReadOnly.args = {
+export const readOnly = Template.bind({});
+readOnly.args = {
     ...Default.args,
     selectedCodes: [
         { "id":106, "name":"Comprehend texts", "code":"CMP-TEX", "description":"", "reference":null, "children":[], "area":null, "level":null, "breadcrumb":"General Capabilities > Literacy > Comprehending texts through listening, reading and viewing" },
         { "id":107, "name":"Navigate, read and view learning area texts", "code":"GCL-NRVLAT", "description":"", "reference":null, "children":[], "area":null, "level":null, "breadcrumb":"General Capabilities > Literacy > Comprehending texts through listening, reading and viewing" },
         { "id":108, "name":"Listen and respond to learning area texts", "code":"GCL-LRLAT", "description":"", "reference":null, "children":[ ], "area":null, "level":null, "breadcrumb":"General Capabilities > Literacy > Comprehending texts through listening, reading and viewing" },
     ],
+    isReadOnly: true,
+}
+
+export const readOnlyWithNoPreSelectedCodes = Template.bind({});
+readOnlyWithNoPreSelectedCodes.args = {
+    ...Default.args,
+    selectedCodes: [],
     isReadOnly: true,
 }
 

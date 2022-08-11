@@ -5,10 +5,12 @@
  */
 
 import { computed } from 'vue';
+import { useStore } from './store/curriculumSelectorStore';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 import CsSelectedCode from './cs-selected-code.vue';
 
 
+const store = useStore();
 const selectedCodesStore = useSelectedCodesStore();
 
 /**
@@ -31,8 +33,10 @@ const curriculumCodes = computed(() => {
             :key="code.id"
             :code="code"
             data-test-code
-        >
-        </cs-selected-code>
+        />
+    </div>
+    <div v-else-if="selectedCodesStore.hasNoCodes && store.isReadOnly" class="selected-codes-container" data-test-container>
+        <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
     <input id="curriculumCodes[]" name="curriculumCodes[]" type="hidden" tabindex="-1" :value="curriculumCodes" />
 </template>
@@ -52,5 +56,9 @@ const curriculumCodes = computed(() => {
     .selected-codes-container__disabled {
         opacity: 0.7;
     }
+
+.no-codes-note {
+    margin-top: 0.35rem;
+}
 
 </style>
