@@ -41,7 +41,10 @@ class Module extends BaseModule
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\IsConfigOn(ConfigMapper::NAME_PASTORAL_ENABLED, $this->getConfig()),
-            new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF),
+            new Rule\Any(
+                new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF),
+                new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)
+            ),
             new Rule\HasHomepageAccess(
                 UserAccess::ACCESS_WRITE,
                 function (array $params = []) {
