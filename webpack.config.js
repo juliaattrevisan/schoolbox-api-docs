@@ -3,6 +3,28 @@ const webpack = require('webpack');
 const {VueLoaderPlugin} = require('vue-loader');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); //https://www.npmjs.com/package/webpack-remove-empty-scripts
 
+const babelOptions = {
+    presets: [
+        [
+            '@babel/preset-env',
+            {
+                targets: {
+                    browsers: [
+                        '>0.25%',
+                        'not dead',
+                        'not op_mini all',
+                        'not ie 11'
+                    ],
+                },
+                useBuiltIns: 'usage',
+                corejs: 3
+            }
+        ]
+    ],
+    plugins: [
+        '@babel/plugin-proposal-optional-chaining',
+    ]
+}
 
 module.exports = {
     entry: { //https://webpack.js.org/configuration/entry-context/
@@ -232,6 +254,9 @@ module.exports = {
         //Canvas
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
 
+        //Canvas
+        typescriptTest: './library/Schoolbox/Greenhouse/templates/typescriptTest.ts',
+
         //Sass
         core: './www/static/css/core/core.scss',
         editor: './www/static/css/core/editor.scss',
@@ -287,29 +312,21 @@ module.exports = {
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader', //to transpile JS code to ensure everything is compatiable with all targeted browsers
-                    options: {
-                        presets: [
-                            [
-                                '@babel/preset-env',
-                                {
-                                    targets: {
-                                        browsers: [
-                                            '>0.25%',
-                                            'not dead',
-                                            'not op_mini all',
-                                            'not ie 11'
-                                        ],
-                                    },
-                                    useBuiltIns: 'usage',
-                                    corejs: 3
-                                }
-                            ]
-                        ],
-                        plugins: [
-                            '@babel/plugin-proposal-optional-chaining',
-                        ]
-                    }
+                    options: babelOptions,
                 },
+            },
+            {
+                test: /\.ts(x?)$/, //typescript uses the same babel setup as JS files, but also uses ts-loader to convert the ts to js
+                exclude: /node_modules/,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: babelOptions,
+                    },
+                    {
+                        loader: 'ts-loader'
+                    }
+                ]
             },
             {
                 test: /\.vue$/,
@@ -381,7 +398,7 @@ module.exports = {
             '@js': path.resolve(__dirname, 'www/static/js'),
             '@css': path.resolve(__dirname, 'www/static/css'),
         },
-        extensions: ['*', '.js', '.vue', '.json']
+        extensions: ['*', '.js', '.vue', '.json', '.ts']
     },
     plugins: [ //https://webpack.js.org/configuration/plugins/
         new webpack.DefinePlugin({ //to enable bundler feature flags, to enable build when compiling in production:
