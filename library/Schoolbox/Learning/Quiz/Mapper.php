@@ -259,6 +259,19 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Deletes all constituents (sections and questions) from the quiz whose
+     * assessment ID matches `$assessmentId`.
+     *
+     * @param int $assessmentId
+     * @return void
+     */
+    public function deleteQuizConstituents(int $assessmentId): void
+    {
+        $sectionMapper = $this->getJoinMapper('sections');
+        $sectionMapper->deleteByColumn('quiz.assessment_id', $assessmentId);
+    }
+
+    /**
      * Post-save callback.
      *
      * Saves a record in external markbook system.

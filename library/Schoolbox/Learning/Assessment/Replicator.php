@@ -143,7 +143,7 @@ class Replicator
         $this->replicateDueWorkRubric($source, $updatedDestination);
 
         // Copy Quiz Sections/Questions/Solutions
-        // TODO clear first
+        $this->deleteQuizConstituents($updatedDestination);
         $this->replicateQuizConstituents($source, $updatedDestination);
 
         return $updatedDestination;
@@ -166,6 +166,21 @@ class Replicator
             return;
         }
         $this->quizMapper->copyQuizConstituents($source->getId(), $destination->getId());
+    }
+
+    /**
+     * Delete any sections (and thus questions and solutions) from
+     * `$assessment`, in preparation for a new set to be copied into it.
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    protected function deleteQuizConstituents(IAssessable $assessment): void
+    {
+        if (!$assessment instanceof Quiz) {
+            return;
+        }
+        $this->quizMapper->deleteQuizConstituents($assessment->getId());
     }
 
     /**
