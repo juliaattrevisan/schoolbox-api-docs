@@ -1,38 +1,38 @@
 {% extends '@core/user/student.twig' %}
 {% block specialAlert %}
     {% if externalUser.StudentSpecialNeedsFlag and showSpecialAlert %}
-        <button class="alert-box-icon highlight icon-bell" title="{{ locale.translate('specialNeeds', false, true) }}" data-alert-button></button>
+        <a class="alert-box-icon highlight icon-bell" title="{{ locale.translate('specialNeeds', false, true) }}" data-alert-button></a>
     {% endif %}
 {% endblock specialAlert %}
 
 {% block englishSecond %}
     {% if externalUser.EnglishSecondFlag and showSpecialAlert  %}
-        <button class="alert-box-icon highlight icon-eng-second-lang" title="English as an Additional Language" data-alert-button></button>
+        <a class="alert-box-icon highlight icon-eng-second-lang" title="English as an Additional Language" data-alert-button></a>
     {% endif %}
 {% endblock englishSecond %}
 
 {% block medicalAlert %}
     {% if externalUser.StudentMedicalAlert and showMedicalAlert %}
-        <button class="alert-box-icon alert icon-alert" title="Medical Note: {{ externalUser.StudentMedicalAlert }}" data-alert-button></button>
+        <a class="alert-box-icon alert icon-alert" title="Medical Note: {{ externalUser.StudentMedicalAlert }}" data-alert-button></a>
     {% endif %}
 {% endblock medicalAlert %}
 
 {% block individualEducationPlan %}
     {% if isStaff and externalUser.countIndividualEducationPlans > 0 %}
-        <button class="alert-box-icon highlight icon-curriculum" title="Individual Education Plan" data-alert-button></button>
+        <a class="alert-box-icon highlight icon-curriculum" title="Individual Education Plan" data-alert-button></a>
     {% endif %}
 {% endblock individualEducationPlan %}
 
 {% block synergeticComments %}
     {% if externalUser.Comment is not empty and showComments %}
-        <button class="alert-box-icon highlight icon-info" title="{{ externalUser.Comment | nl2br }}" data-alert-button></button>
+        <a class="alert-box-icon highlight icon-info" title="{{ externalUser.Comment | nl2br }}" data-alert-button></a>
     {% endif %}
 {% endblock synergeticComments %}
 
 {% block contacts_alert %}
     {# Only staff may view contact alerts #}
     {% if showContactsAlert %}
-        <button class="alert-box-icon alert icon-alert" title="{{ message | nl2br }}" data-alert-button></button>
+        <a class="alert-box-icon alert icon-alert" title="{{ message | nl2br }}" data-alert-button></a>
     {% endif %}
 {% endblock contacts_alert %}
 
@@ -47,15 +47,26 @@
     const alertButtons = document.querySelectorAll('[data-alert-button]');
     alertButtons.forEach((alertButton) => {
         alertButton.addEventListener('click', (event) => {
-            alertButton.textContent = alertButton.getAttribute('title');
+            if (alertButton.textContent === '') {
+                alertButton.textContent = alertButton.getAttribute('title');
+                alertButton.style.width = '100%';
+            } else {
+                alertButton.textContent = '';
+                alertButton.style.width = '2rem';
+            }
         });
     });
 </script>
 <style>
+    @media only print, screen and (max-width: 40em) {
+        .profile .alert-box, .profile .eotc-status, .profile .alert-box-icon, .profile .pastoral-flags {
+            padding: 0.25rem 0.5rem
+        }
+    }
+
     .alert-box-icon {
         display: block;
-        /* make the padding a bit bigger for a larger button target spot */
-        padding: 0.5rem 1rem;
+        width: 2rem;
     }
     .alert-box:empty,
     .alert-box-icon:empty {
