@@ -174,7 +174,7 @@
                     </div>
                     <div class="small-12 columns">
                         {% set animate = not badge or badge.animate %}
-                        <label for="badge-animate">Animate Badge on Achievement</label>
+                        <label for="badge-animate" class="inline-block">Animate Badge on Achievement</label>
                         <div class="switch">
                             <input id="badge-animate" type="checkbox" name="animate" {% if animate %}checked="checked"{% endif %}>
                             <label for="badge-animate">
@@ -187,7 +187,7 @@
                 <fieldset class="content">
                     {% set allowAsGoal = not badge or badge.allowAsGoal %}
                     <div class="small-6 columns">
-                        <label for="badge-allow-as-goal">Allow Use as Goal</label>
+                        <label for="badge-allow-as-goal" class="inline-block">Allow Use as Goal</label>
                         <div class="switch">
                             <input id="badge-allow-as-goal" type="checkbox" name="allow-as-goal" {% if allowAsGoal %}checked="checked"{% endif %}>
                             <label for="badge-allow-as-goal">
