@@ -130,9 +130,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         /** @var Alaress\Authorizer\Authorizer $authorizer */
-        $authorizer = $this->getSitePage()->getDi()->get('authorizer');
-        $route      = 'rubricMarkbook.getMarkbook';
-        $params     = [
+        $authorizer   = $this->getSitePage()->getDi()->get('authorizer');
+        $route        = 'rubricMarkbook.getMarkbook';
+        $folderParams = [
             'folder'   => $this->getContext(),
             'folderId' => $this->getContext()->getId(),
         ];
@@ -142,9 +142,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if (
             ($isGroupPage || $isClassPage || $wasClassPage)
             && $this->getConfigLoader()->get('rubric_markbook_enable')
-            && $authorizer->isPathAuthorizedForUser($route, $params, $this->getUser())
+            && $authorizer->isPathAuthorizedForUser($route, $folderParams, $this->getUser())
         ) {
-            $this->setVar('RUBRIC_MARKBOOK_LINK', $this->getRouter()->generate($route, $params));
+            $this->setVar('RUBRIC_MARKBOOK_LINK', $this->getRouter()->generate($route, $folderParams));
             $this->parse('rubric_markbook_link_block', 'rubric_markbook_link');
             $hasClassActions = true;
         } else {
@@ -167,20 +167,16 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         // Badge Report
-        $badgeReportParams = [
-            'folderId' => $this->getContext()->getId(),
-            'folder'   => $this->getContext(),
-        ];
         if (
             ($isClassPage || $isGroupPage)
             && $this->getConfigLoader()->get(ConfigMapper::NAME_BADGES_ENABLED)
-            && $authorizer->isPathAuthorizedForUser('learningBadgeAward.getListPage', $badgeReportParams, $this->getUser())
+            && $authorizer->isPathAuthorizedForUser('learningBadgeAward.getListPage', $folderParams, $this->getUser())
         ) {
             $this->setVar(
                 'AWARD_LIST_LINK',
                 $this->getRouter()->generate(
                     'learningBadgeAward.getListPage',
-                    $badgeReportParams
+                    $folderParams
                 )
             );
             $this->parse('award_list_link_block', 'award_list_link');
@@ -215,20 +211,16 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         // Generate QR Code
-        $qrcodeParams = [
-            'folderId' => $this->getContext()->getId(),
-            'folder'   => $this->getContext(),
-        ];
         if (
             ($isClassPage || $isGroupPage)
             && $this->getConfigLoader()->get(ConfigMapper::NAME_QR_LOGIN_ENABLED)
-            && $authorizer->isPathAuthorizedForUser('qrcode.getListPage', $qrcodeParams, $this->getUser())
+            && $authorizer->isPathAuthorizedForUser('qrcode.getListPage', $folderParams, $this->getUser())
         ) {
             $this->setVar(
                 'QRCODE_LINK',
                 $this->getRouter()->generate(
                     'qrcode.getListPage',
-                    $qrcodeParams
+                    $folderParams
                 )
             );
             $this->parse('qrcode_link_block', 'qrcode_link');
@@ -296,7 +288,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         /*
          * Render the class_pastoral_report_link_block if the user is authorised to access the link destination.
          */
-        if ($authorizer->isPathAuthorizedForUser('pastoralClassReportModule.getReport', $qrcodeParams, $this->getUser())) {
+        if ($authorizer->isPathAuthorizedForUser('pastoralClassReportModule.getReport', $folderParams, $this->getUser())) {
             $this->parse('class_pastoral_report_link_block', 'class_pastoral_report_link');
             $hasClassActions = true;
         } else {
@@ -346,10 +338,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if (0 !== count($courses[$this->getContext()->getId()])) {
             $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
             foreach ($courses[$this->getContext()->getId()] as $courseid => $courseTitle) {
-                $params             = [
-                    'courseSpecId'   => $courseid,
-                    'folderId' => $this->getContext()->getId(),
-                    'termCode' => $currentTerm->getCode(),
+                $params = [
+                    'courseSpecId' => $courseid,
+                    'folderId'     => $this->getContext()->getId(),
+                    'termCode'     => $currentTerm->getCode(),
                 ];
                 if ($this->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $this->getUser())) {
                     $hasAnalytics = true;

@@ -45,8 +45,8 @@ class Module extends BaseModule
             new Rule\HasHomepageAccess(
                 UserAccess::ACCESS_WRITE,
                 function (array $params = []) {
-                    if ($params['homepageFolder'] instanceof Model) {
-                        return $params['homepageFolder']->getId();
+                    if ($params['folder'] instanceof Model) {
+                        return $params['folder']->getId();
                     } else {
                         return null;
                     }
@@ -85,12 +85,12 @@ class Module extends BaseModule
     private function preloadFolder(array $params): array
     {
         try {
-            $homepageFolder = $this->getFolderMapper()->findById($params['homepageId']);
+            $folder = $this->getFolderMapper()->findById($params['homepageId']);
         } catch (MapperException $e) {
             throw new NotFound();
         }
 
-        return ['homepageFolder' => $homepageFolder];
+        return ['folder' => $folder];
     }
 
     /**
