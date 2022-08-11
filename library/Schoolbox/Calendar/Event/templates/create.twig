@@ -334,16 +334,16 @@
                                 <input name="maxAttendees" maxlength="5" type="number" value="{{ event.maxAttendees }}" />
                             </div>
                             <div class="small-12 medium-6 columns">
-                                <label>
+                                <label for="showAttendees" class="inline-block">
                                     Show Guest List <span class="hint has-tip tip-top" title="Control the visibility of the guest list to other guests, you will always see the guest list." data-tooltip>?</span>
-                                    <div class="switch">
-                                        <input id="showAttendees" name="showAttendees" type="checkbox" value="1" {{ event.showAttendees ? 'checked="checked"' : '' }}>
-                                        <label for="showAttendees">
-                                            <span>On</span>
-                                            <span>Off</span>
-                                        </label>
-                                    </div>
                                 </label>
+                                <div class="switch">
+                                    <input id="showAttendees" name="showAttendees" type="checkbox" value="1" {{ event.showAttendees ? 'checked="checked"' : '' }}>
+                                    <label for="showAttendees">
+                                        <span>On</span>
+                                        <span>Off</span>
+                                    </label>
+                                </div>
                             </div>
 
                         </div>

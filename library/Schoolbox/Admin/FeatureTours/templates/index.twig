@@ -13,7 +13,7 @@
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="tours-enabled">Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Enable or disable all feature tours system-wide.">?</span></label>
+                            <label for="tours-enabled" class="inline-block">Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Enable or disable all feature tours system-wide.">?</span></label>
                             <div class="switch">
                                 <input id="tours-enabled" type="checkbox" name="enabled" {% if toursEnabled %}checked{% endif %}/>
                                 <label for="tours-enabled">
@@ -31,7 +31,7 @@
                             {% for tour in tours %}
                                 <li>
                                     <div class="list-item">
-                                        <div class="card small-1">
+                                        <div class="card small-2">
                                             <div class="switch">
                                                 <input id="tour-enable-{{ tour.uuid }}" type="checkbox" name="tour-enable[]" value="{{ tour.uuid }}" {% if tour.active %}checked{% endif %}/>
                                                 <label for="tour-enable-{{ tour.uuid }}">
@@ -40,7 +40,7 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        <div class="card small-11">
+                                        <div class="card small-10">
                                             <h3>{{ tour.title }}</h3>
                                             <p class="meta" title="Will be seen by Staff">
                                                 Staff

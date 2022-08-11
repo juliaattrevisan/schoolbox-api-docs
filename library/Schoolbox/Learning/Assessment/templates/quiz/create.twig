@@ -109,7 +109,7 @@
     {# ----------------------------------------------------------- #}
     <div class="row">
         <div class="small-5 medium-2 columns">
-            <label for="hasDuration">Allowed Time<span class="hint has-tip tip-top" data-tooltip title="After starting a quiz, students will have this much time to complete it. Switch off for no limit.">?</span></label>
+            <label for="hasDuration" class="inline-block">Allowed Time<span class="hint has-tip tip-top" data-tooltip title="After starting a quiz, students will have this much time to complete it. Switch off for no limit.">?</span></label>
             <div class="switch">
                 <input name="hasDuration" id="hasDuration" type="checkbox" {% if assessment.duration != -1 %}checked="checked"{% endif %} />
                 <label for="hasDuration">

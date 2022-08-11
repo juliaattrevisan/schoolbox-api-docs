@@ -434,6 +434,9 @@ $select-hover-bg-color: tint($warning-color, 50%);
     section {
         label {
             font-size: $paragraph-font-size;
+            &.inline-block {
+                display: inline-block;
+            }
         }
     }
 
@@ -703,9 +706,9 @@ $input-hover-color: $black;
 $legend-bg: transparent;
 
 form {
-    ::placeholder { 
-        color: $aluminum; 
-        font-weight: normal; 
+    ::placeholder {
+        color: $aluminum;
+        font-weight: normal;
     }
     margin: 0 0 calc($form-spacing / 2) 0;
 }
