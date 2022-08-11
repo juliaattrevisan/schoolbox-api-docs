@@ -64,7 +64,6 @@ class CommRuleFamily
      * This is used to identify a father/mother in a joint record sigh
      * Confusingly, the inverse of FATHER_ and MOTHER_NODE
      */
-    private const GENDER_FEMALE = 'F';
     private const GENDER_MALE = 'M';
 
 
