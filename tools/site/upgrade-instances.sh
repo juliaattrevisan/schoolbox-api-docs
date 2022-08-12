@@ -132,12 +132,27 @@ function parse_global_vars(){
 }
 
 function update_schoolbox_update_error_fact_file(){
-  tmp_files_path="/tmp/facter/schoolbox_*_update.json";
-  fact_file="/etc/facter/facts.d/schoolbox_update.json";
+  temp_file_dir="/tmp/facter";
+  fact_file_dir="/etc/facter/facts.d";
+  instances_fact_file_pattern="schoolbox_*_update.json";
+  master_fact_file_name="schoolbox_update.json";
+
   log "Updating fact file for schoolbox_update_error";
 
-  #merge all json files in the tmp file directory then write to fact file
-  jq -s 'reduce .[] as $instance ({}; . * $instance)' $tmp_files_path > $fact_file;
+  #overwrite fact file values with new values and write to temp fact file
+  jq -s \
+    'reduce .[] as $instance ({}; . * $instance)' \
+    ${fact_file_dir}/${master_fact_file_name} ${temp_file_dir}/${instances_fact_file_pattern} \
+     > "${temp_file_dir}/${master_fact_file_name}.new";
+
+  #create an array of instance ids
+  current_instance_ids=$(schoolbox-read-instances --option instance-list | jq -Rn '[inputs|select(length>0)]')
+
+  #delete instances not present in /etc/schoolbox/instances.ini from the fact file
+  jq -c \
+    --arg keys_to_keep "${current_instance_ids}" \
+    '.[] |= with_entries( select( .key as $k | $keys_to_keep | index($k) ) )' \
+    ${temp_file_dir}/${master_fact_file_name}.new > "${fact_file_dir}/${master_fact_file_name}";
 }
 
 # Ensures data-dirs exist (all hosts) then runs SQL updates (primary hosts only)
