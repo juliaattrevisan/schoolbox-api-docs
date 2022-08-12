@@ -194,11 +194,18 @@
                         };
                     toaster.toastActivate({text: 'Writing assessment to course...'});
                     $.ajax(ajaxParams)
-                        .done(function() {
+                        .done(function(data) {
                             toaster.toastTimeout({
                                 text: 'Assessment written to course.',
                                 css: 'pop success'
                             });
+
+                            // After this item is updated even once:
+                            // * method becomes PUT
+                            // * ID and title are updated
+                            $element.attr('data-spec-assessment-id', data.id);
+                            $element.attr('data-spec-assessment-title', data.title);
+                            $element.attr('data-method', 'PUT');
                         })
                         .fail(function () {
                             toaster.toastTimeout({
