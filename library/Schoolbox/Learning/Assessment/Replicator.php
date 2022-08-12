@@ -105,57 +105,8 @@ class Replicator
     }
 
     /**
-     * Overwrite `$destination` with appropriate fields from `$source`.
-     *
-     * @param IAssessable $source
-     * @param IAssessable $destination
-     * @param User        $newOwner
-     * @return IAssessable
-     */
-    public function overwrite(
-        IAssessable $source,
-        IAssessable $destination,
-        User $newOwner,
-    ): IAssessable {
-        // Get fields from destination:
-        $updatedDestination = $source->cloneForCopy();
-        $updatedDestination
-            ->setId($destination->getId())
-            ->setSpecificationAssessment($destination->getSpecificationAssessment())
-            ->setContext($destination->getContext())
-            ->setSequence($destination->getSequence());
-
-        // If copying the assessment into a spec: clear its dates
-        if ($destination->isSpecification()) {
-            $nullDate           = new \Alaress_Date_NullDate();
-            $updatedDestination = $updatedDestination
-                ->setPublishAt($nullDate)
-                ->setOpenAt($nullDate)
-                ->setDueAt($nullDate)
-                ->setCloseAt($nullDate);
-        }
-
-        // Delete quiz constituents and rubric
-        $this->deleteDueWorkRubric($updatedDestination);
-        $this->deleteQuizConstituents($updatedDestination);
-
-        // Save
-        $this->assessmentMapperProxy->save($updatedDestination, $newOwner);
-
-        // Copy DueWork Rubrics
-        $this->replicateDueWorkRubric($source, $updatedDestination);
-
-        // Copy Quiz Sections/Questions/Solutions
-        $this->replicateQuizConstituents($source, $updatedDestination);
-
-        return $updatedDestination;
-    }
-
-
-    /**
-     * Copy any Quiz Sections, Questions + Solutions to $assessable from its Specification
-     *
-     * Can handle when $assessable is a Quiz, or any level of Project (via Recursion)
+     * Copy any quiz sections, questions and solutions to `$destination` from
+     * `$source`.
      *
      * @param IAssessable $source
      * @param IAssessable $destination
@@ -171,22 +122,7 @@ class Replicator
     }
 
     /**
-     * Delete any sections (and thus questions and solutions) from
-     * `$assessment`, in preparation for a new set to be copied into it.
-     *
-     * @param IAssessable $assessment
-     * @return void
-     */
-    private function deleteQuizConstituents(IAssessable $assessment): void
-    {
-        if (!$assessment instanceof Quiz) {
-            return;
-        }
-        $this->quizMapper->deleteQuizConstituents($assessment->getId());
-    }
-
-    /**
-     * Correctly clone a DueWork Rubric
+     * Copy the rubric from `$source` into `$destination`.
      *
      * @param IAssessable $source
      * @param IAssessable $destination
@@ -198,20 +134,5 @@ class Replicator
             return;
         }
         $this->rubricMapper->copyRubric($source->getId(), $destination->getId());
-    }
-
-    /**
-     * Delete the rubric from `$assessment`, in preparation for a new rubric to
-     * be copied into it.
-     *
-     * @param IAssessable $assessment
-     * @return void
-     */
-    private function deleteDueWorkRubric(IAssessable $assessment): void
-    {
-        if (!$assessment instanceof DueWork) {
-            return;
-        }
-        $this->rubricMapper->deleteRubric($assessment->getId());
     }
 }

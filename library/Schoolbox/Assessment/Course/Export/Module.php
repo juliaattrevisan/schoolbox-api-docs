@@ -16,6 +16,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Overwriter;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
@@ -83,6 +84,11 @@ class Module extends \Alaress\Module\Module
         return new Controller(
             $this->getAssessmentDataSource(),
             new Replicator(
+                $this->getAssessmentDataSource(),
+                $this->getMapperFactory()->get(Mapper::class),
+                $this->getMapperFactory()->get(RubricDataSource::class),
+            ),
+            new Overwriter(
                 $this->getAssessmentDataSource(),
                 $this->getMapperFactory()->get(Mapper::class),
                 $this->getMapperFactory()->get(RubricDataSource::class),
