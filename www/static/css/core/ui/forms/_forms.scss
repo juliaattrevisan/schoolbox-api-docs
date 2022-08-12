@@ -609,9 +609,14 @@ $select-hover-bg-color: tint($warning-color, 50%);
     }
 
     /* HTML5 Number spinners settings */
-    input[type="number"] {
+    input[type="number"],
+    input[inputmode="numeric"] {
       @include html5number(moz, $input-number-spinners);
     }
+      input[type="text"]::-webkit-inner-spin-button,
+      input[type="text"]::-webkit-outer-spin-button,
+      input[inputmode="numeric"]::-webkit-inner-spin-button,
+      input[type="numeric"]::-webkit-outer-spin-button,
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
       @include html5number(webkit, $input-number-spinners);

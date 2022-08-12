@@ -8,7 +8,7 @@
     <td data-assessment="{{ assessment.id }}" class="student-grade-cell">
         {% if markbook.assessmentStatistics[assessment.id][key] is defined and writable[assessment.id] is defined %}
             {% if input ?? false and assessment is not task and not assessment.courseManaged and writable[assessment.id] %}
-                <input type="number" name="weight" data-weight value="{{ assessment.weight }}" min=0 data-assessment="{{ assessment.id }}">
+                <input type="number" inputmode="numeric" name="weight" data-weight value="{{ assessment.weight }}" min=0 data-assessment="{{ assessment.id }}">
             {% elseif round is defined %}
                 {{ markbook.assessmentStatistics[assessment.id][key] | round(round) }}
             {% else %}

@@ -158,7 +158,7 @@ export default {
                 });
             } catch (error) {
                 this.$refs.toast.timeout('Failed to remove grade level', false);
-            } 
+            }
 
             this.applyValidator();
         },
@@ -196,8 +196,8 @@ export default {
             this.$refs.toast.activate('Saving...');
             try {
                 const response = await fetch(this.config.postUrl, {
-                    method: 'POST', 
-                    body: JSON.stringify(this.gradeGroups), 
+                    method: 'POST',
+                    body: JSON.stringify(this.gradeGroups),
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -254,6 +254,7 @@ export default {
                     <td>
                         <input :name="'group.' + String(groupIndex) + '.level.' + String(levelIndex) + '.lowerBound'"
                                type="number"
+                               inputmode="numeric"
                                min="0"
                                max="100"
                                step="0.01"
@@ -266,6 +267,7 @@ export default {
                     <td>
                         <input :name="'group.' + String(groupIndex) + '.level.' + String(levelIndex) + '.rawGrade'"
                                type="number"
+                               inputmode="numeric"
                                min="0"
                                max="100"
                                step="0.01"

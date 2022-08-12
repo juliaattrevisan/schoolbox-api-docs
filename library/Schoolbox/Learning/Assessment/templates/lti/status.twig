@@ -141,11 +141,11 @@
                     </div>
                     <div class="small-6 columns">
                         <label for="{{ createAttemptIdBase }}-scoreGiven">Score Given</label>
-                        <input id="{{ createAttemptIdBase }}-scoreGiven" name="scoreGiven" type="number" />
+                        <input id="{{ createAttemptIdBase }}-scoreGiven" name="scoreGiven" type="number" inputmode="numeric" />
                     </div>
                     <div class="small-6 columns">
                         <label for="{{ createAttemptIdBase }}-scoreMaximum">Score Maximum</label>
-                        <input id="{{ createAttemptIdBase }}-scoreMaximum" name="scoreMaximum" type="number" value="{{ participant.assessable.scoreMaximum ?? '' }}" />
+                        <input id="{{ createAttemptIdBase }}-scoreMaximum" name="scoreMaximum" type="number" inputmode="numeric" value="{{ participant.assessable.scoreMaximum ?? '' }}" />
                     </div>
                     <div class="small-12 columns">
                         <label for="{{ createAttemptIdBase }}-comment">Comment</label>
