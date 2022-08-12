@@ -7,13 +7,11 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Mail\Mailer;
 use Schoolbox\Resource\Folder\NNIAN;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Profile\ValidEmailVisible;
 
 class Component_Homepage_MembersController extends Component_Homepage_ControllerAbstract
 {
@@ -29,9 +27,6 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
      * This appears in the empty state message
      */
     const TYPE_NAME = 'members';
-
-    /** @var External_UserInterface $externalUser */
-    private $externalUser;
 
     /**
      * Renders the data into the SitePage. Presentation logic.
@@ -159,9 +154,6 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $userAccessMapper = new UserAccessMapper();
             $admins           = $userAccessMapper->findAdminsInCategory($this->getContext());
 
-            $emailVisible = new ValidEmailVisible($this->getExternalUser(), $this->getConfigLoader());
-            $emailall     = [];
-
             $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
             $studentPhotoHidden   = $this->getConfigLoader()->get('protect_student_photo');
             $viewer               = $this->getUser();
@@ -169,12 +161,6 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             if ($userListCount > 0) {
                 $i = 0;
                 foreach ($userList as $user) {
-                    /* Member bulk email
-                     */
-                    if ($emailVisible->isSatisfiedBy($user, $viewer)) {
-                        $emailall[] = Scrub::text($user->getFormattedEmailDisplay());
-                    }
-
                     /* Member cards
                      */
                     if ($i < self::MAX_MEMBERS) {
@@ -235,7 +221,8 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 }
 
                 $this->setVar("REPLYTO", $this->getUser()->getEmail());
-                $this->setVar("EMAILALL", implode(Mailer::implodeGlue(), array_unique($emailall)));
+                $this->setVar('EMAIL_TARGET', '');
+                $this->setVar('EMAIL_VALUE', '');
 
                 if ($this->getConfigLoader()->get(\Schoolbox\Config\ConfigMapper::NAME_MAIL_ENABLED) && $this->getUser()->hasEmail()) {
                     $this->parse("member_email_block", "member_email");
@@ -250,18 +237,5 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
         }
 
         return true; // everything went according to plan
-    }
-
-    /**
-     * Gets external user interface
-     * @return External_UserInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     */
-    private function getExternalUser(): External_UserInterface
-    {
-        if (!$this->externalUser) {
-            $this->externalUser = $this->getSitePage()->getDi()->get('externalUser');
-        }
-        return $this->externalUser;
     }
 }

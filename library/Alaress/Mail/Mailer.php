@@ -155,8 +155,8 @@ class Mailer
             }
         } else {
             $defaultHost = trim($this->config->get('site_hostname')) . '.' . trim($this->config->get('site_domain'));
-            foreach (self::parseAddressString($to, $defaultHost)[self::KEY_VALID] as $address => $name) {
-                $this->email->addTo(new Address($address, $name ?? ''));
+            foreach (self::parseAddressString($to, $defaultHost)[self::KEY_VALID] as $address) {
+                $this->email->addTo($address);
             }
         }
     }
@@ -476,31 +476,51 @@ class Mailer
     /**
      * @param string $emailAddresses A collection of email addresses in a string format that's separated with self::EMAIL_SEPARATOR_CODE
      *
-     * @return array ['valid' => [['email' => 'name']], 'invalid' => [['email' => 'name']]]
+     * @return array ['valid' => [['email' => Address() ]], 'invalid' => ['email']
      */
     public static function parseAddressString(string $emailAddresses, string $defaultHost): array
     {
-        $return_list = [
+        $returnList = [
             self::KEY_VALID   => [],
             self::KEY_INVALID => [],
         ];
 
         if (trim($emailAddresses) === '') {
-            return $return_list;
-        }
-        $address_list = self::parseAddressList($emailAddresses, $defaultHost);
-
-        foreach ($address_list[self::KEY_VALID] as $address) {
-            $to                                = $address->mailbox . '@' . $address->host;
-            $alias                             = property_exists($address, 'personal') ? $address->personal : null;
-            $return_list[self::KEY_VALID][$to] = $alias;
+            return $returnList;
         }
 
-        if (count($address_list[self::KEY_INVALID]) > 0) {
-            $return_list[self::KEY_INVALID] = $address_list[self::KEY_INVALID];
+        $validEmails = [];
+        $invalidEmails = [];
+        //Explode emails by the ascii's Record Separator
+        $emailList = explode(\chr(self::EMAIL_SEPARATOR_CODE), $emailAddresses);
+
+        foreach ($emailList as $email) {
+            $email = trim($email);
+
+            // Check if string is a valid email OR
+            // Check if the email within a string is valid e.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
+            if (filter_var($email, FILTER_VALIDATE_EMAIL) || self::emailFromStringIsValid($email)) {
+                $validEmails[] = $email;
+                continue;
+            }
+
+            // If email address from username in the profile page is unchecked, and alternate email address is empty,
+            // just skip those rather than showing "9AH French (FREA1)" <> as an error.
+            if (self::getEmailFromString($email) !== '') {
+                $invalidEmails[] = $email;
+            }
         }
 
-        return $return_list;
+        $validAddresses = self::parseValidEmailAddresses($validEmails, $defaultHost);
+
+        foreach ($validAddresses as $address) {
+            $to                               = $address->mailbox . '@' . $address->host;
+            $alias                            = property_exists($address, 'personal') ? $address->personal : '';
+            $returnList[self::KEY_VALID][$to] = new Address($to, $alias);
+        }
+
+        $returnList[self::KEY_INVALID] = $invalidEmails;
+        return $returnList;
     }
 
     /**
@@ -516,42 +536,10 @@ class Mailer
     }
 
     /**
-     * @param string $emailAddresses
-     * @return array
-     */
-    private static function parseAddressList(string $emailAddresses, string $defaultHost): array
-    {
-        $emails = [];
-        //Explode emails by the ascii's Record Separator
-        $emailList = explode(\chr(self::EMAIL_SEPARATOR_CODE), $emailAddresses);
-
-        foreach ($emailList as $email) {
-            $email = trim($email);
-
-            // Check if string is a valid email OR
-            // Check if the email within a string is valid e.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
-            if (filter_var($email, FILTER_VALIDATE_EMAIL) || self::emailFromStringIsValid($email)) {
-                $emails[self::KEY_VALID][] = $email;
-                continue;
-            }
-
-            // If email address from username in the profile page is unchecked, and alternate email address is empty,
-            // just skip those rather than showing "9AH French (FREA1)" <> as an error.
-            if (self::getEmailFromString($email) !== '') {
-                $emails[self::KEY_INVALID][] = $email;
-            }
-        }
-
-        return [
-            self::KEY_VALID   => isset($emails[self::KEY_VALID]) ? self::parseValidEmailAddresses($emails[self::KEY_VALID], $defaultHost) : [],
-            self::KEY_INVALID => $emails[self::KEY_INVALID] ?? [],
-        ];
-    }
-
-    /**
      * Parse valid email addresses from a string
      *
-     * @param array $emails
+     * @param array  $emails
+     * @param string $defaultHost
      * @return array
      */
     private static function parseValidEmailAddresses(array $emails, string $defaultHost): array

@@ -15,9 +15,16 @@ use Alaress\Mail\Mailer;
 use Alaress\Mail\Codec;
 use Aura\Web\Request\Values;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Profile\ValidEmailVisible;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Email;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -34,24 +41,14 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
  */
 class Controller extends Base
 {
-    private UserMapper $userMapper;
-
-    private \External_UserInterface $externalUser;
-
-    private FilesystemProxy $filesystemProxy;
-
-    private EmailFactory $emailFactory;
-
     public function __construct(
-        UserMapper $userMapper,
-        \External_UserInterface $externalUser,
-        FilesystemProxy $filesystemProxy,
-        EmailFactory $emailFactory
+        private UserMapper $userMapper,
+        private \External_UserInterface $externalUser,
+        private FilesystemProxy $filesystemProxy,
+        private EmailFactory $emailFactory,
+        private FolderMapper $folderMapper,
+        private UserAccessMapper $userAccessMapper
     ) {
-        $this->userMapper      = $userMapper;
-        $this->externalUser    = $externalUser;
-        $this->filesystemProxy = $filesystemProxy;
-        $this->emailFactory    = $emailFactory;
     }
 
     /**
@@ -99,147 +96,100 @@ class Controller extends Base
             'bcc'     => [],
         ];
 
-        // Only students' externalIds are passed in. Building emails from there.
-        $buildEmailFromId = !empty($params->get('selectedIds'));
-
-        if ($buildEmailFromId) {
-            $studentExternalIds = explode(',', $params->get('selectedIds'));
-            $selectedGroups     = is_array($params->get('selectedGroups'))
-                ? $params->get('selectedGroups')
-                : ($params->get('selectedGroups') ? explode(',', $params->get('selectedGroups')) : []);
-            /* Now get the parents of the students
-             */
-            if (in_array('parents', $selectedGroups)) {
-                $addressLists['bcc'] = array_merge($addressLists['bcc'], $this->externalUser->getParentEmails($studentExternalIds));
-            }
-            if (in_array('students', $selectedGroups)) {
-                $students = $this->userMapper->findByColumn('synergy_id', $studentExternalIds);
-                foreach ($students as $student) {
-                    $addressLists['bcc'][] = $student->getFormattedEmailDisplay();
-                }
-            }
-            if (in_array('housemasters', $selectedGroups)) {
-                $addressLists['bcc'] = array_merge($addressLists['bcc'], $this->externalUser->getHousemasterEmails($studentExternalIds));
-            }
-            if (in_array('tutors', $selectedGroups)) {
-                $addressLists['bcc'] = array_merge($addressLists['bcc'], $this->externalUser->getTutorEmails($studentExternalIds));
-            }
-        }
-
         /* A list of email addresses that appeared in the To field
          */
         $replyToEmailAddresses = [];
 
         foreach ($addressLists as $type => $request) {
-            if (null !== $params->get($type)) {
-                $emailAddresses = Mailer::parseAddressString($params->get($type), $this->getDefaultHost());
+            if (null === $params->get($type)) {
+                continue;
+            }
+            $emailAddresses = Mailer::parseAddressString($params->get($type), $this->getDefaultHost());
 
-                /* Remember some invalid emails, if any were found
-                 */
-                $invalidEmails[] = $emailAddresses[Mailer::KEY_INVALID];
+            /* Remember some invalid emails, if any were found
+             */
+            $invalidEmails = array_merge($emailAddresses[Mailer::KEY_INVALID], $invalidEmails);
 
-                /* Remember a list of email addresses that were in the To field
-                 * There's a sequential dependency here, such that replyto must be processed
-                 * before either the cc or bcc structs, as defined by $addressLists initialisation
-                 */
-                if ('replyto' === $type) {
-                    $replyToEmailAddresses = array_keys($emailAddresses[Mailer::KEY_VALID]);
-                }
+            /* Remember a list of email addresses that were in the To field
+             * There's a sequential dependency here, such that replyto must be processed
+             * before either the cc or bcc structs, as defined by $addressLists initialisation
+             */
+            if ('replyto' === $type) {
+                $replyToEmailAddresses = array_keys($emailAddresses[Mailer::KEY_VALID]);
+            }
 
-                if (!empty($emailAddresses[Mailer::KEY_VALID])) {
-                    foreach ($emailAddresses[Mailer::KEY_VALID] as $email => $name) {
-                        /* For the CC and BCC fields, if an email address was already in To field,
-                         * disregard it because CC'ing and BCC'ing to yourself is extreme when assigned
-                         * by the system rather than the human
-                         */
-                        if ('replyto' === $type || !in_array($email, $replyToEmailAddresses, true)) {
-                            $addressLists[$type][] = Mailer::buildAddress($email, $name);
-                        }
-                    }
-                }
-            } elseif (!$buildEmailFromId && $type === 'bcc') {
+            /**
+             * @var string  $email
+             * @var Address $address
+             */
+            foreach ($emailAddresses[Mailer::KEY_VALID] as $email => $address) {
                 /* For the CC and BCC fields, if an email address was already in To field,
                  * disregard it because CC'ing and BCC'ing to yourself is extreme when assigned
                  * by the system rather than the human
                  */
-                if (!in_array($this->getUser()->getEmail(), $replyToEmailAddresses, true)) {
-                    $addressLists[$type][] = Mailer::buildAddress(
-                        $this->getUser()->getEmail(),
-                        $this->getUser()->getFullName()
-                    );
+                if ('replyto' === $type || !in_array($email, $replyToEmailAddresses, true)) {
+                    $addressLists[$type][] = $address->toString();
                 }
             }
         }
+        // Add current user to bcc, if not already in TO
+        $isCurrentUserInTo = in_array($this->getUser()->getEmail(), $replyToEmailAddresses, true);
 
-        /**
-         * build the email signature if it is defined, and the user has a schoolbox email
-         * matching on user's email domain matches the smtp from address
-         *
-         * but dont build / add a signature if the signature field is empty
-         */
-        $emailBody     = '';
-        $signature     = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_EMAIL_SIGNATURE);
-        $tokenReplacer = new \Schoolbox\TokenReplacer\Simple();
-        $emailParts    = explode('@', $this->getUser()->getEmail(), 2);
-        if (
-            count($emailParts) === 2 &&
-            $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_ADDRESS) === $emailParts[1] &&
-            '' !== trim($signature)
-        ) {
-            //build signature, and replace requested tokens
-            $emailBody = "<p>&nbsp;</p><p>---</p>"
-                . $tokenReplacer->replace(
-                    $signature,
-                    [
-                        '[title]'     => $this->getUser()->getTitle(),
-                        '[firstname]' => $this->getUser()->getFirstname(),
-                        '[surname]'   => $this->getUser()->getLastname(),
-                        //surname as that is the language we are using in admin user modify
-                        '[fullname]'  => $this->getUser()->getFullName(),
-                        '[email]'     => sprintf('<a href="mailto:%s">%s</a>', $this->getUser()->getEmail(), $this->getUser()->getEmail()),
-                        '[position]'  => $this->getUser()->getPositionTitle(),
-                    ]
-                );
-        }
-
-        // Uniquify invalid email result
-        $invalidEmails = array_unique(array_reduce(array_filter($invalidEmails), 'array_merge', []));
-        $data          = [];
-
-        $data['INVALID_EMAIL'] = '';
-        if (\count($invalidEmails) > 0) {
-            foreach ($invalidEmails as $email) {
-                $data['INVALID_EMAIL'] = '"' . \Scrub::text($email) . '"';
+        $folder = null;
+        if ($params->get('folderId')) {
+            try {
+                $folder = $this->folderMapper->findById((int)$params->get('folderId'));
+            } catch (MapperException $e) {
             }
         }
+
+        $addressListFromIds  = $this->findAddressesFromIds($params, $folder);
+        $addressLists['bcc'] = array_merge($addressLists['bcc'], $addressListFromIds);
+
+        // Add current user if not exists, remove current user if exists in both to and bcc
+        if (!$isCurrentUserInTo && !in_array($this->getUser()->getFormattedEmailDisplay(), $addressLists['bcc'])) {
+            $addressLists['bcc'][] = $this->getUser()->getFormattedEmailDisplay();
+        } elseif ($isCurrentUserInTo) {
+            $addressLists['bcc'] = array_diff($addressLists['bcc'], [
+                $this->getUser()->getEmail(),
+                $this->getUser()->getFormattedEmailDisplay(),
+            ]);
+        }
+
+        $emailBody = $this->getEmailBody();
+
+        // Uniquify invalid email result
+        $invalidEmails = array_unique($invalidEmails);
 
         foreach ($addressLists['replyto'] as $replyToKey => $replyTo) {
             $addressLists['replyto'][$replyToKey] = Codec::decode($replyTo);
         }
-
-        $data['SUBJECT'] = ($_REQUEST['subject'] ?? false) ? \Scrub::text($_REQUEST['subject']) : '';
-        $data['BODY']    = $emailBody;
-        $data['REPLYTO'] = json_encode($addressLists['replyto']);
-        $data['CC']      = json_encode($addressLists['cc']);
-        $data['BCC']     = json_encode($addressLists['bcc']);
 
         $zone = new \Schoolbox\Resource\Attachment\Zone('email-attachments');
         $zone->setMulti(true)
              ->setThumbnailSize(64)
              ->setModalTitle('Select files')
              ->setMimeFilter('*/*')
-             ->setAttachPrompt('Attach files')
+             ->setAttachPrompt('Attach files');
              ->useImportExpiryDate();
         $data['attachzone'] = $zone->getTwigContext();
 
-        $uri               = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme("https");
-        $data['BASE_HREF'] = $uri;
-
+        $uri = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme("https");
 
         $this->getResponse()->content->set(
             [
                 'template' => '@mail/send.twig',
-                'data'     => $data,
+                'data'     => [
+                    'invalidEmails' => $invalidEmails,
+                    'SUBJECT'       => $params->get('subject'),
+                    'BODY'          => $emailBody,
+                    'REPLYTO'       => json_encode(array_values($addressLists['replyto'])),
+                    'CC'            => json_encode(array_values($addressLists['cc'])),
+                    'BCC'           => json_encode(array_values($addressLists['bcc'])),
+                    'attachzone'    => $zone->getTwigContext(),
+                    'BASE_HREF'     => $uri,
+                    'folder'        => $folder,
+                ],
                 'title'    => 'Webmail',
             ]
         );
@@ -287,12 +237,12 @@ class Controller extends Base
                     $this->sendError('Your email address is not valid.');
                 }
                 $mail->setTo(new Address($toUser->getEmail()));
-            } catch (Exception $e) {
+            } catch (MapperException $e) {
                 $this->sendError('Your email address is not valid.');
             }
         } else {
-            foreach ($this->getParsedAddresses($to) as $address => $name) {
-                $mail->setTo(new Address($address, $name ?? ''));
+            foreach ($this->getParsedAddresses($to) as $address) {
+                $mail->setTo($address);
             }
         }
 
@@ -305,11 +255,11 @@ class Controller extends Base
         //create email header
         $mail->setSubject($subject);
 
-        foreach ($this->getParsedAddresses($cc) as $address => $name) {
-            $mail->setCc(new Address($address, $name ?? ''));
+        foreach ($this->getParsedAddresses($cc) as $address) {
+            $mail->setCc($address);
         }
-        foreach ($this->getParsedAddresses($bcc) as $address => $name) {
-            $mail->setBcc(new Address($address, $name ?? ''));
+        foreach ($this->getParsedAddresses($bcc) as $address) {
+            $mail->setBcc($address);
         }
 
         $converter = new Html2Text($message);
@@ -446,5 +396,116 @@ class Controller extends Base
         }
 
         return true;
+    }
+
+    /**
+     * @param Values     $params
+     * @param Model|null $folder
+     * @return array
+     */
+    private function findAddressesFromIds(Values $params, ?Model $folder): array
+    {
+        // Expecting either studentExternalIds, userIds or folderId
+        if ($params->get('studentExternalIds')) {
+            $studentExternalIds = explode(',', (string)$params->get('studentExternalIds'));
+            $users              = $this->userMapper->findByColumn('synergy_id', $studentExternalIds);
+        } elseif ($params->get('userIds')) {
+            $users = $this->userMapper->findByColumn('id', explode(',', (string)$params->get('userIds')));
+        } elseif ($params->get('folderId')) {
+            try {
+                $users = $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, false);
+            } catch (MapperException $e) {
+                return [];
+            }
+        } else {
+            return [];
+        }
+
+        $selectedGroups = [];
+        if ($params->get('selectedGroups')) {
+            $selectedGroups = is_array($params->get('selectedGroups'))
+                ? $params->get('selectedGroups')
+                : explode(',', (string)$params->get('selectedGroups'));
+        }
+        $emailVisible = new ValidEmailVisible($this->externalUser, $this->getConfigLoader());
+        $viewer       = $this->getUser();
+        $targetUsers  = $users->filter(
+            function ($user) use ($emailVisible, $viewer) {
+                /** @var User $user */
+                if ($viewer->getRole()->isParent()) {
+                    return $emailVisible->isSatisfiedByParent($user, $viewer);
+                }
+                return $emailVisible->isSatisfiedByRole($user->getRole()->getType(), $viewer->getRole(), $viewer->isSuperuser());
+            }
+        );
+
+        $addressLists = $targetUsers->map(
+            static function ($user) {
+                /** @var User $user */
+                return $user->getFormattedEmailDisplay();
+            }
+        )->getAll();
+
+        if (!$viewer->getRole()->isStaff() || empty($selectedGroups) || $selectedGroups === ['students']) {
+            return $addressLists;
+        }
+
+        /* Now get the parents of the students
+         */
+        $studentExternalIds ??= $users->filter(
+            function ($user) {
+                /** @var User $user */
+                return $user->getRole()->isStudent();
+            }
+        )->getPropertyValues('externalId');
+
+        if (in_array('parents', $selectedGroups)) {
+            $addressLists = array_merge($addressLists, $this->externalUser->getParentEmails($studentExternalIds));
+        }
+        if (in_array('housemasters', $selectedGroups)) {
+            $addressLists = array_merge($addressLists, $this->externalUser->getHousemasterEmails($studentExternalIds));
+        }
+        if (in_array('tutors', $selectedGroups)) {
+            $addressLists = array_merge($addressLists, $this->externalUser->getTutorEmails($studentExternalIds));
+        }
+        return $addressLists;
+    }
+
+    /**
+     * @return string
+     */
+    private function getEmailBody(): string
+    {
+        /**
+         * build the email signature if it is defined, and the user has a schoolbox email
+         * matching on user's email domain matches the smtp from address
+         *
+         * but dont build / add a signature if the signature field is empty
+         */
+        $emailBody     = '';
+        $signature     = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_EMAIL_SIGNATURE);
+        $tokenReplacer = new \Schoolbox\TokenReplacer\Simple();
+        $emailParts    = explode('@', $this->getUser()->getEmail(), 2);
+        if (
+            count($emailParts) === 2 &&
+            $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_ADDRESS) === $emailParts[1] &&
+            '' !== trim($signature)
+        ) {
+            //build signature, and replace requested tokens
+            $emailBody = "<p>&nbsp;</p><p>---</p>"
+                . $tokenReplacer->replace(
+                    $signature,
+                    [
+                        '[title]'     => $this->getUser()->getTitle(),
+                        '[firstname]' => $this->getUser()->getFirstname(),
+                        '[surname]'   => $this->getUser()->getLastname(),
+                        //surname as that is the language we are using in admin user modify
+                        '[fullname]'  => $this->getUser()->getFullName(),
+                        '[email]'     => sprintf('<a href="mailto:%s">%s</a>', $this->getUser()->getEmail(), $this->getUser()->getEmail()),
+                        '[position]'  => $this->getUser()->getPositionTitle(),
+                    ]
+                );
+        }
+        return $emailBody;
     }
 }

@@ -444,7 +444,7 @@
                                         <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">Email Parents</a>
                                         <form action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post" class="no-margin" id="email-contacts-form">
                                             <input type="hidden" name="replyto" value="{{session.user.getFormattedEmailDisplay}}"/>
-                                            <input type="hidden" name="selectedIds" value="{{ user.externalId }}"/>
+                                            <input type="hidden" name="studentExternalIds" value="{{ user.externalId }}"/>
                                             <input type="hidden" name="selectedGroups" value="parents"/>
                                         </form>
                                     </li>

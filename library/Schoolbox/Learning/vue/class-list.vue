@@ -691,7 +691,7 @@ export default {
                     </ul>
                 </fieldset>
                 <input type="hidden" name="replyto" :value="replyTo"/>
-                <input type="hidden" id="selectedIds" name="selectedIds" :value="selectedStudentExternalIds.join(',')"/>
+                <input type="hidden" id="studentExternalIds" name="studentExternalIds" :value="selectedStudentExternalIds.join(',')"/>
                 <button type="submit" class="button" :disabled="!enableSendEmailButton" @click="sendEmail">
                     {{ sendEmailButtonText }}
                 </button>
