@@ -21,14 +21,24 @@ class Group
      * MODERATED (assigned, by group admin)
      * FREE (anyone can come and go)
      */
-    public const PRIVATE_GROUP = 1;
+    public const PRIVATE_GROUP   = 1;
     public const MODERATED_GROUP = 2;
-    public const FREE_GROUP = 3;
+    public const FREE_GROUP      = 3;
+
+    public const PRIVATE_TYPE_NAME   = 'private';
+    public const MODERATED_TYPE_NAME = 'moderated';
+    public const FREE_TYPE_NAME      = 'free';
 
     public const TYPE_NAME_TO_VAL = [
-        'private'   => self::PRIVATE_GROUP,
-        'moderated' => self::MODERATED_GROUP,
-        'free'      => self::FREE_GROUP,
+        self::PRIVATE_TYPE_NAME   => self::PRIVATE_GROUP,
+        self::MODERATED_TYPE_NAME => self::MODERATED_GROUP,
+        self::FREE_TYPE_NAME      => self::FREE_GROUP,
+    ];
+
+    public const TYPE_VAL_TO_NAME = [
+        self::PRIVATE_GROUP   => self::PRIVATE_TYPE_NAME,
+        self::MODERATED_GROUP => self::MODERATED_TYPE_NAME,
+        self::FREE_GROUP      => self::FREE_TYPE_NAME,
     ];
 
     /**
@@ -147,20 +157,7 @@ class Group
      */
     public function getTypeString(): string
     {
-        switch ($this->type) {
-            case Group::MODERATED_GROUP:
-                return 'moderated';
-            case Group::FREE_GROUP:
-                return 'free';
-            case Group::PRIVATE_GROUP:
-                return 'private';
-            //Occurs when you initiate a new group instance
-            case null:
-                return 'unspecified';
-            //unknown value, return error
-            default:
-                return 'error';
-        }
+        return self::TYPE_VAL_TO_NAME[$this->type] ?? '';
     }
 
     /**

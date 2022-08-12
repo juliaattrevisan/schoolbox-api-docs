@@ -151,7 +151,7 @@ class Controller extends Base
         $groups       = (new Group($user, $this->folderMapper))->generate();
         $campus       = (new Campus($user, $this->campusMapper))->generate();
         $eventType    = (new EventType($this->eventTypeMapper))->generate();
-        $sourceList   = (new SourceList($this->calApiConfigMapper, $this->moduleChecker))->generate();
+        $sourceList   = (new SourceList($this->calApiConfigMapper, $this->moduleChecker, $user))->generate();
 
         /* Get the current session vars that store the Filter settings
          */

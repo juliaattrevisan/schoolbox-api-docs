@@ -115,7 +115,7 @@ class Controller extends Base
                        ->setFolder($group->getFolder())
                        ->setService(UserAccess::SERVICE_HOMEPAGE);
         }
-        $this->processGroupPostData($userAccess, $user, $group);
+        $this->processGroupPostData($userAccess, $user, $group, false);
     }
 
     /**
@@ -133,7 +133,7 @@ class Controller extends Base
             $this->sendJsonError('User does not exist in the group', 409);
             return;
         }
-        $this->processGroupPostData($userAccess, $user, $group);
+        $this->processGroupPostData($userAccess, $user, $group, false);
     }
 
     /**
@@ -151,23 +151,24 @@ class Controller extends Base
             $this->sendJsonError('User does not exist in the group', 409);
             return;
         }
-        $this->processGroupPostData($userAccess, $user, $group);
+        $this->processGroupPostData($userAccess, $user, $group, true);
     }
 
     /**
      * Apply post data to given userAccess and persist
      * @param UserGroupAccess $userAccess
-     * @param User       $user
-     * @param Group      $group
+     * @param User            $user
+     * @param Group           $group
+     * @param bool            $isPatch set false to check full parameters
      * @return void
      */
-    private function processGroupPostData(UserGroupAccess $userAccess, User $user, Group $group)
+    private function processGroupPostData(UserGroupAccess $userAccess, User $user, Group $group, bool $isPatch)
     {
         $post = json_decode(json_encode($this->request->content->get()), true);
 
         try {
             /** @var UserGroupAccess $newAccess */
-            $newAccess = (new ArrayToModel())($post ?? [], $userAccess);
+            $newAccess = (new ArrayToModel())($post ?? [], $userAccess, !$isPatch);
         } catch (\Exception $e) {
             $this->sendJsonError($e->getMessage(), 401);
             return;

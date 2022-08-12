@@ -1,7 +1,6 @@
 <?php
 
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -17,7 +16,6 @@ use Schoolbox\Resource\Folder;
  */
 class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var Term\Mapper
      */
@@ -106,6 +104,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'rubric_markbook_link', 'rubric_markbook_link_block');
         $this->setBlock($templateHandle, 'course_markbook_link', 'course_markbook_link_block');
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
+        $this->setBlock($templateHandle, 'class_pastoral_report_link', 'class_pastoral_report_link_block');
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
         $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
         $this->setBlock($templateHandle, 'analytics_section', 'analytics_section_block');
@@ -131,9 +130,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         /** @var Alaress\Authorizer\Authorizer $authorizer */
-        $authorizer = $this->getSitePage()->getDi()->get('authorizer');
-        $route      = 'rubricMarkbook.getMarkbook';
-        $params     = [
+        $authorizer   = $this->getSitePage()->getDi()->get('authorizer');
+        $route        = 'rubricMarkbook.getMarkbook';
+        $folderParams = [
             'folder'   => $this->getContext(),
             'folderId' => $this->getContext()->getId(),
         ];
@@ -143,9 +142,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if (
             ($isGroupPage || $isClassPage || $wasClassPage)
             && $this->getConfigLoader()->get('rubric_markbook_enable')
-            && $authorizer->isPathAuthorizedForUser($route, $params, $this->getUser())
+            && $authorizer->isPathAuthorizedForUser($route, $folderParams, $this->getUser())
         ) {
-            $this->setVar('RUBRIC_MARKBOOK_LINK', $this->getRouter()->generate($route, $params));
+            $this->setVar('RUBRIC_MARKBOOK_LINK', $this->getRouter()->generate($route, $folderParams));
             $this->parse('rubric_markbook_link_block', 'rubric_markbook_link');
             $hasClassActions = true;
         } else {
@@ -168,20 +167,16 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         // Badge Report
-        $badgeReportParams = [
-            'folderId' => $this->getContext()->getId(),
-            'folder'   => $this->getContext(),
-        ];
         if (
             ($isClassPage || $isGroupPage)
             && $this->getConfigLoader()->get(ConfigMapper::NAME_BADGES_ENABLED)
-            && $authorizer->isPathAuthorizedForUser('learningBadgeAward.getListPage', $badgeReportParams, $this->getUser())
+            && $authorizer->isPathAuthorizedForUser('learningBadgeAward.getListPage', $folderParams, $this->getUser())
         ) {
             $this->setVar(
                 'AWARD_LIST_LINK',
                 $this->getRouter()->generate(
                     'learningBadgeAward.getListPage',
-                    $badgeReportParams
+                    $folderParams
                 )
             );
             $this->parse('award_list_link_block', 'award_list_link');
@@ -216,20 +211,16 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         // Generate QR Code
-        $qrcodeParams = [
-            'folderId' => $this->getContext()->getId(),
-            'folder'   => $this->getContext(),
-        ];
         if (
             ($isClassPage || $isGroupPage)
-            &&  $this->getConfigLoader()->get(ConfigMapper::NAME_QR_LOGIN_ENABLED)
-            && $authorizer->isPathAuthorizedForUser('qrcode.getListPage', $qrcodeParams, $this->getUser())
+            && $this->getConfigLoader()->get(ConfigMapper::NAME_QR_LOGIN_ENABLED)
+            && $authorizer->isPathAuthorizedForUser('qrcode.getListPage', $folderParams, $this->getUser())
         ) {
             $this->setVar(
                 'QRCODE_LINK',
                 $this->getRouter()->generate(
                     'qrcode.getListPage',
-                    $qrcodeParams
+                    $folderParams
                 )
             );
             $this->parse('qrcode_link_block', 'qrcode_link');
@@ -294,6 +285,25 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('manage_criteria_block');
         }
 
+        /*
+         * Render the class_pastoral_report_link_block if:
+         *  * the page is a class page AND
+         *  * the user is authorised to access the link destination
+         */
+        if (
+            $isClassPage &&
+            $authorizer->isPathAuthorizedForUser('pastoralClassReportModule.getReport', $folderParams, $this->getUser())
+        ) {
+            $this->setVar(
+                'PASTORAL_CLASS_REPORT_LINK',
+                $this->getRouter()->generate('pastoralClassReportModule.getReport', $folderParams)
+            );
+            $this->parse('class_pastoral_report_link_block', 'class_pastoral_report_link');
+            $hasClassActions = true;
+        } else {
+            $this->setVar('class_pastoral_report_link_block');
+        }
+
         // Output course modify link if course page
         $this->setVar('course_link_block', '');
 
@@ -337,10 +347,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if (0 !== count($courses[$this->getContext()->getId()])) {
             $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
             foreach ($courses[$this->getContext()->getId()] as $courseid => $courseTitle) {
-                $params             = [
-                    'courseSpecId'   => $courseid,
-                    'folderId' => $this->getContext()->getId(),
-                    'termCode' => $currentTerm->getCode(),
+                $params = [
+                    'courseSpecId' => $courseid,
+                    'folderId'     => $this->getContext()->getId(),
+                    'termCode'     => $currentTerm->getCode(),
                 ];
                 if ($this->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $this->getUser())) {
                     $hasAnalytics = true;

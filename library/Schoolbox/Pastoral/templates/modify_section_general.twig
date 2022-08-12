@@ -65,7 +65,7 @@
         {% endif %}
         {% if config.pastoral_parent_access %}
         <div class="small-12 columns">
-            <label for="parent-comments-allowed">Allow parents to read and post comments</label>
+            <label for="parent-comments-allowed" class="inline-block">Allow parents to read and post comments</label>
             <div class="switch">
                 <input id="parent-comments-allowed" type="checkbox"
                        name="parent comments allowed" value="1" {% if record.parentCommentsAllowed %}checked="checked"{% endif %}>
@@ -78,7 +78,7 @@
         {% endif %}
         {% if config.pastoral_student_access %}
             <div class="small-12 columns">
-                <label for="student-comments-allowed">Allow students to read and post comments</label>
+                <label for="student-comments-allowed" class="inline-block">Allow students to read and post comments</label>
                 <div class="switch">
                     <input id="student-comments-allowed" type="checkbox"
                            name="student comments allowed" value="1" {% if record.studentCommentsAllowed %}checked="checked"{% endif %}>

@@ -234,8 +234,8 @@ class HomePageCest
         $i->sendRequest($memberPayload);
 
         #THEN
-        $i->seeResponseCodeIs(302);
-        $i->seeHttpHeader('location', '/group/modify/' . $homePage->getId());
+        $i->seeResponseCodeIs(200);
+//        $i->seeHttpHeader('location', '/group/modify/' . $homePage->getId());
 
         #WHEN
         $accessLevelPayload = new Payload\Group\ModifyAccessLevel($homePage->getId());
@@ -245,8 +245,8 @@ class HomePageCest
         $i->sendRequest($accessLevelPayload);
 
         #THEN
-        $i->seeResponseCodeIs(302);
-        $i->seeHttpHeader('location', '/group/modify/' . $homePage->getId());
+        $i->seeResponseCodeIs(200);
+//        $i->seeHttpHeader('location', '/group/modify/' . $homePage->getId());
     }
 
 

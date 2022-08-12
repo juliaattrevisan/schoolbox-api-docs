@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Resource;
 
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Storage\IStorage;
 use Alaress\Color\Color;
@@ -21,6 +22,8 @@ use Alaress\Color\Color;
  */
 abstract class AbstractFolder implements IFolder
 {
+    use DeletedAtDate;
+
     /**
      * Identifier
      *
@@ -67,7 +70,7 @@ abstract class AbstractFolder implements IFolder
     /**
      * Set id
      *
-     * @param  int $id
+     * @param  int|string $id
      * @return $this
      */
     public function setId($id)
@@ -79,7 +82,7 @@ abstract class AbstractFolder implements IFolder
     /**
      * Get id
      *
-     * @return int
+     * @return int|string
      */
     public function getId()
     {

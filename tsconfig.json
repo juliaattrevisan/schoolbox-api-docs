@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "allowJs": true, //Allow JavaScript files to be imported inside your project,
+        "target": "ES6", //Modern browsers support all ES6 features, so ES6 is a good choice.
+        "strict": true, //The strict flag enables a wide range of type checking behavior that results in stronger guarantees of program correctness.
+        "esModuleInterop": true, //resolves potential transpile issues: https://www.typescriptlang.org/tsconfig#esModuleInterop
+        "skipLibCheck": true, //Skip type checking of declaration file:  https://www.typescriptlang.org/tsconfig#skipLibCheck
+        "forceConsistentCasingInFileNames": true //When this option is set, TypeScript will issue an error if a program tries to include a file by a casing different from the casing on disk.
+    },
+    "include": ["library/**/*", "templates/**/*", "vue/**/*"], //Specifies an array of filenames or patterns to include in the program.
+    "exclude": ["node_modules", "**/*.spec.ts"] //Specifies an array of filenames or patterns that should be skipped when resolving include.
+}

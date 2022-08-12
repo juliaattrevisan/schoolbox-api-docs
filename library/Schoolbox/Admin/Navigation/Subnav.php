@@ -401,11 +401,11 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the 3rd party LTI integrations that you wish to make available for use in the LTI component.',
                     ],
-                    '/adminv2/rubric-results'                => [
-                        'name'        => 'Rubrics',
+                    '/adminv2/rubric-result-set' => [
+                        'name'        => 'Rubric Result Sets',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
-                        'children'    => [],
-                        'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.',
+                        'description' => 'Setup quick fill results for rubrics to help quickly build a rubric with generic level descriptors.',
+                        'children'    => []
                     ],
                 ],
             ],

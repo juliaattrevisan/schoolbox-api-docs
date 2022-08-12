@@ -1,0 +1,13 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [folder.nameWithCodes, '/homepage/' ~ folder.id],
+    [locale.pastoralCare.proper ~ ' Report']
+) }}
+
+<div class="row actions-small-5">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ pageTitle }}</h1>
+        </div>
+    </div>
+</div>

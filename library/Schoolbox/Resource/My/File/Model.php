@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\My\File;
 
 use Alaress_Date_Format;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFile;
 
@@ -21,7 +22,7 @@ use Schoolbox\Resource\AbstractFile;
  * @package Schoolbox\Resource\My\File
  * @method Resource\My\Folder\Model getFolder()
  */
-class Model extends AbstractFile
+class Model extends AbstractFile implements ISoftDeletable
 {
     /** @var Alaress_Date_Format */
     protected $publishedAt;

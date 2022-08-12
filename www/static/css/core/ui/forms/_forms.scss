@@ -434,6 +434,9 @@ $select-hover-bg-color: tint($warning-color, 50%);
     section {
         label {
             font-size: $paragraph-font-size;
+            &.inline-block {
+                display: inline-block;
+            }
         }
     }
 

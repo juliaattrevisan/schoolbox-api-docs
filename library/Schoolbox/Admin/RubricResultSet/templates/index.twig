@@ -1,0 +1,88 @@
+{% autoescape 'js' %}
+<script>
+    /**
+     * Call the deleteRowViaAjax() function to do as the user has asked.
+     */
+    function deleteRowAfterConfirmation(resultSetId) {
+        $('#delete-row-button-' + resultSetId).confirmDialog(
+            {confirmEvent: function () {deleteRowViaAjax(resultSetId);}}
+        );
+
+        return false;
+    }
+
+    /**
+     * Send a delete-row request to the server and handle the response.
+     */
+    function deleteRowViaAjax(resultSetId) {
+        let toasterJq = $('#toaster');
+        toasterJq.toastActivate({text: 'Deleting...'});
+
+        $.ajax(
+            {
+                url: '/adminv2/rubric-result-set/' + resultSetId,
+                type: 'DELETE',
+                success: function () {
+                    toasterJq.toastTimeout({text: 'Success!', css: 'success'});
+                    $('#delete-row-button-' + resultSetId).closest('li').remove();
+                },
+                error: function () {
+                    toasterJq.toastTimeout({text: 'Delete failed', css: 'alert'});
+                }
+            }
+        );
+    }
+</script>
+{% endautoescape %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+<div class="admin-container row">
+    {{ renderAdminNavigation(pageCurrent) }}
+    <div class="admin-content">
+        <!-- Main content section starts here. -->
+        <div class="row">
+            {% if not rubricsByResultSetId %}
+                <div class="small-12 island">
+                    <div class="empty-state">
+                        <i class="icon-list"></i>
+                        <p>No rubric result sets have been created.</p>
+                        <p><a href="{{ routeLookup('adminRubricResultSet.getCreate') }}">Create new result set</a></p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="small-12 island">
+                    <div class="row actions-small-1">
+                        <nav>
+                            <a class='icon-add' href="{{ routeLookup('adminRubricResultSet.getCreate') }}"
+                               title="Add new result set"></a>
+                        </nav>
+                    </div>
+                    <section>
+                        <ul class="information-list unsortable">
+                            {% for resultSetId, rubrics in rubricsByResultSetId %}
+                                <li class="actions-small-2">
+                                    <div class="list-item">
+                                        <p class="content">
+                                            {% for rubric in rubrics %}
+                                                <span class="result-rubric-label">{{ rubric.label|purify }}</span>
+                                            {% endfor %}
+                                        </p>
+                                    </div>
+                                    <nav>
+                                        <a href="{{ routeLookup('adminRubricResultSet.getUpdate', {resultSetId: resultSetId}) }}"
+                                           class="icon-modify" title="Modify"></a>
+                                        <a onclick="return deleteRowAfterConfirmation({{ resultSetId }})"
+                                           id="delete-row-button-{{ resultSetId }}" class="icon-delete"
+                                           title="Delete"></a>
+                                    </nav>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                </div>
+            {% endif %}
+        </div>
+        <div id='toaster' class="toast" data-toast>></div>
+        <!-- Main content section ends here. -->
+    </div>
+</div>

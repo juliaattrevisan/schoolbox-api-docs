@@ -17,6 +17,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -65,6 +66,12 @@ class Factory
 
 
     /**
+     * @var array
+     */
+    private array $watchlist;
+
+
+    /**
      * This is the config setting for date_local
      * It's used by the Nat Picker in the optional TASS Academic Periods area
      *
@@ -89,42 +96,9 @@ class Factory
 
 
     /**
-     * Set in admin, corresponds to external_tass_addnum_father
-     *
-     * @var int
-     */
-    private int $addnumFather;
-
-
-    /**
-     * Set in admin, corresponds to external_tass_addnum_mother
-     *
-     * @var int
-     */
-    private int $addnumMother;
-
-
-    /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a father specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $fatherAddressDescription;
-
-
-    /**
-     * The address_description field in the getCommunicationRulesDetails payload
-     * that refers to a mother specifically, as determined by schools' instances
-     *
-     * @var string
-     */
-    private string $motherAddressDescription;
-
-
-    /**
      * TASS communication rules type codes (in comma separated format) for all guardian relationships
      * that can be associated with students
+     *
      * @var string|null
      */
     private ?string $communicationTypes;
@@ -209,15 +183,12 @@ class Factory
      * @param bool                                       $perform
      * @param string                                     $host
      * @param string                                     $key
+     * @param array                                      $watchlist
      * @param string                                     $dateLocalFormat
      * @param bool                                       $includePhoto
      * @param string                                     $spousePrefix
-     * @param int                                        $addnumFather
-     * @param int                                        $addnumMother
-     * @param string                                     $fatherAddressDescription
-     * @param string                                     $motherAddressDescription
      * @param string|null                                $communicationTypes
-     * @param UserProfile\Mapper                         $baseProfileMapper
+     * @param Mapper                                     $baseProfileMapper
      * @param UserProfile\Student\Mapper                 $studentProfileMapper
      * @param UserProfile\Parent\Mapper                  $parentProfileMapper
      * @param UserProfile\Staff\Mapper                   $staffProfileMapper
@@ -235,13 +206,10 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        array $watchlist,
         string $dateLocalFormat,
         bool $includePhoto,
         string $spousePrefix,
-        int $addnumFather,
-        int $addnumMother,
-        string $fatherAddressDescription,
-        string $motherAddressDescription,
         ?string $communicationTypes,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
@@ -262,13 +230,10 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->watchlist = $watchlist;
         $this->dateLocalFormat = $dateLocalFormat;
         $this->includePhoto = $includePhoto;
         $this->spousePrefix = $spousePrefix;
-        $this->addnumFather = $addnumFather;
-        $this->addnumMother = $addnumMother;
-        $this->fatherAddressDescription = $fatherAddressDescription;
-        $this->motherAddressDescription = $motherAddressDescription;
         $this->communicationTypes = $communicationTypes;
 
         /* Profile pieces
@@ -335,12 +300,9 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $this->watchlist,
                 $this->includePhoto,
                 $this->spousePrefix,
-                $this->addnumFather,
-                $this->addnumMother,
-                $this->fatherAddressDescription,
-                $this->motherAddressDescription,
                 $this->communicationTypes,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
@@ -373,6 +335,7 @@ class Factory
                 $this->perform,
                 $api,
                 $lookup,
+                $this->watchlist,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper
             ))
@@ -381,6 +344,7 @@ class Factory
                 $this->perform,
                 $api,
                 $lookup,
+                $this->watchlist,
                 $this->dateLocalFormat,
                 $this->eventMapper,
                 $this->classEntryMapper,

@@ -16,15 +16,18 @@ abstract class GroupMember extends Request
 {
     use PostTrait;
 
+    public int $folderId;
+
     public function __construct(int $folderId)
     {
         $this->setReferer("/group/modify/$folderId");
-        $this->setFormParam('categoryID', $folderId);
+        $this->setFormParam('folderId', $folderId);
+        $this->folderId = $folderId;
     }
 
     /** @inheritDoc */
     protected function getUrl(): string
     {
-        return '/group/modifyForm.php';
+        return "/group/addMembers/{$this->folderId}";
     }
 }

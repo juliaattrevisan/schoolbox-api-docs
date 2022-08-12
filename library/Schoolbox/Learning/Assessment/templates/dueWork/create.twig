@@ -64,7 +64,7 @@
              #}
             <input type="hidden" name="courseManaged" value="{% if not courseManaged.isMutable %}{{ assessment.courseManaged }}{% else %}0{% endif %}" />
 
-            <label for="courseManaged" class="checkbox-label">Common Assessment <span class="hint has-tip tip-top"  title="To ensure consistency across the cohort, when {{ locale.dueWork.proper }} is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric." data-tooltip="">?</span></label>
+            <label for="courseManaged" class="checkbox-label inline-block">Common Assessment <span class="hint has-tip tip-top"  title="To ensure consistency across the cohort, when {{ locale.dueWork.proper }} is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric." data-tooltip="">?</span></label>
 
             <div class="switch">
                 <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} {% if not courseManaged.isMutable %}disabled{% endif %}/>
@@ -121,7 +121,7 @@
         <div class="medium-6 columns" id="similarityRow"{% if not assessment.acceptOnline %} style="display: none"{% endif %}>
             <input type="hidden" name="similarityCheckEnabled" value="{% if assessment.courseManaged %}{{ assessment.similarityCheckEnabled }}{% else %}0{% endif %}" />
 
-            <label for="similarityCheckEnabled">Similarity Check <span class="hint has-tip tip-top" title="Turn this on to enable similarity checking on students' submissions." data-tooltip>?</span></label>
+            <label for="similarityCheckEnabled" class="inline-block">Similarity Check <span class="hint has-tip tip-top" title="Turn this on to enable similarity checking on students' submissions." data-tooltip>?</span></label>
             <div class="switch">
                 <input id="similarityCheckEnabled"
                        name="similarityCheckEnabled"

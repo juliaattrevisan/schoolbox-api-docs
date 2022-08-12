@@ -101,7 +101,7 @@ class Admin extends ModuleLoader
         // Filters
         $this->loadModule($di, FilterModule::class, '/adminv2/filters');
 
-        // Restore (undelete) entities that have been recenetly deleted
+        // Restore (undelete) entities that have been recently deleted
         $this->loadModule($di, \Schoolbox\Admin\Restore\Module::class, '/adminv2/restore');
 
         // Grades page
@@ -118,5 +118,8 @@ class Admin extends ModuleLoader
 
         // Email DKIM
         $this->loadModule($di, \Schoolbox\Admin\EmailDKIM\Module::class, '/adminv2/email-dkim');
+
+        // Rubrics
+        $this->loadModule($di, \Schoolbox\Admin\RubricResultSet\Module::class, '/adminv2/rubric-result-set');
     }
 }

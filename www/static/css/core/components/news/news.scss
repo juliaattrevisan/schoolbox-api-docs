@@ -11,7 +11,7 @@
       }
     }
     .thumbnail {
-      width: unset;
+      width: 4rem;
     }
     &.reversed {
       > a > img {
@@ -191,14 +191,14 @@
     > li {
         background: $accent-background;
         border: 0;
-        //shadow trick to have a 1px 'border' around child items without them becoming 
-        //2px borders when sitting next to other children: https://stackoverflow.com/a/52807938 
-        box-shadow: 
-            2px 0 0 0 $white, 
-            0 2px 0 0 $white, 
+        //shadow trick to have a 1px 'border' around child items without them becoming
+        //2px borders when sitting next to other children: https://stackoverflow.com/a/52807938
+        box-shadow:
+            2px 0 0 0 $white,
+            0 2px 0 0 $white,
             2px 2px 0 0 $white,
-            2px 0 0 0 $white inset, 
-            0 2px 0 0 $white inset; 
+            2px 0 0 0 $white inset,
+            0 2px 0 0 $white inset;
         min-height: 80px;
     }
 }

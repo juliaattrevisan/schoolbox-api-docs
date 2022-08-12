@@ -76,7 +76,7 @@ class Current implements IMetadataStrategy
      */
     public function getAllPlayers(Team $team)
     {
-        return $this->getTeamPlayerMapper()->findByColumn('team_id', $team->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]);
+        return $this->getTeamPlayerMapper()->findByColumn('team_id', $team->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'asc']]);
     }
 
     /**

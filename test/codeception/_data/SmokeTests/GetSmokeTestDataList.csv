@@ -134,10 +134,10 @@ Admin,"LMS LMS Policy",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/set
 Admin,"LMS LMS Policy",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy,401
 Admin,"LMS LMS Policy",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy,401
 Admin,"LMS LMS Policy",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy,401
-Admin,"Setup rubric result set",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,200
-Admin,"Setup rubric result set",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,401
-Admin,"Setup rubric result set",Student,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,401
-Admin,"Setup rubric result set",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-results,401
+Admin,"Setup rubric result set",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-result-set,200
+Admin,"Setup rubric result set",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-result-set,401
+Admin,"Setup rubric result set",Student,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-result-set,401
+Admin,"Setup rubric result set",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/rubric-result-set,401
 Admin,"Configure terms",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/terms,200
 Admin,"Configure terms",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401
 Admin,"Configure terms",Student,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401
@@ -547,9 +547,9 @@ CMS,"Get homepage RSS feed",Teacher,https://vagrant.dev.schoolbox.cloud/news/fee
 CMS,"Get homepage RSS feed",Student,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158,200
 CMS,"Get homepage RSS feed",Parent,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158,200
 CMS,"Manage homepage group",Superuser,https://vagrant.dev.schoolbox.cloud/group/modify/153,200
-CMS,"Manage homepage group",Teacher,https://vagrant.dev.schoolbox.cloud/group/modify/153,400
-CMS,"Manage homepage group",Student,https://vagrant.dev.schoolbox.cloud/group/modify/153,400
-CMS,"Manage homepage group",Parent,https://vagrant.dev.schoolbox.cloud/group/modify/153,400
+CMS,"Manage homepage group",Teacher,https://vagrant.dev.schoolbox.cloud/group/modify/153,401
+CMS,"Manage homepage group",Student,https://vagrant.dev.schoolbox.cloud/group/modify/153,401
+CMS,"Manage homepage group",Parent,https://vagrant.dev.schoolbox.cloud/group/modify/153,401
 LMS,"Visit pending asses",Superuser,https://vagrant.dev.schoolbox.cloud/learning/pending/,200
 LMS,"Visit pending asses",Teacher,https://vagrant.dev.schoolbox.cloud/learning/pending/,200
 LMS,"Visit pending asses",Student,https://vagrant.dev.schoolbox.cloud/learning/pending/,401

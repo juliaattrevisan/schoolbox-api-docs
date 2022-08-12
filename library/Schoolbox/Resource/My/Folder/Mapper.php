@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\My\Folder;
 
+use Schoolbox\Collection;
 use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Folder\ILocator;
@@ -24,7 +25,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends AbstractFolderMapper implements ILocator
 {
-
     /**
      * {@inheritdoc}
      * @return Model|object
@@ -52,8 +52,10 @@ class Mapper extends AbstractFolderMapper implements ILocator
         $this->hasTable('myFolder');
 
         $this->hasModel(Model::class);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->joins('owner', UserMapper::class, 'id');
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteContents']);
     }
 
 
@@ -61,7 +63,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * Return the folders contained within the folder with the given ID
      *
      * @param int $nodeId
-     * @return IFolder[]
+     * @return Collection|IFolder[]
      */
     public function findByParentId($nodeId)
     {
@@ -126,5 +128,21 @@ class Mapper extends AbstractFolderMapper implements ILocator
             $ancestry[$parentId] = true;
         }
         return false;
+    }
+
+    /**
+     * @param Model $folder
+     * @return bool
+     */
+    public function softDeleteContents(Model $folder): bool
+    {
+        // delete direct folders in this folder
+        $this->deleteByColumn('parent', $folder->getId());
+
+        // delete direct files in this folder
+        $myFileMapper = \Schoolbox\Resource\My\File\Mapper::getInstance();
+        $myFileMapper->deleteByColumn('parent', $folder->getId());
+
+        return true;
     }
 }

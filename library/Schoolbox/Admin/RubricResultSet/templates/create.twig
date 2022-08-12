@@ -1,0 +1,157 @@
+{% autoescape 'js' %}
+<script>
+    $(function () {
+        // Configure validation.
+        $('#rubric-result-set-form').alaressValidate();
+        $('#rows-container input').each(
+            function (index, element) {
+                $(element).rules('add', {requiredNotBlank: true});
+            }
+        );
+
+        // There may already be too many rows in the result set, so we check for that on page load.
+        if ($('#rows-container').children().length >= parseInt('{{ maxRowsPerResultSet }}')) {
+            disableAddRowButton();
+        }
+    });
+
+    /**
+     * Add a new row to the form.
+     * This function should only be called if the current number of rows is less than the maximum allowed ({{ maxRowsPerResultSet }}).
+     * If the maximum number of rows is reached after adding a row, the add-row-button becomes disabled.
+     */
+    function addRow() {
+        let rowsContainer = document.getElementById('rows-container');
+        let nRows         = rowsContainer.children.length;
+        let newRowHtml    = (
+            // This HTML must match that inside the inner loop in the HTML template below.
+            "<div id='row-" + nRows + "' class='small-12 columns actions-small-1'>\n" +
+            "    <div class='list-item'>\n" +
+            "        <input type='text' name='rubricResultLabels[" + nRows + "]' maxlength='{{ maxCharsPerLabel }}' required/>\n" +
+            "    </div>\n" +
+            "    <nav>\n" +
+            "        <a class='icon-delete' title='Delete rubric result set item' onclick='removeRow(" + nRows + ")'></a>\n" +
+            "    </nav>\n" +
+            "</div>\n"
+        );
+
+        rowsContainer.insertAdjacentHTML('beforeend', newRowHtml);
+        ++nRows; // We have just added a row.
+
+        if (nRows >= parseInt('{{ maxRowsPerResultSet }}')) {
+            disableAddRowButton();
+        }
+
+        // Add validation rules to new input.
+        $('input[name="rubricResultLabels[' + String(nRows) + ']"').rules('add', {requiredNotBlank: true});
+
+        document.getElementById('form-container').style.display = ''; // Show form.
+        document.getElementById('empty-state-island').style.display = 'none'; // Hide empty state box.
+    }
+
+    /**
+     * When the delete button is clicked on a new row, we remove the new row from the form.
+     * We also must update the numbers on the left of the new form rows so there are no gaps.
+     */
+    function removeRow(rowValue) {
+        let rowLi = document.getElementById('row-' + rowValue);
+        rowLi.remove();
+        renumberRows();
+
+        if (document.getElementById('rows-container').children.length === 0) {
+            document.getElementById('empty-state-island').style.display = ''; // Show empty state box.
+            document.getElementById('form-container').style.display = 'none'; // Hide form.
+        }
+
+        // Enable the add-row button in case it was previously disabled, and return button text to original value.
+        // Disabling and button text changing occurs in addRow() when the maximum number of rows is reached.
+        enableAddRowButton();
+    }
+
+    /**
+     * Rename all input fields according to their position.
+     * The top input will be named 'rubricResultLabels[0]'.
+     * The next input will be named 'rubricResultLabels[1]', etc.
+     */
+    function renumberRows() {
+        let divs = document.getElementById('rows-container').children;
+
+        for (let i = 0; i < divs.length; ++i) {
+            let div = divs[i];
+            let inputs = div.querySelectorAll('input');
+
+            inputs[0].setAttribute('name', 'rubricResultLabels[' + i + ']');
+        }
+    }
+
+    /**
+     * Disable the add-row button and change its label.
+     */
+    function disableAddRowButton() {
+        let el = document.getElementById('add-row-button');
+        el.classList.add('disabled');
+        el.innerHTML = 'Max Rows Reached';
+    }
+
+    /**
+     * Enable the add-row button and revert its label back to 'Add Row'.
+     */
+    function enableAddRowButton() {
+        let el = document.getElementById('add-row-button');
+        el.classList.remove('disabled');
+        el.innerHTML = 'Add Row';
+    }
+</script>
+{% endautoescape %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs | merge([[resultSetId is null ? 'Create': 'Update']])) }}
+<div class="admin-container row">
+    {{ renderAdminNavigation(pageCurrent) }}
+    <div class="admin-content">
+        <!-- Main content section starts here. -->
+        <div class="row">
+            <div id="empty-state-island"
+                 class="small-12 island"{% if rubricResultRows %} style="display:none"{% endif %}>
+                <div class="empty-state">
+                    <i class="icon-list"></i>
+                    <p>This rubrics result set is empty.</p>
+                    <p><a onclick="addRow()">Add a row</a></p>
+                </div>
+            </div>
+            <div id="form-container"
+                 class="small-12 island"{% if not rubricResultRows %} style="display:none"{% endif %}>
+                {% if (resultSetId ?? null) %}
+                    {% set formAction = routeLookup('adminRubricResultSet.postUpdate', {resultSetId: resultSetId}) %}
+                {% else %}
+                    {% set formAction = routeLookup('adminRubricResultSet.postCreate') %}
+                {% endif %}
+                <form id="rubric-result-set-form" method="post" action="{{ formAction }}">
+                    <section>
+                        <fieldset id="rows-container" class="content">
+                            {% for row in rubricResultRows %}
+                                <div id="row-{{ row.value|escape('html_attr')}}" class="small-12 columns actions-small-1">
+                                    <div class="list-item">
+                                        <input type="text" name="rubricResultLabels[{{ row.value }}]"
+                                               value="{{ row.label|escape('html_attr') }}" maxlength="{{ maxCharsPerLabel }}"
+                                               required/>
+                                    </div>
+                                    <nav>
+                                        <a class="icon-delete" title="Delete rubric result set item"
+                                           onclick='removeRow({{ row.value }})'></a>
+                                    </nav>
+                                </div>
+                            {% endfor %}
+                        </fieldset>
+                        <div class="component-action">
+                            <section>
+                                <a id="add-row-button" class="button" onclick="addRow()">Add Row</a>
+                            </section>
+                        </div>
+                    </section>
+                    <input type="submit" value="Save">
+                </form>
+            </div>
+        </div>
+        <!-- Main content section ends here. -->
+    </div>
+</div>

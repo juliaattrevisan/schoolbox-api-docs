@@ -35,7 +35,7 @@ class ModelToArray
         $array = [
             'id'                => $access->getFolder()->getId(),
             'name'              => $access->getFolder()->getName(),
-            'type'              => $group->getType(),
+            'type'              => $group->getTypeString(),
             'isForceFollow'     => $group->getForceFollow(),
             'isFavourite'       => $access->getFavourite(),
             'isNotificationsOn' => $access->getFollowing(),

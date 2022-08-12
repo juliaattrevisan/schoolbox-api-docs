@@ -43,14 +43,14 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      *
      * @var array
      */
-    private $campus = array();
+    private $campusIds = array();
 
     /**
      * Group visibility for this stream
      *
      * @var array
      */
-    private $groups = array();
+    private $groupIds = array();
 
     /**
      * Render configs into admin screen
@@ -86,7 +86,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
         $page->checkList(
             'campus_list',
             $userHandler->getCampusList(),
-            $this->getCampus(),
+            $this->getCampusIds(),
             'configFragment',
             [
                 'id' => 'CAMPUS_ID',
@@ -99,7 +99,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
         $page->checkList(
             'group_list',
             $userHandler->getGroupList(),
-            $this->getGroups(),
+            $this->getGroupIds(),
             TEMPLATE_content,
             [
                 'id' => 'GROUP_ID',
@@ -111,14 +111,14 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
     /**
      * Check if current user has permissions to see this event
      *
-     * @param array $userCampus
-     * @param int $userGroup
+     * @param array $userCampusIds
+     * @param int $userGroupId
      *
      * @return bool
      */
-    public function hasPermissions($userCampus, $userGroup)
+    public function hasPermissions($userCampusIds, $userGroupId)
     {
-        if ((count(array_intersect($userCampus, $this->getCampus()))) && in_array($userGroup, $this->getGroups())) {
+        if ((count(array_intersect($userCampusIds, $this->getCampusIds()))) && in_array($userGroupId, $this->getGroupIds())) {
             return true;
         }
 
@@ -167,46 +167,44 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
         return $this->authorization;
     }
 
-
-
     /**
-     * Set campus
+     * Set campusIds
      *
-     * @param array $campus
+     * @param array $campusIds
      */
-    public function setCampus($campus)
+    public function setCampusIds(array $campusIds): void
     {
-        $this->campus = $campus;
+        $this->campusIds = $campusIds;
     }
 
     /**
-     * Get campus
+     * Get campusIds
      *
      * @return array
      */
-    public function getCampus()
+    public function getCampusIds(): array
     {
-        return $this->campus;
+        return $this->campusIds;
     }
 
     /**
-     * Set groups
+     * Set groupIds
      *
-     * @param array $groups
+     * @param array $groupIds
      */
-    public function setGroups($groups)
+    public function setGroupIds(array $groupIds): void
     {
-        $this->groups = $groups;
+        $this->groupIds = $groupIds;
     }
 
     /**
-     * Get groups
+     * Get groupIds
      *
      * @return array
      */
-    public function getGroups()
+    public function getGroupIds(): array
     {
-        return $this->groups;
+        return $this->groupIds;
     }
 
 
