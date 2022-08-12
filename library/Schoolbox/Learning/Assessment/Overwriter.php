@@ -62,7 +62,8 @@ class Overwriter
             ->setId($destination->getId())
             ->setSpecificationAssessment($destination->getSpecificationAssessment())
             ->setContext($destination->getContext())
-            ->setSequence($destination->getSequence());
+            ->setSequence($destination->getSequence())
+            ->setDeletedAt(new \Alaress_Date_NullDate());
 
         // If copying the assessment into a spec: clear its dates
         if ($destination->isSpecification()) {
