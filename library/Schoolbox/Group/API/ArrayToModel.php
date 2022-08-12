@@ -58,7 +58,7 @@ class ArrayToModel
             }
             switch ($attributes['type']) {
                 case 'enum':
-                    if (!in_array($array[$name], $attributes['values'])) {
+                    if (isset($array[$name]) && !in_array($array[$name], $attributes['values'])) {
                         $errors[] = "{$name} must be one of " . implode(', ', $attributes['values']);
                         break;
                     }
