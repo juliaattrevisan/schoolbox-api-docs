@@ -209,6 +209,7 @@ class Controller extends Base
                     'ldap_enabled' => $this->getConfigLoader()->get('ldap_enable'),
                     'backupsEnabled' => $this->getDisasterRecoveryBackupsEnabled(),
                     'collabDocsEnabled' => $this->collabDocsEnabled(),
+                    'turnitinEnabled' => $this->turnitinEnabled(),
                     'ssh_light' => $ssh_light,
                     'ssh_status' => $ssh_status,
                     'is_cloud'  => $this->isCloudHosted(),
@@ -497,5 +498,13 @@ class Controller extends Base
     private function isCloudHosted(): bool
     {
         return $this->getConfigLoader()->get('site_environment') === Version::SITE_ENVIRONMENT_CLOUD_SAAS;
+    }
+
+    private function turnitinEnabled(): bool
+    {
+        return (
+            '' !== trim($this->getConfigLoader()->get('turnitin_api_host')) &&
+            '' !== trim($this->getConfigLoader()->get('turnitin_api_key' ))
+        );
     }
 }
