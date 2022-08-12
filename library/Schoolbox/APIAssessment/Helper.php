@@ -337,7 +337,7 @@ WHERE
    and `sr1`.`deleted_at` is null
    and `sr2`.`id` is null
    and `sr1`.`review_route` = 'instructor'
-   and `sb`.`assessment_id` = ({$bindings->getPlaceholder()})
+   and `sb`.`assessment_id` in ({$bindings->getPlaceholder()})
  group by `sb`.`assessment_id`, `sr1`.`owner`, `sr1`.`review_route`, `sr1`.`published_at`)
 union
 (select `ass`.`assessment_id`   AS `assessment_id`,
@@ -371,7 +371,7 @@ union
    and `aa1`.`deleted_at` is null
    and `aa2`.`attempt_id` is null
    and `ass`.`assessment_id` is not null
-   and `ass`.`assessment_id` = ({$bindings->getPlaceholder()})
+   and `ass`.`assessment_id` in ({$bindings->getPlaceholder()})
  group by `ass`.`assessment_id`, `aa1`.`user_id`, `aa1`.`reviewed_at`)
 union
 (select `t`.`assessment_id`     AS `assessment_id`,
@@ -405,7 +405,7 @@ union
    and `tc1`.`deleted_at` is null
    and `tc2`.`id` is null
    and `tc1`.`completion_status` = 3
-   and `t`.`assessment_id` = ({$bindings->getPlaceholder()})
+   and `t`.`assessment_id` in ({$bindings->getPlaceholder()})
  group by `t`.`assessment_id`, `tc1`.`student_id`, `tc1`.`completion_date`)
 union
 (select `la`.`assessment_id`   AS `assessment_id`,
@@ -439,7 +439,7 @@ union
    and `sc1`.`deleted_at` is null
    and `sc1`.`is_feedback` = 1
    and `sc2`.`id` is null
-and `la`.`assessment_id` = ({$bindings->getPlaceholder()})
+and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
  group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`)
 order by `assessment_id`, `student_id`;
             ", $bindings->getParams());
