@@ -72,8 +72,7 @@
                     <legend>Size<span class='hint has-tip tip-top' data-tooltip title="The font will scale between these percentages depending on the screen size">?</span></legend>
                     <div class="small-5 columns">
                         <label for="title_text_min_size" class="required">From</label>
-                        <input type="text"
-                               inputmode="numeric"
+                        <input type="number"
                                id="title_text_min_size"
                                name="title_text_min_size"
                                value="{{ item.getTitleTextMinSize()|e('html_attr') }}"
@@ -85,8 +84,7 @@
                     </div>
                     <div class="small-5 columns">
                         <label for="title_text_max_size" class="required">To</label>
-                        <input type="text"
-                               inputmode="numeric"
+                        <input type="number"
                                id="title_text_max_size"
                                name="title_text_max_size"
                                value="{{ item.getTitleTextMaxSize()|e('html_attr') }}"

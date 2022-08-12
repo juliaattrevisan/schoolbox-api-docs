@@ -264,7 +264,7 @@
                     <div class="small-4 columns">
                         <label class="interval-input">
                             Days
-                            <input type="text" inputmode="numeric"
+                            <input type="number"
                                    value="{{ isEmpty ? '' : item.minLeadTime.dayTotal }}"
                                    name="min_lead_time[day]"
                             >
@@ -273,8 +273,7 @@
                     <div class="small-4 columns">
                         <label class="interval-input">
                             Hours
-                            <input type="text"
-                                   inputmode="numeric"
+                            <input type="number"
                                    min="0"
                                    max="23"
                                    value="{{ isEmpty ? '' : item.minLeadTime.hourRemainder }}"
@@ -285,8 +284,7 @@
                     <div class="small-4 columns">
                         <label class="interval-input">
                             Minutes
-                            <input type="text"
-                                   inputmode="numeric"
+                            <input type="number"
                                    min="0"
                                    max="59"
                                    value="{{ isEmpty ? '' : item.minLeadTime.minuteRemainder }}"
@@ -306,8 +304,7 @@
                         {% set isEmpty = item.minReservationTime.secondTotal ?? 0 == 0 %}
                         <label class="interval-input">
                             Days
-                            <input type="text"
-                                   inputmode="numeric"
+                            <input type="number"
                                    value="{{ isEmpty ? '' : item.minReservationTime.dayTotal }}"
                                    name="min_reservation_time[day]"
                             >
@@ -316,8 +313,7 @@
                     <div class="small-4 columns">
                         <label class="interval-input">
                             Hours
-                            <input type="text"
-                                   inputmode="numeric"
+                            <input type="number"
                                    min="0"
                                    max="23"
                                    value="{{ isEmpty ? '' : item.minReservationTime.hourRemainder }}"
@@ -328,8 +324,7 @@
                     <div class="small-4 columns">
                         <label class="interval-input">
                             Minutes
-                            <input type="text"
-                                   inputmode="numeric"
+                            <input type="number"
                                    min="0"
                                    max="59"
                                    value="{{ isEmpty ? '' : item.minReservationTime.minuteRemainder }}"
@@ -352,8 +347,7 @@
                         {% set isEmpty = item.maxReservationTime.secondTotal ?? 0 == 0 %}
                         <label class="interval-input">
                             Days
-                            <input type="text"
-                                   inputmode="numeric"
+                            <input type="number"
                                    value="{{ isEmpty ? '' : item.maxReservationTime.dayTotal }}"
                                    name="max_reservation_time[day]">
                         </label>
@@ -361,8 +355,7 @@
                     <div class="small-4 columns">
                         <label class="interval-input">
                             Hours
-                            <input type="text"
-                                   inputmode="numeric"
+                            <input type="number"
                                    min="0"
                                    max="23"
                                    value="{{ isEmpty ? '' : item.maxReservationTime.hourRemainder }}"
@@ -373,8 +366,7 @@
                     <div class="small-4 columns">
                         <label class="interval-input">
                             Minutes
-                            <input type="text"
-                                   inputmode="numeric"
+                            <input type="number"
                                    min="0"
                                    max="59"
                                    value="{{ isEmpty ? '' : item.maxReservationTime.minuteRemainder }}"
