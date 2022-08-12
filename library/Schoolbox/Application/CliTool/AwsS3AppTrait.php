@@ -63,11 +63,12 @@ trait AwsS3AppTrait
 
     /**
      * Fetch the keys of all files found in the bucket in an array where the key is the element index
+     * and value is file size in bytes
      *
      * @param LoggerInterface $log
      * @param S3Client        $s3Client
      * @param string          $bucketName
-     * @return array
+     * @return int[]
      */
     protected function getFilesInS3(LoggerInterface $log, S3Client $s3Client, string $bucketName): array
     {
@@ -82,7 +83,7 @@ trait AwsS3AppTrait
             if ($i && $i % 1000 === 0) {
                 $log->debug("Files found in S3: $i...");
             }
-            $filesInS3[$object['Key']] = true;
+            $filesInS3[$object['Key']] = (int)$object['Size'];
         }
         return $filesInS3;
     }

@@ -163,14 +163,14 @@ HELP;
         $filesInS3             = $this->getFilesInS3($this->getLogger(), $client, $s3Bucket);
         $this->fileSystemAwsS3 = new Filesystem(new AwsS3Adapter($client, $s3Bucket, FilesystemFactory::PREFIX_STORAGE));
 
-        foreach ($filesInS3 as $key => $_v) {
+        foreach ($filesInS3 as $key => $fileSize) {
             $path     = preg_replace('#^storage/#', '', $key);
             $fileName = basename($path);
             if ($this->needsToBeRetained($fileName)) {
                 continue;
             }
             $this->deleteRecordFromStorageTransformTable($fileName);
-            $this->deleteTransformFileFromDisk($path, $this->fileSystemAwsS3->fileSize($path));
+            $this->deleteTransformFileFromDisk($path, $fileSize);
         }
     }
 
