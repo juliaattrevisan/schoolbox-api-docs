@@ -33,7 +33,6 @@ use Schoolbox\Application\Exception as ApplicationException;
  */
 class Controller extends AbstractController
 {
-
     /**
      * @var SportMapper
      */
