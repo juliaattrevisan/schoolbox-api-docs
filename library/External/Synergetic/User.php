@@ -698,7 +698,12 @@ class External_Synergetic_User implements External_UserInterface
                             a.StudentContactTitle,
                             a.StudentContactPreferred,
                             a.StudentContactSurname,
-                            a.StudentContactDefaultEmail,
+                            CASE
+                                WHEN r.UseEmail = 'O' THEN a.StudentContactOccupEmail
+                                WHEN r.UseEmail = 'P' THEN a.StudentContactEmail
+                                WHEN r.UseEmail = 'D' THEN a.StudentContactDefaultEmail
+                                ELSE ''
+                            END AS StudentContactDefaultEmail,
                             a.StudentContactPhoneActual,
                             a.StudentContactSilentPhoneFlag,
                             a.StudentContactMobilePhone,
@@ -711,7 +716,14 @@ class External_Synergetic_User implements External_UserInterface
                             CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseSurname END AS StudentContactSpouseSurname,
                             CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseMobilePhone END AS StudentContactSpouseMobilePhone,
                             CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseOccupPhone END AS StudentContactSpouseOccupPhone,
-                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseDefaultEmail END AS StudentContactSpouseDefaultEmail,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE
+                                CASE
+                                    WHEN rs.UseEmail = 'O' THEN a.StudentContactSpouseOccupEmail
+                                    WHEN rs.UseEmail = 'P' THEN a.StudentContactSpouseEmail
+                                    WHEN rs.UseEmail = 'D' THEN a.StudentContactSpouseDefaultEmail
+                                    ELSE '' 
+                                END 
+                            END AS StudentContactSpouseDefaultEmail,
                             a.StudentContactType,
                             CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseRelation END AS StudentContactSpouseRelation,
                             r.UseEmail AS StudentContactUseEmail,
