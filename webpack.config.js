@@ -254,8 +254,8 @@ module.exports = {
         //Canvas
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
 
-        //Canvas
-        typescriptTest: './library/Schoolbox/Greenhouse/templates/typescriptTest.ts',
+        //Temporary Typescript testing playground, to be deleted in future
+        typescriptTest: './library/Schoolbox/Greenhouse/templates/ts/typescriptTest.ts',
 
         //Sass
         core: './www/static/css/core/core.scss',
