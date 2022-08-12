@@ -243,7 +243,7 @@ class Controller extends AbstractController
     {
         $userIds    = $this->getRequest()->post->get('userId');
         $teamUsers  = [];
-        $sequenceNo = count($userIds);
+        $sequenceNo = 1;
         foreach ($userIds as $userId) {
             try {
                 /** @var TeamUser $teamUser */
@@ -251,7 +251,7 @@ class Controller extends AbstractController
                     'user_id' => $userId,
                     'team_id' => $team->getId(),
                 ]);
-                $teamUsers[] = $teamUser->setSequence($sequenceNo--);
+                $teamUsers[] = $teamUser->setSequence($sequenceNo++);
             } catch (MapperException $e) {
                 // User isn't in team. Ignore
                 continue;
