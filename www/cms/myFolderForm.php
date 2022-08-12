@@ -64,7 +64,7 @@ if (isset($_POST['name'])) {
     } catch (Mapper\Exception $e) {
         respondFailure($isAjax, 'Destination folder not found');
     }
-
+    /** @var MyFolder\Model $myFolder */
     if ((int)$myFolder->getOwner()->getId() !== (int)$_SESSION['id']) {
         respondFailure($isAjax, 'Insufficient permissions');
     }
