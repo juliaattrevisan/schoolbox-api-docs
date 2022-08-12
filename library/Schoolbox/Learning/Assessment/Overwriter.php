@@ -44,6 +44,18 @@ class Overwriter
         IAssessable $destination,
         User $newOwner,
     ): IAssessable {
+        // Must assert that source and destination are the same sort of thing;
+        // otherwise who knows what disaster could happen
+        if (!($source->getFamilyName() === $destination->getFamilyName())) {
+            throw new \RuntimeException(
+                sprintf(
+                    '$source (%s) and $destination (%s) must be the same family of assessable',
+                    $source->getFamilyName(),
+                    $destination->getFamilyName(),
+                )
+            );
+        }
+
         // Get fields from destination:
         $updatedDestination = $source->cloneForCopy();
         $updatedDestination
