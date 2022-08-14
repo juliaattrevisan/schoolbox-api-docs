@@ -68,7 +68,7 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
 function getFormData () {
     const store = useStore();
     return JSON.stringify({
-        groupId: store.groupId,
+        groupId: store.id,
         members: [60, 64, 46]
     });
 }

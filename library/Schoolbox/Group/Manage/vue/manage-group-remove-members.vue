@@ -87,10 +87,10 @@ function onModalClosed () {
         :close-on-background-click="false"
         @closed="onModalClosed"
     >
-        <h2>Removing member(s) from {{ store.groupName }}, please confirm?</h2>
+        <h2>Removing member(s) from {{ store.name }}, please confirm?</h2>
         <p v-if="membersStore.selectedNonAdminCount > 0">
             You are about to remove <b>{{ membersStore.selectedNonAdminCount }} member(s)</b> from the
-            {{ store.groupName }} group.
+            {{ store.name }} group.
         </p>
         <p v-if="membersStore.selectedGroupAdminCount > 0">
                 <span class="alert"><b>Warning: You are removing {{ membersStore.selectedGroupAdminCount }} group

@@ -86,7 +86,7 @@ export const useSettingsStore = defineStore('manageGroupSettings', {
 function getFormData (myStore) {
     const store = useStore();
     return JSON.stringify({
-        groupId: store.groupId,
+        groupId: store.id,
         settings: {
             access: myStore.access,
             isNotificationsEnabled: myStore.isNotificationsEnabled,

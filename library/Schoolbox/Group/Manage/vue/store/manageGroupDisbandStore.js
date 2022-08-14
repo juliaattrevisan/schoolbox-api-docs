@@ -71,6 +71,6 @@ export const useDisbandStore = defineStore('manageGroupDisband', {
 function getFormData () {
     const store = useStore();
     return JSON.stringify({
-        groupId: store.groupId
+        groupId: store.id
     });
 }

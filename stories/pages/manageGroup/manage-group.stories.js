@@ -2,7 +2,6 @@
 import ManageGroup from '../../../library/Schoolbox/Group/Manage/vue/manage-group';
 import { rest } from 'msw';
 import { data } from './dataManageGroup';
-// import { largeData } from '../../classSelector/largeDataClassSelectoreDataClassSelector';
 
 const groupDataEndpoint = '/groupData';
 const removeMembersEndpoint = '/removeMembers';
@@ -10,6 +9,7 @@ const updateMembersEndpoint = '/updateMembers';
 const addMembersEndpoint = '/addMembers';
 const updateSettingsEndpoint = '/updateSettings';
 const disbandGroupEndpoint = '/disbandGroup';
+const sendEmailEndpoint = '/sendEmail';
 
 const mswHandlers = [
     rest.get(groupDataEndpoint, (req, res, ctx) => {
@@ -74,6 +74,7 @@ export default {
         addMembersEndpoint: addMembersEndpoint,
         updateSettingsEndpoint: updateSettingsEndpoint,
         disbandGroupEndpoint: disbandGroupEndpoint,
+        sendEmailEndpoint: sendEmailEndpoint,
     },
     component: ManageGroup,
     decorators: [

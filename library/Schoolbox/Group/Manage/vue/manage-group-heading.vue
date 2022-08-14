@@ -37,7 +37,7 @@ function onUpdateSettingsSelected () {
  *
  */
 function onEmailGroupSelected () {
-    window.location.href = `${Endpoints.SEND_EMAIL}?folderId=${store.groupId}`;
+    window.location.href = `${Endpoints.SEND_EMAIL}?folderId=${store.id}`;
 }
 
 /**

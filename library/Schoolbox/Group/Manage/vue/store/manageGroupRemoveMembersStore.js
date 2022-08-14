@@ -75,10 +75,8 @@ function getFormData () {
     const store = useStore();
     const membersStore = useMembersStore();
     const membersToRemoveIdList = membersStore.selectedMembers.map(row => row.id);
-    return JSON.stringify(
-        {
-            groupId: store.groupId,
-            members: membersToRemoveIdList
-        },
-    );
+    return JSON.stringify({
+        groupId: store.id,
+        members: membersToRemoveIdList
+    });
 }

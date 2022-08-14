@@ -1,5 +1,6 @@
 export const data = {
-    groupId: 23,
+    id: 23,
+    name: 'Chess Club',
     settings: {
         access: 'moderated',
         isNotificationsEnabled: true,
