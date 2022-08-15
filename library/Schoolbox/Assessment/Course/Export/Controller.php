@@ -12,6 +12,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Overwriter;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -55,19 +56,7 @@ class Controller extends Base
         UnitSpec\Model $unitSpec,
         IAssessable $assessment,
     ): void {
-        // How to handle projects?
-        // Just manually I suppose?
-        $newAssessment = $this->replicator->replicateInNewContext(
-            $assessment,
-            $unitSpec,
-            $this->getUser(),
-        );
-
-        $this->associateExistingAssessmentToNewAssessment(
-            $unitSpec,
-            $assessment,
-            $newAssessment,
-        );
+        $newAssessment = $this->copyAssessmentToContext($assessment, $unitSpec);
 
         // TODO return the same format as the assessment API?
         $this->response->content->set(
@@ -98,10 +87,9 @@ class Controller extends Base
     public function putAssessmentIntoUnit(
         IAssessable $assessment,
     ): void {
-        $updatedSpecAssessment = $this->overwriter->overwrite(
+        $updatedSpecAssessment = $this->overwriteAssessment(
             $assessment,
             $assessment->getSpecificationAssessment(),
-            $this->getUser(),
         );
 
         // TODO return the same format as the assessment API?
@@ -114,30 +102,60 @@ class Controller extends Base
     }
 
     /**
-     * Set `$newAssessment` as the spec assessment for `$assessment`, if
-     * `$assessment` is based off of the same course as `$newAssessment` is now
-     * in.
+     * Adds a copy of `$assessment` to the given assessment context `$context`,
+     * and returns the copy.
      *
-     * @param UnitSpec\Model $unitSpec      The unit spec to check.
-     * @param IAssessable    $assessment    The assessment which was written
-     *                                      back (probably to `$unitSpec`).
-     * @param IAssessable $newAssessment    The new assessment within
-     *                                      `$unitSpec`.
-     * @return void
-     * @throws MapperException if somehow the assessment couldn't be written
+     * Also sets the copy as the spec assessment of `$assessment`.
+     *
+     * @param IAssessable       $assessment The assessment to copy
+     * @param AssessmentContext $context    The destination to copy
+     *                                      `$assessment` into
+     * @return IAssessable The newly created copy of `$assessment` within
+     *                     `$context`.
+     * @throws MapperException
      */
-    private function associateExistingAssessmentToNewAssessment(
-        UnitSpec\Model $unitSpec,
+    private function copyAssessmentToContext(
         IAssessable $assessment,
-        IAssessable $newAssessment,
-    ): void {
+        AssessmentContext $context,
+    ): IAssessable {
+        $newAssessment = $this->replicator->replicateInNewContext(
+            $assessment,
+            $context,
+            $this->getUser(),
+        );
+
+        // Associate new assessment with old assessment's context
         $baseContext = $assessment->getBaseContext();
         if (
             $baseContext instanceof UnitImplementation\Model
-            && $unitSpec->getId() === $baseContext->getSpecification()->getId()
+            && $context->getId() === $baseContext->getSpecification()->getId()
         ) {
             $assessment->setSpecificationAssessment($newAssessment);
             $this->assessmentDataSource->save($assessment, $this->getUser());
         }
+
+        // TODO copy project activities
+
+        return $newAssessment;
+    }
+
+    /**
+     * Overwrite `$specAssessment` with `$assessment`.
+     *
+     * @param IAssessable $assessment     The assessment to copy
+     * @param IAssessable $specAssessment The assessment to overwrite
+     * @return IAssessable
+     */
+    private function overwriteAssessment(
+        IAssessable $assessment,
+        IAssessable $specAssessment,
+    ): IAssessable {
+        // TODO copy project activities
+
+        return $this->overwriter->overwrite(
+            $assessment,
+            $specAssessment,
+            $this->getUser(),
+        );
     }
 }
