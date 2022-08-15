@@ -14,8 +14,6 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Code\SubjectMatcherBase;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -34,48 +32,22 @@ use PDO;
  */
 class RelationshipFilterer
 {
-
-    /** @var IConnector */
-    private $db;
-
-    /** @var UserMapper */
-    private $userMapper;
-
-    /** @var External_UserInterface */
-    private $externalUser;
-
-    /** @var Folder\Mapper */
-    private $folderMapper;
-
-    /** @var External_ClassInterface */
-    private $externalClass;
-
-    /** @var UserAccessMapper */
-    private $userAccessMapper;
-
-
     /**
-     * @param IConnector              $db
-     * @param UserMapper              $userMapper
-     * @param External_UserInterface  $externalUser
-     * @param Folder\Mapper           $folderMapper
-     * @param External_ClassInterface $externalClass
-     * @param UserAccessMapper        $userAccessMapper
+     * @param IConnector                  $db
+     * @param UserMapper                  $userMapper
+     * @param External_UserInterface      $externalUser
+     * @param Folder\Mapper               $folderMapper
+     * @param External_ClassInterface     $externalClass
+     * @param Folder\Code\ISubjectMatcher $subjectMatcher
      */
     public function __construct(
-        IConnector $db,
-        UserMapper $userMapper,
-        External_UserInterface $externalUser,
-        Folder\Mapper $folderMapper,
-        External_ClassInterface $externalClass,
-        UserAccessMapper $userAccessMapper
+        private IConnector $db,
+        private UserMapper $userMapper,
+        private External_UserInterface $externalUser,
+        private Folder\Mapper $folderMapper,
+        private External_ClassInterface $externalClass,
+        private Folder\Code\ISubjectMatcher $subjectMatcher,
     ) {
-        $this->db               = $db;
-        $this->userMapper       = $userMapper;
-        $this->externalUser     = $externalUser;
-        $this->folderMapper     = $folderMapper;
-        $this->externalClass    = $externalClass;
-        $this->userAccessMapper = $userAccessMapper;
     }
 
 
@@ -191,7 +163,7 @@ class RelationshipFilterer
     public function getTeachers(array $userIds): array
     {
         if (!\count($userIds)) {
-            return $this->userMapper->createCollection();
+            return [];
         }
 
         $pb = $this->userMapper->getPredicateBuilder()
@@ -205,7 +177,7 @@ class RelationshipFilterer
             // Find all folders where the user is a class student or learner-only.
             $subjects = $this->externalUser->getSubjectList($student);
             foreach ($subjects as $subject) {
-                $classCode = SubjectMatcherBase::generateFolderCode($subject['campusCode'], $subject['code']);
+                $classCode = $this->subjectMatcher::generateFolderCode($subject['campusCode'], $subject['code']);
                 if (!in_array($classCode, $classCodes)) {
                     $classCodes[] = $classCode;
                 }
