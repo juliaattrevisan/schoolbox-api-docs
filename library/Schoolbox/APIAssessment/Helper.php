@@ -584,6 +584,10 @@ v_most_recent_feedback.review_route = 'instructor' AND
                     'indicators'            => []
                 ];
             }
+            //if descriptor is null, then step past it
+            if (null === $row['descriptor_name']) {
+                continue;
+            }
             //capability should already exist, so lets build the indicator for that capability
             if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
                 $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
