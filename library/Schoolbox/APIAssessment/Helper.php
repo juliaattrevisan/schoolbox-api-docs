@@ -578,7 +578,7 @@ v_most_recent_feedback.review_route = 'instructor' AND
                 $output['capabilities'][$row['capability_id']] = [
                     'id'                    => (int)$row['capability_id'],
                     'name'                  => $row['capability_name'],
-                    'value'                 => (float)$row['capability_mark'],
+                    'value'                 => (null === $row['capability_mark']) ? null : (float)$row['capability_mark'],
                     'maxValue'              => (float)$row['capability_max_value'],
                     'mark'                  => $row['capability_human_readable_mark'],
                     'indicators'            => []
