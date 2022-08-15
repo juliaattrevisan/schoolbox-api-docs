@@ -26,7 +26,8 @@ class EventRecurrence
         'daily' => '+1 day',
         'weekly' => '+1 week',
         'fortnightly' => '+2 weeks',
-        'monthly' => '+1 month'
+        'monthly' => '+1 month',
+        'yearly'  => '+1 year'
     );
 
     /**
