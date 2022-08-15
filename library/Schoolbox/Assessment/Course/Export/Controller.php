@@ -186,6 +186,9 @@ class Controller extends Base
         // Load spec activity IDs for later use
         $specActivityIds     = [];
         $implActivitySpecIds = [];
+        // `$specProject` is not guaranteed to have assessments loaded:
+        // load them here
+        $specProject->setAssessables($this->assessmentDataSource->findAllByContext($specProject));
         foreach ($specProject->getAssessables() as $specActivity) {
             $specActivityIds[] = $specActivity->getId();
         }
