@@ -15,8 +15,8 @@ export const useStore = defineStore('manageGroup', {
         isLoading: true, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place, like updating a member access
-        groupId: 0, //the id of the group
-        groupName: '', //the name of the group
+        id: 0, //the id of the group
+        name: '', //the name of the group
         toastEl: null, //so we don't need to pass it all around as a prop
     }),
 
@@ -45,8 +45,8 @@ export const useStore = defineStore('manageGroup', {
                 const response = await fetch(Endpoints.GROUP_DATA);
                 if (response.ok) {
                     const responseJson = await response.json();
-                    this.id = responseJson.id;
-                    this.name = responseJson.name;
+                    this.id = responseJson.groupId;
+                    this.name = responseJson.groupName;
                     const settingsStore = useSettingsStore();
                     settingsStore.loadSettings(responseJson.settings);
                     const membersStore = useMembersStore();

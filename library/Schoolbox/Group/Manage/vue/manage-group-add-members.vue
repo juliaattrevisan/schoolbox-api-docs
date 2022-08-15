@@ -4,7 +4,7 @@
  * Add members to the group
  */
 
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useStore } from './store/manageGroupStore';
 import { useAddMembersStore } from './store/manageGroupAddMembersStore';
 
@@ -13,12 +13,6 @@ const store = useStore();
 const addMembersStore = useAddMembersStore();
 const currentFromSelect = ref('name');
 
-/**
- * ensure the tooltips work
- */
-onMounted(() => {
-    $(document).foundation();
-});
 
 /**
  * Update the input place holder text depending on the currentFromSelect
@@ -28,9 +22,24 @@ onMounted(() => {
 const inputPlaceholder = computed(() => {
     const placeholderOptions = {
         'name': 'Search Users',
-        'group': 'Search User Groups',
-        'role': 'Search User Roles',
+        'group': 'Search Groups',
+        'role': 'Search Roles',
         'list': 'Add from a list',
+    }
+    return placeholderOptions[currentFromSelect.value];
+});
+
+/**
+ * Provide extra details on how the current search selection is to be used
+ *
+ * @returns { String }
+ */
+const inputDetails = computed(() => {
+    const placeholderOptions = {
+        'name': 'You may add users individually by typing their name and selecting from the list.',
+        'group': 'Add all users that belong to another group.',
+        'role': 'Add all users of a particular role in the system.',
+        'list': 'Add a list of users (either external user IDs or Schoolbox usernames).',
     }
     return placeholderOptions[currentFromSelect.value];
 });
@@ -98,6 +107,7 @@ const addButtonText = computed(() => addMembersStore.isProcessing ? 'Adding...' 
                             </ul>
                         </div>
                     </div>
+                    <p class="meta">{{ inputDetails }}</p>
                     <input
                         type="text"
                         :placeholder="inputPlaceholder"

@@ -53,7 +53,7 @@ disbandStore.$onAction(({ name, after, onError }) => {
  */
 async function redirect () {
     await timeout(5000);
-    location.reload();
+    window.location = `/homepage/${store.id}`
 }
 
 
