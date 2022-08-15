@@ -31,7 +31,7 @@
             {% set routeRecordDelete = routeLookupIfAuthorized('pastoral.postRecordDelete', {recordId: record.id}) %}
 
             {% if linkedStudents is defined and linkedStudents|length %}
-                <a href="#" class="icon-link" data-dropdown="linked-students" title="Linked Students"></a>
+                <a href="#" class="icon-link" data-dropdown="linked-students" title="Related Students"></a>
             {% endif %}
 
             {% if routeRecordDelete %}
@@ -61,7 +61,7 @@
 
         {% if linkedStudents is defined and linkedStudents|length %}
             <ul class="f-dropdown" data-dropdown-content="" id="linked-students">
-                <li class="separator">Students With Linked Records</li>
+                <li class="separator">Students With Related Records</li>
                 {% for student in linkedStudents %}
                     <li>
                         <a href="{{ routeLookup('pastoral.getStudent', {studentId: student.student_id}) }}" class="icon-user">
@@ -116,7 +116,7 @@
                 }
             });
         </script>
-        
+
         <section class="tabs-content" data-tabs-content="tabs">
             <div class="content active" id="panel-general">
                 {# General body #}

@@ -11,7 +11,7 @@
             {% if user.role.isStaff %}
                 <h2 class="subheader">
                     {% if linkedStudent %}
-                        Linked {{ locale.pastoral.proper }} Records
+                        Related {{ locale.pastoral.proper }} Records
                     {% else %}
                         {{ locale.pastoral.proper }} Records
                     {% endif %}
@@ -47,7 +47,7 @@
                                                 Original Record:
                                                 {% set headingCurrent = linkedRecord.heading %}
                                             {% else %}
-                                                Linked Record:
+                                                Related Record:
                                                 {% set headingCurrent = record.heading %}
                                             {% endif %}
 
@@ -83,7 +83,7 @@
                                                 {% if relatedRecord.student.id != student.id and relatedRecord.student.id != linkedStudent.id %}
                                                     {% set getStudentRecord = routeLookupIfAuthorized('pastoral.getStudentRecord', {studentId: relatedRecord.student.id, 'recordId': relatedRecord.id}) %}
                                                     {% if getStudentRecord %}
-                                                        Linked Record:
+                                                        Related Record:
                                                         <a href="{{ getStudentRecord }}">{{ relatedRecord.heading }}</a> (<a href="{{ profile.link(relatedRecord.student) }}">{{ relatedRecord.student.fullName }}</a>)
                                                         <br>
                                                     {% endif %}
