@@ -675,7 +675,7 @@ abstract class Kernel
                             $folderMapper,
                             $externalClass,
                             (new SubjectCodeMatchFactory())->build($di->get('config')->get('external_type'))
-                ),
+                        ),
                         $strategyFactory->makeAllSimpleStrategies(),
                         $complexMapper,
                         $newsMapper
