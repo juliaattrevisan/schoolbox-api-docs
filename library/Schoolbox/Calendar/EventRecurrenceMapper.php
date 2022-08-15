@@ -90,6 +90,8 @@ class EventRecurrenceMapper
             29 => 'monthly',
             30 => 'monthly',
             31 => 'monthly',
+            365 => 'yearly',
+            366 => 'yearly',
         );
 
         if (isset($recurMap[$diff])) {
