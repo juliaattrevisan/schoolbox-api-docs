@@ -220,7 +220,7 @@ WHERE
     assessment.deleted_at is null
 ";
         if (array_key_exists('assessmentId', $filter)) {
-            $where .= " AND v_assessmentCodes_relation.assessment_id = :assessmentId ";
+            $where .= " AND v_assessment_relation.assessment_id = :assessmentId ";
             $params['assessmentId'] = $filter['assessmentId'];
         }
         if (array_key_exists('assessmentType', $filter)) {
@@ -319,7 +319,6 @@ WHERE
             $where .= " AND folder_code.code in ({$folderCodesBindings->getPlaceholder()}) ";
             $from .= " JOIN folder_code on (v_assessment_relation.folder_id = folder_code.folder_id and folder_code.deleted_at is NULL) ";
             $params = array_merge($params, $folderCodesBindings->getParams());
-
         }
         return [
             $select . $from . $where,
