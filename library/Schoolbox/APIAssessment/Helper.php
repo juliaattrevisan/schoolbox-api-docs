@@ -306,19 +306,30 @@ WHERE
                 $params['projectID'] = $filter['project']['id'];
             }
         }
-        //were there folder id requested?
-        if (!empty($folderIds)) {
-            $folderIdsBindings = Builder::getBindings($folderIds, 'ids');
-            $where .= " AND folder.id in ({$folderIdsBindings->getPlaceholder()}) ";
-            $params = array_merge($params, $folderIdsBindings->getParams());
+        //was a folder requested?
+        if (!empty($folderIds) || !empty($folderCodes)) {
+            $where .= " AND ( ";
+
+            //were there folder id requested?
+            if (!empty($folderIds)) {
+                $folderIdsBindings = Builder::getBindings($folderIds, 'ids');
+                $where .= " folder.id in ({$folderIdsBindings->getPlaceholder()}) ";
+                $params = array_merge($params, $folderIdsBindings->getParams());
+            }
+            //if folder codes also requested
+            if (!empty($folderIds) && !empty($folderCodes)) {
+                $where .= " OR ";
+            }
+            //where there folder codes requested
+            if (!empty($folderCodes)) {
+                $folderCodesBindings = Builder::getBindings($folderCodes, 'codes');
+                $where .= " folder_code.code in ({$folderCodesBindings->getPlaceholder()}) ";
+                $from .= " JOIN folder_code on (v_assessment_relation.folder_id = folder_code.folder_id and folder_code.deleted_at is NULL) ";
+                $params = array_merge($params, $folderCodesBindings->getParams());
+            }
+            $where .= " ) ";
         }
-        //where there folder codes requested
-        if (!empty($folderCodes)) {
-            $folderCodesBindings = Builder::getBindings($folderCodes, 'codes');
-            $where .= " AND folder_code.code in ({$folderCodesBindings->getPlaceholder()}) ";
-            $from .= " JOIN folder_code on (v_assessment_relation.folder_id = folder_code.folder_id and folder_code.deleted_at is NULL) ";
-            $params = array_merge($params, $folderCodesBindings->getParams());
-        }
+
         return [
             $select . $from . $where,
             $params
