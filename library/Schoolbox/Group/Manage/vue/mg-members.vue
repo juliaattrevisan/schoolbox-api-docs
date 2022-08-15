@@ -6,11 +6,11 @@
 
 import { ref, watch, nextTick } from 'vue';
 import { EventBus } from 'v-tables-3-select-rows';
-import { useMembersStore } from './store/manageGroupMembersStore';
+import { useMembersStore } from './store/mgMembersStore';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
-import ManageGroupMembersFilters from './manage-group-members-filters.vue';
-import ManageGroupMembersName from './manage-group-members-name.vue';
-import ManageGroupMembersAccess from './manage-group-members-access.vue';
+import MgMembersFilters from './mg-members-filters.vue';
+import MgMembersName from './mg-members-name.vue';
+import MgMembersAccess from './mg-members-access.vue';
 import FilterEvents from './manageGroupFilterEvents';
 import AccessTypes from './manageGroupAccessTypes';
 
@@ -228,13 +228,13 @@ function updateSelectedMembers () {
                 @filter="membersStore.refreshMembers(true)"
             >
                 <template #beforeTable>
-                    <manage-group-members-filters />
+                    <mg-members-filters />
                 </template>
                 <template #name="data">
-                    <manage-group-members-name :member="data.row" />
+                    <mg-members-name :member="data.row" />
                 </template>
                 <template #accessType="data">
-                    <manage-group-members-access :member="data.row" />
+                    <mg-members-access :member="data.row" />
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooterEl" data-table-footer></div>

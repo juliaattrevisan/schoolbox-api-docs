@@ -6,10 +6,10 @@
  */
 
 import { onMounted } from 'vue';
-import { useStore } from './store/manageGroupStore';
-import { useMembersStore } from './store/manageGroupMembersStore';
-import { useSettingsStore } from './store/manageGroupSettingsStore';
-import { useDisbandStore } from './store/manageGroupDisbandStore';
+import { useStore } from './store/mgStore';
+import { useMembersStore } from './store/mgMembersStore';
+import { useSettingsStore } from './store/mgSettingsStore';
+import { useDisbandStore } from './store/mgDisbandStore';
 import Endpoints from './manageGroupEndpoints';
 
 

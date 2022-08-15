@@ -5,8 +5,8 @@
  */
 
 import { ref, computed } from 'vue';
-import { useStore } from './store/manageGroupStore';
-import { useAddMembersStore } from './store/manageGroupAddMembersStore';
+import { useStore } from './store/mgStore';
+import { useAddMembersStore } from './store/mgAddMembersStore';
 
 
 const store = useStore();

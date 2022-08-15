@@ -6,11 +6,11 @@
  */
 
 import { ref, computed, watch, onMounted  } from 'vue';
-import { useStore } from './store/manageGroupStore';
-import { useMembersStore } from './store/manageGroupMembersStore';
-import { useRemoveMembersStore } from './store/manageGroupRemoveMembersStore';
+import { useStore } from './store/mgStore';
+import { useMembersStore } from './store/mgMembersStore';
+import { useRemoveMembersStore } from './store/mgRemoveMembersStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
-import ManageGroupSelectAccess from './manage-group-select-access.vue';
+import MgSelectAccess from './mg-select-access.vue';
 import Endpoints from './manageGroupEndpoints';
 
 
@@ -93,7 +93,7 @@ function onRemoveMembersSelected () {
         <span ref="shiftSelectNoteEl" class="shift-select-note">Use Shift+Select to select multiple members</span>
         <button @click.prevent="onClearMemberSelection" class="button-clear" :disable="store.isProcessing">Clear member selection</button>
         <ul class="flex-list">
-            <manage-group-select-access />
+            <mg-select-access />
             <li>
                 <button @click.prevent="onEmailMembersSelected" class="button submit icon-email" :disabled="store.isProcessing">Email {{ membersStore.selectedMembersPlural }}</button>
             </li>

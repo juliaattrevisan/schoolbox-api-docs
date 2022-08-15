@@ -1,18 +1,17 @@
 /**
- * Handles the store to remove members from the Manage Group page
+ * Handles the store to disband the group
  */
 
 import { defineStore } from 'pinia';
-import { useStore } from './manageGroupStore';
-import { useMembersStore } from './manageGroupMembersStore';
-import Endpoints from '../manageGroupEndpoints';
+import { useStore } from './manageGroupStore'
+import Endpoints from '../mgEndpoints';
 
 
-export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
+export const useDisbandStore = defineStore('mgDisband', {
 
     state: () => ({
-        isPromptOpen: false, //to notify that the prompt is opened / closed
         isProcessing: false,
+        isPromptOpen: false, //to notify that the prompt is opened / closed
     }),
 
     actions: {
@@ -20,20 +19,20 @@ export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
         /**
          * to display a prompt to confirm member removal
          */
-        promptRemoveSelectedMembers () {
+        promptDisbandGroup () {
             this.isPromptOpen = true;
         },
 
         /**
          * member removal has been confirmed so pull them out
          */
-        async removeSelectedMembers () {
+        async disbandGroup () {
             this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
             try {
-                const response = await fetch(Endpoints.REMOVE_MEMBERS, {
-                    method: 'DELETE',
+                const response = await fetch(Endpoints.DISBAND_GROUP, {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -41,8 +40,7 @@ export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    const membersStore = useMembersStore();
-                    membersStore.removeSelectedGroupMembers();
+                    //
                 } else {
                     throw new Error();
                 }
@@ -51,14 +49,13 @@ export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
             } finally {
                 this.isProcessing = false;
                 store.isProcessing = false;
-                this.isPromptOpen = false;
             }
         },
 
         /**
          * to hide the confirmation prompt
          */
-        cancelRemoveSelectedMembers () {
+        cancelDisbandGroup () {
             this.isPromptOpen = false;
         },
 
@@ -67,16 +64,13 @@ export const useRemoveMembersStore = defineStore('manageGroupRemoveMembers', {
 })
 
 /**
- * Set up a deleted users array to POST
+ * Pass through the group id
  *
  * @returns { FormData }
  */
 function getFormData () {
     const store = useStore();
-    const membersStore = useMembersStore();
-    const membersToRemoveIdList = membersStore.selectedMembers.map(row => row.id);
     return JSON.stringify({
-        groupId: store.id,
-        members: membersToRemoveIdList
+        groupId: store.id
     });
 }

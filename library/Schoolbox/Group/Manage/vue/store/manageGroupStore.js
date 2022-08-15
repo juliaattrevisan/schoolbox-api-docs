@@ -4,12 +4,12 @@
  */
 
 import { defineStore } from 'pinia';
-import Endpoints from '../manageGroupEndpoints';
-import { useSettingsStore } from './manageGroupSettingsStore';
-import { useMembersStore } from './manageGroupMembersStore';
+import Endpoints from '../mgEndpoints';
+import { useSettingsStore } from './mgSettingsStore';
+import { useMembersStore } from './mgMembersStore';
 
 
-export const useStore = defineStore('manageGroup', {
+export const useStore = defineStore('mg', {
 
     state: () => ({
         isLoading: true, //to display loading note

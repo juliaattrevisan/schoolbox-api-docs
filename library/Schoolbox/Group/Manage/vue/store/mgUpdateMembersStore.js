@@ -4,11 +4,11 @@
 
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
-import { useMembersStore } from './manageGroupMembersStore';
-import Endpoints from '../manageGroupEndpoints';
+import { useMembersStore } from './mgMembersStore';
+import Endpoints from '../mgEndpoints';
 
 
-export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
+export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
 
     state: () => ({
         isProcessing: false,

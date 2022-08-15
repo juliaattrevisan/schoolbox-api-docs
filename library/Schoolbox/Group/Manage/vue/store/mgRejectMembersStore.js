@@ -4,11 +4,11 @@
 
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
-import { useMembersStore } from './manageGroupMembersStore';
-import Endpoints from '../manageGroupEndpoints';
+import { useMembersStore } from './mgMembersStore';
+import Endpoints from '../mgEndpoints';
 
 
-export const useRejectMembersStore = defineStore('manageGroupRejectMembers', {
+export const useRejectMembersStore = defineStore('mgRejectMembers', {
 
     state: () => ({
         isProcessing: false,

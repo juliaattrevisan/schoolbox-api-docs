@@ -5,10 +5,10 @@
  */
 
 import { ref, watch, computed } from 'vue';
-import { useStore } from './store/manageGroupStore';
-import { useMembersStore } from './store/manageGroupMembersStore';
-import { useUpdateMembersStore } from './store/manageGroupUpdateMembersStore';
-import { useRejectMembersStore } from './store/manageGroupRejectMembersStore';
+import { useStore } from './store/mgStore';
+import { useMembersStore } from './store/mgMembersStore';
+import { useUpdateMembersStore } from './store/mgUpdateMembersStore';
+import { useRejectMembersStore } from './store/mgRejectMembersStore';
 import AccessTypes from './manageGroupAccessTypes';
 
 

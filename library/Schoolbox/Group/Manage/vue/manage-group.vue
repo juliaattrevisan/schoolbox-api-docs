@@ -6,16 +6,16 @@
 
 import { ref, onBeforeMount, onMounted } from 'vue';
 import Endpoints from './manageGroupEndpoints';
-import { useStore } from './store/manageGroupStore';
-import { useMembersStore } from './store/manageGroupMembersStore';
-import ManageGroupHeading from './manage-group-heading.vue';
+import { useStore } from './store/mgStore';
+import { useMembersStore } from './store/mgMembersStore';
+import MgHeading from './mg-heading.vue';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table';
-import ManageGroupAddMembers from './manage-group-add-members.vue';
-import ManageGroupMembers from './manage-group-members.vue';
-import ManageGroupSelect from './manage-group-select.vue';
-import ManageGroupRemoveMembers from './manage-group-remove-members.vue';
-import ManageGroupUpdateSettings from './manage-group-update-settings.vue';
-import ManageGroupDisbandGroup from './manage-group-disband-group.vue';
+import MgAddMembers from './mg-add-members.vue';
+import MgMembers from './mg-members.vue';
+import MgSelect from './mg-select.vue';
+import MgRemoveMembers from './mg-remove-members.vue';
+import MgUpdateSettings from './mg-update-settings.vue';
+import MgDisbandGroup from './mg-disband-group.vue';
 import Toast from '@schoolboxVue/components/toast.vue';
 
 
@@ -118,7 +118,7 @@ function onRefreshSelected () {
 </script>
 
 <template>
-    <manage-group-heading />
+    <mg-heading />
     <div v-if="store.isLoading" class="row">
         <div class="small-12 island">
             <loading-table  />
@@ -134,12 +134,12 @@ function onRefreshSelected () {
         </div>
     </div>
     <template v-else-if="store.hasLoadedOk">
-        <manage-group-add-members />
-        <manage-group-members />
-        <manage-group-select />
-        <manage-group-remove-members />
-        <manage-group-update-settings />
-        <manage-group-disband-group />
+        <mg-add-members />
+        <mg-members />
+        <mg-select />
+        <mg-remove-members />
+        <mg-update-settings />
+        <mg-disband-group />
         <toast ref="toastEl"></toast>
     </template>
 </template>

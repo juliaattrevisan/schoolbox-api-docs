@@ -6,8 +6,8 @@
 
 import { ref, computed, watch } from 'vue';
 import { timeout } from '@js/util/jsUtils';
-import { useStore } from './store/manageGroupStore';
-import { useDisbandStore } from './store/manageGroupDisbandStore';
+import { useStore } from './store/mgStore';
+import { useDisbandStore } from './store/mgDisbandStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 

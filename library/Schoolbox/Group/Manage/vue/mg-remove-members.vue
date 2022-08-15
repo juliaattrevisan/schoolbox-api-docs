@@ -5,10 +5,10 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useStore } from './store/manageGroupStore';
-import { useRemoveMembersStore } from './store/manageGroupRemoveMembersStore';
+import { useStore } from './store/mgStore';
+import { useRemoveMembersStore } from './store/mgRemoveMembersStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
-import {useMembersStore} from "./store/manageGroupMembersStore";
+import {useMembersStore} from "./store/mgMembersStore";
 
 
 const store = useStore();
