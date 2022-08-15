@@ -547,8 +547,8 @@ v_most_recent_feedback.review_route = 'instructor' AND
             join `rubric_capability_mark` `rcm` on (`rcm`.`return_id` = `sr`.`id` and `rcm`.`rubric_capability_id` =
                                                      `vr`.`capability_id`))
             left join `v_rubric_indicator_mark_extend` `rim` on (`rim`.`rubric_indicator_id` = `vr`.`indicator_id` and `rcm`.`id` = `rim`.`rubric_capability_mark_id`))
-            INNER JOIN `rubric_descriptor` `rd` on (`rim`.`descriptor_id` = `rd`.`id` and `rd`.`deleted_at` is null)
-            INNER JOIN `rubric_level` `rl` on (`rd`.`level_id` = `rl`.`id` and `sb`.`id` = `rl`.`box_id` and `rl`.`deleted_at` is null)
+            LEFT JOIN `rubric_descriptor` `rd` on (`rim`.`descriptor_id` = `rd`.`id` and `rd`.`deleted_at` is null)
+            LEFT JOIN `rubric_level` `rl` on (`rd`.`level_id` = `rl`.`id` and `sb`.`id` = `rl`.`box_id` and `rl`.`deleted_at` is null)
         where `sr`.`deleted_at` is null
             and `sr`.`published_at` is not null
             and (`rcm`.`valid` is true or `rim`.`valid` is true)
