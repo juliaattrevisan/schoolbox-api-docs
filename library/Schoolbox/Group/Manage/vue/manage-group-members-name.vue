@@ -1,14 +1,8 @@
 <script setup>
 
 /**
- * To view and update each members status
+ * To view a members profile image, name and meta info
  */
-
-import { ref, computed } from 'vue';
-import { useStore } from './store/manageGroupStore';
-import { useUpdateMembersStore } from './store/manageGroupUpdateMembersStore';
-import { useRejectMembersStore } from './store/manageGroupRejectMembersStore';
-import AccessTypes from './manageGroupAccessTypes';
 
 
 const props = defineProps({
@@ -26,10 +20,10 @@ const props = defineProps({
  * use the dummy grey image when in StoryBook
  */
 function getMemberPortraitSrc () {
-    if (STORYBOOK_ENV) {
+    if (typeof STORYBOOK_ENV !== 'undefined') {
         return `https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500`;
     } else {
-        return `/portrait.php?id=${member.userId}&size=square64`;
+        return `/portrait.php?id=${props.member.userId}&size=square64`;
     }
 }
 

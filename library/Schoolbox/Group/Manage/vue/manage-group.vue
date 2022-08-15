@@ -102,7 +102,7 @@ onMounted(() => {
  * as they persist between the stories otherwise
  */
 function checkForStorybook () {
-    if (STORYBOOK_ENV) {
+    if (typeof STORYBOOK_ENV !== 'undefined') {
         store.$reset();
         useMembersStore().$reset();
     }

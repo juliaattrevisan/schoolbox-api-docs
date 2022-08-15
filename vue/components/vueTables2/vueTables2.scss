@@ -34,9 +34,11 @@ $cdn-prefix: "/static";
     margin-right: 0;
 }
 
-.VueTables__sort-icon {
-    float: left;
-    margin-right: 0.5rem;
+.VueTables__sortable {
+    .VueTables__sort-icon { 
+        float: left; 
+        margin-right: 0.5rem;
+    }
 }
 
 .VueTables .glyphicon {

@@ -110,10 +110,11 @@ const addButtonText = computed(() => addMembersStore.isProcessing ? 'Adding...' 
                     <p class="meta">{{ inputDetails }}</p>
                     <input
                         type="text"
+                        v-model="addMembersStore.query"
                         :placeholder="inputPlaceholder"
                         @input="$event.target.composing = false"
                     />
-                    <button @click.prevent="onAddMembersSelected" class="button submit" :disabled="store.isProcessing">{{ addButtonText }}</button>
+                    <button @click.prevent="onAddMembersSelected" class="button submit" :disabled="!addMembersStore.canAddMembers">{{ addButtonText }}</button>
                 </div>
             </section>
         </div><!-- small-12 island -->

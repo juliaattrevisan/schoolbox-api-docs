@@ -95,12 +95,17 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     },
 }
 
+let isFirstLoad = true; 
+
 /**
  * To update the table to show the UI in the footer
  */
 async function onLoaded () {
-    updateFooterUI();
-    addSearchNote();
+    if (isFirstLoad) { //loaded gets called on every state change, and we only want to do the below once
+        isFirstLoad = false;
+        updateFooterUI();
+        addSearchNote();
+    }
 }
 
 /**
