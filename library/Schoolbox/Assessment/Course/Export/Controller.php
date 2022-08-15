@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\Overwriter;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -125,8 +126,14 @@ class Controller extends Base
         );
 
         // Associate new assessment with old assessment's context
-        $implAssessment->setSpecificationAssessment($specAssessment);
-        $this->assessmentDataSource->save($implAssessment, $this->getUser());
+        $baseContext = $implAssessment->getBaseContext();
+        if (
+            $baseContext instanceof UnitImplementation\Model
+            && $context->getId() === $baseContext->getSpecification()->getId()
+        ) {
+            $implAssessment->setSpecificationAssessment($specAssessment);
+            $this->assessmentDataSource->save($implAssessment, $this->getUser());
+        }
 
         if ($implAssessment instanceof Project && $specAssessment instanceof Project) {
             $this->syncProjectActivities($implAssessment, $specAssessment);
