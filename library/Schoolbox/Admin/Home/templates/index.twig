@@ -3,25 +3,32 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/highcharts.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/server-usage/jquery.server-usage.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
+
     $(function() {
         var allCategories = [];
         var allSeriesData = [];
         var allTooltips = [];
         var allData = [];
+
         allData.push({
             label: 'Storage',
             value: parseFloat('{{ disk_percentage }}')
         });
+
         allTooltips.push('{{ disk_used }} / {{ disk_total }}');
+
         allData.push({
             label: 'Memory',
             value: parseFloat('{{ memory_percentage }}')
         });
+
         allTooltips.push('{{ memory_used }} / {{ memory_total }}');
+
         for (var i = 0; i < allData.length; i++) {
             allCategories.push(allData[i].label);
             allSeriesData.push(allData[i].value);
         }
+
         /* Render it out
          */
         $('[data-graph="usage"]').serverUsage({
@@ -40,15 +47,20 @@
             ],
             formatter: function() {
                 var str = '';
+
                 if (this.y > 0) {
                     str = this.y + '%';
                 }
+
                 return str;
             }
         });
     });
+
     $(window).on('load', function () {
+
         // Test that the non-js page has not been requested
+
         if (window.location.pathname.indexOf("nojscript") == -1)
         {
             // Load the user statistics via ajax
@@ -57,6 +69,7 @@
                 for (i in data)
                 {
                     var row = data[i];
+
                     if(row.GROUP_ID > 0) {
                         $('<tr><td><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
                                 '</a></td><td>' + row.GROUP_USER +
@@ -68,13 +81,16 @@
                     }
                 }
             });
+
             // Replace the default www status 'untested' with 'testing'
             $('[data-light="www"]').html('Testing...');
+
             // Load service statuses via ajax
             $.post('/ajax/adminStats.php', { module : 'service_www' }, function(data)
             {
                 $('[data-light="www"]').html(data[0].WWW_STATUS).removeClass('neutral').addClass(data[0].WWW_LIGHT);
             });
+
             {% if saml_enabled %}
             // Replace the default saml status with 'Testing...'
             $('[data-light="saml_cert"]').html('Testing...');
@@ -97,6 +113,7 @@
             }
         });
         {% endif %}
+
         {% if not is_cloud %}
         // check if https://api.schoolbox.cloud/urlCheck?url=http://$current_domain/.well-known/ping is accessible
         $.ajax({
@@ -260,7 +277,6 @@
                 $('[data-light="rabbitmq"]').html(data.rabbitmq_status).removeClass('neutral').addClass(data.rabbitmq_light);
             }
         });
-        {% if turnitinEnabled %}
         // get turnitin status
         $.ajax({
             url: "/ajax/adminStats.php",
@@ -280,12 +296,8 @@
                     $('[data-light="turnitin"]').html(data.message).removeClass('neutral').addClass(light);
                     $('[id="turnitin-block"]').removeAttr('hidden');
                 }
-            },
-            error:function() {
-                $('[data-light="turnitin"]').html('Offline').removeClass('neutral').addClass('alert');
             }
         });
-        {% endif %}
         // get kami status
         $.ajax({
             url: "/ajax/adminStats.php",
@@ -418,17 +430,15 @@
                             </li>
                         {% endif %}
 
-                        {% if turnitinEnabled %}
+                        {# Optionally show turnitin status #}
                             <li id="turnitin-block" hidden>
                                 <div class="small-5 columns content">
-                                    <a id="turnitin-url" href="" target="_blank">SimCheck</a>
+                                    <a id="turnitin-url" href="" target="_blank"></a>
                                 </div>
                                 <div class="small-7 columns content">
                                     <span class="full-width neutral label" data-light="turnitin">Testing...</span>
                                 </div>
                             </li>
-                        {% endif %}
-
                         {# Show ssh + SSL cert status if not cloud hosted #}
                         {% if not is_cloud %}
                             <li>
