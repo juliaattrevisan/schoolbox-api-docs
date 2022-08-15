@@ -1493,7 +1493,7 @@ class DataSource
                 $srcCapability = $capabilityMapper->findById($srcDescriptor->getIndicator()->getCapability()->getId());
                 $dstCapability = clone $srcCapability;
                 $dstCapability->setId(null);
-                $dstCapability->setParentId($existingCapabilityMap[$capabilityName]->getParentId());
+                $dstCapability->setParentId($dstFolder->getId());
                 $existingCapabilityMap[$capabilityName] = $dstCapability;
             }
             $dstCapabilities->setOffset($srcCapabilityId, $dstCapability);
