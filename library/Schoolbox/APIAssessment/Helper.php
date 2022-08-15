@@ -237,8 +237,6 @@ WHERE
             //check if folder is an array
             if (is_array($filter['folder'])) {
                 //iterate through items
-                $codeAdded = false;
-                $idAdded = false;
                 foreach ($filter['folder'] as $folderObj) {
                     //if id set, then add OR id
                     if (isset($folderObj['id'])) {
@@ -250,6 +248,7 @@ WHERE
                     }
                 }
             }
+            //historic method of filtering assessments for a specific folder
             if (array_key_exists('id', $filter['folder'])) {
                 $folderIds[] = $filter['folder']['id'];
             }
