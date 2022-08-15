@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 use DomainException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
 use UnexpectedValueException;
@@ -167,13 +168,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $clone = parent::cloneForCopy();
 
         // copy attachments
-        $newFiles = new Collection();
-        foreach ($this->getAttachedFiles() as $file) {
-            $newFiles->add((new File())
-                ->setStorage($file->getStorage())
-                ->setBasename($file->getBasename()));
-        }
-        $clone->setAttachedFiles($newFiles);
+        $clone->copyAttachedFiles($this);
 
         /* Ensure any current rubric is NOT linked to new location.
          *
@@ -184,6 +179,54 @@ class Model extends AbstractAssessment implements ISelfAssessable
          */
         $clone->setRubricGrid(null);
         return $clone;
+    }
+
+    /**
+     * Overwrite fields from `$source` into this object.
+     *
+     * This implementation overwrites the additional fields over and above the
+     * base implementation:
+     * * attached files
+     * * rubric grid: is set to null, as copying rubrics is too complex an
+     *   operation to handle here.
+     *   @see \Schoolbox\Assessment\Rubric\DataModel\DataSource::copyRubric
+     *
+     * @param IAssessable $source
+     * @return IAssessable
+     */
+    public function overwrite(IAssessable $source): IAssessable
+    {
+        parent::overwrite($source);
+
+        // Copy attachments
+        if ($source instanceof self) {
+            $this->copyAttachedFiles($source);
+        }
+
+        // Clone rubric separately
+        $this->setRubricGrid(null);
+
+        return $this;
+    }
+
+    /**
+     * Copy attached files from `$source` into this object.
+     *
+     * @param Model $source
+     * @return $this
+     */
+    private function copyAttachedFiles(self $source): self
+    {
+        $newFiles = new Collection();
+        foreach ($source->getAttachedFiles() as $file) {
+            $newFiles->add(
+                (new File())
+                    ->setStorage($file->getStorage())
+                    ->setBasename($file->getBasename())
+            );
+        }
+        $this->setAttachedFiles($newFiles);
+        return $this;
     }
 
     /**
