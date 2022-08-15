@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Turnitin\File;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Turnitin\ValidFile;
 
 /**
@@ -19,6 +20,7 @@ use Schoolbox\Learning\Turnitin\ValidFile;
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {
@@ -97,7 +99,7 @@ class Mapper extends \Schoolbox\Mapper
     public function findMostRecentForAssessment(int $assessmentId): array
     {
         $query = '
-            SELECT 
+            SELECT
                 ssf.student_submission_id,
                 ss.submitted_at,
                 ss.owner,

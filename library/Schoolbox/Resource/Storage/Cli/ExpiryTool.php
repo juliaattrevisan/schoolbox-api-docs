@@ -118,7 +118,10 @@ HELP;
 
         /* Otherwise, start doing the stuff
          */
-        $relationalDelete = new \Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete($this->getLogger());
+        $relationalDelete = new \Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete(
+            $this->getLogger(),
+            $storageMapper
+        );
         if ($this->perform()) {
             /* In Perform mode, blow them away
              */

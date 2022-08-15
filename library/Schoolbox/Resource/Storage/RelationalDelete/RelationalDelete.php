@@ -9,11 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\RelationalDelete;
 
-use Eportfolio\CoverPhotoMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
+use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Learning\Turnitin;
+use Schoolbox\Resource\Storage;
 use Psr\Log\LoggerInterface;
 
 /**
- * Delete storage files and it's relationships with other entites.
+ * Delete storage files and it's relationships with other entities.
  *
  * @package Schoolbox\Resource\Storage\RelationalDelete
  */
@@ -30,7 +33,7 @@ class RelationalDelete implements IRelationalDelete
     private $logger;
 
     /**
-     * @var \Schoolbox\Resource\Storage\Mapper
+     * @var Storage\Mapper
      */
     private $storageMapper;
 
@@ -39,11 +42,10 @@ class RelationalDelete implements IRelationalDelete
      *
      * @param LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, Storage\Mapper $storageMapper)
     {
         $this->logger           = $logger;
-
-        $this->storageMapper    = new \Schoolbox\Resource\Storage\Mapper();
+        $this->storageMapper    = $storageMapper;
 
         $this->collectors       = array_merge(
             $this->generateDeletables(),
@@ -98,99 +100,116 @@ class RelationalDelete implements IRelationalDelete
      */
     private function generateDeletables()
     {
+        // Ordered by referencing (table_name,column_name)
         return [
-            // Blog
+            // blog_image.hash
             new Deletable(
                 \Schoolbox\Blog\Homepage\Image\Mapper::getInstance(),
                 $this->logger
             ),
 
-            // ePortfolio
+            // comms_news_article_file.storage_id
             new Deletable(
-                \Schoolbox\Blog\Eportfolio\Image\Mapper::getInstance(),
-                $this->logger
-            ),
-            new Deletable(
-                CoverPhotoMapper::getInstance(),
+                \Schoolbox\Comms\News\File\Mapper::getInstance(),
                 $this->logger,
-                'imagehash'
-            ),
-            new \Component\Eportfolio\RelationalDelete(
-                \Schoolbox\Resource\My\File\Mapper::getInstance(),
-                $this->logger
+                'storage_id'
             ),
 
-            // Pastoral
-            new Deletable(
-                \Schoolbox\Pastoral\Attachment\Mapper::getInstance(),
-                $this->logger
-            ),
-            new Deletable(
-                \Schoolbox\Pastoral\UploadQueue\Mapper::getInstance(),
-                $this->logger
-            ),
-
-            // My File
-            new Deletable(
-                \Schoolbox\Resource\My\File\Mapper::getInstance(),
-                $this->logger
-            ),
-
-            // Dropbox
+            // dropbox.hash
             new Deletable(
                 \Schoolbox\Dropbox\Mapper::getInstance(),
                 $this->logger
             ),
 
-            // Plagscan
-            new \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\RelationalDelete(
-                \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::getInstance(),
-                $this->logger
+            // eotc_metadata_file.storage_id
+            new \EOTC\RelationalDelete(
+                \EOTC\EventMetadataMapper::getInstance(),
+                $this->logger,
+                \Database::getInstance(),
             ),
 
-            // Assessments
+            // eportfolio_component_blog_image.hash
             new Deletable(
-                \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
+                \Schoolbox\Blog\Eportfolio\Image\Mapper::getInstance(),
                 $this->logger
             ),
 
-            // Submission box file
+            // eportfolio_coverphoto.imagehash
+            new Deletable(
+                \Eportfolio\CoverPhotoMapper::getInstance(),
+                $this->logger,
+                'imagehash'
+            ),
+
+            // file.hash
+            new Deletable(
+                \Schoolbox\Resource\File\Mapper::getInstance(),
+                $this->logger
+            ),
+
+            // myFile.hash => storage.hash
+            // eportfolio_component_filelist_item.file_id => myFile.id
+            new \Schoolbox\Resource\My\File\RelationalDelete(
+                \Schoolbox\Resource\My\File\Mapper::getInstance(),
+                $this->logger,
+                \Component\Eportfolio\FileListMapper::getInstance(),
+            ),
+
+            // pastoral_attachment.hash
+            new Deletable(
+                \Schoolbox\Pastoral\Attachment\Mapper::getInstance(),
+                $this->logger
+            ),
+
+            // pastoral_upload_queue.hash
+            new Deletable(
+                \Schoolbox\Pastoral\UploadQueue\Mapper::getInstance(),
+                $this->logger
+            ),
+
+            // plagscan_document.storage_hash
+            new Deletable(
+                Plagscan\Mapper::getInstance(),
+                $this->logger,
+                'storage_hash',
+            ),
+
+            // student_submission_file.hash
+            // turnitinreport.student_submission_file_id
+            // plagscan_document.student_submission_file_id
+            // student_submission_file_kami.student_submission_file_id
+            new \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\RelationalDelete(
+                \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(),
+                $this->logger,
+                Turnitin\File\Mapper::getInstance(),
+                Plagscan\Mapper::getInstance(),
+                Kami\Mapper::getInstance(),
+            ),
+
+            // submission_box_file.storage_id
             new Deletable(
                 \Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Mapper::getInstance(),
                 $this->logger,
                 'storage_id'
             ),
 
-            // Submission return file
+            // submission_return_file.hash
             new Deletable(
                 \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper::getInstance(),
                 $this->logger
             ),
 
-            // Task
+            // task_file.storage_id
             new Deletable(
                 \Schoolbox\Assessment\Course\Task\File\Mapper::getInstance(),
                 $this->logger,
                 'storage_id'
             ),
 
-            // Video Queue
+            // video_queue.hash
             new Deletable(
                 \Schoolbox\Video\QueueMapper::getInstance(),
                 $this->logger
-            ),
-
-            // File
-            new Deletable(
-                \Schoolbox\Resource\File\Mapper::getInstance(),
-                $this->logger
-            ),
-
-            // News
-            new Deletable(
-                \Schoolbox\Comms\News\File\Mapper::getInstance(),
-                $this->logger,
-                'storage_id'
             ),
         ];
     }
@@ -200,7 +219,17 @@ class RelationalDelete implements IRelationalDelete
      */
     private function generateNullables()
     {
+        // Order by table_name,column_name
         return [
+            // badge.image_hash
+            new Nullable(
+                \Schoolbox\Learning\Badge\Mapper::getInstance(),
+                $this->logger,
+                ['image'],
+                'image_hash'
+            ),
+
+            // comms_news_article.feature_image_hash
             new Nullable(
                 \Schoolbox\Comms\News\Mapper::getInstance(),
                 $this->logger,
@@ -208,7 +237,15 @@ class RelationalDelete implements IRelationalDelete
                 'feature_image_hash'
             ),
 
-            // Folder
+            // evidence.hash
+            new Nullable(
+                \Schoolbox\Learning\Moment\Evidence\Mapper::getInstance(),
+                $this->logger,
+                ['storage'],
+                'hash'
+            ),
+
+            // folder.image_hash
             new Nullable(
                 \Schoolbox\Resource\Folder\Mapper::getInstance(),
                 $this->logger,
@@ -216,15 +253,15 @@ class RelationalDelete implements IRelationalDelete
                 'image_hash'
             ),
 
-            // Tile
+            // mobile_app.cert_hash
             new Nullable(
-                \Schoolbox\Tile\Mapper::getInstance(),
+                \Schoolbox\MobileApp\ServiceMapper::getInstance(),
                 $this->logger,
-                ['backgroundImage'],
-                'background_image_hash'
+                ['certificate'],
+                ' cert_hash'
             ),
 
-            // Resource
+            // resource.image_hash
             new Nullable(
                 \Schoolbox\ResourceBooking\Item\Mapper::getInstance(),
                 $this->logger,
@@ -232,13 +269,15 @@ class RelationalDelete implements IRelationalDelete
                 'image_hash'
             ),
 
-            // Socialstream
+            // socialstream_post.cache_hash
             new Nullable(
                 \SocialStream\PostMapper::getInstance(),
                 $this->logger,
                 ['cacheHash'],
                 'cache_hash'
             ),
+
+            // socialstream_post.thumbnail
             new Nullable(
                 \SocialStream\PostMapper::getInstance(),
                 $this->logger,
@@ -246,6 +285,8 @@ class RelationalDelete implements IRelationalDelete
                 'thumbnail',
                 '/storage/image.php?size=maxsize&hash='
             ),
+
+            // socialstream_post.url
             new Nullable(
                 \SocialStream\PostMapper::getInstance(),
                 $this->logger,
@@ -254,34 +295,20 @@ class RelationalDelete implements IRelationalDelete
                 '/storage/image.php?size=maxsize&hash='
             ),
 
-            // User
+            // tile. background_image_hash
+            new Nullable(
+                \Schoolbox\Tile\Mapper::getInstance(),
+                $this->logger,
+                ['backgroundImage'],
+                'background_image_hash'
+            ),
+
+            // user.portrait_hash
             new Nullable(
                 \Schoolbox\UserMapper::getInstance(),
                 $this->logger,
                 ['portrait'],
                 'portrait_hash'
-            ),
-
-            // Badge
-            new Nullable(
-                \Schoolbox\Learning\Badge\Mapper::getInstance(),
-                $this->logger,
-                ['image'],
-                'image_hash'
-            ),
-
-            // Evidence
-            new Nullable(
-                \Schoolbox\Learning\Moment\Evidence\Mapper::getInstance(),
-                $this->logger,
-                ['storage'],
-                'hash'
-            ),
-
-            // EOTC Meta data
-            new \EOTC\RelationalDelete(
-                \EOTC\EventMetadataMapper::getInstance(),
-                $this->logger
             ),
         ];
     }

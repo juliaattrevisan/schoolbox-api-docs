@@ -109,7 +109,7 @@ class Model implements IFile, ISoftDeletable
     }
 
     /**
-     * @return Plagscan
+     * @return null|Plagscan
      */
     public function getPlagscan()
     {

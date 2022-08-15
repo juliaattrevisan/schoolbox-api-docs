@@ -15,6 +15,8 @@
 
 use Monolog\Logger;
 use Schoolbox\Application\CliTool;
+use Schoolbox\MapperFactory;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete;
 
 require_once __DIR__ . '/../conf/core/require.php';
@@ -54,7 +56,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             die();
         }
 
-        (new RelationalDelete($this->getLogger()))->remove($this->hash, !$this->perform());
+        /** @var MapperFactory $mapperFactory */
+        $mapperFactory = $this->getDi()->get('mapperFactory');
+        (new RelationalDelete($this->getLogger(), $mapperFactory->get(Storage\Mapper::class)))->remove($this->hash, !$this->perform());
 
         exit(0);
     }

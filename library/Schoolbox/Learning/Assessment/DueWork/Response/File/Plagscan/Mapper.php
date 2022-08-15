@@ -20,6 +20,7 @@ use Schoolbox\Resource\Storage\Model as Storage;
 
 /**
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {

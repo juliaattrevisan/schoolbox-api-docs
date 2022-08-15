@@ -15,6 +15,8 @@
 
 use Monolog\Logger;
 use Schoolbox\Application\CliTool;
+use Schoolbox\MapperFactory;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -25,8 +27,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     {
         $removeDate = Alaress_Date_Format::newFromTimestamp(strtotime('-1 month'));
         $logMapper = Schoolbox\Sync\Log\Mapper::getInstance();
-
-        $storageDeleter = new RelationalDelete($this->getLogger());
+        /** @var MapperFactory $mapperFactory */
+        $mapperFactory  = $this->getDi()->get('mapperFactory');
+        $storageDeleter = new RelationalDelete($this->getLogger(), $mapperFactory->get(Storage\Mapper::class));
 
 
         $loggerMessageSufix = !$this->perform() ? '[Dry run mode]' : '[Delete mode]';
