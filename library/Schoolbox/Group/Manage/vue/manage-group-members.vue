@@ -22,10 +22,9 @@ import AccessTypes from './manageGroupAccessTypes';
  *
  ****************************************************************/
 
-const store = useStore();
 const membersStore = useMembersStore();
 const tableEl = ref(null);
-const tableColumns = ['name', 'firstName', 'lastName', 'role', 'campus', 'yearLevel', 'accessType'];
+const tableColumns = ['name', 'firstName', 'lastName', 'role', 'campus', 'yearLevel', 'house', 'accessType'];
 const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
     columnsClasses: {
         accessType: 'access-td ', //to specify a width
@@ -68,7 +67,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         name: 'Name',
         accessType: 'Access',
     },
-    hiddenColumns: ['firstName', 'lastName', 'role', 'campus', 'yearLevel'], //these are all added to name, but we need to add them to tableColumns so we can search them
+    hiddenColumns: ['firstName', 'lastName', 'role', 'campus', 'yearLevel', 'house'], //these are all added to name, but we need to add them to tableColumns so we can search them
     orderBy: { //initial sorting display
         ascending: true,
         column: 'name'
@@ -91,7 +90,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     tabbable: false,
     texts: {
         count: '{from}-{to} of {count} members|{count} members|1 member',
-        filterPlaceholder: 'Search group members, they can be searched by name, year level, campus, role or access',
+        filterPlaceholder: 'Search group members, they can be searched by name, year level, house, campus, role or access',
         noResults: 'No matching group members',
     },
 }
@@ -221,7 +220,9 @@ function updateSelectedMembers () {
                             <img src="/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${data.row.firstName} portrait`">
                             {{ data.row.firstName }} {{ data.row.lastName }}
                         </div>
-                        <p class="meta">{{ data.row.role }}, {{ data.row.campus }}{{ data.row.yearLevel ? ', ' + data.row.yearLevel : '' }}</p>
+                        <p class="meta">
+                            {{ data.row.role }}, {{ data.row.campus }}{{ data.row.yearLevel ? ', ' + data.row.yearLevel : '' }}{{ data.row.house ? ', ' + data.row.house : '' }}
+                        </p>
                     </div>
                 </template>
                 <template #accessType="data">

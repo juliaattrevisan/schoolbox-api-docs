@@ -326,6 +326,7 @@ class GroupsHelper
                 'role'       => $member->getRole()->getName(),
                 'campus'     => implode(', ', $member->getCampusCollection()->getPropertyValues('name')),
                 'yearLevel'  => ($member->getYear() && $member->getYear()->getName()) ? $member->getYear()->getLongName() : '',
+                'house'      => $member->getSchoolHouse() ? $member->getSchoolHouse()->getHouse() : '',
             ];
         }
         return $members;
