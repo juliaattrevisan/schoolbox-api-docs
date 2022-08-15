@@ -61,28 +61,41 @@ export const useMembersStore = defineStore('manageGroupMembers', {
         },
 
         /**
+         * Count of selected members
+         * 
+         * @returns { Number }
+         */
+        selectedMembersCount () {
+            return this.selectedMembers.length
+        },
+
+        /**
+         * For proper count display, eg: 'No Members / 1 Member' / '4 Members'
+         * 
+         * @returns { String }
+         */
+        selectedMembersPlural () {
+            return this.selectedMembersCount > 1 ? 'Members' : 'Member'
+        },
+
+        /**
          * To get current group admin id list
+         * 
          * @returns { Array }
          */
-        currentGroupAdminIds() {
+        currentGroupAdminIds () {
             return this.groupMembers.filter((member) => member.accessType === AccessTypes.ADMIN).map((member) => member.id);
         },
 
         /**
          * To get number of group admins in selected members
-         * @returns { int }
+         * 
+         * @returns { Number }
          */
-        selectedGroupAdminCount() {
+        selectedGroupAdminCount () {
             return this.selectedMemberIds.filter((id) => this.currentGroupAdminIds.includes(id)).length;
         },
 
-        /**
-         * To get number of non group admins in selected members
-         * @returns { int }
-         */
-        selectedNonAdminCount() {
-            return this.selectedMemberIds.length - this.selectedGroupAdminCount;
-        }
     },
 
     actions: {

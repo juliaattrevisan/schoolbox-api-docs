@@ -87,16 +87,18 @@ function onModalClosed () {
         :close-on-background-click="false"
         @closed="onModalClosed"
     >
-        <h2>Removing member(s) from {{ store.name }}, please confirm?</h2>
-        <p v-if="membersStore.selectedNonAdminCount > 0">
-            You are about to remove <b>{{ membersStore.selectedNonAdminCount }} member(s)</b> from the
-            {{ store.name }} group.
+        <h2>Remove {{ membersStore.selectedMembersPlural }}</h2>
+        <p>
+            Are you sure you wish to remove the <b>{{ membersStore.selectedMembersCount }} selected 
+            {{ membersStore.selectedMembersPlural }}</b> from the {{ store.name }} group?
         </p>
         <p v-if="membersStore.selectedGroupAdminCount > 0">
-                <span class="alert"><b>Warning: You are removing {{ membersStore.selectedGroupAdminCount }} group
-                    {{ membersStore.selectedGroupAdminCount > 1 ? 'admins' : 'admin' }},
-                    they will no longer be able to manage the group.</b></span></p>
-        <p>Are you sure you wish to remove the selected members?</p>
+            <div class="alert-box alert">
+                Warning: You are removing {{ membersStore.selectedGroupAdminCount }} Group
+                {{ membersStore.selectedGroupAdminCount > 1 ? 'Admins' : 'Admin' }}.
+                They will no longer be able to manage the group.
+            </div>
+        </p>
         <ul class="flex-list buttons">
             <li><button @click.prevent="onRemoveSelected" class="button submit" :disabled="removeMembersStore.isProcessing">{{ removeButtonText }}</button></li>
             <li><button @click.prevent="onCancelSelected" class="button" :disabled="removeMembersStore.isProcessing">Cancel</button></li>

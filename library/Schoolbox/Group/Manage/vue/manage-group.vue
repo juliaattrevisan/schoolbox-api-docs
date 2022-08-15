@@ -7,6 +7,7 @@
 import { ref, onBeforeMount, onMounted } from 'vue';
 import Endpoints from './manageGroupEndpoints';
 import { useStore } from './store/manageGroupStore';
+import { useMembersStore } from './store/manageGroupMembersStore';
 import ManageGroupHeading from './manage-group-heading.vue';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table';
 import ManageGroupAddMembers from './manage-group-add-members.vue';
@@ -92,9 +93,20 @@ onBeforeMount(() => {
  */
 onMounted(() => {
     store.toastEl = toastEl;
-    store.$reset(); //ensure the store state is as it's initially set, this is just for Storybook when switching between stories
+    checkForStorybook();
     store.loadData();
 });
+
+/**
+ * When switching between stories, we need to reset the data models
+ * as they persist between the stories otherwise
+ */
+function checkForStorybook () {
+    if (STORYBOOK_ENV) {
+        store.$reset();
+        useMembersStore().$reset();
+    }
+}
 
 /**
  * Reload the page to try loading again

@@ -50,29 +50,15 @@ watch(() => membersStore.selectedMembers, () => {
 });
 
 /**
- * To track how many are selected
- *
- * @returns { Number }
- */
-const selectedMembersCount = computed(() => membersStore.selectedMembers.length);
-
-/**
- * For proper count display, eg: 'Member' / 'Members'
- *
- * @returns { String }
- */
-const selectedMembersPlural = computed(() => selectedMembersCount.value > 1 ? 'Members' : 'Member');
-
-/**
  * For proper count display, eg: 'No Members / 1 Member' / '4 Members'
  *
  * @returns { String }
  */
 const selectedMembersCountWithRowName = computed(() => {
-    if (selectedMembersCount.value === 0) {
+    if (membersStore.selectedMembersCount === 0) {
         return `No Members`;
     } else {
-        return `${selectedMembersCount.value} ${selectedMembersPlural.value}`;
+        return `${membersStore.selectedMembersCount} ${membersStore.selectedMembersPlural}`;
     }
 });
 
@@ -84,7 +70,9 @@ function onClearMemberSelection () {
 }
 
 /**
- * Email the selected group members
+ * Email the selected group members, passing through the 
+ * required url params
+ * 
  */
 function onEmailMembersSelected () {
     window.location.href = `${Endpoints.SEND_EMAIL}?folderId=${store.id}&userIds=${membersStore.selectedMemberIds.join(',')}`;
@@ -100,17 +88,17 @@ function onRemoveMembersSelected () {
 </script>
 
 <template>
-    <bottom-drawer :showDrawer="selectedMembersCount > 0">
+    <bottom-drawer :showDrawer="membersStore.selectedMembersCount > 0">
         <h3 class="selected-count"><em>{{ selectedMembersCountWithRowName }} selected</em></h3>
         <span ref="shiftSelectNoteEl" class="shift-select-note">Use Shift+Select to select multiple members</span>
         <button @click.prevent="onClearMemberSelection" class="button-clear" :disable="store.isProcessing">Clear member selection</button>
         <ul class="flex-list">
             <manage-group-select-access />
             <li>
-                <button @click.prevent="onEmailMembersSelected" class="button submit icon-email" :disabled="store.isProcessing">Email {{ selectedMembersPlural }}</button>
+                <button @click.prevent="onEmailMembersSelected" class="button submit icon-email" :disabled="store.isProcessing">Email {{ membersStore.selectedMembersPlural }}</button>
             </li>
             <li>
-                <button @click.prevent="onRemoveMembersSelected" class="button submit icon-delete" :disabled="store.isProcessing">Remove {{ selectedMembersPlural }}</button>
+                <button @click.prevent="onRemoveMembersSelected" class="button submit icon-delete" :disabled="store.isProcessing">Remove {{ membersStore.selectedMembersPlural }}</button>
             </li>
         </ul>
     </bottom-drawer>
