@@ -39,10 +39,10 @@ const mswHandlers = [
             ctx.delay(1000),
             ctx.json({
                 newMembers: [
-                    {"id":201,"firstName":"Valentine","lastName":"Holmes","userId":200,"accessType":"read","meta":"2022 QLD State of Origin Team"},
-                    {"id":202,"firstName":"Kurt","lastName":"Capewell","userId":201,"accessType":"read","meta":"2022 QLD State of Origin Team"},
-                    {"id":203,"firstName":"Kalyn","lastName":"Ponga","userId":202,"accessType":"read","meta":"2022 QLD State of Origin Team"},
-                    {"id":204,"firstName":"Ben","lastName":"Hunt","userId":203,"accessType":"read","meta":"2022 QLD State of Origin Team"},
+                    {"id":201,"firstName":"Valentine","lastName":"Holmes","userId":200,"accessType":"read","role":"Senior Student","campus":"Senior","yearLevel":"Year 11","house":"Gresham (Green)"},
+                    {"id":202,"firstName":"Kurt","lastName":"Capewell","userId":201,"accessType":"read","role":"Senior Student","campus":"Senior","yearLevel":"Year 11","house":"Gresham (Green)"},
+                    {"id":203,"firstName":"Kalyn","lastName":"Ponga","userId":202,"accessType":"read","role":"Senior Student","campus":"Senior","yearLevel":"Year 11","house":"Gresham (Green)"},
+                    {"id":204,"firstName":"Ben","lastName":"Hunt","userId":203,"accessType":"read","role":"Senior Student","campus":"Senior","yearLevel":"Year 11","house":"Gresham (Green)"},
                 ],
                 success: true,
             })

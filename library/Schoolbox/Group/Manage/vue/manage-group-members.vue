@@ -102,6 +102,20 @@ async function onLoaded () {
     updateFooterUI();
 }
 
+/**
+ * To avoid dumping a whole lot of errors in the console, 
+ * use the dummy grey image when in StoryBook
+ * 
+ * @parm { String }
+ */
+function getMemberPortraitSrc (userId) {
+    if (STORYBOOK_ENV) {
+        return `https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500`;
+    } else {
+        return `/portrait.php?id=${userId}&size=square64`;
+    }
+}
+
 
 
 /*****************************************************************
@@ -213,7 +227,7 @@ function updateSelectedMembers () {
                 <template #name="data">
                     <div class="card small-12">
                         <a v-if="data.row.userId" :href="`/search/user/${data.row.userId}`" title="View profile" class="name">
-                            <img :src="`/portrait.php?id=${data.row.userId}&size=square64`" :alt="`${data.row.firstName} portrait`">
+                            <img :src="getMemberPortraitSrc(data.row.userId)" :alt="`${data.row.firstName} portrait`">
                             {{ data.row.firstName }} {{ data.row.lastName }}
                         </a>
                         <div v-else>
@@ -244,7 +258,7 @@ function updateSelectedMembers () {
 <style lang="scss">
 
 @import '@schoolboxVue/components/vueTables2/vueTables2';
-@import '../../../../../www/static/css/core/base/colors';
+@import '@css/core/base/colors';
 
 .VueTables {
     margin-bottom: 150px; //to allow space for the bottom-drawer so it can't cut off the bottom of the table
