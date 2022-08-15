@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\Overwriter;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Controller for exporting assessments into courses.
@@ -62,16 +63,11 @@ class Controller extends Base
             $this->getUser(),
         );
 
-        // If `$assessment` exists within an implementation of `$unitSpec`:
-        // associate `$assessment` with `$unitSpec`.
-        $baseContext = $assessment->getBaseContext();
-        if (
-            $baseContext instanceof UnitImplementation\Model
-            && $unitSpec->getId() === $baseContext->getSpecification()->getId()
-        ) {
-            $assessment->setSpecificationAssessment($newAssessment);
-            $this->assessmentDataSource->save($assessment, $this->getUser());
-        }
+        $this->associateExistingAssessmentToNewAssessment(
+            $unitSpec,
+            $assessment,
+            $newAssessment,
+        );
 
         // TODO return the same format as the assessment API?
         $this->response->content->set(
@@ -115,5 +111,33 @@ class Controller extends Base
                 'title' => $updatedSpecAssessment->getTitle(),
             ]),
         );
+    }
+
+    /**
+     * Set `$newAssessment` as the spec assessment for `$assessment`, if
+     * `$assessment` is based off of the same course as `$newAssessment` is now
+     * in.
+     *
+     * @param UnitSpec\Model $unitSpec      The unit spec to check.
+     * @param IAssessable    $assessment    The assessment which was written
+     *                                      back (probably to `$unitSpec`).
+     * @param IAssessable $newAssessment    The new assessment within
+     *                                      `$unitSpec`.
+     * @return void
+     * @throws MapperException if somehow the assessment couldn't be written
+     */
+    private function associateExistingAssessmentToNewAssessment(
+        UnitSpec\Model $unitSpec,
+        IAssessable $assessment,
+        IAssessable $newAssessment,
+    ): void {
+        $baseContext = $assessment->getBaseContext();
+        if (
+            $baseContext instanceof UnitImplementation\Model
+            && $unitSpec->getId() === $baseContext->getSpecification()->getId()
+        ) {
+            $assessment->setSpecificationAssessment($newAssessment);
+            $this->assessmentDataSource->save($assessment, $this->getUser());
+        }
     }
 }
