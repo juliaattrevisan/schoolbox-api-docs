@@ -236,6 +236,43 @@ abstract class AbstractAssessment implements IAssessable
         return $clone;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function overwrite(IAssessable $source): IAssessable
+    {
+        // Just set every field to the value from `$source`.
+        // Exceptions:
+        // * ID
+        // * Context
+        // * Creator
+        // * Plans
+        // * Spec assessment
+        $this->courseManaged   = $source->getCourseManaged();
+        $this->curriculumNodes = $source->getCurriculumNodes();
+        $this->defaultOpenSpan = $source->getDefaultOpenSpan();
+        $this->description     = $source->getDescription();
+        $this->gradeGroup      = $source->getGradeGroup();
+        $this->markScheme      = $source->getMarkScheme();
+        $this->markType        = $source->getMarkType();
+        $this->markVisibility  = $source->getMarkVisibility();
+        $this->sebEnabled      = $source->getSebEnabled();
+        $this->sequence        = $source->getSequence();
+        $this->title           = $source->getTitle();
+        $this->weight          = $source->getWeight();
+        $this->workType        = $source->getWorkType();
+
+        // Dates are cloned
+        $this->publishAt = clone $source->getPublishAt();
+        $this->openAt    = clone $source->getOpenAt();
+        $this->dueAt     = clone $source->getDueAt();
+        $this->closeAt   = clone $source->getCloseAt();
+        $this->createdAt = clone $source->getCreatedAt();
+        $this->updatedAt = clone $source->getUpdatedAt();
+        $this->deletedAt = clone $source->getDeletedAt();
+        return $this;
+    }
+
 
     /**
      * @inheritdoc
