@@ -6,10 +6,10 @@
 
 import { ref, watch } from 'vue';
 import { EventBus } from 'v-tables-3-select-rows';
-import { useStore } from './store/manageGroupStore';
 import { useMembersStore } from './store/manageGroupMembersStore';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
 import ManageGroupMembersFilters from './manage-group-members-filters.vue';
+import ManageGroupMembersName from './manage-group-members-name.vue';
 import ManageGroupMembersAccess from './manage-group-members-access.vue';
 import FilterEvents from './manageGroupFilterEvents';
 import AccessTypes from './manageGroupAccessTypes';
@@ -101,21 +101,6 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
 async function onLoaded () {
     updateFooterUI();
 }
-
-/**
- * To avoid dumping a whole lot of errors in the console, 
- * use the dummy grey image when in StoryBook
- * 
- * @parm { String }
- */
-function getMemberPortraitSrc (userId) {
-    if (STORYBOOK_ENV) {
-        return `https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500`;
-    } else {
-        return `/portrait.php?id=${userId}&size=square64`;
-    }
-}
-
 
 
 /*****************************************************************
@@ -225,19 +210,7 @@ function updateSelectedMembers () {
                     <manage-group-members-filters />
                 </template>
                 <template #name="data">
-                    <div class="card small-12">
-                        <a v-if="data.row.userId" :href="`/search/user/${data.row.userId}`" title="View profile" class="name">
-                            <img :src="getMemberPortraitSrc(data.row.userId)" :alt="`${data.row.firstName} portrait`">
-                            {{ data.row.firstName }} {{ data.row.lastName }}
-                        </a>
-                        <div v-else>
-                            <img src="/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${data.row.firstName} portrait`">
-                            {{ data.row.firstName }} {{ data.row.lastName }}
-                        </div>
-                        <p class="meta">
-                            {{ data.row.role }}, {{ data.row.campus }}{{ data.row.yearLevel ? ', ' + data.row.yearLevel : '' }}{{ data.row.house ? ', ' + data.row.house : '' }}
-                        </p>
-                    </div>
+                    <manage-group-members-name :member="data.row" />
                 </template>
                 <template #accessType="data">
                     <manage-group-members-access :member="data.row" />
