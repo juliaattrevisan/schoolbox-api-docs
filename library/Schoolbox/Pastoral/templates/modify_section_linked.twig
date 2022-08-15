@@ -1,7 +1,7 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 {% if not bulkCreate %}
-<h2 class="subheader">Create Linked Record</h2>
+<h2 class="subheader">Create Related Record</h2>
 {% endif %}
 <section>
     <fieldset class="content">
@@ -13,7 +13,7 @@
             </label>
 
             {% if record.relatedRecords | length %}
-                <label>Linked Records</label>
+                <label>Related Records</label>
                 <ul class="action-list">
                     {% for related in record.relatedRecords %}
                         {% if related.student.id != record.student.id %}

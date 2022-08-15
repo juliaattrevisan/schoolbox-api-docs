@@ -3,7 +3,7 @@
     <div class="row">
         {% if record.relatedRecords | length > 1 %}
         <div class="small-12 {% if record.relatedRecords | length %}medium-6{% endif %} island">
-            <h2 class="subheader">Linked Records</h2>
+            <h2 class="subheader">Related Records</h2>
             <section>
                 <ul class="action-list">
                     {% for related in record.relatedRecords %}
