@@ -861,7 +861,7 @@ class Controller extends ConfigController
             'showClassOverallGrade'      => (bool)$optionsPayload['class']['overallGrade'],
             'showClassGrades'            => (bool)$optionsPayload['class']['grades'],
             'showClassComments'          => (bool)$optionsPayload['class']['comments'],
-            'showClassRubrics'           => (bool)$optionsPayload['summary']['rubrics'],
+            'showClassRubrics'           => (bool)$optionsPayload['class']['rubrics'],
 
             /* Extract any custom summative report styles from Admin Skin Config
              * and slam them in here so schools can tweak our designs
