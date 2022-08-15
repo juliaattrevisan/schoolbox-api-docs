@@ -5,7 +5,7 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useStore } from './store/mgStore';
+import { useStore } from './store/manageGroupStore';
 import { useSettingsStore } from './store/mgSettingsStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 

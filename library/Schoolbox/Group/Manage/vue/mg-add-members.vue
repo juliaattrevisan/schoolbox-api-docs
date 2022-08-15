@@ -4,13 +4,17 @@
  * Add members to the group
  */
 
-import { ref, computed } from 'vue';
-import { useStore } from './store/mgStore';
+import { ref, computed, watch } from 'vue';
+import debounce from 'lodash/debounce';
+import { useStore } from './store/manageGroupStore';
 import { useAddMembersStore } from './store/mgAddMembersStore';
+import { useSearchStore } from './store/mgSearchStore';
+import MgSearchResults from './mg-search-results.vue';
 
 
 const store = useStore();
 const addMembersStore = useAddMembersStore();
+const addSearchStore = useSearchStore();
 const currentFromSelect = ref('name');
 
 
@@ -21,10 +25,10 @@ const currentFromSelect = ref('name');
  */
 const inputPlaceholder = computed(() => {
     const placeholderOptions = {
-        'name': 'Search Users',
-        'group': 'Search Groups',
-        'role': 'Search Roles',
-        'list': 'Add from a list',
+        'name': 'Search users...',
+        'group': 'Search groups...',
+        'role': 'Search roles...',
+        'list': 'Add from a list...',
     }
     return placeholderOptions[currentFromSelect.value];
 });
@@ -43,6 +47,23 @@ const inputDetails = computed(() => {
     }
     return placeholderOptions[currentFromSelect.value];
 });
+
+/**
+ * start searching once the search is active, watching the query string for input
+ */
+watch(() => addSearchStore.query, () => {
+    if (addSearchStore.isSearchActive) {
+        debounceSearch();
+    }
+});
+
+/**
+ * debounce to avoid constant polling while the user is typing
+ */
+const debounceSearch = debounce(() => {
+    addSearchStore.searchForMembers();
+}, 350);
+
 
 /**
  * add the selected members to the group
@@ -107,14 +128,20 @@ const addButtonText = computed(() => addMembersStore.isProcessing ? 'Adding...' 
                             </ul>
                         </div>
                     </div>
-                    <p class="meta">{{ inputDetails }}</p>
                     <input
                         type="text"
-                        v-model="addMembersStore.query"
+                        v-model="addSearchStore.query"
                         :placeholder="inputPlaceholder"
                         @input="$event.target.composing = false"
                     />
-                    <button @click.prevent="onAddMembersSelected" class="button submit" :disabled="!addMembersStore.canAddMembers">{{ addButtonText }}</button>
+                    <mg-search-results />
+                    <p class="meta">{{ inputDetails }}</p>
+                    <button 
+                        class="button submit"
+                        :disabled="!addMembersStore.canAddMembers"
+                        @click.prevent="onAddMembersSelected">
+                        {{ addButtonText }}
+                    </button>
                 </div>
             </section>
         </div><!-- small-12 island -->
@@ -159,6 +186,14 @@ label {
         margin-right: 0;
         min-width: 110px; //takes us all the way down to 320px devices
     }
+}
+
+input {
+    margin-bottom: 0;
+}
+
+.meta {
+    margin-bottom: 1rem;
 }
 
 </style>

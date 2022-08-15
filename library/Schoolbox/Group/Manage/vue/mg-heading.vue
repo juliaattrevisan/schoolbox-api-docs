@@ -6,11 +6,11 @@
  */
 
 import { onMounted } from 'vue';
-import { useStore } from './store/mgStore';
+import { useStore } from './store/manageGroupStore';
 import { useMembersStore } from './store/mgMembersStore';
 import { useSettingsStore } from './store/mgSettingsStore';
 import { useDisbandStore } from './store/mgDisbandStore';
-import Endpoints from './manageGroupEndpoints';
+import Endpoints from './mgEndpoints';
 
 
 const store = useStore();

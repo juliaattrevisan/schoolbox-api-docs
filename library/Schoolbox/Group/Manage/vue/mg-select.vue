@@ -6,12 +6,12 @@
  */
 
 import { ref, computed, watch, onMounted  } from 'vue';
-import { useStore } from './store/mgStore';
+import { useStore } from './store/manageGroupStore';
 import { useMembersStore } from './store/mgMembersStore';
 import { useRemoveMembersStore } from './store/mgRemoveMembersStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
 import MgSelectAccess from './mg-select-access.vue';
-import Endpoints from './manageGroupEndpoints';
+import Endpoints from './mgEndpoints';
 
 
 const store = useStore(); //to disable butons on processing

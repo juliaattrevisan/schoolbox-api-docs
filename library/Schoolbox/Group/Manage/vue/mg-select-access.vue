@@ -5,11 +5,11 @@
  */
 
 import { ref, watch, computed } from 'vue';
-import { useStore } from './store/mgStore';
+import { useStore } from './store/manageGroupStore';
 import { useMembersStore } from './store/mgMembersStore';
 import { useUpdateMembersStore } from './store/mgUpdateMembersStore';
 import { useRejectMembersStore } from './store/mgRejectMembersStore';
-import AccessTypes from './manageGroupAccessTypes';
+import AccessTypes from './mgAccessTypes';
 
 
 const store = useStore(); //to disable buttons on processing

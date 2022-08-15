@@ -5,7 +5,7 @@
  */
 
 import { computed } from 'vue';
-import filterTypes from './manageGroupAccessTypes';
+import filterTypes from './mgAccessTypes';
 import { useMembersStore } from './store/mgMembersStore';
 
 

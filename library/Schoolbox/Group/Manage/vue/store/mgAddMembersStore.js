@@ -8,58 +8,13 @@ import { useMembersStore } from './mgMembersStore';
 import Endpoints from '../mgEndpoints';
 
 
-const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
-const CAPPED_RESULTS_LENGTH = 50; //the maximum amount of results to show
-
 export const useAddMembersStore = defineStore('mgAddMembers', {
 
     state: () => ({
         isProcessing: false, //to notify that an action is taking place, like updating a member access
-        query: '', //current search query
-        isResultsCapped: false, //to show a 'refine your search' note
-        resultsNotShownCount: 0, //a total of the results not visible in the list
-        searchResults: [], //members returned in the current search results
-        selectedMembers: [], //members to add on Add Members selection
     }),
 
-    getters: {
-
-        /**
-         * To only start showing search results once enough characters
-         * have been added 
-         * 
-         * @return { Boolean }
-         */
-        isSearchActive () {
-            return this.query.length >= MIN_QUERY_LENGTH;
-        },
-
-        /**
-         * Only if there's not already a process taking place and there's actually members to add
-         * 
-         * @returns { Boolean }
-         */
-        canAddMembers () {
-            return this.selectedMembers.length > 0 && !this.isProcessing;
-        },
-
-    },
-
     actions: {
-
-        /**
-         * search for members
-         */
-        async searchForMembers () {
-
-        },
-
-        /**
-         * clear the current search
-         */
-        clear () {
-            this.query = '';
-        },
 
         /**
          * add the members to the group

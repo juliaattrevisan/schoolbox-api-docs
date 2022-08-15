@@ -9,7 +9,7 @@ import { useSettingsStore } from './mgSettingsStore';
 import { useMembersStore } from './mgMembersStore';
 
 
-export const useStore = defineStore('mg', {
+export const useStore = defineStore('manageGroup', {
 
     state: () => ({
         isLoading: true, //to display loading note

@@ -11,8 +11,8 @@ import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI'
 import MgMembersFilters from './mg-members-filters.vue';
 import MgMembersName from './mg-members-name.vue';
 import MgMembersAccess from './mg-members-access.vue';
-import FilterEvents from './manageGroupFilterEvents';
-import AccessTypes from './manageGroupAccessTypes';
+import FilterEvents from './mgFilterEvents';
+import AccessTypes from './mgAccessTypes';
 
 
 
@@ -90,7 +90,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     tabbable: false,
     texts: {
         count: '{from}-{to} of {count} members|{count} members|1 member',
-        filterPlaceholder: 'Search group...',
+        filterPlaceholder: 'Search current members...',
         noResults: 'No matching group members',
     },
 }

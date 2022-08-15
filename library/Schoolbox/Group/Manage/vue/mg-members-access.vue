@@ -5,10 +5,10 @@
  */
 
 import { ref, computed } from 'vue';
-import { useStore } from './store/mgStore';
+import { useStore } from './store/manageGroupStore';
 import { useUpdateMembersStore } from './store/mgUpdateMembersStore';
 import { useRejectMembersStore } from './store/mgRejectMembersStore';
-import AccessTypes from './manageGroupAccessTypes';
+import AccessTypes from './mgAccessTypes';
 
 
 const props = defineProps({

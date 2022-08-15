@@ -5,8 +5,8 @@
  */
 
 import { ref, onBeforeMount, onMounted } from 'vue';
-import Endpoints from './manageGroupEndpoints';
-import { useStore } from './store/mgStore';
+import Endpoints from './mgEndpoints';
+import { useStore } from './store/manageGroupStore';
 import { useMembersStore } from './store/mgMembersStore';
 import MgHeading from './mg-heading.vue';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table';
