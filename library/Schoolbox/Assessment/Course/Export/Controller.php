@@ -11,9 +11,9 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Overwriter;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -107,55 +107,109 @@ class Controller extends Base
      *
      * Also sets the copy as the spec assessment of `$assessment`.
      *
-     * @param IAssessable       $assessment The assessment to copy
-     * @param AssessmentContext $context    The destination to copy
-     *                                      `$assessment` into
-     * @return IAssessable The newly created copy of `$assessment` within
+     * @param IAssessable       $implAssessment The assessment to copy.
+     * @param AssessmentContext $context        The destination to copy
+     *                                          `$implAssessment` into.
+     * @return IAssessable The newly created copy of `$implAssessment` within
      *                     `$context`.
      * @throws MapperException
      */
     private function copyAssessmentToContext(
-        IAssessable $assessment,
+        IAssessable $implAssessment,
         AssessmentContext $context,
     ): IAssessable {
-        $newAssessment = $this->replicator->replicateInNewContext(
-            $assessment,
+        $specAssessment = $this->replicator->replicateInNewContext(
+            $implAssessment,
             $context,
             $this->getUser(),
         );
 
         // Associate new assessment with old assessment's context
-        $baseContext = $assessment->getBaseContext();
-        if (
-            $baseContext instanceof UnitImplementation\Model
-            && $context->getId() === $baseContext->getSpecification()->getId()
-        ) {
-            $assessment->setSpecificationAssessment($newAssessment);
-            $this->assessmentDataSource->save($assessment, $this->getUser());
+        $implAssessment->setSpecificationAssessment($specAssessment);
+        $this->assessmentDataSource->save($implAssessment, $this->getUser());
+
+        if ($implAssessment instanceof Project && $specAssessment instanceof Project) {
+            $this->syncProjectActivities($implAssessment, $specAssessment);
         }
 
-        // TODO copy project activities
-
-        return $newAssessment;
+        return $specAssessment;
     }
 
     /**
-     * Overwrite `$specAssessment` with `$assessment`.
+     * Overwrite `$specAssessment` with `$implAssessment`.
      *
-     * @param IAssessable $assessment     The assessment to copy
-     * @param IAssessable $specAssessment The assessment to overwrite
-     * @return IAssessable
+     * @param IAssessable $implAssessment The assessment to copy.
+     * @param IAssessable $specAssessment The assessment to overwrite.
+     * @return IAssessable The updated `$specAssessment`.
      */
     private function overwriteAssessment(
-        IAssessable $assessment,
+        IAssessable $implAssessment,
         IAssessable $specAssessment,
     ): IAssessable {
-        // TODO copy project activities
-
-        return $this->overwriter->overwrite(
-            $assessment,
+        $updatedSpecAssessment = $this->overwriter->overwrite(
+            $implAssessment,
             $specAssessment,
             $this->getUser(),
         );
+
+        if ($implAssessment instanceof Project && $updatedSpecAssessment instanceof Project) {
+            $this->syncProjectActivities($implAssessment, $updatedSpecAssessment);
+        }
+
+        return $updatedSpecAssessment;
+    }
+
+    /**
+     * Overwrite activities within `$implProject` to `$specProject`.
+     *
+     * If the project activity:
+     * * is in `$implProject` but not `$specProject`: copy into `$specProject`
+     * * is in `$implProject` and `$specProject`: overwrite in `$specProject`
+     * * not in `$implProject` but in `$specProject`: remove from `$specProject`
+     *
+     * @param Project $implProject The project whose activities are to be copied
+     * @param Project $specProject The project to copy activities into
+     * @return void
+     * @throws MapperException
+     */
+    private function syncProjectActivities(
+        Project $implProject,
+        Project $specProject,
+    ): void {
+        // Load spec activity IDs for later use
+        $specActivityIds     = [];
+        $implActivitySpecIds = [];
+        foreach ($specProject->getAssessables() as $specActivity) {
+            $specActivityIds[] = $specActivity->getId();
+        }
+
+        // Copy in `$implProject` to `$specProject` if they don't exist there:
+        // otherwise, overwrite the activity in `$specProject` with the
+        // `$implProject` version.
+        foreach ($implProject->getAssessables() as $implActivity) {
+            $specActivity = $implActivity->getSpecificationAssessment();
+            if ($specActivity && in_array($specActivity->getId(), $specActivityIds, true)) {
+                $this->overwriteAssessment(
+                    $implActivity,
+                    $specActivity,
+                );
+                $implActivitySpecIds[] = $specActivity->getId();
+            } else {
+                $newSpecActivity = $this->copyAssessmentToContext(
+                    $implActivity,
+                    $specProject,
+                );
+                $specActivityIds[]     = $newSpecActivity->getId();
+                $implActivitySpecIds[] = $newSpecActivity->getId();
+            }
+        }
+
+        // Now: delete any activities in `$specProject` not in `$implProject`
+        $specActivityIdsNotInImpl = array_diff($specActivityIds, $implActivitySpecIds);
+        foreach ($specProject->getAssessables() as $specActivity) {
+            if (in_array($specActivity->getId(), $specActivityIdsNotInImpl)) {
+                $this->assessmentDataSource->delete($specActivity);
+            }
+        }
     }
 }
