@@ -1375,7 +1375,8 @@ class DataSource
             return false;
         }
 
-        $dstBox = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId);
+        $dstBox    = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId);
+        $dstFolder = $dstBox->getCategory();
 
         // Cannot mutate identity of objects returned from mappers.
         // Index all these collections by source version ID, even though the object will be destination version.
@@ -1403,7 +1404,7 @@ class DataSource
 
         // Get Source Descriptors
         /** @var DescriptorModel[]|GenericCollection $srcDescriptors */
-        $srcDescriptors  = $descriptorMapper->findByColumn('level_id', $srcLevels->getColumnValues('id'))->indexBy('id');
+        $srcDescriptors  = $descriptorMapper->findByColumn('level_id', $srcLevels->getPropertyValues('id'))->indexBy('id');
         if ($srcDescriptors->count() === 0) {
             // no descriptors are set for source assessment
             return false;
@@ -1422,12 +1423,26 @@ class DataSource
          */
         /** @var DescriptorModel $firstSrcDescriptor */
         $firstSrcDescriptor = $srcDescriptors->first();
-        /** @var IndicatorModel[] $existingIndicators */
+        $parentType         = $firstSrcDescriptor->getIndicator()->getCapability()->getParentType();
         $existingIndicators = $indicatorMapper->findForParent(
-            $dstBox->getCategory()->getId(),
-            $firstSrcDescriptor->getIndicator()->getCapability()->getParentType(),
+            $dstFolder->getId(),
+            $parentType,
             false
         );
+
+        // If the rubric is being duped into a unit spec:
+        // also fetch the list of course-level capabilities and indicators
+        $unitSpec = $dstFolder->getUnitSpecification();
+        if ($unitSpec) {
+            $existingIndicators = $existingIndicators->merge(
+                $indicatorMapper->findForParent(
+                    $unitSpec->getFolder()->getParent()->getId(),
+                    $parentType,
+                    false
+                )
+            );
+        }
+
         // Convert to 2-D arrays, indexed by 'capability' then 'name', so we can later find duplicates.
         /** @var IndicatorModel[][] $existingIndicatorMap */
         $existingIndicatorMap = [];
@@ -1478,7 +1493,7 @@ class DataSource
                 $srcCapability = $capabilityMapper->findById($srcDescriptor->getIndicator()->getCapability()->getId());
                 $dstCapability = clone $srcCapability;
                 $dstCapability->setId(null);
-                $dstCapability->setParentId($dstBox->getCategory()->getId());
+                $dstCapability->setParentId($existingCapabilityMap[$capabilityName]->getParentId());
                 $existingCapabilityMap[$capabilityName] = $dstCapability;
             }
             $dstCapabilities->setOffset($srcCapabilityId, $dstCapability);
