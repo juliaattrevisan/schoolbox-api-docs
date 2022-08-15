@@ -4,7 +4,7 @@
  * Display the group members in a table display
  */
 
-import { ref, watch } from 'vue';
+import { ref, watch, nextTick } from 'vue';
 import { EventBus } from 'v-tables-3-select-rows';
 import { useMembersStore } from './store/manageGroupMembersStore';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
@@ -90,7 +90,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     tabbable: false,
     texts: {
         count: '{from}-{to} of {count} members|{count} members|1 member',
-        filterPlaceholder: 'Search group members, they can be searched by name, year level, house, campus, role or access',
+        filterPlaceholder: 'Search group...',
         noResults: 'No matching group members',
     },
 }
@@ -100,7 +100,23 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
  */
 async function onLoaded () {
     updateFooterUI();
+    addSearchNote();
 }
+
+/**
+ * Add a note on what the table can be searched for just below the search
+ * We add below rather than in a placeholder so the long list of search 
+ * options is always available and are visible on mobile 
+ */
+async function addSearchNote () {
+    await nextTick(); //ensure the dom is updated
+    const searchNote = document.createElement('p');
+    searchNote.classList.add('meta');
+    searchNote.innerText = 'The Group can be searched by name, year level, house, campus, role or access.';
+    const searchInput = document.querySelector('.VueTables__search__input'); //safe to assume only one, despite class selection
+    searchInput.parentElement.appendChild(searchNote);
+}
+
 
 
 /*****************************************************************
@@ -235,10 +251,6 @@ function updateSelectedMembers () {
 
 .VueTables {
     margin-bottom: 150px; //to allow space for the bottom-drawer so it can't cut off the bottom of the table
-}
-
-.VueTables__search {
-    padding-bottom: 0.5rem; //to put the manage-group-filters.vue up closer to the search input
 }
 
 .VueTables__search-field label {
