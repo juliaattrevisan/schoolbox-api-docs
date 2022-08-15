@@ -719,32 +719,15 @@ class CourseMarkbook
     }
 
     /**
-     *build student weighting based on whole cohort (course) not just single class
-     * @return array
+     * Build student ranking based on whole cohort (course) not just single class.
+     * See also similar function in library/Schoolbox/Learning/Markbook/Markbook.php.
+     * @return array (integer ranking indexed by studentId)
      */
     public function getRanking(): array
     {
-        //loop through each course
-        //then do the same as for a single course
-        // library/Schoolbox/Learning/Markbook/Markbook.php:430
-        $rank = [];
-
-        /**
-         * need to get a list of the students by id, with their ranking
-         * array(id,rank)
-         */
-
-        //build basic array (id,grade)
+        // First build basic array (id,grade).
         $rankList = [];
-
-        /**
-         * loop through all courses and grab all students
-         */
         foreach ($this->studentAverageMarks as $course) {
-            /**
-             * go thought all students and grab their normalised grade / weighting
-             * and create a list of all grades / weightings and list the users that have these
-             */
             foreach ($course as $studentId => $studentStatistic) {
                 if (isset($studentStatistic['published']['norm'])) {
                     $rankList[] = [
@@ -754,29 +737,30 @@ class CourseMarkbook
                 }
             }
         }
-        //sort based on grade
+
+        // Now sort based on grade.
         usort($rankList, function ($one, $two) {
             return $two['grade'] <=> $one['grade'];
         });
 
-        //set a rank value
         $rankValue            = 1;
-        $hiddenRank           = 1;
-        $lastStudent['grade'] = '';
+        $currentRank          = 1;
+        $prevStudent['grade'] = '';
+
         /**
          * iterate over ordered list of ranked students, and actually give them helpful rankings
          * not 42.06, but 5 (you are 5th in the class)
          */
-
+        $rankByStudentId = [];
         foreach ($rankList as $student) {
-            if ($lastStudent['grade'] !== $student['grade']) {
-                $rankValue = $hiddenRank;
+            if ($prevStudent['grade'] !== $student['grade']) {
+                $rankValue = $currentRank;
             }
-            $rank[$student['id']] = $rankValue;
-            $hiddenRank++;
-            $lastStudent = $student;
+            $rankByStudentId[$student['id']] = $rankValue;
+            $currentRank++;
+            $prevStudent = $student;
         }
 
-        return $rank;
+        return $rankByStudentId;
     }
 }

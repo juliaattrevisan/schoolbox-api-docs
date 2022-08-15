@@ -424,23 +424,14 @@ class Markbook
     }
 
     /**
-     *build student weighting
-     * @return array
+     * Build student ranking
+     * See also similar function in library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php.
+     * @return array (integer ranking indexed by studentId)
      */
     public function getRanking(): array
     {
-        /**
-         * need to get a list of the students by id, with their ranking
-         * array(id,rank)
-         */
-
-        //build basic array (id,grade)
+        // First build basic array (id,grade).
         $rankList = [];
-
-        /**
-         * go thought all students and grab their normalised grade / weighting
-         * and create a list of all grades / weightings and list the users that have these
-         */
         foreach ($this->studentStatistics as $studentId => $studentStatistic) {
             if ($studentStatistic['meanNormalised'] !== null) {
                 $rankList[] = [
@@ -449,28 +440,30 @@ class Markbook
                 ];
             }
         }
-        //sort based on grade
+
+        // Now sort based on grade.
         usort($rankList, function ($one, $two) {
             return $two['grade'] <=> $one['grade'];
         });
 
-        //set a rank value
-        $rankValue = 1;
-        $hiddenRank = 1;
-        $lastStudent['grade'] = '';
+        $rankValue            = 1;
+        $currentRank          = 1;
+        $prevStudent['grade'] = '';
+
         /**
          * iterate over ordered list of ranked students, and actually give them helpful rankings
          * not 42.06, but 5 (you are 5th in the class)
          */
-        $rank = [];
+        $rankByStudentId = [];
         foreach ($rankList as $student) {
-            if ($lastStudent['grade'] !== $student['grade']) {
-                $rankValue = $hiddenRank;
+            if ($prevStudent['grade'] !== $student['grade']) {
+                $rankValue = $currentRank;
             }
-            $rank[$student['id']] = $rankValue;
-            $hiddenRank++;
-            $lastStudent = $student;
+            $rankByStudentId[$student['id']] = $rankValue;
+            $currentRank++;
+            $prevStudent = $student;
         }
-        return $rank;
+
+        return $rankByStudentId;
     }
 }
