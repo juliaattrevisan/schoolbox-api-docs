@@ -15,13 +15,13 @@ const settingsStore = useSettingsStore();
 const updateModalEl = ref(null);
 
 /**
- * we want to force the setting of the Access on the group 
+ * we want to force the setting of the Access on the group
  * straight away if it's not already set
  */
 onMounted(() => {
     if (settingsStore.isAccessNotSet) {
         settingsStore.isPromptOpen = true;
-    } 
+    }
 });
 
 /**

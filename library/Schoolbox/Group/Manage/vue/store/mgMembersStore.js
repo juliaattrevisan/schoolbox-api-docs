@@ -62,7 +62,7 @@ export const useMembersStore = defineStore('mgMembers', {
 
         /**
          * Count of selected members
-         * 
+         *
          * @returns { Number }
          */
         selectedMembersCount () {
@@ -71,7 +71,7 @@ export const useMembersStore = defineStore('mgMembers', {
 
         /**
          * For proper count display, eg: 'No Members / 1 Member' / '4 Members'
-         * 
+         *
          * @returns { String }
          */
         selectedMembersPlural () {
@@ -80,7 +80,7 @@ export const useMembersStore = defineStore('mgMembers', {
 
         /**
          * To get current group admin id list
-         * 
+         *
          * @returns { Array }
          */
         currentGroupAdminIds () {
@@ -89,7 +89,7 @@ export const useMembersStore = defineStore('mgMembers', {
 
         /**
          * To get number of group admins in selected members
-         * 
+         *
          * @returns { Number }
          */
         selectedGroupAdminCount () {

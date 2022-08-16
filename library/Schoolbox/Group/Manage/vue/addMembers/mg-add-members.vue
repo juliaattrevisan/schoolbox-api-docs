@@ -98,7 +98,7 @@ const addButtonText = computed(() => addMembersStore.isProcessing ? 'Adding...' 
                     <mg-selected-search-results />
                     <MgSearch />
                     <p class="meta">{{ inputDetails }}</p>
-                    <button 
+                    <button
                         class="button submit"
                         :disabled="!searchStore.canAddMembers"
                         @click.prevent="onAddMembersSelected">

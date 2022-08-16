@@ -14,10 +14,10 @@ import MgAddMembersSearchResult from './mg-search-result.vue';
 const searchStore = useSearchStore();
 
 /**
- * show select all option for adding / removing codes only if there's 
+ * show select all option for adding / removing codes only if there's
  * more than one search result
- * 
- * @returns { Boolean } 
+ *
+ * @returns { Boolean }
  */
 const showSelectAll = computed(() => {
     return searchStore.results.length > 1;

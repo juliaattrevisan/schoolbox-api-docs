@@ -51,7 +51,7 @@ onUnmounted(() => {
  * so we can select enter when adding codes
  * useful if we copy/paste a bunch of codes,
  * then we can just select enter to add them all
- * 
+ *
  * @param { Event }
  */
 function onKeyUp (event) {
@@ -68,7 +68,7 @@ function onKeyUp (event) {
 
 /**
  * to close the results when selected
- * 
+ *
  * @param { Event }
  */
 function onEscapeKeySelected (event) {
@@ -80,7 +80,7 @@ function onEscapeKeySelected (event) {
 /**
  * to be able to close the search results
  * when selection outside is made
- * 
+ *
  * @param { Event }
  */
 function onMouseClick (event) {
@@ -95,7 +95,7 @@ function onMouseClick (event) {
 watch(() => searchStore.query, () => {
     if (searchStore.isSearchActive) {
         debounceSearch();
-    } 
+    }
 });
 
 /**

@@ -89,7 +89,7 @@ function onModalClosed () {
     >
         <h2>Remove {{ membersStore.selectedMembersPlural }}</h2>
         <p>
-            Are you sure you wish to remove the <b>{{ membersStore.selectedMembersCount }} selected 
+            Are you sure you wish to remove the <b>{{ membersStore.selectedMembersCount }} selected
             {{ membersStore.selectedMembersPlural }}</b> from the {{ store.name }} group?
         </p>
         <p v-if="membersStore.selectedGroupAdminCount > 0">

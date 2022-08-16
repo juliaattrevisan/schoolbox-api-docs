@@ -12,16 +12,16 @@ import { useSearchStore  } from '../store/mgSearchStore';
 const searchStore = useSearchStore();
 
 /**
- * To determine the behaviour of the 'Select all' button, whether to 
+ * To determine the behaviour of the 'Select all' button, whether to
  * add all results or remove all results
- * 
- * @returns { Boolean } 
+ *
+ * @returns { Boolean }
  */
 const isAllResultsSelected = computed(() => {
     if (searchStore.selectedResults.length > 0) {
         const alreadySelectedResults = searchStore.results.filter((resultItem) => {
             return searchStore.selectedResults.some((selectionItem) => resultItem.id === selectionItem.id);
-        }); 
+        });
         return alreadySelectedResults.length === searchStore.results.length ? true : false;
     } else {
         return false;
@@ -29,16 +29,16 @@ const isAllResultsSelected = computed(() => {
 });
 
 /**
- * To add the 'indeterminate' class to the select all checkbox to show some 
+ * To add the 'indeterminate' class to the select all checkbox to show some
  * in the search results are already selected
- * 
- * @returns { Boolean } 
+ *
+ * @returns { Boolean }
  */
 const isSomeResultsSelected = computed(() => {
     if (searchStore.selectedResults.length > 0) {
         const alreadySelectedResults = searchStore.results.filter((resultItem) => {
             return searchStore.selectedResults.some((selectionItem) => resultItem.id === selectionItem.id);
-        }); 
+        });
         return alreadySelectedResults.length >= 1 && alreadySelectedResults.length !== searchStore.results.length ? true : false;
     } else {
         return false;
@@ -48,7 +48,7 @@ const isSomeResultsSelected = computed(() => {
 /**
  * To determine the check display of the checkbox
  *
- * @returns { Boolean } 
+ * @returns { Boolean }
  */
 const isChecked = computed(() => isAllResultsSelected.value ? true : false);
 
@@ -60,14 +60,14 @@ function onSelectAll () {
 }
 
 /**
- * pull all results out 
+ * pull all results out
  */
 function removeAllResults () {
     searchStore.removeAllResults();
 }
 
 /**
- * add all results in 
+ * add all results in
  */
 function addAllResults () {
     searchStore.addAllResults();
@@ -81,7 +81,7 @@ function addAllResults () {
         @keyup.enter="onSelectAll"
     >
         <div class="checklist">
-            <input 
+            <input
                 id="checkbox-select-all"
                 type="checkbox"
                 :checked="isChecked"

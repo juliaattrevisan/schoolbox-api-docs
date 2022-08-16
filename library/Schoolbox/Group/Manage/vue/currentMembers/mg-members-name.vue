@@ -16,7 +16,7 @@ const props = defineProps({
 });
 
 /**
- * To avoid dumping a whole lot of errors in the console, 
+ * To avoid dumping a whole lot of errors in the console,
  * use the dummy grey image when in StoryBook
  */
 function getMemberPortraitSrc () {

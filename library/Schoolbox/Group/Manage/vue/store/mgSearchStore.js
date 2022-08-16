@@ -1,5 +1,5 @@
 /**
- * To search for users to add 
+ * To search for users to add
  */
 
 import { defineStore } from 'pinia';
@@ -26,8 +26,8 @@ export const useSearchStore = defineStore('mgSearch', {
 
         /**
          * To only start showing search results once enough characters
-         * have been added 
-         * 
+         * have been added
+         *
          * @return { Boolean }
          */
         isSearchActive () {
@@ -36,7 +36,7 @@ export const useSearchStore = defineStore('mgSearch', {
 
         /**
          * Changes depending on where we are searching for users
-         * 
+         *
          * @return { String }
          */
         searchEndpoint () {
@@ -52,7 +52,7 @@ export const useSearchStore = defineStore('mgSearch', {
 
         /**
          * If any results have been selected
-         * 
+         *
          * @return { Boolean }
          */
         hasSelectedResults () {
@@ -61,7 +61,7 @@ export const useSearchStore = defineStore('mgSearch', {
 
         /**
          * Only if there's not already a process taking place and there's actually members to add
-         * 
+         *
          * @returns { Boolean }
          */
         canAddMembers () {
@@ -74,7 +74,7 @@ export const useSearchStore = defineStore('mgSearch', {
 
         /**
          * search for members
-         * 
+         *
          * @returns { Array }
          */
         async search () {
@@ -107,9 +107,9 @@ export const useSearchStore = defineStore('mgSearch', {
         },
 
         /**
-         * add a search result 
-         * 
-         * @param { Object } 
+         * add a search result
+         *
+         * @param { Object }
          */
         addResult (searchResult) {
             const addMembersStore = useAddMembersStore();
@@ -121,8 +121,8 @@ export const useSearchStore = defineStore('mgSearch', {
         },
 
         /**
-         * remove a search result 
-         * 
+         * remove a search result
+         *
          * @param { Object }
          */
         removeResult (searchResult) {

@@ -24,7 +24,7 @@ const disbandStore = useDisbandStore();
 watch(() => store.hasLoadedOk, (hasLoadedOk) => {
     if (hasLoadedOk) {
         initFoundation();
-    } 
+    }
 });
 
 /**

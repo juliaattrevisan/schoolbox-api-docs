@@ -70,9 +70,9 @@ function getFormData () {
     const store = useStore();
     const searchStore = useSearchStore();
     const members = searchStore.selectedResults.map((selectedResult) => {
-        return { 
-            id: selectedResult.id, 
-            fromType: selectedResult.fromType 
+        return {
+            id: selectedResult.id,
+            fromType: selectedResult.fromType
         }
     });
     return JSON.stringify({

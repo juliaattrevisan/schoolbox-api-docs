@@ -95,7 +95,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     },
 }
 
-let isFirstLoad = true; 
+let isFirstLoad = true;
 
 /**
  * To update the table to show the UI in the footer
@@ -110,8 +110,8 @@ async function onLoaded () {
 
 /**
  * Add a note on what the table can be searched for just below the search
- * We add below rather than in a placeholder so the long list of search 
- * options is always available and are visible on mobile 
+ * We add below rather than in a placeholder so the long list of search
+ * options is always available and are visible on mobile
  */
 async function addSearchNote () {
     await nextTick(); //ensure the dom is updated

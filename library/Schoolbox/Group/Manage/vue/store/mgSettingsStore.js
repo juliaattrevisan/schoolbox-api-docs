@@ -22,7 +22,7 @@ export const useSettingsStore = defineStore('mgSettings', {
 
         /**
          * to prompt the user to select the group access
-         * 
+         *
          * @return { Boolean }
          */
         isAccessNotSet () {

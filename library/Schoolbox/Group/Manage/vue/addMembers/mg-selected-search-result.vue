@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * A selected Curriculum code, it can be deleted and 
+ * A selected Curriculum code, it can be deleted and
  * further details revealed via a modal
  */
 
@@ -38,17 +38,17 @@ function onRemoveSelected () {
 
 <template>
    <div class="selected-code">
-        <button 
-            class="title-button" 
+        <button
+            class="title-button"
             :title="`View ${props.result.name}`"
         >
             {{ props.result.name }}
         </button>
-        <button 
-            class="remove-button icon-close" 
-            :title="`Remove ${props.result.name}`" 
-            @click.prevent="onRemoveSelected" 
-            @keyup.enter="onRemoveSelected" 
+        <button
+            class="remove-button icon-close"
+            :title="`Remove ${props.result.name}`"
+            @click.prevent="onRemoveSelected"
+            @keyup.enter="onRemoveSelected"
         >
         </button>
     </div>
