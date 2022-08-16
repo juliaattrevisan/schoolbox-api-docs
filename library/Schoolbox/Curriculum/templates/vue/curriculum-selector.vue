@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * To select Curriculum Codes to assign to something like a Due Work 
+ * To select Curriculum Codes to assign to something like a Due Work
  */
 
 import { ref, onMounted } from 'vue';
@@ -35,7 +35,7 @@ const props = defineProps({
         default: [],
     },
     /**
-     * can only view the currently selected codes, not edit them 
+     * can only view the currently selected codes, not edit them
      */
     isReadOnly: {
         type: Boolean,
@@ -44,7 +44,7 @@ const props = defineProps({
     },
 });
 
-const curriculumSelectorEl = ref(null); 
+const curriculumSelectorEl = ref(null);
 
 /**
  * Start loading the curriculum data
@@ -66,12 +66,12 @@ onMounted(() => {
  * as they persist between the stories otherwise
  */
 function checkForStorybook () {
-    if (STORYBOOK_ENV) {
+    if (typeof STORYBOOK_ENV !== 'undefined') {
         useSelectedCodesStore().$reset();
         useSearchResultsStore().$reset();
         useModalStore().$reset();
         useModalActiveCodesStore().$reset();
-        useStore().$reset(); 
+        useStore().$reset();
     }
 }
 
@@ -90,7 +90,7 @@ function checkForStorybook () {
 <style lang="scss" scoped>
 
 .columns {
-    margin-bottom: 1rem;  
+    margin-bottom: 1rem;
 }
 
 </style>
