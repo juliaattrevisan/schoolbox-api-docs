@@ -52,7 +52,7 @@ class Status
          * Turnitin has to be configured, otherwise it won't appear in the list
          */
         $payload = [
-            'name' => 'Turnitin',
+            'name' => 'SimCheck',
             'url'  => 'https://turnitin.statuspage.io/',
             'show' => false,
             'available' => false,
@@ -80,27 +80,20 @@ class Status
                     return $payload;
                 }
 
-                /* Otherwise something to look at
-                 */
-                $payload['name'     ] = $result['product_name'];
+                $payload['name']      = $result['product_name'];
                 $payload['available'] = true;
-                $payload['message'  ] = 'Online';
+                $payload['message']   = 'Online';
 
                 return $payload;
             } catch (Credentials $e) {
                 /* Bad credentials will stop you from making a proper connection
                  */
                 $payload['available'] = true;
-                $payload['message'  ] = 'Auth failed';
-            } catch (GuzzleException $e) {
+                $payload['message']   = 'Auth failed';
+            } catch (GuzzleException | BadEndpoint | Exception $e) {
                 /* Some kind of networky issue; noop
+                 * Catch exception but do nothing so default $payload will be returned.
                  */
-            } catch (BadEndpoint $e) {
-                $payload['available'] = false;
-                $payload['message'  ] = 'Bad end point';
-            } catch (Exception $e) {
-                $payload['available'] = false;
-                $payload['message'  ] = 'Offline';
             }
         }
 
