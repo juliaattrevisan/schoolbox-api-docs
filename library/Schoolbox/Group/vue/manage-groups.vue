@@ -114,7 +114,7 @@ export default {
          */
         checkForDropdowns () {
             this.$nextTick(() => {
-//                $(document).foundation('dropdown', 'reflow');
+               $(document).foundation('dropdown', 'reflow');
             });
         },
 
