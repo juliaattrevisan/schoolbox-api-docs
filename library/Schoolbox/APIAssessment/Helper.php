@@ -640,8 +640,8 @@ order by `assessment_id`, `student_id`;
             join `rubric_capability_mark` `rcm` on (`rcm`.`return_id` = `sr`.`id` and `rcm`.`rubric_capability_id` =
                                                      `vr`.`capability_id`))
             left join `v_rubric_indicator_mark_extend` `rim` on (`rim`.`rubric_indicator_id` = `vr`.`indicator_id` and `rcm`.`id` = `rim`.`rubric_capability_mark_id`))
-            INNER JOIN `rubric_descriptor` `rd` on (`rim`.`descriptor_id` = `rd`.`id` and `rd`.`deleted_at` is null)
-            INNER JOIN `rubric_level` `rl` on (`rd`.`level_id` = `rl`.`id` and `sb`.`id` = `rl`.`box_id` and `rl`.`deleted_at` is null)
+            LEFT JOIN `rubric_descriptor` `rd` on (`rim`.`descriptor_id` = `rd`.`id` and `rd`.`deleted_at` is null)
+            LEFT JOIN `rubric_level` `rl` on (`rd`.`level_id` = `rl`.`id` and `sb`.`id` = `rl`.`box_id` and `rl`.`deleted_at` is null)
         where `sr`.`deleted_at` is null
             and `sr`.`published_at` is not null
             and (`rcm`.`valid` is true or `rim`.`valid` is true)
@@ -671,7 +671,7 @@ order by `assessment_id`, `student_id`;
                 $output['capabilities'][$row['capability_id']] = [
                     'id'                    => (int)$row['capability_id'],
                     'name'                  => $row['capability_name'],
-                    'value'                 => (float)$row['capability_mark'],
+                    'value'                 => (null === $row['capability_mark']) ? null : (float)$row['capability_mark'],
                     'maxValue'              => (float)$row['capability_max_value'],
                     'mark'                  => $row['capability_human_readable_mark'],
                     'indicators'            => []
@@ -684,13 +684,17 @@ order by `assessment_id`, `student_id`;
                     'name'          => $row['indicator_name'],
                     'maxValue'      => (float)$row['indicator_max_value'],
                     'value'         => (float)$row['indicator_mark'],
-                    'descriptor'    => [
+                    'descriptor'    => null,
+                    ];
+                //if descriptor is not null, then enter it
+                if (null != $row['descriptor_name']) {
+                    $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptor'] = [
                         'id'            => (int)$row['descriptor_id'],
                         'description'   => $row['descriptor_name'],
                         'maxValue'      => (float)$row['descriptor_max_value'],
                         'sequence'      => (int)$row['descriptor_sequence']
-                    ]
-                ];
+                    ];
+                }
             }
         }
         //clean the data, remove the numeric array keys
