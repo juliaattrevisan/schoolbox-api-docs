@@ -190,7 +190,10 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * * rubric grid: is set to null, as copying rubrics is too complex an
      *   operation to handle here.
      *   @see \Schoolbox\Assessment\Rubric\DataModel\DataSource::copyRubric
-     * * external ID: this uniquely identifies an assessment for another system
+     *
+     * This implementation does _not_ overwrite:
+     * * external ID: this uniquely identifies the base assessment within
+     *   another system, so it should not be copied
      *
      * @param self $source
      * @return $this
