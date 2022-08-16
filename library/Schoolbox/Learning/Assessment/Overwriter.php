@@ -56,13 +56,8 @@ class Overwriter
             );
         }
 
-        // Get fields from destination:
-        $updatedDestination = $destination->overwrite($source);
-        $updatedDestination
-            ->setId($destination->getId())
-            ->setSpecificationAssessment($destination->getSpecificationAssessment())
-            ->setContext($destination->getContext())
-            ->setSequence($destination->getSequence())
+        // Overwrite destination fields with values from source
+        $updatedDestination = $destination->overwrite($source)
             ->setDeletedAt(new \Alaress_Date_NullDate());
 
         // If copying the assessment into a spec: clear its dates
