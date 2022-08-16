@@ -126,14 +126,19 @@ class Controller extends Base
         );
 
         // Associate new assessment with old assessment's context
-        $baseContext = $implAssessment->getBaseContext();
-        if (
-            $baseContext instanceof UnitImplementation\Model
-            && $context->getId() === $baseContext->getSpecification()->getId()
-        ) {
-            $implAssessment->setSpecificationAssessment($specAssessment);
-            $this->assessmentDataSource->save($implAssessment, $this->getUser());
-        }
+        $implAssessment->setSpecificationAssessment($specAssessment);
+
+        // I get unexpectedly interrupted by cache here:
+        // `save()` re-fetches `$implAssessment` without the spec assessment
+        // associated, and then saves that.
+        // This is because `Mapper::save()` contains a `findByColumnList()` with
+        // `cache:false`: despite this, the act of hydrating the un-cached
+        // version of the object overrides the previous version fetched!
+        // Possible fixes:
+        // * make `cache:false` fetch not write hydrated objects to cache
+        // * use a mapper-bypassing query to attach
+//        $this->assessmentDataSource->save($implAssessment, $this->getUser());
+        $this->assessmentDataSource->saveSpecificationAssessment($implAssessment, $specAssessment);
 
         if ($implAssessment instanceof Project && $specAssessment instanceof Project) {
             $this->syncProjectActivities($implAssessment, $specAssessment);
