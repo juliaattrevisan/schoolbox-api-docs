@@ -190,21 +190,29 @@ class Model extends AbstractAssessment implements ISelfAssessable
      * * rubric grid: is set to null, as copying rubrics is too complex an
      *   operation to handle here.
      *   @see \Schoolbox\Assessment\Rubric\DataModel\DataSource::copyRubric
+     * * external ID: this uniquely identifies an assessment for another system
      *
-     * @param IAssessable $source
-     * @return IAssessable
+     * @param self $source
+     * @return $this
      */
     public function overwrite(IAssessable $source): IAssessable
     {
         parent::overwrite($source);
+        $this->acceptOnline           = $source->acceptOnline;
+        $this->capabilityGradeGroup   = $source->capabilityGradeGroup;
+        $this->capabilityMarkType     = $source->capabilityMarkType;
+        $this->maxMark                = $source->maxMark;
+        $this->selfReviewability      = $source->selfReviewability;
+        $this->showSubmittedOnly      = $source->showSubmittedOnly;
+        $this->similarityCheckEnabled = $source->similarityCheckEnabled;
+        $this->useMarkRange           = $source->useMarkRange;
+        $this->useRubric              = $source->useRubric;
 
         // Copy attachments
-        if ($source instanceof self) {
-            $this->copyAttachedFiles($source);
-        }
+        $this->copyAttachedFiles($source);
 
         // Clone rubric separately
-        $this->setRubricGrid(null);
+        $this->rubricGrid = null;
 
         return $this;
     }
@@ -212,7 +220,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * Copy attached files from `$source` into this object.
      *
-     * @param Model $source
+     * @param self $source
      * @return $this
      */
     private function copyAttachedFiles(self $source): self
