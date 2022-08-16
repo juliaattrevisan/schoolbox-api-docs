@@ -38,7 +38,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * @const WORK_TYPE_QUIZ
      * @deprecated 17.0 - too fragile. You cannot reliably imply semantics from the ID. It is user configurable.
