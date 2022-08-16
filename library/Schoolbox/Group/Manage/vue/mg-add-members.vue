@@ -29,7 +29,7 @@ const inputDetails = computed(() => {
         [FromTypes.ROLE]: 'Add all users of a particular role in the system.',
         [FromTypes.LIST]: 'Add a list of users (either external user IDs or Schoolbox usernames).',
     }
-    return placeholderOptions[addMembersStore.fromOption];
+    return placeholderOptions[addMembersStore.fromType];
 });
 
 /**
@@ -77,19 +77,19 @@ const addButtonText = computed(() => addMembersStore.isProcessing ? 'Adding...' 
                             <label class="title">From:</label>
                             <ul class="option-list">
                                 <li>
-                                    <input type="radio" :id="FromTypes.NAME" :value="FromTypes.NAME" v-model="addMembersStore.fromOption">
+                                    <input type="radio" :id="FromTypes.NAME" :value="FromTypes.NAME" v-model="addMembersStore.fromType">
                                     <label for="name">Name</label>
                                 </li>
                                 <li>
-                                    <input type="radio" :id="FromTypes.GROUP" :value="FromTypes.GROUP" v-model="addMembersStore.fromOption">
+                                    <input type="radio" :id="FromTypes.GROUP" :value="FromTypes.GROUP" v-model="addMembersStore.fromType">
                                     <label for="group">Group</label>
                                 </li>
                                 <li>
-                                    <input type="radio" :id="FromTypes.ROLE" :value="FromTypes.ROLE" v-model="addMembersStore.fromOption">
+                                    <input type="radio" :id="FromTypes.ROLE" :value="FromTypes.ROLE" v-model="addMembersStore.fromType">
                                     <label for="role">Role</label>
                                 </li>
                                 <li>
-                                    <input type="radio" :id="FromTypes.LIST" :value="FromTypes.LIST" v-model="addMembersStore.fromOption">
+                                    <input type="radio" :id="FromTypes.LIST" :value="FromTypes.LIST" v-model="addMembersStore.fromType">
                                     <label for="list">List</label>
                                 </li>
                             </ul>

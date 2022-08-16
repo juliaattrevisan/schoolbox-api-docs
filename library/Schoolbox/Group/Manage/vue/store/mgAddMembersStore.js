@@ -14,7 +14,7 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
 
     state: () => ({
         isProcessing: false, //to notify that an action is taking place, like updating a member access
-        fromOption: FromTypes.NAME, //the current way to search for members to add
+        fromType: FromTypes.NAME, //the current way to search for members to add
     }),
 
     actions: {

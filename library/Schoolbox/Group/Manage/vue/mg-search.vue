@@ -6,12 +6,14 @@
 
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import debounce from 'lodash/debounce';
+import { useAddMembersStore } from './store/mgAddMembersStore';
 import { useSearchStore } from './store/mgSearchStore';
+import FromTypes from './mgAddMembersFromTypes';
 import MgSearchResults from './mg-search-results.vue';
 
 
+const addMembersStore = useAddMembersStore();
 const searchStore = useSearchStore();
-const currentFromSelect = ref('name');
 const searchEl = ref(null);
 
 /**
@@ -21,12 +23,12 @@ const searchEl = ref(null);
  */
 const inputPlaceholder = computed(() => {
     const placeholderOptions = {
-        'name': 'Search users...',
-        'group': 'Search groups...',
-        'role': 'Search roles...',
-        'list': 'Add from a list...',
+        [FromTypes.NAME]: 'Search users...',
+        [FromTypes.GROUP]: 'Search groups...',
+        [FromTypes.ROLE]: 'Search roles...',
+        [FromTypes.LIST]: 'Add from a list...',
     }
-    return placeholderOptions[currentFromSelect.value];
+    return placeholderOptions[addMembersStore.fromType];
 });
 
 /**

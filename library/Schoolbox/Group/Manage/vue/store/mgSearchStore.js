@@ -47,7 +47,7 @@ export const useSearchStore = defineStore('mgSearch', {
                 [FromTypes.LIST]: '',
             }
             const addMembersStore = useAddMembersStore();
-            return searchEndpoints[addMembersStore.fromOption];
+            return searchEndpoints[addMembersStore.fromType];
         },
 
         /**
