@@ -28,6 +28,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Curriculum\Node;
+use TypeError;
 
 abstract class AbstractAssessment implements IAssessable
 {
@@ -496,6 +497,25 @@ abstract class AbstractAssessment implements IAssessable
         }
     }
 
+    /**
+     * Assert that `$this` and `$other` are of the same type.
+     *
+     * @param IAssessable $other
+     * @return void
+     * @throws TypeError if they are not
+     */
+    protected function assertTypeMatch(IAssessable $other): void
+    {
+        if (!($this instanceof $other)) {
+            throw new TypeError(
+                sprintf(
+                    'Assessment type mismatch: %s does not match %s',
+                    $this::class,
+                    $other::class,
+                )
+            );
+        }
+    }
 
     /**
      * @inheritdoc
