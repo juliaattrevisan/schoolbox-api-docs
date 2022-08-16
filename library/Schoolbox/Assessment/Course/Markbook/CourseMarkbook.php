@@ -51,7 +51,6 @@ use InvalidArgumentException;
  */
 class CourseMarkbook
 {
-
     /**
      * Represents column headers. May be assessment specifications or implementations.
      *

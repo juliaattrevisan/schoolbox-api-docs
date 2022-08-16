@@ -22,7 +22,6 @@ use Schoolbox\User;
  */
 class CSV extends AbstractCSV
 {
-
     /**
      * Exports
      * @param CourseMarkbook $courseMarkbook
