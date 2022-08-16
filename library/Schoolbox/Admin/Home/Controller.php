@@ -504,7 +504,7 @@ class Controller extends Base
     {
         return (
             '' !== trim($this->getConfigLoader()->get('turnitin_api_host')) &&
-            '' !== trim($this->getConfigLoader()->get('turnitin_api_key' ))
+            '' !== trim($this->getConfigLoader()->get('turnitin_api_key'))
         );
     }
 }
