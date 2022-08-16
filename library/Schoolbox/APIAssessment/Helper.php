@@ -584,10 +584,6 @@ v_most_recent_feedback.review_route = 'instructor' AND
                     'indicators'            => []
                 ];
             }
-            //if descriptor is null, then step past it
-            if (null === $row['descriptor_name']) {
-                continue;
-            }
             //capability should already exist, so lets build the indicator for that capability
             if (!isset($output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']])) {
                 $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']] = [
@@ -595,13 +591,17 @@ v_most_recent_feedback.review_route = 'instructor' AND
                     'name'          => $row['indicator_name'],
                     'maxValue'      => (float)$row['indicator_max_value'],
                     'value'         => (float)$row['indicator_mark'],
-                    'descriptor'    => [
+                    'descriptor'    => null,
+                    ];
+                //if descriptor is not null, then enter it
+                if (null != $row['descriptor_name']) {
+                    $output['capabilities'][$row['capability_id']]['indicators'][$row['indicator_id']]['descriptor'] = [
                         'id'            => (int)$row['descriptor_id'],
                         'description'   => $row['descriptor_name'],
                         'maxValue'      => (float)$row['descriptor_max_value'],
                         'sequence'      => (int)$row['descriptor_sequence']
-                    ]
-                ];
+                    ];
+                }
             }
         }
         //clean the data, remove the numeric array keys
