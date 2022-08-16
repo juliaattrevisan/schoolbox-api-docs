@@ -57,7 +57,7 @@ class Overwriter
         }
 
         // Get fields from destination:
-        $updatedDestination = $source->cloneForCopy();
+        $updatedDestination = $destination->overwrite($source);
         $updatedDestination
             ->setId($destination->getId())
             ->setSpecificationAssessment($destination->getSpecificationAssessment())
