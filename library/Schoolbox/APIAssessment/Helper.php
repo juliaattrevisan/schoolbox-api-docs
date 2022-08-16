@@ -173,6 +173,9 @@ class Helper
     private function buildSearch(array $filter)
     {
         $params = [];
+        //for filter Builder::getBindings
+        $folderCodes = [];
+        $folderIds = [];
 
         $select = "SELECT
     assessment.id,
@@ -231,9 +234,23 @@ WHERE
             $params['assessmentType'] = $filter['assessmentType'];
         }
         if (array_key_exists('folder', $filter)) {
+            //check if folder is an array
+            if (is_array($filter['folder'])) {
+                //iterate through items
+                foreach ($filter['folder'] as $folderObj) {
+                    //if id set, then add OR id
+                    if (isset($folderObj['id'])) {
+                        $folderIds[] = $folderObj['id'];
+                    }
+                    //if code set, then add OR code
+                    if (isset($folderObj['code'])) {
+                        $folderCodes[] = $folderObj['code'];
+                    }
+                }
+            }
+            //historic method of filtering assessments for a specific folder
             if (array_key_exists('id', $filter['folder'])) {
-                $where              .= " AND v_assessment_relation.folder_id = :folderId ";
-                $params['folderId'] = $filter['folder']['id'];
+                $folderIds[] = $filter['folder']['id'];
             }
         }
         if (array_key_exists('weighted', $filter)) {
@@ -289,6 +306,30 @@ WHERE
                 $params['projectID'] = $filter['project']['id'];
             }
         }
+        //was a folder requested?
+        if (!empty($folderIds) || !empty($folderCodes)) {
+            $where .= " AND ( ";
+
+            //were there folder id requested?
+            if (!empty($folderIds)) {
+                $folderIdsBindings = Builder::getBindings($folderIds, 'ids');
+                $where .= " folder.id in ({$folderIdsBindings->getPlaceholder()}) ";
+                $params = array_merge($params, $folderIdsBindings->getParams());
+            }
+            //if folder codes also requested
+            if (!empty($folderIds) && !empty($folderCodes)) {
+                $where .= " OR ";
+            }
+            //where there folder codes requested
+            if (!empty($folderCodes)) {
+                $folderCodesBindings = Builder::getBindings($folderCodes, 'codes');
+                $where .= " folder_code.code in ({$folderCodesBindings->getPlaceholder()}) ";
+                $from .= " JOIN folder_code on (v_assessment_relation.folder_id = folder_code.folder_id and folder_code.deleted_at is NULL) ";
+                $params = array_merge($params, $folderCodesBindings->getParams());
+            }
+            $where .= " ) ";
+        }
+
         return [
             $select . $from . $where,
             $params
