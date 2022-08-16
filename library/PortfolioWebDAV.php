@@ -259,7 +259,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         foreach ($response as $filepath => $info) {
             $filename = basename($filepath);
 
-            $type = $this->parseResourceType($info['{DAV:}resourcetype']);
+            $type = null;
+            //fix php 8 bug when `{DAV:}resourcetype` is not a parameter of $info
+            if (isset($info['{DAV:}resourcetype'])) {
+                $type =  $this->parseResourceType($info['{DAV:}resourcetype']);
+            }
 
             $index = null;
 
