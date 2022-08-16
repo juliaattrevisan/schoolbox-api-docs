@@ -191,6 +191,7 @@
                         $element.attr('data-spec-assessment-id', data.id);
                         $element.attr('data-spec-assessment-title', data.title);
                         $element.attr('data-method', 'PUT');
+                        document.window.reload();
                     })
                     .fail(function () {
                         $toaster.toastTimeout({
