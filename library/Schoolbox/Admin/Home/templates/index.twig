@@ -297,9 +297,6 @@
                     $('[data-light="turnitin"]').html(data.message).removeClass('neutral').addClass(light);
                     $('[id="turnitin-block"]').removeAttr('hidden');
                 }
-            },
-            error:function() {
-                $('[data-light="turnitin"]').html('Offline').removeClass('neutral').addClass('alert');
             }
         });
         {% endif %}

@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Turnitin\Admin;
 use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Turnitin\Api;
+use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\Helper;
 
@@ -81,18 +82,25 @@ class Status
 
                 /* Otherwise something to look at
                  */
-                $payload['name'] = $result['product_name'];
+                $payload['name'     ] = $result['product_name'];
                 $payload['available'] = true;
-                $payload['message']   = 'Online';
+                $payload['message'  ] = 'Online';
 
                 return $payload;
             } catch (Credentials $e) {
                 /* Bad credentials will stop you from making a proper connection
                  */
-                $payload['message'] =  'Auth failed';
+                $payload['available'] = true;
+                $payload['message'  ] = 'Auth failed';
             } catch (GuzzleException $e) {
                 /* Some kind of networky issue; noop
                  */
+            } catch (BadEndpoint $e) {
+                $payload['available'] = false;
+                $payload['message'  ] = 'Bad end point';
+            } catch (Exception $e) {
+                $payload['available'] = false;
+                $payload['message'  ] = 'Offline';
             }
         }
 
