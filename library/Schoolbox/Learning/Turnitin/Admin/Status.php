@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Admin;
 
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Turnitin\Api;
