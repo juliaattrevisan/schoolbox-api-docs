@@ -5,13 +5,16 @@
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
 import { useMembersStore } from './mgMembersStore';
+import { useSearchStore } from './mgSearchStore';
 import Endpoints from '../mgEndpoints';
+import FromTypes from '../mgAddMembersFromTypes';
 
 
 export const useAddMembersStore = defineStore('mgAddMembers', {
 
     state: () => ({
         isProcessing: false, //to notify that an action is taking place, like updating a member access
+        fromOption: FromTypes.NAME, //the current way to search for members to add
     }),
 
     actions: {
@@ -33,14 +36,14 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    // const newMembers = responseJson.newMembers.map((newMember) => { //add in some additional properties
-                    //     return {
-                    //         ...newMember,
-                    //         displayPriority: 2, //to show at the very top of the display table
-                    //         isNew: true, //to highlight new members just added
-                    //         justUpdated: false, //to highlight members that have just been changed
-                    //     }
-                    // });
+                    const newMembers = responseJson.newMembers.map((newMember) => { //add in some additional properties
+                        return {
+                            ...newMember,
+                            displayPriority: 2, //to show at the very top of the display table
+                            isNew: true, //to highlight new members just added
+                            justUpdated: false, //to highlight members that have just been changed
+                        }
+                    });
                     const membersStore = useMembersStore();
                     membersStore.groupMembers = [...membersStore.groupMembers, ...newMembers]; //add in the new members to the table
                 } else {
@@ -67,8 +70,10 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
  */
 function getFormData () {
     const store = useStore();
+    const searchStore = useSearchStore();
+    const memberIds = searchStore.selectedResults.map((selectedResult) => selectedResult.id);
     return JSON.stringify({
         groupId: store.id,
-        members: [60, 64, 46]
+        members: memberIds,
     });
 }

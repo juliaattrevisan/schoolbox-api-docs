@@ -4,8 +4,8 @@
 
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
-import { useMembersStore } from './mgMembersStore';
-import Endpoints from '../mgEndpoints';
+import { useAddMembersStore } from './mgAddMembersStore';
+import FromTypes from '../mgAddMembersFromTypes';
 
 
 const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
@@ -19,7 +19,7 @@ export const useSearchStore = defineStore('mgSearch', {
         isResultsCapped: false, //to show a 'refine your search' note
         resultsNotShownCount: 0, //a total of the results not visible in the list
         results: [], //members returned in the current search results
-        selection: [], //members to add on Add Members selection
+        selectedResults: [], //members to add on Add Members selectedResults
     }),
 
     getters: {
@@ -35,12 +35,37 @@ export const useSearchStore = defineStore('mgSearch', {
         },
 
         /**
+         * Changes depending on where we are searching for users
+         * 
+         * @return { String }
+         */
+        searchEndpoint () {
+            const searchEndpoints = {
+                [FromTypes.NAME]: '/ajax/user.php?groupID=0&query=',
+                [FromTypes.GROUP]: '/ajax/addUserByGroup.php?type=individual&query=',
+                [FromTypes.ROLE]: '/ajax/addUserByGroup.php?type=system&query=',
+                [FromTypes.LIST]: '',
+            }
+            const addMembersStore = useAddMembersStore();
+            return searchEndpoints[addMembersStore.fromOption];
+        },
+
+        /**
+         * If any results have been selected
+         * 
+         * @return { Boolean }
+         */
+        hasSelectedResults () {
+            return this.selectedResults.length > 0;
+        },
+
+        /**
          * Only if there's not already a process taking place and there's actually members to add
          * 
          * @returns { Boolean }
          */
         canAddMembers () {
-            return this.selection.length > 0 && !this.isProcessing;
+            return this.hasSelectedResults && !this.isProcessing;
         },
 
     },
@@ -52,12 +77,12 @@ export const useSearchStore = defineStore('mgSearch', {
          * 
          * @returns { Array }
          */
-        async searchForMembers () {
+        async search () {
             this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
             try {
-                const response = await fetch(`/ajax/user.php?groupID=0&query=${this.query}`, {
+                const response = await fetch(`${this.searchEndpoint}${this.query}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -68,50 +93,9 @@ export const useSearchStore = defineStore('mgSearch', {
             } catch (error) {
                 console.warn(error);
             } finally {
-                this.isProcessing = true;
+                this.isProcessing = false;
                 store.isProcessing = false;
             }
-        },
-
-        /**
-         * add a search result 
-         * 
-         * @param { Object } 
-         */
-        add (searchResult) {
-            this.selection  = [...this.selection, searchResult];
-        },
-
-        /**
-         * remove a search result 
-         * 
-         * @param { Object }
-         */
-        remove (searchResult) {
-            this.selection = this.selection.filter((selectionItem) => selectionItem.id !== searchResult.id);
-        },
-
-        /**
-         * clear all the currently selected search results
-         */
-        empty () {
-            this.selection  = [];
-        },
-
-        /**
-         * add all found results to the selection
-         */
-         addAllResults () {
-            this.results.forEach((result) => {
-                this.add(result);
-            });
-        },
-
-        /**
-         * remove all found results from the selection
-         */
-        removeAllResults () {
-            this.empty()
         },
 
         /**
@@ -119,8 +103,42 @@ export const useSearchStore = defineStore('mgSearch', {
          */
         clear () {
             this.query = '';
+            this.results = [];
         },
 
+        /**
+         * add a search result 
+         * 
+         * @param { Object } 
+         */
+        addResult (searchResult) {
+            this.selectedResults  = [...this.selectedResults, searchResult];
+        },
+
+        /**
+         * remove a search result 
+         * 
+         * @param { Object }
+         */
+        removeResult (searchResult) {
+            this.selectedResults = this.selectedResults.filter((selectedResultsItem) => selectedResultsItem.id !== searchResult.id);
+        },
+
+        /**
+         * add all found results to the selectedResults
+         */
+        addAllResults () {
+            this.results.forEach((result) => {
+                this.add(result);
+            });
+        },
+
+        /**
+         * remove all found results from the selectedResults
+         */
+        removeAllResults () {
+            this.selectedResults  = [];
+        },
 
     },
 

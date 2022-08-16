@@ -18,9 +18,9 @@ const searchStore = useSearchStore();
  * @returns { Boolean } 
  */
 const isAllResultsSelected = computed(() => {
-    if (searchStore.selection.length > 0) {
+    if (searchStore.selectedResults.length > 0) {
         const alreadySelectedResults = searchStore.results.filter((resultItem) => {
-            return searchStore.selection.some((selectionItem) => resultItem.id === selectionItem.id);
+            return searchStore.selectedResults.some((selectionItem) => resultItem.id === selectionItem.id);
         }); 
         return alreadySelectedResults.length === searchStore.results.length ? true : false;
     } else {
@@ -35,9 +35,9 @@ const isAllResultsSelected = computed(() => {
  * @returns { Boolean } 
  */
 const isSomeResultsSelected = computed(() => {
-    if (searchStore.selection.length > 0) {
+    if (searchStore.selectedResults.length > 0) {
         const alreadySelectedResults = searchStore.results.filter((resultItem) => {
-            return searchStore.selection.some((selectionItem) => resultItem.id === selectionItem.id);
+            return searchStore.selectedResults.some((selectionItem) => resultItem.id === selectionItem.id);
         }); 
         return alreadySelectedResults.length >= 1 && alreadySelectedResults.length !== searchStore.results.length ? true : false;
     } else {

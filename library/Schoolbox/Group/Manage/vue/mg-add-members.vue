@@ -4,34 +4,18 @@
  * Add members to the group
  */
 
-import { ref, computed, watch } from 'vue';
-import debounce from 'lodash/debounce';
+import { computed } from 'vue';
 import { useStore } from './store/manageGroupStore';
 import { useAddMembersStore } from './store/mgAddMembersStore';
 import { useSearchStore } from './store/mgSearchStore';
-import MgSearchResults from './mg-search-results.vue';
+import FromTypes from './mgAddMembersFromTypes';
+import MgSelectedSearchResults from './mg-selected-search-results.vue';
+import MgSearch from './mg-search.vue';
 
 
 const store = useStore();
 const addMembersStore = useAddMembersStore();
-const addSearchStore = useSearchStore();
-const currentFromSelect = ref('name');
-
-
-/**
- * Update the input place holder text depending on the currentFromSelect
- *
- * @returns { String }
- */
-const inputPlaceholder = computed(() => {
-    const placeholderOptions = {
-        'name': 'Search users...',
-        'group': 'Search groups...',
-        'role': 'Search roles...',
-        'list': 'Add from a list...',
-    }
-    return placeholderOptions[currentFromSelect.value];
-});
+const searchStore = useSearchStore();
 
 /**
  * Provide extra details on how the current search selection is to be used
@@ -40,30 +24,13 @@ const inputPlaceholder = computed(() => {
  */
 const inputDetails = computed(() => {
     const placeholderOptions = {
-        'name': 'You may add users individually by typing their name and selecting from the list.',
-        'group': 'Add all users that belong to another group.',
-        'role': 'Add all users of a particular role in the system.',
-        'list': 'Add a list of users (either external user IDs or Schoolbox usernames).',
+        [FromTypes.NAME]: 'You may add users individually by typing their name and selecting from the list.',
+        [FromTypes.GROUP]: 'Add all users that belong to another group.',
+        [FromTypes.ROLE]: 'Add all users of a particular role in the system.',
+        [FromTypes.LIST]: 'Add a list of users (either external user IDs or Schoolbox usernames).',
     }
-    return placeholderOptions[currentFromSelect.value];
+    return placeholderOptions[addMembersStore.fromOption];
 });
-
-/**
- * start searching once the search is active, watching the query string for input
- */
-watch(() => addSearchStore.query, () => {
-    if (addSearchStore.isSearchActive) {
-        debounceSearch();
-    }
-});
-
-/**
- * debounce to avoid constant polling while the user is typing
- */
-const debounceSearch = debounce(() => {
-    addSearchStore.searchForMembers();
-}, 350);
-
 
 /**
  * add the selected members to the group
@@ -110,35 +77,30 @@ const addButtonText = computed(() => addMembersStore.isProcessing ? 'Adding...' 
                             <label class="title">From:</label>
                             <ul class="option-list">
                                 <li>
-                                    <input type="radio" id="name" value="name" v-model="currentFromSelect">
+                                    <input type="radio" :id="FromTypes.NAME" :value="FromTypes.NAME" v-model="addMembersStore.fromOption">
                                     <label for="name">Name</label>
                                 </li>
                                 <li>
-                                    <input type="radio" id="group" value="group" v-model="currentFromSelect">
+                                    <input type="radio" :id="FromTypes.GROUP" :value="FromTypes.GROUP" v-model="addMembersStore.fromOption">
                                     <label for="group">Group</label>
                                 </li>
                                 <li>
-                                    <input type="radio" id="role" value="role" v-model="currentFromSelect">
+                                    <input type="radio" :id="FromTypes.ROLE" :value="FromTypes.ROLE" v-model="addMembersStore.fromOption">
                                     <label for="role">Role</label>
                                 </li>
                                 <li>
-                                    <input type="radio" id="list" value="list" v-model="currentFromSelect">
+                                    <input type="radio" :id="FromTypes.LIST" :value="FromTypes.LIST" v-model="addMembersStore.fromOption">
                                     <label for="list">List</label>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                    <input
-                        type="text"
-                        v-model="addSearchStore.query"
-                        :placeholder="inputPlaceholder"
-                        @input="$event.target.composing = false"
-                    />
-                    <mg-search-results />
+                    <mg-selected-search-results />
+                    <MgSearch />
                     <p class="meta">{{ inputDetails }}</p>
                     <button 
                         class="button submit"
-                        :disabled="!addMembersStore.canAddMembers"
+                        :disabled="!searchStore.canAddMembers"
                         @click.prevent="onAddMembersSelected">
                         {{ addButtonText }}
                     </button>
@@ -186,10 +148,6 @@ label {
         margin-right: 0;
         min-width: 110px; //takes us all the way down to 320px devices
     }
-}
-
-input {
-    margin-bottom: 0;
 }
 
 .meta {

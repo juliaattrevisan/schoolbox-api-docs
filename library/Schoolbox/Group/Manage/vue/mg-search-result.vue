@@ -56,7 +56,7 @@ function highlightSearchInElement (toHighlight) {
  * @returns { Boolean }
  */
 const isSelected = computed(() => { 
-    return searchStore.selection.some((selectedItem) => props.result.id === selectedItem.id);
+    return searchStore.selectedResults.some((selectedItem) => props.result.id === selectedItem.id);
 });
 
 /**
@@ -64,7 +64,7 @@ const isSelected = computed(() => {
  * the result is currently selected
  */
 function onSelected () {
-    isSelected.value ? searchStore.remove(props.result) : searchStore.add(props.result);
+    isSelected.value ? searchStore.removeResult(props.result) : searchStore.addResult(props.result);
 }
 
 </script>

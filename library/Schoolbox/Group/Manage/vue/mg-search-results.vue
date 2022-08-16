@@ -26,7 +26,7 @@ const showSelectAll = computed(() => {
 </script>
 
 <template>
-    <div class="search-results-container">
+    <div v-if="searchStore.isSearchActive" class="search-results-container">
         <div class="search-results">
             <ul>
                 <li v-if="searchStore.isResultsCapped" class="search-refine-note">{{ searchStore.resultsNotShownCount }} search results not shown, try refining your search further.</li>
