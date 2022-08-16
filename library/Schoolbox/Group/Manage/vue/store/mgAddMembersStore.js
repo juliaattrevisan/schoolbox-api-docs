@@ -71,9 +71,14 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
 function getFormData () {
     const store = useStore();
     const searchStore = useSearchStore();
-    const memberIds = searchStore.selectedResults.map((selectedResult) => selectedResult.id);
+    const members = searchStore.selectedResults.map((selectedResult) => {
+        return { 
+            id: selectedResult.id, 
+            fromType: selectedResult.fromType 
+        }
+    });
     return JSON.stringify({
         groupId: store.id,
-        members: memberIds,
+        members: members,
     });
 }

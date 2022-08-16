@@ -112,7 +112,12 @@ export const useSearchStore = defineStore('mgSearch', {
          * @param { Object } 
          */
         addResult (searchResult) {
-            this.selectedResults  = [...this.selectedResults, searchResult];
+            const addMembersStore = useAddMembersStore();
+            const searchResultWithFromType = {
+                ...searchResult,
+                fromType: addMembersStore.fromType,
+            }
+            this.selectedResults  = [...this.selectedResults, searchResultWithFromType];
         },
 
         /**

@@ -35,8 +35,7 @@ const inputPlaceholder = computed(() => {
  * add relevant keyboard and mouse events
  */
 onMounted(() => {
-    // document.addEventListener('keydown', onKeyDown);
-    // document.addEventListener('keyup', onKeyUp);
+    document.addEventListener('keyup', onKeyUp);
     document.addEventListener('click', onMouseClick);
 });
 
@@ -44,10 +43,39 @@ onMounted(() => {
  * remove relevant keyboard and mouse events
  */
 onUnmounted(() => {
-    // document.removeEventListener('keydown', onKeyDown);
-    // document.removeEventListener('keyup', onKeyUp);
+    document.removeEventListener('keyup', onKeyUp);
     document.removeEventListener('click', onMouseClick);
 });
+
+/**
+ * so we can select enter when adding codes
+ * useful if we copy/paste a bunch of codes,
+ * then we can just select enter to add them all
+ * 
+ * @param { Event }
+ */
+function onKeyUp (event) {
+    const keyName = event.key;
+    const keyOptions = {
+        'Escape': () => onEscapeKeySelected(),
+    }
+    if (keyOptions[keyName]) { //ensure search input has focus
+    // if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
+        event.preventDefault();
+        keyOptions[keyName](event);
+    }
+}
+
+/**
+ * to close the results when selected
+ * 
+ * @param { Event }
+ */
+function onEscapeKeySelected (event) {
+    if (searchStore.isSearchActive) {
+        searchStore.clear();
+    }
+}
 
 /**
  * to be able to close the search results
