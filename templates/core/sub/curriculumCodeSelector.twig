@@ -3,13 +3,14 @@
  #
  # @param bool courseManagedReadonly
  #}
-
+{% if courseManagedReadonly is not defined %}
+    {% set courseManagedReadonly = false %}
+{% endif %}
 <div id="curriculum-selector-container">
     <curriculum-selector
             :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
-            :selected-codes="{{ codeList }}"
+            :selected-codes="{{ codeList|json_encode }}"
             data-endpoint="{{ routeLookup('curriculumApi.getTree') }}"
-
     />
 
 </div>
