@@ -21,7 +21,6 @@ use Schoolbox\Learning\Turnitin\Helper;
  */
 class Status
 {
-
     /**
      * @var IConfigLoader
      */
