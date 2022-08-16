@@ -5,9 +5,9 @@
  */
 
 import { computed } from 'vue';
-import { useStore } from './store/manageGroupStore';
-import { useAddMembersStore } from './store/mgAddMembersStore';
-import { useSearchStore } from './store/mgSearchStore';
+import { useStore } from '../store/manageGroupStore';
+import { useAddMembersStore } from '../store/mgAddMembersStore';
+import { useSearchStore } from '../store/mgSearchStore';
 import FromTypes from './mgAddMembersFromTypes';
 import MgSelectedSearchResults from './mg-selected-search-results.vue';
 import MgSearch from './mg-search.vue';

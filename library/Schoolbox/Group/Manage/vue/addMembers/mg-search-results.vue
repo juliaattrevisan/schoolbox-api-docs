@@ -6,7 +6,7 @@
  */
 
 import { computed  } from 'vue';
-import { useSearchStore  } from './store/mgSearchStore';
+import { useSearchStore  } from '../store/mgSearchStore';
 import MgSelectAllSearchResults from './mg-select-all-search-results.vue';
 import MgAddMembersSearchResult from './mg-search-result.vue';
 

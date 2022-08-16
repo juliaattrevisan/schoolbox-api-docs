@@ -7,7 +7,7 @@ import { useStore } from './manageGroupStore';
 import { useMembersStore } from './mgMembersStore';
 import { useSearchStore } from './mgSearchStore';
 import Endpoints from '../mgEndpoints';
-import FromTypes from '../mgAddMembersFromTypes';
+import FromTypes from '../addMembers/mgAddMembersFromTypes';
 
 
 export const useAddMembersStore = defineStore('mgAddMembers', {

@@ -5,7 +5,7 @@
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
 import { useAddMembersStore } from './mgAddMembersStore';
-import FromTypes from '../mgAddMembersFromTypes';
+import FromTypes from '../addMembers/mgAddMembersFromTypes';
 
 
 const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active

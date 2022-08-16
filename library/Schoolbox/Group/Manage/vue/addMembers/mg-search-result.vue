@@ -6,7 +6,7 @@
 
 import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
-import { useSearchStore  } from './store/mgSearchStore';
+import { useSearchStore  } from '../store/mgSearchStore';
 
 
 const searchStore = useSearchStore();

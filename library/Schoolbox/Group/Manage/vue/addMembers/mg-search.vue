@@ -6,8 +6,8 @@
 
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import debounce from 'lodash/debounce';
-import { useAddMembersStore } from './store/mgAddMembersStore';
-import { useSearchStore } from './store/mgSearchStore';
+import { useAddMembersStore } from '../store/mgAddMembersStore';
+import { useSearchStore } from '../store/mgSearchStore';
 import FromTypes from './mgAddMembersFromTypes';
 import MgSearchResults from './mg-search-results.vue';
 

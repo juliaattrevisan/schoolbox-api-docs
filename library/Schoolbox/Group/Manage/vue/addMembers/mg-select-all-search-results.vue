@@ -6,7 +6,7 @@
  */
 
 import { computed } from 'vue';
-import { useSearchStore  } from './store/mgSearchStore';
+import { useSearchStore  } from '../store/mgSearchStore';
 
 
 const searchStore = useSearchStore();

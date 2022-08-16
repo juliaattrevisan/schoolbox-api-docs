@@ -5,7 +5,7 @@
 import { nextTick } from 'vue';
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
-import AccessTypes from '../mgAccessTypes';
+import AccessTypes from '../currentMembers/mgAccessTypes';
 
 
 export const useMembersStore = defineStore('mgMembers', {

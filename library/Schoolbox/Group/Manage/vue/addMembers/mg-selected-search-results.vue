@@ -4,7 +4,7 @@
  * To list all the currently selected search results
  */
 
-import { useSearchStore } from './store/mgSearchStore';
+import { useSearchStore } from '../store/mgSearchStore';
 import MgSelectedSearchResult from './mg-selected-search-result.vue';
 
 

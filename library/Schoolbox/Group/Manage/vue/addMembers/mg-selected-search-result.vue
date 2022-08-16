@@ -5,7 +5,7 @@
  * further details revealed via a modal
  */
 
-import { useSearchStore } from './store/mgSearchStore';
+import { useSearchStore } from '../store/mgSearchStore';
 
 
 const props = defineProps({
