@@ -242,6 +242,7 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function overwrite(IAssessable $source): IAssessable
     {
+        $this->assertTypeMatch($source);
         // Just set every field to the value from `$source`.
         // Exceptions:
         // * ID
