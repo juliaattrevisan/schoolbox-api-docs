@@ -144,7 +144,7 @@
                                 <li>
                                     <a href="{{ saveToCourseRoute }}"
                                        class="icon-export"
-                                       data-action="save-to-course"
+                                       data-reveal-id="save-to-course-modal-{{ assessment.id }}"
                                        data-method="{{ saveToCourseMethod }}"
                                        data-spec-assessment-id="{{ specAssessment.id ?? null }}"
                                        data-spec-assessment-title="{{ specAssessment.title ?? null }}"
@@ -155,6 +155,60 @@
                     </ul>
                 {% endif %}
             </div>
+            {% if saveToCourseRoute %}
+                <div id="save-to-course-modal-{{ assessment.id }}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+                    <h2>Are you sure you wish to write this assessment back to its course?</h2>
+                    {% if specAssessment.id ?? null %}
+                        <div class="warning alert-box">
+                            <p>
+                                The original assessment
+                                <strong>{{ specAssessment.title ?? null }}</strong>
+                                in the course will be replaced with this assessment.
+                            </p>
+                            {% if assessment is project %}
+                                {% if assessment.assessables is not empty %}
+                                    <p>
+                                        As this assessment is a project, its
+                                        activity set will also be updated:
+                                    </p>
+                                    <p>
+                                        <strong>Current</strong>
+                                    </p>
+                                    <ul>
+                                        {% for activity in specAssessment.assessables %}
+                                            <li>{{ activity.title }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    <p>
+                                        <strong>Replacement</strong>
+                                    </p>
+                                    <ul>
+                                        {% for activity in assessment.assessables %}
+                                            <li>{{ activity.title }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            {% endif %}
+                            <p>
+                                Any other imports of the original assessment will
+                                <strong>not</strong> be updated.
+                            </p>
+                        </div>
+                    {% else %}
+                        <div class="alert-box">
+                            <p>
+                                This assessment does not yet exist in the course;
+                                {% if assessment is project %}
+                                    it and its activities will be added.
+                                {% else %}
+                                    it will be added.
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                </div>
+            {% endif %}
         </li>
     {% endfor %}
 </ul>
