@@ -210,7 +210,10 @@ update_puppet_facts(){
     error "SQL updates completed with errors. Please manually fix issues or rollback to pre-update backup."
   else
     #create temp file for no error case
-    jq -n ".$INSTANCE_ID.schoolbox_update_error = 0" > $tmp_fact_file;
+    jq -n -c \
+      --arg instanceid "$INSTANCE_ID" \
+      '.schoolbox_update_error[$instanceid] = 0 | .schoolbox_update_errormsg[$instanceid] = ""' \
+      > $tmp_fact_file;
     log "SQL updates completed";
   fi
 }
