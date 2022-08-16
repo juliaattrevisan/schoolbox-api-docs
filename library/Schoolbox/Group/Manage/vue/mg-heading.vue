@@ -5,7 +5,7 @@
  * providing various group wide tools
  */
 
-import { onMounted } from 'vue';
+import { watch, nextTick } from 'vue';
 import { useStore } from './store/manageGroupStore';
 import { useMembersStore } from './store/mgMembersStore';
 import { useSettingsStore } from './store/mgSettingsStore';
@@ -19,12 +19,21 @@ const settingsStore = useSettingsStore();
 const disbandStore = useDisbandStore();
 
 /**
- * ensure the jelly tot menu works
+ * listen for hasLoadedOk so we can check whether we need to initiation foundation
  */
-onMounted(() => {
-    //
-    // $(document).foundation();
+watch(() => store.hasLoadedOk, (hasLoadedOk) => {
+    if (hasLoadedOk) {
+        initFoundation();
+    } 
 });
+
+/**
+ * ensure the jelly tot menu works,
+ */
+async function initFoundation () {
+    await nextTick();
+    $(document).foundation();
+}
 
 /**
  * to open the update settings modal
@@ -62,20 +71,20 @@ function onDisbandSelected () {
             <h1>Manage Group</h1>
         </div>
         <nav v-if="store.hasLoadedOk">
-            <a href="#" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
+            <a href="#expand" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
         </nav>
         <ul id="tab-control" class="f-dropdown" data-dropdown-content>
             <li>
-                <a href="#" class="icon-settings" id="updateGroupSettings" @click.prevent="onUpdateSettingsSelected">Update Group Settings</a>
+                <a href="#update-group-settings" class="icon-settings" id="updateGroupSettings" @click.prevent="onUpdateSettingsSelected">Update Group Settings</a>
             </li>
             <li v-if="membersStore.hasGroupMembers">
-                <a href="#" class="icon-email" id="emailAllGroup" @click.prevent="onEmailGroupSelected">Email Group Members</a>
+                <a href="#email-group-members" class="icon-email" id="emailAllGroup" @click.prevent="onEmailGroupSelected">Email Group Members</a>
             </li>
             <li v-if="membersStore.hasGroupMembers">
-                <a href="#" class="icon-staff" id="emailAllParents" title="Includes parents of students in the group, as well as parents directly in the group." @click.prevent="onEmailGroupParentsSelected">Email Group Parents</a>
+                <a href="#email-group-parents" class="icon-staff" id="emailAllParents" title="Includes parents of students in the group, as well as parents directly in the group." @click.prevent="onEmailGroupParentsSelected">Email Group Parents</a>
             </li>
             <li>
-                <a href="#" class="icon-delete" @click.prevent="onDisbandSelected">Disband Group</a>
+                <a href="#disband-group" class="icon-delete" @click.prevent="onDisbandSelected">Disband Group</a>
             </li>
         </ul>
     </div>

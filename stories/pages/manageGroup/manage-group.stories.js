@@ -137,7 +137,6 @@ NoMembers.parameters = {
         handlers: [
             rest.get(groupDataEndpoint, (req, res, ctx) => {
                 return res(
-                    ctx.delay(1000),
                     ctx.json({
                         ...data,
                         members: [], //start with no members
@@ -155,10 +154,30 @@ NoGroupAdmins.parameters = {
         handlers: [
             rest.get(groupDataEndpoint, (req, res, ctx) => {
                 return res(
-                    ctx.delay(1000),
                     ctx.json({
                         ...data,
                         members: [ ...data.members.filter((member) => member.accessType !== 'admin')], //to pull out the admins
+                    })
+                )
+            }),
+            ...mswHandlers,
+        ]
+    }
+}
+
+export const NoAccessSet = Template.bind({});
+NoAccessSet.parameters = {
+    msw: {
+        handlers: [
+            rest.get(groupDataEndpoint, (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        ...data,
+                        settings: {
+                            access: '',
+                            isNotificationsEnabled: true,
+                            isForceFollow: false,
+                        },
                     })
                 )
             }),

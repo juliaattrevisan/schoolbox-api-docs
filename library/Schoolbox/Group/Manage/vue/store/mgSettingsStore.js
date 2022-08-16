@@ -15,7 +15,25 @@ export const useSettingsStore = defineStore('mgSettings', {
         isNotificationsEnabled: false, //to send notifications to the group
         isForceFollow: false, //so notifcations are ALWAYS sent to all members
         isPromptOpen: false, //to notify that the prompt is opened / closed
+        isAccessSaved: false, //to ensure group access is set and saved
     }),
+
+    getters: {
+
+        /**
+         * to prompt the user to select the group access
+         * 
+         * @return { Boolean }
+         */
+        isAccessNotSet () {
+            if (this.access === '') {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+    },
 
     actions: {
 
@@ -26,6 +44,9 @@ export const useSettingsStore = defineStore('mgSettings', {
          */
         loadSettings (settings) {
             this.access = settings.access;
+            if (this.access !== '') {
+                this.isAccessSaved = true;
+            }
             this.isNotificationsEnabled = settings.isNotificationsEnabled;
             this.isForceFollow = settings.isForceFollow;
         },
@@ -54,7 +75,7 @@ export const useSettingsStore = defineStore('mgSettings', {
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    //
+                    this.isAccessSaved = true;
                 } else {
                     throw new Error();
                 }

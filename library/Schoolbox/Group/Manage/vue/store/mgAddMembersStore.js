@@ -64,8 +64,6 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
 /**
  * Pass in user ids of the members to add
  *
- * @param { Array }
- *
  * @returns { FormData }
  */
 function getFormData () {

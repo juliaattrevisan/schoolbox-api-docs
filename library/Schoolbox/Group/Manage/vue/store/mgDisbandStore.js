@@ -39,6 +39,7 @@ export const useDisbandStore = defineStore('mgDisband', {
                     body: getFormData(),
                 });
                 const responseJson = await response.json();
+                debugger;
                 if (responseJson.success) {
                     //
                 } else {
