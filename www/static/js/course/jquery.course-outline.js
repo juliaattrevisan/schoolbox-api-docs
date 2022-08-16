@@ -151,71 +151,55 @@
         );
 
 
-        // Save to course:
-        // create a dialog
-        component.on('click.courseInstance', '[data-action=save-to-course]', function (event) {
-            event.preventDefault();
-
-            let $element = $(this),
-                header,
-                text;
-
-            // Header differs on whether:
-            // * this has a spec assessment
-            // * this is a project
-            header = 'Are you sure you wish to write this assessment back to its course?';
-            if ($element.attr('data-spec-assessment-id')) {
-                text = '<div>' +
-                    '<div class=\"warning alert-box\">' +
-                    '<p>The original assessment <strong data-spec-assessment-title></strong> ' +
-                    'in the course will be replaced with this assessment.</p>' +
-                    '<p>Any other imports of the original assessment will <strong>not</strong> ' +
-                    'be updated.</p>' +
-                    '</div>' +
-                    '</div>'
-                let $text = $(text);
-                $text.find('[data-spec-assessment-title]').text($element.attr('data-spec-assessment-title'));
-                text = $text.html();
-            } else {
-                text = '<span class=\"alert-box\">This assessment does not yet exist in the course; it will be added.</span>'
+        // Save to course actions
+        $(document).on(
+            'click.courseInstance',
+            '[data-action=save-to-course-cancel]',
+            function (event) {
+                event.preventDefault();
+                let $element = $(this),
+                    $modal   = $element.closest('[data-reveal]');
+                $modal.foundation('reveal', 'close');
             }
+        );
+        $(document).on(
+            'click.courseInstance',
+            '[data-action=save-to-course]',
+            function (event) {
+                event.preventDefault();
 
-            $element.confirmDialog({
-                header: header,
-                text: text,
-                format: 'html',
-                confirmLabel: 'Yes',
-                cancelLabel: 'No',
-                confirmEvent: function () {
-                    let toaster = component.find('[data-alert]'),
-                        ajaxParams = {
-                            url: $element.attr('href'),
-                            method: $element.attr('data-method'),
-                        };
-                    toaster.toastActivate({text: 'Writing assessment to course...'});
-                    $.ajax(ajaxParams)
-                        .done(function(data) {
-                            toaster.toastTimeout({
-                                text: 'Assessment written to course.',
-                                css: 'pop success'
-                            });
+                let $element   = $(this),
+                    $modal     = $element.closest('[data-reveal]'),
+                    $toaster   = component.find('[data-alert]'),
+                    ajaxParams = {
+                        url:    $element.attr('href'),
+                        method: $element.attr('data-method'),
+                    };
 
-                            // After this item is updated even once:
-                            // * method becomes PUT
-                            // * ID and title are updated
-                            $element.attr('data-spec-assessment-id', data.id);
-                            $element.attr('data-spec-assessment-title', data.title);
-                            $element.attr('data-method', 'PUT');
-                        })
-                        .fail(function () {
-                            toaster.toastTimeout({
-                                text: 'Could not write assessment to course.',
-                                css: 'pop alert'
-                            });
+                $modal.foundation('reveal', 'close');
+                $toaster.toastActivate({text: 'Writing assessment to course...'});
+                $.ajax(ajaxParams)
+                    .done(function(data) {
+                        $toaster.toastTimeout({
+                            text: 'Assessment written to course.',
+                            css: 'pop success'
                         });
-                }
-            });
-        });
+
+                        // After this item is updated even once:
+                        // * method becomes PUT
+                        // * ID and title are updated
+                        $element.attr('data-spec-assessment-id', data.id);
+                        $element.attr('data-spec-assessment-title', data.title);
+                        $element.attr('data-method', 'PUT');
+                    })
+                    .fail(function () {
+                        $toaster.toastTimeout({
+                            text: 'Could not write assessment to course.',
+                            css: 'pop alert'
+                        });
+                    });
+            }
+        );
 
 
 
