@@ -236,6 +236,8 @@ class Controller extends Base
 
         // Go through each item in the graph
 
+        $embedUrl  = null;
+        $launchUrl = null;
         foreach ($contentItemsArray['@graph'] as $item) {
             // Grab the title if there is one
 
@@ -289,6 +291,10 @@ class Controller extends Base
                             $embedUrl .= $item['custom']['activity'] . "/";
                             $embedUrl .= $item['custom']['module'] . "/activity-starter";
 
+                            // Do double duty as the launch URL.
+                            // (I don't even know anymore)
+                            $launchUrl = $embedUrl;
+
                             // Found everything we need, get outta here and use it
 
                             break;
@@ -337,7 +343,7 @@ class Controller extends Base
         // javascript inside this template updates these in the DOM.
 
         // The launch URL generates a POST request to the embed URL.
-        $launchUrl = $this->router->generate('ltiConsumer.getLaunch', [
+        $launchUrl ??= $this->router->generate('ltiConsumer.getLaunch', [
             'providerId'  => $component->getConfig(LtiComponent::COMPONENT_CONFIG_LTI_PROVIDER),
             'componentId' => $component->getInstance()->getId(),
             'folderId'    => $component->getContext()->getId(),
