@@ -162,14 +162,16 @@
                         <div class="warning alert-box">
                             <p>
                                 The original assessment
-                                <strong>{{ specAssessment.title ?? null }}</strong>
-                                in the course will be replaced with this assessment.
+                                &ldquo;{{ specAssessment.title ?? null }}&rdquo;
+                                in the course will be <strong>replaced</strong>
+                                with this assessment.
                             </p>
                             {% if assessment is project %}
                                 {% if assessment.assessables is not empty %}
                                     <p>
                                         As this assessment is a project, its
-                                        activity set will also be updated:
+                                        activity set will also be <strong>replaced</strong>,
+                                        possibly deleting activities:
                                     </p>
                                     <p><strong>Current</strong></p>
                                     <ul>
@@ -191,16 +193,16 @@
                             </p>
                         </div>
                     {% else %}
-                        <div class="alert-box">
-                            <p>
-                                This assessment does not yet exist in the course;
-                                {% if assessment is project %}
-                                    it and its activities will be added.
-                                {% else %}
-                                    it will be added.
-                                {% endif %}
-                            </p>
-                        </div>
+                        <p>
+                            This assessment
+                            &ldquo;{{ assessment.title ?? null }}&rdquo;
+                            does not yet exist in the course;
+                            {% if assessment is project %}
+                                it and its activities will be added.
+                            {% else %}
+                                it will be added.
+                            {% endif %}
+                        </p>
                     {% endif %}
                     <ul class="flex-list buttons">
                         <li>
