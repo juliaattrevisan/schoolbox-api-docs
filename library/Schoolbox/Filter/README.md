@@ -360,7 +360,7 @@ of developing for filters.
 * Create a [Factory Factory](#factory-factory) in the namespace
   `\Schoolbox\Filter\Filters\{entityName}`, extending
   `\Schoolbox\Filter\AbstractFactoryFactory`
-  * define the `ENTITY` constant
+  * define the `ENTITY` constant as the class name of the mapper to filter
   * implement `buildFilterFactoryForFilter`: just have it throw an
     `\InvalidArgumentException` for now
   * implement `checkTeacherFolders`: just have it return the first parameter
