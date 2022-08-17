@@ -89,13 +89,24 @@ HELP;
             exit;
         }
 
-        /* We need this api
+        /* Check that your api setup is functioning
+         * We need this api working
          */
         $api = new Turnitin\Api(
             $this->getConfig()->get('site_version'),
             $this->getConfig()->get('turnitin_api_host'),
             $this->getConfig()->get('turnitin_api_key')
         );
+
+        /* If the basic test() failed, then your turnitin config is broken
+         * and your api host/key combo is somehow wrong
+         */
+        try {
+            $api->test();
+        } catch (Turnitin\Exception\Credentials $e) {
+            $this->getLogger()->warning($e->getMessage());
+            exit(1);
+        }
 
         /* Let's look inside Turnitin's mind
          */
