@@ -302,15 +302,18 @@ class Module extends BaseModule
         }
 
         /**
-         * die early when the requested Turnitin Submission Id does not match the responseID Turnitin Submission Id
+         * die early when the requested Turnitin Submission Id does not match any of the response files Turnitin Submission Id
          */
-        $validFile = true;
+        //start off with the lowest perm state
+        $validFile = false;
         foreach ($response->getAllFiles() as $file) {
             //check if file is a turnitin file then check if it matches the report turnitin id
-            if (null !== $file->getTurnitIn() && ($file->getTurnitIn()->getTurnitinSubmissionId() !== $turnitinReport->getTurnitinSubmissionId())) {
-                $validFile = false;
+            //if they do match (could be multiple files uploaded, so match on any) allow the user through
+            if (null !== $file->getTurnitIn() && ($file->getTurnitIn()->getTurnitinSubmissionId() === $turnitinReport->getTurnitinSubmissionId())) {
+                $validFile = true;
             }
         }
+        //you are not supposed to be accessing this link. go away
         if (!$validFile) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
