@@ -445,6 +445,7 @@ class Controller extends Base
 
                     $launch_data['contentUrl'] = $embedUrl;
                 }
+                $embedUrl = $provider->getUrl();
             } elseif ($ltiRequestType === self::LTI_LAUNCH_TYPE_BASIC) {
                 // Is this content which has actually been picked?
                 // Maintain current behaviour (for fear of breaking any existing integrations)
