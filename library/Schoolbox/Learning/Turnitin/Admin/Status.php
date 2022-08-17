@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Admin;
 
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Turnitin\Api;
+use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Learning\Turnitin\Helper;
 
@@ -20,7 +22,6 @@ use Schoolbox\Learning\Turnitin\Helper;
  */
 class Status
 {
-
     /**
      * @var IConfigLoader
      */
@@ -51,7 +52,7 @@ class Status
          * Turnitin has to be configured, otherwise it won't appear in the list
          */
         $payload = [
-            'name' => 'Turnitin',
+            'name' => 'SimCheck',
             'url'  => 'https://turnitin.statuspage.io/',
             'show' => false,
             'available' => false,
@@ -79,9 +80,7 @@ class Status
                     return $payload;
                 }
 
-                /* Otherwise something to look at
-                 */
-                $payload['name'] = $result['product_name'];
+                $payload['name']      = $result['product_name'];
                 $payload['available'] = true;
                 $payload['message']   = 'Online';
 
@@ -89,9 +88,11 @@ class Status
             } catch (Credentials $e) {
                 /* Bad credentials will stop you from making a proper connection
                  */
-                $payload['message'] =  'Auth failed';
-            } catch (GuzzleException $e) {
+                $payload['available'] = true;
+                $payload['message']   = 'Auth failed';
+            } catch (GuzzleException | BadEndpoint | Exception $e) {
                 /* Some kind of networky issue; noop
+                 * Catch exception but do nothing so default $payload will be returned.
                  */
             }
         }

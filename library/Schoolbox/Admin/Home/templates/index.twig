@@ -277,6 +277,7 @@
                 $('[data-light="rabbitmq"]').html(data.rabbitmq_status).removeClass('neutral').addClass(data.rabbitmq_light);
             }
         });
+        {% if turnitinEnabled %}
         // get turnitin status
         $.ajax({
             url: "/ajax/adminStats.php",
@@ -298,6 +299,7 @@
                 }
             }
         });
+        {% endif %}
         // get kami status
         $.ajax({
             url: "/ajax/adminStats.php",
@@ -431,7 +433,7 @@
                                 </li>
                             {% endif %}
 
-                            {# Optionally show turnitin status #}
+                            {% if turnitinEnabled %}
                                 <li id="turnitin-block" hidden>
                                     <div class="small-5 columns content">
                                         <a id="turnitin-url" href="" target="_blank"></a>
@@ -440,6 +442,8 @@
                                         <span class="full-width neutral label" data-light="turnitin">Testing...</span>
                                     </div>
                                 </li>
+                            {% endif %}
+
                             {# Show ssh + SSL cert status if not cloud hosted #}
                             {% if not is_cloud %}
                                 <li>
@@ -577,5 +581,3 @@
         </div><!-- small-12 columns -->
     </div><!-- admin-content -->
 </div>
-
-
