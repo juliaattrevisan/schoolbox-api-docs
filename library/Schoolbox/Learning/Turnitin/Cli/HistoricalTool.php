@@ -13,7 +13,6 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Helper;
 
-
 /**
  * CLI Tool for historically adding files that should be in Turnitin, but aren't
  */

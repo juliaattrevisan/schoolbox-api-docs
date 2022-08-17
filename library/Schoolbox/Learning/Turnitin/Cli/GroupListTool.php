@@ -26,7 +26,6 @@ use Schoolbox\Learning\Turnitin;
  */
 class GroupListTool extends CliTool\App
 {
-
     /**
      * --help
      *
