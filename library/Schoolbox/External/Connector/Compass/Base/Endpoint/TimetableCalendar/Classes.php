@@ -279,9 +279,9 @@ class Classes implements IStrategy
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
 
-                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Muay Thai excursion'])) {
-                        continue;
-                    }
+//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Muay Thai excursion'])) {
+//                        continue;
+//                    }
 
                     /* We only care about certain activities.
                      *
