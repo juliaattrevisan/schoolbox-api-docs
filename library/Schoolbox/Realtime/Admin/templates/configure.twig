@@ -54,9 +54,9 @@
 
             },
             describe: function () {
-
-                var summary = this.find('[data-summary]'),
-                    table   = this.find('[data-roles]'),
+                var fieldset = this.closest('fieldset');
+                var summary = fieldset.find('[data-summary]'),
+                    table   = fieldset.find('[data-roles]'),
                     rows    = table.find('[data-role]'),
                     text    = 'Sent to ',
                     count   = 0;
@@ -113,7 +113,7 @@
             advanced: function () {
                 var row    = this.closest('[data-role]'),
                     dialog = $('#slider-modal'),
-                    src = row.closest('[data-source]');
+                    src    = row.closest('[data-source]');
 
                 var data = {
                     source: row.closest('[data-source]').data('source'),
