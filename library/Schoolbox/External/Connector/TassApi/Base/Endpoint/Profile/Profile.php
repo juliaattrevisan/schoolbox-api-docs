@@ -396,10 +396,19 @@ class Profile implements IStrategy
                 ->setLastname($lastname);
 
             if ($this->includePhoto && isset($student['general_details']['student_photo']['file_info']['image'])) {
-                $studentBaseProfile = $this->importPortrait(
-                    $studentBaseProfile,
-                    $student['general_details']['student_photo']['file_info']
-                );
+                $this->log->debug(sprintf(
+                    'Importing profile picture for %s %s (%s)',
+                    $firstname,
+                    $lastname,
+                    $externalId
+                ));
+
+                if ($this->perform) {
+                    $studentBaseProfile = $this->importPortrait(
+                        $studentBaseProfile,
+                        $student['general_details']['student_photo']['file_info']
+                    );
+                }
             }
 
             /* Then save it
@@ -1015,10 +1024,19 @@ class Profile implements IStrategy
                 ->setLastname($lastname);
 
             if ($this->includePhoto && isset($staff['teacher_photo']['file_info']['image'])) {
-                $staffBaseProfile = $this->importPortrait(
-                    $staffBaseProfile,
-                    $staff['teacher_photo']['file_info']
-                );
+                $this->log->debug(sprintf(
+                    'Importing profile picture for %s %s (%s)',
+                    $firstname,
+                    $lastname,
+                    $externalId
+                ));
+
+                if ($this->perform) {
+                    $staffBaseProfile = $this->importPortrait(
+                        $staffBaseProfile,
+                        $staff['teacher_photo']['file_info']
+                    );
+                }
             }
 
             /* Then save it
