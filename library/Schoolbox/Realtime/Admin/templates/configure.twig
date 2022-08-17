@@ -2,7 +2,7 @@
 <!--suppress NonShortCircuitBooleanExpressionJS -->
 <script type="text/javascript">
 
-    var levelOff     = 0,
+    let levelOff     = 0,
         levelInstant = 1,
         levelPush    = 2,
         levelEmail   = 4,
@@ -17,7 +17,7 @@
 
     $(function () {
 
-        var ii, configurator;
+        let ii, configurator;
 
         configurator = $('#configurator').msgconfig({
             sourceSelector: '[data-source]',
@@ -26,7 +26,7 @@
             customSelector: '[data-custom]',
             permSelector:   '[data-perm-container]',
             persist: function () {
-                var form = this.find('form[method=post]');
+                let form = this.closest('form[method=post]');
 
                 // clear any previous cache-timeout
                 if (ii) {
@@ -39,7 +39,7 @@
                     form.find('input').prop('disabled', true);
 
                     // Serialize the form
-                    var formSerialized = form.serializeArray();
+                    let formSerialized = form.serializeArray();
 
                     // Go through disabled inputs and add selected to the serialized form
                     form.find('input[disabled]').each(function() {
@@ -54,15 +54,15 @@
 
             },
             describe: function () {
-
-                var summary = this.find('[data-summary]'),
-                    table   = this.find('[data-roles]'),
+                let fieldset = this.closest('fieldset');
+                let summary = fieldset.find('[data-summary]'),
+                    table   = fieldset.find('[data-roles]'),
                     rows    = table.find('[data-role]'),
                     text    = 'Sent to ',
                     count   = 0;
 
                 rows.each(function () {
-                    var row  = $(this),
+                    let row  = $(this),
                         ins  = row.find('input[data-perm]:checked'),
                         role = row.find('[data-role-title]').text(),
                         sum  = 0;
@@ -82,7 +82,7 @@
                     text += role + ' via ';
 
                     ins.each(function () {
-                        var i   = $(this),
+                        let i   = $(this),
                             lbl = desc[i.data('perm')];
 
                         if (typeof lbl === 'undefined' || lbl === 'off') {
@@ -111,11 +111,11 @@
 
             },
             advanced: function () {
-                var row    = this.closest('[data-role]'),
+                let row    = this.closest('[data-role]'),
                     dialog = $('#slider-modal'),
-                    src = row.closest('[data-source]');
+                    src    = row.closest('[data-source]');
 
-                var data = {
+                let data = {
                     source: row.closest('[data-source]').data('source'),
                     slug: row.closest('[data-namespace]').data('namespace'),
 
@@ -139,7 +139,7 @@
                  * https://github.com/zurb/foundation/issues/4746
                  */
                 dialog.on('opened', function() {
-                    var closeButton = '<a class="close-reveal-modal">&#215;</a>';
+                    let closeButton = '<a class="close-reveal-modal">&#215;</a>';
 
                     dialog.append(closeButton);
                 });
@@ -157,21 +157,21 @@
 
         $.each(data, function (slug, sources) {
 
-            var $ns = $('#configurator').find('[data-namespace=' + slug + ']');
+            let $ns = $('#configurator').find('[data-namespace=' + slug + ']');
 
             $.each(sources, function (source, roles) {
 
                 $.each(roles, function (role, config) {
 
-                    var $role = $ns.find('[data-role=' + role + '][data-source=' + source + ']'),
+                    let $role = $ns.find('[data-role=' + role + '][data-source=' + source + ']'),
                         options,
                         inDefault = function () {
-                            var p = $(this).data('perm');
+                            let p = $(this).data('perm');
                             // bitwise! single &
                             return !!(config.default & p || (config.default == 0 && p == 0));
                         },
                         inMask = function () {
-                            var p = $(this).data('perm');
+                            let p = $(this).data('perm');
                             // bitwise! single &
                             return !!(config.mask[1] & p || (config.mask[0] && p == 0));
                         };
