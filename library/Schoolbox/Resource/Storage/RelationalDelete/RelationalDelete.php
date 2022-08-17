@@ -71,9 +71,17 @@ class RelationalDelete implements IRelationalDelete
         $this->logger->debug($debugMessage);
 
         if ($this->validateIfHashExists($hash)) {
-            foreach ($this->collectors as $collector) {
-                $collector->remove($hash, $performDryRun);
+            $this->storageMapper->getDatabase()->beginTransaction();
+            try {
+                foreach ($this->collectors as $collector) {
+                    $collector->remove($hash, $performDryRun);
+                }
+            } catch (\Throwable $e) {
+                $this->logger->error("Fatal exception. Rolling back database changes");
+                $this->storageMapper->getDatabase()->rollback();
+                throw $e;
             }
+            $this->storageMapper->getDatabase()->commit();
         } else {
             $this->logger->error('Unable to find: ' . $hash);
         }
