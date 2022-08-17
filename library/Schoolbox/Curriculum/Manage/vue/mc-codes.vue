@@ -6,8 +6,8 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useCodesStore } from '../store/mcCodesStore';
-import { useActiveCodesStore } from '../store/mcActiveCodesStore';
+import { useCodesStore } from './store/mcCodesStore';
+import { useActiveCodesStore } from './store/mcActiveCodesStore';
 import McCode from './mc-code.vue'
 
 

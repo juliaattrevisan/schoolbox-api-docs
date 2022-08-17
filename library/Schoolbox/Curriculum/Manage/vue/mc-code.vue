@@ -5,8 +5,8 @@
  */
 
 import { computed } from 'vue';
-import { useActiveCodesStore } from '../store/mcActiveCodesStore';
-// import { useModalSelectedCodesStore } from '../store/mcSelectedCodesStore';
+import { useActiveCodesStore } from './store/mcActiveCodesStore';
+// import { useModalSelectedCodesStore } from './store/mcSelectedCodesStore';
 import { escapeRegExp } from '@js/util/jsUtils';
 
 

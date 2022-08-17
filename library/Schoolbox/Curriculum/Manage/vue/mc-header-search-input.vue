@@ -5,7 +5,7 @@
  */
 
 import { computed } from 'vue';
-import { useActiveCodesStore } from '../store/mcActiveCodesStore';
+import { useActiveCodesStore } from './store/mcActiveCodesStore';
 
 
 const activeCodesStore = useActiveCodesStore();
