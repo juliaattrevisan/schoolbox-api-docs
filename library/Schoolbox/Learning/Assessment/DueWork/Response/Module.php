@@ -301,6 +301,13 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        /**
+         * die early when the requested Turnitin Submission Id does not match the responseID Turnitin Submission Id
+         */
+        if ($response->getAllFiles()->first()->getTurnitIn()->getTurnitinSubmissionId() !== $turnitinReport->getTurnitinSubmissionId()) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         /* Die early when participant isn't found
          */
         try {
