@@ -33,24 +33,21 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
 
         {# Input for group curriculum codes #}
         {% if curriculumTaggingEnabled %}
-            <select data-curriculum-code-selector
-                    data-template="rubric-group-curriculum-codes"
-                    {% if group %}name="crits[{{ group.id }}][curriculumCode][]"{% endif %}
-                    multiple
-                    {% if new %}class="hide"{% endif %}
-                    data-placeholder="Add curriculum codes..."
-            >
-                {% if not new %}
-                {% for code in group.curriculumNodes %}
-                    <option label="{{ code.code }}"
-                            value="{{ code.id }}"
-                            title="{{ code.description }}"
-                            data-value-object="{{ code|json_encode }}"
-                            selected
-                    >{{ code.code }}</option>
-                {% endfor %}
-                {% endif %}
-            </select>
+            {% if courseManagedReadonly is not defined %}
+                {% set courseManagedReadonly = false %}
+            {% endif %}
+            {% set codeList = [] %}
+            {% if group is not null %}
+                {% set codeList = group.curriculumNodes %}
+            {% endif %}
+            <div data-cs-container>
+                <curriculum-selector
+                        :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
+                        :selected-codes="{{ codeList|json_encode }}"
+                        data-endpoint="{{ routeLookup('curriculumApi.getTree') }}"
+                />
+
+            </div>
         {% endif %}
     </div>
 

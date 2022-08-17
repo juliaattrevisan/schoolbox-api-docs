@@ -6,7 +6,7 @@
 {% if courseManagedReadonly is not defined %}
     {% set courseManagedReadonly = false %}
 {% endif %}
-<div id="curriculum-selector-container">
+<div data-cs-container>
     <curriculum-selector
             :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
             :selected-codes="{{ codeList|json_encode }}"
