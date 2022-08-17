@@ -148,7 +148,7 @@
                                        data-method="{{ saveToCourseMethod }}"
                                        data-spec-assessment-id="{{ specAssessment.id ?? null }}"
                                        data-spec-assessment-title="{{ specAssessment.title ?? null }}"
-                                    >Save to Course...</a>
+                                    >Copy to Course...</a>
                                 </li>
                             {% endif %}
                         {% endif %}
@@ -157,7 +157,7 @@
             </div>
             {% if saveToCourseRoute %}
                 <div id="save-to-course-modal-{{ assessment.id }}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-                    <h2>Are you sure you wish to write this assessment back to its course?</h2>
+                    <h2>Are you sure you wish to copy this assessment back to its course?</h2>
                     {% if specAssessment.id ?? null %}
                         <div class="warning alert-box">
                             <p>
