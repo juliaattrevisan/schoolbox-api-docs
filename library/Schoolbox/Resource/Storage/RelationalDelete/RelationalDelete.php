@@ -258,7 +258,7 @@ class RelationalDelete implements IRelationalDelete
                 \Schoolbox\MobileApp\ServiceMapper::getInstance(),
                 $this->logger,
                 ['certificate'],
-                ' cert_hash'
+                'cert_hash'
             ),
 
             // resource.image_hash
