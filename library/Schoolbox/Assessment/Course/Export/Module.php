@@ -16,6 +16,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Overwriter;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
@@ -23,6 +24,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -42,20 +44,31 @@ class Module extends \Alaress\Module\Module
     {
         // Permissions:
         // * User must be able to create an assessment in the spec folder
+        // * User must be an instructor of the assessment the folder is within
         $permissions = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new IsInstructor(
-                    $this->getMapperFactory()->get(Access::class),
+                new Rule\HasHomepageAccess(
+                    UserAccess::ACCESS_WRITE,
                     static function (array $params): FolderModel {
                         if (isset($params['unitSpec']) && $params['unitSpec'] instanceof UnitSpec\Model) {
                             return $params['unitSpec']->getFolder();
                         }
                         throw new NotFound('No context preloaded');
+                    },
+                    $this->getMapperFactory()->get(Access::class),
+                ),
+                new IsInstructor(
+                    $this->getMapperFactory()->get(Access::class),
+                    static function (array $params): FolderModel {
+                        if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
+                            return $params['assessment']->getBaseContext()->getFolder();
+                        }
+                        throw new NotFound('No context preloaded');
                     }
-                )
-            )
+                ),
+            ),
         );
 
         // Permissions:
