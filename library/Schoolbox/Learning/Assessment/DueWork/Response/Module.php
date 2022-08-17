@@ -304,7 +304,14 @@ class Module extends BaseModule
         /**
          * die early when the requested Turnitin Submission Id does not match the responseID Turnitin Submission Id
          */
-        if ($response->getAllFiles()->first()->getTurnitIn()->getTurnitinSubmissionId() !== $turnitinReport->getTurnitinSubmissionId()) {
+        $validFile = true;
+        foreach ($response->getAllFiles() as $file) {
+            //check if file is a turnitin file then check if it matches the report turnitin id
+            if (null !== $file->getTurnitIn() && ($file->getTurnitIn()->getTurnitinSubmissionId() !== $turnitinReport->getTurnitinSubmissionId())) {
+                $validFile = false;
+            }
+        }
+        if (!$validFile) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
