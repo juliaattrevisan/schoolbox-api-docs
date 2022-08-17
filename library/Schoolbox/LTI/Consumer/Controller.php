@@ -439,13 +439,10 @@ class Controller extends Base
                 // it expects the homepage as the return URL?
                 $launchPresentationReturnUrl = "{$this->baseUrl}/homepage/{$folder->getId()}";
                 if ($ltiRequestType == self::LTI_LAUNCH_TYPE_PICKER) {
-                    $ltiRequestType = self::LTI_LAUNCH_TYPE_BASIC;
-
-                    // Put the resource url into the launch data
-
-                    $launch_data['contentUrl'] = $embedUrl;
+                    // I have picked something: just go there
+                    $this->response->redirect->to($embedUrl);
+                    return;
                 }
-                $embedUrl = $provider->getUrl();
             } elseif ($ltiRequestType === self::LTI_LAUNCH_TYPE_BASIC) {
                 // Is this content which has actually been picked?
                 // Maintain current behaviour (for fear of breaking any existing integrations)
