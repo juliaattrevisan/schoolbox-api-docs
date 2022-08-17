@@ -668,6 +668,11 @@ class Classes implements IStrategy
         $teacherIds = [];
 
         foreach ($activityInstance['attendees'] as $attendeeTeacher) {
+            /* FIXME Multiple teachers might exist here
+             *  It's possibel that multiple Attendee might be a staff member
+             *  in which case the intent would be "multiple teachers of this class"
+             *  but there's no specimen to verify that hearsay
+             */
             $teacherIds[] = $attendeeTeacher['coveringCompassPersonId'];
             $teacherIds[] = $attendeeTeacher['compassPersonId'];
         }
