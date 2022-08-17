@@ -124,6 +124,25 @@ HELP;
             exit;
         }
 
+        /* Check that your api setup is functioning
+         * We need this api working
+         */
+        $api = new Turnitin\Api(
+            $this->getConfig()->get('site_version'),
+            $this->getConfig()->get('turnitin_api_host'),
+            $this->getConfig()->get('turnitin_api_key')
+        );
+
+        /* If the basic test() failed, then your turnitin config is broken
+         * and your api host/key combo is somehow wrong
+         */
+        try {
+            $api->test();
+        } catch (Turnitin\Exception\Credentials $e) {
+            $this->getLogger()->warning($e->getMessage());
+            exit(1);
+        }
+
         /* Check that this isn't currently running
          */
         try {
@@ -131,14 +150,6 @@ HELP;
         } catch (\RuntimeException $e) {
             exit(1);
         }
-
-        /* We need this api
-         */
-        $api = new Turnitin\Api(
-            $this->getConfig()->get('site_version'),
-            $this->getConfig()->get('turnitin_api_host'),
-            $this->getConfig()->get('turnitin_api_key')
-        );
 
         /* Set up a record processor
          */
