@@ -132,7 +132,7 @@
                 {% if hasAssessmentRoutes or hasCourseRoutes %}
                     <ul data-dropdown-content class="f-dropdown" id="options-task{{ assessment.id }}">
                         {% if hasAssessmentRoutes %}
-                            <li class="separator">Assessment</li>
+                            <li class="separator">{{ locale.translate('assessment', false, true) }}</li>
                             {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
                             {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report">Similarity Report</a></li>{% endif %}
                             {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-modify" title="Modify this {{ locale.assessment }}">Modify</a></li>{% endif %}
@@ -157,19 +157,19 @@
             </div>
             {% if saveToCourseRoute %}
                 <div id="save-to-course-modal-{{ assessment.id }}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-                    <h2>Are you sure you wish to copy this assessment back to its course?</h2>
+                    <h2>Are you sure you wish to copy this {{ locale.translate('assessment') }} back to its course?</h2>
                     {% if specAssessment.id ?? null %}
                         <div class="warning alert-box">
                             <p>
-                                The original assessment
+                                The original {{ locale.translate('assessment') }}
                                 &ldquo;{{ specAssessment.title ?? null }}&rdquo;
                                 in the course will be <strong>replaced</strong>
-                                with this assessment.
+                                with this {{ locale.translate('assessment') }}.
                             </p>
                             {% if assessment is project %}
                                 {% if assessment.assessables is not empty %}
                                     <p>
-                                        As this assessment is a project, its
+                                        As this {{ locale.translate('assessment') }} is a project, its
                                         activity set will also be <strong>replaced</strong>,
                                         possibly deleting activities:
                                     </p>
@@ -188,13 +188,13 @@
                                 {% endif %}
                             {% endif %}
                             <p>
-                                Any other imports of the original assessment will
+                                Any other imports of the original {{ locale.translate('assessment') }} will
                                 <strong>not</strong> be updated.
                             </p>
                         </div>
                     {% else %}
                         <p>
-                            This assessment
+                            This {{ locale.translate('assessment') }}
                             &ldquo;{{ assessment.title ?? null }}&rdquo;
                             does not yet exist in the course;
                             {% if assessment is project %}
