@@ -34,7 +34,6 @@ class IdFinder extends AbstractIdFinder
     }
 
     /**
-     * @param User $user
      * @inheritdoc
      */
     protected function buildQuery(array $completeFilters, User $user, bool $deleted): array
