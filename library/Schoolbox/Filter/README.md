@@ -494,9 +494,12 @@ of developing for filters.
       * define a class constant for the key for each meta-option
       * update `getCustomKeys` to return the keys for the meta-options
       * update `getLabel` to return a specific label for each meta-option
-    * in the [Factory Factory](#factory-factory) implementation:
+    * if there is an [ID Finder](#id-finder) implementation:
       * update `buildQuery` to recognise the meta-options in the filter, and
         build a query appropriately
+    * if there is a [Matcher](#matcher) implementation instead:
+      * update `__invoke` to recognise the meta-options in the filter, and
+        filter appropriately
 
 * Create a [Component](#component) implementation
   (if a custom implementation is required)

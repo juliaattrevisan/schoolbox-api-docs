@@ -30,7 +30,16 @@ class FactoryFactory extends AbstractFactoryFactory
      */
     public function buildFilterFactoryForFilter(string $filterDefinitionClass): IFactory
     {
-        throw new InvalidArgumentException();
+        return match ($filterDefinitionClass) {
+            Creator\Factory::class => new Creator\Factory(
+                $this->getOptionMapper(),
+                $this->getDefaultsMapper(),
+                $this->getSelectionMapper(),
+            ),
+            default => throw new InvalidArgumentException(
+                'No filter factory registered for class: ' . $filterDefinitionClass
+            ),
+        };
     }
 
     /**

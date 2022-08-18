@@ -37,6 +37,28 @@ class IdFinder extends AbstractIdFinder
      */
     protected function buildQuery(array $completeFilters, bool $deleted): array
     {
-        return [];
+        $pb = $this->getMapper()->getPredicateBuilder();
+        if (!$deleted) {
+            $pb->isNull('b.deleted_at');
+        }
+
+        $creatorSelection = $completeFilters[Creator\Definition::class] ?? null;
+        if (isset($creatorSelection[Creator\Definition::KEY_CURRENT_USER])) {
+            // Add current user (where is that?)
+            // May need to pass as a parameter here
+        }
+        if (isset($creatorSelection[Creator\Definition::KEY_OTHER_USERS])) {
+            // Add non-current user (where is that?)
+        }
+
+        // Somehow apply class here?
+        // That may be done by passing a class code, and applying a student
+        // filter?
+
+        $query = "SELECT DISTINCT id FROM pastoral";
+        if (count($pb->getWhere()) > 0) {
+            $query .= ' WHERE ' . $pb->getWhereIntersect();
+        }
+        return [$query, $pb->getParams()];
     }
 }
