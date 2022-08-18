@@ -46,11 +46,12 @@ class IdFinder extends AbstractIdFinder
 
         $creatorSelection = $completeFilters[Creator\Definition::class] ?? null;
         if (isset($creatorSelection[Creator\Definition::KEY_CURRENT_USER])) {
-            // Add current user (where is that?)
-            // May need to pass as a parameter here
+            // Add current user
+            $pb = $pb->equals('p.owner_id', $user->getId());
         }
         if (isset($creatorSelection[Creator\Definition::KEY_OTHER_USERS])) {
-            // Add non-current user (where is that?)
+            // Add non-current user
+            $pb = $pb->notEquals('p.owner_id', $user->getId());
         }
 
         // Somehow apply class here?
