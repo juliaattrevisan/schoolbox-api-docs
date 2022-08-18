@@ -6,6 +6,8 @@ VALUES ('Schoolbox\\Pastoral\\Mapper',
        ('Schoolbox\\Pastoral\\Mapper',
         'Schoolbox\\Filter\\Filters\\Pastoral\\Creator\\Definition'),
        ('Schoolbox\\Pastoral\\Mapper',
+        'Schoolbox\\Filter\\Filters\\Pastoral\\Action\\Definition'),
+       ('Schoolbox\\Pastoral\\Mapper',
         'Schoolbox\\Filter\\Filters\\Pastoral\\Student\\Definition');
 
 ALTER TABLE filter_page

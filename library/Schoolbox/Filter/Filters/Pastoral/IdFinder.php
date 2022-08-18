@@ -38,7 +38,8 @@ class IdFinder extends AbstractIdFinder
      */
     protected function buildQuery(array $completeFilters, User $user, bool $deleted): array
     {
-        $pb = $this->getMapper()->getPredicateBuilder();
+        $joins = [];
+        $pb    = $this->getMapper()->getPredicateBuilder();
         if (!$deleted) {
             $pb->isNull('p.deleted_at');
         }
@@ -46,15 +47,20 @@ class IdFinder extends AbstractIdFinder
         // Creator selection
         $creatorSelectionPb = $this->getMapper()->getPredicateBuilder();
         $creatorSelection   = $completeFilters[Creator\Definition::class] ?? null;
+        $filterByCreator    = false;
         if (isset($creatorSelection[Creator\Definition::KEY_CURRENT_USER])) {
             // Add current user
             $creatorSelectionPb = $creatorSelectionPb->equals('p.owner_id', $user->getId());
+            $filterByCreator    = true;
         }
         if (isset($creatorSelection[Creator\Definition::KEY_OTHER_USERS])) {
             // Add non-current user
             $creatorSelectionPb = $creatorSelectionPb->notEquals('p.owner_id', $user->getId());
+            $filterByCreator    = true;
         }
-        $pb = $pb->any($creatorSelectionPb);
+        if ($filterByCreator) {
+            $pb = $pb->any($creatorSelectionPb);
+        }
 
         // Type/subtype selection
         $typeSelection = $completeFilters[Type\Definition::class] ?? null;
@@ -68,6 +74,26 @@ class IdFinder extends AbstractIdFinder
             $pb = $pb->in('p.severity_id', $severitySelection);
         }
 
+        // Action required selection
+        $actionSelectionPb = $this->getMapper()->getPredicateBuilder();
+        $actionSelection   = $completeFilters[Action\Definition::class] ?? null;
+        $filterByAction    = false;
+        if (isset($actionSelection[Action\Definition::KEY_ACTION_NOT_REQUIRED])) {
+            $filterByAction    = true;
+            $actionSelectionPb = $actionSelectionPb
+                ->isNull('pra.completed')
+                ->isTrue('pra.completed');
+        }
+        if (isset($actionSelection[Action\Definition::KEY_ACTION_REQUIRED])) {
+            $filterByAction    = true;
+            $actionSelectionPb = $actionSelectionPb
+                ->isFalse('pra.completed');
+        }
+        if ($filterByAction) {
+            $joins[] = 'LEFT JOIN pastoral_record_action pra ON p.id = pra.pastoral_id';
+            $pb      = $pb->any($actionSelectionPb);
+        }
+
         // Student selection (hardcoded filter)
         $studentSelection = $completeFilters[Student\Definition::class] ?? null;
         if (isset($studentSelection)) {
@@ -75,6 +101,9 @@ class IdFinder extends AbstractIdFinder
         }
 
         $query = "SELECT DISTINCT p.id FROM pastoral p";
+        if (count($joins)) {
+            $query .= ' ' . implode(' ', $joins);
+        }
         if (count($pb->getWhere()) > 0) {
             $query .= ' WHERE ' . $pb->getWhereIntersect();
         }
