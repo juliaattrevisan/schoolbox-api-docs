@@ -33,9 +33,7 @@ class Definition extends AbstractDefinition
      */
     public static function getPages(IConfigLoader $configLoader): array
     {
-        return [
-            Model::PAGE_CLASS_PASTORAL,
-        ];
+        return [];
     }
 
     /**
