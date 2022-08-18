@@ -84,8 +84,7 @@ class Status
             } catch (Credentials $e) {
                 /* Bad credentials will stop you from making a proper connection
                  */
-                $payload['available'] = true;
-                $payload['message']   = 'Auth failed';
+                $payload['message'] = 'Auth failed';
             } catch (GuzzleException | BadEndpoint | Exception $e) {
                 /* Some kind of networky issue; noop
                  * Catch exception but do nothing so default $payload will be returned.
