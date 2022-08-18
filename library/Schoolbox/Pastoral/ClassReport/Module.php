@@ -18,6 +18,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -73,6 +74,7 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
+            $this->getMapperFactory()->get(PastoralMapper::class),
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(Filter\Mapper::class),
             $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
