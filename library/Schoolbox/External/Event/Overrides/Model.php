@@ -22,6 +22,7 @@ class Model
      * These consts correspond to the enum values in sis_class_user_overrides
      */
     public const CLEAR = 'clear';
+    public const CLEAR_STAFF = 'clear_staff';
     public const ADD = 'add';
     public const SUBTRACT = 'subtract';
 

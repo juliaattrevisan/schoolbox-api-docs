@@ -85,7 +85,6 @@ class TimetableUsers
      */
     public function findForEvent(\Schoolbox\External\Event\Model $event): array
     {
-
         /* Find the sis_class that corresponds to $event
          */
         $class = $this->classEntryMapper->findOneByColumn('code', $event->getCode());
