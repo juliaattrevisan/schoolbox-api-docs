@@ -43,15 +43,17 @@ class IdFinder extends AbstractIdFinder
             $pb->isNull('p.deleted_at');
         }
 
-        $creatorSelection = $completeFilters[Creator\Definition::class] ?? null;
+        $creatorSelectionPb = $this->getMapper()->getPredicateBuilder();
+        $creatorSelection   = $completeFilters[Creator\Definition::class] ?? null;
         if (isset($creatorSelection[Creator\Definition::KEY_CURRENT_USER])) {
             // Add current user
-            $pb = $pb->equals('p.owner_id', $user->getId());
+            $creatorSelectionPb = $creatorSelectionPb->equals('p.owner_id', $user->getId());
         }
         if (isset($creatorSelection[Creator\Definition::KEY_OTHER_USERS])) {
             // Add non-current user
-            $pb = $pb->notEquals('p.owner_id', $user->getId());
+            $creatorSelectionPb = $creatorSelectionPb->notEquals('p.owner_id', $user->getId());
         }
+        $pb = $pb->any($creatorSelectionPb);
 
         $studentSelection = $completeFilters[Student\Definition::class] ?? null;
         if (isset($studentSelection)) {
