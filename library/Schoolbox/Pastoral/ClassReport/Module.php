@@ -16,6 +16,7 @@ use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Filter;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -62,7 +63,8 @@ class Module extends BaseModule
             return $this->preloadFolder($params);
         };
 
-        $this->register('GET', '/{folderId}', 'getReport', $perms, $preload);
+        $this->register(self::METHOD_GET, '/{folderId}', 'getReport', $perms, $preload);
+        $this->register(self::METHOD_POST, '/{folderId}', 'postReport', $perms, $preload);
     }
 
     /**
@@ -72,6 +74,8 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->injector->get('filters.factoryFactory'),
+            $this->getMapperFactory()->get(Filter\Mapper::class),
+            $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
         );
     }
 
