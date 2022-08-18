@@ -31,7 +31,7 @@ class FactoryFactory extends AbstractFactoryFactory
     public function buildFilterFactoryForFilter(string $filterDefinitionClass): IFactory
     {
         return match ($filterDefinitionClass) {
-            Creator\Factory::class => new Creator\Factory(
+            Creator\Definition::class => new Creator\Factory(
                 $this->getOptionMapper(),
                 $this->getDefaultsMapper(),
                 $this->getSelectionMapper(),

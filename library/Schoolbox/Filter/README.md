@@ -290,25 +290,16 @@ of developing for filters.
 * In your page's module:
   * inject the [Factory Factory](#factory-factory) as a controller parameter:
     ```php
-    protected function preInitControllerDependencies(ContainerInterface $injector)
+    protected function buildController(): \Alaress\Web\Controller\Base
     {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'filterFactoryFactory' => $injector->lazyGet('filters.factoryFactory'),
-        ];
+        return new Controller($this->injector->get('filters.factoryFactory'));
     }
     ```
 * In your controller:
   * inject the [Factory Factory](#factory-factory) as a constructor parameter:
     ```php
-    /**
-     * @var \Schoolbox\Filter\IFactoryFactory
-     */
-    private $filterFactoryFactory;
-
-    public function __construct(\Schoolbox\Filter\IFactoryFactory $filterFactoryFactory)
+    public function __construct(private \Schoolbox\Filter\IFactoryFactory $filterFactoryFactory)
     {
-        $this->filterFactoryFactory = $filterFactoryFactory;
     }
     ```
   * generate the filter panel's Twig data in a controller action:

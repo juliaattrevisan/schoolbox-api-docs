@@ -11,3 +11,9 @@
         </div>
     </div>
 </div>
+
+{% include '@filters/panel.twig' with {
+    contentId: 'filterPanel',
+    panel:     filterPanel,
+    quickload: false,
+} only %}
