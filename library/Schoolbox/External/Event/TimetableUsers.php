@@ -9,7 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Event\Overrides\Mapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\UserMapper;
 
 /**
  * For a given event, find the final calculated list of users
@@ -52,24 +56,33 @@ class TimetableUsers
 
 
     /**
-     * @param \Schoolbox\External\ClassEntryMapper       $classEntryMapper
-     * @param \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper
+     * @var \Schoolbox\External\Profile\Staff\Mapper
+     */
+    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
+
+
+    /**
+     * @param ClassEntryMapper                           $classEntryMapper
+     * @param ClassInvolvementMapper                     $classInvolvementMapper
      * @param \Schoolbox\External\Event\Mapper           $eventMapper
-     * @param Overrides\Mapper                           $overrideMapper
-     * @param \Schoolbox\UserMapper                      $userMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overrideMapper
+     * @param UserMapper                                 $userMapper
+     * @param \Schoolbox\External\Profile\Staff\Mapper   $staffProfileMapper
      */
     public function __construct(
         \Schoolbox\External\ClassEntryMapper $classEntryMapper,
         \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
-        \Schoolbox\UserMapper $userMapper
+        \Schoolbox\UserMapper $userMapper,
+        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
     ) {
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->eventMapper = $eventMapper;
         $this->overrideMapper = $overrideMapper;
         $this->userMapper = $userMapper;
+        $this->staffProfileMapper = $staffProfileMapper;
     }
 
 
@@ -117,6 +130,7 @@ class TimetableUsers
                 /* Get a list of staff members
                  */
 
+
                 /* Index them by their externalId (synergy_id)
                  */
 
@@ -128,6 +142,22 @@ class TimetableUsers
         }
 
         return $usualUsers;
+    }
+
+
+    /**
+     * Get a list of all staff members' externalIds
+     * from sis_user_profile_staff
+     *
+     * I suppose it's the most authoritative in this general area/vicinity
+     *
+     * @return array
+     */
+    private function findStaff(): array
+    {
+        $query = "
+            SELECT 
+        ";
     }
 
 
