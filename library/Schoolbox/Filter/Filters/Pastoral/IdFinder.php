@@ -41,7 +41,7 @@ class IdFinder extends AbstractIdFinder
     {
         $pb = $this->getMapper()->getPredicateBuilder();
         if (!$deleted) {
-            $pb->isNull('b.deleted_at');
+            $pb->isNull('p.deleted_at');
         }
 
         $creatorSelection = $completeFilters[Creator\Definition::class] ?? null;
@@ -57,7 +57,7 @@ class IdFinder extends AbstractIdFinder
         // That may be done by passing a class code, and applying a student
         // filter?
 
-        $query = "SELECT DISTINCT id FROM pastoral";
+        $query = "SELECT DISTINCT p.id FROM pastoral p";
         if (count($pb->getWhere()) > 0) {
             $query .= ' WHERE ' . $pb->getWhereIntersect();
         }
