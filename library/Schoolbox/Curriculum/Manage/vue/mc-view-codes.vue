@@ -2,7 +2,7 @@
 
 /**
  * The filtered results from using the <selects> or search <input>
- * From here curriclum codes can be selected
+ * From here curriclum codes can be selected for further travesal or editing
  */
 
 import { ref, computed, watch } from 'vue';

@@ -1,13 +1,13 @@
 <script setup>
 
 /**
- * A curriculum code to select
+ * A curriculum code to select to traverse further down the tree,
+ * or to CRUD via the edit button
  */
 
 import { computed } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useActiveCodesStore } from './store/mcActiveCodesStore';
-// import { useModalSelectedCodesStore } from './store/mcSelectedCodesStore';
 import { escapeRegExp } from '@js/util/jsUtils';
 
 
@@ -37,7 +37,6 @@ const props = defineProps({
 
 const store = useStore();
 const activeCodesStore = useActiveCodesStore();
-// const modalSelectedCodesStore = useModalSelectedCodesStore();
 
 /**
  * to gradually and more paddingLeft to indicate node level depth

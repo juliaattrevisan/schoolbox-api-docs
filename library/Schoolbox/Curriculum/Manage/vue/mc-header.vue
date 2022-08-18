@@ -1,7 +1,8 @@
 <script setup>
 
 /**
- * The heading for the Manage Curriclum page
+ * The heading for the Manage Curriclum page including actions to
+ * create a new curriculum and import a curriculum
  */
 
 import { useStore } from './store/manageCurriculumStore';

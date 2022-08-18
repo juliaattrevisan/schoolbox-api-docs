@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * The modal header, containing the title, select nodes and search input
+ * To search the currently active curriculum node
  */
 
 import { computed } from 'vue';

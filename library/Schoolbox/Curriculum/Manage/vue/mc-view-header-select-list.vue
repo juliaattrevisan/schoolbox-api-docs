@@ -1,7 +1,8 @@
 <script setup>
 
 /**
- * The modal header, containing the title, select nodes and search input
+ * The <select> dropdowns that incrementally display as we
+ * move further down the curriculum tree
  */
 
 import { computed } from 'vue';
