@@ -42,7 +42,7 @@ const activeCodesStore = useActiveCodesStore();
  *
  * @returns { Number }
  */
-const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.5rem)`);
+const paddingLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * If there's a code available, which means it can be selected
@@ -57,15 +57,15 @@ const hasCode = computed(() => props.code.code && props.code.code !== '');
  *
  * @returns { Boolean }
  */
-// const isDisabled = computed(() => {
-//     if (!hasCode.value && props.depth === 0 && !activeCodesStore.isSearchActive) {
-//         return true;
-//     } else if (!hasCode.value && activeCodesStore.isOnFourthNode) { //cant select any further down from the fourth level
-//         return true;
-//     } else {
-//         return false;
-//     }
-// });
+const isDisabled = computed(() => {
+    if (props.depth === 0 && !activeCodesStore.isSearchActive) {
+        return true;
+    } else if (activeCodesStore.isOnFourthNode) { //cant select any further down from the fourth level
+        return true;
+    } else {
+        return false;
+    }
+});
 
 /**
  * Only show the selected node and its direct children when we are on the fourth node
@@ -76,27 +76,19 @@ const hasCode = computed(() => props.code.code && props.code.code !== '');
 const isVisible = computed(() => props.depth <= 1 || activeCodesStore.isOnFourthNode);
 
 /**
- * To determine whether the checkbox is currently selected based
- * on whether it's in the selected list
- *
- * @returns { Boolean }
+ * to open up the edit modal
  */
-// const isCodeSelected = computed(() => {
-//     return modalSelectedCodesStore.codes.some((code) => props.code.id === code.id);
-// });
+function onEditSelected () {
+    console.warn(`will open ${title.value} modal`);
+}
 
 /**
- * Add or remove the code from the current modal selection,
- * or if there's no code, use the code to traverse to the next nodel level
- * as an alternative to using the selects in mc-header-select
+ * traverse to the next nodel level as an alternative to
+ * using the selects in mc-header-select
  */
-// function onSelected () {
-//     if (hasCode.value) {
-//         isCodeSelected.value ? modalSelectedCodesStore.remove(props.code) : modalSelectedCodesStore.add(props.code);
-//     } else {
-//         activeCodesStore.setNextSelectedNode(props.code.id);
-//     }
-// }
+function onNameSelected () {
+    activeCodesStore.setNextSelectedNode(props.code.id);
+}
 
 /**
  * To determine whether we need to display further child nodes within for this code
@@ -110,13 +102,7 @@ const hasChildren = computed(() => props.code.children && props.code.children.le
  *
  * @returns { String }
  */
-const title = computed(() => {
-    if (hasCode.value) {
-        return `[${props.code.code}] ${props.code.name}`;
-    } else {
-        return `${props.code.name}`;
-    }
-});
+const title = computed(() => hasCode.value ? `[${props.code.code}] ${props.code.name}` : `${props.code.name}`);
 
 /**
  * To highlight any search selections in the code / title
@@ -181,9 +167,25 @@ const containerClass = computed(() => {
 
 <template>
     <li v-if="isVisible" :class="containerClass">
-        <div>
-            <span v-html="highlightTitleSearch"></span>
-            <aside v-if="activeCodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
+        <div class="buttons-container">
+            <button
+                class="edit-button icon-modify"
+                :title="`Edit ${title}`"
+                @click.prevent="onEditSelected"
+                @keyup.enter="onEditSelected"
+            >
+
+            </button>
+            <button
+                :class="`name-button`"
+                :disabled="isDisabled"
+                :title="`Expand ${title}`"
+                @click.prevent="onNameSelected"
+                @keyup.enter="onNameSelected"
+            >
+                <span v-html="highlightTitleSearch"></span>
+                <aside v-if="activeCodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
+            </button>
         </div>
         <ul v-if="hasChildren">
             <mc-code
@@ -193,33 +195,6 @@ const containerClass = computed(() => {
                 :depth="props.depth+1"
             />
         </ul>
-        <!-- <button
-            :class="`code-button`"
-            :disabled="isDisabled"
-            @click.prevent="onSelected"
-            @keyup.enter="onSelected"
-        >
-            <div class="checklist" v-if="hasCode">
-                <input
-                    :id="`checkbox-${props.code.id}`"
-                    type="checkbox"
-                    :checked="isCodeSelected"
-                />
-                <label :for="`checkbox-${props.code.id}`"></label>
-            </div>
-            <div>
-                <span v-html="highlightTitleSearch"></span>
-                <aside v-if="activeCodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
-            </div>
-        </button>
-        <ul v-if="hasChildren">
-            <mc-code
-                v-for="code in props.code.children"
-                :key="code.id"
-                :code="code"
-                :depth="props.depth+1"
-            />
-       </ul> -->
    </li>
 </template>
 
@@ -232,25 +207,40 @@ const containerClass = computed(() => {
     }
 }
 
-.code-button {
-    background: none;
+.buttons-container {
     display: flex;
+    margin: 0 0 0 v-bind(paddingLeft);
+}
+
+.button {
+    background: none;
     font-size: 1rem;
     margin: 0;
-    padding: 0.5rem 0.75rem 0.5rem v-bind(paddingLeft); //increment the padding left based on the node depth
+    padding: 0.5rem;
     text-align: left;
-    transition: background 0.2s;
-    width: 100%;
     &:hover {
-        background: var(--content-ui-hover);
-    }
-    &:disabled {
-        color: #222222;
-        opacity: 1;
+        background: var(--content-ui-background);
     }
     @media (max-width: 700px) {
         font-size: 0.8rem;
         padding: 0.25rem;
+    }
+}
+
+.edit-button {
+    @extend .button;
+    color: var(--content-ui-foreground);
+    // opacity: 0.7;
+
+}
+
+.name-button {
+    @extend .button;
+    transition: background 0.2s;
+    width: 100%;
+    &:disabled {
+        color: #222222;
+        opacity: 1;
     }
 }
 
