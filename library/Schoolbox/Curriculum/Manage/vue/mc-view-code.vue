@@ -5,6 +5,7 @@
  */
 
 import { computed } from 'vue';
+import { useStore } from './store/manageCurriculumStore';
 import { useActiveCodesStore } from './store/mcActiveCodesStore';
 // import { useModalSelectedCodesStore } from './store/mcSelectedCodesStore';
 import { escapeRegExp } from '@js/util/jsUtils';
@@ -34,6 +35,7 @@ const props = defineProps({
     },
 });
 
+const store = useStore();
 const activeCodesStore = useActiveCodesStore();
 // const modalSelectedCodesStore = useModalSelectedCodesStore();
 
@@ -169,6 +171,7 @@ const containerClass = computed(() => {
     <li v-if="isVisible" :class="containerClass">
         <div class="buttons-container">
             <button
+                v-if="!store.isReadOnly"
                 class="edit-button icon-modify"
                 :title="`Edit ${title}`"
                 @click.prevent="onEditSelected"

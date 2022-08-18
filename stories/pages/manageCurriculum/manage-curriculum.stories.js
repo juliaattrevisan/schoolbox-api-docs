@@ -22,6 +22,7 @@ const mswHandlers = [
 export default {
     args: {
         dataEndpoint: dataEndpoint,
+        isReadOnly: false,
     },
     component: ManageCurriculum,
     decorators: [
@@ -74,4 +75,10 @@ LoadError.parameters = {
             ...mswHandlers,
         ]
     }
+}
+
+export const readOnly = Template.bind({});
+readOnly.args = {
+    ...Default.args,
+    isReadOnly: true,
 }

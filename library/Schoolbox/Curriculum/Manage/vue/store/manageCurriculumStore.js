@@ -12,6 +12,7 @@ export const useStore = defineStore('curriculumSelectorStore', {
         isLoading: true, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place, like updating a member access
+        isReadOnly: true, //can only view the currently selected codes, not edit them
     }),
 
     getters: {

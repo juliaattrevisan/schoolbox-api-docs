@@ -18,8 +18,16 @@ const props = defineProps({
      */
     dataEndpoint: {
         type: String,
-        required: false,
+        required: true,
         default: '',
+    },
+    /**
+     * can only view the currently selected codes, not edit them
+     */
+    isReadOnly: {
+        type: Boolean,
+        required: true,
+        default: true,
     },
 });
 
@@ -29,7 +37,8 @@ const props = defineProps({
 onMounted(() => {
     checkForStorybook();
     const store = useStore();
-    if (!store.isReadOnly && props.dataEndpoint !== '') { //only load when we need to
+    store.isReadOnly = props.isReadOnly;
+    if (props.dataEndpoint !== '') { //only load when we need to
         store.load(props.dataEndpoint);
     }
 });

@@ -35,7 +35,7 @@ function onRefreshSelected () {
             </section>
         </div>
     </div>
-   <div v-else class="row">
+    <div v-else class="row">
         <div class="small-12 island">
             <section>
                 <fieldset class="content">
