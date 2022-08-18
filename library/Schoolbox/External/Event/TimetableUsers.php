@@ -127,15 +127,12 @@ class TimetableUsers
             } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override->getAction()) {
                 $usualUsers = [];
             } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override->getAction()) {
-                /* Get a list of staff members
-                 */
-                $staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
-
-                /* Do some array magic between $usualUsers
+                /* Get a list of staff members,
+                 * then do some array magic between $usualUsers
                  * and this list of staff ids, to exclude staff
                  * from $usualUsers
                  */
-                $usualUsers = array_diff($usualUsers, $staffExternalIds);
+                $usualUsers = array_diff($usualUsers, $this->staffProfileMapper->findAllExternalIds());
             }
         }
 
