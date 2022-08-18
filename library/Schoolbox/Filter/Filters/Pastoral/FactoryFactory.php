@@ -12,7 +12,7 @@ namespace Schoolbox\Filter\Filters\Pastoral;
 use InvalidArgumentException;
 use Schoolbox\Filter\AbstractFactoryFactory;
 use Schoolbox\Filter\IFactory;
-use Schoolbox\Pastoral\Mapper;
+use Schoolbox\Pastoral;
 use Schoolbox\User;
 
 /**
@@ -23,7 +23,7 @@ class FactoryFactory extends AbstractFactoryFactory
     /**
      * @inheritdoc
      */
-    protected const ENTITY = Mapper::class;
+    protected const ENTITY = Pastoral\Mapper::class;
 
     /**
      * @inheritdoc
@@ -40,6 +40,12 @@ class FactoryFactory extends AbstractFactoryFactory
                 $this->getOptionMapper(),
                 $this->getDefaultsMapper(),
                 $this->getSelectionMapper(),
+            ),
+            Type\Definition::class => new Type\Factory(
+                $this->getOptionMapper(),
+                $this->getDefaultsMapper(),
+                $this->getSelectionMapper(),
+                $this->getMapperFactory()->get(Pastoral\Type\Mapper::class),
             ),
             default => throw new InvalidArgumentException(
                 'No filter factory registered for class: ' . $filterDefinitionClass

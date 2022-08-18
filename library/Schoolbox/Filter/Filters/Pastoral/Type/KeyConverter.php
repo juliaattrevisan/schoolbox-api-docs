@@ -9,14 +9,26 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Pastoral\Type;
 
-use Schoolbox\Filter\AbstractKeyConverter;
+use InvalidArgumentException;
+use Schoolbox\Filter;
 use Schoolbox\User;
 
 /**
  * Key converter for pastoral type/subtype filter.
  */
-class KeyConverter extends AbstractKeyConverter
+class KeyConverter extends Filter\AbstractKeyConverter
 {
+    /**
+     * Constructor
+     *
+     * @param Filter\Model $filter
+     * @param array        $ids
+     */
+    public function __construct(Filter\Model $filter, private array $ids)
+    {
+        parent::__construct($filter);
+    }
+
     /**
      * @inheritdoc
      */
@@ -30,6 +42,9 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey(string $key, User $user, string $page): void
     {
+        if (!in_array($key, $this->ids, true)) {
+            throw new InvalidArgumentException("No pastoral type found for key: $key");
+        }
     }
 
     /**
@@ -37,6 +52,6 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function possibleItemCount(): int
     {
-        return 0;
+        return count($this->ids);
     }
 }

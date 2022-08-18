@@ -56,7 +56,13 @@ class IdFinder extends AbstractIdFinder
         }
         $pb = $pb->any($creatorSelectionPb);
 
-        // Student selection
+        // Type/subtype selection
+        $typeSelection = $completeFilters[Type\Definition::class] ?? null;
+        if (isset($typeSelection)) {
+            $pb = $pb->in('p.type_id', $typeSelection);
+        }
+
+        // Student selection (hardcoded filter)
         $studentSelection = $completeFilters[Student\Definition::class] ?? null;
         if (isset($studentSelection)) {
             $pb = $pb->in('p.student_id', $studentSelection);

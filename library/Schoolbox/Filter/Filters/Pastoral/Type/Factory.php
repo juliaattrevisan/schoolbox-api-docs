@@ -13,12 +13,33 @@ use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\IKeyConverter;
 use Schoolbox\Filter\Model;
+use Schoolbox\Filter\Page;
+use Schoolbox\Filter\Selection;
+use Schoolbox\Pastoral;
 
 /**
  * Factory for pastoral type/subtype filter.
  */
 class Factory extends AbstractFactory
 {
+    /**
+     * Constructor
+     *
+     * @param Page\Option\Mapper          $optionMapper
+     * @param Page\Option\Defaults\Mapper $defaultMapper
+     * @param Selection\Mapper            $selectionMapper
+     * @param Pastoral\Type\Mapper        $pastoralTypeMapper
+     */
+    public function __construct(
+        Page\Option\Mapper $optionMapper,
+        Page\Option\Defaults\Mapper $defaultMapper,
+        Selection\Mapper $selectionMapper,
+        private Pastoral\Type\Mapper $pastoralTypeMapper,
+    ) {
+        parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
+    }
+
+
     /**
      * @inheritdoc
      */
@@ -28,6 +49,7 @@ class Factory extends AbstractFactory
             $filter,
             $this->getOptionMapper(),
             $this->getDefaultsMapper(),
+            $this->pastoralTypeMapper->findAll(),
         );
     }
 
@@ -36,6 +58,6 @@ class Factory extends AbstractFactory
      */
     public function buildKeyConverter(Model $filter): IKeyConverter
     {
-        return new KeyConverter($filter);
+        return new KeyConverter($filter, $this->pastoralTypeMapper->findAllIds());
     }
 }
