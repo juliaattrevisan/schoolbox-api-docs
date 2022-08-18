@@ -285,6 +285,23 @@ of developing for filters.
   * `\Schoolbox\Filter\Page\AvailabilityChecker::isAvailable`
   * `\Schoolbox\Filter\Page\LabelBuilder::buildLabel`
   * `\Schoolbox\Filter\Page\Model::getPageRoleTypes`
+* Update `\Schoolbox\Admin\Navigation\Subnav::generate` so that there's a menu
+  option for the new filter:
+  ```php
+  return [
+      ...
+      '/adminv2/filters' => [
+          ...
+          '/adminv2/filters/classPastoral'  => [
+              'name'        => $filterLabelBuilder->buildLabel(newConstant),
+              'visible'     => $filterAvailabilityChecker->isAvailable(newConstant),
+              'children'    => [],
+              'description' => 'Configure the default and available filter options on the new page.',
+          ],
+          ...
+      ],
+      ...
+  ```
 * Update the `getPages` of each [Definition](#definition) implementation that
   you intend the [Page](#page) to use
 * In your page's module:
