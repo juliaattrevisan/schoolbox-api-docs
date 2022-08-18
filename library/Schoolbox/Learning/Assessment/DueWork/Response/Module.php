@@ -98,7 +98,7 @@ class Module extends BaseModule
             new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
-        $turnitinPattern    = '/similarity/{assessmentId:\d+}/{responseId:\d+}/{turnitinSubId}';
+        $turnitinPattern    = '/similarity/{assessmentId:\d+}/{responseId:\d+}/{turnitinSubId:([a-zA-Z0-9-]+)}';
         $plagscanPattern    = '/plagscans/{assessmentId:\d+}/{responseId:\d+}/{plagscanId:\d+}';
         $assessmentPattern  = '/assessments/{assessmentId:\d+}';
         $participantPattern = $assessmentPattern . '/{studentId:\d+}';
