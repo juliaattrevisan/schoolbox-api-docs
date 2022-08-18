@@ -1,12 +1,35 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
+{% set
+    PORT_80_BLOCKED,
+    HTTPS_UPGRADE,
+    UPSTREAM_ERROR,
+    USER_AGENT_BLOCKING,
+    GEOBLOCKING
+    =
+    'ssl_port_80',
+    'ssl_https_upgrade',
+    'ssl_upstream_error',
+    'ssl_user_agent',
+    'ssl_geoblocking'
+%}
+
 <script>
-    const apiEndpoint = '/urlCheck/';
-    const urlCheckHostname = location.hostname;
-    const urlCheckUrl = 'http://' + urlCheckHostname + '/.well-known/acme-challenge/ping';
-    const letsEncryptUserAgent = 'Mozilla/5.0 (compatible; Let\'s Encrypt validation server; +https://letsencrypt.org)';
-    const chromeUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
+    const LETS_ENCRYPT_USER_AGENT_STRING = 'Mozilla/5.0 (compatible; Let\'s Encrypt validation server; +https://letsencrypt.org)';
+    const CHROME_USER_AGENT_STRING = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
+
+    const PORT_80_BLOCKED        = {{ PORT_80_BLOCKED }};
+    const HTTPS_UPGRADE          = {{ HTTPS_UPGRADE }};
+    const UPSTREAM_ERROR         = {{ UPSTREAM_ERROR }};
+    const USER_AGENT_BLOCKING    = {{ USER_AGENT_BLOCKING }};
+    const GEOBLOCKING            = {{ GEOBLOCKING }};
+
+    // const API_ENDPOINT = '/urlCheck/v2';
+    // const CURRENT_HOSTNAME = location.hostname;
+    const API_ENDPOINT = '/v2';
+    const CURRENT_HOSTNAME = 'immi.immanuel.sa.edu.au';
+    const URL_TO_CHECK = 'http://' + CURRENT_HOSTNAME + '/.well-known/acme-challenge/ping';
 
     //General function for building a string of the keys and values in an object
     function buildHeadersString(headersObj) {
@@ -37,8 +60,8 @@
         document.getElementById("request_headers").innerText = headersString;
     }
 
-    //Shows the user what response Let's Encrypt is getting
-    function updateResponseDetails(statusCode, headersString, body, createLinkOnStatusCode=true) {
+    //Shows the user what response the API is getting
+    function updateResponseDetails(statusCode, headersString, body, createLinkOnStatusCode=false) {
         let statusCodeHTMLString;
         if (createLinkOnStatusCode) {
             const statusCodeATag = document.createElement("a");
@@ -49,88 +72,118 @@
             statusCodeHTMLString = statusCode;
         }
 
-        document.getElementById("response_status").innerText = statusCodeHTMLString;
-        document.getElementById("response_headers").innerText = headersString ? headersString : " ";
-        document.getElementById("response_body").innerText = body ? body : " ";
+        document.getElementById("response_status").innerText = statusCodeHTMLString ? statusCodeHTMLString : "(nothing to show)";
+        document.getElementById("response_headers").innerText = headersString ? headersString : "(nothing to show)";
+        document.getElementById("response_body").innerText = body ? body : "(nothing to show)";
     }
 
     $(window).on('load', function () {
         updateRequestDetails(
                 "GET",
-                urlCheckUrl,
+                URL_TO_CHECK,
                 buildHeadersString({
-                    "user-agent": letsEncryptUserAgent,
+                    "user-agent": LETS_ENCRYPT_USER_AGENT_STRING,
                 }),
         );
 
-        // check if https://api.schoolbox.cloud/urlCheck?url=http://$current_domain/.well-known/acme-challenge/ping is accessible
         const baseCheck = $.ajax({
-            url: "{{ api_url }}" + apiEndpoint + "?url=" + urlCheckUrl,
-            success: function () {
-                updateStatusBar("ssl_port_80", "Pass", "success");
-                updateStatusBar("ssl_https_upgrade", "Pass", "success");
-                updateStatusBar("ssl_upstream_error", "Pass", "success");
-            },
-            error: function (xhr) {
-                if (xhr.responseJSON == null) {
-                    updateStatusBar("ssl_port_80", "Internal error", "warning");
-                    updateStatusBar("ssl_https_upgrade", "Internal error", "warning");
-                    updateStatusBar("ssl_upstream_error", "Internal error", "warning");
+            url: "{{ api_url }}" + API_ENDPOINT + "?url=" + encodeURIComponent(URL_TO_CHECK),
+            success: function (result, status, xhr) {
+                if (xhr.responseJSON.message === "Request timeout occurred") {
+                    updateResponseDetails("", "", "", false);
+                    updateStatusBar(PORT_80_BLOCKED, "Fail: Timeout", "alert");
+                    updateStatusBar(HTTPS_UPGRADE, "Indeterminate", "warning");
+                    updateStatusBar(UPSTREAM_ERROR, "Fail: Timeout", "alert");
                 } else {
-                    updateStatusBar("ssl_port_80", "Fail", "alert");
-
-                    if (xhr.status === 400) {
-                        updateStatusBar("ssl_upstream_error", "Fail", "alert");
-
+                    updateResponseDetails(
+                            xhr.responseJSON.response.status,
+                            buildHeadersString(xhr.responseJSON.response.headers),
+                            xhr.responseJSON.response.body,
+                            true
+                    );
+                    if (xhr.responseJSON.response.status === 200) {
+                        updateStatusBar(PORT_80_BLOCKED, "Pass", "success");
+                        updateStatusBar(HTTPS_UPGRADE, "Pass", "success");
+                        updateStatusBar(UPSTREAM_ERROR, "Pass", "success");
+                    } else {
+                        updateStatusBar(PORT_80_BLOCKED, "Fail", "alert");
+                        updateStatusBar(UPSTREAM_ERROR, "Fail", "alert");
                         if ('location' in xhr.responseJSON.response.headers) {
                             if (xhr.responseJSON.response.headers['location'].startsWith("https")) {
                                 if ('server' in xhr.responseJSON.response.headers) {
                                     const serverResponseHeader = xhr.responseJSON.response.headers['server']
-                                    updateStatusBar("ssl_https_upgrade", "Fail: Check " + serverResponseHeader, "alert");
+                                    updateStatusBar(HTTPS_UPGRADE, "Fail: Check " + serverResponseHeader, "alert");
                                     updateServer(serverResponseHeader);
                                 } else {
-                                    updateStatusBar("ssl_https_upgrade", "Fail", "alert");
+                                    updateStatusBar(HTTPS_UPGRADE, "Fail", "alert");
                                 }
                             } else {
-                                updateStatusBar("ssl_https_upgrade", "Indeterminate", "warning");
+                                updateStatusBar(HTTPS_UPGRADE, "Indeterminate", "warning");
                             }
+                        } else {
+                            updateStatusBar(HTTPS_UPGRADE, "Indeterminate", "warning");
                         }
-                    } else if (xhr.status === 500) {
-                        updateStatusBar("ssl_upstream_error", "Fail: Timeout", "alert");
-                        updateStatusBar("ssl_https_upgrade", "Indeterminate", "warning");
                     }
                 }
             },
-            complete: function (xhr) {
-                if (xhr.responseJSON == null) {
-                    updateResponseDetails("Internal error encountered", "Internal error encountered", "Internal error encountered", false);
+            error: function (xhr, status, error) {
+                updateResponseDetails("", "", "", false);
+
+                let errorMessage;
+                if (status === 400) {
+                    errorMessage = 'Schoolbox error';
+                } else if (status === 500) {
+                    errorMessage = 'API error';
                 } else {
-                    updateResponseDetails(xhr.responseJSON.response.status, buildHeadersString(xhr.responseJSON.response.headers), xhr.responseJSON.response.body);
+                    errorMessage = 'Unknown error';
                 }
+
+                updateStatusBar(PORT_80_BLOCKED, errorMessage, "alert");
+                updateStatusBar(HTTPS_UPGRADE, errorMessage, "alert");
+                updateStatusBar(UPSTREAM_ERROR, errorMessage, "alert");
             },
         });
 
         $.ajax({
-            url: "{{ api_url }}" + apiEndpoint + "?url=" + urlCheckUrl + "&useragent=" + chromeUserAgent,
-            success: function () {
+            url: "{{ api_url }}" + API_ENDPOINT + "?url=" + encodeURIComponent(URL_TO_CHECK) + "&useragent=" + encodeURIComponent(CHROME_USER_AGENT_STRING),
+            success: function (chromeResult, chromeStatus, chromeXhr) {
                 // wait for baseCheck to complete
                 $.when(baseCheck).then(
-                    function() {
-                        //if baseCheck and chromeUserAgentCheck both succeed
-                        updateStatusBar("ssl_user_agent", "Pass", "success");
+                    function(baseResult, baseStatus, baseXhr) {
+                        //if neither url check timed out
+                        if (chromeXhr.responseJSON.message === "Response received" && baseXhr.responseJSON.message === "Response received") {
+                            //if both checks pass
+                            if (chromeXhr.responseJSON.response.status === 200 && chromeXhr.responseJSON.response.status === 200) {
+                                updateStatusBar(USER_AGENT_BLOCKING, "Pass", "success");
+                            }
+                            //if chrome user agent check passes but let's encrypt user agent check fails
+                            else if (chromeXhr.responseJSON.response.status !== 200 && chromeXhr.responseJSON.response.status === 200) {
+                                updateStatusBar(USER_AGENT_BLOCKING, "Fail", "alert");
+                            }
+                            else {
+                                updateStatusBar(USER_AGENT_BLOCKING, "Indeterminate", "warning");
+                            }
+                        }
+                        //if either or both url checks timed out
+                        else {
+                            updateStatusBar(USER_AGENT_BLOCKING, "Indeterminate", "warning");
+                        }
                     },
-                    function() {
-                        //if baseCheck fails but chromeUserAgentCheck succeeded
-                        updateStatusBar("ssl_user_agent", "Fail", "alert");
+                    function(baseXhr, baseStatus, baseError) {
+                        updateStatusBar(USER_AGENT_BLOCKING, "Indeterminate", "warning");
                     }
                 )
             },
-            error: function (xhr) {
-                if (xhr.responseJSON == null) {
-                    updateStatusBar("ssl_user_agent", "Internal error", "warning");
+            error: function (xhr, status, error) {
+                let errorMessage;
+                if (status === 400) {
+                    errorMessage = 'Schoolbox error';
+                } else if (status === 500) {
+                    errorMessage = 'API error';
                 } else {
-                    updateStatusBar("ssl_user_agent", "Indeterminate", "warning");
+                    errorMessage = 'Unknown error';
                 }
+                updateStatusBar(USER_AGENT_BLOCKING, errorMessage, "alert");
             },
         });
     });
@@ -169,16 +222,16 @@
             <section>
                 <ol class="information-list expandable-card">
                     <li>
-                        <div id="port_80">
-                            <div class="expander icon-down-arrow" data-collapser="ssl_port_80"></div>
+                        <div id="{{ PORT_80_BLOCKED }}">
+                            <div class="expander icon-down-arrow" data-collapser="{{ PORT_80_BLOCKED }}"></div>
                             <div class="column-left columns content">
                                 <h3 class="no-margin">Port 80 timeout</h3>
                             </div>
                             <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="ssl_port_80"><span class="loader"></span></span>
+                                <span class="full-width no-margin neutral label" data-light="{{ PORT_80_BLOCKED }}"><span class="loader"></span></span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_port_80" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="{{ PORT_80_BLOCKED }}" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
                                 <p>Let's Encrypt sends domain verification requests via HTTP on port 80. If port 80 traffic is restricted, that could be causing SSL certificate renewal requests to fail.</p>
@@ -186,7 +239,7 @@
                                 <ol>
                                     <li>A firewall may be restricting traffic on port 80</li>
                                     <li>A firewall may be restricting HTTP requests</li>
-                                    <li>A firewall if restricting traffic from the US/EU (see <a href="#geoblocking">Geoblocking</a>)</li>
+                                    <li>A firewall if restricting traffic from the US/EU (see <a href="#{{ GEOBLOCKING }}">Geoblocking</a>)</li>
                                 </ol>
                                 <h5>Resolution steps</h5>
                                 <p>Review the firewall configuration and ensure that HTTP traffic on port 80 is able to reach the Schoolbox server directly. For more information, visit <a href="https://help.schoolbox.com.au/homepage/483#component6918">Schoolbox Help - System Requirements - Security, Firewall and Ports</a>.</p>
@@ -194,16 +247,16 @@
                         </div>
                     </li>
                     <li>
-                        <div id="https_upgrade">
-                            <div class="expander icon-down-arrow" data-collapser="ssl_https_upgrade"></div>
+                        <div id="{{ HTTPS_UPGRADE }}">
+                            <div class="expander icon-down-arrow" data-collapser="{{ HTTPS_UPGRADE }}"></div>
                             <div class="column-left columns content">
                                 <h3 class="no-margin">HTTP > HTTPS upgrade</h3>
                             </div>
                             <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="ssl_https_upgrade"><span class="loader"></span></span>
+                                <span class="full-width no-margin neutral label" data-light="{{ HTTPS_UPGRADE }}"><span class="loader"></span></span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_https_upgrade" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="{{ HTTPS_UPGRADE }}" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
                                 <p>Let's Encrypt domain verification requests are made with HTTP. If these requests are escalated to HTTPS, Schoolbox will redirect this unauthenticated traffic to the Schoolbox login page and the SSL certificate renewal process will fail.</p>
@@ -224,16 +277,16 @@
                         </div>
                     </li>
                     <li>
-                        <div id="upstream_error">
-                            <div class="expander icon-down-arrow" data-collapser="ssl_upstream_error"></div>
+                        <div id="{{ UPSTREAM_ERROR }}">
+                            <div class="expander icon-down-arrow" data-collapser="{{ UPSTREAM_ERROR }}"></div>
                             <div class="column-left columns content">
                                 <h3 class="no-margin">Upstream error</h3>
                             </div>
                             <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="ssl_upstream_error"><span class="loader"></span></span>
+                                <span class="full-width no-margin neutral label" data-light="{{ UPSTREAM_ERROR }}"><span class="loader"></span></span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_upstream_error" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="{{ UPSTREAM_ERROR }}" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
                                 <p>'Upstream error' is an umbrella term for any number of issues that could be restricting the Let's Encrypt requests trying to reach the Schoolbox server.</p>
@@ -249,16 +302,16 @@
                         </div>
                     </li>
                     <li>
-                        <div id="user_agent">
-                            <div class="expander icon-down-arrow" data-collapser="ssl_user_agent"></div>
+                        <div id="{{ USER_AGENT_BLOCKING }}">
+                            <div class="expander icon-down-arrow" data-collapser="{{ USER_AGENT_BLOCKING }}"></div>
                             <div class="column-left columns content">
                                 <h3 class="no-margin">User agent blocking</h3>
                             </div>
                             <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="ssl_user_agent"><span class="loader"></span></span>
+                                <span class="full-width no-margin neutral label" data-light="{{ USER_AGENT_BLOCKING }}"><span class="loader"></span></span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_user_agent" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="{{ USER_AGENT_BLOCKING }}" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
                                 <p>Let's Encrypt domain verification requests use the user-agent header <code>Mozilla/5.0 (compatible; Let's Encrypt validation server; +https://letsencrypt.org)</code>. Some firewalls may block this user-agent when they do not recognise it.</p>
@@ -272,16 +325,16 @@
                         </div>
                     </li>
                     <li>
-                        <div id="geoblocking">
-                            <div class="expander icon-down-arrow" data-collapser="ssl_geoblocking"></div>
+                        <div id="{{ GEOBLOCKING }}">
+                            <div class="expander icon-down-arrow" data-collapser="{{ GEOBLOCKING }}"></div>
                             <div class="column-left columns content">
                                 <h3 class="no-margin">Geoblocking</h3>
                             </div>
                             <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="ssl_geoblocking">No test available</span>
+                                <span class="full-width no-margin neutral label" data-light="{{ GEOBLOCKING }}">No test available</span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="ssl_geoblocking" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="{{ GEOBLOCKING }}" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
                                 <p>Let's Encrypt domain verification requests can come from a range of IP addresses around world including the US, EU, etc. Blocking web requests from specific regions can cause Let's Encrypt domain verification to fail.</p>

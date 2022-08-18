@@ -117,12 +117,20 @@
         {% if not is_cloud %}
         // check if https://api.schoolbox.cloud/urlCheck?url=http://$current_domain/.well-known/ping is accessible
         $.ajax({
-            url: "{{ api_url }}/v2/?url=" + encodeURIComponent("http://" + location.hostname + "/.well-known/acme-challenge/ping"),
-            success: function() {
-                $('[data-light="port_80"]').html('Online').removeClass('neutral').addClass('success');
+            url: "{{ api_url }}/v2/?url=" + encodeURIComponent("http://" + 'intranet.tsc.nsw.edu.au' + "/.well-known/acme-challenge/ping"),
+            success: function(result, status, xhr) {
+                if (xhr.responseJSON.message !== "Request timeout occurred") {
+                    if (xhr.responseJSON.response.status === 200) {
+                        $('[data-light="port_80"]').html('Online').removeClass('neutral').addClass('success');
+                    } else {
+                        $('[data-light="port_80"]').html('Offline').removeClass('neutral').addClass('alert');
+                    }
+                } else {
+                    $('[data-light="port_80"]').html('Offline').removeClass('neutral').addClass('alert');
+                }
             },
             error: function() {
-                $('[data-light="port_80"]').html('Offline').removeClass('neutral').addClass('alert');
+                $('[data-light="port_80"]').html('Error').removeClass('neutral').addClass('alert');
             }
         });
         // check ntp status
