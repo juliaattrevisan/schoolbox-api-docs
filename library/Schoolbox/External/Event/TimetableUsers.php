@@ -62,6 +62,14 @@ class TimetableUsers
 
 
     /**
+     * Remember this set if we fetched it already
+     *
+     * @var array|null
+     */
+    private ?array $staffExternalIds = null;
+
+
+    /**
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
      * @param \Schoolbox\External\Event\Mapper           $eventMapper
@@ -127,12 +135,19 @@ class TimetableUsers
             } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override->getAction()) {
                 $usualUsers = [];
             } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override->getAction()) {
+                /* If we haven't got this already, get it and remember it
+                 * in case we needed it again and again and again
+                 */
+                if (null === $this->staffExternalIds) {
+                    $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
+                }
+
                 /* Get a list of staff members,
                  * then do some array magic between $usualUsers
                  * and this list of staff ids, to exclude staff
                  * from $usualUsers
                  */
-                $usualUsers = array_diff($usualUsers, $this->staffProfileMapper->findAllExternalIds());
+                $usualUsers = array_diff($usualUsers, $this->staffExternalIds);
             }
         }
 
