@@ -53,6 +53,11 @@ class IdFinder extends AbstractIdFinder
             $pb = $pb->notEquals('p.owner_id', $user->getId());
         }
 
+        $studentSelection = $completeFilters[Student\Definition::class] ?? null;
+        if (isset($studentSelection)) {
+            $pb = $pb->in('p.student_id', $studentSelection);
+        }
+
         // Somehow apply class here?
         // That may be done by passing a class code, and applying a student
         // filter?

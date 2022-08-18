@@ -10,7 +10,10 @@ namespace Schoolbox\Pastoral\ClassReport;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Filter;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Role;
+use Schoolbox\SortUsersByName;
 
 class Controller extends Base
 {
@@ -22,6 +25,7 @@ class Controller extends Base
         private Filter\IFactoryFactory $filterFactoryFactory,
         private Filter\Mapper $filterMapper,
         private Filter\Selection\Mapper $filterSelectionMapper,
+        private UserAccessMapper $userAccessMapper,
     ) {
     }
 
@@ -80,12 +84,23 @@ class Controller extends Base
             $page,
         );
 
+        // Get all students in class: add them to filter
+        $students = $this->userAccessMapper
+            ->findUsersInCategory($folder, Role::STUDENT)
+            ->sortByCallback((new SortUsersByName())->getCallable(), true);
+        $studentIds = $students->getPropertyValues('id');
+        $hardCodedFilters = [
+            Filter\Filters\Pastoral\Student\Definition::class => array_combine($studentIds, $studentIds),
+        ];
+
         $idFinder = Filter\Filters\Pastoral\IdFinder::getInstance(
             $this->filterMapper,
             $this->pastoralMapper,
         );
-        $pastoralIds = $idFinder->findIdsByFilters($dynamicFilters, $this->getUser());
-
+        $pastoralIds = $idFinder->findIdsByFilters(
+            array_merge($dynamicFilters, $hardCodedFilters),
+            $this->getUser(),
+        );
 
 //        $pastoralIds = $this->
 
@@ -108,6 +123,7 @@ class Controller extends Base
                         '@pastoralClassReportModule/inner.twig',
                         [
                             'pastoralIds' => $pastoralIds,
+                            'students'    => $students,
 //                            'markbook'              => $markbook,
 //                            'folder'                => $folder,
 //                            'rank'                  => $rank,
