@@ -237,6 +237,9 @@ module.exports = {
         manageGroups: './library/Schoolbox/Group/vue/manageGroups.js',
         manageGroup: './library/Schoolbox/Group/Manage/vue/manageGroup.js',
 
+        //Curriculum
+        manageCurriculum: './library/Schoolbox/Curriculum/Manage/vue/manageCurriculum.js',
+
         // QR codes
         manageQrCodes: './library/Schoolbox/Qrcode/vue/manageQrCodes.js',
 
