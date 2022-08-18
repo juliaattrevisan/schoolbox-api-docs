@@ -43,6 +43,7 @@ class IdFinder extends AbstractIdFinder
             $pb->isNull('p.deleted_at');
         }
 
+        // Creator selection
         $creatorSelectionPb = $this->getMapper()->getPredicateBuilder();
         $creatorSelection   = $completeFilters[Creator\Definition::class] ?? null;
         if (isset($creatorSelection[Creator\Definition::KEY_CURRENT_USER])) {
@@ -55,14 +56,11 @@ class IdFinder extends AbstractIdFinder
         }
         $pb = $pb->any($creatorSelectionPb);
 
+        // Student selection
         $studentSelection = $completeFilters[Student\Definition::class] ?? null;
         if (isset($studentSelection)) {
             $pb = $pb->in('p.student_id', $studentSelection);
         }
-
-        // Somehow apply class here?
-        // That may be done by passing a class code, and applying a student
-        // filter?
 
         $query = "SELECT DISTINCT p.id FROM pastoral p";
         if (count($pb->getWhere()) > 0) {
