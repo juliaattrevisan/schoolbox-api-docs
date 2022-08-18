@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Badge;
 
 use Schoolbox\Filter\AbstractIdFinder;
+use Schoolbox\User;
 
 /**
  * ID finder for the badge filter.
@@ -44,10 +45,11 @@ class IdFinder extends AbstractIdFinder
      * Retrieve ID of all badges which match the filters.
      *
      * @param array $completeFilters
+     * @param User  $user
      * @param bool  $deleted
      * @return array
      */
-    protected function buildQuery(array $completeFilters, bool $deleted): array
+    protected function buildQuery(array $completeFilters, User $user, bool $deleted): array
     {
         $categoryIds = $completeFilters[Category\Definition::class] ?? null;
         $pb          = $this->getMapper()->getPredicateBuilder();

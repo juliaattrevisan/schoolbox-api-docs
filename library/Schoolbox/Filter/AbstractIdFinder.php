@@ -90,7 +90,7 @@ abstract class AbstractIdFinder implements IdFinder
         // Can we simplify filters using set theory?
         $completeFilters = $this->simplifyFilters($completeFilters);
 
-        [$query, $params] = $this->buildQuery($completeFilters, $deleted);
+        [$query, $params] = $this->buildQuery($completeFilters, $user, $deleted);
         $idStatement = $this->getMapper()->getDatabase()->query($query, $params);
         $ids         = array_column($idStatement->fetchAll(), $this->getMapper()->getIdentifierColumn());
 
@@ -197,12 +197,13 @@ abstract class AbstractIdFinder implements IdFinder
     /**
      * Protected so we can call from child unit-testing class
      *
-     * @param Collection[]|null[]|mixed[][] $completeFilters
-     * @param bool                          $deleted Whether to include soft-deleted entities
+     * @param Collection[]|null[]|mixed[][] $completeFilters The full set of filters
+     * @param User                          $user            The user to query in the context of
+     * @param bool                          $deleted         Whether to include soft-deleted entities
      * @return mixed[]                      [$query, $params]
      * @throws BrokenFilterException If a filter SQL fragment cannot be built
      */
-    abstract protected function buildQuery(array $completeFilters, bool $deleted): array;
+    abstract protected function buildQuery(array $completeFilters, User $user, bool $deleted): array;
 
 
     /* Getters

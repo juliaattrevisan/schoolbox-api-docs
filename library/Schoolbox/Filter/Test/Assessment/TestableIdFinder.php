@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\IMapper;
+use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
 use Schoolbox\Filter\Filters\Assessment;
@@ -25,7 +26,6 @@ use Schoolbox\Filter\Filters\Assessment;
  */
 class TestableIdFinder extends IdFinder
 {
-
     /**
      * @param array $completeFilters
      * @return bool
@@ -64,7 +64,7 @@ class TestableIdFinder extends IdFinder
      */
     public function getSqlStringForFilters(array $completeFilters): array
     {
-        return $this->buildQuery($completeFilters, false);
+        return $this->buildQuery($completeFilters, new User(), false);
     }
 
 

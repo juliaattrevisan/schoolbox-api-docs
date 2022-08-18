@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Pastoral;
 
 use Schoolbox\Filter\AbstractIdFinder;
+use Schoolbox\User;
 
 /**
  * ID finder for the pastoral filter
@@ -33,9 +34,10 @@ class IdFinder extends AbstractIdFinder
     }
 
     /**
+     * @param User $user
      * @inheritdoc
      */
-    protected function buildQuery(array $completeFilters, bool $deleted): array
+    protected function buildQuery(array $completeFilters, User $user, bool $deleted): array
     {
         $pb = $this->getMapper()->getPredicateBuilder();
         if (!$deleted) {

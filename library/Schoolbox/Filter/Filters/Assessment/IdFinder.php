@@ -19,6 +19,7 @@ use Schoolbox\Filter\Filters\Assessment\WorkType;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType;
 use Schoolbox\Filter\Mapper;
 use Schoolbox\IMapper;
+use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
 
@@ -74,7 +75,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    protected function buildQuery(array $completeFilters, bool $deleted): array
+    protected function buildQuery(array $completeFilters, User $user, bool $deleted): array
     {
         // Filters which effect which sub-queries are required
         $teacherFolderIds      = $completeFilters[Folder\TeacherInvolved\Definition::class];
