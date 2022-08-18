@@ -188,7 +188,7 @@ const containerClass = computed(() => {
             </button>
         </div>
         <ul v-if="hasChildren">
-            <mc-code
+            <mc-view-code
                 v-for="code in props.code.children"
                 :key="code.id"
                 :code="code"

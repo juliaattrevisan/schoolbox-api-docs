@@ -8,7 +8,7 @@
 import { ref, computed, watch } from 'vue';
 import { useCodesStore } from './store/mcCodesStore';
 import { useActiveCodesStore } from './store/mcActiveCodesStore';
-import McCode from './mc-code.vue'
+import McViewCode from './mc-view-code.vue'
 
 
 const codesStore = useCodesStore();
@@ -65,7 +65,7 @@ watch(() => activeCodesStore.codesWithSearch, () => {
         <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
     </div>
     <ul v-else ref="codesContainerEl">
-        <mc-code
+        <mc-view-code
             v-for="code in activeCodesStore.codesWithSearch"
             :key="code.id"
             :code="code"
@@ -75,8 +75,6 @@ watch(() => activeCodesStore.codesWithSearch, () => {
 </template>
 
 <style lang="scss" scoped>
-
-$height: 500px;
 
 ul {
     list-style: none;
@@ -88,7 +86,7 @@ ul {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: $height;
+    min-height: 200px;
     p {
         max-width: 50%;
     }

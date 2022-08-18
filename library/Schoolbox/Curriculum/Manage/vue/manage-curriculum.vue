@@ -9,7 +9,7 @@ import { useStore } from './store/manageCurriculumStore';
 import { useActiveCodesStore } from './store/mcActiveCodesStore';
 import { useSelectedCodesStore } from './store/mcSelectedCodeStore';
 import McHeader from './mc-header.vue';
-import McCodes from './mc-codes.vue';
+import McView from './mc-view.vue';
 
 
 const props = defineProps({
@@ -49,40 +49,8 @@ function checkForStorybook () {
 </script>
 
 <template>
-    <div class="row actions-small-1 actions-medium-2">
-        <div class="list-item">
-            <div class="small-12 column">
-                <h1>Manage Curriculum</h1>
-            </div>
-        </div>
-        <nav>
-            <span class="hide-for-small">
-                <a href="/curriculum/add" data-interaction="create-curriculum" class="icon icon-add" title="Create New Curriculum"></a>
-                <a href="/curriculum/import" class="icon icon-upload" title="Import Curriculum"></a>
-            </span>
-            <a href="#" class="icon-more show-for-small" data-dropdown="tab-control" title="Actions"></a>
-        </nav>
-        <ul id="tab-control" class="f-dropdown" data-dropdown-content="">
-            <li>
-                <a href="/curriculum/add" data-interaction="create-curriculum" class="icon icon-add">Create New Curriculum</a>
-            </li>
-            <li>
-                <a href="/curriculum/import" class="icon icon-upload">Import Curriculum</a>
-            </li>
-        </ul>
-    </div>
-    <div class="row">
-        <div class="small-12 columns island">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <mc-header />
-                        <mc-codes />
-                    </div>
-                </fieldset>
-            </section>
-        </div>
-    </div>
+    <mc-header />
+    <mc-view />
 </template>
 
 <style lang="scss" scoped>
