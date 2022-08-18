@@ -13,10 +13,11 @@ const MIN_QUERY_LENGTH = 3;
 export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
 
     state: () => ({
-        selectedFirstNodeId: UNSET_ID,
-        selectedSecondNodeId: UNSET_ID,
-        selectedThirdNodeId: UNSET_ID,
-        selectedFourthNodeId: UNSET_ID,
+        selectedNodeIdList: [],
+        // selectedFirstNodeId: UNSET_ID,
+        // selectedSecondNodeId: UNSET_ID,
+        // selectedThirdNodeId: UNSET_ID,
+        // selectedFourthNodeId: UNSET_ID,
         query: '', //current search term to filter the active codes
     }),
 
@@ -31,7 +32,8 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
         hasSingleGroup () {
             const codesStore = useCodesStore();
             if (codesStore.codes.length === 1) {
-                this.selectedFirstNodeId = codesStore.codes[0].id;
+                // this.selectedFirstNodeId = codesStore.codes[0].id;
+                this.selectedNodeIdList = [codesStore.codes[0].id];
                 return true;
             } else {
                 return false;
@@ -61,27 +63,27 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Boolean }
          */
-        hasSelectedFirstNode () {
-            return this.selectedFirstNodeId !== UNSET_ID;
-        },
+        // hasSelectedFirstNode () {
+        //     return this.selectedFirstNodeId !== UNSET_ID;
+        // },
 
         /**
          * The currently selected first node
          *
          * @return { Object }
          */
-        selectedFirstNode () {
-            return this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
-        },
+        // selectedFirstNode () {
+        //     return this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
+        // },
 
         /**
          * To determine whether there's any second level nodes (children) in the selectedFirstNode
          *
          * @return { Boolean }
          */
-        hasSecondNodes () {
-            return this.selectedFirstNode.children.length > 0 ? true : false;
-        },
+        // hasSecondNodes () {
+        //     return this.selectedFirstNode.children.length > 0 ? true : false;
+        // },
 
         /**
          * Show the second level nodes, which are the children of the selectedFirstNode
@@ -89,39 +91,39 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Array }
          */
-        secondNodes () {
-            return [
-                getEmptyNode(),
-                ...this.selectedFirstNode.children,
-            ];
-        },
+        // secondNodes () {
+        //     return [
+        //         getEmptyNode(),
+        //         ...this.selectedFirstNode.children,
+        //     ];
+        // },
 
         /**
          * Whether a second node has been selected via mc-header.vue
          *
          * @return { Boolean }
          */
-        hasSelectedSecondNode () {
-            return this.selectedSecondNodeId !== UNSET_ID;
-        },
+        // hasSelectedSecondNode () {
+        //     return this.selectedSecondNodeId !== UNSET_ID;
+        // },
 
         /**
          * The currently selected second node
          *
          * @return { Object }
          */
-        selectedSecondNode () {
-            return this.secondNodes.find((node) => node.id === this.selectedSecondNodeId);
-        },
+        // selectedSecondNode () {
+        //     return this.secondNodes.find((node) => node.id === this.selectedSecondNodeId);
+        // },
 
         /**
          * To determine whether there's any third level nodes (children) in the selectedSecondNode
          *
          * @return { Boolean }
          */
-        hasThirdNodes () {
-            return this.selectedSecondNode.children.length > 0 ? true : false;
-        },
+        // hasThirdNodes () {
+        //     return this.selectedSecondNode.children.length > 0 ? true : false;
+        // },
 
         /**
          * Show the third level nodes, which are the children of the selectedSecondNode
@@ -129,39 +131,39 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Array }
          */
-        thirdNodes () {
-            return [
-                getEmptyNode(),
-                ...this.selectedSecondNode.children,
-            ];
-        },
+        // thirdNodes () {
+        //     return [
+        //         getEmptyNode(),
+        //         ...this.selectedSecondNode.children,
+        //     ];
+        // },
 
         /**
          * Whether a third node has been selected via mc-header.vue
          *
          * @return { Boolean }
          */
-        hasSelectedThirdNode () {
-            return this.selectedThirdNodeId !== UNSET_ID;
-        },
+        // hasSelectedThirdNode () {
+        //     return this.selectedThirdNodeId !== UNSET_ID;
+        // },
 
         /**
          * The currently selected third node
          *
          * @return { Object }
          */
-        selectedThirdNode () {
-            return this.thirdNodes.find((node) => node.id === this.selectedThirdNodeId);
-        },
+        // selectedThirdNode () {
+        //     return this.thirdNodes.find((node) => node.id === this.selectedThirdNodeId);
+        // },
 
         /**
          * To determine whether there's any fourth level nodes (children) in the selectedFourthNode
          *
          * @return { Boolean }
          */
-        hasFourthNodes () {
-            return this.selectedThirdNode.children.length > 0 ? true : false;
-        },
+        // hasFourthNodes () {
+        //     return this.selectedThirdNode.children.length > 0 ? true : false;
+        // },
 
         /**
          * Show the fourth level nodes, which are the children of the selectedThirdNode
@@ -169,30 +171,30 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Array }
          */
-        fourthNodes () {
-            return [
-                getEmptyNode(),
-                ...this.selectedThirdNode.children,
-            ];
-        },
+        // fourthNodes () {
+        //     return [
+        //         getEmptyNode(),
+        //         ...this.selectedThirdNode.children,
+        //     ];
+        // },
 
         /**
          * Whether a fourth node has been selected via mc-header.vue
          *
          * @return { Boolean }
          */
-        hasSelectedFourthNode () {
-            return this.selectedFourthNodeId !== UNSET_ID;
-        },
+        // hasSelectedFourthNode () {
+        //     return this.selectedFourthNodeId !== UNSET_ID;
+        // },
 
         /**
          * The currently selected fourth node
          *
          * @return { Object }
          */
-        selectedFourthNode () {
-            return this.fourthNodes.find((node) => node.id === this.selectedFourthNodeId);
-        },
+        // selectedFourthNode () {
+        //     return this.fourthNodes.find((node) => node.id === this.selectedFourthNodeId);
+        // },
 
         /**
          * To determine the display of elements based on how far along
@@ -200,9 +202,9 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Boolean }
          */
-        isOnFirstNode () {
-            return this.hasSelectedFirstNode && !this.hasSelectedSecondNode && !this.hasSelectedThirdNode;
-        },
+        // isOnFirstNode () {
+        //     return this.hasSelectedFirstNode && !this.hasSelectedSecondNode && !this.hasSelectedThirdNode;
+        // },
 
         /**
          * To determine the display of elements based on how far along
@@ -210,9 +212,9 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Boolean }
          */
-        isOnSecondNode () {
-            return this.hasSelectedFirstNode && this.hasSelectedSecondNode && !this.hasSelectedThirdNode;
-        },
+        // isOnSecondNode () {
+        //     return this.hasSelectedFirstNode && this.hasSelectedSecondNode && !this.hasSelectedThirdNode;
+        // },
 
         /**
          * To determine the display of elements based on how far along
@@ -220,9 +222,9 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Boolean }
          */
-        isOnThirdNode () {
-            return this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode;
-        },
+        // isOnThirdNode () {
+        //     return this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode;
+        // },
 
         /**
          * To determine the display of elements based on how far along
@@ -230,28 +232,28 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Boolean }
          */
-        isOnFourthNode () {
-            return this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode && this.hasSelectedFourthNode;
-        },
+        // isOnFourthNode () {
+        //     return this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode && this.hasSelectedFourthNode;
+        // },
 
         /**
          * The currently selected code
          *
          * @return { Object }
          */
-        selectedCode () {
-            if (this.isOnFourthNode) {
-                return this.selectedFourthNode;
-            } else if (this.isOnThirdNode) {
-                return this.selectedThirdNode;
-            } else if (this.isOnSecondNode) {
-                return this.selectedSecondNode;
-            } else if (this.isOnFirstNode) {
-                return this.selectedFirstNode;
-            } else {
-                return [];
-            }
-        },
+        // selectedCode () {
+        //     if (this.isOnFourthNode) {
+        //         return this.selectedFourthNode;
+        //     } else if (this.isOnThirdNode) {
+        //         return this.selectedThirdNode;
+        //     } else if (this.isOnSecondNode) {
+        //         return this.selectedSecondNode;
+        //     } else if (this.isOnFirstNode) {
+        //         return this.selectedFirstNode;
+        //     } else {
+        //         return [];
+        //     }
+        // },
 
         /**
          * the search string broken into words, to search for each word
@@ -349,42 +351,69 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
     actions: {
 
         /**
+         *
+         *
+         * @param { number }
+         */
+        getNodesAt (depth) {
+            const codesStore = useCodesStore();
+            if (depth === 0 && this.hasSingleGroup) {
+                return [...codesStore.codes];
+            } else {
+                return [
+                    getEmptyNode(),
+                    ...codesStore.codes
+                ];
+            }
+            // if (this.isOnThirdNode) {
+            //     this.selectedFourthNodeId = id;
+            // } else if (this.isOnSecondNode) {
+            //     this.selectedThirdNodeId = id;
+            // } else if (this.isOnFirstNode) {
+            //     this.selectedSecondNodeId = id;
+            // }
+        },
+
+        /**
          * Can traverse through the codes via direct selection of a mc-code when
          * it doesn't have a code.
+         *
+         * @param { number }
          */
         setNextSelectedNode (id) {
-            if (this.isOnThirdNode) {
-                this.selectedFourthNodeId = id;
-            } else if (this.isOnSecondNode) {
-                this.selectedThirdNodeId = id;
-            } else if (this.isOnFirstNode) {
-                this.selectedSecondNodeId = id;
-            }
+            this.selectedNodeIdList = [...this.selectedNodeIdList, id];
+            // if (this.isOnThirdNode) {
+            //     this.selectedFourthNodeId = id;
+            // } else if (this.isOnSecondNode) {
+            //     this.selectedThirdNodeId = id;
+            // } else if (this.isOnFirstNode) {
+            //     this.selectedSecondNodeId = id;
+            // }
         },
 
         /**
          * to reset the selected second node, reverting the node to empty
          */
-        resetSelectedSecondNode () {
-            this.selectedSecondNodeId = UNSET_ID;
-            this.resetSelectedThirdNode();
-            this.resetSelectedFourthNode();
-        },
+        // resetSelectedSecondNode () {
+        //     this.selectedSecondNodeId = UNSET_ID;
+        //     this.resetSelectedThirdNode();
+        //     this.resetSelectedFourthNode();
+        // },
 
         /**
          * to reset the selected third node, reverting the node to empty
          */
-        resetSelectedThirdNode () {
-            this.selectedThirdNodeId = UNSET_ID;
-            this.resetSelectedFourthNode();
-        },
+        // resetSelectedThirdNode () {
+        //     this.selectedThirdNodeId = UNSET_ID;
+        //     this.resetSelectedFourthNode();
+        // },
 
         /**
          * to reset the selected thurd node, reverting the node to empty
          */
-        resetSelectedFourthNode () {
-            this.selectedFourthNodeId = UNSET_ID;
-        },
+        // resetSelectedFourthNode () {
+        //     this.selectedFourthNodeId = UNSET_ID;
+        // },
 
         /**
          * find all those results that match any search words
