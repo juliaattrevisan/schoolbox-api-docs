@@ -114,6 +114,17 @@ class TimetableUsers
                 $usualUsers[$override->getUser()->getExternalId()] = $override->getUser()->getExternalId();
             } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override->getAction()) {
                 $usualUsers = [];
+            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override->getAction()) {
+                /* Get a list of staff members
+                 */
+
+                /* Index them by their externalId (synergy_id)
+                 */
+
+                /* Do some array magic between $usualUsers
+                 * and this list of staff ids, to exclude staff
+                 * from $usualUsers
+                 */
             }
         }
 
