@@ -5191,24 +5191,20 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
 
 		-
+<<<<<<< HEAD
 			message: "#^Right side of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Model.php
+=======
+			message: "#^Variable \\$plagscan in PHPDoc tag @var does not exist\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Mapper.php
+>>>>>>> 733ca82d42f (remove other baseline non hit issues [SA-14233])
 
 		-
 			message: "#^PHPDoc tag @param for parameter \\$submittedAt with type mixed is not subtype of native type Alaress_Date_Format\\|null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/Model.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\IMapper\\:\\:generateException\\(\\)\\.$#"
-			count: 13
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/Module.php
-
-		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/Module.php
 
 		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Response\\\\ValidSelfAssessable\\:\\:getDueWork\\(\\) should return Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Model but returns Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\.$#"
