@@ -19,12 +19,18 @@ class Definition extends AbstractDefinition
 {
     protected const NAME = 'Creator';
 
+    public const KEY_CURRENT_USER = 'currentUser';
+    public const KEY_OTHER_USERS = 'otherUsers';
+
     /**
      * @inheritdoc
      */
     protected function getCustomKeys(): array
     {
-        return [];
+        return [
+            self::KEY_CURRENT_USER,
+            self::KEY_OTHER_USERS,
+        ];
     }
 
     /**
@@ -40,7 +46,11 @@ class Definition extends AbstractDefinition
      */
     public function getLabel(string $key): string
     {
-        return '';
+        return match ($key) {
+            self::KEY_CURRENT_USER => 'Current User',
+            self::KEY_OTHER_USERS  => 'Other Users',
+            default                => '',
+        };
     }
 
     /**
