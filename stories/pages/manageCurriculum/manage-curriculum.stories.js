@@ -29,17 +29,7 @@ export default {
             template: `
             <div id="container">
                 <div id="content">
-                    <div class="row">
-                        <div class="small-12 columns island">
-                            <section>
-                                <fieldset class="content">
-                                    <div class="small-12 columns">
-                                        <story />
-                                    </div>
-                                </fieldset>
-                            </section>
-                        </div>
-                    </div>
+                    <story />
                 </div>
             </div>
             `

@@ -81,9 +81,6 @@ $height: 500px;
 ul {
     list-style: none;
     margin: 0 0 1rem 0;
-    max-height: $height; /*restrict the size of the modal, it'll scroll when larger */
-    min-height: $height;
-    overflow-y: auto;
 }
 
 .empty-state {
