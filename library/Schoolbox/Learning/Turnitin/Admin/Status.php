@@ -41,10 +41,6 @@ class Status
      * Determine the status of the Turnitin integration (if configured)
      *
      * @return array
-     * @throws \DomainException
-     * @throws \JsonException
-     * @throws \RuntimeException
-     * @throws \Schoolbox\Learning\Turnitin\Exception\BadEndpoint
      */
     public function generate(): array
     {
