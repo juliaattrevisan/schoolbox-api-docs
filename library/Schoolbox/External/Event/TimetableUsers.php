@@ -129,35 +129,17 @@ class TimetableUsers
             } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override->getAction()) {
                 /* Get a list of staff members
                  */
-
-
-                /* Index them by their externalId (synergy_id)
-                 */
+                $staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
 
                 /* Do some array magic between $usualUsers
                  * and this list of staff ids, to exclude staff
                  * from $usualUsers
                  */
+                $usualUsers = array_diff($usualUsers, $staffExternalIds);
             }
         }
 
         return $usualUsers;
-    }
-
-
-    /**
-     * Get a list of all staff members' externalIds
-     * from sis_user_profile_staff
-     *
-     * I suppose it's the most authoritative in this general area/vicinity
-     *
-     * @return array
-     */
-    private function findStaff(): array
-    {
-        $query = "
-            SELECT 
-        ";
     }
 
 
