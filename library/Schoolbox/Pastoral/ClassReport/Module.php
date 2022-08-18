@@ -76,6 +76,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(PastoralMapper::class),
+            $this->injector->get('pastoralDataSource'),
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(Filter\Mapper::class),
             $this->getMapperFactory()->get(Filter\Selection\Mapper::class),

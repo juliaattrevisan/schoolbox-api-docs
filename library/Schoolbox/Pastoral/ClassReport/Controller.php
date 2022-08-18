@@ -9,7 +9,7 @@ namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Filter;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
@@ -21,7 +21,8 @@ class Controller extends Base
      * Constructor
      */
     public function __construct(
-        private PastoralMapper $pastoralMapper,
+        private Pastoral\Mapper $pastoralMapper,
+        private Pastoral\DataSource $pastoralDataSource,
         private Filter\IFactoryFactory $filterFactoryFactory,
         private Filter\Mapper $filterMapper,
         private Filter\Selection\Mapper $filterSelectionMapper,
@@ -101,19 +102,15 @@ class Controller extends Base
             array_merge($dynamicFilters, $hardCodedFilters),
             $this->getUser(),
         );
-
-//        $pastoralIds = $this->
-
-//        $this->response->content->set(
-//            [
-//                'template' => '@pastoralClassReportModule/inner.twig',
-//                'data'     => [
-//                    'folder'      => $folder,
-//                    'pageTitle'   => "Homepage ($classCode)",
-//                    'filterPanel' => $filterPanel,
-//                ]
-//            ]
-//        );
+        $pastoralRecords          = $this->pastoralDataSource
+            ->findByColumnList($this->getUser(), ['id' => $pastoralIds]);
+        $pastoralRecordsByStudent = $pastoralRecords
+            ->groupByCallback(
+                function (Pastoral\Model $pastoral) {
+                    return $pastoral->getStudent()->getId();
+                }
+            )
+        ;
 
         $this->response->content->set(
             $this->buildJsonOutput(
@@ -122,16 +119,10 @@ class Controller extends Base
                     'content' => $this->buildUnthemedHtmlOutput(
                         '@pastoralClassReportModule/inner.twig',
                         [
-                            'pastoralIds' => $pastoralIds,
-                            'students'    => $students,
-//                            'markbook'              => $markbook,
-//                            'folder'                => $folder,
-//                            'rank'                  => $rank,
-//                            'rankEnabled'           => (bool)$this->getConfigLoader()->get('view_rank'),
-//                            'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
-//                            'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
-//                            'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
-                        ])->getAsString(),
+                            'students'                 => $students,
+                            'pastoralRecordsByStudent' => $pastoralRecordsByStudent,
+                        ]
+                    )->getAsString(),
                 ]
             )
         );
