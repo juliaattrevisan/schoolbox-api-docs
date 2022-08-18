@@ -25,7 +25,6 @@ use Schoolbox\UserMapper;
  */
 class TimetableUsers
 {
-
     /**
      * @var \Schoolbox\External\ClassEntryMapper
      */

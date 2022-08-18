@@ -25,7 +25,6 @@ use Schoolbox\User;
 
 class Calendar_Api_Factory
 {
-
     /**
      * A list of all the possible event types to display
      *
