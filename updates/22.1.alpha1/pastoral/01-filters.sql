@@ -2,6 +2,8 @@ INSERT INTO filter (entity, class)
 VALUES ('Schoolbox\\Pastoral\\Mapper',
         'Schoolbox\\Filter\\Filters\\Pastoral\\Type\\Definition'),
        ('Schoolbox\\Pastoral\\Mapper',
+        'Schoolbox\\Filter\\Filters\\Pastoral\\Severity\\Definition'),
+       ('Schoolbox\\Pastoral\\Mapper',
         'Schoolbox\\Filter\\Filters\\Pastoral\\Creator\\Definition'),
        ('Schoolbox\\Pastoral\\Mapper',
         'Schoolbox\\Filter\\Filters\\Pastoral\\Student\\Definition');

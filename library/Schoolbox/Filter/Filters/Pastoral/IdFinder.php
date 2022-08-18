@@ -62,6 +62,12 @@ class IdFinder extends AbstractIdFinder
             $pb = $pb->in('p.type_id', $typeSelection);
         }
 
+        // Severity selection
+        $severitySelection = $completeFilters[Severity\Definition::class] ?? null;
+        if (isset($severitySelection)) {
+            $pb = $pb->in('p.severity_id', $severitySelection);
+        }
+
         // Student selection (hardcoded filter)
         $studentSelection = $completeFilters[Student\Definition::class] ?? null;
         if (isset($studentSelection)) {

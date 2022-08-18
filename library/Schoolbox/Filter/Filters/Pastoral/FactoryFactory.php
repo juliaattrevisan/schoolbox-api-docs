@@ -47,6 +47,12 @@ class FactoryFactory extends AbstractFactoryFactory
                 $this->getSelectionMapper(),
                 $this->getMapperFactory()->get(Pastoral\Type\Mapper::class),
             ),
+            Severity\Definition::class => new Severity\Factory(
+                $this->getOptionMapper(),
+                $this->getDefaultsMapper(),
+                $this->getSelectionMapper(),
+                $this->getMapperFactory()->get(Pastoral\Severity\Mapper::class),
+            ),
             default => throw new InvalidArgumentException(
                 'No filter factory registered for class: ' . $filterDefinitionClass
             ),
