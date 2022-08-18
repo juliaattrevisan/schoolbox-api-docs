@@ -11,7 +11,6 @@ namespace Schoolbox\External\Event;
 
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\Event\Overrides\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\UserMapper;
 
