@@ -10,6 +10,7 @@ namespace Schoolbox\Filter;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 
+use Schoolbox\User;
 use function array_map;
 
 use Schoolbox\Collection;
@@ -71,7 +72,7 @@ abstract class AbstractIdFinder implements IdFinder
     /**
      * @inheritdoc
      */
-    public function findIdsByFilters(array $filters = [], bool $deleted = false): array
+    public function findIdsByFilters(array $filters, User $user, bool $deleted = false): array
     {
         // No filters ?
         if (0 === count($filters)) {

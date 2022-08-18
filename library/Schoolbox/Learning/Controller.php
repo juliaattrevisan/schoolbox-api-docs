@@ -284,7 +284,7 @@ class Controller extends Base
             AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
         ]);
 
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
 
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);

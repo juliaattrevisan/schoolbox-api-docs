@@ -183,7 +183,7 @@ class Controller extends WebController\Base
         $queryArgs = $this->getRequest()->query->getArrayCopy();
         [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
 
-        $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters);
+        $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
 
         $csvExporter = new CSV((bool)$this->getConfigLoader()->get('view_rank'));
@@ -214,7 +214,7 @@ class Controller extends WebController\Base
             // TODO add some intelligence around which filter settings to save (eg AssessmentType but not units)
             [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, true);
 
-            $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters);
+            $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
             $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
 
             /**

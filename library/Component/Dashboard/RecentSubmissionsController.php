@@ -86,14 +86,17 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         // * not an AssessmentSpec
         $folders             = $this->getFolderMapper()->findForUser($this->getUser(), true, UserAccess::ACCESS_WRITE);
         $folderIds           = $folders->getColumnValues('id');
-        $taughtAssessmentIds = $this->idFinder->findIdsByFilters([
-            Filters\Assessment\AssessmentType\Definition::class           => [
-                Filters\Assessment\AssessmentType\Definition::KEY_DUE_WORK => Filters\Assessment\AssessmentType\Definition::KEY_DUE_WORK,
-                Filters\Assessment\AssessmentType\Definition::KEY_QUIZ     => Filters\Assessment\AssessmentType\Definition::KEY_QUIZ,
+        $taughtAssessmentIds = $this->idFinder->findIdsByFilters(
+            [
+                Filters\Assessment\AssessmentType\Definition::class           => [
+                    Filters\Assessment\AssessmentType\Definition::KEY_DUE_WORK => Filters\Assessment\AssessmentType\Definition::KEY_DUE_WORK,
+                    Filters\Assessment\AssessmentType\Definition::KEY_QUIZ     => Filters\Assessment\AssessmentType\Definition::KEY_QUIZ,
+                ],
+                Filters\Assessment\Folder\TeacherInvolved\Definition::class   => array_combine($folderIds, $folderIds),
+                Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
             ],
-            Filters\Assessment\Folder\TeacherInvolved\Definition::class   => array_combine($folderIds, $folderIds),
-            Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
-        ]);
+            $this->getUser(),
+        );
 
         // Short circuit if no assessments match filters
         if (!count($taughtAssessmentIds)) {

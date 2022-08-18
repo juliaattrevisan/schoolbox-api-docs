@@ -161,7 +161,7 @@ class Controller extends Base
         }
 
         $idFinder       = Filter\Filters\Badge\IdFinder::getInstance($this->filterMapper, $this->mapper);
-        $badgeIds       = $idFinder->findIdsByFilters($filters);
+        $badgeIds       = $idFinder->findIdsByFilters($filters, $this->getUser());
 
 
         // Save selected filters

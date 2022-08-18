@@ -87,7 +87,7 @@ class Api implements Calendar_Api_EventType_Interface
             Alaress_Date_Format::newFromTimestamp($startTimestamp),
             Alaress_Date_Format::newFromTimestamp($endTimestamp),
             $this->visibility ? $this->user : null,
-            $this->assessmentIdFinder->findIdsByFilters($this->filters)
+            $this->assessmentIdFinder->findIdsByFilters($this->filters, $this->user)
         );
 
         if ($this->visibility) {

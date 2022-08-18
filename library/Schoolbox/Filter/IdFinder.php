@@ -10,6 +10,7 @@ namespace Schoolbox\Filter;
 
 use Schoolbox\Collection;
 use Schoolbox\IMapper;
+use Schoolbox\User;
 
 /**
  * An 'IdFinder' is able to take a set of filters (indexed by filter definition class),
@@ -39,10 +40,11 @@ interface IdFinder
      * * [X..] => INNER JOIN must be in X.   eg if project filter is [1] then assessments must reside directly in project_1
      *
      * @param Collection[]|null[]|mixed[][] $filters Indexed by filter definition class
+     * @param User                          $user    The user to use as the context for building filters for
      * @param bool                          $deleted Whether to include soft-deleted entities
      * @return int[]
      * @throws \InvalidArgumentException If any filter keys not recognised
      * @throws BrokenFilterException If a injected filter is unable to be processed
      */
-    public function findIdsByFilters(array $filters = [], bool $deleted = false): array;
+    public function findIdsByFilters(array $filters, User $user, bool $deleted = false): array;
 }
