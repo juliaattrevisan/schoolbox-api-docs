@@ -122,7 +122,7 @@ HELP;
          */
         try {
             $api->test();
-        } catch (Turnitin\Exception\Credentials $e) {
+        } catch (\Exception $e) {
             $this->getLogger()->warning($e->getMessage());
             exit(1);
         }
