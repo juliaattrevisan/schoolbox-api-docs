@@ -32,6 +32,7 @@ class Model
     public const PAGE_ASSESSMENT_CALENDAR = 'assessmentCal';
     public const PAGE_BADGE_LIST          = 'badgeList';
     public const PAGE_AWARD_LIST          = 'awardList';
+    public const PAGE_CLASS_PASTORAL      = 'classPastoral';
 
 
     /**
