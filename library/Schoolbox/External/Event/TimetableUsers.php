@@ -9,7 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\UserMapper;
 
 /**
  * For a given event, find the final calculated list of users
@@ -20,7 +25,6 @@ use Schoolbox\GenericCollection;
  */
 class TimetableUsers
 {
-
     /**
      * @var \Schoolbox\External\ClassEntryMapper
      */
@@ -52,40 +56,55 @@ class TimetableUsers
 
 
     /**
-     * @param \Schoolbox\External\ClassEntryMapper       $classEntryMapper
-     * @param \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper
+     * @var \Schoolbox\External\Profile\Staff\Mapper
+     */
+    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
+
+
+    /**
+     * Remember this set if we fetched it already
+     *
+     * @var array|null
+     */
+    private ?array $staffExternalIds = null;
+
+
+    /**
+     * @param ClassEntryMapper                           $classEntryMapper
+     * @param ClassInvolvementMapper                     $classInvolvementMapper
      * @param \Schoolbox\External\Event\Mapper           $eventMapper
-     * @param Overrides\Mapper                           $overrideMapper
-     * @param \Schoolbox\UserMapper                      $userMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overrideMapper
+     * @param UserMapper                                 $userMapper
+     * @param \Schoolbox\External\Profile\Staff\Mapper   $staffProfileMapper
      */
     public function __construct(
         \Schoolbox\External\ClassEntryMapper $classEntryMapper,
         \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
-        \Schoolbox\UserMapper $userMapper
+        \Schoolbox\UserMapper $userMapper,
+        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
     ) {
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->eventMapper = $eventMapper;
         $this->overrideMapper = $overrideMapper;
         $this->userMapper = $userMapper;
+        $this->staffProfileMapper = $staffProfileMapper;
     }
 
 
     /**
      * Find the overall set of involved humans for $event
      *
-     * @param \Schoolbox\External\Event\Model $event
+     * @param Model $event
      * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\Mapper\Exception\NotFound
+     * @throws \PDOException
+     * @throws Exception
+     * @throws Deleted
      */
     public function findForEvent(\Schoolbox\External\Event\Model $event): array
     {
-
         /* Find the sis_class that corresponds to $event
          */
         $class = $this->classEntryMapper->findOneByColumn('code', $event->getCode());
@@ -114,6 +133,20 @@ class TimetableUsers
                 $usualUsers[$override->getUser()->getExternalId()] = $override->getUser()->getExternalId();
             } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override->getAction()) {
                 $usualUsers = [];
+            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override->getAction()) {
+                /* If we haven't got this already, get it and remember it
+                 * in case we needed it again and again and again
+                 */
+                if (null === $this->staffExternalIds) {
+                    $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
+                }
+
+                /* Get a list of staff members,
+                 * then do some array magic between $usualUsers
+                 * and this list of staff ids, to exclude staff
+                 * from $usualUsers
+                 */
+                $usualUsers = array_diff($usualUsers, $this->staffExternalIds);
             }
         }
 

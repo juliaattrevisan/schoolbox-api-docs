@@ -25,7 +25,6 @@ use Schoolbox\User;
 
 class Calendar_Api_Factory
 {
-
     /**
      * A list of all the possible event types to display
      *
@@ -171,7 +170,8 @@ class Calendar_Api_Factory
                 \Schoolbox\External\Event\Mapper::getInstance(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                 \Schoolbox\UserMapper::getInstance(),
-                \Timetable_ColourMapper::getInstance()
+                \Timetable_ColourMapper::getInstance(),
+                \Schoolbox\External\Profile\Staff\Mapper::getInstance()
             ));
         }
 
@@ -227,7 +227,8 @@ class Calendar_Api_Factory
                         \Schoolbox\External\Event\Mapper::getInstance(),
                         \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                         \Schoolbox\UserMapper::getInstance(),
-                        \Timetable_ColourMapper::getInstance()
+                        \Timetable_ColourMapper::getInstance(),
+                        \Schoolbox\External\Profile\Staff\Mapper::getInstance()
                     ));
                     break;
 
@@ -356,7 +357,8 @@ class Calendar_Api_Factory
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper ::getInstance(),
                     \Schoolbox\UserMapper::getInstance(),
-                    \Timetable_ColourMapper::getInstance()
+                    \Timetable_ColourMapper::getInstance(),
+                    \Schoolbox\External\Profile\Staff\Mapper::getInstance()
                 );
             case Calendar_Api_EventType_SudsEvent_Schoolbox_Default::class:
                 return new Calendar_Api_EventType_SudsEvent_Schoolbox_Default(

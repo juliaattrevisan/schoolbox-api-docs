@@ -143,4 +143,31 @@ class Mapper extends \Schoolbox\Mapper
 
         throw new Exception\NotFound('Unknown profile.');
     }
+
+
+    /**
+     * Find all the staff-related external ids
+     *
+     * @return array
+     * @throws \PDOException
+     */
+    public function findAllExternalIds(): array
+    {
+        $query = "
+            SELECT external_id
+            FROM {$this->getTable()} staff
+            INNER JOIN sis_user_profile profile ON staff.sis_user_profile_id = profile.id
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+
+        $stack = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $stack[$row['external_id']] = $row['external_id'];
+        }
+
+        return array_values($stack);
+    }
 }
