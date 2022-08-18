@@ -106,6 +106,7 @@ class Mapper extends \Schoolbox\Mapper
                 ssf.*,
                 storage.ext,
                 tr.id AS turnitinReportId,
+                tr.turnitin_submission_id AS turnitinSubId,
                 overall_match_percentage,
                 internet_match_percentage,
                 publication_match_percentage,
@@ -164,6 +165,7 @@ class Mapper extends \Schoolbox\Mapper
                 'hash' => $row['hash'],
                 'turnitin' => [
                     'id' => $row['turnitinReportId'],
+                    'turnitin_submission_id' => $row['turnitinSubId'],
                     'percentage' => [
                         'overall' => $row['overall_match_percentage'],
                         'internet' => $row['internet_match_percentage'],

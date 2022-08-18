@@ -104,7 +104,7 @@ class SimilarityReportPayload
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
                     'responseId' => $data['submission']['id'],
-                    'turnitinId' => $file['turnitin']['id']
+                    'turnitinSubId' => $file['turnitin']['turnitin_submission_id']
                 ]);
             }
 

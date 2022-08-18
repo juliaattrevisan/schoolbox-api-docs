@@ -15,7 +15,7 @@
         responseId:   response.id,
         response:     response,
         participant:  participant,
-        turnitinId:   currentFile.turnitin.id })
+        turnitinSubId:   currentFile.turnitin.getTurnitinSubmissionId })
     %}
 
     {% if currentFile.turnitin.isComplete and reportRoute %}

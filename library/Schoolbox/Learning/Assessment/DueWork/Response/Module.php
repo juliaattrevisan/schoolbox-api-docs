@@ -98,7 +98,7 @@ class Module extends BaseModule
             new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
-        $turnitinPattern    = '/similarity/{assessmentId:\d+}/{responseId:\d+}/{turnitinId:\d+}';
+        $turnitinPattern    = '/similarity/{assessmentId:\d+}/{responseId:\d+}/{turnitinSubId}';
         $plagscanPattern    = '/plagscans/{assessmentId:\d+}/{responseId:\d+}/{plagscanId:\d+}';
         $assessmentPattern  = '/assessments/{assessmentId:\d+}';
         $participantPattern = $assessmentPattern . '/{studentId:\d+}';
@@ -280,7 +280,7 @@ class Module extends BaseModule
     private function preloadTurnitinWithAssessment(array $params): array
     {
         try {
-            $turnitinReport = Turnitin\File\Mapper::getInstance()->findById($params['turnitinId']);
+            $turnitinReport = Turnitin\File\Mapper::getInstance()->findOneByColumn('turnitin_submission_id', $params['turnitinSubId']);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
