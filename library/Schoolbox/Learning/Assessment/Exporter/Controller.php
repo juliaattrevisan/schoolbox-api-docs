@@ -437,7 +437,7 @@ class Controller extends BaseController
         // Generate an updated csv
         $filename = sb_tempnam();
         $file     = fopen($filename, 'wb');
-        $exporter = new Exporter($this->assessmentIdFinder, $this->assessmentDataSource);
+        $exporter = new Exporter($this->assessmentIdFinder, $this->assessmentDataSource, $this->getUser());
         $exporter->generate($file);
         fclose($file);
 
