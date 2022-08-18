@@ -4,12 +4,10 @@
  * To select Curriculum Codes to assign to something like a Due Work
  */
 
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
-// import { useSelectedCodesStore } from './store/mcSelectedCodesStore';
-// import { useSearchResultsStore } from './store/mcSearchResultsStore';
-// import { useModalStore } from './store/mcStore';
-// import { useModalActiveCodesStore } from './store/mcActiveCodesStore';
+import { useActiveCodesStore } from './store/mcActiveCodesStore';
+import { useSelectedCodesStore } from './store/mcSelectedCodeStore';
 import McHeader from './mc-header.vue';
 import McCodes from './mc-codes.vue';
 
@@ -42,11 +40,9 @@ onMounted(() => {
  */
 function checkForStorybook () {
     if (typeof STORYBOOK_ENV !== 'undefined') {
-        // useSelectedCodesStore().$reset();
-        // useSearchResultsStore().$reset();
-        // useModalStore().$reset();
-        // useModalActiveCodesStore().$reset();
-        // useStore().$reset();
+        useStore().$reset();
+        useActiveCodesStore().$reset();
+        useSelectedCodesStore().$reset();
     }
 }
 

@@ -5,7 +5,6 @@
 
 import { defineStore } from 'pinia';
 import { useCodesStore } from './mcCodesStore';
-import { flattenCodes, searchForMatches } from './mcSearchResultsStore';
 import cloneDeep from 'lodash/cloneDeep';
 
 const UNSET_ID = 0;
@@ -422,4 +421,46 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
         name: '-',
         children: [],
     }
+}
+
+/**
+ * The codes are nested with children:[], so we pull them all
+ * out into a single level when searching
+ *
+ * @param { Object }
+ */
+ export function flattenCodes (obj) {
+    let array = [obj];
+    if (obj.children && obj.children.length > 0) {
+        obj.children.forEach((child) => {
+            array = [...array, ...flattenCodes(child)];
+        });
+        obj.children = [];
+    }
+    return array;
+}
+
+/**
+ * find all those results that match any search words
+ * within the the code, name or breadcrumb fields
+ *
+ * @params { Object }
+ * @params { Array }
+ *
+ * @return { Boolean } true if found
+ */
+export function searchForMatches (code, queryWordList) {
+    let wordMatchCount = 0;
+    queryWordList.forEach(wordInSearch => {
+        if (code.code?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+            wordMatchCount++;
+        }
+        if (code.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+            wordMatchCount++;
+        }
+        if (code.breadcrumb?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+            wordMatchCount++;
+        }
+    });
+    return wordMatchCount > 0 ? true : false; //if there's any matches
 }
