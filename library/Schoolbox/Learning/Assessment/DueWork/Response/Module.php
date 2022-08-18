@@ -476,7 +476,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return IMapper|Kami\Mapper
+     * @return Kami\Mapper
      * @throws \InvalidArgumentException If mapper class not found
      */
     private function getKamiMapper()
