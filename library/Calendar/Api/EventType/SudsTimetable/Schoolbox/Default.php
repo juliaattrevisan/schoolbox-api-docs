@@ -13,7 +13,6 @@ use Schoolbox\User;
 
 class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
-
     /**
      * @var EventTypeMapper
      */
