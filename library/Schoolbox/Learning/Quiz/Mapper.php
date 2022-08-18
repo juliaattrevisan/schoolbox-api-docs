@@ -38,7 +38,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * @const WORK_TYPE_QUIZ
      * @deprecated 17.0 - too fragile. You cannot reliably imply semantics from the ID. It is user configurable.
@@ -256,6 +255,19 @@ class Mapper extends BaseMapper
             }
         }
         return true;
+    }
+
+    /**
+     * Deletes all constituents (sections and questions) from the quiz whose
+     * assessment ID matches `$assessmentId`.
+     *
+     * @param int $assessmentId
+     * @return void
+     * @throws BaseMapper\Exception if the quiz is deleted or doesn't exist
+     */
+    public function deleteQuizConstituents(int $assessmentId): void
+    {
+        $this->softDeleteSections($this->findOneByColumn('assessment_id', $assessmentId));
     }
 
     /**

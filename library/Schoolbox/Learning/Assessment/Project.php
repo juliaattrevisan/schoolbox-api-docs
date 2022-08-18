@@ -28,7 +28,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 class Project extends AbstractAssessment implements AssessmentContext
 {
-
     /**
      * @var GenericCollection|IAssessable[]
      */
@@ -521,6 +520,28 @@ class Project extends AbstractAssessment implements AssessmentContext
         return $clone;
     }
 
+
+    /**
+     * Overwrite fields from `$source` into this object.
+     *
+     * This implementation overwrites the additional fields over and above the
+     * base implementation:
+     * * precision
+     * * summator
+     *
+     * This implementation does _not_ overwrite sub-assessments: that is handled
+     * in another method.
+     *
+     * @param self $source
+     * @return $this
+     */
+    public function overwrite(IAssessable $source): IAssessable
+    {
+        parent::overwrite($source);
+        $this->precision = $source->precision;
+        $this->summator  = $source->summator;
+        return $this;
+    }
 
     /**
      * @inheritdoc

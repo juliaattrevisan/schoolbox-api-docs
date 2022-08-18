@@ -47,7 +47,6 @@ use UnderflowException;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * @inheritdoc
      * @throws BaseMapper\Exception If unable to derive an ID for mapped joins
@@ -1178,6 +1177,30 @@ class Mapper extends BaseMapper
         }
 
         return $modelList;
+    }
+
+    /**
+     * Sets `$specAssessmentId` as the spec assessment for `$implAssessmentId`,
+     * bypassing the mapper and its cache problems in order to do so.
+     *
+     * @param int $implAssessmentId
+     * @param int $specAssessmentId
+     * @return bool
+     */
+    public function saveSpecificationAssessment(int $implAssessmentId, int $specAssessmentId): bool
+    {
+        $this->database->query(
+            "
+                REPLACE INTO assessment_specification_implementation
+                (specification_assessment_id, implementation_assessment_id)
+                VALUES (:specAssessmentId, :implAssessmentId)
+            ",
+            [
+                'specAssessmentId' => $specAssessmentId,
+                'implAssessmentId' => $implAssessmentId,
+            ]
+        );
+        return true;
     }
 
     /**

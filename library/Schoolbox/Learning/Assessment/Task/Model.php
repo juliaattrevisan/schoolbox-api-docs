@@ -19,6 +19,7 @@ namespace Schoolbox\Learning\Assessment\Task;
 
 use InvalidArgumentException;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\User;
@@ -136,16 +137,50 @@ class Model extends AbstractAssessment
         $clone = parent::cloneForCopy();
 
         // copy attachments
+        $clone->copyAttachedFiles($this);
+
+        return $clone;
+    }
+
+    /**
+     * Overwrite fields from `$source` into this object.
+     *
+     * This implementation overwrites the additional fields over and above the
+     * base implementation:
+     * * attached files
+     * * self-assessable
+     * * URL
+     *
+     * @param self $source
+     * @return $this
+     */
+    public function overwrite(IAssessable $source): IAssessable
+    {
+        parent::overwrite($source);
+        $this->isSelfAssessable = $source->isSelfAssessable;
+        $this->url              = $source->url;
+        $this->copyAttachedFiles($source);
+        return $this;
+    }
+
+    /**
+     * Copy attached files from `$source` into this object.
+     *
+     * @param self $source
+     * @return $this
+     */
+    private function copyAttachedFiles(self $source): self
+    {
         $newFiles = new Collection();
-        foreach ($this->getAttachedFiles() as $file) {
+        foreach ($source->getAttachedFiles() as $file) {
             $newFiles->add(
                 (new File())
                     ->setStorage($file->getStorage())
                     ->setBasename($file->getBasename())
             );
         }
-        $clone->setAttachedFiles($newFiles);
-        return $clone;
+        $this->setAttachedFiles($newFiles);
+        return $this;
     }
 
     /**

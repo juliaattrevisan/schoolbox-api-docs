@@ -17,6 +17,7 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 use InvalidArgumentException;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
@@ -26,7 +27,6 @@ use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 class Model extends AbstractAssessment
 {
-
     /**
      * Possible value for `$this->maxAttempts`.
      *
@@ -96,8 +96,32 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * Feedback is required if latest attempt exists, is submitted, and is unreviewed.
+     * Overwrite fields from `$source` into this object.
+     *
+     * This implementation overwrites the additional fields over and above the
+     * base implementation:
+     * * completion message
+     * * duration
+     * * max attempts
+     *
+     * This implementation does _not_ overwrite:
+     * * external ID: this uniquely identifies the base assessment within
+     *   another system, so it should not be copied
+     *
+     * @param self $source
+     * @return $this
+     */
+    public function overwrite(IAssessable $source): IAssessable
+    {
+        parent::overwrite($source);
+        $this->completionMessage = $source->completionMessage;
+        $this->duration          = $source->duration;
+        $this->maxAttempts       = $source->maxAttempts;
+        return $this;
+    }
 
+    /**
+     * Feedback is required if latest attempt exists, is submitted, and is unreviewed.
      *
      * @inheritdoc
      */

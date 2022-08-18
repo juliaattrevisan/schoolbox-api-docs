@@ -1365,6 +1365,24 @@ class MapperProxy
     }
 
     /**
+     * Sets `$specAssessment` as the spec assessment for `$implAssessment`,
+     * bypassing the mapper and its cache problems in order to do so.
+     *
+     * @param IAssessable $implAssessment
+     * @param IAssessable $specAssessment
+     * @return void
+     */
+    public function saveSpecificationAssessment(
+        IAssessable $implAssessment,
+        IAssessable $specAssessment,
+    ): void {
+        $this->baseMapper->saveSpecificationAssessment(
+            $implAssessment->getId(),
+            $specAssessment->getId(),
+        );
+    }
+
+    /**
      * Optimized save method for assessable order.
      *
      * @param Collection $assessables A list of assessables to resequence

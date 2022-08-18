@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 use DomainException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
 use UnexpectedValueException;
@@ -167,13 +168,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $clone = parent::cloneForCopy();
 
         // copy attachments
-        $newFiles = new Collection();
-        foreach ($this->getAttachedFiles() as $file) {
-            $newFiles->add((new File())
-                ->setStorage($file->getStorage())
-                ->setBasename($file->getBasename()));
-        }
-        $clone->setAttachedFiles($newFiles);
+        $clone->copyAttachedFiles($this);
 
         /* Ensure any current rubric is NOT linked to new location.
          *
@@ -184,6 +179,65 @@ class Model extends AbstractAssessment implements ISelfAssessable
          */
         $clone->setRubricGrid(null);
         return $clone;
+    }
+
+    /**
+     * Overwrite fields from `$source` into this object.
+     *
+     * This implementation overwrites the additional fields over and above the
+     * base implementation:
+     * * attached files
+     * * rubric grid: is set to null, as copying rubrics is too complex an
+     *   operation to handle here.
+     *   @see \Schoolbox\Assessment\Rubric\DataModel\DataSource::copyRubric
+     *
+     * This implementation does _not_ overwrite:
+     * * external ID: this uniquely identifies the base assessment within
+     *   another system, so it should not be copied
+     *
+     * @param self $source
+     * @return $this
+     */
+    public function overwrite(IAssessable $source): IAssessable
+    {
+        parent::overwrite($source);
+        $this->acceptOnline           = $source->acceptOnline;
+        $this->capabilityGradeGroup   = $source->capabilityGradeGroup;
+        $this->capabilityMarkType     = $source->capabilityMarkType;
+        $this->maxMark                = $source->maxMark;
+        $this->selfReviewability      = $source->selfReviewability;
+        $this->showSubmittedOnly      = $source->showSubmittedOnly;
+        $this->similarityCheckEnabled = $source->similarityCheckEnabled;
+        $this->useMarkRange           = $source->useMarkRange;
+        $this->useRubric              = $source->useRubric;
+
+        // Copy attachments
+        $this->copyAttachedFiles($source);
+
+        // Clone rubric separately
+        $this->rubricGrid = null;
+
+        return $this;
+    }
+
+    /**
+     * Copy attached files from `$source` into this object.
+     *
+     * @param self $source
+     * @return $this
+     */
+    private function copyAttachedFiles(self $source): self
+    {
+        $newFiles = new Collection();
+        foreach ($source->getAttachedFiles() as $file) {
+            $newFiles->add(
+                (new File())
+                    ->setStorage($file->getStorage())
+                    ->setBasename($file->getBasename())
+            );
+        }
+        $this->setAttachedFiles($newFiles);
+        return $this;
     }
 
     /**

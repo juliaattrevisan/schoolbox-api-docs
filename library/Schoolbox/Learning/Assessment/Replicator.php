@@ -59,74 +59,80 @@ class Replicator
      * if the source Assessments are Specifications. This avoids needing to pass the dates in
      * a custom DTO.
      *
-     * @param IAssessable       $assessmentSpec the assessments to replicate
-     * @param AssessmentContext $destination    the location into which to replicate the assessments
-     * @param User              $newOwner       who should own the newly created assessment
-     * @param null|int          $sequence       enable explicit sequence setting
+     * @param IAssessable       $source             the assessment to replicate
+     * @param AssessmentContext $destinationContext the location into which to replicate the assessment
+     * @param User              $newOwner           who should own the newly created assessment
+     * @param null|int          $sequence           enable explicit sequence setting
      * @return IAssessable if any part of the replication fails
      * @throws \InvalidArgumentException If Destination Quiz already has Sections
      * @throws \UnexpectedValueException
      */
     public function replicateInNewContext(
-        IAssessable $assessmentSpec,
-        AssessmentContext $destination,
+        IAssessable $source,
+        AssessmentContext $destinationContext,
         User $newOwner,
         int $sequence = null
     ): IAssessable {
-        $newAssessment = $assessmentSpec->cloneForCopy();
-        $newAssessment->setContext($destination);
-        $destination->getAssessables()->add($newAssessment);
+        $newAssessment = $source->cloneForCopy();
+        $newAssessment->setContext($destinationContext);
+
+        // If copying the assessment into a spec: clear its dates
+        if ($destinationContext->isSpecificationContext()) {
+            $nullDate      = new \Alaress_Date_NullDate();
+            $newAssessment = $newAssessment
+                ->setPublishAt($nullDate)
+                ->setOpenAt($nullDate)
+                ->setDueAt($nullDate)
+                ->setCloseAt($nullDate);
+        }
+
+        $destinationContext->getAssessables()->add($newAssessment);
         $newAssessment->setCreator($newOwner);
         if (null !== $sequence) {
             $newAssessment->setSequence($sequence);
         }
 
         $this->assessmentMapperProxy->save($newAssessment, $newOwner);
-        $destination->getAssessables()->add($newAssessment);
+        $destinationContext->getAssessables()->add($newAssessment);
 
         // Copy DueWork Rubrics
-        $this->replicateDueWorkRubric($newAssessment);
+        $this->replicateDueWorkRubric($source, $newAssessment);
 
         // Copy Quiz Sections/Questions/Solutions
-        $this->replicateQuizConstituents($newAssessment);
+        $this->replicateQuizConstituents($source, $newAssessment);
 
         return $newAssessment;
     }
 
-
-
     /**
-     * Copy any Quiz Sections, Questions + Solutions to $assessable from its Specification
+     * Copy any quiz sections, questions and solutions to `$destination` from
+     * `$source`.
      *
-     * Can handle when $assessable is a Quiz, or any level of Project (via Recursion)
-     *
-     * @param IAssessable $assessable
+     * @param IAssessable $source
+     * @param IAssessable $destination
+     * @return void
      * @throws \InvalidArgumentException If Destination Quiz already has Sections
      */
-    protected function replicateQuizConstituents(IAssessable $assessable)
+    private function replicateQuizConstituents(IAssessable $source, IAssessable $destination): void
     {
-        if (!$assessable instanceof Quiz) {
+        if (!($source instanceof Quiz && $destination instanceof Quiz)) {
             return;
         }
-
-        $specId = $assessable->getSpecificationAssessment()->getId();
-        $implId = $assessable->getId();
-        $this->quizMapper->copyQuizConstituents($specId, $implId);
+        $this->quizMapper->copyQuizConstituents($source->getId(), $destination->getId());
     }
 
     /**
-     * Correctly clone a DueWork Rubric
+     * Copy the rubric from `$source` into `$destination`.
      *
-     * @param IAssessable $assessable
+     * @param IAssessable $source
+     * @param IAssessable $destination
+     * @return void
      */
-    protected function replicateDueWorkRubric(IAssessable $assessable)
+    private function replicateDueWorkRubric(IAssessable $source, IAssessable $destination): void
     {
-        if (!$assessable instanceof DueWork) {
+        if (!($source instanceof DueWork && $destination instanceof DueWork)) {
             return;
         }
-
-        $specId = $assessable->getSpecificationAssessment()->getId();
-        $implId = $assessable->getId();
-        $this->rubricMapper->copyRubric($specId, $implId);
+        $this->rubricMapper->copyRubric($source->getId(), $destination->getId());
     }
 }

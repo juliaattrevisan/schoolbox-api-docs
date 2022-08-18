@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Lti;
 
 use Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\LTI\Provider\Model as Tool;
@@ -168,6 +169,34 @@ class Model extends AbstractAssessment
             ? $participant->findMostRecentInstructorGivenPublishedFeedback()
             : $participant->findMostRecentInstructorGivenFeedback();
     }
+
+    /**
+     * Overwrite fields from `$source` into this object.
+     *
+     * This implementation overwrites the additional fields over and above the
+     * base implementation:
+     * * custom fields, line item resource ID, score maximum:
+     *   possibly contentious, because these fields relate to a particular item
+     *   within an LTI tool. Should the overwritten item relate to that LTI item
+     *   as well?
+     * * LTI assessment text, title, URL, tool
+     *
+     * @param self $source
+     * @return $this
+     */
+    public function overwrite(IAssessable $source): IAssessable
+    {
+        parent::overwrite($source);
+        $this->customFields         = $source->customFields;
+        $this->lineItemResourceId   = $source->lineItemResourceId;
+        $this->lineItemScoreMaximum = $source->lineItemScoreMaximum;
+        $this->ltiAssessmentText    = $source->ltiAssessmentText;
+        $this->ltiAssessmentTitle   = $source->ltiAssessmentTitle;
+        $this->ltiAssessmentUrl     = $source->ltiAssessmentUrl;
+        $this->ltiTool              = $source->ltiTool;
+        return $this;
+    }
+
 
     /**
      * Feedback is required on this assessment if there is a response, and there

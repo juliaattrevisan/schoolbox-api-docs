@@ -28,6 +28,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Curriculum\Node;
+use TypeError;
 
 abstract class AbstractAssessment implements IAssessable
 {
@@ -221,7 +222,12 @@ abstract class AbstractAssessment implements IAssessable
     {
         $clone = clone $this;
         $clone->setId(null);
-        $clone->setSpecificationAssessment($this);
+
+        // Non-specs may now be used as the basis for a clone.
+        if ($this->isSpecification()) {
+            $clone->setSpecificationAssessment($this);
+        }
+
         $clone->setSequence(null);
         $clone->setCreatedAt(null);
 
@@ -229,6 +235,44 @@ abstract class AbstractAssessment implements IAssessable
         // (One wonders why spec assessments even have plans?)
         $clone->setPlans($clone->getPlans()->emptyClone());
         return $clone;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function overwrite(IAssessable $source): IAssessable
+    {
+        $this->assertTypeMatch($source);
+        // Just set every field to the value from `$source`.
+        // Exceptions:
+        // * ID
+        // * Context
+        // * Creator
+        // * Plans
+        // * Spec assessment
+        $this->courseManaged   = $source->getCourseManaged();
+        $this->curriculumNodes = $source->getCurriculumNodes();
+        $this->defaultOpenSpan = $source->getDefaultOpenSpan();
+        $this->description     = $source->getDescription();
+        $this->gradeGroup      = $source->getGradeGroup();
+        $this->markScheme      = $source->getMarkScheme();
+        $this->markType        = $source->getMarkType();
+        $this->markVisibility  = $source->getMarkVisibility();
+        $this->sebEnabled      = $source->getSebEnabled();
+        $this->sequence        = $source->getSequence();
+        $this->title           = $source->getTitle();
+        $this->weight          = $source->getWeight();
+        $this->workType        = $source->getWorkType();
+
+        // Dates are cloned
+        $this->publishAt = clone $source->getPublishAt();
+        $this->openAt    = clone $source->getOpenAt();
+        $this->dueAt     = clone $source->getDueAt();
+        $this->closeAt   = clone $source->getCloseAt();
+        $this->createdAt = clone $source->getCreatedAt();
+        $this->updatedAt = clone $source->getUpdatedAt();
+        $this->deletedAt = clone $source->getDeletedAt();
+        return $this;
     }
 
 
@@ -454,6 +498,25 @@ abstract class AbstractAssessment implements IAssessable
         }
     }
 
+    /**
+     * Assert that `$this` and `$other` are of the same type.
+     *
+     * @param IAssessable $other
+     * @return void
+     * @throws TypeError if they are not
+     */
+    protected function assertTypeMatch(IAssessable $other): void
+    {
+        if (!($this instanceof $other)) {
+            throw new TypeError(
+                sprintf(
+                    'Assessment type mismatch: %s does not match %s',
+                    $this::class,
+                    $other::class,
+                )
+            );
+        }
+    }
 
     /**
      * @inheritdoc

@@ -150,6 +150,60 @@
             }
         );
 
+
+        // Save to course actions
+        $(document).on(
+            'click.courseInstance',
+            '[data-action=save-to-course-cancel]',
+            function (event) {
+                event.preventDefault();
+                let $element = $(this),
+                    $modal   = $element.closest('[data-reveal]');
+                $modal.foundation('reveal', 'close');
+            }
+        );
+        $(document).on(
+            'click.courseInstance',
+            '[data-action=save-to-course]',
+            function (event) {
+                event.preventDefault();
+
+                let $element   = $(this),
+                    $modal     = $element.closest('[data-reveal]'),
+                    $toaster   = component.find('[data-alert]'),
+                    ajaxParams = {
+                        url:    $element.attr('href'),
+                        method: $element.attr('data-method'),
+                    };
+
+                $modal.foundation('reveal', 'close');
+                $toaster.toastActivate({text: 'Writing assessment to course...'});
+                $.ajax(ajaxParams)
+                    .done(function(data) {
+                        $toaster.toastTimeout({
+                            text: 'Assessment written to course.',
+                            css: 'pop success'
+                        });
+
+                        // After this item is updated even once:
+                        // * method becomes PUT
+                        // * ID and title are updated
+                        $element.attr('data-spec-assessment-id', data.id);
+                        $element.attr('data-spec-assessment-title', data.title);
+                        $element.attr('data-method', 'PUT');
+                        document.window.reload();
+                    })
+                    .fail(function () {
+                        $toaster.toastTimeout({
+                            text: 'Could not write assessment to course.',
+                            css: 'pop alert'
+                        });
+                    });
+            }
+        );
+
+
+
         // Student updating progress or clicking task name
         component.on(
             'click.courseInstance',

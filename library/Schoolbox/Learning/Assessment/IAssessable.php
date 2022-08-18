@@ -15,7 +15,6 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
@@ -67,6 +66,14 @@ interface IAssessable extends ISoftDeletable
      * @return static
      */
     public function cloneForCopy();
+
+    /**
+     * Overwrites this object's modifiable fields with values from `$source`.
+     *
+     * @param IAssessable $source
+     * @return $this
+     */
+    public function overwrite(IAssessable $source): self;
 
     /**
      * Return the context within which this assessment belongs.
