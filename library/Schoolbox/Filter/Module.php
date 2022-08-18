@@ -46,6 +46,7 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_ASSESSMENT_CALENDAR:
                 case Page\Model::PAGE_BADGE_LIST:
                 case Page\Model::PAGE_AWARD_LIST:
+                case Page\Model::PAGE_CLASS_PASTORAL:
                     return ['factoryFactory' => $this->injector->get('filters.factoryFactory')];
                 // Other entity types can have their factory factories registered here
             }

@@ -119,6 +119,9 @@ class Model
             self::PAGE_AWARD_LIST => [
                 Role::STAFF,
             ],
+            self::PAGE_CLASS_PASTORAL => [
+                Role::STAFF,
+            ],
         ];
     }
 

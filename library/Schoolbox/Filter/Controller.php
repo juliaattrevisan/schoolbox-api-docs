@@ -321,6 +321,7 @@ class Controller extends BaseController
             Page\Model::PAGE_ASSESSMENT_CALENDAR  => $labelBuilder->buildLabel(Page\Model::PAGE_ASSESSMENT_CALENDAR),
             Page\Model::PAGE_BADGE_LIST           => $labelBuilder->buildLabel(Page\Model::PAGE_BADGE_LIST),
             Page\Model::PAGE_AWARD_LIST           => $labelBuilder->buildLabel(Page\Model::PAGE_AWARD_LIST),
+            Page\Model::PAGE_CLASS_PASTORAL       => $labelBuilder->buildLabel(Page\Model::PAGE_CLASS_PASTORAL),
         ];
     }
 }

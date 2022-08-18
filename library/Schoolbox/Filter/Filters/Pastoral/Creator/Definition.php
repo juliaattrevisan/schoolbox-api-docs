@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Pastoral\Creator;
 
 use Schoolbox\Filter\AbstractDefinition;
+use Schoolbox\Filter\Page\Model;
 use Schoolbox\IConfigLoader;
 
 /**
@@ -38,7 +39,9 @@ class Definition extends AbstractDefinition
      */
     public static function getPages(IConfigLoader $configLoader): array
     {
-        return [];
+        return [
+            Model::PAGE_CLASS_PASTORAL,
+        ];
     }
 
     /**
