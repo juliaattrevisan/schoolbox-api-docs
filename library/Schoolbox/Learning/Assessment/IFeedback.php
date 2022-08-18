@@ -149,7 +149,7 @@ interface IFeedback
     public function setAssessable($assessable);
 
     /**
-     * @return IResponse
+     * @return IResponse|null
      */
     public function getResponse();
 
