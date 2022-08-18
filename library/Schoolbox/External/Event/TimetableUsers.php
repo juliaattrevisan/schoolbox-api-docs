@@ -12,6 +12,8 @@ namespace Schoolbox\External\Event;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\UserMapper;
 
 /**
@@ -96,12 +98,11 @@ class TimetableUsers
     /**
      * Find the overall set of involved humans for $event
      *
-     * @param \Schoolbox\External\Event\Model $event
+     * @param Model $event
      * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\Mapper\Exception\NotFound
+     * @throws \PDOException
+     * @throws Exception
+     * @throws Deleted
      */
     public function findForEvent(\Schoolbox\External\Event\Model $event): array
     {
