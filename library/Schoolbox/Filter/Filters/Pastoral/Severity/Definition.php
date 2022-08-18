@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Pastoral\Severity;
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
@@ -59,9 +60,9 @@ class Definition extends Filter\AbstractDefinition
      */
     public static function getPages(IConfigLoader $configLoader): array
     {
-        return [
-            Filter\Page\Model::PAGE_CLASS_PASTORAL,
-        ];
+        return $configLoader->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)
+            ? [Filter\Page\Model::PAGE_CLASS_PASTORAL]
+            : [];
     }
 
     /**
