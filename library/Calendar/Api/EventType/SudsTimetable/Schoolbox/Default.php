@@ -57,6 +57,12 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
 
 
     /**
+     * @var \Schoolbox\External\Profile\Staff\Mapper
+     */
+    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
+
+
+    /**
      * @var GenericCollection|null
      */
     private ?GenericCollection $folderCodes;
@@ -76,7 +82,8 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
         \Schoolbox\UserMapper $userMapper,
-        \Timetable_ColourMapper $timetableColourMapper
+        \Timetable_ColourMapper $timetableColourMapper,
+        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
@@ -88,6 +95,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         $this->overrideMapper = $overrideMapper;
         $this->userMapper = $userMapper;
         $this->timetableColourMapper = $timetableColourMapper;
+        $this->staffProfileMapper = $staffProfileMapper;
     }
 
 
@@ -140,7 +148,8 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $this->classInvolvementMapper,
             $this->eventMapper,
             $this->overrideMapper,
-            $this->userMapper
+            $this->userMapper,
+            $this->staffProfileMapper
         ))->findForUser(
             $this->getUser(),
             $startTimestamp,
