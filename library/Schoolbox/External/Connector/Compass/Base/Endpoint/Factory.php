@@ -29,7 +29,6 @@ use UnexpectedValueException;
  */
 class Factory
 {
-
     /**
      * @var LoggerInterface
      */
@@ -247,6 +246,7 @@ class Factory
                 $this->perform,
                 $api,
                 $this->eventMapper,
+                $this->overridesMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $from,

@@ -18,7 +18,6 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
  */
 class Enrolments
 {
-
     /**
      * @var LoggerInterface
      */
@@ -53,6 +52,8 @@ class Enrolments
      * $academicGroupCode was derived earlier from your Academic Groups lookup. It usually corresponds
      * to a year.
      *
+     * Additional teachers of a class are found in this Sessions array node, which we need elsewhere
+     *
      * @param string $activityCode
      * @param string $academicGroupCode
      * @return array
@@ -61,7 +62,8 @@ class Enrolments
     {
         $stack = [
             'students' => [],
-            'teachers' => []
+            'teachers' => [],
+            'sessions' => [],
         ];
 
         /* Get a list of all the guys involved in this $activity
@@ -106,16 +108,33 @@ class Enrolments
                 }
             }
 
-            /* Now mine out a teacher, if specified
+            /* Augment $stack with a bunch of teachers, believe it or not
              *
-             * TODO: There's potential support for Multiple Teachers by inspecting the
-             *  'sessions' array and mining out teachers from that, on a per-class instance basis.
-             *  That might let you have a different teacher on a given instance of this Activity in
-             *  the calendar representation - there doesn't seem to be any of that happening yet tho
+             * Additional teachers of a class are found in Sessions which
+             * is somehow found here. We need to combine these sessions
+             * with the activity instances that are running, in order to
+             * find all the teachers of a class (jesus)
              */
-            if ('' !== (string)$enrolment['leadTeacherCode']) {
-                $stack['teachers'][] = (string)$enrolment['leadTeacherCode'];
-            }
+            $sessions = $enrolment['sessions'];
+
+            /* sort sessions ffs, because instances occur in a random haphazard order
+             * but are actually chronologically ordered
+             */
+            usort($sessions, static function ($a, $b) {
+                if ($a['start'] < $b['start']) {
+                    return -1;
+                }
+
+                if ($a['start'] === $b['start']) {
+                    return 0;
+                }
+
+                return 1;
+            });
+
+            /* Ram it in here with everything else
+             */
+            $stack['sessions'] = $sessions;
         }
 
         return $stack;

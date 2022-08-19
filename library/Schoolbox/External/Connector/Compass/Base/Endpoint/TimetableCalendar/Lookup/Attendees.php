@@ -18,7 +18,6 @@ use Psr\Log\LoggerInterface;
  */
 class Attendees
 {
-
     /**
      * @var LoggerInterface
      */
@@ -32,15 +31,23 @@ class Attendees
 
 
     /**
+     * @var array
+     */
+    private array $studentLookup;
+
+
+    /**
      * Constructor
      *
      * @param LoggerInterface $log
      * @param array           $staffLookup
+     * @param array           $studentLookup
      */
-    public function __construct(LoggerInterface $log, array $staffLookup)
+    public function __construct(LoggerInterface $log, array $staffLookup, array $studentLookup)
     {
         $this->log = $log;
         $this->staffLookup = $staffLookup;
+        $this->studentLookup = $studentLookup;
     }
 
 
@@ -56,15 +63,21 @@ class Attendees
          */
         $enrolments = [
             'students' => [],
-            'teachers' => []
+            'teachers' => [],
+            'sessions' => [],
         ];
 
+        /* Attendees List per Instance
+         * These are always teachers, I think
+         */
         foreach ($activity['instances'] as $activityInstance) {
             foreach ($activityInstance['attendees'] as $attendee) {
                 $compassPersonId = $attendee['compassPersonId'];
 
+                /* These person is the main person teaching this activity
+                 */
                 if (isset($this->staffLookup[$compassPersonId]['externalId'])) {
-                    $enrolments['teachers'][] = $this->staffLookup[$compassPersonId]['externalId'];
+                    $enrolments['teachers'][$compassPersonId] = $this->staffLookup[$compassPersonId]['externalId'];
 
                     $this->log->debug(sprintf(
                         'Activity %s starting on %s has attendee compassPersonId %s, %s %s',
@@ -82,6 +95,53 @@ class Attendees
                         $compassPersonId
                     ));
                 }
+            }
+        }
+
+        /* Attendees List per Activity
+         *
+         * Also find random guys in the attendees list,
+         * which is separate to the attendees list *per instance*
+         *
+         * This is a list of all the guys going on an activity
+         * and can be a mix of staff and students
+         */
+        foreach ($activity['attendees'] as $attendee) {
+            $compassPersonId = $attendee['compassPersonId'];
+
+            if (isset($this->staffLookup[$compassPersonId]['externalId'])) {
+                /* Staff can attend events
+                 */
+                $enrolments['teachers'][$compassPersonId] = $this->staffLookup[$compassPersonId]['externalId'];
+
+                $this->log->debug(sprintf(
+                    'Activity %s starting on %s has attendee compassPersonId %s, %s %s',
+                    $activity['name'],
+                    $activity['start'],
+                    $compassPersonId,
+                    $this->staffLookup[$compassPersonId]['firstname'],
+                    $this->staffLookup[$compassPersonId]['lastname']
+                ));
+            } elseif (isset($this->studentLookup[$compassPersonId]['externalId'])) {
+                /* Students can attend events
+                 */
+                $enrolments['students'][$compassPersonId] = $this->studentLookup[$compassPersonId]['externalId'];
+
+                $this->log->debug(sprintf(
+                    'Activity %s starting on %s has attendee compassPersonId %s, %s %s',
+                    $activity['name'],
+                    $activity['start'],
+                    $compassPersonId,
+                    $this->studentLookup[$compassPersonId]['firstname'],
+                    $this->studentLookup[$compassPersonId]['lastname']
+                ));
+            } else {
+                $this->log->debug(sprintf(
+                    'Activity %s starting on %s has unknown attendee compassPersonId %s',
+                    $activity['name'],
+                    $activity['start'],
+                    $compassPersonId
+                ));
             }
         }
 
