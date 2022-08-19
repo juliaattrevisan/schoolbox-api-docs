@@ -154,6 +154,10 @@ function update_schoolbox_update_error_fact_file(){
     --arg keys_to_keep "${current_instance_ids}" \
     '.[] |= with_entries( select( .key as $k | $keys_to_keep | index($k) ) )' \
     ${temp_file_dir}/${master_fact_file_name}.new > "${fact_file_dir}/${master_fact_file_name}";
+
+  # Remove temp files. (-f flag prevents errors when no instance present on server.)
+  rm "${temp_file_dir}/${master_fact_file_name}.new"
+  rm -f "${temp_file_dir}/${instances_fact_file_pattern}"
 }
 
 # Ensures data-dirs exist (all hosts) then runs SQL updates (primary hosts only)
