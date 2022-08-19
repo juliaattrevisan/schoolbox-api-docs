@@ -87,7 +87,7 @@ class CSV extends AbstractCSV
             $rankByStudentId = [];
             if ($this->viewRank) {
                 array_push($rowHeaders, '');
-                $rankByStudentId = $courseMarkbook->getRanking();
+                $rankByStudentId = $courseMarkbook->getRankByStudentId();
             }
             $this->exportRow($rowHeaders, $classAveragesData);
             // Per Students

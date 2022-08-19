@@ -428,7 +428,7 @@ class Markbook
      * See also similar function in library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php.
      * @return array (integer ranking indexed by studentId)
      */
-    public function getRanking(): array
+    public function getRankByStudentId(): array
     {
         // First build basic array (id,grade).
         $rankList = [];
