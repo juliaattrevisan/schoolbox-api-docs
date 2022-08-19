@@ -166,8 +166,6 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
         getChildrenAt (depth) {
             try {
                 if (depth === 0 && this.hasSingleGroup) {
-                    // const codesStore = useCodesStore();
-                    // return [...codesStore.codes.children];
                     return [...this.nodeLists[depth].children];
                 } else {
                     return [
@@ -261,7 +259,7 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
         },
 
         /**
-         *
+         * Move down one depth down the tree
          *
          * @param { number }
          */
