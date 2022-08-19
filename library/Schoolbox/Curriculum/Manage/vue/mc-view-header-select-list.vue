@@ -2,13 +2,13 @@
 
 /**
  * The <select> dropdowns that incrementally display as we
- * move further down the curriculum tree
+ * move further down the curriculum nodes
  */
 
-import { useActiveCodesStore } from './store/mcActiveCodesStore';
+import { useActiveNodesStore } from './store/mcActiveNodesStore';
 
 
-const activeCodesStore = useActiveCodesStore();
+const activeNodesStore = useActiveNodesStore();
 
 /**
  * to display the just selected node
@@ -17,7 +17,7 @@ const activeCodesStore = useActiveCodesStore();
  * @param { Event }
  */
 function onNodeChanged (depth, event) {
-    activeCodesStore.setSelectedNode(depth, parseInt(event.target.value));
+    activeNodesStore.setSelected(depth, parseInt(event.target.value));
 }
 
 </script>
@@ -25,16 +25,16 @@ function onNodeChanged (depth, event) {
 <template>
     <div class="nodes-container">
         <select
-            v-for="(id, index) in activeCodesStore.nodeListsLimited"
+            v-for="(id, index) in activeNodesStore.listsLimited"
             @change="onNodeChanged(index, $event)"
             :key="index"
-            :disabled="index === 0 && activeCodesStore.hasSingleGroup"
+            :disabled="index === 0 && activeNodesStore.hasSingleCurriculum"
         >
             <option
-                v-for="node in activeCodesStore.getChildrenAt(index)"
+                v-for="node in activeNodesStore.getChildrenAt(index)"
                 :key="node.id"
                 :value="node.id"
-                :selected="activeCodesStore.selectedNodeIdList[index] === node.id"
+                :selected="activeNodesStore.idList[index] === node.id"
             >
                 {{ node.name }}
             </option>

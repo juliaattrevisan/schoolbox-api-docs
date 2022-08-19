@@ -1,21 +1,21 @@
 <script setup>
 
 /**
- * A curriculum code to select to traverse further down the tree,
+ * A curriculum node to select to traverse further down the tree,
  * or to CRUD via the edit button
  */
 
 import { computed } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
-import { useActiveCodesStore } from './store/mcActiveCodesStore';
+import { useActiveNodesStore } from './store/mcActiveNodesStore';
 import { escapeRegExp } from '@js/util/jsUtils';
 
 
 const props = defineProps({
     /**
-     * the assigned code to display
+     * the assigned node to display
      */
-    code: {
+    node: {
         type: Object,
         required: true,
         default() {
@@ -36,7 +36,7 @@ const props = defineProps({
 });
 
 const store = useStore();
-const activeCodesStore = useActiveCodesStore();
+const activeNodesStore = useActiveNodesStore();
 
 /**
  * to gradually and more paddingLeft to indicate node level depth
@@ -46,22 +46,22 @@ const activeCodesStore = useActiveCodesStore();
 const paddingLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
- * If there's a code available, which means it can be selected
+ * If there's a code available, which means it can be added to the name
  *
  * @returns { Boolean }
  */
-const hasCode = computed(() => props.code.code && props.code.code !== '');
+const hasCode = computed(() => props.node.code && props.node.code !== '');
 
 /**
- * To help distinguish those codes that aren't selectable,
+ * To help distinguish those nodes that aren't selectable,
  * we disable and remove the default button colour
  *
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    if (props.depth === 0 && !activeCodesStore.isSearchActive) {
+    if (props.depth === 0 && !activeNodesStore.isSearchActive) {
         return true;
-    } else if (activeCodesStore.isOnLastNode) { //cant select any further down from the fourth level
+    } else if (activeNodesStore.isOnLast) { //cant select any further down from the MAX_DEPTH
         return true;
     } else {
         return false;
@@ -74,7 +74,7 @@ const isDisabled = computed(() => {
  *
  * @returns { Boolean }
  */
-const isVisible = computed(() => props.depth <= 1 || activeCodesStore.isOnLastNode);
+const isVisible = computed(() => props.depth <= 1 || activeNodesStore.isOnLast);
 
 /**
  * to open up the edit modal
@@ -88,22 +88,22 @@ function onEditSelected () {
  * using the selects in mc-header-select
  */
 function onNameSelected () {
-    activeCodesStore.setNextSelectedNode(props.code.id);
+    activeNodesStore.setNextSelected(props.node.id);
 }
 
 /**
- * To determine whether we need to display further child nodes within for this code
+ * To determine whether we need to display further child nodes within for this node
  *
  * @returns { Boolean }
  */
-const hasChildren = computed(() => props.code.children && props.code.children.length > 0);
+const hasChildren = computed(() => props.node.children && props.node.children.length > 0);
 
 /**
  * Add in the code if it's available otherwise just show the title
  *
  * @returns { String }
  */
-const title = computed(() => hasCode.value ? `[${props.code.code}] ${props.code.name}` : `${props.code.name}`);
+const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`);
 
 /**
  * To highlight any search selections in the code / title
@@ -111,7 +111,7 @@ const title = computed(() => hasCode.value ? `[${props.code.code}] ${props.code.
  * @returns { HTML }
  */
 const highlightTitleSearch = computed(() => {
-    if (activeCodesStore.isSearchActive) {
+    if (activeNodesStore.isSearchActive) {
         return highlightSearchInElement(title.value);
     } else {
         return title.value;
@@ -124,8 +124,8 @@ const highlightTitleSearch = computed(() => {
  * @returns { HTML }
  */
 const highlightBreadcrumbSearch = computed(() => {
-    if (activeCodesStore.isSearchActive && props.code.breadcrumb) {
-        return highlightSearchInElement(props.code.breadcrumb);
+    if (activeNodesStore.isSearchActive && props.node.breadcrumb) {
+        return highlightSearchInElement(props.node.breadcrumb);
     } else {
         return '';
     }
@@ -141,7 +141,7 @@ const highlightBreadcrumbSearch = computed(() => {
  */
 function highlightSearchInElement (toHighlight) {
     let highlighted = toHighlight;
-    activeCodesStore.queryWordList.forEach((wordInSearch) => {
+    activeNodesStore.queryWordList.forEach((wordInSearch) => {
         highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
             return `<mark>${match}</mark>`;
         });
@@ -155,7 +155,7 @@ function highlightSearchInElement (toHighlight) {
  * @returns { String }
  */
 const containerClass = computed(() => {
-    if (activeCodesStore.isSearchActive) { //don't style when using search, as all the codes are on one level
+    if (activeNodesStore.isSearchActive) { //don't style when using search, as all the nodes are on one level
         return '';
     } else if (props.depth === 0) {
         return 'parent-container';
@@ -186,14 +186,14 @@ const containerClass = computed(() => {
                 @keyup.enter="onNameSelected"
             >
                 <span v-html="highlightTitleSearch"></span>
-                <aside v-if="activeCodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
+                <aside v-if="activeNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
             </button>
         </div>
         <ul v-if="hasChildren">
-            <mc-view-code
-                v-for="code in props.code.children"
-                :key="code.id"
-                :code="code"
+            <mc-view-node
+                v-for="node in props.node.children"
+                :key="node.id"
+                :node="node"
                 :depth="props.depth+1"
             />
         </ul>

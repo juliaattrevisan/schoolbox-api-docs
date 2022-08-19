@@ -1,13 +1,14 @@
 <script setup>
 
 /**
- * To select Curriculum Codes to assign to something like a Due Work
+ * To manage Curriculum nodes, being able to view the entire node tree and
+ * CRUD individual nodes
  */
 
 import { onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
-import { useActiveCodesStore } from './store/mcActiveCodesStore';
-import { useSelectedCodesStore } from './store/mcSelectedCodeStore';
+import { useActiveNodesStore } from './store/mcActiveNodesStore';
+import { useSelectedNodeStore } from './store/mcSelectedNodeStore';
 import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';
 
@@ -50,8 +51,8 @@ onMounted(() => {
 function checkForStorybook () {
     if (typeof STORYBOOK_ENV !== 'undefined') {
         useStore().$reset();
-        useActiveCodesStore().$reset();
-        useSelectedCodesStore().$reset();
+        useActiveNodesStore().$reset();
+        useSelectedNodeStore().$reset();
     }
 }
 

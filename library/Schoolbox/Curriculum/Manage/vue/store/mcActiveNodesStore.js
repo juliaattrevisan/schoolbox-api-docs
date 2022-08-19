@@ -4,19 +4,19 @@
  */
 
 import { defineStore } from 'pinia';
-import { useCodesStore } from './mcCodesStore';
+import { useNodesStore } from './mcNodesStore';
 import cloneDeep from 'lodash/cloneDeep';
 
 const UNSET_ID = 0;
 const MIN_QUERY_LENGTH = 3;
 const MAX_DEPTH = 6; //dont traverse any further down than 6 levels
 
-export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
+export const useActiveNodesStore = defineStore('mcActiveNodesStore', {
 
     state: () => ({
-        selectedNodeIdList: [],
-        nodeLists: [],
-        activeNode: {},
+        idList: [], //ids of the selected nodes
+        lists: [], //the list of nodes available at each active depth
+        current: {}, //the current node at the most recently selected depth
         currentDepth: -1,
         query: '', //current search term to filter the active codes
     }),
@@ -24,14 +24,14 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
     getters: {
 
         /**
-         * If there's only one curriculum group, we can select it
+         * If there's only one curriculum, we can select it
          * straight away, otherwise we allow the user to make the selection
          *
          * @return { Boolean }
          */
-        hasSingleGroup () {
-            const codesStore = useCodesStore();
-            if (codesStore.codes.children.length === 1) {
+        hasSingleCurriculum () {
+            const nodesStore = useNodesStore();
+            if (nodesStore.nodes.children.length === 1) {
                 return true;
             } else {
                 return false;
@@ -43,8 +43,8 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Boolean }
          */
-        hasNoNodesSelected () {
-            return this.selectedNodeIdList.length === 0;
+        isInactive () {
+            return this.idList.length === 0;
         },
 
         /**
@@ -52,8 +52,8 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Boolean }
          */
-        hasSelectedFirstNode () {
-            return this.selectedNodeIdList.length > 0;
+        isActive () {
+            return this.idList.length > 0;
         },
 
         /**
@@ -61,11 +61,11 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Array }
          */
-        nodeListsLimited () {
-            if (this.activeNode?.children?.length === 0) { //if there's no more children, we don't need to display another depth
-                return this.nodeLists.filter((nodeList, index) => index <= this.currentDepth);
+        listsLimited () {
+            if (this.current?.children?.length === 0) { //if there's no more children, we don't need to display another depth
+                return this.lists.filter((nodeList, index) => index <= this.currentDepth);
             } else {
-                return this.nodeLists.filter((nodeList, index) => index < MAX_DEPTH);
+                return this.lists.filter((nodeList, index) => index < MAX_DEPTH);
             }
 
         },
@@ -75,8 +75,8 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @return { Boolean }
          */
-        isOnLastNode () {
-            if (this.selectedNodeIdList.length === MAX_DEPTH) {
+        isOnLast () {
+            if (this.idList.length === MAX_DEPTH) {
                 return true;
             } else {
                 return false;
@@ -100,12 +100,12 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @returns { Array }
          */
-        codesFlattened () {
+        nodesFlattened () {
             if (this.isSearchActive) {
                 let flatChildren = [];
-                const codesClone = cloneDeep(this.activeNode); //cloneDeep is from lodash.js
-                codesClone.forEach((obj) => flatChildren = [...flatChildren, ...flattenCodes(obj)]);
-                flatChildren = flatChildren.filter((code) => code.code != ''); //only show those with a code, as those without can't be selected
+                const nodesClone = cloneDeep(this.current); //cloneDeep is from lodash.js
+                nodesClone.forEach((obj) => flatChildren = [...flatChildren, ...flattenNodes(obj)]);
+                flatChildren = flatChildren.filter((node) => node.code != ''); //only show those with a code, as those without can't be selected
                 return flatChildren;
             } else {
                 return [];
@@ -129,7 +129,7 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          * @return { Array }
          */
         searchResults () {
-            return this.codesFlattened.filter(this.filterResults);
+            return this.nodesFlattened.filter(this.filterResults);
         },
 
         /**
@@ -138,7 +138,7 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          * @return { Boolean }
          */
         hasNoSearchResults () {
-            return this.searchResults.length === 0 && this.isSearchActive && this.hasSelectedFirstNode;
+            return this.searchResults.length === 0 && this.isSearchActive && this.isActive;
         },
 
         /**
@@ -146,11 +146,11 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @returns { Array }
          */
-        codesWithSearch () {
+        nodesWithSearch () {
             if (this.isSearchActive) { //only start showing results once the query is long enough
                 return this.searchResults;
             } else { //otherwise just show codes
-                return [this.activeNode];
+                return [this.current];
             }
         },
 
@@ -165,12 +165,12 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          */
         getChildrenAt (depth) {
             try {
-                if (depth === 0 && this.hasSingleGroup) {
-                    return [...this.nodeLists[depth].children];
+                if (depth === 0 && this.hasSingleCurriculum) {
+                    return [...this.lists[depth].children];
                 } else {
                     return [
                         getEmptyNode(),
-                        ...this.nodeLists[depth].children
+                        ...this.lists[depth].children
                     ];
                 }
             } catch (error) {
@@ -179,25 +179,26 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
         },
 
         /**
-         *
+         * There's been a change in node selection,
+         * so update based on the change in depth
          *
          * @param { number }
          * @param { number }
          */
-        setSelectedNode (depth, id) {
+        setSelected (depth, id) {
             if (depth === 0 && id === UNSET_ID) { //pulling back to no node selection at all
                 this.reset();
                 return;
             }
             const targetDepth = id === UNSET_ID ? depth - 1 : depth; //we need to go back an additional depth
             if (depth > this.currentDepth) { //progressing to the next depth
-                this.toNextNode(id);
+                this.toNext(id);
             } else if (depth < this.currentDepth) { //or going back to a previous depth
-                this.toAPreviousNode(targetDepth)
+                this.toPrevious(targetDepth)
             } else if (depth === this.currentDepth) { //or selecting a different option on the current depth
-                this.changeOnSameNode(targetDepth, id)
+                this.changeOnSame(targetDepth, id)
             }
-            this.updateOnNodeChange(targetDepth, id)
+            this.updateOnChange(targetDepth, id)
         },
 
         /**
@@ -205,8 +206,8 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @param { number }
          */
-        toNextNode (id) {
-            this.selectedNodeIdList = [...this.selectedNodeIdList, id]; //add the new id in
+        toNext (id) {
+            this.idList = [...this.idList, id]; //add the new id in
         },
 
         /**
@@ -214,47 +215,48 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @param { number }
          */
-        toAPreviousNode (targetDepth) {
-            this.selectedNodeIdList = this.selectedNodeIdList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
-            this.nodeLists = this.nodeLists.filter((id, index) => index <= targetDepth);
+        toPrevious (targetDepth) {
+            this.idList = this.idList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
+            this.lists = this.lists.filter((id, index) => index <= targetDepth);
         },
 
         /**
          *
          *
-         *  @param { number }
-         *  @param { number }
+         * @param { number }
+         * @param { number }
          */
-        changeOnSameNode (targetDepth, id) {
+        changeOnSame (targetDepth, id) {
             if (id === UNSET_ID) { //we need to move back one level
-                this.selectedNodeIdList = this.selectedNodeIdList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
+                this.idList = this.idList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
             } else {
-                this.selectedNodeIdList = this.selectedNodeIdList.filter((id, index) => index !== targetDepth); //remove the latest so we can add the new selection
-                this.selectedNodeIdList = [...this.selectedNodeIdList, id]; //then add the new selection in
+                this.idList = this.idList.filter((id, index) => index !== targetDepth); //remove the latest so we can add the new selection
+                this.idList = [...this.idList, id]; //then add the new selection in
             }
-            this.nodeLists = this.nodeLists.filter((id, index) => index <= targetDepth);
+            this.lists = this.lists.filter((id, index) => index <= targetDepth);
         },
 
         /**
+         * Update to the currently selected node
          *
-         *  @param { number }
-         *  @param { number }
+         * @param { number }
+         * @param { number }
          */
-        updateOnNodeChange (targetDepth, id) {
+        updateOnChange (targetDepth, id) {
             this.currentDepth = targetDepth;
-            const targetId = id === UNSET_ID ? this.selectedNodeIdList[this.currentDepth] : parseInt(id); //we need to move back to the previous selectedNodeList when the id is unset (the - in the select)
-            this.activeNode = this.nodeLists[this.currentDepth].children.find((code) => parseInt(code.id) === targetId);
-            this.nodeLists = [...this.nodeLists, this.activeNode];
+            const targetId = id === UNSET_ID ? this.idList[this.currentDepth] : parseInt(id); //we need to move back to the previous selectedNodeList when the id is unset (the - options in mc-view-header-select-list.vue)
+            this.current = this.lists[this.currentDepth].children.find((code) => parseInt(code.id) === targetId);
+            this.lists = [...this.lists, this.current];
         },
 
         /**
          * Reset to the original state, with no active selection at all
          */
         reset () {
-            const codesStore = useCodesStore();
-            this.selectedNodeIdList = [];
-            this.nodeLists = [codesStore.codes];
-            this.activeNode = {};
+            this.idList = [];
+            const nodesStore = useNodesStore();
+            this.lists = [nodesStore.nodes];
+            this.current = {};
             this.currentDepth = -1;
         },
 
@@ -263,8 +265,8 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          *
          * @param { number }
          */
-        setNextSelectedNode (id) {
-            this.setSelectedNode(this.currentDepth+1, id);
+        setNextSelected (id) {
+            this.setSelected(this.currentDepth+1, id);
         },
 
         /**
@@ -296,7 +298,7 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
  *
  * @param { Object }
  */
- function getEmptyNode () {
+function getEmptyNode () {
     return {
         id: UNSET_ID,
         name: '-',
@@ -310,11 +312,11 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
  *
  * @param { Object }
  */
- export function flattenCodes (obj) {
+export function flattenNodes (obj) {
     let array = [obj];
     if (obj.children && obj.children.length > 0) {
         obj.children.forEach((child) => {
-            array = [...array, ...flattenCodes(child)];
+            array = [...array, ...flattenNodes(child)];
         });
         obj.children = [];
     }
@@ -330,16 +332,16 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
  *
  * @return { Boolean } true if found
  */
-export function searchForMatches (code, queryWordList) {
+export function searchForMatches (node, queryWordList) {
     let wordMatchCount = 0;
     queryWordList.forEach(wordInSearch => {
-        if (code.code?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+        if (node.code?.toLowerCase().includes(wordInSearch.toLowerCase())) {
             wordMatchCount++;
         }
-        if (code.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+        if (node.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
             wordMatchCount++;
         }
-        if (code.breadcrumb?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+        if (node.breadcrumb?.toLowerCase().includes(wordInSearch.toLowerCase())) {
             wordMatchCount++;
         }
     });

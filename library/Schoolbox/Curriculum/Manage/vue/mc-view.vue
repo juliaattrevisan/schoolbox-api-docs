@@ -7,7 +7,7 @@
 import { useStore } from './store/manageCurriculumStore';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
 import McViewHeader from './mc-view-header.vue';
-import McViewCodes from './mc-view-codes.vue';
+import McViewNodes from './mc-view-nodes.vue';
 
 const store = useStore();
 
@@ -30,7 +30,7 @@ function onRefreshSelected () {
         <div class="small-12 island">
             <section class="content">
                 <div tableData-alert class="alert-box alert">
-                    Sorry, we are currently unable to load the curriculum data. Please <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected">refresh the page</a> to try again and contact your support if the problem persists.
+                    Sorry, we are currently unable to load the Curriculum data. Please <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected">refresh the page</a> to try again and contact your support if the problem persists.
                 </div>
             </section>
         </div>
@@ -41,7 +41,7 @@ function onRefreshSelected () {
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <mc-view-header />
-                        <mc-view-codes />
+                        <mc-view-nodes />
                     </div>
                 </fieldset>
             </section>

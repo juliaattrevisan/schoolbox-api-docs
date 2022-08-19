@@ -3,10 +3,10 @@
  */
 
 import { defineStore } from 'pinia';
-import { useCodesStore } from './mcCodesStore';
+import { useNodesStore } from './mcNodesStore';
 
 
-export const useStore = defineStore('curriculumSelectorStore', {
+export const useStore = defineStore('manageCurriculumStore', {
 
     state: () => ({
         isLoading: true, //to display loading note
@@ -40,8 +40,8 @@ export const useStore = defineStore('curriculumSelectorStore', {
                 const response = await fetch(dataEndpoint);
                 if (response.ok) {
                     const responseJson = await response.json();
-                    const codesStore = useCodesStore();
-                    codesStore.load(responseJson);
+                    const nodesStore = useNodesStore();
+                    nodesStore.load(responseJson);
                 } else {
                     console.warn(response);
                     this.hasLoadError = true; //show the load error display state
