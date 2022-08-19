@@ -296,6 +296,7 @@ class Module extends BaseModule
         /* Die early when requested Response doesn't exist in $assessment
          */
         try {
+            /** @var \Schoolbox\Learning\Assessment\DueWork\Response\Model $response */
             $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
         } catch (OutOfBoundsException $e) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
