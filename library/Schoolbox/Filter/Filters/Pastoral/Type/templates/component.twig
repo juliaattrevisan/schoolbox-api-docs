@@ -20,14 +20,9 @@
     {% endif %}
 
     {% for type in types %}
-        {% set selectionId = type.id %}
-
-        {##
-            Does this type have sub-types?
-            If so: don't output the select checkbox, only output for sub-types
-        #}
-
         {% if type.subtypes is empty %}
+            {# No subtypes: just output a selector for this type #}
+            {% set selectionId = type.id %}
             {% include '@filters/_selectionCheckbox.twig' with {
                 roleSelection:      roleSelections[selectionId] ?? null,
                 userSelection:      userSelections[selectionId] ?? null,
@@ -35,8 +30,25 @@
                 disabled:           isDisabled,
             } only %}
         {% else %}
+            {##
+             # If there are subtypes: output selectors for each subtype,
+             # as well as a select-all for this type
+             #}
+            {# Determine if all or any subtypes of this type are selected #}
+            {% set allSubtypesSelected = true %}
+            {% set anySubtypesSelected = false %}
+            {% for subtype in type.subtypes %}
+                {% set selectionId = type.id ~ '_' ~ subtype.id %}
+                {% set selected    = userSelections[selectionId].selected ?? roleSelections[selectionId].selected ?? false %}
+                {% set anySubtypesSelected  = anySubtypesSelected or selected %}
+                {% set allSubtypesSelected  = allSubtypesSelected and selected %}
+            {% endfor %}
+
+            {# Select-all for this type's subtypes #}
             <input id="filter_selection_{{ definition.filter.id }}_{{ type.id }}"
                    type="checkbox"
+                   {% if allSubtypesSelected %}checked{% endif %}
+                   class="{% if anySubtypesSelected and not allSubtypesSelected %}indeterminate{% endif %}"
                    data-select-all-selector="{{ definition.filter.id }}_{{ type.id }}"
                    {% if isDisabled %}disabled data-disabled{% endif %}
             />
@@ -44,6 +56,7 @@
                    class="noselect"
             >{{ type.name }}</label>
 
+            {# Subtype selectors #}
             {% for subtype in type.subtypes %}
                 {% set selectionId = type.id ~ '_' ~ subtype.id %}
                 {% include '@filters/_selectionCheckbox.twig' with {
@@ -53,29 +66,6 @@
                     disabled:           isDisabled,
                 } only %}
             {% endfor %}
-
-{#            #}{# Select all/none for subtypes #}
-{#            <input id="filter_selection_{{ definition.filter.id }}_{{ type.id }}"#}
-{#                   type="checkbox"#}
-{#                   {% if isDisabled %}disabled data-disabled{% endif %}#}
-{#            />#}
-{#            <label for="filter_selection_{{ definition.filter.id }}_{{ type.id }}"#}
-{#                   class="noselect"#}
-{#            >{{ type.name }}</label>#}
-
-{#            <div class="checklist">#}
-{#                <ul class="option-list">#}
-{#                    {% for subtype in type.subtypes %}#}
-{#                        {% set selectionId = type.id ~ '_' ~ subtype.id %}#}
-{#                        {% include '@filters/_selectionCheckbox.twig' with {#}
-{#                            roleSelection:      roleSelections[selectionId] ?? null,#}
-{#                            userSelection:      userSelections[selectionId] ?? null,#}
-{#                            label:              type.name ~ ' › ' ~ subtype.name,#}
-{#                            disabled:           isDisabled,#}
-{#                        } only %}#}
-{#                    {% endfor %}#}
-{#                </ul>#}
-{#            </div>#}
         {% endif %}
     {% endfor %}
 {% endblock userOptions %}
