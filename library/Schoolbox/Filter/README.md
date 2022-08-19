@@ -357,14 +357,27 @@ of developing for filters.
 * In the Twig template:
   * Output the filter
     ```twig
+    {#
+     # quickload: set to true if this is expected to be a large data set.
+     #            When true, any JavaScript must be applied on the
+     #            "filterContentLoaded" event of the contentId element.
+     #}
     {% include '@filters/panel.twig' with {
         contentId: 'filterPanel',
         panel:     filterPanel,
-        // set to true if this is expected to be a large data set
-        // When true, any JavaScript must be applied on the
-        // "filterContentLoaded" event of the contentId element.
         quickload: false,
     } only %}
+
+    {# The filter content, once it loads or is replaced, will be injected here #}
+    <div id="filterPanel" class="filtered-report">
+        <div class="row">
+            <div class="small-12 island" data-placeholder>
+                <section class="content">
+                    <img src="{{ CDN_PREFIX }}/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
+                </section>
+            </div>
+        </div>
+    </div>
     ```
 * > TODO document how to render the filtered content
 
