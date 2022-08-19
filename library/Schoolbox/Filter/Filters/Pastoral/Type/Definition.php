@@ -54,7 +54,10 @@ class Definition extends Filter\AbstractDefinition
         // Return types and subtypes
         $keys = [];
         foreach ($this->types as $type) {
-            $keys[] = $type->getId();
+            // Only include type if there are no subtypes
+            if (count($type->getSubTypes()) === 0) {
+                $keys[] = $type->getId();
+            }
             foreach ($type->getSubTypes() as $subType) {
                 $keys[] = sprintf('%d_%d', $type->getId(), $subType->getId());
             }
