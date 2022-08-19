@@ -23,7 +23,7 @@ const codesContainerEl = ref(null); //to scroll back to top on any selection cha
  * @returns { String }
  */
 const parentNodeTitles = computed(() => {
-    const parentTitlesList = codesStore.codes.map((code) => code.name); //just get the titles
+    const parentTitlesList = codesStore.codes.children.map((code) => code.name); //just get the titles
     return parentTitlesList.join(', ').replace(/, ([^,]*)$/, ' or $1'); //or on the last
 });
 
@@ -55,7 +55,7 @@ watch(() => activeCodesStore.codesWithSearch, () => {
 </script>
 
 <template>
-    <div v-if="activeCodesStore.codes.length === 0" class="empty-state">
+    <div v-if="activeCodesStore.hasNoNodesSelected" class="empty-state">
         <i class="icon-curriculum"></i>
         <p>To start viewing Curriculum Codes, first select from either: {{ parentNodeTitles }}.</p>
     </div>

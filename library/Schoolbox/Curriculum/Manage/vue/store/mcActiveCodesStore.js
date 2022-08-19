@@ -1,5 +1,5 @@
 /**
- * Manages the currently active codes in the modal,
+ * Manages the currently active codes in the view
  * those filtered by both <select> and also the search <input>
  */
 
@@ -9,15 +9,15 @@ import cloneDeep from 'lodash/cloneDeep';
 
 const UNSET_ID = 0;
 const MIN_QUERY_LENGTH = 3;
+const MAX_DEPTH = 6; //dont traverse any further down than 6 levels
 
 export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
 
     state: () => ({
         selectedNodeIdList: [],
-        // selectedFirstNodeId: UNSET_ID,
-        // selectedSecondNodeId: UNSET_ID,
-        // selectedThirdNodeId: UNSET_ID,
-        // selectedFourthNodeId: UNSET_ID,
+        nodeLists: [],
+        activeNode: {},
+        currentDepth: -1,
         query: '', //current search term to filter the active codes
     }),
 
@@ -31,9 +31,7 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
          */
         hasSingleGroup () {
             const codesStore = useCodesStore();
-            if (codesStore.codes.length === 1) {
-                // this.selectedFirstNodeId = codesStore.codes[0].id;
-                this.selectedNodeIdList = [codesStore.codes[0].id];
+            if (codesStore.codes.children.length === 1) {
                 return true;
             } else {
                 return false;
@@ -41,219 +39,49 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
         },
 
         /**
-         * The first level of Curriculum nodes
-         * plus the empty node by default if there's more than one child
+         * No nodes have been selected yet, used to show empy state in mc-view-codes
          *
-         * @return { Array }
+         * @return { Boolean }
          */
-        firstNodes () {
-            const codesStore = useCodesStore();
-            if (this.hasSingleGroup) {
-                return [...codesStore.codes];
-            } else {
-                return [
-                    getEmptyNode(),
-                    ...codesStore.codes
-                ];
-            }
+        hasNoNodesSelected () {
+            return this.selectedNodeIdList.length === 0;
         },
 
         /**
-         * Whether a first node has been selected via mc-header.vue
+         * Can now use the search input
          *
          * @return { Boolean }
          */
-        // hasSelectedFirstNode () {
-        //     return this.selectedFirstNodeId !== UNSET_ID;
-        // },
+        hasSelectedFirstNode () {
+            return this.selectedNodeIdList.length > 0;
+        },
 
         /**
-         * The currently selected first node
-         *
-         * @return { Object }
-         */
-        // selectedFirstNode () {
-        //     return this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
-        // },
-
-        /**
-         * To determine whether there's any second level nodes (children) in the selectedFirstNode
-         *
-         * @return { Boolean }
-         */
-        // hasSecondNodes () {
-        //     return this.selectedFirstNode.children.length > 0 ? true : false;
-        // },
-
-        /**
-         * Show the second level nodes, which are the children of the selectedFirstNode
-         * plus the empty node by default if there's more than one child
+         * Limit to six deep
          *
          * @return { Array }
          */
-        // secondNodes () {
-        //     return [
-        //         getEmptyNode(),
-        //         ...this.selectedFirstNode.children,
-        //     ];
-        // },
+        nodeListsLimited () {
+            if (this.activeNode?.children?.length === 0) { //if there's no more children, we don't need to display another depth
+                return this.nodeLists.filter((nodeList, index) => index <= this.currentDepth);
+            } else {
+                return this.nodeLists.filter((nodeList, index) => index < MAX_DEPTH);
+            }
+
+        },
 
         /**
-         * Whether a second node has been selected via mc-header.vue
+         * We use this to expand the remaining children
          *
          * @return { Boolean }
          */
-        // hasSelectedSecondNode () {
-        //     return this.selectedSecondNodeId !== UNSET_ID;
-        // },
-
-        /**
-         * The currently selected second node
-         *
-         * @return { Object }
-         */
-        // selectedSecondNode () {
-        //     return this.secondNodes.find((node) => node.id === this.selectedSecondNodeId);
-        // },
-
-        /**
-         * To determine whether there's any third level nodes (children) in the selectedSecondNode
-         *
-         * @return { Boolean }
-         */
-        // hasThirdNodes () {
-        //     return this.selectedSecondNode.children.length > 0 ? true : false;
-        // },
-
-        /**
-         * Show the third level nodes, which are the children of the selectedSecondNode
-         * plus the empty node by default if there's more than one child
-         *
-         * @return { Array }
-         */
-        // thirdNodes () {
-        //     return [
-        //         getEmptyNode(),
-        //         ...this.selectedSecondNode.children,
-        //     ];
-        // },
-
-        /**
-         * Whether a third node has been selected via mc-header.vue
-         *
-         * @return { Boolean }
-         */
-        // hasSelectedThirdNode () {
-        //     return this.selectedThirdNodeId !== UNSET_ID;
-        // },
-
-        /**
-         * The currently selected third node
-         *
-         * @return { Object }
-         */
-        // selectedThirdNode () {
-        //     return this.thirdNodes.find((node) => node.id === this.selectedThirdNodeId);
-        // },
-
-        /**
-         * To determine whether there's any fourth level nodes (children) in the selectedFourthNode
-         *
-         * @return { Boolean }
-         */
-        // hasFourthNodes () {
-        //     return this.selectedThirdNode.children.length > 0 ? true : false;
-        // },
-
-        /**
-         * Show the fourth level nodes, which are the children of the selectedThirdNode
-         * plus the empty node by default if there's more than one child
-         *
-         * @return { Array }
-         */
-        // fourthNodes () {
-        //     return [
-        //         getEmptyNode(),
-        //         ...this.selectedThirdNode.children,
-        //     ];
-        // },
-
-        /**
-         * Whether a fourth node has been selected via mc-header.vue
-         *
-         * @return { Boolean }
-         */
-        // hasSelectedFourthNode () {
-        //     return this.selectedFourthNodeId !== UNSET_ID;
-        // },
-
-        /**
-         * The currently selected fourth node
-         *
-         * @return { Object }
-         */
-        // selectedFourthNode () {
-        //     return this.fourthNodes.find((node) => node.id === this.selectedFourthNodeId);
-        // },
-
-        /**
-         * To determine the display of elements based on how far along
-         * the node selection tree we are
-         *
-         * @return { Boolean }
-         */
-        // isOnFirstNode () {
-        //     return this.hasSelectedFirstNode && !this.hasSelectedSecondNode && !this.hasSelectedThirdNode;
-        // },
-
-        /**
-         * To determine the display of elements based on how far along
-         * the node selection tree we are
-         *
-         * @return { Boolean }
-         */
-        // isOnSecondNode () {
-        //     return this.hasSelectedFirstNode && this.hasSelectedSecondNode && !this.hasSelectedThirdNode;
-        // },
-
-        /**
-         * To determine the display of elements based on how far along
-         * the node selection tree we are
-         *
-         * @return { Boolean }
-         */
-        // isOnThirdNode () {
-        //     return this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode;
-        // },
-
-        /**
-         * To determine the display of elements based on how far along
-         * the node selection tree we are
-         *
-         * @return { Boolean }
-         */
-        // isOnFourthNode () {
-        //     return this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode && this.hasSelectedFourthNode;
-        // },
-
-        /**
-         * The currently selected code
-         *
-         * @return { Object }
-         */
-        // selectedCode () {
-        //     if (this.isOnFourthNode) {
-        //         return this.selectedFourthNode;
-        //     } else if (this.isOnThirdNode) {
-        //         return this.selectedThirdNode;
-        //     } else if (this.isOnSecondNode) {
-        //         return this.selectedSecondNode;
-        //     } else if (this.isOnFirstNode) {
-        //         return this.selectedFirstNode;
-        //     } else {
-        //         return [];
-        //     }
-        // },
+        isOnLastNode () {
+            if (this.selectedNodeIdList.length === MAX_DEPTH) {
+                return true;
+            } else {
+                return false;
+            }
+        },
 
         /**
          * the search string broken into words, to search for each word
@@ -267,26 +95,6 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
         },
 
         /**
-         * Display the current nodes based on filtration, so what's selected via the <selects>
-         * and search <input> in mc-header.vue
-         *
-         * @return { Array }
-         */
-        codes () {
-            if (this.isOnFourthNode) {
-                return [this.selectedFourthNode];
-            } else if (this.isOnThirdNode) {
-                return [this.selectedThirdNode];
-            } else if (this.isOnSecondNode) {
-                return [this.selectedSecondNode];
-            } else if (this.isOnFirstNode) {
-                return [this.selectedFirstNode];
-            } else {
-                return [];
-            }
-        },
-
-        /**
          * no children descendents, all put in an array one level deep
          * for search results
          *
@@ -295,7 +103,7 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
         codesFlattened () {
             if (this.isSearchActive) {
                 let flatChildren = [];
-                const codesClone = cloneDeep(this.codes); //cloneDeep is from lodash.js
+                const codesClone = cloneDeep(this.activeNode); //cloneDeep is from lodash.js
                 codesClone.forEach((obj) => flatChildren = [...flatChildren, ...flattenCodes(obj)]);
                 flatChildren = flatChildren.filter((code) => code.code != ''); //only show those with a code, as those without can't be selected
                 return flatChildren;
@@ -342,7 +150,7 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
             if (this.isSearchActive) { //only start showing results once the query is long enough
                 return this.searchResults;
             } else { //otherwise just show codes
-                return this.codes;
+                return [this.activeNode];
             }
         },
 
@@ -351,69 +159,115 @@ export const useActiveCodesStore = defineStore('mcActiveCodesStore', {
     actions: {
 
         /**
+         * Used to get the <select> options in mc-view-header-select-list
          *
-         *
-         * @param { number }
+         * @param { array[object] }
          */
-        getNodesAt (depth) {
-            const codesStore = useCodesStore();
-            if (depth === 0 && this.hasSingleGroup) {
-                return [...codesStore.codes];
-            } else {
-                return [
-                    getEmptyNode(),
-                    ...codesStore.codes
-                ];
+        getChildrenAt (depth) {
+            try {
+                if (depth === 0 && this.hasSingleGroup) {
+                    // const codesStore = useCodesStore();
+                    // return [...codesStore.codes.children];
+                    return [...this.nodeLists[depth].children];
+                } else {
+                    return [
+                        getEmptyNode(),
+                        ...this.nodeLists[depth].children
+                    ];
+                }
+            } catch (error) {
+                debugger;
             }
-            // if (this.isOnThirdNode) {
-            //     this.selectedFourthNodeId = id;
-            // } else if (this.isOnSecondNode) {
-            //     this.selectedThirdNodeId = id;
-            // } else if (this.isOnFirstNode) {
-            //     this.selectedSecondNodeId = id;
-            // }
         },
 
         /**
-         * Can traverse through the codes via direct selection of a mc-code when
-         * it doesn't have a code.
+         *
+         *
+         * @param { number }
+         * @param { number }
+         */
+        setSelectedNode (depth, id) {
+            if (depth === 0 && id === UNSET_ID) { //pulling back to no node selection at all
+                this.reset();
+                return;
+            }
+            const targetDepth = id === UNSET_ID ? depth - 1 : depth; //we need to go back an additional depth
+            if (depth > this.currentDepth) { //progressing to the next depth
+                this.toNextNode(id);
+            } else if (depth < this.currentDepth) { //or going back to a previous depth
+                this.toAPreviousNode(targetDepth)
+            } else if (depth === this.currentDepth) { //or selecting a different option on the current depth
+                this.changeOnSameNode(targetDepth, id)
+            }
+            this.updateOnNodeChange(targetDepth, id)
+        },
+
+        /**
+         * Add one more selection
+         *
+         * @param { number }
+         */
+        toNextNode (id) {
+            this.selectedNodeIdList = [...this.selectedNodeIdList, id]; //add the new id in
+        },
+
+        /**
+         * Move back to a previous node
+         *
+         * @param { number }
+         */
+        toAPreviousNode (targetDepth) {
+            this.selectedNodeIdList = this.selectedNodeIdList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
+            this.nodeLists = this.nodeLists.filter((id, index) => index <= targetDepth);
+        },
+
+        /**
+         *
+         *
+         *  @param { number }
+         *  @param { number }
+         */
+        changeOnSameNode (targetDepth, id) {
+            if (id === UNSET_ID) { //we need to move back one level
+                this.selectedNodeIdList = this.selectedNodeIdList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
+            } else {
+                this.selectedNodeIdList = this.selectedNodeIdList.filter((id, index) => index !== targetDepth); //remove the latest so we can add the new selection
+                this.selectedNodeIdList = [...this.selectedNodeIdList, id]; //then add the new selection in
+            }
+            this.nodeLists = this.nodeLists.filter((id, index) => index <= targetDepth);
+        },
+
+        /**
+         *
+         *  @param { number }
+         *  @param { number }
+         */
+        updateOnNodeChange (targetDepth, id) {
+            this.currentDepth = targetDepth;
+            const targetId = id === UNSET_ID ? this.selectedNodeIdList[this.currentDepth] : parseInt(id); //we need to move back to the previous selectedNodeList when the id is unset (the - in the select)
+            this.activeNode = this.nodeLists[this.currentDepth].children.find((code) => parseInt(code.id) === targetId);
+            this.nodeLists = [...this.nodeLists, this.activeNode];
+        },
+
+        /**
+         * Reset to the original state, with no active selection at all
+         */
+        reset () {
+            const codesStore = useCodesStore();
+            this.selectedNodeIdList = [];
+            this.nodeLists = [codesStore.codes];
+            this.activeNode = {};
+            this.currentDepth = -1;
+        },
+
+        /**
+         *
          *
          * @param { number }
          */
         setNextSelectedNode (id) {
-            this.selectedNodeIdList = [...this.selectedNodeIdList, id];
-            // if (this.isOnThirdNode) {
-            //     this.selectedFourthNodeId = id;
-            // } else if (this.isOnSecondNode) {
-            //     this.selectedThirdNodeId = id;
-            // } else if (this.isOnFirstNode) {
-            //     this.selectedSecondNodeId = id;
-            // }
+            this.setSelectedNode(this.currentDepth+1, id);
         },
-
-        /**
-         * to reset the selected second node, reverting the node to empty
-         */
-        // resetSelectedSecondNode () {
-        //     this.selectedSecondNodeId = UNSET_ID;
-        //     this.resetSelectedThirdNode();
-        //     this.resetSelectedFourthNode();
-        // },
-
-        /**
-         * to reset the selected third node, reverting the node to empty
-         */
-        // resetSelectedThirdNode () {
-        //     this.selectedThirdNodeId = UNSET_ID;
-        //     this.resetSelectedFourthNode();
-        // },
-
-        /**
-         * to reset the selected thurd node, reverting the node to empty
-         */
-        // resetSelectedFourthNode () {
-        //     this.selectedFourthNodeId = UNSET_ID;
-        // },
 
         /**
          * find all those results that match any search words

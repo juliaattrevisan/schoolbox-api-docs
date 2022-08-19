@@ -7,7 +7,7 @@
 import { useStore } from './store/manageCurriculumStore';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
 import McViewHeader from './mc-view-header.vue';
-// import McViewCodes from './mc-view-codes.vue';
+import McViewCodes from './mc-view-codes.vue';
 
 const store = useStore();
 
@@ -41,7 +41,7 @@ function onRefreshSelected () {
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <mc-view-header />
-                        <!-- <mc-view-codes /> -->
+                        <mc-view-codes />
                     </div>
                 </fieldset>
             </section>

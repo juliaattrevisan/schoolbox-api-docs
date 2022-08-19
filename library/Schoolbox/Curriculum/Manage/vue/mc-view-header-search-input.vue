@@ -26,7 +26,7 @@ const placeholder = computed(() => {
     if (isDisabled.value) {
         return 'Select a Curriculum Code to enable search...'
     } else {
-        return `Search ${activeCodesStore.selectedCode.name} for codes or keywords...`;
+        return `Search ${activeCodesStore.activeNode.name} for codes or keywords...`;
     }
 });
 

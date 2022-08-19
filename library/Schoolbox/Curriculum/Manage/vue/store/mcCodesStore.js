@@ -3,12 +3,13 @@
  */
 
 import { defineStore } from 'pinia';
+import { useActiveCodesStore } from './mcActiveCodesStore';
 
 
 export const useCodesStore = defineStore('mcCodesStore', {
 
     state: () => ({
-        codes: [], //all the codes
+        codes: {}, //all the codes
     }),
 
     actions: {
@@ -19,7 +20,14 @@ export const useCodesStore = defineStore('mcCodesStore', {
          * @param { Array }
          */
         load (codes) {
-            this.codes = codes;
+            this.codes = {
+                children: codes,
+            }
+            const activeCodeStore = useActiveCodesStore();
+            activeCodeStore.reset();
+            if (activeCodeStore.hasSingleGroup) {
+                activeCodeStore.setSelectedNode(0, this.codes.children[0].id);
+            }
         },
     },
 

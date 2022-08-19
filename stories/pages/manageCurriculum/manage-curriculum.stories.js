@@ -5,7 +5,7 @@
 import ManageCurriculum from '@library/Schoolbox/Curriculum/Manage/vue/manage-curriculum.vue';
 import { rest } from 'msw';
 import { data as allCurriculumData } from '../../curriculumSelector/dataCurriculumSelector';
-// import { data as vicCurriculumData } from '../../curriculumSelector/dataVicCurriculum';
+import { data as vicCurriculumData } from '../../curriculumSelector/dataVicCurriculum';
 // import { data as nswCurriculumData } from '../../curriculumSelector/dataNswCurriculum';
 
 
@@ -14,7 +14,7 @@ const dataEndpoint = '/curriculumData';
 const mswHandlers = [
     rest.get(dataEndpoint, (req, res, ctx) => {
         return res(
-            ctx.json(allCurriculumData)
+            ctx.json(vicCurriculumData)
         )
     }),
 ];

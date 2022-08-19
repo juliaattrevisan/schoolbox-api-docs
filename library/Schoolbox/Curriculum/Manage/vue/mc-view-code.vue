@@ -61,7 +61,7 @@ const hasCode = computed(() => props.code.code && props.code.code !== '');
 const isDisabled = computed(() => {
     if (props.depth === 0 && !activeCodesStore.isSearchActive) {
         return true;
-    } else if (activeCodesStore.isOnFourthNode) { //cant select any further down from the fourth level
+    } else if (activeCodesStore.isOnLastNode) { //cant select any further down from the fourth level
         return true;
     } else {
         return false;
@@ -74,7 +74,7 @@ const isDisabled = computed(() => {
  *
  * @returns { Boolean }
  */
-const isVisible = computed(() => props.depth <= 1 || activeCodesStore.isOnFourthNode);
+const isVisible = computed(() => props.depth <= 1 || activeCodesStore.isOnLastNode);
 
 /**
  * to open up the edit modal
