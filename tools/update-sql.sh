@@ -204,7 +204,7 @@ update_puppet_facts(){
       --arg instanceid "$INSTANCE_ID" \
       --arg errint "$error_int" \
       --arg errmsg "$error_msg" \
-      '.schoolbox_update_error[$instanceid] = $errint | .schoolbox_update_errormsg[$instanceid] = $errmsg' \
+      '.schoolbox_update_error[$instanceid] = ($errint|tonumber) | .schoolbox_update_errormsg[$instanceid] = $errmsg' \
       > $tmp_fact_file;
 
     error "SQL updates completed with errors. Please manually fix issues or rollback to pre-update backup."
