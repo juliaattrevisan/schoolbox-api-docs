@@ -29,7 +29,6 @@ use UnexpectedValueException;
  */
 class Factory
 {
-
     /**
      * Get timetable classes occurring this far in the past
      * Measured in weeks, defaults to -1 week
