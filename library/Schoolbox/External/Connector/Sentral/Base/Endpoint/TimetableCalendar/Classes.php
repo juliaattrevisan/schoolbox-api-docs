@@ -285,17 +285,17 @@ class Classes implements IStrategy
                 ));
             } else {
                 $event = $this->eventMapper->createModel()
-                    ->setTitle($class['attributes']['className'])
+                    ->setTitle(trim((string)$class['attributes']['subject']))
                     ->setDetail(null)
-                    ->setLocation($class['attributes']['roomName'])
-                    ->setCode($class['attributes']['className'])
-                    ->setDay($class['attributes']['dayName'])
-                    ->setPeriod($class['attributes']['periodName'])
+                    ->setLocation(trim((string)$class['attributes']['roomName']))
+                    ->setCode(trim((string)$class['attributes']['className']))
+                    ->setDay(trim((string)$class['attributes']['dayName']))
+                    ->setPeriod(trim((string)$class['attributes']['periodName']))
                     ->setStartAt($start)
                     ->setFinishAt($finish)
-                    ->setType($class['attributes']['classType'])
+                    ->setType(trim((string)$class['attributes']['classType']))
                     ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
-                    ->setGuid($class['id'])
+                    ->setGuid(trim((string)$class['id']))
                     ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
 
                 if ($this->perform) {
