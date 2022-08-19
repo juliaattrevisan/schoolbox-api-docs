@@ -13,6 +13,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Learning\Turnitin\Exception\Exception;
 use Schoolbox\Learning\Turnitin\Helper;
 
 /**
@@ -128,9 +129,27 @@ HELP;
             exit;
         }
 
+        /* Check that your api setup is functioning
+         * We need this api working
+         */
+        $api = new Turnitin\Api(
+            $this->getConfig()->get('site_version'),
+            $this->getConfig()->get('turnitin_api_host'),
+            $this->getConfig()->get('turnitin_api_key')
+        );
+
+        /* If the basic test() failed, then your turnitin config is broken
+         * and your api host/key combo is somehow wrong
+         */
+        try {
+            $api->test();
+        } catch (Exception $e) {
+            $this->getLogger()->warning($e->getMessage());
+            exit(1);
+        }
+
         /* Check that this isn't currently running
          */
-
         try {
             $lock = $this->acquireLock(self::TURNITIN_LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
@@ -193,14 +212,6 @@ HELP;
             'Commencing upload sequence for %s pending Turnitin groups',
             $models->count()
         ));
-
-        /* We need this api
-         */
-        $api = new Turnitin\Api(
-            $this->getConfig()->get('site_version'),
-            $this->getConfig()->get('turnitin_api_host'),
-            $this->getConfig()->get('turnitin_api_key')
-        );
 
         /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');

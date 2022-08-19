@@ -11,6 +11,8 @@ namespace Schoolbox\Learning\Turnitin\Cli;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Exception\Exception;
+use Schoolbox\Learning\Turnitin\Helper;
 
 /**
  * CLI Tool for historically adding files that should be in Turnitin, but aren't
@@ -106,6 +108,32 @@ Usage: historical.php [--start=2022-02-02] [--end=2022-03-03] [--instance=INSTAN
 
 HELP;
             exit;
+        }
+
+        /* Check if turnitin is configured sufficiently
+         */
+        if (!(new Helper($this->getConfig()))->isConfigured()) {
+            $this->getLogger()->info('Turnitin configuration invalid.');
+            exit;
+        }
+
+        /* Check that your api setup is functioning
+         * We need this api working
+         */
+        $api = new Turnitin\Api(
+            $this->getConfig()->get('site_version'),
+            $this->getConfig()->get('turnitin_api_host'),
+            $this->getConfig()->get('turnitin_api_key')
+        );
+
+        /* If the basic test() failed, then your turnitin config is broken
+         * and your api host/key combo is somehow wrong
+         */
+        try {
+            $api->test();
+        } catch (Exception $e) {
+            $this->getLogger()->warning($e->getMessage());
+            exit(1);
         }
 
         /* Check that this isn't currently running
