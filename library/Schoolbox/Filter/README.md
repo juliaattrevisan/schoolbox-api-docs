@@ -614,7 +614,64 @@ Now, you can start writing the controller action which loads the actual content.
 
 * Create a [Component](#component) implementation
   (if a custom implementation is required)
-  > TODO fill in more about whether a custom component is required
+  > A component implementation will be required if the template needs to display
+  > or use more information than what is provided to the Twig template by
+  > default, e.g.: the list of options displayed in the template depends on a
+  > result retrieved from a mapper.
+  * if so; create it in the namespace determined above, extending
+    `\Schoolbox\Filter\BaseComponent`
+  * in the Factory, override `buildComponent` to create an instance of the
+    custom Component:
+    ```php
+    public function buildComponent(
+        \Schoolbox\Filter\IDefinition $definition,
+        \Schoolbox\User $user,
+        \Schoolbox\Filter\Page\Model $pageFilter,
+        ?\Schoolbox\GenericCollection $selections,
+        ?\Schoolbox\User $viewee,
+        array $routeArgs,
+        \Schoolbox\GenericCollection $overrides,
+    ): \Schoolbox\Filter\IComponent {
+        return new Component(
+            $definition,
+            $user,
+            $pageFilter,
+            $selections,
+            $overrides[$pageFilter->getFilter()->getId()],
+            $this->getSelectionMapper(),
+            // add extra constructor params for the new component here
+        );
+    }
+    ```
+* in the Component:
+  * override the constructor to include extra constructor params
+  * optionally override `toContext` to assign extra params to the Twig template:
+  ```php
+  return array_merge(
+      parent::toContext(),
+      ['params' => $this->someProperty],
+  );
+  ```
+  * optionally override `buildRoleSelections` to return a set of available
+    filter options for the current user:
+  ```php
+  // Build the list of selections
+  foreach ($this->someProperty as $property) {
+      $availableSelections[$key] = $this->createSelection($key, ...);
+  }
+  return $availableSelections;
+  ```
+  * optionally override `buildUserSelections` to return a set of selected
+    filter options:
+    ```php
+    $userSelections = parent::buildUserSelections($roleSelections);
+
+    foreach ($this->someProperty as $key => $property) {
+        $userSelections[$key] = $this->createSelection($key, ...);
+    }
+
+    return $userSelections;
+    ```
 
 * Find the [Factory Factory](#factory-factory) implementation for the
   [Entity](#entity) being filtered
