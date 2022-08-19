@@ -3,6 +3,22 @@
 {% block filterName %}Type{% endblock %}
 
 {% block userOptions %}
+
+    {% if isUserConfigurable %}
+        {# Selectize is only created if the item is user-configurable #}
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript">
+            $(function () {
+                $('input[data-select-all-selector]').each(function () {
+                    let $element = $(this);
+                    $element.selectAllBasic({
+                        selector: 'input[id^=' + this.id + '_]',
+                    });
+                })
+            })
+        </script>
+    {% endif %}
+
     {% for type in types %}
         {% set selectionId = type.id %}
 
@@ -19,6 +35,15 @@
                 disabled:           isDisabled,
             } only %}
         {% else %}
+            <input id="filter_selection_{{ definition.filter.id }}_{{ type.id }}"
+                   type="checkbox"
+                   data-select-all-selector="{{ definition.filter.id }}_{{ type.id }}"
+                   {% if isDisabled %}disabled data-disabled{% endif %}
+            />
+            <label for="filter_selection_{{ definition.filter.id }}_{{ type.id }}"
+                   class="noselect"
+            >{{ type.name }}</label>
+
             {% for subtype in type.subtypes %}
                 {% set selectionId = type.id ~ '_' ~ subtype.id %}
                 {% include '@filters/_selectionCheckbox.twig' with {
