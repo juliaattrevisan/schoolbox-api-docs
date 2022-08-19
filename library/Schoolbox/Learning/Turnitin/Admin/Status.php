@@ -9,12 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Admin;
 
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Turnitin\Api;
-use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
+use Schoolbox\Learning\Turnitin\Exception\Exception;
 use Schoolbox\Learning\Turnitin\Helper;
 
 /**
@@ -41,6 +40,9 @@ class Status
      * Determine the status of the Turnitin integration (if configured)
      *
      * @return array
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function generate(): array
     {
@@ -85,7 +87,7 @@ class Status
                 /* Bad credentials will stop you from making a proper connection
                  */
                 $payload['message'] = 'Auth failed';
-            } catch (GuzzleException | BadEndpoint | Exception $e) {
+            } catch (GuzzleException | Exception $e) {
                 /* Some kind of networky issue; noop
                  * Catch exception but do nothing so default $payload will be returned.
                  */
