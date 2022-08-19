@@ -33,6 +33,12 @@ A Filter may have one or more of its options selected: generally, an
 [Entity](#entity) must match at least one of the selected options in order to
 pass the Filter.
 
+#### Hardcoded Filter
+
+It is possible for a Filter to be hardcoded to a particular value, and to
+not display in the [Panel](#panel): this is useful for when a Page displays only
+a subset of Entities, e.g. only assessments for a particular class.
+
 ### Filter Set
 
 The collection of [Filters](#filter) which are included on a single
@@ -565,10 +571,11 @@ of developing for filters.
     );
     ```
 
-* Now you will want to add this filter to a page: to accomplish that, follow the
-  instructions in the
+* Unless this filter is intended as a [Hardcoded Filter](#hardcoded-filter)
+  only, you will want to add this filter to a page:
+  to accomplish that, follow the instructions in the
   [Adding an existing Filter to a Page's Filter Set](#adding-an-existing-filter-to-a-pages-filter-set)
-  section below
+  section below.
 
 ### Adding an existing Filter to a Page's Filter Set
 
