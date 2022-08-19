@@ -45,6 +45,8 @@ class Javascript extends Base
          * Some events have a class code, but not a class name
          * Some events have both
          */
+        $titlePart = '';
+
         if ('' !== $this->event->getTitle() && '' !== $this->event->getCode()) {
             /* Have both pieces; concat them nicely
              */
@@ -53,7 +55,7 @@ class Javascript extends Base
             /* Just have the code, but not a nice name
              */
             $titlePart = $this->event->getCode();
-        } elseif ('' !== $this->event->getTItle()) {
+        } elseif ('' !== $this->event->getTitle()) {
             /* Just have the title, but not a code
              */
             $titlePart = $this->event->getTitle();
