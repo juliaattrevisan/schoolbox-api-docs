@@ -65,12 +65,12 @@
             const statusCodeATag = document.createElement("a");
             statusCodeATag.setAttribute("href", "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/" + statusCode);
             statusCodeATag.innerText = statusCode;
-            statusCodeHTMLString = statusCodeATag.outerText;
+            statusCodeHTMLString = statusCodeATag.outerHTML;
         } else {
             statusCodeHTMLString = statusCode;
         }
 
-        document.getElementById("response_status").innerText = statusCodeHTMLString ? statusCodeHTMLString : "(nothing to show)";
+        document.getElementById("response_status").innerHTML = statusCodeHTMLString ? statusCodeHTMLString : "(nothing to show)";
         document.getElementById("response_headers").innerText = headersString ? headersString : "(nothing to show)";
         document.getElementById("response_body").innerText = body ? body : "(nothing to show)";
     }
