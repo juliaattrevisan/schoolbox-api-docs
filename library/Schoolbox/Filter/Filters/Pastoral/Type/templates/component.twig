@@ -57,15 +57,20 @@
             >{{ type.name }}</label>
 
             {# Subtype selectors #}
-            {% for subtype in type.subtypes %}
-                {% set selectionId = type.id ~ '_' ~ subtype.id %}
-                {% include '@filters/_selectionCheckbox.twig' with {
-                    roleSelection:      roleSelections[selectionId] ?? null,
-                    userSelection:      userSelections[selectionId] ?? null,
-                    label:              type.name ~ ' › ' ~ subtype.name,
-                    disabled:           isDisabled,
-                } only %}
-            {% endfor %}
+            <div class="checklist">
+                <ul class="option-list">
+                {% for subtype in type.subtypes %}
+                    {% set selectionId = type.id ~ '_' ~ subtype.id %}
+                    {% include '@filters/_selectionCheckbox.twig' with {
+                        roleSelection:      roleSelections[selectionId] ?? null,
+                        userSelection:      userSelections[selectionId] ?? null,
+                        label:              subtype.name,
+                        labelInSummary:     type.name ~ ' › ' ~ subtype.name,
+                        disabled:           isDisabled,
+                    } only %}
+                {% endfor %}
+                </ul>
+            </div>
         {% endif %}
     {% endfor %}
 {% endblock userOptions %}
