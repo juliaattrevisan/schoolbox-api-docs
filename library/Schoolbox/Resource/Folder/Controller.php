@@ -399,7 +399,7 @@ class Controller extends BaseController
                 (int)$post['template'],
                 $post['colour'] ?: null,
                 $post['attachment'][0] ?? null,
-                isset($post['curriculumCodes']) ? array_filter($post['curriculumCodes']) : null,
+                array_filter(explode(',', $post['curriculumCodes'][0] ?? '')),
                 is_array($rolePermissions) ? $rolePermissions : [],
                 (bool)($post['recursive-permissions'] ?? false),
                 $classCodes,
