@@ -466,7 +466,7 @@ class Module extends BaseModule
      */
 
     /**
-     * @return Error\Mapper|IMapper
+     * @return Error\Mapper
      * @throws \InvalidArgumentException If mapper class not found
      */
     private function getErrorMapper()
@@ -486,7 +486,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return IMapper|SubmissionMapper
+     * @return SubmissionMapper
      * @throws \InvalidArgumentException If mapper class not found
      */
     private function getSubmissionMapper()
@@ -496,7 +496,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return object|IConfigLoader
+     * @return IConfigLoader
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getConfigLoader()
@@ -506,7 +506,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return object|AssessmentMapperProxy
+     * @return AssessmentMapperProxy
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getAssessmentMapperProxy()
@@ -516,7 +516,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return object|ResponseMapperProxy
+     * @return ResponseMapperProxy
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getResponseMapperProxy()
@@ -526,7 +526,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return object|FeedbackMapperProxy
+     * @return FeedbackMapperProxy
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getFeedbackMapperProxy()
