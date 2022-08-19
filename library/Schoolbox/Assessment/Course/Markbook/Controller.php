@@ -28,7 +28,6 @@ use function func_get_args;
 
 class Controller extends WebController\Base
 {
-
     /** @var Filter\IFactoryFactory */
     private $filterFactoryFactory;
 
