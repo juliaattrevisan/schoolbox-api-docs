@@ -39,6 +39,26 @@ class Javascript extends Base
             $classes[] = 'group' . $this->event->getFolder()->getId();
         }
 
+        /* Try to manufacture a nice event title using the available pieces
+         *
+         * Some events have a class name, but not a class code
+         * Some events have a class code, but not a class name
+         * Some events have both
+         */
+        if ('' !== $this->event->getTitle() && '' !== $this->event->getCode()) {
+            /* Have both pieces; concat them nicely
+             */
+            $titlePart = "{$this->event->getTitle()} ({$this->event->getCode()})";
+        } elseif ('' === $this->event->getTitle() && '' !== $this->event->getCode()) {
+            /* Just have the code, but not a nice name
+             */
+            $titlePart = $this->event->getCode();
+        } elseif ('' !== $this->event->getTItle()) {
+            /* Just have the title, but not a code
+             */
+            $titlePart = $this->event->getTitle();
+        }
+
         /* Ram in the Day and Period labels as part of the event title
          * Schools sometimes use this terminology colloquially, rather
          * than just the datetimes, to refer to when things happen
@@ -49,11 +69,11 @@ class Javascript extends Base
         $title = implode(', ', array_filter([
             $this->event->getDay(),
             $this->event->getPeriod(),
-            $this->event->getTitle(),
-
+            $titlePart,
+            $this->event->getLocation()
         ], static function ($val) {
             return '' !== trim($val);
-        })) . " ({$this->event->getCode()})";
+        }));
 
         /* Flatten the representation into a standardised structure
          */
