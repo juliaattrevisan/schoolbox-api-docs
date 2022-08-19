@@ -191,8 +191,8 @@ class AllFields extends Base
         if (array_key_exists('curriculumNodes', $json)) {
             //try to not break things...
             //if $json['curriculumNodes'] contains a ',' then explode, as its csv, else believe its just an array
-            if (substr_count($json['curriculumNodes'], ',')) {
-                $json['curriculumNodes'] = explode(',', $json['curriculumNodes']);
+            if (substr_count($json['curriculumNodes'][0], ',')) {
+                $json['curriculumNodes'] = explode(',', $json['curriculumNodes'][0]);
             }
             $this->setCollection(
                 $json,

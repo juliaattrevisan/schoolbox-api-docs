@@ -115,7 +115,7 @@
                 }
         );
         {% if curriculumTaggingEnabled %}
-        payload.curriculumNodes = form.querySelector('input[name="curriculumCodes[]"]').value;
+        payload.curriculumNodes = [form.querySelector('input[name="curriculumCodes[]"]').value];
         {% endif %}
         return payload;
     }
