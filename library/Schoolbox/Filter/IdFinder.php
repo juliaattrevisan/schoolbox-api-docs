@@ -18,7 +18,6 @@ use Schoolbox\User;
  */
 interface IdFinder
 {
-
     /**
      * Fetch the singleton instance of this class
      *

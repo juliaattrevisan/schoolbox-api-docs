@@ -9,21 +9,19 @@
 namespace Schoolbox\Filter;
 
 use Alaress\Database\Predicate\InvalidColumnException;
-
-use Schoolbox\User;
-use function array_map;
-
 use Schoolbox\Collection;
+use Schoolbox\User;
 use Schoolbox\IMapper;
 use UnderflowException;
 use UnexpectedValueException;
+
+use function array_map;
 
 /**
  * Logic common to all IdFinders
  */
 abstract class AbstractIdFinder implements IdFinder
 {
-
     /** @var static[] $instance */
     private static $instance = [];
 

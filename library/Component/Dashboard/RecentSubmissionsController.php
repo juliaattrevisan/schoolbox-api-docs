@@ -22,7 +22,6 @@ use Schoolbox\Permission\Access\UserAccess;
  */
 class Component_Dashboard_RecentSubmissionsController extends Component_Dashboard_ControllerAbstract
 {
-
     // User has selected not to limit days of results, ie they have select 'ALL'
     const DAY_LIMIT_ALL = 0;
 

@@ -35,7 +35,6 @@ use Alaress_Date_Format;
  */
 class Controller extends BaseController
 {
-
     /**
      * @var Access
      */

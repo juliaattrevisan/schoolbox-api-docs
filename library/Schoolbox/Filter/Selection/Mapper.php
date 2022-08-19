@@ -20,7 +20,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * @inheritdoc
      */

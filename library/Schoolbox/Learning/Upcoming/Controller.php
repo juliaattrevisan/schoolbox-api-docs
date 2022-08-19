@@ -50,7 +50,6 @@ use function func_get_args;
  */
 class Controller extends Base
 {
-
     /**
      * Limit of upcoming assessments shown in list
      */

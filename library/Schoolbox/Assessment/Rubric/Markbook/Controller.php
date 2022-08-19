@@ -47,7 +47,6 @@ use function uasort;
 
 class Controller extends Base
 {
-
     /**
      * @var IConnector
      */

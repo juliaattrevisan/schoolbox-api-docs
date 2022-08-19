@@ -19,7 +19,6 @@ use Schoolbox\Filter\Model;
  */
 class Factory extends AbstractFactory
 {
-
     /**
      * @inheritdoc
      */

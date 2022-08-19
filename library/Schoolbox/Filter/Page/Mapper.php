@@ -21,7 +21,6 @@ use Schoolbox\GenericCollection;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * @inheritdoc
      */

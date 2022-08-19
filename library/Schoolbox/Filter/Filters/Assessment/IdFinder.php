@@ -59,7 +59,6 @@ use function implode;
  */
 class IdFinder extends Filter\AbstractIdFinder
 {
-
     // Which date column does the term filter relate to?
     private const DATE_COL_DUE = 'due_date';
     private const DATE_COL_CLS = 'close_date';

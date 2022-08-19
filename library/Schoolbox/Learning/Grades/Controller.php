@@ -49,7 +49,6 @@ use function func_get_args;
 
 class Controller extends Base
 {
-
     /**
      * @var Term\Mapper
      */
