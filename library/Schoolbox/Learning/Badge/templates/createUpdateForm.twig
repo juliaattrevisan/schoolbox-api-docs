@@ -416,12 +416,7 @@
 
                 // Only save curriculum nodes if they are enabled
                 if (curriculumTaggingEnabled) {
-                    let curriculumNodes = form.querySelector('select[name="curriculumCodes[]"]').selectize.items;
-                    payload.curriculumNodes = curriculumNodes.map(
-                        (v) => {
-                            return {id: Number(v)}
-                        }
-                    );
+                    payload.curriculumNodes = [form.querySelector('input[name="curriculumCodes[]"]').value];
                 }
 
                 // Toast then post

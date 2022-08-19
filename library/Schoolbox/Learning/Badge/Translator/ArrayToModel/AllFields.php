@@ -93,16 +93,23 @@ class AllFields extends Base
         );
 
         // Set curriculum nodes
-        $this->setCollection(
-            $array,
-            'curriculumNodes',
-            '',
-            $model,
-            'setCurriculumNodes',
-            new GenericCollection(CurriculumNode::class),
-            new CurriculumNode(),
-            'setId'
-        );
+        if (array_key_exists('curriculumNodes', $array)) {
+            //try to not break things...
+            //if $array['curriculumNodes'] contains a ',' then explode, as its csv, else believe its just an array
+            if (substr_count($array['curriculumNodes'][0], ',')) {
+                $array['curriculumNodes'] = explode(',', $array['curriculumNodes'][0]);
+            }
+            $this->setCollection(
+                $array,
+                'curriculumNodes',
+                '',
+                $model,
+                'setCurriculumNodes',
+                new GenericCollection(CurriculumNode::class),
+                new CurriculumNode(),
+                'setId'
+            );
+        }
 
         // Set created/updated by
         $model = $this->setModel(
