@@ -18,7 +18,6 @@ use Schoolbox\UserMapper;
  */
 class SimilarityReportPayload
 {
-
     /**
      * These consts were defined in twig alone; they don't exist in backend as concepts
      * The implementation here mirrors that which is used in Status screen's jewellery
@@ -104,7 +103,7 @@ class SimilarityReportPayload
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
                     'responseId' => $data['submission']['id'],
-                    'turnitinId' => $file['turnitin']['id']
+                    'turnitinSubId' => $file['turnitin']['turnitin_submission_id']
                 ]);
             }
 

@@ -245,7 +245,7 @@ abstract class AbstractFeedback implements IFeedback
     }
 
     /**
-     * @return IResponse
+     * @return IResponse|null
      */
     public function getResponse()
     {

@@ -6,7 +6,7 @@
  # @param Participant $participant              The participating student
  # @param SingleFile\Model $currentFile         A student submission file instance (Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile)
  #}
- 
+
 {##
  # Decide Urgency of a Similarity Check percentage
  #
@@ -42,7 +42,7 @@
             responseId:   response.id,
             response:     response,
             participant:  participant,
-            turnitinId:   currentFile.turnitin.id })
+            turnitinSubId:   currentFile.turnitin.getTurnitinSubmissionId })
         %}
         {% if reportRoute %}
             <a href="{{ reportRoute }}">

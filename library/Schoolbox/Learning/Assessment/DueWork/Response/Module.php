@@ -98,7 +98,7 @@ class Module extends BaseModule
             new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
-        $turnitinPattern    = '/similarity/{assessmentId:\d+}/{responseId:\d+}/{turnitinId:\d+}';
+        $turnitinPattern    = '/similarity/{assessmentId:\d+}/{responseId:\d+}/{turnitinSubId:([a-zA-Z0-9-]+)}';
         $plagscanPattern    = '/plagscans/{assessmentId:\d+}/{responseId:\d+}/{plagscanId:\d+}';
         $assessmentPattern  = '/assessments/{assessmentId:\d+}';
         $participantPattern = $assessmentPattern . '/{studentId:\d+}';
@@ -158,7 +158,7 @@ class Module extends BaseModule
         return new Rule\HasHomepageAccess(
             UserAccess::ACCESS_WRITE,
             function ($params) {
-                if (isset($params['response']) && $params['response'] instanceof IResponse && $params['response']->getAssessable()) {
+                if (isset($params['response']) && $params['response'] instanceof IResponse) {
                     return $params['response']->getAssessable()->getContext()->getFolder()->getId();
                 }
                 if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
@@ -280,7 +280,7 @@ class Module extends BaseModule
     private function preloadTurnitinWithAssessment(array $params): array
     {
         try {
-            $turnitinReport = Turnitin\File\Mapper::getInstance()->findById($params['turnitinId']);
+            $turnitinReport = Turnitin\File\Mapper::getInstance()->findOneByColumn('turnitin_submission_id', $params['turnitinSubId']);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
@@ -296,8 +296,26 @@ class Module extends BaseModule
         /* Die early when requested Response doesn't exist in $assessment
          */
         try {
+            /** @var \Schoolbox\Learning\Assessment\DueWork\Response\Model $response */
             $response = $this->getResponseMapperProxy()->findInAssessment($params['responseId'], $assessment);
         } catch (OutOfBoundsException $e) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        /**
+         * die early when the requested Turnitin Submission Id does not match any of the response files Turnitin Submission Id
+         */
+        //start off with the lowest perm state
+        $validFile = false;
+        foreach ($response->getAllFiles() as $file) {
+            //check if file is a turnitin file then check if it matches the report turnitin id
+            //if they do match (could be multiple files uploaded, so match on any) allow the user through
+            if (null !== $file->getTurnitIn() && ($file->getTurnitIn()->getTurnitinSubmissionId() === $turnitinReport->getTurnitinSubmissionId())) {
+                $validFile = true;
+            }
+        }
+        //you are not supposed to be accessing this link. go away
+        if (!$validFile) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
@@ -449,7 +467,7 @@ class Module extends BaseModule
      */
 
     /**
-     * @return Error\Mapper|IMapper
+     * @return Error\Mapper
      * @throws \InvalidArgumentException If mapper class not found
      */
     private function getErrorMapper()
@@ -459,7 +477,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return IMapper|Kami\Mapper
+     * @return Kami\Mapper
      * @throws \InvalidArgumentException If mapper class not found
      */
     private function getKamiMapper()
@@ -469,7 +487,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return IMapper|SubmissionMapper
+     * @return SubmissionMapper
      * @throws \InvalidArgumentException If mapper class not found
      */
     private function getSubmissionMapper()
@@ -479,7 +497,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return object|IConfigLoader
+     * @return IConfigLoader
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getConfigLoader()
@@ -489,7 +507,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return object|AssessmentMapperProxy
+     * @return AssessmentMapperProxy
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getAssessmentMapperProxy()
@@ -499,7 +517,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return object|ResponseMapperProxy
+     * @return ResponseMapperProxy
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getResponseMapperProxy()
@@ -509,7 +527,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return object|FeedbackMapperProxy
+     * @return FeedbackMapperProxy
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     protected function getFeedbackMapperProxy()
