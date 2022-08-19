@@ -674,7 +674,7 @@ class Controller extends Base\Base
         }
 
         $courseSpecFolder       = $this->folderMapper->findById($courseSpec->getFolder()->getId());
-        $newCurriculumCodes     = is_array($post->get('curriculumCodes')) ? array_filter($post->get('curriculumCodes')) : [];
+        $newCurriculumCodes     = array_filter(explode(',', $post['curriculumCodes'][0] ?? ''));
         $currentCurriculumCodes = $courseSpecFolder->getCurriculumNodes()->getPropertyValues('id');
 
         // If anything changed for course
