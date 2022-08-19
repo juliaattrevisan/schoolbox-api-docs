@@ -96,7 +96,7 @@ class AllFields extends Base
         $this->setCollection(
             $array,
             'curriculumNodes',
-            'id',
+            '',
             $model,
             'setCurriculumNodes',
             new GenericCollection(CurriculumNode::class),

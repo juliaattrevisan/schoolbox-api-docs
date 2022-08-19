@@ -189,10 +189,15 @@ class AllFields extends Base
 
         // Set curriculum nodes
         if (array_key_exists('curriculumNodes', $json)) {
+            //try to not break things...
+            //if $json['curriculumNodes'] contains a ',' then explode, as its csv, else believe its just an array
+            if (substr_count($json['curriculumNodes'], ',')) {
+                $json['curriculumNodes'] = explode(',', $json['curriculumNodes']);
+            }
             $this->setCollection(
                 $json,
                 'curriculumNodes',
-                'id',
+                '',
                 $model,
                 'setCurriculumNodes',
                 new GenericCollection(CurriculumNode::class),

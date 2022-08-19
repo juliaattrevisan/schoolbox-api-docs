@@ -115,12 +115,7 @@
                 }
         );
         {% if curriculumTaggingEnabled %}
-        let curriculumNodes = form.querySelector('select[name="curriculumCodes[]"]').selectize.items;
-        payload.curriculumNodes = curriculumNodes.map(
-                (v) => {
-                    return {id: Number(v)}
-                }
-        );
+        payload.curriculumNodes = form.querySelector('input[name="curriculumCodes[]"]').value;
         {% endif %}
         return payload;
     }
@@ -175,7 +170,7 @@
                 // Toast then post
                 toast.toastActivate('Saving...')
                 submit.prop('disabled', true);
-                
+
                 // Redirect to the return URL provided
                 fetch(form.action, {
                     method: '{{ isCreate ? 'POST' : 'PUT' }}',
