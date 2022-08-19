@@ -194,7 +194,7 @@ execute_upgrade_scripts(){
 # Reset facter fact
 update_puppet_facts(){
   mkdir -p /etc/facter/facts.d/ >/dev/null 2>&1;
-  mkdir -p /tmp/facter/ >/dev/null 2>&1;
+  mkdir -p /tmp/facter/;
   tmp_fact_file="/tmp/facter/schoolbox_${INSTANCE_ID}_update.json";
   if [ $error_int -ne 0 ]; then
     error_msg=$(echo "$error_msg" | cut -d',' -f2-100);
