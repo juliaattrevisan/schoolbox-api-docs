@@ -12,7 +12,6 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
-use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -30,19 +29,18 @@ use UnexpectedValueException;
  */
 class Factory
 {
-
     /**
      * Get timetable classes occurring this far in the past
-     * Measured in months, defaults to -1 month
+     * Measured in weeks, defaults to -1 week
      */
     private const FROM = -1;
 
 
     /**
      * Get timetable classes up to this far into the future
-     * Measured in months, defaults to 6 months
+     * Measured in weeks, defaults to 4 weeks
      */
-    private const TO = 6;
+    private const TO = 4;
 
 
     /**
@@ -215,8 +213,8 @@ class Factory
 
         /* Date range
          */
-        $from = \Alaress_Date_Format::now()->addMonths(self::FROM)->getDatabaseDate();
-        $to = \Alaress_Date_Format::now()->addMonths(self::TO)->getDatabaseDate();
+        $from = \Alaress_Date_Format::now()->addWeeks(self::FROM)->getDatabaseDate();
+        $to = \Alaress_Date_Format::now()->addWeeks(self::TO)->getDatabaseDate();
 
         return (new GenericCollection(IStrategy::class))
             ->add(new Profile\Prepare(
