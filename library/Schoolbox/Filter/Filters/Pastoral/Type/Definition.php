@@ -51,7 +51,15 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getAbstractKeys(): array
     {
-        return $this->types->getPropertyValues('id');
+        // Return types and subtypes
+        $keys = [];
+        foreach ($this->types as $type) {
+            $keys[] = $type->getId();
+            foreach ($type->getSubTypes() as $subType) {
+                $keys[] = sprintf('%d_%d', $type->getId(), $subType->getId());
+            }
+        }
+        return $keys;
     }
 
     /**
@@ -69,9 +77,21 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getLabel(string $key): string
     {
+        // Does this key contain a subtype?
+        $keyParts   = explode('_', $key);
+        $keyType    = filter_var($keyParts[0], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $keySubType = filter_var($keyParts[1] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         foreach ($this->types as $type) {
-            if ((int)$key === $type->getId()) {
+            if ($keyType !== $type->getId()) {
+                continue;
+            }
+            if (!isset($keySubType)) {
                 return $type->getName();
+            }
+            foreach ($type->getSubTypes() as $subType) {
+                if ($keySubType === $subType->getId()) {
+                    return sprintf('%s › %s', $type->getName(), $subType->getName());
+                }
             }
         }
         return '';
@@ -95,6 +115,22 @@ class Definition extends Filter\AbstractDefinition
                         new GenericCollection(Filter\Page\Option\Defaults\Model::class)
                     );
                 $options->setOffset($option->getKey(), $option);
+            }
+
+            // Add subtypes
+            foreach ($type->getSubTypes() as $subType) {
+                $abstractKey = sprintf('%d_%d', $type->getId(), $subType->getId());
+                if (!$options->offsetExists($abstractKey)) {
+                    $option = new Filter\Page\Option\Model();
+                    $option
+                        ->setFilterPage($pageFilter)
+                        ->setKey($abstractKey)
+                        ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter))
+                        ->setDefaults(
+                            new GenericCollection(Filter\Page\Option\Defaults\Model::class)
+                        );
+                    $options->setOffset($option->getKey(), $option);
+                }
             }
         }
         return $options;
