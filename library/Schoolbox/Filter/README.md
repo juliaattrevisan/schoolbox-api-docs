@@ -311,18 +311,30 @@ of developing for filters.
 * Update the `getPages` of each [Definition](#definition) implementation that
   you intend the [Page](#page) to use
 * In your page's module:
-  * inject the [Factory Factory](#factory-factory) as a controller parameter:
+  * inject the following as controller parameters:
+    * the [Factory Factory](#factory-factory)
+    * the mappers for filters and filter selections
+    * the mapper for the Entity you're filtering
     ```php
     protected function buildController(): \Alaress\Web\Controller\Base
     {
-        return new Controller($this->injector->get('filters.factoryFactory'));
+        return new Controller(
+            $this->injector->get('filters.factoryFactory'),
+            $this->getMapperFactory()->get(\Schoolbox\Filter\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Filter\Selection\Mapper::class),
+            $this->getMapperFactory()->get(Mapper::class),
+        );
     }
     ```
 * In your controller:
-  * inject the [Factory Factory](#factory-factory) as a constructor parameter:
+  * inject the above params as constructor parameters:
     ```php
-    public function __construct(private \Schoolbox\Filter\IFactoryFactory $filterFactoryFactory)
-    {
+    public function __construct(
+        private \Schoolbox\Filter\IFactoryFactory $filterFactoryFactory,
+        private \SchoolboxFilter\Mapper $filterMapper,
+        private \SchoolboxFilter\Selection\Mapper $filterSelectionMapper,
+        private Mapper $filteredEntityMapper,
+    ) {
     }
     ```
   * generate the filter panel's Twig data in a controller action:
@@ -354,7 +366,7 @@ of developing for filters.
         )
     );
     ```
-* In the Twig template:
+* In the Twig template `index.twig`:
   * Output the filter
     ```twig
     {#
@@ -379,8 +391,80 @@ of developing for filters.
         </div>
     </div>
     ```
-* > TODO document how to render the filtered content
 
+Now, you can start writing the controller action which loads the actual content.
+
+* In your page's module:
+  * create a new `POST` route, which takes the same parameters as the `GET`
+    route you added the filter rendering to:
+  ```php
+  // existing GET route
+  $this->register(self::METHOD_GET, '/{folderId}', 'getReport', $perms, $preload);
+
+  // new POST route
+  $this->register(self::METHOD_POST, '/{folderId}', 'postReport', $perms, $preload);
+  ```
+* In your page's controller:
+  * add the new action for the `POST` route; within that action:
+  ```php
+  $request             = $this->request->post['filter_selection'] ?: [];
+  $page                = \Schoolbox\Filter\Page\Model::PAGE_NEW_PAGE;
+  $codec               = new \Schoolbox\Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
+
+  // Convert the request into a set of selections, and update them in the frontend
+  $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+  $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+
+  // Convert the set of selections into actual filters
+  $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
+      $selectionsPerFilter,
+      $this->getUser(),
+      $page,
+  );
+
+  // Are there any hardcoded filters to apply?
+  // If so, create them like so:
+  $hardCodedFilters = [
+      \Schoolbox\Filter\Filters\{entityName}\{filterName}\Definition::class => [
+          // a set of key-value pairs to filter:
+          // the value to filter will usually be the key as well
+      ],
+  ];
+
+  // If using the ID finder:
+  // use the ID finder to create a list of IDs of the filtered mapper,
+  // then pass that list of IDs into the mapper's find method
+  $idFinder = \Schoolbox\Filter\Filters\{entityName}\IdFinder::getInstance(
+      $this->filterMapper,
+      $this->mapper,
+  );
+  $ids = $idFinder->findIdsByFilters(
+      array_merge($dynamicFilters, $hardCodedFilters),
+      $this->getUser(),
+  );
+  $records = $this->mapper->findByColumn('id', $ids);
+
+  // If using the Matcher:
+  // fetch the records, then use the matcher to filter them
+  $matcher = new \Schoolbox\Filter\Filters\{entityName}\Matcher();
+  $records = $this->mapper->findAll()->filter($matcher);
+
+  // render the records in a Twig template
+  $this->response->content->set(
+      $this->buildJsonOutput(
+          [
+              'status'  => 200,
+              'content' => $this->buildUnthemedHtmlOutput(
+                  '@moduleName/inner.twig',
+                  [
+                      'records' => $records,
+                  ]
+              )->getAsString(),
+          ]
+      )
+  );
+  ```
+* in the Twig template `inner.twig`: output the records however you want
 
 ### Implementing Filtering on an Entity
 
