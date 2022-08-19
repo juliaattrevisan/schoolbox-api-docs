@@ -18,6 +18,7 @@ use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
@@ -30,7 +31,6 @@ use UnexpectedValueException;
  */
 class Profile implements IStrategy
 {
-
     /**
      * These consts, used to denote what type of person we're processing,
      * also help us decide which timetable-lessons endpoint to access later
@@ -171,13 +171,12 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
+        /* Import students' profile data
+         * Import their specific parents' profile data
+         */
+        $this->log->info('Processing students and their parents.');
 
-//        /* Import students' profile data
-//         * Import their specific parents' profile data
-//         */
-//        $this->log->info('Processing students and their parents.');
-//
-//        $this->importStudents();
+        $this->importStudents();
 
         /* Import staff profile data
          */
@@ -190,11 +189,9 @@ class Profile implements IStrategy
     /**
      * Import students' profile data
      * @throws Exception
-     * @throws Mapper\DefinitionException
+     * @throws DefinitionException
      * @throws PDOException
      * @throws UnexpectedValueException
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
      */
     private function importStudents(): void
     {
@@ -290,7 +287,6 @@ class Profile implements IStrategy
                     ->setTitle($title)
                     ->setFirstname($firstname)
                     ->setLastname($lastname);
-
 
                 /* Then save it
                  */
@@ -604,7 +600,6 @@ class Profile implements IStrategy
      */
     public function findEmergencyContacts(array $student): ?array
     {
-
         /* There's a sideload for emergencyContactLinks via Get Student Person
          *  ...but it doesn't give you any at all, it seems broken.
          *  http://development.sentral.com.au/#operation/getStudentPerson
@@ -677,6 +672,7 @@ class Profile implements IStrategy
 
         return $emergencyContacts;
     }
+
 
     /**
      * Find a form teacher from their form code
@@ -774,7 +770,6 @@ class Profile implements IStrategy
      */
     private function findMedicalAlert(UserProfile\Model $studentBaseProfile, array $student): string
     {
-
         /* Find another endpoint who can tell us the answer
          */
         $endpoint = $student['relationships']['person']['data']['relationships']['medicalConditions']['links']['related'];
@@ -1054,7 +1049,6 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
-
         /* Sentral gives you paginated data, at most, 200 per page
          *
          * Process multiple pages until there are none remaining, or if something is really stuffed,
@@ -1078,10 +1072,6 @@ class Profile implements IStrategy
                 $room = '';
                 $title = (string)$staff['relationships']['person']['data']['attributes']['title'];
                 $username = (string)$staff['attributes']['timetableCode'];
-
-                if (1959 != $externalId) {
-                    continue;
-                }
 
                 /* Disregard inactive staff
                  */
