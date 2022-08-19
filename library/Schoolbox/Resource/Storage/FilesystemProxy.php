@@ -246,7 +246,7 @@ class FilesystemProxy
     public function delete(IStorage $storage): void
     {
         // Deleting the parent folder of the file deletes all of its transforms
-        $this->filesystem->delete(dirname(self::getPathFromHash($storage->getHash())));
+        $this->filesystem->deleteDirectory(dirname(self::getPathFromHash($storage->getHash())));
 
         // Do not delete storage record here
     }
