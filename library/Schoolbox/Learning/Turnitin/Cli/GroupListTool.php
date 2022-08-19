@@ -14,7 +14,6 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\Exception;
 
-
 /**
  * CLI Tool
  *
