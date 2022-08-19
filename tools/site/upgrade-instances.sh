@@ -138,6 +138,7 @@ function update_schoolbox_update_error_fact_file(){
   master_fact_file_name="schoolbox_update.json";
 
   log "Updating fact file for schoolbox_update_error";
+  mkdir -p /tmp/facter
 
   #overwrite fact file values with new values and write to temp fact file
   jq -s \
