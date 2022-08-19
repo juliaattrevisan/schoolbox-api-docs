@@ -139,14 +139,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = vagrant_box
   config.vm.box_url = "#{data_source}/#{vagrant_box}.box"
 
-  config.vm.network :private_network, ip: private_network_ip
+  # manual ip to prevent ip6 being assigned on networks that don't support them
+  config.vm.network :private_network, ip: private_network_ip, auto_config: false
+  config.vm.provision "shell", run: "always", inline: "ifconfig enp0s8 #{private_network_ip} netmask 255.255.255.0 up"
 
   if public_network
     if bridged_network_interface
-        config.vm.network "public_network", bridge: "#{bridged_network_interface}"
+        config.vm.network "public_network", bridge: "#{bridged_network_interface}", auto_config: false
     else
-        config.vm.network :public_network
+        config.vm.network :public_network, auto_config: false
     end
+    config.vm.provision "shell", run: "always", inline: "dhclient -4 enp0s9 && ifconfig enp0s9 up"
   end
 
   config.vm.provider :virtualbox do |vb|
