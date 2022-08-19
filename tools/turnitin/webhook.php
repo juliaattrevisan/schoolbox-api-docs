@@ -123,7 +123,7 @@ HELP;
          */
         try {
             $api->test();
-        } catch (\Exception $e) {
+        } catch (\Schoolbox\Learning\Turnitin\Exception\Exception $e) {
             $this->getLogger()->warning($e->getMessage());
             exit(1);
         }

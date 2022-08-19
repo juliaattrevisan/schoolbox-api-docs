@@ -12,6 +12,8 @@ namespace Schoolbox\Learning\Turnitin\Cli;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Exception\Exception;
+
 
 /**
  * CLI Tool
@@ -102,7 +104,7 @@ HELP;
          */
         try {
             $api->test();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->getLogger()->warning($e->getMessage());
             exit(1);
         }
