@@ -82,3 +82,13 @@ readOnly.args = {
     ...Default.args,
     isReadOnly: true,
 }
+
+export const editModal = Template.bind({});
+editModal.decorators = [
+    () => ({
+        template: `
+        <story />
+        <p style="margin: 1rem;"><em>To view a node with full info, navigate to Victorian Curriculum > The Arts > Dance > Level A > Explore and Express Ideas > Experience dance, safe movement possibilities and move their body parts intentionally in response to stimulus</em></p>
+        `
+    })
+];
