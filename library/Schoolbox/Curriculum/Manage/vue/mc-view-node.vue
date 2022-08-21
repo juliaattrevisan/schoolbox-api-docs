@@ -8,9 +8,8 @@
 import { computed } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useActiveNodesStore } from './store/mcActiveNodesStore';
-import { useSelectedNodeStore } from './store/mcSelectedNodeStore';
+import { useEditNodeStore } from './store/mcEditNodeStore';
 import { escapeRegExp } from '@js/util/jsUtils';
-import McSelectedNode from './selectedNode/mc-selected-node.vue';
 
 
 const props = defineProps({
@@ -39,7 +38,7 @@ const props = defineProps({
 
 const store = useStore();
 const activeNodesStore = useActiveNodesStore();
-const selectedNodeStore = useSelectedNodeStore();
+const editNodeStore = useEditNodeStore();
 
 /**
  * to gradually and more paddingLeft to indicate node level depth
@@ -83,7 +82,7 @@ const isVisible = computed(() => props.depth <= 1 || activeNodesStore.isOnLast);
  * to open up the edit modal
  */
 function onEditSelected () {
-    selectedNodeStore.set(props.node);
+    editNodeStore.set(props.node);
 }
 
 /**
@@ -91,7 +90,7 @@ function onEditSelected () {
  * using the selects in mc-header-select
  */
 function onNameSelected () {
-    selectedNodeStore.unset();
+    editNodeStore.unset();
     activeNodesStore.setNextSelected(props.node.id);
 }
 
@@ -168,13 +167,6 @@ const containerClass = computed(() => {
     }
 });
 
-/**
- * If this node is currently the selected one
- *
- * @returns { boolean }
- */
-const isSelectedNode = computed(() => selectedNodeStore.isActive && selectedNodeStore.node.id === props.node.id);
-
 </script>
 
 <template>
@@ -200,7 +192,6 @@ const isSelectedNode = computed(() => selectedNodeStore.isActive && selectedNode
                 <aside v-if="activeNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
             </button>
         </div>
-        <mc-selected-node v-if="isSelectedNode" />
         <ul v-if="hasChildren">
             <mc-view-node
                 v-for="node in props.node.children"

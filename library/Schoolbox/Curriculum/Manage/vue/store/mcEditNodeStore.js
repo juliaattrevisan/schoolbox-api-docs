@@ -5,7 +5,7 @@
 import { defineStore } from 'pinia';
 
 
-export const useSelectedNodeStore = defineStore('mcSelectedNodeStore', {
+export const useEditNodeStore = defineStore('mcEditNodeStore', {
 
     state: () => ({
         node: null, //the currently selected node
