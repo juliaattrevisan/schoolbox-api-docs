@@ -70,6 +70,7 @@ class Controller extends Base
             $this->determineOffset(),
             $ancestorCount,
             $descendantCount,
+            $this->request->query->getBool('topLevelOnly', false),
         );
         $this->response->content->set(
             $this->buildJsonOutput(
