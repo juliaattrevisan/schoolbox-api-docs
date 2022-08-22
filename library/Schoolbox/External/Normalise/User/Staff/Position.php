@@ -14,7 +14,6 @@ use Schoolbox\Collection;
 
 class Position
 {
-
     /**
      * Job position descriptions
      * This is usually a nice human-readable format of a person's position
