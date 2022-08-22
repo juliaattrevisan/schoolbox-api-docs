@@ -257,8 +257,6 @@ export default {
                     </p>
                 </template>
 
-                --{{this.cdnPrefix}} {{this.siteVersion}}--
-
                 <dynamic-input
                     :singular="'reason'"
                     :inputName="'reason['+award.badge.id+']'"
