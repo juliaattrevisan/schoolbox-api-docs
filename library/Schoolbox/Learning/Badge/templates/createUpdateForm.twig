@@ -260,7 +260,7 @@
                             <label for="curriculum-code-select">Curriculum Codes</label>
                             <div class="input-group">
                                 {% include 'sub/curriculumCodeSelector.twig' with {
-                                    codeList: badge and badge.curriculumNodes ? badge.curriculumNodes : [],
+                                    codeList: curriculumCodes,
                                     renderButton: true
                                 } %}
                             </div>
