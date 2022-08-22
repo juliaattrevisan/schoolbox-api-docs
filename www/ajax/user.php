@@ -141,8 +141,15 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                 if ($userSchoolbox && $emailVisible->isSatisfiedBy($userSchoolbox, $_SESSION['user'])) {
                     if ($userSchoolbox->getEmail()) {
                         $return[] = [
-                            'name' => $userSchoolbox->getFormattedEmailDisplay(),
-                            'id'   => $userSchoolbox->getFormattedEmailDisplay(),
+                            'name'        => $userSchoolbox->getFormattedEmailDisplay(),
+                            'id'          => $userSchoolbox->getFormattedEmailDisplay(),
+                            'first_name'  => $userSchoolbox->getFirstname(),
+                            'last_name'   => $userSchoolbox->getLastname(),
+                            'full_name'   => $userSchoolbox->formatName(),
+                            'role'        => $userSchoolbox->getRole()->getName(),
+                            'role_id'     => $userSchoolbox->getRole()->getId(),
+                            'roleType'    => $userSchoolbox->getRole()->getType(),
+                            'external_id' => $userSchoolbox->getExternalId(),
                         ];
                     }
                 }
@@ -173,7 +180,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                     'role' => $user['gname'],
                     'role_id' => $user['gid'],
                     'roleType' => $user['gtype'],
-                    'external_id' => $user['synergy_id']
+                    'external_id' => $user['synergy_id'],
                 ];
             }
         }
