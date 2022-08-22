@@ -247,13 +247,10 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         }
 
         $statement->execute();
-        return $this->hydrateList($statement, 'n')
-            ->map(function (Model $model) use ($ancestors) {
-                return $this->loadAncestors($model, 'parent', $ancestors);
-            })
-            ->map(function (Model $model) use ($descendants) {
-                return $this->loadDescendants($model, 'parent', 'children', $descendants);
-            });
+        $result = $this->hydrateList($statement, 'n');
+        $result = $this->loadAncestors($result, 'parent', $ancestors);
+        $result = $this->loadDescendants($result, 'parent', 'children', $descendants);
+        return $result;
     }
 
     /**
