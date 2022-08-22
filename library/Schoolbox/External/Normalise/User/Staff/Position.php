@@ -167,6 +167,6 @@ class Position
      */
     public function __toString(): string
     {
-        return implode(',', $this->description->getAll());
+        return implode(', ', $this->description->getAll());
     }
 }
