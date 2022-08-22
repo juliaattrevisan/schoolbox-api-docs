@@ -64,7 +64,7 @@
                                 <div class="input-group">
                                     {% include 'sub/curriculumCodeSelector.twig' with
                                         {
-                                            codeList: isCreate ? [] : evidence.curriculumNodes,
+                                            codeList: curriculumCodes ?? [],
                                             renderButton: true
                                         } %}
                                 </div>
