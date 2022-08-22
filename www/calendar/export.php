@@ -40,11 +40,11 @@ SitePage::extendExecutionTime();
  * Returns the config id for the specified calendar connector.
  *
  * @param string $className
- * @return Calendar_Api_Config_Record
+ * @return \Schoolbox\Collection
  * @throws InvalidArgumentException If `$className` isn't a `Calendar_Api_EventType_Interface`
  * @throws UnexpectedValueException If connector is not configured
  */
-function getConnector(string $className)
+function getConnectorConfigs(string $className)
 {
     // Must actually be a calendar class we're requesting
     if (!is_a($className, Calendar_Api_EventType_Interface::class, true)) {
@@ -57,17 +57,15 @@ function getConnector(string $className)
         );
     }
 
-    try {
-        $connectorConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass($className);
-    } catch (\Schoolbox\Mapper\Exception $e) {
+    $connectorConfigs = Calendar_Api_Config_Mapper::getInstance()->findAllForClass($className);
+
+    if (!$connectorConfigs->count()) {
         throw new UnexpectedValueException(
-            "Calendar connector configuration record is missing: $className",
-            $e->getCode(),
-            $e
+            "Calendar connector configuration record is missing: $className"
         );
     }
 
-    return $connectorConfig;
+    return $connectorConfigs;
 }
 
 /**
@@ -84,33 +82,34 @@ function getConnector(string $className)
  */
 function buildApiClass(string $class, array $params, bool $enabled, ?HubInterface $sentry): Calendar_Api_EventType_Interface
 {
+    $composite = new Calendar_Api_Composite();
+
     if (!$enabled) {
         // Not enabled; this is fine
-        return new Calendar_Api_Composite();
+        return $composite;
     }
 
     try {
-        $configuration = getConnector($class);
+        $configs = getConnectorConfigs($class);
     } catch (UnexpectedValueException $e) {
         // Config missing: this is fine
-        return new Calendar_Api_Composite();
+        return $composite;
     } catch (InvalidArgumentException $e) {
         // Invalid class: this is not fine, log to Sentry
         if ($sentry) {
             $sentry->captureException($e);
         }
-        return new Calendar_Api_Composite();
+        return $composite;
     }
 
-    if ($configuration->isActive()) {
-        // Active: build API class
-        $constructorParams = array_merge([$configuration->getId()], $params);
-        $reflectionClass   = new ReflectionClass($class);
-        return $reflectionClass->newInstanceArgs($constructorParams);
+    foreach ($configs as $config) {
+        if ($config->isActive()) {
+            $reflectionClass = new ReflectionClass($class);
+            $composite->add($reflectionClass->newInstanceArgs(array_merge([$config->getId()], $params)));
+        }
     }
 
-    // Inactive: this is fine
-    return new Calendar_Api_Composite();
+    return $composite;
 }
 
 // Always output here
