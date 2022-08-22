@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useActiveNodesStore } from './mcActiveNodesStore';
+import { useVisibleNodesStore } from './mcVisibleNodesStore';
 
 
 export const useNodesStore = defineStore('mcNodesStore', {
@@ -23,7 +23,7 @@ export const useNodesStore = defineStore('mcNodesStore', {
             this.nodes = {
                 children: nodes,
             }
-            const activeNodeStore = useActiveNodesStore();
+            const activeNodeStore = useVisibleNodesStore();
             activeNodeStore.reset();
             if (activeNodeStore.hasSingleCurriculum) {
                 activeNodeStore.setSelected(0, this.nodes.children[0].id);

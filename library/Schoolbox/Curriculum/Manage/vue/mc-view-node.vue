@@ -7,7 +7,7 @@
 
 import { computed } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
-import { useActiveNodesStore } from './store/mcActiveNodesStore';
+import { useVisibleNodesStore } from './store/mcVisibleNodesStore';
 import { useEditNodeStore } from './store/mcEditNodeStore';
 import { escapeRegExp } from '@js/util/jsUtils';
 
@@ -37,7 +37,7 @@ const props = defineProps({
 });
 
 const store = useStore();
-const activeNodesStore = useActiveNodesStore();
+const visibleNodesStore = useVisibleNodesStore();
 const editNodeStore = useEditNodeStore();
 
 /**
@@ -61,9 +61,9 @@ const hasCode = computed(() => props.node.code && props.node.code !== '');
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    if (props.depth === 0 && !activeNodesStore.isSearchActive) {
+    if (props.depth === 0 && !visibleNodesStore.isSearchActive) {
         return true;
-    } else if (activeNodesStore.isOnLast) { //cant select any further down from the MAX_DEPTH
+    } else if (visibleNodesStore.isOnLast) { //cant select any further down from the MAX_DEPTH
         return true;
     } else {
         return false;
@@ -76,7 +76,7 @@ const isDisabled = computed(() => {
  *
  * @returns { Boolean }
  */
-const isVisible = computed(() => props.depth <= 1 || activeNodesStore.isOnLast);
+const isVisible = computed(() => props.depth <= 1 || visibleNodesStore.isOnLast);
 
 /**
  * to open up the edit modal
@@ -91,7 +91,7 @@ function onEditSelected () {
  */
 function onNameSelected () {
     editNodeStore.unset();
-    activeNodesStore.setNextSelected(props.node.id);
+    visibleNodesStore.setNextSelected(props.node.id);
 }
 
 /**
@@ -114,7 +114,7 @@ const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.
  * @returns { HTML }
  */
 const highlightTitleSearch = computed(() => {
-    if (activeNodesStore.isSearchActive) {
+    if (visibleNodesStore.isSearchActive) {
         return highlightSearchInElement(title.value);
     } else {
         return title.value;
@@ -127,7 +127,7 @@ const highlightTitleSearch = computed(() => {
  * @returns { HTML }
  */
 const highlightBreadcrumbSearch = computed(() => {
-    if (activeNodesStore.isSearchActive && props.node.breadcrumb) {
+    if (visibleNodesStore.isSearchActive && props.node.breadcrumb) {
         return highlightSearchInElement(props.node.breadcrumb);
     } else {
         return '';
@@ -144,7 +144,7 @@ const highlightBreadcrumbSearch = computed(() => {
  */
 function highlightSearchInElement (toHighlight) {
     let highlighted = toHighlight;
-    activeNodesStore.queryWordList.forEach((wordInSearch) => {
+    visibleNodesStore.queryWordList.forEach((wordInSearch) => {
         highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
             return `<mark>${match}</mark>`;
         });
@@ -158,7 +158,7 @@ function highlightSearchInElement (toHighlight) {
  * @returns { String }
  */
 const containerClass = computed(() => {
-    if (activeNodesStore.isSearchActive) { //don't style when using search, as all the nodes are on one level
+    if (visibleNodesStore.isSearchActive) { //don't style when using search, as all the nodes are on one level
         return '';
     } else if (props.depth === 0) {
         return 'parent-container';
@@ -189,7 +189,7 @@ const containerClass = computed(() => {
                 @keyup.enter="onNameSelected"
             >
                 <span v-html="highlightTitleSearch"></span>
-                <aside v-if="activeNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
+                <aside v-if="visibleNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
             </button>
         </div>
         <ul v-if="hasChildren">

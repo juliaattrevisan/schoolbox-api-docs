@@ -7,12 +7,12 @@
 
 import { ref, computed, watch } from 'vue';
 import { useNodesStore } from './store/mcNodesStore';
-import { useActiveNodesStore } from './store/mcActiveNodesStore';
+import { useVisibleNodesStore } from './store/mcVisibleNodesStore';
 import McViewNode from './mc-view-node.vue'
 
 
 const nodesStore = useNodesStore();
-const activeNodesStore = useActiveNodesStore();
+const visibleNodesStore = useVisibleNodesStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
 const nodesContainerEl = ref(null); //to scroll back to top on any selection change
 
@@ -32,20 +32,20 @@ const parentNodeTitles = computed(() => {
  *
  * @returns { String }
  */
-const currentSelectedNodeTitle = computed(() => activeNodesStore.nodes[0].name);
+const currentSelectedNodeTitle = computed(() => visibleNodesStore.nodes[0].name);
 
 /**
  * Clear the current search query
  */
 function onClearSearchSelected () {
-    activeNodesStore.clearSearch();
+    visibleNodesStore.clearSearch();
 }
 
 /**
  * to scroll back to top on any selection change, otherwise the
  * scroll may be at the bottom on change, which is a bit odd
  */
-watch(() => activeNodesStore.nodesWithSearch, () => {
+watch(() => visibleNodesStore.nodesWithSearch, () => {
     if (nodesContainerEl.value) { //may not always exists in the dom
         nodesContainerEl.value.scrollTop = 0;
     }
@@ -55,18 +55,18 @@ watch(() => activeNodesStore.nodesWithSearch, () => {
 </script>
 
 <template>
-    <div v-if="activeNodesStore.isInactive" class="empty-state">
+    <div v-if="visibleNodesStore.isInactive" class="empty-state">
         <i class="icon-curriculum"></i>
         <p>To start viewing a Curriculum, first select from either: {{ parentNodeTitles }}.</p>
     </div>
-    <div v-else-if="activeNodesStore.hasNoSearchResults" class="empty-state">
+    <div v-else-if="visibleNodesStore.hasNoSearchResults" class="empty-state">
         <i class="icon-curriculum"></i>
         <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
         <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
     </div>
     <ul v-else ref="nodesContainerEl">
         <mc-view-node
-            v-for="node in activeNodesStore.nodesWithSearch"
+            v-for="node in visibleNodesStore.nodesWithSearch"
             :key="node.id"
             :node="node"
             :depth="depth"

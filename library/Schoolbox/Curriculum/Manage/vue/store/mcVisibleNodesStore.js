@@ -1,5 +1,5 @@
 /**
- * Manages the currently active codes in the view
+ * Manages the currently visible codes in the viewleNodesStore
  * those filtered by both <select> and also the search <input>
  */
 
@@ -11,7 +11,7 @@ const UNSET_ID = 0;
 const MIN_QUERY_LENGTH = 3;
 const MAX_DEPTH = 6; //dont traverse any further down than 6 levels
 
-export const useActiveNodesStore = defineStore('mcActiveNodesStore', {
+export const useVisibleNodesStore = defineStore('mcVisibleNodesStore', {
 
     state: () => ({
         idList: [], //ids of the selected nodes

@@ -5,10 +5,10 @@
  * move further down the curriculum nodes
  */
 
-import { useActiveNodesStore } from './store/mcActiveNodesStore';
+import { useVisibleNodesStore } from './store/mcVisibleNodesStore';
 
 
-const activeNodesStore = useActiveNodesStore();
+const visibleNodesStore = useVisibleNodesStore();
 
 /**
  * to display the just selected node
@@ -17,7 +17,7 @@ const activeNodesStore = useActiveNodesStore();
  * @param { Event }
  */
 function onNodeChanged (depth, event) {
-    activeNodesStore.setSelected(depth, parseInt(event.target.value));
+    visibleNodesStore.setSelected(depth, parseInt(event.target.value));
 }
 
 </script>
@@ -25,16 +25,16 @@ function onNodeChanged (depth, event) {
 <template>
     <div class="nodes-container">
         <select
-            v-for="(id, index) in activeNodesStore.listsLimited"
+            v-for="(id, index) in visibleNodesStore.listsLimited"
             @change="onNodeChanged(index, $event)"
             :key="index"
-            :disabled="index === 0 && activeNodesStore.hasSingleCurriculum"
+            :disabled="index === 0 && visibleNodesStore.hasSingleCurriculum"
         >
             <option
-                v-for="node in activeNodesStore.getChildrenAt(index)"
+                v-for="node in visibleNodesStore.getChildrenAt(index)"
                 :key="node.id"
                 :value="node.id"
-                :selected="activeNodesStore.idList[index] === node.id"
+                :selected="visibleNodesStore.idList[index] === node.id"
             >
                 {{ node.name }}
             </option>
