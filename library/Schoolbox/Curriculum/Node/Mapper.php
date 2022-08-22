@@ -190,11 +190,29 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $sortDirection = 'DESC'
     ) {
         // Load all ancestors, no descendants
-        return $this->findByKeyword($keyword, $limit, $offset, 50, 0);
+        return $this->findByKeyword($keyword, $limit, $offset, 50, 0, false);
     }
 
-    public function findByKeyword($keyword, $limit, $offset, $ancestors, $descendants)
-    {
+    /**
+     * Find all nodes which match a keyword.
+     *
+     * @param string $keyword      The keyword to search for
+     * @param int    $limit        The max number of nodes to return
+     * @param int    $offset       The number of matching nodes to skip in the
+     *                             result
+     * @param int    $ancestors    How many levels of parent node to include
+     * @param int    $descendants  How many levels of child node to include
+     * @param bool   $topLevelOnly If true, return only nodes with no parent
+     * @return Collection|Model[]
+     */
+    public function findByKeyword(
+        string $keyword,
+        int $limit,
+        int $offset,
+        int $ancestors,
+        int $descendants,
+        bool $topLevelOnly,
+    ): Collection {
         $query = "
             SELECT
                 {$this->getColumnString('n')}
@@ -202,6 +220,10 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             WHERE n.deleted_at IS NULL
             AND   (n.code LIKE :codeLike OR (n.code != '' AND n.name LIKE :nameLike))
         ";
+        if ($topLevelOnly) {
+            $query .= ' AND n.curriculum_node_parent_id IS NULL';
+        }
+
         $quotedLike = $this->getDatabase()->getQuoter()->escapeForLike($keyword);
         $params     = [
             'codeLike' => $quotedLike . '%',
@@ -218,20 +240,17 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             $statement->bindValue($param, $value);
         }
         if ($limit > 0) {
-            $statement->bindValue('limit', (int) $limit, \PDO::PARAM_INT);
+            $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
         }
         if ($offset) {
-            $statement->bindValue('offset', (int) $offset, \PDO::PARAM_INT);
+            $statement->bindValue('offset', $offset, \PDO::PARAM_INT);
         }
 
         $statement->execute();
-        return $this->hydrateList($statement, 'n')
-            ->map(function (Model $model) use ($ancestors) {
-                return $this->loadAncestors($model, 'parent', $ancestors);
-            })
-            ->map(function (Model $model) use ($descendants) {
-                return $this->loadDescendants($model, 'parent', 'children', $descendants);
-            });
+        $result = $this->hydrateList($statement, 'n');
+        $result = $this->loadAncestors($result, 'parent', $ancestors);
+        $result = $this->loadDescendants($result, 'parent', 'children', $descendants);
+        return $result;
     }
 
     /**
