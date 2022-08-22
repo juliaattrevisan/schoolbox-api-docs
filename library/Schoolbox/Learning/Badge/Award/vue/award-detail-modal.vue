@@ -238,6 +238,11 @@ export default {
 
                 <article v-html="award.badge.body"></article>
 
+                <template v-if="award.reason.length">
+                    <hr />
+                    <article v-html="award.reason"></article>
+                </template>
+
                 <template v-if="award.badge.curriculumNodes.length">
                     <hr />
                     <p class="meta">
