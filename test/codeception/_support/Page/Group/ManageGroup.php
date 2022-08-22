@@ -3,6 +3,7 @@
 namespace Page\Group;
 
 use AcceptanceTester;
+use Codeception\Util\Locator;
 
 class ManageGroup
 {
@@ -10,6 +11,7 @@ class ManageGroup
     public const URL_GROUP_ID = '{group_id}';
 
     public const SUBMIT_BUTTON = 'input[type=submit][value=Submit]';
+    public const UPDATE_BUTTON = 'button.button.submit';
 
 
     /**
@@ -55,5 +57,13 @@ class ManageGroup
     public function clickSubmitButton(): void
     {
         $this->tester->click(self::SUBMIT_BUTTON);
+    }
+
+    /**
+     * click modal update button
+     */
+    public function clickUpdateButton(): void
+    {
+        $this->tester->click(Locator::lastElement(self::UPDATE_BUTTON));
     }
 }

@@ -7,8 +7,8 @@ use Exception;
 
 class CreateFolder
 {
-
     public const URL = '/resource/folder/0/create';
+    public const URL_RESOURCES = '/resources';
     public const FOLDER_NAME = 'name';
     public const HOMEPAGE_TEMPLATE = 'template';
     public const CREATE_GROUP = 'label[for=groupcheck]';

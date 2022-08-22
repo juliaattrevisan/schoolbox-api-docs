@@ -210,6 +210,8 @@ class CreateAndVerifyCest
         $i->amGoingTo("Fill in form values with composite audience: 4 roles and 2 campuses + team and year level");
         $timestamp = time();
         $headline     = "Acceptance Test News Composite Audience Article Testing " . $timestamp;
+        $i->impersonateAnyUser('Jack Coles');
+        $i->amOnPage($formPage->generateCreateRoute());
         $formPage
             ->fillHeadline($headline)
             ->createCompositeAudience('Team', 'Year Level', ['primary-IjEi', 'secondary-Ijki']);
@@ -277,8 +279,13 @@ class CreateAndVerifyCest
     {
 
         $this->createFolder($i);
+        $createFolder = new createFolder($i);
+        $i->impersonateAnyUser('Jack Coles');
         $i->amGoingTo("Navigate to the class page");
+        $i->amOnPage($createFolder::URL_RESOURCES);
         $i->click('News Folder Test');
+        $i->click('Homepage');
+        $i->amGoingTo("Add a News component into the page");
         $homepage = new Homepage($i);
         $homepage->addComponent(Homepage::ELEMENT_ADD_COMPONENT_SECTION_INFORMATION, 'News');
         // Enter content into the new component
@@ -313,6 +320,16 @@ class CreateAndVerifyCest
         $itemPage->modifyArticle();
         $formPage->seeRoles(['News Folder Test','Teacher','Eden Reed']);
         $formPage->submit();
+        $formPage->seeRoles(['News Folder Test','Teacher','AWAITING MODERATION']);
+        $i->amGoingTo("Approve the article pending moderation and check its audience");
+        $i->impersonateAnyUser('Schoolbox Admin');
+        $i->amOnPage('/news/moderation');
+        $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Audience Article via Class Page Testing');
+        $i->click($element);
+        $i->click('#article-submit');
+        $i->amOnPage('/news');
+        $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Audience Article via Class Page Testing');
+        $i->click($element);
         $formPage->seeRoles(['News Folder Test','Teacher','PUBLISHED']);
     }
 
@@ -347,8 +364,9 @@ class CreateAndVerifyCest
         $createFolder->clickCreateGroupToggle();
         $createFolder->clickCreateFolderButton();
         $manageGroup->waitManageGroupTitleToBePresented();
-        $manageGroup->clickTab('settings');
+        $i->click('#content a.icon-more');
+        $i->click('#updateGroupSettings');
         $manageGroup->setAccessPermission('type-3');
-        $manageGroup->clickSubmitButton();
+        $manageGroup->clickUpdateButton();
     }
 }
