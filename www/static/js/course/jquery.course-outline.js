@@ -154,7 +154,7 @@
         // Save to course actions
         $(document).on(
             'click.courseInstance',
-            '[data-action=save-to-course-cancel]',
+            '[data-related-component="'+component_id+'"][data-action=save-to-course-cancel]',
             function (event) {
                 event.preventDefault();
                 let $element = $(this),
@@ -164,7 +164,7 @@
         );
         $(document).on(
             'click.courseInstance',
-            '[data-action=save-to-course]',
+            '[data-related-component="'+component_id+'"][data-action=save-to-course]',
             function (event) {
                 event.preventDefault();
 
@@ -191,7 +191,7 @@
                         $element.attr('data-spec-assessment-id', data.id);
                         $element.attr('data-spec-assessment-title', data.title);
                         $element.attr('data-method', 'PUT');
-                        document.window.reload();
+                        window.location.reload();
                     })
                     .fail(function () {
                         $toaster.toastTimeout({
