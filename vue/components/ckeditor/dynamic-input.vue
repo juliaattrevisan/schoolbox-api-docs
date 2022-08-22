@@ -34,6 +34,12 @@ export default {
             type: String,
             required: true
         },
+        /* The existing textarea content to prefill
+         */
+        value: {
+            type: String,
+            required: false
+        },
         isProcessing: {
             type: Boolean,
             required: true,
@@ -190,15 +196,15 @@ export default {
 </script>
 
 <template>
-   <div class="add-commment-input">
-       <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="onAddSelected">{{ getAddButtonText }}</button>
+    <div class="add-commment-input">
+        <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="onAddSelected">gg{{ getAddButtonText }}</button>
         <div :style="getStyles">
-            <textarea :id="`dynamic-input-${uniqueId}`" :name="this.inputName" rows="4"></textarea>
+            <textarea :id="`dynamic-input-${uniqueId}`" :name="this.inputName" rows="4">{{ this.value }}</textarea>
             <button class="button submit"
                 @click="postItem"
                 :disabled="isPostDisabled">Post {{ this.singular }}</button>
         </div>
-   </div>
+    </div>
 </template>
 
 <style lang="scss" scoped>

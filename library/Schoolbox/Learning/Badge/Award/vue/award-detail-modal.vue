@@ -242,10 +242,14 @@ export default {
 
                 <article v-html="award.badge.body"></article>
 
-                <template v-if="award.reason.length">
-                    <hr />
-                    <article v-html="award.reason"></article>
-                </template>
+                <dynamic-input
+                    :singular="'reason'"
+                    :inputName="'reason['+award.badge.id+']'"
+                    :value="award.reason"
+                    :cdn-prefix="this.cdnPrefix"
+                    :is-processing="true"
+                    :site-version="this.siteVersion"
+                ></dynamic-input>
 
                 <template v-if="award.badge.curriculumNodes.length">
                     <hr />
@@ -256,14 +260,6 @@ export default {
                         </template>
                     </p>
                 </template>
-
-                <dynamic-input
-                    :singular="'reason'"
-                    :inputName="'reason['+award.badge.id+']'"
-                    :cdn-prefix="this.cdnPrefix"
-                    :is-processing="true"
-                    :site-version="this.siteVersion"
-                ></dynamic-input>
 
                 <div class="component-action">
                     <section>
