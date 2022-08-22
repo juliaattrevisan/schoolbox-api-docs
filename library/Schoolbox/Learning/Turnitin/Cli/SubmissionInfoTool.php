@@ -96,7 +96,7 @@ HELP;
 
             $stack = [];
 
-            foreach($ids as $id) {
+            foreach ($ids as $id) {
                 $stack[] = "{$id}%";
             }
 
