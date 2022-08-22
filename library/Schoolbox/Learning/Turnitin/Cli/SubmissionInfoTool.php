@@ -154,6 +154,7 @@ HELP;
             /* Pump to cli for visual inspection
              */
             $turnitinSubmissionInfo = $api->retrieve('GET', "/api/v1/submissions/{$report->getTurnitinSubmissionId()}", []);
+            $turnitinReportInfo = $api->retrieve('GET', "/api/v1/submissions/{$report->getTurnitinSubmissionId()}/similarity", []);
 
             $this->getLogger()->debug(sprintf(
                 'Turnitin report id %s',
@@ -163,6 +164,8 @@ HELP;
             /* There isn't a convenient way to dump all this
              */
             print_r($turnitinSubmissionInfo);
+            print_r($turnitinReportInfo);
+            print_r("\n");
         }
 
         exit();
