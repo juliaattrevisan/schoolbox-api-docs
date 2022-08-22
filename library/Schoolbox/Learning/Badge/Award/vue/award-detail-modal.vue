@@ -9,7 +9,8 @@ import axios from 'axios';
 import { animateBadgeImage } from '../js/animateBadgeImage'
 import { ResizeObserver } from 'vue3-resize';
 import 'vue3-resize/dist/vue3-resize.css';
-
+import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 /**
  * Award detail modal.
@@ -33,6 +34,7 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
+        cdnPrefixMixin,
         goalMixin,
         toastMixin,
         userProfileMixin
@@ -43,8 +45,9 @@ export default {
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-    ],
+    props: {
+        siteVersion: String
+    },
 
     /**
      * Components.
@@ -56,6 +59,7 @@ export default {
         RelativeTime,
         RevealModal,
         ResizeObserver, //to track any size changes to the parent container
+        DynamicInput
     },
 
     /**
@@ -252,6 +256,16 @@ export default {
                         </template>
                     </p>
                 </template>
+
+                --{{this.cdnPrefix}} {{this.siteVersion}}--
+
+                <dynamic-input
+                    :singular="'reason'"
+                    :inputName="'reason['+award.badge.id+']'"
+                    :cdn-prefix="this.cdnPrefix"
+                    :is-processing="true"
+                    :site-version="this.siteVersion"
+                ></dynamic-input>
 
                 <div class="component-action">
                     <section>
