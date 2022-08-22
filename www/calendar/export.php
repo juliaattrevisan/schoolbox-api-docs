@@ -71,29 +71,6 @@ function getConnector(string $className)
 }
 
 /**
- * Returns configs for all VCal calendar connectors.
- *
- * @param string $className
- * @return Calendar_Api_Config_Record[]|Collection
- * @throws InvalidArgumentException If `$className` isn't a `Calendar_Api_EventType_Interface`
- */
-function getVCalConfigs(string $className): Collection|array
-{
-    // Must actually be a calendar class we're requesting.
-    if (!is_a($className, Calendar_Api_EventType_Interface::class, true)) {
-        throw new InvalidArgumentException(
-            sprintf(
-                'Calendar connector class does not exist, or is not a %s: %s',
-                Calendar_Api_EventType_Interface::class,
-                $className
-            )
-        );
-    }
-
-    return Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords()->filterBy('connectorClass', 'Vcal');
-}
-
-/**
  * Builds an API class.
  *
  * @todo move this to a factory class; but there already is one, Calendar_Api_Factory
@@ -128,28 +105,6 @@ function buildApiClass(string $class, array $params, bool $enabled, ?HubInterfac
     if ($configuration->isActive()) {
         // Active: build API class
         $constructorParams = array_merge([$configuration->getId()], $params);
-        $reflectionClass   = new ReflectionClass($class);
-        return $reflectionClass->newInstanceArgs($constructorParams);
-    }
-
-    // Inactive: this is fine
-    return new Calendar_Api_Composite();
-}
-
-/**
- * Builds an API class given a VCal connector
- *
- * @param Calendar_Api_Config_Record $vcalConfig
- * @param string                     $class  The class to build
- * @param array                      $params Params to pass into its constructor
- * @return Calendar_Api_EventType_Interface
- * @throws ReflectionException if $class doesn't exist
- */
-function buildApiClassFromVCalConfig(Calendar_Api_Config_Record $vcalConfig, string $class, array $params): Calendar_Api_EventType_Interface
-{
-    if ($vcalConfig->isActive()) {
-        // Active: build API class
-        $constructorParams = array_merge([$vcalConfig->getId()], $params);
         $reflectionClass   = new ReflectionClass($class);
         return $reflectionClass->newInstanceArgs($constructorParams);
     }
@@ -637,15 +592,14 @@ try {
                 );
                 $api->add($subApi);
 
-                //build vcal sources
-                foreach (getVCalConfigs(Calendar_Api_EventType_Event_Vcal_Default::class) as $connector) {
-                    $subApi = buildApiClassFromVCalConfig(
-                        $connector,
-                        Calendar_Api_EventType_Event_Vcal_Default::class,
-                        [ $user, $viewer ]
-                    );
-                    $api->add($subApi);
-                }
+                //build vcal source
+                $subApi = buildApiClass(
+                    Calendar_Api_EventType_Event_Vcal_Default::class,
+                    [ $user, $viewer ],
+                    true,
+                    $sentry
+                );
+                $api->add($subApi);
 
                 /* Fixtures
                  */
