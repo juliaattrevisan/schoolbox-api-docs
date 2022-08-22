@@ -1,11 +1,11 @@
 /**
- * Manage the currently selected curriculum codes
+ * Manage the currently selected curriculum node
  */
 
 import { defineStore } from 'pinia';
 
 
-export const useEditNodeStore = defineStore('mcEditNodeStore', {
+export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
 
     state: () => ({
         node: null, //the currently selected node

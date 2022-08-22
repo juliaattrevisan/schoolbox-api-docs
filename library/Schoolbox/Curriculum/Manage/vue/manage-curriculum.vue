@@ -8,10 +8,10 @@
 import { onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useVisibleNodesStore } from './store/mcVisibleNodesStore';
-import { useEditNodeStore } from './store/mcEditNodeStore';
+import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';
-import McEditNode from './edit/mc-edit-node.vue';
+import McActiveNode from './activeNode/mc-active-node.vue';
 
 
 const props = defineProps({
@@ -53,7 +53,7 @@ function checkForStorybook () {
     if (typeof STORYBOOK_ENV !== 'undefined') {
         useStore().$reset();
         useVisibleNodesStore().$reset();
-        useEditNodeStore().$reset();
+        useActiveNodeStore().$reset();
     }
 }
 
@@ -62,7 +62,7 @@ function checkForStorybook () {
 <template>
     <mc-header />
     <mc-view />
-    <mc-edit-node />
+    <mc-active-node />
 </template>
 
 <style lang="scss" scoped>

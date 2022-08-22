@@ -8,7 +8,7 @@
 import { computed } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useVisibleNodesStore } from './store/mcVisibleNodesStore';
-import { useEditNodeStore } from './store/mcEditNodeStore';
+import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import { escapeRegExp } from '@js/util/jsUtils';
 
 
@@ -38,7 +38,7 @@ const props = defineProps({
 
 const store = useStore();
 const visibleNodesStore = useVisibleNodesStore();
-const editNodeStore = useEditNodeStore();
+const editNodeStore = useActiveNodeStore();
 
 /**
  * to gradually and more paddingLeft to indicate node level depth

@@ -5,11 +5,11 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useEditNodeStore } from '../store/mcEditNodeStore';
+import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const editNodeStore = useEditNodeStore();
+const editNodeStore = useActiveNodeStore();
 const modalEl = ref(null);
 
 /**
