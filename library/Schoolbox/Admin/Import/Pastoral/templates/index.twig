@@ -18,13 +18,10 @@
             }
         });
 
-        $('#defaultOwner').selectizeSelector({
+        $('#defaultOwner').userSelectizeSelector({
             multiple: false,
             ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
                 data:     {roleTypeID: 'staff'},
-                dataType: 'json'
             }
         });
     });

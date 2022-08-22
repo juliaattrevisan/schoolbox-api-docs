@@ -27,12 +27,9 @@
             })
 
             // Add selectize for user selection and selector for related items
-            form.find('select#resource-moderator-selector').selectizeSelector({
+            form.find('select#resource-moderator-selector').userSelectizeSelector({
                 ajax: {
-                    url:      '/ajax/user.php',
-                    type:     'GET',
                     data:     {roleTypeID: 'staff'},
-                    dataType: 'json'
                 },
                 multiple: true,
                 value: {{ moderatorList|json_encode|raw }}

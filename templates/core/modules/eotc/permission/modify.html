@@ -3,12 +3,9 @@
 <script type="text/javascript" src="{CDN_PREFIX}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
 	$(function () {
-		$('#staff-suggest').selectizeSelector({
+		$('#staff-suggest').userSelectizeSelector({
 			ajax: {
-				url: '/ajax/user.php',
-				type: 'GET',
 				data: { roleTypeID: 'staff', showCampus: true },
-				dataType: 'json'
 			},
 			multiple: false
 		});

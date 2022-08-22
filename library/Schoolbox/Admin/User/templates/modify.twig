@@ -987,13 +987,10 @@
         var addUserButton = $(addUserSelector.prop('form')).find(':submit');
 
         addUserSelector
-            .selectizeSelector({
+            .userSelectizeSelector({
                 multiple: true,
                 ajax: {
-                    url: '/ajax/user.php',
-                    type: 'GET',
                     data: {groupID: 0},
-                    dataType: 'json'
                 }
             })
             .on('selectize.item_add', function () {

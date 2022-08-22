@@ -29,10 +29,7 @@
 
         var options = {
             ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {groupID: 0, email: 1},
-                dataType: 'json'
+                data: {groupID: 0, email: 1},
             },
             multiple: true,
             selectize: {
@@ -88,9 +85,9 @@
             return false;
         }
 
-        $('#to').selectizeSelector($.extend({}, options, {value: {{ replyTo | raw }}}))
-        $('#cc').selectizeSelector($.extend({}, options, {value: {{ cc | raw }}}))
-        $('#bcc').selectizeSelector($.extend({}, options, {value: {{ bcc | raw }}}))
+        $('#to').userSelectizeSelector($.extend({}, options, {value: {{ replyTo | raw }}}))
+        $('#cc').userSelectizeSelector($.extend({}, options, {value: {{ cc | raw }}}))
+        $('#bcc').userSelectizeSelector($.extend({}, options, {value: {{ bcc | raw }}}))
 
         // dialogs for copying email fields
         $('[data-role="copy-emails"]').each(function(index, element) {

@@ -728,13 +728,10 @@
 
         {# Setup selectize boxes #}
 
-        $('#filterStudents').selectizeSelector({
+        $('#filterStudents').userSelectizeSelector({
             multiple: true,
             ajax: {
-                url: '/ajax/user.php',
-                type: 'GET',
                 data: {roleTypeID: 'student'},
-                dataType: 'json'
             },
             value: [
                 {% for student in studentsSelected %}
@@ -773,13 +770,10 @@
             ]
         });
 
-        $('#filterAuthors').selectizeSelector({
+        $('#filterAuthors').userSelectizeSelector({
             multiple: true,
             ajax: {
-                url: '/ajax/user.php',
-                type: 'GET',
                 data: {roleTypeID: 'staff'},
-                dataType: 'json'
             },
             value: [
                 {% for author in authorsSelected %}
