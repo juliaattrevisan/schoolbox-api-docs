@@ -63,6 +63,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
      * @param array|null $allowedEventTypes
      * @return Collection
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException if RoomCode from external system is invalid.
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): Collection
     {
@@ -86,6 +87,15 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
             $currentTime->setTimestamp($currentTimestamp);
             // Get the definition for this day only.
             foreach ($roomTimetable as $room) {
+                $room['RoomCode'] = trim($room['RoomCode']); // Some external systems return room codes with trailing spaces.  Issue found in SA-14054.
+
+                if (!array_key_exists(strtolower($room['RoomCode']), $resourceLookUp)) {
+                    // The room code received from the external system is invalid, so we just ignore it.
+                    continue;
+                }
+
+                $resourceIdMatchingRoomCode = $resourceLookUp[strtolower($room['RoomCode'])];
+
                 // What's the day number for the campus that has booked this room?
                 // If for some reason I can't find it, get timetable for a null campus
                 $timetableCode = $room['TimetableGroup'];
@@ -155,7 +165,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $event->setPublishDate(null);
                 $event->setTitle($room['Description'] . (!empty((string)$room['ClassCode']) ? ' (' . $room['ClassCode'] . ')' : ''));
                 $event->setCampusList($campusId);
-                $event->setResourceId($resourceLookUp[strtolower($room['RoomCode'])]);
+                $event->setResourceId($resourceIdMatchingRoomCode]);
 
                 // Load room and category if they aren't already there.
                 $userExternalId = $room['StaffID'];
