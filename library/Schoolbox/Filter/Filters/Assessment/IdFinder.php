@@ -19,6 +19,7 @@ use Schoolbox\Filter\Filters\Assessment\WorkType;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType;
 use Schoolbox\Filter\Mapper;
 use Schoolbox\IMapper;
+use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
 
@@ -58,7 +59,6 @@ use function implode;
  */
 class IdFinder extends Filter\AbstractIdFinder
 {
-
     // Which date column does the term filter relate to?
     private const DATE_COL_DUE = 'due_date';
     private const DATE_COL_CLS = 'close_date';
@@ -74,7 +74,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    protected function buildQuery(array $completeFilters, bool $deleted): array
+    protected function buildQuery(array $completeFilters, User $user, bool $deleted): array
     {
         // Filters which effect which sub-queries are required
         $teacherFolderIds      = $completeFilters[Folder\TeacherInvolved\Definition::class];

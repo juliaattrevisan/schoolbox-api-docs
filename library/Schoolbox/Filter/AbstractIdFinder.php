@@ -9,20 +9,19 @@
 namespace Schoolbox\Filter;
 
 use Alaress\Database\Predicate\InvalidColumnException;
-
-use function array_map;
-
 use Schoolbox\Collection;
+use Schoolbox\User;
 use Schoolbox\IMapper;
 use UnderflowException;
 use UnexpectedValueException;
+
+use function array_map;
 
 /**
  * Logic common to all IdFinders
  */
 abstract class AbstractIdFinder implements IdFinder
 {
-
     /** @var static[] $instance */
     private static $instance = [];
 
@@ -71,7 +70,7 @@ abstract class AbstractIdFinder implements IdFinder
     /**
      * @inheritdoc
      */
-    public function findIdsByFilters(array $filters = [], bool $deleted = false): array
+    public function findIdsByFilters(array $filters, User $user, bool $deleted = false): array
     {
         // No filters ?
         if (0 === count($filters)) {
@@ -89,7 +88,7 @@ abstract class AbstractIdFinder implements IdFinder
         // Can we simplify filters using set theory?
         $completeFilters = $this->simplifyFilters($completeFilters);
 
-        [$query, $params] = $this->buildQuery($completeFilters, $deleted);
+        [$query, $params] = $this->buildQuery($completeFilters, $user, $deleted);
         $idStatement = $this->getMapper()->getDatabase()->query($query, $params);
         $ids         = array_column($idStatement->fetchAll(), $this->getMapper()->getIdentifierColumn());
 
@@ -196,12 +195,13 @@ abstract class AbstractIdFinder implements IdFinder
     /**
      * Protected so we can call from child unit-testing class
      *
-     * @param Collection[]|null[]|mixed[][] $completeFilters
-     * @param bool                          $deleted Whether to include soft-deleted entities
+     * @param Collection[]|null[]|mixed[][] $completeFilters The full set of filters
+     * @param User                          $user            The user to query in the context of
+     * @param bool                          $deleted         Whether to include soft-deleted entities
      * @return mixed[]                      [$query, $params]
      * @throws BrokenFilterException If a filter SQL fragment cannot be built
      */
-    abstract protected function buildQuery(array $completeFilters, bool $deleted): array;
+    abstract protected function buildQuery(array $completeFilters, User $user, bool $deleted): array;
 
 
     /* Getters

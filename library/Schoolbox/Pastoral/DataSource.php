@@ -108,6 +108,22 @@ class DataSource
 
 
     /**
+     * User-sensitive wrapper for `Mapper::findByColumnList`.
+     *
+     * @param User  $currentUser
+     * @param array $columnList
+     * @return GenericCollection<Model>
+     */
+    public function findByColumnList(User $currentUser, array $columnList): GenericCollection
+    {
+        return $this->accessLevelCensor->filterRecordsForUser(
+            $this->mapper->findByColumnList($columnList),
+            $currentUser,
+        );
+    }
+
+
+    /**
      * Finds a count of records for a particular student visible to the given viewer
      * @param User     $viewer    Who is viewing this student's records
      * @param int      $studentId Id of a student being viewed

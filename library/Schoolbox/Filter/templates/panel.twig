@@ -661,13 +661,13 @@ Usage:
                     // Filter is being applied, add its name and selected option labels.
                     $selected.each(function(idx, elem) {
                         let $elem = $(elem),
-                            label = null,
-                            value = null;
+                            label = $elem.attr('data-label-in-summary'),
+                            value;
                         if ($elem.is('option')) {
-                            label = $elem.text();
+                            label = label ? label : $elem.text();
                             value = $elem.val();
                         } else {
-                            label = $component.find('label[for='+$elem.attr('id')+']').html();
+                            label = label ? label : $component.find('label[for='+$elem.attr('id')+']').html();
                             value = $elem.attr('data-key');
                         }
                         if (value && !(value in componentsInUse[filterId]['labels'])) {

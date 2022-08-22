@@ -3,11 +3,28 @@
     [folder.nameWithCodes, '/homepage/' ~ folder.id],
     [locale.pastoralCare.proper ~ ' Report']
 ) }}
+{% set reportContentId = 'class-pastoral-content' %}
 
 <div class="row actions-small-5">
     <div class="list-item">
         <div class="small-12 column">
             <h1>{{ pageTitle }}</h1>
+        </div>
+    </div>
+</div>
+
+{% include '@filters/panel.twig' with {
+    contentId: reportContentId,
+    panel:     filterPanel,
+    quickload: true,
+} only %}
+
+<div id="{{ reportContentId }}" class="filtered-report">
+    <div class="row">
+        <div class="small-12 island" data-placeholder>
+            <section class="content">
+                <img src="{{ CDN_PREFIX }}/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
+            </section>
         </div>
     </div>
 </div>

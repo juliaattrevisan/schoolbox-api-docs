@@ -47,7 +47,6 @@ use function uasort;
 
 class Controller extends Base
 {
-
     /**
      * @var IConnector
      */
@@ -317,7 +316,7 @@ class Controller extends Base
         $dynamic    = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
         $filters    = array_merge($hardCoded, $dynamic);
 
-        return $this->assessmentIdFinder->findIdsByFilters($filters);
+        return $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
     }
 
 

@@ -1,0 +1,76 @@
+{% extends '@filters/_component.twig' %}
+
+{% block filterName %}Type{% endblock %}
+
+{% block userOptions %}
+
+    {% if isUserConfigurable %}
+        {# Selectize is only created if the item is user-configurable #}
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript">
+            $(function () {
+                $('input[data-select-all-selector]').each(function () {
+                    let $element = $(this);
+                    $element.selectAllBasic({
+                        selector: 'input[id^=' + this.id + '_]',
+                    });
+                })
+            })
+        </script>
+    {% endif %}
+
+    {% for type in types %}
+        {% if type.subtypes is empty %}
+            {# No subtypes: just output a selector for this type #}
+            {% set selectionId = type.id %}
+            {% include '@filters/_selectionCheckbox.twig' with {
+                roleSelection:      roleSelections[selectionId] ?? null,
+                userSelection:      userSelections[selectionId] ?? null,
+                label:              type.name,
+                disabled:           isDisabled,
+            } only %}
+        {% else %}
+            {##
+             # If there are subtypes: output selectors for each subtype,
+             # as well as a select-all for this type
+             #}
+            {# Determine if all or any subtypes of this type are selected #}
+            {% set allSubtypesSelected = true %}
+            {% set anySubtypesSelected = false %}
+            {% for subtype in type.subtypes %}
+                {% set selectionId = type.id ~ '_' ~ subtype.id %}
+                {% set selected    = userSelections[selectionId].selected ?? roleSelections[selectionId].selected ?? false %}
+                {% set anySubtypesSelected  = anySubtypesSelected or selected %}
+                {% set allSubtypesSelected  = allSubtypesSelected and selected %}
+            {% endfor %}
+
+            {# Select-all for this type's subtypes #}
+            <input id="filter_selection_{{ definition.filter.id }}_{{ type.id }}"
+                   type="checkbox"
+                   {% if allSubtypesSelected %}checked{% endif %}
+                   class="{% if anySubtypesSelected and not allSubtypesSelected %}indeterminate{% endif %}"
+                   data-select-all-selector="{{ definition.filter.id }}_{{ type.id }}"
+                   {% if isDisabled %}disabled data-disabled{% endif %}
+            />
+            <label for="filter_selection_{{ definition.filter.id }}_{{ type.id }}"
+                   class="noselect"
+            >{{ type.name }}</label>
+
+            {# Subtype selectors #}
+            <div class="checklist">
+                <ul class="option-list">
+                {% for subtype in type.subtypes %}
+                    {% set selectionId = type.id ~ '_' ~ subtype.id %}
+                    {% include '@filters/_selectionCheckbox.twig' with {
+                        roleSelection:      roleSelections[selectionId] ?? null,
+                        userSelection:      userSelections[selectionId] ?? null,
+                        label:              subtype.name,
+                        labelInSummary:     type.name ~ ' › ' ~ subtype.name,
+                        disabled:           isDisabled,
+                    } only %}
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endblock userOptions %}

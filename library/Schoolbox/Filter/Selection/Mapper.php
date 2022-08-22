@@ -20,7 +20,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * @inheritdoc
      */
@@ -47,6 +46,7 @@ class Mapper extends \Schoolbox\Mapper
                 Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR,
                 Filter\Page\Model::PAGE_BADGE_LIST,
                 Filter\Page\Model::PAGE_AWARD_LIST,
+                Filter\Page\Model::PAGE_CLASS_PASTORAL,
             ]
         );
         $this->uses('key', self::TYPE_STRING);

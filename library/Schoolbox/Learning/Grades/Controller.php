@@ -49,7 +49,6 @@ use function func_get_args;
 
 class Controller extends Base
 {
-
     /**
      * @var Term\Mapper
      */
@@ -732,7 +731,7 @@ class Controller extends Base
      */
     private function findByFiltersWithParticipants(array $filters, User $viewee, bool $loadOtherParticipantInteractions): GenericCollection
     {
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         // Fetch assessments & participants
         $user        = $loadOtherParticipantInteractions ? null : $viewee;
 

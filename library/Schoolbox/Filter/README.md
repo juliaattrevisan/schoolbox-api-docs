@@ -33,6 +33,12 @@ A Filter may have one or more of its options selected: generally, an
 [Entity](#entity) must match at least one of the selected options in order to
 pass the Filter.
 
+#### Hardcoded Filter
+
+It is possible for a Filter to be hardcoded to a particular value, and to
+not display in the [Panel](#panel): this is useful for when a Page displays only
+a subset of Entities, e.g. only assessments for a particular class.
+
 ### Filter Set
 
 The collection of [Filters](#filter) which are included on a single
@@ -285,30 +291,50 @@ of developing for filters.
   * `\Schoolbox\Filter\Page\AvailabilityChecker::isAvailable`
   * `\Schoolbox\Filter\Page\LabelBuilder::buildLabel`
   * `\Schoolbox\Filter\Page\Model::getPageRoleTypes`
+* Update `\Schoolbox\Admin\Navigation\Subnav::generate` so that there's a menu
+  option for the new filter:
+  ```php
+  return [
+      ...
+      '/adminv2/filters' => [
+          ...
+          '/adminv2/filters/classPastoral'  => [
+              'name'        => $filterLabelBuilder->buildLabel(newConstant),
+              'visible'     => $filterAvailabilityChecker->isAvailable(newConstant),
+              'children'    => [],
+              'description' => 'Configure the default and available filter options on the new page.',
+          ],
+          ...
+      ],
+      ...
+  ```
 * Update the `getPages` of each [Definition](#definition) implementation that
   you intend the [Page](#page) to use
 * In your page's module:
-  * inject the [Factory Factory](#factory-factory) as a controller parameter:
+  * inject the following as controller parameters:
+    * the [Factory Factory](#factory-factory)
+    * the mappers for filters and filter selections
+    * the mapper for the Entity you're filtering
     ```php
-    protected function preInitControllerDependencies(ContainerInterface $injector)
+    protected function buildController(): \Alaress\Web\Controller\Base
     {
-        /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'filterFactoryFactory' => $injector->lazyGet('filters.factoryFactory'),
-        ];
+        return new Controller(
+            $this->injector->get('filters.factoryFactory'),
+            $this->getMapperFactory()->get(\Schoolbox\Filter\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Filter\Selection\Mapper::class),
+            $this->getMapperFactory()->get(Mapper::class),
+        );
     }
     ```
 * In your controller:
-  * inject the [Factory Factory](#factory-factory) as a constructor parameter:
+  * inject the above params as constructor parameters:
     ```php
-    /**
-     * @var \Schoolbox\Filter\IFactoryFactory
-     */
-    private $filterFactoryFactory;
-
-    public function __construct(\Schoolbox\Filter\IFactoryFactory $filterFactoryFactory)
-    {
-        $this->filterFactoryFactory = $filterFactoryFactory;
+    public function __construct(
+        private \Schoolbox\Filter\IFactoryFactory $filterFactoryFactory,
+        private \SchoolboxFilter\Mapper $filterMapper,
+        private \SchoolboxFilter\Selection\Mapper $filterSelectionMapper,
+        private Mapper $filteredEntityMapper,
+    ) {
     }
     ```
   * generate the filter panel's Twig data in a controller action:
@@ -340,27 +366,112 @@ of developing for filters.
         )
     );
     ```
-* In the Twig template:
+* In the Twig template `index.twig`:
   * Output the filter
     ```twig
+    {#
+     # quickload: set to true if this is expected to be a large data set.
+     #            When true, any JavaScript must be applied on the
+     #            "filterContentLoaded" event of the contentId element.
+     #}
     {% include '@filters/panel.twig' with {
         contentId: 'filterPanel',
         panel:     filterPanel,
-        // set to true if this is expected to be a large data set
-        // When true, any JavaScript must be applied on the
-        // "filterContentLoaded" event of the contentId element.
         quickload: false,
     } only %}
-    ```
-* > TODO document how to render the filtered content
 
+    {# The filter content, once it loads or is replaced, will be injected here #}
+    <div id="filterPanel" class="filtered-report">
+        <div class="row">
+            <div class="small-12 island" data-placeholder>
+                <section class="content">
+                    <img src="{{ CDN_PREFIX }}/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
+                </section>
+            </div>
+        </div>
+    </div>
+    ```
+
+Now, you can start writing the controller action which loads the actual content.
+
+* In your page's module:
+  * create a new `POST` route, which takes the same parameters as the `GET`
+    route you added the filter rendering to:
+  ```php
+  // existing GET route
+  $this->register(self::METHOD_GET, '/{folderId}', 'getReport', $perms, $preload);
+
+  // new POST route
+  $this->register(self::METHOD_POST, '/{folderId}', 'postReport', $perms, $preload);
+  ```
+* In your page's controller:
+  * add the new action for the `POST` route; within that action:
+  ```php
+  $request             = $this->request->post['filter_selection'] ?: [];
+  $page                = \Schoolbox\Filter\Page\Model::PAGE_NEW_PAGE;
+  $codec               = new \Schoolbox\Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
+
+  // Convert the request into a set of selections, and update them in the frontend
+  $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+  $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+
+  // Convert the set of selections into actual filters
+  $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
+      $selectionsPerFilter,
+      $this->getUser(),
+      $page,
+  );
+
+  // Are there any hardcoded filters to apply?
+  // If so, create them like so:
+  $hardCodedFilters = [
+      \Schoolbox\Filter\Filters\{entityName}\{filterName}\Definition::class => [
+          // a set of key-value pairs to filter:
+          // the value to filter will usually be the key as well
+      ],
+  ];
+
+  // If using the ID finder:
+  // use the ID finder to create a list of IDs of the filtered mapper,
+  // then pass that list of IDs into the mapper's find method
+  $idFinder = \Schoolbox\Filter\Filters\{entityName}\IdFinder::getInstance(
+      $this->filterMapper,
+      $this->mapper,
+  );
+  $ids = $idFinder->findIdsByFilters(
+      array_merge($dynamicFilters, $hardCodedFilters),
+      $this->getUser(),
+  );
+  $records = $this->mapper->findByColumn('id', $ids);
+
+  // If using the Matcher:
+  // fetch the records, then use the matcher to filter them
+  $matcher = new \Schoolbox\Filter\Filters\{entityName}\Matcher();
+  $records = $this->mapper->findAll()->filter($matcher);
+
+  // render the records in a Twig template
+  $this->response->content->set(
+      $this->buildJsonOutput(
+          [
+              'status'  => 200,
+              'content' => $this->buildUnthemedHtmlOutput(
+                  '@moduleName/inner.twig',
+                  [
+                      'records' => $records,
+                  ]
+              )->getAsString(),
+          ]
+      )
+  );
+  ```
+* in the Twig template `inner.twig`: output the records however you want
 
 ### Implementing Filtering on an Entity
 
 * Create a [Factory Factory](#factory-factory) in the namespace
   `\Schoolbox\Filter\Filters\{entityName}`, extending
   `\Schoolbox\Filter\AbstractFactoryFactory`
-  * define the `ENTITY` constant
+  * define the `ENTITY` constant as the class name of the mapper to filter
   * implement `buildFilterFactoryForFilter`: just have it throw an
     `\InvalidArgumentException` for now
   * implement `checkTeacherFolders`: just have it return the first parameter
@@ -494,13 +605,73 @@ of developing for filters.
       * define a class constant for the key for each meta-option
       * update `getCustomKeys` to return the keys for the meta-options
       * update `getLabel` to return a specific label for each meta-option
-    * in the [Factory Factory](#factory-factory) implementation:
+    * if there is an [ID Finder](#id-finder) implementation:
       * update `buildQuery` to recognise the meta-options in the filter, and
         build a query appropriately
+    * if there is a [Matcher](#matcher) implementation instead:
+      * update `__invoke` to recognise the meta-options in the filter, and
+        filter appropriately
 
 * Create a [Component](#component) implementation
   (if a custom implementation is required)
-  > TODO fill in more about whether a custom component is required
+  > A component implementation will be required if the template needs to display
+  > or use more information than what is provided to the Twig template by
+  > default, e.g.: the list of options displayed in the template depends on a
+  > result retrieved from a mapper.
+  * if so; create it in the namespace determined above, extending
+    `\Schoolbox\Filter\BaseComponent`
+  * in the Factory, override `buildComponent` to create an instance of the
+    custom Component:
+    ```php
+    public function buildComponent(
+        \Schoolbox\Filter\IDefinition $definition,
+        \Schoolbox\User $user,
+        \Schoolbox\Filter\Page\Model $pageFilter,
+        ?\Schoolbox\GenericCollection $selections,
+        ?\Schoolbox\User $viewee,
+        array $routeArgs,
+        \Schoolbox\GenericCollection $overrides,
+    ): \Schoolbox\Filter\IComponent {
+        return new Component(
+            $definition,
+            $user,
+            $pageFilter,
+            $selections,
+            $overrides[$pageFilter->getFilter()->getId()],
+            $this->getSelectionMapper(),
+            // add extra constructor params for the new component here
+        );
+    }
+    ```
+* in the Component:
+  * override the constructor to include extra constructor params
+  * optionally override `toContext` to assign extra params to the Twig template:
+  ```php
+  return array_merge(
+      parent::toContext(),
+      ['params' => $this->someProperty],
+  );
+  ```
+  * optionally override `buildRoleSelections` to return a set of available
+    filter options for the current user:
+  ```php
+  // Build the list of selections
+  foreach ($this->someProperty as $property) {
+      $availableSelections[$key] = $this->createSelection($key, ...);
+  }
+  return $availableSelections;
+  ```
+  * optionally override `buildUserSelections` to return a set of selected
+    filter options:
+    ```php
+    $userSelections = parent::buildUserSelections($roleSelections);
+
+    foreach ($this->someProperty as $key => $property) {
+        $userSelections[$key] = $this->createSelection($key, ...);
+    }
+
+    return $userSelections;
+    ```
 
 * Find the [Factory Factory](#factory-factory) implementation for the
   [Entity](#entity) being filtered
@@ -554,10 +725,11 @@ of developing for filters.
     );
     ```
 
-* Now you will want to add this filter to a page: to accomplish that, follow the
-  instructions in the
+* Unless this filter is intended as a [Hardcoded Filter](#hardcoded-filter)
+  only, you will want to add this filter to a page:
+  to accomplish that, follow the instructions in the
   [Adding an existing Filter to a Page's Filter Set](#adding-an-existing-filter-to-a-pages-filter-set)
-  section below
+  section below.
 
 ### Adding an existing Filter to a Page's Filter Set
 

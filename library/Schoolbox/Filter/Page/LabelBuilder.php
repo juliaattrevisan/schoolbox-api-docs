@@ -59,6 +59,9 @@ class LabelBuilder
                 // it does have a label though
                 return "Learning Analytics";
 
+            case Model::PAGE_CLASS_PASTORAL:
+                return 'Class Pastoral';
+
             default:
                 return '';
         }

@@ -22,30 +22,23 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Resource\Folder;
 use InvalidArgumentException;
+use Schoolbox\User;
 use UnexpectedValueException;
 
 class Exporter
 {
-
-    /**
-     * @var AssessmentFilters\IdFinder
-     */
-    private $idFinder;
-
-    /** @var Assessment\MapperProxy */
-    private $assessmentDataSource;
-
-
     /**
      * Exporter constructor.
      *
-     * @param AssessmentFilters\IdFinder $idFinder
-     * @param Assessment\MapperProxy     $assessmentDataSource
+     * @param AssessmentFilters\IdFinder $idFinder             Filter object for finding assessments
+     * @param Assessment\MapperProxy     $assessmentDataSource Data source for assessments
+     * @param User                       $user                 User to fetch assessments for
      */
-    public function __construct(AssessmentFilters\IdFinder $idFinder, Assessment\MapperProxy $assessmentDataSource)
-    {
-        $this->idFinder             = $idFinder;
-        $this->assessmentDataSource = $assessmentDataSource;
+    public function __construct(
+        private AssessmentFilters\IdFinder $idFinder,
+        private Assessment\MapperProxy $assessmentDataSource,
+        private User $user,
+    ) {
     }
 
 
@@ -167,7 +160,7 @@ class Exporter
             NullableContext\Project\Definition::class  => [],
             YearDue\Definition::class                  => [$currentYear => $currentYear],
         ];
-        $ids           = $this->idFinder->findIdsByFilters($filters);
+        $ids           = $this->idFinder->findIdsByFilters($filters, $this->user);
         $assessments   = $this->assessmentDataSource->findAllByIds($ids);
 
         // Hydrate any required folder codes

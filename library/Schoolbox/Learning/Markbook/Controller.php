@@ -29,7 +29,6 @@ use function func_get_args;
 
 class Controller extends Base
 {
-
     /** @var AssessmentMapperProxy */
     private $assessmentMapperProxy;
 
@@ -128,7 +127,7 @@ class Controller extends Base
              */
             [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($request, true);
 
-            $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+            $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
             $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
             /**
@@ -304,7 +303,7 @@ class Controller extends Base
 
         [$filters] = $this->convertRequestToFilters($filtersArray, false);
 
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
         $csvExporter = new Export\CSV((bool)$this->getConfigLoader()->get('view_rank'));

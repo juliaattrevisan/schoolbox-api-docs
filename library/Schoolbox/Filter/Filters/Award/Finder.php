@@ -15,6 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge\Award\Mapper;
 use Schoolbox\Learning\Badge\Award\Model;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 
 /**
  * ID finder for the badge filter.
@@ -81,7 +82,7 @@ class Finder extends AbstractIdFinder
     /**
      * @inheritDoc
      */
-    protected function buildQuery(array $completeFilters, bool $deleted): array
+    protected function buildQuery(array $completeFilters, User $user, bool $deleted): array
     {
         return [];
     }

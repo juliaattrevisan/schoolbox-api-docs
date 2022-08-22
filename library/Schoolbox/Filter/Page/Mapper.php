@@ -21,7 +21,6 @@ use Schoolbox\GenericCollection;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * @inheritdoc
      */
@@ -48,6 +47,7 @@ class Mapper extends \Schoolbox\Mapper
                 Model::PAGE_ASSESSMENT_CALENDAR,
                 Model::PAGE_BADGE_LIST,
                 Model::PAGE_AWARD_LIST,
+                Model::PAGE_CLASS_PASTORAL,
             ]
         );
         $this->uses('enabled', self::TYPE_BOOLEAN);

@@ -50,7 +50,6 @@ use function func_get_args;
  */
 class Controller extends Base
 {
-
     /**
      * Limit of upcoming assessments shown in list
      */
@@ -322,7 +321,7 @@ class Controller extends Base
 
         // If there's a huge number of IDs, we may need to chunk them and query
         // on each chunk.
-        $ids     = $this->assessmentIdFinder->findIdsByFilters($filters);
+        $ids     = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         if (count($ids) > 0) {
             $allWork = $this->assessmentDataSource
                 ->findAllByStudentBetweenDates($student, true, null, null, ['ids' => $ids]);

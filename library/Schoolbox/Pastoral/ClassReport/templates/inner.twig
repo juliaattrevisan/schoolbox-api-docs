@@ -1,0 +1,23 @@
+<div class="row">
+    <div class="small-12 columns">
+        <ul class="action-list">
+            {% for student in students %}
+            <li>
+                <div class="list-item">
+                    <a href="/search/user/{{ student.id }}" title="View Profile">
+                        <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="View Profile">
+                        <p>{{ student.lastname }}, {{ student.firstname }}</p>
+                    </a>
+                </div>
+                <article>
+                    <ul>
+                        {% for pastoralRecord in (pastoralRecordsByStudent[student.id] ?? []) %}
+                        <li>{{ pastoralRecord.heading }}</li>
+                        {% endfor %}
+                    </ul>
+                </article>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

@@ -15,6 +15,7 @@
         <input
             type="hidden"
             name="filter_selection[{{ roleSelection.filter.id }}][{{ roleSelection.key }}]"
+            data-label-in-summary="{{ (labelInSummary ?? label) | nl2br | e('html_attr') }}"
             data-key="{{ roleSelection.key }}"
             data-value-original="{% if roleSelection.selected %}1{% else %}0{% endif %}"
             value="{% if roleSelection.selected %}1{% else %}0{% endif %}">
@@ -26,6 +27,7 @@
             id="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}"
             type="checkbox"
             name="filter_selection[{{ userSelection.filter.id }}][{{ userSelection.key }}]"
+            data-label-in-summary="{{ (labelInSummary ?? label) | nl2br | e('html_attr') }}"
             data-key="{{ userSelection.key }}"
             value="1"
             data-filter-options
@@ -35,6 +37,7 @@
             {% if disabled %}disabled data-disabled{% endif %}
             {% block extraAttrs %}{% endblock %}
         >
-        <label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}" class="noselect">{{ label | nl2br }}</label>
+        <label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}"
+               class="noselect">{{ label | nl2br }}</label>
     </li>
 {% endif %}
