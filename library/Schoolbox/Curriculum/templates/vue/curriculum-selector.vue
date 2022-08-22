@@ -42,6 +42,14 @@ const props = defineProps({
         required: false,
         default: true,
     },
+    /**
+     * input name, to allow custom form structure
+     */
+    formValueName: {
+        type: String,
+        required: false,
+        default: 'curriculumCodes[]',
+    }
 });
 
 const curriculumSelectorEl = ref(null);
@@ -53,6 +61,7 @@ onMounted(() => {
     checkForStorybook();
     const store = useStore();
     store.isReadOnly = props.isReadOnly;
+    store.formValueName = props.formValueName;
     if (!store.isReadOnly && props.dataEndpoint !== '') { //only load when we need to
         store.load(props.dataEndpoint);
     }

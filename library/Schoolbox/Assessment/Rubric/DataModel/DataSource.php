@@ -152,7 +152,7 @@ class DataSource
                     ->setId($capabilityId)
                     ->setName($capabilityModel->getName())
                     ->setIsCourseLevel($isCourseCapability)
-                    ->setCurriculumNodes($capabilityModel->getCurriculumNodes());
+                    ->setCurriculumNodes($capabilityModel->getCurriculumNodes()->reindex());
 
                 if ($getUsages) {
                     foreach (IndicatorUsageMapper::getInstance()->findCapabilityUsage($capabilityId) as $capabilityUsage) {
@@ -173,7 +173,7 @@ class DataSource
             $capabilities[$capabilityId]->getIndicators()[$indicatorId] = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
                 ->setId($indicatorId)
                 ->setName($indicatorModel->getName())
-                ->setCurriculumNodes($indicatorModel->getCurriculumNodes());
+                ->setCurriculumNodes($indicatorModel->getCurriculumNodes()->reindex());
 
             if ($getUsages) {
                 foreach (IndicatorUsageMapper::getInstance()->findIndicatorUsage($indicatorId) as $indicatorUsage) {
