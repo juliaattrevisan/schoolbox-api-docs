@@ -292,7 +292,7 @@ class Controller extends BaseController
                     'editYearLevelUsage'  => $canChangeClassCodes,
                     'yearLevelOptions'    => $yearLevelOptions,
                     'yearLevelValues'     => $yearLevelValues,
-                    'curriculumCodes'     => $folder->getCurriculumNodes()?->reindex(),
+                    'curriculumCodes'     => $folder->getCurriculumNodes()->reindex(),
                 ],
             ]
         );
