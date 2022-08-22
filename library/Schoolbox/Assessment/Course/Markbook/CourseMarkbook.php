@@ -719,8 +719,8 @@ class CourseMarkbook
 
     /**
      * Build student ranking based on whole cohort (course) not just single class.
-     * See also similar function in library/Schoolbox/Learning/Markbook/Markbook.php.
-     * @return array (integer ranking indexed by studentId)
+     * @see library/Schoolbox/Learning/Markbook/Markbook.php for similar function getRankByStudentId().
+     * @return array [studentId => integer ranking]
      */
     public function getRankByStudentId(): array
     {
