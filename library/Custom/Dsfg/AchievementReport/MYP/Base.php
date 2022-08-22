@@ -156,7 +156,7 @@ class Base extends AchievementReportBase
             $commentData[$row['ClassCode']]   ??= [];
             $commentData[$row['ClassCode']][] =
                 [
-                    'comment'    => trim($row['Comment']),
+                    'comment'    => sprintf('Term %s - %s', trim($row['Term']), trim($row['Comment'])),
                     'staffName'  => $row['ClassTeacher1'],
                     'staffEmail' => $row['ClassTeacher1Email'],
                 ];
