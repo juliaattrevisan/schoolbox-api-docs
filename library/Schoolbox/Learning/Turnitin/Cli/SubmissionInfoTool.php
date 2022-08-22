@@ -78,7 +78,7 @@ You can specify partial turnitin submission ids to only return results pertinent
 reports that match those ids. In the following example usage, any turnitin submission
 id starting with abcd and qwe123 will be analysed; others are ignored.
 
-Usage: submissionInfo.php --ids=abcd,qwe123
+Usage: submissionInfo.php --id=abcd,qwe123
 
 
 HELP;
