@@ -400,6 +400,7 @@ class Controller extends Base\Base
             'folderAccess'      => $folderAccess,
             'encodedReturnUrls' => $encodedReturnUrls,
             'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
+            'curriculumCodes'   => $courseSpec->getFolder()->getCurriculumNodes()?->reindex(),
         ]);
     }
 

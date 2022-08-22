@@ -214,8 +214,8 @@ Usage:
                 $(this).closest('[data-new-unit]').before(newDOM);
                 newDOM.slideDown();
                 newDOM.find('[data-collapser]').collapsable();
-                //I'm not sure what's going on in here, but a new version of jQuery has added a  
-                //display:block to this script tag, which will render out the tag code contents 
+                //I'm not sure what's going on in here, but a new version of jQuery has added a
+                //display:block to this script tag, which will render out the tag code contents
                 //into the browser, so it needs to be removed. Perhaps $().before() adds it in.
                 if (newDOM[0].tagName === "SCRIPT") { //just make sure it only applies to <script> tags, as I don't know if this is accessed in other ways
                     newDOM[0].style.display = 'none';
@@ -329,7 +329,7 @@ Usage:
                             <label>Curriculum Codes
                                 {% include 'sub/curriculumCodeSelector.twig' with {
                                     renderButton: false,
-                                    codeList:     courseSpec ? courseSpec.folder.curriculumNodes : []
+                                    codeList:     curriculumCodes ?? []
                                 } only %}
                             </label>
                         </div>
