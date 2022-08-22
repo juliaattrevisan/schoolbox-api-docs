@@ -409,6 +409,7 @@ class Controller extends Base
         $collection = $this->mapper->createCollection();
         $userIds    = array_column($data['users'], 'id');
         $users      = $this->userMapper->findByColumn('id', $userIds);
+        $reason     = trim((string)$data['reason']);
 
         // Are any of those users not students? Error out
         foreach ($users as $user) {
@@ -435,6 +436,7 @@ class Controller extends Base
                 ->setRecipient($user)
                 ->setBadge($badge)
                 ->setStatus($status)
+                ->setReason($reason)
                 ->setAwardedBy($this->getUser())
                 ->setAwardedAt(Alaress_Date_Format::now());
             $award = $award->setExpiresAt((new ExpiryHelper())->determineExpiry($award));

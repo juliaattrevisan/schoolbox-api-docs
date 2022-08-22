@@ -140,6 +140,7 @@ export default {
         return {
             options: [],
             selected: [],
+            reason: null,
             isFormSubmitActive: false
         }
     },
@@ -208,7 +209,7 @@ export default {
         onSubmit() {
             this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
-            axios.post(this.endpoint, {users: this.selected})
+            axios.post(this.endpoint, {users: this.selected, reason: this.reason})
                 .then(() => {
                     // Clear the select, so they don't show next time this opens
                     this.selected = [];
@@ -263,7 +264,7 @@ export default {
         <div>
             <!-- TODO Add bastardised version of add-comment-input.vue here -->
             <!-- such that it can be reused without being so specific -->
-            <textarea name="reason" rows="5" cols="50"></textarea>
+            <textarea v-model="reason" rows="5" cols="50"></textarea>
         </div>
 
         <!--
