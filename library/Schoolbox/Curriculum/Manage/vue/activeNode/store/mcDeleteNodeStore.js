@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useStore } from './manageGroupStore'
+import { useActiveNodeStore } from './mcActiveNodeStore'
 
 
 export const useDeleteNodeStore = defineStore('mcDeleteNode', {
@@ -18,7 +18,7 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
         /**
          * to display a prompt to confirm member removal
          */
-        propt () {
+        prompt () {
             this.isPromptOpen = true;
         },
 
@@ -27,15 +27,12 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
          */
         async delete () {
             this.isProcessing = true;
-            const store = useStore();
-            store.isProcessing = true;
             try {
                 const response = await fetch('/api/curriculum/{id}', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: getFormData(),
                 });
                 const responseJson = await response.json();
                 if (responseJson.success) {
@@ -47,30 +44,16 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
-                store.isProcessing = false;
             }
         },
 
         /**
          * to hide the confirmation prompt
          */
-        cancelDisbandGroup () {
+        cancel () {
             this.isPromptOpen = false;
         },
 
     },
 
 })
-
-/**
- * Pass through the group id
- *
- * @returns { FormData }
- */
-function getFormData () {
-    const store = useStore();
-    return JSON.stringify({
-        groupId: store.groupId
-    });
-
-}

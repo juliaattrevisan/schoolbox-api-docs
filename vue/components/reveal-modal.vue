@@ -33,8 +33,8 @@ export default {
         },
 
         /**
-         * For when closing the modal needs to be temporarily disabled, 
-         * for example when an action is processing. 
+         * For when closing the modal needs to be temporarily disabled,
+         * for example when an action is processing.
          */
         isCloseDisabled: {
             type: Boolean,
@@ -50,7 +50,7 @@ export default {
 
     beforeCreate () {
 
-        /**  
+        /**
          * Generate a really unique identifier
          * instances of reveal-modal may inadevertently generate conflicting identifier strings
          * when they're based on an autoincrementing integer, since the dom is a universal pool
@@ -72,7 +72,7 @@ export default {
         // How do I find the dialog in the DOM? ID probably needs to be unique
         this.modal = $('#' + this.elementId);
     },
-    
+
     methods: {
 
         /**
@@ -84,15 +84,17 @@ export default {
                 'open',
                 { close_on_background_click: this.closeOnBackgroundClick }
             );
-            $(document).on('closed.fndtn.reveal', '[data-reveal]', () => { //to respond to the modal closing when requried
-                this.$emit('closed');
-                $(document).off('closed.fndtn.reveal');
+            $(document).on('closed.fndtn.reveal', '[data-reveal]', (event) => { //to respond to the modal closing when requried
+                if (this.elementId === event.target.id) { //can be multiple modals open at once
+                    this.$emit('closed');
+                    $(document).off('closed.fndtn.reveal');
+                }
             });
         },
 
         /**
          * To prevent the modal being closed when it should be disabled
-         * 
+         *
          * @param { Event } select event
          */
         onCloseSelected (event) {

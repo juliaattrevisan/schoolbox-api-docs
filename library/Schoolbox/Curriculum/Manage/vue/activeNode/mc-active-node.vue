@@ -6,6 +6,7 @@
 
 import { ref, computed, watch } from 'vue';
 import { useActiveNodeStore } from './store/mcActiveNodeStore';
+import { useDeleteNodeStore } from './store/mcDeleteNodeStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
@@ -59,7 +60,7 @@ function onDisableSelected () {
  * open a modal confirming whether to delete this node
  */
 function onDeleteSelected () {
-    console.warn('onDeleteSelected');
+    useDeleteNodeStore().prompt();
 }
 
 /**
