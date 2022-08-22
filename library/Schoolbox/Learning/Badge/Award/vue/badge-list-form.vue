@@ -331,9 +331,16 @@ export default {
         onSubmit() {
             this.toastActivate(this.toastActivateMessage);
             this.$refs.awardModalSubmit.disabled = true;
-            let payload = this.awardToSelfOnly ? null : {users: this.users};
+
             Promise
                 .all(this.selectedBadges.map(v => {
+                    let field = 'reason['+v.id+']';
+                    let reason = document.querySelector('textarea[name="'+field+'"]').value;
+
+                    /* Construct each payload for each badge uniquely
+                     */
+                    let payload = this.awardToSelfOnly ? null : {users: this.users, reason: reason};
+
                     axios.post(v._links[this.postAwardRouteLookup], payload)
                 }))
                 .then(() => {
@@ -407,6 +414,12 @@ export default {
                             <h3>{{ badge.name }}</h3>
                             <h3>{{ badge.reason }}</h3>
                         </div>
+                    </div>
+
+                    <div>
+                        <!-- TODO Add bastardised version of add-comment-input.vue here -->
+                        <!-- such that it can be reused without being so specific -->
+                        <textarea :name="'reason['+badge.id+']'" rows="5" cols="50"></textarea>
                     </div>
                 </li>
             </ul>
