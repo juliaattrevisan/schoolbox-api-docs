@@ -260,6 +260,12 @@ export default {
             </div>
         </div>
 
+        <div>
+            <!-- TODO Add bastardised version of add-comment-input.vue here -->
+            <!-- such that it can be reused without being so specific -->
+            <textarea name="reason" rows="5" cols="50"></textarea>
+        </div>
+
         <!--
         @slot The expiry message for this badge award
         @binding {Date|null} expiryDate An actual expiry date object
