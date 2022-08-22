@@ -53,7 +53,6 @@ use function strnatcasecmp;
 
 class Controller extends BaseController
 {
-
     /** @var Mapper */
     protected $folderMapper;
 
