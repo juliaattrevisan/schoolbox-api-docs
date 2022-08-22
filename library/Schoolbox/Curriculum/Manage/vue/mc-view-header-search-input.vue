@@ -5,17 +5,17 @@
  */
 
 import { computed } from 'vue';
-import { useVisibleNodesStore } from './store/mcVisibleNodesStore';
+import { useViewNodesStore } from './store/mcViewNodesStore';
 
 
-const visibleNodesStore = useVisibleNodesStore();
+const viewNodesStore = useViewNodesStore();
 
 /**
  * Only enable search once a first node is selected
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => !visibleNodesStore.isActive);
+const isDisabled = computed(() => !viewNodesStore.isActive);
 
 /**
  * Only enable search once a first node is selected
@@ -26,7 +26,7 @@ const placeholder = computed(() => {
     if (isDisabled.value) {
         return 'Select a Curriculum Code to enable search...'
     } else {
-        return `Search ${visibleNodesStore.current.name} for codes or keywords...`;
+        return `Search ${viewNodesStore.current.name} for codes or keywords...`;
     }
 });
 
@@ -34,7 +34,7 @@ const placeholder = computed(() => {
 
 <template>
    <input
-        v-model="visibleNodesStore.query"
+        v-model="viewNodesStore.query"
         ref="queryInputEl"
         type="text"
         class="search-input"

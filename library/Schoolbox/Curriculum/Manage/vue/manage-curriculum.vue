@@ -7,7 +7,7 @@
 
 import { onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
-import { useVisibleNodesStore } from './store/mcVisibleNodesStore';
+import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';
@@ -52,7 +52,7 @@ onMounted(() => {
 function checkForStorybook () {
     if (typeof STORYBOOK_ENV !== 'undefined') {
         useStore().$reset();
-        useVisibleNodesStore().$reset();
+        useViewNodesStore().$reset();
         useActiveNodeStore().$reset();
     }
 }

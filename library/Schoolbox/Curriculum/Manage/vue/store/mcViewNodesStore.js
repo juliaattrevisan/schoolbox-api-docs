@@ -11,7 +11,7 @@ const UNSET_ID = 0;
 const MIN_QUERY_LENGTH = 3;
 const MAX_DEPTH = 6; //dont traverse any further down than 6 levels
 
-export const useVisibleNodesStore = defineStore('mcVisibleNodesStore', {
+export const useViewNodesStore = defineStore('mcViewNodesStore', {
 
     state: () => ({
         idList: [], //ids of the selected nodes
