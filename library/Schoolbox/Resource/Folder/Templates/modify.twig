@@ -479,7 +479,7 @@
                                 {%
                                     include 'sub/curriculumCodeSelector.twig' with
                                     {
-                                        'codeList' : folder.getCurriculumNodes,
+                                        'codeList' : curriculumCodes ?? [],
                                         'renderButton' : true
                                     }
                                 %}
