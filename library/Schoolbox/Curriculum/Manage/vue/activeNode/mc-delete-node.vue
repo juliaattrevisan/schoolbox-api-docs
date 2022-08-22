@@ -5,22 +5,24 @@
  */
 
 import { ref, computed, watch } from 'vue';
+import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import { useDeleteNodeStore } from './store/mcDeleteNodeStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
+const activeNodeStore = useActiveNodeStore();
 const deleteNodeStore = useDeleteNodeStore();
 const modalEl = ref(null);
 
 /**
  * to open the modal when requested
  */
-watch(() => deleteNodeStore.isPromptOpen, (isPromptOpen) => {
-    isPromptOpen ? modalEl.value.open() : modalEl.value.close();
+watch(() => deleteNodeStore.isModalOpen, (isModalOpen) => {
+    isModalOpen ? modalEl.value.open() : modalEl.value.close();
 });
 
 /**
- * disband the group confirmed
+ * delete the node when confirmed
  */
 function onDeleteSelected () {
     deleteNodeStore.delete();
@@ -69,7 +71,7 @@ function onCancelSelected () {
 }
 
 /**
- * ensure the isPromptOpen is kept up to date
+ * ensure the isModalOpen is kept up to date
  * as we can currently also use foundation to close the modal
  */
 function onModalClosed () {
@@ -86,7 +88,7 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
-        <p>Are you sure you wish to delete this node?</p>
+        <p>Are you sure you wish to delete this node: {{ activeNodeStore.title }}?</p>
         <ul class="flex-list buttons">
             <li><button @click.prevent="onDeleteSelected" class="button submit" :disabled="deleteNodeStore.isProcessing">{{ deleteButtonText }}</button></li>
             <li><button @click.prevent="onCancelSelected" class="button" :disabled="deleteNodeStore.isProcessing">Cancel</button></li>

@@ -10,6 +10,7 @@ import { useStore } from './store/manageCurriculumStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import { escapeRegExp } from '@js/util/jsUtils';
+import McActiveNode from './activeNode/mc-active-node.vue';
 
 
 const props = defineProps({
@@ -38,7 +39,7 @@ const props = defineProps({
 
 const store = useStore();
 const viewNodesStore = useViewNodesStore();
-const editNodeStore = useActiveNodeStore();
+const activeNodeStore = useActiveNodeStore();
 
 /**
  * to gradually and more paddingLeft to indicate node level depth
@@ -82,7 +83,7 @@ const isVisible = computed(() => props.depth <= 1 || viewNodesStore.isOnLast);
  * to open up the edit modal
  */
 function onEditSelected () {
-    editNodeStore.set(props.node);
+    activeNodeStore.set(props.node);
 }
 
 /**
@@ -90,7 +91,7 @@ function onEditSelected () {
  * using the selects in mc-header-select
  */
 function onNameSelected () {
-    editNodeStore.unset();
+    activeNodeStore.unset();
     viewNodesStore.setNextSelected(props.node.id);
 }
 
@@ -167,6 +168,13 @@ const containerClass = computed(() => {
     }
 });
 
+/**
+ * If this is the active node
+ *
+ * @returns { Boolean }
+ */
+const isActiveNode = computed(() => activeNodeStore.isActive && activeNodeStore.node.id === props.node.id);
+
 </script>
 
 <template>
@@ -192,6 +200,7 @@ const containerClass = computed(() => {
                 <aside v-if="viewNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
             </button>
         </div>
+        <mc-active-node v-if="isActiveNode" />
         <ul v-if="hasChildren">
             <mc-view-node
                 v-for="node in props.node.children"

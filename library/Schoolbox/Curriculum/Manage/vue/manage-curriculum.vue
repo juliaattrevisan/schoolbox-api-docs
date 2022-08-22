@@ -11,7 +11,7 @@ import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';
-import McActiveNode from './activeNode/mc-active-node.vue';
+// import McActiveNode from './activeNode/mc-active-node.vue';
 import McDeleteNode from './activeNode/mc-delete-node.vue';
 
 
@@ -63,7 +63,7 @@ function checkForStorybook () {
 <template>
     <mc-header />
     <mc-view />
-    <mc-active-node />
+    <!-- <mc-active-node /> -->
     <mc-delete-node />
 </template>
 

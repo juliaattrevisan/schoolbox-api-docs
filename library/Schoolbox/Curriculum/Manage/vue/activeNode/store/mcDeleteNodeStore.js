@@ -10,7 +10,7 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
 
     state: () => ({
         isProcessing: false,
-        isPromptOpen: false, //to notify that the prompt is opened / closed
+        isModalOpen: false, //to notify that the prompt is opened / closed
     }),
 
     actions: {
@@ -19,7 +19,7 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
          * to display a prompt to confirm member removal
          */
         prompt () {
-            this.isPromptOpen = true;
+            this.isModalOpen = true;
         },
 
         /**
@@ -27,23 +27,21 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
          */
         async delete () {
             this.isProcessing = true;
+            const activeNodeStore = useActiveNodeStore();
             try {
-                const response = await fetch('/api/curriculum/{id}', {
+                const response = await fetch(`/api/curriculum/${activeNodeStore.node.id}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                 });
-                const responseJson = await response.json();
-                if (responseJson.success) {
-                    //
+                if (response.ok) {
+                    this.isProcessing = false;
                 } else {
                     throw new Error();
                 }
             } catch (error) {
                 console.warn(error);
-            } finally {
-                this.isProcessing = false;
             }
         },
 
@@ -51,7 +49,7 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
          * to hide the confirmation prompt
          */
         cancel () {
-            this.isPromptOpen = false;
+            this.isModalOpen = false;
         },
 
     },

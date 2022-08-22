@@ -4,36 +4,33 @@
  * to show further info in a modal on a code that's been selected
  */
 
-import { ref, computed, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import { useDeleteNodeStore } from './store/mcDeleteNodeStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const editNodeStore = useActiveNodeStore();
-const modalEl = ref(null);
+const activeNodeStore = useActiveNodeStore();
+const deleteNodeStore = useDeleteNodeStore();
+// const modalEl = ref(null);
 
 /**
- * to open the modal when requested
+ * to open the modal when the active node is first set
  */
-watch(() => editNodeStore.isActive, (isActive) => {
-    if (isActive) {
-        modalEl.value.open();
-    }
-});
+// watch(() => activeNodeStore.isActive, (isModalOpen) => {
+//     if (isModalOpen) {
+//         modalEl.value.open();
+//     }
+// });
 
 /**
- * Add in the code if it's available otherwise just show the title
- *
- * @returns { String }
+ * also open when returning from editing a node
  */
-const title = computed(() => {
-    if (editNodeStore.node.code && editNodeStore.node.code !== '') {
-        return `[${editNodeStore.node.code}] ${editNodeStore.node.name}`;
-    } else {
-        return editNodeStore.node.name;
-    }
-});
+// watch(() => activeNodeStore.isUpdating, (newIsUpdating, oldIsUpdating) => {
+//     if (newIsUpdating === false && oldIsUpdating === true) {
+//         modalEl.value.open();
+//     }
+// });
 
 /**
  * open the edit modal
@@ -60,38 +57,38 @@ function onDisableSelected () {
  * open a modal confirming whether to delete this node
  */
 function onDeleteSelected () {
-    useDeleteNodeStore().prompt();
+    deleteNodeStore.prompt();
 }
 
 /**
  * close the modal, setting the edited node to null
  * so we can allow another selection
  */
-function onModalClosed () {
-    editNodeStore.unset(null);
-}
+// function onModalClosed () {
+//     activeNodeStore.unset();
+// }
 
 </script>
 
 <template>
-    <reveal-modal
+    <!-- <reveal-modal
         ref="modalEl"
         size="medium"
         @closed="onModalClosed"
     >
-        <template v-if="editNodeStore.isActive">
-            <h2>{{ title }}</h2>
-            <p class="meta">{{ editNodeStore.node.breadcrumb }}</p>
-            <p v-if="editNodeStore.node.reference"><b>Reference:</b> <span v-html="editNodeStore.node.reference"></span></p>
-            <p>{{ editNodeStore.node.description }}</p>
+        <template v-if="activeNodeStore.isActive"> -->
+            <h2>{{ activeNodeStore.title }}</h2>
+            <p class="meta">{{ activeNodeStore.node.breadcrumb }}</p>
+            <p v-if="activeNodeStore.node.reference"><b>Reference:</b> <span v-html="activeNodeStore.node.reference"></span></p>
+            <p>{{ activeNodeStore.node.description }}</p>
             <ul class="flex-list buttons">
                 <li><button @click.prevent="onEditSelected" @keyup.enter="onEditSelected" class="button icon-modify" :disabled="false">Edit</button></li>
                 <li><button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button icon-add" :disabled="false">Add subsection</button></li>
                 <li><button @click.prevent="onDisableSelected" @keyup.enter="onDisableSelected" class="button icon-view-hollow" :disabled="false">Disable</button></li>
                 <li><button @click.prevent="onDeleteSelected" @keyup.enter="onDeleteSelected" class="button icon-delete" :disabled="false">Delete</button></li>
             </ul>
-        </template>
-    </reveal-modal>
+        <!-- </template>
+    </reveal-modal> -->
 </template>
 
 <style scoped>

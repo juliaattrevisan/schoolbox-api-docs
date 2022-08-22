@@ -3,12 +3,15 @@
  */
 
 import { defineStore } from 'pinia';
+import { useDeleteNodeStore } from './mcDeleteNodeStore';
 
 
 export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
 
     state: () => ({
         node: null, //the currently selected node
+        // isModalOpen: false,
+        // isUpdating: false, //if further action is being taken on the active node
     }),
 
     getters: {
@@ -20,6 +23,21 @@ export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
          */
         isActive () {
             return this.node !== null ? true : false;
+        },
+
+        /**
+         * Add in the code if it's available otherwise just show the title
+         *
+         * @return { String }
+         */
+        title () {
+            if (this.node === null) {
+                return '';
+            } else if (this.node.code && this.node.code !== '') {
+                return `[${this.node.code}] ${this.node.name}`;
+            } else {
+                return this.node.name;
+            }
         },
 
     },
@@ -34,7 +52,27 @@ export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
          */
         set (node) {
             this.node = node;
+            // this.isModalOpen = true;
         },
+
+        /**
+         *
+         */
+        // delete () {
+        //     useDeleteNodeStore().prompt();
+        //     this.isModalOpen = false;
+        //     this.isUpdating = true;
+        // },
+
+        /**
+         *
+         */
+        // cancelDelete () {
+        //     useDeleteNodeStore().cancel();
+        //     this.isModalOpen = true;
+        //     this.isUpdating = false;
+        // },
+
 
         /**
          * unset ready for another use
@@ -42,7 +80,10 @@ export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
          * @param { Object }
          */
         unset () {
-            this.node = null;
+            // if (!this.isUpdating) { //if it's being updated, we shouldn't be setting it inactive
+                this.node = null;
+            // }
+            // this.isModalOpen = false;
         },
 
     },
