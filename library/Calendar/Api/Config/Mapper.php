@@ -87,6 +87,18 @@ class Calendar_Api_Config_Mapper extends BaseMapper
         return $this->findOneByColumnList(['event_type' => $eventType, 'connector_class' => $connectorClass]);
     }
 
+    /**
+     * Finds all config models for the specified fully-qualified class name
+     *
+     * @param string $className The fully-qualified class name, eg 'Calendar_Api_EventType_Custom_EOTC_Default'
+     * @return \Schoolbox\Collection
+     */
+    public function findAllForClass(string $className): \Schoolbox\Collection
+    {
+        // Strip common prefix and explode on '_' char
+        [$eventType, $connectorClass] = explode('_', str_replace('Calendar_Api_EventType_', '', $className));
+        return $this->findByColumnList(['event_type' => $eventType, 'connector_class' => $connectorClass]);
+    }
 
     /**
      * Find all the active timetable-related subscriptions
