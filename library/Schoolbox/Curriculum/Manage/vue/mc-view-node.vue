@@ -66,7 +66,9 @@ const hasCode = computed(() => props.node.code && props.node.code !== '');
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    if (props.depth === 0 && !viewNodesStore.isSearchActive) {
+    if (viewNodesStore.currentDepth === 0 && props.depth === 0) { //we can't to back any further
+        return true;
+    } else if (viewNodesStore.isSearchActive) { //cant do any navigation while search is active
         return true;
     } else if (viewNodesStore.isOnLast) { //cant select any further down from the MAX_DEPTH
         return true;
@@ -76,12 +78,12 @@ const isDisabled = computed(() => {
 });
 
 /**
- * Only show the selected node and its direct children when we are on the fourth node
+ * Only show the selected node and its direct children when we are on the sixth node
  * This is so we don't flood the DOM with very large Curriculum renders
  *
  * @returns { Boolean }
  */
-const isVisible = computed(() => props.depth <= 1 || viewNodesStore.isOnLast);
+const isVisible = computed(() => props.depth < 2 || viewNodesStore.isOnLast);
 
 /**
  * If this is the active node
@@ -92,11 +94,15 @@ const isUpdating = computed(() => updateNodeStore.isModalOpen && activeNodeStore
 
 /**
  * traverse to the next nodel level as an alternative to
- * using the selects in mc-header-select
+ * using the selects in mc-header-select or if the top parent is selected move back one level
  */
 function onNameSelected () {
     activeNodeStore.unset();
-    viewNodesStore.setNextSelected(props.node.id);
+    if (props.depth === 0) {
+        viewNodesStore.setSelected(viewNodesStore.currentDepth, 0);
+    } else {
+        viewNodesStore.setNextSelected(props.node.id);
+    }
 }
 
 /**
@@ -205,7 +211,7 @@ const containerClass = computed(() => {
                 <label :for="`checkbox-${props.node.id}`"></label>
             </div>
             <button
-                :class="`button-name`"
+                :class="`button-name ${ props.depth === 0 ? 'button-name-parent' : '' }`"
                 :disabled="isDisabled"
                 :title="`Expand ${title}`"
                 @click.prevent="onNameSelected"
@@ -239,7 +245,7 @@ const containerClass = computed(() => {
             </button>
             <button
                 v-if="!store.isReadOnly"
-                :class="`button-action-option  ${ isUpdating ? 'icon-close' : 'icon-modify' }`"
+                :class="`button-action-option ${ isUpdating ? 'icon-close' : 'icon-modify' }`"
                 :title="`Update ${title}`"
                 @click.prevent="onUpdateToggleSelected"
                 @keyup.enter="onUpdateToggleSelected"
@@ -260,17 +266,6 @@ const containerClass = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-
-// .container {
-//     border-bottom: 1px solid var(--body-background);
-// }
-
-.parent-container {
-    > button span {
-        font-size: 1.0625rem;
-        font-weight: bold;
-    }
-}
 
 .buttons-container {
     align-items: center;
@@ -310,6 +305,10 @@ const containerClass = computed(() => {
         opacity: 1;
     }
 }
+
+    .button-name-parent {
+        font-weight: bold;
+    }
 
 .button-action-option {
     @extend .button;
