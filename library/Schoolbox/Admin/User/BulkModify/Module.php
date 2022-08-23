@@ -37,7 +37,7 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'getModify', $basePath, "/modify");
         $this->addPostRoute($router, 'getUserList', $basePath, "/modify/list");
         $this->addPostRoute($router, 'postModify', $basePath, "/modifyForm");
-        $this->addPostRoute($router, 'deleteUsers', $basePath, "/modifyForm");
+        $this->addPostRoute($router, 'deleteUsers', $basePath, "/modifyForm/delete");
     }
 
 

@@ -341,13 +341,25 @@ export default {
                 this.isProcessing = false;
                 this.$refs.toast.timeout('Unable to delete', false, 2000);
             } finally {
-                this.$refs.toast.timeout('Successfully Deleted Users', false, 2000);
                 this.hasUpdated = true;
                 this.isProcessing = false;
 
-                this.selectedRows.delete();
 
             }
+        },
+
+        /**
+         * To update the row display after deletion
+         *
+         * @returns { Array }
+         */
+        getUpdatedRowsAfterUserDeletion () {
+            return this.rows.filter((row) => {
+                if (this.selectedRows.some((rowToDelete) => rowToDelete.id === row.id)) { //pull out any deleted rows, those rows that are in selectedFiles, which have just been deleted
+                    return false;
+                }
+                return true;
+            });
         },
 
     },

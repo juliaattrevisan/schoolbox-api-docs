@@ -214,15 +214,15 @@ class Controller extends Base
         }
 
         $this->extendExecutionTime();
+        $message = "{$this->getUser()->getFullname()} ({$this->getUser()->getId()}) started a user bulk delete";
+        $this->userBulkMapper->log($message);
+
 
         $userCollection = $this->userBulkMapper->findByColumn('id', $userIds);
         $this->userBulkMapper->bulkDelete($userCollection);
 
-        $modified = $userCollection;
-
-
         $jsonPayload = [
-            \Scrub::text("Deleted the following users: $userIds"),
+            \Scrub::text($this->userBulkMapper->getOutputMessage()),
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
