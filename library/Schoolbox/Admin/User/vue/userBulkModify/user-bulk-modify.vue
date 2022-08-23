@@ -388,6 +388,9 @@ export default {
             } else {
                 this.hasDataError = true;
                 this.logData = ['Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.'];
+                if (responseData.title !== undefined) {
+                    this.logData = [responseData.title];
+                }
             }
         },
         /**
@@ -454,7 +457,7 @@ export default {
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
             <button @click.prevent="onModifySelected" class="button submit">Modify</button>
-            <button @click.prevent="onDeleteUsersSelected" class="button button-delete">Delete Users</button>
+            <button @click.prevent="onDeleteUsersSelected" class="button submit button-delete">Delete Users</button>
         </bottom-drawer>
         <user-bulk-modify-new-values
             ref="newValues"
@@ -485,11 +488,11 @@ export default {
 
         <reveal-modal ref="outputLogModal">
             <div class="output-log">
-                    <div v-if="hasDataError" class="alert-box alert">The Bulk Modify has failed to update. Further details are logged below.</div>
-                    <textarea v-html="logData"></textarea>
+                <div v-if="hasDataError" class="alert-box alert">The Bulk Modify has failed to update. Further details are logged below.</div>
+                <textarea v-html="logData"></textarea>
             </div>
             <div>
-                    <button @click.prevent="onLogCloseSelected" class="button submit">Close</button>
+                <button @click.prevent="onLogCloseSelected" class="button submit">Close</button>
             </div>
         </reveal-modal>
 
