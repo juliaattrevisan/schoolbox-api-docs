@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * To select Curriculum Codes to assign to something like a Due Work 
+ * To select Curriculum Codes to assign to something like a Due Work
  */
 
 import { ref, onMounted } from 'vue';
@@ -35,16 +35,24 @@ const props = defineProps({
         default: [],
     },
     /**
-     * can only view the currently selected codes, not edit them 
+     * can only view the currently selected codes, not edit them
      */
     isReadOnly: {
         type: Boolean,
         required: false,
         default: true,
     },
+    /**
+     * input name, to allow custom form structure
+     */
+    formValueName: {
+        type: String,
+        required: false,
+        default: 'curriculumCodes[]',
+    }
 });
 
-const curriculumSelectorEl = ref(null); 
+const curriculumSelectorEl = ref(null);
 
 /**
  * Start loading the curriculum data
@@ -53,6 +61,7 @@ onMounted(() => {
     checkForStorybook();
     const store = useStore();
     store.isReadOnly = props.isReadOnly;
+    store.formValueName = props.formValueName;
     if (!store.isReadOnly && props.dataEndpoint !== '') { //only load when we need to
         store.load(props.dataEndpoint);
     }
@@ -66,12 +75,12 @@ onMounted(() => {
  * as they persist between the stories otherwise
  */
 function checkForStorybook () {
-    if (STORYBOOK_ENV) {
+    if (typeof STORYBOOK_ENV !== 'undefined') {
         useSelectedCodesStore().$reset();
         useSearchResultsStore().$reset();
         useModalStore().$reset();
         useModalActiveCodesStore().$reset();
-        useStore().$reset(); 
+        useStore().$reset();
     }
 }
 
@@ -90,7 +99,7 @@ function checkForStorybook () {
 <style lang="scss" scoped>
 
 .columns {
-    margin-bottom: 1rem;  
+    margin-bottom: 1rem;
 }
 
 </style>

@@ -1,5 +1,5 @@
-/** 
- * Manages the currently active codes in the modal, 
+/**
+ * Manages the currently active codes in the modal,
  * those filtered by both <select> and also the search <input>
  */
 
@@ -8,11 +8,11 @@ import { useCodesStore } from './csCodesStore';
 import { flattenCodes, searchForMatches } from './csSearchResultsStore';
 import cloneDeep from 'lodash/cloneDeep';
 
-const UNSET_ID = 0; 
-const MIN_QUERY_LENGTH = 3; 
+const UNSET_ID = 0;
+const MIN_QUERY_LENGTH = 3;
 
 export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
-    
+
     state: () => ({
         selectedFirstNodeId: UNSET_ID,
         selectedSecondNodeId: UNSET_ID,
@@ -22,11 +22,11 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
     }),
 
     getters: {
-       
+
         /**
          * If there's only one curriculum group, we can select it
          * straight away, otherwise we allow the user to make the selection
-         * 
+         *
          * @return { Boolean }
          */
         hasSingleGroup () {
@@ -42,7 +42,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         /**
          * The first level of Curriculum nodes
          * plus the empty node by default if there's more than one child
-         * 
+         *
          * @return { Array }
          */
         firstNodes () {
@@ -50,16 +50,16 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
             if (this.hasSingleGroup) {
                 return [...codesStore.codes];
             } else {
-                return [ 
+                return [
                     getEmptyNode(),
                     ...codesStore.codes
                 ];
             }
         },
-        
+
         /**
          * Whether a first node has been selected via cs-modal-header.vue
-         * 
+         *
          * @return { Boolean }
          */
         hasSelectedFirstNode () {
@@ -68,7 +68,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * The currently selected first node
-         * 
+         *
          * @return { Object }
          */
         selectedFirstNode () {
@@ -77,21 +77,25 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * To determine whether there's any second level nodes (children) in the selectedFirstNode
-         * 
+         *
          * @return { Boolean }
          */
         hasSecondNodes () {
+            if (null === this.selectedFirstNode.children) {
+                //if there are no children, don't check the length...
+                return false;
+            }
             return this.selectedFirstNode.children.length > 0 ? true : false;
         },
 
         /**
          * Show the second level nodes, which are the children of the selectedFirstNode
          * plus the empty node by default if there's more than one child
-         * 
+         *
          * @return { Array }
          */
         secondNodes () {
-            return [ 
+            return [
                 getEmptyNode(),
                 ...this.selectedFirstNode.children,
             ];
@@ -99,7 +103,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * Whether a second node has been selected via cs-modal-header.vue
-         * 
+         *
          * @return { Boolean }
          */
         hasSelectedSecondNode () {
@@ -107,8 +111,8 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
-         * The currently selected second node 
-         * 
+         * The currently selected second node
+         *
          * @return { Object }
          */
         selectedSecondNode () {
@@ -117,21 +121,25 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * To determine whether there's any third level nodes (children) in the selectedSecondNode
-         * 
+         *
          * @return { Boolean }
          */
         hasThirdNodes () {
+            if (null === this.selectedSecondNode.children) {
+                //if there are no children, don't check the length...
+                return false;
+            }
             return this.selectedSecondNode.children.length > 0 ? true : false;
         },
 
         /**
          * Show the third level nodes, which are the children of the selectedSecondNode
          * plus the empty node by default if there's more than one child
-         * 
+         *
          * @return { Array }
          */
         thirdNodes () {
-            return [ 
+            return [
                 getEmptyNode(),
                 ...this.selectedSecondNode.children,
             ];
@@ -139,7 +147,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * Whether a third node has been selected via cs-modal-header.vue
-         * 
+         *
          * @return { Boolean }
          */
         hasSelectedThirdNode () {
@@ -147,8 +155,8 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
-         * The currently selected third node 
-         * 
+         * The currently selected third node
+         *
          * @return { Object }
          */
         selectedThirdNode () {
@@ -157,21 +165,25 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * To determine whether there's any fourth level nodes (children) in the selectedFourthNode
-         * 
+         *
          * @return { Boolean }
          */
         hasFourthNodes () {
+            if (null === this.selectedThirdNode.children) {
+                //if there are no children, don't check the length...
+                return false;
+            }
             return this.selectedThirdNode.children.length > 0 ? true : false;
         },
 
         /**
          * Show the fourth level nodes, which are the children of the selectedThirdNode
          * plus the empty node by default if there's more than one child
-         * 
+         *
          * @return { Array }
          */
         fourthNodes () {
-            return [ 
+            return [
                 getEmptyNode(),
                 ...this.selectedThirdNode.children,
             ];
@@ -179,7 +191,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * Whether a fourth node has been selected via cs-modal-header.vue
-         * 
+         *
          * @return { Boolean }
          */
         hasSelectedFourthNode () {
@@ -187,8 +199,8 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
-         * The currently selected fourth node 
-         * 
+         * The currently selected fourth node
+         *
          * @return { Object }
          */
         selectedFourthNode () {
@@ -196,9 +208,9 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
-         * To determine the display of elements based on how far along 
+         * To determine the display of elements based on how far along
          * the node selection tree we are
-         * 
+         *
          * @return { Boolean }
          */
         isOnFirstNode () {
@@ -206,9 +218,9 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
-         * To determine the display of elements based on how far along 
+         * To determine the display of elements based on how far along
          * the node selection tree we are
-         * 
+         *
          * @return { Boolean }
          */
         isOnSecondNode () {
@@ -216,9 +228,9 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
-         * To determine the display of elements based on how far along 
+         * To determine the display of elements based on how far along
          * the node selection tree we are
-         * 
+         *
          * @return { Boolean }
          */
         isOnThirdNode () {
@@ -226,9 +238,9 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
-         * To determine the display of elements based on how far along 
+         * To determine the display of elements based on how far along
          * the node selection tree we are
-         * 
+         *
          * @return { Boolean }
          */
         isOnFourthNode () {
@@ -237,7 +249,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * The currently selected code
-         * 
+         *
          * @return { Object }
          */
         selectedCode () {
@@ -264,11 +276,11 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
             const spaceSeparated = queryTrimmed.split(' ') ?? []; //split the string with every space
             return spaceSeparated.filter(word => word.length > 0); //and ensure each contains a character
         },
-        
+
         /**
          * Display the current nodes based on filtration, so what's selected via the <selects>
          * and search <input> in cs-modal-header.vue
-         * 
+         *
          * @return { Array }
          */
         codes () {
@@ -288,8 +300,8 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         /**
          * no children descendents, all put in an array one level deep
          * for search results
-         * 
-         * @returns { Array } 
+         *
+         * @returns { Array }
          */
         codesFlattened () {
             if (this.isSearchActive) {
@@ -305,8 +317,8 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * To only start showing search results once enough characters
-         * have been added 
-         * 
+         * have been added
+         *
          * @return { Boolean }
          */
         isSearchActive () {
@@ -316,7 +328,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         /**
          * When the search is active, will return any codes
          * that match the current search query
-         * 
+         *
          * @return { Array }
          */
         searchResults () {
@@ -325,7 +337,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * To show that no codes march the current search
-         * 
+         *
          * @return { Boolean }
          */
         hasNoSearchResults () {
@@ -334,8 +346,8 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
 
         /**
          * the codes found relevant to the search input
-         * 
-         * @returns { Array } 
+         *
+         * @returns { Array }
          */
         codesWithSearch () {
             if (this.isSearchActive) { //only start showing results once the query is long enough
@@ -350,8 +362,8 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
     actions: {
 
         /**
-         * Can traverse through the codes via direct selection of a cs-modal-code when 
-         * it doesn't have a code. 
+         * Can traverse through the codes via direct selection of a cs-modal-code when
+         * it doesn't have a code.
          */
         setNextSelectedNode (id) {
             if (this.isOnThirdNode) {
@@ -360,11 +372,11 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
                 this.selectedThirdNodeId = id;
             } else if (this.isOnFirstNode) {
                 this.selectedSecondNodeId = id;
-            } 
+            }
         },
 
         /**
-         * to reset the selected second node, reverting the node to empty 
+         * to reset the selected second node, reverting the node to empty
          */
         resetSelectedSecondNode () {
             this.selectedSecondNodeId = UNSET_ID;
@@ -373,7 +385,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
-         * to reset the selected third node, reverting the node to empty 
+         * to reset the selected third node, reverting the node to empty
          */
         resetSelectedThirdNode () {
             this.selectedThirdNodeId = UNSET_ID;
@@ -381,7 +393,7 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
-         * to reset the selected thurd node, reverting the node to empty 
+         * to reset the selected thurd node, reverting the node to empty
          */
         resetSelectedFourthNode () {
             this.selectedFourthNodeId = UNSET_ID;
@@ -407,19 +419,19 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
     },
-    
+
 });
 
 /**
  * Used to indicate that a selection hasn't been made
  * on a curriculum node yet
- * 
+ *
  * @param { Object }
  */
  function getEmptyNode () {
-    return { 
-        id: UNSET_ID, 
+    return {
+        id: UNSET_ID,
         name: '-',
-        children: [], 
+        children: [],
     }
 }

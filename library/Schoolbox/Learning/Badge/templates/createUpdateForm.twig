@@ -257,13 +257,13 @@
                     </div>
                     {% if curriculumTaggingEnabled %}
                         <div class="small-12 columns">
-                            <label for="curriculum-code-select">Curriculum Codes</label>
-                            <div class="input-group">
+                            <label for="curriculum-code-select">
+                                Curriculum Codes
                                 {% include 'sub/curriculumCodeSelector.twig' with {
-                                    codeList: badge and badge.curriculumNodes ? badge.curriculumNodes : [],
+                                    codeList: curriculumCodes,
                                     renderButton: true
                                 } %}
-                            </div>
+                            </label>
                         </div>
                     {% endif %}
                 </fieldset>
@@ -282,7 +282,6 @@
 <script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/curriculum/jquery.curriculumSelector.js?v={{ config.site_version }}"></script>
 {% autoescape 'js' %}
 <script type="text/javascript">
     let curriculumTaggingEnabled = Boolean('{{ curriculumTaggingEnabled }}');
@@ -416,12 +415,7 @@
 
                 // Only save curriculum nodes if they are enabled
                 if (curriculumTaggingEnabled) {
-                    let curriculumNodes = form.querySelector('select[name="curriculumCodes[]"]').selectize.items;
-                    payload.curriculumNodes = curriculumNodes.map(
-                        (v) => {
-                            return {id: Number(v)}
-                        }
-                    );
+                    payload.curriculumNodes = [form.querySelector('input[name="curriculumCodes[]"]').value];
                 }
 
                 // Toast then post

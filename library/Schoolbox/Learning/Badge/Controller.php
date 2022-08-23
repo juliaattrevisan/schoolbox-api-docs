@@ -267,6 +267,7 @@ class Controller extends Base
                 '@learningBadge/createUpdateForm.twig',
                 [
                     'badge' => [],
+                    'curriculumCodes' => [],
                     'attachzone' => $attachzone->getTwigContext(),
                     'categories' => $this->categoryMapper->findAll(),
                     'expiries' => self::EXPIRY_OPTION_VALUES,
@@ -372,8 +373,10 @@ class Controller extends Base
             }
         );
 
+        $curriculumCodes = $badge->getCurriculumNodes()?->reindex();
         $this->response->content->set($this->buildHtmlOutput('@learningBadge/createUpdateForm.twig', [
             'badge' => $badge,
+            'curriculumCodes' => $curriculumCodes,
             'attachzone' => $attachzone->getTwigContext(),
             'categories' => $this->categoryMapper->findAll(),
             'expiries' => self::EXPIRY_OPTION_VALUES,

@@ -149,9 +149,17 @@ abstract class Base implements ITranslator
         if (array_key_exists($arrayField, $array)) {
             if (isset($array[$arrayField])) {
                 foreach ($array[$arrayField] as $curriculumCode) {
-                    $joinedModelCollection->add(
-                        (clone $joinedModelTemplate)->$joinedModelIdSetter($curriculumCode[$arrayIdField])
-                    );
+                    //if $arrayIdField is blank, then this is an array, with no extra data
+                    if ('' === $arrayIdField) {
+                        $joinedModelCollection->add(
+                            (clone $joinedModelTemplate)->$joinedModelIdSetter($curriculumCode)
+                        );
+                    } else {
+                        //there are 'id' here, so lets use them...
+                        $joinedModelCollection->add(
+                            (clone $joinedModelTemplate)->$joinedModelIdSetter($curriculumCode[$arrayIdField])
+                        );
+                    }
                 }
                 $model = $model->$modelFieldSetter($joinedModelCollection);
             } else {

@@ -261,6 +261,9 @@ module.exports = {
         core: './www/static/css/core/core.scss',
         editor: './www/static/css/core/editor.scss',
 
+        //curriculumSelector
+        curriculumSelector: './library/Schoolbox/Curriculum/templates/vue/curriculumSelector.js',
+
     },
     output: {
         path: path.resolve(__dirname, 'www/static/js/bundle'),

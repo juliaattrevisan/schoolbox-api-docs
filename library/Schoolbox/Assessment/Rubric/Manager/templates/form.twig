@@ -1,4 +1,3 @@
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/curriculum/jquery.curriculumSelector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 {% autoescape 'js' %}
@@ -18,7 +17,6 @@ $(function() {
         if (this.value.length > 0) {
             var input        = $(this),
                 idInput      = null,
-                codeInput    = null,
                 deleteButton = null,
                 container    = [],
                 groupId      = 0,
@@ -34,7 +32,6 @@ $(function() {
                 criterionId  = criterionMaxId++;
                 addCriterion = true;
                 idInput      = container.find('[data-template="rubric-criterion-id"]');
-                codeInput    = container.find('[data-template="rubric-criterion-curriculum-codes"]');
                 deleteButton = container.find('[data-template="rubric-criterion-delete"]');
 
             } else if (input.data('rubric-group-new')) {
@@ -45,7 +42,6 @@ $(function() {
                 criterionId = criterionMaxId++;
                 addGroup    = true;
                 idInput     = container.find('[data-template="rubric-group-id"]');
-                codeInput   = container.find('[data-template="rubric-group-curriculum-codes"]');
             }
 
             if (container.length) {
@@ -55,7 +51,6 @@ $(function() {
                 input.attr('placeholder', 'Add {{ locale.rubricCriterion.proper }}...');
 
                 newContainer.appendTo(container.parent());
-
                 // Update the new form input - make it no longer new
                 if (addCriterion) {
                     // This is no longer a new row
@@ -71,10 +66,7 @@ $(function() {
 
                     idInput.attr('name', 'crits['+groupId+'][items]['+criterionId+'][id]');
 
-                    codeInput
-                        .attr('name', 'crits['+groupId+'][items]['+criterionId+'][curriculumCode][]')
-                        .removeClass('hide')
-                        .curriculumSelector();
+                    container.find('div.list-item').append("<div data-cs-container> <curriculum-selector :is-read-only=false :selected-codes=[] data-endpoint='{{ routeLookup('curriculumApi.getTree') }}' form-value-name='crits["+groupId+"][items]["+criterionId+"][curriculumCode][]' /> </div>");
 
                     deleteButton.removeClass('hide');
                 }
@@ -92,11 +84,9 @@ $(function() {
 
                     idInput.attr('name', 'crits['+groupId+'][id]');
 
-                    codeInput
-                        .attr('name', 'crits['+groupId+'][curriculumCode][]')
-                        .removeClass('hide')
-                        .curriculumSelector();
+                    container.find('div.list-item').first().append("<div data-cs-container> <curriculum-selector :is-read-only=false :selected-codes=[] data-endpoint='{{ routeLookup('curriculumApi.getTree') }}' form-value-name='crits["+groupId+"][curriculumCode][]' /> </div>");
                 }
+                $('body').append("<script type=\"text/javascript\" src=\"{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}\"> <\/script>");
             }
         }
     };
@@ -174,17 +164,6 @@ $(function() {
     $('[data-interaction="show-example-criteria"]').click(function(e) {
         e.preventDefault();
         $('[data-role="example-criteria"]').foundation('reveal', 'open');
-    });
-
-
-    // Set up the curriculum code selection
-    $(function() {
-        $('[data-curriculum-code-selector]:visible').each(function (i, v) {
-            var $this = $(this);
-            $this.curriculumSelector({
-                value: $.selectizeSelector.getValueFromSelect($this)
-            })
-        });
     });
 });
 </script>
@@ -468,3 +447,4 @@ $(function() {
     Are you sure you want to do this?
     (Make sure you click save at the end of this form to save all changes you have made.)
 </div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>

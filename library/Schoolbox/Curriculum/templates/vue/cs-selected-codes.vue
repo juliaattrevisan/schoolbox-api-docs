@@ -14,7 +14,7 @@ const store = useStore();
 const selectedCodesStore = useSelectedCodesStore();
 
 /**
- * Add a comma separated string of the ids of the selected codes 
+ * Add a comma separated string of the ids of the selected codes
  * for use in forms
  *
  * @returns { String }
@@ -38,7 +38,7 @@ const curriculumCodes = computed(() => {
     <div v-else-if="selectedCodesStore.hasNoCodes && store.isReadOnly" class="selected-codes-container" data-test-container>
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
-    <input id="curriculumCodes[]" name="curriculumCodes[]" type="hidden" tabindex="-1" :value="curriculumCodes" />
+    <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="curriculumCodes" />
 </template>
 
 <style lang="scss" scoped>

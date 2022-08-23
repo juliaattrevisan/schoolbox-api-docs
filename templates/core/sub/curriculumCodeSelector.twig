@@ -3,30 +3,15 @@
  #
  # @param bool courseManagedReadonly
  #}
-<script type="text/javascript">
-    // Set up the curriculum code selection
-    $(function(){
-        $('#curriculum-code-select').curriculumSelector({
-            value: {{ codeList|json_encode|raw }}
-        });
-    });
-</script>
-
-<select id="curriculum-code-select" name="curriculumCodes[]" multiple {% if courseManagedReadonly ?? false %}disabled{% endif %}></select>
-
-{# Synchronous: Empty code so that when no code is selected something is actually sent to form.
- # This distinguishes between all codes being cleared and this input not existing at all.
- # Async: This field MUST be placed after non-empty value.
- #}
-<input type="hidden" name="curriculumCodes[]" value="" />
-
-{# Not yet implemented - resource browser like search #}
-{#
-<a href="#"
-   class="btn inline-block"
-   data-interaction="open-search"
-        ><span></span>Search for codes</a>
-#}
-{% if renderButton or renderButton is not defined %}
-    {% include 'sub/curriculumBrowseButton.twig' %}
+{% if courseManagedReadonly is not defined %}
+    {% set courseManagedReadonly = false %}
 {% endif %}
+<div data-cs-container>
+    <curriculum-selector
+            :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
+            :selected-codes="{{ codeList|json_encode }}"
+            data-endpoint="{{ routeLookup('curriculumApi.getTree') }}"
+    />
+
+</div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>

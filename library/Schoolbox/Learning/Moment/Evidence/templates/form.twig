@@ -60,14 +60,14 @@
                             <label for="evidence-tags">Tags</label>
                             <select data-tags name="tags[]" id="evidence-tags" multiple></select>
                             {% if curriculumTaggingEnabled %}
-                                <label for="curriculum-code-select">Curriculum Codes</label>
-                                <div class="input-group">
+                                <label for="curriculum-code-select">
+                                    Curriculum Codes
                                     {% include 'sub/curriculumCodeSelector.twig' with
                                         {
-                                            codeList: isCreate ? [] : evidence.curriculumNodes,
+                                            codeList: curriculumCodes ?? [],
                                             renderButton: true
                                         } %}
-                                </div>
+                                </label>
                             {% endif %}
                         </div>
                     </fieldset>
@@ -83,7 +83,6 @@
 <script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/curriculum/jquery.curriculumSelector.js?v={{ config.site_version }}"></script>
 {% block formJs %}
     {% autoescape 'js' %}
         <script type="text/javascript">
@@ -115,12 +114,7 @@
                 }
         );
         {% if curriculumTaggingEnabled %}
-        let curriculumNodes = form.querySelector('select[name="curriculumCodes[]"]').selectize.items;
-        payload.curriculumNodes = curriculumNodes.map(
-                (v) => {
-                    return {id: Number(v)}
-                }
-        );
+        payload.curriculumNodes = [form.querySelector('input[name="curriculumCodes[]"]').value];
         {% endif %}
         return payload;
     }
@@ -175,7 +169,7 @@
                 // Toast then post
                 toast.toastActivate('Saving...')
                 submit.prop('disabled', true);
-                
+
                 // Redirect to the return URL provided
                 fetch(form.action, {
                     method: '{{ isCreate ? 'POST' : 'PUT' }}',
