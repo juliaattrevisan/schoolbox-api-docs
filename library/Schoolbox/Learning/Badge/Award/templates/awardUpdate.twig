@@ -25,10 +25,13 @@
         <h1>{{ award.badge.name }}</h1>
 
         <ul class="meta">
-            <li class="icon-staff-students"><a href="/search/user/{{ award.recipient.id }}">{{ award.recipient.fullname }}</a></li>
+            {% set recipientProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id}) %}
+            {% set awarderProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
+
+            <li class="icon-staff-students"><a href="{{ recipientProfileRoute }}">{{ award.recipient.fullname }}</a></li>
             <li class="icon-view">Category: {{ award.badge.category.name }}</li>
             <li class="icon-view">Awarded {{ award.awardedAt.relativeTime }} by
-                <a href="/search/user/{{ award.awardedBy.id }}">{{ award.awardedBy.fullname }}</a>
+                <a href="{{ awarderProfileRoute }}">{{ award.awardedBy.fullname }}</a>
             </li>
         </ul>
     </div>
