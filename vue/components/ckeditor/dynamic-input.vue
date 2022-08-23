@@ -18,10 +18,10 @@ export default {
     ],
 
     props: {
-        /* A word that represents a singular form
-         * for the thing you're adding e.g. "Comment"
+        /* The id of the input/textarea element, supplied
+         * by whatever summons this component
          */
-        singular: {
+        id: {
             type: String,
             required: true
         },
@@ -29,6 +29,13 @@ export default {
          * by whatever summons this component
          */
         inputName: {
+            type: String,
+            required: true
+        },
+        /* A word that represents a singular form
+         * for the thing you're adding e.g. "Comment"
+         */
+        singular: {
             type: String,
             required: true
         },
@@ -91,13 +98,6 @@ export default {
         } else {
             this.uniqueId = this.presetUniqueId;
         }
-
-        /* Spawn immediately, if configured to do so
-         * Start loading up the libraries and stuff
-         */
-        if (this.spawnImmediately) {
-            this.loadDependencies();
-        }
     },
 
     mounted() {
@@ -145,29 +145,11 @@ export default {
  
     methods: {
 
-        async loadDependencies() {
-            if (__isFirstCKEditorLoad) {
-                await injectScript(`${this.cdnPrefix}/js/ckeditor/ckeditor.js?v=${this.siteVersion}`);
-                await injectScript(`${this.cdnPrefix}/js/editor/jquery.editor.js?v=${this.siteVersion}`);
-                __isFirstCKEditorLoad = false;
-            }
-        },
-
         /**
          * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
          */
         onEdit () {
             this.init(EDITOR_CONFIG_FOR_COMMENTS);
-
-            /* Remove the proxy textarea, but show the ckeditor;
-             * the classic bait-and-switch. Don't crash if the
-             * proxy content doesn't exist
-             */
-            let proxy = document.querySelector('#dynamic-input-'+this.uniqueId+'-proxy');
-
-            if (proxy) {
-                document.querySelector('#dynamic-input-' + this.uniqueId + '-proxy').remove();
-            }
         },
 
         /**
@@ -224,7 +206,7 @@ export default {
                     }
                 },
                 startupFocus: true,
-                targetElements: $(`#dynamic-input-${this.uniqueId}`),
+                targetElements: $(`#${this.id}`),
             }
         },
 
@@ -248,14 +230,14 @@ export default {
 
 <template>
     <div>
-        <article :id="`dynamic-input-${uniqueId}-proxy`">{{ this.value }}</article>
+        <article :id="`${this.id}-proxy`">{{ this.value }}</article>
 
         <template v-if="this.allowEdit">
             <a class="button icon-modify" v-show="!isCKEditorLoaded" @click.once="onEdit">{{ getEditButtonText }}</a>
         </template>
 
         <div :style="getStyles">
-            <textarea :id="`dynamic-input-${uniqueId}`" :name="this.inputName" rows="4">{{ this.value }}</textarea>
+            <textarea :id="this.id" :name="this.inputName" rows="4">{{ this.value }}</textarea>
 
             <template v-if="this.allowSubmit">
                 <button class="button submit" @click="postItem" :disabled="isPostDisabled">Save</button>

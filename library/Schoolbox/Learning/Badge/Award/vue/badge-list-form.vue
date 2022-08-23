@@ -345,8 +345,9 @@ export default {
 
             Promise
                 .all(this.selectedBadges.map(v => {
-                    let field = 'reason['+v.id+']';
-                    let reason = document.querySelector('textarea[name="'+field+'"]').value;
+                    /* Shank out the ckeditor's contents
+                     */
+                    let reason = CKEDITOR.instances['reason'].getData();
 
                     /* Construct each payload for each badge uniquely
                      */
@@ -430,12 +431,13 @@ export default {
             </ul>
 
             <dynamic-input
-                :singular="'reason'"
+                :id="'reason'"
                 :inputName="'reason'"
                 :value="''"
-                :allow-edit="false"
+                :singular="'reason'"
+                :allow-edit="true"
                 :allow-submit="false"
-                :spawn-immediately="true"
+                :spawn-immediately="false"
                 :is-processing="true"
                 :cdn-prefix="this.cdnPrefix"
                 :site-version="this.siteVersion"
