@@ -1,3 +1,13 @@
+/* The default foundation formula makes content noncentered
+ * when it should be centered - caused by having short titles
+ * and this max-width: calc(100% - 2.5rem);
+ */
+.reveal-modal .badge-modal {
+  h1, h2, h3, h4, h5, h6 {
+    max-width: initial;
+  }
+}
+
 .badge-grid {
   .badge {
     flex: 1 0 250px;
