@@ -149,81 +149,79 @@
                                        data-spec-assessment-id="{{ specAssessment.id ?? null }}"
                                        data-spec-assessment-title="{{ specAssessment.title ?? null }}"
                                     >Save to Course...</a>
+                                    <div id="save-to-course-modal-{{ assessment.id }}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+                                        <h2>Are you sure you wish to save this {{ locale.translate('assessment') }} back to its course?</h2>
+                                        {% if specAssessment.id ?? null %}
+                                            <div class="warning alert-box">
+                                                <p>
+                                                    The original {{ locale.translate('assessment') }}
+                                                    &ldquo;{{ specAssessment.title ?? null }}&rdquo;
+                                                    in the course will be <strong>replaced</strong>
+                                                    with this {{ locale.translate('assessment') }}.
+                                                </p>
+                                                {% if assessment is project %}
+                                                    {% if assessment.assessables is not empty %}
+                                                        <p>
+                                                            As this {{ locale.translate('assessment') }} is a project, its
+                                                            activity set will also be <strong>replaced</strong>,
+                                                            possibly deleting activities:
+                                                        </p>
+                                                        <p><strong>Current</strong></p>
+                                                        <ul>
+                                                            {% for activity in specAssessment.assessables %}
+                                                                <li>{{ activity.title }}</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                        <p><strong>Replacement</strong></p>
+                                                        <ul>
+                                                            {% for activity in assessment.assessables %}
+                                                                <li>{{ activity.title }}</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    {% endif %}
+                                                {% endif %}
+                                                <p>
+                                                    Any other imports of the original {{ locale.translate('assessment') }} will
+                                                    <strong>not</strong> be updated.
+                                                </p>
+                                            </div>
+                                        {% else %}
+                                            <p>
+                                                This {{ locale.translate('assessment') }}
+                                                &ldquo;{{ assessment.title ?? null }}&rdquo;
+                                                does not yet exist in the course;
+                                                {% if assessment is project %}
+                                                    it and its activities will be added.
+                                                {% else %}
+                                                    it will be added.
+                                                {% endif %}
+                                            </p>
+                                        {% endif %}
+                                        <ul class="flex-list buttons">
+                                            <li>
+                                                <a href="{{ saveToCourseRoute }}"
+                                                   data-method="{{ saveToCourseMethod }}"
+                                                   class="button submit"
+                                                   data-action="save-to-course"
+                                                   data-related-component="component{{ componentInstance.id }}"
+                                                >Yes</a>
+                                            </li>
+                                            <li>
+                                                <a href="#"
+                                                   class="button"
+                                                   data-action="save-to-course-cancel"
+                                                   data-related-component="component{{ componentInstance.id }}"
+                                                >No</a>
+                                            </li>
+                                        </ul>
+                                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                                    </div>
                                 </li>
                             {% endif %}
                         {% endif %}
                     </ul>
                 {% endif %}
             </div>
-            {% if saveToCourseRoute %}
-                <div id="save-to-course-modal-{{ assessment.id }}" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-                    <h2>Are you sure you wish to save this {{ locale.translate('assessment') }} back to its course?</h2>
-                    {% if specAssessment.id ?? null %}
-                        <div class="warning alert-box">
-                            <p>
-                                The original {{ locale.translate('assessment') }}
-                                &ldquo;{{ specAssessment.title ?? null }}&rdquo;
-                                in the course will be <strong>replaced</strong>
-                                with this {{ locale.translate('assessment') }}.
-                            </p>
-                            {% if assessment is project %}
-                                {% if assessment.assessables is not empty %}
-                                    <p>
-                                        As this {{ locale.translate('assessment') }} is a project, its
-                                        activity set will also be <strong>replaced</strong>,
-                                        possibly deleting activities:
-                                    </p>
-                                    <p><strong>Current</strong></p>
-                                    <ul>
-                                        {% for activity in specAssessment.assessables %}
-                                            <li>{{ activity.title }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                    <p><strong>Replacement</strong></p>
-                                    <ul>
-                                        {% for activity in assessment.assessables %}
-                                            <li>{{ activity.title }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            {% endif %}
-                            <p>
-                                Any other imports of the original {{ locale.translate('assessment') }} will
-                                <strong>not</strong> be updated.
-                            </p>
-                        </div>
-                    {% else %}
-                        <p>
-                            This {{ locale.translate('assessment') }}
-                            &ldquo;{{ assessment.title ?? null }}&rdquo;
-                            does not yet exist in the course;
-                            {% if assessment is project %}
-                                it and its activities will be added.
-                            {% else %}
-                                it will be added.
-                            {% endif %}
-                        </p>
-                    {% endif %}
-                    <ul class="flex-list buttons">
-                        <li>
-                            <a href="{{ saveToCourseRoute }}"
-                               data-method="{{ saveToCourseMethod }}"
-                               class="button submit"
-                               data-action="save-to-course"
-                               data-related-component="component{{ componentInstance.id }}"
-                            >Yes</a>
-                        </li>
-                        <li>
-                            <a href="#"
-                               class="button"
-                               data-action="save-to-course-cancel"
-                               data-related-component="component{{ componentInstance.id }}"
-                            >No</a>
-                        </li>
-                    </ul>
-                    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                </div>
-            {% endif %}
         </li>
     {% endfor %}
 </ul>
