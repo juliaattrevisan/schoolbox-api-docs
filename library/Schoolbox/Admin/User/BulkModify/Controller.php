@@ -210,7 +210,7 @@ class Controller extends Base
         $userIds = $params->get('users');
 
         if (!is_array($userIds) || count($userIds) === 0) {
-            error(ErrorMapper::ERROR_PROCESSING, 'No user selected.');
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PROCESSING, null, 'No user selected.', 400);
         }
 
         $this->extendExecutionTime();

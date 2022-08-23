@@ -167,6 +167,8 @@ export default {
             collator: new Intl.Collator('en', {numeric: true, sensitivity: 'base'}), //to naturally sort year level column
             isShiftKeySelected: false, //to multi-select fields,
             hasSelectedShiftKey: false, //to hide a UI note
+            hasDataError: false,
+            logData: [], //to display the output of the returned action
         }
     },
 
@@ -327,24 +329,29 @@ export default {
             });
             try {
                 this.isProcessing = true;
-                await fetch(this.srcUserDelete, {
+                const response = await fetch(this.srcUserDelete, {
+                    headers: {
+                        'Accept': 'application/json',
+                    },
                     method: 'POST',
                     body: formData,
                 });
+                const responseData = await response.json();
+                this.checkUpdateResponse(response, responseData);
                 this.$refs.toast.timeout('Deleted', true, 2000);
                 this.$refs.deleteModal.close();
-                this.rows = this.getUpdatedRowsAfterUserDeletion();
-                this.clearRows();
-                this.$refs.table.resetSelectedRows();
+
             } catch (error) {
                 console.warn(error);
                 this.isProcessing = false;
                 this.$refs.toast.timeout('Unable to delete', false, 2000);
+                this.hasDataError = true;
+
             } finally {
                 this.hasUpdated = true;
                 this.isProcessing = false;
 
-
+                this.$refs.outputLogModal.open();
             }
         },
 
@@ -361,6 +368,34 @@ export default {
                 return true;
             });
         },
+
+        /**
+         * Check for any issues in the returned update
+         *
+         * @param { Object }
+         * @param { Object }
+         */
+        checkUpdateResponse (response, responseData) {
+            if (response.ok) { //successful response
+                this.hasDataError = false;
+                this.logData = responseData;
+                this.rows = this.getUpdatedRowsAfterUserDeletion();
+                this.clearRows();
+                this.$refs.table.resetSelectedRows();
+            } else if (!response.ok && response.status === 501) { //otherwise check for 501 error
+                this.hasDataError = true;
+                this.logData = [responseData.title]; //which comes in with an error message
+            } else {
+                this.hasDataError = true;
+                this.logData = ['Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.'];
+            }
+        },
+        /**
+         * Close the log modal
+         */
+        onLogCloseSelected () {
+            this.$refs.outputLogModal.close();
+        }
 
     },
 
@@ -448,6 +483,16 @@ export default {
             </ul>
         </reveal-modal>
 
+        <reveal-modal ref="outputLogModal">
+            <div class="output-log">
+                    <div v-if="hasDataError" class="alert-box alert">The Bulk Modify has failed to update. Further details are logged below.</div>
+                    <textarea v-html="logData"></textarea>
+            </div>
+            <div>
+                    <button @click.prevent="onLogCloseSelected" class="button submit">Close</button>
+            </div>
+        </reveal-modal>
+
         <toast ref="toast"></toast>
 
     </div>
@@ -484,6 +529,11 @@ export default {
     &:hover {
         background: none;
     }
+}
+
+textarea { //to prevent the potential for a massively long modal
+    min-height: 200px;
+    max-height: 600px;
 }
 
 </style>
