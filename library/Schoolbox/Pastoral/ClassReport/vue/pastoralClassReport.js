@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import PastoralClassReport from './pastoralClassReport.vue';
+import PastoralClassReport from './pastoral-class-report.vue';
 
 createApp({
     components: {

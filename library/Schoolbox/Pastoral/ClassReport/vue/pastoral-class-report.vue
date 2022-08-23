@@ -59,32 +59,33 @@ export default {
 </script>
 
 <template>
-    <div>
-        <div v-if="showSkeletonLoader" class="row">
-            <ul class="information-list">
-                <li class="row" v-for="n in 3" :key="n">
-                    <div class="small-12 card skeleton">
-                        <div class="img"></div>
-                        <h3></h3>
-                        <p class="meta"></p>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        <div v-else>
-            <div v-if="data.length === 0" class="empty-state">
+    <div class="small-12 island badge-report">
+        <section class="content">
+            <div v-if="showSkeletonLoader" class="loader">
+            </div>
+
+            <div v-else-if="data.length === 0" class="empty-state">
                 <i class="icon-class-list"></i>
                 <p>This class contains no students.</p>
             </div>
-            <ul v-else class="information-list">
-                <li class="row" v-for="studentData in data" :key="studentData.student.id">
-                    <div class="small-12 card skeleton">
-                        <div class="img"></div>
-                        <h3></h3>
-                        <p class="meta"></p>
-                    </div>
-                </li>
-            </ul>
-        </div>
+
+            <div v-else>
+                <ul class="action-list">
+                    <li v-for="studentData in data" :key="studentData.student.id">
+                        <div>
+                            <img :src="studentData.student._links.avatar"
+                                 :alt="`profile photo of ${studentData.student.fullName}`"
+                                 class="portrait" />
+                            <div>
+                                <a :href="studentData.student._links.profile" title="View profile" class="name">
+                                    {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
+                                </a>
+                                <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
     </div>
 </template>
