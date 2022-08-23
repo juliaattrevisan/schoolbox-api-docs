@@ -246,7 +246,9 @@ export default {
                     <hr />
                     <article v-html="award.reason"></article>
 
-                    <a class="button icon-modify" :href="award._links.awardUpdate">Edit</a>
+                    <template v-if="award._links.awardUpdate">
+                        <a class="button icon-modify" :href="award._links.awardUpdate">Edit</a>
+                    </template>
                 </template>
 
                 <template v-if="award.badge.curriculumNodes.length">
