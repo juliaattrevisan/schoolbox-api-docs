@@ -38,7 +38,7 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
         />{{ new ? '' : criterion.name }}</textarea>
 
         {# Input for criterion curriculum codes #}
-        {% if curriculumTaggingEnabled %}
+        {% if curriculumTaggingEnabled and not new %}
             {% if courseManagedReadonly is not defined %}
                 {% set courseManagedReadonly = false %}
             {% endif %}

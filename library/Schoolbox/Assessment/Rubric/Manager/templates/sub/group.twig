@@ -32,7 +32,7 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
         />{{ group.name ?? '' }}</textarea>
 
         {# Input for group curriculum codes #}
-        {% if curriculumTaggingEnabled %}
+        {% if curriculumTaggingEnabled and not new %}
             {% if courseManagedReadonly is not defined %}
                 {% set courseManagedReadonly = false %}
             {% endif %}
