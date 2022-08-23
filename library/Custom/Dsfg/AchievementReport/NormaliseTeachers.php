@@ -47,6 +47,10 @@ class NormaliseTeachers
             $key = "ClassTeacher{$currentTeacherIndex}";
             $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
 
+            if (!isset($current[$key])) {
+                continue;
+            }
+
             /* Teacher's name is in this field
              */
             $currentTeacher = $current[$key];
