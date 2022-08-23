@@ -3,7 +3,9 @@
  */
 
 import { defineStore } from 'pinia';
-import { useActiveNodeStore } from './mcActiveNodeStore'
+import { useNodesStore } from '../../store/mcNodesStore';
+import { useActiveNodeStore } from './mcActiveNodeStore';
+import { useViewNodesStore } from '../../store/mcViewNodesStore';
 
 
 export const useDeleteNodeStore = defineStore('mcDeleteNode', {
@@ -23,23 +25,28 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
         },
 
         /**
-         * member removal has been confirmed so pull them out
+         * node removal has been confirmed so notify the backend
+         * and then pull it out of the nodes if successful
          */
         async delete () {
             this.isProcessing = true;
             const activeNodeStore = useActiveNodeStore();
             try {
-                const response = await fetch(`/api/curriculum/${activeNodeStore.node.id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                if (response.ok) {
-                    this.isProcessing = false;
-                } else {
-                    throw new Error();
-                }
+                // useViewNodesStore().deleteActiveNode();
+                useNodesStore().deleteActiveNode();
+                this.isProcessing = false;
+                // const response = await fetch(`/api/curriculum/${activeNodeStore.node.id}`, {
+                //     method: 'DELETE',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                // });
+                // if (response.ok) {
+                //     activeNodeStore.unset(); //unset as the node is no longer available
+                //     this.isProcessing = false;
+                // } else {
+                //     throw new Error();
+                // }
             } catch (error) {
                 console.warn(error);
             }

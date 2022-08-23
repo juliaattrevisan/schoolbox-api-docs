@@ -5,6 +5,7 @@
 
 import { defineStore } from 'pinia';
 import { useNodesStore } from './mcNodesStore';
+import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 import cloneDeep from 'lodash/cloneDeep';
 
 const UNSET_ID = 0;
@@ -67,7 +68,6 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
             } else {
                 return this.lists.filter((nodeList, index) => index < MAX_DEPTH);
             }
-
         },
 
         /**
@@ -174,7 +174,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
                     ];
                 }
             } catch (error) {
-                debugger;
+                console.warn(error);
             }
         },
 
@@ -267,6 +267,20 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          */
         setNextSelected (id) {
             this.setSelected(this.currentDepth+1, id);
+        },
+
+        /**
+         *
+         */
+        deleteActiveNode () {
+            // const activeNode = useActiveNodeStore().node;
+            // if (activeNode.id === this.current.id) {
+            //     // this.toPrevious(this.depth-1); //won't be available anymore, so move one row backwards
+            //     //then pull the active node out of mcNodesStore
+
+            // } else { //loop through and find the id
+
+            // }
         },
 
         /**

@@ -258,10 +258,10 @@ export default {
             if (this.selectedBadgeCount > 0) {
                 const plural = this.selectedBadgeCount > 1 ? 's' : '';
                 const typeSelected = this.confirmButtonText.includes('goal') ? `goal${plural} selected` : `achievement${plural} selected`;
-                return `${this.selectedBadgeCount} ${typeSelected}`;  
+                return `${this.selectedBadgeCount} ${typeSelected}`;
             } else {
                 return '';
-            }  
+            }
         }
     },
     watch: {
@@ -269,13 +269,16 @@ export default {
         /**
          * We need to wait for the transition animation to complete before we re-evaluate
          * the status of horizontal-scroller.
-         * @TODO - consider using ResizeObserver once Safari 15 is released, as 
+         * @TODO - consider using ResizeObserver once Safari 15 is released, as
          * this could be handled much better by the feature
          */
         selectedBadges (newSelectedBadges, oldSelectedBadges) {
+            newSelectedBadges.forEach((badge) => {
+                badge.reason = 'Hai';
+            });
             if (newSelectedBadges.length !== oldSelectedBadges.length) { //if the number of badges has changed
                 setTimeout(() => { //notify horizontal-scroller.vue once enought time to allow the animation to complete has passed
-                    this.hasContentChange = true; 
+                    this.hasContentChange = true;
                     this.$nextTick(() => this.hasContentChange = false); //set back to false for another possibile filtration
                 }, 400);
             }
@@ -301,9 +304,9 @@ export default {
 
         /**
          * When a badge is selected, update the list depending on the selections status
-         * 
-         * @params { Object } 
-         * @params { Boolean } 
+         *
+         * @params { Object }
+         * @params { Boolean }
          */
         onBadgeSelected (badge, isChecked) {
             if (isChecked) {
@@ -352,7 +355,7 @@ export default {
 
 <template>
     <div class="badge-list-form">
-        <badge-list 
+        <badge-list
             ref="badgeList"
             :get-badges-route="getBadgesRoute"
             :get-badge-create-form-route="getBadgeCreateFormRoute"
@@ -370,7 +373,7 @@ export default {
             <div class="selected-container">
                 <h3 class="selected-container__count"><em>{{ selectedBadgeText }}</em></h3>
                 <div class="selected-container__badges">
-                    <horizontal-scoller 
+                    <horizontal-scoller
                         :hasButtons="false"
                         :height="36"
                         :has-content-change="hasContentChange"
@@ -402,6 +405,7 @@ export default {
                         <div>
                             <badge-image :badge="badge"></badge-image>
                             <h3>{{ badge.name }}</h3>
+                            <h3>{{ badge.reason }}</h3>
                         </div>
                     </div>
                 </li>
@@ -450,7 +454,7 @@ export default {
     }
 
     .selected-container__badges {
-        flex: 1 1 auto; //fill up all the space that __count doesn't occupy 
+        flex: 1 1 auto; //fill up all the space that __count doesn't occupy
         min-width: 50%; //and don't get too small when shrunk down
     }
 
@@ -460,7 +464,7 @@ export default {
     transition: all 0.3s;
 }
 
-.selected-badges-enter, 
+.selected-badges-enter,
 .selected-badges-leave-to {
     opacity: 0;
     transform: translateY(30px);

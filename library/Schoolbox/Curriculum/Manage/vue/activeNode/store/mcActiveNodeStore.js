@@ -10,8 +10,6 @@ export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
 
     state: () => ({
         node: null, //the currently selected node
-        // isModalOpen: false,
-        // isUpdating: false, //if further action is being taken on the active node
     }),
 
     getters: {
@@ -56,34 +54,12 @@ export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
         },
 
         /**
-         *
-         */
-        // delete () {
-        //     useDeleteNodeStore().prompt();
-        //     this.isModalOpen = false;
-        //     this.isUpdating = true;
-        // },
-
-        /**
-         *
-         */
-        // cancelDelete () {
-        //     useDeleteNodeStore().cancel();
-        //     this.isModalOpen = true;
-        //     this.isUpdating = false;
-        // },
-
-
-        /**
          * unset ready for another use
          *
          * @param { Object }
          */
         unset () {
-            // if (!this.isUpdating) { //if it's being updated, we shouldn't be setting it inactive
-                this.node = null;
-            // }
-            // this.isModalOpen = false;
+            this.node = null;
         },
 
     },

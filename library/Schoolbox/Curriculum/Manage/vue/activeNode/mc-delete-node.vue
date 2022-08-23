@@ -22,6 +22,13 @@ watch(() => deleteNodeStore.isModalOpen, (isModalOpen) => {
 });
 
 /**
+ * also highlight that you'll be deleting all the children within as well
+ *
+ * @returns { String }
+ */
+const childrenWarning = computed(() => activeNodeStore?.node?.children.length > 0 ? ' and all of its children' : '');
+
+/**
  * delete the node when confirmed
  */
 function onDeleteSelected () {
@@ -88,7 +95,7 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
-        <p>Are you sure you wish to delete this node: {{ activeNodeStore.title }}?</p>
+        <p>Are you sure you wish to delete this node: {{ activeNodeStore.title }}{{ childrenWarning }}?</p>
         <ul class="flex-list buttons">
             <li><button @click.prevent="onDeleteSelected" class="button submit" :disabled="deleteNodeStore.isProcessing">{{ deleteButtonText }}</button></li>
             <li><button @click.prevent="onCancelSelected" class="button" :disabled="deleteNodeStore.isProcessing">Cancel</button></li>
