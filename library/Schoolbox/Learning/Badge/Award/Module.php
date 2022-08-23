@@ -152,6 +152,16 @@ class Module extends BaseModule
         /* Update properties about an Awarding, such as its Reason
          */
         $this->register(
+            self::METHOD_GET,
+            '/{awardId}/update',
+            'getAwardUpdate',
+            $manageBadgesRule,
+            Closure::fromCallable([$this, 'preloadAward'])
+        );
+
+        /* Update properties about an Awarding, such as its Reason
+         */
+        $this->register(
             self::METHOD_POST,
             '/{awardId}/update',
             'postAwardUpdate',

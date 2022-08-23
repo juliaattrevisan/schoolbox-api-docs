@@ -97,7 +97,7 @@ class Links
         /* End point for updating properties about an Awarding
          */
         $translation['awardUpdate'] = $this->getRouteIfAuthorized(
-            'learningBadgeAward.postAwardUpdate',
+            'learningBadgeAward.getAwardUpdate',
             [
                 'awardId' => $award->getId()
             ]

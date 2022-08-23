@@ -628,12 +628,40 @@ class Controller extends Base
     /**
      * For the $award given, update its properties
      *
+     * @api GET /learning/badge/award/{awardId}/update
+     * @param \Schoolbox\Learning\Badge\Award\Model $award
+     * @return void
+     */
+    public function getAwardUpdate(AwardModel $award): void
+    {
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadgeAward/awardUpdate.twig',
+                [
+                    'award' => $award
+                ],
+                'Edit award'
+            )
+        );
+    }
+
+
+    /**
+     * For the $award given, update its properties
+     *
+     * @api POST /learning/badge/award/{awardId}/update
      * @param \Schoolbox\Learning\Badge\Award\Model $award
      * @return void
      */
     public function postAwardUpdate(AwardModel $award): void
     {
-        print_r($this->request->post->getArrayCopy());
+        $award->setReason($this->request->post['reason']);
+
+        $this->mapper->save($award);
+
+        /* Redirect back to a guy's feed, I guess
+         * TODO Maybe a return url is more ideal
+         */
     }
 
 

@@ -242,16 +242,12 @@ export default {
 
                 <article v-html="award.badge.body"></article>
 
-                <form :action="award._links.awardUpdate" method="post">
-                    <dynamic-input
-                        :singular="'reason'"
-                        :inputName="'reason['+award.badge.id+']'"
-                        :value="award.reason"
-                        :cdn-prefix="this.cdnPrefix"
-                        :is-processing="true"
-                        :site-version="this.siteVersion"
-                    ></dynamic-input>
-                </form>
+                <template v-if="award.reason.length">
+                    <hr />
+                    <article v-html="award.reason"></article>
+
+                    <a class="button icon-modify" :href="award._links.awardUpdate">Edit</a>
+                </template>
 
                 <template v-if="award.badge.curriculumNodes.length">
                     <hr />
