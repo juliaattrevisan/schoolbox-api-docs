@@ -84,7 +84,7 @@ $(function() {
 
                     idInput.attr('name', 'crits['+groupId+'][id]');
 
-                    container.find('div.list-item').append("<div data-cs-container> <curriculum-selector :is-read-only=false :selected-codes=[] data-endpoint='{{ routeLookup('curriculumApi.getTree') }}' form-value-name='crits["+groupId+"][curriculumCode][]' /> </div>");
+                    container.find('div.list-item').first().append("<div data-cs-container> <curriculum-selector :is-read-only=false :selected-codes=[] data-endpoint='{{ routeLookup('curriculumApi.getTree') }}' form-value-name='crits["+groupId+"][curriculumCode][]' /> </div>");
                 }
                 $('body').append("<script type=\"text/javascript\" src=\"{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}\"> <\/script>");
             }
