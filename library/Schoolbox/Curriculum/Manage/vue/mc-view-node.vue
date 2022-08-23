@@ -10,8 +10,9 @@ import { useStore } from './store/manageCurriculumStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import { useDeleteNodeStore } from './activeNode/store/mcDeleteNodeStore';
+import { useUpdateNodeStore } from './activeNode/store/mcUpdateNodeStore';
 import { escapeRegExp } from '@js/util/jsUtils';
-import McActiveNode from './activeNode/mc-active-node.vue';
+import McUpdateNode from './activeNode/mc-update-node.vue';
 
 
 const props = defineProps({
@@ -42,6 +43,7 @@ const store = useStore();
 const viewNodesStore = useViewNodesStore();
 const activeNodeStore = useActiveNodeStore();
 const deleteNodeStore = useDeleteNodeStore();
+const updateNodeStore = useUpdateNodeStore();
 
 /**
  * to gradually and more paddingLeft to indicate node level depth
@@ -86,7 +88,7 @@ const isVisible = computed(() => props.depth <= 1 || viewNodesStore.isOnLast);
  *
  * @returns { Boolean }
  */
-const isActiveNode = computed(() => activeNodeStore.isActive && activeNodeStore.node.id === props.node.id);
+const isUpdating = computed(() => updateNodeStore.isModalOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * traverse to the next nodel level as an alternative to
@@ -105,13 +107,13 @@ function onDeleteSelected () {
 }
 
 /**
- * to open up or close the edit modal
+ * to open up or close the update modal
  */
-function onEditToggleSelected () {
-    if (isActiveNode.value) {
-        activeNodeStore.unset();
+function onUpdateToggleSelected () {
+    if (isUpdating.value) {
+        updateNodeStore.cancel();
     } else {
-        activeNodeStore.set(props.node);
+        updateNodeStore.prompt(props.node);
     }
 }
 
@@ -237,15 +239,15 @@ const containerClass = computed(() => {
             </button>
             <button
                 v-if="!store.isReadOnly"
-                class="button-action-option icon-modify"
-                :title="`Edit ${title}`"
-                @click.prevent="onEditToggleSelected"
-                @keyup.enter="onEditToggleSelected"
+                :class="`button-action-option  ${ isUpdating ? 'icon-close' : 'icon-modify' }`"
+                :title="`Update ${title}`"
+                @click.prevent="onUpdateToggleSelected"
+                @keyup.enter="onUpdateToggleSelected"
             >
-                Edit {{ title }}
+                Update {{ title }}
             </button>
         </div>
-        <mc-active-node v-if="isActiveNode" />
+        <mc-update-node v-if="isUpdating" />
         <ul v-if="hasChildren">
             <mc-view-node
                 v-for="node in props.node.children"
