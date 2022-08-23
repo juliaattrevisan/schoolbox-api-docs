@@ -127,9 +127,9 @@ class CSV extends AbstractCSV
      */
     private function writeStudents(GenericCollection $sortedAssessments, Markbook $markbook, GenericCollection $students, GenericCollection $participants): void
     {
-        $rankByStudentId = [];
+        $rank = [];
         if ($this->viewRank) {
-            $rankByStudentId = $markbook->getRankByStudentId();
+            $rank = $markbook->getRanking();
         }
         // Student rows
         foreach ($students as $userId => $student) {
@@ -140,7 +140,7 @@ class CSV extends AbstractCSV
                 $markbook->getStudentStatistics()[$student->getId()]['weightedMean'],
             ];
             if ($this->viewRank) {
-                $studentRowHeaders[] = $rankByStudentId[$student->getId()] ?? '';
+                $studentRowHeaders[] = $rank[$student->getId()] ?? '';
             }
 
             $studentRow = [];

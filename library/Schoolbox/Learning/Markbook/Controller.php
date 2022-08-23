@@ -133,14 +133,14 @@ class Controller extends Base
             /**
              * need to get an list of the students by id, with their ranking
              */
-            $rankByStudentId = $markbook->getRankByStudentId();
+            $rank = $markbook->getRanking();
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@learningMarkbook/markbookInner.twig', [
                     'markbook'              => $markbook,
                     'folder'                => $folder,
-                    'rank'                  => $rankByStudentId,
+                    'rank'                  => $rank,
                     'rankEnabled'           => (bool)$this->getConfigLoader()->get('view_rank'),
                     'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
                     'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),

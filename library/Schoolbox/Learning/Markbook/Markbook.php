@@ -425,10 +425,11 @@ class Markbook
 
     /**
      * Build student ranking
-     * @see library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php for similar function getRankByStudentId().
+     *
+     * @see /library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php for similar function getRanking().
      * @return array [studentId => integer ranking]
      */
-    public function getRankByStudentId(): array
+    public function getRanking(): array
     {
         // First build basic array (id,grade).
         $rankList = [];
@@ -454,16 +455,16 @@ class Markbook
          * iterate over ordered list of ranked students, and actually give them helpful rankings
          * not 42.06, but 5 (you are 5th in the class)
          */
-        $rankByStudentId = [];
+        $ranking = [];
         foreach ($rankList as $student) {
             if ($prevStudent['grade'] !== $student['grade']) {
                 $rankValue = $currentRank;
             }
-            $rankByStudentId[$student['id']] = $rankValue;
+            $ranking[$student['id']] = $rankValue;
             $currentRank++;
             $prevStudent = $student;
         }
 
-        return $rankByStudentId;
+        return $ranking;
     }
 }

@@ -219,12 +219,12 @@ class Controller extends WebController\Base
             /**
              * need to get an list of the students by id, with their ranking
              */
-            $rankByStudentId = $courseMarkbook->getRankByStudentId();
+            $rank = $courseMarkbook->getRanking();
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $this->buildUnthemedHtmlOutput('@courseMarkbook/courseMarkbookInner.twig', [
-                    'rank'                    => $rankByStudentId,
+                    'rank'                    => $rank,
                     'rankEnabled'             => (bool)$this->getConfigLoader()->get('view_rank'),
                     'courseSpec'              => $courseSpec,
                     'collapsedAssessments'    => $courseMarkbook->getCollapsedAssessments(),
