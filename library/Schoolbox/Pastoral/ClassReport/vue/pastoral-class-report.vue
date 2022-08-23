@@ -72,6 +72,7 @@ export default {
             <div v-else>
                 <ul class="action-list">
                     <li v-for="studentData in data" :key="studentData.student.id">
+                        <!-- student profile -->
                         <div>
                             <img :src="studentData.student._links.avatar"
                                  :alt="`profile photo of ${studentData.student.fullName}`"
@@ -83,6 +84,16 @@ export default {
                                 <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
                             </div>
                         </div>
+
+                        <!-- pastoral records -->
+                        <div>
+                            <ul class="information-list">
+                                <li v-for="record in studentData.records">
+                                    {{ record.heading }}
+                                </li>
+                            </ul>
+                        </div>
+
                     </li>
                 </ul>
             </div>
