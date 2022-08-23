@@ -751,16 +751,16 @@ class CourseMarkbook
          * iterate over ordered list of ranked students, and actually give them helpful rankings
          * not 42.06, but 5 (you are 5th in the class)
          */
-        $ranking = [];
+        $rank = [];
         foreach ($rankList as $student) {
             if ($prevStudent['grade'] !== $student['grade']) {
                 $rankValue = $currentRank;
             }
-            $ranking[$student['id']] = $rankValue;
+            $rank[$student['id']] = $rankValue;
             $currentRank++;
             $prevStudent = $student;
         }
 
-        return $ranking;
+        return $rank;
     }
 }
