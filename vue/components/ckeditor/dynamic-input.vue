@@ -38,6 +38,29 @@ export default {
             type: String,
             required: false
         },
+        /* Decide whether to show edit button
+         * Users click this to activate a ckeditor
+         */
+        allowEdit: {
+            type: Boolean,
+            required: true
+        },
+        /* Decide whether to show submit button
+         * If you're using this as part of a bigger form, set to false
+         * since you'll probably have a submit button elsewhere and you
+         * don't need/want this special one
+         */
+        allowSubmit: {
+            type: Boolean,
+            required: true
+        },
+        /* Spawn ckeditor immediately upon load so users don't need to
+         * interact with the ui to start it
+         */
+        spawnImmediately: {
+            type: Boolean,
+            required: true
+        },
         isProcessing: {
             type: Boolean,
             required: true,
@@ -199,37 +222,16 @@ export default {
     <div>
         <article :id="`dynamic-input-${uniqueId}-proxy`">{{ this.value }}</article>
 
-        <a class="button icon-modify" v-show="!isCKEditorLoaded" @click.once="onEdit">{{ getEditButtonText }}</a>
+        <template v-if="this.allowEdit">
+            <a class="button icon-modify" v-show="!isCKEditorLoaded" @click.once="onEdit">{{ getEditButtonText }}</a>
+        </template>
 
         <div :style="getStyles">
             <textarea :id="`dynamic-input-${uniqueId}`" :name="this.inputName" rows="4">{{ this.value }}</textarea>
-            <button class="button submit" @click="postItem" :disabled="isPostDisabled">Save</button>
+
+            <template v-if="this.allowSubmit">
+                <button class="button submit" @click="postItem" :disabled="isPostDisabled">Save</button>
+            </template>
         </div>
     </div>
 </template>
-
-<style lang="scss" scoped>
-
-@import 'www/static/css/core/base/_colors.scss';
-@import 'www/static/css/core/base/_variables.scss';
-//
-//.add-commment-input {
-//    margin-bottom: 1rem;
-//}
-//
-//.btn-show-ckeditor {
-//    background: $white;
-//    border: 1px solid $form-border-color;
-//    color: $content-ui-foreground;
-//    cursor: text;
-//    font-size: 0.8rem;
-//    padding: 0.625rem 0.625rem 1.25rem 0.625rem;
-//    text-align: left;
-//    transition: all 0.1s ease-out;
-//    width: 100%;
-//    &:hover {
-//        border-color: $content-ui-foreground;
-//    }
-//}
-
-</style>

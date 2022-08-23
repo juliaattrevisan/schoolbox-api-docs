@@ -7,7 +7,8 @@ import BadgeList from '../../vue/badge-list';
 import toastMixin from '@schoolboxVue/components/toast-mixin';
 import HorizontalScoller from '@schoolboxVue/components/scroll/horizontal-scoller';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
-
+import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 /**
  * Form for awarding badges to users, by selecting them from a list of badges.
@@ -20,14 +21,18 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [toastMixin],
+    mixins: [
+        cdnPrefixMixin,
+        toastMixin
+    ],
 
     components: {
         BadgeList,
         BadgeImage,
         RevealModal,
         HorizontalScoller, //so badges are contained in one line when a lot are selected
-        BottomDrawer //to pop out when +1 badges is selected
+        BottomDrawer, //to pop out when +1 badges is selected
+        DynamicInput,
     },
     props: {
         /**
@@ -204,6 +209,12 @@ export default {
             type: String,
             default: 'Award selected achievements',
         },
+
+        /* Used to spawn ckeditor files from cdn somewhere
+         */
+        siteVersion: {
+            type: String
+        }
     },
     data() {
         return {
@@ -415,14 +426,20 @@ export default {
                             <h3>{{ badge.reason }}</h3>
                         </div>
                     </div>
-
-                    <div>
-                        <!-- TODO Add bastardised version of add-comment-input.vue here -->
-                        <!-- such that it can be reused without being so specific -->
-                        <textarea :name="'reason['+badge.id+']'" rows="5" cols="50"></textarea>
-                    </div>
                 </li>
             </ul>
+
+            <dynamic-input
+                :singular="'reason'"
+                :inputName="'reason'"
+                :value="''"
+                :allow-edit="true"
+                :allow-submit="false"
+                :spawn-immediately="true"
+                :is-processing="true"
+                :cdn-prefix="this.cdnPrefix"
+                :site-version="this.siteVersion"
+            ></dynamic-input>
 
             <template v-if="!awardToSelfOnly">
                 <hr />
