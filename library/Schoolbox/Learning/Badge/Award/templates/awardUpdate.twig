@@ -40,6 +40,17 @@
 <div class="row">
     <div class="small-12 island">
         <section class="content">
+            {# One of these visual representations was chosen
+             # Visual representation was mandatory in Badge Create
+             #}
+            <div class="badge-img-container content">
+                {% if award.badge.icon %}
+                    <img src=" {{ CDN_PREFIX }}{{ award.badge.icon }}" class="badge-image" alt="{{ award.badge.name }}" title="{{ award.badge.name }}" />
+                {% elseif award.badge.image.hash %}
+                    <img src="/storage/image.php?hash={{ award.badge.image.hash }}" class="badge-image" alt="{{ award.badge.name }}" title="{{ award.badge.name }}" />
+                {% endif %}
+            </div>
+
             <article>{{ award.badge.body|purify }}</article>
         </section>
     </div>
