@@ -45,7 +45,6 @@ deleteNodeStore.$onAction(({ name, after, onError }) => {
         after(() => {
             console.warn('success');
             // store.toastEl.timeout('Group successfully disbanded', true, 5000);
-            //redirect to the home page
         });
         onError((error) => {
             console.warn(error);

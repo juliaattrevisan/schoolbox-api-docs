@@ -51,7 +51,6 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
     }
 });
 
-
 </script>
 
 <template>

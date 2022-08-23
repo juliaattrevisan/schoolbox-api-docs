@@ -3,7 +3,6 @@
  */
 
 import { defineStore } from 'pinia';
-import { useViewNodesStore } from './mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 
@@ -21,35 +20,28 @@ export const useNodesStore = defineStore('mcNodesStore', {
          * @param { Array }
          */
         load (nodes) {
-            const nodesWithChildren = {
+            this.updateNodes(nodes);
+        },
+
+        /**
+         * Update the nodes when a change has occured, either from the initial load or adding or deleting them
+         *
+         * @param { Object }
+         */
+        updateNodes (nodes) { //we add them to .children so the top level structure is consistent with the levels below
+            this.nodes = {
                 children: nodes,
-            }
-            this.nodes = nodesWithChildren;
-            // this.nodes = { //we add them to children so the top level structure is consistent with the levels below
-            //     children: nodes,
-            // }
-            const activeNodeStore = useViewNodesStore();
-            activeNodeStore.reset();
-            if (activeNodeStore.hasSingleCurriculum) { //jump straight to the only available Curriculum if there's only one to choose from
-                activeNodeStore.setSelected(0, this.nodes.children[0].id);
             }
         },
 
         /**
-         *
+         * Pull the active node out of the list
          */
         deleteActiveNode () {
-            const activeNode = useActiveNodeStore().node;
-            const activeNodeRemoved = removeId(this.nodes.children, activeNode.id);
-            const nodesWithChildren = {
-                children: activeNodeRemoved,
-            }
-            this.nodes = nodesWithChildren;
-            // this.nodes = {};
-            // console.warn(activeNodeRemoved[0].children);
-            // this.nodes = {
-            //     children:
-            // };
+            const activeNodeStore = useActiveNodeStore();
+            const activeNodeRemoved = removeId(this.nodes.children, activeNodeStore.node.id);
+            this.updateNodes(activeNodeRemoved);
+            activeNodeStore.unset();
         },
 
     },
@@ -57,7 +49,7 @@ export const useNodesStore = defineStore('mcNodesStore', {
 });
 
 /**
- *
+ * To return an array with any objects containing the specified id removed
  *
  * @param { array }
  * @param { number }

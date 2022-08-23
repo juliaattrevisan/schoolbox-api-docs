@@ -30,11 +30,13 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
          */
         async delete () {
             this.isProcessing = true;
-            const activeNodeStore = useActiveNodeStore();
+            const nodesStore = useNodesStore();
+            // const activeNodeStore = useActiveNodeStore();
             try {
                 // useViewNodesStore().deleteActiveNode();
-                useNodesStore().deleteActiveNode();
+                nodesStore.deleteActiveNode();
                 this.isProcessing = false;
+                this.cancel();
                 // const response = await fetch(`/api/curriculum/${activeNodeStore.node.id}`, {
                 //     method: 'DELETE',
                 //     headers: {

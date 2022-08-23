@@ -6,11 +6,9 @@
  */
 
 import { useViewNodesStore } from './store/mcViewNodesStore';
-import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 
 
 const viewNodesStore = useViewNodesStore();
-const activeNodesStore = useActiveNodeStore();
 
 /**
  * to display the just selected node

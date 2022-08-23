@@ -16,8 +16,6 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
 
     state: () => ({
         idList: [], //ids of the selected nodes
-        lists: [], //the list of nodes available at each active depth
-        current: {}, //the current node at the most recently selected depth
         currentDepth: -1,
         query: '', //current search term to filter the active codes
     }),
@@ -33,6 +31,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
         hasSingleCurriculum () {
             const nodesStore = useNodesStore();
             if (nodesStore.nodes.children.length === 1) {
+                this.setSelected(0, nodesStore.nodes.children[0].id);
                 return true;
             } else {
                 return false;
@@ -55,6 +54,21 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          */
         isActive () {
             return this.idList.length > 0;
+        },
+
+        /**
+         *
+         *
+         * @return { Array }
+         */
+        lists () {
+            const nodesStore = useNodesStore();
+            const lists = [nodesStore.nodes];
+            this.idList.forEach((id) => {
+                const nodeAtDepth = findById(nodesStore.nodes.children, id);
+                lists.push(nodeAtDepth);
+            });
+            return lists;
         },
 
         /**
@@ -84,75 +98,23 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
         },
 
         /**
-         * the search string broken into words, to search for each word
-         *
-         * @returns { Array } the search string broken into single words
-         */
-        queryWordList () {
-            const queryTrimmed = this.query.trim(); //remove any front or back white space
-            const spaceSeparated = queryTrimmed.split(' ') ?? []; //split the string with every space
-            return spaceSeparated.filter(word => word.length > 0); //and ensure each contains a character
-        },
-
-        /**
-         * no children descendents, all put in an array one level deep
-         * for search results
-         *
-         * @returns { Array }
-         */
-        nodesFlattened () {
-            if (this.isSearchActive) {
-                let flatChildren = [];
-                const nodesClone = cloneDeep(this.current); //cloneDeep is from lodash.js
-                nodesClone.forEach((obj) => flatChildren = [...flatChildren, ...flattenNodes(obj)]);
-                flatChildren = flatChildren.filter((node) => node.code != ''); //only show those with a code, as those without can't be selected
-                return flatChildren;
-            } else {
-                return [];
-            }
-        },
-
-        /**
-         * To only start showing search results once enough characters
-         * have been added
-         *
-         * @return { Boolean }
-         */
-        isSearchActive () {
-            return this.query.length >= MIN_QUERY_LENGTH;
-        },
-
-        /**
-         * When the search is active, will return any codes
-         * that match the current search query
-         *
-         * @return { Array }
-         */
-        searchResults () {
-            return this.nodesFlattened.filter(this.filterResults);
-        },
-
-        /**
-         * To show that no codes march the current search
-         *
-         * @return { Boolean }
-         */
-        hasNoSearchResults () {
-            return this.searchResults.length === 0 && this.isSearchActive && this.isActive;
-        },
-
-        /**
          * the codes found relevant to the search input
          *
          * @returns { Array }
          */
         nodesWithSearch () {
-            if (this.isSearchActive) { //only start showing results once the query is long enough
-                return this.searchResults;
-            } else { //otherwise just show codes
-                return [this.current];
-            }
+            return [this.current];
         },
+
+        /**
+         * the current node selection
+         *
+         * @returns { Object }
+         */
+        current () {
+            const nodesStore = useNodesStore();
+            return findById(nodesStore.nodes.children, this.idList[this.currentDepth])
+        }
 
     },
 
@@ -165,8 +127,9 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          */
         getChildrenAt (depth) {
             try {
+                const nodesStore = useNodesStore();
                 if (depth === 0 && this.hasSingleCurriculum) {
-                    return [...this.lists[depth].children];
+                    return [...nodesStore.nodes.children];
                 } else {
                     return [
                         getEmptyNode(),
@@ -174,7 +137,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
                     ];
                 }
             } catch (error) {
-                console.warn(error);
+                debugger;
             }
         },
 
@@ -198,7 +161,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
             } else if (depth === this.currentDepth) { //or selecting a different option on the current depth
                 this.changeOnSame(targetDepth, id)
             }
-            this.updateOnChange(targetDepth, id)
+            this.currentDepth = targetDepth;
         },
 
         /**
@@ -217,11 +180,10 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          */
         toPrevious (targetDepth) {
             this.idList = this.idList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
-            this.lists = this.lists.filter((id, index) => index <= targetDepth);
         },
 
         /**
-         *
+         * Either switching selection on same node, or moving back to the previous for the '-' selection
          *
          * @param { number }
          * @param { number }
@@ -229,24 +191,10 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
         changeOnSame (targetDepth, id) {
             if (id === UNSET_ID) { //we need to move back one level
                 this.idList = this.idList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
-            } else {
+            } else { //or we are on the same level, so remove the latest than add the new in
                 this.idList = this.idList.filter((id, index) => index !== targetDepth); //remove the latest so we can add the new selection
                 this.idList = [...this.idList, id]; //then add the new selection in
             }
-            this.lists = this.lists.filter((id, index) => index <= targetDepth);
-        },
-
-        /**
-         * Update to the currently selected node
-         *
-         * @param { number }
-         * @param { number }
-         */
-        updateOnChange (targetDepth, id) {
-            this.currentDepth = targetDepth;
-            const targetId = id === UNSET_ID ? this.idList[this.currentDepth] : parseInt(id); //we need to move back to the previous selectedNodeList when the id is unset (the - options in mc-view-header-select-list.vue)
-            this.current = this.lists[this.currentDepth].children.find((code) => parseInt(code.id) === targetId);
-            this.lists = [...this.lists, this.current];
         },
 
         /**
@@ -254,14 +202,11 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          */
         reset () {
             this.idList = [];
-            const nodesStore = useNodesStore();
-            this.lists = [nodesStore.nodes];
-            this.current = {};
-            this.currentDepth = -1;
+            this.currentDepth = this.idList.length - 1;
         },
 
         /**
-         * Move down one depth down the tree
+         * Move one depth down the tree
          *
          * @param { number }
          */
@@ -269,38 +214,6 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
             this.setSelected(this.currentDepth+1, id);
         },
 
-        /**
-         *
-         */
-        deleteActiveNode () {
-            // const activeNode = useActiveNodeStore().node;
-            // if (activeNode.id === this.current.id) {
-            //     // this.toPrevious(this.depth-1); //won't be available anymore, so move one row backwards
-            //     //then pull the active node out of mcNodesStore
-
-            // } else { //loop through and find the id
-
-            // }
-        },
-
-        /**
-         * find all those results that match any search words
-         * within the the code, name or breadcrumb fields
-         *
-         * @params { Object }
-         *
-         * @return { Boolean } true if found
-         */
-        filterResults (code) {
-            return searchForMatches(code, this.queryWordList)
-        },
-
-        /**
-         * clear the current search
-         */
-        clearSearch () {
-            this.query = '';
-        },
 
     },
 
@@ -321,43 +234,21 @@ function getEmptyNode () {
 }
 
 /**
- * The codes are nested with children:[], so we pull them all
- * out into a single level when searching
+ * To just return the node containing the specified id
  *
- * @param { Object }
+ * @param { array }
+ * @param { number }
  */
-export function flattenNodes (obj) {
-    let array = [obj];
-    if (obj.children && obj.children.length > 0) {
-        obj.children.forEach((child) => {
-            array = [...array, ...flattenNodes(child)];
-        });
-        obj.children = [];
+function findById (array, id) {
+    for (const item of array) {
+        if (item.id === id) {
+            return item;
+        }
+        if (item.children?.length) {
+            const innerResult = findById(item.children, id);
+            if (innerResult) {
+                return innerResult;
+            }
+        }
     }
-    return array;
-}
-
-/**
- * find all those results that match any search words
- * within the the code, name or breadcrumb fields
- *
- * @params { Object }
- * @params { Array }
- *
- * @return { Boolean } true if found
- */
-export function searchForMatches (node, queryWordList) {
-    let wordMatchCount = 0;
-    queryWordList.forEach(wordInSearch => {
-        if (node.code?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-            wordMatchCount++;
-        }
-        if (node.name?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-            wordMatchCount++;
-        }
-        if (node.breadcrumb?.toLowerCase().includes(wordInSearch.toLowerCase())) {
-            wordMatchCount++;
-        }
-    });
-    return wordMatchCount > 0 ? true : false; //if there's any matches
 }
