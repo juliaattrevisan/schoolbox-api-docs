@@ -7,6 +7,7 @@
 import UserBulkModifyFilters from './user-bulk-modify-filters.vue';
 import UserBulkModifyNewValues from './user-bulk-modify-new-values.vue';
 import FilterEvents from './userBulkModifyFilterEvents';
+import UserLogView from "./user-log-view";
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
@@ -21,6 +22,7 @@ export default {
         BottomDrawer,
         RevealModal,
         Toast,
+        UserLogView,
     },
 
     mixins: [
@@ -60,6 +62,8 @@ export default {
             required: true
         },
     },
+
+    emits: ['displayLog'],
 
     data () {
         return {
@@ -351,7 +355,9 @@ export default {
                 this.hasUpdated = true;
                 this.isProcessing = false;
 
-                this.$refs.outputLogModal.open();
+                this.$refs.userLogView.logData = this.logData;
+                this.$refs.userLogView.hasDataError = this.hasDataError;
+                this.$refs.userLogView.onLogOpenSelected();
             }
         },
 
@@ -393,12 +399,6 @@ export default {
                 }
             }
         },
-        /**
-         * Close the log modal
-         */
-        onLogCloseSelected () {
-            this.$refs.outputLogModal.close();
-        }
 
     },
 
@@ -486,15 +486,7 @@ export default {
             </ul>
         </reveal-modal>
 
-        <reveal-modal ref="outputLogModal">
-            <div class="output-log">
-                <div v-if="hasDataError" class="alert-box alert">The Bulk Modify has failed to update. Further details are logged below.</div>
-                <textarea v-html="logData"></textarea>
-            </div>
-            <div>
-                <button @click.prevent="onLogCloseSelected" class="button submit">Close</button>
-            </div>
-        </reveal-modal>
+        <User-Log-View ref="userLogView" @display-log="displayLog"/>
 
         <toast ref="toast"></toast>
 
