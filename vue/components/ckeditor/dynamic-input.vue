@@ -102,11 +102,7 @@ export default {
          * @returns {Boolean}
          */
         isPostDisabled () {
-            if (this.newValue.trim() === '' || this.isProcessing) {
-                return true;
-            }
-
-            return false;
+            return this.newValue.trim() === '' || this.isProcessing;
         }
     },
  
