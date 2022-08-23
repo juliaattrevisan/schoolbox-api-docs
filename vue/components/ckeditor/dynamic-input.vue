@@ -1,8 +1,7 @@
 <script>
 
 /**
- * Lazy load the CKEditor instance on demand and pass through the current comment 
- * to the parent. 
+ * Lazy load the CKEditor instance on demand
  */
 
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
@@ -11,7 +10,6 @@ let __isFirstCKEditorLoad = true; //so a page only loads the CKEditor scripts on
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin'
 import { injectScript } from '@js/util/domUtils';
 import { EDITOR_DEFAULT_CONFIG, EDITOR_CONFIG_FOR_COMMENTS, EDITOR_CONFIG_WITH_USER_TOKENS } from '@js/editor/editorConfigTypes';
-
 
 export default {
 
@@ -79,12 +77,12 @@ export default {
          *
          * @returns { String }
          */
-        getAddButtonText() {
+        getEditButtonText() {
             if (this.isCKEditorLoading) {
                 return 'Loading';
             }
 
-            return 'Add a ' + this.singular;
+            return 'Edit ' + this.singular;
         },
 
         /**
@@ -123,7 +121,7 @@ export default {
         /**
          * Loads ckeditor only when required rather than on page load
          * 
-         * @param { String } editorTypes an option within editorTypes.js to determine which config options to pass to CKEditor
+         * @param { String } editorType an option within editorTypes.js to determine which config options to pass to CKEditor
          */
         async init (editorType) {
             try {
@@ -200,13 +198,11 @@ export default {
     <div>
         <article :id="`dynamic-input-${uniqueId}-proxy`">{{ this.value }}</article>
 
-        <a class="btn icon-edit" v-show="!isCKEditorLoaded" @click.once="onEdit">{{ getAddButtonText }}</a>
+        <a class="button icon-modify" v-show="!isCKEditorLoaded" @click.once="onEdit">{{ getEditButtonText }}</a>
 
         <div :style="getStyles">
             <textarea :id="`dynamic-input-${uniqueId}`" :name="this.inputName" rows="4">{{ this.value }}</textarea>
-            <button class="button submit"
-                @click="postItem"
-                :disabled="isPostDisabled">Post {{ this.singular }}</button>
+            <button class="button submit" @click="postItem" :disabled="isPostDisabled">Post {{ this.singular }}</button>
         </div>
     </div>
 </template>
