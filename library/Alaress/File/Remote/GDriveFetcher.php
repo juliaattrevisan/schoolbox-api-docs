@@ -237,7 +237,8 @@ class GDriveFetcher implements FetcherInterface
 
         $permissions = $this->permissionCache[$fileId];
         foreach ($permissions['permissions'] as $permission) {
-            if ($permission['emailAddress'] !== $email) {
+            // $permission['emailAddress'] is not set for general access such as anyone in the group or anyone with the link
+            if (isset($permission['emailAddress']) && $permission['emailAddress'] !== $email) {
                 continue;
             }
             return $permission;
