@@ -626,6 +626,18 @@ class Controller extends Base
 
 
     /**
+     * For the $award given, update its properties
+     *
+     * @param \Schoolbox\Learning\Badge\Award\Model $award
+     * @return void
+     */
+    public function postAwardUpdate(AwardModel $award): void
+    {
+        print_r($this->request->post->getArrayCopy());
+    }
+
+
+    /**
      * Builder for the model-to-array translator for badge awards.
      *
      * @return Translator\ModelToArray

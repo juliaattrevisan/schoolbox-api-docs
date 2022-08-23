@@ -149,6 +149,16 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadAward'])
         );
 
+        /* Update properties about an Awarding, such as its Reason
+         */
+        $this->register(
+            self::METHOD_POST,
+            '/{awardId}/update',
+            'postAwardUpdate',
+            $manageBadgesRule,
+            Closure::fromCallable([$this, 'preloadAward'])
+        );
+
         // Forms for mass creation of goals/achievements
         // /learning/badge/award/user/{userIds}/{achievement|goal}
         $preloadUsers = Closure::fromCallable([$this, 'preloadUsers']);

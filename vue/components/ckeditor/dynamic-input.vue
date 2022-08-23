@@ -100,7 +100,8 @@ export default {
          * @returns {Boolean}
          */
         isPostDisabled () {
-            return this.newValue.trim() === '' || this.isProcessing;
+            return false;
+            // return this.newValue.trim() === '' || this.isProcessing;
         }
     },
  
@@ -202,7 +203,7 @@ export default {
 
         <div :style="getStyles">
             <textarea :id="`dynamic-input-${uniqueId}`" :name="this.inputName" rows="4">{{ this.value }}</textarea>
-            <button class="button submit" @click="postItem" :disabled="isPostDisabled">Post {{ this.singular }}</button>
+            <button class="button submit" @click="postItem" :disabled="isPostDisabled">Save</button>
         </div>
     </div>
 </template>
