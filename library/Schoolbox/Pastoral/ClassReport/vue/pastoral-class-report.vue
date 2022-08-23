@@ -2,6 +2,15 @@
 
 import mixinFilter from '@schoolboxVue/mixins/filter';
 
+const SORT_OPTION_CREATED = 'created';
+const SORT_OPTION_UPDATED = 'updated';
+const SORT_OPTION_SEVERITY = 'severity';
+const SORT_OPTIONS = [
+    {value: SORT_OPTION_CREATED, label: 'Created'},
+    {value: SORT_OPTION_UPDATED, label: 'Updated'},
+    {value: SORT_OPTION_SEVERITY, label: 'Severity'},
+];
+
 export default {
     name: "pastoralClassReport",
     mixins: [
@@ -22,6 +31,7 @@ export default {
                 count: null,
                 cursor: null,
             },
+            sort: SORT_OPTION_CREATED,
             showSkeletonLoader: true,
             selectedFilters: null,
         }
@@ -29,6 +39,7 @@ export default {
     created () {
         // assign endpoint for the mixin filter
         this.filter_endpoint = this.getReportDataRoute;
+        this.sortOptions     = SORT_OPTIONS;
     },
     mounted () {
         document.addEventListener('pastoral-class-report__onFilterChange', this.onFilterChange);
@@ -90,6 +101,16 @@ export default {
             </div>
 
             <div v-else>
+                <!-- count filter -->
+                <label>
+                    Sort by:
+                    <select v-model="sort">
+                        <option v-for="option in sortOptions"
+                                :label="option.label"
+                                :value="option.value">{{ option.label }}</option>
+                    </select>
+                </label>
+
                 <ul class="action-list">
                     <li v-for="studentData in data" :key="'student-' + String(studentData.student.id)">
                         <!-- student profile -->
