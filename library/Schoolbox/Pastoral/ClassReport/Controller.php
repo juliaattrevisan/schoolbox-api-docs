@@ -14,7 +14,7 @@ use Schoolbox\Filter;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Resource\Storage\Translator\ModelToArray;
+use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
 use Schoolbox\Role;
 use Schoolbox\SortUsersByName;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
@@ -125,7 +125,10 @@ class Controller extends Base
                 $this->getUser(),
                 new ScrubAdapter(),
             ),
-            new ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+            new StorageTranslator(new PrefixGenerator($this->getConfigLoader())),
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
             new ScrubAdapter(),
         );
         $result             = [];
