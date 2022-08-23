@@ -8,7 +8,7 @@ import BadgeAchievementWithdrawModal from '../Award/vue/badge-achievement-withdr
 import BadgeGoalWithdrawModal from '../Award/vue/badge-goal-withdraw-modal';
 import BadgeImage from './badge-image';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
-import mixinFilter from './mixinFilter';
+import mixinFilter from '@schoolboxVue/mixins/filter';
 
 export default {
 
@@ -195,7 +195,7 @@ export default {
                     method: 'DELETE',
                 });
                 //this is to prevent 'Fetch failed loading' in the console, as nothing is returned and Fetch currently doesn't like that with DELETE
-                await response.text(); 
+                await response.text();
                 this.data = this.data.filter((badge) => badge.id !== this.currentBadge.id);
                 this.metadata.count -= 1;
                 this.$refs.toast.timeout('Badge successfully deleted', true);
