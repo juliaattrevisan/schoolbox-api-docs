@@ -199,4 +199,32 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
     }
+
+    /**
+     * Delete Bulk Users
+     * @api DELETE /adminv2/user/bulk/modifyForm
+     */
+    public function deleteUsers()
+    {
+        $params  = $this->request->post;
+        $userIds = $params->get('users');
+
+        if (!is_array($userIds) || count($userIds) === 0) {
+            error(ErrorMapper::ERROR_PROCESSING, 'No user selected.');
+        }
+
+        $this->extendExecutionTime();
+
+        $userCollection = $this->userBulkMapper->findByColumn('id', $userIds);
+        $this->userBulkMapper->bulkDelete($userCollection);
+
+        $modified = $userCollection;
+
+
+        $jsonPayload = [
+            \Scrub::text("Deleted the following users: $userIds"),
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
+    }
 }

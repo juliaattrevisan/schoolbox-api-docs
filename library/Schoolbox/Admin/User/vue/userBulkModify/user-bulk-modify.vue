@@ -9,6 +9,9 @@ import UserBulkModifyNewValues from './user-bulk-modify-new-values.vue';
 import FilterEvents from './userBulkModifyFilterEvents';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import Toast from '@schoolboxVue/components/toast';
+
 
 export default {
 
@@ -16,6 +19,8 @@ export default {
         UserBulkModifyFilters,
         UserBulkModifyNewValues,
         BottomDrawer,
+        RevealModal,
+        Toast,
     },
 
     mixins: [
@@ -28,6 +33,10 @@ export default {
             required: true
         },
         srcUserModify: {
+            type: String,
+            required: true
+        },
+        srcUserDelete: {
             type: String,
             required: true
         },
@@ -64,22 +73,22 @@ export default {
                     {
                         name: FilterEvents.CAMPUS,
                         callback: (row, query) => {
-                            return row.campuses.join().includes(query); //need to flatten the campuses array then check 
+                            return row.campuses.join().includes(query); //need to flatten the campuses array then check
                         }
                     },
                     {
                         name: FilterEvents.ROLE,
                         callback: (row, query) => {
-                            return row.role === query; 
+                            return row.role === query;
                         }
                     },
                     {
                         name: FilterEvents.YEAR,
                         callback: (row, query) => {
                             if (query === 'null') {
-                                query = null; //cast to proper null here to match 
+                                query = null; //cast to proper null here to match
                             }
-                            return row.year === query; 
+                            return row.year === query;
                         }
                     },
                     {
@@ -232,7 +241,7 @@ export default {
 
         /**
          * Pass in the params to return all rows
-         * 
+         *
          * @retrun { Object}
          */
         getRowsBody () {
@@ -292,8 +301,57 @@ export default {
             this.loadRows(); //refresh the data
         },
 
+        /**
+         * To confirm/cancel selected users deletion
+         */
+        onDeleteUsersSelected () {
+            this.$refs.deleteModal.open();
+        },
+
+        /**
+         * Cancel the the selected users deletion
+         */
+        onCancelDeleteUsersSelected () {
+            this.$refs.deleteModal.close();
+        },
+
+        /**
+         * Delete the selected users
+         */
+        async onConfirmDeleteUsersSelected () {
+            this.$refs.toast.activate('Deleting...');
+            const usersToModifyIDList = this.selectedRows.map(row => row.id);
+            const formData = new FormData();
+            usersToModifyIDList.forEach((item) => {
+                formData.append('users[]', item);
+            });
+            try {
+                this.isProcessing = true;
+                await fetch(this.srcUserDelete, {
+                    method: 'POST',
+                    body: formData,
+                });
+                this.$refs.toast.timeout('Deleted', true, 2000);
+                this.$refs.deleteModal.close();
+                this.rows = this.getUpdatedRowsAfterUserDeletion();
+                this.clearRows();
+                this.$refs.table.resetSelectedRows();
+            } catch (error) {
+                console.warn(error);
+                this.isProcessing = false;
+                this.$refs.toast.timeout('Unable to delete', false, 2000);
+            } finally {
+                this.$refs.toast.timeout('Successfully Deleted Users', false, 2000);
+                this.hasUpdated = true;
+                this.isProcessing = false;
+
+                this.selectedRows.delete();
+
+            }
+        },
+
     },
-    
+
 }
 </script>
 
@@ -316,7 +374,7 @@ export default {
             @select="onRowSelected"
         >
             <template #beforeTable>
-                <user-bulk-modify-filters 
+                <user-bulk-modify-filters
                     :campuses="campuses"
                     :roles="roles"
                     :year-levels="yearLevels"
@@ -349,8 +407,9 @@ export default {
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
             <button @click.prevent="onModifySelected" class="button submit">Modify</button>
+            <button @click.prevent="onDeleteUsersSelected" class="button submit">Delete</button>
         </bottom-drawer>
-        <user-bulk-modify-new-values 
+        <user-bulk-modify-new-values
             ref="newValues"
             :src-user-modify="srcUserModify"
             :campuses="campuses"
@@ -362,6 +421,23 @@ export default {
             :selected-rows-count-with-row-name="selectedRowsCountWithRowName"
             @updated="onUpdated"
         />
+        <reveal-modal ref="deleteModal">
+            <h2>Please Confirm Multiple User Deletion</h2>
+            <div data-alert class="alert-box alert">
+                You are about to permanently delete <strong>{{ selectedRowsCountWithRowName }}</strong>. Deleting users
+                will prevent them from logging into the system and from accessing resources that belong to them. Attached
+                resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links. Resources shared
+                with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain
+                available.
+            </div>
+            <ul class="flex-list buttons">
+                <li><button @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</button></li>
+                <li><button @click.prevent="onCancelDeleteUsersSelected" class="button">Cancel</button></li>
+            </ul>
+        </reveal-modal>
+
+        <toast ref="toast"></toast>
+
     </div>
 </template>
 

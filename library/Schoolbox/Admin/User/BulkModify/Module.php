@@ -37,7 +37,26 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'getModify', $basePath, "/modify");
         $this->addPostRoute($router, 'getUserList', $basePath, "/modify/list");
         $this->addPostRoute($router, 'postModify', $basePath, "/modifyForm");
+        $this->addPostRoute($router, 'deleteUsers', $basePath, "/modifyForm");
     }
+
+
+//    /**
+//     * Hook method for setting up routes via self::register()
+//     *
+//     * @inheritdoc
+//     */
+//    protected function registerRoutes(): void
+//    {
+//        /* Only superusers can access the Groups API
+//         */
+//        $hasApiAccess = new Rule\All(
+//            new Rule\IsLoggedIn(),
+//            new Rule\IsSuperuser()
+//        );
+//
+//        $this->register('DELETE', '/modifyForm', 'deleteUsers', $hasApiAccess);
+//    }
 
     /**
      * @inheritdoc

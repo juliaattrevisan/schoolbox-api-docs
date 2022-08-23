@@ -9,6 +9,7 @@
                 <user-bulk-modify
                     src-user-list="{{ routeLookupIfAuthorized('adminUserBulkModify.getUserList') }}"
                     src-user-modify="{{ routeLookupIfAuthorized('adminUserBulkModify.postModify') }}"
+                    src-user-delete="{{ routeLookupIfAuthorized('adminUserBulkModify.deleteUsers') }}"
                     :campuses="{{ campuses | json_encode }}"
                     :roles="{{ roles | json_encode }}"
                     :year-levels="{{ yearLevels | json_encode }}"
