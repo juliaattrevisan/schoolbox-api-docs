@@ -66,6 +66,7 @@ class Module extends BaseModule
         };
 
         $this->register(self::METHOD_GET, '/{folderId}', 'getReport', $perms, $preload);
+        $this->register(self::METHOD_GET, '/{folderId}/data', 'getReportData', $perms, $preload);
         $this->register(self::METHOD_POST, '/{folderId}', 'postReport', $perms, $preload);
     }
 

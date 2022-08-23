@@ -1,6 +1,14 @@
 <script>
 export default {
-    name: "pastoralClassReport"
+    name: "pastoralClassReport",
+    props: {
+        // The route via which the report data is retrieved
+        getReportDataRoute: {
+            type: String,
+            default: '',
+            required: true,
+        },
+    }
 }
 </script>
 

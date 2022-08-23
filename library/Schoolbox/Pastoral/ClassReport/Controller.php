@@ -46,8 +46,6 @@ class Controller extends Base
             $this->request->query->getArrayCopy(),
         );
 
-        $classCode = $folder->getCodeString();
-
         $this->getResponse()->content->set(
             [
                 'template' => '@pastoralClassReportModule/index.twig',
@@ -58,6 +56,17 @@ class Controller extends Base
                 ]
             ]
         );
+    }
+
+    /**
+     * Get report data as JSON.
+     *
+     * @api GET /pastoral/class/{folderId}/data
+     * @since 22.1
+     */
+    public function getReportData(FolderModel $folder): void
+    {
+        // Format: students, then their pastoral reports
     }
 
     /**
