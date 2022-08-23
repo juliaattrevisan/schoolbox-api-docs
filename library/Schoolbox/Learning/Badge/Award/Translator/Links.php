@@ -24,7 +24,6 @@ use Schoolbox\User;
  */
 class Links
 {
-
     /**
      * The router object, as required to generate a link to content.
      */
