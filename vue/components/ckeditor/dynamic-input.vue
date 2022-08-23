@@ -93,6 +93,14 @@ export default {
         }
     },
 
+    mounted() {
+        /* Spawn immediately, if configured to do so
+         */
+        if (this.spawnImmediately) {
+            this.onEdit();
+        }
+    },
+
     computed: {
 
         /**
@@ -137,9 +145,14 @@ export default {
             this.init(EDITOR_CONFIG_FOR_COMMENTS);
 
             /* Remove the proxy textarea, but show the ckeditor;
-             * the classic bait-and-switch
+             * the classic bait-and-switch. Don't crash if the
+             * proxy content doesn't exist
              */
-            document.querySelector('#dynamic-input-'+this.uniqueId+'-proxy').remove();
+            let proxy = document.querySelector('#dynamic-input-'+this.uniqueId+'-proxy');
+
+            if (proxy) {
+                document.querySelector('#dynamic-input-' + this.uniqueId + '-proxy').remove();
+            }
         },
 
         /**
