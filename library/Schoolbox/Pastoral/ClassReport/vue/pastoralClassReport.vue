@@ -1,4 +1,7 @@
 <script>
+
+import mixinFilter from '@schoolboxVue/mixins/filter';
+
 export default {
     name: "pastoralClassReport",
     mixins: [
@@ -30,6 +33,28 @@ export default {
     mounted () {
         document.addEventListener('pastoral-class-report__onFilterChange', this.onFilterChange);
     },
+    methods: {
+        /**
+         * Callback for when the filters for this badge list are updated.
+         *
+         * Fired from outer space, currently from library/Schoolbox/Learning/Badge/templates/list.twig
+         */
+        onFilterChange (event) {
+            this.changeFilters(event.detail.selectedFilters);
+        },
+
+        /**
+         * Update the display with the selected filters
+         *
+         * @param {object} selectedFilters The filters that were selected
+         */
+        changeFilters (selectedFilters) {
+            this.selectedFilters    = selectedFilters;
+            this.showSkeletonLoader = true;
+            this.filter_load(false);
+            this.filter_emitChange();
+        },
+    }
 }
 </script>
 

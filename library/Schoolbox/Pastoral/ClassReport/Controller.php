@@ -14,6 +14,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
 use Schoolbox\SortUsersByName;
+use Schoolbox\User\Translator\Author\ModelToArray;
 
 class Controller extends Base
 {
@@ -67,15 +68,14 @@ class Controller extends Base
     public function getReportData(FolderModel $folder): void
     {
         // Format: students, then their pastoral reports
-    }
 
-    /**
-     * @api POST /pastoral/class/{folderId}
-     * @since 22.1
-     */
-    public function postReport(FolderModel $folder): void
-    {
-        $request             = $this->request->post['filter_selection'] ?: [];
+        // Get all students in class
+        $students = $this->userAccessMapper
+            ->findUsersInCategory($folder, Role::STUDENT)
+            ->sortByCallback((new SortUsersByName())->getCallable(), true);
+
+        // Piece together the filter
+        $request             = $this->request->query->get('filters', []);
         $page                = Filter\Page\Model::PAGE_CLASS_PASTORAL;
         $codec               = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
@@ -83,53 +83,57 @@ class Controller extends Base
 
         // Hardcoded filter for folder: ensures only students in the given
         // folder get returned
-
         $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
             $selectionsPerFilter,
             $this->getUser(),
             $page,
         );
-
-        // Get all students in class: add them to filter
-        $students = $this->userAccessMapper
-            ->findUsersInCategory($folder, Role::STUDENT)
-            ->sortByCallback((new SortUsersByName())->getCallable(), true);
-        $studentIds = $students->getPropertyValues('id');
-        $hardCodedFilters = [
+        $studentIds       = $students->getPropertyValues('id');
+        $hardcodedFilters = [
             Filter\Filters\Pastoral\Student\Definition::class => array_combine($studentIds, $studentIds),
         ];
 
+        // Find pastoral records
         $idFinder = Filter\Filters\Pastoral\IdFinder::getInstance(
             $this->filterMapper,
             $this->pastoralMapper,
         );
         $pastoralIds = $idFinder->findIdsByFilters(
-            array_merge($dynamicFilters, $hardCodedFilters),
+            array_merge($dynamicFilters, $hardcodedFilters),
             $this->getUser(),
         );
         $pastoralRecords          = $this->pastoralDataSource
             ->findByColumnList($this->getUser(), ['id' => $pastoralIds]);
+        /** @var Pastoral\Model[][] $pastoralRecordsByStudent */
         $pastoralRecordsByStudent = $pastoralRecords
             ->groupByCallback(
                 function (Pastoral\Model $pastoral) {
                     return $pastoral->getStudent()->getId();
                 }
-            )
-        ;
+            );
+
+        $studentTranslator = new ModelToArray();
+        $result            = [];
+        foreach ($students as $student) {
+            $pastoralRecordsForStudent = [];
+            foreach ($pastoralRecordsByStudent[$student->getId()] ?? [] as $pastoralRecord) {
+                $pastoralRecordsForStudent[] = [
+                    'id'      => $pastoralRecord->getId(),
+                    'heading' => $pastoralRecord->getHeading(),
+                ];
+            }
+
+            $result[] = [
+                'student' => $studentTranslator($student),
+                'records' => $pastoralRecordsForStudent,
+            ];
+        }
 
         $this->response->content->set(
-            $this->buildJsonOutput(
-                [
-                    'status'  => 200,
-                    'content' => $this->buildUnthemedHtmlOutput(
-                        '@pastoralClassReportModule/inner.twig',
-                        [
-                            'students'                 => $students,
-                            'pastoralRecordsByStudent' => $pastoralRecordsByStudent,
-                        ]
-                    )->getAsString(),
-                ]
-            )
+            $this->buildJsonOutput([
+                'data'     => $result,
+                'metadata' => null,
+            ]),
         );
     }
 }
