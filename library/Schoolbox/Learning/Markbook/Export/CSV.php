@@ -23,7 +23,6 @@ use Schoolbox\User;
  */
 class CSV extends AbstractCSV
 {
-
     /**
      * @inheritdoc
      */

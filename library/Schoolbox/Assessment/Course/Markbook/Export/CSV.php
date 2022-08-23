@@ -22,7 +22,6 @@ use Schoolbox\User;
  */
 class CSV extends AbstractCSV
 {
-
     /**
      * Exports
      * @param CourseMarkbook $courseMarkbook
@@ -85,7 +84,7 @@ class CSV extends AbstractCSV
                 $classAveragesData = $this->appendData($classAveragesData, $assessmentSpec, $mark);
             }
             $rowHeaders = [$class->getFolder()->getTitle(), '', '', ''];
-            $rank = [];
+            $rank       = [];
             if ($this->viewRank) {
                 array_push($rowHeaders, '');
                 $rank = $courseMarkbook->getRanking();
@@ -111,7 +110,7 @@ class CSV extends AbstractCSV
                     $studentAverageMark
                 ];
                 if ($this->viewRank) {
-                    array_push($studentData, $rank[$student->getId()]);
+                    $studentData[] = $rank[$student->getId()] ?? '';
                 }
                 // Per Assessment
                 $assessmentData = [];
