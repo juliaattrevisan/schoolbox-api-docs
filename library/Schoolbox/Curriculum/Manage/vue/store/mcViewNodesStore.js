@@ -5,19 +5,15 @@
 
 import { defineStore } from 'pinia';
 import { useNodesStore } from './mcNodesStore';
-import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
-import cloneDeep from 'lodash/cloneDeep';
 
 const UNSET_ID = 0;
-const MIN_QUERY_LENGTH = 3;
 const MAX_DEPTH = 6; //dont traverse any further down than 6 levels
 
 export const useViewNodesStore = defineStore('mcViewNodesStore', {
 
     state: () => ({
         idList: [], //ids of the selected nodes
-        currentDepth: -1,
-        query: '', //current search term to filter the active codes
+        currentDepth: -1, //track how far down the tree we are
     }),
 
     getters: {
@@ -57,7 +53,20 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
         },
 
         /**
+         * @TODO in progress to detect deleted nodes
          *
+         * @return { Array }
+         */
+        activeIdList () {
+            const nodesStore = useNodesStore();
+            return this.idList.filter((id) => {
+                const nodeAtDepth = findById(nodesStore.nodes.children, id);
+                return nodeAtDepth !== undefined ? true : false;
+            })
+        },
+
+        /**
+         * to traverse through the nodes via the <selects> in mc-view-header-select-list.vue
          *
          * @return { Array }
          */
@@ -137,7 +146,12 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
                     ];
                 }
             } catch (error) {
-                debugger;
+                // debugger;
+                // @TODO - we should be handling moving back after a deleted note better
+                // consider using this.activeIdList to automtically filter out ids that can no longer be found
+                if (this.lists[depth] === undefined) { //we assume that the node has been deleted if it's undefined
+                    this.setSelected(--depth, UNSET_ID); //in which case move back one level to the previous node
+                }
             }
         },
 
@@ -190,7 +204,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          */
         changeOnSame (targetDepth, id) {
             if (id === UNSET_ID) { //we need to move back one level
-                this.idList = this.idList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
+                this.toPrevious(targetDepth); //shorten the list back to the new reduced depth
             } else { //or we are on the same level, so remove the latest than add the new in
                 this.idList = this.idList.filter((id, index) => index !== targetDepth); //remove the latest so we can add the new selection
                 this.idList = [...this.idList, id]; //then add the new selection in
