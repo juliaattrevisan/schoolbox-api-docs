@@ -217,6 +217,8 @@ export default {
             const comment = this.newValue;
 
             /* TODO What's this
+             * I presume this occurs when you hit a submit button and that people
+             * used it to disable the submit button to prevent double submits
              */
             this.$emit('on-post-comment', comment);
 
