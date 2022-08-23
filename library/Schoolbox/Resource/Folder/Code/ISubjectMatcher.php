@@ -29,4 +29,13 @@ interface ISubjectMatcher
      * @see  \External\Synergetic\SubjectMatcher for details
      */
     public function isMatch(string $sbFolderCode, ?string $sisCampus, string $sisClass): bool;
+
+    /**
+     * Consistently generate a Schoolbox folder code from a SIS subject's campus+class codes
+     *
+     * @param string|null $sisCampus
+     * @param string      $sisClass
+     * @return string
+     */
+    public static function generateFolderCode(?string $sisCampus, string $sisClass): string;
 }

@@ -52,4 +52,15 @@ class SubjectMatcher extends SubjectMatcherBase
 
         return false;
     }
+
+    /**
+     * Pcschools sometimes require a space in sisClass
+     * @inheritDoc
+     */
+    public static function generateFolderCode(?string $sisCampus, string $sisClass): string
+    {
+        // This is the canonical implementation (even for Synergetic which has an alternative fuzzy match fallback)
+        $sisCampus = trim($sisCampus ?? '');
+        return ($sisCampus === '' ? '' : "$sisCampus/") . $sisClass;
+    }
 }

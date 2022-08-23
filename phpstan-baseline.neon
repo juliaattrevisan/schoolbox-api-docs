@@ -3046,16 +3046,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Audience/Mapper.php
 
 		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\RelationshipFilterer\\:\\:getTeachers\\(\\) should return array\\<int\\> but returns iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/RelationshipFilterer.php
-
-		-
-			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Audience\\\\RelationshipFilterer\\:\\:\\$userAccessMapper is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/RelationshipFilterer.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/Folder.php
