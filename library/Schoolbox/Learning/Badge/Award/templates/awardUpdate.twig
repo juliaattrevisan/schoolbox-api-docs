@@ -39,6 +39,14 @@
 
 <div class="row">
     <div class="small-12 island">
+        <section class="content">
+            <article>{{ award.badge.body|purify }}</article>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
         {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
 
         <form action="{{ postRoute }}" method="post">
