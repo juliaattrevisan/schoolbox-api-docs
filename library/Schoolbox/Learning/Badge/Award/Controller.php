@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Badge\Award;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use Exception;
 use PDOException;
@@ -649,9 +650,13 @@ class Controller extends Base
     /**
      * For the $award given, update its properties
      *
-     * @api POST /learning/badge/award/{awardId}/update
-     * @param \Schoolbox\Learning\Badge\Award\Model $award
+     * @param AwardModel $award
      * @return void
+     * @throws MapperException
+     * @throws PDOException
+     * @throws RouteNotFound
+     * @throws UnexpectedValueException
+     * @api POST /learning/badge/award/{awardId}/update
      */
     public function postAwardUpdate(AwardModel $award): void
     {
@@ -660,8 +665,14 @@ class Controller extends Base
         $this->mapper->save($award);
 
         /* Redirect back to a guy's feed, I guess
+         * That's the only place where you can spawn the edit button which
+         * gets you to the award edit form
+         *
          * TODO Maybe a return url is more ideal
          */
+        $this->response->redirect->to($this->router->generate('searchUser.getProfile', [
+            'userId' => $award->getRecipient()->getId()
+        ]));
     }
 
 
