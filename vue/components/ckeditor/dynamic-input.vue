@@ -20,10 +20,19 @@ export default {
     props: {
         /* The id of the input/textarea element, supplied
          * by whatever summons this component
+         *
+         * (Historically, used when the comment boxes are in completely different js bundles,
+         * as __uniqueId wouldn't increment in this case)
+         *
+         * Note that when you try to extract a ckeditor's contents from outside
+         * of this dynemic-input component you need to reference that ckeditor
+         * by its id in CKEDITOR.instances[id], directly - so if you programmatically
+         * generate them it's a bit annoying.
          */
-        id: {
+        presetUniqueId: { //
             type: String,
-            required: true
+            required: false,
+            default: '',
         },
         /* The name attribute for the input field, supplied
          * by whatever summons this component
@@ -75,11 +84,6 @@ export default {
         siteVersion: {
             type: String,
             required: true,
-        },
-        presetUniqueId: { //currently for when the comment boxes are in completely different js bundles, as __uniqueId wouldn't increment in this case
-            type: String,
-            required: false,
-            default: '',
         },
     },
 
@@ -206,7 +210,7 @@ export default {
                     }
                 },
                 startupFocus: true,
-                targetElements: $(`#${this.id}`),
+                targetElements: $(`#${this.presetUniqueId}`),
             }
         },
 
@@ -232,14 +236,14 @@ export default {
 
 <template>
     <div>
-        <article :id="`${this.id}-proxy`">{{ this.value }}</article>
+        <article :id="`${this.presetUniqueId}-proxy`">{{ this.value }}</article>
 
         <template v-if="this.allowEdit">
             <a class="button icon-modify" v-show="!isCKEditorLoaded" @click.once="onEdit">{{ getEditButtonText }}</a>
         </template>
 
         <div :style="getStyles">
-            <textarea :id="this.id" :name="this.inputName" rows="4">{{ this.value }}</textarea>
+            <textarea :id="this.presetUniqueId" :name="this.inputName" rows="4">{{ this.value }}</textarea>
 
             <template v-if="this.allowSubmit">
                 <button class="button submit" @click="postItem" :disabled="isPostDisabled">Save</button>
