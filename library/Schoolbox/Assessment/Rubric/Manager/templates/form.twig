@@ -1,4 +1,3 @@
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/curriculum/jquery.curriculumSelector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 {% autoescape 'js' %}
@@ -174,17 +173,6 @@ $(function() {
     $('[data-interaction="show-example-criteria"]').click(function(e) {
         e.preventDefault();
         $('[data-role="example-criteria"]').foundation('reveal', 'open');
-    });
-
-
-    // Set up the curriculum code selection
-    $(function() {
-        $('[data-curriculum-code-selector]:visible').each(function (i, v) {
-            var $this = $(this);
-            $this.curriculumSelector({
-                value: $.selectizeSelector.getValueFromSelect($this)
-            })
-        });
     });
 });
 </script>
