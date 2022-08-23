@@ -3,14 +3,14 @@
     [folder.nameWithCodes, '/homepage/' ~ folder.id],
     [locale.pastoralCare.proper ~ ' Report']
 ) }}
-{% set reportContentId = 'class-pastoral-content' %}
+{% set reportContentId = 'pastoral-class-report' %}
 
 {% autoescape 'js' %}
     <script type="text/javascript">
         $(function () {
             // Filtered content has been [re]loaded
             $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
-                document.dispatchEvent(new CustomEvent('class-pastoral__onFilterChange', {
+                document.dispatchEvent(new CustomEvent('pastoral-class-report__onFilterChange', {
                     detail: {
                         selectedFilters
                     }
@@ -20,16 +20,21 @@
     </script>
 {% endautoescape %}
 
-<div class="row actions-small-5">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>{{ pageTitle }}</h1>
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ pageTitle }}</h1>
+
+        <div>
+            {% include '@filters/panel.twig' with {
+                contentId: reportContentId,
+                panel:     filterPanel,
+                quickload: true
+            } only %}
         </div>
+
+        <section id="{{ reportContentId }}">
+            <pastoral-class-report></pastoral-class-report>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/pastoralClassReport.js?v={{ config.site_version }}"></script>
+        </section>
     </div>
 </div>
-
-{% include '@filters/panel.twig' with {
-    contentId: reportContentId,
-    panel:     filterPanel,
-    quickload: true,
-} only %}
