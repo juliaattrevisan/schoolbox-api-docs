@@ -3,4 +3,4 @@ import { data as generalCurriculum } from './dataGeneralCurriculum';
 import { data as earlyCurriculum } from './dataEarlyCurriculum';
 
 // export const data = [...generalCurriculum, ...vicCurriculum, ...earlyCurriculum];
-export const data = [...generalCurriculum, ...earlyCurriculum];
+export const data = [...generalCurriculum];

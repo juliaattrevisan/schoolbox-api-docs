@@ -18,9 +18,13 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
     actions: {
 
         /**
-         * to display a prompt to confirm member removal
+         * to display a prompt to confirm a node removal
+         *
+         * @param { object }
          */
-        prompt () {
+        prompt (node) {
+            const activeNodeStore = useActiveNodeStore();
+            activeNodeStore.set(node);
             this.isModalOpen = true;
         },
 
@@ -58,6 +62,8 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
          * to hide the confirmation prompt
          */
         cancel () {
+            const activeNodeStore = useActiveNodeStore();
+            activeNodeStore.unset();
             this.isModalOpen = false;
         },
 

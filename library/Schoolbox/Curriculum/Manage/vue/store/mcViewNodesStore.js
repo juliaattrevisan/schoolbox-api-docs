@@ -1,5 +1,5 @@
 /**
- * Manages the currently visible codes in the viewleNodesStore
+ * Manages the currently visible nodes in mc-view-nodes
  * those filtered by both <select> and also the search <input>
  */
 
@@ -27,7 +27,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
         hasSingleCurriculum () {
             const nodesStore = useNodesStore();
             if (nodesStore.nodes.children.length === 1) {
-                this.setSelected(0, nodesStore.nodes.children[0].id);
+                // this.setSelected(0, nodesStore.nodes.children[0].id); //can't do in getters? is done in mcNodesStore instead
                 return true;
             } else {
                 return false;

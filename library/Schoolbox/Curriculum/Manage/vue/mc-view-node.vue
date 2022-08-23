@@ -9,6 +9,7 @@ import { computed } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
+import { useDeleteNodeStore } from './activeNode/store/mcDeleteNodeStore';
 import { escapeRegExp } from '@js/util/jsUtils';
 import McActiveNode from './activeNode/mc-active-node.vue';
 
@@ -40,6 +41,7 @@ const props = defineProps({
 const store = useStore();
 const viewNodesStore = useViewNodesStore();
 const activeNodeStore = useActiveNodeStore();
+const deleteNodeStore = useDeleteNodeStore();
 
 /**
  * to gradually and more paddingLeft to indicate node level depth
@@ -80,11 +82,11 @@ const isDisabled = computed(() => {
 const isVisible = computed(() => props.depth <= 1 || viewNodesStore.isOnLast);
 
 /**
- * to open up the edit modal
+ * If this is the active node
+ *
+ * @returns { Boolean }
  */
-function onEditSelected () {
-    activeNodeStore.set(props.node);
-}
+const isActiveNode = computed(() => activeNodeStore.isActive && activeNodeStore.node.id === props.node.id);
 
 /**
  * traverse to the next nodel level as an alternative to
@@ -93,6 +95,24 @@ function onEditSelected () {
 function onNameSelected () {
     activeNodeStore.unset();
     viewNodesStore.setNextSelected(props.node.id);
+}
+
+/**
+ * to prompt the nodes removal
+ */
+function onDeleteSelected () {
+    deleteNodeStore.prompt(props.node);
+}
+
+/**
+ * to open up or close the edit modal
+ */
+function onEditToggleSelected () {
+    if (isActiveNode.value) {
+        activeNodeStore.unset();
+    } else {
+        activeNodeStore.set(props.node);
+    }
 }
 
 /**
@@ -168,29 +188,22 @@ const containerClass = computed(() => {
     }
 });
 
-/**
- * If this is the active node
- *
- * @returns { Boolean }
- */
-const isActiveNode = computed(() => activeNodeStore.isActive && activeNodeStore.node.id === props.node.id);
-
 </script>
 
 <template>
-    <li v-if="isVisible" :class="containerClass">
+    <li v-if="isVisible" :class="`container ${containerClass}`">
         <div class="buttons-container">
+            <div class="checklist">
+                <input
+                    :id="`checkbox-${props.node.id}`"
+                    type="checkbox"
+                    :value="props.node.id"
+                    :checked="false"
+                />
+                <label :for="`checkbox-${props.node.id}`"></label>
+            </div>
             <button
-                v-if="!store.isReadOnly"
-                class="edit-button icon-modify"
-                :title="`Edit ${title}`"
-                @click.prevent="onEditSelected"
-                @keyup.enter="onEditSelected"
-            >
-
-            </button>
-            <button
-                :class="`name-button`"
+                :class="`button-name`"
                 :disabled="isDisabled"
                 :title="`Expand ${title}`"
                 @click.prevent="onNameSelected"
@@ -198,6 +211,38 @@ const isActiveNode = computed(() => activeNodeStore.isActive && activeNodeStore.
             >
                 <span v-html="highlightTitleSearch"></span>
                 <aside v-if="viewNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
+            </button>
+            <button
+                v-if="!store.isReadOnly"
+                class="button-action-option icon-delete"
+                :title="`Delete ${title}`"
+                @click.prevent="onDeleteSelected"
+                @keyup.enter="onDeleteSelected"
+            >
+                Delete {{ title }}
+            </button>
+            <button
+                v-if="!store.isReadOnly"
+                class="button-action-option icon-add"
+                :title="`Add subsection to ${title}`"
+            >
+                Add subsection to {{ title }}
+            </button>
+            <button
+                v-if="!store.isReadOnly"
+                :class="`button-action-option icon-view`"
+                title="Toggle visiblity"
+            >
+                Toggle visiblity
+            </button>
+            <button
+                v-if="!store.isReadOnly"
+                class="button-action-option icon-modify"
+                :title="`Edit ${title}`"
+                @click.prevent="onEditToggleSelected"
+                @keyup.enter="onEditToggleSelected"
+            >
+                Edit {{ title }}
             </button>
         </div>
         <mc-active-node v-if="isActiveNode" />
@@ -214,6 +259,10 @@ const isActiveNode = computed(() => activeNodeStore.isActive && activeNodeStore.
 
 <style lang="scss" scoped>
 
+// .container {
+//     border-bottom: 1px solid var(--body-background);
+// }
+
 .parent-container {
     > button span {
         font-size: 1.0625rem;
@@ -222,15 +271,23 @@ const isActiveNode = computed(() => activeNodeStore.isActive && activeNodeStore.
 }
 
 .buttons-container {
+    align-items: center;
+    border-bottom: 1px solid var(--body-background);
     display: flex;
     margin: 0 0 0 v-bind(paddingLeft);
+    padding: 2px;
+}
+
+.checklist {
+    padding-top: 0.5rem;
 }
 
 .button {
     background: none;
     font-size: 1rem;
     margin: 0;
-    padding: 0.5rem;
+    min-height: 42px;
+    min-width: 40px;
     text-align: left;
     &:hover {
         background: var(--content-ui-background);
@@ -241,19 +298,24 @@ const isActiveNode = computed(() => activeNodeStore.isActive && activeNodeStore.
     }
 }
 
-.edit-button {
+.button-name {
     @extend .button;
-    color: var(--content-ui-foreground);
-    // opacity: 0.7;
-
-}
-
-.name-button {
-    @extend .button;
+    padding-left: 0.25rem;
     transition: background 0.2s;
     width: 100%;
     &:disabled {
         color: #222222;
+        opacity: 1;
+    }
+}
+
+.button-action-option {
+    @extend .button;
+    color: var(--content-ui-foreground);
+    font-size: 0rem;
+    opacity: 0.7;
+    padding: 0px 2px 0px 12px;
+    &:hover {
         opacity: 1;
     }
 }

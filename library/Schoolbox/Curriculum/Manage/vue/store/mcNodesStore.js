@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
+import { useViewNodesStore } from '../store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 
@@ -21,6 +22,10 @@ export const useNodesStore = defineStore('mcNodesStore', {
          */
         load (nodes) {
             this.updateNodes(nodes);
+            const viewNodesStore = useViewNodesStore();
+            if (viewNodesStore.hasSingleCurriculum) {
+                viewNodesStore.setSelected(0, this.nodes.children[0].id);
+            }
         },
 
         /**

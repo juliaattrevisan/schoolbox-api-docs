@@ -20,7 +20,8 @@ export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
          * @return { Boolean }
          */
         isActive () {
-            return this.node !== null ? true : false;
+            // return this.node !== null ? true : false;
+            return false;
         },
 
         /**
@@ -43,14 +44,12 @@ export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
     actions: {
 
         /**
-         * set the selected node, which would prompt the mc-active-selected-code-modal to open
-         * and if it's set to null we can listen for it to be set again
+         * set the node to perform an action on
          *
          * @param { Object }
          */
         set (node) {
             this.node = node;
-            // this.isModalOpen = true;
         },
 
         /**
