@@ -91,6 +91,13 @@ export default {
         } else {
             this.uniqueId = this.presetUniqueId;
         }
+
+        /* Spawn immediately, if configured to do so
+         * Start loading up the libraries and stuff
+         */
+        if (this.spawnImmediately) {
+            this.loadDependencies();
+        }
     },
 
     mounted() {
@@ -137,6 +144,14 @@ export default {
     },
  
     methods: {
+
+        async loadDependencies() {
+            if (__isFirstCKEditorLoad) {
+                await injectScript(`${this.cdnPrefix}/js/ckeditor/ckeditor.js?v=${this.siteVersion}`);
+                await injectScript(`${this.cdnPrefix}/js/editor/jquery.editor.js?v=${this.siteVersion}`);
+                __isFirstCKEditorLoad = false;
+            }
+        },
 
         /**
          * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object

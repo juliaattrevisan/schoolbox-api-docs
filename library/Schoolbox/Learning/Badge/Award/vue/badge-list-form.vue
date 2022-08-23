@@ -433,7 +433,7 @@ export default {
                 :singular="'reason'"
                 :inputName="'reason'"
                 :value="''"
-                :allow-edit="true"
+                :allow-edit="false"
                 :allow-submit="false"
                 :spawn-immediately="true"
                 :is-processing="true"
