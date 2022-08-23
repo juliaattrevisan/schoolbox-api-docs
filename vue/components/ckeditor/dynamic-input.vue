@@ -115,8 +115,13 @@ export default {
         /**
          * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
          */
-        onAddSelected () {
+        onEdit () {
             this.init(EDITOR_CONFIG_FOR_COMMENTS);
+
+            /* Remove the proxy textarea, but show the ckeditor;
+             * the classic bait-and-switch
+             */
+            document.querySelector('#dynamic-input-'+this.uniqueId+'-proxy').remove();
         },
 
         /**
@@ -143,7 +148,7 @@ export default {
          * Return the appropriate config to display consistency depending on the editorType
          * these '$.alaress' methods are created and attached to the jQuery $ object in jquery.editor.js
          * 
-         * @param { String } editorTypes an option within editorTypes.js to determine which config options to pass to CKEditor
+         * @param { String } editorType an option within editorTypes.js to determine which config options to pass to CKEditor
          * 
          * @returns { Object }
          */
@@ -196,8 +201,11 @@ export default {
 </script>
 
 <template>
-    <div class="add-commment-input">
-        <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="onAddSelected">gg{{ getAddButtonText }}</button>
+    <div>
+        <article :id="`dynamic-input-${uniqueId}-proxy`">{{ this.value }}</article>
+
+        <a class="btn icon-edit" v-show="!isCKEditorLoaded" @click.once="onEdit">{{ getAddButtonText }}</a>
+
         <div :style="getStyles">
             <textarea :id="`dynamic-input-${uniqueId}`" :name="this.inputName" rows="4">{{ this.value }}</textarea>
             <button class="button submit"
@@ -211,24 +219,24 @@ export default {
 
 @import 'www/static/css/core/base/_colors.scss';
 @import 'www/static/css/core/base/_variables.scss';
-
-.add-commment-input {
-    margin-bottom: 1rem;
-}
-
-.btn-show-ckeditor {
-    background: $white;
-    border: 1px solid $form-border-color;
-    color: $content-ui-foreground;
-    cursor: text;
-    font-size: 0.8rem;
-    padding: 0.625rem 0.625rem 1.25rem 0.625rem;
-    text-align: left;
-    transition: all 0.1s ease-out;
-    width: 100%;
-    &:hover {
-        border-color: $content-ui-foreground;
-    }
-}
+//
+//.add-commment-input {
+//    margin-bottom: 1rem;
+//}
+//
+//.btn-show-ckeditor {
+//    background: $white;
+//    border: 1px solid $form-border-color;
+//    color: $content-ui-foreground;
+//    cursor: text;
+//    font-size: 0.8rem;
+//    padding: 0.625rem 0.625rem 1.25rem 0.625rem;
+//    text-align: left;
+//    transition: all 0.1s ease-out;
+//    width: 100%;
+//    &:hover {
+//        border-color: $content-ui-foreground;
+//    }
+//}
 
 </style>
