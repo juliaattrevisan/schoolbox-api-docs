@@ -257,13 +257,13 @@
                     </div>
                     {% if curriculumTaggingEnabled %}
                         <div class="small-12 columns">
-                            <label for="curriculum-code-select">Curriculum Codes</label>
-                            <div class="input-group">
+                            <label for="curriculum-code-select">
+                                Curriculum Codes
                                 {% include 'sub/curriculumCodeSelector.twig' with {
                                     codeList: curriculumCodes,
                                     renderButton: true
                                 } %}
-                            </div>
+                            </label>
                         </div>
                     {% endif %}
                 </fieldset>

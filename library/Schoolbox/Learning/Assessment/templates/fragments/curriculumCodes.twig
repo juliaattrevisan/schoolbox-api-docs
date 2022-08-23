@@ -12,14 +12,12 @@
             <div class="small-12 columns">
                 <label>Curriculum Codes
                     <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this {{ entityType }} with a corresponding curriculum area, you can link multiple curriculum areas to this {{ entityType }}">?</span>
+                    {% include 'sub/curriculumCodeSelector.twig' with {
+                        'codeList': curriculumNodes,
+                        'renderButton': true,
+                        courseManagedReadonly: courseManagedReadonly ?? false
+                    } %}
                 </label>
-                <div class="input-group">
-                {% include 'sub/curriculumCodeSelector.twig' with {
-                    'codeList': curriculumNodes,
-                    'renderButton': true,
-                    courseManagedReadonly: courseManagedReadonly ?? false
-                } %}
-                </div>
             </div>
         </div>
     </fieldset>

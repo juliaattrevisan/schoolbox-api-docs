@@ -60,14 +60,14 @@
                             <label for="evidence-tags">Tags</label>
                             <select data-tags name="tags[]" id="evidence-tags" multiple></select>
                             {% if curriculumTaggingEnabled %}
-                                <label for="curriculum-code-select">Curriculum Codes</label>
-                                <div class="input-group">
+                                <label for="curriculum-code-select">
+                                    Curriculum Codes
                                     {% include 'sub/curriculumCodeSelector.twig' with
                                         {
                                             codeList: curriculumCodes ?? [],
                                             renderButton: true
                                         } %}
-                                </div>
+                                </label>
                             {% endif %}
                         </div>
                     </fieldset>
