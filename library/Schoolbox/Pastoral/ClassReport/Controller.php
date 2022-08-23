@@ -53,7 +53,7 @@ class Controller extends Base
                 'template' => '@pastoralClassReportModule/index.twig',
                 'data'     => [
                     'folder'      => $folder,
-                    'pageTitle'   => "Homepage ($classCode)",
+                    'pageTitle'   => $folder->getTitle(),
                     'filterPanel' => $filterPanel,
                 ]
             ]
