@@ -108,7 +108,7 @@ export default {
         /* Spawn immediately, if configured to do so
          */
         if (this.spawnImmediately) {
-            this.onEdit();
+            this.spawnEditor();
         }
     },
 
@@ -152,7 +152,7 @@ export default {
         /**
          * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
          */
-        onEdit () {
+        spawnEditor () {
             this.init(EDITOR_CONFIG_FOR_COMMENTS);
         },
 
@@ -239,7 +239,7 @@ export default {
         <article :id="`${this.presetUniqueId}-proxy`">{{ this.value }}</article>
 
         <template v-if="this.allowEdit">
-            <a class="button icon-modify" v-show="!isCKEditorLoaded" @click.once="onEdit">{{ getEditButtonText }}</a>
+            <a class="button icon-modify" v-show="!isCKEditorLoaded" @click.once="spawnEditor">{{ getEditButtonText }}</a>
         </template>
 
         <div :style="getStyles">
