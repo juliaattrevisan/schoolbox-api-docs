@@ -54,6 +54,26 @@ export default {
             this.filter_load(false);
             this.filter_emitChange();
         },
+
+        /**
+         * Format a date for output.
+         *
+         * @param {String} date
+         * @returns {String}
+         */
+        formatDate (date) {
+            return dayjs(date).format(dateDisplayFormats.dayjs);
+        },
+
+        /**
+         * Format a date+time for output.
+         *
+         * @param {String} date
+         * @returns {String}
+         */
+        formatDateTime (date) {
+            return dayjs(date).format(dateDisplayFormats.dayjsDatetime);
+        },
     }
 }
 </script>
@@ -71,7 +91,7 @@ export default {
 
             <div v-else>
                 <ul class="action-list">
-                    <li v-for="studentData in data" :key="studentData.student.id">
+                    <li v-for="studentData in data" :key="'student-' + String(studentData.student.id)">
                         <!-- student profile -->
                         <div>
                             <img :src="studentData.student._links.avatar"
@@ -88,8 +108,22 @@ export default {
                         <!-- pastoral records -->
                         <div>
                             <ul class="information-list">
-                                <li v-for="record in studentData.records">
-                                    {{ record.heading }}
+                                <li v-for="record in studentData.records" :key="'record-' + String(record.id)">
+                                    <a :href="record._links.read">{{ record.heading }}</a>,
+                                    created
+                                    <time :datetime="formatDateTime(record.createdAt)"
+                                          :title="formatDateTime(record.createdAt)"
+                                    >
+                                        {{ formatDate(record.createdAt) }}
+                                    </time>
+                                    <template v-if="record.createdAt !== record.updatedAt">
+                                        updated
+                                        <time :datetime="formatDateTime(record.updatedAt)"
+                                              :title="formatDateTime(record.updatedAt)"
+                                        >
+                                            {{ formatDate(record.updatedAt) }}
+                                        </time>
+                                    </template>
                                 </li>
                             </ul>
                         </div>
