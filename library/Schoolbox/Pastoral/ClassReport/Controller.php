@@ -10,6 +10,7 @@ namespace Schoolbox\Pastoral\ClassReport;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -106,7 +107,8 @@ class Controller extends Base
             $this->getUser(),
         );
         $pastoralRecords          = $this->pastoralDataSource
-            ->findByColumnList($this->getUser(), ['id' => $pastoralIds]);
+            ->findByColumnList($this->getUser(), ['id' => $pastoralIds])
+            ->sortBy('createdAt', Collection::ORDER_DESCENDING);
         /** @var Pastoral\Model[][] $pastoralRecordsByStudent */
         $pastoralRecordsByStudent = $pastoralRecords
             ->groupByCallback(
