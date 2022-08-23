@@ -7,14 +7,17 @@
 
 namespace Schoolbox\Pastoral\ClassReport;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Filter;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Storage\Translator\ModelToArray;
 use Schoolbox\Role;
 use Schoolbox\SortUsersByName;
-use Schoolbox\User\Translator\Author\ModelToArray;
+use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 
 class Controller extends Base
 {
@@ -112,15 +115,23 @@ class Controller extends Base
                 }
             );
 
-        $studentTranslator = new ModelToArray();
-        $result            = [];
+        $studentTranslator  = new UserTranslator();
+        $pastoralTranslator = new Pastoral\Translator\ModelToArray(
+            $studentTranslator,
+            new Pastoral\Comment\Translator\ModelToArray(
+                $studentTranslator,
+                $this->router,
+                $this->authorizer,
+                $this->getUser(),
+                new ScrubAdapter(),
+            ),
+            new ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+        );
+        $result             = [];
         foreach ($students as $student) {
             $pastoralRecordsForStudent = [];
             foreach ($pastoralRecordsByStudent[$student->getId()] ?? [] as $pastoralRecord) {
-                $pastoralRecordsForStudent[] = [
-                    'id'      => $pastoralRecord->getId(),
-                    'heading' => $pastoralRecord->getHeading(),
-                ];
+                $pastoralRecordsForStudent[] = $pastoralTranslator($pastoralRecord);
             }
 
             $result[] = [
