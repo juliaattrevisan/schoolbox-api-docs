@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Translator;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Schoolbox\Pastoral\Comment\Translator\ModelToArray as CommentTranslator;
 use Schoolbox\Pastoral\Model;
 use Schoolbox\Pastoral\Tag\Model as Tag;
@@ -25,11 +26,13 @@ class ModelToArray
      * @param UserTranslator    $userTranslator
      * @param CommentTranslator $commentTranslator
      * @param StorageTranslator $storageTranslator
+     * @param ScrubAdapter      $scrubAdapter
      */
     public function __construct(
         private UserTranslator $userTranslator,
         private CommentTranslator $commentTranslator,
         private StorageTranslator $storageTranslator,
+        private ScrubAdapter $scrubAdapter,
     ) {
     }
 
@@ -72,8 +75,8 @@ class ModelToArray
             'parentCommentsAllowed'  => $model->getParentCommentsAllowed(),
 
             // Text and comments
-            'bodyPrivate'            => $model->getBodyPrivate(),
-            'bodyPublic'             => $model->getBodyPublic(),
+            'bodyPrivate'            => $this->scrubAdapter->purify($model->getBodyPrivate()),
+            'bodyPublic'             => $this->scrubAdapter->purify($model->getBodyPublic()),
             'attachments'            => $model->getAttachments()->map($this->storageTranslator),
             'comments'               => $model->getComments()->map($this->commentTranslator),
 

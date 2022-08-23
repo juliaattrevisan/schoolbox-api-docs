@@ -126,6 +126,7 @@ class Controller extends Base
                 new ScrubAdapter(),
             ),
             new ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+            new ScrubAdapter(),
         );
         $result             = [];
         foreach ($students as $student) {
