@@ -454,7 +454,7 @@ export default {
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
             <button @click.prevent="onModifySelected" class="button submit">Modify</button>
-            <button @click.prevent="onDeleteUsersSelected" class="button submit">Delete</button>
+            <button @click.prevent="onDeleteUsersSelected" class="button button-delete">Delete Users</button>
         </bottom-drawer>
         <user-bulk-modify-new-values
             ref="newValues"
