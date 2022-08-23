@@ -37,16 +37,12 @@ class Controller extends Base
     public function getReport(FolderModel $folder): void
     {
         $page        = Filter\Page\Model::PAGE_CLASS_PASTORAL;
-        $params      = [
-            'folder'   => $folder,
-            'folderId' => $folder->getId(),
-        ];
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
             $page,
-            $this->router->generate('pastoralClassReportModule.postReport', $params),
+            null,
             $this->getUser(),
-            $params,
+            [],
             $this->request->query->getArrayCopy(),
         );
 

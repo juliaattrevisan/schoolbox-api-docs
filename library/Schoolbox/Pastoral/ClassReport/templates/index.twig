@@ -5,6 +5,21 @@
 ) }}
 {% set reportContentId = 'class-pastoral-content' %}
 
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            // Filtered content has been [re]loaded
+            $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
+                document.dispatchEvent(new CustomEvent('class-pastoral__onFilterChange', {
+                    detail: {
+                        selectedFilters
+                    }
+                }));
+            });
+        });
+    </script>
+{% endautoescape %}
+
 <div class="row actions-small-5">
     <div class="list-item">
         <div class="small-12 column">
@@ -18,13 +33,3 @@
     panel:     filterPanel,
     quickload: true,
 } only %}
-
-<div id="{{ reportContentId }}" class="filtered-report">
-    <div class="row">
-        <div class="small-12 island" data-placeholder>
-            <section class="content">
-                <img src="{{ CDN_PREFIX }}/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
-            </section>
-        </div>
-    </div>
-</div>
