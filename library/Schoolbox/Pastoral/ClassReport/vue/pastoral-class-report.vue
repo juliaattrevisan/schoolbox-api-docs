@@ -117,6 +117,12 @@ export default {
         formatDateTime (date) {
             return dayjs(date).format(dateDisplayFormats.dayjsDatetime);
         },
+
+        loadMore (studentId) {
+            // TODO load more data for this student
+            console.log(studentId);
+            this.data[studentId].report.data = [];
+        },
     }
 }
 </script>
@@ -192,6 +198,9 @@ export default {
                                             {{ formatDate(record.updatedAt) }}
                                         </time>
                                     </template>
+                                </li>
+                                <li v-if="studentData.records.metadata.count > studentData.records.data.length">
+                                    <a @click.prevent="loadMore(studentData.student.id)">Show More</a>
                                 </li>
                             </ul>
                         </div>
