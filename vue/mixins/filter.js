@@ -4,37 +4,46 @@ import axios from 'axios';
 const ON_FILTER_CHANGE = 'on-filter-change';
 
 export default {
-    
     data () {
         return {
             filter_endpoint: '' //the endpoint of the filter action
         }
     },
-
     methods: {
-  
         /**
-         * Load badges.
+         * Load filter.
          *
-         * @param {Boolean} showToast Should the toast be activated on load of
-         *                            badges?
+         * @param {Boolean} showToast Should the toast be activated on load?
          *                            The filter calls `onFilterChange` when its
          *                            selections change, and that has its own
          *                            toast so don't show another.
          */
         filter_load (showToast) {
             this.data = [];
-            this.filter_append(null, showToast);
+            this.filter_append(null, showToast, true);
         },
 
         /**
-         * Appends badges to the data list.
+         * Build a list of parameters to send to the filter.
+         *
+         * By default empty: this may have other query string parameters if
+         * required.
+         *
+         * @returns {Object}
+         */
+        filter_build_params () {
+            return {};
+        },
+
+        /**
+         * Appends data to the data list.
          *
          * @param {String|null} cursor
          * @param {Boolean}     showToast
+         * @param {Boolean}     clear     Is the data cleared before appending?
          */
-        filter_append (cursor, showToast) {
-            let params = {};
+        filter_append (cursor, showToast, clear) {
+            let params = this.filter_build_params();
             if (cursor) {
                 params.cursor = cursor;
             }
@@ -51,6 +60,9 @@ export default {
             axios
                 .get(this.filter_endpoint, config)
                 .then(response => {
+                    if (clear) {
+                        this.data = [];
+                    }
                     this.data = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
                     this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
@@ -72,7 +84,5 @@ export default {
         filter_emitChange () {
             this.$emit(ON_FILTER_CHANGE);
         },
-
     },
-
 }

@@ -93,8 +93,8 @@ class Controller extends Base
                 $this->getUser(),
                 $student,
                 $pastoralIds,
-                Cursor::SORT_OPTION_CREATED,
-                1,
+                $this->request->query->get('sort') ?? Cursor::SORT_OPTION_CREATED,
+                $this->request->query->get('count') ?? Cursor::LIMIT_DEFAULT,
             );
             $cursoredRecords = $cursor->retrieveResults(null);
             $result[]        = [

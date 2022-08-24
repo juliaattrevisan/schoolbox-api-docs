@@ -346,7 +346,7 @@ export default {
                     </div>
 
                     <!-- Load more button, if there are more to load -->
-                    <a @click.prevent="filter_append(metadata.cursor.next, true)"
+                    <a @click.prevent="filter_append(metadata.cursor.next, true, false)"
                        class="button load-more expand"
                        title="Load more"
                        v-if="metadata.cursor.next && data.length < metadata.count">Load more</a>
