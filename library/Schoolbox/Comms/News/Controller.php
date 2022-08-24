@@ -1436,8 +1436,8 @@ class Controller extends Base
     {
         $article
             ->setTitle($postData['title'])
-            ->setBody($postData['body'])
-            ->setBlurb($postData['blurb'])
+            ->setBody($postData['body'] ?? '')
+            ->setBlurb($postData['blurb'] ?? '')
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics'] ?? null));
 
         /* I still think that the ValidNewsModerator spec pattern makes this low level
