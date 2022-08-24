@@ -26,11 +26,8 @@ export const useSettingsStore = defineStore('mgSettings', {
          * @return { Boolean }
          */
         isAccessNotSet () {
-            if (this.access === '') {
-                return true;
-            } else {
-                return false;
-            }
+            const store = useStore();
+            return store.showSetting;
         },
 
     },
@@ -84,6 +81,7 @@ export const useSettingsStore = defineStore('mgSettings', {
             } finally {
                 this.isProcessing = false;
                 store.isProcessing = false;
+                store.showSetting = false;
                 this.isPromptOpen = false;
             }
         },

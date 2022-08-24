@@ -29,11 +29,9 @@ class UserAccess extends Base
                 ->setAccessLevel(UserAccessModel::ACCESS_READ);
         }
 
-        $accessLevel = 0;
         if (isset($array['accessType'])) {
-            $accessLevel = UserAccessModel::ACCESS_NAME_TO_LEVEL[$array['accessType']];
+            $model->setAccessLevel(UserAccessModel::ACCESS_NAME_TO_LEVEL[$array['accessType']]);
         }
-        $model->setAccessLevel($accessLevel);
         return $model;
     }
 }

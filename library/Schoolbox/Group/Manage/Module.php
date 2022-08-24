@@ -26,6 +26,7 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model;
 use Schoolbox\Resource\GroupMapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -68,6 +69,9 @@ class Module extends BaseModule
         $this->register(self::METHOD_POST, '/addMembers/{folderId:\d+}', 'addMembers', $perm, $preloadFolder);
         $this->register(self::METHOD_POST, '/updateSettings/{folderId:\d+}', 'updateSettings', $perm, $preloadFolder);
         $this->register(self::METHOD_POST, '/disband/{folderId:\d+}', 'disband', $perm, $preloadFolder);
+        $this->register(self::METHOD_POST, '/searchGroups', 'searchGroups', $perm);
+        $this->register(self::METHOD_POST, '/searchRoles', 'searchRoles', $perm);
+        $this->register(self::METHOD_POST, '/searchUsers', 'searchUsers', $perm);
     }
 
     /**
@@ -80,6 +84,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(GroupMapper::class),
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
             $this->getMapperFactory()->get(RerouteOverrideMapper::class),
         );

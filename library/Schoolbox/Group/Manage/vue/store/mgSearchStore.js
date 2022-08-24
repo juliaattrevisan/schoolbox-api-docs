@@ -42,9 +42,9 @@ export const useSearchStore = defineStore('mgSearch', {
         searchEndpoint () {
             const searchEndpoints = {
                 [FromTypes.NAME]: '/ajax/user.php?groupID=0&query=',
-                [FromTypes.GROUP]: '/ajax/addUserByGroup.php?type=individual&query=',
-                [FromTypes.ROLE]: '/ajax/addUserByGroup.php?type=system&query=',
-                [FromTypes.LIST]: '',
+                [FromTypes.GROUP]: '/group/searchGroups?query=',
+                [FromTypes.ROLE]: '/group/searchRoles?query=',
+                [FromTypes.LIST]: '/group/searchUsers?query=',
             }
             const addMembersStore = useAddMembersStore();
             return searchEndpoints[addMembersStore.fromType];

@@ -21,6 +21,13 @@ import Toast from '@schoolboxVue/components/toast.vue';
 
 const props = defineProps({
     /**
+     * whether to show setting dialog
+     */
+    showSetting: {
+        type: String,
+        required: true,
+    },
+    /**
      * the endpoint to retrieve all the group data from
      */
     groupDataEndpoint: {
@@ -93,6 +100,7 @@ onBeforeMount(() => {
  */
 onMounted(() => {
     store.toastEl = toastEl;
+    store.showSetting = (props.showSetting === '1');
     checkForStorybook();
     store.loadData();
 });

@@ -69,7 +69,7 @@ const updateButtonText = computed(() => settingsStore.isProcessing ? 'Updating..
  *
  * @returns { Boolean }
  */
-const isUpdateModalDisabled = computed(() => settingsStore.isProcessing || settingsStore.isAccessNotSet || !settingsStore.isAccessSaved);
+const isUpdateModalDisabled = computed(() => settingsStore.isProcessing);
 
 /**
  * to close the modal
@@ -92,7 +92,7 @@ function onModalClosed () {
     <reveal-modal
         ref="updateModalEl"
         size="tiny"
-        :is-close-disabled="isUpdateModalDisabled"
+        :is-close-disabled="false"
         :close-on-background-click="false"
         @closed="onModalClosed"
     >
@@ -143,8 +143,8 @@ function onModalClosed () {
             </div>
         </div><!-- small-12 medium-6 columns -->
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onUpdateSelected" class="button submit" :disabled="settingsStore.isProcessing || settingsStore.isAccessNotSet">{{ updateButtonText }}</button></li>
-            <li><button @click.prevent="onCancelSelected" class="button" :disabled="isUpdateModalDisabled">Cancel</button></li>
+            <li><button @click.prevent="onUpdateSelected" class="button submit" :disabled="settingsStore.isProcessing">{{ updateButtonText }}</button></li>
+            <li><button @click.prevent="onCancelSelected" class="button" :disabled="settingsStore.isProcessing">Cancel</button></li>
         </ul>
     </reveal-modal>
 </template>

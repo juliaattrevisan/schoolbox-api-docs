@@ -18,6 +18,7 @@ export const useStore = defineStore('manageGroup', {
         id: 0, //the id of the group
         name: '', //the name of the group
         toastEl: null, //so we don't need to pass it all around as a prop
+        showSetting: false, // display setting modal
     }),
 
     getters: {

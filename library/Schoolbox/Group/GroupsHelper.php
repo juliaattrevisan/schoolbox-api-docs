@@ -317,17 +317,8 @@ class GroupsHelper
         foreach ($memberList as $member) {
             /** @var UserAccess $userAccess */
             $userAccess = $userAccessList->offsetGet($member->getId());
-            $members[]  = [
-                'id'         => $member->getId(),
-                'firstName'  => $member->getFirstname(),
-                'lastName'   => $member->getLastname(),
-                'userId'     => $member->getId(),
-                'accessType' => UserAccess::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()],
-                'role'       => $member->getRole()->getName(),
-                'campus'     => implode(', ', $member->getCampusCollection()->getPropertyValues('name')),
-                'yearLevel'  => ($member->getYear() && $member->getYear()->getName()) ? $member->getYear()->getLongName() : '',
-                'house'      => $member->getSchoolHouse() ? $member->getSchoolHouse()->getHouse() : '',
-            ];
+            $userAccess->setUser($member);
+            $members[] = (new \Schoolbox\Group\Manage\ModelToArray\UserAccess())($userAccess);
         }
         return $members;
     }
