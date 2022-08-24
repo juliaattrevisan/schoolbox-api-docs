@@ -174,9 +174,11 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getSubjectList(User $user): array
     {
-        $externalId = $user->getExternalId();
+        $externalId = trim((string)$user->getExternalId());
 
-        if (empty($externalId)) {
+        /* This user doesn't have an external id; nothing to find
+         */
+        if ('' === $externalId) {
             return [];
         }
 
