@@ -162,8 +162,8 @@ class External_Schoolbox_Class implements External_ClassInterface
          *
          * All you classical grid users can skip this step
          */
-        $pastThreshold = -1;
-        $futureThreshold = 1;
+        $pastThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
+        $futureThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_FUTURE_THRESHOLD)->endOfDay()->getUnixTimeStamp();
         $config = \Schoolbox\Config\Loader::getInstance();
 
         if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === $config->get('timetable_view')) {
@@ -174,7 +174,7 @@ class External_Schoolbox_Class implements External_ClassInterface
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                 \Schoolbox\UserMapper::getInstance(),
                 \Schoolbox\External\Profile\Staff\Mapper::getInstance()
-            ))->findForClassCode($classCode, \Alaress_Date_Format::now()->addWeeks($pastThreshold)->startOfDay()->getUnixTimeStamp(), \Alaress_Date_Format::now()->addWeeks($futureThreshold)->endOfDay()->getUnixTimeStamp());
+            ))->findForClassCode($classCode, $pastThreshold, $futureThreshold);
 
             $teachers = array_merge($teachers, $staffExternalIds);
         }

@@ -26,6 +26,25 @@ use Schoolbox\UserMapper;
 class TimetableUsers
 {
     /**
+     * INVOLVEMENT_FUTURE_THRESHOLD is the number of weeks into the future to look
+     * for involvements. You might not be a teacher of a class today,
+     * but you might be some time later.
+     *
+     * INVOLVEMENT_PAST_THRESHOLD is the number of weeks into the past to look
+     * for involvements. You might have been the teacher of a class
+     * at some point in the past, but no longer
+     *
+     * INVOLVEMENT_PAST_THRESHOLD and INVOLVEMENT_FUTURE_THRESHOLD are both
+     * defaulted to 1 week just because I said so. This gives you a span of
+     * 2 weeks where your involvements are examined.
+     *
+     * We don't know your involvements outside of this interval.
+     */
+    public const INVOLVEMENT_PAST_THRESHOLD = -1;
+    public const INVOLVEMENT_FUTURE_THRESHOLD = 1;
+
+
+    /**
      * @var \Schoolbox\External\ClassEntryMapper
      */
     private \Schoolbox\External\ClassEntryMapper $classEntryMapper;

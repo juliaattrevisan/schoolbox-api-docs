@@ -245,8 +245,8 @@ class External_Schoolbox_User implements External_UserInterface
          * your involvements are examined. We don't know your involvements
          * outside of this interval.
          */
-        $pastThreshold = -1;
-        $futureThreshold = 1;
+        $pastThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
+        $futureThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_FUTURE_THRESHOLD)->endOfDay()->getUnixTimeStamp();
         $overridesTeachers = [];
         $config = \Schoolbox\Config\Loader::getInstance();
 
@@ -264,7 +264,7 @@ class External_Schoolbox_User implements External_UserInterface
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                 \Schoolbox\UserMapper::getInstance(),
                 \Schoolbox\External\Profile\Staff\Mapper::getInstance()
-            ))->findForUser($user, \Alaress_Date_Format::now()->addWeeks($pastThreshold)->startOfDay()->getUnixTimeStamp(), \Alaress_Date_Format::now()->addWeeks($futureThreshold)->endOfDay()->getUnixTimeStamp());
+            ))->findForUser($user, $pastThreshold, $futureThreshold);
 
             /* Shank it into the required format
              */
