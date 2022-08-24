@@ -223,11 +223,36 @@ class External_Schoolbox_User implements External_UserInterface
             $params
         )->fetchAll();
 
+        /* Schools using the SUDS Timetable system might have teachers in
+         * the Overrides system, sis_event_user_overrides - go looking in
+         * there for additional guys
+         *
+         * We only want teachers that we ADD as overrides - we don't want
+         * the ones where we used SUBTRACT modifier as that removes an
+         * involvement
+         */
+        $overridesTeachers = $this->internalDatabase->executeQuery(
+            "SELECT 
+                    sc.name, 
+                    sc.code, 
+                    '' as classType, 
+                    '' AS campusCode
+                FROM sis_event_user_overrides seuo
+                INNER JOIN sis_event se ON seuo.event_id = se.id
+                INNER JOIN sis_class sc ON se.code = sc.code
+                WHERE seuo.external_id = :externalId
+                AND seuo.action = 'add'
+                ORDER BY sc.code ASC, sc.name ASC            
+            ",
+            $params
+        )->fetchAll();
+
         return array_values(
             array_unique(
                 array_merge(
                     $officialTeachers,
-                    $additionalTeachers
+                    $additionalTeachers,
+                    $overridesTeachers
                 ),
                 SORT_REGULAR
             )
