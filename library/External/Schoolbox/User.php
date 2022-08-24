@@ -182,24 +182,14 @@ class External_Schoolbox_User implements External_UserInterface
             return [];
         }
 
-        $params = ['externalUserId' => $externalId];
+        $params = [
+            'externalUserId' => $externalId
+        ];
 
-        $classQuery = $this->internalDatabase->executeQuery(
-            "SELECT     c.name,
-                            c.code,
-                            '' AS classType,
-                            '' AS campusCode
-                FROM        sis_class_user cu
-                INNER JOIN  sis_class c ON c.id = cu.class_id
-                WHERE       cu.external_id = :externalUserId
-                ORDER BY    c.code ASC, c.name ASC
-            ",
-            $params
-        );
-
-        $classList = $classQuery->fetchAll();
-
-        $subjectQuery = $this->internalDatabase->executeQuery(
+        /* Look inside sis_class_period for teachers officially teaching a class
+         * There can be only one official teacher of a class in the classical grid
+         */
+        $officialTeachers = $this->internalDatabase->executeQuery(
             "SELECT     c.name,
                             c.code,
                             '' AS classType,
@@ -211,13 +201,33 @@ class External_Schoolbox_User implements External_UserInterface
                             c.name ASC
             ",
             $params
-        );
+        )->fetchAll();
+
+        /* Look inside sis_class_user for extra teacher involvements
+         * Teachers will be in here if schools are using the classical grid
+         * or if every teacher involved in a class instance is involved in
+         * all their instances. There can only be one official teacher of a class
+         * in a classical grid, but any additional teachers were added into
+         * sis_class_user (where the students live) as a workaround.
+         */
+        $additionalTeachers = $this->internalDatabase->executeQuery(
+            "SELECT     c.name,
+                            c.code,
+                            '' AS classType,
+                            '' AS campusCode
+                FROM        sis_class_user cu
+                INNER JOIN  sis_class c ON c.id = cu.class_id
+                WHERE       cu.external_id = :externalUserId
+                ORDER BY    c.code ASC, c.name ASC
+            ",
+            $params
+        )->fetchAll();
 
         return array_values(
             array_unique(
                 array_merge(
-                    $classList,
-                    $subjectQuery->fetchAll()
+                    $officialTeachers,
+                    $additionalTeachers
                 ),
                 SORT_REGULAR
             )
