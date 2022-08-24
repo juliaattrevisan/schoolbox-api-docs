@@ -88,7 +88,13 @@ class Cursor implements ICursor
      */
     public function retrieveResultCount(): ?int
     {
-        return null;
+        return $this->dataSource->countByColumnList(
+            $this->currentUser,
+            [
+                'id'         => $this->pastoralIds,
+                'student_id' => $this->student->getId(),
+            ],
+        );
     }
 
     /**
