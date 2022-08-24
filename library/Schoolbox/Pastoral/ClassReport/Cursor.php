@@ -98,7 +98,6 @@ class Cursor implements ICursor
     {
         // TODO limit the results returned in query, instead of post-query:
         //      need to update findByColumnList to do so
-        // TODO incorporate student ID into search
         $results = $this->dataSource->findByColumnList(
             $this->currentUser,
             [
@@ -107,18 +106,48 @@ class Cursor implements ICursor
             ],
         );
 
-        // Ordering of results:
-        // * severity: severity.sequence DESC, then created DESC, then id DESC
-        // * created:  created DESC, then id DESC
-        // * updated:  updated DESC, then created DESC, then id DESC
         $results = $results->sortByCallback($this->buildSortCallback());
+        if (count($results) === 0) {
+            return $results;
+        }
 
-        // Slice some off the end
-        return $results->slice(0, $this->limit);
+        // Simplified filtering:
+        // Find the ID in the encoded cursor, and return every record after that
+        // in already-sorted `$results`.
+        // The alternative is to be aware of every ordering option in each sort
+        // option, and filter conditionally on that.
+        // e.g. the severity filter would need to exclude any result with:
+        // * a severity higher than the cursor
+        // * a severity equal to the cursor, and a created higher than the
+        //   cursor
+        // * a severity and created equal to the cursor, and an ID higher than
+        //   the cursor
+        $offset = 0;
+        if (isset($encodedCursor)) {
+            $decodedCursor = $this->codec->decode($encodedCursor);
+            $id            = $decodedCursor['id'] ?? null;
+            if ($id) {
+                $resultIds    = $results->getPropertyValues('id');
+                $cursorOffset = array_search($id, $resultIds, true);
+                // Not found: return an empty result
+                if ($cursorOffset === false) {
+                    return $results->emptyClone();
+                } else {
+                    $offset = $cursorOffset + 1;
+                }
+            }
+        }
+
+        return $results->slice($offset, $this->limit);
     }
 
     /**
      * Build a sort callback for this type of record.
+     *
+     * Ordering of results:
+     * * severity: severity.sequence DESC, then created DESC, then id DESC
+     * * created:  created DESC, then id DESC
+     * * updated:  updated DESC, then created DESC, then id DESC
      *
      * @return Closure
      */

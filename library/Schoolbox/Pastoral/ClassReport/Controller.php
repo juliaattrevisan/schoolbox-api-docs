@@ -113,8 +113,9 @@ class Controller extends Base
                 Cursor::SORT_OPTION_CREATED,
                 1,
             );
-            $resultSet = $cursor->retrieveResults(null);
-            $next      = $cursor->next($resultSet);
+            $resultSet     = $cursor->retrieveResults(null);
+            $next          = $cursor->next($resultSet);
+            $nextResultSet = $cursor->retrieveResults($next);
 
             $result[] = [
                 'student' => call_user_func($this->userTranslator, $student),
