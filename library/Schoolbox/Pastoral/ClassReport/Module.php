@@ -31,6 +31,7 @@ use Schoolbox\Resource\Folder\Model;
 use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
 use Schoolbox\Role;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -63,16 +64,41 @@ class Module extends BaseModule
                         return null;
                     }
                 },
-                Access::getInstance()
+                Access::getInstance(),
             )
         );
 
         $preload = function ($params) {
             return $this->preloadFolder($params);
         };
+        $preloadStudent = function ($params) {
+            $params = $this->preloadFolder($params);
+            $params['student'] = $this->getMapperFactory()->get(UserMapper::class)
+                                                          ->findById($params['studentId']);
+            return $params;
+        };
 
-        $this->register(self::METHOD_GET, '/{folderId}', 'getReport', $perms, $preload);
-        $this->register(self::METHOD_GET, '/{folderId}/data', 'getReportData', $perms, $preload);
+        $this->register(
+            self::METHOD_GET,
+            '/{folderId}',
+            'getReport',
+            $perms,
+            $preload,
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/{folderId}/students',
+            'getReportDataForAllStudents',
+            $perms,
+            $preload,
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/{folderId}/student/{studentId}/data',
+            'getReportDataForStudent',
+            $perms,
+            $preloadStudent,
+        );
     }
 
     /**

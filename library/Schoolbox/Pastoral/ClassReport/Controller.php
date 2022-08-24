@@ -14,6 +14,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
 use Schoolbox\SortUsersByName;
+use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 
 class Controller extends Base
@@ -57,10 +58,14 @@ class Controller extends Base
     /**
      * Get report data as JSON.
      *
-     * @api GET /pastoral/class/{folderId}/data
+     * @api GET /pastoral/class/{folderId}/students
      * @since 22.1
+     *
+     * @param FolderModel $folder
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function getReportData(FolderModel $folder): void
+    public function getReportDataForAllStudents(FolderModel $folder): void
     {
         // Save selected filters
         $this->filterHelper->saveSelections(
@@ -112,5 +117,19 @@ class Controller extends Base
                 'metadata' => null,
             ]),
         );
+    }
+
+    /**
+     * Retrieve more pastoral records for this student.
+     *
+     * @api GET /pastoral/class/{folderId}/student/{studentId}/data
+     * @since 22.1
+     *
+     * @param FolderModel $folder
+     * @param User        $student
+     * @return void
+     */
+    public function getReportDataForStudent(FolderModel $folder, User $student): void
+    {
     }
 }
