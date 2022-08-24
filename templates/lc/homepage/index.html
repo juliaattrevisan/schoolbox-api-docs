@@ -195,12 +195,11 @@
                         <a href="{AWARD_LIST_LINK}" class="icon-achievement">Badge Report</a>
                     </li>
                     <!-- END award_list_link -->
-
-                    <!-- BEGIN class_analytics_link -->
+                    <!-- BEGIN class_pastoral_report_link -->
                     <li>
-                        <a href="{CLASS_ANALYTICS_LINK}" class="icon-poll">Class Analytics</a>
+                        <a href="{PASTORAL_CLASS_REPORT_LINK}" class="icon-pastoral">{TPL_LOCAL_PASTORALCARE_PC} Report</a>
                     </li>
-                    <!-- END class_analytics_link -->
+                    <!-- END class_pastoral_report_link -->
                 </ul>
             </div>
             <!-- END manage_class -->
@@ -270,6 +269,16 @@
                     <li class="separator">Course Actions</li>
                     <li><a href="/course/import/{ID}" class="icon-course" data-course-selector>Import Course</a></li>
                     <li><a href="/course/import/management/{ID}" class="icon-course">Manage Courses</a></li>
+
+                    <!-- BEGIN analytics_section -->
+                    <li class="separator">Analytics</li>
+                    <!-- BEGIN schoolbox_analytics_link -->
+                    <li><a href="{SCHOOLBOX_ANALYTICS_LINK}" class="icon-poll">{SCHOOLBOX_ANALYTICS_LINK_TITLE}</a></li>
+                    <!-- END schoolbox_analytics_link -->
+                    <!-- BEGIN class_analytics_link -->
+                    <li><a href="{CLASS_ANALYTICS_LINK}" class="icon-intellischool">Albitros Analytics</a></li>
+                    <!-- END class_analytics_link -->
+                    <!-- END analytics_section -->
                 </ul>
             </div>
             <!-- END course_actions -->
