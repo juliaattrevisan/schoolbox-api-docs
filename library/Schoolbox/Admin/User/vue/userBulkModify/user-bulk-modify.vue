@@ -11,8 +11,6 @@ import UserBulkModifyLog from "./user-bulk-modify-log";
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
-import Toast from '@schoolboxVue/components/toast';
-
 
 export default {
 
@@ -21,7 +19,6 @@ export default {
         UserBulkModifyNewValues,
         BottomDrawer,
         RevealModal,
-        Toast,
         UserBulkModifyLog,
     },
 
@@ -325,7 +322,6 @@ export default {
          * Delete the selected users
          */
         async onConfirmDeleteUsersSelected () {
-            this.$refs.toast.activate('Deleting...');
             const usersToModifyIDList = this.selectedRows.map(row => row.id);
             const formData = new FormData();
             usersToModifyIDList.forEach((item) => {
@@ -342,13 +338,11 @@ export default {
                 });
                 const responseData = await response.json();
                 this.checkUpdateResponse(response, responseData);
-                this.$refs.toast.timeout('Deleted', true, 2000);
                 this.$refs.deleteModal.close();
 
             } catch (error) {
                 console.warn(error);
                 this.isProcessing = false;
-                this.$refs.toast.timeout('Unable to delete', false, 2000);
                 this.hasDataError = true;
 
             } finally {
@@ -496,8 +490,6 @@ export default {
         </reveal-modal>
 
         <UserBulkModifyLog ref="userLogView" />
-
-        <toast ref="toast"></toast>
 
     </div>
 </template>
