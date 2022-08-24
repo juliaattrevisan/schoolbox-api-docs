@@ -18,11 +18,3 @@ function warn(){
 function error(){
   $LOG $L_ERROR "$1"
 }
-
-# Function to fetch value from .env file by key
-# Usage: value=$(read_var $key)
-read_var() {
-    VAR=$(grep -E "^\s*$1" "$SITE_ROOT"/.env | xargs)
-    IFS="=" read -ra VAR <<< "$VAR"
-    echo "${VAR[1]}"
-}

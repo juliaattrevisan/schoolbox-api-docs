@@ -78,18 +78,12 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find $cachedir -type f -empty -delete;
 
-s3Referer=$(read_var AWS_S3_REFERER)
-if [[ -z $s3Referer ]]; then
-    echo "Unable to derive S3 Referer secret from .env environment file."
-    exit 1;
-fi
-
 # Download some files from S3
-if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --s3-referer "$s3Referer" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
+if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
   echo "Error: Unable to download s3 file: 'vagrant-secrets.sql'";
   exit 1;
 fi
-if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
+if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --iam-access-key "$aws_iam_key" --iam-secret-key "$aws_iam_secret" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
   echo "Error: Unable to download s3 file: 'vagrant-cleanup-secrets.sql'";
   exit 1;
 fi
@@ -135,7 +129,7 @@ then
             # Check if we've already found a matching file
             if [ "$vendorfile" == '' ];
             then
-                etag=$(curl -I -H "Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
+                etag=$(curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
                 if [ $? -eq 0 ];
                 then
                     checketag=`grep $etag vendor.etag.cache 2>/dev/null | wc -l`;
@@ -143,7 +137,7 @@ then
                     then
                         # New/updated version available - download it
                         echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest vendor build: $branch-vendor-php-dev.tar.gz";
-                        wget --no-verbose --header="Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz -O $branch-vendor-php-dev.tar.gz 2>&1;
+                        wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-vendor-php-dev.tar.gz -O $branch-vendor-php-dev.tar.gz 2>&1;
                         if [ $? -eq 0 ];
                         then
                             # This is a new file, so remove old references
@@ -203,7 +197,6 @@ fi
 if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --data-source "$data_source" \
 --dataset "$data_filename" \
---s3-referer "$s3Referer" \
 --iam-access-key "$aws_iam_key" \
 --iam-secret-key "$aws_iam_secret" \
 --skip-bucket-copy \
@@ -322,7 +315,7 @@ then
             # Check if we've already found a matching file
             if [ "$npmfile" == '' ];
             then
-                etag=$(curl -I -H "Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
+                etag=$(curl -I https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
                 if [ $? -eq 0 ];
                 then
                     checketag=`grep $etag npm.etag.cache 2>/dev/null | wc -l`;
@@ -330,7 +323,7 @@ then
                     then
                         # New/updated version available - download it
                         echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest NPM build: $branch-npm.tar.gz";
-                        wget --no-verbose --header="Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz -O $branch-npm.tar.gz 2>&1;
+                        wget --no-verbose https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-npm.tar.gz -O $branch-npm.tar.gz 2>&1;
                         if [ $? -eq 0 ];
                         then
                             # This is a new file, so remove old references
