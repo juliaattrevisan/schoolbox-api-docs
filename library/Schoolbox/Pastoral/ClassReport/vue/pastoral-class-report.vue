@@ -2,18 +2,18 @@
 
 import mixinFilter from '@schoolboxVue/mixins/filter';
 
-const SORT_OPTION_CREATED = 'created';
-const SORT_OPTION_UPDATED = 'updated';
-// Severity is not always enabled
+const SORT_OPTION_CREATED  = 'created';
+const SORT_OPTION_UPDATED  = 'updated';
 const SORT_OPTION_SEVERITY = 'severity';
-const SORT_OPTION_DEFAULT = SORT_OPTION_CREATED;
-const SORT_OPTIONS = [
+const SORT_OPTION_DEFAULT  = SORT_OPTION_CREATED;
+const SORT_OPTIONS         = [
     {value: SORT_OPTION_CREATED, label: 'Created'},
     {value: SORT_OPTION_UPDATED, label: 'Updated'},
     {value: SORT_OPTION_SEVERITY, label: 'Severity'},
 ];
+
 const COUNT_OPTION_DEFAULT = 7;
-const COUNT_OPTIONS = [
+const COUNT_OPTIONS        = [
     {value: 3, label: '3'},
     {value: 7, label: '7'},
     {value: 12, label: '12'},
@@ -28,8 +28,12 @@ export default {
         // The route via which the report data is retrieved
         getReportDataRoute: {
             type: String,
-            default: '',
             required: true,
+        },
+        // Is pastoral severity enabled?
+        severityEnabled: {
+            type: Boolean,
+            default: true,
         },
     },
     data () {
@@ -48,8 +52,10 @@ export default {
     created () {
         // assign endpoint for the mixin filter
         this.filter_endpoint = this.getReportDataRoute;
-        this.sortOptions     = SORT_OPTIONS;
         this.countOptions    = COUNT_OPTIONS;
+        this.sortOptions     = this.severityEnabled
+            ? SORT_OPTIONS
+            : SORT_OPTIONS.filter(v => v.value !== SORT_OPTION_SEVERITY);
     },
     mounted () {
         document.addEventListener('pastoral-class-report__onFilterChange', this.onFilterChange);

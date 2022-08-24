@@ -35,6 +35,7 @@
         <section id="{{ reportContentId }}">
             <pastoral-class-report
                 get-report-data-route="{{ routeLookupIfAuthorized('pastoralClassReportModule.getReportData', {folderId: folder.id, folder: folder}) }}"
+                :severity-enabled="{{ config.pastoral_severity ? 'true' : 'false' }}"
             >
             </pastoral-class-report>
         </section>
