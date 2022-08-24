@@ -32,6 +32,7 @@ export default {
          * emit listener
          */
         displayLog (logData, hasDataError) {
+            console.log('user-log-view - display log');
             this.logData = logData;
             this.hasDataError = hasDataError;
             this.onLogOpenSelected();
@@ -41,8 +42,10 @@ export default {
          * Open the log modal
          */
         onLogOpenSelected () {
+            console.log('user-log-view - open modal');
             this.$refs.outputLogModal.open();
         },
+
         /**
          * Close the log modal
          */

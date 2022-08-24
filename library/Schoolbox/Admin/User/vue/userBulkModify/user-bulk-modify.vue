@@ -355,9 +355,9 @@ export default {
                 this.hasUpdated = true;
                 this.isProcessing = false;
 
-                this.$refs.userLogView.logData = this.logData;
-                this.$refs.userLogView.hasDataError = this.hasDataError;
-                this.$refs.userLogView.onLogOpenSelected();
+                let logData = this.logData;
+                let hasDataError = this.hasDataError;
+                this.openLog({logData, hasDataError});
             }
         },
 
@@ -399,6 +399,14 @@ export default {
                 }
             }
         },
+
+        /**
+         * send to log and open
+         */
+        openLog ({logData, hasDataError = false}) {
+            console.log('user-bulk-modify - open log');
+            this.$refs.userLogView.displayLog(logData, hasDataError);
+        }
 
     },
 
@@ -470,6 +478,7 @@ export default {
             :selected-rows="selectedRows"
             :selected-rows-count-with-row-name="selectedRowsCountWithRowName"
             @updated="onUpdated"
+            @log="openLog"
         />
         <reveal-modal ref="deleteModal">
             <h2>Please Confirm Multiple User Deletion</h2>
@@ -486,7 +495,7 @@ export default {
             </ul>
         </reveal-modal>
 
-        <User-Log-View ref="userLogView" @display-log="displayLog"/>
+        <UserLogView ref="userLogView" />
 
         <toast ref="toast"></toast>
 
