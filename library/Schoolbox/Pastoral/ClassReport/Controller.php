@@ -100,12 +100,23 @@ class Controller extends Base
             $result[]        = [
                 'student' => call_user_func($this->userTranslator, $student),
                 'records' => [
-                    'data' => $cursoredRecords->map($this->pastoralTranslator),
+                    'data'     => $cursoredRecords->map($this->pastoralTranslator),
                     'metadata' => [
                         'count'  => $cursor->retrieveResultCount(),
                         'cursor' => [
                             'current' => $cursor->current($cursoredRecords),
                             'next'    => $cursor->next($cursoredRecords),
+                        ],
+                        '_links' => [
+                            'report' => $this->getRouteIfAuthorized(
+                                'pastoralClassReportModule.getReportDataForStudent',
+                                [
+                                    'folder'    => $folder,
+                                    'folderId'  => $folder->getId(),
+                                    'student'   => $student,
+                                    'studentId' => $student->getId(),
+                                ]
+                            ),
                         ],
                     ],
                 ],
