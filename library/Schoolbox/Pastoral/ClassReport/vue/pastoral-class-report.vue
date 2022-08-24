@@ -10,6 +10,12 @@ const SORT_OPTIONS = [
     {value: SORT_OPTION_UPDATED, label: 'Updated'},
     {value: SORT_OPTION_SEVERITY, label: 'Severity'},
 ];
+const COUNT_OPTION_DEFAULT = 7;
+const COUNT_OPTIONS = [
+    {value: 3, label: '3'},
+    {value: 7, label: '7'},
+    {value: 12, label: '12'},
+];
 
 export default {
     name: "pastoralClassReport",
@@ -32,6 +38,7 @@ export default {
                 cursor: null,
             },
             sort: SORT_OPTION_CREATED,
+            count: COUNT_OPTION_DEFAULT,
             showSkeletonLoader: true,
             selectedFilters: null,
         }
@@ -40,6 +47,7 @@ export default {
         // assign endpoint for the mixin filter
         this.filter_endpoint = this.getReportDataRoute;
         this.sortOptions     = SORT_OPTIONS;
+        this.countOptions    = COUNT_OPTIONS;
     },
     mounted () {
         document.addEventListener('pastoral-class-report__onFilterChange', this.onFilterChange);
@@ -101,15 +109,22 @@ export default {
             </div>
 
             <div v-else>
-                <!-- count filter -->
-                <label>
+                <!-- sort options -->
+                <label for="sortOption">
                     Sort by:
-                    <select v-model="sort">
-                        <option v-for="option in sortOptions"
-                                :label="option.label"
-                                :value="option.value">{{ option.label }}</option>
-                    </select>
                 </label>
+                <select id="sortOption" v-model="sort">
+                    <option v-for="option in sortOptions"
+                            :label="option.label"
+                            :value="option.value">{{ option.label }}</option>
+                </select>
+
+                <!-- count filter -->
+                <label>Show amount:</label>
+                <template v-for="option in countOptions">
+                    <input :id="`countOption-${ option.value }`" type="radio" v-model="count" :value="option.value">
+                    <label :for="`countOption-${ option.value }`" class="input-toggle">{{ option.label }}</label>
+                </template>
 
                 <ul class="action-list">
                     <li v-for="studentData in data" :key="'student-' + String(studentData.student.id)">
