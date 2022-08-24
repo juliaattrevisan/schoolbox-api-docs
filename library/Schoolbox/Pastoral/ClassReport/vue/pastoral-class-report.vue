@@ -279,7 +279,7 @@ export default {
                         <!-- pastoral records -->
                         <div>
                             <ul class="information-list">
-                                <li v-for="record in sortAndLimit(studentData.records)" :key="'record-' + String(record.id)">
+                                <li v-for="record in studentData.records.data" :key="'record-' + String(record.id)">
                                     <a :href="record._links.read">{{ record.heading }}</a>,
                                     created
                                     <time :datetime="formatDateTime(record.createdAt)"

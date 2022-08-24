@@ -85,26 +85,9 @@ class Controller extends Base
             $this->request->query->getArrayCopy(),
         );
 
-        // Push said records through the censor
-        $pastoralRecords = $this->pastoralDataSource
-            ->findByColumnList($this->getUser(), ['id' => $pastoralIds])
-            ->sortBy('createdAt', Collection::ORDER_DESCENDING);
-        /** @var Pastoral\Model[][] $pastoralRecordsByStudent */
-        $pastoralRecordsByStudent = $pastoralRecords
-            ->groupByCallback(
-                function (Pastoral\Model $pastoral) {
-                    return $pastoral->getStudent()->getId();
-                }
-            );
-
         // Build a result
         $result = [];
         foreach ($students as $student) {
-            $pastoralRecordsForStudent = [];
-            foreach ($pastoralRecordsByStudent[$student->getId()] ?? [] as $pastoralRecord) {
-                $pastoralRecordsForStudent[] = call_user_func($this->pastoralTranslator, $pastoralRecord);
-            }
-
             $cursor = new Cursor(
                 $this->pastoralDataSource,
                 $this->getUser(),
@@ -113,13 +96,19 @@ class Controller extends Base
                 Cursor::SORT_OPTION_CREATED,
                 1,
             );
-            $resultSet     = $cursor->retrieveResults(null);
-            $next          = $cursor->next($resultSet);
-            $nextResultSet = $cursor->retrieveResults($next);
-
-            $result[] = [
+            $cursoredRecords = $cursor->retrieveResults(null);
+            $result[]        = [
                 'student' => call_user_func($this->userTranslator, $student),
-                'records' => $pastoralRecordsForStudent,
+                'records' => [
+                    'data' => $cursoredRecords->map($this->pastoralTranslator),
+                    'metadata' => [
+                        'count'  => $cursor->retrieveResultCount(),
+                        'cursor' => [
+                            'current' => $cursor->current($cursoredRecords),
+                            'next'    => $cursor->next($cursoredRecords),
+                        ],
+                    ],
+                ],
             ];
         }
 
