@@ -10,21 +10,27 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Authorizer\Rule;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Comment\Translator\ModelToArray as PastoralCommentTranslator;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Translator\ModelToArray as PastoralTranslator;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model;
+use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
 use Schoolbox\Role;
+use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 
 class Module extends BaseModule
 {
@@ -74,6 +80,27 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        // Build translators here instead of in controller code
+        $userTranslator     = new UserTranslator();
+        $scrubAdapter       = new ScrubAdapter();
+        $router             = $this->getRouter();
+        $authorizer         = $this->getAuthorizer();
+        $currentUser        = $this->injector->get('user');
+        $pastoralTranslator = new PastoralTranslator(
+            $userTranslator,
+            new PastoralCommentTranslator(
+                $userTranslator,
+                $router,
+                $authorizer,
+                $currentUser,
+                $scrubAdapter,
+            ),
+            new StorageTranslator(new PrefixGenerator($this->getConfig())),
+            $router,
+            $authorizer,
+            $currentUser,
+            $scrubAdapter,
+        );
         return new Controller(
             $this->getMapperFactory()->get(PastoralMapper::class),
             $this->injector->get('pastoralDataSource'),
@@ -81,6 +108,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Filter\Mapper::class),
             $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
             $this->getMapperFactory()->get(UserAccessMapper::class),
+            $userTranslator,
+            $pastoralTranslator,
         );
     }
 

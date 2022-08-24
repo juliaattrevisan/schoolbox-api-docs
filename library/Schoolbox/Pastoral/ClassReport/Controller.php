@@ -7,15 +7,12 @@
 
 namespace Schoolbox\Pastoral\ClassReport;
 
-use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
 use Schoolbox\Role;
 use Schoolbox\SortUsersByName;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
@@ -32,6 +29,8 @@ class Controller extends Base
         private Filter\Mapper $filterMapper,
         private Filter\Selection\Mapper $filterSelectionMapper,
         private UserAccessMapper $userAccessMapper,
+        private UserTranslator $userTranslator,
+        private Pastoral\Translator\ModelToArray $pastoralTranslator,
     ) {
     }
 
@@ -71,8 +70,6 @@ class Controller extends Base
      */
     public function getReportData(FolderModel $folder): void
     {
-        // Format: students, then their pastoral reports
-
         // Get all students in class
         $students = $this->userAccessMapper
             ->findUsersInCategory($folder, Role::STUDENT)
@@ -117,31 +114,15 @@ class Controller extends Base
                 }
             );
 
-        $studentTranslator  = new UserTranslator();
-        $pastoralTranslator = new Pastoral\Translator\ModelToArray(
-            $studentTranslator,
-            new Pastoral\Comment\Translator\ModelToArray(
-                $studentTranslator,
-                $this->router,
-                $this->authorizer,
-                $this->getUser(),
-                new ScrubAdapter(),
-            ),
-            new StorageTranslator(new PrefixGenerator($this->getConfigLoader())),
-            $this->router,
-            $this->authorizer,
-            $this->getUser(),
-            new ScrubAdapter(),
-        );
-        $result             = [];
+        $result = [];
         foreach ($students as $student) {
             $pastoralRecordsForStudent = [];
             foreach ($pastoralRecordsByStudent[$student->getId()] ?? [] as $pastoralRecord) {
-                $pastoralRecordsForStudent[] = $pastoralTranslator($pastoralRecord);
+                $pastoralRecordsForStudent[] = call_user_func($this->pastoralTranslator, $pastoralRecord);
             }
 
             $result[] = [
-                'student' => $studentTranslator($student),
+                'student' => call_user_func($this->userTranslator, $student),
                 'records' => $pastoralRecordsForStudent,
             ];
         }
