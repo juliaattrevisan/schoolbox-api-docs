@@ -241,10 +241,12 @@ class External_Schoolbox_User implements External_UserInterface
                 INNER JOIN sis_event se ON seuo.event_id = se.id
                 INNER JOIN sis_class sc ON se.code = sc.code
                 WHERE seuo.external_id = :externalId
-                AND seuo.action = 'add'
+                AND seuo.action = :modifier
                 ORDER BY sc.code ASC, sc.name ASC            
             ",
-            $params
+            array_merge($params, [
+                'modifier' => Schoolbox\External\Event\Overrides\Model::ADD
+            ])
         )->fetchAll();
 
         return array_values(
