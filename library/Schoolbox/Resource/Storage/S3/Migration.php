@@ -11,7 +11,6 @@ namespace Schoolbox\Resource\Storage\S3;
 
 use Alaress_Byte_Format;
 use Alaress\Database as AlaressDatabase;
-use Aws\S3\Exception\S3Exception;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as AwsS3Adapter;
 use League\Flysystem;
@@ -59,9 +58,9 @@ class Migration extends CliTool\App
     private $deleteLocalCopy;
 
     /**
-     * Indexed by filepath
+     * Indexed by filepath. Value is file size in bytes
      *
-     * @var bool[]
+     * @var int[]
      */
     private $filesInS3;
 
@@ -277,9 +276,17 @@ class Migration extends CliTool\App
                 $this->countUploadsFailed++;
             }
         } else {
-            $this->getLogger()->info('File both on local disk and in S3' . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
-            if ($this->deleteLocalCopy && $this->perform()) {
-                unlink($filepath);
+            // Check file size is same both local + s3
+            $fileSizeLocal = filesize($filepath);
+            $fileSizeS3    = $this->filesInS3[FilesystemFactory::PREFIX_STORAGE . $relativePath];
+            if ($fileSizeLocal !== $fileSizeS3) {
+                $this->getLogger()->error("File both on local disk and in S3 but file sizes differ. Local: $fileSizeLocal B, S3: $fileSizeS3 B.");
+                $this->countUploadsFailed++;
+            } else {
+                $this->getLogger()->info('File both on local disk and in S3' . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
+                if ($this->deleteLocalCopy && $this->perform()) {
+                    unlink($filepath);
+                }
             }
         }
 
@@ -406,10 +413,17 @@ class Migration extends CliTool\App
                 $this->filesInS3,
             );
             if ($foundInS3) {
-                $this->getLogger()->info("Transcode file '$entry' found locally and in S3" . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
-
-                if ($this->deleteLocalCopy && $this->perform()) {
-                    unlink($transcodeFilePath);
+                // Check file size is same both local + s3
+                $fileSizeLocal = filesize($transcodeFilePath);
+                $fileSizeS3    = $this->filesInS3[FilesystemFactory::PREFIX_STORAGE . $filepath];
+                if ($fileSizeLocal !== $fileSizeS3) {
+                    $this->getLogger()->error("Transcode both on local disk and in S3 but file sizes differ. Local: $fileSizeLocal B, S3: $fileSizeS3 B.");
+                    $this->countUploadsFailed++;
+                } else {
+                    $this->getLogger()->info("Transcode file '$entry' found locally and in S3" . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
+                    if ($this->deleteLocalCopy && $this->perform()) {
+                        unlink($transcodeFilePath);
+                    }
                 }
                 continue;
             }
