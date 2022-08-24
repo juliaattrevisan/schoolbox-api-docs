@@ -227,9 +227,10 @@ class External_Schoolbox_User implements External_UserInterface
          * the Overrides system, sis_event_user_overrides - go looking in
          * there for additional guys
          *
-         * We only want teachers that we ADD as overrides - we don't want
-         * the ones where we used SUBTRACT modifier as that removes an
-         * involvement
+         * We only want teachers that, after a series of Override mutations,
+         * still remain in the result set. Override mutations can add and
+         * remove people in any combination in any order and in any quantity
+         * so you have to do a bit of math to figure out the final answer.
          *
          * $futureThreshold is the number of weeks into the future to look
          * for involvements. You might not be a teacher of a class today,
