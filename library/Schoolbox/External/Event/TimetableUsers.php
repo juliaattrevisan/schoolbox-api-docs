@@ -332,9 +332,11 @@ class TimetableUsers
             WHERE se.classification = :classification
             AND se.start_at >= :startDatetime
             AND se.finish_at <= :finishDatetime
+            AND seuo.external_id = :externalId
         ";
 
         $params = [
+            'externalId' => $user->getExternalId(),
             'startDatetime' => $startDatetime,
             'finishDatetime' => $finishDatetime,
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,

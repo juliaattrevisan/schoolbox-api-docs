@@ -246,27 +246,35 @@ class External_Schoolbox_User implements External_UserInterface
          */
         $pastThreshold = -1;
         $futureThreshold = 1;
-
-        $events = (new \Schoolbox\External\Event\TimetableUsers(
-            \Schoolbox\External\ClassEntryMapper::getInstance(),
-            \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-            \Schoolbox\External\Event\Mapper::getInstance(),
-            \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-            \Schoolbox\UserMapper::getInstance(),
-            \Schoolbox\External\Profile\Staff\Mapper::getInstance()
-        ))->findForUser($user, \Alaress_Date_Format::now()->addWeeks($pastThreshold)->startOfDay()->getUnixTimeStamp(), \Alaress_Date_Format::now()->addWeeks($futureThreshold)->endOfDay()->getUnixTimeStamp());
-
         $overridesTeachers = [];
+        $config = \Schoolbox\Config\Loader::getInstance();
 
-        /* Shank it into the required format
+        /* Only need to do this if you are using the Calendar view
+         * because that typically means you activated SUDS Timetable subscription
+         * or used it to populate data that we must investigate
+         *
+         * All you classical grid users can skip this step
          */
-        foreach ($events as $event) {
-            $overridesTeachers[] = [
-                'name' => $event->getTitle(),
-                'code' => $event->getCode(),
-                'classType' => '',
-                'campusCode' => ''
-            ];
+        if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === $config->get('timetable_view')) {
+            $events = (new \Schoolbox\External\Event\TimetableUsers(
+                \Schoolbox\External\ClassEntryMapper::getInstance(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                \Schoolbox\UserMapper::getInstance(),
+                \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+            ))->findForUser($user, \Alaress_Date_Format::now()->addWeeks($pastThreshold)->startOfDay()->getUnixTimeStamp(), \Alaress_Date_Format::now()->addWeeks($futureThreshold)->endOfDay()->getUnixTimeStamp());
+
+            /* Shank it into the required format
+             */
+            foreach ($events as $event) {
+                $overridesTeachers[] = [
+                    'name' => $event->getTitle(),
+                    'code' => $event->getCode(),
+                    'classType' => '',
+                    'campusCode' => ''
+                ];
+            }
         }
 
         return array_values(
