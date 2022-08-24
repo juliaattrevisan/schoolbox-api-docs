@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Api\Translator\ArrayToModel;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -62,20 +63,29 @@ class Controller extends Base
      */
     public function searchNode(): void
     {
-        $ancestorCount   = $this->determineAncestorCount();
-        $descendantCount = $this->determineDescendantCount();
-        $results         = $this->nodeMapper->findByKeyword(
-            trim($this->request->query->get('query') ?? ''),
-            $this->determineLimit(),
-            $this->determineOffset(),
-            $ancestorCount,
-            $descendantCount,
-            $this->request->query->getBool('topLevelOnly', false),
-        );
+        $ancestorCount         = $this->determineAncestorCount();
+        $descendantCount       = $this->determineDescendantCount();
+        $searchQuery           = trim($this->request->query->get('query') ?? '');
+        $searchKeywords        = explode(',', $searchQuery);
+        $resultsForAllKeywords = new Collection();
+
+        foreach ($searchKeywords as $searchKeyword) {
+            $resultsForKeyword = $this->nodeMapper->findByKeyword(
+                trim($searchKeyword),
+                $this->determineLimit(),
+                $this->determineOffset(),
+                $ancestorCount,
+                $descendantCount,
+                $this->request->query->getBool('topLevelOnly', false),
+            );
+
+            $resultsForAllKeywords = $resultsForAllKeywords->merge($resultsForKeyword);
+        }
+
         $this->response->content->set(
             $this->buildJsonOutput(
-                $results->map(new ModelToArray($ancestorCount, $descendantCount))
-            ),
+                $resultsForAllKeywords->map(new ModelToArray($ancestorCount, $descendantCount))
+            )
         );
     }
 
