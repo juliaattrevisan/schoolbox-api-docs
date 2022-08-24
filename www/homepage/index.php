@@ -165,7 +165,9 @@ $this->setBlock('page_controls', 'course_actions', 'course_actions_block');
 $this->setBlock('page_controls', 'manage_class', 'manage_class_block');
 $this->setBlock(TEMPLATE_content, 'readonly_switch_on', 'readonly_switch_on_block');
 $this->setBlock(TEMPLATE_content, 'readonly_switch_off', 'readonly_switch_off_block');
-
+$this->setBlock('course_actions', 'analytics_section', 'analytics_section_block');
+$this->setBlock('analytics_section', 'class_analytics_link', 'class_analytics_link_block');
+$this->setBlock('analytics_section', 'schoolbox_analytics_link', 'schoolbox_analytics_link_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 $this->setBlock('page_controls', 'browse_resources', 'browse_resources_block');

@@ -107,9 +107,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'class_pastoral_report_link', 'class_pastoral_report_link_block');
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
         $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
-        $this->setBlock($templateHandle, 'analytics_section', 'analytics_section_block');
-        $this->setBlock('analytics_section', 'class_analytics_link', 'class_analytics_link_block');
-        $this->setBlock('analytics_section', 'schoolbox_analytics_link', 'schoolbox_analytics_link_block');
         $this->setBlock($templateHandle, 'qrcode_link', 'qrcode_link_block');
 
         // Determine the term for the grades link
@@ -363,9 +360,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if ($hasAnalytics) {
             $this->parse('analytics_section_block', 'analytics_section');
         }
+
         return $hasClassActions;
     }
-
 
     /**
      * Build a link to the markbook, if this controller's user has permission to
