@@ -28,7 +28,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     private $externalDbEnabled;
 
-
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -45,7 +44,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         // This component is always present on homepages (embedded in page tot menu)
         return true;
     }
-
 
     /**
      * Renders the data into the SitePage. Presentation logic.
@@ -380,12 +378,14 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             'folderId' => $this->getContext()->getId(),
         ];
         $route = 'learningMarkbook.getMarkbookForClass';
+        
         if (
             !$this->getConfigLoader()->get(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED)
             || !$this->getAuthorizer()->isPathAuthorizedForUser($route, $classArg, $this->getUser())
         ) {
             return null;
         }
+
         return $this->getRouter()->generate($route, $classArg);
     }
 
@@ -403,6 +403,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     {
         $route  = null;
         $params = null;
+
         if ($isCoursePage) {
             $courseSpec = $this->getContext()->getCourseSpecification();
             $route      = 'courseMarkbook.getMarkbook';
@@ -422,6 +423,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if ($route && $this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())) {
             return $this->getRouter()->generate($route, $params);
         }
+
         return null;
     }
 }
