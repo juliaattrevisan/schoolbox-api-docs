@@ -378,7 +378,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             'folderId' => $this->getContext()->getId(),
         ];
         $route = 'learningMarkbook.getMarkbookForClass';
-        
+
         if (
             !$this->getConfigLoader()->get(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED)
             || !$this->getAuthorizer()->isPathAuthorizedForUser($route, $classArg, $this->getUser())
