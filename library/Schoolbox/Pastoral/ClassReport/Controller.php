@@ -9,7 +9,6 @@ namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
-use Schoolbox\Filter;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -63,6 +62,12 @@ class Controller extends Base
      */
     public function getReportData(FolderModel $folder): void
     {
+        // Save selected filters
+        $this->filterHelper->saveSelections(
+            $this->getUser(),
+            $this->request->query->getArrayCopy(),
+        );
+
         // Find all students in class
         $students = $this->userAccessMapper
             ->findUsersInCategory($folder, Role::STUDENT)
@@ -76,7 +81,7 @@ class Controller extends Base
         );
 
         // Push said records through the censor
-        $pastoralRecords          = $this->pastoralDataSource
+        $pastoralRecords = $this->pastoralDataSource
             ->findByColumnList($this->getUser(), ['id' => $pastoralIds])
             ->sortBy('createdAt', Collection::ORDER_DESCENDING);
         /** @var Pastoral\Model[][] $pastoralRecordsByStudent */
@@ -87,6 +92,7 @@ class Controller extends Base
                 }
             );
 
+        // Build a result
         $result = [];
         foreach ($students as $student) {
             $pastoralRecordsForStudent = [];

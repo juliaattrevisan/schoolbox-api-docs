@@ -11,6 +11,7 @@ namespace Schoolbox\Pastoral\ClassReport;
 
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
 use Schoolbox\User;
 
@@ -57,34 +58,41 @@ class FilterHelper
     }
 
     /**
+     * Update the selected filters for this user.
+     *
+     * @param User  $currentUser The request's user
+     * @param array $query       The request's query string parameters
+     * @return void
+     * @throws MapperException if somehow the selections couldn't be updated
+     */
+    public function saveSelections(User $currentUser, array $query): void
+    {
+        $selectionsPerFilter = $this->buildSelectionPerFilter($currentUser, $query);
+        $this->filterSelectionMapper->updateSelections(
+            $currentUser,
+            self::FILTER_PAGE,
+            $selectionsPerFilter,
+        );
+    }
+
+    /**
      * Find the pastoral records which match the filter and the set of students.
      *
-     * @param User              $currentUser
-     * @param GenericCollection $students
-     * @param array             $query
+     * @param User                     $currentUser The request's user
+     * @param GenericCollection|User[] $students    The students to fetch
+     *                                              records for
+     * @param array $query                          The request's query string
+     *                                              parameters
      * @return array
      */
     public function findPastoralRecordIds(User $currentUser, GenericCollection $students, array $query): array
     {
         // Piece together the actually selected filter
-        $request             = $query['filters'] ?? [];
-        $codec               = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
-        $selectionsPerFilter = $codec->convertRequestToSelections(
-            $currentUser,
-            self::FILTER_PAGE,
-            $request,
-        );
-        $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
+        $selectionsPerFilter = $this->buildSelectionPerFilter($currentUser, $query);
+        $dynamicFilters      = $this->filterFactoryFactory->convertSelectionsToFilters(
             $selectionsPerFilter,
             $currentUser,
             self::FILTER_PAGE,
-        );
-
-        // Save the selected filters
-        $this->filterSelectionMapper->updateSelections(
-            $currentUser,
-            self::FILTER_PAGE,
-            $selectionsPerFilter,
         );
 
         // Hardcoded filter: ensures only records for `$students` get returned
@@ -101,6 +109,24 @@ class FilterHelper
         return $idFinder->findIdsByFilters(
             array_merge($dynamicFilters, $hardcodedFilters),
             $currentUser,
+        );
+    }
+
+    /**
+     * Build filters out of the given selection
+     *
+     * @param User  $currentUser The request's user
+     * @param array $query       The request's query string parameters
+     * @return GenericCollection|GenericCollection[]|Filter\Selection\Model[][]
+     */
+    private function buildSelectionPerFilter(User $currentUser, array $query): GenericCollection
+    {
+        $request = $query['filters'] ?? [];
+        $codec   = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
+        return $codec->convertRequestToSelections(
+            $currentUser,
+            self::FILTER_PAGE,
+            $request,
         );
     }
 }
