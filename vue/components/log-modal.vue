@@ -19,11 +19,9 @@ export default {
     data () {
         return {
             hasDataError: false,
+            errorMessage: [], //text to display in the error div
             logData: [], //to display the output of the returned action
         }
-    },
-
-    computed: {
     },
 
     methods: {
@@ -31,10 +29,10 @@ export default {
         /**
          * emit listener
          */
-        displayLog (logData, hasDataError) {
-            console.log('user-log-view - display log');
+        displayLog (logData, hasDataError, errorMessage) {
             this.logData = logData;
             this.hasDataError = hasDataError;
+            this.errorMessage = errorMessage;
             this.onLogOpenSelected();
         },
 
@@ -42,7 +40,6 @@ export default {
          * Open the log modal
          */
         onLogOpenSelected () {
-            console.log('user-log-view - open modal');
             this.$refs.outputLogModal.open();
         },
 
@@ -62,7 +59,7 @@ export default {
     <div>
         <reveal-modal ref="outputLogModal">
             <div class="output-log">
-                <div v-if="hasDataError" class="alert-box alert">The Bulk Modify has failed to update. Further details are logged below.</div>
+                <div v-if="hasDataError" v-html="errorMessage" class="alert-box alert"></div>
                 <textarea v-html="logData"></textarea>
             </div>
             <div>

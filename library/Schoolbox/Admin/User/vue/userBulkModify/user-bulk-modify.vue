@@ -7,7 +7,7 @@
 import UserBulkModifyFilters from './user-bulk-modify-filters.vue';
 import UserBulkModifyNewValues from './user-bulk-modify-new-values.vue';
 import FilterEvents from './userBulkModifyFilterEvents';
-import UserBulkModifyLog from "./user-bulk-modify-log";
+import UserBulkModifyLog from "@schoolboxVue/components/log-modal";
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
@@ -398,8 +398,11 @@ export default {
          * send to log and open
          */
         openLog ({logData, hasDataError = false}) {
-            console.log('user-bulk-modify - open log');
-            this.$refs.userLogView.displayLog(logData, hasDataError);
+            let errorMessage = [];
+            if (hasDataError) {
+                errorMessage = 'The Bulk Modify has failed to update. Further details are logged below.\n';
+            }
+            this.$refs.userLogView.displayLog(logData, hasDataError, errorMessage);
         }
 
     },
