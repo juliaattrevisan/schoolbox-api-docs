@@ -11,6 +11,7 @@ namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
+use Closure;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\DataSource;
@@ -22,7 +23,16 @@ use Schoolbox\User;
  */
 class Cursor implements ICursor
 {
+    /**
+     * Codec, for translating the cursor.
+     */
     private ICodec $codec;
+
+    public const SORT_OPTION_CREATED = 'created';
+    public const SORT_OPTION_UPDATED = 'updated';
+    public const SORT_OPTION_SEVERITY = 'severity';
+
+    public const LIMIT_DEFAULT = 7;
 
     /**
      * Constructor
@@ -31,7 +41,7 @@ class Cursor implements ICursor
      * @param User       $currentUser      The user for whom results should be censored
      * @param User       $student          The student to fetch results for
      * @param array      $pastoralIds      A list of IDs already determined to match a filter
-     * @param string     $orderByField     A field to order results by
+     * @param string     $sortOption       A field to order results by
      * @param int        $limit            The max number of results to fetch
      */
     public function __construct(
@@ -39,8 +49,8 @@ class Cursor implements ICursor
         private User $currentUser,
         private User $student,
         private array $pastoralIds,
-        private string $orderByField,
-        private int $limit,
+        private string $sortOption = self::SORT_OPTION_CREATED,
+        private int $limit = self::LIMIT_DEFAULT,
     ) {
         $this->codec = new Base64();
     }
@@ -57,8 +67,8 @@ class Cursor implements ICursor
         if ($lastRecord instanceof Model) {
             $nextCursor = $this->codec->encode([
                 'severity' => $lastRecord->getSeverity()->getSequence(),
-                'created'  => $lastRecord->getCreatedAt()->toRfc3339String(),
-                'updated'  => $lastRecord->getUpdatedAt()->toRfc3339String(),
+                'created'  => $lastRecord->getCreatedAt()->getUnixTimeStamp(),
+                'updated'  => $lastRecord->getUpdatedAt()->getUnixTimeStamp(),
                 'id'       => $lastRecord->getId(),
             ]);
         }
@@ -101,8 +111,81 @@ class Cursor implements ICursor
         // * severity: severity.sequence DESC, then created DESC, then id DESC
         // * created:  created DESC, then id DESC
         // * updated:  updated DESC, then created DESC, then id DESC
+        $results = $results->sortByCallback($this->buildSortCallback());
 
         // Slice some off the end
         return $results->slice(0, $this->limit);
+    }
+
+    /**
+     * Build a sort callback for this type of record.
+     *
+     * @return Closure
+     */
+    private function buildSortCallback(): Closure
+    {
+        $callback = match ($this->sortOption) {
+            self::SORT_OPTION_SEVERITY => function (Model $a, Model $b) {
+                return $this->sortSeverity($a, $b) ?: $this->sortCreated($a, $b) ?: $this->sortId($a, $b);
+            },
+            self::SORT_OPTION_UPDATED => function (Model $a, Model $b) {
+                return $this->sortUpdated($a, $b) ?: $this->sortCreated($a, $b) ?: $this->sortId($a, $b);
+            },
+            default => function (Model $a, Model $b) {
+                return $this->sortCreated($a, $b) ?: $this->sortId($a, $b);
+            },
+        };
+        return Closure::fromCallable($callback);
+    }
+
+    /**
+     * Sort pastoral records by severity (descending).
+     *
+     * @param Model $a
+     * @param Model $b
+     * @return int
+     */
+    private function sortSeverity(Model $a, Model $b): int
+    {
+        if (!($a->getSeverity() && $b->getSeverity())) {
+            return 0;
+        }
+        return $b->getSeverity()->getId() <=> $a->getSeverity()->getId();
+    }
+
+    /**
+     * Sort pastoral records by created (descending)
+     *
+     * @param Model $a
+     * @param Model $b
+     * @return int
+     */
+    private function sortCreated(Model $a, Model $b): int
+    {
+        return $b->getCreatedAt()->getUnixTimeStamp() <=> $a->getCreatedAt()->getUnixTimeStamp();
+    }
+
+    /**
+     * Sort pastoral records by updated (descending)
+     *
+     * @param Model $a
+     * @param Model $b
+     * @return int
+     */
+    private function sortUpdated(Model $a, Model $b): int
+    {
+        return $b->getUpdatedAtDisplay()->getUnixTimeStamp() <=> $a->getUpdatedAtDisplay()->getUnixTimeStamp();
+    }
+
+    /**
+     * Sort pastoral records by ID (descending)
+     *
+     * @param Model $a
+     * @param Model $b
+     * @return int
+     */
+    private function sortId(Model $a, Model $b): int
+    {
+        return $b->getId() <=> $a->getId();
     }
 }

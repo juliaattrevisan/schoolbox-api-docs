@@ -105,6 +105,17 @@ class Controller extends Base
                 $pastoralRecordsForStudent[] = call_user_func($this->pastoralTranslator, $pastoralRecord);
             }
 
+            $cursor = new Cursor(
+                $this->pastoralDataSource,
+                $this->getUser(),
+                $student,
+                $pastoralIds,
+                Cursor::SORT_OPTION_CREATED,
+                1,
+            );
+            $resultSet = $cursor->retrieveResults(null);
+            $next      = $cursor->next($resultSet);
+
             $result[] = [
                 'student' => call_user_func($this->userTranslator, $student),
                 'records' => $pastoralRecordsForStudent,
