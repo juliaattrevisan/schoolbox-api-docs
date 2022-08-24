@@ -95,6 +95,54 @@ class TimetableUsers
 
 
     /**
+     * Finds all staff externalIds involved in $classCode between the two timestamps,
+     * taking into account override mutations
+     *
+     * @param string $classCode
+     * @param int    $startTimestamp
+     * @param int    $endTimestamp
+     * @return array
+     * @throws Deleted
+     * @throws Exception
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     */
+    public function findForClassCode(string $classCode, int $startTimestamp, int $endTimestamp): array
+    {
+        /* Get a list of events between $startTimestap and $endTimestamp
+         */
+        $pb = $this->eventMapper->getPredicateBuilder();
+        $pb->betweenDates('start_at', \Alaress_Date_Format::newFromTimestamp($startTimestamp), \Alaress_Date_Format::newFromTimestamp($endTimestamp));
+        $pb->equals('code', $classCode);
+
+        $events = $this->eventMapper->findByPredicates($pb);
+
+        /* If we haven't got this already, get it and remember it
+         * in case we needed it again and again and again
+         */
+        if (null === $this->staffExternalIds) {
+            $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
+        }
+
+        /* Find out all the staff members in each of this $classCode's event instances
+         */
+        $externalIds = [];
+
+        foreach ($events as $event) {
+            $externalIds = array_merge($externalIds, $this->findForEvent($event));
+        }
+
+        /* Dedupe all external ids
+         */
+        $externalIds = array_values(array_unique($externalIds));
+
+        /* Return only the staff members' externalIds that were in the set
+         */
+        return array_intersect($this->staffExternalIds, $externalIds);
+    }
+    
+
+    /**
      * Find the overall set of involved humans for $event
      *
      * @param Model $event

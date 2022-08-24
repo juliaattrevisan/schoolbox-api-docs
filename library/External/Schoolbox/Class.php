@@ -156,6 +156,29 @@ class External_Schoolbox_Class implements External_ClassInterface
             }
         }
 
+        /* Only need to do this if you are using the Calendar view
+         * because that typically means you activated SUDS Timetable subscription
+         * or used it to populate data that we must investigate
+         *
+         * All you classical grid users can skip this step
+         */
+        $pastThreshold = -1;
+        $futureThreshold = 1;
+        $config = \Schoolbox\Config\Loader::getInstance();
+
+        if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === $config->get('timetable_view')) {
+            $staffExternalIds = (new \Schoolbox\External\Event\TimetableUsers(
+                \Schoolbox\External\ClassEntryMapper::getInstance(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                \Schoolbox\UserMapper::getInstance(),
+                \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+            ))->findForClassCode($classCode, \Alaress_Date_Format::now()->addWeeks($pastThreshold)->startOfDay()->getUnixTimeStamp(), \Alaress_Date_Format::now()->addWeeks($futureThreshold)->endOfDay()->getUnixTimeStamp());
+
+            $teachers = array_merge($teachers, $staffExternalIds);
+        }
+
         return array_unique($teachers);
     }
 
