@@ -23,33 +23,26 @@ class Controller extends Base
      * Constructor
      */
     public function __construct(
-        private Pastoral\Mapper $pastoralMapper,
         private Pastoral\DataSource $pastoralDataSource,
-        private Filter\IFactoryFactory $filterFactoryFactory,
-        private Filter\Mapper $filterMapper,
-        private Filter\Selection\Mapper $filterSelectionMapper,
         private UserAccessMapper $userAccessMapper,
         private UserTranslator $userTranslator,
         private Pastoral\Translator\ModelToArray $pastoralTranslator,
+        private FilterHelper $filterHelper,
     ) {
     }
 
     /**
+     * Get report page.
+     *
      * @api GET /pastoral/class/{folderId}
      * @since 22.1
      */
     public function getReport(FolderModel $folder): void
     {
-        $page        = Filter\Page\Model::PAGE_CLASS_PASTORAL;
-        $filterPanel = $this->filterFactoryFactory->buildPanel(
+        $filterPanel = $this->filterHelper->buildFilterPanel(
             $this->getUser(),
-            $page,
-            null,
-            $this->getUser(),
-            [],
             $this->request->query->getArrayCopy(),
         );
-
         $this->getResponse()->content->set(
             [
                 'template' => '@pastoralClassReportModule/index.twig',
@@ -70,39 +63,19 @@ class Controller extends Base
      */
     public function getReportData(FolderModel $folder): void
     {
-        // Get all students in class
+        // Find all students in class
         $students = $this->userAccessMapper
             ->findUsersInCategory($folder, Role::STUDENT)
             ->sortByCallback((new SortUsersByName())->getCallable(), true);
 
-        // Piece together the filter
-        $request             = $this->request->query->get('filters', []);
-        $page                = Filter\Page\Model::PAGE_CLASS_PASTORAL;
-        $codec               = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
-        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
-        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
-
-        // Hardcoded filter for folder: ensures only students in the given
-        // folder get returned
-        $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
-            $selectionsPerFilter,
+        // Find all pastoral IDs for records matching those students
+        $pastoralIds = $this->filterHelper->findPastoralRecordIds(
             $this->getUser(),
-            $page,
+            $students,
+            $this->request->query->getArrayCopy(),
         );
-        $studentIds       = $students->getPropertyValues('id');
-        $hardcodedFilters = [
-            Filter\Filters\Pastoral\Student\Definition::class => array_combine($studentIds, $studentIds),
-        ];
 
-        // Find pastoral records
-        $idFinder = Filter\Filters\Pastoral\IdFinder::getInstance(
-            $this->filterMapper,
-            $this->pastoralMapper,
-        );
-        $pastoralIds = $idFinder->findIdsByFilters(
-            array_merge($dynamicFilters, $hardcodedFilters),
-            $this->getUser(),
-        );
+        // Push said records through the censor
         $pastoralRecords          = $this->pastoralDataSource
             ->findByColumnList($this->getUser(), ['id' => $pastoralIds])
             ->sortBy('createdAt', Collection::ORDER_DESCENDING);

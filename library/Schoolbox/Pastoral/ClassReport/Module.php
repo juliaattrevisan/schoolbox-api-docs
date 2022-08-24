@@ -101,15 +101,18 @@ class Module extends BaseModule
             $currentUser,
             $scrubAdapter,
         );
-        return new Controller(
+        $filterHelper = new FilterHelper(
             $this->getMapperFactory()->get(PastoralMapper::class),
-            $this->injector->get('pastoralDataSource'),
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(Filter\Mapper::class),
             $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
+        );
+        return new Controller(
+            $this->injector->get('pastoralDataSource'),
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $userTranslator,
             $pastoralTranslator,
+            $filterHelper,
         );
     }
 
