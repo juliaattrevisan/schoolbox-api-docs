@@ -1,0 +1,85 @@
+<div id="save-to-course-modal-{{ assessment.id }}"
+     class="reveal-modal"
+     data-reveal
+     aria-hidden="true"
+     role="dialog"
+>
+    <h2>Are you sure you wish to save this {{ locale.translate('assessment') }} back to its course?</h2>
+
+    {# Modal content: spec assessment exists variant #}
+    <div data-display-if-spec-assessment-exists
+         class="warning alert-box {% if specAssessment is null %}hide{% endif %}">
+        <p>
+            The original {{ locale.translate('assessment') }}
+            &ldquo;<span data-spec-assessment-title>{{ specAssessment.title ?? null }}</span>&rdquo;
+            in the course will be <strong>replaced</strong>
+            with this {{ locale.translate('assessment') }}.
+        </p>
+        {% if assessment is project %}
+            {% if assessment.assessables is not empty %}
+                <p>
+                    As this {{ locale.translate('assessment') }} is a project, its
+                    activity set will also be <strong>replaced</strong>,
+                    possibly deleting activities:
+                </p>
+                <p><strong>Current</strong></p>
+                <ul>
+                    {##
+                     # If the spec assessment wasn't set when this was rendered:
+                     # just render the assessment's activities here.
+                     #
+                     # When the save to course button is pressed again, this
+                     # will be shown: we can pretend the spec assessment's
+                     # activities are the same as this implementation's.
+                     #}
+                    {% for activity in (specAssessment.assessables ?? assessment.assessables) %}
+                        <li>{{ activity.title }}</li>
+                    {% endfor %}
+                </ul>
+                <p><strong>Replacement</strong></p>
+                <ul>
+                    {% for activity in assessment.assessables %}
+                        <li>{{ activity.title }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endif %}
+        <p>
+            Any other imports of the original {{ locale.translate('assessment') }} will
+            <strong>not</strong> be updated.
+        </p>
+    </div>
+
+    {# Modal content: spec assessment doesn't exist variant #}
+    <p data-display-if-spec-assessment-not-exists
+       class="{% if specAssessment is not null %}hide{% endif %}"
+    >
+        This {{ locale.translate('assessment') }}
+        &ldquo;<span data-spec-assessment-title>{{ assessment.title ?? null }}</span>&rdquo;
+        does not yet exist in the course;
+        {% if assessment is project %}
+            it and its activities will be added.
+        {% else %}
+            it will be added.
+        {% endif %}
+    </p>
+
+    <ul class="flex-list buttons">
+        <li>
+            <a href="{{ saveToCourseRoute }}"
+               data-method="{{ saveToCourseMethod }}"
+               class="button submit"
+               data-action="save-to-course"
+               data-related-component="component{{ componentInstance.id }}"
+            >Yes</a>
+        </li>
+        <li>
+            <a href="#"
+               class="button"
+               data-action="save-to-course-cancel"
+               data-related-component="component{{ componentInstance.id }}"
+            >No</a>
+        </li>
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
