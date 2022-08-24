@@ -7,7 +7,7 @@
 import UserBulkModifyFilters from './user-bulk-modify-filters.vue';
 import UserBulkModifyNewValues from './user-bulk-modify-new-values.vue';
 import FilterEvents from './userBulkModifyFilterEvents';
-import UserLogView from "./user-log-view";
+import UserBulkModifyLog from "./user-bulk-modify-log";
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
@@ -22,7 +22,7 @@ export default {
         BottomDrawer,
         RevealModal,
         Toast,
-        UserLogView,
+        UserBulkModifyLog,
     },
 
     mixins: [
@@ -495,7 +495,7 @@ export default {
             </ul>
         </reveal-modal>
 
-        <UserLogView ref="userLogView" />
+        <UserBulkModifyLog ref="userLogView" />
 
         <toast ref="toast"></toast>
 
