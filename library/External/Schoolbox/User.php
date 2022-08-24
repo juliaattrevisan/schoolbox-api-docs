@@ -230,24 +230,44 @@ class External_Schoolbox_User implements External_UserInterface
          * We only want teachers that we ADD as overrides - we don't want
          * the ones where we used SUBTRACT modifier as that removes an
          * involvement
+         *
+         * $futureThreshold is the number of weeks into the future to look
+         * for involvements. You might not be a teacher of a class today,
+         * but you might be some time later.
+         *
+         * $pastThreshold is the number of weeks into the past to look
+         * for involvements. You might have been the teacher of a class
+         * at some point in the past, but no longer
+         *
+         * $pastThreshold and $futureThreshold are both defaulted to 1 week
+         * just because I said so. This gives you a span of 2 weeks where
+         * your involvements are examined. We don't know your involvements
+         * outside of this interval.
          */
-        $overridesTeachers = $this->internalDatabase->executeQuery(
-            "SELECT 
-                    sc.name, 
-                    sc.code, 
-                    '' as classType, 
-                    '' AS campusCode
-                FROM sis_event_user_overrides seuo
-                INNER JOIN sis_event se ON seuo.event_id = se.id
-                INNER JOIN sis_class sc ON se.code = sc.code
-                WHERE seuo.external_id = :externalId
-                AND seuo.action = :modifier
-                ORDER BY sc.code ASC, sc.name ASC            
-            ",
-            array_merge($params, [
-                'modifier' => Schoolbox\External\Event\Overrides\Model::ADD
-            ])
-        )->fetchAll();
+        $pastThreshold = -1;
+        $futureThreshold = 1;
+
+        $events = (new \Schoolbox\External\Event\TimetableUsers(
+            \Schoolbox\External\ClassEntryMapper::getInstance(),
+            \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+            \Schoolbox\External\Event\Mapper::getInstance(),
+            \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+            \Schoolbox\UserMapper::getInstance(),
+            \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+        ))->findForUser($user, \Alaress_Date_Format::now()->addWeeks($pastThreshold)->startOfDay()->getUnixTimeStamp(), \Alaress_Date_Format::now()->addWeeks($futureThreshold)->endOfDay()->getUnixTimeStamp());
+
+        $overridesTeachers = [];
+
+        /* Shank it into the required format
+         */
+        foreach ($events as $event) {
+            $overridesTeachers[] = [
+                'name' => $event->getTitle(),
+                'code' => $event->getCode(),
+                'classType' => '',
+                'campusCode' => ''
+            ];
+        }
 
         return array_values(
             array_unique(
