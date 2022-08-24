@@ -115,7 +115,8 @@ export const useSearchStore = defineStore('mgSearch', {
             const addMembersStore = useAddMembersStore();
             const searchResultWithFromType = {
                 ...searchResult,
-                fromType: addMembersStore.fromType,
+                // list returns search result in the same format as name
+                fromType: addMembersStore.fromType === 'list' ? 'name' : addMembersStore.fromType,
             }
             this.selectedResults  = [...this.selectedResults, searchResultWithFromType];
         },

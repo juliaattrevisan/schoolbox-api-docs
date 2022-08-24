@@ -317,8 +317,17 @@ class Controller extends Base
         $return   = [];
         /** @var User $user */
         foreach ($users as $user) {
+            $meta = '';
+            if ($user->getYear()) {
+                $meta .= $user->getYear()->getLongName() . ', ';
+            }
+            $meta .= $user->getRole()->getName();
+            if ($user->getExternalId() !== null) {
+                $meta .= "({$user->getExternalId()})";
+            }
+
             $return[] = [
-                'name'        => $user->getUsername(),
+                'name'        => sprintf("%s - %s", $user->formatName('{firstname} {lastname}'), $meta),
                 'id'          => $user->getId(),
                 'first_name'  => $user->getFirstname(),
                 'last_name'   => $user->getLastname(),
