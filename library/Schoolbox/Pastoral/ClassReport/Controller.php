@@ -8,7 +8,7 @@
 namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -17,6 +17,9 @@ use Schoolbox\SortUsersByName;
 use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 
+/**
+ * Controller for pastoral report page.
+ */
 class Controller extends Base
 {
     /**
@@ -50,7 +53,7 @@ class Controller extends Base
                     'folder'      => $folder,
                     'pageTitle'   => $folder->getTitle(),
                     'filterPanel' => $filterPanel,
-                ]
+                ],
             ]
         );
     }
@@ -88,38 +91,9 @@ class Controller extends Base
         // Build a result
         $result = [];
         foreach ($students as $student) {
-            $cursor = new Cursor(
-                $this->pastoralDataSource,
-                $this->getUser(),
-                $student,
-                $pastoralIds,
-                $this->request->query->get('sort') ?? Cursor::SORT_OPTION_CREATED,
-                $this->request->query->get('count') ?? Cursor::LIMIT_DEFAULT,
-            );
-            $cursoredRecords = $cursor->retrieveResults(null);
-            $result[]        = [
+            $result[] = [
                 'student' => call_user_func($this->userTranslator, $student),
-                'records' => [
-                    'data'     => $cursoredRecords->map($this->pastoralTranslator),
-                    'metadata' => [
-                        'count'  => $cursor->retrieveResultCount(),
-                        'cursor' => [
-                            'current' => $cursor->current($cursoredRecords),
-                            'next'    => $cursor->next($cursoredRecords),
-                        ],
-                        '_links' => [
-                            'report' => $this->getRouteIfAuthorized(
-                                'pastoralClassReportModule.getReportDataForStudent',
-                                [
-                                    'folder'    => $folder,
-                                    'folderId'  => $folder->getId(),
-                                    'student'   => $student,
-                                    'studentId' => $student->getId(),
-                                ]
-                            ),
-                        ],
-                    ],
-                ],
+                'records' => $this->retrieveCursoredRecords($folder, $student, $pastoralIds, null),
             ];
         }
 
@@ -143,5 +117,56 @@ class Controller extends Base
      */
     public function getReportDataForStudent(FolderModel $folder, User $student): void
     {
+        $pastoralIds = $this->filterHelper->findPastoralRecordIds(
+            $this->getUser(),
+            new GenericCollection(User::class, [$student]),
+            $this->request->query->getArrayCopy(),
+        );
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $this->retrieveCursoredRecords($folder, $student, $pastoralIds, $this->request->query->get('cursor'))
+            ),
+        );
+    }
+
+    /**
+     * @param FolderModel $folder
+     * @param User        $student
+     * @param array       $pastoralIds
+     * @param string|null $encodedCursor
+     * @return array
+     */
+    private function retrieveCursoredRecords(FolderModel $folder, User $student, array $pastoralIds, ?string $encodedCursor): array
+    {
+        $cursor  = new Cursor(
+            $this->pastoralDataSource,
+            $this->getUser(),
+            $student,
+            $pastoralIds,
+            $this->request->query->get('sort') ?? Cursor::SORT_OPTION_CREATED,
+            $this->request->query->get('count') ?? Cursor::LIMIT_DEFAULT,
+        );
+        $records = $cursor->retrieveResults($encodedCursor);
+        return [
+            'data'     => $records->map($this->pastoralTranslator),
+            'metadata' => [
+                'count'  => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $cursor->current($records),
+                    'next'    => $cursor->next($records),
+                ],
+                '_links' => [
+                    'report' => $this->getRouteIfAuthorized(
+                        'pastoralClassReportModule.getReportDataForStudent',
+                        [
+                            'folder'    => $folder,
+                            'folderId'  => $folder->getId(),
+                            'student'   => $student,
+                            'studentId' => $student->getId(),
+                        ]
+                    ),
+                ],
+            ],
+        ];
     }
 }

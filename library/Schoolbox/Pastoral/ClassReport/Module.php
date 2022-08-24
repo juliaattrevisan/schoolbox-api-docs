@@ -72,10 +72,10 @@ class Module extends BaseModule
             return $this->preloadFolder($params);
         };
         $preloadStudent = function ($params) {
-            $params = $this->preloadFolder($params);
-            $params['student'] = $this->getMapperFactory()->get(UserMapper::class)
-                                                          ->findById($params['studentId']);
-            return $params;
+            $newParams = $this->preloadFolder($params);
+            $newParams['student'] = $this->getMapperFactory()->get(UserMapper::class)
+                                                             ->findById($params['studentId']);
+            return $newParams;
         };
 
         $this->register(
