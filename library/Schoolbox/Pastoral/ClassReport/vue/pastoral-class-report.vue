@@ -4,7 +4,9 @@ import mixinFilter from '@schoolboxVue/mixins/filter';
 
 const SORT_OPTION_CREATED = 'created';
 const SORT_OPTION_UPDATED = 'updated';
+// Severity is not always enabled
 const SORT_OPTION_SEVERITY = 'severity';
+const SORT_OPTION_DEFAULT = SORT_OPTION_CREATED;
 const SORT_OPTIONS = [
     {value: SORT_OPTION_CREATED, label: 'Created'},
     {value: SORT_OPTION_UPDATED, label: 'Updated'},
@@ -37,7 +39,7 @@ export default {
                 count: null,
                 cursor: null,
             },
-            sort: SORT_OPTION_CREATED,
+            sort: SORT_OPTION_DEFAULT,
             count: COUNT_OPTION_DEFAULT,
             showSkeletonLoader: true,
             selectedFilters: null,
@@ -93,6 +95,133 @@ export default {
         formatDateTime (date) {
             return dayjs(date).format(dateDisplayFormats.dayjsDatetime);
         },
+
+        /**
+         * Return a sorted and limited subset of the list of pastoral records
+         * for each student.
+         *
+         * @param {Array} records A student's pastoral records.
+         * @returns {Array}
+         */
+        sortAndLimit (records) {
+            if (records.length === 0) {
+                return records;
+            }
+            return [...records]
+                .sort(this.sortCallback)
+                .slice(0, this.count);
+        },
+
+        /**
+         * Sort callback for pastoral records.
+         *
+         * @param {Array} a A pastoral record
+         * @param {Array} b A pastoral record
+         * @returns {number}
+         */
+        sortCallback (a, b) {
+            // Severity sorting
+            let comparison;
+            if (this.sort === SORT_OPTION_SEVERITY) {
+                comparison = this.sortCallbackSeverity(a, b);
+                if (comparison !== 0) {
+                    return comparison;
+                }
+            }
+
+            // Created sorting
+            if (this.sort === SORT_OPTION_CREATED) {
+                comparison = this.sortCallbackCreated(a, b);
+                if (comparison !== 0) {
+                    return comparison;
+                }
+            }
+
+            // Updated sorting
+            if (this.sort === SORT_OPTION_UPDATED) {
+                comparison = this.sortCallbackUpdated(a, b);
+                if (comparison !== 0) {
+                    return comparison;
+                }
+            }
+
+            // Fallback: created (if not already attempted), then ID
+            if (this.sort !== SORT_OPTION_CREATED) {
+                comparison = this.sortCallbackCreated(a, b);
+                if (comparison !== 0) {
+                    return comparison;
+                }
+            }
+            comparison = this.sortCallbackId(a, b);
+            if (comparison !== 0) {
+                return comparison;
+            }
+            return 0;
+        },
+
+        /**
+         * Severity (descending) sort callback for pastoral records.
+         *
+         * @param {Array} a A pastoral record
+         * @param {Array} b A pastoral record
+         * @returns {number}
+         */
+        sortCallbackSeverity (a, b) {
+            let aValue = a?.severity?.sequence ?? null,
+                bValue = b?.severity?.sequence ?? null;
+            if (aValue === null || bValue === null) {
+                return 0;
+            }
+            return aValue > bValue ? -1 : 1;
+        },
+
+        /**
+         * Created date (descending) sort callback for pastoral records.
+         *
+         * @param {Array} a A pastoral record
+         * @param {Array} b A pastoral record
+         * @returns {number}
+         */
+        sortCallbackCreated (a, b) {
+            let aValue = a?.createdAt ?? null,
+                bValue = b?.createdAt ?? null;
+            if (aValue === null || bValue === null) {
+                return 0;
+            }
+            return aValue > bValue ? -1 : 1;
+        },
+
+        /**
+         * Updated date (descending) sort callback for pastoral records.
+         *
+         * @param {Array} a A pastoral record
+         * @param {Array} b A pastoral record
+         * @returns {number}
+         */
+        sortCallbackUpdated (a, b) {
+            let aValue = a?.updatedAt ?? null,
+                bValue = b?.updatedAt ?? null;
+            if (aValue === null || bValue === null) {
+                return 0;
+            }
+            return aValue > bValue ? -1 : 1;
+        },
+
+        /**
+         * ID (descending) sort callback for pastoral records.
+         *
+         * @param {Array} a A pastoral record
+         * @param {Array} b A pastoral record
+         * @returns {number}
+         */
+        sortCallbackId (a, b) {
+            let aValue = a?.id ?? null,
+                bValue = b?.id ?? null;
+            if (aValue === null || bValue === null) {
+                return 0;
+            }
+            return aValue > bValue ? -1 : 1;
+        },
     }
 }
 </script>
@@ -144,7 +273,7 @@ export default {
                         <!-- pastoral records -->
                         <div>
                             <ul class="information-list">
-                                <li v-for="record in studentData.records" :key="'record-' + String(record.id)">
+                                <li v-for="record in sortAndLimit(studentData.records)" :key="'record-' + String(record.id)">
                                     <a :href="record._links.read">{{ record.heading }}</a>,
                                     created
                                     <time :datetime="formatDateTime(record.createdAt)"

@@ -72,6 +72,7 @@ class ModelToArray
                     'colour'    => $model->getType()->getColor(),
                     'icon'      => $model->getType()->getIcon(),
                     'sentiment' => $model->getType()->getSentiment(),
+                    'sequence'  => $model->getType()->getSequence(),
                 ]
                 : null,
             'subType'                => $model->getSubType()
@@ -81,12 +82,14 @@ class ModelToArray
                     'colour'    => $model->getSubType()->getColor(),
                     'icon'      => $model->getSubType()->getIcon(),
                     'sentiment' => $model->getSubType()->getSentiment(),
+                    'sequence'  => $model->getSubType()->getSequence(),
                 ]
                 : null,
             'severity'               => $model->getSeverity()
                 ? [
-                    'id'   => $model->getSeverity()->getId(),
-                    'name' => $model->getSeverity()->getName(),
+                    'id'       => $model->getSeverity()->getId(),
+                    'name'     => $model->getSeverity()->getName(),
+                    'sequence' => $model->getSeverity()->getSequence(),
                 ]
                 : null,
             'points'                 => $model->getPoints(),
