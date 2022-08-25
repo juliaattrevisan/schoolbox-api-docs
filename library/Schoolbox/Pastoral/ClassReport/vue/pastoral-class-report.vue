@@ -154,49 +154,49 @@ export default {
 </script>
 
 <template>
-    <div class="small-12 island badge-report">
-        <section class="content">
-            <div v-if="showSkeletonLoader" class="loader">
+    <section class="content">
+        <div v-if="showSkeletonLoader" class="loader">
+        </div>
+
+        <div v-else-if="data.length === 0" class="empty-state">
+            <i class="icon-class-list"></i>
+            <p>This class contains no students.</p>
+        </div>
+
+        <div v-else>
+            <!-- sort options -->
+            <div class="small-12 medium-6 columns">
+                <label for="sortOption">
+                    Sort by:
+                </label>
+                <select id="sortOption"
+                        v-model="sort"
+                        @change="filter_append(null, true, true)"
+                >
+                    <option v-for="option in sortOptions"
+                            :label="option.label"
+                            :value="option.value">{{ option.label }}</option>
+                </select>
             </div>
 
-            <div v-else-if="data.length === 0" class="empty-state">
-                <i class="icon-class-list"></i>
-                <p>This class contains no students.</p>
-            </div>
-
-            <div v-else>
-                <!-- sort options -->
-                <div class="small-12 medium-6 columns">
-                    <label for="sortOption">
-                        Sort by:
-                    </label>
-                    <select id="sortOption"
-                            v-model="sort"
-                            @change="filter_append(null, true, true)"
+            <!-- count filter -->
+            <div class="small-12 medium-6 columns">
+                <label>Show amount:</label>
+                <template v-for="option in countOptions">
+                    <input :id="`countOption-${ option.value }`"
+                           type="radio"
+                           v-model="count"
+                           :value="option.value"
+                           @change="filter_append(null, true, true)"
                     >
-                        <option v-for="option in sortOptions"
-                                :label="option.label"
-                                :value="option.value">{{ option.label }}</option>
-                    </select>
-                </div>
+                    <label :for="`countOption-${ option.value }`" class="input-toggle">{{ option.label }}</label>
+                </template>
+            </div>
 
-                <!-- count filter -->
-                <div class="small-12 medium-6 columns">
-                    <label>Show amount:</label>
-                    <template v-for="option in countOptions">
-                        <input :id="`countOption-${ option.value }`"
-                               type="radio"
-                               v-model="count"
-                               :value="option.value"
-                               @change="filter_append(null, true, true)"
-                        >
-                        <label :for="`countOption-${ option.value }`" class="input-toggle">{{ option.label }}</label>
-                    </template>
-                </div>
-
-                <ul class="action-list">
-                    <li v-for="(studentData, studentIndex) in data" :key="'student-' + String(studentData.student.id)">
-                        <!-- student profile -->
+            <ul class="action-list threaded">
+                <template v-for="(studentData, studentIndex) in data" :key="'student-' + String(studentData.student.id)">
+                    <!-- student profile -->
+                    <li>
                         <div class="list-item">
                             <div class="card">
                                 <a :href="studentData.student._links.profile" title="View profile" class="name">
@@ -204,42 +204,37 @@ export default {
                                          :alt="`profile photo of ${studentData.student.fullName}`"
                                          class="portrait" />
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
-
                                 </a>
                                 <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
                             </div>
                         </div>
-
-                        <!-- pastoral records -->
-                        <div>
-                            <ul class="information-list">
-                                <li v-for="record in studentData.records.data" :key="'record-' + String(record.id)">
-                                    <a :href="record._links.read">{{ record.heading }}</a>,
-                                    created
-                                    <time :datetime="formatDateTime(record.createdAt)"
-                                          :title="formatDateTime(record.createdAt)"
-                                    >
-                                        {{ formatDate(record.createdAt) }}
-                                    </time>
-                                    <template v-if="record.createdAt !== record.updatedAt">
-                                        updated
-                                        <time :datetime="formatDateTime(record.updatedAt)"
-                                              :title="formatDateTime(record.updatedAt)"
-                                        >
-                                            {{ formatDate(record.updatedAt) }}
-                                        </time>
-                                    </template>
-                                </li>
-                                <li v-if="studentData.records.metadata.count > studentData.records.data.length">
-                                    <a @click.prevent="loadMore(studentIndex)">Show More</a>
-                                </li>
-                            </ul>
-                        </div>
-
                     </li>
-                </ul>
-            </div>
-        </section>
+
+                    <!-- pastoral records -->
+                    <li v-for="record in studentData.records.data" :key="'record-' + String(record.id)">
+                        <a :href="record._links.read">{{ record.heading }}</a>,
+                        created
+                        <time :datetime="formatDateTime(record.createdAt)"
+                              :title="formatDateTime(record.createdAt)"
+                        >
+                            {{ formatDate(record.createdAt) }}
+                        </time>
+                        <template v-if="record.createdAt !== record.updatedAt">
+                            updated
+                            <time :datetime="formatDateTime(record.updatedAt)"
+                                  :title="formatDateTime(record.updatedAt)"
+                            >
+                                {{ formatDate(record.updatedAt) }}
+                            </time>
+                        </template>
+                    </li>
+                    <li v-if="studentData.records.metadata.count > studentData.records.data.length">
+                        <a @click.prevent="loadMore(studentIndex)">Show More</a>
+                    </li>
+                </template>
+            </ul>
+        </div>
+
         <toast ref="toast"></toast>
-    </div>
+    </section>
 </template>
