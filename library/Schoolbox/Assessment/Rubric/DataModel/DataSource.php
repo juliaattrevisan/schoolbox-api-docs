@@ -1591,7 +1591,11 @@ class DataSource
     public function deleteRubric(int $assessmentId): void
     {
         $boxMapper = SubmissionBoxMapper::getInstance();
-        $box       = $boxMapper->findOneByColumn('assessment_id', $assessmentId);
+        try {
+            $box = $boxMapper->findOneByColumn('assessment_id', $assessmentId);
+        } catch (MapperException\Deleted $e) {
+            $box = $e->getDeletedObject();
+        }
 
         $capabilityUsageMapper = CapabilityUsageMapper::getInstance();
         $capabilityUsageMapper->deleteByColumn('submission_box_id', $box->getId());
