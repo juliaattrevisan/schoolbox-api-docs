@@ -17,7 +17,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
     actions: {
 
         /**
-         * to display a prompt to confirm a node removal
+         * to display a prompt to update a nodes details
          *
          * @param { object }
          */
@@ -29,8 +29,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
         },
 
         /**
-         * node removal has been confirmed so notify the backend
-         * and then pull it out of the nodes if successful
+         * update the nodes details in the back end
          *
          * @param { object or null }
          */
@@ -59,7 +58,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
         },
 
         /**
-         * to hide the confirmation prompt
+         * to hide the update details prompt
          */
         cancel () {
             const activeNodeStore = useActiveNodeStore();

@@ -10,10 +10,12 @@ import { useStore } from './store/manageCurriculumStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import { useDeleteNodeStore } from './activeNode/store/mcDeleteNodeStore';
+import { useAddSubsectionStore } from './activeNode/store/mcAddSubsectionStore';
 import { useEnableNodeStore } from './activeNode/store/mcEnableNodeStore';
 import { useUpdateNodeStore } from './activeNode/store/mcUpdateNodeStore';
 import { escapeRegExp } from '@js/util/jsUtils';
 import { slideDown, slideUp } from '@js/util/animateUtils';
+import McAddSubsection from './activeNode/mc-add-subsection.vue';
 import McUpdateNode from './activeNode/mc-update-node.vue';
 
 
@@ -45,6 +47,7 @@ const store = useStore();
 const viewNodesStore = useViewNodesStore();
 const activeNodeStore = useActiveNodeStore();
 const deleteNodeStore = useDeleteNodeStore();
+const addSubsectionStore = useAddSubsectionStore();
 const enabledNodeStore = useEnableNodeStore();
 const updateNodeStore = useUpdateNodeStore();
 
@@ -103,6 +106,20 @@ const isUpdating = computed(() => updateNodeStore.isOpen && activeNodeStore.node
 const isUpdatingAnother = computed(() => updateNodeStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
+ * If this is the active node being updated
+ *
+ * @returns { Boolean }
+ */
+const isAdding = computed(() => addSubsectionStore.isOpen && activeNodeStore.node.id === props.node.id);
+
+/**
+ * If there's another node being updated
+ *
+ * @returns { Boolean }
+ */
+const isAddingAnother = computed(() => addSubsectionStore.isOpen && activeNodeStore.node.id !== props.node.id);
+
+/**
  * traverse to the next nodel level as an alternative to
  * using the selects in mc-header-select or if the top parent is selected move back one level
  */
@@ -129,6 +146,17 @@ function onEnableToggleSelected () {
         enabledNodeStore.prompt(props.node);
     } else {
         enabledNodeStore.enable(props.node);
+    }
+}
+
+/**
+ * to open up or close the update modal
+ */
+function onAddSubsectionToggleSelected () {
+    if (isAdding.value) {
+        addSubsectionStore.cancel();
+    } else {
+        addSubsectionStore.prompt(props.node);
     }
 }
 
@@ -240,7 +268,7 @@ async function onLeave (el, done) {
 
 <template>
     <li v-if="isVisible" :class="`container ${containerClass}`">
-        <div :class="`buttons-container ${ isUpdatingAnother ? 'inactive' : '' }`">
+        <div :class="`buttons-container ${ isUpdatingAnother ? 'inactive' : '' } ${ isAddingAnother ? 'inactive' : '' }`">
             <div class="checklist">
                 <input
                     :id="`checkbox-${props.node.id}`"
@@ -252,7 +280,7 @@ async function onLeave (el, done) {
                 <label :for="`checkbox-${props.node.id}`"></label>
             </div>
             <button
-                :class="`button-name ${ props.depth === 0 ? 'button-name-parent' : '' } ${ isUpdating ? 'inactive' : '' }`"
+                :class="`button-name ${ props.depth === 0 ? 'button-name-parent' : '' } ${ isUpdating ? 'inactive' : '' } ${ isAdding ? 'inactive' : '' }`"
                 :style="{ opacity: props.node.enabled ? '1' : '0.3' }"
                 :title="`Expand ${title}`"
                 :enabledd="isDisabled"
@@ -264,7 +292,7 @@ async function onLeave (el, done) {
             </button>
             <button
                 v-if="!store.isReadOnly"
-                :class="`button-action-option icon-delete ${ isUpdating ? 'inactive' : '' }`"
+                :class="`button-action-option icon-delete ${ isUpdating ? 'inactive' : '' } ${ isAdding ? 'inactive' : '' }`"
                 :title="`Delete ${title}`"
                 @click.prevent="onDeleteSelected"
                 @keyup.enter="onDeleteSelected"
@@ -273,14 +301,16 @@ async function onLeave (el, done) {
             </button>
             <button
                 v-if="!store.isReadOnly"
-                :class="`button-action-option icon-add ${ isUpdating ? 'inactive' : '' }`"
+                :class="`button-action-option ${ isUpdating ? 'inactive' : '' } ${ isAdding ? 'icon-close' : 'icon-add' }`"
                 :title="`Add subsection to ${title}`"
+                @click.prevent="onAddSubsectionToggleSelected"
+                @keyup.enter="onAddSubsectionToggleSelected"
             >
                 Add subsection to {{ title }}
             </button>
             <button
                 v-if="!store.isReadOnly"
-                :class="`button-action-option ${ props.node.enabled ? 'icon-view' : 'icon-view-hollow' } ${ isUpdating ? 'inactive' : '' }`"
+                :class="`button-action-option ${ props.node.enabled ? 'icon-view' : 'icon-view-hollow' } ${ isUpdating ? 'inactive' : '' } ${ isAdding ? 'inactive' : '' }`"
                 :title="`${ props.node.enabled ? 'Disable' : 'Enable' } node`"
                 @click.prevent="onEnableToggleSelected"
                 @keyup.enter="onEnableToggleSelected"
@@ -289,7 +319,7 @@ async function onLeave (el, done) {
             </button>
             <button
                 v-if="!store.isReadOnly"
-                :class="`button-action-option ${ isUpdating ? 'icon-close' : 'icon-modify' }`"
+                :class="`button-action-option ${ isUpdating ? 'icon-close' : 'icon-modify' } ${ isAdding ? 'inactive' : '' }`"
                 :title="`Update ${title}`"
                 @click.prevent="onUpdateToggleSelected"
                 @keyup.enter="onUpdateToggleSelected"
@@ -297,6 +327,12 @@ async function onLeave (el, done) {
                 Update {{ title }}
             </button>
         </div>
+        <Transition
+            @enter="onEnter"
+            @leave="onLeave"
+        >
+            <mc-add-subsection v-if="isAdding" />
+        </Transition>
         <Transition
             @enter="onEnter"
             @leave="onLeave"

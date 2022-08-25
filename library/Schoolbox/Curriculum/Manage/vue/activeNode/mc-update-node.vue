@@ -13,7 +13,7 @@ const activeNodeStore = useActiveNodeStore();
 const updateNodeStore = useUpdateNodeStore();
 
 /**
- * To instantly notify the user that the node is being deleted
+ * To instantly notify the user that the node is being updated
  * by updating the button text
  *
  * @returns { String }
