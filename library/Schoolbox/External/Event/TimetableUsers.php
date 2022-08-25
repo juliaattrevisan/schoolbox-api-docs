@@ -213,9 +213,38 @@ class TimetableUsers
 
         /* Perform mutations
          */
-        $manifest = $stack[$classCode]['usuals'];
+        $manifest = $this->applyOverrides($stack[$classCode]['usuals'], $stack[$classCode]['overrides']);
 
-        foreach ($stack[$classCode]['overrides'] as $override) {
+        /* Since we're explicitly looking for staff members in this method
+         * we can basically kick out everyone else who isn't, if they
+         * survived the override mutations
+         *
+         * If we haven't got this already, get it and remember it
+         * in case we needed it again and again and again
+         */
+        if (null === $this->staffExternalIds) {
+            $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
+        }
+
+        return array_values(array_intersect($this->staffExternalIds, $manifest));
+    }
+
+
+    /**
+     * Apply $overrides to a set of usual guys $usuals,
+     * to see who still remains. Everyone still surviving
+     * is the event's $manifest
+     *
+     * @param array $usuals
+     * @param array $overrides
+     * @return array
+     * @throws \PDOException
+     */
+    private function applyOverrides(array $usuals, array $overrides): array
+    {
+        $manifest = $usuals;
+
+        foreach ($overrides as $override) {
             if (\Schoolbox\External\Event\Overrides\Model::SUBTRACT === $override['action']) {
                 unset($manifest[$override['external_id']]);
             } elseif (\Schoolbox\External\Event\Overrides\Model::ADD === $override['action']) {
@@ -239,20 +268,8 @@ class TimetableUsers
             }
         }
 
-        /* Since we're explicitly looking for staff members in this method
-         * we can basically kick out everyone else who isn't, if they
-         * survived the override mutations
-         *
-         * If we haven't got this already, get it and remember it
-         * in case we needed it again and again and again
-         */
-        if (null === $this->staffExternalIds) {
-            $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
-        }
-
-        return array_values(array_intersect($this->staffExternalIds, $manifest));
+        return $manifest;
     }
-
 
     /**
      * Generate a list of events in which $user is involved, between two timestamps
@@ -314,11 +331,17 @@ class TimetableUsers
             if (!isset($lookup[$row['code']])) {
                 $lookup[$row['code']] = [
                     'code' => $row['code'],
+                    /* The guys who are usually involved in this class
+                     */
+                    'usuals' => [],
+                    /* A list of overrides index by event id since each event
+                     * has its own list of overrides
+                     */
+                    'overrides' => [],
                     /* A list of people who survived all the mutations
                      * and transformations in this algorithm, for each event instance
                      */
                     'manifest' => [],
-                    'usuals' => [],
                 ];
             }
 
@@ -355,11 +378,17 @@ class TimetableUsers
             if (!isset($lookup[$row['code']])) {
                 $lookup[$row['code']] = [
                     'code' => $row['code'],
+                    /* The guys who are usually involved in this class
+                     */
+                    'usuals' => [],
+                    /* A list of overrides index by event id since each event
+                     * has its own list of overrides
+                     */
+                    'overrides' => [],
                     /* A list of people who survived all the mutations
                      * and transformations in this algorithm, for each event instance
                      */
                     'manifest' => [],
-                    'overrides' => []
                 ];
             }
 
@@ -373,10 +402,15 @@ class TimetableUsers
 
         /* For every thing we found in $lookup,
          * Play back all the overrides against $usuals
-         * then collate the list of guys in $manifest
+         * then collate the list of surviving guys in $manifest
          */
-        foreach ($lookup as $classCode => $data) {
+        foreach ($lookup as $classCode => &$data) {
+            foreach ($data['overrides'] as $eventId => $overrides) {
+                $data['manifest'][$eventId] = $this->applyOverrides($data['usuals'], $overrides);
+            }
         }
+
+        unset($data);
 
         new \Alaress_Probe($lookup);
         die();
