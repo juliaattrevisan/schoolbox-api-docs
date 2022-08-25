@@ -303,7 +303,7 @@ class TimetableUsers
          * a class' usual guys.
          */
         $query = "
-            SELECT se.code, scu.*
+            SELECT se.code, sc.name, scu.*
             FROM sis_class_user scu
             INNER JOIN sis_class sc ON scu.class_id = sc.id
             INNER JOIN sis_event se ON sc.code = se.code
@@ -330,6 +330,7 @@ class TimetableUsers
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             if (!isset($lookup[$row['code']])) {
                 $lookup[$row['code']] = [
+                    'name' => $row['name'],
                     'code' => $row['code'],
                     /* The guys who are usually involved in this class
                      */
@@ -355,7 +356,7 @@ class TimetableUsers
          * until you play through all the mutations
          */
         $query = "
-            SELECT se.code, se.id, seuo.*
+            SELECT se.code, se.title, se.id, seuo.*
             FROM sis_event se
             INNER JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
             WHERE se.classification = :classification
@@ -377,6 +378,7 @@ class TimetableUsers
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             if (!isset($lookup[$row['code']])) {
                 $lookup[$row['code']] = [
+                    'name' => $row['title'],
                     'code' => $row['code'],
                     /* The guys who are usually involved in this class
                      */
@@ -407,7 +409,16 @@ class TimetableUsers
         foreach ($lookup as $classCode => &$data) {
             foreach ($data['overrides'] as $eventId => $overrides) {
                 $data['manifest'][$eventId] = $this->applyOverrides($data['usuals'], $overrides);
+
+                /* If you were involved in this class at any point within the
+                 * time interval specified, I suppose you can pile its class code
+                 * into the stack and skip processing other overrides - we don't
+                 * need to investigate further, since we know you're involved at
+                 * least once.
+                 */
             }
+
+
         }
 
         unset($data);
