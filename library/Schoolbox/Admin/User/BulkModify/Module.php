@@ -41,23 +41,6 @@ class Module extends BaseModule
     }
 
 
-//    /**
-//     * Hook method for setting up routes via self::register()
-//     *
-//     * @inheritdoc
-//     */
-//    protected function registerRoutes(): void
-//    {
-//        /* Only superusers can access the Groups API
-//         */
-//        $hasApiAccess = new Rule\All(
-//            new Rule\IsLoggedIn(),
-//            new Rule\IsSuperuser()
-//        );
-//
-//        $this->register('DELETE', '/modifyForm', 'deleteUsers', $hasApiAccess);
-//    }
-
     /**
      * @inheritdoc
      */
