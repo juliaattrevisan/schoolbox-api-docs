@@ -252,66 +252,6 @@ class TimetableUsers
 
         return array_values(array_intersect($this->staffExternalIds, $manifest));
     }
-    
-
-    /**
-     * Find the overall set of involved humans for $event
-     *
-     * @param Model $event
-     * @return array
-     * @throws \PDOException
-     * @throws Exception
-     * @throws Deleted
-     */
-    public function findForEvent(\Schoolbox\External\Event\Model $event): array
-    {
-        /* Find the sis_class that corresponds to $event
-         */
-        $class = $this->classEntryMapper->findOneByColumn('code', $event->getCode());
-
-        /* Find the usual guys in class 11
-         */
-        $involvements = $this->classInvolvementMapper->findByColumn('class_id', $class->getId());
-
-        $usualUsers = [];
-
-        foreach ($involvements as $involvement) {
-            $usualUsers[$involvement->getExternalId()] = $involvement->getExternalId();
-        }
-
-        /* Find the overrides
-         */
-        $overrides = $this->overrideMapper->findForEvent($event->getId());
-
-        /* Decide how each $override affects the $stack set
-         */
-        /** @var \Schoolbox\External\Event\Overrides\Model $override */
-        foreach ($overrides as $override) {
-            if (\Schoolbox\External\Event\Overrides\Model::SUBTRACT === $override->getAction()) {
-                unset($usualUsers[$override->getUser()->getExternalId()]);
-            } elseif (\Schoolbox\External\Event\Overrides\Model::ADD === $override->getAction()) {
-                $usualUsers[$override->getUser()->getExternalId()] = $override->getUser()->getExternalId();
-            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override->getAction()) {
-                $usualUsers = [];
-            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override->getAction()) {
-                /* If we haven't got this already, get it and remember it
-                 * in case we needed it again and again and again
-                 */
-                if (null === $this->staffExternalIds) {
-                    $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
-                }
-
-                /* Get a list of staff members,
-                 * then do some array magic between $usualUsers
-                 * and this list of staff ids, to exclude staff
-                 * from $usualUsers
-                 */
-                $usualUsers = array_diff($usualUsers, $this->staffExternalIds);
-            }
-        }
-
-        return $usualUsers;
-    }
 
 
     /**
@@ -334,6 +274,30 @@ class TimetableUsers
      * @throws \UnexpectedValueException
      */
     public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
+    {
+    }
+
+
+    /**
+     * Generate a list of events in which $user is involved, between two timestamps
+     * Also takes into account any event overrides
+     *
+     * @param \Schoolbox\User        $user
+     * @param int                    $startTimestamp
+     * @param int                    $endTimestamp
+     * @param GenericCollection|null $folderCodes
+     * @return GenericCollection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     * @throws \UnderflowException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    private function findForUserSlow(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
         $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
@@ -385,6 +349,66 @@ class TimetableUsers
         }
 
         return $events;
+    }
+
+
+    /**
+     * Find the overall set of involved humans for $event
+     *
+     * @param Model $event
+     * @return array
+     * @throws \PDOException
+     * @throws Exception
+     * @throws Deleted
+     */
+    private function findForEvent(\Schoolbox\External\Event\Model $event): array
+    {
+        /* Find the sis_class that corresponds to $event
+         */
+        $class = $this->classEntryMapper->findOneByColumn('code', $event->getCode());
+
+        /* Find the usual guys in class 11
+         */
+        $involvements = $this->classInvolvementMapper->findByColumn('class_id', $class->getId());
+
+        $usualUsers = [];
+
+        foreach ($involvements as $involvement) {
+            $usualUsers[$involvement->getExternalId()] = $involvement->getExternalId();
+        }
+
+        /* Find the overrides
+         */
+        $overrides = $this->overrideMapper->findForEvent($event->getId());
+
+        /* Decide how each $override affects the $stack set
+         */
+        /** @var \Schoolbox\External\Event\Overrides\Model $override */
+        foreach ($overrides as $override) {
+            if (\Schoolbox\External\Event\Overrides\Model::SUBTRACT === $override->getAction()) {
+                unset($usualUsers[$override->getUser()->getExternalId()]);
+            } elseif (\Schoolbox\External\Event\Overrides\Model::ADD === $override->getAction()) {
+                $usualUsers[$override->getUser()->getExternalId()] = $override->getUser()->getExternalId();
+            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override->getAction()) {
+                $usualUsers = [];
+            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override->getAction()) {
+                /* If we haven't got this already, get it and remember it
+                 * in case we needed it again and again and again
+                 */
+                if (null === $this->staffExternalIds) {
+                    $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
+                }
+
+                /* Get a list of staff members,
+                 * then do some array magic between $usualUsers
+                 * and this list of staff ids, to exclude staff
+                 * from $usualUsers
+                 */
+                $usualUsers = array_diff($usualUsers, $this->staffExternalIds);
+            }
+        }
+
+        return $usualUsers;
     }
 
 
