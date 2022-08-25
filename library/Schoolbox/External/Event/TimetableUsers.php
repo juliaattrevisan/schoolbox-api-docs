@@ -277,8 +277,7 @@ class TimetableUsers
     {
         /* Micromanage a stack of minimal event data with overrides
          */
-        $usualGuysLookup = [];
-        $overridesLookup = [];
+        $lookup = [];
         $stack = [];
 
         /* Find the usual guys for the given class code out of sis_class_user
@@ -312,8 +311,8 @@ class TimetableUsers
          * sis_event you find
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if (!isset($usualGuysLookup[$row['code']])) {
-                $usualGuysLookup[$row['code']] = [
+            if (!isset($lookup[$row['code']])) {
+                $lookup[$row['code']] = [
                     'code' => $row['code'],
                     'usuals' => [],
                 ];
@@ -321,7 +320,7 @@ class TimetableUsers
 
             /* Insert and dedupe
              */
-            $usualGuysLookup[$row['code']]['usuals'][$row['external_id']] = $row['external_id'];
+            $lookup[$row['code']]['usuals'][$row['external_id']] = $row['external_id'];
         }
 
         /* Find all the events within the time interval specified, because $user
@@ -349,8 +348,8 @@ class TimetableUsers
          * in a convenient manner
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if (!isset($overridesLookup[$row['code']])) {
-                $overridesLookup[$row['code']] = [
+            if (!isset($lookup[$row['code']])) {
+                $lookup[$row['code']] = [
                     'code' => $row['code'],
                     'overrides' => []
                 ];
@@ -358,13 +357,13 @@ class TimetableUsers
 
             /* Manufacture a list of overrides for this event id
              */
-            $overridesLookup[$row['code']]['overrides'][$row['id']][] = [
+            $lookup[$row['code']]['overrides'][$row['id']][] = [
                 'external_id' => $row['external_id'],
                 'action' => $row['action']
             ];
         }
 
-        new \Alaress_Probe($usualGuysLookup, $overridesLookup);
+        new \Alaress_Probe($lookup);
         die();
 
         return $this->eventMapper->createCollection();
