@@ -26,8 +26,7 @@ use Schoolbox\Pastoral\Translator\ModelToArray as PastoralTranslator;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
 use Schoolbox\Role;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
@@ -58,7 +57,7 @@ class Module extends BaseModule
             new Rule\HasHomepageAccess(
                 UserAccess::ACCESS_WRITE,
                 function (array $params = []) {
-                    if ($params['folder'] instanceof Model) {
+                    if ($params['folder'] instanceof Folder\Model) {
                         return $params['folder']->getId();
                     } else {
                         return null;
@@ -92,6 +91,11 @@ class Module extends BaseModule
             $perms,
             $preload,
         );
+
+        // Student route permission:
+        // Could check the student is actually involved in the class, but this
+        // is not strictly necessary as the access-level censor removes all
+        // pastoral records which the current user can't view.
         $this->register(
             self::METHOD_GET,
             '/{folderId}/student/{studentId}/data',
@@ -166,10 +170,10 @@ class Module extends BaseModule
     }
 
     /**
-     * @return FolderMapper
+     * @return Folder\Mapper
      */
-    protected function getFolderMapper(): FolderMapper
+    protected function getFolderMapper(): Folder\Mapper
     {
-        return $this->getMapperFactory()->get(FolderMapper::class);
+        return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
 }
