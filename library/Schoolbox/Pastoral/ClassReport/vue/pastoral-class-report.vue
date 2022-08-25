@@ -166,40 +166,45 @@ export default {
 
             <div v-else>
                 <!-- sort options -->
-                <label for="sortOption">
-                    Sort by:
-                </label>
-                <select id="sortOption"
-                        v-model="sort"
-                        @change="filter_append(null, true, true)"
-                >
-                    <option v-for="option in sortOptions"
-                            :label="option.label"
-                            :value="option.value">{{ option.label }}</option>
-                </select>
+                <div class="small-12 medium-6 columns">
+                    <label for="sortOption">
+                        Sort by:
+                    </label>
+                    <select id="sortOption"
+                            v-model="sort"
+                            @change="filter_append(null, true, true)"
+                    >
+                        <option v-for="option in sortOptions"
+                                :label="option.label"
+                                :value="option.value">{{ option.label }}</option>
+                    </select>
+                </div>
 
                 <!-- count filter -->
-                <label>Show amount:</label>
-                <template v-for="option in countOptions">
-                    <input :id="`countOption-${ option.value }`"
-                           type="radio"
-                           v-model="count"
-                           :value="option.value"
-                           @change="filter_append(null, true, true)"
-                    >
-                    <label :for="`countOption-${ option.value }`" class="input-toggle">{{ option.label }}</label>
-                </template>
+                <div class="small-12 medium-6 columns">
+                    <label>Show amount:</label>
+                    <template v-for="option in countOptions">
+                        <input :id="`countOption-${ option.value }`"
+                               type="radio"
+                               v-model="count"
+                               :value="option.value"
+                               @change="filter_append(null, true, true)"
+                        >
+                        <label :for="`countOption-${ option.value }`" class="input-toggle">{{ option.label }}</label>
+                    </template>
+                </div>
 
                 <ul class="action-list">
                     <li v-for="(studentData, studentIndex) in data" :key="'student-' + String(studentData.student.id)">
                         <!-- student profile -->
-                        <div>
-                            <img :src="studentData.student._links.avatar"
-                                 :alt="`profile photo of ${studentData.student.fullName}`"
-                                 class="portrait" />
-                            <div>
+                        <div class="list-item">
+                            <div class="card">
                                 <a :href="studentData.student._links.profile" title="View profile" class="name">
+                                    <img :src="studentData.student._links.avatar"
+                                         :alt="`profile photo of ${studentData.student.fullName}`"
+                                         class="portrait" />
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
+
                                 </a>
                                 <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
                             </div>
