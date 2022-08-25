@@ -461,8 +461,14 @@ export default {
             <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
-            <button @click.prevent="onModifySelected" class="button submit">Modify</button>
-            <button @click.prevent="onDeleteUsersSelected" class="button submit button-delete">Delete Users</button>
+            <ul class="flex-list buttons">
+            <li>
+                <button @click.prevent="onModifySelected" class="submit">Modify</button>
+            </li>
+            <li>
+                <button @click.prevent="onDeleteUsersSelected" class="alert icon-delete">Delete Users</button>
+            </li>
+            </ul>
         </bottom-drawer>
         <user-bulk-modify-new-values
             ref="newValues"
@@ -509,7 +515,7 @@ export default {
     margin-right: 1rem;
 }
 
-.button-clear, .selected-count {
+.button-clear, .selected-count, .button-delete {
     display: inline-block;
 }
 
