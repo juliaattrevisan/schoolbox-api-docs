@@ -53,7 +53,7 @@ removeMembersStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const removeButtonText = computed(() => removeMembersStore.isProcessing ? 'Removing...' : 'Remove');
+const removeButtonText = computed(() => removeMembersStore.isProcessing ? 'Removing...' : 'Yes');
 
 /**
  * to prevent the user from moving away from the modal while
