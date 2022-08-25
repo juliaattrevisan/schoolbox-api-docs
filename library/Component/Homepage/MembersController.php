@@ -45,6 +45,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
         $this->setBlock($templateHandle, 'has_members', 'has_members_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
+        $this->setVar('FOLDER_ID', $this->getContext()->getId());
 
         // Get collection of members
         $userMapper = UserMapper::getInstance();
@@ -220,7 +221,6 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     $i++;
                 }
 
-                $this->setVar("REPLYTO", $this->getUser()->getEmail());
                 $this->setVar('EMAIL_TARGET', '');
                 $this->setVar('EMAIL_VALUE', '');
 

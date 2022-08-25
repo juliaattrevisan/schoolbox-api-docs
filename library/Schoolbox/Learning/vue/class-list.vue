@@ -125,10 +125,9 @@ export default {
         },
 
         /**
-         * The address to set as the "Reply To" address for emails sent from
-         * this component.
+         * Folder id
          */
-        replyToEmail: {
+        folderId: {
             type: String,
             default: ''
         },
@@ -433,9 +432,6 @@ export default {
         }
     },
     computed: {
-        replyTo: function () {
-            return '"' + this.subjectTitle + '"' + ' <' + this.replyToEmail + '>';
-        },
         showCheckboxes: function () {
             return this.learningMomentsEnabled || this.mailEnabled;
         },
@@ -690,7 +686,7 @@ export default {
                         </li>
                     </ul>
                 </fieldset>
-                <input type="hidden" name="replyto" :value="replyTo"/>
+                <input type="hidden" name="folderId" :value="folderId"/>
                 <input type="hidden" id="studentExternalIds" name="studentExternalIds" :value="selectedStudentExternalIds.join(',')"/>
                 <button type="submit" class="button" :disabled="!enableSendEmailButton" @click="sendEmail">
                     {{ sendEmailButtonText }}

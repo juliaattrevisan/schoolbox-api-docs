@@ -11,7 +11,6 @@ namespace Schoolbox\Realtime;
 
 use Alaress\Async\Queue\QueueInterface;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Collection;
 use Schoolbox\Mail\EmailFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;

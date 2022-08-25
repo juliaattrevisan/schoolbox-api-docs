@@ -41,6 +41,12 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
  */
 class Controller extends Base
 {
+    // available parameters to pass to createMail, similar to relationship of news audience
+    private const SELF            = 'self';
+    private const PARENTS_OF      = 'parents_of';
+    private const HOUSEMASTERS_OF = 'housemasters_of';
+    private const TUTORS_OF       = 'tutors_of';
+
     public function __construct(
         private UserMapper $userMapper,
         private \External_UserInterface $externalUser,
@@ -146,15 +152,22 @@ class Controller extends Base
         $addressListFromIds  = $this->findAddressesFromIds($params, $folder);
         $addressLists['bcc'] = array_merge($addressLists['bcc'], $addressListFromIds);
 
-        // Add current user if not exists, remove current user if exists in both to and bcc
-        if (!$isCurrentUserInTo && !in_array($this->getUser()->getFormattedEmailDisplay(), $addressLists['bcc'])) {
-            $addressLists['bcc'][] = $this->getUser()->getFormattedEmailDisplay();
-        } elseif ($isCurrentUserInTo) {
-            $addressLists['bcc'] = array_diff($addressLists['bcc'], [
-                $this->getUser()->getEmail(),
-                $this->getUser()->getFormattedEmailDisplay(),
-            ]);
-        }
+        // Add current user if not exists
+        if (!$isCurrentUserInTo) {
+            if ($folder) {
+                try {
+                    $replyTo = new Address($this->getUser()->getEmail(), $folder->getName());
+                } catch (RfcComplianceException | LogicException $e) {
+                    // noop
+                }
+            }
+            $addressLists['replyto'][] = isset($replyTo) ? $replyTo->toString() : $this->getUser()->getFormattedEmailDisplay();
+        };
+        // Remove current user if exists in both to and bcc
+        $addressLists['bcc'] = array_diff($addressLists['bcc'], [
+            $this->getUser()->getEmail(),
+            $this->getUser()->getFormattedEmailDisplay(),
+        ]);
 
         $emailBody = $this->getEmailBody();
 
@@ -421,32 +434,38 @@ class Controller extends Base
             return [];
         }
 
-        $selectedGroups = [];
         if ($params->get('selectedGroups')) {
             $selectedGroups = is_array($params->get('selectedGroups'))
                 ? $params->get('selectedGroups')
                 : explode(',', (string)$params->get('selectedGroups'));
+        } else {
+            $selectedGroups = [self::SELF];
         }
+
         $emailVisible = new ValidEmailVisible($this->externalUser, $this->getConfigLoader());
         $viewer       = $this->getUser();
-        $targetUsers  = $users->filter(
-            function ($user) use ($emailVisible, $viewer) {
-                /** @var User $user */
-                if ($viewer->getRole()->isParent()) {
-                    return $emailVisible->isSatisfiedByParent($user, $viewer);
+
+        $addressLists = [];
+        if (in_array(self::SELF, $selectedGroups)) {
+            $targetUsers = $users->filter(
+                function ($user) use ($emailVisible, $viewer) {
+                    /** @var User $user */
+                    if ($viewer->getRole()->isParent()) {
+                        return $emailVisible->isSatisfiedByParent($user, $viewer);
+                    }
+                    return $emailVisible->isSatisfiedByRole($user->getRole()->getType(), $viewer->getRole(), $viewer->isSuperuser());
                 }
-                return $emailVisible->isSatisfiedByRole($user->getRole()->getType(), $viewer->getRole(), $viewer->isSuperuser());
-            }
-        );
+            );
 
-        $addressLists = $targetUsers->map(
-            static function ($user) {
-                /** @var User $user */
-                return $user->getFormattedEmailDisplay();
-            }
-        )->getAll();
+            $addressLists = $targetUsers->map(
+                static function ($user) {
+                    /** @var User $user */
+                    return $user->getFormattedEmailDisplay();
+                }
+            )->getAll();
+        }
 
-        if (!$viewer->getRole()->isStaff() || empty($selectedGroups) || $selectedGroups === ['students']) {
+        if (!$viewer->getRole()->isStaff() || $selectedGroups === [self::SELF]) {
             return $addressLists;
         }
 
@@ -459,16 +478,16 @@ class Controller extends Base
             }
         )->getPropertyValues('externalId');
 
-        if (in_array('parents', $selectedGroups)) {
+        if (in_array(self::PARENTS_OF, $selectedGroups) && $emailVisible->isSatisfiedByRole(Role::PARENT, $viewer->getRole(), $viewer->isSuperuser())) {
             $addressLists = array_merge($addressLists, $this->externalUser->getParentEmails($studentExternalIds));
         }
-        if (in_array('housemasters', $selectedGroups)) {
+        if (in_array(self::HOUSEMASTERS_OF, $selectedGroups)) {
             $addressLists = array_merge($addressLists, $this->externalUser->getHousemasterEmails($studentExternalIds));
         }
-        if (in_array('tutors', $selectedGroups)) {
+        if (in_array(self::TUTORS_OF, $selectedGroups)) {
             $addressLists = array_merge($addressLists, $this->externalUser->getTutorEmails($studentExternalIds));
         }
-        return $addressLists;
+        return array_unique(array_filter($addressLists));
     }
 
     /**
