@@ -210,6 +210,8 @@ class CreateAndVerifyCest
         $i->amGoingTo("Fill in form values with composite audience: 4 roles and 2 campuses + team and year level");
         $timestamp = time();
         $headline     = "Acceptance Test News Composite Audience Article Testing " . $timestamp;
+        $i->impersonateAnyUser('Jack Coles');
+        $i->amOnPage($formPage->generateCreateRoute());
         $formPage
             ->fillHeadline($headline)
             ->createCompositeAudience('Team', 'Year Level', ['primary-IjEi', 'secondary-Ijki']);
@@ -279,6 +281,7 @@ class CreateAndVerifyCest
         $this->createFolder($i);
         $i->amGoingTo("Navigate to the class page");
         $i->click('News Folder Test');
+        $i->amGoingTo("Add a News component into the page");
         $homepage = new Homepage($i);
         $homepage->addComponent(Homepage::ELEMENT_ADD_COMPONENT_SECTION_INFORMATION, 'News');
         // Enter content into the new component
@@ -347,8 +350,9 @@ class CreateAndVerifyCest
         $createFolder->clickCreateGroupToggle();
         $createFolder->clickCreateFolderButton();
         $manageGroup->waitManageGroupTitleToBePresented();
-        $manageGroup->clickTab('settings');
+        $i->click('#content a.icon-more');
+        $i->click('#updateGroupSettings');
         $manageGroup->setAccessPermission('type-3');
-        $manageGroup->clickSubmitButton();
+        $manageGroup->clickUpdateButton();
     }
 }
