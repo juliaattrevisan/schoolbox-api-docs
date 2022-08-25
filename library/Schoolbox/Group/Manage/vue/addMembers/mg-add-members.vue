@@ -36,7 +36,7 @@ const inputDetails = computed(() => {
  * add the selected members to the group
  */
 function onAddMembersSelected () {
-    addMembersStore.addMembers();
+    addMembersStore.add();
 }
 
 /**

@@ -22,7 +22,7 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
         /**
          * add the members to the group
          */
-        async addMembers () {
+        async add () {
             this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
@@ -44,15 +44,17 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
                             justUpdated: false, //to highlight members that have just been changed
                         }
                     });
+                    const searchStore = useSearchStore();
+                    searchStore.removeAllResults(); //the members have been added so clear the search
                     const membersStore = useMembersStore();
-                    membersStore.groupMembers = [...membersStore.groupMembers, ...newMembers]; //add in the new members to the table
+                    membersStore.members = [...membersStore.members, ...newMembers]; //add in the new members to the table
                 } else {
                     throw new Error();
                 }
             } catch (error) {
                 console.warn(error);
             } finally {
-                this.isProcessing = true;
+                this.isProcessing = false;
                 store.isProcessing = false;
             }
         },

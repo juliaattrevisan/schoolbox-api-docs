@@ -4,6 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
+import { useMembersStore } from './mgMembersStore';
 import { useAddMembersStore } from './mgAddMembersStore';
 import FromTypes from '../addMembers/mgAddMembersFromTypes';
 
@@ -18,7 +19,7 @@ export const useSearchStore = defineStore('mgSearch', {
         query: '', //current search query
         isResultsCapped: false, //to show a 'refine your search' note
         resultsNotShownCount: 0, //a total of the results not visible in the list
-        results: [], //members returned in the current search results
+        results: [], //members/groups/roles returned in the current search results
         selectedResults: [], //members to add on Add Members selectedResults
     }),
 
@@ -48,6 +49,17 @@ export const useSearchStore = defineStore('mgSearch', {
             }
             const addMembersStore = useAddMembersStore();
             return searchEndpoints[addMembersStore.fromType];
+        },
+
+        /**
+         * filter out any returned members that are already in the list
+         *
+         * @return { array }
+         */
+        filteredResults () {
+            const membersStore = useMembersStore();
+            const memberIdList = membersStore.members.map((member) => member.id); //create an array of just the existing member ids
+            return this.results.filter((result) => !memberIdList.includes(result.id)); //to only keep those search results that aren't already in the group
         },
 
         /**

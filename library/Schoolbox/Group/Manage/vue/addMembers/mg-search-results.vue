@@ -33,7 +33,7 @@ const showSelectAll = computed(() => {
                 <li v-if="showSelectAll">
                     <mg-select-all-search-results />
                 </li>
-                <li v-for="result in searchStore.results" :key="result.id">
+                <li v-for="result in searchStore.filteredResults" :key="result.id">
                     <mg-add-members-search-result :result="result"/>
                 </li>
             </ul>

@@ -218,7 +218,7 @@ function updateSelectedMembers () {
             <v-client-table
                 v-if="membersStore.hasGroupMembers"
                 ref="tableEl"
-                :data="membersStore.groupMembers"
+                :data="membersStore.members"
                 :columns="tableColumns"
                 :options="tableOptions"
                 @loaded="onLoaded"
