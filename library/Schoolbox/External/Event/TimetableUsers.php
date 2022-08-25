@@ -126,15 +126,88 @@ class TimetableUsers
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
      */
-    public function findForClassCode(string $classCode, int $startTimestamp, int $endTimestamp): array
+    public function findTeachersForClassCode(string $classCode, int $startTimestamp, int $endTimestamp): array
     {
-        /* Get a list of events between $startTimestap and $endTimestamp
+        /* Micromanage a stack of minimal event data with overrides
          */
-        $pb = $this->eventMapper->getPredicateBuilder();
-        $pb->betweenDates('start_at', \Alaress_Date_Format::newFromTimestamp($startTimestamp), \Alaress_Date_Format::newFromTimestamp($endTimestamp));
-        $pb->equals('code', $classCode);
+        $stack = [];
 
-        $events = $this->eventMapper->findByPredicates($pb);
+        /* Find the usual guys for the given class code out of sis_class_user
+         */
+        $query = "
+            SELECT DISTINCT se.code, scu.*
+            FROM sis_class_user scu
+            INNER JOIN sis_class sc ON scu.class_id = sc.id
+            INNER JOIN sis_event se ON sc.code = se.code
+            WHERE sc.code = :classCode
+            AND se.classification = :classification
+            ORDER BY sc.id ASC
+        ";
+
+        $statement = $this->eventMapper->getDatabase()->prepare($query);
+        $statement->execute([
+            'classCode' => $classCode,
+            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+        ]);
+
+        /* Pile it into the $stack in preparation for the mutations
+         */
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            if (!isset($stack[$row['code']])) {
+                $stack[$row['code']] = [
+                    'code' => $row['code'],
+                    'usuals' => []
+                ];
+            }
+
+            $stack[$row['code']]['usuals'][] = $row['external_id'];
+        }
+
+        new \Alaress_Probe($stack);
+
+        /* Get a list of events between $startTimestamp and $endTimestamp
+         * along with an ordered list of their overrides
+         */
+        $query = "
+            SELECT se.id, se.code, seuo.*
+            FROM sis_event se
+            INNER JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
+            WHERE se.code = :classCode
+            AND se.classification = :classification
+            AND se.start_at >= :from
+            AND se.start_at <= :to
+            ORDER BY se.id ASC, seuo.sequence ASC
+        ";
+
+        $statement = $this->eventMapper->getDatabase()->prepare($query);
+        $statement->execute([
+            'classCode' => $classCode,
+            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+            'from' => \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(),
+            'to' => \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase(),
+        ]);
+
+        /* Remember: overrides are generally optional so they might not even
+         * exist for $classCode which is why we get the Usual Guys first
+         *
+         * Assumption:
+         *   We can presume that sis_class_user data exists first simply because
+         *   that's how we chose to build things. To have overrides only, and
+         *   nothing for sis_class and sis_class_user, is a bit weird and is
+         *   probably a broken situation. I thought of making a manifest for
+         *   each sis_event, but the data size would be extremely big so we chose
+         *   not to do that and opted for this hybrid approach instead. In the
+         *   grand scheme of things it would have been easier to have that
+         *   manifest instead, but I was overridden
+         */
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $stack[$row['code']]['overrides'][] = [
+                'external_id' => $row['external_id'],
+                'action' => $row['action']
+            ];
+        }
+
+        new \Alaress_Probe($stack);
 
         /* If we haven't got this already, get it and remember it
          * in case we needed it again and again and again
