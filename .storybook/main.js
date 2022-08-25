@@ -26,7 +26,7 @@ module.exports = {
         // `configType` has a value of 'DEVELOPMENT' or 'PRODUCTION'
         // You can change the configuration based on that.
         // 'PRODUCTION' is used when building the static version of storybook.
-    
+
         // Make whatever fine-grained changes you need
         config.module.rules.push({
             test: /\.scss$/,
@@ -36,7 +36,8 @@ module.exports = {
 
         config.resolve.alias['@js'] = path.resolve(__dirname, '../www/static/js');
         config.resolve.alias['@schoolboxVue'] = path.resolve(__dirname, '../vue');
-    
+        config.resolve.alias['@library'] = path.resolve(__dirname, '../library');
+
         // Return the altered config
         return config;
       },
