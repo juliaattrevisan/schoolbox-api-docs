@@ -400,7 +400,7 @@ export default {
         openLog ({logData, hasDataError = false}) {
             let errorMessage = [];
             if (hasDataError) {
-                errorMessage = 'The Bulk Modify has failed to update. Further details are logged below.\n';
+                errorMessage = 'The bulk modify has failed to update. Further details are logged below.\n';
             }
             this.$refs.userLogView.displayLog(logData, hasDataError, errorMessage);
         }
