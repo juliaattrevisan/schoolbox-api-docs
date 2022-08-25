@@ -156,14 +156,18 @@ class TimetableUsers
             if (!isset($stack[$row['code']])) {
                 $stack[$row['code']] = [
                     'code' => $row['code'],
-                    'usuals' => []
+                    'usuals' => [],
+                    /* A list of people who survived all the mutations
+                     * and transformations in this algorithm
+                     */
+                    'manifest' => [],
                 ];
             }
 
-            $stack[$row['code']]['usuals'][] = $row['external_id'];
+            /* Insert and dedupe
+             */
+            $stack[$row['code']]['usuals'][$row['external_id']] = $row['external_id'];
         }
-
-        new \Alaress_Probe($stack);
 
         /* Get a list of events between $startTimestamp and $endTimestamp
          * along with an ordered list of their overrides
@@ -207,30 +211,46 @@ class TimetableUsers
             ];
         }
 
-        new \Alaress_Probe($stack);
+        /* Perform mutations
+         */
+        $manifest = $stack[$classCode]['usuals'];
 
-        /* If we haven't got this already, get it and remember it
+        foreach ($stack[$classCode]['overrides'] as $override) {
+            if (\Schoolbox\External\Event\Overrides\Model::SUBTRACT === $override['action']) {
+                unset($manifest[$override['external_id']]);
+            } elseif (\Schoolbox\External\Event\Overrides\Model::ADD === $override['action']) {
+                $manifest[$override['external_id']] = $override['external_id'];
+            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override['action']) {
+                $manifest = [];
+            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override['action']) {
+                /* If we haven't got this already, get it and remember it
+                 * in case we needed it again and again and again
+                 */
+                if (null === $this->staffExternalIds) {
+                    $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
+                }
+
+                /* Get a list of staff members,
+                 * then do some array magic between $usualUsers
+                 * and this list of staff ids, to exclude staff
+                 * from $usualUsers
+                 */
+                $manifest = array_diff($manifest, $this->staffExternalIds);
+            }
+        }
+
+        /* Since we're explicitly looking for staff members in this method
+         * we can basically kick out everyone else who isn't, if they
+         * survived the override mutations
+         *
+         * If we haven't got this already, get it and remember it
          * in case we needed it again and again and again
          */
         if (null === $this->staffExternalIds) {
             $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
         }
 
-        /* Find out all the staff members in each of this $classCode's event instances
-         */
-        $externalIds = [];
-
-        foreach ($events as $event) {
-            $externalIds = array_merge($externalIds, $this->findForEvent($event));
-        }
-
-        /* Dedupe all external ids
-         */
-        $externalIds = array_values(array_unique($externalIds));
-
-        /* Return only the staff members' externalIds that were in the set
-         */
-        return array_intersect($this->staffExternalIds, $externalIds);
+        return array_values(array_intersect($this->staffExternalIds, $manifest));
     }
     
 
