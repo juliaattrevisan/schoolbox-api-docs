@@ -174,7 +174,7 @@ class External_Schoolbox_Class implements External_ClassInterface
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                 \Schoolbox\UserMapper::getInstance(),
                 \Schoolbox\External\Profile\Staff\Mapper::getInstance()
-            ))->findForClassCode($classCode, $pastThreshold, $futureThreshold);
+            ))->findTeachersForClassCode($classCode, $pastThreshold, $futureThreshold);
 
             $teachers = array_merge($teachers, $staffExternalIds);
         }

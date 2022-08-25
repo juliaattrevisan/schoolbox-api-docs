@@ -264,14 +264,14 @@ class External_Schoolbox_User implements External_UserInterface
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                 \Schoolbox\UserMapper::getInstance(),
                 \Schoolbox\External\Profile\Staff\Mapper::getInstance()
-            ))->findForUser($user, $pastThreshold, $futureThreshold);
+            ))->findClassCodesForUser($user, $pastThreshold, $futureThreshold);
 
             /* Shank it into the required format
              */
             foreach ($events as $event) {
                 $overridesTeachers[] = [
-                    'name' => $event->getTitle(),
-                    'code' => $event->getCode(),
+                    'name' => $event['name'],
+                    'code' => $event['code'],
                     'classType' => '',
                     'campusCode' => ''
                 ];
