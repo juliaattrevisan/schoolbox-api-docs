@@ -314,6 +314,10 @@ class TimetableUsers
             if (!isset($lookup[$row['code']])) {
                 $lookup[$row['code']] = [
                     'code' => $row['code'],
+                    /* A list of people who survived all the mutations
+                     * and transformations in this algorithm, for each event instance
+                     */
+                    'manifest' => [],
                     'usuals' => [],
                 ];
             }
@@ -351,11 +355,15 @@ class TimetableUsers
             if (!isset($lookup[$row['code']])) {
                 $lookup[$row['code']] = [
                     'code' => $row['code'],
+                    /* A list of people who survived all the mutations
+                     * and transformations in this algorithm, for each event instance
+                     */
+                    'manifest' => [],
                     'overrides' => []
                 ];
             }
 
-            /* Manufacture a list of overrides for this event id
+            /* Manufacture a list of overrides for each event id
              */
             $lookup[$row['code']]['overrides'][$row['id']][] = [
                 'external_id' => $row['external_id'],
