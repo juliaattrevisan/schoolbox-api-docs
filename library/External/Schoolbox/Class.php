@@ -17,7 +17,6 @@ use Schoolbox\Role;
  */
 class External_Schoolbox_Class implements External_ClassInterface
 {
-
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
 
