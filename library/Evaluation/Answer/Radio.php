@@ -42,7 +42,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
         $answer['question_id'] = $question_id;
         $answer['sequence'] = 1;
 
-        if (isset($object['allAnswers']) && $object['allAnswers'] != '') {
+        if (isset($object['allAnswers']) && $object['allAnswers']) {
             foreach (json_decode($object['allAnswers']) as $currentAnswer) {
                 $answer['answer'][] = $currentAnswer;
                 $answer['sequence']++;
@@ -95,12 +95,10 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
                     foreach ($allAnswers as $currentAnswer) {
                         $page->setVar(
                             array(
-                                'ANSWER_VALUE' => $currentAnswer->value,
-                                'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                                'ANSWER_OPTION_STATUS' => $currentAnswer->correct != ''
-                                    ? 'evaluation-selected-answer-option'
-                                    : '',
-                                'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                                'ANSWER_VALUE'         => $currentAnswer->value,
+                                'ANSWER_DESCRIPTION'   => Scrub::text($currentAnswer->description),
+                                'ANSWER_OPTION_STATUS' => $currentAnswer->correct ? 'evaluation-selected-answer-option': '',
+                                'ANSWER_CHECKED'       => $currentAnswer->correct ? 'checked=\'checked\'' : ''
                             )
                         );
 
@@ -136,9 +134,9 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
             if (is_array($allAnswers) && count($allAnswers)) {
                 foreach ($allAnswers as $currentAnswer) {
                     $page->setVar(array(
-                        'ANSWER_VALUE' => $currentAnswer->value,
+                        'ANSWER_VALUE'       => $currentAnswer->value,
                         'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                        'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                        'ANSWER_CHECKED'     => $currentAnswer->correct ? 'checked=\'checked\'' : ''
                     ));
 
                     $page->parse('answerOption_block', 'answerOption', true);
