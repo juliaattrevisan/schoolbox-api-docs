@@ -42,7 +42,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
         $answer['question_id'] = $question_id;
         $answer['sequence'] = 1;
 
-        if (isset($object['allAnswers']) && $object['allAnswers']) {
+        if (isset($object['allAnswers']) && $object['allAnswers'] != '') {
             foreach (json_decode($object['allAnswers']) as $currentAnswer) {
                 $answer['answer'][] = $currentAnswer;
                 $answer['sequence']++;
