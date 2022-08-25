@@ -155,7 +155,7 @@ export const useSearchStore = defineStore('mgSearch', {
          * add all found results to the selectedResults
          */
         addAllResults () {
-            this.results.forEach((result) => {
+            this.filteredResults.forEach((result) => {
                 this.addResult(result);
             });
         },

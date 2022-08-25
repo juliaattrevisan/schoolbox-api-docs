@@ -20,7 +20,7 @@ const searchStore = useSearchStore();
  * @returns { Boolean }
  */
 const showSelectAll = computed(() => {
-    return searchStore.results.length > 1;
+    return searchStore.filteredResults.length > 1;
 });
 
 </script>
