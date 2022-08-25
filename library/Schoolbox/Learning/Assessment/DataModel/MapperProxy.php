@@ -1419,7 +1419,7 @@ class MapperProxy
                 return null;
             }
 
-            $ids = $mapper->findIdsByColumn('assessment_id', $assessmentId, ['deleted' => true,]);
+            $ids = $mapper->findIdsByColumn('assessment_id', $assessmentId);
             return isset($ids[0]) ? $ids[0] : null;
         }
         return null;
