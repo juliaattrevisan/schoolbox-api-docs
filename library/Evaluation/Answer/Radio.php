@@ -97,7 +97,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
                             array(
                                 'ANSWER_VALUE'         => $currentAnswer->value,
                                 'ANSWER_DESCRIPTION'   => Scrub::text($currentAnswer->description),
-                                'ANSWER_OPTION_STATUS' => $currentAnswer->correct ? 'evaluation-selected-answer-option': '',
+                                'ANSWER_OPTION_STATUS' => $currentAnswer->correct ? 'evaluation-selected-answer-option' : '',
                                 'ANSWER_CHECKED'       => $currentAnswer->correct ? 'checked=\'checked\'' : ''
                             )
                         );
