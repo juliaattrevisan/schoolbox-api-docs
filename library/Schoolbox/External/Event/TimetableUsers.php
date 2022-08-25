@@ -14,6 +14,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -271,26 +272,19 @@ class TimetableUsers
         return $manifest;
     }
 
+
     /**
      * Generate a list of events in which $user is involved, between two timestamps
      * Also takes into account any event overrides
      *
-     * @param \Schoolbox\User        $user
+     * @param User                   $user
      * @param int                    $startTimestamp
      * @param int                    $endTimestamp
      * @param GenericCollection|null $folderCodes
-     * @return GenericCollection
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @return array
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\Mapper\Exception\NotFound
-     * @throws \UnderflowException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
      */
-    public function findClassCodesForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
+    public function findClassCodesForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): array
     {
         /* Micromanage a stack of minimal event data with overrides
          */
@@ -416,17 +410,20 @@ class TimetableUsers
                  * need to investigate further, since we know you're involved at
                  * least once.
                  */
+                if (isset($data['manifest'][$eventId][$user->getExternalId()])) {
+                    $stack[$data['code']] = [
+                        'name' => $data['name'],
+                        'code' => $data['code'],
+                    ];
+
+                    break;
+                }
             }
-
-
         }
 
         unset($data);
 
-        new \Alaress_Probe($lookup);
-        die();
-
-        return $this->eventMapper->createCollection();
+        return array_values($stack);
     }
 
 
