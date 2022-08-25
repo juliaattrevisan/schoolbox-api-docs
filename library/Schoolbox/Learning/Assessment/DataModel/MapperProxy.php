@@ -1419,7 +1419,7 @@ class MapperProxy
                 return null;
             }
 
-            $ids = $mapper->findIdsByColumn('assessment_id', $assessmentId);
+            $ids = $mapper->findIdsByColumn('assessment_id', $assessmentId, ['deleted' => true,]);
             return isset($ids[0]) ? $ids[0] : null;
         }
         return null;
@@ -1450,6 +1450,33 @@ class MapperProxy
         $assessable->setDeletedAt($dataModel->getDeletedAt());
         // I don't think I need to delete sub-objects.
         // The assessable itself is all that should need deletion
+    }
+
+
+    /**
+     * Restores an assessable
+     *
+     * @param IAssessable $assessable
+     * @throws UnexpectedValueException If assessment does not have a context
+     * @throws LogicException If cyclic graph detected during translation
+     */
+    public function restoreSoftDeleted(IAssessable $assessable)
+    {
+        $dataModel = $this->translateToDataModel($assessable);
+        $subModel  = $dataModel->getSubObject();
+        if ($subModel instanceof SubmissionBox) {
+            // The assessment model is a component of the submission box.
+            // The composite object is responsible for deleting its components
+            // TODO - roll out this methodology to other assessment types
+            SubmissionBoxMapper::getInstance()->restoreSoftDeleted($subModel);
+        } else {
+            // Special handling for quiz: restore the quiz model
+            if ($subModel instanceof Quiz) {
+                QuizMapper::getInstance()->restoreSoftDeleted($subModel);
+            }
+            $this->baseMapper->restoreSoftDeleted($dataModel);
+        }
+        $assessable->setDeletedAt(new \Alaress_Date_NullDate());
     }
 
     /**
