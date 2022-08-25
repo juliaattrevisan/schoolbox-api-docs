@@ -18,7 +18,7 @@
         $.fn.alaressEditor({
             targetElements: $('#body'),
             removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe',
-            baseHref: "{{ BASE_HREF }}"
+            baseHref: "{{ baseHref }}"
         });
 
         var options = {
@@ -82,9 +82,9 @@
             return false;
         }
 
-        $('#to').selectizeSelector($.extend({}, options, {value: {{ REPLYTO | raw }}}))
-        $('#cc').selectizeSelector($.extend({}, options, {value: {{ CC | raw }}}))
-        $('#bcc').selectizeSelector($.extend({}, options, {value: {{ BCC | raw }}}))
+        $('#to').selectizeSelector($.extend({}, options, {value: {{ replyTo | raw }}}))
+        $('#cc').selectizeSelector($.extend({}, options, {value: {{ cc | raw }}}))
+        $('#bcc').selectizeSelector($.extend({}, options, {value: {{ bcc | raw }}}))
 
         // dialogs for copying email fields
         $('[data-role="copy-emails"]').each(function(index, element) {
@@ -208,9 +208,9 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="subject" class="required">Subject</label>
-                        <input type="text" name="subject" id="subject" value="{{ SUBJECT }}" required />
+                        <input type="text" name="subject" id="subject" value="{{ subject }}" required />
                         <label>
-                            <textarea name="message" id="body">{{ BODY }}</textarea>
+                            <textarea name="message" id="body">{{ body }}</textarea>
                         </label>
                         <label>
                             Attachments

@@ -152,7 +152,7 @@ class Controller extends Base
         $addressListFromIds  = $this->findAddressesFromIds($params, $folder);
         $addressLists['bcc'] = array_merge($addressLists['bcc'], $addressListFromIds);
 
-        // Add current user if not exists
+        // Add current user to replyto if not exists
         if (!$isCurrentUserInTo) {
             if ($folder) {
                 try {
@@ -163,7 +163,7 @@ class Controller extends Base
             }
             $addressLists['replyto'][] = isset($replyTo) ? $replyTo->toString() : $this->getUser()->getFormattedEmailDisplay();
         };
-        // Remove current user if exists in both to and bcc
+        // Remove current user if exists in bcc
         $addressLists['bcc'] = array_diff($addressLists['bcc'], [
             $this->getUser()->getEmail(),
             $this->getUser()->getFormattedEmailDisplay(),
@@ -194,13 +194,13 @@ class Controller extends Base
                 'template' => '@mail/send.twig',
                 'data'     => [
                     'invalidEmails' => $invalidEmails,
-                    'SUBJECT'       => $params->get('subject'),
-                    'BODY'          => $emailBody,
-                    'REPLYTO'       => json_encode(array_values($addressLists['replyto'])),
-                    'CC'            => json_encode(array_values($addressLists['cc'])),
-                    'BCC'           => json_encode(array_values($addressLists['bcc'])),
+                    'subject'       => $params->get('subject'),
+                    'body'          => $emailBody,
+                    'replyTo'       => json_encode(array_values($addressLists['replyto'])),
+                    'cc'            => json_encode(array_values($addressLists['cc'])),
+                    'bcc'           => json_encode(array_values($addressLists['bcc'])),
                     'attachzone'    => $zone->getTwigContext(),
-                    'BASE_HREF'     => $uri,
+                    'baseHref'      => $uri,
                     'folder'        => $folder,
                 ],
                 'title'    => 'Webmail',
