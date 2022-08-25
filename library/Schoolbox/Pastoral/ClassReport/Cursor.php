@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Pastoral\DataSource;
 use Schoolbox\Pastoral\Model;
 use Schoolbox\User;
+use ValueError;
 
 /**
  * Cursor for pastoral records in the class report.
@@ -32,17 +33,19 @@ class Cursor implements ICursor
     public const SORT_OPTION_UPDATED = 'updated';
     public const SORT_OPTION_SEVERITY = 'severity';
 
+    public const LIMIT_MIN     = 1;
     public const LIMIT_DEFAULT = 7;
+    public const LIMIT_MAX     = 12;
 
     /**
      * Constructor
      *
-     * @param DataSource $dataSource       Pastoral data source
-     * @param User       $currentUser      The user for whom results should be censored
-     * @param User       $student          The student to fetch results for
-     * @param array      $pastoralIds      A list of IDs already determined to match a filter
-     * @param string     $sortOption       A field to order results by
-     * @param int        $limit            The max number of results to fetch
+     * @param DataSource $dataSource  Pastoral data source
+     * @param User       $currentUser The user for whom results should be censored
+     * @param User       $student     The student to fetch results for
+     * @param array      $pastoralIds A list of IDs already determined to match a filter
+     * @param string     $sortOption  A field to order results by
+     * @param int        $limit       The max number of results to fetch
      */
     public function __construct(
         private DataSource $dataSource,
@@ -52,6 +55,16 @@ class Cursor implements ICursor
         private string $sortOption = self::SORT_OPTION_CREATED,
         private int $limit = self::LIMIT_DEFAULT,
     ) {
+        if ($this->limit < self::LIMIT_MIN || $this->limit > self::LIMIT_MAX) {
+            throw new ValueError(
+                sprintf(
+                    '$limit parameter must be within [%d, %d]: received %d',
+                    self::LIMIT_MIN,
+                    self::LIMIT_MAX,
+                    $this->limit,
+                )
+            );
+        }
         $this->codec = new Base64();
     }
 
@@ -63,12 +76,13 @@ class Cursor implements ICursor
         $nextCursor  = null;
         $lastRecord  = $collection->last();
 
-        // The next cursor points to the last record
         if ($lastRecord instanceof Model) {
+            // Simplified cursor, based only on ID: see "Simplified filtering"
+            // in `retrieveResults` for discussion
             $nextCursor = $this->codec->encode([
-                'severity' => $lastRecord->getSeverity()->getSequence(),
-                'created'  => $lastRecord->getCreatedAt()->getUnixTimeStamp(),
-                'updated'  => $lastRecord->getUpdatedAt()->getUnixTimeStamp(),
+//                'severity' => $lastRecord->getSeverity()->getSequence(),
+//                'created'  => $lastRecord->getCreatedAt()->getUnixTimeStamp(),
+//                'updated'  => $lastRecord->getUpdatedAt()->getUnixTimeStamp(),
                 'id'       => $lastRecord->getId(),
             ]);
         }
