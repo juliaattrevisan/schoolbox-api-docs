@@ -198,7 +198,7 @@ export default {
                     <!-- student profile -->
                     <li>
                         <div class="list-item">
-                            <div class="card">
+                            <div class="card small-12">
                                 <a :href="studentData.student._links.profile" title="View profile" class="name">
                                     <img :src="studentData.student._links.avatar"
                                          :alt="`profile photo of ${studentData.student.fullName}`"
@@ -212,21 +212,38 @@ export default {
 
                     <!-- pastoral records -->
                     <li v-for="record in studentData.records.data" :key="'record-' + String(record.id)">
-                        <a :href="record._links.read">{{ record.heading }}</a>,
-                        created
-                        <time :datetime="formatDateTime(record.createdAt)"
-                              :title="formatDateTime(record.createdAt)"
-                        >
-                            {{ formatDate(record.createdAt) }}
-                        </time>
-                        <template v-if="record.createdAt !== record.updatedAt">
-                            updated
-                            <time :datetime="formatDateTime(record.updatedAt)"
-                                  :title="formatDateTime(record.updatedAt)"
-                            >
-                                {{ formatDate(record.updatedAt) }}
-                            </time>
-                        </template>
+                        <div class="list-item">
+                            <div class="tiny card small-12">
+                                <a :href="record._links.read" title="View record">
+                                    <img :src="record.createdBy._links.avatar"
+                                         :alt="`profile photo of ${record.createdBy.fullName}`"
+                                         class="portrait" />
+                                    {{ record.heading }}
+                                </a>
+                                <p class="meta">
+                                    created by
+                                    <a :href="record.createdBy._links.profile" title="View profile" class="name">
+                                        {{ record.createdBy.fullName }}
+                                    </a> <time :datetime="formatDateTime(record.createdAt)"
+                                          :title="formatDateTime(record.createdAt)"
+                                    >
+                                        {{ formatDate(record.createdAt) }}
+                                    </time><template v-if="record.createdAt !== record.updatedAt">,
+                                        updated
+                                        <template v-if="record.createdBy.id !== record.updatedBy.id">
+                                            by
+                                            <a :href="record.updatedBy._links.profile" title="View profile" class="name">
+                                                {{ record.updatedBy.fullName }}
+                                            </a>
+                                        </template> <time :datetime="formatDateTime(record.updatedAt)"
+                                              :title="formatDateTime(record.updatedAt)"
+                                        >
+                                            {{ formatDate(record.updatedAt) }}
+                                        </time>
+                                    </template>
+                                </p>
+                            </div>
+                        </div>
                     </li>
                     <li v-if="studentData.records.metadata.count > studentData.records.data.length">
                         <a @click.prevent="loadMore(studentIndex)">Show More</a>
