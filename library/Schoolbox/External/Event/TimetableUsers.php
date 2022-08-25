@@ -275,6 +275,58 @@ class TimetableUsers
      */
     public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
+        /* Micromanage a stack of minimal event data with overrides
+         */
+        $lookup = [];
+        $stack = [];
+
+        /* Find the usual guys for the given class code out of sis_class_user
+         * In this case, $user will be the only guy in the list since we don't
+         * actually care about anyone else. We only care when $user is one of
+         * a class' usual guys.
+         */
+        $query = "
+            SELECT se.code, scu.*
+            FROM sis_class_user scu
+            INNER JOIN sis_class sc ON scu.class_id = sc.id
+            INNER JOIN sis_event se ON sc.code = se.code
+            WHERE scu.external_id = :externalId
+            AND se.classification = :classification
+            AND se.start_at >= :from
+            AND se.start_at <= :to
+            ORDER BY sc.id ASC
+        ";
+
+        $statement = $this->eventMapper->getDatabase()->prepare($query);
+        $statement->execute([
+            'externalId' => $user->getExternalId(),
+            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+            'from' => \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(),
+            'to' => \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase(),
+        ]);
+
+        /* Pile it into the $lookup in preparation for the mutations across multiple
+         * instances of a sis_event. A class code could have different sets of humans
+         * involved on different days so you have to repeat the process for every
+         * sis_event you find
+         */
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            if (!isset($lookup[$row['code']])) {
+                $lookup[$row['code']] = [
+                    'code' => $row['code'],
+                    'usuals' => [],
+                ];
+            }
+
+            /* Insert and dedupe
+             */
+            $lookup[$row['code']]['usuals'][$row['external_id']] = $row['external_id'];
+        }
+
+        new \Alaress_Probe($lookup);
+        die();
+
+        return $this->eventMapper->createCollection();
     }
 
 
