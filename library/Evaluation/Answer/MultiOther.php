@@ -97,7 +97,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
                         $page->setVar(array(
                             'ANSWER_VALUE'       => $currentAnswer->value,
                             'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                            'ANSWER_CHECKED'     => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                            'ANSWER_CHECKED'     => $currentAnswer->correct ? 'checked=\'checked\'' : ''
                         ));
 
                         $page->parse('answerOption_block', 'answerOption', true);
@@ -132,7 +132,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
                     $page->setVar(array(
                         'ANSWER_VALUE'       => $currentAnswer->value,
                         'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                        'ANSWER_CHECKED'     => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                        'ANSWER_CHECKED'     => $currentAnswer->correct ? 'checked=\'checked\'' : ''
                     ));
 
                     $page->parse('answerOption_block', 'answerOption', true);
