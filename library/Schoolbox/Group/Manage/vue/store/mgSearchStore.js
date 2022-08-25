@@ -63,6 +63,15 @@ export const useSearchStore = defineStore('mgSearch', {
         },
 
         /**
+         * there's no results to show currently
+         *
+         * @return { Boolean }
+         */
+        hasNoResults () {
+            return this.isSearchActive && this.filteredResults.length === 0 && !this.isProcessing;
+        },
+
+        /**
          * If any results have been selected
          *
          * @return { Boolean }
