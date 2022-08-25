@@ -273,7 +273,7 @@ class TimetableUsers
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
+    public function findClassCodesForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
         /* Micromanage a stack of minimal event data with overrides
          */
@@ -371,6 +371,13 @@ class TimetableUsers
             ];
         }
 
+        /* For every thing we found in $lookup,
+         * Play back all the overrides against $usuals
+         * then collate the list of guys in $manifest
+         */
+        foreach ($lookup as $classCode => $data) {
+        }
+
         new \Alaress_Probe($lookup);
         die();
 
@@ -397,7 +404,7 @@ class TimetableUsers
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    private function findForUserSlow(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
+    private function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
         $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
