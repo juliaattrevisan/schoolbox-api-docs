@@ -41,7 +41,7 @@ class Module extends BaseModule
      */
     public function registerRoutes(): void
     {
-        $perm = new All(
+        $permManage = new All(
             new IsLoggedIn(),
             new Any(
                 new IsSuperuser(),
@@ -58,20 +58,22 @@ class Module extends BaseModule
             )
         );
 
+        $permSearch = new IsLoggedIn();
+
         $preloadFolder = function ($params) {
             return $this->preloadFolder($params);
         };
 
-        $this->register(self::METHOD_GET, '/modify/{folderId:\d+}', 'getModify', $perm, $preloadFolder);
-        $this->register(self::METHOD_GET, '/getData/{folderId:\d+}', 'getData', $perm, $preloadFolder);
-        $this->register(self::METHOD_DELETE, '/removeMembers/{folderId:\d+}', 'removeMembers', $perm, $preloadFolder);
-        $this->register(self::METHOD_PATCH, '/updateMembers/{folderId:\d+}', 'updateMembers', $perm, $preloadFolder);
-        $this->register(self::METHOD_POST, '/addMembers/{folderId:\d+}', 'addMembers', $perm, $preloadFolder);
-        $this->register(self::METHOD_POST, '/updateSettings/{folderId:\d+}', 'updateSettings', $perm, $preloadFolder);
-        $this->register(self::METHOD_POST, '/disband/{folderId:\d+}', 'disband', $perm, $preloadFolder);
-        $this->register(self::METHOD_POST, '/searchGroups', 'searchGroups', $perm);
-        $this->register(self::METHOD_POST, '/searchRoles', 'searchRoles', $perm);
-        $this->register(self::METHOD_POST, '/searchUsers', 'searchUsers', $perm);
+        $this->register(self::METHOD_GET, '/modify/{folderId:\d+}', 'getModify', $permManage, $preloadFolder);
+        $this->register(self::METHOD_GET, '/getData/{folderId:\d+}', 'getData', $permManage, $preloadFolder);
+        $this->register(self::METHOD_DELETE, '/removeMembers/{folderId:\d+}', 'removeMembers', $permManage, $preloadFolder);
+        $this->register(self::METHOD_PATCH, '/updateMembers/{folderId:\d+}', 'updateMembers', $permManage, $preloadFolder);
+        $this->register(self::METHOD_POST, '/addMembers/{folderId:\d+}', 'addMembers', $permManage, $preloadFolder);
+        $this->register(self::METHOD_POST, '/updateSettings/{folderId:\d+}', 'updateSettings', $permManage, $preloadFolder);
+        $this->register(self::METHOD_POST, '/disband/{folderId:\d+}', 'disband', $permManage, $preloadFolder);
+        $this->register(self::METHOD_POST, '/searchGroups', 'searchGroups', $permSearch);
+        $this->register(self::METHOD_POST, '/searchRoles', 'searchRoles', $permSearch);
+        $this->register(self::METHOD_POST, '/searchUsers', 'searchUsers', $permSearch);
     }
 
     /**

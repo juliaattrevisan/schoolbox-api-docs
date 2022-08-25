@@ -21,6 +21,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -270,7 +271,21 @@ class Controller extends Base
     {
         $query  = trim($this->request->query->get('query'));
         $return = [];
+
+        // folders accessible by role
+        $availableFolderIds = $this->groupMapper->getAvailableGroupIds($this->getUser());
+        // folders accessible by membership
+        $availableFolderIds = array_unique(
+            array_merge(
+                $this->userAccessMapper->findAllGroupsForUser($this->getUser())->getPropertyValues('serviceIdentifier'),
+                $availableFolderIds
+            )
+        );
+
         foreach ($this->folderMapper->searchByName($query, true) as $group) {
+            if (!in_array($group->getId(), $availableFolderIds)) {
+                continue;
+            }
             $return[] = [
                 'name' => $group->getName(),
                 'id'   => $group->getId(),
@@ -305,7 +320,7 @@ class Controller extends Base
     /**
      * Find users from comma separated list of usernames and external ids
      * @return void
-     * @api   POST /searchRoles
+     * @api   POST /searchUsers
      * @since 22.1
      */
     public function searchUsers()
@@ -315,8 +330,29 @@ class Controller extends Base
         $users    = $this->userMapper->findByColumnList(['synergy_id' => $searches]);
         $users    = $users->mergeUnique($this->userMapper->findByColumnList(['username' => $searches]), 'id');
         $return   = [];
+
+        $excludeRoles = [];
+        if ($this->getUser()->getRole()->isGuest()) {
+            $excludeRoles[] = Role::PARENT;
+            $excludeRoles[] = Role::STUDENT;
+        } elseif (!$this->getUser()->getRole()->isStaff()) {
+            /* Include parent users in search results if the config is enabled
+             */
+            if (!$this->getConfigLoader()->get('parent_search_enable')) {
+                $excludeRoles[] = Role::PARENT;
+            }
+            /* Include students users in search results if the config is enabled
+             */
+            if (!$this->getConfigLoader()->get('student_search_enable')) {
+                $excludeRoles[] = Role::STUDENT;
+            }
+        }
+
         /** @var User $user */
         foreach ($users as $user) {
+            if (in_array($user->getRole()->getType(), $excludeRoles)) {
+                continue;
+            }
             $meta = '';
             if ($user->getYear()) {
                 $meta .= $user->getYear()->getLongName() . ', ';
