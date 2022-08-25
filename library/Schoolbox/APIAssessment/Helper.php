@@ -363,9 +363,9 @@ WHERE
         `staff`.`firstname` as `staffFirstname`,
         `staff`.`lastname` as `staffLastname`,
         `staff`.`synergy_id` as `staffExternalId`
- from ((`schoolbox`.`submission_return` `sr1`
-     join `schoolbox`.`submission_box` `sb` on (`sr1`.`box_id` = `sb`.`id`))
-     left join `schoolbox`.`submission_return` `sr2` on (
+ from ((`submission_return` `sr1`
+     join `submission_box` `sb` on (`sr1`.`box_id` = `sb`.`id`))
+     left join `submission_return` `sr2` on (
                  `sr1`.`box_id` = `sr2`.`box_id`
              and `sr1`.`owner` = `sr2`.`owner`
              and `sr1`.`review_route` = `sr2`.`review_route`
@@ -398,9 +398,9 @@ union
         `staff`.`firstname` as `staffFirstname`,
         `staff`.`lastname` as `staffLastname`,
         `staff`.`synergy_id` as `staffExternalId`
- from ((`schoolbox`.`assess_attempt` `aa1`
-     join `schoolbox`.`assess` `ass` on (`aa1`.`assess_id` = `ass`.`assess_id`))
-     left join `schoolbox`.`assess_attempt` `aa2` on (
+ from ((`assess_attempt` `aa1`
+     join `assess` `ass` on (`aa1`.`assess_id` = `ass`.`assess_id`))
+     left join `assess_attempt` `aa2` on (
                  `aa1`.`assess_id` = `aa2`.`assess_id`
              and `aa1`.`user_id` = `aa2`.`user_id`
              and `aa2`.`reviewed_at` is not null
@@ -432,9 +432,9 @@ union
         `staff`.`firstname` as `staffFirstname`,
         `staff`.`lastname` as `staffLastname`,
         `staff`.`synergy_id` as `staffExternalId`
- from ((`schoolbox`.`task_completion` `tc1`
-     join `schoolbox`.`task` `t` on (`tc1`.`task_id` = `t`.`id`))
-     left join `schoolbox`.`task_completion` `tc2` on (
+ from ((`task_completion` `tc1`
+     join `task` `t` on (`tc1`.`task_id` = `t`.`id`))
+     left join `task_completion` `tc2` on (
                  `tc1`.`task_id` = `tc2`.`task_id`
              and `tc1`.`student_id` = `tc2`.`student_id`
              and `tc1`.`completion_status` = `tc2`.`completion_status`
@@ -466,9 +466,9 @@ union
         `staff`.`firstname` as `staffFirstname`,
         `staff`.`lastname` as `staffLastname`,
         `staff`.`synergy_id` as `staffExternalId`
- from ((`schoolbox`.`lti_assessment_score` `sc1`
-     join `schoolbox`.`lti_assessment` `la` on (`sc1`.`lti_assessment_id` = `la`.`id`))
-     left join `schoolbox`.`lti_assessment_score` `sc2` on (
+ from ((`lti_assessment_score` `sc1`
+     join `lti_assessment` `la` on (`sc1`.`lti_assessment_id` = `la`.`id`))
+     left join `lti_assessment_score` `sc2` on (
                  `sc1`.`lti_assessment_id` = `sc2`.`lti_assessment_id`
              and `sc1`.`student_id` = `sc2`.`student_id`
              and `sc2`.`created_at` is not null
