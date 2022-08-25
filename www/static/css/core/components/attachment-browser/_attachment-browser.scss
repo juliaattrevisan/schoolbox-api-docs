@@ -42,7 +42,6 @@
         min-height: 292px;
         padding: 0;
         position: relative;
-        width: calc(100% - 135px);
         @media #{$small-only} {
             min-height: 100vh;
             max-height: 100vh;
