@@ -1474,6 +1474,15 @@ class MapperProxy
             if ($subModel instanceof Quiz) {
                 QuizMapper::getInstance()->restoreSoftDeleted($subModel);
             }
+            if ($subModel instanceof Task) {
+                TaskMapper::getInstance()->restoreSoftDeleted($subModel);
+            }
+            if ($subModel instanceof LtiAssessment\Model) {
+                LtiAssessment\Mapper::getInstance()->restoreSoftDeleted($subModel);
+            }
+            if ($subModel instanceof Project) {
+                ProjectMapper::getInstance()->restoreSoftDeleted($subModel);
+            }
             $this->baseMapper->restoreSoftDeleted($dataModel);
         }
         $assessable->setDeletedAt(new \Alaress_Date_NullDate());
