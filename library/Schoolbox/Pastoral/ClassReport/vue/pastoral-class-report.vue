@@ -246,7 +246,11 @@ export default {
                         </div>
                     </li>
                     <li v-if="studentData.records.metadata.count > studentData.records.data.length">
-                        <a @click.prevent="loadMore(studentIndex)">Show More</a>
+                        <div class="component-action">
+                            <section>
+                                <button @click.prevent="loadMore(studentIndex)">Show more</button>
+                            </section>
+                        </div>
                     </li>
                 </template>
             </ul>
