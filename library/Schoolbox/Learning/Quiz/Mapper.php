@@ -267,7 +267,12 @@ class Mapper extends BaseMapper
      */
     public function deleteQuizConstituents(int $assessmentId): void
     {
-        $this->softDeleteSections($this->findOneByColumn('assessment_id', $assessmentId));
+        try {
+            $quiz = $this->findOneByColumn('assessment_id', $assessmentId);
+        } catch (BaseMapper\Exception\Deleted $e) {
+            $quiz = $e->getDeletedObject();
+        }
+        $this->softDeleteSections($quiz);
     }
 
     /**
