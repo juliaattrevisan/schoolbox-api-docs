@@ -138,10 +138,16 @@ export default {
 
             // Fetch data from endpoint,
             // update this student's report data and metadata
-            const response     = await fetch(endpoint),
-                  jsonResponse = await response.json();
-            this.data[studentIndex].records.data     = this.data[studentIndex].records.data.concat(jsonResponse.data);
-            this.data[studentIndex].records.metadata = reactive(jsonResponse.metadata);
+            this.$refs.toast.activate('Loading...');
+            const response = await fetch(endpoint);
+            if (response.ok) {
+                const jsonResponse = await response.json();
+                this.data[studentIndex].records.data     = this.data[studentIndex].records.data.concat(jsonResponse.data);
+                this.data[studentIndex].records.metadata = reactive(jsonResponse.metadata);
+                this.$refs.toast.timeout('Loaded', true);
+            } else {
+                this.$refs.toast.timeout('Loading failed', false);
+            }
         },
     }
 }
