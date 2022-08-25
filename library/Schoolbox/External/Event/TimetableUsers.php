@@ -122,9 +122,6 @@ class TimetableUsers
      * @param int    $startTimestamp
      * @param int    $endTimestamp
      * @return array
-     * @throws Deleted
-     * @throws Exception
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
      */
     public function findTeachersForClassCode(string $classCode, int $startTimestamp, int $endTimestamp): array
@@ -228,48 +225,6 @@ class TimetableUsers
         }
 
         return array_values(array_intersect($this->staffExternalIds, $manifest));
-    }
-
-
-    /**
-     * Apply $overrides to a set of usual guys $usuals,
-     * to see who still remains. Everyone still surviving
-     * is the event's $manifest
-     *
-     * @param array $usuals
-     * @param array $overrides
-     * @return array
-     * @throws \PDOException
-     */
-    private function applyOverrides(array $usuals, array $overrides): array
-    {
-        $manifest = $usuals;
-
-        foreach ($overrides as $override) {
-            if (\Schoolbox\External\Event\Overrides\Model::SUBTRACT === $override['action']) {
-                unset($manifest[$override['external_id']]);
-            } elseif (\Schoolbox\External\Event\Overrides\Model::ADD === $override['action']) {
-                $manifest[$override['external_id']] = $override['external_id'];
-            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override['action']) {
-                $manifest = [];
-            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override['action']) {
-                /* If we haven't got this already, get it and remember it
-                 * in case we needed it again and again and again
-                 */
-                if (null === $this->staffExternalIds) {
-                    $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
-                }
-
-                /* Get a list of staff members,
-                 * then do some array magic between $usualUsers
-                 * and this list of staff ids, to exclude staff
-                 * from $usualUsers
-                 */
-                $manifest = array_diff($manifest, $this->staffExternalIds);
-            }
-        }
-
-        return $manifest;
     }
 
 
@@ -424,6 +379,48 @@ class TimetableUsers
         unset($data);
 
         return array_values($stack);
+    }
+
+
+    /**
+     * Apply $overrides to a set of usual guys $usuals,
+     * to see who still remains. Everyone still surviving
+     * is the event's $manifest
+     *
+     * @param array $usuals
+     * @param array $overrides
+     * @return array
+     * @throws \PDOException
+     */
+    private function applyOverrides(array $usuals, array $overrides): array
+    {
+        $manifest = $usuals;
+
+        foreach ($overrides as $override) {
+            if (\Schoolbox\External\Event\Overrides\Model::SUBTRACT === $override['action']) {
+                unset($manifest[$override['external_id']]);
+            } elseif (\Schoolbox\External\Event\Overrides\Model::ADD === $override['action']) {
+                $manifest[$override['external_id']] = $override['external_id'];
+            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override['action']) {
+                $manifest = [];
+            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override['action']) {
+                /* If we haven't got this already, get it and remember it
+                 * in case we needed it again and again and again
+                 */
+                if (null === $this->staffExternalIds) {
+                    $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
+                }
+
+                /* Get a list of staff members,
+                 * then do some array magic between $usualUsers
+                 * and this list of staff ids, to exclude staff
+                 * from $usualUsers
+                 */
+                $manifest = array_diff($manifest, $this->staffExternalIds);
+            }
+        }
+
+        return $manifest;
     }
 
 
