@@ -1470,7 +1470,7 @@ class MapperProxy
             // TODO - roll out this methodology to other assessment types
             SubmissionBoxMapper::getInstance()->restoreSoftDeleted($subModel);
         } else {
-            // Special handling for quiz: restore the quiz model
+            // Special handling: restore each different kind of model
             if ($subModel instanceof Quiz) {
                 QuizMapper::getInstance()->restoreSoftDeleted($subModel);
             }
