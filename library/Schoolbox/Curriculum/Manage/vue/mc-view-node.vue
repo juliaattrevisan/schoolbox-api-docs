@@ -10,6 +10,7 @@ import { useStore } from './store/manageCurriculumStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import { useDeleteNodeStore } from './activeNode/store/mcDeleteNodeStore';
+import { useEnableNodeStore } from './activeNode/store/mcEnableNodeStore';
 import { useUpdateNodeStore } from './activeNode/store/mcUpdateNodeStore';
 import { escapeRegExp } from '@js/util/jsUtils';
 import { slideDown, slideUp } from '@js/util/animateUtils';
@@ -44,6 +45,7 @@ const store = useStore();
 const viewNodesStore = useViewNodesStore();
 const activeNodeStore = useActiveNodeStore();
 const deleteNodeStore = useDeleteNodeStore();
+const enabledNodeStore = useEnableNodeStore();
 const updateNodeStore = useUpdateNodeStore();
 
 /**
@@ -62,7 +64,7 @@ const hasCode = computed(() => props.node.code && props.node.code !== '');
 
 /**
  * To help distinguish those nodes that aren't selectable,
- * we disable and remove the default button colour
+ * we enabled and remove the default button colour
  *
  * @returns { Boolean }
  */
@@ -117,6 +119,17 @@ function onNameSelected () {
  */
 function onDeleteSelected () {
     deleteNodeStore.prompt(props.node);
+}
+
+/**
+ * to open up or close the update modal
+ */
+function onEnableToggleSelected () {
+    if (props.node.enabled) {
+        enabledNodeStore.prompt(props.node);
+    } else {
+        enabledNodeStore.enable(props.node);
+    }
 }
 
 /**
@@ -234,14 +247,15 @@ async function onLeave (el, done) {
                     type="checkbox"
                     :value="props.node.id"
                     :checked="false"
-                    :disabled="isUpdating"
+                    :enabledd="isUpdating"
                 />
                 <label :for="`checkbox-${props.node.id}`"></label>
             </div>
             <button
                 :class="`button-name ${ props.depth === 0 ? 'button-name-parent' : '' } ${ isUpdating ? 'inactive' : '' }`"
+                :style="{ opacity: props.node.enabled ? '1' : '0.3' }"
                 :title="`Expand ${title}`"
-                :disabled="isDisabled"
+                :enabledd="isDisabled"
                 @click.prevent="onNameSelected"
                 @keyup.enter="onNameSelected"
             >
@@ -266,8 +280,10 @@ async function onLeave (el, done) {
             </button>
             <button
                 v-if="!store.isReadOnly"
-                :class="`button-action-option icon-view ${ isUpdating ? 'inactive' : '' }`"
-                title="Toggle visiblity"
+                :class="`button-action-option ${ props.node.enabled ? 'icon-view' : 'icon-view-hollow' } ${ isUpdating ? 'inactive' : '' }`"
+                :title="`${ props.node.enabled ? 'Disable' : 'Enable' } node`"
+                @click.prevent="onEnableToggleSelected"
+                @keyup.enter="onEnableToggleSelected"
             >
                 Toggle visiblity
             </button>
@@ -323,7 +339,7 @@ async function onLeave (el, done) {
     &:hover {
         background: var(--content-ui-background);
     }
-    // &:disabled { // @TODO - think about the various disabled states more
+    // &:enabledd { // @TODO - think about the various enabledd states more
     //     opacity: 0.2;
     // }
     @media (max-width: 700px) {
@@ -337,7 +353,7 @@ async function onLeave (el, done) {
     padding-left: 0.25rem;
     transition: background 0.2s;
     width: 100%;
-    &:disabled {
+    &:enabledd {
         color: #222222;
         opacity: 1;
     }

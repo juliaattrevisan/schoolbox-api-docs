@@ -31,6 +31,8 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
         /**
          * node removal has been confirmed so notify the backend
          * and then pull it out of the nodes if successful
+         *
+         * @param { object or null }
          */
         async update () {
             this.isProcessing = true;

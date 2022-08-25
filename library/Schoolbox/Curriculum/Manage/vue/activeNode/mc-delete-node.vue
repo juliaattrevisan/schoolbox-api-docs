@@ -17,8 +17,8 @@ const modalEl = ref(null);
 /**
  * to open the modal when requested
  */
-watch(() => deleteNodeStore.isModalOpen, (isModalOpen) => {
-    isModalOpen ? modalEl.value.open() : modalEl.value.close();
+watch(() => deleteNodeStore.isOpen, (isOpen) => {
+    isOpen ? modalEl.value.open() : modalEl.value.close();
 });
 
 /**
@@ -77,7 +77,7 @@ function onCancelSelected () {
 }
 
 /**
- * ensure the isModalOpen is kept up to date
+ * ensure the isOpen is kept up to date
  * as we can currently also use foundation to close the modal
  */
 function onModalClosed () {
@@ -94,7 +94,7 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
-        <p>Are you sure you wish to delete this node: <em>{{ activeNodeStore.title }}</em>{{ childrenWarning }}?</p>
+        <p>Are you sure you wish to delete this node: <strong>{{ activeNodeStore.title }} {{ childrenWarning }}?</strong></p>
         <ul class="flex-list buttons">
             <li><button @click.prevent="onDeleteSelected" class="button submit" :disabled="deleteNodeStore.isProcessing">{{ deleteButtonText }}</button></li>
             <li><button @click.prevent="onCancelSelected" class="button" :disabled="deleteNodeStore.isProcessing">Cancel</button></li>

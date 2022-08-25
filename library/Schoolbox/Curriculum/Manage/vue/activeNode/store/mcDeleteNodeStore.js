@@ -5,14 +5,13 @@
 import { defineStore } from 'pinia';
 import { useNodesStore } from '../../store/mcNodesStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
-import { useViewNodesStore } from '../../store/mcViewNodesStore';
 
 
 export const useDeleteNodeStore = defineStore('mcDeleteNode', {
 
     state: () => ({
         isProcessing: false,
-        isModalOpen: false, //to notify that the prompt is opened / closed
+        isOpen: false, //to notify that the prompt is opened / closed
     }),
 
     actions: {
@@ -25,7 +24,7 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
         prompt (node) {
             const activeNodeStore = useActiveNodeStore();
             activeNodeStore.set(node);
-            this.isModalOpen = true;
+            this.isOpen = true;
         },
 
         /**
@@ -34,25 +33,22 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
          */
         async delete () {
             this.isProcessing = true;
-            const nodesStore = useNodesStore();
-            // const activeNodeStore = useActiveNodeStore();
             try {
-                // useViewNodesStore().deleteActiveNode();
-                nodesStore.deleteActiveNode();
-                this.isProcessing = false;
-                this.cancel();
-                // const response = await fetch(`/api/curriculum/${activeNodeStore.node.id}`, {
-                //     method: 'DELETE',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                // });
-                // if (response.ok) {
-                //     activeNodeStore.unset(); //unset as the node is no longer available
-                //     this.isProcessing = false;
-                // } else {
-                //     throw new Error();
-                // }
+                const activeNodeStore = useActiveNodeStore();
+                const response = await fetch(`/api/curriculum/${activeNodeStore.node.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                if (response.ok) {
+                    const nodesStore = useNodesStore();
+                    nodesStore.deleteActiveNode();
+                    this.isProcessing = false;
+                    this.cancel();
+                } else {
+                    throw new Error();
+                }
             } catch (error) {
                 console.warn(error);
             }
@@ -64,7 +60,7 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
         cancel () {
             const activeNodeStore = useActiveNodeStore();
             activeNodeStore.unset();
-            this.isModalOpen = false;
+            this.isOpen = false;
         },
 
     },

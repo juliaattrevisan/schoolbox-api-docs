@@ -59,8 +59,8 @@ function onCancelSelected () {
                 </div>
                 <div class="small-12 columns">
                     <ul class="flex-list buttons">
-                        <li><button @click.prevent="onUpdateSelected" @keyup.enter="onUpdateSelected" class="button submit" :disabled="updateNodeStore.isProcessing">{{ updateButtonText }}</button></li>
                         <li><button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button" :disabled="updateNodeStore.isProcessing">Cancel</button></li>
+                        <li><button @click.prevent="onUpdateSelected" @keyup.enter="onUpdateSelected" class="button submit" :disabled="updateNodeStore.isProcessing">{{ updateButtonText }}</button></li>
                     </ul>
                 </div>
             </fieldset>
@@ -73,7 +73,7 @@ function onCancelSelected () {
 .update-node-container {
     border-bottom: 1px solid var(--content-ui-background);
     border-top: 1px solid var(--content-ui-background);
-    margin: -1px 0 1rem 0;
+    margin: -1px 0 0 0; //-1px so it butts up against the node border above
 }
 
 legend {
