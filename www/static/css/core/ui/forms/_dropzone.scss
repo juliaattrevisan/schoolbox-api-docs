@@ -36,11 +36,13 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
 
     /* Ensure file upload preview items span full width on small viewports
      */
-    width: calc(50% - 0.5rem);
+    @media #{$small-only} {
+      min-width: calc(100% - 0.5rem);
+    }
 
     /* Limit file upload preview items to half modal width on medium viewports and larger to display two columns.
      */
-    @media #{medium-up} {
+    @media #{$medium-up} {
         min-width: calc(50% - 0.5rem);
     }
 
