@@ -12,7 +12,14 @@
         <p>
             The original {{ locale.translate('assessment') }}
             &ldquo;<span data-spec-assessment-title>{{ specAssessment.title ?? null }}</span>&rdquo;
-            in the course will be <strong>replaced</strong>
+            in the course
+
+            <span data-display-if-spec-assessment-deleted class="{% if not specAssessment.deleted %}hide{% endif %}">
+                has been deleted; it will be <strong>restored</strong> and <strong>replaced</strong>
+            </span>
+            <span data-display-if-spec-assessment-not-deleted class="{% if specAssessment.deleted %}hide{% endif %}">
+                will be <strong>replaced</strong>
+            </span>
             with this {{ locale.translate('assessment') }}.
         </p>
         {% if assessment is project %}
