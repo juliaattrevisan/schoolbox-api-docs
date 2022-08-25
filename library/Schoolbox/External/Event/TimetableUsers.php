@@ -277,7 +277,8 @@ class TimetableUsers
     {
         /* Micromanage a stack of minimal event data with overrides
          */
-        $lookup = [];
+        $usualGuysLookup = [];
+        $overridesLookup = [];
         $stack = [];
 
         /* Find the usual guys for the given class code out of sis_class_user
@@ -311,8 +312,8 @@ class TimetableUsers
          * sis_event you find
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if (!isset($lookup[$row['code']])) {
-                $lookup[$row['code']] = [
+            if (!isset($usualGuysLookup[$row['code']])) {
+                $usualGuysLookup[$row['code']] = [
                     'code' => $row['code'],
                     'usuals' => [],
                 ];
@@ -320,10 +321,50 @@ class TimetableUsers
 
             /* Insert and dedupe
              */
-            $lookup[$row['code']]['usuals'][$row['external_id']] = $row['external_id'];
+            $usualGuysLookup[$row['code']]['usuals'][$row['external_id']] = $row['external_id'];
         }
 
-        new \Alaress_Probe($lookup);
+        /* Find all the events within the time interval specified, because $user
+         * could have been affected by any of their overrides - you won't know
+         * until you play through all the mutations
+         */
+        $query = "
+            SELECT se.code, se.id, seuo.*
+            FROM sis_event se
+            INNER JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
+            WHERE se.classification = :classification
+            AND se.start_at >= :from
+            AND se.start_at <= :to
+            ORDER BY se.id, seuo.sequence
+        ";
+
+        $statement = $this->eventMapper->getDatabase()->prepare($query);
+        $statement->execute([
+            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+            'from' => \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(),
+            'to' => \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase(),
+        ]);
+
+        /* Collate all the overrides and group them so we can mutate everything
+         * in a convenient manner
+         */
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            if (!isset($overridesLookup[$row['code']])) {
+                $overridesLookup[$row['code']] = [
+                    'code' => $row['code'],
+                    'overrides' => []
+                ];
+            }
+
+            /* Manufacture a list of overrides for this event id
+             */
+            $overridesLookup[$row['code']]['overrides'][$row['id']][] = [
+                'external_id' => $row['external_id'],
+                'action' => $row['action']
+            ];
+        }
+
+        new \Alaress_Probe($usualGuysLookup, $overridesLookup);
         die();
 
         return $this->eventMapper->createCollection();
