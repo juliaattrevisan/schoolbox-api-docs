@@ -246,6 +246,11 @@ class TimetableUsers
         $lookup = [];
         $stack = [];
 
+        /* Micromanage dates
+         */
+        $from = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
+        $to = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
+
         /* Find the usual guys for the given class code out of sis_class_user
          * In this case, $user will be the only guy in the list since we don't
          * actually care about anyone else. We only care when $user is one of
@@ -267,8 +272,8 @@ class TimetableUsers
         $statement->execute([
             'externalId' => $user->getExternalId(),
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'from' => \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(),
-            'to' => \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase(),
+            'from' => $from,
+            'to' => $to,
         ]);
 
         /* Pile it into the $lookup in preparation for the mutations across multiple
@@ -317,8 +322,8 @@ class TimetableUsers
         $statement = $this->eventMapper->getDatabase()->prepare($query);
         $statement->execute([
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'from' => \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(),
-            'to' => \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase(),
+            'from' => $from,
+            'to' => $to,
         ]);
 
         /* Collate all the overrides and group them so we can mutate everything
