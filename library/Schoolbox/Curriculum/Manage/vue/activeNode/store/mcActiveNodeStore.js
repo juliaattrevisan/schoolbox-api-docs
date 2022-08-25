@@ -53,6 +53,18 @@ export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
         },
 
         /**
+         * Set newly saved values on the node
+         *
+         * @param { Object }
+         */
+        update (node) {
+            this.node.name = node.name;
+            this.node.code = node.code;
+            this.node.reference = node.reference;
+            this.node.description = node.description;
+        },
+
+        /**
          * unset ready for another use
          *
          * @param { Object }

@@ -3,16 +3,15 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore } from '../../store/mcNodesStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
-import { useViewNodesStore } from '../../store/mcViewNodesStore';
 
 
 export const useUpdateNodeStore = defineStore('mcUpdateNode', {
 
     state: () => ({
         isProcessing: false,
-        isModalOpen: false, //to notify that the prompt is opened / closed
+        isOpen: false, //to notify that the prompt is opened / closed
+        activeNodeCopy: {},
     }),
 
     actions: {
@@ -25,7 +24,8 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
         prompt (node) {
             const activeNodeStore = useActiveNodeStore();
             activeNodeStore.set(node);
-            this.isModalOpen = true;
+            this.activeNodeCopy = getActiveNodeCopy(node);
+            this.isOpen = true;
         },
 
         /**
@@ -34,25 +34,23 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
          */
         async update () {
             this.isProcessing = true;
-            const nodesStore = useNodesStore();
-            // const activeNodeStore = useActiveNodeStore();
             try {
-                // useViewNodesStore().deleteActiveNode();
-                // nodesStore.deleteActiveNode();
-                // this.isProcessing = false;
-                // this.cancel();
-                // const response = await fetch(`/api/curriculum/${activeNodeStore.node.id}`, {
-                //     method: 'DELETE',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                // });
-                // if (response.ok) {
-                //     activeNodeStore.unset(); //unset as the node is no longer available
-                //     this.isProcessing = false;
-                // } else {
-                //     throw new Error();
-                // }
+                this.isProcessing = false;
+                const activeNodeStore = useActiveNodeStore();
+                const response = await fetch(`/api/curriculum/${activeNodeStore.node.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: getFormData(this.activeNodeCopy),
+                });
+                if (response.ok) {
+                    activeNodeStore.update(this.activeNodeCopy);
+                    this.isProcessing = false;
+                    this.cancel();
+                } else {
+                    throw new Error();
+                }
             } catch (error) {
                 console.warn(error);
             }
@@ -64,9 +62,39 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
         cancel () {
             const activeNodeStore = useActiveNodeStore();
             activeNodeStore.unset();
-            this.isModalOpen = false;
+            this.isOpen = false;
         },
 
     },
 
 })
+
+/**
+ * Create a copy so the data is only updated once actually saved
+ *
+ * @param { Object }
+ *
+ * @returns { Object }
+ */
+ function getActiveNodeCopy (node) {
+    return {
+        name: node.name,
+        code: node.code,
+        reference: node.reference,
+        description: node.description,
+    }
+}
+
+/**
+ * Pass through the group id
+ *
+ * @returns { FormData }
+ */
+ function getFormData (node) {
+    return JSON.stringify({
+        name: node.name,
+        code: node.code,
+        reference: node.reference,
+        description: node.description,
+    });
+}

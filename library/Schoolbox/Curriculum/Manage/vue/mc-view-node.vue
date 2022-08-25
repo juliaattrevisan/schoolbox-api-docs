@@ -12,6 +12,7 @@ import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import { useDeleteNodeStore } from './activeNode/store/mcDeleteNodeStore';
 import { useUpdateNodeStore } from './activeNode/store/mcUpdateNodeStore';
 import { escapeRegExp } from '@js/util/jsUtils';
+import { slideDown, slideUp } from '@js/util/animateUtils';
 import McUpdateNode from './activeNode/mc-update-node.vue';
 
 
@@ -86,18 +87,24 @@ const isDisabled = computed(() => {
 const isVisible = computed(() => props.depth < 2 || viewNodesStore.isOnLast);
 
 /**
- * If this is the active node
+ * If this is the active node being updated
  *
  * @returns { Boolean }
  */
-const isUpdating = computed(() => updateNodeStore.isModalOpen && activeNodeStore.node.id === props.node.id);
+const isUpdating = computed(() => updateNodeStore.isOpen && activeNodeStore.node.id === props.node.id);
+
+/**
+ * If there's another node being updated
+ *
+ * @returns { Boolean }
+ */
+const isUpdatingAnother = computed(() => updateNodeStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
  * traverse to the next nodel level as an alternative to
  * using the selects in mc-header-select or if the top parent is selected move back one level
  */
 function onNameSelected () {
-    activeNodeStore.unset();
     if (props.depth === 0) {
         viewNodesStore.setSelected(viewNodesStore.currentDepth, 0);
     } else {
@@ -196,24 +203,45 @@ const containerClass = computed(() => {
     }
 });
 
+/**
+ * Slide down the node to be updated
+ *
+ * @param { DOMElement }
+ */
+async function onEnter (el, done) {
+    await slideDown(el);
+    done()
+}
+
+/**
+ * Slide up the on close or when the node is updated
+ *
+ * @param { DOMElement }
+ */
+async function onLeave (el, done) {
+    await slideUp(el);
+    done()
+}
+
 </script>
 
 <template>
     <li v-if="isVisible" :class="`container ${containerClass}`">
-        <div class="buttons-container">
+        <div :class="`buttons-container ${ isUpdatingAnother ? 'inactive' : '' }`">
             <div class="checklist">
                 <input
                     :id="`checkbox-${props.node.id}`"
                     type="checkbox"
                     :value="props.node.id"
                     :checked="false"
+                    :disabled="isUpdating"
                 />
                 <label :for="`checkbox-${props.node.id}`"></label>
             </div>
             <button
-                :class="`button-name ${ props.depth === 0 ? 'button-name-parent' : '' }`"
-                :disabled="isDisabled"
+                :class="`button-name ${ props.depth === 0 ? 'button-name-parent' : '' } ${ isUpdating ? 'inactive' : '' }`"
                 :title="`Expand ${title}`"
+                :disabled="isDisabled"
                 @click.prevent="onNameSelected"
                 @keyup.enter="onNameSelected"
             >
@@ -222,7 +250,7 @@ const containerClass = computed(() => {
             </button>
             <button
                 v-if="!store.isReadOnly"
-                class="button-action-option icon-delete"
+                :class="`button-action-option icon-delete ${ isUpdating ? 'inactive' : '' }`"
                 :title="`Delete ${title}`"
                 @click.prevent="onDeleteSelected"
                 @keyup.enter="onDeleteSelected"
@@ -231,14 +259,14 @@ const containerClass = computed(() => {
             </button>
             <button
                 v-if="!store.isReadOnly"
-                class="button-action-option icon-add"
+                :class="`button-action-option icon-add ${ isUpdating ? 'inactive' : '' }`"
                 :title="`Add subsection to ${title}`"
             >
                 Add subsection to {{ title }}
             </button>
             <button
                 v-if="!store.isReadOnly"
-                :class="`button-action-option icon-view`"
+                :class="`button-action-option icon-view ${ isUpdating ? 'inactive' : '' }`"
                 title="Toggle visiblity"
             >
                 Toggle visiblity
@@ -253,7 +281,12 @@ const containerClass = computed(() => {
                 Update {{ title }}
             </button>
         </div>
-        <mc-update-node v-if="isUpdating" />
+        <Transition
+            @enter="onEnter"
+            @leave="onLeave"
+        >
+            <mc-update-node v-if="isUpdating" />
+        </Transition>
         <ul v-if="hasChildren">
             <mc-view-node
                 v-for="node in props.node.children"
@@ -273,6 +306,7 @@ const containerClass = computed(() => {
     display: flex;
     margin: 0 0 0 v-bind(paddingLeft);
     padding: 2px;
+    transition: 0.3s;
 }
 
 .checklist {
@@ -289,6 +323,9 @@ const containerClass = computed(() => {
     &:hover {
         background: var(--content-ui-background);
     }
+    // &:disabled { // @TODO - think about the various disabled states more
+    //     opacity: 0.2;
+    // }
     @media (max-width: 700px) {
         font-size: 0.8rem;
         padding: 0.25rem;
@@ -319,6 +356,11 @@ const containerClass = computed(() => {
     &:hover {
         opacity: 1;
     }
+}
+
+.inactive {
+    opacity: 0.2;
+    pointer-events: none;
 }
 
 .checklist {
