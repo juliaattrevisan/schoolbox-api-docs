@@ -2,6 +2,8 @@
 
 import Toast from '@schoolboxVue/components/toast';
 import mixinFilter from '@schoolboxVue/mixins/filter';
+import {stringify} from 'qs';
+import {reactive} from "vue";
 
 const SORT_OPTION_CREATED  = 'created';
 const SORT_OPTION_UPDATED  = 'updated';
@@ -118,10 +120,28 @@ export default {
             return dayjs(date).format(dateDisplayFormats.dayjsDatetime);
         },
 
-        loadMore (studentId) {
-            // TODO load more data for this student
-            console.log(studentId);
-            this.data[studentId].report.data = [];
+        /**
+         * Load more records for the student at this index.
+         *
+         * @param {Integer} studentIndex
+         */
+        async loadMore (studentIndex) {
+            // Find the endpoint which fetches data for students,
+            // and build a set of QS params to append to the endpoint
+            let endpoint = new URL(this.data[studentIndex].records.metadata._links.report, window.location.origin),
+                params   = this.filter_build_params();
+
+            // Add filters and cursor value, and append to endpoint
+            params.filters  = this.selectedFilters;
+            params.cursor   = this.data[studentIndex].records.metadata.cursor.next;
+            endpoint.search = stringify(params, { arrayFormat: 'brackets' });
+
+            // Fetch data from endpoint,
+            // update this student's report data and metadata
+            const response     = await fetch(endpoint),
+                  jsonResponse = await response.json();
+            this.data[studentIndex].records.data     = this.data[studentIndex].records.data.concat(jsonResponse.data);
+            this.data[studentIndex].records.metadata = reactive(jsonResponse.metadata);
         },
     }
 }
@@ -165,7 +185,7 @@ export default {
                 </template>
 
                 <ul class="action-list">
-                    <li v-for="studentData in data" :key="'student-' + String(studentData.student.id)">
+                    <li v-for="(studentData, studentIndex) in data" :key="'student-' + String(studentData.student.id)">
                         <!-- student profile -->
                         <div>
                             <img :src="studentData.student._links.avatar"
@@ -200,7 +220,7 @@ export default {
                                     </template>
                                 </li>
                                 <li v-if="studentData.records.metadata.count > studentData.records.data.length">
-                                    <a @click.prevent="loadMore(studentData.student.id)">Show More</a>
+                                    <a @click.prevent="loadMore(studentIndex)">Show More</a>
                                 </li>
                             </ul>
                         </div>
