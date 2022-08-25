@@ -202,7 +202,7 @@ class Controller extends Base
 
     /**
      * Delete Bulk Users
-     * @api DELETE /adminv2/user/bulk/modifyForm
+     * @api POST /adminv2/user/bulk/modifyForm/delete
      */
     public function deleteUsers()
     {
