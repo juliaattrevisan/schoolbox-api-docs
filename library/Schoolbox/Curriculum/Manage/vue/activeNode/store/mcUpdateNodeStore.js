@@ -6,7 +6,7 @@ import { defineStore } from 'pinia';
 import { useActiveNodeStore } from './mcActiveNodeStore';
 
 
-export const useUpdateNodeStore = defineStore('mcUpdateNode', {
+export const useUpdateNodeStore = defineStore('mcUpdateNodeStore', {
 
     state: () => ({
         isProcessing: false,
