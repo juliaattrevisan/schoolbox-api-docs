@@ -196,13 +196,14 @@ class Controller extends Base
         );
 
         // Prepare new access
-        $newAccesses = $this->userAccessMapper->createCollection();
+        $newAccesses    = $this->userAccessMapper->createCollection();
+        $groupStaffOnly = $this->getConfigLoader()->get(ConfigMapper::NAME_GROUP_STAFF_ONLY);
         foreach ($users as $user) {
             if ($existingAccesses->offsetExists($user->getId())) {
                 continue;
             }
             /** @var UserAccess $userAccess */
-            $userAccess = (new ArrayToModel\UserAccess())($requestBody);
+            $userAccess = (new ArrayToModel\UserAccess())($requestBody, null, $groupStaffOnly);
             $userAccess->setUser($user)
                        ->setServiceIdentifier($folder->getId());
             $newAccesses->add($userAccess);
