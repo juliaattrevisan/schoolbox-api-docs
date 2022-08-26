@@ -211,7 +211,7 @@
     });
 </script>
 <form data-emailallparents action="/mail/create" method="post">
-    <input type="hidden" name="replyto" value="&quot;{HEADING} Parents&quot; &lt;{REPLY_TO}&gt;"/>
-    <input type="hidden" name="bcc" value="{EMAIL_ALL_PARENTS}"/>
+    <input type="hidden" name="studentExternalIds" value="{EMAIL_ALL_PARENTS}"/>
+    <input type="hidden" name="selectedGroups" value="parents_of"/>
 </form>
 <!-- END email_all_parents -->
