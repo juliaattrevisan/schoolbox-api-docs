@@ -167,6 +167,7 @@ class Controller extends Base
     }
 
     /**
+     * Add members to a group
      * @param Folder $folder
      * @return void
      * @throws MapperException
@@ -201,6 +202,7 @@ class Controller extends Base
 
         // Persist
         if ($newAccesses->count() > 0) {
+            // Create a group for this folder, if it does not exist.
             if (!$folder->getGroup()) {
                 $group = $this->groupMapper->createModel()
                                            ->setFolder($folder)
@@ -223,6 +225,7 @@ class Controller extends Base
     }
 
     /**
+     * Update group setting
      * @param Folder $folder
      * @return void
      * @throws MapperException
@@ -251,6 +254,7 @@ class Controller extends Base
     }
 
     /**
+     * Disband group
      * @param Folder $folder
      * @return void
      * @api   POST /group/disband/{folderId}
@@ -299,7 +303,7 @@ class Controller extends Base
     /**
      * Find roles which name contains given search query string
      * @return void
-     * @api   POST /searchRoles
+     * @api   POST /group/searchRoles
      * @since 22.1
      */
     public function searchRoles()
@@ -320,7 +324,7 @@ class Controller extends Base
     /**
      * Find users from comma separated list of usernames and external ids
      * @return void
-     * @api   POST /searchUsers
+     * @api   POST /group/searchUsers
      * @since 22.1
      */
     public function searchUsers()
@@ -400,6 +404,7 @@ class Controller extends Base
                 case 'role':
                     $roleIds[] = (int)$memberRequest['id'];
                     break;
+                // should not happen, as users selected in list come with fromType 'name'
                 case 'list':
             }
         }
