@@ -38,10 +38,10 @@
 
     .attachment-browser-panel-container {
         flex-grow: 1;
-        padding: 0;
-        position: relative;
         max-height: 75vh;
         min-height: 292px;
+        padding: 0;
+        position: relative;
         @media #{$small-only} {
             min-height: 100vh;
             max-height: 100vh;

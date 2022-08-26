@@ -33,8 +33,19 @@ $attachzone-overlay-timing: cubic-bezier(0.2, 1, 0, 1);
     border: 1px solid $attachzone-resting-color;
     display: flex;
     height: 5rem;
-    width: calc(50% - 0.5rem);
-    min-width: rem-calc(334);
+
+    /* Ensure file upload preview items span full width on small viewports
+     */
+    @media #{$small-only} {
+      min-width: calc(100% - 0.5rem);
+    }
+
+    /* Limit file upload preview items to half modal width on medium viewports and larger to display two columns.
+     */
+    @media #{$medium-up} {
+        min-width: calc(50% - 0.5rem);
+    }
+
     margin: 0.25rem;
 
     &:hover {
