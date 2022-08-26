@@ -347,12 +347,12 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
              */
             $answer['description'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE | ENT_QUOTES);
             $answer['value'] = trim((string)$currentAnswer->value);
-            $answer['correct'] = 0;
+            $answer['correct'] = false;
 
             /* Indicate this is a correct answer
              */
             if ((int)$currentAnswer->attributes()->fraction > 0) {
-                $answer['correct'] = 1;
+                $answer['correct'] = true;
             }
 
             $allAnswers[] = $answer;

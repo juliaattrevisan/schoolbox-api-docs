@@ -338,12 +338,12 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
              */
             $answer['description'] = trim((string)$currentAnswer->text);
             $answer['value'] = trim((string)$currentAnswer->value);
-            $answer['correct'] = 0;
+            $answer['correct'] = false;
 
             /* Indicate this is a correct answer
              */
             if ((int)$currentAnswer->attributes()->fraction > 0) {
-                $answer['correct'] = 1;
+                $answer['correct'] = true;
             }
 
             $allAnswers[] = $answer;
