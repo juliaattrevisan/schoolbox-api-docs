@@ -461,11 +461,11 @@ export default {
             <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
-            <ul class="flex-list buttons">
-            <li>
+            <ul class="flex-list buttons list-item">
+            <li class="small-12 medium-8 column">
                 <button @click.prevent="onModifySelected" class="submit">Modify</button>
             </li>
-            <li>
+            <li class="small-12 medium-4 column">
                 <button @click.prevent="onDeleteUsersSelected" class="alert icon-delete">Delete Users</button>
             </li>
             </ul>
