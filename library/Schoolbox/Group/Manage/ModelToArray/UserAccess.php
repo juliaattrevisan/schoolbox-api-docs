@@ -30,6 +30,7 @@ class UserAccess
             'userId'     => $user->getId(),
             'accessType' => UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()],
             'role'       => $user->getRole()->getName(),
+            'isStaff'    => $user->getRole()->isStaff(),
             'campus'     => implode(', ', $user->getCampusCollection()->getPropertyValues('name')),
             'yearLevel'  => ($user->getYear() && $user->getYear()->getName()) ? $user->getYear()->getLongName() : '',
             'house'      => $user->getSchoolHouse() ? $user->getSchoolHouse()->getHouse() : '',

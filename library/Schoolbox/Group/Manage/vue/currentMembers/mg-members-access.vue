@@ -162,7 +162,7 @@ rejectMembersStore.$onAction(({ name, args, after, onError }) => {
     >
         <option :value="AccessTypes.READ">Read Access</option>
         <option :value="AccessTypes.WRITE">Write Access</option>
-        <option :value="AccessTypes.ADMIN">Group Admin</option>
+        <option v-if="props.member.isStaff || !store.groupStaffOnly" :value="AccessTypes.ADMIN">Group Admin</option>
     </select>
 </template>
 

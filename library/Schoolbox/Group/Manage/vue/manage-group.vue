@@ -21,6 +21,13 @@ import Toast from '@schoolboxVue/components/toast.vue';
 
 const props = defineProps({
     /**
+     * whether to restrict only staff to be a group manager
+     */
+    groupStaffOnly: {
+        type: String,
+        required: true,
+    },
+    /**
      * whether to show setting dialog
      */
     showSetting: {
@@ -101,6 +108,7 @@ onBeforeMount(() => {
 onMounted(() => {
     store.toastEl = toastEl;
     store.showSetting = (props.showSetting === '1');
+    store.groupStaffOnly = props.groupStaffOnly;
     checkForStorybook();
     store.loadData();
 });

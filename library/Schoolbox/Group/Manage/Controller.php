@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Group\Manage;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Group\Manage\ArrayToModel;
 use Schoolbox\Group\GroupsHelper;
@@ -151,9 +152,16 @@ class Controller extends Base
         $users        = $this->userMapper->findByColumnList(['id' => array_keys($newAccesses)]);
         $userAccesses = $this->userAccessMapper->findForFolderUser($folder, $users);
 
-        $userAccesses->map(function ($userAccess) use ($newAccesses) {
-            return (new ArrayToModel\UserAccess())($newAccesses[$userAccess->getUser()->getId()], $userAccess);
-        });
+        $groupStaffOnly = $this->getConfigLoader()->get(ConfigMapper::NAME_GROUP_STAFF_ONLY);
+        try {
+            $userAccesses->map(function ($userAccess) use ($newAccesses, $groupStaffOnly) {
+                return (new ArrayToModel\UserAccess())($newAccesses[$userAccess->getUser()->getId()], $userAccess, $groupStaffOnly);
+            });
+        } catch (\InvalidArgumentException $e) {
+            $this->sendJsonError('Failed to update member: ' . $e->getMessage(), 400);
+            return;
+        }
+
         try {
             $this->userAccessMapper->save($userAccesses);
         } catch (MapperException $e) {
