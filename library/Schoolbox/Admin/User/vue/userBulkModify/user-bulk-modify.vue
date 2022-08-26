@@ -461,13 +461,13 @@ export default {
             <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
-            <ul class="flex-list buttons list-item">
-            <li class="small-12 medium-8 column">
-                <button @click.prevent="onModifySelected" class="submit">Modify</button>
-            </li>
-            <li class="small-12 medium-4 column">
-                <button @click.prevent="onDeleteUsersSelected" class="alert icon-delete">Delete Users</button>
-            </li>
+            <ul class="flex-list buttons">
+                <li class="two-thirds">
+                    <button @click.prevent="onModifySelected" class="submit">Modify</button>
+                </li>
+                <li class="one-third">
+                    <button @click.prevent="onDeleteUsersSelected" class="alert icon-delete">Delete Users</button>
+                </li>
             </ul>
         </bottom-drawer>
         <user-bulk-modify-new-values
@@ -541,4 +541,11 @@ textarea { //to prevent the potential for a massively long modal
     max-height: 600px;
 }
 
+.flex-list .two-thirds {
+    flex: 66%;
+}
+
+.flex-list .one-third {
+    flex: 33%;
+}
 </style>
