@@ -356,7 +356,7 @@ class Report_Parent extends Report_Abstract
             $allContacts = $contactsFiltered;
         }
 
-        $allStudentExternalIds = array();
+        $allEmails = array();
 
         $showContact = false;
 
@@ -370,10 +370,6 @@ class Report_Parent extends Report_Abstract
 
             for ($lastID = -1, $i = 0; $i < $count; $i++) {
                 $currentContact = $allContacts[$i];
-
-                if (!in_array($currentContact['StudentID'], $allStudentExternalIds)) {
-                    $allStudentExternalIds[] = $currentContact['StudentID'];
-                }
 
                 /* New student, or first student
                  */
@@ -515,6 +511,10 @@ class Report_Parent extends Report_Abstract
 
                     $showContact = true;
 
+                    if ($currentContact['StudentContactDefaultEmail']) {
+                        $allEmails[] = $currentContact['StudentContactDefaultEmail'];
+                    }
+
                     $this->getPage()->parse('primary_block', 'primary');
                 } else {
                     /* Clear fields for spouse
@@ -563,6 +563,11 @@ class Report_Parent extends Report_Abstract
                     );
 
                     $showContact = true;
+
+                    if ($currentContact['StudentContactDefaultEmail']) {
+                        $allEmails[] = $currentContact['StudentContactSpouseDefaultEmail'];
+                    }
+
                     $this->getPage()->parse('spouse_block', 'spouse');
                 } else {
                     $this->getPage()->setVar('spouse_block', '');
@@ -594,10 +599,10 @@ class Report_Parent extends Report_Abstract
             }
 
             // Uniqueify and cleanup empty string emails
-            $filteredEmails = array_filter(array_unique($allStudentExternalIds));
+            $filteredEmails = array_filter(array_unique($allEmails));
 
             $this->getPage()->parse('student_block', 'student', true);
-            $this->getPage()->setVar('EMAIL_ALL_PARENTS', implode(',', $filteredEmails));
+            $this->getPage()->setVar('EMAIL_ALL_PARENTS', implode(Mailer::implodeGlue(), $filteredEmails));
             $this->getPage()->setVar('empty_block', '');
         } else {
             $this->getPage()->parse('show_filter_options_block', 'show_filter_options');

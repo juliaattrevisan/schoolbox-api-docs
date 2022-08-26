@@ -493,13 +493,9 @@ class External_Synergetic_User implements External_UserInterface
                         StudentContactPreferred,
                         StudentContactLegalFullName,
                         StudentContactSurname,
-                        CASE WHEN scp.ShareEmailFlag <> 1 THEN '' ELSE
-                            CASE
-                                WHEN r.UseEmail = 'O' THEN StudentContactOccupEmail
-                                WHEN r.UseEmail = 'P' THEN StudentContactEmail
-                                WHEN r.UseEmail = 'D' THEN StudentContactDefaultEmail
-                                ELSE ''
-                            END
+                        CASE
+                            WHEN scp.ShareEmailFlag = 1 THEN StudentContactDefaultEmail
+                            ELSE ''
                         END AS StudentContactDefaultEmail,
                         vStudentContactAllAddress.ValidAddressFlag,
                         StudentContactAddress1,
@@ -535,13 +531,9 @@ class External_Synergetic_User implements External_UserInterface
                             ELSE ''
                         END AS StudentContactSpouseMobilePhone,
                         StudentContactSpouseOccupPhone,
-                        CASE WHEN scpSpouse.ShareEmailFlag <> 1 THEN '' ELSE
-                            CASE
-                                WHEN rs.UseEmail = 'O' THEN StudentContactSpouseOccupEmail
-                                WHEN rs.UseEmail = 'P' THEN StudentContactSpouseEmail
-                                WHEN rs.UseEmail = 'D' THEN StudentContactSpouseDefaultEmail
-                                ELSE ''
-                            END
+                        CASE
+                            WHEN scpSpouse.ShareEmailFlag = 1 THEN StudentContactSpouseDefaultEmail
+                            ELSE ''
                         END AS StudentContactSpouseDefaultEmail,
                         StudentContactType,
                         StudentContactSilentPhoneFlag,
@@ -563,8 +555,6 @@ class External_Synergetic_User implements External_UserInterface
             LEFT JOIN   dbo.luCountry StudentHomeCountry ON StudentContactHomeCountryCode = StudentHomeCountry.Code
             LEFT JOIN   dbo.StudentContactsPortal scp ON vStudentContactAllAddress.StudentID = scp.StudentID AND StudentContactID = scp.CommunityID
             LEFT JOIN   dbo.StudentContactsPortal scpSpouse ON vStudentContactAllAddress.StudentID = scpSpouse.StudentID AND StudentContactSpouseID = scpSpouse.CommunityID
-            LEFT JOIN   Relationships r ON r.id = vStudentContactAllAddress.StudentID AND r.RelatedID = vStudentContactAllAddress.StudentContactID
-            LEFT JOIN   Relationships rs ON rs.id = vStudentContactAllAddress.StudentID AND rs.RelatedID = vStudentContactAllAddress.StudentContactSpouseID
             JOIN        FileSemesters Semester ON
                             Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
                             Semester.FileYear = vStudentContactAllAddress.FileYear AND
@@ -731,8 +721,8 @@ class External_Synergetic_User implements External_UserInterface
                                     WHEN rs.UseEmail = 'O' THEN a.StudentContactSpouseOccupEmail
                                     WHEN rs.UseEmail = 'P' THEN a.StudentContactSpouseEmail
                                     WHEN rs.UseEmail = 'D' THEN a.StudentContactSpouseDefaultEmail
-                                    ELSE ''
-                                END
+                                    ELSE '' 
+                                END 
                             END AS StudentContactSpouseDefaultEmail,
                             a.StudentContactType,
                             CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseRelation END AS StudentContactSpouseRelation,
