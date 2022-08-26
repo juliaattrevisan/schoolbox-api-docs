@@ -466,7 +466,7 @@ export default {
                     <button @click.prevent="onModifySelected" class="submit">Modify</button>
                 </li>
                 <li class="one-third">
-                    <button @click.prevent="onDeleteUsersSelected" class="alert icon-delete">Delete Users</button>
+                    <button @click.prevent="onDeleteUsersSelected" class="alert icon-delete button-delete">Delete Users</button>
                 </li>
             </ul>
         </bottom-drawer>
@@ -536,16 +536,4 @@ export default {
     }
 }
 
-textarea { //to prevent the potential for a massively long modal
-    min-height: 200px;
-    max-height: 600px;
-}
-
-.flex-list .two-thirds {
-    flex: 66%;
-}
-
-.flex-list .one-third {
-    flex: 33%;
-}
 </style>
