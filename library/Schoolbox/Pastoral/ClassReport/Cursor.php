@@ -102,6 +102,9 @@ class Cursor implements ICursor
      */
     public function retrieveResultCount(): ?int
     {
+        if (count($this->pastoralIds) === 0) {
+            return 0;
+        }
         return $this->dataSource->countByColumnList(
             $this->currentUser,
             [
