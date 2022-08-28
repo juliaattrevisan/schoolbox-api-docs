@@ -21,11 +21,11 @@ class Formatter
      *
      * @param string $format The format to use for formatting the user's name.
      *                       May contain the following replacement tokens:
-     *                       * {title}:         the user's title, if they have one
-     *                       * {firstname}:     the user's legal first name
-     *                       * {preferredname}: the user's preferred name, if they have one
-     *                       * {givenname}:     the user's preferred name, if they have one: otherwise their first name
-     *                       * {lastname}:      the user's surname
+     *                       * {title}:          the user's title, if they have one
+     *                       * {firstname}:      the user's legal first name
+     *                       * {preferredname}:  the user's given name (preferred name, if they have one: otherwise their first name), if they have one: otherwise their first name
+     *                       * {preferred_name}: alias of "preferredname"
+     *                       * {lastname}:       the user's surname
      */
     public function __construct(private string $format)
     {
@@ -46,33 +46,8 @@ class Formatter
             'firstname'      => $user->getFirstname(),
             'preferredname'  => $user->getPreferredName(),
             'preferred_name' => $user->getPreferredName(),
-            'givenname'      => $user->getGivenName(),
             'lastname'       => $user->getLastname(),
         ]);
-//        $format = $this->format;
-//
-//        /* Replace tags */
-//        preg_match_all('|{\w+}|', $format, $tags);
-//
-//        foreach ($tags[0] as $tag) {
-//            $key  = trim($tag, '{}');
-//            $func = 'get' . ucfirst($key);
-//            $value = '';
-//            if (method_exists($user, $func)) {
-//                if (is_string($user->$func())) {
-//                    $value = $user->$func();
-//                } else {
-//                    $value = '';
-//                }
-//            }
-//            $format = str_replace($tag, $value, $format);
-//        }
-//
-//        if ($format = trim($format)) {
-//            return $format;
-//        } else {
-//            return 'Unknown User';
-//        }
     }
 
     /**
@@ -86,8 +61,6 @@ class Formatter
      *                        * firstname:      the user's legal first name
      *                        * preferredname:  the user's preferred name, if they have one
      *                        * preferred_name: alias of "preferredname"
-     *                        * givenname:      the user's preferred name, if they have one: otherwise their first name
-     *                        *                 (derived from "preferredname" and "firstname" if not explicitly set)
      *                        * lastname:       the user's surname
      * @return string
      */
@@ -103,13 +76,13 @@ class Formatter
 
         // Modify $userInfo to something which matches possible format:
         // * "preferred_name" and "preferredname" are the same
-        // * "givenname" is "preferredname" if set, otherwise "firstname"
+        // * if "preferredname" is empty, fall back to "firstname"
         if (isset($userInfo['preferred_name']) && !isset($userInfo['preferredname'])) {
             $userInfo['preferredname'] = $userInfo['preferred_name'];
         }
-        $userInfo['givenname'] = (($userInfo['preferredname'] ?? '') !== '')
-            ? $userInfo['preferredname']
-            : ($userInfo['firstname'] ?? '');
+        if (($userInfo['preferredname'] ?? '') === '') {
+            $userInfo['preferredname'] = ($userInfo['firstname'] ?? '');
+        }
 
         foreach ($tags[0] as $tag) {
             $key = trim($tag, '{}');
