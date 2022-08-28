@@ -210,7 +210,7 @@ class User extends DeprecatedModel
             LEFT JOIN `lu_year_level` ON `user`.year_id = `lu_year_level`.id AND `lu_year_level`.deleted_at IS NULL
             WHERE $wherePart
         ";
-        $query .= " ORDER BY lastname, given_name ASC
+        $query .= " ORDER BY lastname, chosen_name ASC
                         LIMIT $offset, $limit;";
         // retreive count
         $count_query = "SELECT COUNT(*) FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id WHERE $wherePart";
@@ -261,7 +261,7 @@ class User extends DeprecatedModel
                         OR username = '$keyword'
                     )
                     $wherePart
-                    ORDER BY lastname, given_name ASC
+                    ORDER BY lastname, chosen_name ASC
                     LIMIT $offset, $limit;";
         // retreive count
         $count_query = "SELECT COUNT(*)
@@ -368,7 +368,7 @@ class User extends DeprecatedModel
         if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
             $query .= ' AND ' . $searchFilter;
         }
-        $query .= "ORDER BY group_id, lyl.sequence, lastname, given_name";
+        $query .= "ORDER BY group_id, lyl.sequence, lastname, chosen_name";
         if (is_numeric($limit)) {
             $query .= " LIMIT $limit";
         }

@@ -58,7 +58,7 @@ class Helper
         if (0 !== $cursor) {
             $query .= " AND user.id > :cursor ";
         }
-        $query .= "ORDER BY user.id, lyl.sequence, lastname, given_name";
+        $query .= "ORDER BY user.id, lyl.sequence, lastname, chosen_name";
         if (0 !== $limit) {
             $query .= " LIMIT :limit";
         }

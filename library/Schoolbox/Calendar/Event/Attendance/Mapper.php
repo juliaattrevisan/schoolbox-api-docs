@@ -118,7 +118,7 @@ class Mapper extends \Schoolbox\Mapper
             'cache' => false,
             'order' => [
                 'u.lastname' => 'asc',
-                'u.given_name' => 'asc'
+                'u.chosen_name' => 'asc'
             ]
         ]);
 

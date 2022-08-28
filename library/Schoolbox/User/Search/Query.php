@@ -90,7 +90,7 @@ class Query
             [
                 'order' => [
                     'lastname'   => 'ASC',
-                    'given_name' => 'ASC',
+                    'chosen_name' => 'ASC',
                 ]
             ]
         );
@@ -126,7 +126,7 @@ class Query
         $statement = $this->db->prepareQuery(
             'SELECT DISTINCT u.id FROM user u INNER JOIN `groups` g ON u.group_id = g.id'
             . $where
-            . ' ORDER BY u.lastname, u.given_name ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
+            . ' ORDER BY u.lastname, u.chosen_name ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
         );
 
         $statement->execute($params);
