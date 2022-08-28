@@ -93,6 +93,33 @@ class FormatterTest extends TestCase
             '{title} {firstname} {lastname}',
         ];
 
+        yield 'title null' => [
+            'A B',
+            (new User())
+                ->setTitle(null)
+                ->setFirstname('A')
+                ->setLastname('B'),
+            '{title} {firstname} {lastname}',
+        ];
+
+        yield 'title empty' => [
+            'A B',
+            (new User())
+                ->setTitle('')
+                ->setFirstname('A')
+                ->setLastname('B'),
+            '{title} {firstname} {lastname}',
+        ];
+
+        yield 'title falsy' => [
+            '0 A B',
+            (new User())
+                ->setTitle('0')
+                ->setFirstname('A')
+                ->setLastname('B'),
+            '{title} {firstname} {lastname}',
+        ];
+
         yield 'first name not set' => [
             'Mr  B',
             (new User())
@@ -242,7 +269,36 @@ class FormatterTest extends TestCase
         yield 'title not set' => [
             'A B',
             [
+                'firstname' => 'A',
+                'lastname'  => 'B',
+            ],
+            '{title} {firstname} {lastname}',
+        ];
+
+        yield 'title null' => [
+            'A B',
+            [
+                'title'     => null,
+                'firstname' => 'A',
+                'lastname'  => 'B',
+            ],
+            '{title} {firstname} {lastname}',
+        ];
+
+        yield 'title empty' => [
+            'A B',
+            [
                 'title'     => '',
+                'firstname' => 'A',
+                'lastname'  => 'B',
+            ],
+            '{title} {firstname} {lastname}',
+        ];
+
+        yield 'title falsy' => [
+            '0 A B',
+            [
+                'title'     => '0',
                 'firstname' => 'A',
                 'lastname'  => 'B',
             ],
