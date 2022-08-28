@@ -85,7 +85,7 @@ class FormatterTest extends TestCase
             '{lastname}, {firstname}',
         ];
 
-        yield 'no title' => [
+        yield 'title not set' => [
             'A B',
             (new User())
                 ->setFirstname('A')
@@ -93,7 +93,7 @@ class FormatterTest extends TestCase
             '{title} {firstname} {lastname}',
         ];
 
-        yield 'no first name' => [
+        yield 'first name not set' => [
             'Mr  B',
             (new User())
                 ->setTitle('Mr')
@@ -101,7 +101,7 @@ class FormatterTest extends TestCase
             '{title} {firstname} {lastname}',
         ];
 
-        yield 'no last name' => [
+        yield 'last name not set' => [
             'Mr A',
             (new User())
                 ->setTitle('Mr')
@@ -121,6 +121,30 @@ class FormatterTest extends TestCase
             'A',
             (new User())
                 ->setFirstname('A'),
+            '{preferredname}',
+        ];
+
+        yield 'preferred name null' => [
+            'A',
+            (new User())
+                ->setFirstname('A')
+                ->setPreferredName(null),
+            '{preferredname}',
+        ];
+
+        yield 'preferred name empty' => [
+            'A',
+            (new User())
+                ->setFirstname('A')
+                ->setPreferredName(''),
+            '{preferredname}',
+        ];
+
+        yield 'preferred name falsy' => [
+            'A',
+            (new User())
+                ->setFirstname('A')
+                ->setPreferredName('0'),
             '{preferredname}',
         ];
 
@@ -215,7 +239,7 @@ class FormatterTest extends TestCase
             '{lastname}, {firstname}',
         ];
 
-        yield 'no title' => [
+        yield 'title not set' => [
             'A B',
             [
                 'title'     => '',
@@ -225,7 +249,7 @@ class FormatterTest extends TestCase
             '{title} {firstname} {lastname}',
         ];
 
-        yield 'no first name' => [
+        yield 'first name not set' => [
             'Mr  B',
             [
                 'title'     => 'Mr',
@@ -235,7 +259,7 @@ class FormatterTest extends TestCase
             '{title} {firstname} {lastname}',
         ];
 
-        yield 'no last name' => [
+        yield 'last name not set' => [
             'Mr A',
             [
                 'title'     => 'Mr',
@@ -257,8 +281,34 @@ class FormatterTest extends TestCase
         yield 'preferred name not set' => [
             'A',
             [
+                'firstname' => 'A',
+            ],
+            '{preferredname}',
+        ];
+
+        yield 'preferred name null' => [
+            'A',
+            [
+                'firstname'     => 'A',
+                'preferredname' => null,
+            ],
+            '{preferredname}',
+        ];
+
+        yield 'preferred name empty' => [
+            'A',
+            [
                 'firstname'     => 'A',
                 'preferredname' => '',
+            ],
+            '{preferredname}',
+        ];
+
+        yield 'preferred name falsy' => [
+            'A',
+            [
+                'firstname'     => 'A',
+                'preferredname' => '0',
             ],
             '{preferredname}',
         ];
