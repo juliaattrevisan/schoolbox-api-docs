@@ -168,7 +168,7 @@ class FormatterTest extends TestCase
         ];
 
         yield 'preferred name falsy' => [
-            'A',
+            '0',
             (new User())
                 ->setFirstname('A')
                 ->setPreferredName('0'),
@@ -361,7 +361,7 @@ class FormatterTest extends TestCase
         ];
 
         yield 'preferred name falsy' => [
-            'A',
+            '0',
             [
                 'firstname'     => 'A',
                 'preferredname' => '0',
