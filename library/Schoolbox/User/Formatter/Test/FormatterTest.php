@@ -67,6 +67,24 @@ class FormatterTest extends TestCase
             '{title} {firstname} {lastname}',
         ];
 
+        yield 'title + last name' => [
+            'Mr B',
+            (new User())
+                ->setTitle('Mr')
+                ->setFirstname('A')
+                ->setLastname('B'),
+            '{title} {lastname}',
+        ];
+
+        yield 'last name, firstname' => [
+            'B, A',
+            (new User())
+                ->setTitle('Mr')
+                ->setFirstname('A')
+                ->setLastname('B'),
+            '{lastname}, {firstname}',
+        ];
+
         yield 'no title' => [
             'A B',
             (new User())
@@ -104,6 +122,24 @@ class FormatterTest extends TestCase
             (new User())
                 ->setFirstname('A'),
             '{preferredname}',
+        ];
+
+        yield 'unrecognized format' => [
+            'Unknown User',
+            (new User())
+                ->setTitle('Mr')
+                ->setFirstname('A')
+                ->setPreferredName('B'),
+            '{unrecognized}',
+        ];
+
+        yield 'partially unrecognized format' => [
+            'Mr',
+            (new User())
+                ->setTitle('Mr')
+                ->setFirstname('A')
+                ->setPreferredName('B'),
+            '{title} {unrecognized}',
         ];
     }
 }
