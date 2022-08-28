@@ -27,7 +27,6 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
-use Schoolbox\Resource\Folder\Code\SubjectMatcherBase;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Pastoral;
 
@@ -407,32 +406,10 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function formatName($format = null)
     {
         // Check for custom format
-        if (empty($format)) {
-            $format = $this->getConfigLoader()->get('name_format');
-        }
-
-        /* Replace tags */
-        preg_match_all('|{\w+}|', $format, $tags);
-
-        foreach ($tags[0] as $tag) {
-            $key  = trim($tag, '{}');
-            $func = 'get' . ucfirst($key);
-            $value = '';
-            if (method_exists($this, $func)) {
-                if (is_string($this->$func())) {
-                    $value = $this->$func();
-                } else {
-                    $value = '';
-                }
-            }
-            $format = str_replace($tag, $value, $format);
-        }
-
-        if ($format = trim($format)) {
-            return $format;
-        } else {
-            return 'Unknown User';
-        }
+        $formatter = empty($format)
+            ? (new User\Formatter\Factory())->buildFromConfig($this->getConfigLoader())
+            : new User\Formatter\Formatter($format);
+        return $formatter->formatObject($this);
     }
 
     /**

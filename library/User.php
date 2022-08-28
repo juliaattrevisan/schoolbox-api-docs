@@ -6,8 +6,8 @@
  */
 
 use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
+use Schoolbox\User\Formatter;
 
 class User extends DeprecatedModel
 {
@@ -447,41 +447,9 @@ class User extends DeprecatedModel
      */
     public function formatName($userInfo, $format = null)
     {
-        // Check for custom format
-        if (empty($format)) {
-            $format = Config::get('name_format');
-        }
-
-        /* Replace tags */
-        preg_match_all('|{\w+}|', $format, $tags);
-        if (empty($tags) || empty($userInfo)) {
-            return 'Unknown User';
-        }
-
-        // Modify $userInfo to something which matches possible format:
-        // * "preferred_name" and "preferredname" are the same
-        // * "givenname" is "preferredname" if set, otherwise "firstname"
-        if (isset($userInfo['preferred_name']) && !isset($userInfo['preferredname'])) {
-            $userInfo['preferredname'] = $userInfo['preferred_name'];
-        }
-        $userInfo['givenname'] = (($userInfo['preferredname'] ?? '') !== '')
-            ? $userInfo['preferredname']
-            : ($userInfo['firstname'] ?? '');
-
-        foreach ($tags[0] as $tag) {
-            $key = trim($tag, '{}');
-
-            if (isset($userInfo[$key]) && is_string($userInfo[$key])) {
-                $value = $userInfo[$key];
-            } else {
-                $value = '';
-            }
-            $format = str_replace($tag, $value, $format);
-        }
-        if ($format = trim($format)) {
-            return $format;
-        } else {
-            return 'Unknown User';
-        }
+        $formatter = empty($format)
+            ? (new Formatter\Factory())->buildFromNothing()
+            : new Formatter\Formatter($format);
+        return $formatter->formatArray($userInfo);
     }
 }
