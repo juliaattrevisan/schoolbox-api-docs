@@ -42,11 +42,10 @@ class Formatter
     public function formatObject(User $user): string
     {
         return $this->formatArray([
-            'title'          => $user->getTitle(),
-            'firstname'      => $user->getFirstname(),
-            'preferredname'  => $user->getPreferredName(),
-            'preferred_name' => $user->getPreferredName(),
-            'lastname'       => $user->getLastname(),
+            'title'         => $user->getTitle(),
+            'firstname'     => $user->getFirstname(),
+            'preferredname' => $user->getPreferredName(),
+            'lastname'      => $user->getLastname(),
         ]);
     }
 
@@ -94,10 +93,10 @@ class Formatter
             }
             $format = str_replace($tag, $value, $format);
         }
-        if ($format = trim($format)) {
-            return $format;
-        } else {
-            return 'Unknown User';
-        }
+
+        $format = trim($format);
+        return ($format !== '')
+            ? $format
+            : 'Unknown User';
     }
 }
