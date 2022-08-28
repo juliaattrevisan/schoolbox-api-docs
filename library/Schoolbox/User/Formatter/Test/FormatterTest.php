@@ -369,6 +369,25 @@ class FormatterTest extends TestCase
             '{preferredname}',
         ];
 
+        yield 'preferred name alias set' => [
+            'B',
+            [
+                'firstname'      => 'A',
+                'preferred_name' => 'B',
+            ],
+            '{preferredname}',
+        ];
+
+        yield 'preferred name and alias set: use non-alias' => [
+            'B',
+            [
+                'firstname'      => 'A',
+                'preferredname'  => 'B',
+                'preferred_name' => 'C',
+            ],
+            '{preferredname}',
+        ];
+
         yield 'unrecognized format' => [
             'Unknown User',
             [
