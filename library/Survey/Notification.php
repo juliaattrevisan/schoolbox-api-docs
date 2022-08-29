@@ -68,7 +68,7 @@ class Survey_Notification
         $subject = "A response for {$this->getSurveyTitle()} was submitted";
 
         $baseUrl = (new UrlFactory($this->config))->buildFullyQualified();
-        $email   = $this->emailFactory->buildTwigEmail('instantmail.twig', $subject, $author->getEmail());
+        $email   = $this->emailFactory->buildTwigEmail('instantmail.twig', $subject, $author);
         $email->setContext(
             [
                 'hideUnsubscribe' => true,

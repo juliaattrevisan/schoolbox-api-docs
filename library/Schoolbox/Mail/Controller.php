@@ -106,38 +106,29 @@ class Controller extends Base
          */
         $replyToEmailAddresses = [];
 
-        foreach ($addressLists as $type => $request) {
+        foreach (array_keys($addressLists) as $type) {
             if (null === $params->get($type)) {
                 continue;
             }
-            $emailAddresses = Mailer::parseAddressString($params->get($type), $this->getDefaultHost());
+            $emailAddresses = Mailer::parseAddressString($params->get($type));
+            if ($type === 'replyto') {
+                $replyToEmailAddresses = array_keys($emailAddresses[Mailer::KEY_VALID]);
+            }
 
             /* Remember some invalid emails, if any were found
              */
             $invalidEmails = array_merge($emailAddresses[Mailer::KEY_INVALID], $invalidEmails);
 
-            /* Remember a list of email addresses that were in the To field
-             * There's a sequential dependency here, such that replyto must be processed
-             * before either the cc or bcc structs, as defined by $addressLists initialisation
-             */
-            if ('replyto' === $type) {
-                $replyToEmailAddresses = array_keys($emailAddresses[Mailer::KEY_VALID]);
-            }
-
-            /**
-             * @var string  $email
-             * @var Address $address
-             */
-            foreach ($emailAddresses[Mailer::KEY_VALID] as $email => $address) {
-                /* For the CC and BCC fields, if an email address was already in To field,
-                 * disregard it because CC'ing and BCC'ing to yourself is extreme when assigned
-                 * by the system rather than the human
-                 */
-                if ('replyto' === $type || !in_array($email, $replyToEmailAddresses, true)) {
-                    $addressLists[$type][] = $address->toString();
-                }
-            }
+            /** Get valid email addresses */
+            $addressLists[$type] = array_map(
+                function ($address) {
+                    /** @var Address $address */
+                    return $address->toString();
+                },
+                $emailAddresses[Mailer::KEY_VALID]
+            );
         }
+
         // Add current user to bcc, if not already in TO
         $isCurrentUserInTo = in_array($this->getUser()->getEmail(), $replyToEmailAddresses, true);
 
@@ -302,7 +293,7 @@ class Controller extends Base
      */
     private function getParsedAddresses(string $addressString): array
     {
-        $emailAddresses = Mailer::parseAddressString(Mailer::standardiseEmailSeparator($addressString), $this->getDefaultHost());
+        $emailAddresses = Mailer::parseAddressString(Mailer::standardiseEmailSeparator($addressString));
         return $emailAddresses[Mailer::KEY_VALID] ?? [];
     }
 

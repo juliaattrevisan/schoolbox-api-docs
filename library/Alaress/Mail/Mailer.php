@@ -30,6 +30,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Crypto\DkimOptions;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
@@ -154,8 +155,7 @@ class Mailer
                 }
             }
         } else {
-            $defaultHost = trim($this->config->get('site_hostname')) . '.' . trim($this->config->get('site_domain'));
-            foreach (self::parseAddressString($to, $defaultHost)[self::KEY_VALID] as $address) {
+            foreach (self::parseAddressString($to)[self::KEY_VALID] as $address) {
                 $this->email->addTo($address);
             }
         }
@@ -478,7 +478,7 @@ class Mailer
      *
      * @return array ['valid' => [['email' => Address() ]], 'invalid' => ['email']
      */
-    public static function parseAddressString(string $emailAddresses, string $defaultHost): array
+    public static function parseAddressString(string $emailAddresses): array
     {
         $returnList = [
             self::KEY_VALID   => [],
@@ -489,97 +489,25 @@ class Mailer
             return $returnList;
         }
 
-        $validEmails = [];
+        $validEmails   = [];
         $invalidEmails = [];
         //Explode emails by the ascii's Record Separator
         $emailList = explode(\chr(self::EMAIL_SEPARATOR_CODE), $emailAddresses);
 
         foreach ($emailList as $email) {
-            $email = trim($email);
-
-            // Check if string is a valid email OR
-            // Check if the email within a string is valid e.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
-            if (filter_var($email, FILTER_VALIDATE_EMAIL) || self::emailFromStringIsValid($email)) {
-                $validEmails[] = $email;
+            try {
+                $emailAddress                             = Address::create(trim($email));
+                $validEmails[$emailAddress->getAddress()] = $emailAddress;
                 continue;
+            } catch (RfcComplianceException | InvalidArgumentException $e) {
+                // noop
             }
-
-            // If email address from username in the profile page is unchecked, and alternate email address is empty,
-            // just skip those rather than showing "9AH French (FREA1)" <> as an error.
-            if (self::getEmailFromString($email) !== '') {
-                $invalidEmails[] = $email;
-            }
+            $invalidEmails[] = $email;
         }
-
-        $validAddresses = self::parseValidEmailAddresses($validEmails, $defaultHost);
-
-        foreach ($validAddresses as $address) {
-            $to                               = $address->mailbox . '@' . $address->host;
-            $alias                            = property_exists($address, 'personal') ? $address->personal : '';
-            $returnList[self::KEY_VALID][$to] = new Address($to, $alias);
-        }
-
-        $returnList[self::KEY_INVALID] = $invalidEmails;
-        return $returnList;
-    }
-
-    /**
-     * @param string $address
-     * @param string $name
-     * @return string
-     */
-    public static function buildAddress($address, $name = '')
-    {
-        [$mailbox, $host] = explode('@', $address, 2);
-
-        return imap_rfc822_write_address($mailbox, $host, $name);
-    }
-
-    /**
-     * Parse valid email addresses from a string
-     *
-     * @param array  $emails
-     * @param string $defaultHost
-     * @return array
-     */
-    private static function parseValidEmailAddresses(array $emails, string $defaultHost): array
-    {
-        $emailAddresses = [];
-        foreach ($emails as $email) {
-            $emailAddresses[] = Codec::encode($email);
-        }
-
-        return imap_rfc822_parse_adrlist(implode(',', $emailAddresses), $defaultHost);
-    }
-
-    /**
-     * Get an email from a string. E.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
-     * @param string $string
-     * @return bool
-     */
-    private static function emailFromStringIsValid(string $string): bool
-    {
-        $email = self::getEmailFromString($string);
-
-        if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $string
-     *
-     * @return string
-     */
-    public static function getEmailFromString(string $string): string
-    {
-        if (preg_match('~<(.*?)>~', $string, $output) !== 0) {
-            return trim($output[1]);
-        }
-
-        return '';
+        return [
+            self::KEY_VALID   => $validEmails,
+            self::KEY_INVALID => $invalidEmails,
+        ];
     }
 
     /**
