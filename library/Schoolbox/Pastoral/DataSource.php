@@ -124,6 +124,32 @@ class DataSource
 
 
     /**
+     * User-sensitive wrapper for `Mapper::countByColumnList`.
+     *
+     * @param User  $viewer
+     * @param array $columnList
+     * @return int
+     */
+    public function countByColumnList(User $viewer, array $columnList): int
+    {
+        $where = $this->getPermissionClause($viewer, null, null);
+        $pb    = $this->mapper->getPredicateBuilder();
+        foreach ($columnList as $column => $value) {
+            $pb = is_iterable($value)
+                ? $pb->in('p.' . $column, $value)
+                : $pb->equals('p.' . $column, $value);
+        }
+
+        $pbWhere = $pb->getWhereIntersect();
+        if ($pbWhere !== '') {
+            $where['where'] .= ' AND ' . $pbWhere;
+        }
+        $where['params'] = array_merge($where['params'], $pb->getParams());
+        return $this->countRecordsFromWhere($where['where'], $where['params']);
+    }
+
+
+    /**
      * Finds a count of records for a particular student visible to the given viewer
      * @param User     $viewer    Who is viewing this student's records
      * @param int      $studentId Id of a student being viewed
@@ -134,14 +160,20 @@ class DataSource
     public function countRecords(User $viewer, int $studentId, ?int $typeId, ?int $subtypeId): int
     {
         $where = $this->getPermissionClause($viewer, $studentId, $typeId, $subtypeId);
-        $sql   = "
-        SELECT count(*)
-                FROM pastoral p
-        WHERE {$where['where']}
-        ";
+        return $this->countRecordsFromWhere($where['where'], $where['params']);
+    }
 
-        $stmt = $this->mapper->getDatabase()->query($sql, $where['params']);
-
+    /**
+     * Helper function for counting matching records.
+     *
+     * @param string $where
+     * @param array  $params
+     * @return int
+     */
+    private function countRecordsFromWhere(string $where, array $params): int
+    {
+        $sql  = "SELECT count(*) FROM pastoral p WHERE {$where}";
+        $stmt = $this->mapper->getDatabase()->query($sql, $params);
         return (int)$stmt->fetchColumn();
     }
 

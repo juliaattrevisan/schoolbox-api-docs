@@ -246,6 +246,7 @@ module.exports = {
         // Pastoral
         pastoralRecordCommentsPublic: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPublic.js',
         pastoralRecordCommentsPrivate: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPrivate.js',
+        pastoralClassReport: './library/Schoolbox/Pastoral/ClassReport/vue/pastoralClassReport.js',
 
         //Resource
         googleFiles: './library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js',

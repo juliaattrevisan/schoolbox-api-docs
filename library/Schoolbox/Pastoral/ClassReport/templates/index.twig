@@ -3,28 +3,42 @@
     [folder.nameWithCodes, '/homepage/' ~ folder.id],
     [locale.pastoralCare.proper ~ ' Report']
 ) }}
-{% set reportContentId = 'class-pastoral-content' %}
+{% set reportContentId = 'pastoral-class-report' %}
 
-<div class="row actions-small-5">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>{{ pageTitle }}</h1>
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            // Filtered content has been [re]loaded
+            $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
+                document.dispatchEvent(new CustomEvent('pastoral-class-report__onFilterChange', {
+                    detail: {
+                        selectedFilters
+                    }
+                }));
+            });
+        });
+    </script>
+{% endautoescape %}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ pageTitle }}</h1>
+
+        <div>
+            {% include '@filters/panel.twig' with {
+                contentId: reportContentId,
+                panel:     filterPanel,
+                quickload: true
+            } only %}
         </div>
-    </div>
-</div>
 
-{% include '@filters/panel.twig' with {
-    contentId: reportContentId,
-    panel:     filterPanel,
-    quickload: true,
-} only %}
-
-<div id="{{ reportContentId }}" class="filtered-report">
-    <div class="row">
-        <div class="small-12 island" data-placeholder>
-            <section class="content">
-                <img src="{{ CDN_PREFIX }}/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
-            </section>
-        </div>
+        <section id="{{ reportContentId }}">
+            <pastoral-class-report
+                get-report-data-route="{{ routeLookupIfAuthorized('pastoralClassReportModule.getReportDataForAllStudents', {folderId: folder.id, folder: folder}) }}"
+                :severity-enabled="{{ config.pastoral_severity ? 'true' : 'false' }}"
+            >
+            </pastoral-class-report>
+        </section>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/pastoralClassReport.js?v={{ config.site_version }}"></script>
     </div>
 </div>

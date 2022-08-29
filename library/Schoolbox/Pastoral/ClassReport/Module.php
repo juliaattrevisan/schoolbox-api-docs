@@ -10,21 +10,27 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Authorizer\Rule;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Comment\Translator\ModelToArray as PastoralCommentTranslator;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Translator\ModelToArray as PastoralTranslator;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
 use Schoolbox\Role;
+use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -51,22 +57,52 @@ class Module extends BaseModule
             new Rule\HasHomepageAccess(
                 UserAccess::ACCESS_WRITE,
                 function (array $params = []) {
-                    if ($params['folder'] instanceof Model) {
+                    if ($params['folder'] instanceof Folder\Model) {
                         return $params['folder']->getId();
                     } else {
                         return null;
                     }
                 },
-                Access::getInstance()
+                Access::getInstance(),
             )
         );
 
         $preload = function ($params) {
             return $this->preloadFolder($params);
         };
+        $preloadStudent = function ($params) {
+            $newParams = $this->preloadFolder($params);
+            $newParams['student'] = $this->getMapperFactory()->get(UserMapper::class)
+                                                             ->findById($params['studentId']);
+            return $newParams;
+        };
 
-        $this->register(self::METHOD_GET, '/{folderId}', 'getReport', $perms, $preload);
-        $this->register(self::METHOD_POST, '/{folderId}', 'postReport', $perms, $preload);
+        $this->register(
+            self::METHOD_GET,
+            '/{folderId}',
+            'getReport',
+            $perms,
+            $preload,
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/{folderId}/students',
+            'getReportDataForAllStudents',
+            $perms,
+            $preload,
+        );
+
+        // Student route permission:
+        // Could check the student is actually involved in the class, but this
+        // is not strictly necessary as the access-level censor removes all
+        // pastoral records which the current user can't view.
+        $this->register(
+            self::METHOD_GET,
+            '/{folderId}/student/{studentId}/data',
+            'getReportDataForStudent',
+            $perms,
+            $preloadStudent,
+        );
     }
 
     /**
@@ -74,13 +110,39 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller(
+        // Build translators here instead of in controller code
+        $userTranslator     = new UserTranslator();
+        $scrubAdapter       = new ScrubAdapter();
+        $router             = $this->getRouter();
+        $authorizer         = $this->getAuthorizer();
+        $currentUser        = $this->injector->get('user');
+        $pastoralTranslator = new PastoralTranslator(
+            $userTranslator,
+            new PastoralCommentTranslator(
+                $userTranslator,
+                $router,
+                $authorizer,
+                $currentUser,
+                $scrubAdapter,
+            ),
+            new StorageTranslator(new PrefixGenerator($this->getConfig())),
+            $router,
+            $authorizer,
+            $currentUser,
+            $scrubAdapter,
+        );
+        $filterHelper = new FilterHelper(
             $this->getMapperFactory()->get(PastoralMapper::class),
-            $this->injector->get('pastoralDataSource'),
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(Filter\Mapper::class),
             $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
+        );
+        return new Controller(
+            $this->injector->get('pastoralDataSource'),
             $this->getMapperFactory()->get(UserAccessMapper::class),
+            $userTranslator,
+            $pastoralTranslator,
+            $filterHelper,
         );
     }
 
@@ -108,10 +170,10 @@ class Module extends BaseModule
     }
 
     /**
-     * @return FolderMapper
+     * @return Folder\Mapper
      */
-    protected function getFolderMapper(): FolderMapper
+    protected function getFolderMapper(): Folder\Mapper
     {
-        return $this->getMapperFactory()->get(FolderMapper::class);
+        return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
 }
