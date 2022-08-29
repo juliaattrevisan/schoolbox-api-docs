@@ -39,7 +39,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsectionStore', {
                 this.isProcessing = false;
                 const activeNodeStore = useActiveNodeStore();
                 const response = await fetch(`/api/curriculum/${activeNodeStore.node.id}`, {
-                    method: 'PUT',
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
