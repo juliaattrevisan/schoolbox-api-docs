@@ -132,7 +132,7 @@ class Controller extends Base
         if ($this->getUser()->getYear()) {
             $termCode = $this->termMapper->findForDateAndYearLevel(Alaress_Date_Format::now(), $this->getUser()->getYear())->getCode();
         } else {
-            $termCode = $this->getTermMapper()->findForToday()->getCode();
+            $termCode = $this->termMapper->findForToday()->getCode();
         }
 
         $this->getResponse()->redirect->to(
@@ -319,10 +319,12 @@ class Controller extends Base
     {
         $from = (new Alaress_Date_Format())->setYear($year)->startOfYear();
         $to = (new Alaress_Date_Format())->setYear($year)->endOfYear();
-        //If we are looking at the year, no term is specified.
-        //Specify term 1 of that year in this case
-        $term = $this->getTermMapper()->findForDate($from);
-        $term->setTitle($year);
+        // find a term from the from date to get actual term code
+        $term = $this->termMapper->findForDate($from);
+        // fake its period to match the year
+        $term->setTitle($year)
+            ->setStart($from)
+            ->setActualFinish($to);
 
         $this->getCustomGrades($viewee, $term, $from, $to);
     }
@@ -747,26 +749,6 @@ class Controller extends Base
         return $assessments;
     }
 
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return AssessmentMapperProxy
-     */
-    protected function getAssessmentMapperProxy(): AssessmentMapperProxy
-    {
-        return $this->assessmentMapperProxy;
-    }
-
-
-    /**
-     * @return Term\Mapper
-     */
-    protected function getTermMapper(): Term\Mapper
-    {
-        return $this->termMapper;
-    }
 
     /**
      * @param int $vieweeId
