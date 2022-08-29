@@ -81,7 +81,6 @@ export const useUpdateNodeStore = defineStore('mcUpdateNodeStore', {
     return {
         name: node.name,
         code: node.code,
-        reference: node.reference,
         description: node.description,
     }
 }
@@ -95,7 +94,6 @@ export const useUpdateNodeStore = defineStore('mcUpdateNodeStore', {
     return JSON.stringify({
         name: node.name,
         code: node.code,
-        reference: node.reference,
         description: node.description,
     });
 }

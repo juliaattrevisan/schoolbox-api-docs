@@ -50,10 +50,6 @@ function onCancelSelected () {
                     <input type="text" id="code" v-model="updateNodeStore.activeNodeCopy.code">
                 </div>
                 <div class="small-12 columns">
-                    <label for="reference">Reference</label>
-                    <input type="text" id="reference" v-model="updateNodeStore.activeNodeCopy.reference">
-                </div>
-                <div class="small-12 columns">
                     <label for="description">Description</label>
                     <input type="text" id="description" v-model="updateNodeStore.activeNodeCopy.description">
                 </div>
@@ -70,7 +66,7 @@ function onCancelSelected () {
 
 <style lang="scss" scoped>
 
-.update-node-container {
+.node-container {
     border-bottom: 1px solid var(--content-ui-background);
     border-top: 1px solid var(--content-ui-background);
     margin: -1px 0 0 0; //-1px so it butts up against the node border above

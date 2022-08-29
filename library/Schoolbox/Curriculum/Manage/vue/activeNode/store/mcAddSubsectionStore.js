@@ -82,7 +82,6 @@ export const useAddSubsectionStore = defineStore('mcAddSubsectionStore', {
     return {
         name: '',
         code: '',
-        reference: '',
         description: '',
     }
 }
@@ -96,7 +95,6 @@ export const useAddSubsectionStore = defineStore('mcAddSubsectionStore', {
     return JSON.stringify({
         name: node.name,
         code: node.code,
-        reference: node.reference,
         description: node.description,
     });
 }

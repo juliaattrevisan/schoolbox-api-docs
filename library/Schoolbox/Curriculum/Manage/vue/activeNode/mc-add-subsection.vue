@@ -37,7 +37,7 @@ function onCancelSelected () {
 </script>
 
 <template>
-    <div class="addSubsection-node-container">
+    <div class="node-container">
         <section>
             <fieldset class="content">
                 <legend>Adding subsection to: {{ activeNodeStore.title }}</legend>
@@ -48,10 +48,6 @@ function onCancelSelected () {
                 <div class="small-12 columns">
                     <label for="code">Code</label>
                     <input type="text" id="code" v-model="addSubsectionStore.subsection.code">
-                </div>
-                <div class="small-12 columns">
-                    <label for="reference">Reference</label>
-                    <input type="text" id="reference" v-model="addSubsectionStore.subsection.reference">
                 </div>
                 <div class="small-12 columns">
                     <label for="description">Description</label>
@@ -70,7 +66,7 @@ function onCancelSelected () {
 
 <style lang="scss" scoped>
 
-.addSubsection-node-container {
+.node-container {
     border-bottom: 1px solid var(--content-ui-background);
     border-top: 1px solid var(--content-ui-background);
     margin: -1px 0 0 0; //-1px so it butts up against the node border above
