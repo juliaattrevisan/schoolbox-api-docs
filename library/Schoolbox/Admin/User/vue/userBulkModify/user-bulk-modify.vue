@@ -515,7 +515,7 @@ export default {
     margin-right: 1rem;
 }
 
-.button-clear, .selected-count, .button-delete {
+.button-clear, .selected-count {
     display: inline-block;
 }
 
@@ -536,4 +536,7 @@ export default {
     }
 }
 
+.button-delete:hover {
+    background-color: rgba(240, 65, 36, 0.8) !important;
+}
 </style>
