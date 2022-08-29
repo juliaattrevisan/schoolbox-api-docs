@@ -7,12 +7,17 @@ import { defineStore } from 'pinia';
 import { useNodesStore } from './mcNodesStore';
 
 const UNSET_ID = 0;
+const DIRECTION = {
+    FORWARDS: 'forwards',
+    BACKWARDS: 'backwards',
+}
 
 export const useViewNodesStore = defineStore('mcViewNodesStore', {
 
     state: () => ({
         idList: [], //ids of the selected nodes
         currentDepth: -1, //track how far down the tree we are
+        currrentDirection: DIRECTION.FORWARDS //which direction we are currently travelling in the tree
     }),
 
     getters: {
@@ -150,8 +155,6 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
                 this.toNext(id);
             } else if (depth < this.currentDepth) { //or going back to a previous depth
                 this.toPrevious(targetDepth)
-            } else if (depth === this.currentDepth) { //or selecting a different option on the current depth
-                this.changeOnSame(targetDepth, id)
             }
             this.currentDepth = targetDepth;
         },
@@ -162,6 +165,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          * @param { number }
          */
         toNext (id) {
+            this.currrentDirection = DIRECTION.FORWARDS;
             this.idList = [...this.idList, id]; //add the new id in
         },
 
@@ -171,22 +175,8 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          * @param { number }
          */
         toPrevious (targetDepth) {
+            this.currrentDirection = DIRECTION.BACKWARDS;
             this.idList = this.idList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
-        },
-
-        /**
-         * Either switching selection on same node, or moving back to the previous for the '-' selection
-         *
-         * @param { number }
-         * @param { number }
-         */
-        changeOnSame (targetDepth, id) {
-            if (id === UNSET_ID) { //we need to move back one level
-                this.toPrevious(targetDepth); //shorten the list back to the new reduced depth
-            } else { //or we are on the same level, so remove the latest than add the new in
-                this.idList = this.idList.filter((id, index) => index !== targetDepth); //remove the latest so we can add the new selection
-                this.idList = [...this.idList, id]; //then add the new selection in
-            }
         },
 
         /**

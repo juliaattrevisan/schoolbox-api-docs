@@ -5,7 +5,7 @@
  * or to CRUD via the edit button
  */
 
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
@@ -41,6 +41,13 @@ const props = defineProps({
         type: Number,
         required: true,
     },
+});
+
+/**
+ *
+ */
+onMounted(() => {
+    console.warn('hai');
 });
 
 const store = useStore();
@@ -82,8 +89,7 @@ const isDisabled = computed(() => {
 });
 
 /**
- * Only show the selected node and its direct children when we are on the sixth node
- * This is so we don't flood the DOM with very large Curriculum renders
+ * Only show the selected node and any of its direct children
  *
  * @returns { Boolean }
  */
@@ -118,15 +124,10 @@ const isAdding = computed(() => addSubsectionStore.isOpen && activeNodeStore.nod
 const isAddingAnother = computed(() => addSubsectionStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
- * traverse to the next nodel level as an alternative to
- * using the selects in mc-header-select or if the top parent is selected move back one level
+ * traverse to the next nodel level
  */
 function onNameSelected () {
-    if (props.depth === 0) {
-        viewNodesStore.setSelected(viewNodesStore.currentDepth, 0);
-    } else {
-        viewNodesStore.setNextSelected(props.node.id);
-    }
+    viewNodesStore.setNextSelected(props.node.id);
 }
 
 /**
@@ -140,33 +141,21 @@ function onDeleteSelected () {
  * to open up or close the update modal
  */
 function onEnableToggleSelected () {
-    if (props.node.enabled) {
-        enabledNodeStore.prompt(props.node);
-    } else {
-        enabledNodeStore.enable(props.node);
-    }
+    props.node.enabled ? enabledNodeStore.prompt(props.node) : enabledNodeStore.enable(props.node);
 }
 
 /**
  * to open up or close the update modal
  */
 function onAddSubsectionToggleSelected () {
-    if (isAdding.value) {
-        addSubsectionStore.cancel();
-    } else {
-        addSubsectionStore.prompt(props.node);
-    }
+    isAdding.value ? addSubsectionStore.cancel() : addSubsectionStore.prompt(props.node);
 }
 
 /**
  * to open up or close the update modal
  */
 function onUpdateToggleSelected () {
-    if (isUpdating.value) {
-        updateNodeStore.cancel();
-    } else {
-        updateNodeStore.prompt(props.node);
-    }
+    isUpdating.value ? updateNodeStore.cancel() : updateNodeStore.prompt(props.node);
 }
 
 /**
