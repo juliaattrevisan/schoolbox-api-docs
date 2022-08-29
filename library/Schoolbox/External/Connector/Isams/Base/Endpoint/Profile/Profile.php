@@ -34,6 +34,19 @@ use Laminas\Uri\Exception\InvalidUriPartException;
 class Profile implements IStrategy
 {
     /**
+     * Maximum number of chars that a position_title can be
+     * In iSAMS this is an aggregation of all the Roles assigned
+     * to a guy. We had precedent for a school giving a dummy
+     * account all the roles, which is a lot of chars to concat
+     * SA-14272
+     *
+     * This is utterly unrealistic but we've seen it crash imports
+     * when schools are first setting up
+     */
+    private const MAX_POSITION_LENGTH = 255;
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -846,6 +859,25 @@ class Profile implements IStrategy
                 }
             }
 
+            $positionTitle = implode(', ', $positions);
+
+            /* Throw a warning about accounts that have an insane configuration
+             */
+            if (strlen($positionTitle) >= self::MAX_POSITION_LENGTH) {
+                $this->log->warning(sprintf(
+                    'Staff member %s %s (%s) has a truncated position_title',
+                    $firstname,
+                    $lastname,
+                    $externalId
+                ));
+            }
+
+            /* MAYBE have to use mb_substr but I can't tell if that's needed,
+             * or even if isams lets that kind of input occur Anyway, arbitrarily
+             * cut at MAX_POSITION_LENGTH chars
+             */
+            $positionTitle = mb_substr($positionTitle, 0, self::MAX_POSITION_LENGTH, 'UTF-8');
+
             /* Select the first campus (schoolbox connector only supports one campus per profile)
              */
             $campusName = '';
@@ -861,7 +893,7 @@ class Profile implements IStrategy
                 ->setDepartment(null)
                 ->setEmail(trim((string)$staff->SchoolEmailAddress))
                 ->setPhone(trim((string)$staff->SchoolMobileNumber))
-                ->setPositionTitle(implode(', ', $positions))
+                ->setPositionTitle($positionTitle)
                 ->setRoom(null)
                 ->setUsername($username);
 
