@@ -77,7 +77,7 @@ export const useSettingsStore = defineStore('mgSettings', {
                     throw new Error();
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error);
             } finally {
                 this.isProcessing = false;
                 store.isProcessing = false;

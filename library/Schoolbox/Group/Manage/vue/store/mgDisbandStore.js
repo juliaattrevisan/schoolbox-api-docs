@@ -39,14 +39,11 @@ export const useDisbandStore = defineStore('mgDisband', {
                     body: getFormData(),
                 });
                 const responseJson = await response.json();
-                debugger;
-                if (responseJson.success) {
-                    //
-                } else {
+                if (!responseJson.success) {
                     throw new Error();
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error);
             } finally {
                 this.isProcessing = false;
                 store.isProcessing = false;
