@@ -101,8 +101,14 @@ class Controller extends AbstractController
         $divisions = $this->getDivisionMapper()->findByColumn('sport_id', $entity->getId());
 
         foreach ($divisions as $division) {
+            $teams = $this->getTeamMapper()->findByColumn('division_id', $division->getId(), [
+                'order' => [
+                    'name' => 'ASC'
+                ]
+            ]);
+
             /** @var Division $division */
-            $division->setTeams($this->getTeamMapper()->findByColumn('division_id', $division->getId()));
+            $division->setTeams($teams);
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/entity.twig', [
