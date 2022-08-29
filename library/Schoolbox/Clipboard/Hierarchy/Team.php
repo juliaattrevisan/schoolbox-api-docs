@@ -13,6 +13,8 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
+use Schoolbox\Fixtures\Division\User\Mapper;
+use Schoolbox\UserMapper;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -23,7 +25,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Team implements IStrategy
 {
-
     /**
      * Short-circuit to prevent infinite loops
      */
@@ -97,6 +98,18 @@ class Team implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Coach\Mapper
+     */
+    private \Schoolbox\Fixtures\Coach\Mapper $coachMapper;
+
+
+    /**
+     * @var \Schoolbox\Fixtures\Team\Coach\Mapper
+     */
+    private \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper;
+
+
+    /**
      * @var \Schoolbox\UserMapper
      */
     private \Schoolbox\UserMapper $userMapper;
@@ -116,10 +129,12 @@ class Team implements IStrategy
      * @param bool                                     $membership
      * @param Registry                                 $registry
      * @param Person                                   $userLookup
-     * @param \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper
+     * @param Mapper                                   $divisionUserMapper
      * @param \Schoolbox\Fixtures\Team\Player\Mapper   $teamPlayerMapper
      * @param \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper
-     * @param \Schoolbox\UserMapper                    $userMapper
+     * @param \Schoolbox\Fixtures\Coach\Mapper         $coachMapper
+     * @param \Schoolbox\Fixtures\Team\Coach\Mapper    $teamCoachMapper
+     * @param UserMapper                               $userMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -132,6 +147,8 @@ class Team implements IStrategy
         \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper,
         \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
         \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper,
+        \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
+        \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper,
         \Schoolbox\UserMapper $userMapper
     ) {
         $this->log = $log;
@@ -144,6 +161,8 @@ class Team implements IStrategy
         $this->divisionUserMapper = $divisionUserMapper;
         $this->teamPlayerMapper = $teamPlayerMapper;
         $this->teamPositionMapper = $teamPositionMapper;
+        $this->coachMapper = $coachMapper;
+        $this->teamCoachMapper = $teamCoachMapper;
         $this->userMapper = $userMapper;
         $this->divisionCodec = new Codec\Division();
     }
@@ -182,10 +201,12 @@ class Team implements IStrategy
          * Disgusting
          */
         $includeStudents = 'false';
+        $includeStaff = 'false';
         $userLookup = [];
 
         if ($this->membership) {
             $includeStudents = 'true';
+            $includeStaff = 'true';
 
             $userLookup = $this->userLookup->generate();
         }
@@ -206,6 +227,7 @@ class Team implements IStrategy
             $teams = $this->api->retrieve('GET', $endpoint, [
                 'includePositions' => 'true',
                 'includeStudents' => $includeStudents,
+                'includeStaff' => $includeStaff,
                 /* Bash through paginated data
                  */
                 'page' => $currentPage,
@@ -285,6 +307,12 @@ class Team implements IStrategy
                         $positionData['name'],
                         $team->getName()
                     ));
+                }
+
+                /* Slap in a team coach
+                 */
+                foreach ($teamData['assignedStaff'] as $assignedStaff) {
+                    $this->assignCoach($this->findCoach($assignedStaff), $team);
                 }
 
                 /* If the --membership flag was set, ram in students and staff relationships too
@@ -446,4 +474,82 @@ class Team implements IStrategy
             }
         }
     }
+
+
+
+    /**
+     * Assign a coach to a team, if they aren't already assigned
+     *
+     * @param \Schoolbox\Fixtures\Coach\Model $coach
+     * @param \Schoolbox\Fixtures\Team\Model  $team
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function assignCoach(\Schoolbox\Fixtures\Coach\Model $coach, \Schoolbox\Fixtures\Team\Model $team): void
+    {
+        try {
+            $teamCoach = $this->teamCoachMapper->findOneByColumnList([
+                'team_id' => $team->getId(),
+                'coach_id' => $coach->getId()
+            ]);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->log->info(sprintf(
+                'Assigning coach %s to team %s',
+                $coach->getName(),
+                $team->getName()
+            ));
+
+            $teamCoach = $this->teamCoachMapper->createModel()
+                ->setTeam($team)
+                ->setCoach($coach);
+
+            if ($this->perform) {
+                $this->teamCoachMapper->save($teamCoach);
+            }
+        }
+    }
+
+
+    /**
+     * Find a coach for the given Clipboard data $coach
+     * Creates a coach record if they couldn't be found
+     *
+     * @param array $coach
+     * @return \Schoolbox\Fixtures\Coach\Model
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function findCoach(array $coach): \Schoolbox\Fixtures\Coach\Model
+    {
+        $coachName = "{$coach['firstName']} {$coach['lastName']}";
+
+        try {
+            $coach = $this->coachMapper->findOneByColumnList([
+                'name' => $coachName
+            ]);
+
+            $this->log->debug(sprintf(
+                'Reusing existing coach %s',
+                $coachName
+            ));
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $coach = $this->coachMapper->createModel()
+                ->setName($coachName);
+
+            $this->log->debug(sprintf(
+                'Creating new coach %s',
+                $coachName
+            ));
+        }
+
+        if ($this->perform) {
+            $this->coachMapper->save($coach);
+        }
+
+        return $coach;
+    }
+
 }

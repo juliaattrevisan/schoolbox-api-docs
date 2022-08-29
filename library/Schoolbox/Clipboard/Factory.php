@@ -126,6 +126,9 @@ class Factory
         $teamPositionMapper = \Schoolbox\Fixtures\Team\Position\Mapper::getInstance();
         $divisionUserMapper = \Schoolbox\Fixtures\Division\User\Mapper::getInstance();
         $userMapper = \Schoolbox\UserMapper::getInstance();
+        $teamCoachMapper = \Schoolbox\Fixtures\Team\Coach\Mapper::getInstance();
+        $coachMapper = \Schoolbox\Fixtures\Coach\Mapper::getInstance();
+        $teamCoachMapper = \Schoolbox\Fixtures\Team\Coach\Mapper::getInstance();
 
         /* Set up a local cache for (sport, division, team) tuples
          */
@@ -160,6 +163,8 @@ class Factory
                 $teamMapper,
                 $teamPlayerMapper,
                 $teamPositionMapper,
+                $teamCoachMapper,
+                $coachMapper,
                 $divisionUserMapper
             ))
             ->add(new Hierarchy\Team(
@@ -173,6 +178,8 @@ class Factory
                 $divisionUserMapper,
                 $teamPlayerMapper,
                 $teamPositionMapper,
+                $coachMapper,
+                $teamCoachMapper,
                 $userMapper
             ))
             ->add(new Hierarchy\Cleanup(
@@ -183,7 +190,8 @@ class Factory
                 $sportMapper,
                 $positionMapper,
                 $divisionMapper,
-                $teamMapper
+                $teamMapper,
+                $coachMapper
             ));
         }
 
@@ -198,8 +206,6 @@ class Factory
         if ($sessions) {
             $venueMapper = \Schoolbox\Fixtures\Venue\Mapper::getInstance();
             $matchupMapper = \Schoolbox\Fixtures\Matchup\Mapper::getInstance();
-            $coachMapper = \Schoolbox\Fixtures\Coach\Mapper::getInstance();
-            $teamCoachMapper = \Schoolbox\Fixtures\Team\Coach\Mapper::getInstance();
             $resultMapper = \Schoolbox\Fixtures\Result\Mapper::getInstance();
 
             $bus->add(new Sessions\Prepare(
@@ -207,7 +213,6 @@ class Factory
                 $this->perform,
                 $this->lock,
                 $matchupMapper,
-                $coachMapper,
                 $resultMapper
             ))
             ->add(new Sessions\Sessions(
@@ -220,8 +225,6 @@ class Factory
                 $userLookup,
                 $venueMapper,
                 $matchupMapper,
-                $coachMapper,
-                $teamCoachMapper,
                 $resultMapper
             ))
             ->add(new Sessions\Cleanup(
@@ -229,7 +232,6 @@ class Factory
                 $this->perform,
                 $this->lock,
                 $matchupMapper,
-                $coachMapper,
                 $resultMapper
             ));
         }

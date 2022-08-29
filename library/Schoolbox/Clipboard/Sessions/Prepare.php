@@ -20,7 +20,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Prepare implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */
@@ -46,12 +45,6 @@ class Prepare implements IStrategy
 
 
     /**
-     * @var \Schoolbox\Fixtures\Coach\Mapper
-     */
-    private \Schoolbox\Fixtures\Coach\Mapper $coachMapper;
-
-
-    /**
      * @var \Schoolbox\Fixtures\Result\Mapper
      */
     private \Schoolbox\Fixtures\Result\Mapper $resultMapper;
@@ -62,7 +55,6 @@ class Prepare implements IStrategy
      * @param bool                               $perform
      * @param LockInterface                      $lock
      * @param \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
-     * @param \Schoolbox\Fixtures\Coach\Mapper   $coachMapper
      * @param \Schoolbox\Fixtures\Result\Mapper  $resultMapper
      */
     public function __construct(
@@ -70,14 +62,12 @@ class Prepare implements IStrategy
         bool $perform,
         LockInterface $lock,
         \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
-        \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
         \Schoolbox\Fixtures\Result\Mapper $resultMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->lock = $lock;
         $this->matchupMapper = $matchupMapper;
-        $this->coachMapper = $coachMapper;
         $this->resultMapper = $resultMapper;
     }
 
@@ -95,7 +85,6 @@ class Prepare implements IStrategy
             $this->lock->refresh();
 
             $this->matchupMapper->getDatabase()->query("UPDATE {$this->matchupMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
-            $this->coachMapper->getDatabase()->query("UPDATE {$this->coachMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
             $this->resultMapper->getDatabase()->query("UPDATE {$this->resultMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
         }
 

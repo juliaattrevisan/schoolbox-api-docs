@@ -11,6 +11,7 @@ namespace Schoolbox\Clipboard\Hierarchy;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Clipboard\IStrategy;
+use Schoolbox\Fixtures\Season\Mapper;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -18,7 +19,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Cleanup implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */
@@ -68,14 +68,21 @@ class Cleanup implements IStrategy
 
 
     /**
-     * @param LoggerInterface                     $log
-     * @param bool                                $perform
-     * @param LockInterface                       $lock
-     * @param \Schoolbox\Fixtures\Season\Mapper   $seasonMapper
-     * @param \Schoolbox\Fixtures\Sport\Mapper    $sportMapper
-     * @param \Schoolbox\Fixtures\Position\Mapper $positionMapper
-     * @param \Schoolbox\Fixtures\Division\Mapper $divisionMapper
-     * @param \Schoolbox\Fixtures\Team\Mapper     $teamMapper
+     * @var \Schoolbox\Fixtures\Coach\Mapper
+     */
+    private \Schoolbox\Fixtures\Coach\Mapper $coachMapper;
+
+
+    /**
+     * @param LoggerInterface                       $log
+     * @param bool                                  $perform
+     * @param LockInterface                         $lock
+     * @param Mapper                                $seasonMapper
+     * @param \Schoolbox\Fixtures\Sport\Mapper      $sportMapper
+     * @param \Schoolbox\Fixtures\Position\Mapper   $positionMapper
+     * @param \Schoolbox\Fixtures\Division\Mapper   $divisionMapper
+     * @param \Schoolbox\Fixtures\Team\Mapper       $teamMapper
+     * @param \Schoolbox\Fixtures\Coach\Mapper      $coachMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -85,7 +92,8 @@ class Cleanup implements IStrategy
         \Schoolbox\Fixtures\Sport\Mapper $sportMapper,
         \Schoolbox\Fixtures\Position\Mapper $positionMapper,
         \Schoolbox\Fixtures\Division\Mapper $divisionMapper,
-        \Schoolbox\Fixtures\Team\Mapper $teamMapper
+        \Schoolbox\Fixtures\Team\Mapper $teamMapper,
+        \Schoolbox\Fixtures\Coach\Mapper $coachMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -95,6 +103,7 @@ class Cleanup implements IStrategy
         $this->positionMapper = $positionMapper;
         $this->divisionMapper = $divisionMapper;
         $this->teamMapper = $teamMapper;
+        $this->coachMapper = $coachMapper;
     }
 
 
@@ -125,6 +134,7 @@ class Cleanup implements IStrategy
             $this->positionMapper->getDatabase()->query("UPDATE {$this->positionMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
             $this->divisionMapper->getDatabase()->query("UPDATE {$this->divisionMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
             $this->teamMapper->getDatabase()->query("UPDATE {$this->teamMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
+            $this->coachMapper->getDatabase()->query("UPDATE {$this->coachMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
         }
 
         $this->log->info('Soft-deleting seasons, sports, positions, divisions and teams that did not appear in the import.');

@@ -18,7 +18,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Cleanup implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */
@@ -44,12 +43,6 @@ class Cleanup implements IStrategy
 
 
     /**
-     * @var \Schoolbox\Fixtures\Coach\Mapper
-     */
-    private \Schoolbox\Fixtures\Coach\Mapper $coachMapper;
-
-
-    /**
      * @var \Schoolbox\Fixtures\Result\Mapper
      */
     private \Schoolbox\Fixtures\Result\Mapper $resultMapper;
@@ -60,7 +53,6 @@ class Cleanup implements IStrategy
      * @param bool                               $perform
      * @param LockInterface                      $lock
      * @param \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
-     * @param \Schoolbox\Fixtures\Coach\Mapper   $coachMapper
      * @param \Schoolbox\Fixtures\Result\Mapper  $resultMapper
      */
     public function __construct(
@@ -68,14 +60,13 @@ class Cleanup implements IStrategy
         bool $perform,
         LockInterface $lock,
         \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
-        \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
+
         \Schoolbox\Fixtures\Result\Mapper $resultMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->lock = $lock;
         $this->matchupMapper = $matchupMapper;
-        $this->coachMapper = $coachMapper;
         $this->resultMapper = $resultMapper;
     }
 
@@ -93,7 +84,6 @@ class Cleanup implements IStrategy
             $this->lock->refresh();
 
             $this->matchupMapper->getDatabase()->query("UPDATE {$this->matchupMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
-            $this->coachMapper->getDatabase()->query("UPDATE {$this->coachMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
             $this->resultMapper->getDatabase()->query("UPDATE {$this->resultMapper->getTable()} SET deleted_at = NOW() WHERE updated_at = '0000-00-00 00:00:00'");
         }
 
