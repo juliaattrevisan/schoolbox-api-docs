@@ -76,8 +76,6 @@ const isDisabled = computed(() => {
         return true;
     } else if (viewNodesStore.isSearchActive) { //cant do any navigation while search is active
         return true;
-    } else if (viewNodesStore.isOnLast) { //cant select any further down from the MAX_DEPTH
-        return true;
     } else {
         return false;
     }
@@ -393,6 +391,7 @@ async function onLeave (el, done) {
     &:disabled {
         color: #222222;
         opacity: 1;
+        font-weight: bold;
     }
 }
 

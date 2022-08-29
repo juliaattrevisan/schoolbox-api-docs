@@ -25,11 +25,11 @@ function onSelected (depth, id) {
 <template>
     <div class="breadcrumbs-container">
         <button
-            v-for="(id, index) in viewNodesStore.idList"
-            @click.prevent="onSelected(index, id)"
-            @keyup.enter="onSelected(index, id)"
+            v-for="(breadcrumb, index) in viewNodesStore.breadcrumbs"
+            @click.prevent="onSelected(index, breadcrumb.id)"
+            @keyup.enter="onSelected(index, breadcrumb.id)"
         >
-            {{ id }}
+            {{ breadcrumb.name }}
         </button>
 
     </div>

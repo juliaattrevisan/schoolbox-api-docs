@@ -7,7 +7,6 @@ import { defineStore } from 'pinia';
 import { useNodesStore } from './mcNodesStore';
 
 const UNSET_ID = 0;
-const MAX_DEPTH = 6; //dont traverse any further down than 6 levels
 
 export const useViewNodesStore = defineStore('mcViewNodesStore', {
 
@@ -69,39 +68,19 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          *
          * @return { Array }
          */
-        lists () {
+        breadcrumbs () {
             const nodesStore = useNodesStore();
-            const lists = [nodesStore.nodes];
-            this.idList.forEach((id) => {
-                const nodeAtDepth = findById(nodesStore.nodes.children, id);
-                lists.push(nodeAtDepth);
-            });
-            return lists;
-        },
-
-        /**
-         * Limit to six deep
-         *
-         * @return { Array }
-         */
-        listsLimited () {
-            if (this.current?.children?.length === 0) { //if there's no more children, we don't need to display another depth
-                return this.lists.filter((nodeList, index) => index <= this.currentDepth);
+            const lastIdRemovedList = this.idList.slice(0, this.idList.length - 1);
+            if (lastIdRemovedList.length > 0) {
+                return lastIdRemovedList.map((id) => {
+                    const nodeAtDepth = findById(nodesStore.nodes.children, id);
+                    return {
+                        id: id,
+                        name: nodeAtDepth.name,
+                    }
+                });
             } else {
-                return this.lists.filter((nodeList, index) => index < MAX_DEPTH);
-            }
-        },
-
-        /**
-         * We use this to expand the remaining children
-         *
-         * @return { Boolean }
-         */
-        isOnLast () {
-            if (this.idList.length === MAX_DEPTH) {
-                return true;
-            } else {
-                return false;
+                return [];
             }
         },
 
