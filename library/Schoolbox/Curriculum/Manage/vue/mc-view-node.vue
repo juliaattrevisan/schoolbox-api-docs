@@ -43,13 +43,6 @@ const props = defineProps({
     },
 });
 
-/**
- *
- */
-onMounted(() => {
-    console.warn('hai');
-});
-
 const store = useStore();
 const viewNodesStore = useViewNodesStore();
 const activeNodeStore = useActiveNodeStore();
@@ -57,6 +50,13 @@ const deleteNodeStore = useDeleteNodeStore();
 const addSubsectionStore = useAddSubsectionStore();
 const enabledNodeStore = useEnableNodeStore();
 const updateNodeStore = useUpdateNodeStore();
+
+/**
+ *
+ */
+onMounted(() => {
+    console.warn(viewNodesStore.currentDirection);
+});
 
 /**
  * to gradually and more paddingLeft to indicate node level depth
@@ -159,11 +159,11 @@ function onUpdateToggleSelected () {
 }
 
 /**
- * To determine whether we need to display further child nodes within for this node
+ * To determine whether we need to display further child nodes within this node
  *
  * @returns { Boolean }
  */
-const hasChildren = computed(() => props.node.children && props.node.children.length > 0);
+const showChildren = computed(() => props.node.children && props.node.children.length > 0 && (props.depth+1) < 2);
 
 /**
  * Add in the code if it's available otherwise just show the title
@@ -326,7 +326,7 @@ async function onLeave (el, done) {
         >
             <mc-update-node v-if="isUpdating" />
         </Transition>
-        <ul v-if="hasChildren">
+        <ul v-if="showChildren ">
             <mc-view-node
                 v-for="node in props.node.children"
                 :key="node.id"

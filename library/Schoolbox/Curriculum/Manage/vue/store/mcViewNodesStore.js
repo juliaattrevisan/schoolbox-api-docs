@@ -17,7 +17,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
     state: () => ({
         idList: [], //ids of the selected nodes
         currentDepth: -1, //track how far down the tree we are
-        currrentDirection: DIRECTION.FORWARDS //which direction we are currently travelling in the tree
+        currentDirection: DIRECTION.FORWARDS //which direction we are currently travelling in the tree
     }),
 
     getters: {
@@ -113,32 +113,6 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
     actions: {
 
         /**
-         * Used to get the <select> options in mc-view-header-select-list
-         *
-         * @param { array[object] }
-         */
-        getChildrenAt (depth) {
-            try {
-                const nodesStore = useNodesStore();
-                if (depth === 0 && this.hasSingleCurriculum) {
-                    return [...nodesStore.nodes.children];
-                } else {
-                    return [
-                        getEmptyNode(),
-                        ...this.lists[depth].children
-                    ];
-                }
-            } catch (error) {
-                // debugger;
-                // @TODO - we should be handling moving back after a deleted note better
-                // consider using this.activeIdList to automtically filter out ids that can no longer be found
-                if (this.lists[depth] === undefined) { //we assume that the node has been deleted if it's undefined
-                    this.setSelected(--depth, UNSET_ID); //in which case move back one level to the previous node
-                }
-            }
-        },
-
-        /**
          * There's been a change in node selection,
          * so update based on the change in depth
          *
@@ -165,7 +139,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          * @param { number }
          */
         toNext (id) {
-            this.currrentDirection = DIRECTION.FORWARDS;
+            this.currentDirection = DIRECTION.FORWARDS;
             this.idList = [...this.idList, id]; //add the new id in
         },
 
@@ -175,7 +149,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          * @param { number }
          */
         toPrevious (targetDepth) {
-            this.currrentDirection = DIRECTION.BACKWARDS;
+            this.currentDirection = DIRECTION.BACKWARDS;
             this.idList = this.idList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
         },
 
@@ -200,20 +174,6 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
     },
 
 });
-
-/**
- * Used to indicate that a selection hasn't been made
- * on a curriculum node yet
- *
- * @param { Object }
- */
-function getEmptyNode () {
-    return {
-        id: UNSET_ID,
-        name: '-',
-        children: [],
-    }
-}
 
 /**
  * To just return the node containing the specified id
