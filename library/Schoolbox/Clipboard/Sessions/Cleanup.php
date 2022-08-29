@@ -60,7 +60,6 @@ class Cleanup implements IStrategy
         bool $perform,
         LockInterface $lock,
         \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
-
         \Schoolbox\Fixtures\Result\Mapper $resultMapper
     ) {
         $this->log = $log;

@@ -551,5 +551,4 @@ class Team implements IStrategy
 
         return $coach;
     }
-
 }
