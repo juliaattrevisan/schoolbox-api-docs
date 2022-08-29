@@ -413,36 +413,32 @@ class Controller extends BaseController
 
         // Load users for form teacher, tutor, etc.
         $formTeacher = null;
-        if (isset($externalUser['StudentFormStaffName']) && (string)$externalUser['StudentFormStaffName'] !== '') {
-            if ($externalUser['TeacherFormID']) {
-                try {
-                    $formTeacher = $this->userMapper->findByExternalId($externalUser['TeacherFormID'], Role::STAFF);
-                } catch (MapperException $e) {
-                    $formTeacher = $this->userMapper->createModel();
-                    $formTeacher->setLastname($externalUser['StudentFormStaffName']);
-                }
-            } else {
-                $formTeacher = $this->userMapper->createModel();
-                $formTeacher->setLastname($externalUser['StudentFormStaffName']);
+        if (isset($externalUser['TeacherFormID']) && (string)$externalUser['TeacherFormID'] !== '') {
+            try {
+                $formTeacher = $this->userMapper->findByExternalId($externalUser['TeacherFormID'], Role::STAFF);
+            } catch (MapperException $e) {
+                // noop
             }
+        }
+        if (!$formTeacher && isset($externalUser['StudentFormStaffName']) && (string)$externalUser['StudentFormStaffName'] !== '') {
+            $formTeacher = $this->userMapper->createModel();
+            $formTeacher->setLastname($externalUser['StudentFormStaffName']);
         }
 
         /* Display their name if you couldn't find them in the db
          * via their id (some sis don't have the id)
          */
         $tutorTeacher = null;
-        if (isset($externalUser['StudentTutorName']) && (string)$externalUser['StudentTutorName'] !== '') {
-            if ($externalUser['TeacherTutorID']) {
-                try {
-                    $tutorTeacher = $this->userMapper->findByExternalId($externalUser['TeacherTutorID'], Role::STAFF);
-                } catch (MapperException $e) {
-                    $tutorTeacher = $this->userMapper->createModel();
-                    $tutorTeacher->setLastname($externalUser['StudentTutorName']);
-                }
-            } else {
-                $tutorTeacher = $this->userMapper->createModel();
-                $tutorTeacher->setLastname($externalUser['StudentTutorName']);
+        if (isset($externalUser['TeacherTutorID']) && (string)$externalUser['TeacherTutorID'] !== '') {
+            try {
+                $tutorTeacher = $this->userMapper->findByExternalId($externalUser['TeacherTutorID'], Role::STAFF);
+            } catch (MapperException $e) {
+                // noop
             }
+        }
+        if (!$tutorTeacher && isset($externalUser['StudentTutorName']) && (string)$externalUser['StudentTutorName'] !== '') {
+            $tutorTeacher = $this->userMapper->createModel();
+            $tutorTeacher->setLastname($externalUser['StudentTutorName']);
         }
 
         $hohTeacher = null;
