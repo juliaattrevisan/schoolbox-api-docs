@@ -6,7 +6,6 @@
 import { defineStore } from 'pinia';
 import { useNodesStore } from './mcNodesStore';
 
-const UNSET_ID = 0;
 const DIRECTION = {
     FORWARDS: 'forwards',
     BACKWARDS: 'backwards',
@@ -16,7 +15,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
 
     state: () => ({
         idList: [], //ids of the selected nodes
-        currentDepth: -1, //track how far down the tree we are
+        currentDepth: 0, //track how far down the tree we are
         currentDirection: DIRECTION.FORWARDS //which direction we are currently travelling in the tree
     }),
 
@@ -38,16 +37,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
         },
 
         /**
-         * No nodes have been selected yet, used to show empy state in mc-view-codes
-         *
-         * @return { Boolean }
-         */
-        isInactive () {
-            return this.idList.length === 0;
-        },
-
-        /**
-         * Can now use the search input
+         * Can now use the search input when we have selected at least one node
          *
          * @return { Boolean }
          */
@@ -56,37 +46,22 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
         },
 
         /**
-         * @TODO in progress to detect deleted nodes
-         *
-         * @return { Array }
-         */
-        activeIdList () {
-            const nodesStore = useNodesStore();
-            return this.idList.filter((id) => {
-                const nodeAtDepth = findById(nodesStore.nodes.children, id);
-                return nodeAtDepth !== undefined ? true : false;
-            })
-        },
-
-        /**
-         * to traverse through the nodes via the <selects> in mc-view-header-select-list.vue
+         * to traverse back through the nodes via breadcrumbs
          *
          * @return { Array }
          */
         breadcrumbs () {
             const nodesStore = useNodesStore();
-            const lastIdRemovedList = this.idList.slice(0, this.idList.length - 1);
-            if (lastIdRemovedList.length > 0) {
-                return lastIdRemovedList.map((id) => {
-                    const nodeAtDepth = findById(nodesStore.nodes.children, id);
-                    return {
-                        id: id,
-                        name: nodeAtDepth.name,
-                    }
-                });
-            } else {
-                return [];
+            let breadcrumbs = [];
+            if (!this.hasSingleCurriculum) { //we only need this breadcrumb if there's more than one Curriculum, otherwise we jump straight to the single node with no option of returning back
+                breadcrumbs.push( { id: nodesStore.nodes.id, name: nodesStore.nodes.name, depth: 0 } );
             }
+            this.idList.forEach((id, index) => { //add in a breadcrumb for each selected node
+                const nodeAtDepth = findById(nodesStore.nodes.children, id);
+                breadcrumbs.push( { id: id, name: nodeAtDepth.name, depth: index+1 } );
+            });
+            //we return an empty array if there's no selections yet, otherwise we pull out the latest as it represents the node we are currently on (not one we need to move back to)
+            return breadcrumbs.length === 0 ? [] : breadcrumbs.slice(0, -1);
         },
 
         /**
@@ -105,7 +80,11 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          */
         current () {
             const nodesStore = useNodesStore();
-            return findById(nodesStore.nodes.children, this.idList[this.currentDepth])
+            if (this.idList.length > 0) { //grab the current latest selection
+                return findById(nodesStore.nodes.children, this.idList[this.currentDepth-1]);
+            } else { //otherwise return the root level structure when there's more than one root level node
+                return nodesStore.nodes;
+            }
         }
 
     },
@@ -120,17 +99,23 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          * @param { number }
          */
         setSelected (depth, id) {
-            if (depth === 0 && id === UNSET_ID) { //pulling back to no node selection at all
+            if (depth === 0) { //pulling back to no node selection at all, the root level
                 this.reset();
-                return;
-            }
-            const targetDepth = id === UNSET_ID ? depth - 1 : depth; //we need to go back an additional depth
-            if (depth > this.currentDepth) { //progressing to the next depth
+            } else if (depth > this.currentDepth) { //progressing to the next depth
                 this.toNext(id);
             } else if (depth < this.currentDepth) { //or going back to a previous depth
-                this.toPrevious(targetDepth)
+                this.toPrevious(depth)
             }
-            this.currentDepth = targetDepth;
+            this.currentDepth = depth;
+        },
+
+        /**
+         * Reset to the original state, with no active selection at all
+         */
+        reset () {
+            this.currentDirection = DIRECTION.BACKWARDS;
+            this.idList = [];
+            this.currentDepth = 0;
         },
 
         /**
@@ -150,15 +135,7 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
          */
         toPrevious (targetDepth) {
             this.currentDirection = DIRECTION.BACKWARDS;
-            this.idList = this.idList.filter((id, index) => index <= targetDepth); //shorten the list back to the new reduced depth
-        },
-
-        /**
-         * Reset to the original state, with no active selection at all
-         */
-        reset () {
-            this.idList = [];
-            this.currentDepth = this.idList.length - 1;
+            this.idList = this.idList.filter((id, index) => index < targetDepth); //shorten the list back to the new reduced depth
         },
 
         /**
@@ -169,7 +146,6 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
         setNextSelected (id) {
             this.setSelected(this.currentDepth+1, id);
         },
-
 
     },
 

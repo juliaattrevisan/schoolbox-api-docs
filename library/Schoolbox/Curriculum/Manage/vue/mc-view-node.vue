@@ -7,6 +7,7 @@
 
 import { computed, onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
+import { useNodesStore, UNSET_ID } from './store/mcNodesStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import { useDeleteNodeStore } from './activeNode/store/mcDeleteNodeStore';
@@ -44,6 +45,7 @@ const props = defineProps({
 });
 
 const store = useStore();
+const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
 const activeNodeStore = useActiveNodeStore();
 const deleteNodeStore = useDeleteNodeStore();
@@ -87,6 +89,13 @@ const isDisabled = computed(() => {
         return false;
     }
 });
+
+/**
+ * Only show the selected node and any of its direct children
+ *
+ * @returns { Boolean }
+ */
+const isIdSet = computed(() => props.node.id !== UNSET_ID);
 
 /**
  * Only show the selected node and any of its direct children
@@ -256,7 +265,7 @@ async function onLeave (el, done) {
 <template>
     <li v-if="isVisible" :class="`container ${containerClass}`">
         <div :class="`buttons-container ${ isUpdatingAnother ? 'inactive' : '' } ${ isAddingAnother ? 'inactive' : '' }`">
-            <div class="checklist">
+            <div v-if="isIdSet" class="checklist">
                 <input
                     :id="`checkbox-${props.node.id}`"
                     type="checkbox"

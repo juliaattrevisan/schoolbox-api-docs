@@ -6,6 +6,8 @@ import { defineStore } from 'pinia';
 import { useViewNodesStore } from '../store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
+export const UNSET_ID = 0;
+
 
 export const useNodesStore = defineStore('mcNodesStore', {
 
@@ -24,7 +26,7 @@ export const useNodesStore = defineStore('mcNodesStore', {
             this.updateNodes(nodes);
             const viewNodesStore = useViewNodesStore();
             if (viewNodesStore.hasSingleCurriculum) {
-                viewNodesStore.setSelected(0, this.nodes.children[0].id);
+                viewNodesStore.setSelected(1, this.nodes.children[0].id);
             }
         },
 
@@ -35,6 +37,8 @@ export const useNodesStore = defineStore('mcNodesStore', {
          */
         updateNodes (nodes) { //we add them to .children so the top level structure is consistent with the levels below
             this.nodes = {
+                id: UNSET_ID,
+                name: 'Curriculum Packages',
                 children: nodes,
             }
         },

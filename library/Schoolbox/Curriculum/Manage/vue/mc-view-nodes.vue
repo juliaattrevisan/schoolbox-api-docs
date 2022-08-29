@@ -54,11 +54,7 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
 </script>
 
 <template>
-    <div v-if="viewNodesStore.isInactive" class="empty-state">
-        <i class="icon-curriculum"></i>
-        <p>To start viewing a Curriculum, first select from either: {{ parentNodeTitles }}.</p>
-    </div>
-    <div v-else-if="viewNodesStore.hasNoSearchResults" class="empty-state">
+    <div v-if="viewNodesStore.hasNoSearchResults" class="empty-state">
         <i class="icon-curriculum"></i>
         <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
         <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>

@@ -14,7 +14,7 @@ const dataEndpoint = '/curriculumData';
 const mswHandlers = [
     rest.get(dataEndpoint, (req, res, ctx) => {
         return res(
-            ctx.json(vicCurriculumData)
+            ctx.json(allCurriculumData)
         )
     }),
 ];
