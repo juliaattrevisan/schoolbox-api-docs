@@ -95,9 +95,9 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                 if (is_array($allAnswers) && count($allAnswers)) {
                     foreach ($allAnswers as $currentAnswer) {
                         $page->setVar(array(
-                            'ANSWER_VALUE' => $currentAnswer->value,
+                            'ANSWER_VALUE'       => $currentAnswer->value,
                             'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                            'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                            'ANSWER_CHECKED'     => $currentAnswer->correct ? 'checked=\'checked\'' : ''
                         ));
 
                         $page->parse('answerOption_block', 'answerOption', true);
@@ -130,9 +130,9 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
             if (is_array($allAnswers) && count($allAnswers)) {
                 foreach ($allAnswers as $currentAnswer) {
                     $page->setVar(array(
-                        'ANSWER_VALUE' => $currentAnswer->value,
+                        'ANSWER_VALUE'       => $currentAnswer->value,
                         'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                        'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                        'ANSWER_CHECKED'     => $currentAnswer->correct ? 'checked=\'checked\'' : ''
                     ));
 
                     $page->parse('answerOption_block', 'answerOption', true);
@@ -347,12 +347,12 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
              */
             $answer['description'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE | ENT_QUOTES);
             $answer['value'] = trim((string)$currentAnswer->value);
-            $answer['correct'] = 0;
+            $answer['correct'] = false;
 
             /* Indicate this is a correct answer
              */
             if ((int)$currentAnswer->attributes()->fraction > 0) {
-                $answer['correct'] = 1;
+                $answer['correct'] = true;
             }
 
             $allAnswers[] = $answer;
