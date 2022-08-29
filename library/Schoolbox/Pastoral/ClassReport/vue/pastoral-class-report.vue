@@ -165,7 +165,7 @@ export default {
 
         <div v-else>
             <!-- sort options -->
-            <div class="small-12 medium-6 columns">
+            <div class="small-12 medium-6 columns sort-filter">
                 <label for="sortOption">
                     Sort by:
                 </label>
@@ -180,7 +180,7 @@ export default {
             </div>
 
             <!-- count filter -->
-            <div class="small-12 medium-6 columns">
+            <div class="small-12 medium-6 columns count-filter">
                 <label>Show amount:</label>
                 <template v-for="option in countOptions">
                     <input :id="`countOption-${ option.value }`"
@@ -273,5 +273,41 @@ ul {
     width: 98%;
     margin: auto;
 }
+
+.sort-filter {
+    display: flex;
+    flex-direction: row;
+    margin-top: 1rem;
+
+    label {
+        width: 8%;
+        line-height: 2rem;
+    }
+
+    select {
+        width: 30%;
+        min-height: 0;
+        border-radius: 2px;
+    }
+
+}
+
+.count-filter {
+    display: flex;
+    flex-direction: row;
+    margin-top: 1rem;
+    justify-content: end;
+
+    label {
+        line-height: 2rem;
+        margin-right: 1rem;
+    }
+}
+
+input[type=radio]:not(.plain) + label.input-toggle {
+    border: 1px solid var(--form-border-color);
+    margin-left: 0.5rem;
+}
+
 
 </style>
