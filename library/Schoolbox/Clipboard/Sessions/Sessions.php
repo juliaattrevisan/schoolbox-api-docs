@@ -577,6 +577,12 @@ class Sessions implements IStrategy
                 'coach_id' => $coach->getId()
             ]);
         } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->log->info(sprintf(
+                'Assigning coach %s to team %s',
+                $coach->getName(),
+                $team->getName()
+            ));
+
             $teamCoach = $this->teamCoachMapper->createModel()
                 ->setTeam($team)
                 ->setCoach($coach);
@@ -606,9 +612,19 @@ class Sessions implements IStrategy
             $coach = $this->coachMapper->findOneByColumnList([
                 'name' => $coachName
             ]);
+
+            $this->log->debug(sprintf(
+                'Reusing existing coach %s',
+                $coachName
+            ));
         } catch (\Schoolbox\Mapper\Exception $e) {
             $coach = $this->coachMapper->createModel()
                 ->setName($coachName);
+
+            $this->log->debug(sprintf(
+                'Creating new coach %s',
+                $coachName
+            ));
         }
 
         if ($this->perform) {
