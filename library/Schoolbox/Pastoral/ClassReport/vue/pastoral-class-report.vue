@@ -202,15 +202,12 @@ export default {
                                 <a :href="studentData.student._links.profile" title="View profile" class="name">
                                     <img :src="studentData.student._links.avatar"
                                          :alt="`profile photo of ${studentData.student.fullName}`"
-                                         class="portrait" />
+                                         class="portrait"/>
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
                                 </a>
                                 <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
                             </div>
-                        </div>
-                    </li>
-
-                    <!-- pastoral records -->
+                            <!-- pastoral records -->
                     <li v-for="record in studentData.records.data" :key="'record-' + String(record.id)">
                         <div class="list-item">
                             <div class="tiny card small-12">
@@ -225,26 +222,30 @@ export default {
                                     <a :href="record.createdBy._links.profile" title="View profile" class="name">
                                         {{ record.createdBy.fullName }}
                                     </a> <time :datetime="formatDateTime(record.createdAt)"
-                                          :title="formatDateTime(record.createdAt)"
+                                               :title="formatDateTime(record.createdAt)"
+                                >
+                                    {{ formatDate(record.createdAt) }}
+                                </time><template v-if="record.createdAt !== record.updatedAt">,
+                                    updated
+                                    <template v-if="record.createdBy.id !== record.updatedBy.id">
+                                        by
+                                        <a :href="record.updatedBy._links.profile" title="View profile" class="name">
+                                            {{ record.updatedBy.fullName }}
+                                        </a>
+                                    </template> <time :datetime="formatDateTime(record.updatedAt)"
+                                                      :title="formatDateTime(record.updatedAt)"
                                     >
-                                        {{ formatDate(record.createdAt) }}
-                                    </time><template v-if="record.createdAt !== record.updatedAt">,
-                                        updated
-                                        <template v-if="record.createdBy.id !== record.updatedBy.id">
-                                            by
-                                            <a :href="record.updatedBy._links.profile" title="View profile" class="name">
-                                                {{ record.updatedBy.fullName }}
-                                            </a>
-                                        </template> <time :datetime="formatDateTime(record.updatedAt)"
-                                              :title="formatDateTime(record.updatedAt)"
-                                        >
-                                            {{ formatDate(record.updatedAt) }}
-                                        </time>
-                                    </template>
+                                        {{ formatDate(record.updatedAt) }}
+                                    </time>
+                                </template>
                                 </p>
                             </div>
                         </div>
                     </li>
+                        </div>
+                    </li>
+
+
                     <li v-if="studentData.records.metadata.count > studentData.records.data.length">
                         <div class="component-action">
                             <section>
@@ -265,7 +266,7 @@ export default {
 
 
 .island .content {
-    padding: 1rem;
+    padding: 1.5rem;
 }
 
 ul {
@@ -309,5 +310,24 @@ input[type=radio]:not(.plain) + label.input-toggle {
     margin-left: 0.5rem;
 }
 
+.component-action {
+    section {
+        border: none;
+    }
+        button {
+            padding: 0 1rem;
+        }
+
+        button:hover {
+            background-color: var(--content-ui-foreground);
+            color: white;
+            transition: all 0.5s ease;
+        }
+}
+
+img {
+    border-radius: 50%;
+    transform: scale(0.85);
+}
 
 </style>
