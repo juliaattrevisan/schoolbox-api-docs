@@ -72,7 +72,8 @@ updateMembersStore.$onAction(({ name, after, onError }) => {
         });
         onError((error) => {
             console.warn(error);
-            store.toastEl.timeout('Unable to update members', false, 5000);
+            store.toastEl.timeout(error, false, 5000);
+            changeMemberAccess.value = ''; //default back to blank on any update
         });
     }
 });

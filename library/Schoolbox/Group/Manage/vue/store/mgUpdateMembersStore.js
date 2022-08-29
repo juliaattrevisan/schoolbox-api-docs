@@ -37,15 +37,16 @@ export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
                     },
                     body: getFormData([member], accessType)
                 });
+                const updatedMember = membersStore.members.find((groupMember) => groupMember.id === member.id);
                 const responseJson = await response.json();
                 if (responseJson.success) {
-                    const updatedMember = membersStore.members.find((groupMember) => groupMember.id === member.id);
                     updateMember(updatedMember, accessType);
                 } else {
-                    throw new Error();
+                    updateMember(updatedMember, updatedMember.accessType); //we revert back to original accessType if the change has failed
+                    throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {
-                throw new Error(error);
+                throw new Error(error.message, error.options);
             } finally {
                 this.isProcessing = false;
                 store.isProcessing = false;
@@ -79,10 +80,10 @@ export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
                         updateMember(updatedMember, accessType);
                     });
                 } else {
-                    throw new Error();
+                    throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {
-                throw new Error(error);
+                throw new Error(error.message, error.options);
             } finally {
                 this.isSelectedProcessing = false;
                 store.isProcessing = false;
