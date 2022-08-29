@@ -258,4 +258,20 @@ export default {
 
         <toast ref="toast"></toast>
     </section>
+
 </template>
+
+<style lang="scss" scoped>
+
+
+.island .content {
+    padding: 1rem;
+}
+
+ul {
+    border: 1px solid greenyellow;
+    width: 98%;
+    margin: auto;
+}
+
+</style>
