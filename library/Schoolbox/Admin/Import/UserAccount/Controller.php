@@ -183,7 +183,8 @@ class Controller extends Base
             ->setAttachmentsLabel('Upload CSV')
             ->setAttachPrompt('upload CSV')
             ->setReadOnly($readonly)
-            ->setMulti(false);
+            ->setMulti(false)
+            ->setExpiryDate(\Alaress_Date_Format::now()->addWeeks(2));
 
         if (null !== $hash) {
             $zone->attachFiles([$hash]);
