@@ -324,6 +324,7 @@ class Controller extends Base
         // fake its period to match the year
         $term->setTitle($year)
             ->setStart($from)
+            ->setDisplayFinish($to)
             ->setActualFinish($to);
 
         $this->getCustomGrades($viewee, $term, $from, $to);
