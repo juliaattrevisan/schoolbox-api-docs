@@ -24,7 +24,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Timetable_ColourMapper;
 
 class GroupsHelper
@@ -295,32 +294,6 @@ class GroupsHelper
             return null;
         }
         return $userPerms->first();
-    }
-
-    /**
-     * Get all users in the group
-     * @param Group $group
-     * @return array
-     */
-    public function getGroupUsers(Group $group): array
-    {
-        /** @var UserMapper $userMapper */
-        $userMapper     = $this->userAccessMapper->getJoinMapper('user');
-        $userAccessList = $this->userAccessMapper->findForFolder($group->getFolder())
-                                                 ->indexByCallback(static function (UserAccess $userAccess) {
-                                                     return $userAccess->getUser()->getId();
-                                                 });
-
-        $memberList = $userMapper->findByColumn('id', $userAccessList->keys());
-
-        $members = [];
-        foreach ($memberList as $member) {
-            /** @var UserAccess $userAccess */
-            $userAccess = $userAccessList->offsetGet($member->getId());
-            $userAccess->setUser($member);
-            $members[] = (new \Schoolbox\Group\Manage\ModelToArray\UserAccess())($userAccess);
-        }
-        return $members;
     }
 
     /**

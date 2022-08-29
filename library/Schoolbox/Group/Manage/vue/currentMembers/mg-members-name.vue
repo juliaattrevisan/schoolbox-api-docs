@@ -23,7 +23,7 @@ function getMemberPortraitSrc () {
     if (typeof STORYBOOK_ENV !== 'undefined') {
         return `https://demo.schoolbox.com.au/images/fail.php?transform_type=portrait&transform=square64&code=500`;
     } else {
-        return `/portrait.php?id=${props.member.userId}&size=square64`;
+        return props.member._links.avatar;
     }
 }
 
@@ -31,8 +31,8 @@ function getMemberPortraitSrc () {
 
 <template>
     <div class="card small-12">
-        <a v-if="member.userId" :href="`/search/user/${member.userId}`" title="View profile" class="name">
-            <img :src="getMemberPortraitSrc(member.userId)" :alt="`${member.firstName} portrait`">
+        <a v-if="member.id" :href="member._links.profile" title="View profile" class="name">
+            <img :src="getMemberPortraitSrc(member.id)" :alt="`${member.firstName} portrait`">
             {{ member.firstName }} {{ member.lastName }}
         </a>
         <div v-else>

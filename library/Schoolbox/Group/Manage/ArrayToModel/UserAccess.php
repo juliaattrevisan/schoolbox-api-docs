@@ -16,10 +16,22 @@ use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
  */
 class UserAccess
 {
+    // config of whether only staff can be a group admin
+    private bool $groupStaffOnly;
+
+    /**
+     * @param bool $groupStaffOnly
+     * @return void
+     */
+    public function __construct(bool $groupStaffOnly)
+    {
+        $this->groupStaffOnly = $groupStaffOnly;
+    }
+
     /**
      * Translate the array representation of the group access into a model.
      */
-    public function __invoke(array $array, ?object $model, bool $groupStaffOnly): object
+    public function __invoke(array $array, ?object $model): object
     {
         if (!$model) {
             $model = (new UserAccessModel())
@@ -31,7 +43,7 @@ class UserAccess
         // Only staff can be admin, if $groupStaffOnly is true
         if (isset($array['accessType'])) {
             if (
-                $groupStaffOnly
+                $this->groupStaffOnly
                 && $array['accessType'] === UserAccessModel::MEMBERSHIP_ADMIN
                 && !$model->getUser()->getRole()->isStaff()
             ) {

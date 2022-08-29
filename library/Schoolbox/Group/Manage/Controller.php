@@ -16,6 +16,7 @@ use Schoolbox\Group\Manage\ArrayToModel;
 use Schoolbox\Group\GroupsHelper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -90,8 +91,27 @@ class Controller extends Base
      */
     public function getData(Folder $folder)
     {
-        $group = $folder->getGroup();
-        $data  = [
+        $group   = $folder->getGroup();
+        $members = [];
+
+        if ($group) {
+            $userAccessList = $this->userAccessMapper->findForFolder($group->getFolder())
+                                                     ->indexByCallback(static function (UserAccess $userAccess) {
+                                                         return $userAccess->getUser()->getId();
+                                                     });
+            $memberList     = $this->userMapper->findByColumn('id', $userAccessList->keys());
+
+            foreach ($memberList as $user) {
+                /** @var UserAccess $userAccess */
+                $userAccess = $userAccessList->offsetGet($user->getId());
+                // setting user attributes and accessType to be the same level to keep the member table searchable
+                $member               = (new \Schoolbox\Group\Manage\ModelToArray\User())($user);
+                $member['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
+                $members[]            = $member;
+            }
+        }
+
+        $data = [
             'groupId'   => $folder->getId(),
             'groupName' => $folder->getNameWithCodes(),
             'settings'  => [
@@ -100,7 +120,7 @@ class Controller extends Base
                 'isNotificationsEnabled' => $this->groupsHelper->groupNotificationEnabled($folder->getId()),
                 'isForceFollow'          => $group && $group->getForceFollow(),
             ],
-            'members'   => $group ? $this->groupsHelper->getGroupUsers($group) : [],
+            'members'   => $members,
         ];
 
         $this->getResponse()->content->set(
@@ -152,10 +172,10 @@ class Controller extends Base
         $users        = $this->userMapper->findByColumnList(['id' => array_keys($newAccesses)]);
         $userAccesses = $this->userAccessMapper->findForFolderUser($folder, $users);
 
-        $groupStaffOnly = $this->getConfigLoader()->get(ConfigMapper::NAME_GROUP_STAFF_ONLY);
+        $translator = new ArrayToModel\UserAccess($this->getConfigLoader()->get(ConfigMapper::NAME_GROUP_STAFF_ONLY));
         try {
-            $userAccesses->map(function ($userAccess) use ($newAccesses, $groupStaffOnly) {
-                return (new ArrayToModel\UserAccess())($newAccesses[$userAccess->getUser()->getId()], $userAccess, $groupStaffOnly);
+            $userAccesses->map(function ($userAccess) use ($newAccesses, $translator) {
+                return $translator($newAccesses[$userAccess->getUser()->getId()], $userAccess);
             });
         } catch (\InvalidArgumentException $e) {
             $this->sendJsonError('Failed to update member: ' . $e->getMessage(), 400);
@@ -203,7 +223,7 @@ class Controller extends Base
                 continue;
             }
             /** @var UserAccess $userAccess */
-            $userAccess = (new ArrayToModel\UserAccess())($requestBody, null, $groupStaffOnly);
+            $userAccess = (new ArrayToModel\UserAccess($groupStaffOnly))($requestBody, null);
             $userAccess->setUser($user)
                        ->setServiceIdentifier($folder->getId());
             $newAccesses->add($userAccess);
@@ -227,7 +247,11 @@ class Controller extends Base
             $this->buildJsonOutput(
                 [
                     'success'    => true,
-                    'newMembers' => $newAccesses->map(new \Schoolbox\Group\Manage\ModelToArray\UserAccess()),
+                    'newMembers' => $newAccesses->map(function ($userAccess) {
+                        $array               = (new \Schoolbox\Group\Manage\ModelToArray\User())($userAccess->getUser());
+                        $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
+                        return $array;
+                    }),
                 ]
             )
         );
