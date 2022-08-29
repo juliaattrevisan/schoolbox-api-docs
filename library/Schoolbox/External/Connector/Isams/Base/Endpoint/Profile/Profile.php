@@ -33,7 +33,6 @@ use Laminas\Uri\Exception\InvalidUriPartException;
  */
 class Profile implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */
