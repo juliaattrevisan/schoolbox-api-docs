@@ -876,7 +876,7 @@ class Profile implements IStrategy
              * or even if isams lets that kind of input occur Anyway, arbitrarily
              * cut at MAX_POSITION_LENGTH chars
              */
-            $positionTitle = substr($positionTitle, 0, self::MAX_POSITION_LENGTH);
+            $positionTitle = mb_substr($positionTitle, 0, self::MAX_POSITION_LENGTH, 'UTF-8');
 
             /* Select the first campus (schoolbox connector only supports one campus per profile)
              */
