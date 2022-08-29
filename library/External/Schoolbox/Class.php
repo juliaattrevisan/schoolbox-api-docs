@@ -17,7 +17,6 @@ use Schoolbox\Role;
  */
 class External_Schoolbox_Class implements External_ClassInterface
 {
-
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
 
@@ -154,6 +153,29 @@ class External_Schoolbox_Class implements External_ClassInterface
             foreach ($teacherIterator as $teacher) {
                 $teachers[] = $teacher['synergy_id'];
             }
+        }
+
+        /* Only need to do this if you are using the Calendar view
+         * because that typically means you activated SUDS Timetable subscription
+         * or used it to populate data that we must investigate
+         *
+         * All you classical grid users can skip this step
+         */
+        $pastThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
+        $futureThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_FUTURE_THRESHOLD)->endOfDay()->getUnixTimeStamp();
+        $config = \Schoolbox\Config\Loader::getInstance();
+
+        if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === $config->get('timetable_view')) {
+            $staffExternalIds = (new \Schoolbox\External\Event\TimetableUsers(
+                \Schoolbox\External\ClassEntryMapper::getInstance(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                \Schoolbox\UserMapper::getInstance(),
+                \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+            ))->findTeachersForClassCode($classCode, $pastThreshold, $futureThreshold);
+
+            $teachers = array_merge($teachers, $staffExternalIds);
         }
 
         return array_unique($teachers);

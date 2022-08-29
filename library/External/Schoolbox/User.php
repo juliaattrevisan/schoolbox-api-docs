@@ -174,30 +174,22 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getSubjectList(User $user): array
     {
-        $externalId = $user->getExternalId();
+        $externalId = trim((string)$user->getExternalId());
 
-        if (empty($externalId)) {
+        /* This user doesn't have an external id; nothing to find
+         */
+        if ('' === $externalId) {
             return [];
         }
 
-        $params = ['externalUserId' => $externalId];
+        $params = [
+            'externalUserId' => $externalId
+        ];
 
-        $classQuery = $this->internalDatabase->executeQuery(
-            "SELECT     c.name,
-                            c.code,
-                            '' AS classType,
-                            '' AS campusCode
-                FROM        sis_class_user cu
-                INNER JOIN  sis_class c ON c.id = cu.class_id
-                WHERE       cu.external_id = :externalUserId
-                ORDER BY    c.code ASC, c.name ASC
-            ",
-            $params
-        );
-
-        $classList = $classQuery->fetchAll();
-
-        $subjectQuery = $this->internalDatabase->executeQuery(
+        /* Look inside sis_class_period for teachers officially teaching a class
+         * There can be only one official teacher of a class in the classical grid
+         */
+        $officialTeachers = $this->internalDatabase->executeQuery(
             "SELECT     c.name,
                             c.code,
                             '' AS classType,
@@ -209,13 +201,89 @@ class External_Schoolbox_User implements External_UserInterface
                             c.name ASC
             ",
             $params
-        );
+        )->fetchAll();
+
+        /* Look inside sis_class_user for extra teacher involvements
+         * Teachers will be in here if schools are using the classical grid
+         * or if every teacher involved in a class instance is involved in
+         * all their instances. There can only be one official teacher of a class
+         * in a classical grid, but any additional teachers were added into
+         * sis_class_user (where the students live) as a workaround.
+         */
+        $additionalTeachers = $this->internalDatabase->executeQuery(
+            "SELECT     c.name,
+                            c.code,
+                            '' AS classType,
+                            '' AS campusCode
+                FROM        sis_class_user cu
+                INNER JOIN  sis_class c ON c.id = cu.class_id
+                WHERE       cu.external_id = :externalUserId
+                ORDER BY    c.code ASC, c.name ASC
+            ",
+            $params
+        )->fetchAll();
+
+        /* Schools using the SUDS Timetable system might have teachers in
+         * the Overrides system, sis_event_user_overrides - go looking in
+         * there for additional guys
+         *
+         * We only want teachers that, after a series of Override mutations,
+         * still remain in the result set. Override mutations can add and
+         * remove people in any combination in any order and in any quantity
+         * so you have to do a bit of math to figure out the final answer.
+         *
+         * $futureThreshold is the number of weeks into the future to look
+         * for involvements. You might not be a teacher of a class today,
+         * but you might be some time later.
+         *
+         * $pastThreshold is the number of weeks into the past to look
+         * for involvements. You might have been the teacher of a class
+         * at some point in the past, but no longer
+         *
+         * $pastThreshold and $futureThreshold are both defaulted to 1 week
+         * just because I said so. This gives you a span of 2 weeks where
+         * your involvements are examined. We don't know your involvements
+         * outside of this interval.
+         */
+        $pastThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
+        $futureThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_FUTURE_THRESHOLD)->endOfDay()->getUnixTimeStamp();
+        $overridesTeachers = [];
+        $config = \Schoolbox\Config\Loader::getInstance();
+
+        /* Only need to do this if you are using the Calendar view
+         * because that typically means you activated SUDS Timetable subscription
+         * or used it to populate data that we must investigate
+         *
+         * All you classical grid users can skip this step
+         */
+        if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === $config->get('timetable_view')) {
+            $events = (new \Schoolbox\External\Event\TimetableUsers(
+                \Schoolbox\External\ClassEntryMapper::getInstance(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                \Schoolbox\UserMapper::getInstance(),
+                \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+            ))->findClassCodesForUser($user, $pastThreshold, $futureThreshold);
+
+            /* Shank it into the required format
+             */
+            foreach ($events as $event) {
+                $overridesTeachers[] = [
+                    'name' => $event['name'],
+                    'code' => $event['code'],
+                    'classType' => '',
+                    'campusCode' => ''
+                ];
+            }
+        }
 
         return array_values(
             array_unique(
                 array_merge(
-                    $classList,
-                    $subjectQuery->fetchAll()
+                    $officialTeachers,
+                    $additionalTeachers,
+                    $overridesTeachers
                 ),
                 SORT_REGULAR
             )
