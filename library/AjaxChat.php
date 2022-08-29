@@ -13,7 +13,6 @@ use Schoolbox\Role;
 
 class AjaxChat
 {
-
     private $groupHandler;
     private $chatHandler;
 
