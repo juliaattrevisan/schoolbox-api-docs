@@ -667,14 +667,35 @@ class Profile implements IStrategy
          * it's not a Normalised Data Structure object here
          */
         foreach ($parents as $parent) {
-            $externalId = trim((string)$parent->xpath('@PersonId')[0]);
+            $firstname = trim((string)$parent->Forename);
+            $lastname = trim((string)$parent->Surname);
+
+            /* Inspect the xpath for attributes
+             *
+             * If you haven't got any attributes, you can't really continue with this $parent
+             * as we need their attributes
+             */
+            $attributes = $parent->xpath('@PersonId');
+
+            if (!\count($attributes)) {
+                $this->log->warning(sprintf(
+                    'Parent %s %s missing personId attribute; skipping',
+                    $firstname,
+                    $lastname
+                ));
+
+                continue;
+            }
+
+            /* externalId is derived from PersonId attribute in the xml
+             * which might not exist for unknown reasons
+             */
+            $externalId = trim((string)$attributes[0]);
 
             /* Assign parents' usernames in UPS
              */
             $username = '';
 
-            $firstname = trim((string)$parent->Forename);
-            $lastname = trim((string)$parent->Surname);
             $relationship = trim((string)$parent->RelationshipRaw);
 
             /* Parents might inadvertently have the same externalId as someone else's
