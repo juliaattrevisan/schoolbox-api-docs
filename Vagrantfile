@@ -16,6 +16,7 @@ external_db_host = default["external_db_host"]
 external_db_db = default["external_db_db"]
 public_network = default["public_network"]
 private_network_ip = default["private_network_ip"]
+network_auto_config = default["network_auto_config"]
 provision_script = default["provision_script"]
 data_source = default["data_source"]
 data_filename = default["data_filename"]
@@ -66,6 +67,9 @@ if File.file?('vagrant.yaml')
   end
   if !conf["private_network_ip"].nil?
     private_network_ip = conf["private_network_ip"]
+  end
+  if !conf["network_auto_config"].nil?
+    network_auto_config = conf["network_auto_config"]
   end
   if !conf["provision_script"].nil?
     provision_script = conf["provision_script"]
@@ -139,17 +143,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = vagrant_box
   config.vm.box_url = "#{data_source}/#{vagrant_box}.box"
 
-  # manual ip to prevent ip6 being assigned on networks that don't support them
-  config.vm.network :private_network, ip: private_network_ip, auto_config: false
-  config.vm.provision "shell", run: "always", inline: "ifconfig enp0s8 #{private_network_ip} netmask 255.255.255.0 up"
+  config.vm.network :private_network, ip: private_network_ip, auto_config: network_auto_config
+  if ! network_auto_config
+    # manual ip to prevent ip6 being assigned on networks that don't support them
+    config.vm.provision "shell", run: "always", inline: "ifconfig enp0s8 #{private_network_ip} netmask 255.255.255.0 up"
+  end
+
 
   if public_network
+    # If multiple bridged-network adapters found, specifying the adapter in will cause it to be selected automatically
+    # and avoid vagrant prompting the user.
     if bridged_network_interface
-        config.vm.network "public_network", bridge: "#{bridged_network_interface}", auto_config: false
+      config.vm.network "public_network", bridge: "#{bridged_network_interface}", auto_config: network_auto_config
     else
-        config.vm.network :public_network, auto_config: false
+      config.vm.network :public_network, auto_config: network_auto_config
     end
-    config.vm.provision "shell", run: "always", inline: "dhclient -4 enp0s9 && ifconfig enp0s9 up"
+    if ! network_auto_config
+      # manually configure DHCP ip to prevent ip6 being assigned on networks that don't support them
+      config.vm.provision "shell", run: "always", inline: "dhclient -4 enp0s9 && ifconfig enp0s9 up"
+    end
   end
 
   config.vm.provider :virtualbox do |vb|
