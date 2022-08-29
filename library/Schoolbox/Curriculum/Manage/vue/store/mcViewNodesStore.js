@@ -27,7 +27,6 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
         hasSingleCurriculum () {
             const nodesStore = useNodesStore();
             if (nodesStore.nodes.children.length === 1) {
-                // this.setSelected(0, nodesStore.nodes.children[0].id); //can't do in getters? is done in mcNodesStore instead
                 return true;
             } else {
                 return false;

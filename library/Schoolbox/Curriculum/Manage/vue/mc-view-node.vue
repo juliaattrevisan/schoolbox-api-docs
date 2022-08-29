@@ -67,12 +67,12 @@ const hasCode = computed(() => props.node.code && props.node.code !== '');
 
 /**
  * To help distinguish those nodes that aren't selectable,
- * we enabled and remove the default button colour
+ * we disable and remove the default button colour
  *
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    if (viewNodesStore.currentDepth === 0 && props.depth === 0) { //we can't to back any further
+    if (props.depth === 0) { //we can't go back any further
         return true;
     } else if (viewNodesStore.isSearchActive) { //cant do any navigation while search is active
         return true;
@@ -275,15 +275,15 @@ async function onLeave (el, done) {
                     type="checkbox"
                     :value="props.node.id"
                     :checked="false"
-                    :enabledd="isUpdating"
+                    :disabled="isUpdating"
                 />
                 <label :for="`checkbox-${props.node.id}`"></label>
             </div>
             <button
-                :class="`button-name ${ props.depth === 0 ? 'button-name-parent' : '' } ${ isUpdating ? 'inactive' : '' } ${ isAdding ? 'inactive' : '' }`"
+                :class="`button-name ${ isUpdating ? 'inactive' : '' } ${ isAdding ? 'inactive' : '' }`"
                 :style="{ opacity: props.node.enabled ? '1' : '0.3' }"
                 :title="`Expand ${title}`"
-                :enabledd="isDisabled"
+                :disabled="isDisabled"
                 @click.prevent="onNameSelected"
                 @keyup.enter="onNameSelected"
             >
@@ -362,6 +362,7 @@ async function onLeave (el, done) {
 }
 
 .checklist {
+    flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it
     padding-top: 0.5rem;
 }
 
@@ -389,15 +390,11 @@ async function onLeave (el, done) {
     padding-left: 0.25rem;
     transition: background 0.2s;
     width: 100%;
-    &:enabledd {
+    &:disabled {
         color: #222222;
         opacity: 1;
     }
 }
-
-    .button-name-parent {
-        font-weight: bold;
-    }
 
 .button-action-option {
     @extend .button;
@@ -413,10 +410,6 @@ async function onLeave (el, done) {
 .inactive {
     opacity: 0.2;
     pointer-events: none;
-}
-
-.checklist {
-    flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it
 }
 
 ul {
