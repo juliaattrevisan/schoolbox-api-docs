@@ -588,6 +588,49 @@ class SubmissionBoxMapper extends BaseMapper
         return true;
     }
 
+
+    /**
+     * Special case restore for submission boxes:
+     * they take their deletion status from the assessment table.
+     *
+     * This table lacks a soft-delete column, but is soft-deletable by virtue of
+     * it being composed of a soft-deletable assessment.
+     *
+     * @param object|Collection|SubmissionBox $object
+     * @return bool
+     * @throws \UnexpectedValueException If a callback fails and we need to halt
+     * @throws Schoolbox\Mapper\DefinitionException
+     */
+    public function restoreSoftDeleted($object)
+    {
+        $collection = $this->getModelAsCollection($object);
+
+        // Trigger the pre-trigger
+        foreach ($collection as $model) {
+            if (!$this->triggerCallbacks(self::CALLBACK_PRERESTORE, $model)) {
+                return false;
+            }
+        }
+
+        // This is neither a PRE or POST action - it is the action.
+        /** @var AssessmentMapper $assessmentMapper */
+        $assessmentMapper = $this->getJoinMapper('assessmentModel');
+        /** @var SubmissionBox $model */
+        foreach ($collection as $model) {
+            if (!$model->getAssessmentModel()->isDeleted()) {
+                continue;
+            }
+            $assessmentMapper->restoreSoftDeleted($model->getAssessmentModel());
+        }
+
+        // Trigger the post-trigger
+        foreach ($collection as $model) {
+            $this->triggerCallbacks(self::CALLBACK_POSTRESTORE, $model);
+        }
+
+        return true;
+    }
+
     /**
      * Any notifications related to assessments must be deferred until all
      * its plans and constituent participation records are saved.

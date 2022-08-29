@@ -56,6 +56,11 @@ class Overwriter
             );
         }
 
+        // Restore destination before overwriting it?
+        if ($destination->isDeleted()) {
+            $this->assessmentMapperProxy->restoreSoftDeleted($destination);
+        }
+
         // Overwrite destination fields with values from source
         $updatedDestination = $destination->overwrite($source)
             ->setDeletedAt(new \Alaress_Date_NullDate());

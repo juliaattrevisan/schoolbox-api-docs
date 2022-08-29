@@ -1452,6 +1452,42 @@ class MapperProxy
         // The assessable itself is all that should need deletion
     }
 
+
+    /**
+     * Restores an assessable
+     *
+     * @param IAssessable $assessable
+     * @throws UnexpectedValueException If assessment does not have a context
+     * @throws LogicException If cyclic graph detected during translation
+     */
+    public function restoreSoftDeleted(IAssessable $assessable)
+    {
+        $dataModel = $this->translateToDataModel($assessable);
+        $subModel  = $dataModel->getSubObject();
+        if ($subModel instanceof SubmissionBox) {
+            // The assessment model is a component of the submission box.
+            // The composite object is responsible for deleting its components
+            // TODO - roll out this methodology to other assessment types
+            SubmissionBoxMapper::getInstance()->restoreSoftDeleted($subModel);
+        } else {
+            // Special handling: restore each different kind of model
+            if ($subModel instanceof Quiz) {
+                QuizMapper::getInstance()->restoreSoftDeleted($subModel);
+            }
+            if ($subModel instanceof Task) {
+                TaskMapper::getInstance()->restoreSoftDeleted($subModel);
+            }
+            if ($subModel instanceof LtiAssessment\Model) {
+                LtiAssessment\Mapper::getInstance()->restoreSoftDeleted($subModel);
+            }
+            if ($subModel instanceof Project) {
+                ProjectMapper::getInstance()->restoreSoftDeleted($subModel);
+            }
+            $this->baseMapper->restoreSoftDeleted($dataModel);
+        }
+        $assessable->setDeletedAt(new \Alaress_Date_NullDate());
+    }
+
     /**
      * Translates the data model to a domain object.
      *

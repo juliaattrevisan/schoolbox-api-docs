@@ -189,11 +189,15 @@
                         // * method becomes PUT
                         // * title is updated in modal
                         // * show the spec exists modal variant
+                        // ** show the spec not deleted variant within
+                        // ** hide the spec deleted variant within
                         // * hide the spec missing modal variant
                         $element.attr('data-method', 'PUT');
                         $modal.find('[data-spec-assessment-title]').text(data.title);
                         $modal.find('[data-display-if-spec-assessment-exists]').removeClass('hide');
                         $modal.find('[data-display-if-spec-assessment-not-exists]').addClass('hide');
+                        $modal.find('[data-display-if-spec-assessment-deleted]').addClass('hide');
+                        $modal.find('[data-display-if-spec-assessment-not-deleted]').removeClass('hide');
                     })
                     .fail(function () {
                         $toaster.toastTimeout({
