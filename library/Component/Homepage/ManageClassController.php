@@ -28,7 +28,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     private $externalDbEnabled;
 
-
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -45,7 +44,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         // This component is always present on homepages (embedded in page tot menu)
         return true;
     }
-
 
     /**
      * Renders the data into the SitePage. Presentation logic.
@@ -107,9 +105,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'class_pastoral_report_link', 'class_pastoral_report_link_block');
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
         $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
-        $this->setBlock($templateHandle, 'analytics_section', 'analytics_section_block');
-        $this->setBlock('analytics_section', 'class_analytics_link', 'class_analytics_link_block');
-        $this->setBlock('analytics_section', 'schoolbox_analytics_link', 'schoolbox_analytics_link_block');
         $this->setBlock($templateHandle, 'qrcode_link', 'qrcode_link_block');
 
         // Determine the term for the grades link
@@ -363,9 +358,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if ($hasAnalytics) {
             $this->parse('analytics_section_block', 'analytics_section');
         }
+
         return $hasClassActions;
     }
-
 
     /**
      * Build a link to the markbook, if this controller's user has permission to
@@ -383,12 +378,14 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             'folderId' => $this->getContext()->getId(),
         ];
         $route = 'learningMarkbook.getMarkbookForClass';
+
         if (
             !$this->getConfigLoader()->get(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED)
             || !$this->getAuthorizer()->isPathAuthorizedForUser($route, $classArg, $this->getUser())
         ) {
             return null;
         }
+
         return $this->getRouter()->generate($route, $classArg);
     }
 
@@ -406,6 +403,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     {
         $route  = null;
         $params = null;
+
         if ($isCoursePage) {
             $courseSpec = $this->getContext()->getCourseSpecification();
             $route      = 'courseMarkbook.getMarkbook';
@@ -425,6 +423,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         if ($route && $this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())) {
             return $this->getRouter()->generate($route, $params);
         }
+
         return null;
     }
 }

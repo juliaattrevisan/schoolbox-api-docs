@@ -42,6 +42,8 @@
                 {% if rubricMarkbookRoute %}<li><a href="{{ rubricMarkbookRoute }}" class="icon-curriculum">Rubric Markbook</a></li>{% endif %}
                 {% set badgeAwardRoute = routeLookupIfAuthorized('learningBadgeAward.getListPage', {folder: class, folderId: class.id}) %}
                 {% if badgeAwardRoute %}<li><a href="{{ badgeAwardRoute }}" class="icon-achievement">Badge Report</a></li>{% endif %}
+                {% set classPastoralRoute = routeLookupIfAuthorized('pastoralClassReportModule.getReport', {folder: class, folderId: class.id}) %}
+                {% if classPastoralRoute %}<li><a href="{{ classPastoralRoute }}" class="icon-pastoral">{{ locale.pastoralCare.proper }}</a></li>{% endif %}
                 <li><a href="{{ routeLookup('folder.getFolderModify', {id: class.id}) }}" class="icon-modify">Modify</a></li>
                 {% set routes = {} %}
                 {% set intellischoolRoute = routeLookupIfAuthorized('intellischool.getClassAnalytics', {folderId: class.id}) %}
