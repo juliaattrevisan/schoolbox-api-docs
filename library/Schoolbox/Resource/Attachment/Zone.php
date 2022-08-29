@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\Attachment;
 
+use Alaress_Date_Format;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Browser\NodeFactory;
@@ -84,6 +85,12 @@ class Zone
      * @var string|null
      */
     private ?string $filesystemContext = null;
+
+    /**
+     * The expiry date to use for any files uploaded to this attachzone, or null
+     * if not provided.
+     */
+    private ?Alaress_Date_Format $expiryDate = null;
 
     /**
      * @param string $zoneId
@@ -280,6 +287,17 @@ class Zone
 
 
     /**
+     * @param Alaress_Date_Format|null $expiryDate
+     * @return static
+     */
+    public function setExpiryDate(?Alaress_Date_Format $expiryDate): self
+    {
+        $this->expiryDate = $expiryDate;
+        return $this;
+    }
+
+
+    /**
      * Return an array that represents a context that can be passed into Twig
      *
      * @return array
@@ -298,21 +316,24 @@ class Zone
 
 
         $context = [
-            'title'     => $this->text['modalTitle'],
-            'id'        => $this->id,
-            'camelId'   => $this->delim2camel($this->id),
-            'label'     => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
-            'prompt'    => $this->text['attachPrompt'],
-            'fileVar'   => $this->text['fileVar'],
-            'mime'      => $filter,
-            'readonly'  => $this->readOnly,
-            'multi'     => $this->multi,
-            'mode'      => $this->buttonMode ? 'button' : 'normal',
-            'size'      => $this->size,
-            'useModal'  => $this->useModal,
-            'capture'   => $this->capture,
-            'iconClass' => $this->iconClass,
-            'fs'        => $this->filesystemContext,
+            'title'      => $this->text['modalTitle'],
+            'id'         => $this->id,
+            'camelId'    => $this->delim2camel($this->id),
+            'label'      => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
+            'prompt'     => $this->text['attachPrompt'],
+            'fileVar'    => $this->text['fileVar'],
+            'mime'       => $filter,
+            'readonly'   => $this->readOnly,
+            'multi'      => $this->multi,
+            'mode'       => $this->buttonMode ? 'button' : 'normal',
+            'size'       => $this->size,
+            'useModal'   => $this->useModal,
+            'capture'    => $this->capture,
+            'iconClass'  => $this->iconClass,
+            'fs'         => $this->filesystemContext,
+            'expiryDate' => ($this->expiryDate && !$this->expiryDate->isNull())
+                ? $this->expiryDate->toRfc3339String()
+                : null,
         ];
 
         foreach ($this->attachments as $storage) {

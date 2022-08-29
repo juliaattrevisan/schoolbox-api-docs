@@ -20,6 +20,7 @@ $data = {
         prev: (url)
     }, ...],
     fs: (?string),
+    expiryDate: (?string)
 }
 
 #}
@@ -74,7 +75,7 @@ $data = {
         <script type="text/javascript">
             $(function () {
                 $('#{{ attachzone.id }}-zone').resourceAttach({
-                    url: '/storage/asyncUpload.php',
+                    url: '/storage/asyncUpload.php{% if attachzone.expiryDate is defined %}?expiryDate={{ attachzone.expiryDate }}{% endif %}',
                     paramName: 'upload',
                     trigger: 'div.dzone',
                     detachSelector: '[data-dz-remove]',
