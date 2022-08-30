@@ -453,13 +453,21 @@ class Team implements IStrategy
             if ('' !== trim((string)$student['positionId'])) {
                 $position = $positionLookup[$student['positionId']];
 
-                $teamPosition = $this->teamPositionMapper->createModel()
-                    ->setTeam($team)
-                    ->setPosition($position)
-                    ->setUser($user);
+                try {
+                    $teamPosition = $this->teamPositionMapper->findOneByColumnList([
+                        'team_id' => $team->getId(),
+                        'position_id' => $position->getid(),
+                        'user_id' => $user->getId()
+                    ]);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $teamPosition = $this->teamPositionMapper->createModel()
+                        ->setTeam($team)
+                        ->setPosition($position)
+                        ->setUser($user);
 
-                if ($this->perform) {
-                    $this->teamPositionMapper->save($teamPosition);
+                    if ($this->perform) {
+                        $this->teamPositionMapper->save($teamPosition);
+                    }
                 }
 
                 $this->log->debug(sprintf(
