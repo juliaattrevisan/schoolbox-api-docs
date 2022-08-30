@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Resource\Attachment;
 
+use Alaress_Date_Format;
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
@@ -73,6 +74,13 @@ class Factory
      * @var User
      */
     private $user;
+
+
+    /**
+     * The expiry date to use for any files uploaded to the controllers this
+     * factory creates, or null if not provided.
+     */
+    private ?Alaress_Date_Format $expiryDate = null;
 
 
     /**
@@ -161,6 +169,17 @@ class Factory
     public function setUser(User $user): self
     {
         $this->user = $user;
+        return $this;
+    }
+
+
+    /**
+     * @param Alaress_Date_Format|null $expiryDate
+     * @return static
+     */
+    public function setExpiryDate(?Alaress_Date_Format $expiryDate): self
+    {
+        $this->expiryDate = $expiryDate;
         return $this;
     }
 
