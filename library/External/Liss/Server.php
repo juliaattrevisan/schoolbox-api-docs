@@ -25,7 +25,6 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
-use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -92,6 +91,14 @@ class External_Liss_Server
      * as the cycle's identifier and also its name
      */
     private const DEFAULT_CYCLE_IDENTIFIER = 'Main Timetable';
+
+
+    /**
+     * This const corresponds to the enum for the config var external_liss_default_event_type
+     * This is used to decide if we use numeric teacher ids, or alphanumeric teacher codes
+     * If you're not using teacherId, you're presumed to be using teacherCode instead
+     */
+    private const TEACHER_IDENTIFIER_ID = 'teacherId';
 
 
     /**
