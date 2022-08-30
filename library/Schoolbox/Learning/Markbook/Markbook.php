@@ -396,23 +396,23 @@ class Markbook
             $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
         }
 
-        // Collate project statistics too
-        if ($assessment instanceof Project) {
-            $statistics['projectTotalWeight'] = 0;
-            foreach ($assessment->getAssessables() as $projectAssessment) {
-                $this->collateAssessmentStatistics($projectAssessment);
-                $statistics['projectTotalWeight'] += $projectAssessment->getWeight();
-            }
-
-            // Pass 2: weight percent
-            if ($statistics['projectTotalWeight'] > 0) {
-                foreach ($assessment->getAssessables() as $projectAssessment) {
-                    $projectAssessmentId = $projectAssessment->getId();
-                    $this->assessmentStatistics[$projectAssessmentId]['projectWeightPercent']
-                        = $this->assessmentStatistics[$projectAssessmentId]['weightInProject'] / $statistics['projectTotalWeight'] * 100;
-                }
-            }
-        }
+//        // Collate project statistics too
+//        if ($assessment instanceof Project) {
+//            $statistics['projectTotalWeight'] = 0;
+//            foreach ($assessment->getAssessables() as $projectAssessment) {
+//                $this->collateAssessmentStatistics($projectAssessment);
+//                $statistics['projectTotalWeight'] += $projectAssessment->getWeight();
+//            }
+//
+//            // Pass 2: weight percent
+//            if ($statistics['projectTotalWeight'] > 0) {
+//                foreach ($assessment->getAssessables() as $projectAssessment) {
+//                    $projectAssessmentId = $projectAssessment->getId();
+//                    $this->assessmentStatistics[$projectAssessmentId]['projectWeightPercent']
+//                        = $this->assessmentStatistics[$projectAssessmentId]['weightInProject'] / $statistics['projectTotalWeight'] * 100;
+//                }
+//            }
+//        }
 
         $this->assessmentStatistics[$assessment->getId()] = $statistics;
     }
