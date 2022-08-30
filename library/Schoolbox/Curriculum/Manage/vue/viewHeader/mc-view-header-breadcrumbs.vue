@@ -6,9 +6,11 @@
  */
 
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
+import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 
 const viewNodesStore = useViewNodesStore();
+const activeNodeStore = useActiveNodeStore();
 
 /**
  * to display the just selected node
@@ -26,6 +28,7 @@ function onSelected (depth, id) {
     <ul class="breadcrumb">
         <li v-for="(breadcrumb) in viewNodesStore.breadcrumbs">
             <a
+                :class="`${ activeNodeStore.isActive ? 'disabled' : '' }`"
                 :href="`/curricululm/${breadcrumb.id}`"
                 :title="`View ${breadcrumb.name}`"
                 @click.prevent="onSelected(breadcrumb.depth, breadcrumb.id)"
@@ -39,10 +42,8 @@ function onSelected (depth, id) {
 
 <style lang="scss" scoped>
 
-.breadcrumbs-container {
-    display: flex;
-    gap: 0.5rem;
-    padding: 1rem 0;
+.disabled {
+    opacity: 0.5;
 }
 
 </style>

@@ -57,7 +57,7 @@ const viewNodesStore = useViewNodesStore();
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => {
+const notButton = computed(() => {
     if (props.depth === 0) { //we can't go back any further
         return true;
     } else if (viewNodesStore.isSearchActive) { //cant do any navigation while search is active
@@ -121,16 +121,24 @@ function highlightSearchInElement (toHighlight) {
 </script>
 
 <template>
-    <button
-        :class="`button-name ${ props.isUpdatingOrAdding ? 'inactive' : '' }`"
+    <div
+        v-if="notButton"
+        class="name"
         :style="{ opacity: props.node.enabled ? '1' : '0.3' }"
-        :title="`Expand ${props.title}`"
-        :disabled="isDisabled"
-        @click.prevent="onNameSelected"
-        @keyup.enter="onNameSelected"
     >
         <span v-html="highlightTitleSearch"></span>
         <aside v-if="viewNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
+    </div>
+    <button
+        v-else
+        :class="`button-name`"
+        :style="{ opacity: props.node.enabled ? '1' : '0.3' }"
+        :title="`Expand ${props.title}`"
+        :disabled="props.isUpdatingOrAdding"
+        @click.prevent="onNameSelected"
+        @keyup.enter="onNameSelected"
+    >
+        {{ props.title }}
     </button>
 </template>
 
@@ -138,21 +146,24 @@ function highlightSearchInElement (toHighlight) {
 
 @import './style/mcViewNode';
 
-.button-name {
-    @extend .button;
-    padding-left: 0.25rem;
-    transition: background 0.2s;
+.name {
+    color: var(--body-foreground-h1);
+    opacity: 1;
+    font-size: 1rem;
+    font-weight: bold;
     width: 100%;
-    &:disabled {
-        color: var(--body-foreground-h1);
-        opacity: 1;
-        font-weight: bold;
-    }
 }
 
 aside {
     font-size: 0.725rem;
     font-style: italic;
+}
+
+.button-name {
+    @extend .button;
+    padding-left: 0.25rem;
+    transition: background 0.2s;
+    width: 100%;
 }
 
 </style>

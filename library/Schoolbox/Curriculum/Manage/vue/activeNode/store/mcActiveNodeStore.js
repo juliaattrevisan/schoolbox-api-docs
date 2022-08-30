@@ -19,8 +19,7 @@ export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
          * @return { Boolean }
          */
         isActive () {
-            // return this.node !== null ? true : false;
-            return false;
+            return this.node !== null ? true : false;
         },
 
         /**

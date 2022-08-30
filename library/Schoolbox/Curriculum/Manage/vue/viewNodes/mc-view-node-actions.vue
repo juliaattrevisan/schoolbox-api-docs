@@ -93,36 +93,40 @@ function onUpdateToggleSelected () {
 
 <template>
     <button
-        :class="`button-action-option icon-delete ${ props.isUpdatingOrAdding ? 'button__inactive' : '' }`"
-        :title="`Delete ${props.title}`"
-        @click.prevent="onDeleteSelected"
-        @keyup.enter="onDeleteSelected"
+        :class="`button-action-option ${ props.isUpdating ? 'icon-close' : 'icon-modify' }`"
+        :title="`Update ${props.title}`"
+        :disabled="props.isAdding"
+        @click.prevent="onUpdateToggleSelected"
+        @keyup.enter="onUpdateToggleSelected"
     >
-        Delete {{ title }}
+        Update {{ props.title }}
     </button>
     <button
-        :class="`button-action-option ${ props.isAdding ? 'icon-close' : 'icon-add' } ${ props.isUpdating ? 'button__inactive' : '' }`"
+        :class="`button-action-option ${ props.isAdding ? 'icon-close' : 'icon-add' }`"
         :title="`Add subsection to ${props.title}`"
+        :disabled="props.isUpdating"
         @click.prevent="onAddSubsectionToggleSelected"
         @keyup.enter="onAddSubsectionToggleSelected"
     >
         Add subsection to {{ props.title }}
     </button>
     <button
-        :class="`button-action-option ${ props.node.enabled ? 'icon-view' : 'icon-view-hollow' } ${ props.isUpdatingOrAdding ? 'button__inactive' : '' }`"
+        :class="`button-action-option ${ props.node.enabled ? 'icon-view' : 'icon-view-hollow' }`"
         :title="`${ props.node.enabled ? 'Disable' : 'Enable' } node`"
+        :disabled="props.isUpdatingOrAdding"
         @click.prevent="onEnableToggleSelected"
         @keyup.enter="onEnableToggleSelected"
     >
         Toggle visiblity of {{ props.title }}
     </button>
     <button
-        :class="`button-action-option ${ props.isUpdating ? 'icon-close' : 'icon-modify' } ${ props.isAdding ? 'button__inactive' : '' }`"
-        :title="`Update ${props.title}`"
-        @click.prevent="onUpdateToggleSelected"
-        @keyup.enter="onUpdateToggleSelected"
+        class="button-action-option icon-delete"
+        :title="`Delete ${props.title}`"
+        :disabled="props.isUpdatingOrAdding"
+        @click.prevent="onDeleteSelected"
+        @keyup.enter="onDeleteSelected"
     >
-        Update {{ props.title }}
+        Delete {{ title }}
     </button>
 </template>
 

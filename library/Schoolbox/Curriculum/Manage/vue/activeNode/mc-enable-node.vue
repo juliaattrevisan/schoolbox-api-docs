@@ -67,7 +67,7 @@ const enabledButtonText = computed(() => enabledNodeStore.isProcessing ? 'Deleti
  *
  * @returns { Boolean }
  */
-const isModalEnabled = computed(() => enabledNodeStore.isProcessing);
+const isModalDisabled = computed(() => enabledNodeStore.isProcessing);
 
 /**
  * to close the modal
@@ -89,7 +89,7 @@ function onModalClosed () {
 <template>
     <reveal-modal
         ref="modalEl"
-        :is-close-enabledd="isModalEnabled"
+        :is-close-disabled="isModalDisabled"
         :close-on-background-click="false"
         @closed="onModalClosed"
     >

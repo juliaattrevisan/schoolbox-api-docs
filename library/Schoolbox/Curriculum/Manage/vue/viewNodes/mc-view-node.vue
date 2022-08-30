@@ -119,7 +119,7 @@ const isAddingAnother = computed(() => addSubsectionStore.isOpen && activeNodeSt
  *
  * @returns { Boolean }
  */
- const isUpdatingOrAdding = computed(() => isUpdating.value || isAdding.value);
+const isUpdatingOrAdding = computed(() => isUpdating.value || isAdding.value);
 
 /**
  * To determine whether we need to display further child nodes within this node
@@ -217,6 +217,11 @@ async function onLeave (el, done) {
 ul {
     list-style: none; //don't use any dots
     margin: 0; //and spacing is controlled by props.depth
+}
+
+.inactive {
+    opacity: 0.2;
+    pointer-events: none;
 }
 
 </style>
