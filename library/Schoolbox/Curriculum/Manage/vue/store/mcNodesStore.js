@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useViewNodesStore } from '../store/mcViewNodesStore';
+import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 export const UNSET_ID = 0;

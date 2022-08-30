@@ -7,7 +7,7 @@
 
 import { onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
-import { useViewNodesStore } from './store/mcViewNodesStore';
+import { useViewNodesStore } from './viewNodes/store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';

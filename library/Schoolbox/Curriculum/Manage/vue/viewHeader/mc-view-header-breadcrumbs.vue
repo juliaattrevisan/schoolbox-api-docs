@@ -5,7 +5,7 @@
  * move backwards through the tree
  */
 
-import { useViewNodesStore } from './store/mcViewNodesStore';
+import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 
 
 const viewNodesStore = useViewNodesStore();

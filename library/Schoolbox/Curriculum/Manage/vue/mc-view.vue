@@ -6,8 +6,8 @@
 
 import { useStore } from './store/manageCurriculumStore';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
-import McViewHeader from './mc-view-header.vue';
-import McViewNodes from './mc-view-nodes.vue';
+import McViewHeader from './viewHeader/mc-view-header.vue';
+import McViewNodes from './viewNodes/mc-view-nodes.vue';
 
 const store = useStore();
 

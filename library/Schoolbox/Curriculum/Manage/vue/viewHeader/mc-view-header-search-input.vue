@@ -5,8 +5,8 @@
  */
 
 import { computed } from 'vue';
-import { useViewNodesStore } from './store/mcViewNodesStore';
-import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
+import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
+import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 
 const viewNodesStore = useViewNodesStore();

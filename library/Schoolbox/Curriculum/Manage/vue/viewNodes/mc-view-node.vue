@@ -11,7 +11,7 @@ import { escapeRegExp } from '@js/util/jsUtils';
 import { slideDown, slideUp } from '@js/util/animateUtils';
 import { useStore } from '../store/manageCurriculumStore';
 import { useNodesStore, UNSET_ID } from '../store/mcNodesStore';
-import { useViewNodesStore, DIRECTION } from '../store/mcViewNodesStore';
+import { useViewNodesStore, DIRECTION } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 import { useDeleteNodeStore } from '../activeNode/store/mcDeleteNodeStore';
 import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
