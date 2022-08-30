@@ -6,7 +6,7 @@ import { defineStore } from 'pinia';
 import { useNodesStore } from './mcNodesStore';
 
 
-export const useStore = defineStore('manageCurriculumStore', {
+export const useStore = defineStore('manageCurriculum', {
 
     state: () => ({
         isLoading: true, //to display loading note

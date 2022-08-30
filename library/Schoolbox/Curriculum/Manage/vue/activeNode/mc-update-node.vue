@@ -76,7 +76,9 @@ function getVueSpecificConfig () {
                 updateNodeStore.activeNodeCopy.description = CKEDITOR.instances[ckeditorInstance.value].getData();
             },
             instanceReady: (event) => { //can display the loaded CKEditor now
-                event.editor.setData(updateNodeStore.activeNodeCopy.description); //set the initial data
+                if (updateNodeStore.activeNodeCopy.description !== null) {
+                    event.editor.setData(updateNodeStore.activeNodeCopy.description); //set the initial data
+                }
             }
         },
         targetElements: $(`#${ckeditorInstance.value}`),

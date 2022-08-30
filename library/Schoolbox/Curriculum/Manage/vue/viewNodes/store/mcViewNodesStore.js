@@ -11,7 +11,7 @@ export const DIRECTION = {
     BACKWARDS: 'backwards',
 }
 
-export const useViewNodesStore = defineStore('mcViewNodesStore', {
+export const useViewNodesStore = defineStore('mcViewNodes', {
 
     state: () => ({
         idList: [], //ids of the selected nodes

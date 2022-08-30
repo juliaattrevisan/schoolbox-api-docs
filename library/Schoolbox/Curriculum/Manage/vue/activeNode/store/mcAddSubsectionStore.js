@@ -6,7 +6,7 @@ import { defineStore } from 'pinia';
 import { useActiveNodeStore } from './mcActiveNodeStore';
 
 
-export const useAddSubsectionStore = defineStore('mcAddSubsectionStore', {
+export const useAddSubsectionStore = defineStore('mcAddSubsection', {
 
     state: () => ({
         isProcessing: false,

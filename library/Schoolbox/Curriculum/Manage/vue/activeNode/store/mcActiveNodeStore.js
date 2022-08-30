@@ -5,7 +5,7 @@
 import { defineStore } from 'pinia';
 
 
-export const useActiveNodeStore = defineStore('mcActiveNodeStore', {
+export const useActiveNodeStore = defineStore('mcActiveNode', {
 
     state: () => ({
         node: null, //the currently selected node

@@ -9,7 +9,7 @@ import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 export const UNSET_ID = 0;
 
 
-export const useNodesStore = defineStore('mcNodesStore', {
+export const useNodesStore = defineStore('mcNodes', {
 
     state: () => ({
         nodes: {}, //all the nodes currently loaded
