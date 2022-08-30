@@ -430,3 +430,8 @@ $masonry-drop-background: $input-focus-bg-color;
     @extend .icon-intellischool;
     color: $icon-color-intellischool;
 }
+
+.icon-masonry-Component_Dashboard_CanvasAssignmentsController:before {
+    @extend .icon-canvas-lms;
+    color: $icon-color-canvas-lms;
+}
