@@ -556,6 +556,12 @@ class External_Liss_Server
             $allData = $message->getParam(1)->me['array'];
 
             foreach ($allData as $currentData) {
+                /* An example $currentData that you can paste into a test.json
+                 * so you have a meaningful example of what you're working with
+                 * This came straight outta their 2020 devkit
+                 *
+                 * {"me":{"struct":{"DayNumber":{"me":{"i4":1},"mytype":1,"_php_class":null},"Period":{"me":{"string":"3"},"mytype":1,"_php_class":null},"ClassCode":{"me":{"string":"7PDH 2"},"mytype":1,"_php_class":null},"EdvalClassCode":{"me":{"string":"7PDH2"},"mytype":1,"_php_class":null},"TeacherId":{"me":{"string":"79455"},"mytype":1,"_php_class":null},"TeacherCode":{"me":{"string":"ANDN"},"mytype":1,"_php_class":null},"RoomCode":{"me":{"string":"B3"},"mytype":1,"_php_class":null}}},"mytype":3,"_php_class":null}
+                 */
                 $struct = $currentData->me['struct'];
 
                 /* Find the Period data
