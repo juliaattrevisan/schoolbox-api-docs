@@ -37,7 +37,7 @@ const props = defineProps({
         }
     },
     /**
-     * to gradually add more paddingLeft to indicate node level depth
+     * to gradually add more marginLeft to indicate node level depth
      */
     depth: {
         type: Number,
@@ -84,11 +84,11 @@ function animateOn () {
 }
 
 /**
- * to gradually and more paddingLeft to indicate node level depth
+ * to gradually and more marginLeft to indicate node level depth
  *
  * @returns { Number }
  */
-const paddingLeft = computed(() => `calc(${props.depth * 2}rem)`);
+const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * If there's a code available, which means it can be added to the name
@@ -328,13 +328,19 @@ async function onLeave (el, done) {
             @enter="onEnter"
             @leave="onLeave"
         >
-            <mc-add-subsection v-if="isAdding" />
+            <mc-add-subsection
+                v-if="isAdding"
+                :depth="props.depth"
+            />
         </Transition>
         <Transition
             @enter="onEnter"
             @leave="onLeave"
         >
-            <mc-update-node v-if="isUpdating" />
+            <mc-update-node
+                v-if="isUpdating"
+                :depth="props.depth"
+            />
         </Transition>
         <ul v-if="showChildren ">
             <mc-view-node
@@ -353,7 +359,7 @@ async function onLeave (el, done) {
     align-items: center;
     border-bottom: 1px solid var(--body-background);
     display: flex;
-    margin: 0 0 0 v-bind(paddingLeft);
+    margin: 0 0 0 v-bind(marginLeft);
     padding: 2px;
     transition: 0.3s;
 }

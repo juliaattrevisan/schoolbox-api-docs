@@ -9,8 +9,25 @@ import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import { useUpdateNodeStore } from './store/mcUpdateNodeStore';
 
 
+const props = defineProps({
+    /**
+     * to gradually add more marginLeft to indicate node level depth
+     */
+    depth: {
+        type: Number,
+        required: true,
+    },
+});
+
 const activeNodeStore = useActiveNodeStore();
 const updateNodeStore = useUpdateNodeStore();
+
+/**
+ * to gradually and more marginLeft to indicate node level depth
+ *
+ * @returns { Number }
+ */
+const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * To instantly notify the user that the node is being updated
@@ -37,7 +54,7 @@ function onCancelSelected () {
 </script>
 
 <template>
-    <div class="update-node-container">
+    <div class="node-container">
         <section>
             <fieldset class="content">
                 <legend>Editing: {{ activeNodeStore.title }}</legend>
@@ -69,7 +86,7 @@ function onCancelSelected () {
 .node-container {
     border-bottom: 1px solid var(--content-ui-background);
     border-top: 1px solid var(--content-ui-background);
-    margin: -1px 0 0 0; //-1px so it butts up against the node border above
+    margin: -1px 0 0 v-bind(marginLeft); //-1px so it butts up against the node border above
 }
 
 legend {

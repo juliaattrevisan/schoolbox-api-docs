@@ -9,8 +9,25 @@ import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import { useAddSubsectionStore } from './store/mcAddSubsectionStore';
 
 
+const props = defineProps({
+    /**
+     * to gradually add more marginLeft to indicate node level depth
+     */
+    depth: {
+        type: Number,
+        required: true,
+    },
+});
+
 const activeNodeStore = useActiveNodeStore();
 const addSubsectionStore = useAddSubsectionStore();
+
+/**
+ * to gradually and more marginLeft to indicate node level depth
+ *
+ * @returns { Number }
+ */
+const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * To instantly notify the user that the subsection is being added
@@ -69,7 +86,7 @@ function onCancelSelected () {
 .node-container {
     border-bottom: 1px solid var(--content-ui-background);
     border-top: 1px solid var(--content-ui-background);
-    margin: -1px 0 0 0; //-1px so it butts up against the node border above
+    margin: -1px 0 0 v-bind(marginLeft); //-1px so it butts up against the node border above
 }
 
 legend {
