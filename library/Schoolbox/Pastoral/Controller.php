@@ -18,13 +18,11 @@ use Aura\Web\Request\Values as RequestValues;
 use Exception;
 use External_Pastoral;
 use InvalidArgumentException;
-use PDOException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -64,7 +62,6 @@ use Schoolbox\RoleMapper;
 use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -493,10 +490,8 @@ class Controller extends Base
 
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
 
-        $reports = $this->pastoralReportMapper->createCollection();
         if ($moderator) {
             $record->setRevisions($this->pastoralRevisionDataSource->findForRecord($this->getUser(), $record));
-            $reports = $this->pastoralReportMapper->findForRecord($record, false);
         }
 
         // Hydrate group members and their roles so we can display them in the visibility section
@@ -539,7 +534,6 @@ class Controller extends Base
                     'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
                     'access'             => $access,
                     'linkedStudents'     => [],
-                    'reports'            => $reports,
                 ],
                 'title'    => $record->getHeading(),
             ]
@@ -808,9 +802,8 @@ class Controller extends Base
      * if these tags once existed
      *
      * @param string $tagCsv
+     * @return Collection
      * @throws MapperException
-     * @throws PDOException
-     * @throws UnexpectedValueException
      */
     private function prepareTags(string $tagCsv): Collection
     {
@@ -856,6 +849,7 @@ class Controller extends Base
     /**
      * @param RequestValues $post
      * @return Collection
+     * @throws MapperException
      */
     private function prepareAccesses(RequestValues $post): Collection
     {
@@ -1341,6 +1335,8 @@ class Controller extends Base
      * Download an attachment from file system, permissions are applied via routing system
      *
      * @param PastoralAttachmentModel $attachment
+     * @return void
+     * @throws \League\Flysystem\FilesystemException
      */
     public function getStudentRecordAttachment(PastoralAttachmentModel $attachment): void
     {

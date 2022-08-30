@@ -13,6 +13,7 @@ use PDOStatement;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -175,14 +176,13 @@ class Mapper extends BaseMapper
             // (of hydrated objects where applicable)
 
             $model->setOrder(new Collection(explode(',', $row['order'])));
-            $model->setYears(new Collection(explode(',', $row['years'])));
-
+            $model->setYears($this->getCollection(\Schoolbox\YearLevel\Mapper::getInstance(), $row['years']));
             $model->setTypes($this->getCollection(PastoralTypeMapper::getInstance(), $row['types']));
             $model->setSubTypes($this->getCollection(PastoralSubTypeMapper::getInstance(), $row['sub_types']));
             $model->setAuthors($this->getCollection(UserMapper::getInstance(), $row['authors']));
             $model->setStudents($this->getCollection(UserMapper::getInstance(), $row['students']));
             $model->setTags($this->getCollection(PastoralTagMapper::getInstance(), $row['tags']));
-            $model->setGroups($this->getCollection(PastoralGroupMapper::getInstance(), $row['groups'] ?? null));
+            $model->setGroups($this->getCollection(PastoralGroupMapper::getInstance(), $row['groups']));
             $model->setHouses($this->getCollection(\HouseMapper::getInstance(), $row['houses']));
             $model->setCampuses($this->getCollection(CampusMapper::getInstance(), $row['campuses']));
             if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
@@ -330,17 +330,18 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Find reports which criteria match the pastoral record provided
+     * This does not check the current user's accessibility to the record
      * @param \Schoolbox\Pastoral\Model $pastoral
      * @param bool                      $notificationEnabledOnly
      * @return \Schoolbox\GenericCollection
      */
-    public function findForRecord(\Schoolbox\Pastoral\Model $pastoral, bool $notificationEnabledOnly)
+    public function findForRecord(\Schoolbox\Pastoral\Model $pastoral, bool $notificationEnabledOnly): GenericCollection
     {
         // For now, this does not check date, when uses_relative_date is true.
 
         $sql = "
-            SELECT      {$this->getColumnString()}
-            FROM        {$this->getTable()}
+            {$this->getSelectString()}
             WHERE
                   (
                       `uses_relative_date` = 1
@@ -395,13 +396,12 @@ class Mapper extends BaseMapper
         $tagWheres = [];
         foreach ($pastoral->getTags() as $i => $tag) {
             $tagWheres[]         = "CONCAT(',', `tags`, ',') LIKE :tagLike$i";
-            $params["tagLike$i"] = "%,{$tag->getId()},%";
+            $params["tagLike$i"] = "%,{$tag->getName()},%";
         }
         if ($pastoral->getTags()->count() === 0) {
-            // this field is set to empty string, for types without subtype
-            $wheres[] = "`tags` = ''";
+            $wheres[] = "`tags` IS NULL";
         } else {
-            $wheres[] = sprintf("(`tags` = '' OR %s)", implode(' OR ', $tagWheres));
+            $wheres[] = sprintf("(`tags` IS NULL OR %s)", implode(' OR ', $tagWheres));
         }
 
         // Year level
@@ -440,18 +440,18 @@ class Mapper extends BaseMapper
                 $params["actionLike$i"] = "%,{$action->getId()},%";
             }
             if ($pastoral->getRecordActions()->count() === 0) {
-                $wheres[] = "`actions` = '' OR `actions` IS NULL OR `include_records_without_action` = 1";
+                $wheres[] = "`actions` IS NULL OR `include_records_without_action` = 1";
             } else {
-                $wheres[] = sprintf("(`actions` = '' OR `actions` IS NULL OR %s)", implode(' OR ', $actionWheres));
+                $wheres[] = sprintf("(`actions` IS NULL OR %s)", implode(' OR ', $actionWheres));
             }
         }
 
         // Notification enabled only
         if ($notificationEnabledOnly) {
-            $wheres[] = "`notification_enabled ` = 1";
+            $wheres[] = "`notification_enabled` = 1";
         }
 
-        $sql .= ' AND ' . implode(' AND ', $wheres);
+        $sql .= ' AND ' . implode(' AND ', $wheres) . ' GROUP BY `pastoral_report`.`id`';
 
         $statement = $this->getDatabase()->prepare($sql);
         $statement->execute($params);
@@ -465,7 +465,7 @@ class Mapper extends BaseMapper
      * @param BaseMapper $mapper
      * @param string     $ids
      *
-     * @return Collection
+     * @return GenericCollection
      */
     private function getCollection($mapper, $ids)
     {

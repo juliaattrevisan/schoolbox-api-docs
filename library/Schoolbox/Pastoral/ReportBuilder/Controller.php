@@ -539,7 +539,7 @@ class Controller extends Base
      */
     public function postReportModify(): void
     {
-        $post = $this->getRequest()->post;
+        $post = $this->request->post;
 
         /* User must supply name, types, years and houses
          */
@@ -547,120 +547,76 @@ class Controller extends Base
         $includeStudentsWithoutHouse = $post->getBool('includeStudentsWithoutHouse', false);
         // For years and houses, either no-house/year or years/houses need to be selected
         if (
-            !strlen(trim($post['name']))
-            || !count($post['types'])
-            || !($includeStudentsWithoutYear || count($post['years']))
-            || !($includeStudentsWithoutHouse || count($post['houses']))
+            !strlen($post->get('name'))
+            || !count($post->get('types'))
+            || !($includeStudentsWithoutYear || count($post->get('years')))
+            || !($includeStudentsWithoutHouse || count($post->get('houses')))
         ) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        if (empty($post['id'])) {
+        if (empty($post->getInt('id'))) {
             $pastoralReport = $this->pastoralReportMapper->createModel();
         } else {
-            $pastoralReport = $this->pastoralReportMapper->findByIdWithFallback($post['id']);
+            $pastoralReport = $this->pastoralReportMapper->findByIdWithFallback($post->getInt('id'));
         }
 
         $pastoralReport->setOwner($this->getUser());
-        $pastoralReport->setName($post['name']);
-        $pastoralReport->setDescription($post['description'] ?? '');
-        $pastoralReport->setOrderCsv($post['order']);
-        $pastoralReport->setInvolved($post['involved'] ?? false);
+        $pastoralReport->setName($post->get('name'));
+        $pastoralReport->setDescription($post->get('description'));
+        $pastoralReport->setOrderCsv($post->get('order'));
+        $pastoralReport->setInvolved($post->getBool('involved', false));
 
         // Only save severity if it is enabled by policy
-        if ($this->getConfigLoader()->get('pastoral_severity')) {
-            $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post['severity'] ?? null));
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
+            $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post->get('severity')));
         }
 
-        if (!empty($post['date-option']) && $post['date-option'] === PastoralReport::ABSOLUTE_DATE) {
+        if (!empty($post->get('date-option')) && $post->get('date-option') === PastoralReport::ABSOLUTE_DATE) {
             $pastoralReport->setUsesRelativeDate(false);
 
-            if (!empty($post['before'])) {
-                $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($post['before']));
+            if (!empty($post->get('before'))) {
+                $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($post->get('before')));
             }
 
-            if (!empty($post['after'])) {
-                $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($post['after']));
+            if (!empty($post->get('after'))) {
+                $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($post->get('after')));
             }
         } else {
             $pastoralReport->setUsesRelativeDate(true);
             $pastoralReport->setRelativeDateString(self::THIS_YEAR);
 
             // Update with POSTed relative date if it's valid
-            $relativeDateString = $post['relative-dates-dropdown'];
+            $relativeDateString = $post->get('relative-dates-dropdown');
             if (!empty($relativeDateString) && array_key_exists($relativeDateString, self::RELATIVE_DATE_PRESETS)) {
                 $pastoralReport->setRelativeDateString($relativeDateString);
             }
         }
 
-
-        if (is_array($post['types'])) {
-            $pastoralReport->setTypesCsv(implode(',', $post['types']));
-        } else {
-            $pastoralReport->setTypesCsv('');
-        }
-
-        if (is_array($post['subtypes'] ?? false)) {
-            $pastoralReport->setSubTypesCsv(implode(',', $post['subtypes']));
-        } else {
-            $pastoralReport->setSubTypesCsv('');
-        }
-
-        if (is_array($post['authors'] ?? false)) {
-            $pastoralReport->setAuthorsCsv(implode(',', $post['authors']));
-        } else {
-            $pastoralReport->setAuthorsCsv('');
-        }
-
-        if (is_array($post['students'] ?? false)) {
-            $pastoralReport->setStudentsCsv(implode(',', $post['students']));
-        } else {
-            $pastoralReport->setStudentsCsv('');
-        }
-
-        if (is_array($post['tags'] ?? false)) {
-            $pastoralReport->setTagsCsv(implode(',', $post['tags']));
-        } else {
-            $pastoralReport->setTagsCsv('');
-        }
-
-        if (is_array($post['years'] ?? false)) {
-            $pastoralReport->setYearsCsv(implode(',', $post['years']));
-        } else {
-            $pastoralReport->setYearsCsv('');
-        }
-
-        if (is_array($post['houses'] ?? false)) {
-            $pastoralReport->setHousesCsv(implode(',', $post['houses']));
-        } else {
-            $pastoralReport->setHousesCsv('');
-        }
-
-        if (is_array($post['campuses'])) {
-            $pastoralReport->setCampusesCsv(implode(',', $post['campuses']));
-        } else {
-            $pastoralReport->setCampusesCsv('');
-        }
+        $pastoralReport->setTypesCsv($this->getCsv($post->get('types')));
+        $pastoralReport->setSubTypesCsv($this->getCsv($post->get('subtypes')));
+        $pastoralReport->setAuthorsCsv($this->getCsv($post->get('authors')));
+        $pastoralReport->setStudentsCsv($this->getCsv($post->get('students')));
+        $pastoralReport->setTagsCsv($this->getCsv($post->get('tags')));
+        $pastoralReport->setYearsCsv($this->getCsv($post->get('years')));
+        $pastoralReport->setHousesCsv($this->getCsv($post->get('houses')));
+        $pastoralReport->setCampusesCsv($this->getCsv($post->get('campuses')));
 
         $pastoralReport->setIncludeStudentsWithoutYear($includeStudentsWithoutYear);
         $pastoralReport->setIncludeStudentsWithoutHouse($includeStudentsWithoutHouse);
 
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
-            if (is_array($post['actions'] ?? false)) {
-                $pastoralReport->setActionsCsv(implode(',', $post['actions']));
-            } else {
-                $pastoralReport->setActionsCsv('');
-            }
+            $pastoralReport->setActionsCsv($this->getCsv($post->get('actions')));
             $pastoralReport->setIncludeRecordsWithoutAction($post->getBool('includeRecordsWithoutAction', false));
             $pastoralReport->setIncludeUncompletedActionsOnly($post->getBool('includeUncompletedActionsOnly', false));
         }
 
         // Save groups the report is shared with
 
-        if (is_array($post['group'] ?? false)) {
-            $groupsCollection = new Collection();
+        if (is_array($post->get('group') ?? false)) {
+            $groupsCollection = $this->pastoralGroupMapper->createCollection();
 
-            foreach ($post['group'] as $groupId => $checked) {
+            foreach ($post->get('group') as $groupId => $checked) {
                 if ($checked) {
                     $groupsCollection->add($this->pastoralGroupMapper->createModel($groupId));
                 }
@@ -673,8 +629,7 @@ class Controller extends Base
         $this->pastoralReportMapper->save($pastoralReport);
 
         // Update display on pastoral dashboard status
-
-        $this->updatePastoralDashboard($pastoralReport, isset($post['dashboard']));
+        $this->updatePastoralDashboard($pastoralReport, $post->getBool('dashboard', false));
 
         // Go back to the reports list
 
@@ -693,7 +648,7 @@ class Controller extends Base
 
         // Create bare minimum report object
 
-        $report = $this->pastoralReportMapper->createModel($post['reportId']);
+        $report = $this->pastoralReportMapper->createModel($post->get('reportId'));
 
         $result = $this->updatePastoralDashboard($report, (bool)$post->get('display'));
 
@@ -752,5 +707,14 @@ class Controller extends Base
         }
 
         return $result;
+    }
+
+    /**
+     * @param array|null $var
+     * @return string|null
+     */
+    private function getCsv(?array $var): ?string
+    {
+        return is_array($var) ? implode(',', $var) : null;
     }
 }

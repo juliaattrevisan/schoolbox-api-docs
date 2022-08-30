@@ -1048,7 +1048,7 @@ class Mapper extends BaseMapper
 
         if ($years->count()) {
             $pbArray = PredicateBuilder::getArrayBindings(
-                $years->getAll(),
+                $years->getPropertyValues('id'),
                 's_year' . self::$placeholderIndex
             );
 

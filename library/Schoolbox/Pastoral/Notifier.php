@@ -15,12 +15,14 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -62,13 +64,13 @@ class Notifier extends AbstractModuleNotifier
     /** @var PastoralGroupMapper $pastoralGroupMapper */
     protected PastoralGroupMapper $pastoralGroupMapper;
 
+    protected PastoralReportMapper $pastoralReportMapper;
+
     /** @var RoleMapper $roleMapper */
     protected RoleMapper $roleMapper;
 
     /** @var UserMapper $userMapper */
     protected UserMapper $userMapper;
-
-    protected PastoralReportMapper $pastoralReportMapper;
 
     /** @var RosettaStone $l10n */
     protected RosettaStone $l10n;
@@ -129,50 +131,36 @@ class Notifier extends AbstractModuleNotifier
             return $envelope;
         }
 
-        // Get the kids teachers
-        // Create the message
-        $href     = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}";
-        $severity = $pastoral->getSeverity()
-            ? sprintf('%s %s', strtolower($pastoral->getSeverity()->getName()), $this->l10n->translate('severity'))
-            : '';
-        $type     = strtolower($pastoral->getSubType() instanceof SubType\Model ? $pastoral->getSubType()->getName() : $pastoral->getType()->getName());
-
-        $builder = new Builder();
-        $builder->setTitle("A :pastoralcare record has been {$method}")
-                ->setParam('pastoralcare', new Param("{$severity} {$type}", $href, ParameterInterface::STACKING_APPEND))
-                ->setIcon($this->getUserIcon($effector))
-                ->setHref($href)
-                ->setNamespace($this->getSlug())
-                ->setSeverity(Logger::ERROR)
-                ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
-                ->addTopic("pastoral.{$pastoral->getId()}.{$method}");
-
+        $builder = $this->getBaseBuilder($pastoral, $method, $effector);
         $message = $builder->build();
 
         // Work out who to send the message to
 
-        $parentAccessEnabled  = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
-        $studentAccessEnabled = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
+        if ($method === self::TRIGGER_ADDED_TO_REPORT) {
+            $targetUsers = $this->findReportUsersForRecord($pastoral);
+        } else {
+            $parentAccessEnabled  = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
+            $studentAccessEnabled = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
 
-        $privateChangeOnly = false;
-        if ($diff) {
-            $relevantDiff      = array_intersect(array_keys($diff), self::COLS);
-            $privateChangeOnly = empty(array_diff($relevantDiff, ['bodyPrivate', 'attachmentsPrivate']));
+            $privateChangeOnly = false;
+            if ($diff) {
+                $relevantDiff      = array_intersect(array_keys($diff), self::COLS);
+                $privateChangeOnly = empty(array_diff($relevantDiff, ['bodyPrivate', 'attachmentsPrivate']));
+            }
+
+            /** @var Collection|PastoralAccess[] $accessRecords */
+            $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
+            $targetUsers   = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->log))
+                ->buildTargetUsers(
+                    $accessRecords,
+                    $privateChangeOnly,
+                    $student,
+                    $parentAccessEnabled,
+                    $studentAccessEnabled,
+                    'pastoral',
+                    $method,
+                );
         }
-
-        /** @var Collection|PastoralAccess[] $accessRecords */
-        $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
-        $targetUsers   = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->log))
-            ->buildTargetUsers(
-                $accessRecords,
-                $privateChangeOnly,
-                $student,
-                $parentAccessEnabled,
-                $studentAccessEnabled,
-                'pastoral',
-                $method,
-            );
-
 
         $accessLevelCensor = new AccessLevelCensor();
         foreach ($targetUsers as $userId => $user) {
@@ -226,81 +214,32 @@ class Notifier extends AbstractModuleNotifier
      *
      * @return Envelope
      */
-    public function notifyCreated(Model $model, User $effector, $diff = []): Envelope
+    public function notifyCreated(Model $model, User $effector, ?array $diff = []): Envelope
     {
         return $this->buildMessage($model, self::TRIGGER_CREATED, $effector, $diff);
     }
 
     /**
-     * @param Model $model
-     * @param User  $effector
-     * @param array $diff
+     * @param Model      $model
+     * @param User       $effector
+     * @param array|null $diff
      *
      * @return Envelope
      */
-    public function notifyUpdated(Model $model, User $effector, $diff = []): Envelope
+    public function notifyUpdated(Model $model, User $effector, ?array $diff = []): Envelope
     {
         return $this->buildMessage($model, self::TRIGGER_UPDATED, $effector, $diff);
     }
 
     /**
-     * @param Model $model
-     * @param User  $effector
-     * @param       $diff
+     * @param Model      $model
+     * @param User       $effector
+     * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStaffAddedToReport(Model $model, User $effector, $diff = []): Envelope
+    public function notifyAddedToReport(Model $model, User $effector, ?array $diff = []): Envelope
     {
-        $envelope = new Envelope();
-
-        // Get hydrated pastoral record
-        try {
-            $pastoral = $this->mapper->findById($model->getId());
-            $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
-//            $student->loadParents();
-            $student->loadTeachers();
-            $pastoral->setStudent($student);
-        } catch (MapperException $e) {
-            $this->log->error("Error: Unable to send pastoral addedToReport notification. {$e->getMessage()}", ['exception' => $e]);
-            return $envelope;
-        }
-
-        // Get the kids teachers
-        // Create the message
-        $href     = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}";
-        $severity = $pastoral->getSeverity()
-            ? sprintf('%s %s', strtolower($pastoral->getSeverity()->getName()), $this->l10n->translate('severity'))
-            : '';
-        $type     = strtolower($pastoral->getSubType() instanceof SubType\Model ? $pastoral->getSubType()->getName() : $pastoral->getType()->getName());
-
-        $builder = new Builder();
-        $builder->setTitle("A new :pastoralcare record is added to your :report")
-                ->setParam('pastoralcare', new Param("{$severity} {$type}", $href, ParameterInterface::STACKING_APPEND))
-                ->setIcon($this->getUserIcon($effector))
-                ->setHref($href)
-                ->setNamespace($this->getSlug())
-                ->setSeverity(Logger::ERROR)
-                ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
-                ->addTopic("pastoral.{$pastoral->getId()}." . self::TRIGGER_ADDED_TO_REPORT);
-
-        $message = $builder->build();
-
-        $reports = $this->findReportForRecord($pastoral);
-
-        $targetUsers = $this->findUsersForReports($reports);
-
-
-
-        $accessLevelCensor = new AccessLevelCensor();
-        foreach ($targetUsers as $userId => $user) {
-            // make sure that multiple conditions allow user to access this record
-            if ($accessLevelCensor->getAccessLevel($pastoral, $user) === PastoralAccessMapper::ACCESS_DENY) {
-                continue;
-            }
-            $envelope->targetToUser($userId, $message);
-        }
-
-        return $envelope;
+        return $this->buildMessage($model, self::TRIGGER_ADDED_TO_REPORT, $effector, $diff);
     }
 
     /**
@@ -340,6 +279,18 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
+     * @param PastoralReportMapper $pastoralReportMapper
+     *
+     * @return static
+     */
+    public function setPastoralReportMapper(PastoralReportMapper $pastoralReportMapper): self
+    {
+        $this->pastoralReportMapper = $pastoralReportMapper;
+
+        return $this;
+    }
+
+    /**
      * @param RoleMapper $roleMapper
      *
      * @return static
@@ -374,15 +325,76 @@ class Notifier extends AbstractModuleNotifier
         return $this;
     }
 
-    private function findReportForRecord(Model $pastoral)
+    /**
+     * @param Model  $pastoral
+     * @param string $method
+     * @param User   $effector
+     * @return Builder
+     */
+    private function getBaseBuilder(Model $pastoral, string $method, User $effector): Builder
     {
-        $this->pastoralReportMapper->findForRecord();
+        // Get the kids teachers
+        // Create the message
+        $href = sprintf("/pastoral/student/%s/record/%s", $pastoral->getStudent()->getId(), $pastoral->getId());
+        $meta = [];
+        // severity
+        if ($this->conf->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED) && $pastoral->getSeverity()) {
+            $meta[] = sprintf('%s %s', strtolower($pastoral->getSeverity()->getName()), $this->l10n->translate('severity'));
+        }
+        // type
+        $meta[]      = strtolower($pastoral->getSubType() instanceof SubType\Model ? $pastoral->getSubType()->getName() : $pastoral->getType()->getName());
+        $recordTitle = implode(' ', $meta);
+
+        if ($method === self::TRIGGER_ADDED_TO_REPORT) {
+            $messageTitle = "A new :pastoralcare record has been added to your report";
+        } else {
+            $messageTitle = "A :pastoralcare record has been {$method}";
+        }
+
+        $builder = new Builder();
+        $builder->setTitle($messageTitle)
+                ->setParam('pastoralcare', new Param($recordTitle, $href, ParameterInterface::STACKING_APPEND))
+                ->setIcon($this->getUserIcon($effector))
+                ->setHref($href)
+                ->setNamespace($this->getSlug())
+                ->setSeverity(Logger::ERROR)
+                ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
+                ->addTopic("pastoral.{$pastoral->getId()}.{$method}");
+
+        return $builder;
     }
 
-    private function findUsersForReports(Collection $reports)
+    /**
+     * @param Model $pastoral
+     * @return GenericCollection
+     */
+    private function findReportUsersForRecord(Model $pastoral): GenericCollection
     {
-
+        $reports = $this->pastoralReportMapper->findForRecord($pastoral, true);
+        $this->log->debug(count($reports) . " reports found for pastoral {$pastoral->getId()}");
+        $this->log->debug("Report ids: " . implode(',', $reports->getPropertyValues('id')));
+        $userIds = [];
+        /** @var Report\Model $report */
+        foreach ($reports as $report) {
+            if (!in_array($report->getOwner()->getId(), $userIds)) {
+                $userIds[] = $report->getOwner()->getId();
+            }
+            $groups = $report->getGroups();
+            foreach ($groups as $group) {
+                $memberIds = $group->getMembers()->map(function ($member) {
+                    return $member->getUser()->getId();
+                })->getAll();
+                $userIds   = array_unique(array_merge($userIds, $memberIds));
+            }
+        }
+        return $this->userMapper->findByColumn('id', $userIds)->filter(
+            function ($user) {
+                /** @var User $user */
+                return $user->getRole()->isStaff()
+                    && ($user->getRole()->getAccessPastoral()
+                        || $user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)
+                    );
+            }
+        )->indexBy('id');
     }
-
-
 }

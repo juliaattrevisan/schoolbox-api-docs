@@ -148,20 +148,3 @@
     {% include '@pastoral/record_section_actions.twig' %}
     {% include '@pastoral/record_section_linked.twig' %}
 {% endif %}
-
-{% if (reports | length) > 0 %}
-    <div class="row">
-        <div class="small-12 medium-6 columns island">
-            <h2 class="subheader">Reports</h2>
-            <section>
-                <fieldset class="checklist">
-                    <ul class="option-list">
-                        {% for report in reports %}
-                            <li>{{ report.name }}</li>
-                        {% endfor %}
-                    </ul>
-                </fieldset>
-            </section>
-        </div>
-    </div>
-{% endif %}
