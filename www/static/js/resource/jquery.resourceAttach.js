@@ -354,21 +354,26 @@
 
 
     ResourceAttach.prototype.getQueryString = function () {
-        var qString = 'multi=' + (this.options.multi ? '1' : '0');
+        let urlSearchParams = new URLSearchParams();
+        urlSearchParams.append('multi', this.options.multi ? '1' : '0');
 
         if (this.options.allowedFiles) {
-            qString += '&mime=' + this.options.allowedFiles;
+            urlSearchParams.append('mime', this.options.allowedFiles);
         }
 
         if (this.options.useFolder) {
-            qString += '&f=1';
+            urlSearchParams.append('f', '1');
         }
 
         if (this.options.fs) {
-            qString += '&fs=' + this.options.fs;
+            urlSearchParams.append('fs', this.options.fs);
         }
 
-        return qString;
+        if (this.options.expiryDate) {
+            urlSearchParams.append('expiryDate', this.options.expiryDate);
+        }
+
+        return urlSearchParams.toString();
     };
 
 
