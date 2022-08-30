@@ -63,11 +63,31 @@ export const useNodesStore = defineStore('mcNodesStore', {
  * @param { array }
  * @param { number }
  */
-function removeId (data, id) {
+export function removeId (data, id) {
     return data.reduce((previousValue, currentValue) => {
         if (currentValue.id !== id) {
             previousValue.push( { ...currentValue, children: removeId(currentValue.children, id) } );
         }
         return previousValue;
     }, []);
+}
+
+/**
+ * To just return the node containing the specified id
+ *
+ * @param { array }
+ * @param { number }
+ */
+export function findById (array, id) {
+    for (const item of array) {
+        if (item.id === id) {
+            return item;
+        }
+        if (item.children?.length) {
+            const innerResult = findById(item.children, id);
+            if (innerResult) {
+                return innerResult;
+            }
+        }
+    }
 }

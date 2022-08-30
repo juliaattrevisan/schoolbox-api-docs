@@ -4,6 +4,8 @@
  * To add, edit, delete or enable/disable a single node
  */
 
+ import { computed } from 'vue';
+import { useNodesStore, findById } from '../store/mcNodesStore';
 import { useDeleteNodeStore } from '../activeNode/store/mcDeleteNodeStore';
 import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
 import { useEnableNodeStore } from '../activeNode/store/mcEnableNodeStore';
@@ -55,6 +57,7 @@ const props = defineProps({
     },
 });
 
+const nodesStore = useNodesStore();
 const deleteNodeStore = useDeleteNodeStore();
 const addSubsectionStore = useAddSubsectionStore();
 const enabledNodeStore = useEnableNodeStore();
@@ -89,6 +92,20 @@ function onUpdateToggleSelected () {
     props.isUpdating ? updateNodeStore.cancel() : updateNodeStore.prompt(props.node);
 }
 
+/**
+ *
+ *
+ * @returns { Boolean }
+ */
+const isParentEnabled = computed(() => {
+    if (props.node.parent === null) { //assumed if there's no parent, we are at the root level, and we'll always need to show the button in this case
+        return true;
+    } else {
+        const parentNode = findById(nodesStore.nodes.children, props.node.parent?.id);
+        return parentNode.enabled;
+    }
+});
+
 </script>
 
 <template>
@@ -110,7 +127,9 @@ function onUpdateToggleSelected () {
     >
         Add subsection to {{ props.title }}
     </button>
+    <!-- only show this when the parent is enabled -->
     <button
+        v-if="isParentEnabled"
         :class="`button-action-option ${ props.node.enabled ? 'icon-view' : 'icon-view-hollow' }`"
         :title="`${ props.node.enabled ? 'Disable' : 'Enable' } node`"
         :disabled="props.isUpdatingOrAdding"

@@ -32,7 +32,7 @@ const parentNodeTitles = computed(() => {
  *
  * @returns { String }
  */
-const currentSelectedNodeTitle = computed(() => viewNodesStore.nodes[0].name);
+const currentSelectedNodeTitle = computed(() => viewNodesStore.current.name);
 
 /**
  * Clear the current search query

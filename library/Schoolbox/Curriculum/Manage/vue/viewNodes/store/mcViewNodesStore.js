@@ -4,7 +4,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore } from '../../store/mcNodesStore';
+import { useNodesStore, findById } from '../../store/mcNodesStore';
 
 export const DIRECTION = {
     FORWARDS: 'forwards',
@@ -150,23 +150,3 @@ export const useViewNodesStore = defineStore('mcViewNodesStore', {
     },
 
 });
-
-/**
- * To just return the node containing the specified id
- *
- * @param { array }
- * @param { number }
- */
-function findById (array, id) {
-    for (const item of array) {
-        if (item.id === id) {
-            return item;
-        }
-        if (item.children?.length) {
-            const innerResult = findById(item.children, id);
-            if (innerResult) {
-                return innerResult;
-            }
-        }
-    }
-}
