@@ -105,7 +105,7 @@ class Controller extends Base
 //                 * fix date format, from UTC ($assignment['end_at']) to localtime
 //                 */
 //                $date                       = \Alaress_Date_Format::newFromTimestamp(strtotime($assignment['end_at']));
-//                $assignments[$id]['end_at'] = $date->getLocal();
+//                $assignments[$id]['end_at'] = $date->getLong();
 //            }
 //        }
 //        return $this->getResponse()->content->set($this->buildJsonOutput([
@@ -182,7 +182,7 @@ class Controller extends Base
                      * fix date format, from UTC ($assignment['end_at']) to localtime
                      */
                     $date                       = \Alaress_Date_Format::newFromTimestamp(strtotime($assignment['end_at']));
-                    $assignments[$id]['end_at'] = $date->getLocal();
+                    $assignments[$id]['end_at'] = $date->getLong();
                 }
             }
         } catch (\RuntimeException | \DomainException $e) {
