@@ -90,13 +90,13 @@ function getVueSpecificConfig () {
  *
  * @returns { String }
  */
-const addSubsectionButtonText = computed(() => addSubsectionStore.isProcessing ? 'Adding...' : 'Add');
+const addButtonText = computed(() => addSubsectionStore.isProcessing ? 'Adding...' : 'Add');
 
 /**
  * submit save
  */
 function onAddSubsectionSelected () {
-    addSubsectionStore.addSubsection();
+    addSubsectionStore.add();
 }
 
 /**
@@ -112,7 +112,7 @@ function onCancelSelected () {
     <div class="node-container">
         <section>
             <fieldset class="content">
-                <legend><em>Add subsection to {{ activeNodeStore.title }}</em></legend>
+                <legend>Add subsection to {{ activeNodeStore.title }}</legend>
                 <div class="small-12 columns">
                     <label for="name">Name</label>
                     <input type="text" id="name" v-model="addSubsectionStore.subsection.name">
@@ -128,7 +128,7 @@ function onCancelSelected () {
                 <div class="small-12 columns">
                     <ul class="flex-list buttons">
                         <li><button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button" :disabled="addSubsectionStore.isProcessing">Cancel</button></li>
-                        <li><button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button submit" :disabled="addSubsectionStore.isProcessing">{{ addSubsectionButtonText }}</button></li>
+                        <li><button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button submit" :disabled="addSubsectionStore.isProcessing">{{ addButtonText }}</button></li>
                     </ul>
                 </div>
             </fieldset>

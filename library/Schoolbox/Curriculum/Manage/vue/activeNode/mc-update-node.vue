@@ -113,7 +113,7 @@ function onCancelSelected () {
     <div class="node-container">
         <section>
             <fieldset class="content">
-                <legend><em>Update {{ activeNodeStore.title }}</em></legend>
+                <legend>Update {{ activeNodeStore.title }}</legend>
                 <div class="small-12 columns">
                     <label for="name">Name</label>
                     <input type="text" id="name" v-model="updateNodeStore.activeNodeCopy.name">

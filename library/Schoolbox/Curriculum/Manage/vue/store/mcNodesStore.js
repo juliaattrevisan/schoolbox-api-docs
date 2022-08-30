@@ -8,7 +8,7 @@ import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 export const UNSET_ID = 0;
-let apiEndpoint = '';
+export let apiEndpoint = '';
 
 
 export const useNodesStore = defineStore('mcNodes', {

@@ -30,10 +30,8 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
 
         /**
          * pass the new subsections details to the backend
-         *
-         * @param { object or null }
          */
-        async addSubsection () {
+        async add () {
             this.isProcessing = true;
             try {
                 this.isProcessing = false;
