@@ -211,7 +211,10 @@ class TimetableUsers
 
         /* Perform mutations
          */
-        $manifest = $this->applyOverrides($stack[$classCode]['usuals'], $stack[$classCode]['overrides']);
+        $manifest = $this->applyOverrides(
+            $stack[$classCode]['usuals'] ?? [],
+            $stack[$classCode]['overrides'] ?? [],
+        );
 
         /* Since we're explicitly looking for staff members in this method
          * we can basically kick out everyone else who isn't, if they
