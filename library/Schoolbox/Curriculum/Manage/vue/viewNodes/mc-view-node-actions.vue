@@ -98,6 +98,7 @@ function onUpdateToggleSelected () {
  * @returns { Boolean }
  */
 const isParentEnabled = computed(() => {
+    return true;
     if (props.node.parent === null) { //assumed if there's no parent, we are at the root level, and we'll always need to show the button in this case
         return true;
     } else {

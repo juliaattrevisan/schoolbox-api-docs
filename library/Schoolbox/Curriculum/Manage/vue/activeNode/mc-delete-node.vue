@@ -26,7 +26,7 @@ watch(() => deleteNodeStore.isOpen, (isOpen) => {
  *
  * @returns { String }
  */
-const childrenWarning = computed(() => activeNodeStore?.node?.children.length > 0 ? ' and all of its children' : '');
+const childrenWarning = computed(() => activeNodeStore?.node?.children?.length > 0 ? ' and all of its children' : '');
 
 /**
  * delete the node when confirmed

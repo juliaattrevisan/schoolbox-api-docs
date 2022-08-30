@@ -40,6 +40,7 @@ export const useNodesStore = defineStore('mcNodes', {
                 id: UNSET_ID,
                 name: 'Curriculums',
                 children: nodes,
+                enabled: true,
             }
         },
 

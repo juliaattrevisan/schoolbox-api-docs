@@ -1,7 +1,6 @@
 <div id="manage-curriculum-container">
     <manage-curriculum
-        data-endpoint="{{ routeLookup('curriculumApi.getTree') }}"
-        {# data-endpoint="/api/curriculum/" #}
+        data-endpoint="/api/curriculum/?topLevelOnly=1"
         :is-read-only="{{ readonly ? 'true' : 'false' }}"
     />
 </div>

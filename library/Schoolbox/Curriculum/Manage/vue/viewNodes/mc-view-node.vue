@@ -9,6 +9,7 @@ import { ref, computed, onMounted } from 'vue';
 import { gsap } from 'gsap/all';
 import { slideDown, slideUp } from '@js/util/animateUtils';
 import { useStore } from '../store/manageCurriculumStore';
+import { useNodesStore, UNSET_ID } from '../store/mcNodesStore';
 import { useViewNodesStore, DIRECTION } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
@@ -143,6 +144,14 @@ const showChildren = computed(() => props.node.children && props.node.children.l
 const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`);
 
 /**
+ * Whether the buttons should be displayed, shouldn't be if the user is read only
+ * or are are at the root level node
+ *
+ * @returns { Boolean }
+ */
+const showActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID);
+
+/**
  * Slide down the node to be updated / added
  *
  * @param { DOMElement }
@@ -178,13 +187,17 @@ async function onLeave (el, done) {
                 :isUpdatingOrAdding="isUpdatingOrAdding"
             />
             <mc-view-node-actions
-                v-if="!store.isReadOnly"
+                v-if="showActions"
                 :node="props.node"
                 :title="title"
                 :isUpdating="isUpdating"
                 :isAdding="isAdding"
                 :isUpdatingOrAdding="isUpdatingOrAdding"
             />
+            <!-- <div class="alert-box success messsage-container">
+                Node successfully updated
+                <a href="" class="close">×</a>
+            </div> -->
         </div>
         <Transition @enter="onEnter" @leave="onLeave">
             <mc-add-subsection v-if="isAdding" :depth="props.depth" />
@@ -211,7 +224,16 @@ async function onLeave (el, done) {
     display: flex;
     margin: 0 0 0 v-bind(marginLeft);
     padding: 2px;
+    position: relative;
     transition: 0.3s;
+}
+
+.messsage-container {
+    height: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    width: 100%;
 }
 
 ul {
