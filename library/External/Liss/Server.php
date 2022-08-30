@@ -575,6 +575,10 @@ class External_Liss_Server
                  */
                 $allClasses = $classEntryMapper->findByColumn('code', trim($struct['ClassCode']->me['string']));
 
+                /* TODO: Decide which externalId format to use via config var
+                 */
+                $externalId = trim((string)$struct['TeacherCode']->me['string']);
+
                 /* Check that all three are provided
                  * Save it!
                  */
@@ -582,7 +586,7 @@ class External_Liss_Server
                     $classPeriod = $classPeriodMapper->createModel();
                     $classPeriod->setClass($allClasses->first()->getId());
                     $classPeriod->setPeriod($allPeriods->first()->getId());
-                    $classPeriod->setTeacher(trim((string)$struct['TeacherCode']->me['string']));
+                    $classPeriod->setTeacher($externalId);
                     $classPeriod->setRoom(trim((string)$struct['RoomCode']->me['string']));
                     $classPeriodMapper->save($classPeriod);
                 } else {
@@ -932,9 +936,13 @@ class External_Liss_Server
                      */
                     $event->setAccess(Event::ACCESS_PERSONAL);
 
+                    /* TODO: Decide which externalId format to use via config var
+                     */
+                    $teacherExternalIds = $currentEvent['teacherIds'];
+
                     /* Teachers and Students can be treated synonymously
                      */
-                    $combined = array_merge($currentEvent['students'], $currentEvent['teacherIds']);
+                    $combined = array_merge($currentEvent['students'], $teacherExternalIds);
 
                     foreach ($combined as $currentExternalId) {
                         try {
