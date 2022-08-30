@@ -121,6 +121,8 @@ export const useNodesStore = defineStore('mcNodes', {
  *
  * @param { array }
  * @param { number }
+ *
+ * @returns { object }
  */
 export function removeId (data, id) {
     return data.reduce((previousValue, currentValue) => {

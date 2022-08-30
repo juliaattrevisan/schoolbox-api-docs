@@ -59,7 +59,7 @@ enabledNodeStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const enabledButtonText = computed(() => enabledNodeStore.isProcessing ? 'Deleting...' : 'Yes');
+const enabledButtonText = computed(() => enabledNodeStore.isProcessing ? 'Disabling...' : 'Yes');
 
 /**
  * to prevent the user from moving away from the modal while
@@ -98,8 +98,8 @@ function onModalClosed () {
             Are you sure you wish to disable {{ activeNodeStore.title }} and all of its children?
             If you continue, this node and any child nodes will be hidden from the curriculum code selector during curriclum mapping.</p>
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onEnableSelected" class="button submit" :enabledd="enabledNodeStore.isProcessing">{{ enabledButtonText }}</button></li>
-            <li><button @click.prevent="onCancelSelected" class="button" :enabledd="enabledNodeStore.isProcessing">Cancel</button></li>
+            <li><button @click.prevent="onEnableSelected" class="button submit" :disabled="enabledNodeStore.isProcessing">{{ enabledButtonText }}</button></li>
+            <li><button @click.prevent="onCancelSelected" class="button" :disabled="enabledNodeStore.isProcessing">Cancel</button></li>
         </ul>
     </reveal-modal>
 </template>
