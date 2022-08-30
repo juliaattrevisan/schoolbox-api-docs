@@ -94,6 +94,15 @@ export const useNodesStore = defineStore('mcNodes', {
         },
 
         /**
+         * A new curriculum has been added so add it to the nodes
+         *
+         * @param { object }
+         */
+        addNewCurriculum (curriculum) {
+            this.nodes.children.push(curriculum);
+        },
+
+        /**
          * Pull the active node out of the list
          */
         deleteActiveNode () {

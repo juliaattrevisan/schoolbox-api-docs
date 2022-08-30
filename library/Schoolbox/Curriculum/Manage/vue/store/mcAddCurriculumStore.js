@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
+import { useNodesStore } from './mcNodesStore';
 
 
 export const useAddCurriculumStore = defineStore('mcAddCurriculum', {
@@ -38,8 +39,9 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', {
                     body: getFormData(this.curriculum),
                 });
                 if (response.ok) {
-                    const responseJson = await response.json();
-                    // activeNodeStore.update(this.activeNodeCopy);
+                    const newCurriculum = await response.json();
+                    const nodesStore = useNodesStore();
+                    nodesStore.addNewCurriculum(newCurriculum);
                     this.isProcessing = false;
                     this.cancel();
                 } else {

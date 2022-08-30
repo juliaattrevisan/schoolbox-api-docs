@@ -95,7 +95,7 @@ function onModalClosed () {
     >
         <h2>Please Confirm</h2>
         <p>
-            Are you sure you wish to disable this node and all of its children?
+            Are you sure you wish to disable {{ activeNodeStore.title }} and all of its children?
             If you continue, this node and any child nodes will be hidden from the curriculum code selector during curriclum mapping.</p>
         <ul class="flex-list buttons">
             <li><button @click.prevent="onEnableSelected" class="button submit" :enabledd="enabledNodeStore.isProcessing">{{ enabledButtonText }}</button></li>

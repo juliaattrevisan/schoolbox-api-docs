@@ -142,6 +142,8 @@ function onCancelSelected () {
     border-bottom: 1px solid var(--content-ui-background);
     border-top: 1px solid var(--content-ui-background);
     margin: -1px 0 0 v-bind(marginLeft); //-1px so it butts up against the node border above
+    position: relative;
+    z-index: 1;
 }
 
 legend {
