@@ -207,9 +207,6 @@ class Factory
             Filesystem\MyfileController::class => new Filesystem\MyfileController(
                 $this->multi,
                 $this->mime,
-                $this->conf,
-                $this->rosetta,
-                $this->useFolder,
             ),
             Filesystem\BrowseController::class => new Filesystem\BrowseController(
                 $this->multi,
@@ -235,16 +232,13 @@ class Factory
                 $this->multi,
                 $this->mime,
                 $this->conf,
-                $this->rosetta,
-                $this->useFolder,
-                $this->defaultFolderId,
                 $this->user,
             ),
             Filesystem\UploadController::class => new Filesystem\UploadController(
                 $this->multi,
                 $this->mime,
-                $this->conf,
-                $this->rosetta,
+                $this->useFolder,
+                $this->defaultFolderId,
             ),
             Filesystem\UsermediaController::class => new Filesystem\UsermediaController(
                 $this->multi,
