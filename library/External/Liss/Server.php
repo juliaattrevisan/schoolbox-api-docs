@@ -61,7 +61,6 @@ use Schoolbox\UserMapper;
  */
 class External_Liss_Server
 {
-
     /**
      * Default logging message when attempting to use liss with a non-schoolbox connector
      */
