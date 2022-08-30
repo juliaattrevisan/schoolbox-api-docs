@@ -809,10 +809,8 @@ class External_Liss_Server
             $defaultEventType = trim((string)$this->config->get('external_liss_default_event_type'));
 
             foreach ($allEvents as $lissEvent) {
-                /* A sample of a $lissEvent straight from the 2020 devkit
-                 *
-                 * {"rooms":"B1","classCode":"12Study.R2 MonB4","className":"Study","type":"Study","startDateTime":{"database":"2020-12-28 11:50:00","unixTimestamp":1609116600,"local":"28\/12\/2020 11:50am","json":"2020-12-28T11:50:00+11:00"},"endDateTime":{"database":"2020-12-28 12:40:00","unixTimestamp":1609119600,"local":"28\/12\/2020 12:40pm","json":"2020-12-28T12:40:00+11:00"},"period":"4","guid":"0357e4093920baab01118a49e94f65d1","detail":"","students":["13862","16363","19022","50343","19262","19464","14205","14214","14220","49668","15158","16408","14845","52075","13033","18874","14164","14186","46136","16347"],"teacherIds":[""]}
-                 * {"rooms":"R09","classCode":"7ART 6","className":"Visual Arts","type":"","startDateTime":{"database":"2020-12-28 09:45:00","unixTimestamp":1609109100,"local":"28\/12\/2020 9:45am","json":"2020-12-28T09:45:00+11:00"},"endDateTime":{"database":"2020-12-28 10:35:00","unixTimestamp":1609112100,"local":"28\/12\/2020 10:35am","json":"2020-12-28T10:35:00+11:00"},"period":"2","guid":"e151ec717db720003924f95c803d5547","detail":"","students":[],"teacherIds":["74587"]}
+                /* $lissEvent is a condensed version of what they send to us,
+                 * structured by the helper class
                  */
                 $currentEvent = $lissEvent;
 
