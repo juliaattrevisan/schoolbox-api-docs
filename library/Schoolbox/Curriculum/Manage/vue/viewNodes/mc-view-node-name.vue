@@ -123,8 +123,7 @@ function highlightSearchInElement (toHighlight) {
 <template>
     <div
         v-if="notButton"
-        class="name"
-        :style="{ opacity: props.node.enabled ? '1' : '0.3' }"
+        :class="`name`"
     >
         <span v-html="highlightTitleSearch"></span>
         <aside v-if="viewNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
@@ -132,7 +131,6 @@ function highlightSearchInElement (toHighlight) {
     <button
         v-else
         :class="`button-name`"
-        :style="{ opacity: props.node.enabled ? '1' : '0.3' }"
         :title="`Expand ${props.title}`"
         :disabled="props.isUpdatingOrAdding"
         @click.prevent="onNameSelected"

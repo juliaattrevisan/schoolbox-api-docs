@@ -166,7 +166,7 @@ async function onLeave (el, done) {
 
 <template>
     <li ref="viewNodeEl">
-        <div :class="`buttons-container ${ isUpdatingAnother || isAddingAnother ? 'inactive' : '' }`">
+        <div :class="`buttons-container ${ isUpdatingAnother || isAddingAnother ? 'inactive' : '' } ${ props.node.enabled ? '' : 'not-enabled' }`">
             <!-- <mc-view-node-checkbox
                 :node="props.node"
                 :isUpdatingOrAdding="isUpdatingOrAdding"
@@ -222,6 +222,10 @@ ul {
 .inactive {
     opacity: 0.2;
     pointer-events: none;
+}
+
+.not-enabled {
+    background: #f0efef;
 }
 
 </style>
