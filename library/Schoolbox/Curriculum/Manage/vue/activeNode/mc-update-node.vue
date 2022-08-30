@@ -4,7 +4,8 @@
  * to show further info in a modal on a code that's been selected
  */
 
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { isScriptAdded, injectScript } from '@js/util/domUtils';
 import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import { useUpdateNodeStore } from './store/mcUpdateNodeStore';
 
@@ -22,12 +23,65 @@ const props = defineProps({
 const activeNodeStore = useActiveNodeStore();
 const updateNodeStore = useUpdateNodeStore();
 
+
 /**
  * to gradually and more marginLeft to indicate node level depth
  *
  * @returns { Number }
  */
 const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
+
+/**
+ * Store a reference to the ckeditor used for the description
+ *
+ * @returns { String }
+ */
+ const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}` );
+
+/**
+ * to load the ckeditor when ready
+ */
+onMounted(() => {
+    loadCKEditor();
+});
+
+/**
+ * load the ckeditor into the browser
+ */
+async function loadCKEditor () {
+    try {
+        const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`;
+        if (!isScriptAdded(ckeditorScript)) {
+            await injectScript(ckeditorScript);
+        }
+        const jqueryEditorScript = `${cdnPrefix}/js/editor/jquery.editor.js?v=${siteVersion}`
+        if (!isScriptAdded(jqueryEditorScript)) {
+            await injectScript(jqueryEditorScript);
+        }
+        $.fn.alaressEditor($.alaressEditorConfigForComments(getVueSpecificConfig()));
+    } catch (error) {
+        console.warn(error);
+    }
+}
+
+/**
+ * The config that needs to be passed to CKEditor in order to for it to work in Vue land
+ *
+ * @returns { Object }
+ */
+function getVueSpecificConfig () {
+    return {
+        on: {
+            change: () => { // Bind the content of CKEditor into the description model on change
+                updateNodeStore.activeNodeCopy.description = CKEDITOR.instances[ckeditorInstance.value].getData();
+            },
+            instanceReady: (event) => { //can display the loaded CKEditor now
+                event.editor.setData(updateNodeStore.activeNodeCopy.description); //set the initial data
+            }
+        },
+        targetElements: $(`#${ckeditorInstance.value}`),
+    }
+}
 
 /**
  * To instantly notify the user that the node is being updated
@@ -68,7 +122,7 @@ function onCancelSelected () {
                 </div>
                 <div class="small-12 columns">
                     <label for="description">Description</label>
-                    <input type="text" id="description" v-model="updateNodeStore.activeNodeCopy.description">
+                    <textarea :id="ckeditorInstance" rows="6"></textarea>
                 </div>
                 <div class="small-12 columns">
                     <ul class="flex-list buttons">

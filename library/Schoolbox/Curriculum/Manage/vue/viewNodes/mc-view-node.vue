@@ -57,7 +57,7 @@ const updateNodeStore = useUpdateNodeStore();
 const viewNodeEl = ref(null);
 
 /**
- *
+ * to animate on the node
  */
 onMounted(() => {
     if (props.depth === 0) { //we only need to animate the first node, as the rest are contained within
@@ -114,7 +114,7 @@ const isDisabled = computed(() => {
 });
 
 /**
- * Only show the selected node and any of its direct children
+ * Dont add a checklist on the very first level node
  *
  * @returns { Boolean }
  */
@@ -242,7 +242,7 @@ function highlightSearchInElement (toHighlight) {
 }
 
 /**
- * Slide down the node to be updated
+ * Slide down the node to be updated / added
  *
  * @param { DOMElement }
  */
@@ -252,7 +252,7 @@ async function onEnter (el, done) {
 }
 
 /**
- * Slide up the on close or when the node is updated
+ * Slide up on close or when the node is updated  / added
  *
  * @param { DOMElement }
  */
@@ -324,23 +324,11 @@ async function onLeave (el, done) {
                 Update {{ title }}
             </button>
         </div>
-        <Transition
-            @enter="onEnter"
-            @leave="onLeave"
-        >
-            <mc-add-subsection
-                v-if="isAdding"
-                :depth="props.depth"
-            />
+        <Transition @enter="onEnter" @leave="onLeave">
+            <mc-add-subsection v-if="isAdding" :depth="props.depth" />
         </Transition>
-        <Transition
-            @enter="onEnter"
-            @leave="onLeave"
-        >
-            <mc-update-node
-                v-if="isUpdating"
-                :depth="props.depth"
-            />
+        <Transition @enter="onEnter" @leave="onLeave" >
+            <mc-update-node v-if="isUpdating" :depth="props.depth" />
         </Transition>
         <ul v-if="showChildren ">
             <mc-view-node
