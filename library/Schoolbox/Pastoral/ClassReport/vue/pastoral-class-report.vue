@@ -193,11 +193,13 @@ export default {
                 </template>
             </div>
 
-            <ul class="action-list threaded">
+            <ul class="action-list threaded content-container">
                 <template v-for="(studentData, studentIndex) in data" :key="'student-' + String(studentData.student.id)">
+
                     <!-- student profile -->
-                    <li>
-                        <div class="list-item">
+
+                    <li class="student-container">
+                        <div class="list-item =">
                             <div class="card small-12">
                                 <a :href="studentData.student._links.profile" title="View profile" class="name">
                                     <img :src="studentData.student._links.avatar"
@@ -206,10 +208,14 @@ export default {
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
                                 </a>
                                 <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
+
                             </div>
                             <!-- pastoral records -->
-                    <li v-for="record in studentData.records.data" :key="'record-' + String(record.id)">
-                        <div class="list-item">
+
+                        </div>
+                    </li>
+                    <li v-for="record in studentData.records.data" :key="'record-' + String(record.id)" class="pastoral-container">
+                        <div class="list-item ">
                             <div class="tiny card small-12">
                                 <a :href="record._links.read" title="View record">
                                     <img :src="record.createdBy._links.avatar"
@@ -233,8 +239,7 @@ export default {
                                             {{ record.updatedBy.fullName }}
                                         </a>
                                     </template> <time :datetime="formatDateTime(record.updatedAt)"
-                                                      :title="formatDateTime(record.updatedAt)"
-                                    >
+                                                      :title="formatDateTime(record.updatedAt)">
                                         {{ formatDate(record.updatedAt) }}
                                     </time>
                                 </template>
@@ -242,9 +247,6 @@ export default {
                             </div>
                         </div>
                     </li>
-                        </div>
-                    </li>
-
 
                     <li v-if="studentData.records.metadata.count > studentData.records.data.length">
                         <div class="component-action">
@@ -269,19 +271,13 @@ export default {
     padding: 1.5rem;
 }
 
-ul {
-    border: 1px solid greenyellow;
-    width: 98%;
-    margin: auto;
-}
-
 .sort-filter {
     display: flex;
     flex-direction: row;
     margin-top: 1rem;
 
     label {
-        width: 8%;
+        width: 60px;
         line-height: 2rem;
     }
 
@@ -328,6 +324,21 @@ input[type=radio]:not(.plain) + label.input-toggle {
 img {
     border-radius: 50%;
     transform: scale(0.85);
+}
+.content-container {
+    border: 1px solid chocolate;
+    width: 98%;
+    margin: auto;
+    display: flex;
+
+
+    .student-container {
+        width: 50%;
+    }
+    .pastoral-container {
+        width: 50%;
+    }
+
 }
 
 </style>
