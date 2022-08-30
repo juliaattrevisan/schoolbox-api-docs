@@ -128,7 +128,14 @@ class TimetableUsers
     {
         /* Micromanage a stack of minimal event data with overrides
          */
-        $stack = [];
+        $stack[$classCode] = [
+            'code' => $classCode,
+            'usuals' => [],
+            /* A list of people who survived all the mutations
+             * and transformations in this algorithm
+             */
+            'manifest' => [],
+        ];
 
         /* Find the usual guys for the given class code out of sis_class_user
          */
@@ -211,7 +218,10 @@ class TimetableUsers
 
         /* Perform mutations
          */
-        $manifest = $this->applyOverrides($stack[$classCode]['usuals'], $stack[$classCode]['overrides']);
+        $manifest = $this->applyOverrides(
+            $stack[$classCode]['usuals'] ?? [],
+            $stack[$classCode]['overrides'] ?? [],
+        );
 
         /* Since we're explicitly looking for staff members in this method
          * we can basically kick out everyone else who isn't, if they
