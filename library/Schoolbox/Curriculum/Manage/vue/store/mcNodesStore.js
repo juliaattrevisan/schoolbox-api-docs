@@ -3,30 +3,75 @@
  */
 
 import { defineStore } from 'pinia';
+import { useStore } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 export const UNSET_ID = 0;
+let apiEndpoint = '';
 
 
 export const useNodesStore = defineStore('mcNodes', {
 
     state: () => ({
         nodes: {}, //all the nodes currently loaded
+        isLoading: true, //to display loading note
+        hasLoadError: false, //to display loading error
+        isProcessing: false, //to notify that an action is taking place
     }),
 
     actions: {
 
         /**
-         * Add in all the codes for display
+         * Add in all the top level nodes for display
          *
-         * @param { Array }
+         * @param { Strng }
          */
-        load (nodes) {
-            this.updateNodes(nodes);
-            const viewNodesStore = useViewNodesStore();
-            if (viewNodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
-                viewNodesStore.setSelected(1, this.nodes.children[0].id);
+        async loadTopLevel (endpoint) {
+            apiEndpoint = endpoint;
+            const store = useStore();
+            try {
+                const response = await fetch(`${apiEndpoint}?topLevelOnly=1`);
+                if (response.ok) {
+                    const nodes = await response.json();
+                    this.updateNodes(nodes);
+                    const viewNodesStore = useViewNodesStore();
+                    if (viewNodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
+                        viewNodesStore.setSelected(1, this.nodes.children[0].id);
+                    }
+                } else {
+                    console.warn(response);
+                    store.hasLoadError = true; //show the load error display state
+                }
+            } catch (error) {
+                console.warn(error);
+                store.hasLoadError = true; //show the load error display state
+            } finally {
+                store.isLoading = false; //otherwise show the table
+            }
+        },
+
+        /**
+         * Load in another level of children of the target node
+         *
+         * @param { number }
+         */
+        async loadChildren (id) {
+            try {
+                const response = await fetch(`${apiEndpoint}${id}?descendants=1`);
+                if (response.ok) {
+                    const newNode = await response.json();
+                    const oldNode = findById(this.nodes.children, id);
+                    oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property that was previously null
+                } else {
+                    console.warn(response);
+                    this.hasLoadError = true;
+                }
+            } catch (error) {
+                console.warn(error);
+                this.hasLoadError = true;
+            } finally {
+                this.isLoading = false;
             }
         },
 

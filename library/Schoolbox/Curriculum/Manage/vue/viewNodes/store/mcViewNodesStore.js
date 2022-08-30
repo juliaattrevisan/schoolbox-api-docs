@@ -143,7 +143,9 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
          *
          * @param { number }
          */
-        setNextSelected (id) {
+        async setNextSelected (id) {
+            const nodesStore = useNodesStore();
+            await nodesStore.loadChildren(id);
             this.setSelected(this.currentDepth+1, id);
         },
 

@@ -31,27 +31,13 @@ export const useStore = defineStore('manageCurriculum', {
     actions: {
 
         /**
-         * load all the curriculum data
+         * load the top level curriculums
          *
          * @param { String }
          */
-        async load (dataEndpoint) {
-            try {
-                const response = await fetch(dataEndpoint);
-                if (response.ok) {
-                    const responseJson = await response.json();
-                    const nodesStore = useNodesStore();
-                    nodesStore.load(responseJson);
-                } else {
-                    console.warn(response);
-                    this.hasLoadError = true; //show the load error display state
-                }
-            } catch (error) {
-                console.warn(error);
-                this.hasLoadError = true; //show the load error display state
-            } finally {
-                this.isLoading = false; //otherwise show the table
-            }
+        async load (apiEndpoint) {
+            const nodesStore = useNodesStore();
+            nodesStore.loadTopLevel(apiEndpoint);
         },
 
     },
