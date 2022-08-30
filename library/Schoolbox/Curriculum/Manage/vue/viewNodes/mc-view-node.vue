@@ -66,7 +66,7 @@ onMounted(() => {
  * fade on the node and slide it from forwards/backwards depending on the currentDirection
  */
 function animateOn () {
-    const xStart = viewNodesStore.currentDirection === DIRECTION.FORWARDS ? -5 : 5;
+    const xStart = viewNodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
     gsap.set(viewNodeEl.value, {
         opacity: 0,
         x: xStart
@@ -247,7 +247,7 @@ ul {
 }
 
 .not-enabled {
-    background: #f0efef;
+    background: #F6F6F6;
 }
 
 </style>

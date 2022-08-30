@@ -4,7 +4,7 @@
  * to show further info in a modal on a code that's been selected
  */
 
-import { ref, computed, onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { isScriptAdded, injectScript } from '@js/util/domUtils';
 import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import { useUpdateNodeStore } from './store/mcUpdateNodeStore';
@@ -36,7 +36,7 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
  *
  * @returns { String }
  */
- const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}` );
+const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}` );
 
 /**
  * to load the ckeditor when ready
@@ -113,7 +113,7 @@ function onCancelSelected () {
     <div class="node-container">
         <section>
             <fieldset class="content">
-                <legend>Editing: {{ activeNodeStore.title }}</legend>
+                <legend><em>Update {{ activeNodeStore.title }}</em></legend>
                 <div class="small-12 columns">
                     <label for="name">Name</label>
                     <input type="text" id="name" v-model="updateNodeStore.activeNodeCopy.name">
@@ -147,6 +147,7 @@ function onCancelSelected () {
 
 legend {
     font-size: 1rem;
+    margin-bottom: 1rem;
 }
 
 </style>

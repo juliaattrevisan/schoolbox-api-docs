@@ -94,7 +94,7 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
-        <p>Are you sure you wish to delete this node: <strong>{{ activeNodeStore.title }} {{ childrenWarning }}?</strong></p>
+        <p>Are you sure you wish to delete this node and all of its children?</p>
         <ul class="flex-list buttons">
             <li><button @click.prevent="onDeleteSelected" class="button submit" :disabled="deleteNodeStore.isProcessing">{{ deleteButtonText }}</button></li>
             <li><button @click.prevent="onCancelSelected" class="button" :disabled="deleteNodeStore.isProcessing">Cancel</button></li>
