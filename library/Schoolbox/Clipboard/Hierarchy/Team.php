@@ -13,8 +13,12 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
+use Schoolbox\Fixtures\Division\Model;
 use Schoolbox\Fixtures\Division\User\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -173,9 +177,10 @@ class Team implements IStrategy
      * creating them if they don't already exist
      *
      * @return void
+     * @throws Exception
+     * @throws LockAcquiringException
+     * @throws LockConflictedException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \UnexpectedValueException
      */
     public function import(): void
@@ -339,14 +344,16 @@ class Team implements IStrategy
      * Import the students listed in $teamData into schoolbox Fixtures,
      * associating them with $team
      *
-     * @param array                              $userLookup
-     * @param array                              $positionLookup
-     * @param \Schoolbox\Fixtures\Division\Model $division
-     * @param \Schoolbox\Fixtures\Team\Model     $team
-     * @param array                              $teamData
+     * @param array                          $userLookup
+     * @param array                          $positionLookup
+     * @param Model                          $division
+     * @param \Schoolbox\Fixtures\Team\Model $team
+     * @param array                          $teamData
      * @return void
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
+     * @throws LockAcquiringException
+     * @throws LockConflictedException
      * @throws \UnexpectedValueException
      */
     private function importMemberships(
@@ -482,7 +489,6 @@ class Team implements IStrategy
             }
         }
     }
-
 
 
     /**
