@@ -10,9 +10,10 @@
 
 namespace Component\Eportfolio;
 
-class FileList extends ListItem
-{
+use Schoolbox\ISoftDeletable;
 
+class FileList extends ListItem implements ISoftDeletable
+{
     /**
      * Id of a published file
      *
@@ -174,5 +175,13 @@ class FileList extends ListItem
     public function getPageId()
     {
         return $this->pageId;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isDeleted()
+    {
+        return ($this->getDeletedAt() instanceof \Alaress_Date_Format && !$this->getDeletedAt()->isNull());
     }
 }

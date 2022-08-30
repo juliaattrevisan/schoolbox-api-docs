@@ -18,7 +18,6 @@ use Schoolbox\GenericCollection;
 
 class FileListMapper extends Schoolbox\Mapper
 {
-
     /* properties for consistent joinage between methods */
     protected $myFileAlias   = 'mf';
     protected $storageAlias  = 'st';
@@ -70,11 +69,7 @@ class FileListMapper extends Schoolbox\Mapper
             'type'       => self::TYPE_DATETIME,
         ));
 
-        $this->hasMap(array(
-            'column'     => 'deleted_at',
-            'property'   => 'deletedAt',
-            'type'       => self::TYPE_DATETIME,
-        ));
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->hasJoin($this->myFileJoin, array(
             'multiple'  => false,
