@@ -560,6 +560,10 @@ class External_Liss_Server
             $classPeriodMapper = new ClassPeriodMapper();
             $classPeriodMapper->truncate();
 
+            /* Decide which externalId format to use via config var
+             */
+            $isTeacherIds = $this->isTeacherIds();
+
             $allData = $message->getParam(1)->me['array'];
 
             foreach ($allData as $currentData) {
@@ -582,9 +586,13 @@ class External_Liss_Server
                  */
                 $allClasses = $classEntryMapper->findByColumn('code', trim($struct['ClassCode']->me['string']));
 
-                /* TODO: Decide which externalId format to use via config var
+                /* Decide which externalId format to use via config var
                  */
-                $externalId = trim((string)$struct['TeacherCode']->me['string']);
+                if ($isTeacherIds) {
+                    $externalId = trim((string)$struct['TeacherId']->me['string']);
+                } else {
+                    $externalId = trim((string)$struct['TeacherCode']->me['string']);
+                }
 
                 /* Check that all three are provided
                  * Save it!
@@ -819,6 +827,10 @@ class External_Liss_Server
              */
             $defaultEventType = trim((string)$this->config->get('external_liss_default_event_type'));
 
+            /* Decide which externalId format to use via config var
+             */
+            $isTeacherIds = $this->isTeacherIds();
+
             foreach ($allEvents as $lissEvent) {
                 /* $lissEvent is a condensed version of what they send to us,
                  * structured by the helper class
@@ -943,9 +955,16 @@ class External_Liss_Server
                      */
                     $event->setAccess(Event::ACCESS_PERSONAL);
 
-                    /* TODO: Decide which externalId format to use via config var
+                    /* Decide which externalId format to use via config var
                      */
-                    $teacherExternalIds = $currentEvent['teacherIds'];
+                    if ($isTeacherIds) {
+                        $teacherExternalIds = $currentEvent['teacherIds'];
+                    } else {
+                        $teacherExternalIds = $currentEvent['teacherCodes'];
+                    }
+
+//                    $this->log->warning(json_encode($currentEvent));
+                    $this->log->warning(json_encode($teacherExternalIds));
 
                     /* Teachers and Students can be treated synonymously
                      */
@@ -1048,6 +1067,18 @@ class External_Liss_Server
         /* External must also be schoolbox connector
          */
         return $this->config->get('external_type') === 'schoolbox';
+    }
+
+
+    /**
+     * Decide if we're going to use teacherIds as the externalId for staff
+     * or whether we use teacherCodes instead
+     *
+     * @return bool
+     */
+    private function isTeacherIds(): bool
+    {
+        return self::TEACHER_IDENTIFIER_ID === trim((string)$this->config->get('external_liss_teacher_identifier'));
     }
 
 
