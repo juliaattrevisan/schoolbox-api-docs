@@ -187,6 +187,8 @@ class Model implements ISoftDeletable
      */
     private bool $includeUncompletedActionsOnly = false;
 
+    private bool $notificationEnabled = false;
+
     /**
      * Model constructor
      */
@@ -883,6 +885,24 @@ class Model implements ISoftDeletable
     public function setIncludeUncompletedActionsOnly(bool $includeUncompletedActionsOnly): self
     {
         $this->includeUncompletedActionsOnly = $includeUncompletedActionsOnly;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getNotificationEnabled(): bool
+    {
+        return $this->notificationEnabled;
+    }
+
+    /**
+     * @param bool $notificationEnabled
+     * @return static
+     */
+    public function setNotificationEnabled(bool $notificationEnabled): self
+    {
+        $this->notificationEnabled = $notificationEnabled;
         return $this;
     }
 

@@ -668,6 +668,7 @@ class Controller extends Base
 
             $pastoralReport->setGroups($groupsCollection);
         }
+        $pastoralReport->setNotificationEnabled($post->getBool('notificationEnabled', false));
 
         $this->pastoralReportMapper->save($pastoralReport);
 

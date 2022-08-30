@@ -493,8 +493,10 @@ class Controller extends Base
 
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
 
+        $reports = $this->pastoralReportMapper->createCollection();
         if ($moderator) {
             $record->setRevisions($this->pastoralRevisionDataSource->findForRecord($this->getUser(), $record));
+            $reports = $this->pastoralReportMapper->findForRecord($record, false);
         }
 
         // Hydrate group members and their roles so we can display them in the visibility section
@@ -537,6 +539,7 @@ class Controller extends Base
                     'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
                     'access'             => $access,
                     'linkedStudents'     => [],
+                    'reports'            => $reports,
                 ],
                 'title'    => $record->getHeading(),
             ]
