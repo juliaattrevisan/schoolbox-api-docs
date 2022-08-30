@@ -963,9 +963,6 @@ class External_Liss_Server
                         $teacherExternalIds = $currentEvent['teacherCodes'];
                     }
 
-//                    $this->log->warning(json_encode($currentEvent));
-                    $this->log->warning(json_encode($teacherExternalIds));
-
                     /* Teachers and Students can be treated synonymously
                      */
                     $combined = array_merge($currentEvent['students'], $teacherExternalIds);
