@@ -9,6 +9,7 @@
 namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use Alaress_Date_Format;
+use Laminas\Uri\Uri;
 use Schoolbox\Resource\Attachment\AbstractController;
 use Scrub;
 use SitePage;
@@ -56,10 +57,16 @@ class UploadController extends AbstractController
             $mime = "'" . Scrub::text($this->mimeFilter) . "'";
         }
 
-        $page->setVar(array(
+        $uploadUrl = new Uri('/storage/asyncUpload.php');
+        if ($this->expiryDate && !$this->expiryDate->isNull()) {
+            $uploadUrl = $uploadUrl->setQuery(['expiryDate' => $this->expiryDate->toRfc3339String()]);
+        }
+
+        $page->setVar([
+            'UPLOAD_URL'     => $uploadUrl->toString(),
             'MAX_FILES'      => $this->multi ? self::DEFAULT_MAX_FILES : '1',
             'ACCEPTED_FILES' => $mime,
-        ));
+        ]);
     }
 
 
