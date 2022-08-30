@@ -239,6 +239,7 @@ class Factory
                 $this->mime,
                 $this->useFolder,
                 $this->defaultFolderId,
+                $this->expiryDate,
             ),
             Filesystem\UsermediaController::class => new Filesystem\UsermediaController(
                 $this->multi,

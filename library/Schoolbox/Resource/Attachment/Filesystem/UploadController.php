@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Resource\Attachment\Filesystem;
 
+use Alaress_Date_Format;
 use Schoolbox\Resource\Attachment\AbstractController;
 use Scrub;
 use SitePage;
@@ -25,6 +26,24 @@ class UploadController extends AbstractController
      */
     private const DEFAULT_MAX_FILES = 256;
 
+    /**
+     * Constructor
+     *
+     * @param bool                     $multi
+     * @param string                   $mimeFilter
+     * @param bool                     $useFolder
+     * @param int                      $defaultFolderId
+     * @param Alaress_Date_Format|null $expiryDate
+     */
+    public function __construct(
+        $multi,
+        $mimeFilter = null,
+        $useFolder = true,
+        $defaultFolderId = 0,
+        private ?Alaress_Date_Format $expiryDate = null,
+    ) {
+        parent::__construct($multi, $mimeFilter, $useFolder, $defaultFolderId);
+    }
 
     /**
      * @param SitePage $page
