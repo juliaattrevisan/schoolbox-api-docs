@@ -16,7 +16,6 @@ use External\Canvas\Importer\Api;
 
 class Controller extends Base
 {
-
     private string $bearerToken;
     private string $canvasUrl;
 
