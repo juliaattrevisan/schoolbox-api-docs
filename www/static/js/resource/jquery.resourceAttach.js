@@ -46,6 +46,7 @@
             allowedFiles: null,
             multi: false,
             useFolder: true,
+            expiryDate: null,
 
             /* Optional Filesystem context
              * This is used by /resources/attachment.php to provide Filesystem options
@@ -108,8 +109,13 @@
 
 
         // wrap ourselves around an instance of dropzone
+        let dropzoneUrl = new URL(window.location.href);
+        dropzoneUrl.pathname = opt.url;
+        if (opt.expiryDate) {
+            dropzoneUrl.searchParams.append('expiryDate', opt.expiryDate);
+        }
         azone.dropzone({
-            url: opt.url,
+            url: dropzoneUrl,
             paramName: opt.paramName,
             // The dropzone is clickable if the modal is disabled
             clickable: opt.useModal ? false : dzone[0],
