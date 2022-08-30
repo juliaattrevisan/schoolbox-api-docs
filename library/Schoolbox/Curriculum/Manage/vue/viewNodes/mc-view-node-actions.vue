@@ -1,0 +1,144 @@
+<script setup>
+
+/**
+ * To add, edit, delete or enable/disable a single node
+ */
+
+import { useDeleteNodeStore } from '../activeNode/store/mcDeleteNodeStore';
+import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
+import { useEnableNodeStore } from '../activeNode/store/mcEnableNodeStore';
+import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
+
+
+const props = defineProps({
+    /**
+     * the assigned node to display
+     */
+    node: {
+        type: Object,
+        required: true,
+        default() {
+            return {
+                id: '0',
+                name: '-',
+                children: [],
+            }
+        }
+    },
+    /**
+     * the already computed node title
+     */
+    title: {
+        type: String,
+        required: true,
+    },
+    /**
+     * to disable certain events when updating the node
+     */
+    isUpdating: {
+        type: Boolean,
+        required: true,
+    },
+    /**
+     * to disable certain events when adding a node
+     */
+    isAdding: {
+        type: Boolean,
+        required: true,
+    },
+    /**
+     * to disable certain events when any editing is taking place
+     */
+    isUpdatingOrAdding: {
+        type: Boolean,
+        required: true,
+    },
+});
+
+const deleteNodeStore = useDeleteNodeStore();
+const addSubsectionStore = useAddSubsectionStore();
+const enabledNodeStore = useEnableNodeStore();
+const updateNodeStore = useUpdateNodeStore();
+
+
+/**
+ * to prompt the nodes removal
+ */
+function onDeleteSelected () {
+    deleteNodeStore.prompt(props.node);
+}
+
+/**
+ * to open up or close the update modal
+ */
+function onEnableToggleSelected () {
+    props.node.enabled ? enabledNodeStore.prompt(props.node) : enabledNodeStore.enable(props.node);
+}
+
+/**
+ * to open up or close the update modal
+ */
+function onAddSubsectionToggleSelected () {
+    props.isAdding ? addSubsectionStore.cancel() : addSubsectionStore.prompt(props.node);
+}
+
+/**
+ * to open up or close the update modal
+ */
+function onUpdateToggleSelected () {
+    props.isUpdating ? updateNodeStore.cancel() : updateNodeStore.prompt(props.node);
+}
+
+</script>
+
+<template>
+    <button
+        :class="`button-action-option icon-delete ${ props.isUpdatingOrAdding ? 'button__inactive' : '' }`"
+        :title="`Delete ${props.title}`"
+        @click.prevent="onDeleteSelected"
+        @keyup.enter="onDeleteSelected"
+    >
+        Delete {{ title }}
+    </button>
+    <button
+        :class="`button-action-option ${ props.isAdding ? 'icon-close' : 'icon-add' } ${ props.isUpdating ? 'button__inactive' : '' }`"
+        :title="`Add subsection to ${props.title}`"
+        @click.prevent="onAddSubsectionToggleSelected"
+        @keyup.enter="onAddSubsectionToggleSelected"
+    >
+        Add subsection to {{ props.title }}
+    </button>
+    <button
+        :class="`button-action-option ${ props.node.enabled ? 'icon-view' : 'icon-view-hollow' } ${ props.isUpdatingOrAdding ? 'button__inactive' : '' }`"
+        :title="`${ props.node.enabled ? 'Disable' : 'Enable' } node`"
+        @click.prevent="onEnableToggleSelected"
+        @keyup.enter="onEnableToggleSelected"
+    >
+        Toggle visiblity of {{ props.title }}
+    </button>
+    <button
+        :class="`button-action-option ${ props.isUpdating ? 'icon-close' : 'icon-modify' } ${ props.isAdding ? 'button__inactive' : '' }`"
+        :title="`Update ${props.title}`"
+        @click.prevent="onUpdateToggleSelected"
+        @keyup.enter="onUpdateToggleSelected"
+    >
+        Update {{ props.title }}
+    </button>
+</template>
+
+<style lang="scss" scoped>
+
+@import './style/mcViewNode';
+
+.button-action-option {
+    @extend .button;
+    color: var(--content-ui-foreground);
+    font-size: 0rem;
+    opacity: 0.7;
+    padding: 0px 2px 0px 12px;
+    &:hover {
+        opacity: 1;
+    }
+}
+
+</style>

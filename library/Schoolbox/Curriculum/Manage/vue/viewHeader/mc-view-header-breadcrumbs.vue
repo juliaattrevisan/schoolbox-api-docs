@@ -23,16 +23,18 @@ function onSelected (depth, id) {
 </script>
 
 <template>
-    <div class="breadcrumbs-container">
-        <button
-            v-for="(breadcrumb) in viewNodesStore.breadcrumbs"
-            @click.prevent="onSelected(breadcrumb.depth, breadcrumb.id)"
-            @keyup.enter="onSelected(breadcrumb.depth, breadcrumb.id)"
-        >
-            {{ breadcrumb.name }}
-        </button>
-
-    </div>
+    <ul class="breadcrumb">
+        <li v-for="(breadcrumb) in viewNodesStore.breadcrumbs">
+            <a
+                :href="`/curricululm/${breadcrumb.id}`"
+                :title="`View ${breadcrumb.name}`"
+                @click.prevent="onSelected(breadcrumb.depth, breadcrumb.id)"
+                @keyup.enter="onSelected(breadcrumb.depth, breadcrumb.id)"
+            >
+                {{ breadcrumb.name }}
+            </a>
+        </li>
+    </ul>
 </template>
 
 <style lang="scss" scoped>
