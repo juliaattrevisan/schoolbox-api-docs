@@ -128,7 +128,14 @@ class TimetableUsers
     {
         /* Micromanage a stack of minimal event data with overrides
          */
-        $stack = [];
+        $stack[$classCode] = [
+            'code' => $classCode,
+            'usuals' => [],
+            /* A list of people who survived all the mutations
+             * and transformations in this algorithm
+             */
+            'manifest' => [],
+        ];
 
         /* Find the usual guys for the given class code out of sis_class_user
          */
