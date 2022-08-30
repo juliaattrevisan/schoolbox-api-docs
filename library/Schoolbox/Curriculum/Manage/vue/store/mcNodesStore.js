@@ -25,7 +25,7 @@ export const useNodesStore = defineStore('mcNodesStore', {
         load (nodes) {
             this.updateNodes(nodes);
             const viewNodesStore = useViewNodesStore();
-            if (viewNodesStore.hasSingleCurriculum) {
+            if (viewNodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
                 viewNodesStore.setSelected(1, this.nodes.children[0].id);
             }
         },

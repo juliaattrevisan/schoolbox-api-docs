@@ -5,19 +5,20 @@
  * or to CRUD via the edit button
  */
 
-import { computed, onMounted } from 'vue';
-import { useStore } from './store/manageCurriculumStore';
-import { useNodesStore, UNSET_ID } from './store/mcNodesStore';
-import { useViewNodesStore } from './store/mcViewNodesStore';
-import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
-import { useDeleteNodeStore } from './activeNode/store/mcDeleteNodeStore';
-import { useAddSubsectionStore } from './activeNode/store/mcAddSubsectionStore';
-import { useEnableNodeStore } from './activeNode/store/mcEnableNodeStore';
-import { useUpdateNodeStore } from './activeNode/store/mcUpdateNodeStore';
+import { ref, computed, onMounted } from 'vue';
+import { gsap } from 'gsap/all';
 import { escapeRegExp } from '@js/util/jsUtils';
 import { slideDown, slideUp } from '@js/util/animateUtils';
-import McAddSubsection from './activeNode/mc-add-subsection.vue';
-import McUpdateNode from './activeNode/mc-update-node.vue';
+import { useStore } from '../store/manageCurriculumStore';
+import { useNodesStore, UNSET_ID } from '../store/mcNodesStore';
+import { useViewNodesStore, DIRECTION } from '../store/mcViewNodesStore';
+import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
+import { useDeleteNodeStore } from '../activeNode/store/mcDeleteNodeStore';
+import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
+import { useEnableNodeStore } from '../activeNode/store/mcEnableNodeStore';
+import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
+import McAddSubsection from '../activeNode/mc-add-subsection.vue';
+import McUpdateNode from '../activeNode/mc-update-node.vue';
 
 
 const props = defineProps({
@@ -53,12 +54,34 @@ const addSubsectionStore = useAddSubsectionStore();
 const enabledNodeStore = useEnableNodeStore();
 const updateNodeStore = useUpdateNodeStore();
 
+const viewNodeEl = ref(null);
+
 /**
  *
  */
 onMounted(() => {
-    console.warn(viewNodesStore.currentDirection);
+    if (props.depth === 0) { //we only need to animate the first node, as the rest are contained within
+        animateOn();
+    }
 });
+
+/**
+ * animate to help show which direction we are currently moving through the tree
+ * fade on the node and slide it from forwards/backwards depending on the currentDirection
+ */
+function animateOn () {
+    const xStart = viewNodesStore.currentDirection === DIRECTION.FORWARDS ? -5 : 5;
+    gsap.set(viewNodeEl.value, {
+        opacity: 0,
+        x: xStart
+    } );
+    gsap.to(viewNodeEl.value, {
+        ease: 'power1.out',
+        duration: 0.3 ,
+        opacity: 1,
+        x: 0
+    } );
+}
 
 /**
  * to gradually and more paddingLeft to indicate node level depth
@@ -96,13 +119,6 @@ const isDisabled = computed(() => {
  * @returns { Boolean }
  */
 const isIdSet = computed(() => props.node.id !== UNSET_ID);
-
-/**
- * Only show the selected node and any of its direct children
- *
- * @returns { Boolean }
- */
-const isVisible = computed(() => props.depth < 2 || viewNodesStore.isOnLast);
 
 /**
  * If this is the active node being updated
@@ -226,21 +242,6 @@ function highlightSearchInElement (toHighlight) {
 }
 
 /**
- * Add some styling to help visually clarify the tree structure
- *
- * @returns { String }
- */
-const containerClass = computed(() => {
-    if (viewNodesStore.isSearchActive) { //don't style when using search, as all the nodes are on one level
-        return '';
-    } else if (props.depth === 0) {
-        return 'parent-container';
-    } else {
-        '';
-    }
-});
-
-/**
  * Slide down the node to be updated
  *
  * @param { DOMElement }
@@ -263,7 +264,7 @@ async function onLeave (el, done) {
 </script>
 
 <template>
-    <li v-if="isVisible" :class="`container ${containerClass}`">
+    <li ref="viewNodeEl">
         <div :class="`buttons-container ${ isUpdatingAnother ? 'inactive' : '' } ${ isAddingAnother ? 'inactive' : '' }`">
             <div v-if="isIdSet" class="checklist">
                 <input

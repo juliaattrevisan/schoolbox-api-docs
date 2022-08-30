@@ -8,7 +8,7 @@
 import { ref, computed, watch } from 'vue';
 import { useNodesStore } from './store/mcNodesStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
-import McViewNode from './mc-view-node.vue'
+import McViewNode from './viewNode/mc-view-node.vue'
 
 
 const nodesStore = useNodesStore();
