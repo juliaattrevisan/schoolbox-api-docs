@@ -201,13 +201,15 @@ export default {
                     <li class="student-container">
                         <div class="list-item">
                             <div class="student-card card small-12">
+                                <div class="image-container"> <img :src="studentData.student._links.avatar"
+                                                                   :alt="`profile photo of ${studentData.student.fullName}`"
+                                                                   class="portrait"/> </div>
                                 <h4><a :href="studentData.student._links.profile" title="View profile" class="name">
-                                   <div class="image-container"> <img :src="studentData.student._links.avatar"
-                                         :alt="`profile photo of ${studentData.student.fullName}`"
-                                         class="portrait"/> </div>
+
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
                                 </a></h4>
                                 <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
+
                     <li v-for="record in studentData.records.data" :key="'record-' + String(record.id)" class="pastoral-container">
                         <div class="list-item ">
                             <div class="tiny card small-12">
@@ -339,28 +341,42 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                 display: flex;
                 flex-wrap: wrap;
+                flex-direction: row;
+                align-items: center;
+
+
+                .image-container  {
+
+                    margin-left: 0;
+                    border-right: 1px solid rebeccapurple;
+                    padding: 0.75rem;
+                    padding-right: 0;
+                    margin-right: 0;
+
+
+                    img {
+                        border-radius: 50%;
+                        transform: scale(0.85);
+
+
+                    }
+                }
 
                 h4 {
 
                     overflow: visible;
                     padding: 0.75rem;
 
-                   .image-container  {
-
-                       margin-left: 0;
-
-                        img {
-                        border-radius: 50%;
-                        transform: scale(0.85);
-
-                    }
-                   }
                 }
-
-                .pastoral-container {
+                .pastoral-container:first-child {
                     border: 1px solid lightseagreen;
+                }
+                .pastoral-container {
+
                     height: 60px;
                     width: 100%;
+                    margin-top: -0.5rem;
+                    margin-left: 4.9rem;
 
                     .tiny {
                         display: flex;
