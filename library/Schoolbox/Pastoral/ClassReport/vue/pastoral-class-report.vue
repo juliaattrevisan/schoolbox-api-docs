@@ -199,7 +199,7 @@ export default {
                     <!-- student profile -->
 
                     <li class="student-container">
-                        <div class="list-item =">
+                        <div class="list-item">
                             <div class="card small-12">
                                 <a :href="studentData.student._links.profile" title="View profile" class="name">
                                     <img :src="studentData.student._links.avatar"
@@ -208,12 +208,6 @@ export default {
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
                                 </a>
                                 <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
-
-                            </div>
-                            <!-- pastoral records -->
-
-                        </div>
-                    </li>
                     <li v-for="record in studentData.records.data" :key="'record-' + String(record.id)" class="pastoral-container">
                         <div class="list-item ">
                             <div class="tiny card small-12">
@@ -248,6 +242,13 @@ export default {
                         </div>
                     </li>
 
+                            </div>
+                            <!-- pastoral records -->
+
+                        </div>
+                    </li>
+
+
                     <li v-if="studentData.records.metadata.count > studentData.records.data.length">
                         <div class="component-action">
                             <section>
@@ -277,7 +278,7 @@ export default {
     margin-top: 1rem;
 
     label {
-        width: 60px;
+        width: 70px;
         line-height: 2rem;
     }
 
@@ -317,7 +318,7 @@ input[type=radio]:not(.plain) + label.input-toggle {
         button:hover {
             background-color: var(--content-ui-foreground);
             color: white;
-            transition: all 0.5s ease;
+            transition: all .2s cubic-bezier(.5,1,.89,1);
         }
 }
 
@@ -330,15 +331,34 @@ img {
     width: 98%;
     margin: auto;
     display: flex;
-
+    flex-wrap: wrap;
 
     .student-container {
-        width: 50%;
-    }
-    .pastoral-container {
-        width: 50%;
-    }
 
+        width: 100%;
+
+        .list-item {
+
+            .card {
+
+                .pastoral-container {
+                    border: 1px solid lightseagreen;
+                    height: 60px;
+                    .tiny {
+                        display: flex;
+                        a {
+                            width: 50%;
+                            p {
+                            width: 50%;
+                        }
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
 }
 
 </style>
