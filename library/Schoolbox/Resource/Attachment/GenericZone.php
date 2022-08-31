@@ -16,7 +16,6 @@ use Schoolbox\Resource\Storage\Model as StorageModel;
 
 class GenericZone extends Zone
 {
-
     /** @var string */
     protected $prefix;
 
