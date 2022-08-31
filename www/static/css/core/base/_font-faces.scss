@@ -15,7 +15,7 @@
 @font-face {
     font-family: "LibreBarcode128";
     src:
-        url('#{$cdn-prefix}//custom/ccca/fonts/LibreBarcode128-Regular.ttf') format('truetype');
+        url('#{$cdn-prefix}/fonts/LibreBarcode128-Regular.ttf');
     font-weight: normal;
     font-style: normal;
 }
