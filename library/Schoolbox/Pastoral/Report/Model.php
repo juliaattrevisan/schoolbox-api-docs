@@ -59,7 +59,7 @@ class Model implements ISoftDeletable
      *
      * @var bool $involved
      */
-    private bool $involved;
+    private bool $involved = false;
 
     /** @var bool $usesRelativeDate */
     private bool $usesRelativeDate = true;
