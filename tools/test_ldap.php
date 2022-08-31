@@ -22,8 +22,33 @@ require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new CliTool\Kernel(new class extends CliTool\App {
     public function run(): void
     {
-        $host = $this->getConfig()->get('ldap_host');
-        $username = $this->getConfig()->get('ldap_user');
+        $this->getLogger()->notice("Testing primary...");
+        $this->testLdap($this->getConfig()->get('ldap_host'), $this->getConfig()->get('ldap_user'));
+
+        $this->getLogger()->notice("Testing alternate...");
+        $this->testLdap($this->getConfig()->get('ldap_host_alt'),$this->getConfig()->get('ldap_user_alt'));
+
+        $this->getLogger()->notice("Testing tertiary...");
+        $this->testLdap($this->getConfig()->get('ldap_host_ter'),$this->getConfig()->get('ldap_user_ter'));
+    }
+
+    /**
+     * Tests the specified LDAP Host + Username
+     *
+     * @param string $host
+     * @param string $username
+     * @return void
+     */
+    private function testLdap(string $host, string $username): void
+    {
+        if (empty($host)) {
+            $this->getLogger()->notice("Empty host, skipping...");
+            return;
+        }
+        if (empty($username)) {
+            $this->getLogger()->notice("Empty username, skipping...");
+            return;
+        }
         $password = $this->getConfig()->get('ldap_pass');
         $ldapCaCertHash = $this->getConfig()->get('ldap_ca_certificate');
         /** @var FilesystemProxy $filesystemProxy */
@@ -33,35 +58,31 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
         // This enables the debug output from the LDAP functions
         ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
 
-        if ($host) {
-            if ($ldapCaCertHash) {
-                // Copy this file to local cache somewhere (stream_dir I guess)
-                $ldapCaCert     = StorageMapper::getInstance()->findByHash($ldapCaCertHash);
-                $ldapCaCertPath = sprintf(
-                    '%s/ldap-ca-cert-%s-%s',
-                    $this->getConfig()->get('stream_dir'),
-                    INSTANCE_ID,
-                    $ldapCaCert->getHash()
-                );
-                if (!file_exists($ldapCaCertPath)) {
-                    file_put_contents($ldapCaCertPath, $filesystemProxy->read($ldapCaCert));
-                }
-                ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
-                ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);
+        if ($ldapCaCertHash) {
+            // Copy this file to local cache somewhere (stream_dir I guess)
+            $ldapCaCert     = StorageMapper::getInstance()->findByHash($ldapCaCertHash);
+            $ldapCaCertPath = sprintf(
+                '%s/ldap-ca-cert-%s-%s',
+                $this->getConfig()->get('stream_dir'),
+                INSTANCE_ID,
+                $ldapCaCert->getHash()
+            );
+            if (!file_exists($ldapCaCertPath)) {
+                file_put_contents($ldapCaCertPath, $filesystemProxy->read($ldapCaCert));
             }
-            $ds = ldap_connect($host);
-            if ($ds) {
-                ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-                ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-                if (ldap_bind($ds, $session->ldapEscape($username), utf8_encode($password))) {
-                    $this->getLogger()->info('LDAP Connection Successful');
-                } else {
-                    if (ldap_get_option($ds, LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error)) {
-                        echo "Error Binding to LDAP: $extended_error";
-                    } else {
-                        echo "Error Binding to LDAP: No additional information is available.";
-                    }
-                }
+            ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
+            ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);
+        }
+        $ds = ldap_connect($host);
+        if ($ds) {
+            ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
+            ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
+            if (ldap_bind($ds, $session->ldapEscape($username), utf8_encode($password))) {
+                $this->getLogger()->info('LDAP Connection Successful');
+            } elseif (ldap_get_option($ds, LDAP_OPT_DIAGNOSTIC_MESSAGE, $extended_error)) {
+                echo "Error Binding to LDAP: $extended_error";
+            } else {
+                echo "Error Binding to LDAP: No additional information is available.";
             }
         }
     }
