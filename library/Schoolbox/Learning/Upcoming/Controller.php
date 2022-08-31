@@ -397,11 +397,21 @@ class Controller extends Base
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
         $filters             = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
-        $visibility          = new Visibility($this->access);
+
+        if (count($filters) == 0) {
+            // If no filters were supplied, the result set was found to include events that were irrelevant to the user,
+            // and should not be seen by that user (see SA-14181).  The easiest solution (suggested by James) was just to
+            // forbid requests that do not include a valid filter.  Note an invalid filter query would have caused an error
+            // above in the filter factory.
+            throw new \BadFunctionCallException("URL parameter 'filters' is required.");
+        }
+
+        $visibility = new Visibility($this->access);
 
         // User must have provided a start and end date: error out otherwise
         $start = filter_var($this->request->query->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         $end   = filter_var($this->request->query->get('end'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+
         if (!isset($start, $end)) {
             // No you don't throw any exception: only ApplicationException
             /** @noinspection PhpUnhandledExceptionInspection */
