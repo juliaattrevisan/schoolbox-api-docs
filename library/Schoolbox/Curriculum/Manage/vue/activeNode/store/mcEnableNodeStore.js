@@ -27,7 +27,7 @@ export const useEnableNodeStore = defineStore('mcEnableNode', {
         },
 
         /**
-         * node removal has been confirmed so notify the backend
+         * node enable/disable has been confirmed so notify the backend
          * and then pull it out of the nodes if successful
          */
         async enable (node = null) {

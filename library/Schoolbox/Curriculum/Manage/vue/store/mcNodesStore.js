@@ -118,6 +118,8 @@ export const useNodesStore = defineStore('mcNodes', {
 
 /**
  * To return an array with any objects containing the specified id removed
+ * we move through the object, looping recursively through .children and remove
+ * any with the id that's being removed
  *
  * @param { array }
  * @param { number }
@@ -125,12 +127,16 @@ export const useNodesStore = defineStore('mcNodes', {
  * @returns { object }
  */
 export function removeId (data, id) {
-    return data.reduce((previousValue, currentValue) => {
-        if (currentValue.id !== id) {
-            previousValue.push( { ...currentValue, children: removeId(currentValue.children, id) } );
-        }
-        return previousValue;
-    }, []);
+    if (data !== null) { // .children wont always be available if the node hasn't been loaded yet
+        return data.reduce((previousValue, currentValue) => {
+            if (currentValue.id !== id) {
+                previousValue.push( { ...currentValue, children: removeId(currentValue.children, id) } );
+            }
+            return previousValue;
+        }, []);
+    } else {
+        return data;
+    }
 }
 
 /**
