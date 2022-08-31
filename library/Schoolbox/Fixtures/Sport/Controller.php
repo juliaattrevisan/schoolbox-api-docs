@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Fixtures\Sport;
 
-use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -20,7 +19,6 @@ use Schoolbox\Fixtures\Division\Model as Division;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 use Schoolbox\Fixtures\Position\Model as Position;
-use Schoolbox\Mapper as BaseMapper;
 
 /**
  * @method Mapper getMapper()
@@ -87,13 +85,13 @@ class Controller extends AbstractController
         ]));
     }
 
+
     /**
      * Populate the Response object with a representation of the given entity:
      *  - in the format provided in the request Accepts header
      * If entity is deleted, respond with '210 Gone'
      *
      * @param Sport $entity
-     * @throws Exception
      * @return void
      */
     public function getEntity($entity)
@@ -101,8 +99,14 @@ class Controller extends AbstractController
         $divisions = $this->getDivisionMapper()->findByColumn('sport_id', $entity->getId());
 
         foreach ($divisions as $division) {
+            $teams = $this->getTeamMapper()->findByColumn('division_id', $division->getId(), [
+                'order' => [
+                    'name' => 'ASC'
+                ]
+            ]);
+
             /** @var Division $division */
-            $division->setTeams($this->getTeamMapper()->findByColumn('division_id', $division->getId()));
+            $division->setTeams($teams);
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/entity.twig', [

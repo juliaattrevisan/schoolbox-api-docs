@@ -11,6 +11,7 @@ namespace Schoolbox\Clipboard\Hierarchy;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Clipboard\IStrategy;
+use Schoolbox\Fixtures\Season\Mapper;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -20,7 +21,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Prepare implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */
@@ -82,6 +82,18 @@ class Prepare implements IStrategy
 
 
     /**
+     * @var \Schoolbox\Fixtures\Team\Coach\Mapper
+     */
+    private \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper;
+
+
+    /**
+     * @var \Schoolbox\Fixtures\Coach\Mapper
+     */
+    private \Schoolbox\Fixtures\Coach\Mapper $coachMapper;
+
+
+    /**
      * @var \Schoolbox\Fixtures\Division\User\Mapper
      */
     private \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper;
@@ -91,13 +103,15 @@ class Prepare implements IStrategy
      * @param LoggerInterface                          $log
      * @param bool                                     $perform
      * @param LockInterface                            $lock
-     * @param \Schoolbox\Fixtures\Season\Mapper        $seasonMapper
+     * @param Mapper                                   $seasonMapper
      * @param \Schoolbox\Fixtures\Sport\Mapper         $sportMapper
      * @param \Schoolbox\Fixtures\Position\Mapper      $positionMapper
      * @param \Schoolbox\Fixtures\Division\Mapper      $divisionMapper
      * @param \Schoolbox\Fixtures\Team\Mapper          $teamMapper
      * @param \Schoolbox\Fixtures\Team\Player\Mapper   $teamPlayerMapper
      * @param \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper
+     * @param \Schoolbox\Fixtures\Team\Coach\Mapper    $teamCoachMapper
+     * @param \Schoolbox\Fixtures\Coach\Mapper         $coachMapper
      * @param \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper
      */
     public function __construct(
@@ -111,6 +125,8 @@ class Prepare implements IStrategy
         \Schoolbox\Fixtures\Team\Mapper $teamMapper,
         \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
         \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper,
+        \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper,
+        \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
         \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper
     ) {
         $this->log = $log;
@@ -123,6 +139,8 @@ class Prepare implements IStrategy
         $this->teamMapper = $teamMapper;
         $this->teamPlayerMapper = $teamPlayerMapper;
         $this->teamPositionMapper = $teamPositionMapper;
+        $this->teamCoachMapper = $teamCoachMapper;
+        $this->coachMapper = $coachMapper;
         $this->divisionUserMapper = $divisionUserMapper;
     }
 
@@ -144,9 +162,11 @@ class Prepare implements IStrategy
             $this->positionMapper->getDatabase()->query("UPDATE {$this->positionMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
             $this->divisionMapper->getDatabase()->query("UPDATE {$this->divisionMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
             $this->teamMapper->getDatabase()->query("UPDATE {$this->teamMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
+            $this->coachMapper->getDatabase()->query("UPDATE {$this->coachMapper->getTable()} SET updated_at = '0000-00-00 00:00:00'");
 
             /* Hard deletions for relationships
              */
+            $this->teamCoachMapper->getDatabase()->query("DELETE FROM {$this->teamCoachMapper->getTable()}");
             $this->teamPlayerMapper->getDatabase()->query("DELETE FROM {$this->teamPlayerMapper->getTable()}");
             $this->teamPositionMapper->getDatabase()->query("DELETE FROM {$this->teamPositionMapper->getTable()}");
             $this->divisionUserMapper->getDatabase()->query("DELETE FROM {$this->divisionUserMapper->getTable()}");
