@@ -10,8 +10,12 @@
 
 namespace Component\Eportfolio;
 
-class FileList extends ListItem
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+
+class FileList extends ListItem implements ISoftDeletable
 {
+    use DeletedAtDate;
 
     /**
      * Id of a published file
@@ -46,12 +50,6 @@ class FileList extends ListItem
      * @var \Alaress_Date_Format
      */
     private $updated_at;
-
-    /**
-     * When the File List item was softdeleted
-     * @var \Alaress_Date_Format
-     */
-    private $deleted_at;
 
     /* Getters/Setters
      */
@@ -94,26 +92,6 @@ class FileList extends ListItem
     public function getCreatedAt()
     {
         return $this->created_at;
-    }
-
-    /**
-     * Set deleted at
-     *
-     * @param \Alaress_Date_Format $deleted_at
-     */
-    public function setDeletedAt($deleted_at)
-    {
-        $this->deleted_at = $deleted_at;
-    }
-
-    /**
-     * Get deleted at
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deleted_at;
     }
 
     /**

@@ -53,7 +53,6 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 foreach ($components[$position] as $sequence => $componentID) {
                     if ($componentID) {
                         try {
-                            /** @var Component_Instance $inst */
                             $inst = Component_InstanceMapper::getInstance()->findById($componentID);
                             $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database
                             $inst->setPosition($position);
@@ -93,7 +92,6 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
         } elseif (is_numeric($_POST['delete'] ?? false)) {
             // Delete the instance and its configuration
 
-            /** @var Component_Instance $instance */
             $instance = $componentInstanceMapper->findById($_POST['delete']);
             $configs  = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
 
@@ -105,7 +103,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
         } elseif (is_numeric($_POST['add'] ?? false) || is_numeric($_POST['reload'] ?? false)) {
             // Add new component to page and output render of component
 
-            if (is_numeric($_POST['add'])) {
+            if (is_numeric($_POST['add'] ?? false)) {
                 $component = new Component_Instance();
                 $component
                     ->setDefinitionId($_POST['add'])
@@ -143,7 +141,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
             // If this is a new component create a config and transfer across some items from the default configuration
 
-            if (is_numeric($_POST['add'])) {
+            if (is_numeric($_POST['add'] ?? false)) {
                 $componentInstance       = $component->getInstance();
                 $componentInstanceConfig = $componentInstance->getConfig();
                 $componentDefinition     = $componentClass = $component->getInstance()->getDefinition();
@@ -271,7 +269,6 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                     // This should be 1:1 relation, so return only the first instance of this definition
 
                     try {
-                        /** @var Component_Config $confI */
                         $confI = $componentConfigInstanceMapper->findOneByColumnList([
                             'component_config_definition_id' => $confD->getId(),
                             'component_instance_id'          => $instance->getId()

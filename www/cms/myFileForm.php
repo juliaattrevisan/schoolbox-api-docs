@@ -49,7 +49,7 @@ if (isset($_POST['description'])) {
     $file = null;
 
     // if we're editing an existing file, ensure the file exists
-    if (is_numeric($_POST['fileID'])) {
+    if (is_numeric($_POST['fileID'] ?? false)) {
         $file = MyFileMapper::getInstance()->findById($_POST['fileID']);
     } else {
         try {
@@ -114,6 +114,8 @@ if (isset($_POST['description'])) {
 
         /* If any checkboxes were selected, publish to eportfolio My Files components on various pages
          */
+        $fileListMapper = \Component\Eportfolio\FileListMapper::getInstance();
+        $existingFiles = $fileListMapper->findByColumn('file_id', $file->getId())->indexBy('pageId');
         if (isset($_POST['published']) && is_array($_POST['published']) && count($_POST['published'])) {
             $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
@@ -127,19 +129,22 @@ if (isset($_POST['description'])) {
                     foreach ($pageIds as $currentPageId => $unused) {
                         $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, $currentPageId);
                         if ($authenticator->canModify()) {
-                            $publishedFile = new \Component\Eportfolio\FileList();
-                            $publishedFile->setPageId($currentPageId);
-                            $publishedFile->setFileId($file->getId());
-                            $publishedFile->setCreatedAt($now);
+                            $publishedFile = $existingFiles->offsetGet($currentPageId);
+                            if (!$publishedFile) {
+                                $publishedFile = new \Component\Eportfolio\FileList();
+                                $publishedFile->setPageId($currentPageId);
+                                $publishedFile->setFileId($file->getId());
+                                $publishedFile->setCreatedAt($now);
+                            }
                             $publishedFile->setUpdatedAt($now);
-
-                            \Component\Eportfolio\FileListMapper::getInstance()->save($publishedFile);
+                            $fileListMapper->save($publishedFile);
+                            $existingFiles->offsetUnset($currentPageId);
                         }
                     }
 
                     // Image component:
                     // set uploaded file as the current image
-                    $componentId = $_POST['component_instance_id'];
+                    $componentId = $_POST['component_instance_id'] ?? null;
                     if (!empty($componentId)) {
                         $component = Component_InstanceMapper::getInstance()->findByInstanceId($componentId);
                         if (
@@ -177,6 +182,8 @@ if (isset($_POST['description'])) {
                 }
             }
         }
+        // deleted
+        $fileListMapper->softDelete($existingFiles);
 
         if (isset($_POST['return']) && $_POST['return'] !== '') {
             SitePage::localRedir($_POST['return']);

@@ -85,7 +85,7 @@ if ($this->arg[0] == 'new') {
 
     $folderTree = $folderHandler->getFolderTree();
     renderTreeSelect($this, $folderTree, $parent['id']);
-    renderPublishingOptions($this, $fileOwner->getId(), true, $publishComponent);
+    renderPublishingOptions($this, null, $fileOwner->getId(), true, $publishComponent);
 
     /* Render out breadcrumbs
      */
@@ -132,7 +132,7 @@ if ($this->arg[0] == 'new') {
 
     $folderTree = $folderHandler->getFolderTree();
     renderTreeSelect($this, $folderTree, $file['parent']);
-    renderPublishingOptions($this, $fileOwner->getId(), true);
+    renderPublishingOptions($this, (int)$file['id'], $fileOwner->getId(), true);
 
     /* Render out breadcrumbs
      */
@@ -159,7 +159,7 @@ if ($this->arg[0] == 'new') {
  * Render the <select> element with the tree structure defined, or just a default "top level" if there is none
  *
  * @param SitePage $page
- * @param array $tree
+ * @param array|bool $tree
  * @param int $selected
  */
 function renderTreeSelect($page, $tree, $selected = 0)
@@ -192,20 +192,14 @@ function renderTreeSelect($page, $tree, $selected = 0)
  * Render the UI options for publishing, if there are any
  *
  * @param SitePage $page
+ * @param int|null $fileId
  * @param int $userId
  * @param bool $includeImageControllers
  * @param bool|int $publishComponent
  */
-function renderPublishingOptions($page, $userId, $includeImageControllers, $publishComponent = false)
+function renderPublishingOptions($page, $fileId, $userId, $includeImageControllers, $publishComponent = false)
 {
-
-    /**
-    * @var PageMapper $eMap
-    * @var Component_DefinitionMapper $cMap
-    * @var Component_InstanceMapper $iMap
-    */
     $eMap = PageMapper::getInstance();
-    $cMap = Component_DefinitionMapper::getInstance();
     $iMap = Component_InstanceMapper::getInstance();
 
     // if $publishComponent is set, use it to find the page associated with it
@@ -225,13 +219,19 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
      */
     $availablePages = $eMap->findPublishablePages($userId);
 
+    $publishedPageIds = [];
+    if ($fileId) {
+        $fileListMapper = \Component\Eportfolio\FileListMapper::getInstance();
+        $publishedPageIds = $fileListMapper->findByColumn('file_id', $fileId)->getPropertyValues('pageId');
+    }
+
     /* Manufacture the necessary info
      */
     if (is_array($availablePages) && count($availablePages)) {
         foreach ($availablePages as $currentPage) {
             /** @var Eportfolio\Page $ePage */
             $ePage    = $currentPage['page'];
-            $selected = $ePage->getPageId() == $targetPageId;
+            $selected = $ePage->getPageId() === $targetPageId || in_array($ePage->getPageId(), $publishedPageIds);
             $page->setVar(
                 [
                     'PUBLISHED'                  => $selected ? 'checked="checked"' : '',
