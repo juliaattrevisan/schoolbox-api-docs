@@ -180,7 +180,8 @@ class Controller extends Base
             ->setAttachPrompt('Upload CSV')
             ->setMimeFilter('*/*')
             ->setReadOnly(false)
-            ->setMulti(false);
+            ->setMulti(false)
+            ->useImportExpiryDate();
 
         return $zone->getTwigContext();
     }

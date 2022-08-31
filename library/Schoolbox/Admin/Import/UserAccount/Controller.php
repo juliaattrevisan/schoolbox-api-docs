@@ -184,7 +184,7 @@ class Controller extends Base
             ->setAttachPrompt('upload CSV')
             ->setReadOnly($readonly)
             ->setMulti(false)
-            ->setExpiryDate(\Alaress_Date_Format::now()->addWeeks(2));
+            ->useImportExpiryDate();
 
         if (null !== $hash) {
             $zone->attachFiles([$hash]);

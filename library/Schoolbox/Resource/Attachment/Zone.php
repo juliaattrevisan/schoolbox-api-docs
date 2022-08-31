@@ -298,6 +298,21 @@ class Zone
 
 
     /**
+     * Use an expiry date suitable for files which are used in an import, and
+     * therefore should expire soon.
+     *
+     * (Currently, this is a two-week expiry.)
+     *
+     * @return static
+     */
+    public function useImportExpiryDate(): self
+    {
+        $this->expiryDate = Alaress_Date_Format::now()->addWeeks(2);
+        return $this;
+    }
+
+
+    /**
      * Return an array that represents a context that can be passed into Twig
      *
      * @return array
