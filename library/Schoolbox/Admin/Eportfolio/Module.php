@@ -33,7 +33,7 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
                 '/deploy' => 'getDeploy',
-                '/deploy/progress/{id}/{skip}' => 'getImportProgress',
+                '/deploy/progress/{id}{/skip}' => 'getImportProgress',
                 '/user/{userId}/pages' => 'getUserPages',
             ],
             'POST' => [

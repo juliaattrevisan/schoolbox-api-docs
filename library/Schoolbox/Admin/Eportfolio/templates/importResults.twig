@@ -4,7 +4,7 @@
         window.countErrors = 0;
 
         function update() {
-            $.get('{{ routeLookup('adminEportfolio.getImportProgress', {id: id}) }}' + window.skipCount)
+            $.get('{{ routeLookup('adminEportfolio.getImportProgress', {id: id}) }}/' + window.skipCount)
                     .done(function (data) {
                         if (data.logs.length > 0) {
 
