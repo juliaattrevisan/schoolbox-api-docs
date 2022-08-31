@@ -62,7 +62,7 @@ class Translator
         $config = ConfigLoader::getInstance();
         $whitelist = $config->get('cyberhound_whitelist');
 
-        $this->whitelist = array_filter(explode("\n", $whitelist));
+        $this->whitelist = array_filter(preg_split('/\R/', $whitelist));
     }
 
     /**
