@@ -1,0 +1,62 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="{CDN_PREFIX}/js/print/jquery.artificial-print.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/dataTables.js?v={SITE_VERSION}"></script>
+<script type="text/javascript">
+    $(function(){
+        $('[data-action="print"]').artificialPrint();
+
+        $('[data-tablesorter]').DataTable({
+            info: false,
+            paging: false,
+            order: [[2,'asc']],
+            searching: false
+        });
+    });
+</script>
+<!-- END custom_head -->
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Staff Directory</h1>
+        </div>
+    </div>
+    <nav>
+        <a data-action='print' class="icon-print" title="Print" href="#"></a>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <div class="scrollable">
+            <table data-tablesorter>
+                <thead>
+                    <tr>
+                        <th class="hide-for-small" data-orderable="false">Image</th>
+                        <th>First name</th>
+                        <th>Surname</th>
+                        <th class="hide-for-medium-down">Department</th>
+                        <th class="hide-for-small">Role</th>
+                        <th>Contact Phone</th>
+                        <th>Ext</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN staff -->
+                    <tr>
+                        <td class="hide-for-small"><img src="/portrait.php?userId={STAFF_STAFFID}&size=square32"></td>
+                        <td>{STAFF_FIRSTNAME}</td>
+                        <td>{STAFF_SURNAME}</td>
+                        <td class="hide-for-medium-down">{STAFF_DEPARTMENT}</td>
+                        <td class="hide-for-small">{STAFF_ROLE}</td>
+                        <td><a href="tel:{STAFF_PHONE}">{STAFF_PHONE}</a></td>
+                        <td>{STAFF_EXTENSION}</td>
+                        <td><a href="mailto:{STAFF_EMAIL}">{STAFF_EMAIL}</a></td>
+                    </tr>
+                    <!-- END staff -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
