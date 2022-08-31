@@ -26,7 +26,6 @@ use function spl_object_hash;
  */
 class AccessLevelCensor
 {
-
     /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
     private $pastoralGroupMemberMapper;
 
