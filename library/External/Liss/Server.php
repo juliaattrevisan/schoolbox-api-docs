@@ -25,7 +25,6 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
-use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -62,7 +61,6 @@ use Schoolbox\UserMapper;
  */
 class External_Liss_Server
 {
-
     /**
      * Default logging message when attempting to use liss with a non-schoolbox connector
      */
@@ -92,6 +90,14 @@ class External_Liss_Server
      * as the cycle's identifier and also its name
      */
     private const DEFAULT_CYCLE_IDENTIFIER = 'Main Timetable';
+
+
+    /**
+     * This const corresponds to the enum for the config var external_liss_default_event_type
+     * This is used to decide if we use numeric teacher ids, or alphanumeric teacher codes
+     * If you're not using teacherId, you're presumed to be using teacherCode instead
+     */
+    private const TEACHER_IDENTIFIER_ID = 'teacherId';
 
 
     /**
@@ -553,9 +559,19 @@ class External_Liss_Server
             $classPeriodMapper = new ClassPeriodMapper();
             $classPeriodMapper->truncate();
 
+            /* Decide which externalId format to use via config var
+             */
+            $isTeacherIds = $this->isTeacherIds();
+
             $allData = $message->getParam(1)->me['array'];
 
             foreach ($allData as $currentData) {
+                /* An example $currentData that you can paste into a test.json
+                 * so you have a meaningful example of what you're working with
+                 * This came straight outta their 2020 devkit
+                 *
+                 * {"me":{"struct":{"DayNumber":{"me":{"i4":1},"mytype":1,"_php_class":null},"Period":{"me":{"string":"3"},"mytype":1,"_php_class":null},"ClassCode":{"me":{"string":"7PDH 2"},"mytype":1,"_php_class":null},"EdvalClassCode":{"me":{"string":"7PDH2"},"mytype":1,"_php_class":null},"TeacherId":{"me":{"string":"79455"},"mytype":1,"_php_class":null},"TeacherCode":{"me":{"string":"ANDN"},"mytype":1,"_php_class":null},"RoomCode":{"me":{"string":"B3"},"mytype":1,"_php_class":null}}},"mytype":3,"_php_class":null}
+                 */
                 $struct = $currentData->me['struct'];
 
                 /* Find the Period data
@@ -569,6 +585,14 @@ class External_Liss_Server
                  */
                 $allClasses = $classEntryMapper->findByColumn('code', trim($struct['ClassCode']->me['string']));
 
+                /* Decide which externalId format to use via config var
+                 */
+                if ($isTeacherIds) {
+                    $externalId = trim((string)$struct['TeacherId']->me['string']);
+                } else {
+                    $externalId = trim((string)$struct['TeacherCode']->me['string']);
+                }
+
                 /* Check that all three are provided
                  * Save it!
                  */
@@ -576,7 +600,7 @@ class External_Liss_Server
                     $classPeriod = $classPeriodMapper->createModel();
                     $classPeriod->setClass($allClasses->first()->getId());
                     $classPeriod->setPeriod($allPeriods->first()->getId());
-                    $classPeriod->setTeacher(trim((string)$struct['TeacherCode']->me['string']));
+                    $classPeriod->setTeacher($externalId);
                     $classPeriod->setRoom(trim((string)$struct['RoomCode']->me['string']));
                     $classPeriodMapper->save($classPeriod);
                 } else {
@@ -802,7 +826,14 @@ class External_Liss_Server
              */
             $defaultEventType = trim((string)$this->config->get('external_liss_default_event_type'));
 
+            /* Decide which externalId format to use via config var
+             */
+            $isTeacherIds = $this->isTeacherIds();
+
             foreach ($allEvents as $lissEvent) {
+                /* $lissEvent is a condensed version of what they send to us,
+                 * structured by the helper class
+                 */
                 $currentEvent = $lissEvent;
 
                 /* Event doesn't have a type; see if we specified one in config
@@ -923,9 +954,17 @@ class External_Liss_Server
                      */
                     $event->setAccess(Event::ACCESS_PERSONAL);
 
+                    /* Decide which externalId format to use via config var
+                     */
+                    if ($isTeacherIds) {
+                        $teacherExternalIds = $currentEvent['teacherIds'];
+                    } else {
+                        $teacherExternalIds = $currentEvent['teacherCodes'];
+                    }
+
                     /* Teachers and Students can be treated synonymously
                      */
-                    $combined = array_merge($currentEvent['students'], $currentEvent['teacherIds']);
+                    $combined = array_merge($currentEvent['students'], $teacherExternalIds);
 
                     foreach ($combined as $currentExternalId) {
                         try {
@@ -1024,6 +1063,18 @@ class External_Liss_Server
         /* External must also be schoolbox connector
          */
         return $this->config->get('external_type') === 'schoolbox';
+    }
+
+
+    /**
+     * Decide if we're going to use teacherIds as the externalId for staff
+     * or whether we use teacherCodes instead
+     *
+     * @return bool
+     */
+    private function isTeacherIds(): bool
+    {
+        return self::TEACHER_IDENTIFIER_ID === trim((string)$this->config->get('external_liss_teacher_identifier'));
     }
 
 

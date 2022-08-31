@@ -93,10 +93,11 @@ class PublishDailyData
             'detail' => '',
             'students' => [],
 
-            /* Assemble Teachers
+            /* Assemble numeric Teacher Ids and alphanumeric Teacher Codes
              * No idea why this has to be a csv, but students is an array...wevs
              */
-            'teacherIds' => explode(',', $currentEvent->me['struct']['TeacherIds']->me['string']),
+            'teacherCodes' => array_filter(explode(',', $currentEvent->me['struct']['TeacherCodes']->me['string'])),
+            'teacherIds' => array_filter(explode(',', $currentEvent->me['struct']['TeacherIds']->me['string'])),
         ];
 
         /* Assemble Students
