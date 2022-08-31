@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Group\Manage\ArrayToModel;
 
+use InvalidArgumentException;
 use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 
 /**
@@ -16,16 +17,12 @@ use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
  */
 class UserAccess
 {
-    // config of whether only staff can be a group admin
-    private bool $groupStaffOnly;
-
     /**
-     * @param bool $groupStaffOnly
+     * @param bool $groupStaffOnly config of whether only staff can be a group admin
      * @return void
      */
-    public function __construct(bool $groupStaffOnly)
+    public function __construct(private bool $groupStaffOnly)
     {
-        $this->groupStaffOnly = $groupStaffOnly;
     }
 
     /**
@@ -47,7 +44,7 @@ class UserAccess
                 && $array['accessType'] === UserAccessModel::MEMBERSHIP_ADMIN
                 && !$model->getUser()->getRole()->isStaff()
             ) {
-                throw new \InvalidArgumentException('Only staff can be a group admin');
+                throw new InvalidArgumentException('Only staff can be a group admin');
             }
             $model->setAccessLevel(UserAccessModel::ACCESS_NAME_TO_LEVEL[$array['accessType']]);
         }
