@@ -33,6 +33,7 @@ class User extends ModelToArray
             'title'     => $user->getTitle(),
             'firstName' => $user->getFirstname(),
             'lastName'  => $user->getLastname(),
+            'fullName'  => $user->getFullName(),
             'role'      => $user->getRole()->getName(),
             'isStaff'   => $user->getRole()->isStaff(),
             'campus'    => implode(', ', $user->getCampusCollection()->getPropertyValues('name')),
