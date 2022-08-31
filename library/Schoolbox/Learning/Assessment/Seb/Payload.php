@@ -170,7 +170,10 @@ class Payload
         }
 
         if ($this->config->get('seb_whitelist')) {
-            $whitelistUrls = array_merge($whitelistUrls, array_map('trim', explode("\n", $this->config->get('seb_whitelist'))));
+            $whitelistUrls = array_merge(
+                $whitelistUrls,
+                array_map('trim', preg_split('/\R/', $this->config->get('seb_whitelist'))) // Explode on \R to include all types of newline chars.
+            );
         }
 
         /* Manufacture a phplib style struct for strings and their replacements
