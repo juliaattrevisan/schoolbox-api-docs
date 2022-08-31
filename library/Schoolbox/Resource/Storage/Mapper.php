@@ -29,6 +29,7 @@ use Schoolbox\Video\QueueMapper;
  * @package Schoolbox\Resource\Storage
  * @method GenericCollection|Model[] findAll($options = [])
  * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
  */
 class Mapper extends BaseMapper implements IReceiver
 {
@@ -78,6 +79,25 @@ class Mapper extends BaseMapper implements IReceiver
      */
     public function preventExpiredAtDecrement(Model $storage, ?Model $previous = null): bool
     {
+        // Only check against previous expiry if there's a previous storage file
+        if ($previous) {
+            $expiryAt = $storage->getExpiryAt();
+            // Only check against previous expiry if the new storage file
+            // actually has an expiry
+            if ($expiryAt && !$expiryAt->isNull()) {
+                $previousExpiryAt = $previous->getExpiryAt();
+                // Allow update of expiry only if the new expiry is after the
+                // previous
+                if ($previousExpiryAt && !$previousExpiryAt->isNull()) {
+                    $updateExpiry = $expiryAt->gt($previousExpiryAt);
+                } else {
+                    $updateExpiry = false;
+                }
+                if (!$updateExpiry) {
+                    $storage->setExpiryAt($previousExpiryAt ? clone $previousExpiryAt : null);
+                }
+            }
+        }
         return true;
     }
 
