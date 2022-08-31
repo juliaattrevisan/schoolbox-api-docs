@@ -201,7 +201,7 @@ class Scrub
             ];
 
             // Add any additional iframe sources as configured
-            foreach (explode("\n", Config::get('safe_iframe_source_list')) as $source) {
+            foreach (preg_split('/\R/', Config::get('safe_iframe_source_list')) as $source) { // Explode on \R to include all types of newline chars.
                 $source = trim($source);
                 if (strlen($source) > 0) {
                     $safeIframeSources[] = preg_quote($source, '%');

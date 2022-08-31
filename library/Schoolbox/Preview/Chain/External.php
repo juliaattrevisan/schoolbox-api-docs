@@ -37,7 +37,7 @@ class External extends Base
         $this->start([
             new Image($decodedUrl, []),
             new Embed($decodedUrl, []),
-            new IFrame($decodedUrl, explode("\n", ConfigLoader::getInstance()->get('safe_iframe_source_list'))),
+            new IFrame($decodedUrl, preg_split('/\R/', ConfigLoader::getInstance()->get('safe_iframe_source_list'))), // Explode on \R to include all types of newline chars.
             new Redirect($decodedUrl, []),
         ]);
     }
