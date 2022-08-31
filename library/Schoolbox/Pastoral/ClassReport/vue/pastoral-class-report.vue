@@ -201,12 +201,12 @@ export default {
                     <li class="student-container">
                         <div class="list-item">
                             <div class="card small-12">
-                                <a :href="studentData.student._links.profile" title="View profile" class="name">
+                                <h4><a :href="studentData.student._links.profile" title="View profile" class="name">
                                     <img :src="studentData.student._links.avatar"
                                          :alt="`profile photo of ${studentData.student.fullName}`"
                                          class="portrait"/>
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
-                                </a>
+                                </a></h4>
                                 <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
                     <li v-for="record in studentData.records.data" :key="'record-' + String(record.id)" class="pastoral-container">
                         <div class="list-item ">
@@ -322,10 +322,6 @@ input[type=radio]:not(.plain) + label.input-toggle {
         }
 }
 
-img {
-    border-radius: 50%;
-    transform: scale(0.85);
-}
 .content-container {
     border: 1px solid chocolate;
     width: 98%;
@@ -341,6 +337,19 @@ img {
 
             .card {
 
+
+                h4 {
+                    border: 1px solid green;
+                    overflow: visible;
+                    padding: 0.5rem;
+
+                    img {
+                        border-radius: 50%;
+                        transform: scale(0.85);
+                    }
+
+                }
+
                 .pastoral-container {
                     border: 1px solid lightseagreen;
                     height: 60px;
@@ -354,6 +363,8 @@ img {
                         }
                     }
                 }
+
+
             }
 
         }
