@@ -15,7 +15,7 @@ INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `opti
 VALUES (
     'external_liss_teacher_identifier',
     'teacherId',
-    'External LISS Staff External ID Field',
+    'External LISS Staff ID Field',
     'The LISS protocol provides two options for the external ID. Select the one that matches your Schoolbox External ID.',
     (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
     'teacherId;Teacher ID:teacherCode;Teacher Code',
