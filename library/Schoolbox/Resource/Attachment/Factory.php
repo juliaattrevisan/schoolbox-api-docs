@@ -21,7 +21,6 @@ use Schoolbox\User;
  */
 class Factory
 {
-
     /**
      * Filesystem controllers follow this nomenclature
      */

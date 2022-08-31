@@ -25,7 +25,6 @@ use SitePage;
  */
 class TeamsController extends AbstractController
 {
-
     /**
      * The icon for this controller; appears in the accordion
      */

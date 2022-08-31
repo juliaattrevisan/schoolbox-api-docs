@@ -17,7 +17,6 @@ use Schoolbox\Resource\Attachment\NavigatorController;
  */
 class MyfileController extends NavigatorController
 {
-
     /**
      * @param bool   $multi
      * @param string $mimeFilter

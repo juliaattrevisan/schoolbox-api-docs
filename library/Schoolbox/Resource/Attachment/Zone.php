@@ -28,7 +28,6 @@ use UnexpectedValueException;
  */
 class Zone
 {
-
     const TPL = 'azTpl';
 
     /** @var string */
