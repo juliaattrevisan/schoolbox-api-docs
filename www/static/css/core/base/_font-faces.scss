@@ -7,7 +7,15 @@
   src:
     url('#{$cdn-prefix}/fonts/schoolbox.ttf?7bbold') format('truetype'),
     url('#{$cdn-prefix}/fonts/schoolbox.woff?7bbold') format('woff'),
-    url('#{$cdn-prefix}/fonts/schoolbox.svg?7bbold#schoolbox') format('svg');  
+    url('#{$cdn-prefix}/fonts/schoolbox.svg?7bbold#schoolbox') format('svg');
   font-weight: normal;
   font-style: normal;
+}
+
+@font-face {
+    font-family: "LibreBarcode128";
+    src:
+        url('#{$cdn-prefix}//custom/ccca/fonts/LibreBarcode128-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }
