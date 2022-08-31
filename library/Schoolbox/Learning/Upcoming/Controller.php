@@ -411,7 +411,6 @@ class Controller extends Base
         // User must have provided a start and end date: error out otherwise
         $start = filter_var($this->request->query->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         $end   = filter_var($this->request->query->get('end'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-
         if (!isset($start, $end)) {
             // No you don't throw any exception: only ApplicationException
             /** @noinspection PhpUnhandledExceptionInspection */
