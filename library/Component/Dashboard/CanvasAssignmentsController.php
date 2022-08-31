@@ -42,10 +42,10 @@ class Component_Dashboard_CanvasAssignmentsController extends Component_Dashboar
             [
                 'componentInstanceId' => $this->getInstance()->getId(),
             ],
+            true,
+            true,
             false,
-            false,
-            false,
-            false
+            true
         );
     }
 }
