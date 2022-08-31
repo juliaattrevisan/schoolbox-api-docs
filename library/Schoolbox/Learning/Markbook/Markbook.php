@@ -352,8 +352,38 @@ class Markbook
             'quartile2'         => $fivePoints['quartile2'],
             'quartile3'         => $fivePoints['quartile3']
         ];
+
+        /* $assessment might or might not be in a Project
+         * (Projects are assessments too)
+         *
+         * If it's in a Project, we need to inspect its siblings' weights
+         * to do an additional analysis
+         */
         if ($assessment->getContext() instanceof Project) {
             $statistics['weightInProject'] = $assessment->getWeight();
+
+            /* Init at zero
+             */
+            $statistics['projectTotalWeight'] = 0;
+
+            /* If $assessment is inside a Project, it needs to know
+             * about the weights of its siblings so that $assessment
+             * can be represented as a proportion of the siblings'
+             * combined weights
+             *
+             * Note that this might be repeated a bit, for every assessment
+             * in the project itself but there's probably nothing convenient
+             * we can do to address that right now
+             */
+            foreach ($assessment->getContext()->getAssessables() as $projectAssessment) {
+                $statistics['projectTotalWeight'] += $projectAssessment->getWeight();
+            }
+
+            /* Avoid a division by zero
+             */
+            if ($statistics['projectTotalWeight'] > 0) {
+                $statistics['projectWeightPercent'] = 100 * $statistics['weightInProject'] / $statistics['projectTotalWeight'];
+            }
         } else {
             $statistics['weight'] = $assessment->getWeight();
         }
@@ -364,24 +394,6 @@ class Markbook
             $statistics['draftMean']        = $markScheme->getHumanReadableMark($meanSummator->summateList($draftNormMarks));
             $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
             $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
-        }
-
-        // Collate project statistics too
-        if ($assessment instanceof Project) {
-            $statistics['projectTotalWeight'] = 0;
-            foreach ($assessment->getAssessables() as $projectAssessment) {
-                $this->collateAssessmentStatistics($projectAssessment);
-                $statistics['projectTotalWeight'] += $projectAssessment->getWeight();
-            }
-
-            // Pass 2: weight percent
-            if ($statistics['projectTotalWeight'] > 0) {
-                foreach ($assessment->getAssessables() as $projectAssessment) {
-                    $projectAssessmentId = $projectAssessment->getId();
-                    $this->assessmentStatistics[$projectAssessmentId]['projectWeightPercent']
-                        = $this->assessmentStatistics[$projectAssessmentId]['weightInProject'] / $statistics['projectTotalWeight'] * 100;
-                }
-            }
         }
 
         $this->assessmentStatistics[$assessment->getId()] = $statistics;
