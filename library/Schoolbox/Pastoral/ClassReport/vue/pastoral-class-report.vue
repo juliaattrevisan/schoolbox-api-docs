@@ -200,11 +200,11 @@ export default {
 
                     <li class="student-container">
                         <div class="list-item">
-                            <div class="card small-12">
+                            <div class="student-card card small-12">
                                 <h4><a :href="studentData.student._links.profile" title="View profile" class="name">
-                                    <img :src="studentData.student._links.avatar"
+                                   <div class="image-container"> <img :src="studentData.student._links.avatar"
                                          :alt="`profile photo of ${studentData.student.fullName}`"
-                                         class="portrait"/>
+                                         class="portrait"/> </div>
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
                                 </a></h4>
                                 <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
@@ -331,28 +331,37 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
     .student-container {
 
-        width: 100%;
+        width: 105%;
 
         .list-item {
 
-            .card {
+            .student-card {
 
+                display: flex;
+                flex-wrap: wrap;
 
                 h4 {
-                    border: 1px solid green;
-                    overflow: visible;
-                    padding: 0.5rem;
 
-                    img {
+                    overflow: visible;
+                    padding: 0.75rem;
+
+                   .image-container  {
+
+                       margin-left: 0;
+
+                        img {
                         border-radius: 50%;
                         transform: scale(0.85);
-                    }
 
+                    }
+                   }
                 }
 
                 .pastoral-container {
                     border: 1px solid lightseagreen;
                     height: 60px;
+                    width: 100%;
+
                     .tiny {
                         display: flex;
                         a {
