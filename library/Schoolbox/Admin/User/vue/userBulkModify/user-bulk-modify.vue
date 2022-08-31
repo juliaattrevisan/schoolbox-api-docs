@@ -7,8 +7,10 @@
 import UserBulkModifyFilters from './user-bulk-modify-filters.vue';
 import UserBulkModifyNewValues from './user-bulk-modify-new-values.vue';
 import FilterEvents from './userBulkModifyFilterEvents';
+import UserBulkModifyLog from "@schoolboxVue/components/log-modal";
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
 
 export default {
 
@@ -16,6 +18,8 @@ export default {
         UserBulkModifyFilters,
         UserBulkModifyNewValues,
         BottomDrawer,
+        RevealModal,
+        UserBulkModifyLog,
     },
 
     mixins: [
@@ -28,6 +32,10 @@ export default {
             required: true
         },
         srcUserModify: {
+            type: String,
+            required: true
+        },
+        srcUserDelete: {
             type: String,
             required: true
         },
@@ -52,6 +60,8 @@ export default {
         },
     },
 
+    emits: ['displayLog'],
+
     data () {
         return {
             hasDataLoaded: false, //show loading display until true
@@ -64,22 +74,22 @@ export default {
                     {
                         name: FilterEvents.CAMPUS,
                         callback: (row, query) => {
-                            return row.campuses.join().includes(query); //need to flatten the campuses array then check 
+                            return row.campuses.join().includes(query); //need to flatten the campuses array then check
                         }
                     },
                     {
                         name: FilterEvents.ROLE,
                         callback: (row, query) => {
-                            return row.role === query; 
+                            return row.role === query;
                         }
                     },
                     {
                         name: FilterEvents.YEAR,
                         callback: (row, query) => {
                             if (query === 'null') {
-                                query = null; //cast to proper null here to match 
+                                query = null; //cast to proper null here to match
                             }
-                            return row.year === query; 
+                            return row.year === query;
                         }
                     },
                     {
@@ -158,6 +168,8 @@ export default {
             collator: new Intl.Collator('en', {numeric: true, sensitivity: 'base'}), //to naturally sort year level column
             isShiftKeySelected: false, //to multi-select fields,
             hasSelectedShiftKey: false, //to hide a UI note
+            hasDataError: false,
+            logData: [], //to display the output of the returned action
         }
     },
 
@@ -232,7 +244,7 @@ export default {
 
         /**
          * Pass in the params to return all rows
-         * 
+         *
          * @retrun { Object}
          */
         getRowsBody () {
@@ -292,8 +304,109 @@ export default {
             this.loadRows(); //refresh the data
         },
 
+        /**
+         * To confirm/cancel selected users deletion
+         */
+        onDeleteUsersSelected () {
+            this.$refs.deleteModal.open();
+        },
+
+        /**
+         * Cancel the the selected users deletion
+         */
+        onCancelDeleteUsersSelected () {
+            this.$refs.deleteModal.close();
+        },
+
+        /**
+         * Delete the selected users
+         */
+        async onConfirmDeleteUsersSelected () {
+            const usersToModifyIDList = this.selectedRows.map(row => row.id);
+            const formData = new FormData();
+            usersToModifyIDList.forEach((item) => {
+                formData.append('users[]', item);
+            });
+            try {
+                this.isProcessing = true;
+                const response = await fetch(this.srcUserDelete, {
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    method: 'POST',
+                    body: formData,
+                });
+                const responseData = await response.json();
+                this.checkUpdateResponse(response, responseData);
+                this.$refs.deleteModal.close();
+
+            } catch (error) {
+                console.warn(error);
+                this.isProcessing = false;
+                this.hasDataError = true;
+
+            } finally {
+                this.hasUpdated = true;
+                this.isProcessing = false;
+
+                let logData = this.logData;
+                let hasDataError = this.hasDataError;
+                this.openLog({logData, hasDataError});
+            }
+        },
+
+        /**
+         * To update the row display after deletion
+         *
+         * @returns { Array }
+         */
+        getUpdatedRowsAfterUserDeletion () {
+            return this.rows.filter((row) => {
+                if (this.selectedRows.some((rowToDelete) => rowToDelete.id === row.id)) { //pull out any deleted rows, those rows that are in selectedFiles, which have just been deleted
+                    return false;
+                }
+                return true;
+            });
+        },
+
+        /**
+         * Check for any issues in the returned update
+         *
+         * @param { Object }
+         * @param { Object }
+         */
+        checkUpdateResponse (response, responseData) {
+            if (response.ok) { //successful response
+                this.hasDataError = false;
+                this.logData = responseData;
+                this.rows = this.getUpdatedRowsAfterUserDeletion();
+                this.clearRows();
+                this.$refs.table.resetSelectedRows();
+            } else if (!response.ok && response.status === 501) { //otherwise check for 501 error
+                this.hasDataError = true;
+                this.logData = [responseData.title]; //which comes in with an error message
+            } else {
+                this.hasDataError = true;
+                this.logData = ['Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.'];
+                if (responseData.title !== undefined) {
+                    this.logData = [responseData.title];
+                }
+            }
+        },
+
+        /**
+         * send to log and open
+         */
+        openLog ({logData, hasDataError = false}) {
+            let errorMessage = [];
+            if (hasDataError) {
+                errorMessage = 'The bulk modify has failed to update. Further details are logged below.\n';
+            }
+            this.$refs.userLogView.displayLog(logData, hasDataError, errorMessage);
+        }
+
     },
-    
+
 }
 </script>
 
@@ -316,7 +429,7 @@ export default {
             @select="onRowSelected"
         >
             <template #beforeTable>
-                <user-bulk-modify-filters 
+                <user-bulk-modify-filters
                     :campuses="campuses"
                     :roles="roles"
                     :year-levels="yearLevels"
@@ -348,9 +461,16 @@ export default {
             <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
-            <button @click.prevent="onModifySelected" class="button submit">Modify</button>
+            <ul class="flex-list buttons">
+                <li class="two-thirds">
+                    <button @click.prevent="onModifySelected" class="submit">Modify</button>
+                </li>
+                <li class="one-third">
+                    <button @click.prevent="onDeleteUsersSelected" class="alert icon-delete button-delete">Delete Users</button>
+                </li>
+            </ul>
         </bottom-drawer>
-        <user-bulk-modify-new-values 
+        <user-bulk-modify-new-values
             ref="newValues"
             :src-user-modify="srcUserModify"
             :campuses="campuses"
@@ -361,7 +481,25 @@ export default {
             :selected-rows="selectedRows"
             :selected-rows-count-with-row-name="selectedRowsCountWithRowName"
             @updated="onUpdated"
+            @log="openLog"
         />
+        <reveal-modal ref="deleteModal">
+            <h2>Please Confirm Multiple User Deletion</h2>
+            <div data-alert class="alert-box alert">
+                You are about to permanently delete <strong>{{ selectedRowsCountWithRowName }}</strong>. Deleting users
+                will prevent them from logging into the system and from accessing resources that belong to them. Attached
+                resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links. Resources shared
+                with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain
+                available.
+            </div>
+            <ul class="flex-list buttons">
+                <li><button @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</button></li>
+                <li><button @click.prevent="onCancelDeleteUsersSelected" class="button">Cancel</button></li>
+            </ul>
+        </reveal-modal>
+
+        <UserBulkModifyLog ref="userLogView" />
+
     </div>
 </template>
 
@@ -398,4 +536,7 @@ export default {
     }
 }
 
+.button-delete:hover {
+    background-color: rgba(240, 65, 36, 0.8) !important;
+}
 </style>

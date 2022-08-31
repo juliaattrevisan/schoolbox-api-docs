@@ -49,7 +49,7 @@ export default {
         },
     },
 
-    emits: ['updated'],
+    emits: ['updated', 'log'],
 
     data () {
         return {
@@ -72,8 +72,6 @@ export default {
             updateFieldsOriginal: {}, //to reset to original values once an update is complete
             isProcessing: false,
             hasUpdated: false,
-            hasDataError: false,
-            logData: [], //to display the output of the returned action
         }
     },
 
@@ -155,16 +153,20 @@ export default {
          * @param { Object }
          */
         checkUpdateResponse (response, responseData) {
+            let logData, hasDataError = false;
             if (response.ok) { //successful response
-                this.hasDataError = false;
-                this.logData = responseData;
+                hasDataError = false;
+                logData = responseData;
             } else if (!response.ok && response.status === 501) { //otherwise check for 501 error
-                this.hasDataError = true;
-                this.logData = [responseData.title]; //which comes in with an error message
+                hasDataError = true;
+                logData = [responseData.title]; //which comes in with an error message
             } else {
-                this.hasDataError = true;
-                this.logData = ['Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.'];
+                hasDataError = true;
+                logData = ['Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.'];
             }
+            //close this modal before opening the log modal...
+            this.onCloseSelected();
+            this.$emit('log', {logData, hasDataError});
         },
 
         /**
@@ -182,16 +184,7 @@ export default {
 <template>
     <reveal-modal ref="modal" size="xlarge" :close-on-background-click="false" :is-close-disabled="isProcessing">
         <Transition name="fade" mode="out-in">
-            <div v-if="hasUpdated" class="new-values">
-                <div class="new-values__full-width">
-                    <div v-if="hasDataError" class="alert-box alert">The Bulk Modify has failed to update. Further details are logged below.</div>
-                    <textarea v-html="logData"></textarea>
-                </div>
-                <div class="new-values__full-width">
-                    <button @click.prevent="onCloseSelected" class="button submit">Close</button>
-                </div>
-            </div>
-            <div v-else class="new-values">
+            <div class="new-values">
                 <div class="new-values__full-width">
                     <h2>Bulk modify {{ selectedRowsCountWithRowName }} selected</h2>
                 </div>
