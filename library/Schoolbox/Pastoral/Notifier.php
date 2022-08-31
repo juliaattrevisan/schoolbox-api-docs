@@ -22,7 +22,6 @@ use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -66,6 +65,8 @@ class Notifier extends AbstractModuleNotifier
 
     protected PastoralReportMapper $pastoralReportMapper;
 
+    protected AccessLevelCensor $accessLevelCensor;
+
     /** @var RoleMapper $roleMapper */
     protected RoleMapper $roleMapper;
 
@@ -95,6 +96,10 @@ class Notifier extends AbstractModuleNotifier
 
         if (empty($dependencies["pastoralReportMapper"])) {
             $dependencies["pastoralReportMapper"] = PastoralReportMapper::getInstance();
+        }
+
+        if (empty($dependencies["accessLevelCensor"])) {
+            $dependencies["accessLevelCensor"] = new AccessLevelCensor();
         }
 
         if (empty($dependencies["roleMapper"])) {
@@ -136,36 +141,31 @@ class Notifier extends AbstractModuleNotifier
 
         // Work out who to send the message to
 
-        if ($method === self::TRIGGER_ADDED_TO_REPORT) {
-            $targetUsers = $this->findReportUsersForRecord($pastoral);
-        } else {
-            $parentAccessEnabled  = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
-            $studentAccessEnabled = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
+        $parentAccessEnabled  = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
+        $studentAccessEnabled = (bool)$this->conf->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
 
-            $privateChangeOnly = false;
-            if ($diff) {
-                $relevantDiff      = array_intersect(array_keys($diff), self::COLS);
-                $privateChangeOnly = empty(array_diff($relevantDiff, ['bodyPrivate', 'attachmentsPrivate']));
-            }
-
-            /** @var Collection|PastoralAccess[] $accessRecords */
-            $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
-            $targetUsers   = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->log))
-                ->buildTargetUsers(
-                    $accessRecords,
-                    $privateChangeOnly,
-                    $student,
-                    $parentAccessEnabled,
-                    $studentAccessEnabled,
-                    'pastoral',
-                    $method,
-                );
+        $privateChangeOnly = false;
+        if ($diff) {
+            $relevantDiff      = array_intersect(array_keys($diff), self::COLS);
+            $privateChangeOnly = empty(array_diff($relevantDiff, ['bodyPrivate', 'attachmentsPrivate']));
         }
 
-        $accessLevelCensor = new AccessLevelCensor();
+        /** @var Collection|PastoralAccess[] $accessRecords */
+        $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
+        $targetUsers   = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->log))
+            ->buildTargetUsers(
+                $accessRecords,
+                $privateChangeOnly,
+                $student,
+                $parentAccessEnabled,
+                $studentAccessEnabled,
+                'pastoral',
+                $method,
+            );
+
         foreach ($targetUsers as $userId => $user) {
             // make sure that multiple conditions allow user to access this record
-            if ($accessLevelCensor->getAccessLevel($pastoral, $user) === PastoralAccessMapper::ACCESS_DENY) {
+            if ($this->accessLevelCensor->getAccessLevel($pastoral, $user) === PastoralAccessMapper::ACCESS_DENY) {
                 continue;
             }
             $envelope->targetToUser($userId, $message);
@@ -239,7 +239,28 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyAddedToReport(Model $model, User $effector, ?array $diff = []): Envelope
     {
-        return $this->buildMessage($model, self::TRIGGER_ADDED_TO_REPORT, $effector, $diff);
+        $envelope = new Envelope();
+
+        // Get hydrated pastoral record
+        try {
+            $pastoral = $this->mapper->findById($model->getId());
+            $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
+            $student->loadTeachers();
+            $pastoral->setStudent($student);
+        } catch (MapperException $e) {
+            $this->log->error("Error: Unable to send pastoral addedToReport notification. {$e->getMessage()}", ['exception' => $e]);
+            return $envelope;
+        }
+
+        $builder = $this->getBaseBuilder($pastoral, self::TRIGGER_ADDED_TO_REPORT, $effector);
+        $message = $builder->build();
+
+        $targetUsers = $this->findReportUsersForRecord($pastoral);
+        foreach ($targetUsers as $userId => $user) {
+            $envelope->targetToUser($userId, $message);
+        }
+
+        return $envelope;
     }
 
     /**
@@ -286,6 +307,18 @@ class Notifier extends AbstractModuleNotifier
     public function setPastoralReportMapper(PastoralReportMapper $pastoralReportMapper): self
     {
         $this->pastoralReportMapper = $pastoralReportMapper;
+
+        return $this;
+    }
+
+    /**
+     * @param AccessLevelCensor $accessLevelCensor
+     *
+     * @return self
+     */
+    public function setAccessLevelCensor(AccessLevelCensor $accessLevelCensor): self
+    {
+        $this->accessLevelCensor = $accessLevelCensor;
 
         return $this;
     }
@@ -373,28 +406,41 @@ class Notifier extends AbstractModuleNotifier
         $reports = $this->pastoralReportMapper->findForRecord($pastoral, true);
         $this->log->debug(count($reports) . " reports found for pastoral {$pastoral->getId()}");
         $this->log->debug("Report ids: " . implode(',', $reports->getPropertyValues('id')));
-        $userIds = [];
+
+        $targetUsers = $this->userMapper->createCollection();
         /** @var Report\Model $report */
         foreach ($reports as $report) {
-            if (!in_array($report->getOwner()->getId(), $userIds)) {
-                $userIds[] = $report->getOwner()->getId();
-            }
-            $groups = $report->getGroups();
-            foreach ($groups as $group) {
-                $memberIds = $group->getMembers()->map(function ($member) {
-                    return $member->getUser()->getId();
-                })->getAll();
-                $userIds   = array_unique(array_merge($userIds, $memberIds));
+            $reportUserIds = $report->getUserIds();
+            foreach ($reportUserIds as $reportUserId) {
+                // if already exists, continue
+                if ($targetUsers->offsetExists($reportUserId)) {
+                    continue;
+                }
+                // if owner of the record, add the user to target
+                if ($pastoral->getOwner()->getId() === $reportUserId) {
+                    $targetUsers->offsetSet($pastoral->getOwner()->getId(), $pastoral->getOwner());
+                    continue;
+                }
+                try {
+                    $reportUser = $this->userMapper->findById($reportUserId);
+                } catch (MapperException $e) {
+                    continue;
+                }
+                // if the user is moderator and the report is not limited to involved, add the user
+                if ($this->accessLevelCensor->isPastoralModerator($reportUser) && !$report->getInvolved()) {
+                    $targetUsers->offsetSet($reportUser->getId(), $reportUser);
+                    continue;
+                }
+                // check role and permission
+                if (!$reportUser->getRole()->getAccessPastoral() || !$reportUser->getRole()->isStaff()) {
+                    continue;
+                }
+                // check actual access level
+                if ($this->accessLevelCensor->getRawAccessLevel($pastoral, $reportUser) > PastoralAccessMapper::ACCESS_DENY) {
+                    $targetUsers->offsetSet($reportUser->getId(), $reportUser);
+                }
             }
         }
-        return $this->userMapper->findByColumn('id', $userIds)->filter(
-            function ($user) {
-                /** @var User $user */
-                return $user->getRole()->isStaff()
-                    && ($user->getRole()->getAccessPastoral()
-                        || $user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)
-                    );
-            }
-        )->indexBy('id');
+        return $targetUsers;
     }
 }

@@ -331,7 +331,10 @@ class Mapper extends BaseMapper
 
     /**
      * Find reports which criteria match the pastoral record provided
-     * This does not check the current user's accessibility to the record
+     * Please note:
+     * * This does not check the current user's accessibility to the record
+     * * This does not check involved report flag, as it's expensive
+     *
      * @param \Schoolbox\Pastoral\Model $pastoral
      * @param bool                      $notificationEnabledOnly
      * @return \Schoolbox\GenericCollection
@@ -362,8 +365,6 @@ class Mapper extends BaseMapper
             'authorLike'  => "%,{$pastoral->getOwner()->getId()},%",
             'studentLike' => "%,{$pastoral->getStudent()->getId()},%",
         ];
-
-        // TODO involved
 
         // Severity
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {

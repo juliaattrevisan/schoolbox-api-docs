@@ -219,7 +219,17 @@ class AccessLevelCensor
         if ($this->isPastoralModerator($user) || (int)$user->getId() === (int)$record->getOwner()->getId()) {
             return PastoralAccessMapper::ACCESS_PRIVATE;
         }
+        return $this->getRawAccessLevel($record, $user);
+    }
 
+    /**
+     * Return access level, ignoring pastoral moderator and owner
+     * @param Model $record
+     * @param User  $user
+     * @return int
+     */
+    public function getRawAccessLevel(Model $record, User $user): int
+    {
         // Hydrate group membership
         if ($user->getPastoralGroupsMemberships() === null) {
             $user->setPastoralGroupsMemberships(

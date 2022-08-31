@@ -332,10 +332,10 @@
                                                    name="years[]"
                                                    value="{{ year.id }}"
                                                    type="checkbox"
-                                                   {% for yearSelected in (report.years ?? []) |filter(yearSelected => yearSelected == year.id ) %}checked{% endfor %}
+                                                   {% for yearSelected in (report.years ?? []) |filter(yearSelected => yearSelected.id == year.id ) %}checked{% endfor %}
                                                    data-check-year
                                             >
-                                            <label for="year-{{ year.id }}">{{ year.name }}</label>
+                                            <label for="year-{{ year.id }}">{{ year.longname }}</label>
                                         </li>
                                     {% endfor %}
                                 </ul>

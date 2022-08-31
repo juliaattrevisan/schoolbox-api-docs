@@ -396,15 +396,15 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getOrderCsv(): string
+    public function getOrderCsv(): ?string
     {
         return $this->orderCsv;
     }
 
     /**
-     * @param string $value
+     * @param string|null $value
      *
      * @return static
      */
@@ -416,9 +416,9 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getYearsCsv(): string
+    public function getYearsCsv(): ?string
     {
         return $this->yearsCsv;
     }
@@ -928,5 +928,24 @@ class Model implements ISoftDeletable
         }
 
         return false;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUserIds(): array
+    {
+        $userIds = [];
+        if (!in_array($this->getOwner()->getId(), $userIds)) {
+            $userIds[] = $this->getOwner()->getId();
+        }
+        $groups = $this->getGroups();
+        foreach ($groups as $group) {
+            $memberIds = $group->getMembers()->map(function ($member) {
+                return $member->getUser()->getId();
+            })->getAll();
+            $userIds   = array_unique(array_merge($userIds, $memberIds));
+        }
+        return $userIds;
     }
 }
