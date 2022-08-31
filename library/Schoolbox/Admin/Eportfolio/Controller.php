@@ -9,7 +9,6 @@
 namespace Schoolbox\Admin\Eportfolio;
 
 use Alaress\Web\Controller\Base;
-use Alaress_Date_Format;
 use Aura\Web\Request\Values;
 use Component\Eportfolio\Textbox as EportfolioTextbox;
 use Component\Eportfolio\TextboxMapper as EportfolioTextboxMapper;
@@ -168,7 +167,7 @@ class Controller extends Base
      */
     private function deployCallback($post, $id)
     {
-        if ($post['dryRun'] == '1') {
+        if ($post->getBool('dryRun', false)) {
             $this->log('Starting dry run.', $id);
         } else {
             $this->log('Starting import.', $id);
@@ -202,16 +201,16 @@ class Controller extends Base
                 }
             }
 
-            if (is_array($post['role'])) {
-                foreach ($post['role'] as $roleId) {
+            if (is_array($post->get('role'))) {
+                foreach ($post->get('role') as $roleId) {
                     $destinationUsers = $destinationUsers->mergeUnique($this->userMapper->findByColumn('group_id', $roleId), 'id');
                 }
             }
 
             // Load in users
 
-            if (is_array($post['campus'])) {
-                foreach ($post['campus'] as $campusId) {
+            if (is_array($post->get('campus'))) {
+                foreach ($post->get('campus') as $campusId) {
                     $campus = new Campus();
                     $campus->setId($campusId);
                     $destinationUsers = $destinationUsers->mergeUnique($this->campusMapper->findUsersInCampus($campus), 'id');
@@ -219,12 +218,13 @@ class Controller extends Base
             }
 
             // We now had a list of destination users, lets make this party happen
-            /** @var SitePage $page */
-            $page = $this->getDi()->get('sitePage');
+//            /** @var SitePage $sitePage */
+//            $sitePage = $this->getDi()->get('sitePage');
+            $sitePage = new SitePage($this->getDi());
 
             // Preload the component list for each page
 
-            $factory = new Component_Eportfolio_Factory($user, $page);
+            $factory = new Component_Eportfolio_Factory($user, $sitePage);
             $eportfolioList = array();
 
             /** @var EportfolioPage $page */
@@ -275,7 +275,7 @@ class Controller extends Base
      */
     private function importSingleUser($post, $logId, User $srcUser, User $destUser, $eportfolioList)
     {
-        $dryRun = $post['dryRun'] == '1';
+        $dryRun = $post->getBool('dryRun', false);
         $this->log('Importing ePortfolio pages from ' . $srcUser->getFullName() . ' to ' . $destUser->getFullName(), $logId);
 
         $destUserId = $destUser->getId();
