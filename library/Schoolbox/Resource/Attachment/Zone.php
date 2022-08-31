@@ -301,13 +301,13 @@ class Zone
      * Use an expiry date suitable for files which are used in an import, and
      * therefore should expire soon.
      *
-     * (Currently, this is a two-week expiry.)
+     * (Currently, this is a one-day expiry.)
      *
      * @return static
      */
     public function useImportExpiryDate(): self
     {
-        $this->expiryDate = Alaress_Date_Format::now()->addWeeks(2);
+        $this->expiryDate = Alaress_Date_Format::now()->addDays(1);
         return $this;
     }
 
