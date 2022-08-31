@@ -47,6 +47,25 @@ class UploadController extends AbstractController
     }
 
     /**
+     * Include expiry date in URL as well
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        $url = parent::getUrl();
+        if (!$this->expiryDate || $this->expiryDate->isNull()) {
+            return $url;
+        }
+
+        $urlObject = new Uri($url);
+        $urlObject->setQuery(
+            $urlObject->getQueryAsArray() + ['expiryDate' => $this->expiryDate->toRfc3339String()],
+        );
+        return $urlObject->toString();
+    }
+
+    /**
      * @param SitePage $page
      */
     protected function pparse(SitePage $page)
