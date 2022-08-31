@@ -926,25 +926,28 @@
         });
 
         {# Delete token #}
+        //make the function reusable so we can call after adding a new token
+        let tokenDelete = function () {
+            $('[data-delete-token]').click(function (event) {
+                event.preventDefault();
 
-        $('[data-delete-token]').click(function (event) {
-            event.preventDefault();
+                let tokenId = $(this).data('delete-token');
+                let tokenRow = $(this).closest('[data-token]');
 
-            let tokenId = $(this).data('delete-token');
-            let tokenRow = $(this).closest('[data-token]');
-
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete this token?',
-                confirmLabel: 'Delete',
-                confirmEvent: function () {
-                    $.post('{{ routeLookup('userToken.postDeleteToken', {}) }}',
-                            {jwtIdToken: tokenId})
-                            .done(function () {
-                                tokenRow.remove();
-                            });
-                }
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this token?',
+                    confirmLabel: 'Delete',
+                    confirmEvent: function () {
+                        $.post('{{ routeLookup('userToken.postDeleteToken', {}) }}',
+                                {jwtIdToken: tokenId})
+                                .done(function () {
+                                    tokenRow.remove();
+                                });
+                    }
+                });
             });
-        });
+        };
+        tokenDelete();
 
         {# Delete permission #}
 
@@ -1078,6 +1081,7 @@
                                 + data.jwtId +
                                 '" class="icon-delete" title="Remove"></a></nav></li>';
                         $('[data-token-list]').html($('[data-token-list]').html() + html);
+                        tokenDelete();
                     })
         });
 
