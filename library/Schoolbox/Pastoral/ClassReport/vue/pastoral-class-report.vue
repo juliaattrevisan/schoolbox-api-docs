@@ -268,7 +268,8 @@ export default {
 
 
 .island .content {
-    padding: 1.5rem;
+    padding: 2rem;
+    margin-bottom: 0;
 }
 
 .sort-filter {
@@ -357,12 +358,13 @@ input[type=radio]:not(.plain) + label.input-toggle {
                     overflow: visible;
                     padding: 0.75rem;
                     margin-top: 0.25rem;
+                    padding-left: 0;
                 }
 
                 .pastoral-container {
                     height: 2.5rem;
                     width: 100%;
-                    margin-left: 1rem;
+                    margin-left: 0.25rem;
 
                     .tiny {
                         display: grid;
@@ -378,7 +380,9 @@ input[type=radio]:not(.plain) + label.input-toggle {
                         }
 
                         p {
-
+                            text-overflow: inherit;
+                            overflow: visible;
+                            white-space: inherit;
                         }
 
                         .time-container {
@@ -389,7 +393,6 @@ input[type=radio]:not(.plain) + label.input-toggle {
                 }
 
                 .text-container {
-                    border-left: 1px solid var(--form-border-color);
                     flex: 1 1 0px;
                     min-height: 5.5rem;
                     padding-left: 0.25rem;
