@@ -100,13 +100,13 @@ Usage:
             // Reset checkboxes
             $filterPanel.find('input[type=checkbox][data-value-default]').each(function(idx, elem){
                 let $checkbox = $(elem);
-                $checkbox.prop('checked', $checkbox.data('value-default'));
+                $checkbox.prop('checked', $checkbox.data('value-default')).trigger('change');
             });
 
             // Reset text inputs
             $filterPanel.find('input[type=text][data-value-default]').each(function(idx, elem){
                 let $input = $(elem);
-                $input.val($input.data('value-default'));
+                $input.val($input.data('value-default')).trigger('change');
             });
 
             // Reset selectizes
