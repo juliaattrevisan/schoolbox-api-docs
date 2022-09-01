@@ -403,7 +403,7 @@ class Controller extends Base
             // and should not be seen by that user (see SA-14181).  The easiest solution (suggested by James) was just to
             // forbid requests that do not include a valid filter.  Note an invalid filter query would have caused an error
             // above in the filter factory.
-            throw new \BadFunctionCallException("URL parameter 'filters' is required.");
+            throw ErrorMapper::getInstance()->generateException(0, null, "URL parameter 'filters' is required.");
         }
 
         $visibility = new Visibility($this->access);
