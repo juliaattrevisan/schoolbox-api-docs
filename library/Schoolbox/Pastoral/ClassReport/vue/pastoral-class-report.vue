@@ -175,17 +175,19 @@ export default {
             </div>
 
             <!-- count filter -->
-            <div class="small-12 medium-6 columns count-filter">
-                <label>Show amount:</label>
-                <template v-for="option in countOptions">
-                    <input :id="`countOption-${ option.value }`"
-                           type="radio"
-                           v-model="count"
-                           :value="option.value"
-                           @change="filter_append(null, true, true)"
-                    >
-                    <label :for="`countOption-${ option.value }`" class="input-toggle">{{ option.label }}</label>
-                </template>
+            <div class="small-12 medium-6 columns">
+                <div class="count-filter">
+                    <label>Show amount:</label>
+                    <template v-for="option in countOptions">
+                        <input :id="`countOption-${ option.value }`"
+                               type="radio"
+                               v-model="count"
+                               :value="option.value"
+                               @change="filter_append(null, true, true)"
+                        >
+                        <label :for="`countOption-${ option.value }`" class="input-toggle">{{ option.label }}</label>
+                    </template>
+                </div>
             </div>
 
             <ul class="action-list threaded content-container">
@@ -269,7 +271,6 @@ export default {
 .sort-filter {
     display: flex;
     flex-direction: row;
-    margin-top: 1rem;
 
     label {
         width: 70px;
@@ -281,14 +282,11 @@ export default {
         min-height: 0;
         border-radius: 2px;
     }
-
 }
 
 .count-filter {
     display: flex;
-    flex-direction: row;
-    margin-top: 1rem;
-    justify-content: end;
+    justify-content: flex-end;
 
     label {
         line-height: 2rem;
@@ -305,15 +303,16 @@ input[type=radio]:not(.plain) + label.input-toggle {
     section {
         border: none;
     }
-        button {
-            padding: 0 1rem;
-        }
 
-        button:hover {
-            background-color: var(--content-ui-foreground);
-            color: white;
-            transition: all .2s cubic-bezier(.5,1,.89,1);
-        }
+    button {
+        padding: 0 1rem;
+    }
+
+    button:hover {
+        background-color: var(--content-ui-foreground);
+        color: white;
+        transition: all .2s cubic-bezier(.5,1,.89,1);
+    }
 }
 
 .content-container {
@@ -336,11 +335,9 @@ input[type=radio]:not(.plain) + label.input-toggle {
                 float: none;
 
                 .image-container  {
-
                     margin-left: 0;
                     margin-right: 0;
                     padding: 0.75rem;
-
 
                     img {
                         border-radius: 50%;
@@ -352,15 +349,12 @@ input[type=radio]:not(.plain) + label.input-toggle {
                 }
 
                 h4 {
-
                     overflow: visible;
                     padding: 0.75rem;
                     margin-top: 0.25rem;
-
                 }
 
                 .pastoral-container {
-
                     height: 2.5rem;
                     width: 100%;
                     margin-left: 1rem;
@@ -376,15 +370,13 @@ input[type=radio]:not(.plain) + label.input-toggle {
                                 border-radius: 50%;
                                 margin-right: 0.75rem;
                             }
-
-
                         }
+
                         p {
 
                         }
 
                         .time-container {
-
                             text-align: right;
                         }
                     }
@@ -399,7 +391,5 @@ input[type=radio]:not(.plain) + label.input-toggle {
         }
     }
 }
-
-
 
 </style>
