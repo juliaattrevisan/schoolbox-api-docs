@@ -1676,15 +1676,6 @@ abstract class Mapper implements IMapper, Serializable
             return false;
         }
 
-        // Trigger the pre-trigger, if there is one.
-        if (isset($pre_trigger)) {
-            foreach ($collection as $model) {
-                if (!($this->triggerCallbacks($pre_trigger, $model))) {
-                    return false;
-                }
-            }
-        }
-
         // Get the property to update on each model, if there is one.
         $property_map = null;
         foreach ($this->map as $map) {
@@ -1700,10 +1691,23 @@ abstract class Mapper implements IMapper, Serializable
 
         $pbs = $this->buildPredicateBuildersForCollection($collection);
 
+        // Build a collection of previous models,
+        // for comparison when triggering callbacks
+        $previousCollection = $collection->deepClone();
+
         // Update property on each model
         foreach ($collection as $model) {
             if (isset($property_map)) {
                 $this->setModelProperty($model, $property_map['property'], $value);
+            }
+        }
+
+        // Trigger the pre-trigger, if there is one.
+        if (isset($pre_trigger)) {
+            foreach ($collection as $i => $model) {
+                if (!($this->triggerCallbacks($pre_trigger, $model, $previousCollection[$i] ?? null))) {
+                    return false;
+                }
             }
         }
 
@@ -1737,8 +1741,8 @@ abstract class Mapper implements IMapper, Serializable
 
         // Trigger the post-trigger, if there is one.
         if (isset($post_trigger)) {
-            foreach ($collection as $model) {
-                $this->triggerCallbacks($post_trigger, $model);
+            foreach ($collection as $i => $model) {
+                $this->triggerCallbacks($post_trigger, $model, $previousCollection[$i] ?? null);
             }
         }
 
