@@ -37,7 +37,9 @@ export const useNodesStore = defineStore('mcNodes', {
                     this.updateNodes(nodes);
                     const viewNodesStore = useViewNodesStore();
                     if (viewNodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
-                        viewNodesStore.setSelected(1, this.nodes.children[0].id);
+                        const singleCurriculumId = this.nodes.children[0].id;
+                        viewNodesStore.setSelected(1, singleCurriculumId);
+                        this.loadChildren(singleCurriculumId); //and also load in its children for initial display
                     }
                 } else {
                     console.warn(response);
