@@ -223,23 +223,25 @@ export default {
                                     created by
                                     <a :href="record.createdBy._links.profile" title="View profile" class="name">
                                         {{ record.createdBy.fullName }}
-                                    </a> <time :datetime="formatDateTime(record.createdAt)"
-                                               :title="formatDateTime(record.createdAt)"
+                                    </a>
+                                </p>
+                                <div class="time-container"><time :datetime="formatDateTime(record.createdAt)"
+                                      :title="formatDateTime(record.createdAt)"
                                 >
                                     {{ formatDate(record.createdAt) }}
                                 </time><template v-if="record.createdAt !== record.updatedAt">,
-                                    updated
-                                    <template v-if="record.createdBy.id !== record.updatedBy.id">
-                                        by
-                                        <a :href="record.updatedBy._links.profile" title="View profile" class="name">
-                                            {{ record.updatedBy.fullName }}
-                                        </a>
-                                    </template> <time :datetime="formatDateTime(record.updatedAt)"
-                                                      :title="formatDateTime(record.updatedAt)">
-                                        {{ formatDate(record.updatedAt) }}
-                                    </time>
-                                </template>
-                                </p>
+                                updated
+                                <template v-if="record.createdBy.id !== record.updatedBy.id">
+                                    by
+                                    <a :href="record.updatedBy._links.profile" title="View profile" class="name">
+                                        {{ record.updatedBy.fullName }}
+                                    </a>
+                                </template> <time :datetime="formatDateTime(record.updatedAt)"
+                                                  :title="formatDateTime(record.updatedAt)">
+                                    {{ formatDate(record.updatedAt) }}
+                                </time>
+                            </template>
+                                </div>
                             </div>
                         </div>
                     </li>
@@ -376,21 +378,30 @@ input[type=radio]:not(.plain) + label.input-toggle {
                     margin-left: 5.5rem;
 
                     .tiny {
-                        display: flex;
+                        display: grid;
+                        grid-template-columns: 4fr 1fr 1fr;
+                        width: 90%;
 
 
                         a {
                             width: 50%;
+                            border: 1px solid darkgreen;
+                            line-height: 1.5rem;
 
                             img {
                                 border-radius: 50%;
                                 margin-right: 0.75rem;
                             }
 
-                            p {
-                            width: 50%;
+
+                        }
+                        p {
+                            border: 1px solid yellow;
                         }
 
+                        .time-container {
+                            border: 1px solid red;
+                            text-align: right;
                         }
                     }
                 }
