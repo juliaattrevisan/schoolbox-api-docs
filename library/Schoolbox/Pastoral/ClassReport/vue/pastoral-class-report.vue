@@ -213,7 +213,6 @@ export default {
                                 <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
 
                     <div v-for="record in studentData.records.data" :key="'record-' + String(record.id)" class="pastoral-container">
-                        <div class="list-item ">
                             <div class="tiny card small-12">
                                 <a :href="record._links.read" title="View record">
                                     <img :src="record.createdBy._links.avatar"
@@ -244,7 +243,6 @@ export default {
                                 </time>
                             </template>
                                 </div>
-                            </div>
                         </div>
                     </div>
 </div>
@@ -371,6 +369,7 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                     overflow: visible;
                     padding: 0.75rem;
+                    margin-top: 0.25rem;
 
                 }
 
@@ -385,8 +384,6 @@ input[type=radio]:not(.plain) + label.input-toggle {
                         grid-template-columns: 4fr 1fr 1fr;
 
                         a {
-                            width: 50%;
-
                             line-height: 1.5rem;
 
                             img {
@@ -410,6 +407,7 @@ input[type=radio]:not(.plain) + label.input-toggle {
                 .text-container {
                     border-left: 1px solid var(--form-border-color);
                     min-height: 5.5rem;
+                    padding-left: 0.25rem;
                 }
 
             }
@@ -418,12 +416,6 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
     }
 }
-
-.student-card li:nth-child(3) {
-
-    margin-top: -0.5rem;
-}
-
 
 
 
