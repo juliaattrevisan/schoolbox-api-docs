@@ -39,8 +39,7 @@ export const useRemoveMembersStore = defineStore('mgRemoveMembers', {
                     },
                     body: getFormData(),
                 });
-                const responseJson = await response.json();
-                if (responseJson.success) {
+                if (response.ok) {
                     const membersStore = useMembersStore();
                     membersStore.removeSelectedGroupMembers();
                 } else {

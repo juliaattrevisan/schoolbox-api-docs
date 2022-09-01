@@ -39,7 +39,7 @@ export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
                 });
                 const updatedMember = membersStore.members.find((groupMember) => groupMember.id === member.id);
                 const responseJson = await response.json();
-                if (responseJson.success) {
+                if (response.ok) {
                     updateMember(updatedMember, accessType);
                 } else {
                     updateMember(updatedMember, updatedMember.accessType); //we revert back to original accessType if the change has failed
@@ -73,7 +73,7 @@ export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
                     body: getFormData(membersStore.selectedMembers, accessType)
                 });
                 const responseJson = await response.json();
-                if (responseJson.success) { //update the state only after the DB change is a success
+                if (response.ok) { //update the state only after the DB change is a success
                     membersStore.selectedMembers.forEach((member) => {
                         member.accessType = accessType; //the selectedMembers data is unique to the members data
                         const updatedMember = membersStore.members.find((groupMember) => groupMember.id === member.id);

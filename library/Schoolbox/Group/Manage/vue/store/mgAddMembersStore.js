@@ -35,7 +35,7 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
                     body: getFormData(),
                 });
                 const responseJson = await response.json();
-                if (responseJson.success) {
+                if (response.ok) {
                     const newMembers = responseJson.newMembers.map((newMember) => { //add in some additional properties
                         return {
                             ...newMember,

@@ -37,8 +37,7 @@ export const useRejectMembersStore = defineStore('mgRejectMembers', {
                         members: [member.id],
                     }),
                 });
-                const responseJson = await response.json();
-                if (responseJson.success) {
+                if (response.ok) {
                     const membersStore = useMembersStore();
                     membersStore.removeMember(member);
                 } else {
@@ -67,8 +66,7 @@ export const useRejectMembersStore = defineStore('mgRejectMembers', {
                     },
                     body: getFormData(),
                 });
-                const responseJson = await response.json();
-                if (responseJson.success) {
+                if (response.ok) {
                     const membersStore = useMembersStore();
                     membersStore.removeSelectedGroupMembers();
                 } else {

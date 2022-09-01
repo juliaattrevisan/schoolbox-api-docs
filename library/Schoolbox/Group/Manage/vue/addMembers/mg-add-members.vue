@@ -27,7 +27,7 @@ const inputDetails = computed(() => {
         [FromTypes.NAME]: 'You may add users individually by typing their name and selecting from the list.',
         [FromTypes.GROUP]: 'Add all users that belong to another group.',
         [FromTypes.ROLE]: 'Add all users of a particular role in the system.',
-        [FromTypes.LIST]: 'Add a list of users (either external user IDs or Schoolbox usernames).',
+        [FromTypes.LIST]: 'Add a comma separated list of users (either external user IDs or Schoolbox usernames).',
     }
     return placeholderOptions[addMembersStore.fromType];
 });

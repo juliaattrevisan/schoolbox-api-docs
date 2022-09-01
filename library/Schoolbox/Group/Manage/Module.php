@@ -71,9 +71,9 @@ class Module extends BaseModule
         $this->register(self::METHOD_POST, '/addMembers/{folderId:\d+}', 'addMembers', $permManage, $preloadFolder);
         $this->register(self::METHOD_POST, '/updateSettings/{folderId:\d+}', 'updateSettings', $permManage, $preloadFolder);
         $this->register(self::METHOD_POST, '/disband/{folderId:\d+}', 'disband', $permManage, $preloadFolder);
-        $this->register(self::METHOD_POST, '/searchGroups', 'searchGroups', $permSearch);
-        $this->register(self::METHOD_POST, '/searchRoles', 'searchRoles', $permSearch);
-        $this->register(self::METHOD_POST, '/searchUsers', 'searchUsers', $permSearch);
+        $this->register(self::METHOD_GET, '/searchGroups', 'searchGroups', $permSearch);
+        $this->register(self::METHOD_GET, '/searchRoles', 'searchRoles', $permSearch);
+        $this->register(self::METHOD_GET, '/searchUsers', 'searchUsers', $permSearch);
     }
 
     /**

@@ -112,13 +112,12 @@ export const useSearchStore = defineStore('mgSearch', {
             store.isProcessing = true;
             try {
                 const response = await fetch(`${this.searchEndpoint}${this.query}`, {
-                    method: 'POST',
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                 });
-                const responseJson = await response.json();
-                this.results = responseJson;
+                this.results = await response.json();
             } catch (error) {
                 console.warn(error);
             } finally {

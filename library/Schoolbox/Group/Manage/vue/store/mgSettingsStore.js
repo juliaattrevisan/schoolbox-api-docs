@@ -70,8 +70,7 @@ export const useSettingsStore = defineStore('mgSettings', {
                     },
                     body: getFormData(this),
                 });
-                const responseJson = await response.json();
-                if (responseJson.success) {
+                if (response.ok) {
                     this.isAccessSaved = true;
                 } else {
                     throw new Error();

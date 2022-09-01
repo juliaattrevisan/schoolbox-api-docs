@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Group\Manage;
 
 use Alaress\Web\Controller\Base;
+use InvalidArgumentException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Group\Manage\ArrayToModel;
@@ -105,7 +106,7 @@ class Controller extends Base
                 /** @var UserAccess $userAccess */
                 $userAccess = $userAccessList->offsetGet($user->getId());
                 // setting user attributes and accessType to be the same level to keep the member table searchable
-                $member               = (new \Schoolbox\Group\Manage\ModelToArray\User())($user);
+                $member               = (new ModelToArray\User())($user);
                 $member['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
                 $members[]            = $member;
             }
@@ -132,8 +133,9 @@ class Controller extends Base
      * Remove members from a group
      * @param Folder $folder
      * @return void
-     * @api   DELETE /group/removeMembers/{folderId}
+     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @since 22.1
+     * @api   DELETE /group/removeMembers/{folderId}
      */
     public function removeMembers(Folder $folder)
     {
@@ -148,10 +150,7 @@ class Controller extends Base
             $this->sendJsonError('Failed to remove member: ' . $e->getMessage(), 400);
             return;
         }
-
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(['success' => true])
-        );
+        $this->getResponse()->status->setCode(204);
     }
 
     /**
@@ -177,7 +176,7 @@ class Controller extends Base
             $userAccesses->map(function ($userAccess) use ($newAccesses, $translator) {
                 return $translator($newAccesses[$userAccess->getUser()->getId()], $userAccess);
             });
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $this->sendJsonError('Failed to update member: ' . $e->getMessage(), 400);
             return;
         }
@@ -190,7 +189,15 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set(
-            $this->buildJsonOutput(['success' => true])
+            $this->buildJsonOutput(
+                [
+                    'members' => $userAccesses->map(function ($userAccess) {
+                        $array               = (new ModelToArray\User())($userAccess->getUser());
+                        $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
+                        return $array;
+                    }),
+                ]
+            )
         );
     }
 
@@ -246,9 +253,8 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildJsonOutput(
                 [
-                    'success'    => true,
                     'newMembers' => $newAccesses->map(function ($userAccess) {
-                        $array               = (new \Schoolbox\Group\Manage\ModelToArray\User())($userAccess->getUser());
+                        $array               = (new ModelToArray\User())($userAccess->getUser());
                         $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
                         return $array;
                     }),
@@ -263,7 +269,7 @@ class Controller extends Base
      * @return void
      * @throws MapperException
      * @since 22.1
-     * @api   PATCH /group/updateMembers/{folderId}
+     * @api   PATCH /group/updateSettings/{folderId}
      */
     public function updateSettings(Folder $folder)
     {
@@ -284,6 +290,17 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildJsonOutput(['success' => true])
         );
+        $data = [
+            'settings' => [
+                'new'                    => $this->request->query->get('new') ?? 0,
+                'access'                 => $group->getTypeString(),
+                'isNotificationsEnabled' => $this->groupsHelper->groupNotificationEnabled($folder->getId()),
+                'isForceFollow'          => $group->getForceFollow(),
+            ],
+        ];
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput($data)
+        );
     }
 
     /**
@@ -301,7 +318,7 @@ class Controller extends Base
     /**
      * Find groups which name contains given search query string
      * @return void
-     * @api   POST /searchGroups
+     * @api   GET /searchGroups
      * @since 22.1
      */
     public function searchGroups()
@@ -336,7 +353,7 @@ class Controller extends Base
     /**
      * Find roles which name contains given search query string
      * @return void
-     * @api   POST /group/searchRoles
+     * @api   GET /group/searchRoles
      * @since 22.1
      */
     public function searchRoles()
@@ -357,7 +374,7 @@ class Controller extends Base
     /**
      * Find users from comma separated list of usernames and external ids
      * @return void
-     * @api   POST /group/searchUsers
+     * @api   GET /group/searchUsers
      * @since 22.1
      */
     public function searchUsers()
@@ -396,7 +413,7 @@ class Controller extends Base
             }
             $meta .= $user->getRole()->getName();
             if ($user->getExternalId() !== null) {
-                $meta .= "({$user->getExternalId()})";
+                $meta .= " ({$user->getExternalId()})";
             }
 
             $return[] = [
