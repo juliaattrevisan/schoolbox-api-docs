@@ -244,11 +244,8 @@ export default {
 
                 <template v-if="award.reason.length">
                     <hr />
+                    <a v-if="award._links.awardUpdate" class="icon-modify no-text modify-link" :href="award._links.awardUpdate"></a>
                     <article v-html="award.reason"></article>
-
-                    <template v-if="award._links.awardUpdate">
-                        <a class="button icon-modify" :href="award._links.awardUpdate">Edit</a>
-                    </template>
                 </template>
 
                 <template v-if="award.badge.curriculumNodes.length">
@@ -272,3 +269,13 @@ export default {
         </template>
     </reveal-modal>
 </template>
+
+<style scoped>
+
+.modify-link {
+    color: var(--content-ui-foreground);
+    float: right;
+    margin-right: 1rem;
+}
+
+</style>
