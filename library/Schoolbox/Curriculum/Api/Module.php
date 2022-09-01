@@ -38,14 +38,17 @@ class Module extends BaseModule
             )
         );
         $preload = function (array $params) {
-            return [
-                'node' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
-            ];
+            if (isset($params['id'])) {
+                return [
+                    'node' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
+                ];
+            }
+            return [];
         };
         $this->register(self::METHOD_GET, '', 'searchNode', $hasApiAccess);
         $this->register(self::METHOD_GET, '/{id:\\d+}', 'getNode', $hasApiAccess, $preload);
         $this->register(self::METHOD_GET, '/tree', 'getTree', $hasApiAccess);
-        $this->register(self::METHOD_POST, '', 'postNode', $hasApiAccess);
+        $this->register(self::METHOD_POST, '{/id:\\d+}', 'postNode', $hasApiAccess, $preload);
         $this->register(self::METHOD_PUT, '/{id:\\d+}', 'putNode', $hasApiAccess, $preload);
         $this->register(self::METHOD_PATCH, '/{id:\\d+}', 'patchNode', $hasApiAccess, $preload);
         $this->register(self::METHOD_DELETE, '/{id:\\d+}', 'deleteNode', $hasApiAccess, $preload);
