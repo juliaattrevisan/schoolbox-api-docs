@@ -45,11 +45,10 @@ class KeyConverter extends Filter\AbstractKeyConverter
      */
     protected function assertValidKey(string $key, User $user, string $page): void
     {
-        $parts = explode('_', $key);
+        $parts = self::extractTypeAndSubtype($key);
 
         // Assert type is in list
-        $typeKey = $parts[0];
-        $type    = $this->types[$typeKey] ?? null;
+        $type = $this->types[$parts['type']] ?? null;
         if (!$type) {
             throw new InvalidArgumentException("No pastoral type found for key: $key");
         }
@@ -57,15 +56,14 @@ class KeyConverter extends Filter\AbstractKeyConverter
         // Is there a subtype?
         // * if not: assert the type has no subtypes
         // * if so: assert the subtype is one of the type's subtypes
-        $subtypeKey = $parts[1] ?? null;
-        if (!isset($subtypeKey)) {
+        if (!isset($parts['subtype'])) {
             if ($type->getSubTypes()->count() !== 0) {
                 throw new InvalidArgumentException(
                     "Pastoral type with subtypes cannot be selected without a subtype: $key"
                 );
             }
         } else {
-            $subtype = $type->getSubTypes()[$subtypeKey] ?? null;
+            $subtype = $type->getSubTypes()[$parts['subtype']] ?? null;
             if (!$subtype) {
                 throw new InvalidArgumentException(
                     "Pastoral type does not contain subtype: $key"
@@ -87,5 +85,20 @@ class KeyConverter extends Filter\AbstractKeyConverter
             $count += max(1, $type->getSubTypes()->count());
         }
         return $count;
+    }
+
+    /**
+     * Extract type and subtype from the key.
+     *
+     * @param string $key
+     * @return array{type: ?int, subtype: ?int}
+     */
+    public static function extractTypeAndSubtype(string $key): array
+    {
+        $keyParts = explode('_', $key);
+        return [
+            'type'    => filter_var($keyParts[0], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE),
+            'subtype' => filter_var($keyParts[1] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE),
+        ];
     }
 }

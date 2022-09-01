@@ -80,19 +80,16 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getLabel(string $key): string
     {
-        // Does this key contain a subtype?
-        $keyParts   = explode('_', $key);
-        $keyType    = filter_var($keyParts[0], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-        $keySubType = filter_var($keyParts[1] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $keyParts = KeyConverter::extractTypeAndSubtype($key);
         foreach ($this->types as $type) {
-            if ($keyType !== $type->getId()) {
+            if ($keyParts['type'] !== $type->getId()) {
                 continue;
             }
-            if (!isset($keySubType)) {
+            if (!isset($keyParts['subtype'])) {
                 return $type->getName();
             }
             foreach ($type->getSubTypes() as $subType) {
-                if ($keySubType === $subType->getId()) {
+                if ($keyParts['subtype'] === $subType->getId()) {
                     return sprintf('%s › %s', $type->getName(), $subType->getName());
                 }
             }
