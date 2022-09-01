@@ -385,8 +385,10 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                 .text-container {
                     border-left: 1px solid var(--form-border-color);
+                    flex: 1 1 0px;
                     min-height: 5.5rem;
                     padding-left: 0.25rem;
+                    width: 0;
                 }
             }
         }
