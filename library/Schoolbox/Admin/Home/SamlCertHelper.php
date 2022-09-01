@@ -18,12 +18,6 @@ use Schoolbox\Application\Exception as SchoolboxException;
  */
 class SamlCertHelper
 {
-    /**
-     * Flag to force this class to pretend that any supplied metadata url is offline/unavailable.
-     * Used for unit testing only.
-     */
-    public const FORCE_METADATA_URL_OFFLINE = 'offline';
-
     private const IDP_CERT_EMPTY      = 0;     // config field empty
     private const IDP_CERT_UNPARSABLE = 1;     // unable to parse cert from value
     private const IDP_CERT_OK         = 2;     // able to parse cert from value
@@ -37,26 +31,36 @@ class SamlCertHelper
     public const LIGHT_WARNING = 'warning';
     public const LIGHT_SUCCESS = 'success';
 
-    private static Alaress_Saml_Cache $samlCache;
+    private Alaress_Saml_Cache $samlCache;
 
+    /**
+     * @param Alaress_Saml_Cache|null $samlCache
+     */
+    public function __construct(Alaress_Saml_Cache $samlCache = null)
+    {
+        if ($samlCache) {
+            $this->samlCache = $samlCache;
+        } else {
+            $this->samlCache = new Alaress_Saml_Cache();
+        }
+    }
 
     /**
      * @param string                   $idpCertificate
      * @param string                   $idpMetadataUrl
-     * @param string|null              $metadataOverride If 'offline', pretend URL is offline/unreachable.
-     *                                                   If non-null, pretend URL is online and returns this content.
-     * @param Alaress_Date_Format|null $nowOverride      Enable 'now' to be overridden for deterministic unit testing.
+     * @param Alaress_Date_Format|null $nowOverride Enable 'now' to be overridden for deterministic unit testing.
      * @return SamlWidget
      */
-    public static function buildWidget(
+    public function buildWidget(
         string $idpCertificate,
         string $idpMetadataUrl,
-        Alaress_Saml_Cache $samlCache,
-//        string $metadataOverride = null,
         Alaress_Date_Format $nowOverride = null,
 
     ): SamlWidget {
-        self::$samlCache = $samlCache;
+        /**
+         * Time value used in testing to simulate and reproduce different test cases.
+         * We use this to replicate how the widget responds depending on how close a cert is to expiry
+         */
         $now = $nowOverride ?? Alaress_Date_Format::now();
 
         // Derive idp certificate status + daysToExpire
@@ -64,44 +68,35 @@ class SamlCertHelper
             $idpCertDaysToExpiry = null;
             $idpCertStatus       = self::IDP_CERT_EMPTY;
         } else {
-            $idpCertDaysToExpiry = self::getDaysBeforeExpiry(Utils::formatCert($idpCertificate), $now->getUnixTimeStamp());
+            $idpCertDaysToExpiry = $this->getDaysBeforeExpiry(Utils::formatCert($idpCertificate), $now->getUnixTimeStamp());
             $idpCertStatus       = $idpCertDaysToExpiry === null ? self::IDP_CERT_UNPARSABLE : self::IDP_CERT_OK;
         }
 
         // Derive metadata URL status + daysToExpire
-        if ($metadataOverride === null && trim($idpMetadataUrl) === "") {
+        if (trim($idpMetadataUrl) === "") {
             // Empty metadata URL
             $metadataUrlStatus    = self::METADATA_URL_EMPTY;
             $metadataDaysToExpire = null;
-        } elseif ($metadataOverride === self::FORCE_METADATA_URL_OFFLINE) {
-            // Force metadata URL to be offline/unreachable
-            $metadataUrlStatus    = self::METADATA_URL_OFFLINE;
-            $metadataDaysToExpire = null;
         } else {
-            // Derive XML content (respect overridden value if provided)
-            if ($metadataOverride !== null) {
-                $metadataXml = $metadataOverride;
-            } else {
-                try {
-                    $metadataXml = self::fetchMetadataXml($idpMetadataUrl);
-                } catch (InvalidUriException|SchoolboxException\Exception $e) {
-                    // Invalid URL | Unable to connect.
-                    $metadataXml = null;
-                }
+            try {
+                $metadataXml = $this->fetchMetadataXml($idpMetadataUrl);
+            } catch (InvalidUriException|SchoolboxException\Exception $e) {
+                // Invalid URL | Unable to connect.
+                $metadataXml = null;
             }
 
             if ($metadataXml === null) {
                 $metadataDaysToExpire = null;
                 $metadataUrlStatus    = self::METADATA_URL_OFFLINE;
             } else {
-                $metadataDaysToExpire = self::parseDaysToExpireFromMetadataXml($metadataXml, $now);
+                $metadataDaysToExpire = $this->parseDaysToExpireFromMetadataXml($metadataXml, $now);
                 $metadataUrlStatus    = $metadataDaysToExpire === null
                     ? self::METADATA_URL_UNPARSABLE
                     : self::METADATA_URL_OK;
             }
         }
 
-        return self::buildStatusFromDerived($idpCertStatus, $idpCertDaysToExpiry, $metadataUrlStatus, $metadataDaysToExpire);
+        return $this->buildStatusFromDerived($idpCertStatus, $idpCertDaysToExpiry, $metadataUrlStatus, $metadataDaysToExpire);
     }
 
 
@@ -114,7 +109,7 @@ class SamlCertHelper
      * @throws InvalidUriException             If $idpMetadataUrl cannot be recognised as a URL
      * @throws SchoolboxException\Exception    If we cannot connect to ULR
      */
-    private static function fetchMetadataXml(string $idpMetadataUrl): ?string
+    private function fetchMetadataXml(string $idpMetadataUrl): ?string
     {
         try {
             $url = new Uri($idpMetadataUrl);
@@ -127,7 +122,7 @@ class SamlCertHelper
         $validUrl = $url->toString();
 
         try {
-            $idpMetadataCache = self::$samlCache->init($validUrl);
+            $idpMetadataCache = $this->samlCache->init($validUrl);
         } catch (\InvalidArgumentException $e) {
             // Should never get here. Only thrown in $idpMetadataUrl is not a string, which is
             // impossible due to method's param type declaration.
@@ -146,7 +141,7 @@ class SamlCertHelper
      * @param Alaress_Date_Format $now
      * @return int|null
      */
-    private static function parseDaysToExpireFromMetadataXml(string $metadataXml, Alaress_Date_Format $now): ?int
+    private function parseDaysToExpireFromMetadataXml(string $metadataXml, Alaress_Date_Format $now): ?int
     {
         try {
             $metadataInfo = IdPMetadataParser::parseXML($metadataXml);
@@ -156,9 +151,9 @@ class SamlCertHelper
         }
 
         $certExpiryArray = [];
-        foreach (self::getArrayOfSamlCerts($metadataInfo) as $cert) {
+        foreach ($this->getArrayOfSamlCerts($metadataInfo) as $cert) {
             $formattedCert    = Utils::formatCert($cert);
-            $daysBeforeExpiry = self::getDaysBeforeExpiry($formattedCert, $now->getUnixTimeStamp());
+            $daysBeforeExpiry = $this->getDaysBeforeExpiry($formattedCert, $now->getUnixTimeStamp());
             if ($daysBeforeExpiry !== null) {
                 $certExpiryArray[] = $daysBeforeExpiry;
             }
@@ -180,7 +175,7 @@ class SamlCertHelper
      * @param int|null $metadataDaysToExpire
      * @return SamlWidget
      */
-    private static function buildStatusFromDerived(int $idpCertStatus, ?int $idpCertDaysToExpiry, int $metadataUrlStatus, ?int $metadataDaysToExpire): SamlWidget
+    private function buildStatusFromDerived(int $idpCertStatus, ?int $idpCertDaysToExpiry, int $metadataUrlStatus, ?int $metadataDaysToExpire): SamlWidget
     {
         if ($idpCertStatus === self::IDP_CERT_EMPTY && $metadataUrlStatus === self::METADATA_URL_EMPTY) {
             return new SamlWidget(self::LIGHT_ALERT, 'Empty SAML config');
@@ -195,7 +190,7 @@ class SamlCertHelper
         }
 
         if ($idpCertStatus === self::IDP_CERT_EMPTY && $metadataUrlStatus === self::METADATA_URL_OK) {
-            return new SamlWidget(self::getLight($metadataDaysToExpire), self::getMessage($metadataDaysToExpire));
+            return new SamlWidget($this->getLight($metadataDaysToExpire), $this->getMessage($metadataDaysToExpire));
         }
 
         if ($idpCertStatus === self::IDP_CERT_UNPARSABLE && $metadataUrlStatus === self::METADATA_URL_EMPTY) {
@@ -211,23 +206,23 @@ class SamlCertHelper
         }
 
         if ($idpCertStatus === self::IDP_CERT_UNPARSABLE && $metadataUrlStatus === self::METADATA_URL_OK) {
-            return new SamlWidget(self::getLight($metadataDaysToExpire), self::getMessage($metadataDaysToExpire));
+            return new SamlWidget($this->getLight($metadataDaysToExpire), $this->getMessage($metadataDaysToExpire));
         }
 
         if ($idpCertStatus === self::IDP_CERT_OK && $metadataUrlStatus === self::METADATA_URL_EMPTY) {
-            return new SamlWidget(self::getLight($idpCertDaysToExpiry), self::getMessage($idpCertDaysToExpiry));
+            return new SamlWidget($this->getLight($idpCertDaysToExpiry), $this->getMessage($idpCertDaysToExpiry));
         }
 
         if ($idpCertStatus === self::IDP_CERT_OK && $metadataUrlStatus === self::METADATA_URL_OFFLINE) {
-            return new SamlWidget(self::getLight($idpCertDaysToExpiry), self::getMessage($idpCertDaysToExpiry));
+            return new SamlWidget($this->getLight($idpCertDaysToExpiry), $this->getMessage($idpCertDaysToExpiry));
         }
 
         if ($idpCertStatus === self::IDP_CERT_OK && $metadataUrlStatus === self::METADATA_URL_UNPARSABLE) {
-            return new SamlWidget(self::getLight($idpCertDaysToExpiry), self::getMessage($idpCertDaysToExpiry));
+            return new SamlWidget($this->getLight($idpCertDaysToExpiry), $this->getMessage($idpCertDaysToExpiry));
         }
 
         // $idpCertStatus === self::IDP_CERT_OK && $metadataUrlStatus === self::METADATA_URL_OK
-        return new SamlWidget(self::getLight($metadataDaysToExpire), self::getMessage($metadataDaysToExpire));
+        return new SamlWidget($this->getLight($metadataDaysToExpire), $this->getMessage($metadataDaysToExpire));
     }
 
 
@@ -237,7 +232,7 @@ class SamlCertHelper
      * @param int $daysToExpire
      * @return string
      */
-    private static function getLight(int $daysToExpire): string
+    private function getLight(int $daysToExpire): string
     {
         if ($daysToExpire < 7) {
             return self::LIGHT_ALERT;
@@ -255,7 +250,7 @@ class SamlCertHelper
      * @param int $daysToExpire
      * @return string
      */
-    private static function getMessage(int $daysToExpire): string
+    private function getMessage(int $daysToExpire): string
     {
         $absDaysBeforeExpiry = abs($daysToExpire);
         // get plural/singular form of 'day'
@@ -278,7 +273,7 @@ class SamlCertHelper
      * @return int|null Days before the $samlCert expires, negative if past expiry
      *                         Returns NULL if unable to parse an expiry
      */
-    public static function getDaysBeforeExpiry(string $samlCert, int $nowTimestamp): ?int
+    public function getDaysBeforeExpiry(string $samlCert, int $nowTimestamp): ?int
     {
         $samlCertMetadata = openssl_x509_parse($samlCert);
 
@@ -300,7 +295,7 @@ class SamlCertHelper
      * @param array $samlConfig
      * @return array
      */
-    public static function getArrayOfSamlCerts(array $samlConfig): array
+    public function getArrayOfSamlCerts(array $samlConfig): array
     {
         /**
          * Replicates library logic to derive cert list.
