@@ -261,7 +261,8 @@ try {
                     \Schoolbox\External\Event\Mapper::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                     \Schoolbox\UserMapper::getInstance(),
-                    \Timetable_ColourMapper::getInstance()
+                    \Timetable_ColourMapper::getInstance(),
+                    \Schoolbox\External\Profile\Staff\Mapper::getInstance()
                 ],
                 true,
                 $sentry
@@ -482,7 +483,8 @@ try {
                     \Schoolbox\External\Event\Mapper::getInstance(),
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                     \Schoolbox\UserMapper::getInstance(),
-                    \Timetable_ColourMapper::getInstance()
+                    \Timetable_ColourMapper::getInstance(),
+                    \Schoolbox\External\Profile\Staff\Mapper::getInstance()
                 ],
                 true,
                 $sentry
@@ -629,7 +631,8 @@ try {
                         \Schoolbox\External\Event\Mapper::getInstance(),
                         \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                         \Schoolbox\UserMapper::getInstance(),
-                        \Timetable_ColourMapper::getInstance()
+                        \Timetable_ColourMapper::getInstance(),
+                        \Schoolbox\External\Profile\Staff\Mapper::getInstance()
                     ],
                     true,
                     $sentry
