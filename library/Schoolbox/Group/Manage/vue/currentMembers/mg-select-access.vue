@@ -71,7 +71,6 @@ updateMembersStore.$onAction(({ name, after, onError }) => {
             changeMemberAccess.value = ''; //default back to blank on any update
         });
         onError((error) => {
-            console.warn(error);
             store.toastEl.timeout(error.message, false, 5000);
             changeMemberAccess.value = ''; //default back to blank on any update
         });

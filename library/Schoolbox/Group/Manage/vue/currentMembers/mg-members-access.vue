@@ -74,7 +74,6 @@ updateMembersStore.$onAction(({ name, args, after, onError }) => {
             isProcessing.value = false;
         });
         onError((error) => {
-            console.warn(error);
             store.toastEl.timeout(error.message, false, 5000);
             isProcessing.value = false;
         });
