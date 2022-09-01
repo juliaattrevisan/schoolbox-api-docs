@@ -398,7 +398,7 @@ class Controller extends Base
         $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
         $filters             = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
-        if (count($filters) == 0) {
+        if (count($filters) === 0) {
             // If no filters were supplied, the result set was found to include events that were irrelevant to the user,
             // and should not be seen by that user (see SA-14181).  The easiest solution (suggested by James) was just to
             // forbid requests that do not include a valid filter.  Note an invalid filter query would have caused an error
