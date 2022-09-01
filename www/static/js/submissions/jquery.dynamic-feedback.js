@@ -49,11 +49,6 @@
 
         var config = init(options, $(this));
 
-        /* We're going to remember the last time students received a published Feedback
-         * This is a 2D array of (id, timestamp) tuples
-         */
-        let lastPublished = Array();
-
         setupPreValues();
         setupListeners();
         setupPublishAction();
@@ -223,12 +218,10 @@
                 participantId = $participant.data('participant'),
                 commentBoxId = "comment-" + participantId;
 
-            /* Remember when we started this, because we'll use it to
-             * prevent a draft from submitting shortly thereafter due
-             * to an onblur causing it to fulfil its destiny in addition
-             * to publishFeedback() fulfilling its own destiny
+            /* Force blur in case you directly go from fiddling with the mark
+             * straight to the publish
              */
-            lastPublished[participantId] = (new Date()).getTime();
+            $participant.find('[data-mark-input]').blur();
 
             // We can safely clear this timeout now that we're publishing
             window.clearTimeout(commentBoxTimeouts[commentBoxId]);
@@ -309,12 +302,6 @@
          */
         function timeoutUpdate() {
             var $input = $(this);
-
-            /* Find out if we just did a Publish
-             */
-            let participantId = findParticipantElement($input).data('participant');
-            let now = (new Date()).getTime();
-            console.log(participantId, now, (now-lastPublished[participantId]));
 
             // Comment box elements have this name attribute
             var elementIsCommentBox = $input.attr("name") === "comment";
