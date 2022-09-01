@@ -6,15 +6,15 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useCodesStore } from './store/mcCodesStore';
-import { useActiveCodesStore } from './store/mcActiveCodesStore';
-import McViewCode from './mc-view-code.vue'
+import { useNodesStore } from '../store/mcNodesStore';
+import { useViewNodesStore } from './store/mcViewNodesStore';
+import McViewNode from './mc-view-node.vue'
 
 
-const codesStore = useCodesStore();
-const activeCodesStore = useActiveCodesStore();
+const nodesStore = useNodesStore();
+const viewNodesStore = useViewNodesStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
-const codesContainerEl = ref(null); //to scroll back to top on any selection change
+const nodesContainerEl = ref(null); //to scroll back to top on any selection change
 
 
 /**
@@ -23,7 +23,7 @@ const codesContainerEl = ref(null); //to scroll back to top on any selection cha
  * @returns { String }
  */
 const parentNodeTitles = computed(() => {
-    const parentTitlesList = codesStore.codes.map((code) => code.name); //just get the titles
+    const parentTitlesList = nodesStore.nodes.children.map((code) => code.name); //just get the titles
     return parentTitlesList.join(', ').replace(/, ([^,]*)$/, ' or $1'); //or on the last
 });
 
@@ -32,43 +32,38 @@ const parentNodeTitles = computed(() => {
  *
  * @returns { String }
  */
-const currentSelectedNodeTitle = computed(() => activeCodesStore.codes[0].name);
+const currentSelectedNodeTitle = computed(() => viewNodesStore.current.name);
 
 /**
  * Clear the current search query
  */
 function onClearSearchSelected () {
-    activeCodesStore.clearSearch();
+    viewNodesStore.clearSearch();
 }
 
 /**
  * to scroll back to top on any selection change, otherwise the
  * scroll may be at the bottom on change, which is a bit odd
  */
-watch(() => activeCodesStore.codesWithSearch, () => {
-    if (codesContainerEl.value) { //may not always exists in the dom
-        codesContainerEl.value.scrollTop = 0;
+watch(() => viewNodesStore.nodesWithSearch, () => {
+    if (nodesContainerEl.value) { //may not always exists in the dom
+        nodesContainerEl.value.scrollTop = 0;
     }
 });
-
 
 </script>
 
 <template>
-    <div v-if="activeCodesStore.codes.length === 0" class="empty-state">
+    <div v-if="viewNodesStore.hasNoSearchResults" class="empty-state">
         <i class="icon-curriculum"></i>
-        <p>To start viewing Curriculum Codes, first select from either: {{ parentNodeTitles }}.</p>
-    </div>
-    <div v-else-if="activeCodesStore.hasNoSearchResults" class="empty-state">
-        <i class="icon-curriculum"></i>
-        <p>No Curriculum Codes in: {{ currentSelectedNodeTitle }} match your current search.</p>
+        <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
         <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
     </div>
-    <ul v-else ref="codesContainerEl">
-        <mc-view-code
-            v-for="code in activeCodesStore.codesWithSearch"
-            :key="code.id"
-            :code="code"
+    <ul v-else ref="nodesContainerEl">
+        <mc-view-node
+            v-for="node in viewNodesStore.nodesWithSearch"
+            :key="node.id"
+            :node="node"
             :depth="depth"
         />
     </ul>

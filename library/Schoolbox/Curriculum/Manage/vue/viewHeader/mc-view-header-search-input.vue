@@ -5,17 +5,20 @@
  */
 
 import { computed } from 'vue';
-import { useActiveCodesStore } from './store/mcActiveCodesStore';
+import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
+import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 
-const activeCodesStore = useActiveCodesStore();
+const viewNodesStore = useViewNodesStore();
+const activeNodeStore = useActiveNodeStore();
 
 /**
  * Only enable search once a first node is selected
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => !activeCodesStore.hasSelectedFirstNode);
+// const isDisabled = computed(() => !viewNodesStore.isActive || activeNodeStore.isActive);
+const isDisabled = computed(() => !viewNodesStore.isActive);
 
 /**
  * Only enable search once a first node is selected
@@ -23,10 +26,10 @@ const isDisabled = computed(() => !activeCodesStore.hasSelectedFirstNode);
  * @returns { String }
  */
 const placeholder = computed(() => {
-    if (isDisabled.value) {
-        return 'Select a Curriculum Code to enable search...'
+    if (viewNodesStore.isActive) {
+        return `Search ${viewNodesStore.current.name} for codes or keywords...`;
     } else {
-        return `Search ${activeCodesStore.selectedCode.name} for codes or keywords...`;
+        return 'Select a Curriculum Code to enable search...'  ;
     }
 });
 
@@ -34,7 +37,7 @@ const placeholder = computed(() => {
 
 <template>
    <input
-        v-model="activeCodesStore.query"
+        v-model="viewNodesStore.query"
         ref="queryInputEl"
         type="text"
         class="search-input"

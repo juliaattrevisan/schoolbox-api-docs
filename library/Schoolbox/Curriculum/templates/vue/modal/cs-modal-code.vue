@@ -29,7 +29,7 @@ const props = defineProps({
      * to gradually add more paddingLeft to indicate node level depth
      */
     depth: {
-        type: Number, 
+        type: Number,
         required: true,
     },
 });
@@ -52,7 +52,7 @@ const paddingLeft = computed(() => `calc(${props.depth * 2}rem + 0.5rem)`);
 const hasCode = computed(() => props.code.code && props.code.code !== '');
 
 /**
- * To help distinguish those codes that aren't selectable, 
+ * To help distinguish those codes that aren't selectable,
  * we disable and remove the default button colour
  *
  * @returns { Boolean }
@@ -76,17 +76,17 @@ const isDisabled = computed(() => {
 const isVisible = computed(() => props.depth <= 1 || modalActiveCodesStore.isOnFourthNode);
 
 /**
- * To determine whether the checkbox is currently selected based 
+ * To determine whether the checkbox is currently selected based
  * on whether it's in the selected list
  *
  * @returns { Boolean }
  */
-const isCodeSelected = computed(() => { 
+const isCodeSelected = computed(() => {
     return modalSelectedCodesStore.codes.some((code) => props.code.id === code.id);
 });
 
 /**
- * Add or remove the code from the current modal selection, 
+ * Add or remove the code from the current modal selection,
  * or if there's no code, use the code to traverse to the next nodel level
  * as an alternative to using the selects in cs-modal-header-select
  */
@@ -94,7 +94,7 @@ function onSelected () {
     if (hasCode.value) {
         isCodeSelected.value ? modalSelectedCodesStore.remove(props.code) : modalSelectedCodesStore.add(props.code);
     } else {
-        modalActiveCodesStore.setNextSelectedNode(props.code.id);
+        modalActiveCodesStore.setNextSelected(props.code.id);
     }
 }
 
@@ -146,7 +146,7 @@ const highlightBreadcrumbSearch = computed(() => {
 
 /**
  * To highlight where the search string matches within the settings result
- * (?![^>]*>) is used to check we are not inside an element node 
+ * (?![^>]*>) is used to check we are not inside an element node
  *
  * @params { String } the string to find all instanced of the current search string in
  *
@@ -170,7 +170,7 @@ function highlightSearchInElement (toHighlight) {
 const containerClass = computed(() => {
     if (modalActiveCodesStore.isSearchActive) { //don't style when using search, as all the codes are on one level
         return '';
-    } else if (props.depth === 0) { 
+    } else if (props.depth === 0) {
         return 'parent-container';
     } else {
         '';
@@ -181,14 +181,14 @@ const containerClass = computed(() => {
 
 <template>
    <li v-if="isVisible" :class="containerClass">
-        <button 
-            :class="`code-button`" 
+        <button
+            :class="`code-button`"
             :disabled="isDisabled"
             @click.prevent="onSelected"
             @keyup.enter="onSelected"
         >
             <div class="checklist" v-if="hasCode">
-                <input 
+                <input
                     :id="`checkbox-${props.code.id}`"
                     type="checkbox"
                     :checked="isCodeSelected"
@@ -214,7 +214,7 @@ const containerClass = computed(() => {
 <style lang="scss" scoped>
 
 .parent-container {
-    > button span { 
+    > button span {
         font-size: 1.0625rem;
         font-weight: bold;
     }
@@ -231,14 +231,14 @@ const containerClass = computed(() => {
     width: 100%;
     &:hover {
         background: var(--content-ui-hover);
-    } 
-    &:disabled { 
+    }
+    &:disabled {
         color: #222222;
         opacity: 1;
     }
     @media (max-width: 700px) {
         font-size: 0.8rem;
-        padding: 0.25rem; 
+        padding: 0.25rem;
     }
 }
 
