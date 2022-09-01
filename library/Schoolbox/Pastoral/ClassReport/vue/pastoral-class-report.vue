@@ -322,14 +322,12 @@ input[type=radio]:not(.plain) + label.input-toggle {
     margin: auto;
     padding: 0;
 
-    .student-container {
-        border-bottom: 1px solid var(--form-border-color);
-        width: 100%;
-
-        .list-item {
+    .list-item {
+        .student-container {
+            border-bottom: 1px solid var(--form-border-color);
+            width: 100%;
 
             .student-card {
-
                 display: flex;
                 flex-wrap: wrap;
                 flex-direction: row;
@@ -397,11 +395,8 @@ input[type=radio]:not(.plain) + label.input-toggle {
                     min-height: 5.5rem;
                     padding-left: 0.25rem;
                 }
-
             }
-
         }
-
     }
 }
 
