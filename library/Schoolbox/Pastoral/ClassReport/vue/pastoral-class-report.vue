@@ -371,7 +371,7 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                 .pastoral-container {
 
-                    height: 60px;
+                    height: 2.5rem;
                     width: 100%;
                     margin-left: 5.5rem;
 
@@ -381,9 +381,16 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                         a {
                             width: 50%;
+
+                            img {
+                                border-radius: 50%;
+                                margin-right: 0.75rem;
+                            }
+
                             p {
                             width: 50%;
                         }
+
                         }
                     }
                 }
@@ -397,8 +404,8 @@ input[type=radio]:not(.plain) + label.input-toggle {
 }
 
 .student-card li:nth-child(3) {
-    background-color: #0a6aa1;
-    margin-top: -1rem;
+
+    margin-top: -0.5rem;
 }
 
 
