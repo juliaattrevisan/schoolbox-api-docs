@@ -162,33 +162,34 @@ export default {
             <i class="icon-class-list"></i>
             <p>This class contains no students.</p>
         </div>
-
         <div v-else>
-            <!-- sort options -->
-            <div class="small-6 no-pad columns">
-                <div class="sort-filter">
-                    <label for="sortOption">
-                        Sort by:
-                    </label>
-                    <select id="sortOption" v-model="sort" @change="filter_append(null, true, true)">
-                        <option v-for="option in sortOptions" :label="option.label" :value="option.value">{{ option.label }}</option>
-                    </select>
+            <div class="row">
+                <!-- sort options -->
+                <div class="small-6 no-pad columns">
+                    <div class="sort-filter">
+                        <label for="sortOption">
+                            Sort by:
+                        </label>
+                        <select id="sortOption" v-model="sort" @change="filter_append(null, true, true)">
+                            <option v-for="option in sortOptions" :label="option.label" :value="option.value">{{ option.label }}</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
 
-            <!-- count filter -->
-            <div class="small-6 no-pad columns">
-                <div class="count-filter">
-                    <label>Show amount:</label>
-                    <template v-for="option in countOptions">
-                        <input :id="`countOption-${ option.value }`"
-                               type="radio"
-                               v-model="count"
-                               :value="option.value"
-                               @change="filter_append(null, true, true)"
-                        >
-                        <label :for="`countOption-${ option.value }`" class="input-toggle">{{ option.label }}</label>
-                    </template>
+                <!-- count filter -->
+                <div class="small-6 no-pad columns">
+                    <div class="count-filter">
+                        <label>Show amount:</label>
+                        <template v-for="option in countOptions">
+                            <input :id="`countOption-${ option.value }`"
+                                   type="radio"
+                                   v-model="count"
+                                   :value="option.value"
+                                   @change="filter_append(null, true, true)"
+                            >
+                            <label :for="`countOption-${ option.value }`" class="input-toggle">{{ option.label }}</label>
+                        </template>
+                    </div>
                 </div>
             </div>
 
@@ -271,8 +272,10 @@ export default {
 }
 
 .sort-filter {
+    align-items: center;
     display: flex;
     flex-direction: row;
+    padding-left: 1rem;
 
     label {
         width: 70px;
@@ -280,18 +283,19 @@ export default {
     }
 
     select {
-        width: 30%;
-        min-height: 0;
         border-radius: 2px;
+        margin: 0;
+        width: 30%;
     }
 }
 
 .count-filter {
+    align-items: center;
     display: flex;
     justify-content: flex-end;
+    padding-right: 1rem;
 
     label {
-        line-height: 2rem;
         margin-right: 1rem;
     }
 }
