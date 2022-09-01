@@ -211,6 +211,13 @@ export default {
         },
 
         /**
+         * Save the updated data and close the modal once complete
+         */
+        onSaveSelected () {
+            this.isModalOpen = false;
+        },
+
+        /**
          * The modal is now completely closed
          */
         onModalClosed () {
@@ -258,6 +265,8 @@ export default {
 
                 <article v-html="award.badge.body"></article>
 
+                <hr/>
+                <label>Reason</label>
                 <dynamic-input
                     v-if="isModalOpen"
                     :preset-unique-id="'reason'"
@@ -271,6 +280,8 @@ export default {
                     :cdn-prefix="this.cdnPrefix"
                     :site-version="this.siteVersion"
                 ></dynamic-input>
+
+                <button class="submit save-button" @click.prevent="onSaveSelected" @keyup.enter="onSaveSelected">Save</button>
 
                 <template v-if="award.badge.curriculumNodes.length">
                     <hr />
@@ -300,6 +311,10 @@ export default {
     color: var(--content-ui-foreground);
     float: right;
     margin-right: 1rem;
+}
+
+.save-button {
+    margin-bottom: 1rem;
 }
 
 </style>
