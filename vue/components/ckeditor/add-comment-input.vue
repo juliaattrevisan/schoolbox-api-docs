@@ -10,7 +10,7 @@ let __isFirstCKEditorLoad = true; //so a page only loads the CKEditor scripts on
 
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin'
 import { injectScript } from '@js/util/domUtils';
-import { EDITOR_DEFAULT_CONFIG, EDITOR_CONFIG_FOR_COMMENTS, EDITOR_CONFIG_WITH_USER_TOKENS } from '@js/editor/editorConfigTypes';
+import configTypes from '@js/editor/editorConfigTypes';
 
 
 export default {
@@ -94,7 +94,7 @@ export default {
          * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
          */
         onAddCommentSelected () {
-            this.init(EDITOR_CONFIG_FOR_COMMENTS);
+            this.init(configTypes.FOR_COMMENTS);
         },
 
         /**
@@ -127,9 +127,9 @@ export default {
          */
         getConfigOptions (editorType) {
             const configOptions = { //use computed property names to retrieve the appropriate config options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names
-                [EDITOR_DEFAULT_CONFIG]: $.alaressEditorConfig(this.getVueSpecificConfig()),
-                [EDITOR_CONFIG_FOR_COMMENTS]: $.alaressEditorConfigForComments(this.getVueSpecificConfig()),
-                [EDITOR_CONFIG_WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(this.getVueSpecificConfig())
+                [configTypes.DEFAULT]: $.alaressEditorConfig(this.getVueSpecificConfig()),
+                [configTypes.FOR_COMMENTS]: $.alaressEditorConfigForComments(this.getVueSpecificConfig()),
+                [configTypes.WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(this.getVueSpecificConfig())
             }
             return configOptions[editorType] || $.alaressEditorConfig(this.getVueSpecificConfig());
         },
