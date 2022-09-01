@@ -933,12 +933,9 @@ class Model implements ISoftDeletable
     /**
      * @return array
      */
-    public function getUserIds(): array
+    public function getMemberUserIds(): array
     {
         $userIds = [];
-        if (!in_array($this->getOwner()->getId(), $userIds)) {
-            $userIds[] = $this->getOwner()->getId();
-        }
         $groups = $this->getGroups();
         foreach ($groups as $group) {
             $memberIds = $group->getMembers()->map(function ($member) {

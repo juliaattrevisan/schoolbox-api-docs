@@ -22,6 +22,7 @@ use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
+use Schoolbox\Pastoral\Report\Model as Report;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -136,7 +137,24 @@ class Notifier extends AbstractModuleNotifier
             return $envelope;
         }
 
-        $builder = $this->getBaseBuilder($pastoral, $method, $effector);
+        // Get the kids teachers
+        // Create the message
+        $href     = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}";
+        $severity = $pastoral->getSeverity()
+            ? sprintf('%s %s', strtolower($pastoral->getSeverity()->getName()), $this->l10n->translate('severity'))
+            : '';
+        $type     = strtolower($pastoral->getSubType() instanceof SubType\Model ? $pastoral->getSubType()->getName() : $pastoral->getType()->getName());
+
+        $builder = new Builder();
+        $builder->setTitle("A :pastoralcare record has been {$method}")
+                ->setParam('pastoralcare', new Param("{$severity} {$type}", $href, ParameterInterface::STACKING_APPEND))
+                ->setIcon($this->getUserIcon($effector))
+                ->setHref($href)
+                ->setNamespace($this->getSlug())
+                ->setSeverity(Logger::ERROR)
+                ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
+                ->addTopic("pastoral.{$pastoral->getId()}.{$method}");
+
         $message = $builder->build();
 
         // Work out who to send the message to
@@ -252,12 +270,34 @@ class Notifier extends AbstractModuleNotifier
             return $envelope;
         }
 
-        $builder = $this->getBaseBuilder($pastoral, self::TRIGGER_ADDED_TO_REPORT, $effector);
-        $message = $builder->build();
+        // Create the message
+        $recordHref   = sprintf("/pastoral/student/%s/record/%s", $pastoral->getStudent()->getId(), $pastoral->getId());
+        $recordName   = $this->l10n->translate('pastoral') . ' record';
+        $messageTitle = "A new :record has been added to :report";
 
-        $targetUsers = $this->findReportUsersForRecord($pastoral);
-        foreach ($targetUsers as $userId => $user) {
-            $envelope->targetToUser($userId, $message);
+        $reports = $this->pastoralReportMapper->findForRecord($pastoral, true);
+        $this->log->debug(count($reports) . " reports found for pastoral {$pastoral->getId()}");
+        $this->log->debug("Report ids: " . implode(',', $reports->getPropertyValues('id')));
+
+        /** @var Report $report */
+        foreach ($reports as $report) {
+            $reportHref = sprintf("/pastoral/report/results/%d", $report->getId());
+            $builder    = new Builder();
+            $builder->setTitle($messageTitle)
+                    ->setParam('record', new Param($recordName, $recordHref, ParameterInterface::STACKING_IGNORE))
+                    ->setParam('report', new Param($report->getName(), $reportHref, ParameterInterface::STACKING_IGNORE))
+                    ->setIcon($this->getUserIcon($effector))
+                    ->setHref($reportHref)
+                    ->setNamespace($this->getSlug())
+                    ->setSeverity(Logger::ERROR)
+                    ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
+                    ->addTopic(sprintf("pastoral.%s.%s.%s", $pastoral->getId(), $report->getId(), self::TRIGGER_ADDED_TO_REPORT));
+
+            $message     = $builder->build();
+            $targetUsers = $this->findUsersForRecordAndReport($pastoral, $report);
+            foreach ($targetUsers as $userId => $user) {
+                $envelope->targetToUser($userId, $message);
+            }
         }
 
         return $envelope;
@@ -360,85 +400,43 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @param Model  $pastoral
-     * @param string $method
-     * @param User   $effector
-     * @return Builder
-     */
-    private function getBaseBuilder(Model $pastoral, string $method, User $effector): Builder
-    {
-        // Get the kids teachers
-        // Create the message
-        $href = sprintf("/pastoral/student/%s/record/%s", $pastoral->getStudent()->getId(), $pastoral->getId());
-        $meta = [];
-        // severity
-        if ($this->conf->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED) && $pastoral->getSeverity()) {
-            $meta[] = sprintf('%s %s', strtolower($pastoral->getSeverity()->getName()), $this->l10n->translate('severity'));
-        }
-        // type
-        $meta[]      = strtolower($pastoral->getSubType() instanceof SubType\Model ? $pastoral->getSubType()->getName() : $pastoral->getType()->getName());
-        $recordTitle = implode(' ', $meta);
-
-        if ($method === self::TRIGGER_ADDED_TO_REPORT) {
-            $messageTitle = "A new :pastoralcare record has been added to your report";
-        } else {
-            $messageTitle = "A :pastoralcare record has been {$method}";
-        }
-
-        $builder = new Builder();
-        $builder->setTitle($messageTitle)
-                ->setParam('pastoralcare', new Param($recordTitle, $href, ParameterInterface::STACKING_APPEND))
-                ->setIcon($this->getUserIcon($effector))
-                ->setHref($href)
-                ->setNamespace($this->getSlug())
-                ->setSeverity(Logger::ERROR)
-                ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
-                ->addTopic("pastoral.{$pastoral->getId()}.{$method}");
-
-        return $builder;
-    }
-
-    /**
-     * @param Model $pastoral
+     * @param Report $report
      * @return GenericCollection
      */
-    private function findReportUsersForRecord(Model $pastoral): GenericCollection
+    private function findUsersForRecordAndReport(Model $pastoral, Report $report): GenericCollection
     {
-        $reports = $this->pastoralReportMapper->findForRecord($pastoral, true);
-        $this->log->debug(count($reports) . " reports found for pastoral {$pastoral->getId()}");
-        $this->log->debug("Report ids: " . implode(',', $reports->getPropertyValues('id')));
-
         $targetUsers = $this->userMapper->createCollection();
-        /** @var Report\Model $report */
-        foreach ($reports as $report) {
-            $reportUserIds = $report->getUserIds();
-            foreach ($reportUserIds as $reportUserId) {
-                // if already exists, continue
-                if ($targetUsers->offsetExists($reportUserId)) {
-                    continue;
-                }
-                // if owner of the record, add the user to target
-                if ($pastoral->getOwner()->getId() === $reportUserId) {
-                    $targetUsers->offsetSet($pastoral->getOwner()->getId(), $pastoral->getOwner());
-                    continue;
-                }
-                try {
-                    $reportUser = $this->userMapper->findById($reportUserId);
-                } catch (MapperException $e) {
-                    continue;
-                }
-                // if the user is moderator and the report is not limited to involved, add the user
-                if ($this->accessLevelCensor->isPastoralModerator($reportUser) && !$report->getInvolved()) {
-                    $targetUsers->offsetSet($reportUser->getId(), $reportUser);
-                    continue;
-                }
-                // check role and permission
-                if (!$reportUser->getRole()->getAccessPastoral() || !$reportUser->getRole()->isStaff()) {
-                    continue;
-                }
-                // check actual access level
-                if ($this->accessLevelCensor->getRawAccessLevel($pastoral, $reportUser) > PastoralAccessMapper::ACCESS_DENY) {
-                    $targetUsers->offsetSet($reportUser->getId(), $reportUser);
-                }
+        // target users are the report owner and report members
+        $reportUserIds   = $report->getMemberUserIds();
+        $reportUserIds[] = $report->getOwner()->getId();
+        // check access for this pastoral record for each of the users, and add to targetUsers
+        foreach ($reportUserIds as $reportUserId) {
+            // if already exists, continue
+            if ($targetUsers->offsetExists($reportUserId)) {
+                continue;
+            }
+            // if owner of the record, add the user to target
+            if ($pastoral->getOwner()->getId() === $reportUserId) {
+                $targetUsers->offsetSet($pastoral->getOwner()->getId(), $pastoral->getOwner());
+                continue;
+            }
+            try {
+                $reportUser = $this->userMapper->findById($reportUserId);
+            } catch (MapperException $e) {
+                continue;
+            }
+            // if the user is moderator and the report is not limited to involved, add the user
+            if ($this->accessLevelCensor->isPastoralModerator($reportUser) && !$report->getInvolved()) {
+                $targetUsers->offsetSet($reportUser->getId(), $reportUser);
+                continue;
+            }
+            // check role and permission
+            if (!$reportUser->getRole()->getAccessPastoral() || !$reportUser->getRole()->isStaff()) {
+                continue;
+            }
+            // check actual access level
+            if ($this->accessLevelCensor->getRawAccessLevel($pastoral, $reportUser) > PastoralAccessMapper::ACCESS_DENY) {
+                $targetUsers->offsetSet($reportUser->getId(), $reportUser);
             }
         }
         return $targetUsers;

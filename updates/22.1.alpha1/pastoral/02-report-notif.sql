@@ -7,6 +7,17 @@ VALUES ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'pastoral'),
         'addedToReport',
         'staff',
         'a new {:pastoral} record is added to an existing report.');
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
+SELECT (SELECT id
+        FROM `msg_source`
+        WHERE `namespace` = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'pastoral')
+          AND `key` = 'addedToReport'
+          AND `role_type` = 'staff'),
+       `groups`.id,
+       'MU,DI,IN,MO,EM',
+       'IN'
+FROM `groups`
+WHERE `groups`.`group_type` = 'staff';
 
 -- create a new column to pastoral_report table
 ALTER TABLE `pastoral_report`
