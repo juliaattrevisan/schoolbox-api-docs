@@ -362,7 +362,7 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                     .tiny {
                         display: grid;
-                        grid-template-columns: 4fr 1fr 1fr;
+                        grid-template-columns: 6fr 3fr 2fr;
 
                         a {
                             line-height: 1.5rem;
