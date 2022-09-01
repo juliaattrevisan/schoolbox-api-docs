@@ -329,15 +329,16 @@ input[type=radio]:not(.plain) + label.input-toggle {
 }
 
 .content-container {
-    border: 1px solid chocolate;
+    border: 1px solid var(--form-border-color);
     width: 98%;
     margin: auto;
     display: flex;
     flex-wrap: wrap;
+    padding: 0;
 
     .student-container {
-
-        width: 105%;
+        border-bottom: 1px solid var(--form-border-color);
+        width: 100%;
 
         .list-item {
 
@@ -347,22 +348,21 @@ input[type=radio]:not(.plain) + label.input-toggle {
                 flex-wrap: wrap;
                 flex-direction: row;
                 align-items: start;
-                padding-top: 0;
-
+                padding: 0;
+                float: none;
 
                 .image-container  {
 
                     margin-left: 0;
-                    padding: 0.75rem;
-                    padding-right: 0;
                     margin-right: 0;
-                    padding-left: 0;
+                    padding: 0.75rem;
 
 
                     img {
                         border-radius: 50%;
                         transform: scale(0.85);
-
+                        float: none;
+                        margin: 0;
 
                     }
                 }
@@ -409,7 +409,7 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                 .text-container {
                     border-left: 1px solid var(--form-border-color);
-                    min-height: 5rem;
+                    min-height: 5.5rem;
                 }
 
             }
