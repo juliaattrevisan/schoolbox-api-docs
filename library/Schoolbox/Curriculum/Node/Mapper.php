@@ -44,7 +44,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertHeritage']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'disableChildren']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'disableOrReEnableChildren']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteChildren']);
     }
 
@@ -138,34 +138,37 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     }
 
     /**
-     * Post-save callback: if this node is no longer enabled, disable all child
-     * nodes of the given node.
+     * Post-save callback:
+     * * if this node is no longer enabled, disable all child nodes
+     * * if this node was not enabled but is now, enable all child nodes
      *
-     * Note the reverse doesn't apply: enabling a node which was disabled
-     * doesn't re-enable its children. This is because the node might have
-     * children which should remain disabled.
+     * AS: I don't think enabling a node which was disabled should re-enable
+     * its children, because the node might have children which should remain
+     * disabled.
      *
      * This method applies recursively to each node's children: the action of
-     * disabling a node will call this method on the children.
+     * disabling or re-enabling a node will call this method on the children.
      *
      * @param Model      $model
      * @param Model|null $previous
      */
-    public function disableChildren(Model $model, Model $previous = null)
+    public function disableOrReEnableChildren(Model $model, Model $previous = null)
     {
-        $isEnabled  = $model->getEnabled();
-        $wasEnabled = $previous?->getEnabled() ?? true;
-        if (!$isEnabled && $wasEnabled) {
-            $this->updateAll(
-                $this->findByColumn(
-                    'curriculum_node_parent_id',
-                    $model->getId(),
-                ),
-                'enabled',
-                false,
-                self::CALLBACK_PRESAVE,
-                self::CALLBACK_POSTSAVE,
-            );
+        if ($previous) {
+            $isEnabled  = $model->getEnabled();
+            $wasEnabled = $previous->getEnabled();
+            if ($isEnabled !== $wasEnabled) {
+                $this->updateAll(
+                    $this->findByColumn(
+                        'curriculum_node_parent_id',
+                        $model->getId(),
+                    ),
+                    'enabled',
+                    $isEnabled,
+                    self::CALLBACK_PRESAVE,
+                    self::CALLBACK_POSTSAVE,
+                );
+            }
         }
     }
 
