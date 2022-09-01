@@ -86,6 +86,12 @@ function animateOn () {
  */
 const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
+/**
+ * To better highlight the current top level node from its children
+ *
+ * @returns { String }
+ */
+ const borderBottomColour = computed(() => props.depth === 0 ? `var(--body-foreground-h1)` : `var(--body-background)`);
 
 /**
  * If this is the active node being updated
@@ -220,7 +226,7 @@ async function onLeave (el, done) {
 
 .buttons-container {
     align-items: center;
-    border-bottom: 1px solid var(--body-background);
+    border-bottom: 1px solid v-bind(borderBottomColour);
     display: flex;
     margin: 0 0 0 v-bind(marginLeft);
     padding: 2px;

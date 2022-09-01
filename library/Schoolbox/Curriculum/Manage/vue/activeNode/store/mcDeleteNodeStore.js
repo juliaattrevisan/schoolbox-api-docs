@@ -44,7 +44,7 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
                 });
                 if (response.ok) {
                     const nodesStore = useNodesStore();
-                    nodesStore.deleteActiveNode();
+                    nodesStore.deleteNode();
                     this.isProcessing = false;
                     this.cancel();
                 } else {

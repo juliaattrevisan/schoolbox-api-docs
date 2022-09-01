@@ -4,6 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
+import { useNodesStore } from '../../store/mcNodesStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
 
 
@@ -45,8 +46,9 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
                     body: getFormData(this.subsection),
                 });
                 if (response.ok) {
-                    const responseJson = await response.json();
-                    // activeNodeStore.update(this.activeNodeCopy);
+                    const newNode = await response.json();
+                    const nodesStore = useNodesStore();
+                    await nodesStore.addSubsection(newNode);
                     this.isProcessing = false;
                     this.cancel();
                 } else {
