@@ -3860,16 +3860,21 @@ abstract class Mapper implements IMapper, Serializable
      * If callback fails and you want it to be silent, return false.
      * If caller should know why it failed, throw an UnexpectedValueException explaining failure.
      *
-     * @param string $point  One of the self::CALLBACK_* constants
+     * @param string $point     One of the self::CALLBACK_* constants
+     * @param mixed  ...$params Any other params to pass into the callback:
+     *                          * `self::CALLBACK_PRESAVE` accepts the model to
+     *                             be saved, and its state prior to modification
+     *                          * `self::CALLBACK_POSTSAVE` accepts the model
+     *                             just saved, and its previous state
+     *                          * all others accept the model to be operated on
      * @return bool
      * @throws \UnexpectedValueException If callback failed and caller should know why
      */
-    public function triggerCallbacks($point)
+    public function triggerCallbacks(string $point, ...$params)
     {
-        $params = array_slice(func_get_args(), 1);
         if (array_key_exists($point, $this->callback_queue)) {
             foreach ($this->callback_queue[$point] as $method) {
-                if (call_user_func_array($method, $params) === false) {
+                if (call_user_func($method, ...$params) === false) {
                     //
                     // Consider providing details on which callback failed.
                     return false;
