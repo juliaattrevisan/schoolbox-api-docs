@@ -413,7 +413,11 @@ class Importer
         if (\count($assessment->getStandards())) {
             // Pass 1: build the rowset, adding capabilities+indicators as required
             foreach ($assessment->getStandards() as $standard) {
-                $capabilityName = $standard->getTitle();
+                // Truncate string to max 900 chars before saving to database to avoid error (see SA-14273).
+                // 1000 is the limit in the database, but we choose 900 as our limit due to concern about special
+                // characters (eg. bullet points) requiring more bytes than normal characters.
+                // See expanded reason in www/static/js/submissions/jquery.rubric-editable.js.
+                $capabilityName = substr($standard->getTitle(), 0, 900);
 
                 // Build capability
                 $groupDataModel = $this->rubricCapabilityMapper->findOrCreateOneForFolderByName(
