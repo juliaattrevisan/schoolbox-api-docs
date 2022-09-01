@@ -4,6 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { useActiveNodeStore } from './mcActiveNodeStore';
+import { apiEndpoint } from '../../store/manageCurriculumStore';
 
 
 export const useEnableNodeStore = defineStore('mcEnableNode', {
@@ -38,7 +39,7 @@ export const useEnableNodeStore = defineStore('mcEnableNode', {
             this.isProcessing = true;
             try {
                 const enabledInverted = !activeNodeStore.node.enabled;
-                const response = await fetch(`/api/curriculum/${activeNodeStore.node.id}`, {
+                const response = await fetch(`${apiEndpoint}/${activeNodeStore.node.id}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',

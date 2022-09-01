@@ -6,6 +6,8 @@ import { defineStore } from 'pinia';
 import { useNodesStore } from './mcNodesStore';
 
 
+export let apiEndpoint = '';
+
 export const useStore = defineStore('manageCurriculum', {
 
     state: () => ({
@@ -35,9 +37,10 @@ export const useStore = defineStore('manageCurriculum', {
          *
          * @param { String }
          */
-        async load (apiEndpoint) {
+        async load (endpoint) {
+            apiEndpoint = endpoint;
             const nodesStore = useNodesStore();
-            nodesStore.loadTopLevel(apiEndpoint);
+            nodesStore.loadTopLevel();
         },
 
     },

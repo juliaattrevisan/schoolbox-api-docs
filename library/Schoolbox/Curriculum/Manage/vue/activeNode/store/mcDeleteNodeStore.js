@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
+import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useNodesStore } from '../../store/mcNodesStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
 
@@ -35,7 +36,7 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
             this.isProcessing = true;
             try {
                 const activeNodeStore = useActiveNodeStore();
-                const response = await fetch(`/api/curriculum/${activeNodeStore.node.id}`, {
+                const response = await fetch(`${apiEndpoint}/${activeNodeStore.node.id}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

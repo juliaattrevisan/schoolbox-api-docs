@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
+import { apiEndpoint } from './manageCurriculumStore';
 import { useNodesStore } from './mcNodesStore';
 
 
@@ -31,7 +32,7 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', {
             this.isProcessing = true;
             try {
                 this.isProcessing = false;
-                const response = await fetch(`/api/curriculum/`, {
+                const response = await fetch(`${apiEndpoint}/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

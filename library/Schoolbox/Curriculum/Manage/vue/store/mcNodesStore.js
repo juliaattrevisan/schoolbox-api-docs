@@ -3,12 +3,11 @@
  */
 
 import { defineStore } from 'pinia';
-import { useStore } from './manageCurriculumStore';
+import { useStore, apiEndpoint } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 export const UNSET_ID = 0;
-export let apiEndpoint = '';
 
 
 export const useNodesStore = defineStore('mcNodes', {
@@ -24,22 +23,20 @@ export const useNodesStore = defineStore('mcNodes', {
 
         /**
          * Add in all the top level nodes for display
-         *
-         * @param { Strng }
          */
-        async loadTopLevel (endpoint) {
-            apiEndpoint = endpoint;
+        async loadTopLevel () {
+
             const store = useStore();
             try {
-                const response = await fetch(`${apiEndpoint}?topLevelOnly=1`);
+                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1`);
                 if (response.ok) {
                     const nodes = await response.json();
                     this.updateNodes(nodes);
                     const viewNodesStore = useViewNodesStore();
                     if (viewNodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
                         const singleCurriculumId = this.nodes.children[0].id;
-                        viewNodesStore.setSelected(1, singleCurriculumId);
-                        this.loadChildren(singleCurriculumId); //and also load in its children for initial display
+                        await this.loadChildren(singleCurriculumId); //load in its children for initial display
+                        viewNodesStore.setSelected(1, singleCurriculumId); //then select the node
                     }
                 } else {
                     console.warn(response);
@@ -64,7 +61,7 @@ export const useNodesStore = defineStore('mcNodes', {
                 return;
             }
             try {
-                const response = await fetch(`${apiEndpoint}${id}?descendants=1`);
+                const response = await fetch(`${apiEndpoint}/${id}?descendants=1`);
                 if (response.ok) {
                     const newNode = await response.json();
                     const oldNode = findById(this.nodes.children, id);
