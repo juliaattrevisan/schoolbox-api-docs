@@ -153,7 +153,7 @@ export default {
          * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
          */
         spawnEditor () {
-            this.init(configTypes.FOR_COMMENTS);
+            this.init(configTypes.BASIC);
         },
 
         /**
@@ -188,7 +188,8 @@ export default {
             const configOptions = { //use computed property names to retrieve the appropriate config options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names
                 [configTypes.DEFAULT]: $.alaressEditorConfig(this.getVueSpecificConfig()),
                 [configTypes.FOR_COMMENTS]: $.alaressEditorConfigForComments(this.getVueSpecificConfig()),
-                [configTypes.WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(this.getVueSpecificConfig())
+                [configTypes.WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(this.getVueSpecificConfig()),
+                [configTypes.BASIC]: $.alaressEditorConfigBasic(this.getVueSpecificConfig()),
             }
             return configOptions[editorType] || $.alaressEditorConfig(this.getVueSpecificConfig());
         },
