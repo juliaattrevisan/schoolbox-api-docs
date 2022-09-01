@@ -200,7 +200,7 @@ export default {
                         <div class="student-container">
                             <div class="student-card card small-12">
                                 <div class="image-container">
-                                    <img :src="studentData.student._links.avatar" :alt="`profile photo of ${studentData.student.fullName}`" class="portrait"/>
+                                    <img :src="studentData.student._links.avatar" :alt="`Profile photo of ${studentData.student.fullName}`" class="portrait"/>
                                 </div>
 
                                 <div class="text-container">
@@ -213,32 +213,18 @@ export default {
                                         <div class="tiny card small-12">
                                             <a :href="record._links.read" title="View record">
                                                 <img :src="record.createdBy._links.avatar"
-                                                     :alt="`profile photo of ${record.createdBy.fullName}`"
+                                                     :alt="`Profile photo of ${record.createdBy.fullName}`"
+                                                     :title="`Created by ${ record.createdBy.fullName }`"
                                                      class="portrait" />
                                                 {{ record.heading }}
                                             </a>
-                                            <p class="meta">
-                                                created by
-                                                <a :href="record.createdBy._links.profile" title="View profile" class="name">
-                                                    {{ record.createdBy.fullName }}
-                                                </a>
-                                            </p>
                                             <div class="time-container">
+                                                <template v-if="record.createdAt !== record.updatedAt">
+                                                    <span :title="`Updated on ${formatDateTime(record.updatedAt)}`">⭐</span>
+                                                </template>
                                                 <time :datetime="formatDateTime(record.createdAt)" :title="formatDateTime(record.createdAt)">
                                                 {{ formatDate(record.createdAt) }}
                                                 </time>
-                                                <template v-if="record.createdAt !== record.updatedAt">,
-                                                    updated
-                                                    <template v-if="record.createdBy.id !== record.updatedBy.id">
-                                                        by
-                                                        <a :href="record.updatedBy._links.profile" title="View profile" class="name">
-                                                            {{ record.updatedBy.fullName }}
-                                                        </a>
-                                                    </template>
-                                                    <time :datetime="formatDateTime(record.updatedAt)" :title="formatDateTime(record.updatedAt)">
-                                                        {{ formatDate(record.updatedAt) }}
-                                                    </time>
-                                                </template>
                                             </div>
                                         </div>
                                     </div>
@@ -329,7 +315,6 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
     .list-item {
         .student-container {
-            border-bottom: 1px solid var(--form-border-color);
             width: 100%;
 
             .student-card {
@@ -368,7 +353,7 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                     .tiny {
                         display: grid;
-                        grid-template-columns: 6fr 3fr 2fr;
+                        grid-template-columns: 6fr 2fr;
 
                         a {
                             line-height: 1.5rem;
