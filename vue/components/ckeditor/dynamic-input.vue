@@ -237,17 +237,10 @@ export default {
 <template>
     <div>
         <article :id="`${this.presetUniqueId}-proxy`">{{ this.value }}</article>
-
-        <template v-if="this.allowEdit">
-            <a class="button icon-modify" v-show="!isCKEditorLoaded" @click.once="spawnEditor">{{ getEditButtonText }}</a>
-        </template>
-
+        <button v-if="this.allowEdit" class="show-ckeditor-button" v-show="!isCKEditorLoaded" @click.once="spawnEditor">{{ getEditButtonText }}</button>
         <div :style="getStyles">
             <textarea :id="this.presetUniqueId" :name="this.inputName" rows="4">{{ this.value }}</textarea>
-
-            <template v-if="this.allowSubmit">
-                <button class="button submit" @click="postItem" :disabled="isPostDisabled">Save</button>
-            </template>
+            <button v-if="this.allowSubmit" class="button submit" @click="postItem" :disabled="isPostDisabled">Save</button>
         </div>
     </div>
 </template>
