@@ -227,6 +227,7 @@ export default {
              * where opening, closing, then re-opening a modal causes the ckeditor to break
              */
             isModalOpen: false,
+            reason: '', //the reason the badge(s) are being awarded
         }
     },
     computed: {
@@ -349,17 +350,28 @@ export default {
         },
 
         /**
-         * Close the modal
+         * Open the award modal to confirm and submit the goals/awards
          */
-        onCancelSelected () {
-            this.$refs.awardModal.close();
+        onConfirmSelected () {
+            this.isModalOpen = true;
+            this.$refs.awardModal.open();
         },
 
         /**
-         * The modal is now completely closed
+         * To keep track of the reason, that's being updated by dynamic-input.vue
+         *
+         * @param { string }
+         */
+        onReasonChanged (newValue) {
+            this.reason = newValue;
+        },
+
+        /**
+         * The modal is now completely closed so reset
          */
         onModalClosed () {
             this.isModalOpen = false;
+            this.reason = '';
         },
 
         /**
@@ -372,16 +384,13 @@ export default {
             this.$refs.awardModalSubmit.disabled = true;
 
             Promise
-                .all(this.selectedBadges.map(v => {
-                    /* Shank out the ckeditor's contents
-                     */
-                    let reason = CKEDITOR.instances['reason'].getData();
+                .all(this.selectedBadges.map((badge) => {
 
                     /* Construct each payload for each badge uniquely
                      */
-                    let payload = this.awardToSelfOnly ? null : {users: this.users, reason: reason};
+                    let payload = this.awardToSelfOnly ? null : { users: this.users, reason: this.reason };
 
-                    axios.post(v._links[this.postAwardRouteLookup], payload)
+                    axios.post(badge._links[this.postAwardRouteLookup], payload);
                 }))
                 .then(() => {
                     this.toastSuccess(this.toastSuccessMessage);
@@ -460,16 +469,17 @@ export default {
 
             <dynamic-input
                 v-if="isModalOpen"
-                :preset-unique-id="'reason'"
-                :inputName="'reason'"
-                :value="''"
-                :singular="'reason'"
+                preset-unique-id="reason"
+                inputName="reason"
+                singular="reason"
+                :value="reason"
                 :allow-edit="true"
                 :allow-submit="false"
                 :spawn-immediately="true"
                 :is-processing="true"
                 :cdn-prefix="this.cdnPrefix"
                 :site-version="this.siteVersion"
+                @value-changed="onReasonChanged"
             ></dynamic-input>
 
             <template v-if="!awardToSelfOnly">

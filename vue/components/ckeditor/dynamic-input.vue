@@ -91,7 +91,6 @@ export default {
         return {
             isCKEditorLoading: false,
             isCKEditorLoaded: false,
-            newValue: '',
         }
     },
 
@@ -124,7 +123,7 @@ export default {
                 return 'Loading';
             }
 
-            return 'Edit ' + this.singular;
+            return 'Add ' + this.singular;
         },
 
         /**
@@ -203,7 +202,9 @@ export default {
             return {
                 on: {
                     change: () => { // Bind the content of CKEditor into the comment model on change
-                        this.newValue = CKEDITOR.instances[this.inputName].getData();
+                        if (!this.allowSubmit) { //if the submit isn't within dynamic-input, we should be notifying of any changes for a parent to maintain state
+                            this.$emit('value-changed', CKEDITOR.instances[this.inputName].getData());
+                        }
                     },
                     instanceReady: () => { //can display the loaded CKEditor now
                         this.isCKEditorLoading = false;
