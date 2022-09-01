@@ -1,6 +1,5 @@
 <script>
 
-import axios from 'axios';
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badge-list';
@@ -388,9 +387,15 @@ export default {
 
                     /* Construct each payload for each badge uniquely
                      */
-                    let payload = this.awardToSelfOnly ? null : { users: this.users, reason: this.reason };
+                    const payload = this.awardToSelfOnly ? null : { users: this.users, reason: this.reason };
 
-                    axios.post(badge._links[this.postAwardRouteLookup], payload);
+                    fetch(badge._links[this.postAwardRouteLookup], {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload),
+                    });
                 }))
                 .then(() => {
                     this.toastSuccess(this.toastSuccessMessage);
