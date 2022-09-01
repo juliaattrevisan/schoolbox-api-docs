@@ -165,7 +165,7 @@ export default {
 
         <div v-else>
             <!-- sort options -->
-            <div class="small-12 medium-6 no-pad columns">
+            <div class="small-6 no-pad columns">
                 <div class="sort-filter">
                     <label for="sortOption">
                         Sort by:
@@ -177,7 +177,7 @@ export default {
             </div>
 
             <!-- count filter -->
-            <div class="small-12 medium-6 no-pad columns">
+            <div class="small-6 no-pad columns">
                 <div class="count-filter">
                     <label>Show amount:</label>
                     <template v-for="option in countOptions">
