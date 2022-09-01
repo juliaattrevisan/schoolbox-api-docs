@@ -104,7 +104,7 @@ export default {
         }
     },
 
-    mounted() {
+    mounted () {
         /* Spawn immediately, if configured to do so
          */
         if (this.spawnImmediately) {
@@ -146,7 +146,7 @@ export default {
             // return this.newValue.trim() === '' || this.isProcessing;
         }
     },
- 
+
     methods: {
 
         /**
@@ -158,7 +158,7 @@ export default {
 
         /**
          * Loads ckeditor only when required rather than on page load
-         * 
+         *
          * @param { String } editorType an option within editorTypes.js to determine which config options to pass to CKEditor
          */
         async init (editorType) {
@@ -171,7 +171,7 @@ export default {
                 }
                 $.fn.alaressEditor(this.getConfigOptions(editorType));
             } catch (error) {
-                this.isCKEditorLoading = false; 
+                this.isCKEditorLoading = false;
                 this.$emit('on-load-error');
             }
         },
@@ -179,23 +179,23 @@ export default {
         /**
          * Return the appropriate config to display consistency depending on the editorType
          * these '$.alaress' methods are created and attached to the jQuery $ object in jquery.editor.js
-         * 
+         *
          * @param { String } editorType an option within editorTypes.js to determine which config options to pass to CKEditor
-         * 
+         *
          * @returns { Object }
          */
         getConfigOptions (editorType) {
             const configOptions = { //use computed property names to retrieve the appropriate config options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names
                 [EDITOR_DEFAULT_CONFIG]: $.alaressEditorConfig(this.getVueSpecificConfig()),
                 [EDITOR_CONFIG_FOR_COMMENTS]: $.alaressEditorConfigForComments(this.getVueSpecificConfig()),
-                [EDITOR_CONFIG_WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(this.getVueSpecificConfig()) 
+                [EDITOR_CONFIG_WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(this.getVueSpecificConfig())
             }
             return configOptions[editorType] || $.alaressEditorConfig(this.getVueSpecificConfig());
         },
 
         /**
          * The config that needs to be passed to CKEditor in order to for it to work in Vue land
-         * 
+         *
          * @returns { Object }
          */
         getVueSpecificConfig () {

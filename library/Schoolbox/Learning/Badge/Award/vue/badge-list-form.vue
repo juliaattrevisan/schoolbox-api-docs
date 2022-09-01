@@ -220,7 +220,13 @@ export default {
         return {
             selectedBadges: [],
             badgeListChangeEvent: 'EVENT_CHANGE',
-            hasContentChange: false //to track badge addition changes
+            hasContentChange: false, //to track badge addition changes
+            /**
+             * so dynamic-input.vue is only in the dom while the modal is active
+             * we do this to avoid issues around ckeditor instantiation coupled with modals
+             * where opening, closing, then re-opening a modal causes the ckeditor to break
+             */
+            isModalOpen: false,
         }
     },
     computed: {
@@ -335,6 +341,28 @@ export default {
         },
 
         /**
+         * Open the award modal to confirm and submit the goals/awards
+         */
+        onConfirmSelected () {
+            this.isModalOpen = true;
+            this.$refs.awardModal.open();
+        },
+
+        /**
+         * Close the modal
+         */
+        onCancelSelected () {
+            this.$refs.awardModal.close();
+        },
+
+        /**
+         * The modal is now completely closed
+         */
+        onModalClosed () {
+            this.isModalOpen = false;
+        },
+
+        /**
          * Submit action for this form.
          *
          * Award badges, and then go back to the return URL once done.
@@ -410,12 +438,12 @@ export default {
                     <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
                 </li>
                 <li>
-                    <button @click.prevent="$refs.awardModal.open" @keyup.enter="$refs.awardModal.open" class="submit">{{ confirmButtonText }}</button>
+                    <button @click.prevent="onConfirmSelected" @keyup.enter="onConfirmSelected" class="submit">{{ confirmButtonText }}</button>
                 </li>
             </ul>
         </bottom-drawer>
 
-        <reveal-modal ref="awardModal" size="large">
+        <reveal-modal ref="awardModal" size="large" @closed="onModalClosed">
             <h2>{{ confirmModalHeader }}</h2>
             <p class="meta">{{ confirmModalBadgeListMeta }}</p>
             <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
@@ -431,13 +459,14 @@ export default {
             </ul>
 
             <dynamic-input
+                v-if="isModalOpen"
                 :preset-unique-id="'reason'"
                 :inputName="'reason'"
                 :value="''"
                 :singular="'reason'"
                 :allow-edit="true"
                 :allow-submit="false"
-                :spawn-immediately="false"
+                :spawn-immediately="true"
                 :is-processing="true"
                 :cdn-prefix="this.cdnPrefix"
                 :site-version="this.siteVersion"
@@ -459,7 +488,7 @@ export default {
             </template>
 
             <ul class="flex-list buttons">
-                <li><a @click.prevent="$refs.awardModal.close" @keyup.enter="$refs.awardModal.close" class="button">Cancel</a></li>
+                <li><a @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button">Cancel</a></li>
                 <li><button ref="awardModalSubmit" @click.prevent="onSubmit" @keyup.enter="onSubmit" class="submit">Confirm</button></li>
             </ul>
         </reveal-modal>
