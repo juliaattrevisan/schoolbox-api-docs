@@ -267,12 +267,13 @@ export default {
 
                 <hr/>
                 <label>Reason</label>
+                <!-- <article v-html="award.reason"></article> -->
                 <dynamic-input
                     v-if="isModalOpen"
-                    :preset-unique-id="'reason'"
-                    :inputName="'reason'"
+                    preset-unique-id="reason"
+                    inputName="reason"
+                    singular="reason"
                     :value="award.reason"
-                    :singular="'reason'"
                     :allow-edit="true"
                     :allow-submit="false"
                     :spawn-immediately="true"
