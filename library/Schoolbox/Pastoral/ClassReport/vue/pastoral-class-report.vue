@@ -165,17 +165,19 @@ export default {
 
         <div v-else>
             <!-- sort options -->
-            <div class="small-12 medium-6 columns sort-filter">
-                <label for="sortOption">
-                    Sort by:
-                </label>
-                <select id="sortOption" v-model="sort" @change="filter_append(null, true, true)">
-                    <option v-for="option in sortOptions" :label="option.label" :value="option.value">{{ option.label }}</option>
-                </select>
+            <div class="small-12 medium-6 no-pad columns">
+                <div class="sort-filter">
+                    <label for="sortOption">
+                        Sort by:
+                    </label>
+                    <select id="sortOption" v-model="sort" @change="filter_append(null, true, true)">
+                        <option v-for="option in sortOptions" :label="option.label" :value="option.value">{{ option.label }}</option>
+                    </select>
+                </div>
             </div>
 
             <!-- count filter -->
-            <div class="small-12 medium-6 columns">
+            <div class="small-12 medium-6 no-pad columns">
                 <div class="count-filter">
                     <label>Show amount:</label>
                     <template v-for="option in countOptions">
@@ -317,9 +319,8 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
 .content-container {
     border: 1px solid var(--form-border-color);
-    width: 98%;
     margin: auto;
-    padding: 0;
+    margin-top: 1rem;
 
     .list-item {
         .student-container {
