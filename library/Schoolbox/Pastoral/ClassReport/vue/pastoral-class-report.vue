@@ -198,19 +198,21 @@ export default {
 
                     <!-- student profile -->
 
-                    <li class="student-container">
+                    <div class="student-container">
                         <div class="list-item">
                             <div class="student-card card small-12">
                                 <div class="image-container"> <img :src="studentData.student._links.avatar"
                                                                    :alt="`profile photo of ${studentData.student.fullName}`"
                                                                    class="portrait"/> </div>
+
+                                <div class="text-container">
                                 <h4><a :href="studentData.student._links.profile" title="View profile" class="name">
 
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
                                 </a></h4>
                                 <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
 
-                    <li v-for="record in studentData.records.data" :key="'record-' + String(record.id)" class="pastoral-container">
+                    <div v-for="record in studentData.records.data" :key="'record-' + String(record.id)" class="pastoral-container">
                         <div class="list-item ">
                             <div class="tiny card small-12">
                                 <a :href="record._links.read" title="View record">
@@ -244,13 +246,13 @@ export default {
                                 </div>
                             </div>
                         </div>
-                    </li>
-
+                    </div>
+</div>
                             </div>
                             <!-- pastoral records -->
 
                         </div>
-                    </li>
+                    </div>
 
 
                     <li v-if="studentData.records.metadata.count > studentData.records.data.length">
@@ -344,16 +346,17 @@ input[type=radio]:not(.plain) + label.input-toggle {
                 display: flex;
                 flex-wrap: wrap;
                 flex-direction: row;
-                align-items: center;
+                align-items: start;
+                padding-top: 0;
 
 
                 .image-container  {
 
                     margin-left: 0;
-                    border-right: 1px solid rebeccapurple;
                     padding: 0.75rem;
                     padding-right: 0;
                     margin-right: 0;
+                    padding-left: 0;
 
 
                     img {
@@ -375,17 +378,15 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                     height: 2.5rem;
                     width: 100%;
-                    margin-left: 5.5rem;
+                    margin-left: 1rem;
 
                     .tiny {
                         display: grid;
                         grid-template-columns: 4fr 1fr 1fr;
-                        width: 90%;
-
 
                         a {
                             width: 50%;
-                            border: 1px solid darkgreen;
+
                             line-height: 1.5rem;
 
                             img {
@@ -396,16 +397,20 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                         }
                         p {
-                            border: 1px solid yellow;
+
                         }
 
                         .time-container {
-                            border: 1px solid red;
+
                             text-align: right;
                         }
                     }
                 }
 
+                .text-container {
+                    border-left: 1px solid var(--form-border-color);
+                    min-height: 5rem;
+                }
 
             }
 
