@@ -169,13 +169,8 @@ export default {
                 <label for="sortOption">
                     Sort by:
                 </label>
-                <select id="sortOption"
-                        v-model="sort"
-                        @change="filter_append(null, true, true)"
-                >
-                    <option v-for="option in sortOptions"
-                            :label="option.label"
-                            :value="option.value">{{ option.label }}</option>
+                <select id="sortOption" v-model="sort" @change="filter_append(null, true, true)">
+                    <option v-for="option in sortOptions" :label="option.label" :value="option.value">{{ option.label }}</option>
                 </select>
             </div>
 
@@ -197,61 +192,57 @@ export default {
                 <template v-for="(studentData, studentIndex) in data" :key="'student-' + String(studentData.student.id)">
 
                     <!-- student profile -->
-
                     <div class="student-container">
                         <div class="list-item">
                             <div class="student-card card small-12">
-                                <div class="image-container"> <img :src="studentData.student._links.avatar"
-                                                                   :alt="`profile photo of ${studentData.student.fullName}`"
-                                                                   class="portrait"/> </div>
+                                <div class="image-container">
+                                    <img :src="studentData.student._links.avatar" :alt="`profile photo of ${studentData.student.fullName}`" class="portrait"/>
+                                </div>
 
                                 <div class="text-container">
-                                <h4><a :href="studentData.student._links.profile" title="View profile" class="name">
-
+                                    <h4><a :href="studentData.student._links.profile" title="View profile" class="name">
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
-                                </a></h4>
-                                <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
+                                    </a></h4>
+                                    <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
 
-                    <div v-for="record in studentData.records.data" :key="'record-' + String(record.id)" class="pastoral-container">
-                            <div class="tiny card small-12">
-                                <a :href="record._links.read" title="View record">
-                                    <img :src="record.createdBy._links.avatar"
-                                         :alt="`profile photo of ${record.createdBy.fullName}`"
-                                         class="portrait" />
-                                    {{ record.heading }}
-                                </a>
-                                <p class="meta">
-                                    created by
-                                    <a :href="record.createdBy._links.profile" title="View profile" class="name">
-                                        {{ record.createdBy.fullName }}
-                                    </a>
-                                </p>
-                                <div class="time-container"><time :datetime="formatDateTime(record.createdAt)"
-                                      :title="formatDateTime(record.createdAt)"
-                                >
-                                    {{ formatDate(record.createdAt) }}
-                                </time><template v-if="record.createdAt !== record.updatedAt">,
-                                updated
-                                <template v-if="record.createdBy.id !== record.updatedBy.id">
-                                    by
-                                    <a :href="record.updatedBy._links.profile" title="View profile" class="name">
-                                        {{ record.updatedBy.fullName }}
-                                    </a>
-                                </template> <time :datetime="formatDateTime(record.updatedAt)"
-                                                  :title="formatDateTime(record.updatedAt)">
-                                    {{ formatDate(record.updatedAt) }}
-                                </time>
-                            </template>
+                                    <div v-for="record in studentData.records.data" :key="'record-' + String(record.id)" class="pastoral-container">
+                                        <div class="tiny card small-12">
+                                            <a :href="record._links.read" title="View record">
+                                                <img :src="record.createdBy._links.avatar"
+                                                     :alt="`profile photo of ${record.createdBy.fullName}`"
+                                                     class="portrait" />
+                                                {{ record.heading }}
+                                            </a>
+                                            <p class="meta">
+                                                created by
+                                                <a :href="record.createdBy._links.profile" title="View profile" class="name">
+                                                    {{ record.createdBy.fullName }}
+                                                </a>
+                                            </p>
+                                            <div class="time-container">
+                                                <time :datetime="formatDateTime(record.createdAt)" :title="formatDateTime(record.createdAt)">
+                                                {{ formatDate(record.createdAt) }}
+                                                </time>
+                                                <template v-if="record.createdAt !== record.updatedAt">,
+                                                    updated
+                                                    <template v-if="record.createdBy.id !== record.updatedBy.id">
+                                                        by
+                                                        <a :href="record.updatedBy._links.profile" title="View profile" class="name">
+                                                            {{ record.updatedBy.fullName }}
+                                                        </a>
+                                                    </template>
+                                                    <time :datetime="formatDateTime(record.updatedAt)" :title="formatDateTime(record.updatedAt)">
+                                                        {{ formatDate(record.updatedAt) }}
+                                                    </time>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                        </div>
-                    </div>
-</div>
                             </div>
                             <!-- pastoral records -->
-
                         </div>
                     </div>
-
 
                     <li v-if="studentData.records.metadata.count > studentData.records.data.length">
                         <div class="component-action">
