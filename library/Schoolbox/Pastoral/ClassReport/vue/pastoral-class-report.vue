@@ -368,18 +368,17 @@ input[type=radio]:not(.plain) + label.input-toggle {
                     padding: 0.75rem;
 
                 }
-                .pastoral-container:first-child {
-                    border: 1px solid lightseagreen;
-                }
+
                 .pastoral-container {
 
                     height: 60px;
                     width: 100%;
-                    margin-top: -0.5rem;
-                    margin-left: 4.9rem;
+                    margin-left: 5.5rem;
 
                     .tiny {
                         display: flex;
+
+
                         a {
                             width: 50%;
                             p {
@@ -396,5 +395,13 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
     }
 }
+
+.student-card li:nth-child(3) {
+    background-color: #0a6aa1;
+    margin-top: -1rem;
+}
+
+
+
 
 </style>
