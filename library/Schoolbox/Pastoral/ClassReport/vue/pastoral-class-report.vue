@@ -190,10 +190,9 @@ export default {
 
             <ul class="action-list threaded content-container">
                 <template v-for="(studentData, studentIndex) in data" :key="'student-' + String(studentData.student.id)">
-
-                    <!-- student profile -->
-                    <div class="student-container">
-                        <div class="list-item">
+                    <li class="list-item">
+                        <!-- student profile -->
+                        <div class="student-container">
                             <div class="student-card card small-12">
                                 <div class="image-container">
                                     <img :src="studentData.student._links.avatar" :alt="`profile photo of ${studentData.student.fullName}`" class="portrait"/>
@@ -242,7 +241,7 @@ export default {
                             </div>
                             <!-- pastoral records -->
                         </div>
-                    </div>
+                    </li>
 
                     <li v-if="studentData.records.metadata.count > studentData.records.data.length">
                         <div class="component-action">
@@ -321,8 +320,6 @@ input[type=radio]:not(.plain) + label.input-toggle {
     border: 1px solid var(--form-border-color);
     width: 98%;
     margin: auto;
-    display: flex;
-    flex-wrap: wrap;
     padding: 0;
 
     .student-container {
