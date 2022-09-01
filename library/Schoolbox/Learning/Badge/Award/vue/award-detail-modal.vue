@@ -73,6 +73,12 @@ export default {
             award: {},
             canvasWidth: 0,
             canvasHeight: 0,
+            /**
+             * so dynamic-input.vue is only in the dom while the modal is active
+             * we do this to avoid issues around ckeditor instantiation coupled with modals
+             * where opening, closing, then re-opening a modal causes the ckeditor to break
+             */
+            isModalOpen: false,
         }
     },
 
@@ -113,6 +119,7 @@ export default {
          * Open this modal.
          */
         open (award) {
+            this.isModalOpen = true;
             this.award = award;
             this.$refs.modal.open();
             this.modelCheckInterval = setInterval(this.onModalCheck, 50); //be checking if the modal is on screen yet
@@ -201,12 +208,21 @@ export default {
                 .catch(() => {
                     this.toastError('Failed to award achievement')
                 })
-        }
+        },
+
+        /**
+         * The modal is now completely closed
+         */
+        onModalClosed () {
+            this.isModalOpen = false;
+        },
+
     }
+
 }
 </script>
 <template>
-    <reveal-modal ref="modal" size="medium">
+    <reveal-modal ref="modal" size="medium" @closed="onModalClosed">
         <template v-if="award.badge">
             <div class="badge-modal">
                 <div class="badge-img-container" ref="badgeImgContainer">
@@ -242,11 +258,19 @@ export default {
 
                 <article v-html="award.badge.body"></article>
 
-                <template v-if="award.reason.length">
-                    <hr />
-                    <a v-if="award._links.awardUpdate" class="icon-modify no-text modify-link" :href="award._links.awardUpdate"></a>
-                    <article v-html="award.reason"></article>
-                </template>
+                <dynamic-input
+                    v-if="isModalOpen"
+                    :preset-unique-id="'reason'"
+                    :inputName="'reason'"
+                    :value="award.reason"
+                    :singular="'reason'"
+                    :allow-edit="true"
+                    :allow-submit="false"
+                    :spawn-immediately="true"
+                    :is-processing="true"
+                    :cdn-prefix="this.cdnPrefix"
+                    :site-version="this.siteVersion"
+                ></dynamic-input>
 
                 <template v-if="award.badge.curriculumNodes.length">
                     <hr />

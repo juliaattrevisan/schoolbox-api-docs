@@ -237,7 +237,6 @@ export default {
 
 <template>
     <div>
-        <article :id="`${this.presetUniqueId}-proxy`">{{ this.value }}</article>
         <button v-if="this.allowEdit" class="show-ckeditor-button" v-show="!isCKEditorLoaded" @click.once="spawnEditor">{{ getEditButtonText }}</button>
         <div :style="getStyles">
             <textarea :id="this.presetUniqueId" :name="this.inputName" rows="4">{{ this.value }}</textarea>
