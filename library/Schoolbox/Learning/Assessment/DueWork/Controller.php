@@ -259,7 +259,7 @@ class Controller extends Assessment\Controller
      * @throws InvalidArgumentException If assessment due date is null.
      * @throws PDOException
      * @throws UnexpectedValueException
-     * @api GET /learning/assessment/:assessmentId/status
+     * @api GET /learning/assessments/:assessmentId/status
      */
     public function getStatus(IAssessable $assessment): void
     {
@@ -792,7 +792,7 @@ class Controller extends Assessment\Controller
      * @param Model $assessment
      * @param User              $student
      * @since 165
-     * @api   GET /learning/assessment/:assessmentId/:participantId/submit
+     * @api   GET /learning/assessments/:assessmentId/:participantId/submit
      */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
