@@ -378,6 +378,7 @@ input[type=radio]:not(.plain) + label.input-toggle {
                         }
 
                         .time-container {
+                            padding-right: 1rem;
                             text-align: right;
                         }
                     }
