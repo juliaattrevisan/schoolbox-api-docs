@@ -1,8 +1,8 @@
 <script>
 
 /**
- * Lazy load the CKEditor instance on demand and pass through the current comment 
- * to the parent. 
+ * Lazy load the CKEditor instance on demand and pass through the current comment
+ * to the parent.
  */
 
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
@@ -87,7 +87,7 @@ export default {
         }
 
     },
- 
+
     methods: {
 
         /**
@@ -99,7 +99,7 @@ export default {
 
         /**
          * Loads ckeditor only when required rather than on page load
-         * 
+         *
          * @param { String } editorTypes an option within editorTypes.js to determine which config options to pass to CKEditor
          */
         async init (editorType) {
@@ -112,7 +112,7 @@ export default {
                 }
                 $.fn.alaressEditor(this.getConfigOptions(editorType));
             } catch (error) {
-                this.isCKEditorLoading = false; 
+                this.isCKEditorLoading = false;
                 this.$emit('on-load-error');
             }
         },
@@ -120,30 +120,30 @@ export default {
         /**
          * Return the appropriate config to display consistency depending on the editorType
          * these '$.alaress' methods are created and attached to the jQuery $ object in jquery.editor.js
-         * 
+         *
          * @param { String } editorTypes an option within editorTypes.js to determine which config options to pass to CKEditor
-         * 
+         *
          * @returns { Object }
          */
         getConfigOptions (editorType) {
             const configOptions = { //use computed property names to retrieve the appropriate config options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names
                 [EDITOR_DEFAULT_CONFIG]: $.alaressEditorConfig(this.getVueSpecificConfig()),
                 [EDITOR_CONFIG_FOR_COMMENTS]: $.alaressEditorConfigForComments(this.getVueSpecificConfig()),
-                [EDITOR_CONFIG_WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(this.getVueSpecificConfig()) 
+                [EDITOR_CONFIG_WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(this.getVueSpecificConfig())
             }
             return configOptions[editorType] || $.alaressEditorConfig(this.getVueSpecificConfig());
         },
 
         /**
          * The config that needs to be passed to CKEditor in order to for it to work in Vue land
-         * 
+         *
          * @returns { Object }
          */
         getVueSpecificConfig () {
             return {
                 on: {
                     change: () => { // Bind the content of CKEditor into the comment model on change
-                        this.newComment = CKEDITOR.instances[`comment-${this.uniqueId}`].getData(); 
+                        this.newComment = CKEDITOR.instances[`comment-${this.uniqueId}`].getData();
                     },
                     instanceReady: () => { //can display the loaded CKEditor now
                         this.isCKEditorLoading = false;
@@ -173,7 +173,7 @@ export default {
 
 <template>
    <div class="add-commment-input">
-       <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="onAddCommentSelected">{{ getAddCommentButtonText }}</button>
+       <button class="show-ckeditor-button" v-show="!isCKEditorLoaded" @click.once="onAddCommentSelected">{{ getAddCommentButtonText }}</button>
         <div :style="getStyles">
             <textarea :id="`comment-${uniqueId}`" rows="4"></textarea>
             <button class="button submit"
@@ -185,26 +185,8 @@ export default {
 
 <style lang="scss" scoped>
 
-@import 'www/static/css/core/base/_colors.scss';
-@import 'www/static/css/core/base/_variables.scss';
-
 .add-commment-input {
     margin-bottom: 1rem;
-}
-
-.btn-show-ckeditor {
-    background: $white;
-    border: 1px solid $form-border-color;
-    color: $content-ui-foreground;
-    cursor: text;
-    font-size: 0.8rem;
-    padding: 0.625rem 0.625rem 1.25rem 0.625rem;
-    text-align: left;
-    transition: all 0.1s ease-out;
-    width: 100%;
-    &:hover {
-        border-color: $content-ui-foreground;
-    }
 }
 
 </style>
