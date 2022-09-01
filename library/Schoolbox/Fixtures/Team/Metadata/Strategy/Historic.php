@@ -110,7 +110,7 @@ class Historic implements IMetadataStrategy
             'team_id' => $team->getId()
         ], [
             'order' => [
-                'user_id' => 'asc'
+                'name' => 'asc'
             ]
         ]);
     }
