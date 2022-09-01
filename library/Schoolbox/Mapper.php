@@ -968,6 +968,48 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * Recursively finds all IDs of descendants of the given IDs.
+     *
+     * This should only recurse n times, where n = max depth of tree beneath
+     * `$ids`.
+     *
+     * @param array  $ids          IDs to find descendants for.
+     * @param string $parentColumn The DB column which stores the parent ID
+     * @param int    $maxDepth     The maximum depth to traverse: defaults to 50
+     * @param int    $currentDepth The current depth of this traversal:
+     *                             incremented after each recursion.
+     * @return array
+     */
+    public function findDescendantIds(
+        array $ids,
+        string $parentColumn,
+        int $maxDepth = 50,
+        int $currentDepth = 1,
+    ): array {
+        // Recursive relation protection
+        if ($currentDepth > $maxDepth) {
+            return [];
+        }
+
+        // Find this set of ID's descendants
+        $descendantIds = $this->findIdsByColumn($parentColumn, $ids);
+        if (empty($descendantIds)) {
+            return [];
+        }
+
+        // Find the descendants of the descendants (recursively)
+        $grandDescendantIds = $this->findDescendantIds(
+            $descendantIds,
+            $parentColumn,
+            $maxDepth,
+            $currentDepth + 1,
+        );
+
+        // Merge them together
+        return array_merge($descendantIds, $grandDescendantIds);
+    }
+
+    /**
      * Gets name of get method for identifier column.
      *
      * @return string
