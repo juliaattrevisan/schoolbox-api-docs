@@ -112,15 +112,20 @@ class Controller extends Base
     /**
      * Endpoint for creating a curriculum node.
      *
-     * @api   POST /api/curriculum/{id}
+     * @api   POST /api/curriculum{/id}
      * @since 22.1
      *
+     * @param Node\Model|null $node if set: set this node as the parent of the
+     *                              new node
      * @return void
      * @throws MapperException if somehow the node can't be created
      */
-    public function postNode(): void
+    public function postNode(?Node\Model $node): void
     {
-        $this->respondWithNode($this->persistNode(null), 0, 0);
+        $newNode = $node
+            ? (new Node\Model())->setParent($node)
+            : null;
+        $this->respondWithNode($this->persistNode($newNode), 0, 0);
     }
 
     /**
