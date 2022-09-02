@@ -49,11 +49,18 @@ use Schoolbox\User;
  */
 class Importer
 {
-    private const CURRICULUM_CODE_ATLAS_ROOT       = 'atlas:root';
-    private const CURRICULUM_CODE_ATLAS_STANDARDS  = 'atlas:standards';
-    private const CURRICULUM_CODE_ATLAS_CURRICULUM = 'atlas:curriculum:%d';
-    private const CURRICULUM_CODE_ATLAS_UNIT       = 'atlas:unit:%d';
-    private const CURRICULUM_CODE_ATLAS_ASSESSMENT = 'atlas:assessment:%d';
+    private const CURRICULUM_CODE_ATLAS_ROOT         = 'atlas:root';
+    private const CURRICULUM_CODE_ATLAS_STANDARDS    = 'atlas:standards';
+    private const CURRICULUM_CODE_ATLAS_CURRICULUM   = 'atlas:curriculum:%d';
+    private const CURRICULUM_CODE_ATLAS_UNIT         = 'atlas:unit:%d';
+    private const CURRICULUM_CODE_ATLAS_ASSESSMENT   = 'atlas:assessment:%d';
+
+    /* 1000 is the limit in the database, but we choose 900 as our limit due to concern about special characters
+     * (eg. bullet points) requiring more bytes than normal characters.
+     * @see expanded reason in www/static/js/submissions/jquery.rubric-editable.js.
+     * @see also SA-13689.
+     */
+    private const CAPABILITY_NAME_MAX_CHARS_TO_STORE = 900;
 
     /**
      * @var FolderMapper
@@ -413,11 +420,13 @@ class Importer
         if (\count($assessment->getStandards())) {
             // Pass 1: build the rowset, adding capabilities+indicators as required
             foreach ($assessment->getStandards() as $standard) {
-                // Truncate string to max 900 chars before saving to database to avoid error (see SA-14273).
-                // 1000 is the limit in the database, but we choose 900 as our limit due to concern about special
-                // characters (eg. bullet points) requiring more bytes than normal characters.
-                // See expanded reason in www/static/js/submissions/jquery.rubric-editable.js.
-                $capabilityName = substr($standard->getTitle(), 0, 900);
+                // Truncate string before saving to database to avoid error (see SA-14273).
+                //  * Note mb_substr() is used rather than substr().  This is because substr is completely ignorant of
+                //    character encodings, and just assumes one byte = one character.  Also, this means that not only can
+                //    the string be truncated earlier than expected, but can also mean the string is invalid (and will
+                //    cause an error if attempting to insert into the DB) if the truncation happens in the middle of a
+                //    multibyte character.
+                $capabilityName = mb_substr($standard->getTitle(), 0, self::CAPABILITY_NAME_MAX_CHARS_TO_STORE);
 
                 // Build capability
                 $groupDataModel = $this->rubricCapabilityMapper->findOrCreateOneForFolderByName(
