@@ -292,7 +292,9 @@ export default {
                     @post="onSaveReasonSelected"
                 ></dynamic-input>
                 <template v-else>
-                    <button class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
+                    <template v-if="award._links.awardUpdate">
+                        <button class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
+                    </template>
                     <article v-html="award.reason"></article>
                 </template>
 
