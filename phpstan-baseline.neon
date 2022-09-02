@@ -6066,11 +6066,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/CommandLineTool/AttachmentUploader.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Pastoral/ReportBuilder/Module.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getId\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Revision/Mapper.php

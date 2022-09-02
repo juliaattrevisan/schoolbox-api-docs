@@ -1511,8 +1511,7 @@ class Controller extends Base
                 'id'   => $tag->getId(),
                 'name' => $tag->getName(),
             ];
-        }
-        );
+        });
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 }
