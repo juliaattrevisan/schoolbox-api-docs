@@ -55,13 +55,6 @@ class Importer
     private const CURRICULUM_CODE_ATLAS_UNIT         = 'atlas:unit:%d';
     private const CURRICULUM_CODE_ATLAS_ASSESSMENT   = 'atlas:assessment:%d';
 
-    /* 1000 is the limit in the database, but we choose 900 as our limit due to concern about special characters
-     * (eg. bullet points) requiring more bytes than normal characters.
-     * @see expanded reason in www/static/js/submissions/jquery.rubric-editable.js.
-     * @see also SA-13689.
-     */
-    private const CAPABILITY_NAME_MAX_CHARS_TO_STORE = 900;
-
     /**
      * @var FolderMapper
      */
@@ -426,7 +419,7 @@ class Importer
                 //    the string be truncated earlier than expected, but can also mean the string is invalid (and will
                 //    cause an error if attempting to insert into the DB) if the truncation happens in the middle of a
                 //    multibyte character.
-                $capabilityName = mb_substr($standard->getTitle(), 0, self::CAPABILITY_NAME_MAX_CHARS_TO_STORE);
+                $capabilityName = mb_substr($standard->getTitle(), 0, RubricCapabilityMapper::CAPABILITY_NAME_MAX_CHARS_TO_STORE);
 
                 // Build capability
                 $groupDataModel = $this->rubricCapabilityMapper->findOrCreateOneForFolderByName(
