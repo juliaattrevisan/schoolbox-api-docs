@@ -4,10 +4,10 @@
 
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore'
-import Endpoints from '../manageGroupEndpoints';
+import Endpoints from '../mgEndpoints';
 
 
-export const useSettingsStore = defineStore('manageGroupSettings', {
+export const useSettingsStore = defineStore('mgSettings', {
 
     state: () => ({
         isProcessing: false,
@@ -15,7 +15,22 @@ export const useSettingsStore = defineStore('manageGroupSettings', {
         isNotificationsEnabled: false, //to send notifications to the group
         isForceFollow: false, //so notifcations are ALWAYS sent to all members
         isPromptOpen: false, //to notify that the prompt is opened / closed
+        isAccessSaved: false, //to ensure group access is set and saved
     }),
+
+    getters: {
+
+        /**
+         * to prompt the user to select the group access
+         *
+         * @return { Boolean }
+         */
+        isAccessNotSet () {
+            const store = useStore();
+            return store.showSetting;
+        },
+
+    },
 
     actions: {
 
@@ -26,6 +41,9 @@ export const useSettingsStore = defineStore('manageGroupSettings', {
          */
         loadSettings (settings) {
             this.access = settings.access;
+            if (this.access !== '') {
+                this.isAccessSaved = true;
+            }
             this.isNotificationsEnabled = settings.isNotificationsEnabled;
             this.isForceFollow = settings.isForceFollow;
         },
@@ -52,17 +70,17 @@ export const useSettingsStore = defineStore('manageGroupSettings', {
                     },
                     body: getFormData(this),
                 });
-                const responseJson = await response.json();
-                if (responseJson.success) {
-                    //
+                if (response.ok) {
+                    this.isAccessSaved = true;
                 } else {
                     throw new Error();
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error);
             } finally {
                 this.isProcessing = false;
                 store.isProcessing = false;
+                store.showSetting = false;
                 this.isPromptOpen = false;
             }
         },
@@ -86,7 +104,7 @@ export const useSettingsStore = defineStore('manageGroupSettings', {
 function getFormData (myStore) {
     const store = useStore();
     return JSON.stringify({
-        groupId: store.groupId,
+        groupId: store.id,
         settings: {
             access: myStore.access,
             isNotificationsEnabled: myStore.isNotificationsEnabled,

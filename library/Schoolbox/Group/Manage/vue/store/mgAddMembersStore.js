@@ -4,14 +4,17 @@
 
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
-import { useMembersStore } from './manageGroupMembersStore';
-import Endpoints from '../manageGroupEndpoints';
+import { useMembersStore } from './mgMembersStore';
+import { useSearchStore } from './mgSearchStore';
+import Endpoints from '../mgEndpoints';
+import FromTypes from '../addMembers/mgAddMembersFromTypes';
 
 
-export const useAddMembersStore = defineStore('manageGroupAddMembers', {
+export const useAddMembersStore = defineStore('mgAddMembers', {
 
     state: () => ({
         isProcessing: false, //to notify that an action is taking place, like updating a member access
+        fromType: FromTypes.NAME, //the current way to search for members to add
     }),
 
     actions: {
@@ -19,7 +22,7 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
         /**
          * add the members to the group
          */
-        async addMembers () {
+        async add () {
             this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
@@ -32,7 +35,7 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
                     body: getFormData(),
                 });
                 const responseJson = await response.json();
-                if (responseJson.success) {
+                if (response.ok) {
                     const newMembers = responseJson.newMembers.map((newMember) => { //add in some additional properties
                         return {
                             ...newMember,
@@ -41,15 +44,17 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
                             justUpdated: false, //to highlight members that have just been changed
                         }
                     });
+                    const searchStore = useSearchStore();
+                    searchStore.removeAllResults(); //the members have been added so clear the search
                     const membersStore = useMembersStore();
-                    membersStore.groupMembers = [...membersStore.groupMembers, ...newMembers]; //add in the new members to the table
+                    membersStore.members = [...membersStore.members, ...newMembers]; //add in the new members to the table
                 } else {
                     throw new Error();
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error);
             } finally {
-                this.isProcessing = true;
+                this.isProcessing = false;
                 store.isProcessing = false;
             }
         },
@@ -61,14 +66,19 @@ export const useAddMembersStore = defineStore('manageGroupAddMembers', {
 /**
  * Pass in user ids of the members to add
  *
- * @param { Array }
- *
  * @returns { FormData }
  */
 function getFormData () {
     const store = useStore();
+    const searchStore = useSearchStore();
+    const members = searchStore.selectedResults.map((selectedResult) => {
+        return {
+            id: selectedResult.id,
+            fromType: selectedResult.fromType
+        }
+    });
     return JSON.stringify({
-        groupId: store.groupId,
-        members: [60, 64, 46]
+        groupId: store.id,
+        members: members,
     });
 }

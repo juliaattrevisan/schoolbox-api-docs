@@ -4,42 +4,39 @@
  * Add members to the group
  */
 
-import { ref, computed, onMounted } from 'vue';
-import { useStore } from './store/manageGroupStore';
-import { useAddMembersStore } from './store/manageGroupAddMembersStore';
+import { computed } from 'vue';
+import { useStore } from '../store/manageGroupStore';
+import { useAddMembersStore } from '../store/mgAddMembersStore';
+import { useSearchStore } from '../store/mgSearchStore';
+import FromTypes from './mgAddMembersFromTypes';
+import MgSelectedSearchResults from './mg-selected-search-results.vue';
+import MgSearch from './mg-search.vue';
 
 
 const store = useStore();
 const addMembersStore = useAddMembersStore();
-const currentFromSelect = ref('name');
+const searchStore = useSearchStore();
 
 /**
- * ensure the tooltips work
- */
-onMounted(() => {
-    $(document).foundation();
-});
-
-/**
- * Update the input place holder text depending on the currentFromSelect
+ * Provide extra details on how the current search selection is to be used
  *
  * @returns { String }
  */
-const inputPlaceholder = computed(() => {
+const inputDetails = computed(() => {
     const placeholderOptions = {
-        'name': 'Search Users',
-        'group': 'Search User Groups',
-        'role': 'Search User Roles',
-        'list': 'Add from a list',
+        [FromTypes.NAME]: 'You may add users individually by typing their name and selecting from the list.',
+        [FromTypes.GROUP]: 'Add all users that belong to another group.',
+        [FromTypes.ROLE]: 'Add all users of a particular role in the system.',
+        [FromTypes.LIST]: 'Add a comma separated list of users (either external user IDs or Schoolbox usernames).',
     }
-    return placeholderOptions[currentFromSelect.value];
+    return placeholderOptions[addMembersStore.fromType];
 });
 
 /**
  * add the selected members to the group
  */
 function onAddMembersSelected () {
-    addMembersStore.addMembers();
+    addMembersStore.add();
 }
 
 /**
@@ -80,30 +77,33 @@ const addButtonText = computed(() => addMembersStore.isProcessing ? 'Adding...' 
                             <label class="title">From:</label>
                             <ul class="option-list">
                                 <li>
-                                    <input type="radio" id="name" value="name" v-model="currentFromSelect">
+                                    <input type="radio" :id="FromTypes.NAME" :value="FromTypes.NAME" v-model="addMembersStore.fromType">
                                     <label for="name">Name</label>
                                 </li>
                                 <li>
-                                    <input type="radio" id="group" value="group" v-model="currentFromSelect">
+                                    <input type="radio" :id="FromTypes.GROUP" :value="FromTypes.GROUP" v-model="addMembersStore.fromType">
                                     <label for="group">Group</label>
                                 </li>
                                 <li>
-                                    <input type="radio" id="role" value="role" v-model="currentFromSelect">
+                                    <input type="radio" :id="FromTypes.ROLE" :value="FromTypes.ROLE" v-model="addMembersStore.fromType">
                                     <label for="role">Role</label>
                                 </li>
                                 <li>
-                                    <input type="radio" id="list" value="list" v-model="currentFromSelect">
+                                    <input type="radio" :id="FromTypes.LIST" :value="FromTypes.LIST" v-model="addMembersStore.fromType">
                                     <label for="list">List</label>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                    <input
-                        type="text"
-                        :placeholder="inputPlaceholder"
-                        @input="$event.target.composing = false"
-                    />
-                    <button @click.prevent="onAddMembersSelected" class="button submit" :disabled="store.isProcessing">{{ addButtonText }}</button>
+                    <mg-selected-search-results />
+                    <MgSearch />
+                    <p class="meta">{{ inputDetails }}</p>
+                    <button
+                        class="button submit"
+                        :disabled="!searchStore.canAddMembers"
+                        @click.prevent="onAddMembersSelected">
+                        {{ addButtonText }}
+                    </button>
                 </div>
             </section>
         </div><!-- small-12 island -->
@@ -148,6 +148,10 @@ label {
         margin-right: 0;
         min-width: 110px; //takes us all the way down to 320px devices
     }
+}
+
+.meta {
+    margin: 0.25rem 0 1rem 0;
 }
 
 </style>

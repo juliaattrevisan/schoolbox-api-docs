@@ -2,7 +2,6 @@
 import ManageGroup from '../../../library/Schoolbox/Group/Manage/vue/manage-group';
 import { rest } from 'msw';
 import { data } from './dataManageGroup';
-// import { largeData } from '../../classSelector/largeDataClassSelectoreDataClassSelector';
 
 const groupDataEndpoint = '/groupData';
 const removeMembersEndpoint = '/removeMembers';
@@ -10,6 +9,7 @@ const updateMembersEndpoint = '/updateMembers';
 const addMembersEndpoint = '/addMembers';
 const updateSettingsEndpoint = '/updateSettings';
 const disbandGroupEndpoint = '/disbandGroup';
+const sendEmailEndpoint = '/sendEmail';
 
 const mswHandlers = [
     rest.get(groupDataEndpoint, (req, res, ctx) => {
@@ -39,10 +39,10 @@ const mswHandlers = [
             ctx.delay(1000),
             ctx.json({
                 newMembers: [
-                    {"id":201,"firstName":"Valentine","lastName":"Holmes","userId":200,"accessType":"read","meta":"2022 QLD State of Origin Team"},
-                    {"id":202,"firstName":"Kurt","lastName":"Capewell","userId":201,"accessType":"read","meta":"2022 QLD State of Origin Team"},
-                    {"id":203,"firstName":"Kalyn","lastName":"Ponga","userId":202,"accessType":"read","meta":"2022 QLD State of Origin Team"},
-                    {"id":204,"firstName":"Ben","lastName":"Hunt","userId":203,"accessType":"read","meta":"2022 QLD State of Origin Team"},
+                    {"id":201,"firstName":"Valentine","lastName":"Holmes","userId":200,"accessType":"read","role":"Senior Student","campus":"Senior","yearLevel":"Year 11","house":"Gresham (Green)"},
+                    {"id":202,"firstName":"Kurt","lastName":"Capewell","userId":201,"accessType":"read","role":"Senior Student","campus":"Senior","yearLevel":"Year 11","house":"Gresham (Green)"},
+                    {"id":203,"firstName":"Kalyn","lastName":"Ponga","userId":202,"accessType":"read","role":"Senior Student","campus":"Senior","yearLevel":"Year 11","house":"Gresham (Green)"},
+                    {"id":204,"firstName":"Ben","lastName":"Hunt","userId":203,"accessType":"read","role":"Senior Student","campus":"Senior","yearLevel":"Year 11","house":"Gresham (Green)"},
                 ],
                 success: true,
             })
@@ -74,6 +74,7 @@ export default {
         addMembersEndpoint: addMembersEndpoint,
         updateSettingsEndpoint: updateSettingsEndpoint,
         disbandGroupEndpoint: disbandGroupEndpoint,
+        sendEmailEndpoint: sendEmailEndpoint,
     },
     component: ManageGroup,
     decorators: [
@@ -136,7 +137,6 @@ NoMembers.parameters = {
         handlers: [
             rest.get(groupDataEndpoint, (req, res, ctx) => {
                 return res(
-                    ctx.delay(1000),
                     ctx.json({
                         ...data,
                         members: [], //start with no members
@@ -154,10 +154,30 @@ NoGroupAdmins.parameters = {
         handlers: [
             rest.get(groupDataEndpoint, (req, res, ctx) => {
                 return res(
-                    ctx.delay(1000),
                     ctx.json({
                         ...data,
                         members: [ ...data.members.filter((member) => member.accessType !== 'admin')], //to pull out the admins
+                    })
+                )
+            }),
+            ...mswHandlers,
+        ]
+    }
+}
+
+export const NoAccessSet = Template.bind({});
+NoAccessSet.parameters = {
+    msw: {
+        handlers: [
+            rest.get(groupDataEndpoint, (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        ...data,
+                        settings: {
+                            access: '',
+                            isNotificationsEnabled: true,
+                            isForceFollow: false,
+                        },
                     })
                 )
             }),

@@ -16,7 +16,7 @@ class AddMembers extends GroupMember
     public function setNewMembers(array $userIds): void
     {
         foreach ($userIds as $idx => $userId) {
-            $this->setFormParam("members[$idx]", $userId);
+            $this->setFormParam("members[$idx]", ['id' => $userId, 'fromType' => 'name']);
             $this->setFormParam("accessType", UserAccess::ACCESS_LEVEL_TO_NAME[UserAccess::ACCESS_READ]);
         }
     }

@@ -21,7 +21,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $userHandler = new User();
 $groupHandler = new Group();
-/** @var SitePage $page */
+/** @var SitePage $pageHandler */
 $pageHandler = $kernel->get('sitePage');
 $pageHandler->initSession();
 

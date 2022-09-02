@@ -5,13 +5,13 @@
 import { nextTick } from 'vue';
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
-import AccessTypes from '../manageGroupAccessTypes';
+import AccessTypes from '../currentMembers/mgAccessTypes';
 
 
-export const useMembersStore = defineStore('manageGroupMembers', {
+export const useMembersStore = defineStore('mgMembers', {
 
     state: () => ({
-        groupMembers: [], //all the group members
+        members: [], //all the group members
         selectedMemberIds: [], //to track the current group member selection
         selectedFilters: [AccessTypes.WAITING, AccessTypes.READ, AccessTypes.WRITE, AccessTypes.ADMIN], //the list of table filters available
     }),
@@ -25,7 +25,7 @@ export const useMembersStore = defineStore('manageGroupMembers', {
          */
         hasGroupMembers () {
             const store = useStore();
-            return !store.isLoading && !store.hasLoadError && this.groupMembers.length > 0;
+            return !store.isLoading && !store.hasLoadError && this.members.length > 0;
         },
 
         /**
@@ -35,7 +35,7 @@ export const useMembersStore = defineStore('manageGroupMembers', {
          */
         hasNoGroupMembers () {
             const store = useStore();
-            return !store.isLoading && !store.hasLoadError && this.groupMembers.length === 0;
+            return !store.isLoading && !store.hasLoadError && this.members.length === 0;
         },
 
         /**
@@ -44,45 +44,58 @@ export const useMembersStore = defineStore('manageGroupMembers', {
          * @returns { Boolean }
          */
         hasNoGroupAdmins () {
-            return this.groupMembers.filter((member) => member.accessType === AccessTypes.ADMIN).length === 0
+            return this.members.filter((member) => member.accessType === AccessTypes.ADMIN).length === 0
                     && this.hasGroupMembers;
         },
 
         /**
          * Retrieve the selected members based on the selectedMemberIds
-         * We do this so we are referencing the groupMembers directly,
-         * so any data changes are kept on groupMembers, not a copy if we created
+         * We do this so we are referencing the members directly,
+         * so any data changes are kept on members, not a copy if we created
          * a seperate selectedMembers array
          *
          * @returns { Array }
          */
         selectedMembers () {
-            return this.groupMembers.filter((member) => this.selectedMemberIds.includes(member.id));
+            return this.members.filter((member) => this.selectedMemberIds.includes(member.id));
+        },
+
+        /**
+         * Count of selected members
+         *
+         * @returns { Number }
+         */
+        selectedMembersCount () {
+            return this.selectedMembers.length
+        },
+
+        /**
+         * For proper count display, eg: 'No Members / 1 Member' / '4 Members'
+         *
+         * @returns { String }
+         */
+        selectedMembersPlural () {
+            return this.selectedMembersCount > 1 ? 'Members' : 'Member'
         },
 
         /**
          * To get current group admin id list
+         *
          * @returns { Array }
          */
-        currentGroupAdminIds() {
-            return this.groupMembers.filter((member) => member.accessType === AccessTypes.ADMIN).map((member) => member.id);
+        currentGroupAdminIds () {
+            return this.members.filter((member) => member.accessType === AccessTypes.ADMIN).map((member) => member.id);
         },
 
         /**
          * To get number of group admins in selected members
-         * @returns { int }
+         *
+         * @returns { Number }
          */
-        selectedGroupAdminCount() {
+        selectedGroupAdminCount () {
             return this.selectedMemberIds.filter((id) => this.currentGroupAdminIds.includes(id)).length;
         },
 
-        /**
-         * To get number of non group admins in selected members
-         * @returns { int }
-         */
-        selectedNonAdminCount() {
-            return this.selectedMemberIds.length - this.selectedGroupAdminCount;
-        }
     },
 
     actions: {
@@ -92,16 +105,16 @@ export const useMembersStore = defineStore('manageGroupMembers', {
          *
          * @param { Object }
          */
-        loadMembers (members) {
-            const groupMembers = members.map((groupMember) => { //add in some additional properties
+        loadMembers (loadedMembers) {
+            const members = loadedMembers.map((member) => { //add in some additional properties
                 return {
-                    ...groupMember,
-                    displayPriority: groupMember.accessType === 'none' ? 1 : 0, //waiting list members are put at the top of the table
+                    ...member,
+                    displayPriority: member.accessType === 'none' ? 1 : 0, //waiting list members are put at the top of the table
                     isNew: false, //to highlight new members just added
                     justUpdated: false, //to highlight members that have just been changed
                 }
             });
-            this.groupMembers = groupMembers;
+            this.members = members;
         },
 
         /**
@@ -119,7 +132,7 @@ export const useMembersStore = defineStore('manageGroupMembers', {
          * @param { Object }
          */
         removeMember (removedMember) {
-            this.groupMembers = this.groupMembers.filter((member) => member.id !== removedMember.id);
+            this.members = this.members.filter((member) => member.id !== removedMember.id);
             this.selectedMemberIds = this.selectedMemberIds.filter((memberId) => memberId !== removedMember.id);; //ensure the member wasn't also a selected member
         },
 
@@ -128,7 +141,7 @@ export const useMembersStore = defineStore('manageGroupMembers', {
          * which have just been deleted or rejected
          */
         removeSelectedGroupMembers () {
-            this.groupMembers = this.groupMembers.filter((member) => !this.selectedMemberIds.includes(member.id));
+            this.members = this.members.filter((member) => !this.selectedMemberIds.includes(member.id));
             this.clearSelectedMembers(); //can't keep selecting members that have just been removed/rejected
         },
 
@@ -166,7 +179,7 @@ export const useMembersStore = defineStore('manageGroupMembers', {
          */
         async refreshMembers (isTableChange=false ) {
             await nextTick();
-            this.groupMembers.forEach((member) => {
+            this.members.forEach((member) => {
                 member.isNew = false;
                 member.justUpdated = false;
                 if (isTableChange && member.displayPriority > 0 && member.accessType !== AccessTypes.WAITING) {

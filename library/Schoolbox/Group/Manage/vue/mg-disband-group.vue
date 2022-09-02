@@ -5,14 +5,16 @@
  */
 
 import { ref, computed, watch } from 'vue';
+import { timeout } from '@js/util/jsUtils';
 import { useStore } from './store/manageGroupStore';
-import { useDisbandStore } from './store/manageGroupDisbandStore';
+import { useDisbandStore } from './store/mgDisbandStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
 const store = useStore();
 const disbandStore = useDisbandStore();
 const removeModalEl = ref(null);
+const hasDisbanded = ref(false); //to toggle the successful disband note
 
 /**
  * to open the modal when requested
@@ -36,8 +38,8 @@ disbandStore.$onAction(({ name, after, onError }) => {
     if (name === 'disbandGroup') {
         store.toastEl.activate('Disbanding...');
         after(() => {
-            store.toastEl.timeout('Group successfully disbanded', true, 5000);
-            //redirect to the home page
+            hasDisbanded.value = true;
+            redirect();
         });
         onError((error) => {
             console.warn(error);
@@ -45,6 +47,15 @@ disbandStore.$onAction(({ name, after, onError }) => {
         });
     }
 });
+
+/**
+ * redirect to the appropriate page once the group has been disbanded
+ */
+async function redirect () {
+    await timeout(5000);
+    window.location = `/homepage/${store.id}`
+}
+
 
 /**
  * To instantly notify the user that the members are being removed
@@ -56,11 +67,12 @@ const disbandButtonText = computed(() => disbandStore.isProcessing ? 'Disbanding
 
 /**
  * to prevent the user from moving away from the modal while
- * processing is taking place
+ * processing is taking place or the disband is a success and the
+ * user is being redirected
  *
  * @returns { Boolean }
  */
-const isCloseModalDisabled = computed(() => disbandStore.isProcessing);
+const isCloseModalDisabled = computed(() => disbandStore.isProcessing || hasDisbanded.value);
 
 /**
  * to close the modal
@@ -88,9 +100,10 @@ function onModalClosed () {
     >
         <h2>Please Confirm</h2>
         <p>Are you sure you wish to disband this group? All members of the group will be removed, but all homepage content will remain.</p>
+        <div v-if="hasDisbanded" class="alert-box success">Group successfully disbanded, redirecting...</div>
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onDisbandGroupSelected" class="button submit" :disabled="disbandStore.isProcessing">{{ disbandButtonText }}</button></li>
-            <li><button @click.prevent="onCancelSelected" class="button" :disabled="disbandStore.isProcessing">Cancel</button></li>
+            <li><button @click.prevent="onDisbandGroupSelected" class="button submit" :disabled="disbandStore.isProcessing || hasDisbanded">{{ disbandButtonText }}</button></li>
+            <li><button @click.prevent="onCancelSelected" class="button" :disabled="disbandStore.isProcessing || hasDisbanded">Cancel</button></li>
         </ul>
     </reveal-modal>
 </template>

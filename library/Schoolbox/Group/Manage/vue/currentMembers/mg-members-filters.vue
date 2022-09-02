@@ -5,8 +5,8 @@
  */
 
 import { computed } from 'vue';
-import filterTypes from './manageGroupAccessTypes';
-import { useMembersStore } from './store/manageGroupMembersStore';
+import filterTypes from './mgAccessTypes';
+import { useMembersStore } from '../store/mgMembersStore';
 
 
 const membersStore = useMembersStore(); //to access the selectedFilters and notify of any changes
@@ -28,6 +28,7 @@ function onFilterChange (accessType) {
 </script>
 
 <template>
+    <!-- <p class="meta">Search group members, they can be searched by name, year level, house, campus, role or access</p> -->
     <div class="filters">
         <div class="checklist">
             <label class="title">Filter:</label>

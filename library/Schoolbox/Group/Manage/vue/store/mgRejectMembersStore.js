@@ -4,11 +4,11 @@
 
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
-import { useMembersStore } from './manageGroupMembersStore';
-import Endpoints from '../manageGroupEndpoints';
+import { useMembersStore } from './mgMembersStore';
+import Endpoints from '../mgEndpoints';
 
 
-export const useRejectMembersStore = defineStore('manageGroupRejectMembers', {
+export const useRejectMembersStore = defineStore('mgRejectMembers', {
 
     state: () => ({
         isProcessing: false,
@@ -32,22 +32,19 @@ export const useRejectMembersStore = defineStore('manageGroupRejectMembers', {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(
-                        {
-                            groupId: store.groupId,
-                            members: [member.id],
-                        },
-                    ),
+                    body: JSON.stringify({
+                        groupId: store.id,
+                        members: [member.id],
+                    }),
                 });
-                const responseJson = await response.json();
-                if (responseJson.success) {
+                if (response.ok) {
                     const membersStore = useMembersStore();
                     membersStore.removeMember(member);
                 } else {
                     throw new Error();
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error);
             } finally {
                 this.isProcessing = false;
                 store.isProcessing = false;
@@ -69,15 +66,14 @@ export const useRejectMembersStore = defineStore('manageGroupRejectMembers', {
                     },
                     body: getFormData(),
                 });
-                const responseJson = await response.json();
-                if (responseJson.success) {
+                if (response.ok) {
                     const membersStore = useMembersStore();
                     membersStore.removeSelectedGroupMembers();
                 } else {
                     throw new Error();
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error);
             } finally {
                 this.isSelectedProcessing = false;
                 store.isProcessing = false;
@@ -97,10 +93,8 @@ function getFormData () {
     const store = useStore();
     const membersStore = useMembersStore();
     const membersToRejectIdList = membersStore.selectedMembers.map(row => row.id);
-    return JSON.stringify(
-        {
-            groupId: store.groupId,
-            members: membersToRejectIdList
-        },
-    );
+    return JSON.stringify({
+        groupId: store.id,
+        members: membersToRejectIdList
+    });
 }

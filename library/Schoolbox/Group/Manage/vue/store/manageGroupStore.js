@@ -4,9 +4,9 @@
  */
 
 import { defineStore } from 'pinia';
-import Endpoints from '../manageGroupEndpoints';
-import { useSettingsStore } from './manageGroupSettingsStore';
-import { useMembersStore } from './manageGroupMembersStore';
+import Endpoints from '../mgEndpoints';
+import { useSettingsStore } from './mgSettingsStore';
+import { useMembersStore } from './mgMembersStore';
 
 
 export const useStore = defineStore('manageGroup', {
@@ -15,9 +15,11 @@ export const useStore = defineStore('manageGroup', {
         isLoading: true, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place, like updating a member access
-        groupId: 0, //the id of the group
-        groupName: '',
+        id: 0, //the id of the group
+        name: '', //the name of the group
         toastEl: null, //so we don't need to pass it all around as a prop
+        showSetting: false, // display setting modal
+        groupStaffOnly: false, // restrict only staff to be group admin
     }),
 
     getters: {
@@ -45,8 +47,8 @@ export const useStore = defineStore('manageGroup', {
                 const response = await fetch(Endpoints.GROUP_DATA);
                 if (response.ok) {
                     const responseJson = await response.json();
-                    this.groupId = responseJson.groupId;
-                    this.groupName = responseJson.groupName;
+                    this.id = responseJson.groupId;
+                    this.name = responseJson.groupName;
                     const settingsStore = useSettingsStore();
                     settingsStore.loadSettings(responseJson.settings);
                     const membersStore = useMembersStore();

@@ -5,10 +5,10 @@
  */
 
 import { ref, computed } from 'vue';
-import { useStore } from './store/manageGroupStore';
-import { useUpdateMembersStore } from './store/manageGroupUpdateMembersStore';
-import { useRejectMembersStore } from './store/manageGroupRejectMembersStore';
-import AccessTypes from './manageGroupAccessTypes';
+import { useStore } from '../store/manageGroupStore';
+import { useUpdateMembersStore } from '../store/mgUpdateMembersStore';
+import { useRejectMembersStore } from '../store/mgRejectMembersStore';
+import AccessTypes from './mgAccessTypes';
 
 
 const props = defineProps({
@@ -74,8 +74,7 @@ updateMembersStore.$onAction(({ name, args, after, onError }) => {
             isProcessing.value = false;
         });
         onError((error) => {
-            console.warn(error);
-            store.toastEl.timeout('Unable to update member', false, 5000);
+            store.toastEl.timeout(error.message, false, 5000);
             isProcessing.value = false;
         });
     }
@@ -162,7 +161,7 @@ rejectMembersStore.$onAction(({ name, args, after, onError }) => {
     >
         <option :value="AccessTypes.READ">Read Access</option>
         <option :value="AccessTypes.WRITE">Write Access</option>
-        <option :value="AccessTypes.ADMIN">Group Admin</option>
+        <option v-if="props.member.isStaff || !store.groupStaffOnly" :value="AccessTypes.ADMIN">Group Admin</option>
     </select>
 </template>
 

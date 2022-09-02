@@ -4,15 +4,15 @@
  * Display the group members in a table display
  */
 
-import { ref, watch } from 'vue';
+import { ref, watch, nextTick } from 'vue';
 import { EventBus } from 'v-tables-3-select-rows';
-import { useStore } from './store/manageGroupStore';
-import { useMembersStore } from './store/manageGroupMembersStore';
+import { useMembersStore } from '../store/mgMembersStore';
 import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
-import ManageGroupMembersFilters from './manage-group-members-filters.vue';
-import ManageGroupMembersAccess from './manage-group-members-access.vue';
-import FilterEvents from './manageGroupFilterEvents';
-import AccessTypes from './manageGroupAccessTypes';
+import MgMembersFilters from './mg-members-filters.vue';
+import MgMembersName from './mg-members-name.vue';
+import MgMembersAccess from './mg-members-access.vue';
+import FilterEvents from './mgFilterEvents';
+import AccessTypes from './mgAccessTypes';
 
 
 
@@ -22,10 +22,9 @@ import AccessTypes from './manageGroupAccessTypes';
  *
  ****************************************************************/
 
-const store = useStore();
 const membersStore = useMembersStore();
 const tableEl = ref(null);
-const tableColumns = ['name', 'firstName', 'lastName', 'role', 'campus', 'yearLevel', 'accessType'];
+const tableColumns = ['name', 'firstName', 'lastName', 'role', 'campus', 'yearLevel', 'house', 'accessType'];
 const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
     columnsClasses: {
         accessType: 'access-td ', //to specify a width
@@ -68,7 +67,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         name: 'Name',
         accessType: 'Access',
     },
-    hiddenColumns: ['firstName', 'lastName', 'role', 'campus', 'yearLevel'], //these are all added to name, but we need to add them to tableColumns so we can search them
+    hiddenColumns: ['firstName', 'lastName', 'role', 'campus', 'yearLevel', 'house'], //these are all added to name, but we need to add them to tableColumns so we can search them
     orderBy: { //initial sorting display
         ascending: true,
         column: 'name'
@@ -91,16 +90,37 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     tabbable: false,
     texts: {
         count: '{from}-{to} of {count} members|{count} members|1 member',
-        filterPlaceholder: 'Search group members, they can be searched by name, year level, campus, role or access',
+        filterPlaceholder: 'Search current members...',
         noResults: 'No matching group members',
     },
 }
+
+let isFirstLoad = true;
 
 /**
  * To update the table to show the UI in the footer
  */
 async function onLoaded () {
-    updateFooterUI();
+    if (isFirstLoad) { //loaded gets called on every state change, and we only want to do the below once
+        isFirstLoad = false;
+        updateFooterUI();
+        addSearchNote();
+    }
+}
+
+/**
+ * Add a note on what the table can be searched for just below the search
+ * We add below rather than in a placeholder so the long list of search
+ * options is always available and are visible on mobile
+ */
+async function addSearchNote () {
+    await nextTick(); //ensure the dom is updated
+    const searchNote = document.createElement('p');
+    searchNote.classList.add('meta');
+    searchNote.style.marginTop = '0.25rem';
+    searchNote.innerText = 'The Group can be searched by name, year level, house, campus, role or access.';
+    const searchInput = document.querySelector('.VueTables__search__input'); //safe to assume only one, despite class selection
+    searchInput.parentElement.appendChild(searchNote);
 }
 
 
@@ -199,7 +219,7 @@ function updateSelectedMembers () {
             <v-client-table
                 v-if="membersStore.hasGroupMembers"
                 ref="tableEl"
-                :data="membersStore.groupMembers"
+                :data="membersStore.members"
                 :columns="tableColumns"
                 :options="tableOptions"
                 @loaded="onLoaded"
@@ -209,23 +229,13 @@ function updateSelectedMembers () {
                 @filter="membersStore.refreshMembers(true)"
             >
                 <template #beforeTable>
-                    <manage-group-members-filters />
+                    <mg-members-filters />
                 </template>
                 <template #name="data">
-                    <div class="card small-12">
-                        <a v-if="data.row.userId" :href="`/search/user/${data.row.userId}`" title="View profile" class="name">
-                            <img :src="`/portrait.php?id=${data.row.userId}&size=square64`" :alt="`${data.row.firstName} portrait`">
-                            {{ data.row.firstName }} {{ data.row.lastName }}
-                        </a>
-                        <div v-else>
-                            <img src="/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${data.row.firstName} portrait`">
-                            {{ data.row.firstName }} {{ data.row.lastName }}
-                        </div>
-                        <p class="meta">{{ data.row.role }}, {{ data.row.campus }}{{ data.row.yearLevel ? ', ' + data.row.yearLevel : '' }}</p>
-                    </div>
+                    <mg-members-name :member="data.row" />
                 </template>
                 <template #accessType="data">
-                    <manage-group-members-access :member="data.row" />
+                    <mg-members-access :member="data.row" />
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooterEl" data-table-footer></div>
@@ -243,14 +253,10 @@ function updateSelectedMembers () {
 <style lang="scss">
 
 @import '@schoolboxVue/components/vueTables2/vueTables2';
-@import '../../../../../www/static/css/core/base/colors';
+@import '@css/core/base/colors';
 
 .VueTables {
     margin-bottom: 150px; //to allow space for the bottom-drawer so it can't cut off the bottom of the table
-}
-
-.VueTables__search {
-    padding-bottom: 0.5rem; //to put the manage-group-filters.vue up closer to the search input
 }
 
 .VueTables__search-field label {

@@ -225,7 +225,7 @@ class HomePageCest
         $i->sendRequest($folderPayload);
         $i->seeResponseCodeIs(303);
         $homePage = $i->grabFirstFolderByTitle($homepage_title);
-        $i->seeHttpHeader('location', "/group/modify/{$homePage->getId()}");
+//        $i->seeHttpHeader('location', "/group/modify/{$homePage->getId()}");
 
         #WHEN
         $memberPayload = new Payload\Group\AddMembers($homePage->getId());

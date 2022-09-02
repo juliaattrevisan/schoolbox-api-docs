@@ -4,15 +4,25 @@
  * To be able to remove selected members from the group
  */
 
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useStore } from './store/manageGroupStore';
-import { useSettingsStore } from './store/manageGroupSettingsStore';
+import { useSettingsStore } from './store/mgSettingsStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
 const store = useStore();
 const settingsStore = useSettingsStore();
 const updateModalEl = ref(null);
+
+/**
+ * we want to force the setting of the Access on the group
+ * straight away if it's not already set
+ */
+onMounted(() => {
+    if (settingsStore.isAccessNotSet) {
+        settingsStore.isPromptOpen = true;
+    }
+});
 
 /**
  * to open the modal when requested
@@ -55,7 +65,7 @@ const updateButtonText = computed(() => settingsStore.isProcessing ? 'Updating..
 
 /**
  * to prevent the user from moving away from the modal while
- * processing is taking place
+ * processing is taking place or access needs to be set
  *
  * @returns { Boolean }
  */
@@ -82,11 +92,12 @@ function onModalClosed () {
     <reveal-modal
         ref="updateModalEl"
         size="tiny"
-        :is-close-disabled="isUpdateModalDisabled"
+        :is-close-disabled="false"
         :close-on-background-click="false"
         @closed="onModalClosed"
     >
         <h2>Update Group Settings</h2>
+        <div v-if="settingsStore.isAccessNotSet" class="alert-box warning">Please select an Access type to continue.</div>
         <div class="row">
             <div class="small-12 medium-6 columns no-pad">
                 <legend>Access</legend>

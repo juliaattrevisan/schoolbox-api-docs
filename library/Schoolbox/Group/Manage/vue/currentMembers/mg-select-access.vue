@@ -5,11 +5,11 @@
  */
 
 import { ref, watch, computed } from 'vue';
-import { useStore } from './store/manageGroupStore';
-import { useMembersStore } from './store/manageGroupMembersStore';
-import { useUpdateMembersStore } from './store/manageGroupUpdateMembersStore';
-import { useRejectMembersStore } from './store/manageGroupRejectMembersStore';
-import AccessTypes from './manageGroupAccessTypes';
+import { useStore } from '../store/manageGroupStore';
+import { useMembersStore } from '../store/mgMembersStore';
+import { useUpdateMembersStore } from '../store/mgUpdateMembersStore';
+import { useRejectMembersStore } from '../store/mgRejectMembersStore';
+import AccessTypes from './mgAccessTypes';
 
 
 const store = useStore(); //to disable buttons on processing
@@ -71,8 +71,8 @@ updateMembersStore.$onAction(({ name, after, onError }) => {
             changeMemberAccess.value = ''; //default back to blank on any update
         });
         onError((error) => {
-            console.warn(error);
-            store.toastEl.timeout('Unable to update members', false, 5000);
+            store.toastEl.timeout(error.message, false, 5000);
+            changeMemberAccess.value = ''; //default back to blank on any update
         });
     }
 });

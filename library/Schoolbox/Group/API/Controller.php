@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Group\API;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Group\GroupsHelper;
 use Schoolbox\Group\UserGroupAccess;
 use Schoolbox\Permission\Access\UserAccess;
@@ -171,6 +172,15 @@ class Controller extends Base
             $newAccess = (new ArrayToModel())($post ?? [], $userAccess, !$isPatch);
         } catch (\Exception $e) {
             $this->sendJsonError($e->getMessage(), 401);
+            return;
+        }
+
+        if (
+            $userAccess->getAccessLevel() === UserAccess::ACCESS_FULL
+            && !$user->getRole()->isStaff()
+            && $this->getConfigLoader()->get(ConfigMapper::NAME_GROUP_STAFF_ONLY)
+        ) {
+            $this->sendJsonError('Non staff cannot be a group manager', 401);
             return;
         }
 

@@ -4,11 +4,11 @@
 
 import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
-import { useMembersStore } from './manageGroupMembersStore';
-import Endpoints from '../manageGroupEndpoints';
+import { useMembersStore } from './mgMembersStore';
+import Endpoints from '../mgEndpoints';
 
 
-export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
+export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
 
     state: () => ({
         isProcessing: false,
@@ -37,15 +37,16 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
                     },
                     body: getFormData([member], accessType)
                 });
+                const updatedMember = membersStore.members.find((groupMember) => groupMember.id === member.id);
                 const responseJson = await response.json();
-                if (responseJson.success) {
-                    const updatedMember = membersStore.groupMembers.find((groupMember) => groupMember.id === member.id);
+                if (response.ok) {
                     updateMember(updatedMember, accessType);
                 } else {
-                    throw new Error();
+                    updateMember(updatedMember, updatedMember.accessType); //we revert back to original accessType if the change has failed
+                    throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error.message, error.options);
             } finally {
                 this.isProcessing = false;
                 store.isProcessing = false;
@@ -72,17 +73,17 @@ export const useUpdateMembersStore = defineStore('manageGroupUpdateMembers', {
                     body: getFormData(membersStore.selectedMembers, accessType)
                 });
                 const responseJson = await response.json();
-                if (responseJson.success) { //update the state only after the DB change is a success
+                if (response.ok) { //update the state only after the DB change is a success
                     membersStore.selectedMembers.forEach((member) => {
-                        member.accessType = accessType; //the selectedMembers data is unique to the groupMembers data
-                        const updatedMember = membersStore.groupMembers.find((groupMember) => groupMember.id === member.id);
+                        member.accessType = accessType; //the selectedMembers data is unique to the members data
+                        const updatedMember = membersStore.members.find((groupMember) => groupMember.id === member.id);
                         updateMember(updatedMember, accessType);
                     });
                 } else {
-                    throw new Error();
+                    throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error.message, error.options);
             } finally {
                 this.isSelectedProcessing = false;
                 store.isProcessing = false;
@@ -105,7 +106,7 @@ function getFormData (selectedMembers, accessType) {
     const store = useStore();
     const membersToUpdateIdList = selectedMembers.map(row => ({userId: row.id, accessType: accessType}));
     return JSON.stringify({
-        groupId: store.groupId,
+        groupId: store.id,
         accessTypes: membersToUpdateIdList,
     });
 }
