@@ -10,24 +10,31 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 /** @var SitePage $this */
 $folderId = $this->arg[0];
 $contextType = $_POST['context_type'];
 $contextId = $_POST['context_id'];
 
+/** @var FilesystemProxy $filesystemProxy */
+$filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+
 if (!is_numeric($folderId) || empty($contextType) || !is_numeric($contextId)) {
-    error(18);
+    error(ErrorMapper::ERROR_SUBJECT_DELETED);
 }
 
-$data = null;
-if ($_FILES['importXML']['tmp_name']) {
-    $data = file_get_contents($_FILES['importXML']['tmp_name']);
-} else {
-    error(134);
+$collector = (new CollectorFactory())->build($_POST['importXml'] ?? []);
+try {
+    $file = $collector->getFirst();
+    $data = $filesystemProxy->read($file);
+} catch (\Schoolbox\Resource\Exception $e) {
+    error(ErrorMapper::ERROR_IMPORT_FILE_NOT_FOUND);
 }
 
 SitePage::extendExecutionTime();
