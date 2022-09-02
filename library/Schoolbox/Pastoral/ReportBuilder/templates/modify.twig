@@ -38,11 +38,33 @@
                             <span class="required-with-tip">Report Name</span>
                             <input id="name" type="text" name="name" value="{{ report.name }}"/>
                         </label>
-                        <div class="checklist">
+
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label class="inline-block" for="dashboard">
+                        Show this report on my {{ locale.pastoral }} dashboard
+                        </label>
+                        <div class="switch">
                             <input id="dashboard" name="dashboard" value="1" type="checkbox"
                                    {% if report.dashboard %}checked{% endif %}>
                             <label for="dashboard">
-                                Show this report on my {{ locale.pastoral }} dashboard
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label class="inline-block" for="notificationEnabled">Send notification on new record
+                            <span class="hint has-tip tip-top" data-tooltip
+                                  title="Send a notification to you and anyone who the report is shared with when a new
+                            record appears in this report.">?</span>
+                        </label>
+                        <div class="switch">
+                            <input name="notificationEnabled" id="notificationEnabled" type="checkbox"
+                                   {% if report.notificationEnabled %}checked="checked"{% endif %} value="1"/>
+                            <label for="notificationEnabled">
+                                <span>On</span>
+                                <span>Off</span>
                             </label>
                         </div>
                     </div>
@@ -581,25 +603,6 @@
                     </fieldset>
                 </section>
             {% endif %}
-            <section>
-                <fieldset>
-                    <div class="small-12 columns">
-                        <label class="inline-block" for="notificationEnabled">Enable notification on new matching record
-                            <span class="hint has-tip tip-top" data-tooltip
-                                  title="Send a notification to you and anyone who the report is shared with when a new
-                            record appears in this report.">?</span>
-                        </label>
-                        <div class="switch">
-                            <input name="notificationEnabled" id="notificationEnabled" type="checkbox"
-                                   {% if report.notificationEnabled %}checked="checked"{% endif %} value="1"/>
-                            <label for="notificationEnabled">
-                                <span>On</span>
-                                <span>Off</span>
-                            </label>
-                        </div>
-                    </div>
-                </fieldset>
-            </section>
             <input type="submit" value="Save Report"/>
         </form>
     </div>
