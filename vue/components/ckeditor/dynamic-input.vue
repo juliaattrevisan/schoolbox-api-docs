@@ -170,6 +170,7 @@ export default {
                 }
                 $.fn.alaressEditor(this.getConfigOptions(editorType));
             } catch (error) {
+                console.warn(error);
                 this.isCKEditorLoading = false;
                 this.$emit('on-load-error');
             }

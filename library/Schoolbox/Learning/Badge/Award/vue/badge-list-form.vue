@@ -290,9 +290,6 @@ export default {
          * this could be handled much better by the feature
          */
         selectedBadges (newSelectedBadges, oldSelectedBadges) {
-            newSelectedBadges.forEach((badge) => {
-                badge.reason = 'Hai';
-            });
             if (newSelectedBadges.length !== oldSelectedBadges.length) { //if the number of badges has changed
                 setTimeout(() => { //notify horizontal-scroller.vue once enought time to allow the animation to complete has passed
                     this.hasContentChange = true;
