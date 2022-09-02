@@ -6,6 +6,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Calendar\Relation;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Resource\Attachment\Zone;
 
 if (!$_SESSION['user']->isSuperuser()) {
     error(19, "", 401);
@@ -110,6 +111,18 @@ foreach ($typeList as $type) {
      * Import page
      */
     if (($type['type'] == 'Import') && ($selectedType == 'Import')) {
+        // Attachzone
+        $zone = (new Zone('bulkadd'))
+            ->setFileVar('bulkadd[]')
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select CSV/ICS')
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Upload CSV/ICS')
+            ->setMimeFilter('*/*')
+            ->setReadOnly(false)
+            ->setMulti(false)
+            ->useImportExpiryDate();
+        $zone->renderIntoSitePage($this, 'BULKADD_ATTACH_ZONE');
         $this->parse('import_block', 'import');
     } elseif (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
         /* Subscribe page

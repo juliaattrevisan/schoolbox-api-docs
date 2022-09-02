@@ -1,6 +1,9 @@
 <?php
 
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 
 SitePage::extendExecutionTime();
 
@@ -8,7 +11,7 @@ if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 
-
+/** @var SitePage $this */
 $this->setTitle('Admin - Bulk Add Calendar Events');
 $this->setFile(TEMPLATE_content, 'adminv2/bulkAddCalendar.html');
 $this->setBlock(TEMPLATE_content, 'event', 'event_block');
@@ -20,8 +23,18 @@ $this->setBlock(TEMPLATE_content, 'event', 'event_block');
 
 /* Two types of upload.. either single user.. or via csv file..
  */
-if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name'] && (isset($_POST['userGroup']) && isset($_POST['campusList']))) {
-    $extension = strtolower(pathinfo($_FILES['bulkadd']['name'], PATHINFO_EXTENSION));
+
+/** @var FilesystemProxy $filesystemProxy */
+$filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+
+$collector = (new CollectorFactory())->build($_POST['bulkadd'] ?? []);
+try {
+    $file = $collector->getFirst();
+} catch (\Schoolbox\Resource\Exception $e) {
+    error(ErrorMapper::ERROR_INFORMATION_MISSING);
+}
+if (isset($_POST['userGroup']) && isset($_POST['campusList'])) {
+    $extension = $file->getExtension();
     /* Must have the correct .csv or .ics extension
      */
     if (!('csv' === $extension || 'ics' === $extension)) {
