@@ -12,7 +12,7 @@ if (!$_SESSION['user']->isSuperuser()) {
     error(19, "", 401);
 }
 
-if ($this->arg[0]) {
+if ($this->arg[0] ?? null) {
     $selectedType = urldecode($this->arg[0]);
 } else {
     $selectedType = 'Import';
