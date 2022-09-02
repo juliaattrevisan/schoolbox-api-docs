@@ -518,105 +518,14 @@
                     {# Handle clicks on 'Submission Received' buttons #}
                     $('[data-sobo]').on('click', function (event) {
 
-                        let $button = $(this);
+                        window.buttonClickedJq = $(this);
 
                         if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
-                            $(this).confirmDialog({
-                                text: 'Was this work submitted on time?',
-                                confirmLabel: 'Yes',
-                                cancelLabel : 'No',
-                                confirmEvent: function () {postSobo($button, true );},
-                                cancelEvent : function () {postSobo($button, false);}
-                            });
+                            $('#confirm-dialog').show().css('visibility', 'visible');
                         } else {
-                            postSobo($button, false);
+                            postSobo(false);
                         }
                     });
-
-                    function postSobo($button, submissionWasOnTime) {
-                        let buttonText   = $button.html(),
-                            $actionBar   = $button.closest('[data-action-bar]'),
-                            $participant = $actionBar.closest('[data-participant]'),
-                            $statusIcon  = $participant.find('[data-status]'),
-                            $statusLabel = $participant.find('[data-status-label]'),
-                            $toast       = $('[data-save-draft]');
-
-                        $toast.toastActivate({text: 'Marking submission as received...'});
-                        $button.html('Working...');
-                        $button.attr('disabled', '');
-
-                        $.post($button.attr('href'), {'submissionWasOnTime': submissionWasOnTime})
-                        .done(function(response) {
-                            /** @var {bool} response.success */
-                            if (true !== Boolean(response.success)) {
-                                soboFailure($button, buttonText, $toast);
-                                return;
-                            }
-
-                            /** @var {bool} response.submittedLate */
-                            soboSuccess(
-                                $participant,
-                                $button,
-                                $actionBar,
-                                $statusIcon,
-                                $statusLabel,
-                                response.submittedLate,
-                                $toast
-                            )
-                        })
-                        .fail(function () {
-                            soboFailure($button, buttonText, $toast);
-                        });
-                    }
-
-                    /**
-                     * Handle a submission receipt success
-                     *
-                     * @param {jQuery} $participant
-                     * @param {jQuery} $button
-                     * @param {jQuery} $actionBar
-                     * @param {jQuery} $statusIcon
-                     * @param {jQuery} $statusLabel
-                     * @param {bool}   submittedLate
-                     * @param {jQuery} $toast
-                     */
-                    function soboSuccess($participant,
-                                         $button,
-                                         $actionBar,
-                                         $statusIcon,
-                                         $statusLabel,
-                                         submittedLate,
-                                         $toast) {
-                        $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
-                        $button.fadeOut({
-                            done: function () {
-                                if (!$actionBar.is('[data-mass-publish]')) {
-                                    $actionBar.slideUp();
-                                }
-                                $button.remove();
-                            }
-                        });
-                        $participant.attr('data-status', 'pending');
-                        $actionBar.removeAttr('data-mass-submit');
-                        $statusIcon.addClass('{{ statusPending }}');
-                        $statusLabel.html('Submitted in person ' + (submittedLate ? 'late' : 'on time'));
-                        $statusIcon.attr('title', '{{ labelPending }}');
-                        $statusIcon.attr('data-assessment-status-light', 'pending');
-                        $('#filters').find('[data-status="pending"]').prop('checked', true);
-                    }
-
-                    /**
-                     * Handle a submission receipt failure
-                     *
-                     * @param {jQuery} $button
-                     * @param {string} buttonText
-                     * @param {jQuery} $toast
-                     */
-                    function soboFailure($button, buttonText, $toast) {
-                        $button.html(buttonText);
-                        $button.removeAttr('disabled');
-                        $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
-                    }
 
                     /**
                      * Handle a draft submission success
@@ -649,6 +558,95 @@
                         }
                     }
                 });
+
+                function postSobo(submissionWasOnTime) {
+                    let $button      = window.buttonClickedJq,
+                        buttonText   = $button.html(),
+                        $actionBar   = $button.closest('[data-action-bar]'),
+                        $participant = $actionBar.closest('[data-participant]'),
+                        $statusIcon  = $participant.find('[data-status]'),
+                        $statusLabel = $participant.find('[data-status-label]'),
+                        $toast       = $('[data-save-draft]');
+
+                    $toast.toastActivate({text: 'Marking submission as received...'});
+                    $button.html('Working...');
+                    $button.attr('disabled', '');
+
+                    $.post($button.attr('href'), {'submissionWasOnTime': submissionWasOnTime})
+                    .done(function(response) {
+                        /** @var {bool} response.success */
+                        if (true !== Boolean(response.success)) {
+                            soboFailure($button, buttonText, $toast);
+                            return;
+                        }
+
+                        $('#confirm-dialog').hide();
+
+                        /** @var {bool} response.submittedLate */
+                        soboSuccess(
+                            $participant,
+                            $button,
+                            $actionBar,
+                            $statusIcon,
+                            $statusLabel,
+                            response.submittedLate,
+                            $toast
+                        )
+                    })
+                    .fail(function () {
+                        $('#confirm-dialog').hide();
+                        soboFailure($button, buttonText, $toast);
+                    });
+                }
+
+                /**
+                 * Handle a submission receipt success
+                 *
+                 * @param {jQuery} $participant
+                 * @param {jQuery} $button
+                 * @param {jQuery} $actionBar
+                 * @param {jQuery} $statusIcon
+                 * @param {jQuery} $statusLabel
+                 * @param {bool}   submittedLate
+                 * @param {jQuery} $toast
+                 */
+                function soboSuccess($participant,
+                                     $button,
+                                     $actionBar,
+                                     $statusIcon,
+                                     $statusLabel,
+                                     submittedLate,
+                                     $toast) {
+                    $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
+                    $button.fadeOut({
+                        done: function () {
+                            if (!$actionBar.is('[data-mass-publish]')) {
+                                $actionBar.slideUp();
+                            }
+                            $button.remove();
+                        }
+                    });
+                    $participant.attr('data-status', 'pending');
+                    $actionBar.removeAttr('data-mass-submit');
+                    $statusIcon.addClass('{{ statusPending }}');
+                    $statusLabel.html('Submitted in person ' + (submittedLate ? 'late' : 'on time'));
+                    $statusIcon.attr('title', '{{ labelPending }}');
+                    $statusIcon.attr('data-assessment-status-light', 'pending');
+                    $('#filters').find('[data-status="pending"]').prop('checked', true);
+                }
+
+                /**
+                 * Handle a submission receipt failure
+                 *
+                 * @param {jQuery} $button
+                 * @param {string} buttonText
+                 * @param {jQuery} $toast
+                 */
+                function soboFailure($button, buttonText, $toast) {
+                    $button.html(buttonText);
+                    $button.removeAttr('disabled');
+                    $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
+                }
             </script>
         {% endautoescape %}
 
@@ -663,6 +661,19 @@
                 $('#importFeedbackForm').importFeedback();
             });
         </script>
+
+        <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
+            <div>
+                <h2>Please confirm</h2>
+                <p>Was this work submitted on time?</p>
+            </div>
+            <ul class="flex-list buttons">
+                <li><a class="button submit" data-accept onclick='postSobo(true)'>Yes</a></li>
+                <li><a class="button" data-reject onclick='postSobo(false)'>No</a></li>
+                <li><a class="button" data-reject onclick="$('#confirm-dialog').hide()">Cancel</a></li>
+            </ul>
+        </div>
+
         <div id="importFeedbackModal" class="reveal-modal" data-reveal>
             <form id="importFeedbackForm" action="#">
                 <section>
