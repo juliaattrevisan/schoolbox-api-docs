@@ -14,6 +14,7 @@
      - selfReflect:       bool            Is this being viewed in a self reflection context?
      - blindReviewUrl:   string
 #}
+
 {% extends '@learningAssessment/status.twig' %}
 
 {% set labelIncomplete = 'Submission required' %}
@@ -261,7 +262,7 @@
             {%- apply spaceless %}
                 {% if pAckReceipt %}
                     {% set soboTitle = 'Acknowledge receipt of student submission' %}
-                    <a class="button" data-sobo title="{{ soboTitle }}" href="{{ pAckReceipt }}">Mark as Submitted</a>
+                    <button class="button" data-sobo title="{{ soboTitle }}" href="{{ pAckReceipt }}">Mark as Submitted</button>
                 {% endif %}
                 {% set draftSaveTitle = 'You can discard this draft from the Grading Overview screen' %}
                 {% set draftSaveHtml = isDraftFeedback ? 'Saved as Draft' : '' %}
@@ -516,43 +517,57 @@
 
                     {# Handle clicks on 'Submission Received' buttons #}
                     $('[data-sobo]').on('click', function (event) {
-                        event.preventDefault();
 
-                        var $button = $(this),
-                            buttonText = $button.html(),
-                            $actionBar = $button.closest('[data-action-bar]'),
+                        let $button = $(this);
+
+                        if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
+                            $(this).confirmDialog({
+                                text: 'Was this work submitted on time?',
+                                confirmLabel: 'Yes',
+                                cancelLabel : 'No',
+                                confirmEvent: function () {postSobo($button, true );},
+                                cancelEvent : function () {postSobo($button, false);}
+                            });
+                        } else {
+                            postSobo($button, false);
+                        }
+                    });
+
+                    function postSobo($button, submissionWasOnTime) {
+                        let buttonText   = $button.html(),
+                            $actionBar   = $button.closest('[data-action-bar]'),
                             $participant = $actionBar.closest('[data-participant]'),
-                            $statusIcon = $participant.find('[data-status]'),
+                            $statusIcon  = $participant.find('[data-status]'),
                             $statusLabel = $participant.find('[data-status-label]'),
-                            $toast = $('[data-save-draft]');
+                            $toast       = $('[data-save-draft]');
 
                         $toast.toastActivate({text: 'Marking submission as received...'});
                         $button.html('Working...');
                         $button.attr('disabled', '');
 
-                        $.post($button.attr('href'))
-                            .done(function (response) {
-                                /** @var {bool} response.success */
-                                if (true !== Boolean(response.success)) {
-                                    soboFailure($button, buttonText, $toast);
-                                    return;
-                                }
-
-                                /** @var {bool} response.submittedLate */
-                                soboSuccess(
-                                    $participant,
-                                    $button,
-                                    $actionBar,
-                                    $statusIcon,
-                                    $statusLabel,
-                                    response.submittedLate,
-                                    $toast
-                                )
-                            })
-                            .fail(function () {
+                        $.post($button.attr('href'), {'submissionWasOnTime': submissionWasOnTime})
+                        .done(function(response) {
+                            /** @var {bool} response.success */
+                            if (true !== Boolean(response.success)) {
                                 soboFailure($button, buttonText, $toast);
-                            });
-                    });
+                                return;
+                            }
+
+                            /** @var {bool} response.submittedLate */
+                            soboSuccess(
+                                $participant,
+                                $button,
+                                $actionBar,
+                                $statusIcon,
+                                $statusLabel,
+                                response.submittedLate,
+                                $toast
+                            )
+                        })
+                        .fail(function () {
+                            soboFailure($button, buttonText, $toast);
+                        });
+                    }
 
                     /**
                      * Handle a submission receipt success
