@@ -77,6 +77,8 @@ class Controller extends Base
                 $ancestorCount,
                 $descendantCount,
                 $this->request->query->getBool('topLevelOnly', false),
+                $this->request->query->getInt('parentId'),
+                $this->request->query->getBool('enabled'),
             );
 
             $resultsForAllKeywords = $resultsForAllKeywords->merge($resultsForKeyword);

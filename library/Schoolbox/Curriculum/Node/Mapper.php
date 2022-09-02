@@ -193,19 +193,23 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $sortDirection = 'DESC'
     ) {
         // Load all ancestors, no descendants
-        return $this->findByKeyword($keyword, $limit, $offset, 50, 0, false);
+        return $this->findByKeyword($keyword, $limit, $offset, 50, 0, false, null, null);
     }
 
     /**
      * Find all nodes which match a keyword.
      *
-     * @param string $keyword      The keyword to search for
-     * @param int    $limit        The max number of nodes to return
-     * @param int    $offset       The number of matching nodes to skip in the
-     *                             result
-     * @param int    $ancestors    How many levels of parent node to include
-     * @param int    $descendants  How many levels of child node to include
-     * @param bool   $topLevelOnly If true, return only nodes with no parent
+     * @param string    $keyword      The keyword to search for
+     * @param int       $limit        The max number of nodes to return
+     * @param int       $offset       The number of matching nodes to skip in
+     *                                the result
+     * @param int       $ancestors    How many levels of parent node to include
+     * @param int       $descendants  How many levels of child node to include
+     * @param bool      $topLevelOnly If true, return only nodes with no parent
+     * @param int|null  $parentId     If not null, search only within this node
+     *                                and descendants
+     * @param bool|null $enabled      If not null: return only nodes which are
+     *                                enabled (if true) or disabled (if false)
      * @return Collection|Model[]
      */
     public function findByKeyword(
@@ -215,23 +219,45 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         int $ancestors,
         int $descendants,
         bool $topLevelOnly,
+        ?int $parentId,
+        ?bool $enabled,
     ): Collection {
+        $filteredIds = null;
+        if (isset($parentId)) {
+            // Collate a list of descendant IDs
+            // (impossible without recursive query)
+            $filteredIds   = $this->findDescendantIds([$parentId], 'curriculum_node_parent_id');
+            $filteredIds[] = $parentId;
+        }
         $query = "
             SELECT
                 {$this->getColumnString('n')}
             FROM {$this->getTable()} n
-            WHERE n.deleted_at IS NULL
-            AND   (n.code LIKE :codeLike OR (n.code != '' AND n.name LIKE :nameLike))
         ";
+        $quotedLike = $this->getDatabase()->getQuoter()->escapeForLike($keyword);
+        $pb = $this->getPredicateBuilder()
+            ->isNull('n.deleted_at')
+            ->any(
+                $this->getPredicateBuilder()
+                    ->like('n.code', $quotedLike . '%')
+                    ->all(
+                        $this->getPredicateBuilder()
+                            ->notEquals('n.code', '')
+                            ->like('n.name', '%' . $quotedLike . '%')
+                    )
+            );
         if ($topLevelOnly) {
-            $query .= ' AND n.curriculum_node_parent_id IS NULL';
+            $pb = $pb->isNull('n.curriculum_node_parent_id');
+        }
+        if (isset($filteredIds)) {
+            $pb = $pb->in('n.id', $filteredIds);
+        }
+        if (isset($enabled)) {
+            $pb = $pb->equals('n.enabled', $enabled);
         }
 
-        $quotedLike = $this->getDatabase()->getQuoter()->escapeForLike($keyword);
-        $params     = [
-            'codeLike' => $quotedLike . '%',
-            'nameLike' => '%' . $quotedLike . '%',
-        ];
+        $query .= ' WHERE ' . $pb->getWhereIntersect();
+        $params = $pb->getParams();
         if ($limit > 0) {
             $query .= ' LIMIT :limit';
         }
