@@ -397,7 +397,7 @@ class Mapper extends BaseMapper
         $tagWheres = [];
         foreach ($pastoral->getTags() as $i => $tag) {
             $tagWheres[]         = "CONCAT(',', `tags`, ',') LIKE :tagLike$i";
-            $params["tagLike$i"] = "%,{$tag->getName()},%";
+            $params["tagLike$i"] = "%,{$tag->getId()},%";
         }
         if ($pastoral->getTags()->count() === 0) {
             $wheres[] = "`tags` IS NULL";

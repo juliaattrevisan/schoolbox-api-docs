@@ -568,7 +568,7 @@ class Controller extends Base
      */
     public function getStudentRecordUpdateForm($record): void
     {
-        if (!$this->getConfigLoader()->get('pastoral_severity')) {
+        if (!$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
             $severities = [];
         } else {
             $severities = $this->pastoralSeverityMapper->findAll();
@@ -820,7 +820,7 @@ class Controller extends Base
                      */
 
                     /** @var PastoralTagsModel $tag */
-                    $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagCurrent, ['cache' => false]);
+                    $tag = $this->pastoralTagMapper->findOneByColumn('id', $tagCurrent, ['cache' => false]);
                 } catch (MapperDeletedException $e) {
                     /* Restore this tag to active duty SA-2737
                      * This was put here to reduce dupe tags from original implementation
@@ -1495,6 +1495,24 @@ class Controller extends Base
             $data['error'] = $e->getMessage();
             $this->getResponse()->status->setCode(400);
         }
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+    /**
+     * @api   GET /searchTags
+     * @since 21.1
+     */
+    public function searchTags()
+    {
+        $tags = $this->pastoralTagMapper->findForTag($this->getUser(), $this->request->query->get('query'));
+        $data = $tags->map(function ($tag) {
+            /** @var Tag\Model $tag */
+            return [
+                'id'   => $tag->getId(),
+                'name' => $tag->getName(),
+            ];
+        }
+        );
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 }

@@ -79,7 +79,7 @@ class Module extends BaseModule
                     '/insert'                        => ['getReportInsert' => $permissionStaff],
                     '/update/{reportId:\d+}'         => ['getReportUpdate' => $permissionModifyReport],
                     '/results/{reportId:\d+}'        => ['getReportResults' => $permissionReadReport],
-                    '/results/tag/{tagId:\d+}'       => ['getReportTags' => $permissionReadReport],
+                    '/results/tag/{tagId:\d+}'       => ['getReportTags' => $permissionStaff],
                     '/results/{reportId:\d+}/print'  => ['getReportResultsPrint' => $permissionReadReport],
                     '/results/{reportId:\d+}/export' => ['getReportResultsExport' => $permissionReadReport],
                 ],

@@ -752,7 +752,7 @@
                      * $query var
                      */
                     $.ajax({
-                        url: '/ajax/tags/pastoral',
+                        url: '{{ routeLookup('pastoral.searchTags') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: {query: query}
