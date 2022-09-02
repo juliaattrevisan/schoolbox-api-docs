@@ -32,6 +32,7 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -351,6 +352,16 @@ class Controller extends Assessment\Controller
     protected function getAssessmentTwigData(IAssessable $assessment): array
     {
         $data['acceptingResponses'] = true;
+        $data['importAttachzone']   = (new Zone('importXml'))
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select XML')
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Upload XML')
+            ->setMimeFilter('text/xml,application/xml')
+            ->setReadOnly(false)
+            ->setMulti(false)
+            ->useImportExpiryDate()
+            ->getTwigContext();
         return $data;
     }
 

@@ -217,9 +217,7 @@ in a form. The template hierachy should be refactored so that quiz EXTENDS the p
     <form action="/assess/import/xml/{{ context.folder.id }}" method="post" enctype="multipart/form-data">
         <input type="hidden" name="context_type" value="{{ contextType }}">
         <input type="hidden" name="context_id" value="{{ context.id }}">
-        <label>
-            <input name="importXML" type="file">
-        </label>
+        {% include 'sub/attachzone.twig' with { attachzone: importAttachzone } %}
         <label>
             <input type="submit" value="Import from XML file">
         </label>
