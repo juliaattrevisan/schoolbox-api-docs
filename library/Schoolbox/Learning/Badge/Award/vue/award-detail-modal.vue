@@ -79,6 +79,11 @@ export default {
              * where opening, closing, then re-opening a modal causes the ckeditor to break
              */
             hasSelectedModify: false,
+            /* Decide if the edit button for the Reason is available
+             * (presuming you have access to the update route)
+             * This toggles to false when you spawn the ckeditor
+             */
+            allowReasonEdit: true,
         }
     },
 
@@ -215,6 +220,7 @@ export default {
          */
         onEditReasonSelected () {
             this.hasSelectedModify = true;
+            this.allowReasonEdit = false;
         },
 
         /**
@@ -288,6 +294,7 @@ export default {
                                 preset-unique-id="reason"
                                 inputName="reason"
                                 singular="reason"
+                                :proxy="'reason-proxy'"
                                 :value="award.reason"
                                 :allow-edit="true"
                                 :allow-submit="true"
@@ -300,10 +307,10 @@ export default {
                         </form>
 
                         <!-- Also provide the button to make the change -->
-                        <button class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
+                        <button v-if="this.allowReasonEdit" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
                     </template>
 
-                    <article v-html="award.reason"></article>
+                    <article v-html="award.reason" id="reason-proxy"></article>
                 </template>
 
                 <template v-if="award.badge.curriculumNodes.length">

@@ -48,6 +48,14 @@ export default {
             type: String,
             required: true
         },
+        /* This is an identifier for an element which should be made hidden
+         * when the ckeditor spawns. It shows a readonly version of what
+         * would otherwise be in the ckeditor
+         */
+        proxy: {
+            type: String,
+            required: false
+        },
         /* The existing textarea content to prefill
          */
         value: {
@@ -91,6 +99,7 @@ export default {
         return {
             isCKEditorLoading: false,
             isCKEditorLoaded: false,
+            showEdit: true
         }
     },
 
@@ -153,6 +162,18 @@ export default {
          */
         spawnEditor () {
             this.init(configTypes.BASIC);
+
+            /* If a proxy element exists, remove it
+             */
+            let proxy = document.querySelector('#' + this.proxy);
+
+            if (proxy) {
+                proxy.remove();
+            }
+
+            /* Once the ck spawns you can also hide the edit button
+             */
+            this.showEdit = false;
         },
 
         /**
@@ -229,7 +250,6 @@ export default {
 
 <template>
     <div class="dynamic-input">
-        <button v-if="this.allowEdit" class="show-ckeditor-button" v-show="!isCKEditorLoaded" @click.once="spawnEditor">{{ getEditButtonText }}</button>
         <div :style="getStyles">
             <textarea :id="this.presetUniqueId" :name="this.inputName" rows="4">{{ this.value }}</textarea>
             <button v-if="this.allowSubmit" class="button submit" @click="postItem" :disabled="isPostDisabled">Save</button>
