@@ -29,6 +29,7 @@ $this->setBlock(TEMPLATE_content, 'source_panel', 'source_panel_block');
 $multi             = !empty($_GET['multi']);
 $filesystemContext = empty($_GET['fs']) ? false : $_GET['fs'];
 $defaultFolderId   = (int)($_GET['fid'] ?? 0);
+$expiryDate        = $_GET['expiryDate'] ?? null;
 
 /* This is the first instance of two places where this is specified
  * The other is www/ajax/resources.php
@@ -68,7 +69,12 @@ $factory->allowMulti($multi)
         ->setConfig($configLoader)
         ->setRosetta($rosettaStone)
         ->setUseFolder($useFolder)
-        ->setDefaultFolderId($defaultFolderId);
+        ->setDefaultFolderId($defaultFolderId)
+        ->setExpiryDate(
+            isset($expiryDate)
+                ? new Alaress_Date_Format($expiryDate, DateTimeInterface::RFC3339)
+                : null
+        );
 if ($_SESSION['user'] instanceof User) {
     $factory->setUser($_SESSION['user']);
 }

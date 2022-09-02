@@ -39,6 +39,7 @@ if (!isset($_GET['mime'])) {
  */
 $useFolder = isset($_GET['f']);
 $defaultFolderId = (int)($_GET['fid'] ?? 0);
+$expiryDate = $_GET['expiryDate'] ?? null;
 
 $this->setVar([
     'SITE_VERSION'  => Config::get('site_version'),
@@ -57,7 +58,12 @@ $factory
     ->allowMulti($multi)
     ->setConfig($configLoader)
     ->setUseFolder($useFolder)
-    ->setDefaultFolderId($defaultFolderId);
+    ->setDefaultFolderId($defaultFolderId)
+    ->setExpiryDate(
+        isset($expiryDate)
+            ? new Alaress_Date_Format($expiryDate, DateTimeInterface::RFC3339)
+            : null,
+    );
 if ($_SESSION['user'] instanceof User) {
     $factory->setUser($_SESSION['user']);
 }

@@ -25,7 +25,6 @@ use SitePage;
  */
 class TeamsController extends AbstractController
 {
-
     /**
      * The icon for this controller; appears in the accordion
      */
@@ -70,18 +69,12 @@ class TeamsController extends AbstractController
      * @param bool               $multi
      * @param string             $mimeFilter
      * @param IConfigLoader|null $conf
-     * @param RosettaStone|null  $rosetta
-     * @param bool               $useFolder
-     * @param int                $defaultFolderId
      * @param User|null          $user
      */
     public function __construct(
         $multi,
         $mimeFilter = null,
         $conf = null,
-        $rosetta = null,
-        $useFolder = true,
-        $defaultFolderId = 0,
         User $user = null
     ) {
         parent::__construct($multi, $mimeFilter);

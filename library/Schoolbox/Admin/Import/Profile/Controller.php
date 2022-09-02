@@ -146,6 +146,7 @@ class Controller extends Base
             ->setMimeFilter('*/*')
             ->setReadOnly(false)
             ->setMulti(false)
+            ->useImportExpiryDate()
             ->getTwigContext();
     }
 
