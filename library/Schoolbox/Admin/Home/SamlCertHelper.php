@@ -12,7 +12,6 @@ use OneLogin\Saml2\IdPMetadataParser;
 use OneLogin\Saml2\Utils;
 use Schoolbox\Application\Exception as SchoolboxException;
 
-
 /**
  * Functions for processing SAML certificate
  */
@@ -55,7 +54,6 @@ class SamlCertHelper
         string $idpCertificate,
         string $idpMetadataUrl,
         Alaress_Date_Format $nowOverride = null,
-
     ): SamlWidget {
         /**
          * Time value used in testing to simulate and reproduce different test cases.
@@ -80,7 +78,7 @@ class SamlCertHelper
         } else {
             try {
                 $metadataXml = $this->fetchMetadataXml($idpMetadataUrl);
-            } catch (InvalidUriException|SchoolboxException\Exception $e) {
+            } catch (InvalidUriException | SchoolboxException\Exception $e) {
                 // Invalid URL | Unable to connect.
                 $metadataXml = null;
             }

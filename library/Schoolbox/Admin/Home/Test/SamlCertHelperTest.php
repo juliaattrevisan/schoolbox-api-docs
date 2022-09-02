@@ -1,7 +1,5 @@
 <?php
 /** @noinspection PhpUnhandledExceptionInspection */
-
-
 /**
  * @copyright Copyright 2022, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -12,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Home\Test;
 
 use Alaress_Date_Format;
-use InvalidArgumentException;
 use PHPUnit\Framework;
 use Schoolbox\Admin\Home\SamlCertHelper;
 
@@ -91,13 +88,15 @@ class SamlCertHelperTest extends Framework\TestCase
         pVD6z4oqU+9WEA7/hJq/8HFbfA7uT7jeOq6LOjgotc6dMUW32o4evw==";
 
     private const VALID_METADATA_URL = "http://test.schoolbox.cloud";
-    private const INVALID_IDP_CERT = "abcde";
+    private const INVALID_IDP_CERT = "this is an invalid cert";
 
-    private function getMetadataEmptyMock() {
+    private function getMetadataEmptyMock()
+    {
         return null;
     }
 
-    private function getMetadataUnparsableMock(): \Alaress_Saml_Cache {
+    private function getMetadataUnparsableMock(): \Alaress_Saml_Cache
+    {
         $return = $this->createMock(\Alaress_Saml_Cache::class);
         $return->method("getStreamContents")
                ->willReturn(
@@ -112,7 +111,8 @@ class SamlCertHelperTest extends Framework\TestCase
         return $samlCache;
     }
 
-    private function getMetadataOfflineMock(): \Alaress_Saml_Cache {
+    private function getMetadataOfflineMock(): \Alaress_Saml_Cache
+    {
         $return = $this->createMock(\Alaress_Saml_Cache::class);
         $return->method("getStreamContents")
                ->willReturn(
@@ -127,7 +127,8 @@ class SamlCertHelperTest extends Framework\TestCase
         return $samlCache;
     }
 
-    private function getMetadataOkMock(): \Alaress_Saml_Cache {
+    private function getMetadataOkMock(): \Alaress_Saml_Cache
+    {
         $return = $this->createMock(\Alaress_Saml_Cache::class);
         $return->method("getStreamContents")
                ->willReturn(
@@ -142,8 +143,12 @@ class SamlCertHelperTest extends Framework\TestCase
         return $samlCache;
     }
 
-    public function test_IdpCertEmpty_metadataUrlEmpty(): void
+    public function testIdpCertEmptyMetadataUrlEmpty(): void
     {
+        /** Testing:
+         *  IDP Certificate      - Empty
+         *  Metadata URL         - Empty
+         */
         $samlCertHelper = new SamlCertHelper($this->getMetadataEmptyMock());
 
         $widget = $samlCertHelper->buildWidget("", "");
@@ -152,8 +157,12 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals('Empty SAML config', $widget->getMessage());
     }
 
-    public function test_IdpCertEmpty_metadataUrlOffline(): void
+    public function testIdpCertEmptyMetadataUrlOffline(): void
     {
+        /** Testing:
+         *  IDP Certificate      - Empty
+         *  Metadata URL         - Offline
+         */
         $samlCertHelper = new SamlCertHelper($this->getMetadataOfflineMock());
 
         $widget = $samlCertHelper->buildWidget("", self::VALID_METADATA_URL);
@@ -161,8 +170,12 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals('Metadata URL offline', $widget->getMessage());
     }
 
-    public function test_IdpCertEmpty_metadataUrlUnparsable(): void
+    public function testIdpCertEmptyMetadataUrlUnparsable(): void
     {
+        /** Testing:
+         *  IDP Certificate      - Empty
+         *  Metadata URL         - Unparsable
+         */
         $samlCertHelper = new SamlCertHelper($this->getMetadataUnparsableMock());
 
         $widget = $samlCertHelper->buildWidget("", self::VALID_METADATA_URL);
@@ -171,10 +184,14 @@ class SamlCertHelperTest extends Framework\TestCase
     }
 
     /**
-     * @dataProvider provider_IdpCertEmpty_metadataUrlOk
+     * @dataProvider providerIdpCertEmptyMetadataUrlOk
      */
-    public function test_IdpCertEmpty_metadataUrlOk(string $nowOverride, string $light, string $message): void
+    public function testIdpCertEmptyMetadataUrlOk(string $nowOverride, string $light, string $message): void
     {
+        /** Testing:
+         *  IDP Certificate      - Empty
+         *  Metadata URL         - Ok
+         */
         $samlCertHelper = new SamlCertHelper($this->getMetadataOkMock());
 
         $now = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
@@ -184,7 +201,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function provider_IdpCertEmpty_metadataUrlOk(): array
+    public function providerIdpCertEmptyMetadataUrlOk(): array
     {
         return [
             ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, 'Valid'],
@@ -194,8 +211,12 @@ class SamlCertHelperTest extends Framework\TestCase
         ];
     }
 
-    public function test_IdpCertUnparsable_metadataUrlEmpty(): void
+    public function testIdpCertUnparsableMetadataUrlEmpty(): void
     {
+        /** Testing:
+         *  IDP Certificate      - Unparsable
+         *  Metadata URL         - Empty
+         */
         $samlCertHelper = new SamlCertHelper($this->getMetadataEmptyMock());
 
         $widget = $samlCertHelper->buildWidget(self::INVALID_IDP_CERT, "");
@@ -204,8 +225,12 @@ class SamlCertHelperTest extends Framework\TestCase
     }
 
 
-    public function test_IdpCertUnparsable_metadataUrlOffline(): void
+    public function testIdpCertUnparsableMetadataUrlOffline(): void
     {
+        /** Testing:
+         *  IDP Certificate      - Unparsable
+         *  Metadata URL         - Offline
+         */
         $samlCertHelper = new SamlCertHelper($this->getMetadataOfflineMock());
 
         $widget = $samlCertHelper->buildWidget(self::INVALID_IDP_CERT, self::VALID_METADATA_URL);
@@ -214,8 +239,12 @@ class SamlCertHelperTest extends Framework\TestCase
     }
 
 
-    public function test_IdpCertUnparsable_metadataUrlUnparsable(): void
+    public function testIdpCertUnparsableMetadataUrlUnparsable(): void
     {
+        /** Testing:
+         *  IDP Certificate      - Unparsable
+         *  Metadata URL         - Unparsable
+         */
         $samlCertHelper = new SamlCertHelper($this->getMetadataUnparsableMock());
 
         $widget = $samlCertHelper->buildWidget(self::INVALID_IDP_CERT, self::VALID_METADATA_URL);
@@ -225,10 +254,14 @@ class SamlCertHelperTest extends Framework\TestCase
 
 
     /**
-     * @dataProvider provider_IdpCertUnparsable_metadataUrlOk
+     * @dataProvider providerIdpCertUnparsableMetadataUrlOk
      */
-    public function test_IdpCertUnparsable_metadataUrlOk(string $nowOverride, string $light, string $message): void
+    public function testIdpCertUnparsableMetadataUrlOk(string $nowOverride, string $light, string $message): void
     {
+        /** Testing:
+         *  IDP Certificate      - Unparsable
+         *  Metadata URL         - Ok
+         */
         $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
         $samlCertHelper = new SamlCertHelper($this->getMetadataOkMock());
@@ -239,7 +272,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function provider_IdpCertUnparsable_metadataUrlOk(): array
+    public function providerIdpCertUnparsableMetadataUrlOk(): array
     {
         return [
             ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
@@ -250,10 +283,14 @@ class SamlCertHelperTest extends Framework\TestCase
     }
 
     /**
-     * @dataProvider provider_IdpCertOk_metadataUrlEmpty
+     * @dataProvider providerIdpCertOkMetadataUrlEmpty
      */
-    public function test_IdpCertOk_metadataUrlEmpty(string $nowOverride, string $light, string $message): void
+    public function testIdpCertOkMetadataUrlEmpty(string $nowOverride, string $light, string $message): void
     {
+        /** Testing:
+         *  IDP Certificate      - Ok
+         *  Metadata URL         - Empty
+         */
         $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
         $samlCertHelper = new SamlCertHelper($this->getMetadataEmptyMock());
@@ -263,7 +300,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function provider_IdpCertOk_metadataUrlEmpty(): array
+    public function providerIdpCertOkMetadataUrlEmpty(): array
     {
         return [
             ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
@@ -275,10 +312,14 @@ class SamlCertHelperTest extends Framework\TestCase
 
 
     /**
-     * @dataProvider provider_IdpCertOk_metadataUrlOffline
+     * @dataProvider providerIdpCertOkMetadataUrlOffline
      */
-    public function test_IdpCertOk_metadataUrlOffline(string $nowOverride, string $light, string $message): void
+    public function testIdpCertOkMetadataUrlOffline(string $nowOverride, string $light, string $message): void
     {
+        /** Testing:
+         *  IDP Certificate      - Ok
+         *  Metadata URL         - Offline
+         */
         $samlCertHelper = new SamlCertHelper($this->getMetadataOfflineMock());
 
         $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
@@ -288,7 +329,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function provider_IdpCertOk_metadataUrlOffline(): array
+    public function providerIdpCertOkMetadataUrlOffline(): array
     {
         return [
             ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
@@ -299,10 +340,14 @@ class SamlCertHelperTest extends Framework\TestCase
     }
 
     /**
-     * @dataProvider provider_IdpCertOk_metadataUrlUnparsable
+     * @dataProvider providerIdpCertOkMetadataUrlUnparsable
      */
-    public function test_IdpCertOk_metadataUrlUnparsable(string $nowOverride, string $light, string $message): void
+    public function testIdpCertOkMetadataUrlUnparsable(string $nowOverride, string $light, string $message): void
     {
+        /** Testing:
+         *  IDP Certificate      - Ok
+         *  Metadata URL         - Unparsable
+         */
         $samlCertHelper = new SamlCertHelper($this->getMetadataUnparsableMock());
 
         $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
@@ -312,7 +357,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function provider_IdpCertOk_metadataUrlUnparsable(): array
+    public function providerIdpCertOkMetadataUrlUnparsable(): array
     {
         return [
             ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
@@ -323,10 +368,14 @@ class SamlCertHelperTest extends Framework\TestCase
     }
 
     /**
-     * @dataProvider provider_IdpCertOk_metadataUrlOk
+     * @dataProvider providerIdpCertOkMetadataUrlOk
      */
-    public function test_IdpCertOk_metadataUrlOk(string $nowOverride, string $idpCert, string $light, string $message): void
+    public function testIdpCertOkMetadataUrlOk(string $nowOverride, string $idpCert, string $light, string $message): void
     {
+        /** Testing:
+         *  IDP Certificate      - Ok
+         *  Metadata URL         - Ok
+         */
         $samlCertHelper = new SamlCertHelper($this->getMetadataOkMock());
 
         $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
@@ -336,7 +385,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function provider_IdpCertOk_metadataUrlOk(): array
+    public function providerIdpCertOkMetadataUrlOk(): array
     {
         return [
             ["2027-03-20", self::CERT_2022_09_08, SamlCertHelper::LIGHT_SUCCESS, 'Valid'],
