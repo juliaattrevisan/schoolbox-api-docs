@@ -353,6 +353,7 @@ class Controller extends Assessment\Controller
     {
         $data['acceptingResponses'] = true;
         $data['importAttachzone']   = (new Zone('importXml'))
+            ->setFileVar('importXml[]')
             ->setThumbnailSize(64)
             ->setModalTitle('Select XML')
             ->setAttachmentsLabel('')

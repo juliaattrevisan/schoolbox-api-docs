@@ -121,6 +121,7 @@ if (!empty($_POST)) {
 
     // Attachzone
     $zone = (new Zone('importXml'))
+        ->setFileVar('importXml[]')
         ->setThumbnailSize(64)
         ->setModalTitle('Select XML')
         ->setAttachmentsLabel('')

@@ -23,7 +23,7 @@ if (!is_numeric($this->arg[0])) {
 /** @var FilesystemProxy $filesystemProxy */
 $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
 
-$collector = (new CollectorFactory())->build($_POST['attachment'] ?? []);
+$collector = (new CollectorFactory())->build($_POST['importXml'] ?? []);
 try {
     $file = $collector->getFirst();
     $data = $filesystemProxy->read($file);

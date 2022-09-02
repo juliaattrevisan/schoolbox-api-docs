@@ -29,7 +29,7 @@ if (!is_numeric($folderId) || empty($contextType) || !is_numeric($contextId)) {
     error(ErrorMapper::ERROR_SUBJECT_DELETED);
 }
 
-$collector = (new CollectorFactory())->build($_POST['attachment'] ?? []);
+$collector = (new CollectorFactory())->build($_POST['importXml'] ?? []);
 try {
     $file = $collector->getFirst();
     $data = $filesystemProxy->read($file);
