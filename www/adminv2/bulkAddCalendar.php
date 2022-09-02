@@ -23,10 +23,6 @@ $this->setBlock(TEMPLATE_content, 'event', 'event_block');
 
 /* Two types of upload.. either single user.. or via csv file..
  */
-
-/** @var FilesystemProxy $filesystemProxy */
-$filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-
 $collector = (new CollectorFactory())->build($_POST['bulkadd'] ?? []);
 try {
     $file = $collector->getFirst();
@@ -47,7 +43,23 @@ if (isset($_POST['userGroup']) && isset($_POST['campusList'])) {
         $ownerId = null;
     }
 
-    $bulkHandler = new Bulk_Calendar($_FILES['bulkadd']['tmp_name'], null, $ownerId, [], $_POST['userGroup'], $_POST['campusList']);
+    // Need to make uploaded file available locally,
+    // to avoid changing a whole heap of classes
+    /** @var FilesystemProxy $filesystemProxy */
+    $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
+    $fileTempName    = sb_tempnam('cal');
+    $fp              = fopen($fileTempName, 'wb');
+    stream_copy_to_stream($filesystemProxy->readStream($file), $fp);
+    fclose($fp);
+
+    $bulkHandler = new Bulk_Calendar(
+        $fileTempName,
+        null,
+        $ownerId,
+        [],
+        $_POST['userGroup'],
+        $_POST['campusList'],
+    );
     $allEvents = $bulkHandler->addCalendar();
 
     if ($allEvents && count($allEvents)) {
