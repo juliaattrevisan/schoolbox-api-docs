@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 
@@ -118,6 +119,17 @@ if (!empty($_POST)) {
         )
     );
 
+    // Attachzone
+    $zone = (new Zone('importXml'))
+        ->setThumbnailSize(64)
+        ->setModalTitle('Select XML')
+        ->setAttachmentsLabel('')
+        ->setAttachPrompt('Upload XML')
+        ->setMimeFilter('text/xml,application/xml')
+        ->setReadOnly(false)
+        ->setMulti(false)
+        ->useImportExpiryDate();
+    $zone->renderIntoSitePage($this, 'ASSESS_IMPORT_ATTACH_ZONE');
     $this->parse('importXML_block', 'importXML');
 
     /* Render out breadcrumbs
