@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+
 require_once __DIR__ . '/../../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -49,22 +51,14 @@ if ($authenticator->canModify()) {
         $listItem->setContent($content);
         $listItem->setSequence(1);
 
-        $uploadedFilename = $_FILES['imagehash']['name'];
-        $uploadedLocation = $_FILES['imagehash']['tmp_name'];
-        $uploadedUid      = $_SESSION['id'];
-
-        if (is_readable($uploadedLocation)) {
-            $allowedFiles = new \Schoolbox\File\MimetypeMapper();
-            $mime         = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
-
-            if (is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(), 'image/')) {
-                try {
-                    $imageResource = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($uploadedFilename, $uploadedLocation);
-                    $listItem->setImagehash($imageResource->getHash());
-                } catch (Exception $e) {
-                    //Silently fail if image cannot be uploaded
-                }
+        $collector = (new CollectorFactory())->build($_POST['imagehash'] ?? []);
+        try {
+            $file = $collector->getFirst();
+            if ($file->getMimetype()->isImage()) {
+                $listItem->setImagehash($file->getHash());
             }
+        } catch (\Schoolbox\Resource\Exception $e) {
+            // Silently fail if image cannot be uploaded?
         }
 
         \Component\Eportfolio\AdvancedListMapper::getInstance()->save($listItem);
@@ -78,18 +72,14 @@ if ($authenticator->canModify()) {
         $listItem->setTitle($title);
         $listItem->setContent($content);
 
-        $uploadedFilename = $_FILES['imagehash']['name'];
-        $uploadedLocation = $_FILES['imagehash']['tmp_name'];
-        $uploadedUid      = $_SESSION['id'];
-
-        if (is_readable($uploadedLocation)) {
-            $allowedFiles = new \Schoolbox\File\MimetypeMapper();
-            $mime         = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
-
-            if (is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(), 'image/')) {
-                $imageResource = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($uploadedFilename, $uploadedLocation);
-                $listItem->setImagehash($imageResource->getHash());
+        $collector = (new CollectorFactory())->build($_POST['imagehash'] ?? []);
+        try {
+            $file = $collector->getFirst();
+            if ($file->getMimetype()->isImage()) {
+                $listItem->setImagehash($file->getHash());
             }
+        } catch (\Schoolbox\Resource\Exception $e) {
+            // Silently fail if image cannot be uploaded?
         }
 
         \Component\Eportfolio\AdvancedListMapper::getInstance()->save($listItem);

@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Attachment\Zone;
 
 /**
  * @method \Component\Eportfolio\AdvancedListMapper getMapper()
@@ -54,7 +55,6 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
         $this->setVar(array(
             'has_create_form_block' => '',
             'has_modify_form_block' => '',
-            'has_image_modify_block' => '',
             'has_delete_form_block' => '',
             'has_image_block' => '',
             'no_image_block' => '',
@@ -64,6 +64,16 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
         /* Controls
          */
         if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+            $zone = (new Zone('imagehashCreate'))
+                ->setFileVar('imagehash[]')
+                ->setThumbnailSize(64)
+                ->setModalTitle('Select Images')
+                ->setAttachmentsLabel('')
+                ->setAttachPrompt('Upload Images')
+                ->setMimeFilter('image/*')
+                ->setReadOnly(false)
+                ->setMulti(false);
+            $zone->renderIntoSitePage($this->getSitePage(), 'IMAGEHASH_CREATE_ATTACH_ZONE');
             $this->parse('has_create_form_block', 'has_create_form');
         }
 
@@ -88,7 +98,6 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
                     ));
 
                     $this->parse('has_image_block', 'has_image');
-                    $this->parse('has_image_modify_block', 'has_image_modify');
                 } else {
                     $this->parse('no_image_block', 'no_image');
                 }
@@ -97,6 +106,20 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
                  */
                 if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                     $this->parse('has_modify_button_block', 'has_modify_button');
+                    $zone = (new Zone('imagehashModify'))
+                        ->setFileVar('imagehash[]')
+                        ->setThumbnailSize(64)
+                        ->setModalTitle('Select Images')
+                        ->setAttachmentsLabel('')
+                        ->setAttachPrompt('Upload Images')
+                        ->setMimeFilter('image/*')
+                        ->attachFiles([$currentItem->getImageHash()])
+                        ->setReadOnly(false)
+                        ->setMulti(false);
+                    if (strlen($currentItem->getImagehash())) {
+                        $zone->attachFiles([$currentItem->getImageHash()]);
+                    }
+                    $zone->renderIntoSitePage($this->getSitePage(), 'IMAGEHASH_MODIFY_ATTACH_ZONE');
                     $this->parse('has_modify_form_block', 'has_modify_form');
                     $this->parse('has_delete_form_block', 'has_delete_form');
                 }
