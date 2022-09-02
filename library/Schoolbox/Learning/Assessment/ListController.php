@@ -748,6 +748,25 @@ class ListController extends Web\Controller\Base
     {
         // If haven't got participation data, get it
         if (!$this->existingParticipationPerUser) {
+            /* Find Plans are associated with an assessment
+             *
+             * Multiplayer schoolbox allows $plans to be different upon saving
+             * so you can't use it as a source of truth - $plans ids in one tab
+             * is different to $plans ids in another tab, allowing a misunderstanding
+             * to occur that inadvertently lets a person have multiple plans
+             */
+
+            /* For each of those plans, find out if $userId is associated with it
+             * If it is, then this person already has a plan - index them with a
+             * (user id, plan id) tuple. This is the actual truth about which user
+             * has a plan in a given assessment; you cannot trust the GenericCollection
+             * $plans to contain the source of truth
+             */
+
+
+
+
+
             $participantMapper = $this->participantDataSource->getParticipantMapper();
             $planIds           = $plans->getPropertyValues('id');
 
