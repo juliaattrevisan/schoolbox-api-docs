@@ -38,7 +38,7 @@
                      * $query var
                      */
                     $.ajax({
-                        url: '/ajax/tags/pastoral',
+                        url: '{{ routeLookup('pastoral.searchTags') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: { query: query }
@@ -51,7 +51,7 @@
             },
             value: [
                 {% for tag in record.tags %}
-                {{ tag | json_encode | raw }}{% if not loop.last %},{% endif %}
+                {'id': '{{ tag.id }}', 'name': '{{ tag.name | escape('js') }}'},
                 {% endfor %}
             ]
         });

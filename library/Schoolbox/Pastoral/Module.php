@@ -220,6 +220,7 @@ class Module extends BaseModule
                     '/student/{studentId:\d+}/record/{recordId:\d+}/attachment/{attachmentId:\d+}' => ['getStudentRecordAttachment' => $permissionRecordView],
                     '/student/{studentId:\d+}/record/insert'                                       => ['getStudentRecordInsertForm' => $permissionStaff],
                     '/student/{studentId:\d+}/record/{recordId:\d+}/update'                        => ['getStudentRecordUpdateForm' => $permissionRecordUpdate],
+                    '/searchTags'                                                                  => ['searchTags' => $permissionStaff],
                 ],
                 'POST' => [
                     '/record/insert'                                        => ['postRecordInsert' => $permissionStaff],

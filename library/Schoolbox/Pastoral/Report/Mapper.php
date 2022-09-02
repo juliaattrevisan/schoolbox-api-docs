@@ -13,6 +13,7 @@ use PDOStatement;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -69,6 +70,7 @@ class Mapper extends BaseMapper
 
         $this->uses('include_records_without_action', self::TYPE_BOOLEAN);
         $this->uses('include_uncompleted_actions_only', self::TYPE_BOOLEAN);
+        $this->uses('notification_enabled', self::TYPE_BOOLEAN);
 
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -150,7 +152,7 @@ class Mapper extends BaseMapper
 
             $model = $this->hydrate($row);
 
-            if ($this->getConfigLoader()->get('pastoral_severity')) {
+            if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
                 if (!empty($row['severity_id'])) {
                     /** @var null|PastoralSeverity $severity */
                     try {
@@ -174,8 +176,7 @@ class Mapper extends BaseMapper
             // (of hydrated objects where applicable)
 
             $model->setOrder(new Collection(explode(',', $row['order'])));
-            $model->setYears(new Collection(explode(',', $row['years'])));
-
+            $model->setYears($this->getCollection(\Schoolbox\YearLevel\Mapper::getInstance(), $row['years']));
             $model->setTypes($this->getCollection(PastoralTypeMapper::getInstance(), $row['types']));
             $model->setSubTypes($this->getCollection(PastoralSubTypeMapper::getInstance(), $row['sub_types']));
             $model->setAuthors($this->getCollection(UserMapper::getInstance(), $row['authors']));
@@ -327,13 +328,145 @@ class Mapper extends BaseMapper
         return $this->hydrateSelect($statement);
     }
 
+
+    /**
+     * Find reports which criteria match the pastoral record provided
+     * Please note:
+     * * This does not check the current user's accessibility to the record
+     * * This does not check involved report flag, as it's expensive
+     *
+     * @param \Schoolbox\Pastoral\Model $pastoral
+     * @param bool                      $notificationEnabledOnly
+     * @return \Schoolbox\GenericCollection
+     */
+    public function findForRecord(\Schoolbox\Pastoral\Model $pastoral, bool $notificationEnabledOnly): GenericCollection
+    {
+        // For now, this does not check date, when uses_relative_date is true.
+
+        $sql = "
+            {$this->getSelectString()}
+            WHERE
+                  (
+                      `uses_relative_date` = 1
+                      OR
+                      (
+                          (`after_date` IS NULL OR `after_date` <= :createdAt)
+                          AND
+                          (`before_date` IS NULL OR :createdAt <= `before_date`)
+                      )
+                  )
+                  AND (`authors` IS NULL OR CONCAT(',', `authors`, ',') LIKE :authorLike)
+                  AND (`students` IS NULL OR CONCAT(',', `students`, ',') LIKE :studentLike)
+     ";
+
+        $wheres = [];
+        $params = [
+            'createdAt'   => $pastoral->getCreatedAt()->getDatabase(),
+            'authorLike'  => "%,{$pastoral->getOwner()->getId()},%",
+            'studentLike' => "%,{$pastoral->getStudent()->getId()},%",
+        ];
+
+        // Severity
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
+            // show all severity levels = severity_id = null
+            if ($pastoral->getSeverity()) {
+                $wheres[]                   = "(`severity_id` IS NULL OR :severitySequence >= `severity_id`)";
+                $params['severitySequence'] = $pastoral->getSeverity()->getSequence();
+            } else {
+                $wheres[] = "`severity_id` IS NULL";
+            }
+        }
+
+        // Type
+        if ($pastoral->getType()) {
+            $wheres[]           = "(`types` IS NULL OR CONCAT(',', `types`, ',') LIKE :typeLike)";
+            $params['typeLike'] = "%,{$pastoral->getType()->getId()},%";
+        } else {
+            // both pastoral record and report should not have this field null, but...
+            $wheres[] = "`types` IS NULL";
+        }
+
+        // SubType
+        // when subtype is empty, do not check report's sub_types field
+        if ($pastoral->getSubType()) {
+            $wheres[]              = "(`sub_types` IS NULL OR CONCAT(',', `sub_types`, ',') LIKE :subTypeLike)";
+            $params['subTypeLike'] = "%,{$pastoral->getSubType()->getId()},%";
+        }
+
+        // Tag
+        $tagWheres = [];
+        foreach ($pastoral->getTags() as $i => $tag) {
+            $tagWheres[]         = "CONCAT(',', `tags`, ',') LIKE :tagLike$i";
+            $params["tagLike$i"] = "%,{$tag->getId()},%";
+        }
+        if ($pastoral->getTags()->count() === 0) {
+            $wheres[] = "`tags` IS NULL";
+        } else {
+            $wheres[] = sprintf("(`tags` IS NULL OR %s)", implode(' OR ', $tagWheres));
+        }
+
+        // Year level
+        if ($pastoral->getStudent()->getYear()) {
+            $wheres[]           = "CONCAT(',', `years`, ',') LIKE :yearLike";
+            $params["yearLike"] = "%,{$pastoral->getStudent()->getYear()->getId()},%";
+        } else {
+            $wheres[] = "`include_students_without_year` = 1";
+        }
+
+        // House
+        if ($pastoral->getStudent()->getSchoolHouse()) {
+            $wheres[]            = "CONCAT(',', `houses`, ',') LIKE :houseLike";
+            $params["houseLike"] = "%,{$pastoral->getStudent()->getSchoolHouse()->getId()},%";
+        } else {
+            $wheres[] = "`include_students_without_house` = 1";
+        }
+
+        // Campus
+        $campusWheres = [];
+        foreach ($pastoral->getStudent()->getCampusCollection() as $i => $campus) {
+            $campusWheres[]         = "CONCAT(',', `campuses`, ',') LIKE :campusLike$i";
+            $params["campusLike$i"] = "%,{$campus->getId()},%";
+        }
+        $wheres[] = sprintf("(%s)", implode(' OR ', $campusWheres));
+
+        // Action
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+            $actionWheres = [];
+            foreach ($pastoral->getRecordActions() as $i => $action) {
+                if ($action->getCompleted()) {
+                    $actionWheres[] = "(CONCAT(',', `actions`, ',') LIKE :actionLike$i AND `include_uncompleted_actions_only` = 0)";
+                } else {
+                    $actionWheres[] = "CONCAT(',', `actions`, ',') LIKE :actionLike$i";
+                }
+                $params["actionLike$i"] = "%,{$action->getId()},%";
+            }
+            if ($pastoral->getRecordActions()->count() === 0) {
+                $wheres[] = "`actions` IS NULL OR `include_records_without_action` = 1";
+            } else {
+                $wheres[] = sprintf("(`actions` IS NULL OR %s)", implode(' OR ', $actionWheres));
+            }
+        }
+
+        // Notification enabled only
+        if ($notificationEnabledOnly) {
+            $wheres[] = "`notification_enabled` = 1";
+        }
+
+        $sql .= ' AND ' . implode(' AND ', $wheres) . ' GROUP BY `pastoral_report`.`id`';
+
+        $statement = $this->getDatabase()->prepare($sql);
+        $statement->execute($params);
+
+        return $this->hydrateSelect($statement);
+    }
+
     /**
      * Helper function to convert CSV filters to a collection of objects
      *
      * @param BaseMapper $mapper
      * @param string     $ids
      *
-     * @return Collection
+     * @return GenericCollection
      */
     private function getCollection($mapper, $ids)
     {

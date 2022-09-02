@@ -849,7 +849,7 @@ class Mapper extends BaseMapper
             $this->filters[]              = '`pastoral`.`created_at` >= :afterDate';
         }
 
-        if ($severity && $this->getConfigLoader()->get('pastoral_severity')) {
+        if ($severity && $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
             $this->bindings[':severity'] = $severity->getSequence();
             $this->filters[]             = '`sv`.`sequence` >= :severity';
         }
@@ -1048,7 +1048,7 @@ class Mapper extends BaseMapper
 
         if ($years->count()) {
             $pbArray = PredicateBuilder::getArrayBindings(
-                $years->getAll(),
+                $years->getPropertyValues('id'),
                 's_year' . self::$placeholderIndex
             );
 
