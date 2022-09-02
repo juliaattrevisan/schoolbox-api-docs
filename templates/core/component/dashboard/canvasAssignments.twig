@@ -1,11 +1,6 @@
-<div id='component-{{ componentInstanceId }}' class='component-container {COMPONENT_CLASS}' data-component>
-    <!-- Custom javascript -->
-
-    <div class="small-12 island">
-        <div id="canvas-assignments-container">
-            <canvas-assignments></canvas-assignments>
-        </div>
-    </div>
-    <!-- You need this; spawns after you "npm run build" or "npm run watch" for the first time -->
-    <script src="{{ CDN_PREFIX }}/js/bundle/canvasAssignments.js?v={{ config.site_version }}"></script>
+<!-- Custom javascript -->
+<div class="small-12 columns no-pad" id="canvas-assignments-container">
+        <canvas-assignments></canvas-assignments>
 </div>
+<!-- You need this; spawns after you "npm run build" or "npm run watch" for the first time -->
+<script src="{{ CDN_PREFIX }}/js/bundle/canvasAssignments.js?v={{ config.site_version }}"></script>
