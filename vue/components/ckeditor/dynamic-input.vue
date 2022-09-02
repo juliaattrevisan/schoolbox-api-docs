@@ -203,9 +203,7 @@ export default {
             return {
                 on: {
                     change: () => { // Bind the content of CKEditor into the comment model on change
-                        if (!this.allowSubmit) { //if the submit isn't within dynamic-input, we should be notifying of any changes for a parent to maintain state
-                            this.$emit('value-changed', CKEDITOR.instances[this.inputName].getData());
-                        }
+                        this.$emit('value-changed', CKEDITOR.instances[this.inputName].getData()); //notifying of any changes for a parent to maintain state
                     },
                     instanceReady: () => { //can display the loaded CKEditor now
                         this.isCKEditorLoading = false;
@@ -218,19 +216,11 @@ export default {
         },
 
         /**
-         * Notify the parent and clear the comment box
+         * Notify the parent to submit the form
          */
         postItem () {
-            const comment = this.newValue;
-
-            /* TODO What's this
-             * I presume this occurs when you hit a submit button and that people
-             * used it to disable the submit button to prevent double submits
-             */
-            this.$emit('on-post-comment', comment);
-
-            this.newValue = '';
-            CKEDITOR.instances[this.inputName].setData(this.newValue); //clear out the CKEditor for another possible post
+            const value = CKEDITOR.instances[this.inputName].getData();
+            this.$emit('post', value);
         },
     }
 }
@@ -238,7 +228,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div class="dynamic-input">
         <button v-if="this.allowEdit" class="show-ckeditor-button" v-show="!isCKEditorLoaded" @click.once="spawnEditor">{{ getEditButtonText }}</button>
         <div :style="getStyles">
             <textarea :id="this.presetUniqueId" :name="this.inputName" rows="4">{{ this.value }}</textarea>
@@ -246,3 +236,11 @@ export default {
         </div>
     </div>
 </template>
+
+<style lang="scss" scoped>
+
+.dynamic-input {
+    margin-bottom: 1rem;
+}
+
+</style>

@@ -346,20 +346,19 @@ export default {
         },
 
         /**
-         * Open the award modal to confirm and submit the goals/awards
-         */
-        onConfirmSelected () {
-            this.isModalOpen = true;
-            this.$refs.awardModal.open();
-        },
-
-        /**
          * To keep track of the reason, that's being updated by dynamic-input.vue
          *
          * @param { string }
          */
         onReasonChanged (newValue) {
             this.reason = newValue;
+        },
+
+        /**
+         * close the modal
+         */
+        onCancelSelected () {
+            this.$refs.awardModal.close();
         },
 
         /**

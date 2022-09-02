@@ -78,7 +78,7 @@ export default {
              * we do this to avoid issues around ckeditor instantiation coupled with modals
              * where opening, closing, then re-opening a modal causes the ckeditor to break
              */
-            isModalOpen: false,
+            hasSelectedModify: false,
         }
     },
 
@@ -211,17 +211,27 @@ export default {
         },
 
         /**
-         * Save the updated data and close the modal once complete
+         * to be able to udpate the reason using dynamic-input.vue
          */
-        onSaveSelected () {
-            this.isModalOpen = false;
+        onEditReasonSelected () {
+            this.hasSelectedModify = true;
+        },
+
+        /**
+         * post the changed reason value to the backend
+         * and then close the modal
+         *
+         * @param { string }
+         */
+        onSaveReasonSelected (value) {
+            console.warn(value);
         },
 
         /**
          * The modal is now completely closed
          */
         onModalClosed () {
-            this.isModalOpen = false;
+            this.hasSelectedModify = false;
         },
 
     }
@@ -267,22 +277,24 @@ export default {
 
                 <hr/>
                 <label>Reason</label>
-                <!-- <article v-html="award.reason"></article> -->
                 <dynamic-input
-                    v-if="isModalOpen"
+                    v-if="hasSelectedModify"
                     preset-unique-id="reason"
                     inputName="reason"
                     singular="reason"
                     :value="award.reason"
                     :allow-edit="true"
-                    :allow-submit="false"
+                    :allow-submit="true"
                     :spawn-immediately="true"
                     :is-processing="true"
                     :cdn-prefix="this.cdnPrefix"
                     :site-version="this.siteVersion"
+                    @post="onSaveReasonSelected"
                 ></dynamic-input>
-
-                <button class="submit save-button" @click.prevent="onSaveSelected" @keyup.enter="onSaveSelected">Save</button>
+                <template v-else>
+                    <button class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
+                    <article v-html="award.reason"></article>
+                </template>
 
                 <template v-if="award.badge.curriculumNodes.length">
                     <hr />
@@ -309,9 +321,14 @@ export default {
 <style scoped>
 
 .modify-link {
+    background: none;
     color: var(--content-ui-foreground);
     float: right;
     margin-right: 1rem;
+}
+
+article {
+    max-width: none; /* allow to stretch full width in this context */
 }
 
 .save-button {
