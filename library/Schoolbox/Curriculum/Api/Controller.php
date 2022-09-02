@@ -100,7 +100,7 @@ class Controller extends Base
     public function getTree(): void
     {
         $tree = $this->nodeMapper->getCollectionAsTree(
-            $this->nodeMapper->findAll(),
+            $this->nodeMapper->findAll(['order' => ['order' => 'asc', 'id' => 'asc']]),
             'parent',
             'children',
         );

@@ -256,7 +256,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             $pb = $pb->equals('n.enabled', $enabled);
         }
 
-        $query .= ' WHERE ' . $pb->getWhereIntersect();
+        $query .= ' WHERE ' . $pb->getWhereIntersect() . ' ORDER BY n.order ASC, n.id ASC';
         $params = $pb->getParams();
         if ($limit > 0) {
             $query .= ' LIMIT :limit';
