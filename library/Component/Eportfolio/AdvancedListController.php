@@ -64,7 +64,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
         /* Controls
          */
         if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-            $zone = (new Zone('imagehashCreate'))
+            $zone = (new Zone('imagehashCreate'.$this->getInstance()->getId()))
                 ->setFileVar('imagehash[]')
                 ->setThumbnailSize(64)
                 ->setModalTitle('Select Images')
@@ -106,7 +106,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
                  */
                 if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                     $this->parse('has_modify_button_block', 'has_modify_button');
-                    $zone = (new Zone('imagehashModify'))
+                    $zone = (new Zone('imagehashModify'.$this->getInstance()->getId().'-'.$currentItem->getId()) )
                         ->setFileVar('imagehash[]')
                         ->setThumbnailSize(64)
                         ->setModalTitle('Select Images')

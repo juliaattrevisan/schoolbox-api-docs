@@ -80,6 +80,7 @@ if ($authenticator->canModify()) {
             }
         } catch (\Schoolbox\Resource\Exception $e) {
             // Silently fail if image cannot be uploaded?
+            $listItem->setImagehash(null);
         }
 
         \Component\Eportfolio\AdvancedListMapper::getInstance()->save($listItem);
