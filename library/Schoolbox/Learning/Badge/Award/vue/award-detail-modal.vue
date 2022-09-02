@@ -275,26 +275,34 @@ export default {
 
                 <article v-html="award.badge.body"></article>
 
-                <hr/>
-                <label>Reason</label>
-                <dynamic-input
-                    v-if="hasSelectedModify"
-                    preset-unique-id="reason"
-                    inputName="reason"
-                    singular="reason"
-                    :value="award.reason"
-                    :allow-edit="true"
-                    :allow-submit="true"
-                    :spawn-immediately="true"
-                    :is-processing="true"
-                    :cdn-prefix="this.cdnPrefix"
-                    :site-version="this.siteVersion"
-                    @post="onSaveReasonSelected"
-                ></dynamic-input>
-                <template v-else>
+                <!-- Only show the Reason section if there was something meaningful -->
+                <template v-if="award.reason.length">
+                    <hr/>
+
+                    <!-- If you have the ability to change the Reason, provide dynamic input -->
                     <template v-if="award._links.awardUpdate">
+                        <form :action="award._links.awardUpdate" method="post">
+                            <label>Reason</label>
+                            <dynamic-input
+                                v-if="hasSelectedModify"
+                                preset-unique-id="reason"
+                                inputName="reason"
+                                singular="reason"
+                                :value="award.reason"
+                                :allow-edit="true"
+                                :allow-submit="true"
+                                :spawn-immediately="true"
+                                :is-processing="true"
+                                :cdn-prefix="this.cdnPrefix"
+                                :site-version="this.siteVersion"
+                                @post="onSaveReasonSelected"
+                            ></dynamic-input>
+                        </form>
+
+                        <!-- Also provide the button to make the change -->
                         <button class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
                     </template>
+
                     <article v-html="award.reason"></article>
                 </template>
 
