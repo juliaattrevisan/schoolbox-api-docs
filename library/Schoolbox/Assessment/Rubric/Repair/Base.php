@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface as Logger;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Mail\EmailFactory;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Address;
 
 /**
  * Base class for rubric repair scripts.
@@ -386,7 +387,7 @@ abstract class Base extends CliTool\App
         if ($mailto) {
             /** @var EmailFactory $emailFactory */
             $emailFactory = $this->getDi()->get('mail.emailFactory');
-            $mailer = $emailFactory->buildTwigEmail($template, $subject, $mailto);
+            $mailer = $emailFactory->buildTwigEmail($template, $subject, Address::create($mailto));
             $mailer->setLogger($this->log);
             $mailer->setContext($context);
             try {

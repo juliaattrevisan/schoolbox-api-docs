@@ -37,7 +37,7 @@ $emailFactory = new \Schoolbox\Mail\EmailFactory($config, \Schoolbox\Admin\Email
 
 switch ($this->arg[0]) {
     case 'instant':
-        $email = $emailFactory->buildTwigEmail('instantmail.twig', '', '');
+        $email = $emailFactory->buildTwigEmail('instantmail.twig', '', null);
         $email->setContext(array(
             'recipient' => $_SESSION['user']->getFirstname()
         ));
@@ -62,7 +62,7 @@ switch ($this->arg[0]) {
 
     case 'digest':
     default:
-        $email = $emailFactory->buildTwigEmail('digestmail.twig', '', '');
+        $email = $emailFactory->buildTwigEmail('digestmail.twig', '', null);
         $cctx = $email->getCoreContext();
 
         $decorator->appendInstance($bob

@@ -53,11 +53,11 @@ class TwigEmail extends Mailer
      * Prepares the email by importing various configurations from the system
      *
      * @param string                    $subject - the default email subject, can be changed after construction
-     * @param string|array|Address|User $to      - the defailt recipient, can be changed after construction
+     * @param Address|User|null         $to      - the defailt recipient, can be changed after construction
      * @param IConfigLoader             $config
      * @param Mapper                    $dkimMapper
      */
-    public function __construct(string $subject, string | array | Address | User $to, IConfigLoader $config, Mapper $dkimMapper)
+    public function __construct(string $subject, Address | User | null $to, IConfigLoader $config, Mapper $dkimMapper)
     {
         parent::__construct($subject, $to, $config, $dkimMapper);
 

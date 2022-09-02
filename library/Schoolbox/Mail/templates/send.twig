@@ -4,6 +4,12 @@
         [ folder.nameWithCodes, '/homepage/' ~ folder.id ],
         [ 'Compose Email', '#' ],
     ) }}
+{% elseif student %}
+    {% import 'sub/breadcrumbs.twig' as bread %}
+    {{ bread.crumbs(
+        [ student.fullname ~ ' - ' ~ title, '/search/user/' ~ student.id ],
+        [ 'Compose Email', '#' ],
+    ) }}
 {% endif %}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>

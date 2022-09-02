@@ -11,15 +11,15 @@ namespace Schoolbox\Mail;
 
 use Alaress\Html\ToText as Html2Text;
 use Alaress\Web\Controller\Base;
-use Alaress\Mail\Mailer;
-use Alaress\Mail\Codec;
 use Aura\Web\Request\Values;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Profile\ValidEmailVisible;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -29,6 +29,7 @@ use Schoolbox\UserMapper;
 use Email;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
@@ -102,49 +103,42 @@ class Controller extends Base
             'bcc'     => [],
         ];
 
-        /* A list of email addresses that appeared in the To field
-         */
-        $replyToEmailAddresses = [];
-
         foreach (array_keys($addressLists) as $type) {
             if (null === $params->get($type)) {
                 continue;
             }
-            $emailAddresses = Mailer::parseAddressString($params->get($type));
-            if ($type === 'replyto') {
-                $replyToEmailAddresses = array_keys($emailAddresses[Mailer::KEY_VALID]);
+            $emailAddresses = imap_rfc822_parse_adrlist($params->get($type), '');
+            foreach ($emailAddresses as $emailAddress) {
+                try {
+                    $address = $this->convertAddress($emailAddress);
+                    if ($this->getUser()->getEmail() === $address->getAddress()) {
+                        // do not add for now. deal with this later
+                        continue;
+                    }
+                    $addressLists[$type][] = $address->toString();
+                } catch (Exception $e) {
+                    $invalidEmails[] = $e->getMessage();
+                    continue;
+                }
             }
-
-            /* Remember some invalid emails, if any were found
-             */
-            $invalidEmails = array_merge($emailAddresses[Mailer::KEY_INVALID], $invalidEmails);
-
-            /** Get valid email addresses */
-            $addressLists[$type] = array_map(
-                function ($address) {
-                    /** @var Address $address */
-                    return $address->toString();
-                },
-                $emailAddresses[Mailer::KEY_VALID]
-            );
         }
 
-        // Add current user to bcc, if not already in TO
-        $isCurrentUserInTo = in_array($this->getUser()->getEmail(), $replyToEmailAddresses, true);
-
+        // get addresses from ids and add to corresponding field
         $folder = null;
-        if ($params->get('folderId')) {
+        // we don't want the top level folder as well...
+        if ($params->get('folderId') && (int)$params->get('folderId') !== IFolder::ROOT_ID) {
             try {
                 $folder = $this->folderMapper->findById((int)$params->get('folderId'));
             } catch (MapperException $e) {
             }
         }
 
-        $addressListFromIds  = $this->findAddressesFromIds($params, $folder);
-        $addressLists['bcc'] = array_merge($addressLists['bcc'], $addressListFromIds);
+        $addressListFromIds    = $this->findAddressesFromIds($params, $folder);
+        $target                = $params->get('target') ?? 'bcc';
+        $addressLists[$target] = array_merge($addressLists[$target], $addressListFromIds);
 
-        // Add current user to replyto if not exists
-        if (!$isCurrentUserInTo) {
+        // add current user to TO or BCC
+        if (empty($addressLists['replyto'])) {
             if ($folder) {
                 try {
                     $replyTo = new Address($this->getUser()->getEmail(), $folder->getName());
@@ -153,21 +147,24 @@ class Controller extends Base
                 }
             }
             $addressLists['replyto'][] = isset($replyTo) ? $replyTo->toString() : $this->getUser()->getFormattedEmailDisplay();
-        };
-        // Remove current user if exists in bcc
-        $addressLists['bcc'] = array_diff($addressLists['bcc'], [
-            $this->getUser()->getEmail(),
-            $this->getUser()->getFormattedEmailDisplay(),
-        ]);
+            // Remove current user, if exists in cc and bcc
+            foreach (['cc', 'bcc'] as $type) {
+                $addressLists[$type] = array_diff($addressLists[$type], [
+                    $this->getUser()->getEmail(),
+                    $this->getUser()->getFormattedEmailDisplay(),
+                ]);
+            }
+        } elseif (
+            !in_array($this->getUser()->getEmail(), $addressLists['bcc'])
+            && !in_array($this->getUser()->getFormattedEmailDisplay(), $addressLists['bcc'])
+        ) {
+            $addressLists['bcc'][] = $this->getUser()->getFormattedEmailDisplay();
+        }
 
         $emailBody = $this->getEmailBody();
 
         // Uniquify invalid email result
         $invalidEmails = array_unique($invalidEmails);
-
-        foreach ($addressLists['replyto'] as $replyToKey => $replyTo) {
-            $addressLists['replyto'][$replyToKey] = Codec::decode($replyTo);
-        }
 
         $zone = new \Schoolbox\Resource\Attachment\Zone('email-attachments');
         $zone->setMulti(true)
@@ -179,6 +176,15 @@ class Controller extends Base
         $data['attachzone'] = $zone->getTwigContext();
 
         $uri = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme("https");
+
+        $student = null;
+        if ($params->get('studentId')) {
+            try {
+                $student = $this->userMapper->findById($params->get('studentId'));
+            } catch (MapperException $e) {
+                // noop
+            }
+        }
 
         $this->getResponse()->content->set(
             [
@@ -193,6 +199,8 @@ class Controller extends Base
                     'attachzone'    => $zone->getTwigContext(),
                     'baseHref'      => $uri,
                     'folder'        => $folder,
+                    'student'       => $student,
+                    'title'         => $params->get('title'),
                 ],
                 'title'    => 'Webmail',
             ]
@@ -220,7 +228,7 @@ class Controller extends Base
             $this->sendError('No recipient provided');
         }
         $attachments = $this->request->post->get('attachment') ?? [];
-        $mail        = $this->emailFactory->buildSimpleEmail($subject, '');
+        $mail        = $this->emailFactory->buildSimpleEmail($subject, null);
 
         //get users email address to use in from field
 
@@ -245,8 +253,12 @@ class Controller extends Base
                 $this->sendError('Your email address is not valid.');
             }
         } else {
-            foreach ($this->getParsedAddresses($to) as $address) {
-                $mail->setTo($address);
+            foreach (imap_rfc822_parse_adrlist($to, '') as $addressObj) {
+                try {
+                    $mail->setTo($this->convertAddress($addressObj));
+                } catch (Exception $e) {
+                    continue;
+                }
             }
         }
 
@@ -259,11 +271,19 @@ class Controller extends Base
         //create email header
         $mail->setSubject($subject);
 
-        foreach ($this->getParsedAddresses($cc) as $address) {
-            $mail->setCc($address);
+        foreach (imap_rfc822_parse_adrlist($cc, '') as $addressObj) {
+            try {
+                $mail->setCc($this->convertAddress($addressObj));
+            } catch (Exception $e) {
+                continue;
+            }
         }
-        foreach ($this->getParsedAddresses($bcc) as $address) {
-            $mail->setBcc($address);
+        foreach (imap_rfc822_parse_adrlist($bcc, '') as $addressObj) {
+            try {
+                $mail->setBcc($this->convertAddress($addressObj));
+            } catch (Exception $e) {
+                continue;
+            }
         }
 
         $converter = new Html2Text($message);
@@ -285,24 +305,6 @@ class Controller extends Base
         } catch (TransportExceptionInterface $e) {
             $this->sendError($e->getMessage());
         }
-    }
-
-    /**
-     * @param string $addressString
-     * @return array
-     */
-    private function getParsedAddresses(string $addressString): array
-    {
-        $emailAddresses = Mailer::parseAddressString(Mailer::standardiseEmailSeparator($addressString));
-        return $emailAddresses[Mailer::KEY_VALID] ?? [];
-    }
-
-    /**
-     * @return string
-     */
-    private function getDefaultHost(): string
-    {
-        return trim($this->getConfigLoader()->get('site_hostname')) . '.' . trim($this->getConfigLoader()->get('site_domain'));
     }
 
     /**
@@ -517,5 +519,19 @@ class Controller extends Base
                 );
         }
         return $emailBody;
+    }
+
+    /**
+     * Convert output of imap_rfc822_parse_adrlist to Symfony Address object
+     * @param \stdClass $addressObj
+     * @return Address
+     */
+    private function convertAddress(\stdClass $addressObj): Address
+    {
+        try {
+            return new Address($addressObj->mailbox . '@' . $addressObj->host, $addressObj->personal ?? '');
+        } catch (RfcComplianceException | InvalidArgumentException $e) {
+            throw new Exception($addressObj->mailbox . (!empty($addressObj->host) ? '@' . $addressObj->host : ''));
+        }
     }
 }

@@ -30,26 +30,14 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Crypto\DkimOptions;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\Exception\InvalidArgumentException;
-use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\TextPart;
 
-use function count;
-use function trim;
-
 class Mailer
 {
-    // These two const are just a key for an array structure that will separate valid and invalid email addresses
-    // As of the moment, these keys are being used here and in createMail.php::45 only
-    public const KEY_INVALID = 'invalid';
-    public const KEY_VALID   = 'valid';
-
     private const MAX_RETRIES   = 4;
     private const RETRY_TIMEOUT = 1;
-
-    public const EMAIL_SEPARATOR_CODE = 0x1E;
 
     /**
      * Instance of mail transporter.
@@ -90,11 +78,11 @@ class Mailer
      * Construct the basics of a new Mailer
      *
      * @param string                    $subject
-     * @param string|array|Address|User $to
+     * @param Address|User|null $to
      * @param IConfigLoader             $config
      * @param Mapper                    $dkimMapper
      */
-    public function __construct(string $subject, string | array | Address | User $to, IConfigLoader $config, Mapper $dkimMapper)
+    public function __construct(string $subject, Address | User | null $to, IConfigLoader $config, Mapper $dkimMapper)
     {
         $this->config     = $config;
         $this->dkimMapper = $dkimMapper;
@@ -130,34 +118,15 @@ class Mailer
 
     /**
      * Set To
-     * @param string|array|Address|User $to
+     * @param Address | User | null $to
      * @return void
      */
-    public function setTo(string | array | Address | User $to)
+    public function setTo(Address | User | null $to)
     {
         if ($to instanceof User) {
             $this->email->addTo(new Address($to->getEmail(), $to->formatName()));
         } elseif ($to instanceof Address) {
             $this->email->addTo($to);
-        } elseif (\is_array($to)) {
-            if ($to['email']) {
-                //Assume one dimensional array
-                $this->email->addTo(new Address($to['email'], $to['name'] ?? ''));
-            } else {
-                if ($to['name']) {
-                    // Name only, can't send email
-                    throw new RfcComplianceException("No email address supplied.");
-                } else {
-                    // Assume two dimensional array
-                    foreach ($to as $email) {
-                        $this->email->addTo(new Address($email['email'], $email['name'] ?? ''));
-                    }
-                }
-            }
-        } else {
-            foreach (self::parseAddressString($to)[self::KEY_VALID] as $address) {
-                $this->email->addTo($address);
-            }
         }
     }
 
@@ -471,64 +440,6 @@ class Mailer
             }
         }
         return self::$transport;
-    }
-
-    /**
-     * @param string $emailAddresses A collection of email addresses in a string format that's separated with self::EMAIL_SEPARATOR_CODE
-     *
-     * @return array ['valid' => [['email' => Address() ]], 'invalid' => ['email']
-     */
-    public static function parseAddressString(string $emailAddresses): array
-    {
-        $returnList = [
-            self::KEY_VALID   => [],
-            self::KEY_INVALID => [],
-        ];
-
-        if (trim($emailAddresses) === '') {
-            return $returnList;
-        }
-
-        $validEmails   = [];
-        $invalidEmails = [];
-        //Explode emails by the ascii's Record Separator
-        $emailList = explode(\chr(self::EMAIL_SEPARATOR_CODE), $emailAddresses);
-
-        foreach ($emailList as $email) {
-            try {
-                $emailAddress                             = Address::create(trim($email));
-                $validEmails[$emailAddress->getAddress()] = $emailAddress;
-                continue;
-            } catch (RfcComplianceException | InvalidArgumentException $e) {
-                // noop
-            }
-            $invalidEmails[] = $email;
-        }
-        return [
-            self::KEY_VALID   => $validEmails,
-            self::KEY_INVALID => $invalidEmails,
-        ];
-    }
-
-    /**
-     * Update email separator from comma with EMAIL_SEPARATOR_CODE
-     * @param string $string
-     * @return mixed
-     */
-    public static function standardiseEmailSeparator($string)
-    {
-        // Do not replace comma symbols inside "".
-        // Double quotes on header are being set on homepage/classList.html. It should be safe to say that we can use to regex?
-        return preg_replace('/,(?=(?:[^"]*"[^"]*")*[^"]*$)/', \chr(self::EMAIL_SEPARATOR_CODE), $string);
-    }
-
-    /**
-     * Implode glue to join email addresses array
-     * @return string
-     */
-    public static function implodeGlue(): string
-    {
-        return \chr(self::EMAIL_SEPARATOR_CODE);
     }
 
     /**
