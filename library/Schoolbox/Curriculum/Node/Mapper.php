@@ -236,8 +236,9 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         ";
         $quotedLike = $this->getDatabase()->getQuoter()->escapeForLike($keyword);
         $pb = $this->getPredicateBuilder()
-            ->isNull('n.deleted_at')
-            ->any(
+            ->isNull('n.deleted_at');
+        if ($keyword !== '') {
+            $pb = $pb->any(
                 $this->getPredicateBuilder()
                     ->like('n.code', $quotedLike . '%')
                     ->all(
@@ -246,6 +247,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
                             ->like('n.name', '%' . $quotedLike . '%')
                     )
             );
+        }
         if ($topLevelOnly) {
             $pb = $pb->isNull('n.curriculum_node_parent_id');
         }
