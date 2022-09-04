@@ -171,7 +171,7 @@ class Controller extends Base
              ->setThumbnailSize(64)
              ->setModalTitle('Select files')
              ->setMimeFilter('*/*')
-             ->setAttachPrompt('Attach files');
+             ->setAttachPrompt('Attach files')
              ->useImportExpiryDate();
         $data['attachzone'] = $zone->getTwigContext();
 
