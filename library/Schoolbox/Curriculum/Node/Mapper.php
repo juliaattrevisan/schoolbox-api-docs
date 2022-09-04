@@ -285,6 +285,20 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     }
 
     /**
+     * Order by the virtual label field, then by ID.
+     *
+     * @return array
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return [
+            'virtual_label' => 'asc',
+            'id'            => 'asc',
+        ];
+    }
+
+
+    /**
      * Hydrates a curriculum node, with joins to area+source and level+source.
      *
      * @param array  $row
