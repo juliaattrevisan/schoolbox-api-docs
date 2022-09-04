@@ -21,7 +21,7 @@ use Schoolbox\Profile\ValidEmailVisible;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -94,15 +94,13 @@ class Controller extends Base
         // The name needs to be included in both the ID and value
         $invalidEmails = [];
 
-        /* The replyto array key must come first, because we use it to dedupe replyto
-         * senders against cc and bcc fields, to prevent them self-spamming unnecessarily
-         */
         $addressLists = [
             'replyto' => [],
             'cc'      => [],
             'bcc'     => [],
         ];
 
+        // Validate email addresses provided and remove current user
         foreach (array_keys($addressLists) as $type) {
             if (null === $params->get($type)) {
                 continue;
@@ -112,7 +110,7 @@ class Controller extends Base
                 try {
                     $address = $this->convertAddress($emailAddress);
                     if ($this->getUser()->getEmail() === $address->getAddress()) {
-                        // do not add for now. deal with this later
+                        // do not add current user to any lists for now. deal with this later
                         continue;
                     }
                     $addressLists[$type][] = $address->toString();
@@ -123,7 +121,7 @@ class Controller extends Base
             }
         }
 
-        // get addresses from ids and add to corresponding field
+        // Find addresses from ids and add to corresponding field
         $folder = null;
         // we don't want the top level folder as well...
         if ($params->get('folderId') && (int)$params->get('folderId') !== IFolder::ROOT_ID) {
@@ -137,8 +135,12 @@ class Controller extends Base
         $target                = $params->get('target') ?? 'bcc';
         $addressLists[$target] = array_merge($addressLists[$target], $addressListFromIds);
 
-        // add current user to TO or BCC
+        // Add current user
+        // - to replyto, if replyto is empty
+        // - to bcc, if reply to is not empty
         if (empty($addressLists['replyto'])) {
+            // If TO field is empty, add current user to the TO field
+            // and make sure that the current user does not exist in CC and BCC
             if ($folder) {
                 try {
                     $replyTo = new Address($this->getUser()->getEmail(), $folder->getName());
@@ -173,7 +175,6 @@ class Controller extends Base
              ->setMimeFilter('*/*')
              ->setAttachPrompt('Attach files')
              ->useImportExpiryDate();
-        $data['attachzone'] = $zone->getTwigContext();
 
         $uri = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme("https");
 
@@ -363,7 +364,10 @@ class Controller extends Base
             $context['hideUnsubscribe'] = true;
 
             $subject = $this->getConfigLoader()->get('title') . ' Feedback - ' . $this->request->post->get('subject');
-            $to      = new Address($this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_SUPPORT_ADDRESS), $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_FROM_NAME));
+            $to      = new Address(
+                $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_SUPPORT_ADDRESS),
+                $this->getConfigLoader()->get(ConfigMapper::NAME_MAIL_FROM_NAME)
+            );
             $email   = $this->emailFactory->buildTwigEmail('feedback.twig', $subject, $to);
             $email->addReplyTo($replyTo);
             $email->setContext($context);
@@ -405,11 +409,11 @@ class Controller extends Base
     }
 
     /**
-     * @param Values     $params
-     * @param Model|null $folder
+     * @param Values      $params
+     * @param Folder|null $folder
      * @return array
      */
-    private function findAddressesFromIds(Values $params, ?Model $folder): array
+    private function findAddressesFromIds(Values $params, ?Folder $folder): array
     {
         // Expecting either studentExternalIds, userIds or folderId
         if ($params->get('studentExternalIds')) {
@@ -443,10 +447,7 @@ class Controller extends Base
             $targetUsers = $users->filter(
                 function ($user) use ($emailVisible, $viewer) {
                     /** @var User $user */
-                    if ($viewer->getRole()->isParent()) {
-                        return $emailVisible->isSatisfiedByParent($user, $viewer);
-                    }
-                    return $emailVisible->isSatisfiedByRole($user->getRole()->getType(), $viewer->getRole(), $viewer->isSuperuser());
+                    return $emailVisible->isSatisfiedBy($user, $viewer);
                 }
             );
 
