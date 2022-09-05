@@ -44,12 +44,21 @@ const props = defineProps({
 const isIdSet = computed(() => props.node.id !== UNSET_ID);
 
 /**
+ * if the node is a child of one that's selected but is not in
+ * the selected list it should be disabled
+ *
+ * @returns { Boolean }
+ */
+const isDisabled = computed(() => {
+    return props.node.isSelected && !selectedNodesStore.nodesIds.includes(props.node.id);
+});
+
+/**
  * Update the status of the checkbox based on whether it's selected or not
  *
  * @returns { Boolean }
  */
 const isChecked = computed(() => {
-    // return selectedNodesStore.nodesIds.includes(props.node.id);
     return props.node.isSelected;
 });
 
@@ -70,8 +79,8 @@ function onChange (isChecked) {
             :id="`checkbox-${props.node.id}`"
             type="checkbox"
             :value="props.node.id"
+            :disabled="isDisabled"
             :checked="isChecked"
-            :disabled="props.isUpdatingOrAdding"
             @change="onChange($event.target.checked)"
         />
         <label :for="`checkbox-${props.node.id}`"></label>

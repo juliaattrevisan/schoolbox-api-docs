@@ -29,7 +29,7 @@ export const useNodesStore = defineStore('mcNodes', {
          */
         initTopLevel () {
             /**
-             * Hold off on this for now, I'll need to think a bit more on what to store in the session storage
+             * @TODO - Hold off on this for now, I'll need to think a bit more on what to store in the session storage
              * before I enable this.
              */
             // if (sessionStorage.getItem(SB_CURRICULUM_TOP_LEVEL)) {
@@ -53,7 +53,7 @@ export const useNodesStore = defineStore('mcNodes', {
         /**
          * load in the top level nodes from the api
          */
-         async loadTopLevel () {
+        async loadTopLevel () {
             const store = useStore();
             try {
                 const response = await fetch(`${apiEndpoint}/?topLevelOnly=1`);
@@ -162,12 +162,35 @@ export const useNodesStore = defineStore('mcNodes', {
         },
 
         /**
+         * To return an array with any objects containing the specified id removed
+         * we move through the object, looping recursively through .children and remove
+         * any with the id that's being removed
+         *
+         * @param { array }
+         * @param { number }
+         *
+         * @returns { object }
+         */
+        removeId (data, id) {
+            if (data !== null) { // .children wont always be available if the node hasn't been loaded yet
+                return data.reduce((previousValue, currentValue) => {
+                    if (currentValue.id !== id) {
+                        previousValue.push( { ...currentValue, children: this.removeId(currentValue.children, id) } );
+                    }
+                    return previousValue;
+                }, []);
+            } else {
+                return data;
+            }
+        },
+
+        /**
          * Pull the node out of the list
          *
          * @param { object }
          */
         deleteNode (node) {
-            const nodeRemoved = removeId(this.nodes.children, node.id);
+            const nodeRemoved = this.removeId(this.nodes.children, node.id);
             this.updateNodes(nodeRemoved);
         },
 
@@ -175,28 +198,7 @@ export const useNodesStore = defineStore('mcNodes', {
 
 });
 
-/**
- * To return an array with any objects containing the specified id removed
- * we move through the object, looping recursively through .children and remove
- * any with the id that's being removed
- *
- * @param { array }
- * @param { number }
- *
- * @returns { object }
- */
-export function removeId (data, id) {
-    if (data !== null) { // .children wont always be available if the node hasn't been loaded yet
-        return data.reduce((previousValue, currentValue) => {
-            if (currentValue.id !== id) {
-                previousValue.push( { ...currentValue, children: removeId(currentValue.children, id) } );
-            }
-            return previousValue;
-        }, []);
-    } else {
-        return data;
-    }
-}
+
 
 /**
  * To just return the node containing the specified id
