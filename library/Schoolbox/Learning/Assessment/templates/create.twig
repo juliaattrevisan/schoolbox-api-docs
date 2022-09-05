@@ -213,7 +213,7 @@
 {# TODO - This should be in the quiz fragment, not the parent, but that doesn't work because you can't have a form
 in a form. The template hierachy should be refactored so that quiz EXTENDS the parent, rather than being included.
 #}
-{% if assessment is quiz %}
+{% if (assessment is defined and assessment is quiz) %}
     <div id="import-modal" class="reveal-modal" data-reveal="">
         <form action="/assess/import/xml/{{ context.folder.id }}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="context_type" value="{{ contextType }}">
