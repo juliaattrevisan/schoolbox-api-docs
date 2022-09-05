@@ -51,7 +51,7 @@ function onDeleteNodesSelected () {
     <bottom-drawer :showDrawer="selectedNodesStore.hasNodes">
         <h3 class="selected-count"><em>{{ selectedNodesSummary }} selected</em></h3>
         <button @click.prevent="onClearMemberSelection" class="button-clear" :disabled="false">Clear selection</button>
-        <ul class="flex-list">
+        <ul class="flex-list buttons">
             <!-- <li>
                 <button @click.prevent="onEmailnodesSelected" class="button submit icon-email" :disabled="false">Email {{ selectedNodesStore.selectednodesPlural }}</button>
             </li> -->
@@ -70,13 +70,6 @@ function onDeleteNodesSelected () {
 
 .button-clear, .button-delete, .selected-count {
     display: inline-block;
-}
-
-.shift-select-note {
-    color: #9a9a9a;
-    font-size: 13px;
-    font-style: italic;
-    margin-right: 1rem;
 }
 
 .button-clear {

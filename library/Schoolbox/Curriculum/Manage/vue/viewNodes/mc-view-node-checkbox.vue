@@ -49,7 +49,8 @@ const isIdSet = computed(() => props.node.id !== UNSET_ID);
  * @returns { Boolean }
  */
 const isChecked = computed(() => {
-    return selectedNodesStore.nodesIds.includes(props.node.id);
+    // return selectedNodesStore.nodesIds.includes(props.node.id);
+    return props.node.isSelected;
 });
 
 /**

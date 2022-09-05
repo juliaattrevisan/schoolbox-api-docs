@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
+import { useNodesStore, findById } from '../../store/mcNodesStore';
 
 
 export const useSelectedNodesStore = defineStore('csSelectedNodes', {
@@ -80,6 +81,9 @@ export const useSelectedNodesStore = defineStore('csSelectedNodes', {
             if (Array.isArray(nodeToAdd)) {
                 this.nodes  = [...this.nodes, ...nodeToAdd];
             } else {
+                //when we get a new node we need to loop through all the children and update isSelected on each
+                //also when we load new nodes we need to check the status of the parent, and add the isSelected property when appropriate
+                this.updateIsSelected(nodeToAdd, true);
                 this.nodes  = [...this.nodes, nodeToAdd];
             }
         },
@@ -95,8 +99,41 @@ export const useSelectedNodesStore = defineStore('csSelectedNodes', {
                     this.nodes = this.nodes.filter((selectedCode) => selectedCode.id !== node.id);
                 });
             } else {
+                this.updateIsSelected(nodeToRemove, false);
                 this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id);
             }
+        },
+
+        /**
+         * to track whether a node is selected (with mc-view-node-checkbox)
+         * we add an additional property to each node
+         *
+         * @param { object }
+         */
+        addIsSelected (node) {
+            if (node.isSelected === undefined) {
+                const nodesStore = useNodesStore();
+                const parentNode = findById(nodesStore.nodes.children, node.parent?.id);
+                if (parentNode) {
+                    node.isSelected = parentNode.isSelected;
+                } else {
+                    node.isSelected = false;
+                }
+            }
+        },
+
+        /**
+         * Loop through and update all children to the parents
+         * updated isSelected state
+         *
+         * @param { array }
+         * @param { boolean }
+         */
+        updateIsSelected (node, isSelected) {
+            node.isSelected = isSelected;
+            node.children?.forEach((innerNode) => {
+                this.updateIsSelected(innerNode, isSelected);
+            });
         },
 
         /**
@@ -119,3 +156,4 @@ export const useSelectedNodesStore = defineStore('csSelectedNodes', {
     },
 
 })
+

@@ -5,6 +5,7 @@
 import { defineStore } from 'pinia';
 import { useStore, apiEndpoint } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
+import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 export const UNSET_ID = 0;
@@ -102,7 +103,9 @@ export const useNodesStore = defineStore('mcNodes', {
                 const response = await fetch(`${apiEndpoint}/${id}?descendants=1`);
                 if (response.ok) {
                     const newNode = await response.json();
+                    newNode.children.forEach((node) => useSelectedNodesStore().addIsSelected(node));
                     const oldNode = findById(this.nodes.children, id);
+                    useSelectedNodesStore().addIsSelected(oldNode);
                     oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
                     console.warn(response);
@@ -128,6 +131,7 @@ export const useNodesStore = defineStore('mcNodes', {
                 children: nodes,
                 enabled: true,
             }
+            nodes.forEach((node) => useSelectedNodesStore().addIsSelected(node));
         },
 
         /**
