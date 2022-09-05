@@ -63,15 +63,6 @@ export const useActiveNodeStore = defineStore('mcActiveNode', {
         },
 
         /**
-         * toggle the nodes enabled state
-         *
-         * @param { boolean }
-         */
-        enabled (enabled) {
-            enabledAllChildren(this.node, enabled);
-        },
-
-        /**
          * unset ready for another use
          *
          * @param { Object }
@@ -83,17 +74,3 @@ export const useActiveNodeStore = defineStore('mcActiveNode', {
     },
 
 })
-
-/**
- * Loop through and update all children to the parents
- * updated enabled state
- *
- * @param { array }
- * @param { boolean }
- */
- function enabledAllChildren (node, enabled) {
-    node.enabled = enabled;
-    node.children?.forEach((innerNode) => {
-        enabledAllChildren(innerNode, enabled);
-    });
-}

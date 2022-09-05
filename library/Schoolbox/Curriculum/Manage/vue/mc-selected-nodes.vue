@@ -5,16 +5,16 @@
  * on the members currently selected
  */
 
-import { ref, computed, watch, onMounted  } from 'vue';
-// import { useStore } from '../store/manageGroupStore';
+import { computed  } from 'vue';
 import { useSelectedNodesStore } from './selectedNodes/store/mcSelectedNodesStore';
 import { useDeleteSelectedNodesStore } from './selectedNodes/store/mcDeleteSelectedNodesStore';
+import { useEnableSelectedNodesStore } from './selectedNodes/store/mcEnableSelectedNodesStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
 
 
-// const store = useStore(); //to disable butons on processing
 const selectedNodesStore = useSelectedNodesStore(); //to keep track of selected nodes
 const deleteSelectedNodesStore = useDeleteSelectedNodesStore();
+const enableSelectedNodesStore = useEnableSelectedNodesStore();
 
 
 
@@ -32,14 +32,21 @@ const selectedNodesSummary = computed(() => {
 });
 
 /**
- * Dispatch to manage-group.vue so the selection can be cleared
+ * Clear the current selection
  */
 function onClearMemberSelection () {
     selectedNodesStore.empty();
 }
 
 /**
- * So the selected members can be removed
+ * So the selected nodes can be enabled / disabled
+ */
+ function onEnableNodesSelected () {
+    enableSelectedNodesStore.prompt();
+}
+
+/**
+ * So the selected nodes can be removed
  */
 function onDeleteNodesSelected () {
     deleteSelectedNodesStore.prompt();
@@ -50,13 +57,13 @@ function onDeleteNodesSelected () {
 <template>
     <bottom-drawer :showDrawer="selectedNodesStore.hasNodes">
         <h3 class="selected-count"><em>{{ selectedNodesSummary }} selected</em></h3>
-        <button @click.prevent="onClearMemberSelection" class="button-clear" :disabled="false">Clear selection</button>
+        <button class="button-clear" @click.prevent="onClearMemberSelection">Clear selection</button>
         <ul class="flex-list buttons">
-            <!-- <li>
-                <button @click.prevent="onEmailnodesSelected" class="button submit icon-email" :disabled="false">Email {{ selectedNodesStore.selectednodesPlural }}</button>
-            </li> -->
             <li>
-                <button @click.prevent="onDeleteNodesSelected" class="button submit icon-delete" :disabled="false">Delete {{ selectedNodesSummary }}</button>
+                <button class="icon-email"  @click.prevent="onEnableNodesSelected" @keyup.enter="onEnableNodesSelected">Enable {{ selectedNodesSummary }}</button>
+            </li>
+            <li>
+                <button class="icon-delete" @click.prevent="onDeleteNodesSelected" @keyup.enter="onDeleteNodesSelected">Delete {{ selectedNodesSummary }}</button>
             </li>
         </ul>
     </bottom-drawer>

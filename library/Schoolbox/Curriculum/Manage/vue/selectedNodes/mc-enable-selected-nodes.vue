@@ -5,41 +5,34 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useActiveNodeStore } from './store/mcActiveNodeStore';
-import { useEnableNodeStore } from './store/mcEnableNodeStore';
+import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
+import { useEnableSelectedNodesStore } from './store/mcEnableSelectedNodesStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const activeNodeStore = useActiveNodeStore();
-const enableNodeStore = useEnableNodeStore();
+const selectedNodesStore = useSelectedNodesStore();
+const enableSelectedNodesStore = useEnableSelectedNodesStore();
 const modalEl = ref(null);
 
 /**
  * to open the modal when requested
  */
-watch(() => enableNodeStore.isOpen, (isOpen) => {
+watch(() => enableSelectedNodesStore.isOpen, (isOpen) => {
     isOpen ? modalEl.value.open() : modalEl.value.close();
 });
-
-/**
- * also highlight that you'll be deleting all the children within as well
- *
- * @returns { String }
- */
-const childrenWarning = computed(() => activeNodeStore?.node?.children?.length > 0 ? ' and all of its children' : '');
 
 /**
  * enabled the node when confirmed
  */
 function onEnableSelected () {
-    enableNodeStore.enable();
+    enableSelectedNodesStore.enable();
 }
 
 /**
  * so we can track the progress of the node removal
  * and update the UI accordingly
  */
-enableNodeStore.$onAction(({ name, after, onError }) => {
+enableSelectedNodesStore.$onAction(({ name, after, onError }) => {
     if (name === 'enabled') {
         // store.toastEl.activate('Disbanding...');
         after(() => {
@@ -59,7 +52,7 @@ enableNodeStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const enabledButtonText = computed(() => enableNodeStore.isProcessing ? 'Disabling...' : 'Yes');
+const enabledButtonText = computed(() => enableSelectedNodesStore.isProcessing ? 'Disabling...' : 'Yes');
 
 /**
  * to prevent the user from moving away from the modal while
@@ -67,13 +60,13 @@ const enabledButtonText = computed(() => enableNodeStore.isProcessing ? 'Disabli
  *
  * @returns { Boolean }
  */
-const isModalDisabled = computed(() => enableNodeStore.isProcessing);
+const isModalDisabled = computed(() => enableSelectedNodesStore.isProcessing);
 
 /**
  * to close the modal
  */
 function onCancelSelected () {
-    enableNodeStore.cancel();
+    enableSelectedNodesStore.cancel();
 }
 
 /**
@@ -81,7 +74,7 @@ function onCancelSelected () {
  * as we can currently also use foundation to close the modal
  */
 function onModalClosed () {
-    enableNodeStore.cancel();
+    enableSelectedNodesStore.cancel();
 }
 
 </script>
@@ -95,11 +88,16 @@ function onModalClosed () {
     >
         <h2>Please Confirm</h2>
         <p>
-            Are you sure you wish to disable {{ activeNodeStore.title }} and all of its children?
-            If you continue, this node and any child nodes will be hidden from the curriculum code selector during curriclum mapping.</p>
+            Are you sure you wish to delete the {{ selectedNodesStore.countWithName }} selected and all of {{ selectedNodesStore.count > 1 ? 'their' : 'its' }} children?
+            If you continue, this node and any child nodes will be hidden from the curriculum code selector during curriclum mapping.
+        </p>
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onEnableSelected" class="button submit" :disabled="enableNodeStore.isProcessing">{{ enabledButtonText }}</button></li>
-            <li><button @click.prevent="onCancelSelected" class="button" :disabled="enableNodeStore.isProcessing">Cancel</button></li>
+            <li>
+                <button @click.prevent="onEnableSelected" class="button submit" :disabled="enableSelectedNodesStore.isProcessing">{{ enabledButtonText }}</button>
+            </li>
+            <li>
+                <button @click.prevent="onCancelSelected" class="button" :disabled="enableSelectedNodesStore.isProcessing">Cancel</button>
+            </li>
         </ul>
     </reveal-modal>
 </template>
