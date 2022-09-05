@@ -258,7 +258,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             $pb = $pb->equals('n.enabled', $enabled);
         }
 
-        $query .= ' WHERE ' . $pb->getWhereIntersect() . ' ORDER BY n.virtual_label ASC, n.id ASC';
+        $query .= ' WHERE ' . $pb->getWhereIntersect() . ' ORDER BY n.virtual_order ASC, n.id ASC';
         $params = $pb->getParams();
         if ($limit > 0) {
             $query .= ' LIMIT :limit';
@@ -292,7 +292,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     protected function getDefaultOrderByParams(): array
     {
         return [
-            'virtual_label' => 'asc',
+            'virtual_order' => 'asc',
             'id'            => 'asc',
         ];
     }
