@@ -515,37 +515,6 @@
                         }
                     });
 
-                    /**
-                     * Handle a draft submission success
-                     *
-                     * @param {jQuery} $actionBar
-                     * @param {jQuery} $publishButton
-                     */
-                    function draftPublishSuccess($actionBar, $publishButton) {
-                        var $soboButton      = $actionBar.find('[data-sobo]'),
-                            $draftedSpan     = $actionBar.find('[data-draft=drafted]'),
-                            $extraMeta       = $actionBar.find('[data-feedback-attach-info]'),
-                            $feedbackButtons = $draftedSpan.add($publishButton);
-
-                        $actionBar.removeAttr('data-mass-publish');
-                        $actionBar.removeAttr('data-mass-submit');
-
-                        // Cannot sobo an acknowledgment once published feedback exists
-                        $soboButton.fadeOut({
-                            done: function () {
-                                $soboButton.remove();
-                            }
-                        });
-
-                        // Hide the feedback buttons
-                        $feedbackButtons.fadeOut();
-
-                        // Slide up if no meta to display
-                        if(!$extraMeta.length){
-                            $actionBar.slideUp();
-                        }
-                    }
-
                     {# Handle clicks on 'Submission Received' buttons #}
                     $('[data-sobo]').on('click', function (event) {
                         window.buttonClickedJq = $(this);
@@ -649,6 +618,37 @@
                         $button.html(buttonText);
                         $button.removeAttr('disabled');
                         $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
+                    }
+
+                    /**
+                     * Handle a draft submission success
+                     *
+                     * @param {jQuery} $actionBar
+                     * @param {jQuery} $publishButton
+                     */
+                    function draftPublishSuccess($actionBar, $publishButton) {
+                        var $soboButton      = $actionBar.find('[data-sobo]'),
+                                $draftedSpan     = $actionBar.find('[data-draft=drafted]'),
+                                $extraMeta       = $actionBar.find('[data-feedback-attach-info]'),
+                                $feedbackButtons = $draftedSpan.add($publishButton);
+
+                        $actionBar.removeAttr('data-mass-publish');
+                        $actionBar.removeAttr('data-mass-submit');
+
+                        // Cannot sobo an acknowledgment once published feedback exists
+                        $soboButton.fadeOut({
+                            done: function () {
+                                $soboButton.remove();
+                            }
+                        });
+
+                        // Hide the feedback buttons
+                        $feedbackButtons.fadeOut();
+
+                        // Slide up if no meta to display
+                        if(!$extraMeta.length){
+                            $actionBar.slideUp();
+                        }
                     }
                 });
             </script>
