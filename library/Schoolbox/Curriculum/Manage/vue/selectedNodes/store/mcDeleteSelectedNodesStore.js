@@ -5,10 +5,10 @@
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useNodesStore } from '../../store/mcNodesStore';
-import { useActiveNodeStore } from './mcActiveNodeStore';
+import { useActiveNodeStore } from '../../activeNode/store/mcActiveNodeStore';
 
 
-export const useDeleteNodeStore = defineStore('mcDeleteNode', {
+export const useDeleteSelectedNodesStore = defineStore('mcDeleteSelectedNodes', {
 
     state: () => ({
         isProcessing: false,

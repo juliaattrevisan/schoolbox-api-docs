@@ -7,14 +7,14 @@
 
 import { ref, computed, watch, onMounted  } from 'vue';
 // import { useStore } from '../store/manageGroupStore';
-import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
-import { useDeleteNodeStore } from './activeNode/store/mcDeleteNodeStore';
+import { useSelectedNodesStore } from './selectedNodes/store/mcSelectedNodesStore';
+import { useDeleteSelectedNodesStore } from './selectedNodes/store/mcDeleteSelectedNodesStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
 
 
 // const store = useStore(); //to disable butons on processing
 const selectedNodesStore = useSelectedNodesStore(); //to keep track of selected nodes
-const deleteNodeStore = useDeleteNodeStore();
+const deleteSelectedNodesStore = useDeleteSelectedNodesStore();
 
 
 
@@ -42,7 +42,7 @@ function onClearMemberSelection () {
  * So the selected members can be removed
  */
 function onDeleteNodesSelected () {
-    deleteNodeStore.prompt();
+    deleteSelectedNodesStore.prompt();
 }
 
 </script>

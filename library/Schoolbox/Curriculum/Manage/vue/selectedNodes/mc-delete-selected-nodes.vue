@@ -5,19 +5,19 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useActiveNodeStore } from './store/mcActiveNodeStore';
-import { useDeleteNodeStore } from './store/mcDeleteNodeStore';
+import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
+import { useDeleteSelectedNodesStore } from './store/mcDeleteSelectedNodesStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const activeNodeStore = useActiveNodeStore();
-const deleteNodeStore = useDeleteNodeStore();
+const activeNodeStore = useSelectedNodesStore();
+const deleteSelectedNodesStore = useDeleteSelectedNodesStore();
 const modalEl = ref(null);
 
 /**
  * to open the modal when requested
  */
-watch(() => deleteNodeStore.isOpen, (isOpen) => {
+watch(() => deleteSelectedNodesStore.isOpen, (isOpen) => {
     isOpen ? modalEl.value.open() : modalEl.value.close();
 });
 
@@ -32,14 +32,14 @@ const childrenWarning = computed(() => activeNodeStore?.node?.children?.length >
  * delete the node when confirmed
  */
 function onDeleteSelected () {
-    deleteNodeStore.delete();
+    deleteSelectedNodesStore.delete();
 }
 
 /**
  * so we can track the progress of the node removal
  * and update the UI accordingly
  */
-deleteNodeStore.$onAction(({ name, after, onError }) => {
+deleteSelectedNodesStore.$onAction(({ name, after, onError }) => {
     if (name === 'delete') {
         // store.toastEl.activate('Disbanding...');
         after(() => {
@@ -59,7 +59,7 @@ deleteNodeStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const deleteButtonText = computed(() => deleteNodeStore.isProcessing ? 'Deleting...' : 'Yes');
+const deleteButtonText = computed(() => deleteSelectedNodesStore.isProcessing ? 'Deleting...' : 'Yes');
 
 /**
  * to prevent the user from moving away from the modal while
@@ -67,13 +67,13 @@ const deleteButtonText = computed(() => deleteNodeStore.isProcessing ? 'Deleting
  *
  * @returns { Boolean }
  */
-const isModalDisabled = computed(() => deleteNodeStore.isProcessing);
+const isModalDisabled = computed(() => deleteSelectedNodesStore.isProcessing);
 
 /**
  * to close the modal
  */
 function onCancelSelected () {
-    deleteNodeStore.cancel();
+    deleteSelectedNodesStore.cancel();
 }
 
 /**
@@ -81,7 +81,7 @@ function onCancelSelected () {
  * as we can currently also use foundation to close the modal
  */
 function onModalClosed () {
-    deleteNodeStore.cancel();
+    deleteSelectedNodesStore.cancel();
 }
 
 </script>
@@ -94,10 +94,10 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
-        <p>Are you sure you wish to delete {{ activeNodeStore.title }} and all of its children?</p>
+        <p>Are you sure you wish to delete {{ activeNodeStore.title }} and all of their children?</p>
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onDeleteSelected" class="button submit" :disabled="deleteNodeStore.isProcessing">{{ deleteButtonText }}</button></li>
-            <li><button @click.prevent="onCancelSelected" class="button" :disabled="deleteNodeStore.isProcessing">Cancel</button></li>
+            <li><button @click.prevent="onDeleteSelected" class="button submit" :disabled="deleteSelectedNodesStore.isProcessing">{{ deleteButtonText }}</button></li>
+            <li><button @click.prevent="onCancelSelected" class="button" :disabled="deleteSelectedNodesStore.isProcessing">Cancel</button></li>
         </ul>
     </reveal-modal>
 </template>

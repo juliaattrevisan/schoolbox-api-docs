@@ -7,7 +7,7 @@
 
 import { computed } from 'vue';
 import { UNSET_ID } from '../store/mcNodesStore';
-import { useSelectedNodesStore } from '../store/mcSelectedNodesStore';
+import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
 
 const selectedNodesStore = useSelectedNodesStore();
 
