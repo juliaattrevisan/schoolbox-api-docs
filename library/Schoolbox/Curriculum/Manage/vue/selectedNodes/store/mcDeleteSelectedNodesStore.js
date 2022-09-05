@@ -5,7 +5,7 @@
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useNodesStore } from '../../store/mcNodesStore';
-import { useActiveNodeStore } from '../../activeNode/store/mcActiveNodeStore';
+import { useSelectedNodesStore } from './mcSelectedNodesStore';
 
 
 export const useDeleteSelectedNodesStore = defineStore('mcDeleteSelectedNodes', {
@@ -27,20 +27,20 @@ export const useDeleteSelectedNodesStore = defineStore('mcDeleteSelectedNodes', 
         /**
          * node removal has been confirmed so notify the backend
          * and then pull it out of the nodes if successful
+         *
+         * @TODO - more extensive error checking needs to occur
          */
         async delete () {
             this.isProcessing = true;
             try {
-                const activeNodeStore = useActiveNodeStore();
-                const response = await fetch(`${apiEndpoint}/${activeNodeStore.node.id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                if (response.ok) {
+                const nodeDeletions = await Promise.all(this.getFetches());
+                const deleteResponses = nodeDeletions.map((response) => response.ok);
+                const isAllResponsesOk = deleteResponses.every((response) => response === true);
+                if (isAllResponsesOk) {
+                    const selectedNodesStore = useSelectedNodesStore();
                     const nodesStore = useNodesStore();
-                    nodesStore.deleteNode(node);
+                    selectedNodesStore.nodes.forEach((node) => nodesStore.deleteNode(node)); //delete each node from the tree
+                    selectedNodesStore.empty();
                     this.isProcessing = false;
                     this.cancel();
                 } else {
@@ -49,6 +49,26 @@ export const useDeleteSelectedNodesStore = defineStore('mcDeleteSelectedNodes', 
             } catch (error) {
                 console.warn(error);
             }
+        },
+
+        /**
+         * To delete all the marked nodes in parallel
+         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
+         *
+         * @returns { Array }
+         */
+        getFetches () {
+            const fetchList = [];
+            const selectedNodesStore = useSelectedNodesStore();
+            selectedNodesStore.nodes.forEach((node) => {
+                fetchList.push(fetch(`${apiEndpoint}/${node.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                }));
+            });
+            return fetchList;
         },
 
         /**

@@ -27,7 +27,7 @@ const selectedNodesSummary = computed(() => {
     if (selectedNodesStore.hasNoNodes) {
         return `No nodes`;
     } else {
-        return `${selectedNodesStore.count} ${selectedNodesStore.singleOrPlural}`;
+        return selectedNodesStore.countWithName;
     }
 });
 

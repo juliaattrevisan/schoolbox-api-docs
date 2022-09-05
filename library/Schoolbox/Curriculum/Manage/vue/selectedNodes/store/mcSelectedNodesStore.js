@@ -50,6 +50,15 @@ export const useSelectedNodesStore = defineStore('csSelectedNodes', {
         },
 
         /**
+         * Return the single or plural depending on node selection
+         *
+         * @return { string }
+         */
+        countWithName () {
+            return `${this.count} ${this.singleOrPlural}`;
+        },
+
+        /**
          * just return an array of ids, used to compare if a node is selected or not
          *
          * @return { array }

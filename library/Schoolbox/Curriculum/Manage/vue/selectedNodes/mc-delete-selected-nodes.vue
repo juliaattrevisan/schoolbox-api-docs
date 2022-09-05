@@ -10,7 +10,7 @@ import { useDeleteSelectedNodesStore } from './store/mcDeleteSelectedNodesStore'
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const activeNodeStore = useSelectedNodesStore();
+const selectedNodesStore = useSelectedNodesStore();
 const deleteSelectedNodesStore = useDeleteSelectedNodesStore();
 const modalEl = ref(null);
 
@@ -26,7 +26,7 @@ watch(() => deleteSelectedNodesStore.isOpen, (isOpen) => {
  *
  * @returns { String }
  */
-const childrenWarning = computed(() => activeNodeStore?.node?.children?.length > 0 ? ' and all of its children' : '');
+const childrenWarning = computed(() => selectedNodesStore?.node?.children?.length > 0 ? ' and all of its children' : '');
 
 /**
  * delete the node when confirmed
@@ -94,7 +94,7 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
-        <p>Are you sure you wish to delete {{ activeNodeStore.title }} and all of their children?</p>
+        <p>Are you sure you wish to delete the {{ selectedNodesStore.countWithName }} selected and all of {{ selectedNodesStore.count > 1 ? 'their' : 'its' }} children?</p>
         <ul class="flex-list buttons">
             <li><button @click.prevent="onDeleteSelected" class="button submit" :disabled="deleteSelectedNodesStore.isProcessing">{{ deleteButtonText }}</button></li>
             <li><button @click.prevent="onCancelSelected" class="button" :disabled="deleteSelectedNodesStore.isProcessing">Cancel</button></li>
