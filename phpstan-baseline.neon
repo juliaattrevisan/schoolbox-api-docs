@@ -7405,19 +7405,3 @@ parameters:
 			message: "#^Variable \\$type might not be defined\\.$#"
 			count: 1
 			path: www/modules/conference/index.php
-		-
-			message: "#^Undefined variable\\: \\$this$#"
-			count: 2
-			path: www/custom/tigs/deans-comments.php
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: www/custom/tigs/deans-comments.php
-		-
-			message: "#^Call to an undefined method Psr\\\\Log\\\\LoggerInterface\\:\\:getResults\\(\\)\\.$#"
-			count: 2
-			path: www/custom/tigs/deans-comments.php
-		-
-			message: "#^Call to an undefined method Psr\\\\Log\\\\LoggerInterface\\:\\:hasErrors\\(\\)\\.$#"
-			count: 1
-			path: www/custom/tigs/deans-comments.php
