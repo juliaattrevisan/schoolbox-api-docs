@@ -517,11 +517,10 @@
 
                     {# Handle clicks on 'Submission Received' buttons #}
                     $('[data-sobo]').on('click', function (event) {
-
                         window.buttonClickedJq = $(this);
 
                         if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
-                            $('#confirm-dialog').show().css('visibility', 'visible');
+                            $('#confirm-dialog').foundation('reveal', 'open');
                         } else {
                             postSobo(false);
                         }
@@ -668,9 +667,9 @@
                 <p>Was this work submitted on time?</p>
             </div>
             <ul class="flex-list buttons">
-                <li><a class="button submit" data-accept onclick='postSobo(true)'>Yes</a></li>
-                <li><a class="button" data-reject onclick='postSobo(false)'>No</a></li>
-                <li><a class="button" data-reject onclick="$('#confirm-dialog').hide()">Cancel</a></li>
+                <li><a class="button submit" data-accept onclick="postSobo(true);$('#confirm-dialog').foundation('reveal', 'close');">Yes</a></li>
+                <li><a class="button submit" data-reject onclick="postSobo(false);$('#confirm-dialog').foundation('reveal', 'close');">No</a></li>
+                <li><a class="button" data-reject onclick="$('#confirm-dialog').foundation('reveal', 'close')">Cancel</a></li>
             </ul>
         </div>
 
