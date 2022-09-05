@@ -628,9 +628,9 @@
                      */
                     function draftPublishSuccess($actionBar, $publishButton) {
                         var $soboButton      = $actionBar.find('[data-sobo]'),
-                                $draftedSpan     = $actionBar.find('[data-draft=drafted]'),
-                                $extraMeta       = $actionBar.find('[data-feedback-attach-info]'),
-                                $feedbackButtons = $draftedSpan.add($publishButton);
+                            $draftedSpan     = $actionBar.find('[data-draft=drafted]'),
+                            $extraMeta       = $actionBar.find('[data-feedback-attach-info]'),
+                            $feedbackButtons = $draftedSpan.add($publishButton);
 
                         $actionBar.removeAttr('data-mass-publish');
                         $actionBar.removeAttr('data-mass-submit');
