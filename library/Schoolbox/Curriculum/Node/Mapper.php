@@ -238,8 +238,9 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         ";
         $quotedLike = $this->getDatabase()->getQuoter()->escapeForLike($keyword);
         $pb = $this->getPredicateBuilder()
-            ->isNull('n.deleted_at')
-            ->any(
+            ->isNull('n.deleted_at');
+        if ($keyword !== '') {
+            $pb = $pb->any(
                 $this->getPredicateBuilder()
                     ->like('n.code', $quotedLike . '%')
                     ->all(
@@ -248,6 +249,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
                             ->like('n.name', '%' . $quotedLike . '%')
                     )
             );
+        }
         if ($topLevelOnly) {
             $pb = $pb->isNull('n.curriculum_node_parent_id');
         }
@@ -258,7 +260,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             $pb = $pb->equals('n.enabled', $enabled);
         }
 
-        $query .= ' WHERE ' . $pb->getWhereIntersect();
+        $query .= ' WHERE ' . $pb->getWhereIntersect() . ' ORDER BY n.virtual_order ASC, n.id ASC';
         $params = $pb->getParams();
         if ($limit > 0) {
             $query .= ' LIMIT :limit';
@@ -283,6 +285,20 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $result = $this->loadDescendants($result, 'parent', 'children', $descendants);
         return $result;
     }
+
+    /**
+     * Order by the virtual label field, then by ID.
+     *
+     * @return array
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return [
+            'virtual_order' => 'asc',
+            'id'            => 'asc',
+        ];
+    }
+
 
     /**
      * Hydrates a curriculum node, with joins to area+source and level+source.
