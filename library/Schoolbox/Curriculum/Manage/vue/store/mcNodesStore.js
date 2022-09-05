@@ -8,6 +8,7 @@ import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 export const UNSET_ID = 0;
+const SB_CURRICULUM_TOP_LEVEL = 'SB_CURRICULUM_TOP_LEVEL'; //to id to store the top level session storage with
 
 
 export const useNodesStore = defineStore('mcNodes', {
@@ -22,22 +23,37 @@ export const useNodesStore = defineStore('mcNodes', {
     actions: {
 
         /**
-         * Add in all the top level nodes for display
+         * check if the top level is loaded in the session storage already
+         * so we don't reload
          */
-        async loadTopLevel () {
+        initTopLevel () {
+            if (sessionStorage.getItem(SB_CURRICULUM_TOP_LEVEL)) {
+                this.getTopLevel();
+            } else {
+                this.loadTopLevel();
+            }
+        },
 
+        /**
+         * get the top level from session storage
+         */
+        async getTopLevel () {
+            const topLevelNodes = JSON.parse(sessionStorage.getItem(SB_CURRICULUM_TOP_LEVEL)); //convert the saved string var back to JSON
+            await this.setTopLevel(topLevelNodes);
+            store.isLoading = false;
+        },
+
+        /**
+         * load in the top level nodes from the api
+         */
+         async loadTopLevel () {
             const store = useStore();
             try {
                 const response = await fetch(`${apiEndpoint}/?topLevelOnly=1`);
                 if (response.ok) {
-                    const nodes = await response.json();
-                    this.updateNodes(nodes);
-                    const viewNodesStore = useViewNodesStore();
-                    if (viewNodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
-                        const singleCurriculumId = this.nodes.children[0].id;
-                        await this.loadChildren(singleCurriculumId); //load in its children for initial display
-                        viewNodesStore.setSelected(1, singleCurriculumId); //then select the node
-                    }
+                    const topLevelNodes = await response.json();
+                    sessionStorage.setItem(SB_CURRICULUM_TOP_LEVEL, JSON.stringify(topLevelNodes)); //session storage vars need to be saved as strings only
+                    await this.setTopLevel(topLevelNodes);
                 } else {
                     console.warn(response);
                     store.hasLoadError = true; //show the load error display state
@@ -46,7 +62,23 @@ export const useNodesStore = defineStore('mcNodes', {
                 console.warn(error);
                 store.hasLoadError = true; //show the load error display state
             } finally {
-                store.isLoading = false; //otherwise show the table
+                store.isLoading = false; //otherwise show the tree
+            }
+        },
+
+        /**
+         * set the top level nodes, passed through either from loading or
+         * the already stored session storage
+         *
+         * @param { object }
+         */
+        async setTopLevel (nodes) {
+            this.updateNodes(nodes);
+            const viewNodesStore = useViewNodesStore();
+            if (viewNodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
+                const singleCurriculumId = this.nodes.children[0].id;
+                await this.loadChildren(singleCurriculumId); //load in its children for initial display
+                viewNodesStore.setSelected(1, singleCurriculumId); //then select the node
             }
         },
 
