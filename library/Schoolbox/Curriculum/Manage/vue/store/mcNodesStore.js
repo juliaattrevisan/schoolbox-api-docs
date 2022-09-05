@@ -198,8 +198,6 @@ export const useNodesStore = defineStore('mcNodes', {
 
 });
 
-
-
 /**
  * To just return the node containing the specified id
  *

@@ -6,7 +6,7 @@ import { defineStore } from 'pinia';
 import { useNodesStore, findById } from '../../store/mcNodesStore';
 
 
-export const useSelectedNodesStore = defineStore('csSelectedNodes', {
+export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
 
     state: () => ({
         nodes: [], //the currently selected nodes
@@ -81,11 +81,28 @@ export const useSelectedNodesStore = defineStore('csSelectedNodes', {
             if (Array.isArray(nodeToAdd)) {
                 this.nodes  = [...this.nodes, ...nodeToAdd];
             } else {
-                //when we get a new node we need to loop through all the children and update isSelected on each
-                //also when we load new nodes we need to check the status of the parent, and add the isSelected property when appropriate
                 this.updateIsSelected(nodeToAdd, true);
+                this.nodes = this.removeChildNodes(nodeToAdd);
                 this.nodes  = [...this.nodes, nodeToAdd];
             }
+        },
+
+        /**
+         * we need to check if a new parent has been selected of any existing children
+         * if it has the children should be removed as the parent now takes precedence
+         *
+         * @param { Object }
+         */
+        removeChildNodes (nodeToAdd) {
+            const withoutChildrenOfNewSelection = this.nodes.filter((selectedNode) => {
+                if (nodeToAdd.children) { //only if the children have loaded
+                    const node = findById(nodeToAdd.children, selectedNode.id);
+                    return node !== undefined ? false : true; //only keep those nodes that aren't a child of the new node
+                } else { //otherwise no existing nodes will be children, as they haven't been loaded and so couldn't have been selected
+                    return true;
+                }
+            });
+            return withoutChildrenOfNewSelection;
         },
 
         /**
@@ -150,7 +167,7 @@ export const useSelectedNodesStore = defineStore('csSelectedNodes', {
          * clear all the currently selected nodes
          */
         empty () {
-            this.nodes  = [];
+            this.nodes.forEach((node) => this.remove(node));
         },
 
     },
