@@ -229,7 +229,7 @@
 }
 
 .sticky {
-    background-color: $content-ui-selected;
+    background-color: var(--fc-neutral-bg-color, rgba(208, 208, 208, 0.2));
 }
 
 .article-read-more {
