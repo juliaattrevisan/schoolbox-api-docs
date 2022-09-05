@@ -395,7 +395,7 @@
                         onPreDraftCallback: function(){
                         },
                         onDraftCallback: function (userId, isSuccess, message, feedbackId) {
-                            var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
+                            let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
                                 $publishButton = $actionBar.find('[data-draft=publish]');
                             $publishButton.attr('data-draft-id', feedbackId);
                             $actionBar.attr('data-mass-publish', '');
@@ -404,7 +404,7 @@
                         onPrePublishCallback: function(){
                         },
                         onPublishCallback: function (userId) {
-                            var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
+                            let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
                                 $ackButton = $actionBar.find('[data-sobo]'),
                                 $publishButton = $actionBar.find('[data-draft=publish]');
                             $publishButton.removeAttr('data-draft-id');
@@ -418,7 +418,7 @@
                         }
                     });
 
-                    var $userList = $('#assessment-status');
+                    let $userList = $('#assessment-status');
 
                     {# Mass publish draft feedbacks #}
                     $('#mass-publish').bulky({
@@ -427,7 +427,7 @@
                                 return 'None Selected';
                             }
 
-                            if (len == all) {
+                            if (len === all) {
                                 return 'Publish All';
                             }
 
@@ -451,7 +451,7 @@
                          # and the available drafts in the quickmark screen
                          #}
                         onSubmit: function (toPublish) {
-                            var draftFeedbackIds = [],
+                            let draftFeedbackIds = [],
                                 $actionBars      = [],
                                 $toast = $('[data-save-draft]');
 
@@ -459,7 +459,7 @@
 
                             {# Iterate through each publish button #}
                             toPublish.each(function () {
-                                var $actionBar      = $(this),
+                                let $actionBar      = $(this),
                                     $publishButton  = $actionBar.find('[data-draft=publish]'),
                                     draftFeedbackId = $publishButton.attr('data-draft-id');
 
@@ -472,11 +472,11 @@
                             $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks', {assessmentId: assessment.id}) }}', {
                                 'drafts': draftFeedbackIds
                             }).done(function (response) {
-                                var feedbackErrors = false;
+                                let feedbackErrors = false;
 
-                                for (var feedbackId in response) {
+                                for (let feedbackId in response) {
                                     if (response.hasOwnProperty(feedbackId)) {
-                                        var result           = response[feedbackId],
+                                        let result           = response[feedbackId],
                                             isPublishSuccess = result['publishSuccess'],
                                             $actionBar       = $actionBars[feedbackId],
                                             $publishButton   = $actionBar.find('[data-draft=publish]');
@@ -505,7 +505,7 @@
                         }
                     });
 
-                    // These variables allows the confirm-dialog to be disabled in the case of bulk acknowledgements,
+                    // These variables allow the confirm-dialog to be disabled in the case of bulk acknowledgements,
                     // and set whether bulk acknowledgements should confirm submissions as having been on-time.
                     let confirmDialogDisabled            = false;
                     let confirmDialogDisabledOnTimeValue = false;
@@ -537,7 +537,7 @@
                     let $buttonClicked = null;
 
                     {# Handle clicks on 'Submission Received' buttons #}
-                    $('[data-sobo]').on('click', function (event) {
+                    $('[data-sobo]').on('click', function () {
                         $buttonClicked = $(this);
 
                         if (!confirmDialogDisabled) {
@@ -652,7 +652,7 @@
                      * @param {jQuery} $publishButton
                      */
                     function draftPublishSuccess($actionBar, $publishButton) {
-                        var $soboButton      = $actionBar.find('[data-sobo]'),
+                        let $soboButton      = $actionBar.find('[data-sobo]'),
                             $draftedSpan     = $actionBar.find('[data-draft=drafted]'),
                             $extraMeta       = $actionBar.find('[data-feedback-attach-info]'),
                             $feedbackButtons = $draftedSpan.add($publishButton);
