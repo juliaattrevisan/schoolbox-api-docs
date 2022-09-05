@@ -227,6 +227,9 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             // Collate a list of descendant IDs
             // (impossible without recursive query)
             $filteredIds = $this->findDescendantIds([$parentId], 'curriculum_node_parent_id');
+            if (count($filteredIds) === 0) {
+                return $this->createCollection();
+            }
         }
         $query = "
             SELECT
