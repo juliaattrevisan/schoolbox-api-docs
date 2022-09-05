@@ -335,6 +335,16 @@
         <div id="mass-submit" class="reveal-modal" data-reveal data-list-id="mass-submit-list" aria-hidden="true"
              role="dialog">
             <h2>Acknowledge Receipt of Submission</h2>
+            <p>
+                Submitted on time
+                <span class="switch">
+                    <input id="onTimeCheckboxSwitch" type="checkbox">
+                    <label for="onTimeCheckboxSwitch">
+                        <span>On</span>
+                        <span>Off</span>
+                    </label>
+                </span>
+            </p>
             <p data-mass-unavailable>You have no students requiring submission.</p>
             <p data-mass-available>Acknowledge receipt of submission for:</p>
             <section class="checklist" id="mass-submit-list">
@@ -495,8 +505,10 @@
                         }
                     });
 
-                    // This allows the confirm-dialog to be disabled in the case of bulk submission.
-                    let soboBulkModeIsOn = false;
+                    // These variables allows the confirm-dialog to be disabled in the case of bulk acknowledgements,
+                    // and set whether bulk acknowledgements should confirm submissions as having been on-time.
+                    let confirmDialogDisabled            = false;
+                    let confirmDialogDisabledOnTimeValue = false;
 
                     {# Mass acknowledge receipt of submissions #}
                     $('#mass-submit').bulky({
@@ -512,7 +524,8 @@
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
                         onSubmit: function (toSubmit) {
-                            soboBulkModeIsOn = true;
+                            confirmDialogDisabled            = true;
+                            confirmDialogDisabledOnTimeValue = $('#onTimeCheckboxSwitch').prop('checked');
                             toSubmit.each(function () {
                                 $(this).find('[data-sobo]').trigger('click');
                             });
@@ -527,10 +540,14 @@
                     $('[data-sobo]').on('click', function (event) {
                         $buttonClicked = $(this);
 
-                        if (!soboBulkModeIsOn && (Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
-                            $('#confirm-dialog').foundation('reveal', 'open');
+                        if (!confirmDialogDisabled) {
+                            if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
+                                $('#confirm-dialog').foundation('reveal', 'open'); // Reveal confirm popup to ask the user whether submission was on-time.
+                            } else {
+                                postSobo(false); // Submission was not confirmed to be on-time.
+                            }
                         } else {
-                            postSobo(false);
+                            postSobo(confirmDialogDisabledOnTimeValue); // Use default value for whether submission was confirmed to be on-time.
                         }
                     });
 
