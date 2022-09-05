@@ -38,8 +38,7 @@ export const useDeleteSelectedNodesStore = defineStore('mcDeleteSelectedNodes', 
                 const isAllResponsesOk = deleteResponses.every((response) => response === true);
                 if (isAllResponsesOk) {
                     const selectedNodesStore = useSelectedNodesStore();
-                    const nodesStore = useNodesStore();
-                    selectedNodesStore.nodes.forEach((node) => nodesStore.deleteNode(node)); //delete each node from the tree
+                    selectedNodesStore.nodes.forEach((node) => this.deleteNode(node)); //delete each node from the tree
                     selectedNodesStore.empty();
                     this.isProcessing = false;
                     this.cancel();
@@ -69,6 +68,40 @@ export const useDeleteSelectedNodesStore = defineStore('mcDeleteSelectedNodes', 
                 }));
             });
             return fetchList;
+        },
+
+        /**
+         * Pull the node out of the list
+         *
+         * @param { object }
+         */
+        deleteNode (node) {
+            const nodesStore = useNodesStore();
+            const nodeRemoved = this.removeId(nodesStore.nodes.children, node.id);
+            nodesStore.updateNodes(nodeRemoved);
+        },
+
+        /**
+         * To return an array with any objects containing the specified id removed
+         * we move through the object, looping recursively through .children and remove
+         * any with the id that's being removed
+         *
+         * @param { array }
+         * @param { number }
+         *
+         * @returns { object }
+         */
+         removeId (data, id) {
+            if (data !== null) { // .children wont always be available if the node hasn't been loaded yet
+                return data.reduce((previousValue, currentValue) => {
+                    if (currentValue.id !== id) {
+                        previousValue.push( { ...currentValue, children: this.removeId(currentValue.children, id) } );
+                    }
+                    return previousValue;
+                }, []);
+            } else {
+                return data;
+            }
         },
 
         /**

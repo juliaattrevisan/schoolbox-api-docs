@@ -47,7 +47,7 @@ enableSelectedNodesStore.$onAction(({ name, after, onError }) => {
 });
 
 /**
- * To instantly notify the user that the node is being enabledd
+ * To instantly notify the user that the node is being enabled / disabled
  * by updating the button text
  *
  * @returns { String }
