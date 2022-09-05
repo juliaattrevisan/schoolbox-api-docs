@@ -65,6 +65,21 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
         },
 
         /**
+         *
+         *
+         * @return { Array }
+         */
+        lists () {
+            const nodesStore = useNodesStore();
+            const lists = [nodesStore.nodes];
+            this.idList.forEach((id) => {
+                const nodeAtDepth = findById(nodesStore.nodes.children, id);
+                lists.push(nodeAtDepth);
+            });
+            return lists;
+        },
+
+        /**
          * the codes found relevant to the search input
          *
          * @returns { Array }

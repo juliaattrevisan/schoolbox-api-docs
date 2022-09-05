@@ -8,10 +8,9 @@
 {% endif %}
 <div data-cs-container>
     <curriculum-selector
-            :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
-            :selected-codes="{{ codeList|json_encode }}"
-            data-endpoint="{{ routeLookup('curriculumApi.getTree') }}"
+        :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
+        :selected-codes="{{ codeList|json_encode }}"
+        data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
     />
-
 </div>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>

@@ -66,7 +66,7 @@ $(function() {
 
                     idInput.attr('name', 'crits['+groupId+'][items]['+criterionId+'][id]');
 
-                    container.find('div.list-item').append("<div data-cs-container> <curriculum-selector :is-read-only=false :selected-codes=[] data-endpoint='{{ routeLookup('curriculumApi.getTree') }}' form-value-name='crits["+groupId+"][items]["+criterionId+"][curriculumCode][]' /> </div>");
+                    container.find('div.list-item').append("<div data-cs-container> <curriculum-selector :is-read-only=false :selected-codes=[] data-endpoint='{{ routeLookup('curriculumApi.searchNode') }}' form-value-name='crits["+groupId+"][items]["+criterionId+"][curriculumCode][]' /> </div>");
 
                     deleteButton.removeClass('hide');
                 }
@@ -84,9 +84,9 @@ $(function() {
 
                     idInput.attr('name', 'crits['+groupId+'][id]');
 
-                    container.find('div.list-item').first().append("<div data-cs-container> <curriculum-selector :is-read-only=false :selected-codes=[] data-endpoint='{{ routeLookup('curriculumApi.getTree') }}' form-value-name='crits["+groupId+"][curriculumCode][]' /> </div>");
+                    container.find('div.list-item').first().append("<div data-cs-container> <curriculum-selector :is-read-only=false :selected-codes=[] data-endpoint='{{ routeLookup('curriculumApi.searchNode') }}' form-value-name='crits["+groupId+"][curriculumCode][]' /> </div>");
                 }
-                $('body').append("<script type=\"text/javascript\" src=\"{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}\"> <\/script>");
+                $('body').append("<script src=\"{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}\"> <\/script>");
             }
         }
     };
@@ -447,4 +447,4 @@ $(function() {
     Are you sure you want to do this?
     (Make sure you click save at the end of this form to save all changes you have made.)
 </div>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>
