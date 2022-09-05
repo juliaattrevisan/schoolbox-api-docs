@@ -526,6 +526,11 @@
                         }
                     });
 
+                    {# Handle clicks on confirm popup buttons #}
+                    $('#confirm-dialog .button.yes'   ).click(function () {postSobo(true );});
+                    $('#confirm-dialog .button.no'    ).click(function () {postSobo(false);});
+                    $('#confirm-dialog .button.cancel').click(function () {$('#confirm-dialog').foundation('reveal', 'close');});
+
                     /**
                      * Handle a draft submission success
                      *
@@ -579,8 +584,6 @@
                             return;
                         }
 
-                        $('#confirm-dialog').hide();
-
                         /** @var {bool} response.submittedLate */
                         soboSuccess(
                             $participant,
@@ -596,6 +599,8 @@
                         $('#confirm-dialog').hide();
                         soboFailure($button, buttonText, $toast);
                     });
+
+                    $('#confirm-dialog').foundation('reveal', 'close');
                 }
 
                 /**
@@ -667,9 +672,9 @@
                 <p>Was this work submitted on time?</p>
             </div>
             <ul class="flex-list buttons">
-                <li><a class="button submit" data-accept onclick="postSobo(true);$('#confirm-dialog').foundation('reveal', 'close');">Yes</a></li>
-                <li><a class="button submit" data-reject onclick="postSobo(false);$('#confirm-dialog').foundation('reveal', 'close');">No</a></li>
-                <li><a class="button" data-reject onclick="$('#confirm-dialog').foundation('reveal', 'close')">Cancel</a></li>
+                <li><a class="button submit yes" data-yes>Yes</a></li>
+                <li><a class="button submit no" data-no>No</a></li>
+                <li><a class="button cancel" data-cancel>Cancel</a></li>
             </ul>
         </div>
 
