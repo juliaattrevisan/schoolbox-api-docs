@@ -753,38 +753,13 @@ class ListController extends Web\Controller\Base
         if (!$this->existingParticipationPerUser) {
             $participantMapper = $this->participantDataSource->getParticipantMapper();
 
-            /* Find Plans are associated with an assessment
-             *
-             * Multiplayer schoolbox allows $plans to be different upon saving
-             * so you can't use it as a source of truth - $plans ids in one tab
-             * is different to $plans ids in another tab, allowing a misunderstanding
-             * to occur that inadvertently lets a person have multiple plans
-             */
-            $query = "
-                SELECT participant_plan_id
-                FROM {$participantMapper->getTable()} p
-                INNER JOIN participant_plan pp ON p.participant_plan_id = pp.id
-                WHERE assessment_id = :assessmentId
-                AND p.user_id = :userId
-            ";
-
-            $statement = $participantMapper->getDatabase()->prepare($query);
-            $statement->execute([
-                'assessmentId' => $assessment->getId(),
-                'userId' => $userId
-            ]);
-
-            $planIds = [];
-
-            /* For each of those plans, find out if $userId is associated with it
+            /* For each of those assigned plans, find out if $userId is associated with it
              * If it is, then this person already has a plan - index them with a
              * (user id, plan id) tuple. This is the actual truth about which user
              * has a plan in a given assessment; you cannot trust the GenericCollection
              * $plans to contain the source of truth
              */
-            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $planIds[] = $row['participant_plan_id'];
-            }
+            $planIds = $participantMapper->findAssignedPlans($assessment->getId());
 
             /* Shank it into the same struct so we can find out which plan
              * was given to a particular user
