@@ -5,7 +5,7 @@
 import { defineStore } from 'pinia';
 
 
-export const useSelectedNodesStore = defineStore('csSelectedNodesStore', {
+export const useSelectedNodesStore = defineStore('csSelectedNodes', {
 
     state: () => ({
         nodes: [], //the currently selected nodes
@@ -29,6 +29,33 @@ export const useSelectedNodesStore = defineStore('csSelectedNodesStore', {
          */
         hasNodes () {
             return this.nodes.length > 0;
+        },
+
+        /**
+         * Number of nodes
+         *
+         * @return { number }
+         */
+        count () {
+            return this.nodes.length;
+        },
+
+        /**
+         * Return the single or plural depending on node selection
+         *
+         * @return { string }
+         */
+        singleOrPlural () {
+            return this.count > 1 ? 'nodes' : 'node';
+        },
+
+        /**
+         * just return an array of ids, used to compare if a node is selected or not
+         *
+         * @return { array }
+         */
+        nodesIds () {
+            return this.nodes.map((node) => node.id);
         },
 
     },
@@ -64,12 +91,13 @@ export const useSelectedNodesStore = defineStore('csSelectedNodesStore', {
         },
 
         /**
-         * completely update the nodes with a new array
+         * to switch a nodes selection status
          *
-         * @param { Aray }
+         * @param { object }
+         * @param { boolean }
          */
-        update (updatedNodes) {
-            this.nodes  = [...updatedNodes];
+        switch (node, isChecked) {
+            isChecked ? this.add(node) : this.remove(node);
         },
 
         /**

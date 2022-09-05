@@ -13,6 +13,7 @@ import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';
 import McDeleteNode from './activeNode/mc-delete-node.vue';
 import McEnableNode from './activeNode/mc-enable-node.vue';
+import McSelectedNodes from './mc-selected-nodes.vue';
 
 
 const props = defineProps({
@@ -65,6 +66,7 @@ function checkForStorybook () {
     <mc-view />
     <mc-delete-node />
     <mc-enable-node />
+    <mc-selected-nodes />
 </template>
 
 <style lang="scss" scoped>
