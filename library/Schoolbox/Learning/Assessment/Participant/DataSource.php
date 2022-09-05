@@ -594,11 +594,14 @@ class DataSource
 
 
     /**
-     * @return Participant\Mapper|\Schoolbox\Mapper
+     * @return Participant\Mapper
      * @throws DefinitionException
      */
     public function getParticipantMapper()
     {
-        return $this->getPlanMapper()->getJoinMapper('participants');
+        /** @var \Schoolbox\Assessment\Participant\Mapper $participantMapper */
+        $participantMapper = $this->getPlanMapper()->getJoinMapper('participants');
+
+        return $participantMapper;
     }
 }
