@@ -68,6 +68,34 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
             return this.nodes.map((node) => node.id);
         },
 
+        /**
+         * check if all nodes are enabled so we can just show the disable button
+         *
+         * @return { boolean }
+         */
+        allNodesEnabled () {
+            if (this.hasNodes) {
+                const enabledNodes = this.nodes.filter((node) => node.enabled);
+                return enabledNodes.length === this.nodes.length;
+            } else {
+                return false;
+            }
+        },
+
+        /**
+         * check if all nodes are disabled so we can just show the enable button
+         *
+         * @return { boolean }
+         */
+        allNodesDisabled () {
+            if (this.hasNodes) {
+                const enabledNodes = this.nodes.filter((node) => !node.enabled);
+                return enabledNodes.length === this.nodes.length;
+            } else {
+                return false;
+            }
+        },
+
     },
 
     actions: {

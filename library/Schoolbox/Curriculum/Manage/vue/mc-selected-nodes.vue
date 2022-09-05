@@ -40,9 +40,11 @@ function onClearMemberSelection () {
 
 /**
  * So the selected nodes can be enabled / disabled
+ *
+ * @param { boolean }
  */
- function onEnableNodesSelected () {
-    enableSelectedNodesStore.prompt();
+ function onEnableNodesSelected (enabled) {
+    enableSelectedNodesStore.prompt(enabled);
 }
 
 /**
@@ -59,8 +61,11 @@ function onDeleteNodesSelected () {
         <h3 class="selected-count"><em>{{ selectedNodesSummary }} selected</em></h3>
         <button class="button-clear" @click.prevent="onClearMemberSelection">Clear selection</button>
         <ul class="flex-list buttons">
-            <li>
-                <button class="icon-email"  @click.prevent="onEnableNodesSelected" @keyup.enter="onEnableNodesSelected">Enable {{ selectedNodesSummary }}</button>
+            <li v-if="selectedNodesStore.allNodesEnabled">
+                <button class="icon-view-hollow" @click.prevent="onEnableNodesSelected(false)" @keyup.enter="onEnableNodesSelected(false)">Disable {{ selectedNodesSummary }}</button>
+            </li>
+            <li v-else-if="selectedNodesStore.allNodesDisabled">
+                <button class="icon-view" @click.prevent="onEnableNodesSelected(true)" @keyup.enter="onEnableNodesSelected(true)">Enable {{ selectedNodesSummary }}</button>
             </li>
             <li>
                 <button class="icon-delete" @click.prevent="onDeleteNodesSelected" @keyup.enter="onDeleteNodesSelected">Delete {{ selectedNodesSummary }}</button>

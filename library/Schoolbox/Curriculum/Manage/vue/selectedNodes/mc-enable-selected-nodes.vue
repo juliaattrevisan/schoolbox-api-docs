@@ -52,7 +52,15 @@ enableSelectedNodesStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const enabledButtonText = computed(() => enableSelectedNodesStore.isProcessing ? 'Disabling...' : 'Yes');
+const enabledButtonText = computed(() => {
+    if (enableSelectedNodesStore.isProcessing && enableSelectedNodesStore.enabled) {
+        return 'Enabling...';
+    } else if (enableSelectedNodesStore.isProcessing && !enableSelectedNodesStore.enabled) {
+        return 'Disabling...';
+    } else {
+        return 'Yes';
+    }
+});
 
 /**
  * to prevent the user from moving away from the modal while
@@ -87,9 +95,13 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
-        <p>
-            Are you sure you wish to delete the {{ selectedNodesStore.countWithName }} selected and all of {{ selectedNodesStore.count > 1 ? 'their' : 'its' }} children?
-            If you continue, this node and any child nodes will be hidden from the curriculum code selector during curriclum mapping.
+        <p v-if="enableSelectedNodesStore.enabled">
+            Are you sure you wish to enable the {{ selectedNodesStore.countWithName }} selected and all of {{ selectedNodesStore.count > 1 ? 'their' : 'its' }} children?
+            If you continue, these nodes will be visible from the curriculum code selector during curriclum mapping.
+        </p>
+        <p v-else>
+            Are you sure you wish to disable the {{ selectedNodesStore.countWithName }} selected and all of {{ selectedNodesStore.count > 1 ? 'their' : 'its' }} children?
+            If you continue, these nodes will be hidden from the curriculum code selector during curriclum mapping.
         </p>
         <ul class="flex-list buttons">
             <li>

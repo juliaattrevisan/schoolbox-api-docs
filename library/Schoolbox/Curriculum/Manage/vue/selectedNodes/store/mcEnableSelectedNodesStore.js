@@ -3,8 +3,8 @@
  */
 
 import { defineStore } from 'pinia';
-import { useActiveNodeStore } from '../../activeNode/store/mcActiveNodeStore';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
+import { useSelectedNodesStore } from './mcSelectedNodesStore';
 
 
 export const useEnableSelectedNodesStore = defineStore('mcEnableSelectedNodes', {
@@ -12,14 +12,18 @@ export const useEnableSelectedNodesStore = defineStore('mcEnableSelectedNodes', 
     state: () => ({
         isProcessing: false,
         isOpen: false, //to notify that the prompt is opened / closed
+        enabled: false, //to set what enabled status the current selection is being set to
     }),
 
     actions: {
 
         /**
          * to display a prompt to confirm a node enabled change
+         *
+         * @param { boolean }
          */
-        prompt () {
+        prompt (enabled) {
+            this.enabled = enabled;
             this.isOpen = true;
         },
 
@@ -28,36 +32,8 @@ export const useEnableSelectedNodesStore = defineStore('mcEnableSelectedNodes', 
          * and update the frontend to match
          *
          * @TODO - more extensive error checking needs to occur
-         *
-         * @param { boolean }
          */
-        async enable (enabled) {
-            // const activeNodeStore = useActiveNodeStore();
-            // if (node !== null) { //when we are enabling, we don't need the prompt, so we pass in the node directly
-            //     activeNodeStore.set(node);
-            // }
-            // this.isProcessing = true;
-            // try {
-            //     const enabledInverted = !activeNodeStore.node.enabled;
-            //     const response = await fetch(`${apiEndpoint}/${activeNodeStore.node.id}`, {
-            //         method: 'PATCH',
-            //         headers: {
-            //             'Content-Type': 'application/json',
-            //         },
-            //         body: JSON.stringify({
-            //             enabled: enabledInverted,
-            //         }),
-            //     });
-            //     if (response.ok) {
-            //         activeNodeStore.enabled(enabledInverted);
-            //         this.isProcessing = false;
-            //         this.cancel();
-            //     } else {
-            //         throw new Error();
-            //     }
-            // } catch (error) {
-            //     console.warn(error);
-            // }
+        async enable () {
             this.isProcessing = true;
             try {
                 const nodeEnables = await Promise.all(this.getFetches());
@@ -65,7 +41,8 @@ export const useEnableSelectedNodesStore = defineStore('mcEnableSelectedNodes', 
                 const isAllResponsesOk = enableResponses.every((response) => response === true);
                 if (isAllResponsesOk) {
                     const selectedNodesStore = useSelectedNodesStore();
-                    selectedNodesStore.nodes.forEach((node) => this.enableAllChildren(node, enabled)); //set the enabled on each node
+                    selectedNodesStore.nodes.forEach((node) => this.enableAllChildren(node)); //set the enabled on each node
+                    selectedNodesStore.empty();
                     this.isProcessing = false;
                     this.cancel();
                 } else {
@@ -80,11 +57,9 @@ export const useEnableSelectedNodesStore = defineStore('mcEnableSelectedNodes', 
          * To delete all the marked nodes in parallel
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
          *
-         * @param { boolean }
-         *
          * @returns { Array }
          */
-        getFetches (enabled) {
+        getFetches () {
             const fetchList = [];
             const selectedNodesStore = useSelectedNodesStore();
             selectedNodesStore.nodes.forEach((node) => {
@@ -94,7 +69,7 @@ export const useEnableSelectedNodesStore = defineStore('mcEnableSelectedNodes', 
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        enabled: enabled,
+                        enabled: this.enabled,
                     }),
                 }));
             });
@@ -102,16 +77,16 @@ export const useEnableSelectedNodesStore = defineStore('mcEnableSelectedNodes', 
         },
 
         /**
-         * Loop through and update all children to the parents
-         * updated enabled state
+         * Loop through recursively and update all
+         * children to the parents updated enabled state
          *
          * @param { array }
          * @param { boolean }
          */
-        enableAllChildren (node, enabled) {
-            node.enabled = enabled;
+        enableAllChildren (node) {
+            node.enabled = this.enabled;
             node.children?.forEach((innerNode) => {
-                this.enableAllChildren(innerNode, enabled);
+                this.enableAllChildren(innerNode);
             });
         },
 
