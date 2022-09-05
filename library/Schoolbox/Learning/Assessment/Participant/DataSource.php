@@ -14,7 +14,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant as ParticipantObject;
 use Schoolbox\Learning\Assessment\Plan as PlanObject;
 use Schoolbox\Assessment\Participant;
@@ -35,7 +34,6 @@ use DomainException;
  */
 class DataSource
 {
-
     /**
      * Data source for class lists
      *

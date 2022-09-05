@@ -13,7 +13,6 @@ use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\LTI\Assessment\Model as LTIAssessment;
 use Schoolbox\GenericCollection;
@@ -29,7 +28,6 @@ use Alaress_Date_NullDate;
  */
 class Mapper extends BaseMapper
 {
-
     public function mapping(): void
     {
         $this->hasTable('participant');
