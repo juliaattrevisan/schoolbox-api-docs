@@ -63,6 +63,7 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
             {# Hide it until the item is actually in use, though #}
             <a class="icon-delete hide"
                data-template="rubric-criterion-delete"
+               data-rubric-criterion-name=""
                data-rubric-criterion=""
                data-role="remove-criterion"
                title="Delete {{ locale.rubricCriterion.proper }}"
@@ -98,6 +99,7 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
         <li>
             <a class="icon-delete"
                data-rubric-criterion="{{ criterionId }}"
+               data-rubric-criterion-name="{{ new ? '' : criterion.name }}"
                data-role="remove-criterion"
                href="#">Delete {{ locale.rubricCriterion.proper }}</a>
         </li>
