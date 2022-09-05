@@ -495,6 +495,9 @@
                         }
                     });
 
+                    // This allows the confirm-dialog to be disabled in the case of bulk submission.
+                    let soboBulkModeIsOn = false;
+
                     {# Mass acknowledge receipt of submissions #}
                     $('#mass-submit').bulky({
                         submitText: function (len, all) {
@@ -509,17 +512,22 @@
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
                         onSubmit: function (toSubmit) {
+                            soboBulkModeIsOn = true;
                             toSubmit.each(function () {
                                 $(this).find('[data-sobo]').trigger('click');
                             });
                         }
                     });
 
+                    // This allows the clicked button to be passed to postSobo() function indirectly.
+                    // Note that confirm popup is displayed in between click of button and calling of postSoho(), so cannot pass directly.
+                    let $buttonClicked = null;
+
                     {# Handle clicks on 'Submission Received' buttons #}
                     $('[data-sobo]').on('click', function (event) {
-                        window.buttonClickedJq = $(this);
+                        $buttonClicked = $(this);
 
-                        if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
+                        if (!soboBulkModeIsOn && (Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
                             $('#confirm-dialog').foundation('reveal', 'open');
                         } else {
                             postSobo(false);
@@ -532,7 +540,7 @@
                     $('#confirm-dialog .button.cancel').click(function () {$('#confirm-dialog').foundation('reveal', 'close');});
 
                     function postSobo(submissionWasOnTime) {
-                        let $button      = window.buttonClickedJq,
+                        let $button      = $buttonClicked,
                             buttonText   = $button.html(),
                             $actionBar   = $button.closest('[data-action-bar]'),
                             $participant = $actionBar.closest('[data-participant]'),
