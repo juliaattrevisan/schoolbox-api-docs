@@ -14,7 +14,7 @@ import { useViewNodesStore, DIRECTION } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
 import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
-// import McViewNodeCheckbox from './mc-view-node-checkbox.vue';
+import McViewNodeCheckbox from './mc-view-node-checkbox.vue';
 import McViewNodeName from './mc-view-node-name.vue';
 import McViewNodeActions from './mc-view-node-actions.vue';
 import McAddSubsection from '../activeNode/mc-add-subsection.vue';
@@ -182,10 +182,10 @@ async function onLeave (el, done) {
 <template>
     <li ref="viewNodeEl">
         <div :class="`buttons-container ${ isUpdatingAnother || isAddingAnother ? 'inactive' : '' } ${ props.node.enabled ? '' : 'not-enabled' }`">
-            <!-- <mc-view-node-checkbox
+            <mc-view-node-checkbox
                 :node="props.node"
                 :isUpdatingOrAdding="isUpdatingOrAdding"
-            /> -->
+            />
             <mc-view-node-name
                 :node="props.node"
                 :depth="props.depth"
