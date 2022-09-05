@@ -33,7 +33,7 @@ class Mapper extends BaseMapper
      * @see expanded reason in www/static/js/submissions/jquery.rubric-editable.js.
      * @see also SA-13689.
      */
-    private const CAPABILITY_NAME_MAX_CHARS_TO_STORE = 900;
+    public const CAPABILITY_NAME_MAX_CHARS_TO_STORE = 900;
 
     /**
      * @inheritdoc
