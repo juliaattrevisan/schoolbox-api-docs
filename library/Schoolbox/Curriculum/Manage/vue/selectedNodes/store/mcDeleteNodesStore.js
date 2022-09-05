@@ -8,7 +8,7 @@ import { useNodesStore } from '../../store/mcNodesStore';
 import { useSelectedNodesStore } from './mcSelectedNodesStore';
 
 
-export const useDeleteSelectedNodesStore = defineStore('mcDeleteSelectedNodes', {
+export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
 
     state: () => ({
         isProcessing: false,

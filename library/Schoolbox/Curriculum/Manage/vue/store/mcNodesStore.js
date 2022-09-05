@@ -140,25 +140,10 @@ export const useNodesStore = defineStore('mcNodes', {
          * @param { object }
          */
         addNewCurriculum (curriculum) {
+            /**
+             * @TODO - place in sorted alphabetically
+             */
             this.nodes.children.push(curriculum);
-        },
-
-        /**
-         * Add in a new subsection to the active node
-         *
-         * @param { object }
-         */
-        async addSubsection (newNode) {
-            const activeNodeStore = useActiveNodeStore();
-            if (activeNodeStore.node.children === null) { //if the children aren't loaded, load them in - which will also return the newly added node
-                await this.loadChildren(activeNodeStore.node.id);
-            } else { //otherwise we need to push the newNode in as the children are already loaded
-                activeNodeStore.node.children.push(newNode);
-            }
-            const viewNodesStore = useViewNodesStore();
-            if (viewNodesStore.current.id !== newNode.parent.id) { //if we aren't on the new nodes level move down so we can see the new node
-                viewNodesStore.setNextSelected(newNode.parent.id);
-            }
         },
 
     },

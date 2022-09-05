@@ -7,7 +7,7 @@ import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useSelectedNodesStore } from './mcSelectedNodesStore';
 
 
-export const useEnableSelectedNodesStore = defineStore('mcEnableSelectedNodes', {
+export const useEnableNodesStore = defineStore('mcEnableNodes', {
 
     state: () => ({
         isProcessing: false,

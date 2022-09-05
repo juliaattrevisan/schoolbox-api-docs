@@ -7,14 +7,14 @@
 
 import { computed  } from 'vue';
 import { useSelectedNodesStore } from './selectedNodes/store/mcSelectedNodesStore';
-import { useDeleteSelectedNodesStore } from './selectedNodes/store/mcDeleteSelectedNodesStore';
-import { useEnableSelectedNodesStore } from './selectedNodes/store/mcEnableSelectedNodesStore';
+import { useDeleteNodesStore } from './selectedNodes/store/mcDeleteNodesStore';
+import { useEnableNodesStore } from './selectedNodes/store/mcEnableNodesStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
 
 
 const selectedNodesStore = useSelectedNodesStore(); //to keep track of selected nodes
-const deleteSelectedNodesStore = useDeleteSelectedNodesStore();
-const enableSelectedNodesStore = useEnableSelectedNodesStore();
+const deleteNodesStore = useDeleteNodesStore();
+const enableNodesStore = useEnableNodesStore();
 
 
 
@@ -44,14 +44,14 @@ function onClearMemberSelection () {
  * @param { boolean }
  */
  function onEnableNodesSelected (enabled) {
-    enableSelectedNodesStore.prompt(enabled);
+    enableNodesStore.prompt(enabled);
 }
 
 /**
  * So the selected nodes can be removed
  */
 function onDeleteNodesSelected () {
-    deleteSelectedNodesStore.prompt();
+    deleteNodesStore.prompt();
 }
 
 </script>
