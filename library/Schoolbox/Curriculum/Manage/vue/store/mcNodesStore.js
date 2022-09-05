@@ -27,11 +27,16 @@ export const useNodesStore = defineStore('mcNodes', {
          * so we don't reload
          */
         initTopLevel () {
-            if (sessionStorage.getItem(SB_CURRICULUM_TOP_LEVEL)) {
-                this.getTopLevel();
-            } else {
-                this.loadTopLevel();
-            }
+            /**
+             * Hold off on this for now, I'll need to think a bit more on what to store in the session storage
+             * before I enable this.
+             */
+            // if (sessionStorage.getItem(SB_CURRICULUM_TOP_LEVEL)) {
+            //     this.getTopLevel();
+            // } else {
+            //     this.loadTopLevel();
+            // }
+            this.loadTopLevel();
         },
 
         /**
@@ -40,6 +45,7 @@ export const useNodesStore = defineStore('mcNodes', {
         async getTopLevel () {
             const topLevelNodes = JSON.parse(sessionStorage.getItem(SB_CURRICULUM_TOP_LEVEL)); //convert the saved string var back to JSON
             await this.setTopLevel(topLevelNodes);
+            const store = useStore();
             store.isLoading = false;
         },
 
