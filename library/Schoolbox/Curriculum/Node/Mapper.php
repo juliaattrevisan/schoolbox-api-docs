@@ -206,8 +206,8 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
      * @param int       $ancestors    How many levels of parent node to include
      * @param int       $descendants  How many levels of child node to include
      * @param bool      $topLevelOnly If true, return only nodes with no parent
-     * @param int|null  $parentId     If not null, search only within this node
-     *                                and descendants
+     * @param int|null  $parentId     If not null, search only within this
+     *                                node's descendants
      * @param bool|null $enabled      If not null: return only nodes which are
      *                                enabled (if true) or disabled (if false)
      * @return Collection|Model[]
@@ -226,8 +226,10 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         if (isset($parentId)) {
             // Collate a list of descendant IDs
             // (impossible without recursive query)
-            $filteredIds   = $this->findDescendantIds([$parentId], 'curriculum_node_parent_id');
-            $filteredIds[] = $parentId;
+            $filteredIds = $this->findDescendantIds([$parentId], 'curriculum_node_parent_id');
+            if (count($filteredIds) === 0) {
+                return $this->createCollection();
+            }
         }
         $query = "
             SELECT
