@@ -31,7 +31,6 @@ use Schoolbox\Resource\Attachment\Zone;
 
 class Controller extends Base
 {
-
     /**
      * @var Mapper
      */
