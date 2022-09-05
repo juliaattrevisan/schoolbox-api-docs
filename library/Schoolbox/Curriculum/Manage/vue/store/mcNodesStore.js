@@ -158,13 +158,13 @@ export const useNodesStore = defineStore('mcNodes', {
         },
 
         /**
-         * Pull the active node out of the list
+         * Pull the node out of the list
+         *
+         * @param { object }
          */
-        deleteNode () {
-            const activeNodeStore = useActiveNodeStore();
-            const activeNodeRemoved = removeId(this.nodes.children, activeNodeStore.node.id);
-            this.updateNodes(activeNodeRemoved);
-            activeNodeStore.unset();
+        deleteNode (node) {
+            const nodeRemoved = removeId(this.nodes.children, node.id);
+            this.updateNodes(nodeRemoved);
         },
 
     },

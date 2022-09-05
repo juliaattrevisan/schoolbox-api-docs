@@ -19,12 +19,8 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
 
         /**
          * to display a prompt to confirm a node removal
-         *
-         * @param { object }
          */
-        prompt (node) {
-            const activeNodeStore = useActiveNodeStore();
-            activeNodeStore.set(node);
+        prompt () {
             this.isOpen = true;
         },
 
@@ -44,7 +40,7 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
                 });
                 if (response.ok) {
                     const nodesStore = useNodesStore();
-                    nodesStore.deleteNode();
+                    nodesStore.deleteNode(node);
                     this.isProcessing = false;
                     this.cancel();
                 } else {
@@ -59,8 +55,6 @@ export const useDeleteNodeStore = defineStore('mcDeleteNode', {
          * to hide the confirmation prompt
          */
         cancel () {
-            const activeNodeStore = useActiveNodeStore();
-            activeNodeStore.unset();
             this.isOpen = false;
         },
 

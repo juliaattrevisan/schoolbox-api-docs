@@ -6,7 +6,6 @@
 
  import { computed } from 'vue';
 import { useNodesStore, findById } from '../store/mcNodesStore';
-import { useDeleteNodeStore } from '../activeNode/store/mcDeleteNodeStore';
 import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
 import { useEnableNodeStore } from '../activeNode/store/mcEnableNodeStore';
 import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
@@ -58,18 +57,10 @@ const props = defineProps({
 });
 
 const nodesStore = useNodesStore();
-const deleteNodeStore = useDeleteNodeStore();
 const addSubsectionStore = useAddSubsectionStore();
 const enabledNodeStore = useEnableNodeStore();
 const updateNodeStore = useUpdateNodeStore();
 
-
-/**
- * to prompt the nodes removal
- */
-function onDeleteSelected () {
-    deleteNodeStore.prompt(props.node);
-}
 
 /**
  * to open up or close the update modal
@@ -138,15 +129,6 @@ const isParentEnabled = computed(() => {
         @keyup.enter="onEnableToggleSelected"
     >
         Toggle visiblity of {{ props.title }}
-    </button>
-    <button
-        class="button-action-option icon-delete"
-        :title="`Delete ${props.title}`"
-        :disabled="props.isUpdatingOrAdding"
-        @click.prevent="onDeleteSelected"
-        @keyup.enter="onDeleteSelected"
-    >
-        Delete {{ title }}
     </button>
 </template>
 

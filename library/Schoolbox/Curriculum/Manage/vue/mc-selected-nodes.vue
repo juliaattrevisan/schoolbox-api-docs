@@ -8,13 +8,13 @@
 import { ref, computed, watch, onMounted  } from 'vue';
 // import { useStore } from '../store/manageGroupStore';
 import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
-// import { useRemovenodesStore } from '../store/mgRemovenodesStore';
+import { useDeleteNodeStore } from './activeNode/store/mcDeleteNodeStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
 
 
 // const store = useStore(); //to disable butons on processing
 const selectedNodesStore = useSelectedNodesStore(); //to keep track of selected nodes
-// const removenodesStore = useRemovenodesStore(); //to remove selectednodes
+const deleteNodeStore = useDeleteNodeStore();
 
 
 
@@ -41,9 +41,8 @@ function onClearMemberSelection () {
 /**
  * So the selected members can be removed
  */
-function onRemoveNodesSelected () {
-    console.warn('onRemoveNodesSelected');
-    // removenodesStore.promptRemoveSelectednodes();
+function onDeleteNodesSelected () {
+    deleteNodeStore.prompt();
 }
 
 </script>
@@ -57,7 +56,7 @@ function onRemoveNodesSelected () {
                 <button @click.prevent="onEmailnodesSelected" class="button submit icon-email" :disabled="false">Email {{ selectedNodesStore.selectednodesPlural }}</button>
             </li> -->
             <li>
-                <button @click.prevent="onRemoveNodesSelected" class="button submit icon-delete" :disabled="false">Remove {{ selectedNodesSummary }}</button>
+                <button @click.prevent="onDeleteNodesSelected" class="button submit icon-delete" :disabled="false">Delete {{ selectedNodesSummary }}</button>
             </li>
         </ul>
     </bottom-drawer>
