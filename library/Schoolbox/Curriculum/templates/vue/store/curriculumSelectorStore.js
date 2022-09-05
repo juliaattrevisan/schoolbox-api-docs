@@ -6,6 +6,8 @@ import { defineStore } from 'pinia';
 import { useCodesStore } from './csCodesStore';
 
 
+export let apiEndpoint = '';
+
 export const useStore = defineStore('curriculumSelectorStore', {
 
     state: () => ({
@@ -30,28 +32,15 @@ export const useStore = defineStore('curriculumSelectorStore', {
 
     actions: {
 
-        /**git
-         * load all the curriculum data
+        /**
+         * load the top level curriculums
          *
          * @param { String }
          */
-        async load (dataEndpoint) {
-            try {
-                const response = await fetch(dataEndpoint);
-                if (response.ok) {
-                    const responseJson = await response.json();
-                    const codesStore = useCodesStore();
-                    codesStore.load(responseJson);
-                } else {
-                    console.warn(response);
-                    this.hasLoadError = true; //show the load error display state
-                }
-            } catch (error) {
-                console.warn(error);
-                this.hasLoadError = true; //show the load error display state
-            } finally {
-                this.isLoading = false; //otherwise show the table
-            }
+        load (endpoint) {
+            apiEndpoint = endpoint;
+            const codesStore = useCodesStore();
+            codesStore.initTopLevel();
         },
 
     },
