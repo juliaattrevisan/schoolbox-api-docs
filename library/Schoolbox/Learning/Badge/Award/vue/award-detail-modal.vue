@@ -283,32 +283,50 @@ export default {
 
                 <!-- Only show the Reason section if there was something meaningful -->
                 <template v-if="award.reason && award.reason.length">
-                    <!-- If you have the ability to change the Reason, provide dynamic input -->
-                    <template v-if="award._links.awardUpdate">
-                        <form :action="award._links.awardUpdate" method="post">
-                            <dynamic-input
-                                v-if="hasSelectedModify"
-                                preset-unique-id="reason"
-                                inputName="reason"
-                                singular="reason"
-                                :proxy="'reason-proxy'"
-                                :value="award.reason"
-                                :allow-edit="true"
-                                :allow-submit="true"
-                                :spawn-immediately="true"
-                                :is-processing="true"
-                                :cdn-prefix="this.cdnPrefix"
-                                :site-version="this.siteVersion"
-                                @post="onSaveReasonSelected"
-                            ></dynamic-input>
-                        </form>
+                    <div class="actions-small-1">
+                        <div class="list-item">
+                            <h4>Evidence</h4>
 
-                        <!-- Also provide the button to make the change -->
-                        <button v-if="this.allowReasonEdit" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
+                            <article v-html="award.reason" id="reason-proxy"></article>
+                        </div>
+                        <nav>
+                            <!-- Provide the button to make the change -->
+                            <!-- Nonzero-length reason gets a button -->
+                            <button v-if="this.allowReasonEdit" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
+                        </nav>
+                    </div>
+                </template>
+
+                <!-- If you can edit the reason... -->
+                <template v-if="award._links.awardUpdate">
+                    <!-- If there's no value here, provide empty state -->
+                    <template v-if="'' === award.reason.toString()">
+                        <div class="empty-state" v-if="this.allowReasonEdit">
+                            <i class="icon-badge"></i>
+                            <p>Provide <a @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected">evidence</a> for this badge.</p>
+                        </div>
                     </template>
+                </template>
 
-                    <h4>Evidence</h4>
-                    <article v-html="award.reason" id="reason-proxy"></article>
+                <!-- If you have the ability to change the Reason, provide dynamic input -->
+                <template v-if="award._links.awardUpdate">
+                    <form :action="award._links.awardUpdate" method="post">
+                        <dynamic-input
+                            v-if="hasSelectedModify"
+                            preset-unique-id="reason"
+                            inputName="reason"
+                            singular="reason"
+                            :proxy="'reason-proxy'"
+                            :value="award.reason"
+                            :allow-edit="true"
+                            :allow-submit="true"
+                            :spawn-immediately="true"
+                            :is-processing="true"
+                            :cdn-prefix="this.cdnPrefix"
+                            :site-version="this.siteVersion"
+                            @post="onSaveReasonSelected"
+                        ></dynamic-input>
+                    </form>
                 </template>
 
                 <template v-if="award.badge.curriculumNodes.length">
