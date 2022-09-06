@@ -8,11 +8,12 @@
  *
  */
 
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
 use Sentry\State\HubInterface;
 
 $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
@@ -165,9 +166,9 @@ $this->setBlock('page_controls', 'course_actions', 'course_actions_block');
 $this->setBlock('page_controls', 'manage_class', 'manage_class_block');
 $this->setBlock(TEMPLATE_content, 'readonly_switch_on', 'readonly_switch_on_block');
 $this->setBlock(TEMPLATE_content, 'readonly_switch_off', 'readonly_switch_off_block');
-$this->setBlock('course_actions', 'analytics_section', 'analytics_section_block');
-$this->setBlock('analytics_section', 'class_analytics_link', 'class_analytics_link_block');
-$this->setBlock('analytics_section', 'schoolbox_analytics_link', 'schoolbox_analytics_link_block');
+$this->setBlock('course_actions', 'analytics_section_heading', 'analytics_section_heading_block');
+$this->setBlock('course_actions', 'class_analytics_link', 'class_analytics_link_block');
+$this->setBlock('course_actions', 'schoolbox_analytics_link', 'schoolbox_analytics_link_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 $this->setBlock('page_controls', 'browse_resources', 'browse_resources_block');
@@ -382,6 +383,8 @@ if ($manageClassController->renderTemplate('manage_class')) {
     $this->setVar('manage_class_block', '');
 }
 
+renderTemplateForAnalyticsSection($this, $manageClassController, $sessionUser);
+
 $this->parse('page_controls_block', 'page_controls');
 
 if ($sessionUser->getRole()->isStaff()) {
@@ -489,4 +492,73 @@ $emptyPositionList = array_diff(array('top', 'left', 'right','bottom'), $occupie
 
 foreach ($emptyPositionList as $emptyPosition) {
     $this->setVar("component_position_{$emptyPosition}", '');
+}
+
+// Functions. //////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The Analytics section in the 3-dot menu was moved from the leftmost column (titled 'Class Actions'), to the
+ * rightmost column (titled 'Course Actions').
+ * Since this section is no longer in the 'Class Actions' column, it does not belong in the ManageClassController.  So
+ * this code was moved from that class to here.
+ *
+ * Note that this code needs to run even if the current folder is not a class, in order to blank out the PHPLib blocks.
+ *
+ * @param $phpLibObj
+ * @param $manageClassController
+ * @param $sessionUser
+ * @return void
+ */
+function renderTemplateForAnalyticsSection($phpLibObj, Component_Homepage_ManageClassController $manageClassController, Schoolbox\User $sessionUser)
+{
+    // Blank out all PHPLib blocks relating to analytics initially.  They will be re-enabled if necessary below.
+    $phpLibObj->setVar('analytics_section_heading_block', '');
+    $phpLibObj->setVar('class_analytics_link_block'     , '');
+    $phpLibObj->setVar('schoolbox_analytics_link_block' , '');
+
+    $hasAnalytics = false;
+
+    // Class analytics link.
+    if ($manageClassController->getContext()->isClass()) {
+        $cohortProfileRoute = 'intellischool.getClassAnalytics';
+        $params             = [
+            'folder'   => $manageClassController->getContext(),
+            'folderId' => $manageClassController->getContext()->getId(),
+        ];
+        if ($manageClassController->getAuthorizer()->isPathAuthorizedForUser($cohortProfileRoute, $params, $sessionUser)) {
+            $hasAnalytics = true;
+            $phpLibObj->setVar('CLASS_ANALYTICS_LINK', $manageClassController->getRouter()->generate($cohortProfileRoute, $params));
+            $phpLibObj->parse('class_analytics_link_block', 'class_analytics_link');
+        }
+    }
+
+    // Schoolbox analytics link.
+    // Grab magic code to grab course IDs this folder is part of.
+    $currentTerm      = $manageClassController->getCurrentTerm();
+    $classListFactory = new Folder\ClassListFactory($phpLibObj->getDi()->get('databaseInternal'));
+    $courses          = $classListFactory->findFoldersWithDueImportedAssessments(
+        [$manageClassController->getContext()->getId()],
+        $currentTerm->getStart(),
+        $currentTerm->getActualFinish()
+    );
+    if (0 !== count($courses[$manageClassController->getContext()->getId()])) {
+        $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
+        foreach ($courses[$manageClassController->getContext()->getId()] as $courseid => $courseTitle) {
+            $params = [
+                'courseSpecId' => $courseid,
+                'folderId'     => $manageClassController->getContext()->getId(),
+                'termCode'     => $currentTerm->getCode(),
+            ];
+            if ($manageClassController->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $sessionUser)) {
+                $hasAnalytics = true;
+                $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK', $manageClassController->getRouter()->generate($schoolboxAnalytics, $params));
+                $phpLibObj->setVar('SCHOOLBOX_ANALYTICS_LINK_TITLE', $courseTitle);
+                $phpLibObj->parse('schoolbox_analytics_link_block', 'schoolbox_analytics_link', true);
+            }
+        }
+    }
+
+    if ($hasAnalytics) {
+        $phpLibObj->parse('analytics_section_heading_block', 'analytics_section_heading');
+    }
 }

@@ -46,6 +46,15 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     }
 
     /**
+     * @return Term\Model
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function getCurrentTerm()
+    {
+        return $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getContext()->getYearLevels()->first());
+    }
+
+    /**
      * Renders the data into the SitePage. Presentation logic.
      *
      * @param String $templateHandle
@@ -108,7 +117,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'qrcode_link', 'qrcode_link_block');
 
         // Determine the term for the grades link
-        $currentTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getContext()->getYearLevels()->first());
+        $currentTerm = $this->getCurrentTerm();
 
         // Show markbook link to staff on class or group pages
         $this->setVar('markbook_link_block');
@@ -308,55 +317,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('PAGE_COURSE_ID', (string)$this->getContext()->getCourseSpecification()->getId());
             $this->parse('course_link_block', 'course_link');
             $hasClassActions = true;
-        }
-
-        //analytics space
-        $this->setVar('analytics_section_block', '');
-        $hasAnalytics = false;
-        // Class analytics link
-        $this->setVar('class_analytics_link_block', '');
-        if ($isClassPage) {
-            $cohortProfileRoute = 'intellischool.getClassAnalytics';
-            $params             = [
-                'folder'   => $this->getContext(),
-                'folderId' => $this->getContext()->getId(),
-            ];
-            if ($this->getAuthorizer()->isPathAuthorizedForUser($cohortProfileRoute, $params, $this->getUser())) {
-                $hasAnalytics = true;
-                $this->setVar('CLASS_ANALYTICS_LINK', $this->getRouter()->generate($cohortProfileRoute, $params));
-                $this->parse('class_analytics_link_block', 'class_analytics_link');
-            }
-        }
-
-        //schoolbox analytics
-        $this->setVar('schoolbox_analytics_link_block', '');
-        /**
-         * grab magic code to grab course IDs this is part of
-         */
-        $classListFactory = new Folder\ClassListFactory($this->getSitePage()->getDi()->get('databaseInternal'));
-        $courses = $classListFactory->findFoldersWithDueImportedAssessments(
-            [$this->getContext()->getId()],
-            $currentTerm->getStart(),
-            $currentTerm->getActualFinish()
-        );
-        if (0 !== count($courses[$this->getContext()->getId()])) {
-            $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
-            foreach ($courses[$this->getContext()->getId()] as $courseid => $courseTitle) {
-                $params = [
-                    'courseSpecId' => $courseid,
-                    'folderId'     => $this->getContext()->getId(),
-                    'termCode'     => $currentTerm->getCode(),
-                ];
-                if ($this->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $this->getUser())) {
-                    $hasAnalytics = true;
-                    $this->setVar('SCHOOLBOX_ANALYTICS_LINK', $this->getRouter()->generate($schoolboxAnalytics, $params));
-                    $this->setVar('SCHOOLBOX_ANALYTICS_LINK_TITLE', $courseTitle);
-                    $this->parse('schoolbox_analytics_link_block', 'schoolbox_analytics_link', true);
-                }
-            }
-        }
-        if ($hasAnalytics) {
-            $this->parse('analytics_section_block', 'analytics_section');
         }
 
         return $hasClassActions;
