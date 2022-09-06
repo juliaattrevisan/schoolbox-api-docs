@@ -92,6 +92,7 @@ ul {
     margin: 0 0 1rem 0;
     max-height: $height; /*restrict the size of the modal, it'll scroll when larger */
     min-height: $height;
+    overflow-x: hidden; /*prevent any horizontal animations from showing a scrollbar */
     overflow-y: auto;
 }
 

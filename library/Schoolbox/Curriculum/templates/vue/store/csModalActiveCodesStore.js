@@ -30,7 +30,7 @@ export const useModalActiveCodesStore = defineStore('csModelActiveCodes', {
          */
         hasSingleCurriculum () {
             const codesStore = useCodesStore();
-            if (codesStore.codes.children.length === 1) {
+            if (codesStore.codes.children?.length === 1) {
                 return true;
             } else {
                 return false;
