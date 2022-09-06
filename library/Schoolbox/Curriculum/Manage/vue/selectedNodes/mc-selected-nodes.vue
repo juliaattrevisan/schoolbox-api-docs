@@ -6,10 +6,11 @@
  */
 
 import { computed  } from 'vue';
-import { useSelectedNodesStore } from './selectedNodes/store/mcSelectedNodesStore';
-import { useDeleteNodesStore } from './selectedNodes/store/mcDeleteNodesStore';
-import { useEnableNodesStore } from './selectedNodes/store/mcEnableNodesStore';
+import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
+import { useDeleteNodesStore } from './store/mcDeleteNodesStore';
+import { useEnableNodesStore } from './store/mcEnableNodesStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
+import McSelectedNode from './mc-selected-node.vue';
 
 
 const selectedNodesStore = useSelectedNodesStore(); //to keep track of selected nodes
@@ -58,8 +59,15 @@ function onDeleteNodesSelected () {
 
 <template>
     <bottom-drawer :showDrawer="selectedNodesStore.hasNodes">
-        <h3 class="selected-count"><em>{{ selectedNodesSummary }} selected</em></h3>
-        <button class="button-clear" @click.prevent="onClearMemberSelection">Clear selection</button>
+        <!-- <h3 class="selected-count"><em>{{ selectedNodesSummary }} selected</em></h3>
+        <button class="button-clear" @click.prevent="onClearMemberSelection">Clear selection</button> -->
+        <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container">
+            <mc-selected-node
+                v-for="node in selectedNodesStore.nodes"
+                :key="node.id"
+                :node="node"
+            />
+        </div>
         <ul class="flex-list buttons">
             <li v-if="selectedNodesStore.allNodesEnabled">
                 <button class="icon-view-hollow" @click.prevent="onEnableNodesSelected(false)" @keyup.enter="onEnableNodesSelected(false)">Disable {{ selectedNodesSummary }}</button>
@@ -75,6 +83,16 @@ function onDeleteNodesSelected () {
 </template>
 
 <style lang="scss" scoped>
+
+.selected-nodes-container {
+    border: 1px solid var(--form-border-color);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    min-height: 50px;
+    padding: 0.5rem;
+}
 
 .selected-count {
     margin-right: 1rem;

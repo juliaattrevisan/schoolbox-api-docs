@@ -10,6 +10,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
 
     state: () => ({
         nodes: [], //the currently selected nodes
+        activeNode: null, //to show extra info on a selected code in a modal
     }),
 
     getters: {
@@ -100,6 +101,15 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
             } else {
                 return false;
             }
+        },
+
+        /**
+         * To show further info on a selected node
+         *
+         * @return { Boolean }
+         */
+        hasActiveNode () {
+            return this.activeNode !== null ? true : false;
         },
 
     },
@@ -202,6 +212,16 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
          */
         empty () {
             this.nodes.forEach((node) => this.remove(node));
+        },
+
+        /**
+         * set the active node, which would prompt the mc-active-selected-code-modal to open
+         * and if it's set to null we can listen for it to be set again
+         *
+         * @param { Object }
+         */
+        setActiveNode (node) {
+            this.activeNode = node;
         },
 
     },

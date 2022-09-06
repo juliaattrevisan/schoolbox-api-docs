@@ -11,9 +11,10 @@ import { useViewNodesStore } from './viewNodes/store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';
-import McSelectedNodes from './mc-selected-nodes.vue';
+import McSelectedNodes from './selectedNodes/mc-selected-nodes.vue';
 import McEnableNodes from './selectedNodes/mc-enable-nodes.vue';
 import McDeleteNodes from './selectedNodes/mc-delete-nodes.vue';
+import McActiveSelectedNodeModal from './selectedNodes/mc-active-selected-node-modal.vue';
 
 
 const props = defineProps({
@@ -67,6 +68,7 @@ function checkForStorybook () {
     <mc-selected-nodes />
     <mc-enable-nodes />
     <mc-delete-nodes />
+    <mc-active-selected-node-modal />
 </template>
 
 <style lang="scss" scoped>
