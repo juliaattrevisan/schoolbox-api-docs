@@ -397,7 +397,8 @@ class Importer
             ->setWeight(0)
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
             ->setCreator($this->currentUser)
-            ->setMarkScheme(new Percentage());
+            ->setMarkScheme(new Percentage())
+            ->setMarkVisibility($this->config->get('submission_access'));
 
         $dueWorkNode = $this->findOrCreateCurriculumNodeFromAssessment($assessment, $unitSpecNode);
         $dueWork->getCurriculumNodes()->add($dueWorkNode);
@@ -413,7 +414,13 @@ class Importer
         if (\count($assessment->getStandards())) {
             // Pass 1: build the rowset, adding capabilities+indicators as required
             foreach ($assessment->getStandards() as $standard) {
-                $capabilityName = $standard->getTitle();
+                // Truncate string before saving to database to avoid error (see SA-14273).
+                //  * Note mb_substr() is used rather than substr().  This is because substr is completely ignorant of
+                //    character encodings, and just assumes one byte = one character.  Also, this means that not only can
+                //    the string be truncated earlier than expected, but can also mean the string is invalid (and will
+                //    cause an error if attempting to insert into the DB) if the truncation happens in the middle of a
+                //    multibyte character.
+                $capabilityName = mb_substr($standard->getTitle(), 0, RubricCapabilityMapper::CAPABILITY_NAME_MAX_CHARS_TO_STORE, 'UTF-8');
 
                 // Build capability
                 $groupDataModel = $this->rubricCapabilityMapper->findOrCreateOneForFolderByName(
@@ -637,7 +644,7 @@ class Importer
             $node = $this->nodeMapper->createModel()
                 ->setName($name)
                 ->setCode($code)
-                ->setDescription($description)
+                ->setDescription($description ?? '')
                 ->setReference($reference)
                 ->setParent($parent);
             $this->nodeMapper->save($node);
