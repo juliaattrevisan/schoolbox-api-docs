@@ -263,6 +263,7 @@ class Mapper extends BaseMapper
             FROM {$this->getTable()} p
             INNER JOIN participant_plan pp ON p.participant_plan_id = pp.id
             WHERE assessment_id = :assessmentId
+            AND pp.deleted_at IS NULL
         ";
 
         $statement = $this->getDatabase()->prepare($query);
