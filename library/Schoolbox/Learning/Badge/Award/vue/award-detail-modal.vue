@@ -238,10 +238,9 @@ export default {
          */
         onModalClosed () {
             this.hasSelectedModify = false;
+            this.allowReasonEdit = true;
         },
-
     }
-
 }
 </script>
 <template>
