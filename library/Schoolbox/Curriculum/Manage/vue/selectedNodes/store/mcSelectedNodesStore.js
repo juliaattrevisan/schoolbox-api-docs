@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore, findById } from '../../store/mcNodesStore';
+import { useNodesStore, enabledNodes, findById } from '../../store/mcNodesStore';
 
 
 export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
@@ -84,13 +84,19 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
 
         /**
          * check if all nodes are disabled so we can just show the enable button
+         * disabled child nodes cant be enabled - only the disabled parent can be enabled
          *
          * @return { boolean }
          */
         allNodesDisabled () {
             if (this.hasNodes) {
                 const enabledNodes = this.nodes.filter((node) => !node.enabled);
-                return enabledNodes.length === this.nodes.length;
+                const nodesStore = useNodesStore();
+                const noChildEnabledNodes = enabledNodes.filter((node) => { //prevent enabling child nodes of disabled parents
+                    const parentNode = findById(nodesStore.nodes.children, node.parent.id);
+                    return parentNode.enabled ? true : false;
+                });
+                return noChildEnabledNodes.length === this.nodes.length;
             } else {
                 return false;
             }
