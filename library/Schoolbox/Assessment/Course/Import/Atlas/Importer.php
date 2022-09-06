@@ -49,11 +49,11 @@ use Schoolbox\User;
  */
 class Importer
 {
-    private const CURRICULUM_CODE_ATLAS_ROOT         = 'atlas:root';
-    private const CURRICULUM_CODE_ATLAS_STANDARDS    = 'atlas:standards';
-    private const CURRICULUM_CODE_ATLAS_CURRICULUM   = 'atlas:curriculum:%d';
-    private const CURRICULUM_CODE_ATLAS_UNIT         = 'atlas:unit:%d';
-    private const CURRICULUM_CODE_ATLAS_ASSESSMENT   = 'atlas:assessment:%d';
+    private const CURRICULUM_CODE_ATLAS_ROOT       = 'atlas:root';
+    private const CURRICULUM_CODE_ATLAS_STANDARDS  = 'atlas:standards';
+    private const CURRICULUM_CODE_ATLAS_CURRICULUM = 'atlas:curriculum:%d';
+    private const CURRICULUM_CODE_ATLAS_UNIT       = 'atlas:unit:%d';
+    private const CURRICULUM_CODE_ATLAS_ASSESSMENT = 'atlas:assessment:%d';
 
     /**
      * @var FolderMapper
@@ -397,7 +397,8 @@ class Importer
             ->setWeight(0)
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
             ->setCreator($this->currentUser)
-            ->setMarkScheme(new Percentage());
+            ->setMarkScheme(new Percentage())
+            ->setMarkVisibility($this->config->get('submission_access'));
 
         $dueWorkNode = $this->findOrCreateCurriculumNodeFromAssessment($assessment, $unitSpecNode);
         $dueWork->getCurriculumNodes()->add($dueWorkNode);
@@ -643,7 +644,7 @@ class Importer
             $node = $this->nodeMapper->createModel()
                 ->setName($name)
                 ->setCode($code)
-                ->setDescription($description)
+                ->setDescription($description ?? '')
                 ->setReference($reference)
                 ->setParent($parent);
             $this->nodeMapper->save($node);
