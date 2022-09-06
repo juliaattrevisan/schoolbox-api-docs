@@ -5271,16 +5271,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/IResponse.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:restoreResponsesAndFeedbacks\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:softDeleteResponsesAndFeedbacks\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/ListController.php
