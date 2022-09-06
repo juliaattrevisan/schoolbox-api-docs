@@ -252,8 +252,6 @@ ul {
     pointer-events: none;
 }
 
-.not-enabled {
-    background: #F6F6F6;
-}
+@import '../style/mcStyle';
 
 </style>

@@ -45,7 +45,7 @@ function onRemoveSelected () {
 </script>
 
 <template>
-   <div class="selected-node">
+   <div :class="`selected-node ${ props.node.enabled ? '' : 'not-enabled' }`">
         <button
             class="title-button"
             :title="`View ${props.node.name}`"
@@ -79,14 +79,14 @@ function onRemoveSelected () {
 }
 
 .title-button {
-    background: var(--body-background);
+    background: none;
     margin: 0;
     min-height: 0;
     padding: 0;
 }
 
 .remove-button {
-    background: var(--body-background);
+    background: none;
     border-radius: 1rem;
     flex: 0 0 1rem;
     height: 1rem;
@@ -94,5 +94,7 @@ function onRemoveSelected () {
     margin-top: 3px;
     padding: 0;
 }
+
+@import '../style/mcStyle';
 
 </style>
