@@ -8,15 +8,24 @@
  *
  */
 
+use Alaress\Color\ColorFactory;
+use Aura\Router\Exception\RouteNotFound;
+use External\Canvas\Importer\CanvasDb;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Mapper;
+use Schoolbox\Resource\Folder\Model;
 use Sentry\State\HubInterface;
 
-$folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+$folderMapper = Mapper::getInstance();
 $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
 $folder = null;
 
@@ -45,7 +54,7 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     } catch (\Schoolbox\Mapper\Exception $e) {
         $this->pageNotFound();
     }
-} elseif (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
+} elseif (($this->arg[0] === $prefix) && (count($this->arg) > 1)) {
     /* If a prefixed argument is given, load category code directly
      * e.g. /homepage/$prefix/EN344
      */
@@ -57,7 +66,7 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     try {
         // TODO investigate whether this needs to be double-decoded, or decoded at all
         $folder = $folderMapper->findByCode(urldecode(urldecode($code)));
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
         $this->pageNotFound();
     }
 } elseif (!is_numeric($this->arg[0])) {
@@ -67,7 +76,7 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     $items = $this->arg;
     $code = implode('/', $items);
 
-    $this->localRedir("/homepage/{$prefix}/$code");
+    $this->localRedir("/homepage/$prefix/$code");
 }
 
 /* James gave me clearance to do this school-specific check on 19/01/2022
@@ -77,8 +86,8 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
  */
 if (\Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getDi()->get('config')->get('site_school_code'))) {
     $redirect = (new \Custom\Newic\Redirect(
-        (string)$this->getDi()->get('config')->get(\Schoolbox\Config\ConfigMapper::_CANVAS_URL),
-        new \External\Canvas\Importer\CanvasDb(),
+        (string)$this->getDi()->get('config')->get(ConfigMapper::_CANVAS_URL),
+        new CanvasDb(),
         $folderMapper
     ))->generateRedirect($folder);
 
@@ -93,9 +102,9 @@ if (\Custom\Newic\Redirect::SITE_SCHOOL_CODE === strtolower($this->getDi()->get(
 
 /* if we still have no category, advise that these are not the droids you're looking for
  *
- * Check that it's not softdeleted
+ * Check that it's not soft deleted
  */
-if (!($folder instanceof \Schoolbox\Resource\Folder\Model) || $folder->isDeleted()) {
+if (!($folder instanceof Model) || $folder->isDeleted()) {
     error(ErrorMapper::ERROR_SUBJECT_DELETED);
 }
 
@@ -107,21 +116,21 @@ if (!$folder->getId()) {
 $sessionUser = $this->getDi()->get('session')->get('user');
 
 // confirm that the user has permission to view this page
-$access = \Schoolbox\Permission\Access\Access::getInstance();
+$access = Access::getInstance();
 if (($actualPermission = $access->getFolderAccess($sessionUser, $folder->getId())) < UserAccess::ACCESS_READ) {
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $readonly = !empty($_GET['readonly']);
 
-// If I'm a write level user, I can downgrade myself to read access
+// If write level user, downgrade to read access.
 if ($actualPermission > UserAccess::ACCESS_READ && $readonly) {
     $virtualPermission = UserAccess::ACCESS_READ;
 } else {
     $virtualPermission = $actualPermission;
 }
 
-// setup the homepage handler
+// Set up the homepage handler.
 $homepageHandler = new Homepage($folder->getId());
 
 // this category doesn't have a template, therefore doesn't have a homepage: redirect to resource browser.
@@ -130,7 +139,7 @@ if (!$homepageHandler->getTemplate()) {
 }
 
 // Color mangling
-$colorFactory = new \Alaress\Color\ColorFactory();
+$colorFactory = new ColorFactory();
 
 // Colors (defaults)
 $defaultColour = array(
@@ -151,7 +160,7 @@ foreach ($homepageHandler->getColorList() as $key => $color) {
 }
 
 
-// moving forward! log the pageview
+// moving forward! log the page view
 $mapper = new Schoolbox\Resource\Folder\Log\Mapper();
 $mapper->incrementHitcount($sessionUser, $folder);
 $folderMapper->logPageView($folder);
@@ -180,9 +189,9 @@ if ($readonly) {
 }
 $componentCollection = $componentFactory->buildComponentList($folder->getId());
 
-// Decide which of parent/student view butonyes to show, if either
-$this->setVar('readonly_switch_on_block', '');
-$this->setVar('readonly_switch_off_block', '');
+// Decide which of parent/student view buttons to show, if either.
+$this->setVar('readonly_switch_on_block');
+$this->setVar('readonly_switch_off_block');
 if ($actualPermission >= UserAccess::ACCESS_WRITE) {
     if ($readonly) {
         $this->parse('readonly_switch_off_block', 'readonly_switch_off');
@@ -191,7 +200,7 @@ if ($actualPermission >= UserAccess::ACCESS_WRITE) {
     }
 }
 
-// User has elevated priviliges: can write to page
+// User has elevated privileges: can write to page
 if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     $this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
     $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
@@ -205,20 +214,20 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
     $hasUnitSpec = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
     if (
-        Config::get('lms_enabled')
-        && (!$hasCourseSpec && !$hasUnitSpec)
+        (!$hasCourseSpec && !$hasUnitSpec)
+        && Config::get('lms_enabled')
         && ($sessionUser->getRole()->isStaff() || $sessionUser->isSuperuser())
     ) {
         $this->parse('course_actions_block', 'course_actions');
     } else {
-        $this->setVar('course_actions_block', '');
+        $this->setVar('course_actions_block');
     }
 
 
     if (Config::get('homepage_enable_colour')) {
         $this->parse('homepage_color_selector_block', 'homepage_color_selector');
     } else {
-        $this->setVar('homepage_color_selector_block', '');
+        $this->setVar('homepage_color_selector_block');
     }
 
     $definitionCollection = $componentFactory->getDefinitionList('component_category');
@@ -227,7 +236,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     foreach ($definitionCollection as $definition) {
         foreach ($componentCollection as $inst) {
             /** @var Component_ControllerAbstract $inst */
-            if ($inst->getInstance()->getDefinitionId() == $definition->getId()) {
+            if ($inst->getInstance()->getDefinitionId() === $definition->getId()) {
                 $definition->incrementInstanceCount();
             }
         }
@@ -280,31 +289,22 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
                 $tabList[$component->getComponentCategory()]['count'] = 0;
             }
 
-            if ($component->getComponentCategory() != $previous->getComponentCategory() && $i > 1) {
-                $this->parse('homepage_component_page_block', 'homepage_component_page', true);
-                $this->setVar('homepage_component_block', '');
-                $this->parse('homepage_component_block', 'homepage_component', true);
-                $tabNumber++;
+            $this->parse('homepage_component_block', 'homepage_component', true);
 
-                // last rotation
-                if ($total == $i) {
-                    $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component->getComponentCategory());
-                    $this->parse('homepage_component_page_block', 'homepage_component_page', true);
-                }
-            } else {
-                // last rotation
-                if ($total == $i) {
-                    $this->parse('homepage_component_block', 'homepage_component', true);
-                    $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component->getComponentCategory());
-                    $this->parse('homepage_component_page_block', 'homepage_component_page', true);
-                } else {
-                    $this->parse('homepage_component_block', 'homepage_component', true);
-                }
+            if ($i > 1 && $component->getComponentCategory() !== $previous->getComponentCategory()) {
+                $this->parse('homepage_component_page_block', 'homepage_component_page', true);
+                $this->setVar('homepage_component_block');
+                $tabNumber++;
+            }
+
+            // last rotation
+            if ($total === $i) {
+                $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component->getComponentCategory());
+                $this->parse('homepage_component_page_block', 'homepage_component_page', true);
             }
 
             $previous = $component;
 
-            //
             // This was set to $component->componentCategoryName - a non-existent value
             $tabList[$component->getComponentCategory()]['name'] = $component->getComponentCategoryName();
             $tabList[$component->getComponentCategory()]['count']++;
@@ -380,7 +380,7 @@ $manageClassController->execute();
 if ($manageClassController->renderTemplate('manage_class')) {
     $this->parse('manage_class_block', 'manage_class');
 } else {
-    $this->setVar('manage_class_block', '');
+    $this->setVar('manage_class_block');
 }
 
 renderTemplateForAnalyticsSection($this, $manageClassController, $sessionUser);
@@ -465,16 +465,14 @@ foreach ($componentCollection as $component) {
         $component->setup($folder);
 
 
-        if ($component->execute()) {
-            if ($component->renderTemplate($templateHandle) !== false) {
-                if (!in_array($instance->getPosition(), $occupiedPositionList)) {
-                    $occupiedPositionList[] = $instance->getPosition();
-                }
-
-                $this->parse($templateTarget, $templateHandle, true);
+        if ($component->execute() && $component->renderTemplate($templateHandle) !== false) {
+            if (!in_array($instance->getPosition(), $occupiedPositionList)) {
+                $occupiedPositionList[] = $instance->getPosition();
             }
+
+            $this->parse($templateTarget, $templateHandle, true);
         }
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         // if a component explodes for any reason, we only want it to explode the page if we're in debug mode
         if (Config::get('debug_mode')) {
             throw $e;
@@ -491,7 +489,7 @@ foreach ($componentCollection as $component) {
 $emptyPositionList = array_diff(array('top', 'left', 'right','bottom'), $occupiedPositionList);
 
 foreach ($emptyPositionList as $emptyPosition) {
-    $this->setVar("component_position_{$emptyPosition}", '');
+    $this->setVar("component_position_$emptyPosition");
 }
 
 // Functions. //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -504,10 +502,14 @@ foreach ($emptyPositionList as $emptyPosition) {
  *
  * Note that this code needs to run even if the current folder is not a class, in order to blank out the PHPLib blocks.
  *
- * @param $phpLibObj
- * @param $manageClassController
- * @param $sessionUser
+ * @param                                          $phpLibObj
+ * @param Component_Homepage_ManageClassController $manageClassController
+ * @param \Schoolbox\User                          $sessionUser
  * @return void
+ * @throws RouteNotFound
+ * @throws ContainerExceptionInterface
+ * @throws NotFoundExceptionInterface
+ * @throws \Schoolbox\Mapper\Exception
  */
 function renderTemplateForAnalyticsSection($phpLibObj, Component_Homepage_ManageClassController $manageClassController, Schoolbox\User $sessionUser): void
 {
@@ -543,9 +545,9 @@ function renderTemplateForAnalyticsSection($phpLibObj, Component_Homepage_Manage
     );
     if (0 !== count($courses[$manageClassController->getContext()->getId()])) {
         $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
-        foreach ($courses[$manageClassController->getContext()->getId()] as $courseid => $courseTitle) {
+        foreach ($courses[$manageClassController->getContext()->getId()] as $courseId => $courseTitle) {
             $params = [
-                'courseSpecId' => $courseid,
+                'courseSpecId' => $courseId,
                 'folderId'     => $manageClassController->getContext()->getId(),
                 'termCode'     => $currentTerm->getCode(),
             ];
