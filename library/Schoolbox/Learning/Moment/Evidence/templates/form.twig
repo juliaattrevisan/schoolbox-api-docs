@@ -62,12 +62,12 @@
                             {% if curriculumTaggingEnabled %}
                                 <label for="curriculum-code-select">
                                     Curriculum Codes
+                                </label>
                                     {% include 'sub/curriculumCodeSelector.twig' with
                                         {
                                             codeList: curriculumCodes ?? [],
                                             renderButton: true
                                         } %}
-                                </label>
                             {% endif %}
                         </div>
                     </fieldset>
