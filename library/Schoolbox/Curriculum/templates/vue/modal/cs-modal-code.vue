@@ -9,7 +9,7 @@ import { ref, computed, onMounted } from 'vue';
 import { gsap } from 'gsap/all';
 import { useModalActiveCodesStore, DIRECTION } from '../store/csModalActiveCodesStore';
 // import { useSearchStore } from '../store/mcSearchStore';
-// import McViewNodeCheckbox from './mc-view-node-checkbox.vue';
+// import CsModalCodeCheckbox from './cs-modal-code-checkbox.vue';
 import CsModalCodeName from './cs-modal-code-name.vue';
 
 
@@ -17,7 +17,7 @@ const props = defineProps({
     /**
      * the assigned node to display
      */
-    node: {
+    code: {
         type: Object,
         required: true,
         default() {
@@ -94,21 +94,21 @@ const borderBottomColour = computed(() => {
  *
  * @returns { Boolean }
  */
-const showChildren = computed(() => props.node.children && props.node.children.length > 0 && (props.depth+1) < 2);
+const showChildren = computed(() => props.code.children && props.code.children.length > 0 && (props.depth+1) < 2);
 
 /**
  * If there's a code available, which means it can be added to the name
  *
  * @returns { Boolean }
  */
-const hasCode = computed(() => props.node.code && props.node.code !== '');
+const hasCode = computed(() => props.code.code && props.code.code !== '');
 
 /**
  * Add in the code if it's available otherwise just show the title
  *
  * @returns { String }
  */
-const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`);
+const title = computed(() => hasCode.value ? `[${props.code.code}] ${props.code.name}` : `${props.code.name}`);
 
 </script>
 
@@ -116,19 +116,19 @@ const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.
     <li ref="viewNodeEl">
         <div :class="`buttons-container`">
             <!-- <cs-modal-code-checkbox
-                :node="props.node"
+                :code="props.code"
             /> -->
             <cs-modal-code-name
-                :node="props.node"
+                :code="props.code"
                 :depth="props.depth"
                 :title="title"
             />
         </div>
         <ul v-if="showChildren">
             <cs-modal-code
-                v-for="node in props.node.children"
-                :key="node.id"
-                :node="node"
+                v-for="code in props.code.children"
+                :key="code.id"
+                :code="code"
                 :depth="props.depth+1"
             />
         </ul>

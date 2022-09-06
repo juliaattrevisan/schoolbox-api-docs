@@ -75,9 +75,9 @@ watch(() => modalActiveCodesStore.codes, () => {
     </ul> -->
     <ul ref="nodesContainerEl">
         <cs-modal-code
-            v-for="node in modalActiveCodesStore.codes"
-            :key="node.id"
-            :node="node"
+            v-for="code in modalActiveCodesStore.codes"
+            :key="code.id"
+            :code="code"
             :depth="depth"
         />
     </ul>

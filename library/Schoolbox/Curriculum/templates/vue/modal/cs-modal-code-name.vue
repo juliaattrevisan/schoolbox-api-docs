@@ -15,7 +15,7 @@ const props = defineProps({
     /**
      * the assigned node to display
      */
-    node: {
+    code: {
         type: Object,
         required: true,
         default() {
@@ -65,8 +65,8 @@ const notButton = computed(() => {
 /**
  * traverse to the next nodel level
  */
-    function onNameSelected () {
-    viewNodesStore.setNextSelected(props.node.id);
+function onNameSelected () {
+    viewNodesStore.setNextSelected(props.code.id);
 }
 
 /**
@@ -89,8 +89,8 @@ const highlightTitleSearch = computed(() => {
  * @returns { HTML }
  */
 // const highlightBreadcrumbSearch = computed(() => {
-//     if (searchStore.isActive && props.node.breadcrumb) {
-//         return highlightSearchInElement(props.node.breadcrumb);
+//     if (searchStore.isActive && props.code.breadcrumb) {
+//         return highlightSearchInElement(props.code.breadcrumb);
 //     } else {
 //         return '';
 //     }
