@@ -282,7 +282,7 @@ export default {
                 <article v-html="award.badge.body"></article>
 
                 <!-- Only show the Reason section if there was something meaningful -->
-                <template v-if="award.reason.length">
+                <template v-if="award.reason && award.reason.length">
                     <hr/>
 
                     <!-- If you have the ability to change the Reason, provide dynamic input -->
