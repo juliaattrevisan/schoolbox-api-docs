@@ -325,12 +325,11 @@ Usage:
 
                     {% if curriculumEnabled %}
                         <div class="small-12 column">
-                            <label>Curriculum Codes
+                            <label>Curriculum Codes</label>
                                 {% include 'sub/curriculumCodeSelector.twig' with {
                                     renderButton: false,
                                     codeList:     curriculumCodes ?? []
                                 } only %}
-                            </label>
                         </div>
                     {% endif %}
 
