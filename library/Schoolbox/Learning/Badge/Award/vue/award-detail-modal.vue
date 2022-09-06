@@ -283,8 +283,6 @@ export default {
 
                 <!-- Only show the Reason section if there was something meaningful -->
                 <template v-if="award.reason && award.reason.length">
-                    <hr/>
-
                     <!-- If you have the ability to change the Reason, provide dynamic input -->
                     <template v-if="award._links.awardUpdate">
                         <form :action="award._links.awardUpdate" method="post">
@@ -309,7 +307,7 @@ export default {
                         <button v-if="this.allowReasonEdit" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
                     </template>
 
-                    <label>Reason</label>
+                    <h4>Evidence</h4>
                     <article v-html="award.reason" id="reason-proxy"></article>
                 </template>
 
@@ -341,7 +339,6 @@ export default {
     background: none;
     color: var(--content-ui-foreground);
     float: right;
-    margin-right: 1rem;
 }
 
 article {
