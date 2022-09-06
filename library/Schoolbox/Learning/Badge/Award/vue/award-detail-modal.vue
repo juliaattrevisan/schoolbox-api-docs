@@ -288,7 +288,6 @@ export default {
                     <!-- If you have the ability to change the Reason, provide dynamic input -->
                     <template v-if="award._links.awardUpdate">
                         <form :action="award._links.awardUpdate" method="post">
-                            <label>Reason</label>
                             <dynamic-input
                                 v-if="hasSelectedModify"
                                 preset-unique-id="reason"
@@ -310,6 +309,7 @@ export default {
                         <button v-if="this.allowReasonEdit" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
                     </template>
 
+                    <label>Reason</label>
                     <article v-html="award.reason" id="reason-proxy"></article>
                 </template>
 
