@@ -420,7 +420,7 @@ class Importer
                 //    the string be truncated earlier than expected, but can also mean the string is invalid (and will
                 //    cause an error if attempting to insert into the DB) if the truncation happens in the middle of a
                 //    multibyte character.
-                $capabilityName = mb_substr($standard->getTitle(), 0, RubricCapabilityMapper::CAPABILITY_NAME_MAX_CHARS_TO_STORE);
+                $capabilityName = mb_substr($standard->getTitle(), 0, RubricCapabilityMapper::CAPABILITY_NAME_MAX_CHARS_TO_STORE, 'UTF-8');
 
                 // Build capability
                 $groupDataModel = $this->rubricCapabilityMapper->findOrCreateOneForFolderByName(
