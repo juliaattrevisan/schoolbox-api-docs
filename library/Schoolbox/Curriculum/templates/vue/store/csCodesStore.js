@@ -4,6 +4,10 @@
 
 import { defineStore } from 'pinia';
 import { useStore, apiEndpoint } from './curriculumSelectorStore';
+import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
+// import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
+
+export const UNSET_ID = 0;
 
 
 export const useCodesStore = defineStore('csCodesStore', {
@@ -62,7 +66,7 @@ export const useCodesStore = defineStore('csCodesStore', {
                 const response = await fetch(`${apiEndpoint}/?topLevelOnly=1`);
                 if (response.ok) {
                     const topLevelNodes = await response.json();
-                    sessionStorage.setItem(SB_CURRICULUM_TOP_LEVEL, JSON.stringify(topLevelNodes)); //session storage vars need to be saved as strings only
+                    // sessionStorage.setItem(SB_CURRICULUM_TOP_LEVEL, JSON.stringify(topLevelNodes)); //session storage vars need to be saved as strings only
                     await this.setTopLevel(topLevelNodes);
                 } else {
                     console.warn(response);
@@ -84,11 +88,11 @@ export const useCodesStore = defineStore('csCodesStore', {
          */
         async setTopLevel (nodes) {
             this.updateNodes(nodes);
-            const viewNodesStore = useViewNodesStore();
-            if (viewNodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
+            const modalActiveCodesStore = useModalActiveCodesStore();
+            if (modalActiveCodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
                 const singleCurriculumId = this.codes.children[0].id;
                 await this.loadChildren(singleCurriculumId); //load in its children for initial display
-                viewNodesStore.setSelected(1, singleCurriculumId); //then select the node
+                modalActiveCodesStore.setSelected(1, singleCurriculumId); //then select the node
             }
         },
 
@@ -137,3 +141,23 @@ export const useCodesStore = defineStore('csCodesStore', {
     },
 
 });
+
+/**
+ * To just return the node containing the specified id
+ *
+ * @param { array }
+ * @param { number }
+ */
+export function findById (array, id) {
+    for (const item of array) {
+        if (item.id === id) {
+            return item;
+        }
+        if (item.children?.length) {
+            const innerResult = findById(item.children, id);
+            if (innerResult) {
+                return innerResult;
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-/** 
+/**
  * Handles the display state of the curriculum selector modal
  */
 
@@ -7,7 +7,7 @@ import { useModalSelectedCodesStore } from './csModalSelectedCodesStore';
 
 
 export const useModalStore = defineStore('csModalStore', {
-    
+
     state: () => ({
         isOpen: false, //to notify that the modal is opened / closed
     }),
@@ -15,7 +15,7 @@ export const useModalStore = defineStore('csModalStore', {
     actions: {
 
         /**
-         * to open the modal and show currently selected nodes 
+         * to open the modal and show currently selected nodes
          * in the new modal session
          */
         open () {
@@ -24,7 +24,7 @@ export const useModalStore = defineStore('csModalStore', {
         },
 
         /**
-         * to close the modal, clearing and selected codes in this modal session
+         * to close the modal, clearing any selected codes in this modal session
          */
         cancel () {
             useModalSelectedCodesStore().empty();
@@ -42,5 +42,5 @@ export const useModalStore = defineStore('csModalStore', {
         },
 
     },
-    
+
 })
