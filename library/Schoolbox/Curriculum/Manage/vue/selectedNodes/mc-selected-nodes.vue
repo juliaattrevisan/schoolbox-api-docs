@@ -59,8 +59,6 @@ function onDeleteNodesSelected () {
 
 <template>
     <bottom-drawer :showDrawer="selectedNodesStore.hasNodes">
-        <!-- <h3 class="selected-count"><em>{{ selectedNodesSummary }} selected</em></h3>
-        <button class="button-clear" @click.prevent="onClearMemberSelection">Clear selection</button> -->
         <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container">
             <mc-selected-node
                 v-for="node in selectedNodesStore.nodes"
