@@ -7,13 +7,13 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Redis;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
-use Schoolbox\Realtime\Routing\Subscription\Loader;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User;
 
 class Component_ConfigNotifier extends AbstractModuleNotifier
@@ -36,6 +36,10 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
 
 
     /**
+     * Note: This notifier is not triggered asynchronously in the same way as the other notifiers.
+     * The notifyXXX methods are directly called by post-save/delete-callbacks of Component_ConfigMapper
+     * and this bundleTriggers is not in use
+     *
      * @param TriggerBundleInterface $bundle
      * @return void
      */
@@ -68,15 +72,14 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
     public function retrieveCallbacks($label)
     {
         return [
-            [ $this, "notifySystem$label" ]
+            [$this, "notifySystem$label"],
         ];
     }
 
 
     /**
      * @param Component_Config $model
-     * @param User             $effector
-     * @throws Mapper\Exception
+     * @param User|null        $effector
      */
     public function notifySystemCreated(Component_Config $model, User $effector = null)
     {
@@ -85,14 +88,14 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         }
 
         $this->handleCreate($this->getInstanceFromConfig($model), $model->getValue());
+        $this->refreshBindingCache($model, $effector);
     }
 
 
     /**
      * @param Component_Config $model
-     * @param User             $effector
+     * @param User|null        $effector
      * @param array            $diff
-     * @throws Mapper\Exception
      */
     public function notifySystemUpdated(Component_Config $model, User $effector = null, array $diff = [])
     {
@@ -111,6 +114,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         // update is a delete-and-replace action
         $this->handleDelete($instance, $diff['value'][1]);
         $this->handleCreate($instance, $diff['value'][0]);
+        $this->refreshBindingCache($model, $effector);
     }
 
 
@@ -119,8 +123,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
      *                    be deleted, despite the fact that there is still a component pointing to that alt-source.
      *
      * @param Component_Config $model
-     * @param User             $effector
-     * @throws Mapper\Exception
+     * @param User|null        $effector
      */
     public function notifySystemDeleted(Component_Config $model, User $effector = null)
     {
@@ -179,7 +182,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
             return;
         }
 
-        foreach ([ UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL ] as $access) {
+        foreach ([UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL] as $access) {
             $from = $this->determineSourcePath($instance, $access, $altSourceId);
             $to   = $this->determineDestinationPath($instance, $access);
 
@@ -187,17 +190,56 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
                 $this->doQuery($query, $from, $to);
             }
         }
+    }
 
-        // The routing subscription loader is stored in Redis, not jst cached
-        // TODO desingleton these
-        $redis      = Redis::getCacheClientInstance();
-        $redisQueue = Redis::getSignalQueueClientInstance();
+    /**
+     * @param Component_Config $model
+     * @param User|null        $effector
+     * @return void
+     */
+    public function refreshBindingCache(Component_Config $model, User $effector = null)
+    {
+        // Get the taskd context, and send
+        /** @var Producer $producer */
+        $producer = Mapper::getDi()->get('taskd.messageProducer');
 
-        // update the cache
-        // TODO replace with $di('subscriptionCache')
-        $cache = new WriteCache($redis, new Loader\Factory($redis), $redisQueue);
+        /** @var Jwt $tokenBuilder */
+        $tokenBuilder = Mapper::getDi()->get('user.tokenBuilder');
 
-        $cache->cacheRedirects(INSTANCE_ID);
+        /** @var MessageFactory $messageFactory */
+        $messageFactory = Mapper::getDi()->get('taskd.messageFactory');
+        $token          = $effector ? $tokenBuilder->generate($effector) : null;
+        $params         = [];
+        if (isset($token)) {
+            $params['token'] = $token;
+        }
+        $urlBase = (new \Schoolbox\Url\Factory($this->conf))->buildFullyQualified();
+
+        try {
+            /** @var \Aura\Router\Router $router */
+            $router  = Mapper::getDi()->get('router');
+            $message = $messageFactory->build(
+                'notify',
+                $params,
+                $urlBase
+                    ->setPath(
+                        $router->generate(
+                            'apiusernotify.apiRefreshBindingCache',
+                            ['userId' => $effector->getId()]
+                        )
+                    )
+                    ->setQuery(null)
+                    ->toString(),
+                [
+                    'data' => '',
+                ],
+                $effector
+            );
+
+            $producer->send($message);
+        } catch (\Psr\Container\NotFoundExceptionInterface | \Psr\Container\ContainerExceptionInterface | \Interop\Queue\Exception $e) {
+            $this->log->debug($e->getTraceAsString());
+        }
     }
 
     /**
@@ -207,7 +249,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
      */
     private function doQuery($query, $from, $to)
     {
-        $this->getMapper()->getDatabase()->query($query, [ 'from' => $from, 'to' => $to ]);
+        $this->getMapper()->getDatabase()->query($query, ['from' => $from, 'to' => $to]);
     }
 
 
@@ -253,7 +295,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
      * @param Component_Config $model
      * @return bool
      */
-    private function definitionIsSource(Component_Config $model)
+    private function definitionIsSource(Component_Config $model): bool
     {
         if (empty($this->definitionCache)) {
             $this->definitionCache = Component_ConfigDefinitionMapper::getInstance()->findIdsByColumn('key', 'src');

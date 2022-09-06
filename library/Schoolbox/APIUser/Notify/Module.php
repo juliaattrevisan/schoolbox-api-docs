@@ -48,6 +48,7 @@ class Module extends BaseModule
         };
 
         // Notify user (belongs in API for now I guess?)
+        $this->register(self::METHOD_POST, '/refreshBindingCache', 'apiRefreshBindingCache', new Rule\IsLoggedIn());
         $this->register(self::METHOD_POST, '/{userId}/notify', 'apiUserNotify', $hasApiAccess, $preloadUser);
     }
 
@@ -58,7 +59,8 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->injector->get('redis.storage')
+            $this->injector->get('redis.storage'),
+            $this->injector->get('subscriptionCache'),
         );
     }
 
