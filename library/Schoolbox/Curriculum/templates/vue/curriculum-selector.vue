@@ -13,7 +13,7 @@ import { useModalActiveCodesStore } from './store/csModalActiveCodesStore';
 import CsSearchInput from './cs-search-input.vue';
 import CsSelectedCodes from './cs-selected-codes.vue';
 import CsSearchResults from './cs-search-results.vue';
-// import CsModal from './modal/cs-modal.vue';
+import CsModal from './modal/cs-modal.vue';
 // import CsActiveSelectedCodeModal from './cs-active-selected-code-modal.vue';
 
 
@@ -92,7 +92,7 @@ function checkForStorybook () {
         <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
         <cs-search-results />
     </div>
-    <!-- <cs-modal /> -->
+    <cs-modal />
     <!-- <cs-active-selected-code-modal /> -->
 </template>
 

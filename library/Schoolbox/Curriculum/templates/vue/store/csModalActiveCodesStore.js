@@ -85,7 +85,7 @@ export const useModalActiveCodesStore = defineStore('csModelActiveCodes', {
          *
          * @returns { Array }
          */
-        nodes () {
+        codes () {
             // const searchStore = useSearchStore();
             // if (searchStore.hasNoResults) {
             //     return [this.current];
