@@ -94,7 +94,7 @@ function onSelected () {
     if (hasCode.value) {
         isCodeSelected.value ? modalSelectedCodesStore.remove(props.code) : modalSelectedCodesStore.add(props.code);
     } else {
-        modalActiveCodesStore.setNextSelected(props.code.id);
+        modalActiveCodesStore.setNextSelectedNode(props.code.id);
     }
 }
 
