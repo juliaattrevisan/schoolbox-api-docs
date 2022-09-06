@@ -6,7 +6,13 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Database\Predicate\InvalidColumnException;
+use Aura\Router\Exception\RouteNotFound;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Assessment\Term\Model;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
@@ -19,14 +25,14 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     /**
      * @var Term\Mapper
      */
-    private $termMapper;
+    private Term\Mapper $termMapper;
 
     /**
      * Is the external DB enabled in the admin config?
      *
      * @var bool
      */
-    private $externalDbEnabled;
+    private bool $externalDbEnabled;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -34,7 +40,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      * @return bool Whether to continue on and attempt Component render
      * @throws InvalidArgumentException If unable to find a specified mapper class
      */
-    public function execute()
+    public function execute(): bool
     {
         /** @var Term\Mapper $termMapper */
         $termMapper              = $this->getMapperFactory()->get(Term\Mapper::class);
@@ -46,12 +52,12 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     }
 
     /**
-     * @return Term\Model
+     * @return Model
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function getCurrentTerm()
+    public function getCurrentTerm(): Model
     {
-        return $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getContext()->getYearLevels()->first());
+        return $this->termMapper->findForDateAndYearLevel(Alaress_Date_Format::now(), $this->getContext()->getYearLevels()->first());
     }
 
     /**
@@ -63,13 +69,13 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      * @throws LogicException
      * @throws PDOException
      * @throws RuntimeException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws InvalidColumnException
+     * @throws NotFoundExceptionInterface|ContainerExceptionInterface
+     * @throws RouteNotFound
+     * @throws DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function renderTemplate($templateHandle)
+    public function renderTemplate($templateHandle): bool
     {
         $isGroupPage  = $this->getContext()->isGroup();
         $isClassPage  = $this->getContext()->isClass();
@@ -186,7 +192,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->parse('award_list_link_block', 'award_list_link');
             $hasClassActions = true;
         } else {
-            $this->setVar('award_list_link_block', '');
+            $this->setVar('award_list_link_block');
         }
 
         /* Assessment Calendar Link
@@ -230,7 +236,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->parse('qrcode_link_block', 'qrcode_link');
             $hasClassActions = true;
         } else {
-            $this->setVar('qrcode_link_block', '');
+            $this->setVar('qrcode_link_block');
         }
 
         $involvedInGroup = $isGroupPage && $this->getAccess()->involvedInGroup(
@@ -252,20 +258,20 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         ];
         if (
             ($involvedInGroup || $involvedInClass)
-            && UserAccess::ACCESS_READ === $this->getContentPermission()
             && $lmsEnabled
+            && UserAccess::ACCESS_READ === $this->getContentPermission()
             && $this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())
         ) {
             $this->setVar('STUDENT_GRADE_LINK', $this->getRouter()->generate($route, $params));
             $this->parse('student_grades_block', 'student_grades');
             $hasClassActions = true;
         } else {
-            $this->setVar('student_grades_block', '');
+            $this->setVar('student_grades_block');
         }
 
         // Not a class, or externalDB disabled, or no write access?
         if (!$isClassPage || !$this->externalDbEnabled || $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-            $this->setVar('class_list_block', '');
+            $this->setVar('class_list_block');
         } else {
             $this->parse('class_list_block', 'class_list');
             $hasClassActions = true;
@@ -309,7 +315,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         // Output course modify link if course page
-        $this->setVar('course_link_block', '');
+        $this->setVar('course_link_block');
 
         /* Decide if you have WRITE permissions before providing Modify link
          */
@@ -328,8 +334,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      *
      * @return string|null
      * @throws RuntimeException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws NotFoundExceptionInterface|ContainerExceptionInterface
+     * @throws RouteNotFound
      */
     private function buildMarkbookLink(): ?string
     {
@@ -354,10 +360,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      *
      * @param bool $isUnitPage
      * @param bool $isCoursePage
-     * @return string
+     * @return ?string
      * @throws RuntimeException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws NotFoundExceptionInterface|ContainerExceptionInterface
+     * @throws RouteNotFound
      */
     private function buildCourseMarkbookLink(bool $isUnitPage, bool $isCoursePage): ?string
     {

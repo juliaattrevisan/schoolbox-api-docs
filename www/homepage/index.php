@@ -509,7 +509,7 @@ foreach ($emptyPositionList as $emptyPosition) {
  * @param $sessionUser
  * @return void
  */
-function renderTemplateForAnalyticsSection($phpLibObj, Component_Homepage_ManageClassController $manageClassController, Schoolbox\User $sessionUser)
+function renderTemplateForAnalyticsSection($phpLibObj, Component_Homepage_ManageClassController $manageClassController, Schoolbox\User $sessionUser): void
 {
     // Blank out all PHPLib blocks relating to analytics initially.  They will be re-enabled if necessary below.
     $phpLibObj->setVar('analytics_section_heading_block', '');
