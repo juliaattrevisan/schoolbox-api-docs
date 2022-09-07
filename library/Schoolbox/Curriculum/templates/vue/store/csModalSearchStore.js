@@ -65,7 +65,6 @@ export const useModalSearchStore = defineStore('csModalSearch', {
          */
         hasNoResults () {
             return this.filteredResults.length === 0 && !this.isProcessing;
-            // return this.isActive && this.filteredResults.length === 0 && !this.isProcessing;
         },
 
     },

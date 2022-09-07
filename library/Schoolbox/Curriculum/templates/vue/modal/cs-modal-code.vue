@@ -8,7 +8,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { gsap } from 'gsap/all';
 import { useModalActiveCodesStore, DIRECTION } from '../store/csModalActiveCodesStore';
-// import { useSearchStore } from '../store/mcSearchStore';
+import { useModalSearchStore } from '../store/csModalSearchStore';
 import CsModalCodeCheckbox from './cs-modal-code-checkbox.vue';
 import CsModalCodeName from './cs-modal-code-name.vue';
 
@@ -38,7 +38,7 @@ const props = defineProps({
 });
 
 const modalActiveCodesStore = useModalActiveCodesStore();
-// const searchStore = useSearchStore();
+const modalSearchStore = useModalSearchStore();
 const viewNodeEl = ref(null); //to animate the node
 
 /**
@@ -81,8 +81,7 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
  * @returns { String }
  */
 const borderBottomColour = computed(() => {
-    // if (searchStore.isActive || props.depth !== 0) {
-    if (props.depth !== 0) {
+    if (modalSearchStore.isActive || props.depth !== 0) {
         return `var(--body-background)`;
     } else if (props.depth === 0) {
         return `var(--body-foreground-h1)`;
@@ -147,24 +146,9 @@ const title = computed(() => hasCode.value ? `[${props.code.code}] ${props.code.
     transition: 0.3s;
 }
 
-.messsage-container {
-    height: 100%;
-    left: 0;
-    top: 0;
-    position: absolute;
-    width: 100%;
-}
-
 ul {
     list-style: none; //don't use any dots
     margin: 0; //and spacing is controlled by props.depth
 }
-
-.inactive {
-    opacity: 0.2;
-    pointer-events: none;
-}
-
-// @import '../style/mcStyle';
 
 </style>

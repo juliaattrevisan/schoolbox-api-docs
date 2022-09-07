@@ -6,9 +6,9 @@
  */
 
 import { computed } from 'vue';
-// import { escapeRegExp } from '@js/util/jsUtils';
+import { escapeRegExp } from '@js/util/jsUtils';
 import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
-// import { useSearchStore } from '../store/mcSearchStore';
+import { useModalSearchStore } from '../store/csModalSearchStore';
 
 
 const props = defineProps({
@@ -42,8 +42,8 @@ const props = defineProps({
     },
 });
 
-const viewNodesStore = useModalActiveCodesStore();
-// const searchStore = useSearchStore();
+const modalActiveCodesStore = useModalActiveCodesStore();
+const modalSearchStore = useModalSearchStore();
 
 
 /**
@@ -55,18 +55,25 @@ const viewNodesStore = useModalActiveCodesStore();
 const notButton = computed(() => {
     if (props.depth === 0) { //we can't go back any further
         return true;
-    // } else if (searchStore.isActive) { //cant do any navigation while search is active
-    //     return true;
+    } else if (modalSearchStore.isActive) { //cant do any navigation while search is active
+        return true;
     } else {
         return false;
     }
 });
 
 /**
+ * dont use bold when searching, as it clutters the ui bit too much
+ *
+ * @returns { string }
+ */
+const fontWeight = computed(() => modalSearchStore.isActive ? 'normal' : 'bold');
+
+/**
  * traverse to the next nodel level
  */
 function onNameSelected () {
-    viewNodesStore.setNextSelected(props.code.id);
+    modalActiveCodesStore.setNextSelected(props.code.id);
 }
 
 /**
@@ -75,26 +82,12 @@ function onNameSelected () {
  * @returns { HTML }
  */
 const highlightTitleSearch = computed(() => {
-    // if (searchStore.isActive) {
-    //     return highlightSearchInElement(props.title);
-    // } else {
-    //     return props.title;
-    // }
-    return props.title;
+    if (modalSearchStore.isActive) {
+        return highlightSearchInElement(props.title);
+    } else {
+        return props.title;
+    }
 });
-
-/**
- * To highlight any search selections in the breadcrumbs
- *
- * @returns { HTML }
- */
-// const highlightBreadcrumbSearch = computed(() => {
-//     if (searchStore.isActive && props.code.breadcrumb) {
-//         return highlightSearchInElement(props.code.breadcrumb);
-//     } else {
-//         return '';
-//     }
-// });
 
 /**
  * To highlight where the search string matches within the settings result
@@ -106,11 +99,11 @@ const highlightTitleSearch = computed(() => {
  */
 function highlightSearchInElement (toHighlight) {
     let highlighted = toHighlight;
-    // viewNodesStore.queryWordList.forEach((wordInSearch) => {
-    //     highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
-    //         return `<mark>${match}</mark>`;
-    //     });
-    // });
+    modalSearchStore.queryWordList.forEach((wordInSearch) => {
+        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
+            return `<mark>${match}</mark>`;
+        });
+    });
     return highlighted;
 }
 
@@ -119,15 +112,14 @@ function highlightSearchInElement (toHighlight) {
 <template>
     <div
         v-if="notButton"
-        :class="`name`"
+        class="name"
     >
         <span v-html="highlightTitleSearch"></span>
-        <!-- <aside v-if="searchStore.isActive" v-html="highlightBreadcrumbSearch"></aside> -->
     </div>
     <button
         v-else
-        :class="`button-name`"
-        :title="`Expand ${props.title}`"
+        class="button-name"
+        :title="`View ${props.title}`"
         @click.prevent="onNameSelected"
         @keyup.enter="onNameSelected"
     >
@@ -140,23 +132,22 @@ function highlightSearchInElement (toHighlight) {
 .name {
     color: var(--body-foreground-h1);
     opacity: 1;
+    padding: 0.5rem 0;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: v-bind(fontWeight);
     width: 100%;
 }
 
-aside {
-    font-size: 0.725rem;
-    font-style: italic;
-}
-
-.button {
+.button-name {
     background: none;
     font-size: 1rem;
     margin: 0;
     min-height: 42px;
     min-width: 40px;
+    padding-left: 0.25rem;
     text-align: left;
+    transition: background 0.2s;
+    width: 100%;
     &:hover {
         background: var(--content-ui-background);
     }
@@ -167,13 +158,6 @@ aside {
         font-size: 0.8rem;
         padding: 0.25rem;
     }
-}
-
-.button-name {
-    @extend .button;
-    padding-left: 0.25rem;
-    transition: background 0.2s;
-    width: 100%;
 }
 
 </style>
