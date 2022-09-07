@@ -53,7 +53,7 @@ function onEmailGroupSelected () {
  *
  */
 function onEmailGroupParentsSelected () {
-    window.location.href = `${Endpoints.SEND_EMAIL}?folderId=${store.groupId}&selectedGroups=parents_of`;
+    window.location.href = `${Endpoints.SEND_EMAIL}?folderId=${store.id}&selectedGroups=parents_of`;
 }
 
 /**
