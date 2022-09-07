@@ -47,7 +47,7 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
          * @return { array }
          */
         codesIds () {
-            return this.codes.map((node) => node.id);
+            return this.codes.map((code) => code.id);
         },
 
     },
@@ -106,6 +106,17 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
          */
         updateIsSelected (code, isSelected) {
             code.isSelected = isSelected;
+        },
+
+        /**
+         * to check if a code is selected
+         *
+         * @param { Object }
+         *
+         * @returns { boolean }
+         */
+        isSelected (code) {
+            return this.codesIds.includes(code.id);
         },
 
         /**

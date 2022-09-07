@@ -4,7 +4,6 @@
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from './curriculumSelectorStore';
-// import { useCodesStore } from './csCodesStore';
 import { useSelectedCodesStore } from './csSelectedCodesStore';
 
 
@@ -89,7 +88,6 @@ export const useSearchStore = defineStore('csSearch', {
          async search () {
             this.isProcessing = true;
             try {
-                // const viewNodesStore = useViewNodesStore();
                 const response = await fetch(`${apiEndpoint}?query=${this.query}`, {
                     method: 'GET',
                     headers: {
@@ -97,8 +95,8 @@ export const useSearchStore = defineStore('csSearch', {
                     },
                 });
                 this.results = await response.json();
-                // const selectedNodesStore = useSelectedNodesStore();
-                // this.results.forEach((node) => node.isSelected = selectedNodesStore.isNodeSelected(node)); //ensure checked results are reflected
+                const selectedCodesStore = useSelectedCodesStore();
+                this.results.forEach((code) => code.isSelected = selectedCodesStore.isSelected(code)); //ensure checked results are reflected
             } catch (error) {
                 console.warn(error);
             } finally {
