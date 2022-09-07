@@ -6,11 +6,9 @@
  */
 
 import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
-// import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 
 const modalActiveCodesStore = useModalActiveCodesStore();
-// const activeNodeStore = useActiveNodeStore();
 
 /**
  * to display the just selected node
@@ -25,9 +23,8 @@ function onSelected (depth, id) {
 </script>
 
 <template>
-    <ul class="breadcrumb">
-        <li v-for="(breadcrumb) in modalActiveCodesStore.breadcrumbs">
-            <!-- :class="`${ activeNodeStore.isActive ? 'disabled' : '' }`" -->
+    <TransitionGroup name="list" class="breadcrumb" tag="ul">
+        <li v-for="(breadcrumb) in modalActiveCodesStore.breadcrumbs" :key="breadcrumb.id">
             <a
                 :href="`/curricululm/${breadcrumb.id}`"
                 :title="`View ${breadcrumb.name}`"
@@ -37,13 +34,22 @@ function onSelected (depth, id) {
                 {{ breadcrumb.name }}
             </a>
         </li>
-    </ul>
+    </TransitionGroup>
 </template>
 
 <style lang="scss" scoped>
 
-.disabled {
-    opacity: 0.5;
+.list-enter-active,
+.list-leave-active {
+    transition: all 0.3s ease;
+}
+.list-enter-from {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+.list-leave-to {
+    opacity: 0;
+    transform: translateX(10px);
 }
 
 </style>
