@@ -106,6 +106,7 @@ export const useModalActiveCodesStore = defineStore('csModelActive', {
          * @param { number }
          */
         setSelected (depth, id) {
+            useModalSearchStore().clear(); //clear the search results when traversing
             if (depth === 0) { //pulling back to no node selection at all, the root level
                 this.reset();
             } else if (depth > this.currentDepth) { //progressing to the next depth
