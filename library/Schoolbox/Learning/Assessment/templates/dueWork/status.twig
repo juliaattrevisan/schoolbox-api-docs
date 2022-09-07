@@ -162,7 +162,7 @@
                             <label>{{ locale.grades.proper }}
                                 {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
                                     participant: participant,
-                                    feedback: participant.findMostRecentInstructorGivenFeedback,
+                                    feedback:    participant.findMostRecentInstructorGivenFeedback,
                                     markScheme:  assessment.markScheme,
                                     tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
                                     errors:      errors,
@@ -182,13 +182,13 @@
                     {% endif %}
                     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                         {% include '@learningAssessment/dueWork/comment.twig' with {
-                            feedback:    participant.findMostRecentInstructorGivenFeedback,
-                            participant: participant,
-                            tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
-                            readonly:    readonly,
+                            feedback:       participant.findMostRecentInstructorGivenFeedback,
+                            participant:    participant,
+                            tabIndex:       (loop.index0 * inputsPerFeedback) + inputNo,
+                            readonly:       readonly,
                             selfAssessment: selfAssess,
                             selfReflection: selfReflect,
-                            blindMode:   false
+                            blindMode:      false
                         } only %}
                         {% set inputNo = inputNo + 1 %}
                         {% if 'none' == markSchemeName | lower %}
@@ -335,10 +335,11 @@
         <div id="mass-submit" class="reveal-modal" data-reveal data-list-id="mass-submit-list" aria-hidden="true"
              role="dialog">
             <h2>Acknowledge Receipt of Submission</h2>
-            <p>
-                Did all students below submit on time?
+            <p id="checkbox-switch-container">
+                The due date for this work has passed.<br/>
+                Did all students below submit their work on time?
                 <span class="switch">
-                    <input id="onTimeCheckboxSwitch" type="checkbox">
+                    <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
                     <label for="onTimeCheckboxSwitch">
                         <span>Yes</span>
                         <span>No</span>
@@ -513,6 +514,12 @@
                     {# Mass acknowledge receipt of submissions #}
                     $('#mass-submit').bulky({
                         submitText: function (len, all) {
+                            if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
+                                $('#checkbox-switch-container').show();
+                            } else {
+                                $('#checkbox-switch-container').hide();
+                            }
+
                             if (!len) {
                                 return 'None Selected';
                             }
@@ -700,13 +707,13 @@
 
         <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
             <div>
-                <h2>Please confirm</h2>
-                <p>Was this work submitted on time?</p>
+                <h2>The due date for this work has passed.</h2>
+                <a class="close-reveal-modal" aria-label="Close">x</a>
+                <p>Did the student submit their work on time?</p>
             </div>
             <ul class="flex-list buttons">
-                <li><a class="button submit yes" data-yes>Yes</a></li>
-                <li><a class="button submit no" data-no>No</a></li>
-                <li><a class="button cancel" data-cancel>Cancel</a></li>
+                <li><a class="button no" data-no>No, they submitted late</a></li>
+                <li><a class="button submit yes" data-yes>Yes, they submitted on-time</a></li>
             </ul>
         </div>
 
