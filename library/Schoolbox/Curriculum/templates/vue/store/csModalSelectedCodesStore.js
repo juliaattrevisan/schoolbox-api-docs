@@ -7,7 +7,7 @@ import { randomId } from '@js/util/jsUtils';
 import { useSelectedCodesStore } from './csSelectedCodesStore';
 
 
-export const useModalSelectedCodesStore = defineStore(`csModalSelectedCodes-${randomId()}`, {
+export const useModalSelectedCodesStore = defineStore(`csModalSelectedCodes__${randomId()}`, {
 
     state: () => ({
         codes: [], //the currently selected codes in the current modal session, with any previously selected also considered
@@ -50,7 +50,6 @@ export const useModalSelectedCodesStore = defineStore(`csModalSelectedCodes-${ra
          * @param { Object }
          */
         add (codeToAdd) {
-            useSelectedCodesStore().updateIsSelected(codeToAdd, true);
             this.codes  = [...this.codes, codeToAdd];
         },
 
@@ -60,8 +59,18 @@ export const useModalSelectedCodesStore = defineStore(`csModalSelectedCodes-${ra
          * @param { Object }
          */
         remove (codeToRemove) {
-            useSelectedCodesStore().updateIsSelected(codeToRemove, false);
             this.codes = this.codes.filter((code) => code.id !== codeToRemove.id);
+        },
+
+        /**
+         * to check if a code is selected
+         *
+         * @param { Object }
+         *
+         * @returns { boolean }
+         */
+         isSelected (code) {
+            return this.codesIds.includes(code.id);
         },
 
         /**
@@ -86,17 +95,6 @@ export const useModalSelectedCodesStore = defineStore(`csModalSelectedCodes-${ra
          */
         update () {
             useSelectedCodesStore().update(this.codes);
-        },
-
-        /**
-         * to check if a code is selected
-         *
-         * @param { Object }
-         *
-         * @returns { boolean }
-         */
-        isSelected (code) {
-            return this.codesIds.includes(code.id);
         },
 
     },

@@ -6,12 +6,11 @@ import { defineStore } from 'pinia';
 import { randomId } from '@js/util/jsUtils';
 import { useStore, apiEndpoint } from './curriculumSelectorStore';
 import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
-import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
 
 export const UNSET_ID = 0;
 
 
-export const useCodesStore = defineStore(`csCodes-${randomId()}`, {
+export const useCodesStore = defineStore(`csCodes__${randomId()}`, {
 
     state: () => ({
         codes: [], //all the codes currenty loaded
@@ -103,9 +102,7 @@ export const useCodesStore = defineStore(`csCodes-${randomId()}`, {
                 if (response.ok) {
                     const newNode = await response.json();
                     const newNodeChildrenEnabled = newNode.children.filter((node) => (node.enabled)); //only show those nodes with children enabled, this can be handled with enabled=1 on just topLevelOnly
-                    newNodeChildrenEnabled.forEach((node) => useSelectedCodesStore().addIsSelected(node));
                     const oldNode = findById(this.codes.children, id);
-                    useSelectedCodesStore().addIsSelected(oldNode);
                     oldNode.children = newNodeChildrenEnabled; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
                     console.warn(response);
@@ -131,7 +128,6 @@ export const useCodesStore = defineStore(`csCodes-${randomId()}`, {
                 children: nodes,
                 enabled: true,
             }
-            nodes.forEach((node) => useSelectedCodesStore().addIsSelected(node));
         },
 
     },

@@ -6,7 +6,7 @@ import { defineStore } from 'pinia';
 import { randomId } from '@js/util/jsUtils';
 
 
-export const useSelectedCodesStore = defineStore(`csSelectedCodes-${randomId()}`, {
+export const useSelectedCodesStore = defineStore(`csSelectedCodes__${randomId()}`, {
 
     state: () => ({
         codes: [], //the currently selected codes
@@ -62,10 +62,8 @@ export const useSelectedCodesStore = defineStore(`csSelectedCodes-${randomId()}`
          */
         add (codeToAdd) {
             if (Array.isArray(codeToAdd)) {
-                codeToAdd.forEach((code) => this.updateIsSelected(code, true));
                 this.codes  = [...this.codes, ...codeToAdd];
             } else {
-                this.updateIsSelected(codeToAdd, true);
                 this.codes  = [...this.codes, codeToAdd];
             }
         },
@@ -77,36 +75,12 @@ export const useSelectedCodesStore = defineStore(`csSelectedCodes-${randomId()}`
          */
         remove (codeToRemove) {
             if (Array.isArray(codeToRemove)) {
-                codeToRemove.forEach((code) => this.updateIsSelected(code, false));
                 codeToRemove.forEach((code) => {
                     this.codes = this.codes.filter((selectedCode) => selectedCode.id !== code.id);
                 });
             } else {
-                this.updateIsSelected(codeToRemove, false);
                 this.codes = this.codes.filter((code) => code.id !== codeToRemove.id);
             }
-        },
-
-        /**
-         * to track whether a node is selected
-         * we add an additional property to each node
-         *
-         * @param { object }
-         */
-        addIsSelected (code) {
-            if (code.isSelected === undefined) {
-                code.isSelected = false;
-            }
-        },
-
-        /**
-         * Update the code to the new selected state
-         *
-         * @param { object }
-         * @param { boolean }
-         */
-        updateIsSelected (code, isSelected) {
-            code.isSelected = isSelected;
         },
 
         /**

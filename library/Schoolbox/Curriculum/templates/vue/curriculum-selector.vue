@@ -5,7 +5,7 @@
  */
 
 import { ref, onMounted } from 'vue';
-import { useStore } from './store/curriculumSelectorStore';
+import { useStore, uniqueId } from './store/curriculumSelectorStore';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 import { useSearchStore } from './store/csSearchStore';
 import { useModalStore } from './store/csModalStore';
@@ -53,6 +53,7 @@ const props = defineProps({
 });
 
 const curriculumSelectorEl = ref(null);
+
 
 /**
  * Start loading the curriculum data
