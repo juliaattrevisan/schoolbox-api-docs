@@ -64,11 +64,12 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         }
 
         $i = 0;
+        /** @var Model $child */
         foreach ($model->getChildren() as $child) {
             $child
                 ->setLearningArea($model->getLearningArea())
                 ->setLearningLevel($model->getLearningLevel())
-                ->setParent($model->getId())
+                ->setParent($model)
                 ->setOrder($i++);
             $this->saveTree($child);
         }
@@ -355,7 +356,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
-            'assessmentId' => $assessmentId
+            'assessmentId' => $assessmentId,
         ]);
 
         return $this;
@@ -380,7 +381,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         foreach ($curriculumNodes as $currentNode) {
             $statement->execute([
                 'curriculumNodeId' => $currentNode->getId(),
-                'assessmentId' => $assessmentId
+                'assessmentId' => $assessmentId,
             ]);
         }
 
