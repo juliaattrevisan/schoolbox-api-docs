@@ -37,10 +37,10 @@ export const useStore = defineStore('manageCurriculum', {
          *
          * @param { String }
          */
-        async load (endpoint) {
+        load (endpoint) {
             apiEndpoint = endpoint;
             const nodesStore = useNodesStore();
-            nodesStore.loadTopLevel();
+            nodesStore.initTopLevel();
         },
 
     },

@@ -1,0 +1,163 @@
+<script setup>
+
+/**
+ * A curriculum node to select to traverse further down the tree,
+ * will also highlight any matches in the current search query when search is active
+ */
+
+import { computed } from 'vue';
+import { escapeRegExp } from '@js/util/jsUtils';
+import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
+import { useModalSearchStore } from '../store/csModalSearchStore';
+
+
+const props = defineProps({
+    /**
+     * the assigned node to display
+     */
+    code: {
+        type: Object,
+        required: true,
+        default() {
+            return {
+                id: '0',
+                name: '-',
+                children: [],
+            }
+        }
+    },
+    /**
+     * to gradually add more marginLeft to indicate node level depth
+     */
+    depth: {
+        type: Number,
+        required: true,
+    },
+    /**
+     * the already computed node title
+     */
+    title: {
+        type: String,
+        required: true,
+    },
+});
+
+const modalActiveCodesStore = useModalActiveCodesStore();
+const modalSearchStore = useModalSearchStore();
+
+
+/**
+ * To help distinguish those nodes that aren't selectable,
+ * we disable and remove the default button colour
+ *
+ * @returns { Boolean }
+ */
+const notButton = computed(() => {
+    if (props.depth === 0) { //we can't go back any further
+        return true;
+    } else if (modalSearchStore.isActive) { //cant do any navigation while search is active
+        return true;
+    } else {
+        return false;
+    }
+});
+
+/**
+ * dont use bold when searching, as it clutters the ui bit too much
+ *
+ * @returns { string }
+ */
+const fontWeight = computed(() => modalSearchStore.isActive ? 'normal' : 'bold');
+
+/**
+ * traverse to the next nodel level
+ */
+function onNameSelected () {
+    modalActiveCodesStore.setNextSelected(props.code.id);
+}
+
+/**
+ * To highlight any search selections in the code / title
+ *
+ * @returns { HTML }
+ */
+const highlightTitleSearch = computed(() => {
+    if (modalSearchStore.isActive) {
+        return highlightSearchInElement(props.title);
+    } else {
+        return props.title;
+    }
+});
+
+/**
+ * To highlight where the search string matches within the settings result
+ * (?![^>]*>) is used to check we are not inside an element node
+ *
+ * @params { String } the string to find all instanced of the current search string in
+ *
+ * @returns { String } string for v-html with <mark></mark> wrapped around each found result
+ */
+function highlightSearchInElement (toHighlight) {
+    let highlighted = toHighlight;
+    modalSearchStore.queryWordList.forEach((wordInSearch) => {
+        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
+            return `<mark>${match}</mark>`;
+        });
+    });
+    return highlighted;
+}
+
+</script>
+
+<template>
+    <div
+        v-if="notButton"
+        class="name"
+    >
+        <span v-html="highlightTitleSearch"></span>
+    </div>
+    <button
+        v-else
+        class="button-name"
+        :title="`View ${props.title}`"
+        @click.prevent="onNameSelected"
+        @keyup.enter="onNameSelected"
+    >
+        {{ props.title }}
+    </button>
+</template>
+
+<style lang="scss" scoped>
+
+.name {
+    color: var(--body-foreground-h1);
+    opacity: 1;
+    padding: 0.5rem 0;
+    font-size: 1rem;
+    font-weight: v-bind(fontWeight);
+    width: 100%;
+}
+
+.button-name {
+    background: none;
+    font-size: 1rem;
+    margin: 0;
+    min-height: 42px;
+    min-width: 40px;
+    padding-left: 0.25rem;
+    text-align: left;
+    transition: background 0.2s;
+    width: 100%;
+    &:hover {
+        background: var(--content-ui-background);
+    }
+    &:disabled {
+        opacity: 0.2;
+    }
+    @media (max-width: 700px) {
+        font-size: 0.8rem;
+        padding: 0.25rem;
+    }
+}
+
+</style>

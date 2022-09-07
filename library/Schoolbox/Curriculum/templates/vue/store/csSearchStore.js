@@ -3,56 +3,44 @@
  */
 
 import { defineStore } from 'pinia';
-import { useCodesStore } from './csCodesStore';
+import { randomId } from '@js/util/jsUtils';
+import { apiEndpoint } from './curriculumSelectorStore';
 import { useSelectedCodesStore } from './csSelectedCodesStore';
-import cloneDeep from 'lodash/cloneDeep';
 
 
 const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
 const CAPPED_RESULTS_LENGTH = 50; //the maximum amount of results to show
 
-export const useSearchResultsStore = defineStore('csSearchResultsStore', {
+export const useSearchStore = defineStore(`csSearch-${randomId()}`, {
 
     state: () => ({
+        isProcessing: false, //to notify that an action is taking place,
         query: '', //current search term to filter the active codes
         isResultsCapped: false, //to show a 'refine your search' note
         resultsNotShownCount: 0, //a total of the results not visible in the list
+        results: [], //nodes returned in the current search results
     }),
 
     getters: {
-        
+
         /**
          * To only start showing search results once enough characters
-         * have been added 
-         * 
+         * have been added
+         *
          * @return { Boolean }
          */
-        isSearchActive () {
+        isActive () {
             return this.query.length >= MIN_QUERY_LENGTH;
         },
 
         /**
-         * To search the curriculum codes
-         * 
-         * @return { Array }
+         * add any filters, should we be showing existing results?
+         *
+         * @return { array }
          */
-        codes () {
-            return useCodesStore().codes;
-        },
-
-        /**
-         * no children descendents, all put in an array one level deep
-         * for search results
-         * 
-         * @returns { Array } 
-         */
-        codesFlattened () {
-            if (this.isSearchActive) {
-                let flatChildren = [];
-                const codesClone = cloneDeep(this.codes); //cloneDeep is from lodash.js
-                codesClone.forEach((obj) => flatChildren = [...flatChildren, ...flattenCodes(obj)]);
-                flatChildren = flatChildren.filter((code) => code.code != ''); //only show those with a code, as those without can't be selected
-                return flatChildren;
+         filteredResults () {
+            if (this.isActive) {
+                return this.results;
             } else {
                 return [];
             }
@@ -69,48 +57,49 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
             const commaSeparated = queryTrimmed.split(re) ?? []; //split the string into a comma separated list
             return commaSeparated.filter(word => word.length > 0); //and ensure each contains a character
         },
-        
+
         /**
-         * When the search is active, will return any codes
-         * that match the current search query
-         * 
-         * @return { Array }
+         * To show that no codes match the current search
+         *
+         * @return { Boolean }
          */
-        results () {
-            const fullResults = this.codesFlattened.filter(this.filterResults);
-            if (fullResults.length > CAPPED_RESULTS_LENGTH) { //too many results, so cap them
-                this.isResultsCapped = true; //to display the results are capped note
-                this.resultsNotShownCount = fullResults.length - CAPPED_RESULTS_LENGTH; //and how many are actually capped
-                return fullResults.slice(0, CAPPED_RESULTS_LENGTH);
-            } else { //otherwise just return them all
-                this.isResultsCapped = false; 
-                return fullResults;
+        hasNoResults () {
+            // return this.filteredResults.length === 0 && !this.isProcessing;
+            return this.isActive && this.filteredResults.length === 0 && !this.isProcessing;
+        },
+
+    },
+
+    actions: {
+
+        /**
+         * search for nodes that match
+         */
+         async search () {
+            this.isProcessing = true;
+            try {
+                const response = await fetch(`${apiEndpoint}?query=${this.query}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                this.results = await response.json();
+                const selectedCodesStore = useSelectedCodesStore();
+                this.results.forEach((code) => code.isSelected = selectedCodesStore.isSelected(code)); //ensure checked results are reflected
+            } catch (error) {
+                console.warn(error);
+            } finally {
+                this.isProcessing = false;
             }
         },
 
         /**
-         * To show that no codes march the current search
-         * 
-         * @return { Boolean }
+         * clear the current search
          */
-        hasNoResults () {
-            return this.results.length === 0 && this.isSearchActive;
-        },
-
-    },
-   
-    actions: {
-    
-        /**
-         * find all those results that match any search words
-         * within the the code, name or breadcrumb fields
-         *
-         * @params { Object }
-         *
-         * @return { Boolean } true if found
-         */
-        filterResults (code) {
-            return searchForMatches(code, this.queryWordList)
+        clear () {
+            this.query = '';
+            this.results = [];
         },
 
         /**
@@ -135,33 +124,9 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
             selectedCodesStore.remove(matchedSelectedCodes);
         },
 
-        /**
-         * clear the current search
-         */
-        clear () {
-            this.query = '';
-        },
-
     },
-   
-});
 
-/**
- * The codes are nested with children:[], so we pull them all
- * out into a single level when searching 
- * 
- * @param { Object }
- */
-export function flattenCodes (obj) {
-    let array = [obj];
-    if (obj.children && obj.children.length > 0) {
-        obj.children.forEach((child) => {
-            array = [...array, ...flattenCodes(child)];
-        });
-        obj.children = []; 
-    }
-    return array;
-}
+});
 
 /**
  * find all those results that match any search words

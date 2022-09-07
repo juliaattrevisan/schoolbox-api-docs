@@ -3,9 +3,10 @@
  */
 
 import { defineStore } from 'pinia';
+import { randomId } from '@js/util/jsUtils';
 
 
-export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
+export const useSelectedCodesStore = defineStore(`csSelectedCodes-${randomId()}`, {
 
     state: () => ({
         codes: [], //the currently selected codes
@@ -13,10 +14,10 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
     }),
 
     getters: {
-       
+
         /**
          * Do we have any selected codes?
-         * 
+         *
          * @return { Boolean }
          */
         hasNoCodes () {
@@ -25,7 +26,7 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
 
         /**
          * Do we have any selected codes?
-         * 
+         *
          * @return { Boolean }
          */
         hasCodes () {
@@ -34,48 +35,104 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
 
         /**
          * To show further info on a selected code
-         * 
+         *
          * @return { Boolean }
          */
         hasActiveCode () {
             return this.activeCode !== null ? true : false;
         },
 
-    },
-   
-    actions: {
-       
         /**
-         * add a code 
-         * 
+         * just return an array of ids, used to compare if a code is selected or not
+         *
+         * @return { array }
+         */
+        codesIds () {
+            return this.codes.map((code) => code.id);
+        },
+
+    },
+
+    actions: {
+
+        /**
+         * add a code
+         *
          * @param { Object or Array } either a single code, or mulitple can be added
          */
         add (codeToAdd) {
             if (Array.isArray(codeToAdd)) {
+                codeToAdd.forEach((code) => this.updateIsSelected(code, true));
                 this.codes  = [...this.codes, ...codeToAdd];
             } else {
+                this.updateIsSelected(codeToAdd, true);
                 this.codes  = [...this.codes, codeToAdd];
             }
         },
 
         /**
-         * remove a code 
-         * 
+         * remove a code
+         *
          * @param { Object }
          */
         remove (codeToRemove) {
             if (Array.isArray(codeToRemove)) {
+                codeToRemove.forEach((code) => this.updateIsSelected(code, false));
                 codeToRemove.forEach((code) => {
                     this.codes = this.codes.filter((selectedCode) => selectedCode.id !== code.id);
                 });
             } else {
+                this.updateIsSelected(codeToRemove, false);
                 this.codes = this.codes.filter((code) => code.id !== codeToRemove.id);
             }
         },
 
         /**
+         * to track whether a node is selected
+         * we add an additional property to each node
+         *
+         * @param { object }
+         */
+        addIsSelected (code) {
+            if (code.isSelected === undefined) {
+                code.isSelected = false;
+            }
+        },
+
+        /**
+         * Update the code to the new selected state
+         *
+         * @param { object }
+         * @param { boolean }
+         */
+        updateIsSelected (code, isSelected) {
+            code.isSelected = isSelected;
+        },
+
+        /**
+         * to check if a code is selected
+         *
+         * @param { Object }
+         *
+         * @returns { boolean }
+         */
+        isSelected (code) {
+            return this.codesIds.includes(code.id);
+        },
+
+        /**
+         * to switch a codes selection status
+         *
+         * @param { object }
+         * @param { boolean }
+         */
+        switch (code, isChecked) {
+            isChecked ? this.add(code) : this.remove(code);
+        },
+
+        /**
          * completely update the codes with a new array
-         * 
+         *
          * @param { Aray }
          */
         update (updatedCodes) {
@@ -86,13 +143,13 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
          * clear all the currently selected codes
          */
         empty () {
-            this.codes  = [];
+            this.codes.forEach((node) => this.remove(node));
         },
-        
+
         /**
          * set the active code, which would prompt the cs-active-selected-code-modal to open
          * and if it's set to null we can listen for it to be set again
-         * 
+         *
          * @param { Object }
          */
         setActiveCode (code) {
@@ -100,5 +157,5 @@ export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
         },
 
     },
-   
+
 })

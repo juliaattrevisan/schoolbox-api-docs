@@ -6,11 +6,11 @@
 
 import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
-import { useSearchResultsStore } from './store/csSearchResultsStore'; 
-import { useSelectedCodesStore } from './store/csSelectedCodesStore'; 
+import { useSearchStore } from './store/csSearchStore';
+import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 
 
-const searchResultsStore = useSearchResultsStore();
+const searchStore = useSearchStore();
 const selectedCodesStore = useSelectedCodesStore();
 
 
@@ -64,7 +64,7 @@ const highlightBreadcrumbSearch = computed(() => {
 
 /**
  * To highlight where the search string matches within the settings result
- * (?![^mark>]*mark>) is used to check we are not inside an element node 
+ * (?![^mark>]*mark>) is used to check we are not inside an element node
  *
  * @params { String } the string to find all instanced of the current search string in
  *
@@ -72,7 +72,7 @@ const highlightBreadcrumbSearch = computed(() => {
  */
 function highlightSearchInElement (toHighlight) {
     let highlighted = toHighlight;
-    searchResultsStore.queryWordList.forEach((wordInSearch) => {
+    searchStore.queryWordList.forEach((wordInSearch) => {
         highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
             return `<mark>${match}</mark>`;
         });
@@ -81,12 +81,12 @@ function highlightSearchInElement (toHighlight) {
 }
 
 /**
- * To determine whether the checkbox is currently selected 
+ * To determine whether the checkbox is currently selected
  * based on whether it's in the selected list
  *
  * @returns { Boolean }
  */
-const isCodeSelected = computed(() => { 
+const isCodeSelected = computed(() => {
     return selectedCodesStore.codes.some((code) => props.result.id === code.id);
 });
 
@@ -101,13 +101,13 @@ function onSelected () {
 </script>
 
 <template>
-    <button 
+    <button
         class="search-result"
         @click.prevent="onSelected"
         @keyup.enter="onSelected"
     >
         <div class="checklist">
-            <input 
+            <input
                 :id="`checkbox-${result.id}`"
                 type="checkbox"
                 :checked="isCodeSelected"

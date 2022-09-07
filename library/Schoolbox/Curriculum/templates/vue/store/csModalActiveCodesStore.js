@@ -1,38 +1,37 @@
 /**
- * Manages the currently active codes in the modal,
+ * Manages the currently visible nodes in mc-view-nodes
  * those filtered by both <select> and also the search <input>
  */
 
 import { defineStore } from 'pinia';
-import { useCodesStore } from './csCodesStore';
-import { flattenCodes, searchForMatches } from './csSearchResultsStore';
-import cloneDeep from 'lodash/cloneDeep';
+import { randomId } from '@js/util/jsUtils';
+import { useCodesStore, findById } from './csCodesStore';
+import { useModalSearchStore } from './csModalSearchStore';
 
-const UNSET_ID = 0;
-const MIN_QUERY_LENGTH = 3;
+export const DIRECTION = {
+    FORWARDS: 'forwards',
+    BACKWARDS: 'backwards',
+}
 
-export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
+export const useModalActiveCodesStore = defineStore(`csModelActive-${randomId()}`, {
 
     state: () => ({
-        selectedFirstNodeId: UNSET_ID,
-        selectedSecondNodeId: UNSET_ID,
-        selectedThirdNodeId: UNSET_ID,
-        selectedFourthNodeId: UNSET_ID,
-        query: '', //current search term to filter the active codes
+        idList: [], //ids of the selected nodes
+        currentDepth: 0, //track how far down the tree we are
+        currentDirection: DIRECTION.FORWARDS //which direction we are currently travelling in the tree
     }),
 
     getters: {
 
         /**
-         * If there's only one curriculum group, we can select it
+         * If there's only one curriculum, we can select it
          * straight away, otherwise we allow the user to make the selection
          *
          * @return { Boolean }
          */
-        hasSingleGroup () {
+        hasSingleCurriculum () {
             const codesStore = useCodesStore();
-            if (codesStore.codes.length === 1) {
-                this.selectedFirstNodeId = codesStore.codes[0].id;
+            if (codesStore.codes.children?.length === 1) {
                 return true;
             } else {
                 return false;
@@ -40,320 +39,59 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
         },
 
         /**
-         * The first level of Curriculum nodes
-         * plus the empty node by default if there's more than one child
+         * Can now use the search input when we have selected at least one node
+         *
+         * @return { Boolean }
+         */
+        isActive () {
+            return this.idList.length > 0;
+        },
+
+        /**
+         * to traverse back through the nodes via breadcrumbs
          *
          * @return { Array }
          */
-        firstNodes () {
+        breadcrumbs () {
             const codesStore = useCodesStore();
-            if (this.hasSingleGroup) {
-                return [...codesStore.codes];
-            } else {
-                return [
-                    getEmptyNode(),
-                    ...codesStore.codes
-                ];
+            let breadcrumbs = [];
+            if (!this.hasSingleCurriculum) { //we only need this breadcrumb if there's more than one Curriculum, otherwise we jump straight to the single node with no option of returning back
+                breadcrumbs.push( { id: codesStore.codes.id, name: codesStore.codes.name, depth: 0 } );
+            }
+            this.idList.forEach((id, index) => { //add in a breadcrumb for each selected node
+                const nodeAtDepth = findById(codesStore.codes.children, id);
+                breadcrumbs.push( { id: id, name: nodeAtDepth.name, depth: index+1 } );
+            });
+            //we return an empty array if there's no selections yet, otherwise we pull out the latest as it represents the node we are currently on (not one we need to move back to)
+            return breadcrumbs.length === 0 ? [] : breadcrumbs.slice(0, -1);
+        },
+
+        /**
+         * the current node selection
+         *
+         * @returns { Object }
+         */
+        current () {
+            const codesStore = useCodesStore();
+            if (this.idList.length > 0) { //grab the current latest selection
+                return findById(codesStore.codes.children, this.idList[this.currentDepth-1]);
+            } else { //otherwise return the root level structure when there's more than one root level node
+                return codesStore.codes;
             }
         },
 
         /**
-         * Whether a first node has been selected via cs-modal-header.vue
+         * the current nodes to display, which are either just the current selection
+         * or when the search is active the results found within the current selection
          *
-         * @return { Boolean }
-         */
-        hasSelectedFirstNode () {
-            return this.selectedFirstNodeId !== UNSET_ID;
-        },
-
-        /**
-         * The currently selected first node
-         *
-         * @return { Object }
-         */
-        selectedFirstNode () {
-            return this.firstNodes.find((node) => node.id === this.selectedFirstNodeId);
-        },
-
-        /**
-         * To determine whether there's any second level nodes (children) in the selectedFirstNode
-         *
-         * @return { Boolean }
-         */
-        hasSecondNodes () {
-            if (null === this.selectedFirstNode.children) {
-                //if there are no children, don't check the length...
-                return false;
-            }
-            return this.selectedFirstNode.children.length > 0 ? true : false;
-        },
-
-        /**
-         * Show the second level nodes, which are the children of the selectedFirstNode
-         * plus the empty node by default if there's more than one child
-         *
-         * @return { Array }
-         */
-        secondNodes () {
-            return [
-                getEmptyNode(),
-                ...this.selectedFirstNode.children,
-            ];
-        },
-
-        /**
-         * Whether a second node has been selected via cs-modal-header.vue
-         *
-         * @return { Boolean }
-         */
-        hasSelectedSecondNode () {
-            return this.selectedSecondNodeId !== UNSET_ID;
-        },
-
-        /**
-         * The currently selected second node
-         *
-         * @return { Object }
-         */
-        selectedSecondNode () {
-            return this.secondNodes.find((node) => node.id === this.selectedSecondNodeId);
-        },
-
-        /**
-         * To determine whether there's any third level nodes (children) in the selectedSecondNode
-         *
-         * @return { Boolean }
-         */
-        hasThirdNodes () {
-            if (null === this.selectedSecondNode.children) {
-                //if there are no children, don't check the length...
-                return false;
-            }
-            return this.selectedSecondNode.children.length > 0 ? true : false;
-        },
-
-        /**
-         * Show the third level nodes, which are the children of the selectedSecondNode
-         * plus the empty node by default if there's more than one child
-         *
-         * @return { Array }
-         */
-        thirdNodes () {
-            return [
-                getEmptyNode(),
-                ...this.selectedSecondNode.children,
-            ];
-        },
-
-        /**
-         * Whether a third node has been selected via cs-modal-header.vue
-         *
-         * @return { Boolean }
-         */
-        hasSelectedThirdNode () {
-            return this.selectedThirdNodeId !== UNSET_ID;
-        },
-
-        /**
-         * The currently selected third node
-         *
-         * @return { Object }
-         */
-        selectedThirdNode () {
-            return this.thirdNodes.find((node) => node.id === this.selectedThirdNodeId);
-        },
-
-        /**
-         * To determine whether there's any fourth level nodes (children) in the selectedFourthNode
-         *
-         * @return { Boolean }
-         */
-        hasFourthNodes () {
-            if (null === this.selectedThirdNode.children) {
-                //if there are no children, don't check the length...
-                return false;
-            }
-            return this.selectedThirdNode.children.length > 0 ? true : false;
-        },
-
-        /**
-         * Show the fourth level nodes, which are the children of the selectedThirdNode
-         * plus the empty node by default if there's more than one child
-         *
-         * @return { Array }
-         */
-        fourthNodes () {
-            return [
-                getEmptyNode(),
-                ...this.selectedThirdNode.children,
-            ];
-        },
-
-        /**
-         * Whether a fourth node has been selected via cs-modal-header.vue
-         *
-         * @return { Boolean }
-         */
-        hasSelectedFourthNode () {
-            return this.selectedFourthNodeId !== UNSET_ID;
-        },
-
-        /**
-         * The currently selected fourth node
-         *
-         * @return { Object }
-         */
-        selectedFourthNode () {
-            return this.fourthNodes.find((node) => node.id === this.selectedFourthNodeId);
-        },
-
-        /**
-         * To determine the display of elements based on how far along
-         * the node selection tree we are
-         *
-         * @return { Boolean }
-         */
-        isOnFirstNode () {
-            return this.hasSelectedFirstNode && !this.hasSelectedSecondNode && !this.hasSelectedThirdNode;
-        },
-
-        /**
-         * To determine the display of elements based on how far along
-         * the node selection tree we are
-         *
-         * @return { Boolean }
-         */
-        isOnSecondNode () {
-            return this.hasSelectedFirstNode && this.hasSelectedSecondNode && !this.hasSelectedThirdNode;
-        },
-
-        /**
-         * To determine the display of elements based on how far along
-         * the node selection tree we are
-         *
-         * @return { Boolean }
-         */
-        isOnThirdNode () {
-            return this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode;
-        },
-
-        /**
-         * To determine the display of elements based on how far along
-         * the node selection tree we are
-         *
-         * @return { Boolean }
-         */
-        isOnFourthNode () {
-            return this.hasSelectedFirstNode && this.hasSelectedSecondNode && this.hasSelectedThirdNode && this.hasSelectedFourthNode;
-        },
-
-        /**
-         * The currently selected code
-         *
-         * @return { Object }
-         */
-        selectedCode () {
-            if (this.isOnFourthNode) {
-                return this.selectedFourthNode;
-            } else if (this.isOnThirdNode) {
-                return this.selectedThirdNode;
-            } else if (this.isOnSecondNode) {
-                return this.selectedSecondNode;
-            } else if (this.isOnFirstNode) {
-                return this.selectedFirstNode;
-            } else {
-                return [];
-            }
-        },
-
-        /**
-         * the search string broken into words, to search for each word
-         *
-         * @returns { Array } the search string broken into single words
-         */
-        queryWordList () {
-            const queryTrimmed = this.query.trim(); //remove any front or back white space
-            const spaceSeparated = queryTrimmed.split(' ') ?? []; //split the string with every space
-            return spaceSeparated.filter(word => word.length > 0); //and ensure each contains a character
-        },
-
-        /**
-         * Display the current nodes based on filtration, so what's selected via the <selects>
-         * and search <input> in cs-modal-header.vue
-         *
-         * @return { Array }
+         * @returns { Array }
          */
         codes () {
-            if (this.isOnFourthNode) {
-                return [this.selectedFourthNode];
-            } else if (this.isOnThirdNode) {
-                return [this.selectedThirdNode];
-            } else if (this.isOnSecondNode) {
-                return [this.selectedSecondNode];
-            } else if (this.isOnFirstNode) {
-                return [this.selectedFirstNode];
+            const searchStore = useModalSearchStore();
+            if (searchStore.hasNoResults) {
+                return [this.current];
             } else {
-                return [];
-            }
-        },
-
-        /**
-         * no children descendents, all put in an array one level deep
-         * for search results
-         *
-         * @returns { Array }
-         */
-        codesFlattened () {
-            if (this.isSearchActive) {
-                let flatChildren = [];
-                const codesClone = cloneDeep(this.codes); //cloneDeep is from lodash.js
-                codesClone.forEach((obj) => flatChildren = [...flatChildren, ...flattenCodes(obj)]);
-                flatChildren = flatChildren.filter((code) => code.code != ''); //only show those with a code, as those without can't be selected
-                return flatChildren;
-            } else {
-                return [];
-            }
-        },
-
-        /**
-         * To only start showing search results once enough characters
-         * have been added
-         *
-         * @return { Boolean }
-         */
-        isSearchActive () {
-            return this.query.length >= MIN_QUERY_LENGTH;
-        },
-
-        /**
-         * When the search is active, will return any codes
-         * that match the current search query
-         *
-         * @return { Array }
-         */
-        searchResults () {
-            return this.codesFlattened.filter(this.filterResults);
-        },
-
-        /**
-         * To show that no codes march the current search
-         *
-         * @return { Boolean }
-         */
-        hasNoSearchResults () {
-            return this.searchResults.length === 0 && this.isSearchActive && this.hasSelectedFirstNode;
-        },
-
-        /**
-         * the codes found relevant to the search input
-         *
-         * @returns { Array }
-         */
-        codesWithSearch () {
-            if (this.isSearchActive) { //only start showing results once the query is long enough
-                return this.searchResults;
-            } else { //otherwise just show codes
-                return this.codes;
+                return searchStore.results;
             }
         },
 
@@ -362,76 +100,64 @@ export const useModalActiveCodesStore = defineStore('csModalActiveCodesStore', {
     actions: {
 
         /**
-         * Can traverse through the codes via direct selection of a cs-modal-code when
-         * it doesn't have a code.
+         * There's been a change in node selection,
+         * so update based on the change in depth
+         *
+         * @param { number }
+         * @param { number }
          */
-        setNextSelectedNode (id) {
-            if (this.isOnThirdNode) {
-                this.selectedFourthNodeId = id;
-            } else if (this.isOnSecondNode) {
-                this.selectedThirdNodeId = id;
-            } else if (this.isOnFirstNode) {
-                this.selectedSecondNodeId = id;
+        setSelected (depth, id) {
+            useModalSearchStore().clear(); //clear the search results when traversing
+            if (depth === 0) { //pulling back to no node selection at all, the root level
+                this.reset();
+            } else if (depth > this.currentDepth) { //progressing to the next depth
+                this.toNext(id);
+            } else if (depth < this.currentDepth) { //or going back to a previous depth
+                this.toPrevious(depth)
             }
+            this.currentDepth = depth;
         },
 
         /**
-         * to reset the selected second node, reverting the node to empty
+         * Reset to the original state, with no active selection at all
          */
-        resetSelectedSecondNode () {
-            this.selectedSecondNodeId = UNSET_ID;
-            this.resetSelectedThirdNode();
-            this.resetSelectedFourthNode();
+        reset () {
+            this.currentDirection = DIRECTION.BACKWARDS;
+            this.idList = [];
+            this.currentDepth = 0;
         },
 
         /**
-         * to reset the selected third node, reverting the node to empty
-         */
-        resetSelectedThirdNode () {
-            this.selectedThirdNodeId = UNSET_ID;
-            this.resetSelectedFourthNode();
-        },
-
-        /**
-         * to reset the selected thurd node, reverting the node to empty
-         */
-        resetSelectedFourthNode () {
-            this.selectedFourthNodeId = UNSET_ID;
-        },
-
-        /**
-         * find all those results that match any search words
-         * within the the code, name or breadcrumb fields
+         * Add one more selection
          *
-         * @params { Object }
-         *
-         * @return { Boolean } true if found
+         * @param { number }
          */
-        filterResults (code) {
-            return searchForMatches(code, this.queryWordList)
+        toNext (id) {
+            this.currentDirection = DIRECTION.FORWARDS;
+            this.idList = [...this.idList, id]; //add the new id in
         },
 
         /**
-         * clear the current search
+         * Move back to a previous node
+         *
+         * @param { number }
          */
-        clearSearch () {
-            this.query = '';
+        toPrevious (targetDepth) {
+            this.currentDirection = DIRECTION.BACKWARDS;
+            this.idList = this.idList.filter((id, index) => index < targetDepth); //shorten the list back to the new reduced depth
+        },
+
+        /**
+         * Move one depth down the tree
+         *
+         * @param { number }
+         */
+        async setNextSelected (id) {
+            const codesStore = useCodesStore();
+            await codesStore.loadChildren(id);
+            this.setSelected(this.currentDepth+1, id);
         },
 
     },
 
 });
-
-/**
- * Used to indicate that a selection hasn't been made
- * on a curriculum node yet
- *
- * @param { Object }
- */
- function getEmptyNode () {
-    return {
-        id: UNSET_ID,
-        name: '-',
-        children: [],
-    }
-}
