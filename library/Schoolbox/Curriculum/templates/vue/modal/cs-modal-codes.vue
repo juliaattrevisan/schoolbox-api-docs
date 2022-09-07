@@ -7,10 +7,13 @@
 
 import { ref, computed, watch } from 'vue';
 import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
+import { useModalSearchStore } from '../store/csModalSearchStore';
+import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
 import CsModalCode from './cs-modal-code.vue'
 
 
 const modalActiveCodesStore = useModalActiveCodesStore();
+const modalSearchStore = useModalSearchStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
 const codesContainerEl = ref(null); //to scroll back to top on any selection change
 
@@ -20,14 +23,14 @@ const codesContainerEl = ref(null); //to scroll back to top on any selection cha
  *
  * @returns { String }
  */
-const currentSelectedNodeTitle = computed(() => modalActiveCodesStore.codes[0].name);
+const currentSelectedNodeTitle = computed(() => modalActiveCodesStore.current.name);
 
 /**
  * Clear the current search query
  */
-// function onClearSearchSelected () {
-//     modalActiveCodesStore.clearSearch();
-// }
+function onClearSearchSelected () {
+    modalSearchStore.clear();
+}
 
 /**
  * to scroll back to top on any selection change, otherwise the
@@ -43,37 +46,15 @@ watch(() => modalActiveCodesStore.codes, () => {
 </script>
 
 <template>
-    <!-- <div v-if="modalActiveCodesStore.codes.length === 0" class="empty-state">
-        <i class="icon-curriculum"></i>
-        <p>To start viewing Curriculum Codes, first select from either: {{ parentNodeTitles }}.</p>
+    <div v-if="modalSearchStore.isProcessing">
+        <loading-table />
     </div>
-    <div v-else-if="modalActiveCodesStore.hasNoSearchResults" class="empty-state">
-        <i class="icon-curriculum"></i>
-        <p>No Curriculum Codes in: {{ currentSelectedNodeTitle }} match your current search.</p>
-        <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
-    </div>
-    <ul v-else ref="codesContainerEl">
-        <cs-modal-code
-            v-for="code in modalActiveCodesStore.codesWithSearch"
-            :key="code.id"
-            :code="code"
-            :depth="depth"
-        />
-    </ul> -->
-    <!-- <div v-if="searchStore.isActive && searchStore.hasNoResults" class="empty-state">
+    <div v-else-if="modalSearchStore.isActive && modalSearchStore.hasNoResults" class="empty-state">
         <i class="icon-curriculum"></i>
         <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
         <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
     </div>
     <ul v-else ref="nodesContainerEl">
-        <cs-modal-code
-            v-for="node in modalActiveCodesStore.codes"
-            :key="node.id"
-            :node="node"
-            :depth="depth"
-        />
-    </ul> -->
-    <ul ref="nodesContainerEl">
         <cs-modal-code
             v-for="code in modalActiveCodesStore.codes"
             :key="code.id"

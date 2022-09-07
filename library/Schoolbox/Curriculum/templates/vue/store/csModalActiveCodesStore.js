@@ -5,7 +5,7 @@
 
 import { defineStore } from 'pinia';
 import { useCodesStore, findById } from './csCodesStore';
-// import { useSearchStore } from '../../store/mcSearchStore';
+import { useModalSearchStore } from './csModalSearchStore';
 
 export const DIRECTION = {
     FORWARDS: 'forwards',
@@ -86,13 +86,12 @@ export const useModalActiveCodesStore = defineStore('csModelActiveCodes', {
          * @returns { Array }
          */
         codes () {
-            // const searchStore = useSearchStore();
-            // if (searchStore.hasNoResults) {
-            //     return [this.current];
-            // } else {
-            //     return searchStore.results;
-            // }
-            return [this.current];
+            const searchStore = useModalSearchStore();
+            if (searchStore.hasNoResults) {
+                return [this.current];
+            } else {
+                return searchStore.results;
+            }
         },
 
     },
