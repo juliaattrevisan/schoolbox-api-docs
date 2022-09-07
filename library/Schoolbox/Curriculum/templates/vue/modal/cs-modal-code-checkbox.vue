@@ -8,11 +8,9 @@
 import { computed } from 'vue';
 import { UNSET_ID } from '../store/csCodesStore';
 import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
-// import { useSearchStore } from '../store/mcSearchStore';
 
 
 const modalSelectedCodesStore = useModalSelectedCodesStore();
-// const searchStore = useSearchStore();
 
 
 const props = defineProps({

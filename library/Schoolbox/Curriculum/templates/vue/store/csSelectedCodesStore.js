@@ -142,7 +142,7 @@ export const useSelectedCodesStore = defineStore('csSelectedCodes', {
          * clear all the currently selected codes
          */
         empty () {
-            this.codes  = [];
+            this.codes.forEach((node) => this.remove(node));
         },
 
         /**

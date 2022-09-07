@@ -49,6 +49,7 @@ export const useModalSelectedCodesStore = defineStore('csModalSelectedCodes', {
          * @param { Object }
          */
         add (codeToAdd) {
+            useSelectedCodesStore().updateIsSelected(codeToAdd, true);
             this.codes  = [...this.codes, codeToAdd];
         },
 
@@ -58,6 +59,7 @@ export const useModalSelectedCodesStore = defineStore('csModalSelectedCodes', {
          * @param { Object }
          */
         remove (codeToRemove) {
+            useSelectedCodesStore().updateIsSelected(codeToRemove, false);
             this.codes = this.codes.filter((code) => code.id !== codeToRemove.id);
         },
 
@@ -75,7 +77,7 @@ export const useModalSelectedCodesStore = defineStore('csModalSelectedCodes', {
          * clear all the currently selected codes
          */
         empty () {
-            this.codes  = [];
+            this.codes.forEach((node) => this.remove(node));
         },
 
         /**
