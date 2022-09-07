@@ -547,9 +547,11 @@
                             if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
                                 $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
 
-                                {# Handle clicks on confirm popup buttons #}
-                                $('#confirm-dialog [data-yes]').click(function () {postSobo($buttonClicked, true );});
-                                $('#confirm-dialog [data-no]' ).click(function () {postSobo($buttonClicked, false);});
+                                {# Handle clicks on confirm popup buttons. #}
+                                {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
+                                {# Because we bind here, we must first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clickec. #}
+                                $('#confirm-dialog [data-yes]').unbind('click').click(function () {postSobo($buttonClicked, true );});
+                                $('#confirm-dialog [data-no]' ).unbind('click').click(function () {postSobo($buttonClicked, false);});
                             } else {
                                 postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
                             }
