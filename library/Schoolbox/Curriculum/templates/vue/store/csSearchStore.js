@@ -3,20 +3,22 @@
  */
 
 import { defineStore } from 'pinia';
-import { useCodesStore } from './csCodesStore';
+import { apiEndpoint } from './curriculumSelectorStore';
+// import { useCodesStore } from './csCodesStore';
 import { useSelectedCodesStore } from './csSelectedCodesStore';
-import cloneDeep from 'lodash/cloneDeep';
 
 
 const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
 const CAPPED_RESULTS_LENGTH = 50; //the maximum amount of results to show
 
-export const useSearchStore = defineStore('csSearchStore', {
+export const useSearchStore = defineStore('csSearch', {
 
     state: () => ({
+        isProcessing: false, //to notify that an action is taking place,
         query: '', //current search term to filter the active codes
         isResultsCapped: false, //to show a 'refine your search' note
         resultsNotShownCount: 0, //a total of the results not visible in the list
+        results: [], //nodes returned in the current search results
     }),
 
     getters: {
@@ -27,35 +29,32 @@ export const useSearchStore = defineStore('csSearchStore', {
          *
          * @return { Boolean }
          */
-        isSearchActive () {
+        isActive () {
             return this.query.length >= MIN_QUERY_LENGTH;
         },
 
         /**
-         * To search the curriculum codes
+         * filter out any returned members that are already in the list
          *
-         * @return { Array }
+         * @return { array }
          */
-        codes () {
-            return useCodesStore().codes;
-        },
-
-        /**
-         * no children descendents, all put in an array one level deep
-         * for search results
-         *
-         * @returns { Array }
-         */
-        codesFlattened () {
-            if (this.isSearchActive) {
-                let flatChildren = [];
-                const codesClone = cloneDeep(this.codes); //cloneDeep is from lodash.js
-                codesClone.forEach((obj) => flatChildren = [...flatChildren, ...flattenCodes(obj)]);
-                flatChildren = flatChildren.filter((code) => code.code != ''); //only show those with a code, as those without can't be selected
-                return flatChildren;
+         filteredResults () {
+            if (this.isActive) {
+                return this.results;
             } else {
                 return [];
             }
+            // const addMembersStore = useAddMembersStore();
+            // if (addMembersStore.fromType === FromTypes.NAME || addMembersStore.fromType === FromTypes.LIST) {
+            //     const membersStore = useMembersStore();
+            //     const memberIdList = membersStore.members.map((member) => member.id); //create an array of just the existing member ids
+            //     return this.results.filter((result) => !memberIdList.includes(result.id)); //to only keep those search results that aren't already in the group
+            // } else if (addMembersStore.fromType === FromTypes.GROUP) {
+            //     const store = useStore();
+            //     return this.results.filter((result) => result.id !== store.id); //don't return the group we are currently on in the search
+            // } else {
+            //     return this.results;
+            // }
         },
 
         /**
@@ -71,30 +70,13 @@ export const useSearchStore = defineStore('csSearchStore', {
         },
 
         /**
-         * When the search is active, will return any codes
-         * that match the current search query
-         *
-         * @return { Array }
-         */
-        results () {
-            const fullResults = this.codesFlattened.filter(this.filterResults);
-            if (fullResults.length > CAPPED_RESULTS_LENGTH) { //too many results, so cap them
-                this.isResultsCapped = true; //to display the results are capped note
-                this.resultsNotShownCount = fullResults.length - CAPPED_RESULTS_LENGTH; //and how many are actually capped
-                return fullResults.slice(0, CAPPED_RESULTS_LENGTH);
-            } else { //otherwise just return them all
-                this.isResultsCapped = false;
-                return fullResults;
-            }
-        },
-
-        /**
-         * To show that no codes march the current search
+         * To show that no codes match the current search
          *
          * @return { Boolean }
          */
         hasNoResults () {
-            return this.results.length === 0 && this.isSearchActive;
+            // return this.filteredResults.length === 0 && !this.isProcessing;
+            return this.isActive && this.filteredResults.length === 0 && !this.isProcessing;
         },
 
     },
@@ -102,15 +84,34 @@ export const useSearchStore = defineStore('csSearchStore', {
     actions: {
 
         /**
-         * find all those results that match any search words
-         * within the the code, name or breadcrumb fields
-         *
-         * @params { Object }
-         *
-         * @return { Boolean } true if found
+         * search for nodes that match
          */
-        filterResults (code) {
-            return searchForMatches(code, this.queryWordList)
+         async search () {
+            this.isProcessing = true;
+            try {
+                // const viewNodesStore = useViewNodesStore();
+                const response = await fetch(`${apiEndpoint}?query=${this.query}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                this.results = await response.json();
+                // const selectedNodesStore = useSelectedNodesStore();
+                // this.results.forEach((node) => node.isSelected = selectedNodesStore.isNodeSelected(node)); //ensure checked results are reflected
+            } catch (error) {
+                console.warn(error);
+            } finally {
+                this.isProcessing = false;
+            }
+        },
+
+        /**
+         * clear the current search
+         */
+        clear () {
+            this.query = '';
+            this.results = [];
         },
 
         /**
@@ -135,33 +136,9 @@ export const useSearchStore = defineStore('csSearchStore', {
             selectedCodesStore.remove(matchedSelectedCodes);
         },
 
-        /**
-         * clear the current search
-         */
-        clear () {
-            this.query = '';
-        },
-
     },
 
 });
-
-/**
- * The codes are nested with children:[], so we pull them all
- * out into a single level when searching
- *
- * @param { Object }
- */
-export function flattenCodes (obj) {
-    let array = [obj];
-    if (obj.children && obj.children.length > 0) {
-        obj.children.forEach((child) => {
-            array = [...array, ...flattenCodes(child)];
-        });
-        obj.children = [];
-    }
-    return array;
-}
 
 /**
  * find all those results that match any search words

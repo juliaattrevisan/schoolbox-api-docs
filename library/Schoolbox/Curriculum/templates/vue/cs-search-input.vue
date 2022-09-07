@@ -4,7 +4,8 @@
  * To search for codes or select the browse button to open the modal
  */
 
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
+import debounce from 'lodash/debounce';
 import { useStore } from './store/curriculumSelectorStore';
 import { useModalStore } from './store/csModalStore';
 import { useSearchStore } from './store/csSearchStore';
@@ -104,10 +105,26 @@ function onEnterKeySelected () {
  * @param { Event }
  */
 function onMouseClick (event) {
-    if (searchStore.isSearchActive && props.curriculumSelectorEl && !props.curriculumSelectorEl.contains(event.target)) {
+    if (searchStore.isActive && props.curriculumSelectorEl && !props.curriculumSelectorEl.contains(event.target)) {
         searchStore.clear();
     }
 }
+
+/**
+ * start searching once the search is active, watching the query string for input
+ */
+ watch(() => searchStore.query, () => {
+    if (searchStore.isActive) {
+        debounceSearch();
+    }
+});
+
+/**
+ * debounce to avoid constant polling while the user is typing
+ */
+const debounceSearch = debounce(() => {
+    searchStore.search();
+}, 350);
 
 /**
  * to open the modal

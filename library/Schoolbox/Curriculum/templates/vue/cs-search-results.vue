@@ -20,7 +20,7 @@ const searchStore = useSearchStore();
  * @returns { Boolean }
  */
 const showSelectAll = computed(() => {
-    return searchStore.results.length > 1;
+    return searchStore.filteredResults.length > 1;
 });
 
 </script>
@@ -29,11 +29,13 @@ const showSelectAll = computed(() => {
     <div class="search-results-container">
         <div class="search-results">
             <ul>
-                <li v-if="searchStore.isResultsCapped" class="search-refine-note">{{ searchStore.resultsNotShownCount }} search results not shown, try refining your search further.</li>
+                <li v-if="searchStore.isProcessing" class="search-status">Searching for results....</li>
+                <li v-else-if="searchStore.hasNoResults" class="search-status">No results found for your current search.</li>
+                <li v-else-if="searchStore.isResultsCapped" class="search-status">{{ searchStore.resultsNotShownCount }} search results not shown, try refining your search further.</li>
                 <li v-if="showSelectAll">
                     <cs-select-all-search-results />
                 </li>
-                <li v-for="result in searchStore.results" :key="result.id">
+                <li v-for="result in searchStore.filteredResults" :key="result.id">
                     <cs-search-result :result="result"/>
                 </li>
             </ul>
@@ -73,7 +75,7 @@ const showSelectAll = computed(() => {
     }
 }
 
-.search-refine-note {
+.search-status {
     background-color: #FAFAFA;
     padding: 0.75rem;
     font-style: italic;
