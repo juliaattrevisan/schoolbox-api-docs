@@ -333,7 +333,7 @@ export default {
                 :proxy="'reason-proxy'"
                 :value="''"
                 :allow-edit="true"
-                :allow-submit="true"
+                :allow-submit="false"
                 :spawn-immediately="true"
                 :is-processing="true"
                 :cdn-prefix="this.cdnPrefix"
