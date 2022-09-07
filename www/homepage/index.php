@@ -475,21 +475,21 @@ foreach ($emptyPositionList as $emptyPosition) {
  *
  * Note that this code needs to run even if the current folder is not a class, in order to blank out the PHPLib blocks.
  *
- * @param                                          $phpLibObj
+ * @param SitePage                                 $phpLibObj
  * @param Component_Homepage_ManageClassController $manageClassController
  * @param \Schoolbox\User                          $sessionUser
  * @return void
- * @throws RouteNotFound
  * @throws ContainerExceptionInterface
  * @throws NotFoundExceptionInterface
+ * @throws RouteNotFound
  * @throws \Schoolbox\Mapper\Exception
  */
-function renderTemplateForAnalyticsSection($phpLibObj, Component_Homepage_ManageClassController $manageClassController, Schoolbox\User $sessionUser): void
+function renderTemplateForAnalyticsSection(SitePage $phpLibObj, Component_Homepage_ManageClassController $manageClassController, Schoolbox\User $sessionUser): void
 {
     // Blank out all PHPLib blocks relating to analytics initially.  They will be re-enabled if necessary below.
-    $phpLibObj->setVar('analytics_section_heading_block', '');
-    $phpLibObj->setVar('class_analytics_link_block'     , '');
-    $phpLibObj->setVar('schoolbox_analytics_link_block' , '');
+    $phpLibObj->setVar('analytics_section_heading_block');
+    $phpLibObj->setVar('class_analytics_link_block');
+    $phpLibObj->setVar('schoolbox_analytics_link_block');
 
     $hasAnalytics = false;
 
