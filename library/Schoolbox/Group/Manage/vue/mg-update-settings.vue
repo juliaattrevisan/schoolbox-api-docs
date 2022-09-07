@@ -21,6 +21,10 @@ const updateModalEl = ref(null);
 onMounted(() => {
     if (settingsStore.isAccessNotSet) {
         settingsStore.isPromptOpen = true;
+        let href = window.location.href;
+        if (href.indexOf('?isNew')) {
+            window.history.pushState(null, null, href.split('?')[0]);
+        }
     }
 });
 
