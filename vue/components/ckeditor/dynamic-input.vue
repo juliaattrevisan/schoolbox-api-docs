@@ -206,13 +206,15 @@ export default {
          * @returns { Object }
          */
         getConfigOptions (editorType) {
+            const vueSpecificConfig = this.getVueSpecificConfig();
+
             const configOptions = { //use computed property names to retrieve the appropriate config options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names
-                [configTypes.DEFAULT]: $.alaressEditorConfig(this.getVueSpecificConfig()),
-                [configTypes.FOR_COMMENTS]: $.alaressEditorConfigForComments(this.getVueSpecificConfig()),
-                [configTypes.WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(this.getVueSpecificConfig()),
-                [configTypes.BASIC]: $.alaressEditorConfigBasic(this.getVueSpecificConfig()),
+                [configTypes.DEFAULT]: $.alaressEditorConfig(vueSpecificConfig),
+                [configTypes.FOR_COMMENTS]: $.alaressEditorConfigForComments(vueSpecificConfig),
+                [configTypes.WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(vueSpecificConfig),
+                [configTypes.BASIC]: $.alaressEditorConfigBasic(vueSpecificConfig),
             }
-            return configOptions[editorType] || $.alaressEditorConfig(this.getVueSpecificConfig());
+            return configOptions[editorType] || $.alaressEditorConfig(vueSpecificConfig);
         },
 
         /**
