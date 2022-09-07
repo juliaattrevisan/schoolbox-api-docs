@@ -90,7 +90,7 @@
                     //noinspection JSUnresolvedVariable
                     let html = $('[data-user-permission-clone]').html()
                         .replace(/{TYPE_NAME}/g, 'User')
-                        .replace(/{FULL_NAME}/g, user.full_name)
+                        .replace(/{NAME}/g, user.full_name)
                         .replace(/{ID}/g, user.id)
                         .replace(/{ROLE}/g, user.role);
 
