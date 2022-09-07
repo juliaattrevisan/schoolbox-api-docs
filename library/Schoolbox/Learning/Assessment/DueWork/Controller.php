@@ -259,7 +259,7 @@ class Controller extends Assessment\Controller
      * @throws InvalidArgumentException If assessment due date is null.
      * @throws PDOException
      * @throws UnexpectedValueException
-     * @api GET /learning/assessment/:assessmentId/status
+     * @api GET /learning/assessments/:assessmentId/status
      */
     public function getStatus(IAssessable $assessment): void
     {
@@ -792,7 +792,7 @@ class Controller extends Assessment\Controller
      * @param Model $assessment
      * @param User              $student
      * @since 165
-     * @api   GET /learning/assessment/:assessmentId/:participantId/submit
+     * @api   GET /learning/assessments/:assessmentId/:participantId/submit
      */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
@@ -1324,12 +1324,25 @@ class Controller extends Assessment\Controller
      */
     public function postStatusAcknowledge(IAssessable $assessment, User $student): void
     {
+        // NOTE: We do not use $assessment->isOverdue() because that will return true only if now is between dueAt and closeAt.
+        //       For assessments able to be submitted offline (which we deal with here), closeAt will always equal dueAt, and
+        //       so isOverdue() will return false if now is after dueAt/closeAt.  Therefore function isOverdue() is not applicable here.
+        if (Alaress_Date_Format::now()->gt($assessment->getDueAt())) {
+            // If the 'submissionWasOnTime' parameter is true, then this is a late acknowledgement of an event that occurred earlier.
+            // Otherwise, set submission time to 'now' to align with the behaviour before parameter 'submissionWasOnTime' was introduced.
+            $submittedLate  = !$this->getRequest()->post->getBool('submissionWasOnTime', false);
+            $submissionTime = ($submittedLate) ? Alaress_Date_Format::now() : $assessment->getDueAt()->addSeconds(-1); // 1 second before due time.
+        } else {
+            $submittedLate  = false;
+            $submissionTime = Alaress_Date_Format::now();
+        }
+
         try {
-            $response = $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
+            $response = $this->persistAcknowledgementResponse($assessment, $student, $submissionTime);
             $data     = [
                 'success'       => true,
                 'id'            => $response->getId(),
-                'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
+                'submittedLate' => $submittedLate
             ];
             $code     = 200;
         } catch (PDOException $e) {

@@ -12,7 +12,7 @@
  * * cancelLabel:   Label for "No" button
  * * confirmEvent:  Callback that is run when 'Yes' is clicked. Defaults to
  *                  following whatever link is on this element.
- * * confirmEvent:  Callback that is run when 'No' is clicked. Defaults to no op.
+ * * cancelEvent:   Callback that is run when 'No' is clicked. Defaults to no op.
  * * destroyDialog: True if dialog is to be destroyed when it's closed.
  */
 (function($){

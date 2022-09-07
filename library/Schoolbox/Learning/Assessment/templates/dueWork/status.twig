@@ -14,6 +14,7 @@
      - selfReflect:       bool            Is this being viewed in a self reflection context?
      - blindReviewUrl:   string
 #}
+
 {% extends '@learningAssessment/status.twig' %}
 
 {% set labelIncomplete = 'Submission required' %}
@@ -161,7 +162,7 @@
                             <label>{{ locale.grades.proper }}
                                 {% include '@learningMarkScheme/'~markSchemeName~'.twig' with {
                                     participant: participant,
-                                    feedback: participant.findMostRecentInstructorGivenFeedback,
+                                    feedback:    participant.findMostRecentInstructorGivenFeedback,
                                     markScheme:  assessment.markScheme,
                                     tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
                                     errors:      errors,
@@ -181,13 +182,13 @@
                     {% endif %}
                     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                         {% include '@learningAssessment/dueWork/comment.twig' with {
-                            feedback:    participant.findMostRecentInstructorGivenFeedback,
-                            participant: participant,
-                            tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
-                            readonly:    readonly,
+                            feedback:       participant.findMostRecentInstructorGivenFeedback,
+                            participant:    participant,
+                            tabIndex:       (loop.index0 * inputsPerFeedback) + inputNo,
+                            readonly:       readonly,
                             selfAssessment: selfAssess,
                             selfReflection: selfReflect,
-                            blindMode:   false
+                            blindMode:      false
                         } only %}
                         {% set inputNo = inputNo + 1 %}
                         {% if 'none' == markSchemeName | lower %}
@@ -261,7 +262,7 @@
             {%- apply spaceless %}
                 {% if pAckReceipt %}
                     {% set soboTitle = 'Acknowledge receipt of student submission' %}
-                    <a class="button" data-sobo title="{{ soboTitle }}" href="{{ pAckReceipt }}">Mark as Submitted</a>
+                    <button data-sobo title="{{ soboTitle }}" href="{{ pAckReceipt }}">Mark as Submitted</button>
                 {% endif %}
                 {% set draftSaveTitle = 'You can discard this draft from the Grading Overview screen' %}
                 {% set draftSaveHtml = isDraftFeedback ? 'Saved as Draft' : '' %}
@@ -334,6 +335,17 @@
         <div id="mass-submit" class="reveal-modal" data-reveal data-list-id="mass-submit-list" aria-hidden="true"
              role="dialog">
             <h2>Acknowledge Receipt of Submission</h2>
+            <p id="checkbox-switch-container">
+                <span class="alert-box warning">{{ assessment.title }} is now overdue</span>
+                Did these students submit their work on time? <br />
+                <span class="switch">
+                    <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
+                    <label for="onTimeCheckboxSwitch">
+                        <span>Yes</span>
+                        <span>No</span>
+                    </label>
+                </span>
+            </p>
             <p data-mass-unavailable>You have no students requiring submission.</p>
             <p data-mass-available>Acknowledge receipt of submission for:</p>
             <section class="checklist" id="mass-submit-list">
@@ -384,7 +396,7 @@
                         onPreDraftCallback: function(){
                         },
                         onDraftCallback: function (userId, isSuccess, message, feedbackId) {
-                            var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
+                            let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
                                 $publishButton = $actionBar.find('[data-draft=publish]');
                             $publishButton.attr('data-draft-id', feedbackId);
                             $actionBar.attr('data-mass-publish', '');
@@ -393,7 +405,7 @@
                         onPrePublishCallback: function(){
                         },
                         onPublishCallback: function (userId) {
-                            var $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
+                            let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
                                 $ackButton = $actionBar.find('[data-sobo]'),
                                 $publishButton = $actionBar.find('[data-draft=publish]');
                             $publishButton.removeAttr('data-draft-id');
@@ -407,7 +419,7 @@
                         }
                     });
 
-                    var $userList = $('#assessment-status');
+                    let $userList = $('#assessment-status');
 
                     {# Mass publish draft feedbacks #}
                     $('#mass-publish').bulky({
@@ -416,7 +428,7 @@
                                 return 'None Selected';
                             }
 
-                            if (len == all) {
+                            if (len === all) {
                                 return 'Publish All';
                             }
 
@@ -440,7 +452,7 @@
                          # and the available drafts in the quickmark screen
                          #}
                         onSubmit: function (toPublish) {
-                            var draftFeedbackIds = [],
+                            let draftFeedbackIds = [],
                                 $actionBars      = [],
                                 $toast = $('[data-save-draft]');
 
@@ -448,7 +460,7 @@
 
                             {# Iterate through each publish button #}
                             toPublish.each(function () {
-                                var $actionBar      = $(this),
+                                let $actionBar      = $(this),
                                     $publishButton  = $actionBar.find('[data-draft=publish]'),
                                     draftFeedbackId = $publishButton.attr('data-draft-id');
 
@@ -461,11 +473,11 @@
                             $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks', {assessmentId: assessment.id}) }}', {
                                 'drafts': draftFeedbackIds
                             }).done(function (response) {
-                                var feedbackErrors = false;
+                                let feedbackErrors = false;
 
-                                for (var feedbackId in response) {
+                                for (let feedbackId in response) {
                                     if (response.hasOwnProperty(feedbackId)) {
-                                        var result           = response[feedbackId],
+                                        let result           = response[feedbackId],
                                             isPublishSuccess = result['publishSuccess'],
                                             $actionBar       = $actionBars[feedbackId],
                                             $publishButton   = $actionBar.find('[data-draft=publish]');
@@ -494,9 +506,20 @@
                         }
                     });
 
+                    {# These variables allow the confirm-dialog to be disabled in the case of bulk acknowledgements, #}
+                    {# and set whether bulk acknowledgements should confirm submissions as having been on-time.      #}
+                    let confirmDialogDisabled            = false;
+                    let confirmDialogDisabledOnTimeValue = false;
+
                     {# Mass acknowledge receipt of submissions #}
                     $('#mass-submit').bulky({
                         submitText: function (len, all) {
+                            if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
+                                $('#checkbox-switch-container').show();
+                            } else {
+                                $('#checkbox-switch-container').hide();
+                            }
+
                             if (!len) {
                                 return 'None Selected';
                             }
@@ -508,6 +531,8 @@
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
                         onSubmit: function (toSubmit) {
+                            confirmDialogDisabled            = true;
+                            confirmDialogDisabledOnTimeValue = $('#onTimeCheckboxSwitch').prop('checked');
                             toSubmit.each(function () {
                                 $(this).find('[data-sobo]').trigger('click');
                             });
@@ -515,44 +540,69 @@
                     });
 
                     {# Handle clicks on 'Submission Received' buttons #}
-                    $('[data-sobo]').on('click', function (event) {
-                        event.preventDefault();
+                    $('[data-sobo]').on('click', function () {
+                        $buttonClicked = $(this);
 
-                        var $button = $(this),
-                            buttonText = $button.html(),
-                            $actionBar = $button.closest('[data-action-bar]'),
+                        if (!confirmDialogDisabled) {
+                            if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
+                                $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
+
+                                {# Handle clicks on confirm popup buttons #}
+                                $('#confirm-dialog [data-yes]').click(function () {postSobo($buttonClicked, true );});
+                                $('#confirm-dialog [data-no]' ).click(function () {postSobo($buttonClicked, false);});
+                            } else {
+                                postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
+                            }
+                        } else {
+                            postSobo($buttonClicked, confirmDialogDisabledOnTimeValue); {# Use default value for whether submission was confirmed to be on-time. #}
+                        }
+                    });
+
+                    /**
+                     * Send a post request to the server, notifying that:
+                     *  * the student (identified by the button clicked)
+                     *  * has submitted the assessment task (identified by the button href).
+                     *
+                     * @param {boolean} submissionWasOnTime - true if the submission was received on time.
+                     */
+                    function postSobo($button, submissionWasOnTime) {
+                        let buttonText   = $button.html(),
+                            $actionBar   = $button.closest('[data-action-bar]'),
                             $participant = $actionBar.closest('[data-participant]'),
-                            $statusIcon = $participant.find('[data-status]'),
+                            $statusIcon  = $participant.find('[data-status]'),
                             $statusLabel = $participant.find('[data-status-label]'),
-                            $toast = $('[data-save-draft]');
+                            $toast       = $('[data-save-draft]');
 
                         $toast.toastActivate({text: 'Marking submission as received...'});
                         $button.html('Working...');
                         $button.attr('disabled', '');
 
-                        $.post($button.attr('href'))
-                            .done(function (response) {
-                                /** @var {bool} response.success */
-                                if (true !== Boolean(response.success)) {
-                                    soboFailure($button, buttonText, $toast);
-                                    return;
-                                }
-
-                                /** @var {bool} response.submittedLate */
-                                soboSuccess(
-                                    $participant,
-                                    $button,
-                                    $actionBar,
-                                    $statusIcon,
-                                    $statusLabel,
-                                    response.submittedLate,
-                                    $toast
-                                )
-                            })
-                            .fail(function () {
+                        $.post($button.attr('href'), {'submissionWasOnTime': submissionWasOnTime})
+                        .done(function(response) {
+                            /** @var {bool} response.success */
+                            if (true !== Boolean(response.success)) {
                                 soboFailure($button, buttonText, $toast);
-                            });
-                    });
+                                return;
+                            }
+
+                            /** @var {bool} response.submittedLate */
+                            soboSuccess(
+                                $participant,
+                                $button,
+                                $actionBar,
+                                $statusIcon,
+                                $statusLabel,
+                                response.submittedLate,
+                                $toast
+                            )
+                        })
+                        .fail(function () {
+                            $('#confirm-dialog').hide();
+                            soboFailure($button, buttonText, $toast);
+                        });
+
+                        $('#confirm-dialog').foundation('reveal', 'close');
+                    }
 
                     /**
                      * Handle a submission receipt success
@@ -610,9 +660,9 @@
                      * @param {jQuery} $publishButton
                      */
                     function draftPublishSuccess($actionBar, $publishButton) {
-                        var $soboButton    = $actionBar.find('[data-sobo]'),
-                            $draftedSpan   = $actionBar.find('[data-draft=drafted]'),
-                            $extraMeta     = $actionBar.find('[data-feedback-attach-info]'),
+                        let $soboButton      = $actionBar.find('[data-sobo]'),
+                            $draftedSpan     = $actionBar.find('[data-draft=drafted]'),
+                            $extraMeta       = $actionBar.find('[data-feedback-attach-info]'),
                             $feedbackButtons = $draftedSpan.add($publishButton);
 
                         $actionBar.removeAttr('data-mass-publish');
@@ -648,6 +698,19 @@
                 $('#importFeedbackForm').importFeedback();
             });
         </script>
+
+        <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
+            <div>
+                <h2>Please confirm if this student has submitted their work on time?</h2>
+                <a class="close-reveal-modal" aria-label="Close">×</a>
+                <p>{{ assessment.title }} is currently overdue, please confirm if you would like to acknowledge the students submission before the due date. If you answer no, the students work will be marked as submitted late.</p>
+            </div>
+            <ul class="flex-list buttons">
+                <li><a class="button" data-no>No, they submitted late</a></li>
+                <li><a class="button submit" data-yes>Yes, they submitted on-time</a></li>
+            </ul>
+        </div>
+
         <div id="importFeedbackModal" class="reveal-modal" data-reveal>
             <form id="importFeedbackForm" action="#">
                 <section>
