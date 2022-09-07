@@ -378,6 +378,7 @@ export default {
         <reveal-modal size="medium" ref="awardAsAchievementModal" :closeOnBackgroundClick="false" @closed="onModalClosed">
             <badge-award
                 v-if="currentBadge"
+                type="achievement"
                 :key="'awardAchievement-' + String(currentBadge.id)"
                 :badge="currentBadge"
                 :endpoint="currentBadge._links.awardAsAchievement"
@@ -409,6 +410,7 @@ export default {
         <reveal-modal size="medium" ref="setAsGoalModal" :closeOnBackgroundClick="false" @closed="onModalClosed">
             <badge-award
                 v-if="currentBadge"
+                type="goal"
                 :key="'setGoal-' + String(currentBadge.id)"
                 :badge="currentBadge"
                 :endpoint="currentBadge._links.setAsGoal"

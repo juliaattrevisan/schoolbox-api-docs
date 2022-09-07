@@ -153,6 +153,12 @@ export default {
             default: null,
         },
 
+        /* Either "goal" or "achievement" depending on the context of this badge
+         * being awarded - there are nuanced behaviours depending on whether this
+         * badge was awarded as an achievemtn, or set as a goal
+         */
+        type: String,
+
         isModalOpen: Boolean,
         siteVersion: String
     },
@@ -300,22 +306,25 @@ export default {
         </div>
 
         <div>
-            <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
+            <!-- Only achievements can do this -->
+            <template v-if="'achievement' === type">
+                <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
 
-            <dynamic-input
-                v-if="this.isModalOpen"
-                preset-unique-id="reason"
-                inputName="reason"
-                singular="''"
-                :value="''"
-                :allow-edit="true"
-                :allow-submit="false"
-                :spawn-immediately="true"
-                :is-processing="true"
-                :cdn-prefix="this.cdnPrefix"
-                :site-version="this.siteVersion"
-                @value-changed="onReasonChanged"
-            ></dynamic-input>
+                <dynamic-input
+                    v-if="this.isModalOpen"
+                    preset-unique-id="reason"
+                    inputName="reason"
+                    singular="''"
+                    :value="''"
+                    :allow-edit="true"
+                    :allow-submit="false"
+                    :spawn-immediately="true"
+                    :is-processing="true"
+                    :cdn-prefix="this.cdnPrefix"
+                    :site-version="this.siteVersion"
+                    @value-changed="onReasonChanged"
+                ></dynamic-input>
+            </template>
         </div>
 
         <!--
