@@ -6,8 +6,8 @@
     <div class="content active" id="panel-general">
         <p class="meta">
             You may use the following tokens that will be substituted with the
-            students details on creation: [firstname], [surname], [fullname],
-            [year], [house]
+            students details on creation:
+            [firstname], [preferredname], [surname], [fullname], [year], [house]
         </p>
         <textarea id="body_public" name="body_public">{{ record.bodyPublic }}</textarea>
         {% include 'sub/attachzone.twig' with {attachzone: attachzonePublic} %}
@@ -15,8 +15,8 @@
     <div class="content" id="panel-confidential">
         <p class="meta">
             You may use the following tokens that will be substituted with the
-            students details on creation: [firstname], [surname], [fullname],
-            [year], [house]
+            students details on creation:
+            [firstname], [preferredname], [surname], [fullname], [year], [house]
         </p>
         <textarea id="body_private" name="body_private">{{ record.bodyPrivate }}</textarea>
         {% include 'sub/attachzone.twig' with {attachzone: attachzonePrivate} %}

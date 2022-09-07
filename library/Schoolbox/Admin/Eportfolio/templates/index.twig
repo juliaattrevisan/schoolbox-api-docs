@@ -8,12 +8,9 @@
         var sourceEmpty = $('#source-empty');
         var previousUser = null;
 
-        $('#sourceUserId').selectizeSelector({
+        $('#sourceUserId').userSelectizeSelector({
             ajax: {
-                url: '/ajax/user.php',
-                type: 'GET',
                 data: {groupID: 0},
-                dataType: 'json'
             }
         }).on('selectize.item_add', function (e, value) {
 
@@ -55,12 +52,9 @@
             previousUser = null;
         });
 
-        $('#destinationUserId').selectizeSelector({
+        $('#destinationUserId').userSelectizeSelector({
             ajax: {
-                url: '/ajax/user.php',
-                type: 'GET',
                 data: {groupID: 0},
-                dataType: 'json'
             },
             multiple: true
         });

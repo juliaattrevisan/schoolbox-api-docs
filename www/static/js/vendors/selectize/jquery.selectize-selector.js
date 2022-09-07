@@ -57,6 +57,48 @@
             .toArray();
     };
 
+    /**
+     * Build a set of options which can be passed into `$.fn.selectizeSelector`.
+     *
+     * @param {Object} options Any overrides
+     * @returns {Object}
+     */
+    $.selectizeSelector.buildUserSelectizeOptions = function (options) {
+        let defaults = {
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                dataType: 'json'
+            },
+            selectize: {
+                searchField: ['name', 'first_name', 'last_name', 'full_name', 'external_id'],
+            },
+        };
+        return $.extend(true, {}, defaults, options)
+    };
+
+    /**
+     * Build a selectize especially for selecting users.
+     *
+     * @param {Object} options Any overrides
+     * @returns {Object}
+     */
+    $.fn.userSelectizeSelector = function (options) {
+        return this.selectizeSelector($.selectizeSelector.buildUserSelectizeOptions(options));
+    };
+
+    /**
+     * Build a selectize.
+     *
+     * Defaults:
+     * * value:     initial selected value.
+     * * multiple:  whether multiple selections can be made
+     * * ajax:      Parameters passed to jQuery.ajax() call in selectize.load()
+     * * selectize: options for selectize
+     *
+     * @param {Object} options Any overrides
+     * @returns {Object}
+     */
     $.fn.selectizeSelector = function(options) {
         var element  = this;
         var settings = {}

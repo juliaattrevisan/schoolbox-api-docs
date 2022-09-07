@@ -8,7 +8,6 @@
  */
 class Report_Login extends Report_Abstract implements Report_IReport
 {
-
     private $groupID = null;
     private $dataSet;
     private $dataCount;
@@ -216,6 +215,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
                         user.id AS user,
                         title,
                         firstname,
+                        preferred_name,
                         lastname,
                         `groups`.name as role,
                         `groups`.group_type as roletype,
@@ -285,9 +285,10 @@ class Report_Login extends Report_Abstract implements Report_IReport
                 $userHandler = new User();
 
                 $nameShards = array(
-                    'title'     => $log['title'],
-                    'firstname' => $log['firstname'],
-                    'lastname'  => $log['lastname']
+                    'title'          => $log['title'],
+                    'firstname'      => $log['firstname'],
+                    'preferred_name' => $log['preferred_name'],
+                    'lastname'       => $log['lastname']
                 );
 
                 $page->setVar(

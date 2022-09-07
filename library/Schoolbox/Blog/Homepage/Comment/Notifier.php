@@ -31,7 +31,6 @@ use Schoolbox\User;
 
 class Notifier extends AbstractModuleNotifier implements SourceInterface
 {
-
     const TRIGGER_COMMENTED = 'commented';
     const TRIGGER_FOLLOWED = 'followed';
 
@@ -147,7 +146,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ->setNamespace($this->getSlug())
             ->setBody($comment->getBody())
             ->setFolderId($folderId)
-            ->setByline($author->formatName("{firstname} wrote"));
+            ->setByline($author->formatName("{preferredname} wrote"));
 
         return $bob;
     }

@@ -37,7 +37,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * @inheritDoc
      */
@@ -363,7 +362,6 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findRecipients(string $keyword, Badge\Model $badge, string $awardStatus, string $roleType): array
     {
-
         /* No keyword provided; nothing to search
          */
         if (strlen($keyword) < Results::MIN_SEARCH_LENGTH) {
@@ -378,6 +376,7 @@ class Mapper extends \Schoolbox\Mapper
 
         $pb = $this->getPredicateBuilder()
             ->like('user.firstname', "%{$keyword}%")
+            ->like('user.preferred_name', "%{$keyword}%")
             ->like('user.lastname', "%{$keyword}%")
             ->like('user.username', "%{$keyword}%")
             ->like('user.synergy_id', "%{$keyword}%");
@@ -387,7 +386,9 @@ class Mapper extends \Schoolbox\Mapper
         $query = "
             SELECT DISTINCT
                 `user`.id,
+                `user`.title,
                 `user`.firstname,
+                `user`.preferred_name,
                 `user`.lastname,
                 lyl.name AS year,
                 `groups`.name AS role,
@@ -414,10 +415,12 @@ class Mapper extends \Schoolbox\Mapper
 
         $users = [];
 
+        $formatter = (new User\Formatter\Factory())->buildFromConfig($this->getConfigLoader());
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             /* Manufacture a string to present to the user
              */
-            $person = "{$row['firstname']} {$row['lastname']} - ";
+            $fullName = $formatter->formatArray($row);
+            $person = "{$fullName} - ";
 
             if (isset($row['year'])) {
                 $person .= $this->getLongName($row['year']) . ', ';

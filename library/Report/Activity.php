@@ -8,7 +8,6 @@
  */
 class Report_Activity extends Report_Abstract implements Report_IReport
 {
-
     private $groupID = null;
     private $dataSet;
     private $dataCount;
@@ -219,7 +218,7 @@ OR ml.name        LIKE :keyword
 
         $dataQuery = "SELECT
             cl.id AS cl_id, cl.object, cl.objectId, cl.action, cl.user AS user_id, cl.time,
-            u.username, u.title, u.firstname, u.lastname,
+            u.username, u.title, u.firstname, u.preferred_name, u.lastname,
             c.id AS c_id, c.name AS c_name,
             cfolder.id AS cf_id, cfolder.name AS cf_name,
             f.id AS f_id, f.category AS f_cid, f.realname AS f_realname, f.description AS f_description, cfile.name AS f_catname,
@@ -330,9 +329,10 @@ OR ml.name        LIKE :keyword
 
                 $userHandler = new User();
                 $nameShards = array(
-                    'title'     => $log['title'],
-                    'firstname' => $log['firstname'],
-                    'lastname'  => $log['lastname']
+                    'title'          => $log['title'],
+                    'firstname'      => $log['firstname'],
+                    'preferred_name' => $log['preferred_name'],
+                    'lastname'       => $log['lastname']
                 );
                 $displayName = $userHandler->formatName($nameShards);
 

@@ -13,7 +13,6 @@ use Schoolbox\Role;
 
 class AjaxChat
 {
-
     private $groupHandler;
     private $chatHandler;
 
@@ -114,7 +113,7 @@ class AjaxChat
         }
 
         if (!in_array($this->userID, $mutedUsers) && $this->getConfig('state') == 'Active') {
-            $this->chatHandler->create_log($this->catID, $this->userID, $body);
+            $this->chatHandler->createLog($this->catID, $this->userID, $body);
         }
     }
 
@@ -122,9 +121,9 @@ class AjaxChat
     private function receive($lastPoll)
     {
         if (empty($lastPoll) || $lastPoll == 'null') {
-            $log = $this->chatHandler->get_logs($this->catID, new DateTime('-30 minutes'));
+            $log = $this->chatHandler->getLogs($this->catID, new DateTime('-30 minutes'));
         } else {
-            $log = $this->chatHandler->get_logs($this->catID, new DateTime($lastPoll), $this->userID);
+            $log = $this->chatHandler->getLogs($this->catID, new DateTime($lastPoll), $this->userID);
         }
 
         if (empty($log)) {
@@ -136,13 +135,13 @@ class AjaxChat
 
     private function poll()
     {
-        $this->chatHandler->update_poll($this->catID, $this->userID);
+        $this->chatHandler->updatePoll($this->catID, $this->userID);
 
         // Do not prune users anymore: get_users only gets new users
-//        $this->chatHandler->prune_users($this->catID);
+//        $this->chatHandler->pruneUsers($this->catID);
 
         // Return list of active users
-        $users = $this->chatHandler->get_users($this->catID);
+        $users = $this->chatHandler->getUsers($this->catID);
 
         if (empty($users)) {
             $users = array();

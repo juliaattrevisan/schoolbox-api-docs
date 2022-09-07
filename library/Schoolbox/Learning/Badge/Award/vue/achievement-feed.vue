@@ -166,7 +166,7 @@ export default {
                 console.warn(error);
             } finally {
                 this.loading = false;
-            }    
+            }
         },
 
         /**
@@ -279,10 +279,10 @@ export default {
                 </template>
                 <template v-else>
                     <!-- Parent or student -->
-                    <p>{{ config.student.firstname }} doesn't have any achievements yet.</p>
+                    <p>{{ config.student.givenName }} doesn't have any achievements yet.</p>
                     <p v-if="config.routes.getAwardAsAchievementForm">
                         <a :href="config.routes.getAwardAsAchievementForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                           title="Award an achievement">Award an achievement</a> for {{ config.student.firstname }}.
+                           title="Award an achievement">Award an achievement</a> for {{ config.student.givenName }}.
                     </p>
                 </template>
             </div>

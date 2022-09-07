@@ -86,7 +86,7 @@
                             $(Object.keys(response['affectedUsers'])).each(function(index, userId) {
                                 var noInstructorFeedback = affectedUsers[userId]['selfAssess'] && !affectedUsers[userId]['instructorGiven'];
 
-                                var userName = affectedUsers[userId]['user']['firstname'] + ' ' + affectedUsers[userId]['user']['lastname'];
+                                var userName = affectedUsers[userId]['user']['fullName'];
                                 dialogHtml += '<li>' +
                                     '      <div class="row">' +
                                     '          <div class="small-12 list-item compact card">' +

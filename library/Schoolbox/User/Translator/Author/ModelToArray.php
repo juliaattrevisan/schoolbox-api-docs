@@ -36,13 +36,14 @@ class ModelToArray extends User\Translator\ModelToArray
     public function __invoke(User $user, $groups = false): array
     {
         return [
-            'id'        => $user->getId(),
-            '_links'    => $this->deriveLinks($user),
-            'title'     => $user->getTitle(),
-            'firstName' => $user->getFirstname(),
-            'lastName'  => $user->getLastname(),
-            'fullName'  => $user->getFullName(),
-            'isDeleted' => $user->isDeleted(),
+            'id'            => $user->getId(),
+            '_links'        => $this->deriveLinks($user),
+            'title'         => $user->getTitle(),
+            'firstName'     => $user->getFirstname(),
+            'preferredName' => $user->getPreferredName(),
+            'lastName'      => $user->getLastname(),
+            'fullName'      => $user->getFullName(),
+            'isDeleted'     => $user->isDeleted(),
         ];
     }
 }

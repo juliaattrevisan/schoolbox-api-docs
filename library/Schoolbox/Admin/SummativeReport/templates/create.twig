@@ -104,16 +104,13 @@
             },
         });
 
-        $('#report-students').selectizeSelector({
+        $('#report-students').userSelectizeSelector({
             multiple: true,
             value: {{ options.students|json_encode|raw }},
             ajax: {
-                url: '/ajax/user.php',
-                type: 'GET',
                 data: {
                     roleTypeID: 'student',
                 },
-                dataType: 'json'
             },
         });
 

@@ -24,7 +24,7 @@ import AccessTypes from './mgAccessTypes';
 
 const membersStore = useMembersStore();
 const tableEl = ref(null);
-const tableColumns = ['name', 'firstName', 'lastName', 'role', 'campus', 'yearLevel', 'house', 'accessType'];
+const tableColumns = ['name', 'firstName', 'givenName', 'preferredName', 'lastName', 'role', 'campus', 'yearLevel', 'house', 'accessType'];
 const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
     columnsClasses: {
         accessType: 'access-td ', //to specify a width
@@ -55,10 +55,18 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
                 } else if (a.displayPriority > b.displayPriority) {
                     return -1;
                 }
-                if (ascending) {
-                    return a.lastName >= b.lastName ? 1 : -1;
+
+                // Sort on last name, then given name
+                if (a.lastName !== b.lastName) {
+                    if (ascending) {
+                        return a.lastName >= b.lastName ? 1 : -1;
+                    }
+                    return a.lastName <= b.lastName ? 1 : -1;
                 }
-                return a.lastName <= b.lastName ? 1 : -1;
+                if (ascending) {
+                    return a.givenName >= b.givenName ? 1 : -1;
+                }
+                return a.givenName <= b.givenName ? 1 : -1;
             }
         },
     },
@@ -67,7 +75,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         name: 'Name',
         accessType: 'Access',
     },
-    hiddenColumns: ['firstName', 'lastName', 'role', 'campus', 'yearLevel', 'house'], //these are all added to name, but we need to add them to tableColumns so we can search them
+    hiddenColumns: ['firstName', 'givenName', 'preferredName', 'lastName', 'role', 'campus', 'yearLevel', 'house'], //these are all added to name, but we need to add them to tableColumns so we can search them
     orderBy: { //initial sorting display
         ascending: true,
         column: 'name'

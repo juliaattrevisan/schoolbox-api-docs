@@ -22,6 +22,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
+use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
@@ -32,7 +33,6 @@ use Schoolbox\UserMapper;
 
 class Notifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_ATTEMPTED = 'attempted';
     const TRIGGER_MARKED    = 'marked';
 
@@ -314,7 +314,7 @@ class Notifier extends AbstractModuleNotifier
             ->setTitle(":staff has marked :child's attempt of :quiz in :cat")
             ->setParams([
                 'staff' => new UserParam($teacher),
-                'child' => new UserParam($student, Param::STACKING_REPLACE, '{firstname}'),
+                'child' => new ChildParam($student, Param::STACKING_REPLACE),
                 'quiz'  => new Param($assess->getTitle(), $href),
                 'cat'   => new CategoryParam($category),
             ])

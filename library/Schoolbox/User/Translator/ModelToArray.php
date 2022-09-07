@@ -66,6 +66,7 @@ class ModelToArray
             'enabled'        => $user->getEnabled(),
             'title'          => $user->getTitle(),
             'firstName'      => $user->getFirstname(),
+            'preferredName'  => $user->getPreferredName(),
             'lastName'       => $user->getLastname(),
             'fullName'       => $user->getFullName(),
             'isEmailDerived' => $user->getLocalEmail(),

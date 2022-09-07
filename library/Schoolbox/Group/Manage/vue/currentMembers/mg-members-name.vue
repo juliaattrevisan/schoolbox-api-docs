@@ -32,11 +32,11 @@ function getMemberPortraitSrc () {
 <template>
     <div class="card small-12">
         <a v-if="member.id" :href="member._links.profile" title="View profile" class="name">
-            <img :src="getMemberPortraitSrc(member.id)" :alt="`${member.firstName} portrait`">
+            <img :src="getMemberPortraitSrc(member.id)" :alt="`${member.givenName} portrait`">
             {{ member.fullName }}
         </a>
         <div v-else>
-            <img src="/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${member.firstName} portrait`">
+            <img src="/images/fail.php?transform_type=portrait&transform=square64&code=500" :alt="`${member.givenName} portrait`">
             {{ member.fullName }}
         </div>
         <p class="meta">

@@ -78,9 +78,9 @@
                 <ul id="feedbackOptions-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
                     {%- apply spaceless %}
                         {% if pActionSummary %}
-                            <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s attempt history">View Attempt History</a></li>
+                            <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.givenName }}'s attempt history">View Attempt History</a></li>
                         {% endif %}
-                        <li><a href="#" data-reveal-id="{{ createAttemptIdBase }}" class="icon-due-work" title="Create score for {{ participant.user.firstName }}">Create Score...</a></li>
+                        <li><a href="#" data-reveal-id="{{ createAttemptIdBase }}" class="icon-due-work" title="Create score for {{ participant.user.givenName }}">Create Score...</a></li>
                     {% endapply -%}
                 </ul>
             </div>

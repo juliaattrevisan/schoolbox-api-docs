@@ -161,7 +161,7 @@
                {% if assessment.ltiTool.isTargetWindow %}target="_blank"{% endif %}
                href="{{ launchAssessmentUrl }}">
                 Attempt {{ locale.assessment.proper }}
-                {% if student.id != USER.id %}on behalf of {{ student.firstname }}{% endif %}
+                {% if student.id != USER.id %}on behalf of {{ student.givenName }}{% endif %}
             </a>
         </div>
     </div>
