@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
+import { randomId } from '@js/util/jsUtils';
 import { useStore, apiEndpoint } from './curriculumSelectorStore';
 import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
 import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
@@ -10,7 +11,7 @@ import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
 export const UNSET_ID = 0;
 
 
-export const useCodesStore = defineStore('csCodes', {
+export const useCodesStore = defineStore(`csCodes-${randomId()}`, {
 
     state: () => ({
         codes: [], //all the codes currenty loaded

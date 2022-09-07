@@ -3,12 +3,13 @@
  */
 
 import { defineStore } from 'pinia';
+import { randomId } from '@js/util/jsUtils';
 import { useCodesStore } from './csCodesStore';
 
 
 export let apiEndpoint = '';
 
-export const useStore = defineStore('curriculumSelector', {
+export const useStore = defineStore(`curriculumSelector-${randomId()}`, {
 
     state: () => ({
         isLoading: true, //to display loading note

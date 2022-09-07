@@ -3,9 +3,10 @@
  */
 
 import { defineStore } from 'pinia';
+import { randomId } from '@js/util/jsUtils';
 
 
-export const useSelectedCodesStore = defineStore('csSelectedCodes', {
+export const useSelectedCodesStore = defineStore(`csSelectedCodes-${randomId()}`, {
 
     state: () => ({
         codes: [], //the currently selected codes
