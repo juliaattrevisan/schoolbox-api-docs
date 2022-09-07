@@ -88,12 +88,12 @@ function onModalClosed () {
     >
         <h2>Please Confirm</h2>
         <p>Are you sure you wish to delete the {{ selectedNodesStore.countWithName }} selected and all of {{ selectedNodesStore.count > 1 ? 'their' : 'its' }} children?</p>
-        <ul class="flex-list buttons">
+        <ul class="flex-list">
             <li>
-                <button @click.prevent="onDeleteSelected" class="button submit" :disabled="deleteNodesStore.isProcessing">{{ deleteButtonText }}</button>
+                <button @click.prevent="onDeleteSelected" class="button icon-approve submit" :disabled="deleteNodesStore.isProcessing">{{ deleteButtonText }}</button>
             </li>
             <li>
-                <button @click.prevent="onCancelSelected" class="button" :disabled="deleteNodesStore.isProcessing">Cancel</button>
+                <button @click.prevent="onCancelSelected" class="button icon-close" :disabled="deleteNodesStore.isProcessing">Cancel</button>
             </li>
         </ul>
     </reveal-modal>

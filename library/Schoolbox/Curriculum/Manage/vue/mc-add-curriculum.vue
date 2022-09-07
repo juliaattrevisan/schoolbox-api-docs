@@ -111,8 +111,12 @@ function onCancelSelected () {
                     </div>
                     <div class="small-12 columns">
                         <ul class="flex-list buttons">
-                            <li><button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button" :disabled="addCurriculumStore.isProcessing">Cancel</button></li>
-                            <li><button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button submit" :disabled="addCurriculumStore.isProcessing">{{ addButtonText }}</button></li>
+                            <li>
+                                <button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button icon-close" :disabled="addCurriculumStore.isProcessing">Cancel</button>
+                            </li>
+                            <li>
+                                <button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button icon-add submit" :disabled="addCurriculumStore.isProcessing">{{ addButtonText }}</button>
+                            </li>
                         </ul>
                     </div>
                 </fieldset>

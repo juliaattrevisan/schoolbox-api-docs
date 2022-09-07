@@ -103,12 +103,12 @@ function onModalClosed () {
             Are you sure you wish to disable the {{ selectedNodesStore.countWithName }} selected and all of {{ selectedNodesStore.count > 1 ? 'their' : 'its' }} children?
             If you continue, these nodes will be hidden from the curriculum code selector during curriculum mapping.
         </p>
-        <ul class="flex-list buttons">
+        <ul class="flex-list">
             <li>
-                <button @click.prevent="onEnableSelected" class="button submit" :disabled="enableNodesStore.isProcessing">{{ enabledButtonText }}</button>
+                <button @click.prevent="onEnableSelected" class="button icon-approve submit" :disabled="enableNodesStore.isProcessing">{{ enabledButtonText }}</button>
             </li>
             <li>
-                <button @click.prevent="onCancelSelected" class="button" :disabled="enableNodesStore.isProcessing">Cancel</button>
+                <button @click.prevent="onCancelSelected" class="button icon-close" :disabled="enableNodesStore.isProcessing">Cancel</button>
             </li>
         </ul>
     </reveal-modal>

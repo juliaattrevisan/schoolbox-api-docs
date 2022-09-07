@@ -66,15 +66,15 @@ function onDeleteNodesSelected () {
                 :node="node"
             />
         </div>
-        <ul class="flex-list buttons">
+        <ul class="flex-list">
             <li v-if="selectedNodesStore.allNodesEnabled">
-                <button class="icon-view-hollow" @click.prevent="onEnableNodesSelected(false)" @keyup.enter="onEnableNodesSelected(false)">Disable {{ selectedNodesSummary }}</button>
+                <button class="button icon-view-hollow" @click.prevent="onEnableNodesSelected(false)" @keyup.enter="onEnableNodesSelected(false)">Disable {{ selectedNodesSummary }}</button>
             </li>
             <li v-else-if="selectedNodesStore.allNodesDisabled">
-                <button class="icon-view" @click.prevent="onEnableNodesSelected(true)" @keyup.enter="onEnableNodesSelected(true)">Enable {{ selectedNodesSummary }}</button>
+                <button class="button icon-view" @click.prevent="onEnableNodesSelected(true)" @keyup.enter="onEnableNodesSelected(true)">Enable {{ selectedNodesSummary }}</button>
             </li>
             <li>
-                <button class="icon-delete" @click.prevent="onDeleteNodesSelected" @keyup.enter="onDeleteNodesSelected">Delete {{ selectedNodesSummary }}</button>
+                <button class="button icon-delete alert" @click.prevent="onDeleteNodesSelected" @keyup.enter="onDeleteNodesSelected">Delete {{ selectedNodesSummary }}</button>
             </li>
         </ul>
     </bottom-drawer>

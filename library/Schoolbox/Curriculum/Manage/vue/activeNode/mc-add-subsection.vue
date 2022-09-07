@@ -126,9 +126,13 @@ function onCancelSelected () {
                     <textarea :id="ckeditorInstance" rows="6"></textarea>
                 </div>
                 <div class="small-12 columns">
-                    <ul class="flex-list buttons">
-                        <li><button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button" :disabled="addSubsectionStore.isProcessing">Cancel</button></li>
-                        <li><button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button submit" :disabled="addSubsectionStore.isProcessing">{{ addButtonText }}</button></li>
+                    <ul class="flex-list">
+                        <li>
+                            <button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button icon-close" :disabled="addSubsectionStore.isProcessing">Cancel</button>
+                        </li>
+                        <li>
+                            <button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button icon-add submit" :disabled="addSubsectionStore.isProcessing">{{ addButtonText }}</button>
+                        </li>
                     </ul>
                 </div>
             </fieldset>
