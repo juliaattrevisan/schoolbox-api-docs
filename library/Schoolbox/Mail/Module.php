@@ -18,6 +18,8 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -59,6 +61,8 @@ class Module extends BaseModule
             $this->injector->get('externalUser'),
             $this->injector->get('filesystem.storageProxy'),
             $this->injector->get('mail.emailFactory'),
+            $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
         );
     }
 

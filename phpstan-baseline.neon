@@ -926,11 +926,6 @@ parameters:
 			path: library/Component/Homepage/ImageController.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Component/Homepage/MembersController.php
-
-		-
 			message: "#^Variable \\$partCount might not be defined\\.$#"
 			count: 1
 			path: library/Component/Homepage/PinterestController.php

@@ -5,11 +5,10 @@
     Data:
         assessment:      IAssessible
         stats:           Assessment\Statistics
-        studentsToEmail: string[]               An array of student email addresses
+        studentsToEmail: string[]               An array of student ids to email
         isTask:          bool                   (optional) Override to indicate to render as Task
         isQuiz:          bool                   (optional) Override to indicate to render as Quiz
         isDueWork:       bool                   (optional) Override to indicate to render as DueWork
-        emailSeparator: string                  ASCII Character
 #}
 {% import 'sub/assessmentContext.twig' as assessmentContext %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
@@ -89,8 +88,8 @@
                 <div class="row">
                     <div class="small-12 columns">
                         <input type="hidden" name="subject" value="Overdue - {{ assessment.title }}"/>
-                        <input type="hidden" name="replyto" value="&quot;{{assessment.baseContext.folder.title}}&quot;<{{USER.email}}>"/>
-                        <input data-email-students type="hidden" name="bcc" value="{{ studentsToEmail|join(emailSeparator) }}"/>
+                        <input type="hidden" name="folderId" value="{{ assessment.baseContext.folder.id }}"/>
+                        <input data-email-students type="hidden" name="userIds" value="{{ studentsToEmail|join(',') }}"/>
                         <button type="submit" class="button">Email all</button>
                     </div>
                 </div>

@@ -47,7 +47,7 @@ class MailService
      */
     private $resetMapper;
 
-    private Address | null $from;
+    private Address | null $from = null;
 
     /**
      * @param IConfigLoader $config
@@ -171,7 +171,7 @@ class MailService
             // No users to mail to were found.
             // To mitigate timing attacks: craft the email regardless, and send
             // it to the blackhole.
-            $email = $this->mailFactory->buildTwigEmail('userPasswordReset/userNotExists.twig', $subject, '');
+            $email = $this->mailFactory->buildTwigEmail('userPasswordReset/userNotExists.twig', $subject, null);
             $email->sendToBlackhole();
             return $sent;
         }
@@ -215,7 +215,7 @@ class MailService
     {
         $user = $reset->getUser();
         if (!filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL)) {
-            $email = $this->mailFactory->buildTwigEmail('userPasswordReset/userNotExists.twig', $subject, '');
+            $email = $this->mailFactory->buildTwigEmail('userPasswordReset/userNotExists.twig', $subject, null);
             $email->sendToBlackhole();
             return true;
         }

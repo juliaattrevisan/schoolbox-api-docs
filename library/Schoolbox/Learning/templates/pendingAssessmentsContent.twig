@@ -4,7 +4,7 @@
         statistics:                Assessment\Statistics[]  indexed by assessment.id
         assessmentsToMark:         IAssessable[]            indexed by assessment.id
         assessmentsToChase:        IAssessable[]            indexed by assessment.id
-        assessmentStudentsToEmail: string[][]               indexed by assessment.id, user.id
+        assessmentStudentsToEmail: string[][]               indexed by assessment.id
         emailSeparator:            string                   ASCII Character
 #}
 {% import 'sub/assessmentContext.twig' as assessmentContext %}
@@ -46,7 +46,6 @@
             assessment:      assessment,
             stats:           statistics[assessment.id],
             studentsToEmail: assessmentStudentsToEmail[assessment.id],
-            emailSeparator:  emailSeparator
         } only %}
     {% endfor %}
     </div>

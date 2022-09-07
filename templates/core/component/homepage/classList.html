@@ -57,9 +57,9 @@
                     <section>
                         <!-- BEGIN student_email -->
                             <form id='form-students' action="/mail/create" method="post" class="no-margin">
-                                <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
-                                <input type="hidden" name="selectedIds" value="{EMAIL_ALL_STUDENTS}"/>
-                                <input type="hidden" name="selectedGroups" value="students"/>
+                                <input type="hidden" name="userIds" value="{STUDENTS_USER_IDS}"/>
+                                <input type="hidden" name="selectedGroups" value="self"/>
+                                <input type="hidden" name="folderId" value="{FOLDER_ID}"/>
                             </form>
                             <script>
                                 $(function() {
@@ -73,9 +73,9 @@
                         <!-- BEGIN parent_email -->
                             <a data-parents-email class="button">Email Parents</a>
                             <form id='form-parents' action="/mail/create" method="post" class="no-margin">
-                                <input type="hidden" name="replyto" value="&quot;{HEADING}&quot; &lt;{REPLY_TO}&gt;"/>
-                                <input type="hidden" name="selectedIds" value="{EMAIL_ALL_PARENTS}"/>
-                                <input type="hidden" name="selectedGroups" value="parents"/>
+                                <input type="hidden" name="userIds" value="{STUDENTS_USER_IDS}"/>
+                                <input type="hidden" name="selectedGroups" value="parents_of"/>
+                                <input type="hidden" name="folderId" value="{FOLDER_ID}"/>
                             </form>
                         <script>
                             $(function() {

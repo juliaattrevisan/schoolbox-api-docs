@@ -30,25 +30,14 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Crypto\DkimOptions;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\TextPart;
 
-use function count;
-use function trim;
-
 class Mailer
 {
-    // These two const are just a key for an array structure that will separate valid and invalid email addresses
-    // As of the moment, these keys are being used here and in createMail.php::45 only
-    public const KEY_INVALID = 'invalid';
-    public const KEY_VALID   = 'valid';
-
     private const MAX_RETRIES   = 4;
     private const RETRY_TIMEOUT = 1;
-
-    public const EMAIL_SEPARATOR_CODE = 0x1E;
 
     /**
      * Instance of mail transporter.
@@ -89,11 +78,11 @@ class Mailer
      * Construct the basics of a new Mailer
      *
      * @param string                    $subject
-     * @param string|array|Address|User $to
+     * @param Address|User|null $to
      * @param IConfigLoader             $config
      * @param Mapper                    $dkimMapper
      */
-    public function __construct(string $subject, string | array | Address | User $to, IConfigLoader $config, Mapper $dkimMapper)
+    public function __construct(string $subject, Address | User | null $to, IConfigLoader $config, Mapper $dkimMapper)
     {
         $this->config     = $config;
         $this->dkimMapper = $dkimMapper;
@@ -129,35 +118,15 @@ class Mailer
 
     /**
      * Set To
-     * @param string|array|Address|User $to
+     * @param Address | User | null $to
      * @return void
      */
-    public function setTo(string | array | Address | User $to)
+    public function setTo(Address | User | null $to)
     {
         if ($to instanceof User) {
             $this->email->addTo(new Address($to->getEmail(), $to->formatName()));
         } elseif ($to instanceof Address) {
             $this->email->addTo($to);
-        } elseif (\is_array($to)) {
-            if ($to['email']) {
-                //Assume one dimensional array
-                $this->email->addTo(new Address($to['email'], $to['name'] ?? ''));
-            } else {
-                if ($to['name']) {
-                    // Name only, can't send email
-                    throw new RfcComplianceException("No email address supplied.");
-                } else {
-                    // Assume two dimensional array
-                    foreach ($to as $email) {
-                        $this->email->addTo(new Address($email['email'], $email['name'] ?? ''));
-                    }
-                }
-            }
-        } else {
-            $defaultHost = trim($this->config->get('site_hostname')) . '.' . trim($this->config->get('site_domain'));
-            foreach (self::parseAddressString($to, $defaultHost)[self::KEY_VALID] as $address => $name) {
-                $this->email->addTo(new Address($address, $name ?? ''));
-            }
         }
     }
 
@@ -471,148 +440,6 @@ class Mailer
             }
         }
         return self::$transport;
-    }
-
-    /**
-     * @param string $emailAddresses A collection of email addresses in a string format that's separated with self::EMAIL_SEPARATOR_CODE
-     *
-     * @return array ['valid' => [['email' => 'name']], 'invalid' => [['email' => 'name']]]
-     */
-    public static function parseAddressString(string $emailAddresses, string $defaultHost): array
-    {
-        $return_list = [
-            self::KEY_VALID   => [],
-            self::KEY_INVALID => [],
-        ];
-
-        if (trim($emailAddresses) === '') {
-            return $return_list;
-        }
-        $address_list = self::parseAddressList($emailAddresses, $defaultHost);
-
-        foreach ($address_list[self::KEY_VALID] as $address) {
-            $to                                = $address->mailbox . '@' . $address->host;
-            $alias                             = property_exists($address, 'personal') ? $address->personal : null;
-            $return_list[self::KEY_VALID][$to] = $alias;
-        }
-
-        if (count($address_list[self::KEY_INVALID]) > 0) {
-            $return_list[self::KEY_INVALID] = $address_list[self::KEY_INVALID];
-        }
-
-        return $return_list;
-    }
-
-    /**
-     * @param string $address
-     * @param string $name
-     * @return string
-     */
-    public static function buildAddress($address, $name = '')
-    {
-        [$mailbox, $host] = explode('@', $address, 2);
-
-        return imap_rfc822_write_address($mailbox, $host, $name);
-    }
-
-    /**
-     * @param string $emailAddresses
-     * @return array
-     */
-    private static function parseAddressList(string $emailAddresses, string $defaultHost): array
-    {
-        $emails = [];
-        //Explode emails by the ascii's Record Separator
-        $emailList = explode(\chr(self::EMAIL_SEPARATOR_CODE), $emailAddresses);
-
-        foreach ($emailList as $email) {
-            $email = trim($email);
-
-            // Check if string is a valid email OR
-            // Check if the email within a string is valid e.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
-            if (filter_var($email, FILTER_VALIDATE_EMAIL) || self::emailFromStringIsValid($email)) {
-                $emails[self::KEY_VALID][] = $email;
-                continue;
-            }
-
-            // If email address from username in the profile page is unchecked, and alternate email address is empty,
-            // just skip those rather than showing "9AH French (FREA1)" <> as an error.
-            if (self::getEmailFromString($email) !== '') {
-                $emails[self::KEY_INVALID][] = $email;
-            }
-        }
-
-        return [
-            self::KEY_VALID   => isset($emails[self::KEY_VALID]) ? self::parseValidEmailAddresses($emails[self::KEY_VALID], $defaultHost) : [],
-            self::KEY_INVALID => $emails[self::KEY_INVALID] ?? [],
-        ];
-    }
-
-    /**
-     * Parse valid email addresses from a string
-     *
-     * @param array $emails
-     * @return array
-     */
-    private static function parseValidEmailAddresses(array $emails, string $defaultHost): array
-    {
-        $emailAddresses = [];
-        foreach ($emails as $email) {
-            $emailAddresses[] = Codec::encode($email);
-        }
-
-        return imap_rfc822_parse_adrlist(implode(',', $emailAddresses), $defaultHost);
-    }
-
-    /**
-     * Get an email from a string. E.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
-     * @param string $string
-     * @return bool
-     */
-    private static function emailFromStringIsValid(string $string): bool
-    {
-        $email = self::getEmailFromString($string);
-
-        if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $string
-     *
-     * @return string
-     */
-    public static function getEmailFromString(string $string): string
-    {
-        if (preg_match('~<(.*?)>~', $string, $output) !== 0) {
-            return trim($output[1]);
-        }
-
-        return '';
-    }
-
-    /**
-     * Update email separator from comma with EMAIL_SEPARATOR_CODE
-     * @param string $string
-     * @return mixed
-     */
-    public static function standardiseEmailSeparator($string)
-    {
-        // Do not replace comma symbols inside "".
-        // Double quotes on header are being set on homepage/classList.html. It should be safe to say that we can use to regex?
-        return preg_replace('/,(?=(?:[^"]*"[^"]*")*[^"]*$)/', \chr(self::EMAIL_SEPARATOR_CODE), $string);
-    }
-
-    /**
-     * Implode glue to join email addresses array
-     * @return string
-     */
-    public static function implodeGlue(): string
-    {
-        return \chr(self::EMAIL_SEPARATOR_CODE);
     }
 
     /**

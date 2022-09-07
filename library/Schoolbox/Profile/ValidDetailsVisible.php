@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Profile;
 
 use External_UserInterface;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
@@ -24,27 +26,14 @@ use Schoolbox\User;
  */
 class ValidDetailsVisible
 {
-
-    /**
-     * @var External_UserInterface
-     */
-    private $externalUser;
-
-    /**
-     * @var IConfigLoader
-     */
-    private $config;
-
     /**
      * Constructor
      *
      * @param External_UserInterface $externalUser
      * @param IConfigLoader          $config
      */
-    public function __construct(External_UserInterface $externalUser, IConfigLoader $config)
+    public function __construct(private External_UserInterface $externalUser, private IConfigLoader $config)
     {
-        $this->externalUser = $externalUser;
-        $this->config       = $config;
     }
 
     /**
@@ -55,47 +44,77 @@ class ValidDetailsVisible
      */
     public function isSatisfiedBy(User $viewee, User $viewer): bool
     {
-        /* Superusers see everything
-         */
-        if ($viewer->isSuperuser()) {
+        // Superusers see everything
+        // A viewer can see self, if not guest
+        if (
+            $viewer->isSuperuser()
+            || (!$viewer->getRole()->isGuest() && ($viewer->getId() === $viewee->getId()))
+        ) {
             return true;
+        }
+        if (!$viewer->getRole()->isParent()) {
+            return $this->isSatisfiedByRole($viewee->getRole()->getType(), $viewer->getRole(), $viewer->isSuperuser());
+        }
+        return $this->isSatisfiedByParent($viewee, $viewer);
+    }
+
+    /**
+     * @param string $vieweeRoleType
+     * @param Role   $viewerRole
+     * @param bool   $isSuperUser
+     * @return bool
+     */
+    public function isSatisfiedByRole(string $vieweeRoleType, Role $viewerRole, bool $isSuperUser): bool
+    {
+        if ($viewerRole->isParent()) {
+            throw new Exception('Use isSatisfiedByParent instead');
         }
 
         // Guest should never be able to see any other user's detail
-        if ($viewer->getRole()->isGuest()) {
+        if ($viewerRole->isGuest()) {
             return false;
         }
 
         // Only Superuser can see a guest
-        if ($viewee->getRole()->isGuest()) {
-            return $viewer->isSuperuser();
-        }
-
-        // A viewer can see self
-        if ($viewer->getId() === $viewee->getId()) {
-            return true;
+        if ($vieweeRoleType === Role::GUEST) {
+            return $isSuperUser;
         }
 
         // Staff can see profile depending on role permission
-        if ($viewer->getRole()->isStaff()) {
-            if ($viewee->getRole()->isStudent()) {
-                return $viewer->getRole()->getViewStudentProfile();
-            } elseif ($viewee->getRole()->isParent()) {
-                return $viewer->getRole()->getViewParentProfile();
+        if ($viewerRole->isStaff()) {
+            if ($vieweeRoleType === Role::STUDENT) {
+                return $viewerRole->getViewStudentProfile();
+            } elseif ($vieweeRoleType === Role::PARENT) {
+                return $viewerRole->getViewParentProfile();
             } else {
                 return true;
             }
         }
 
         // Student can see staff's detail
-        if ($viewer->getRole()->isStudent()) {
-            return $viewee->getRole()->isStaff();
+        if ($viewerRole->isStudent()) {
+            return $vieweeRoleType === Role::STAFF;
+        }
+
+        // should not come here
+        return false;
+    }
+
+    /**
+     * @param User $viewee
+     * @param User $viewer
+     * @return bool
+     */
+    public function isSatisfiedByParent(User $viewee, User $viewer): bool
+    {
+        if (!$viewer->getRole()->isParent()) {
+            throw new Exception('Use isSatisfiedByRole instead');
         }
 
         // Current user is a parent
         // a parent viewing a staff
         if ($viewee->getRole()->isStaff()) {
-            return $this->config->get('report_staff_access');
+            return (bool)$this->config->get('report_staff_access');
         }
 
         // a parent viewing a student

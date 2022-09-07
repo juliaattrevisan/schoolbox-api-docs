@@ -1,4 +1,16 @@
-<!-- BEGIN custom_head -->
+{% if folder %}
+    {% import 'sub/breadcrumbs.twig' as bread %}
+    {{ bread.crumbs(
+        [ folder.nameWithCodes, '/homepage/' ~ folder.id ],
+        [ 'Compose Email', '#' ],
+    ) }}
+{% elseif student %}
+    {% import 'sub/breadcrumbs.twig' as bread %}
+    {{ bread.crumbs(
+        [ student.fullname ~ ' - ' ~ title, '/search/user/' ~ student.id ],
+        [ 'Compose Email', '#' ],
+    ) }}
+{% endif %}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
@@ -12,7 +24,7 @@
         $.fn.alaressEditor({
             targetElements: $('#body'),
             removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe',
-            baseHref: "{{ BASE_HREF }}"
+            baseHref: "{{ baseHref }}"
         });
 
         var options = {
@@ -76,9 +88,9 @@
             return false;
         }
 
-        $('#to').selectizeSelector($.extend({}, options, {value: {{ REPLYTO | raw }}}))
-        $('#cc').selectizeSelector($.extend({}, options, {value: {{ CC | raw }}}))
-        $('#bcc').selectizeSelector($.extend({}, options, {value: {{ BCC | raw }}}))
+        $('#to').selectizeSelector($.extend({}, options, {value: {{ replyTo | raw }}}))
+        $('#cc').selectizeSelector($.extend({}, options, {value: {{ cc | raw }}}))
+        $('#bcc').selectizeSelector($.extend({}, options, {value: {{ bcc | raw }}}))
 
         // dialogs for copying email fields
         $('[data-role="copy-emails"]').each(function(index, element) {
@@ -159,13 +171,15 @@
 <div class="row">
     <div class="small-12 island">
         <h1>Compose Email</h1>
-        {% if INVALID_EMAIL is not empty %}
+        {% if invalidEmails is not empty %}
         <div data-alert class="alert-box alert">
             <p>The following email addresses are invalid and could not be added.</p>
             <a href="#" class="close">&times;</a>
             <ul>
                 <li>
-                    {{ INVALID_EMAIL }}
+                    {% for invalidEmail in invalidEmails %}
+                        {{ invalidEmail }}
+                    {% endfor %}
                 </li>
             </ul>
         </div>
@@ -200,9 +214,9 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="subject" class="required">Subject</label>
-                        <input type="text" name="subject" id="subject" value="{{ SUBJECT }}" required />
+                        <input type="text" name="subject" id="subject" value="{{ subject }}" required />
                         <label>
-                            <textarea name="message" id="body">{{ BODY }}</textarea>
+                            <textarea name="message" id="body">{{ body }}</textarea>
                         </label>
                         <label>
                             Attachments

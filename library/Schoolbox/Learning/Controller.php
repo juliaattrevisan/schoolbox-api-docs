@@ -325,7 +325,7 @@ class Controller extends Base
                 foreach ($assessment->getAllParticipants() as $participant) {
                     if ($participant->isResponseRequired()) {
                         $student = $participant->getUser();
-                        $assessmentStudentsToEmail[$assessment->getId()][$student->getId()] = $student->getFormattedEmailDisplay();
+                        $assessmentStudentsToEmail[$assessment->getId()][] = $student->getId();
                     }
                 }
             }
@@ -339,7 +339,6 @@ class Controller extends Base
             'assessmentsToMark'         => $assessmentsToMark,
             'assessmentsToChase'        => $assessmentsToChase,
             'assessmentStudentsToEmail' => $assessmentStudentsToEmail,
-            'emailSeparator'            => Mailer::implodeGlue(),
         ])->getAsString();
     }
 
@@ -444,7 +443,6 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learning/classLists.twig', [
                 'specialNeeds'           => $this->rosettaStone->translate('specialNeeds', true, true),
-                'replyTo'                => $this->getUser()->getEmail(),
                 'mailEnabled'            => $this->getConfigLoader()->get('mail_enable'),
                 'pastoralEnabled'        => $this->getConfigLoader()->get('pastoral_enabled') && $this->getUser()->isStaffWithPastoralAccess(),
                 'learningMomentsEnabled' =>
@@ -471,21 +469,21 @@ class Controller extends Base
         $availableEmailGroups = [
             'email_all_parents'  => [
                 self::LABEL_KEY   => 'Parents of selected students',
-                self::LABEL_VALUE => 'parents',
+                self::LABEL_VALUE => 'parents_of',
             ],
             'email_housemasters' => [
                 self::LABEL_KEY   => 'Head of House for selected students',
-                self::LABEL_VALUE => 'housemasters',
+                self::LABEL_VALUE => 'housemasters_of',
             ],
             'email_tutors' => [
                 self::LABEL_KEY   => 'Tutor for selected students',
-                self::LABEL_VALUE => 'tutors',
+                self::LABEL_VALUE => 'tutors_of',
             ],
         ];
 
         $result[] = [
             self::LABEL_KEY     => 'Selected students',
-            self::LABEL_VALUE   => 'students',
+            self::LABEL_VALUE   => 'self',
             self::ISCHECKED_KEY => true,
         ];
 
