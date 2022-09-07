@@ -127,7 +127,7 @@ export const useNodesStore = defineStore('mcNodes', {
         updateNodes (nodes) { //we add them to .children so the top level structure is consistent with the levels below
             this.nodes = {
                 id: UNSET_ID,
-                name: 'Curriculums',
+                name: 'Curricula',
                 children: nodes,
                 enabled: true,
             }
