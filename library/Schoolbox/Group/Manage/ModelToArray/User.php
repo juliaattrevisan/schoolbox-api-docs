@@ -28,17 +28,19 @@ class User extends ModelToArray
     public function __invoke(UserModel $user, $groups = false): array
     {
         return [
-            'id'        => $user->getId(),
-            '_links'    => $this->deriveLinks($user),
-            'title'     => $user->getTitle(),
-            'firstName' => $user->getFirstname(),
-            'lastName'  => $user->getLastname(),
-            'fullName'  => $user->getFullName(),
-            'role'      => $user->getRole()->getName(),
-            'isStaff'   => $user->getRole()->isStaff(),
-            'campus'    => implode(', ', $user->getCampusCollection()->getPropertyValues('name')),
-            'yearLevel' => $user->getYear() ? $user->getYear()->getLongName() : "",
-            'house'     => $user->getSchoolHouse() ? $user->getSchoolHouse()->getHouse() : '',
+            'id'            => $user->getId(),
+            '_links'        => $this->deriveLinks($user),
+            'title'         => $user->getTitle(),
+            'firstName'     => $user->getFirstname(),
+            'preferredName' => $user->getPreferredName(),
+            'givenName'     => $user->getGivenName(),
+            'lastName'      => $user->getLastname(),
+            'fullName'      => $user->getFullName(),
+            'role'          => $user->getRole()->getName(),
+            'isStaff'       => $user->getRole()->isStaff(),
+            'campus'        => implode(', ', $user->getCampusCollection()->getPropertyValues('name')),
+            'yearLevel'     => $user->getYear() ? $user->getYear()->getLongName() : "",
+            'house'         => $user->getSchoolHouse() ? $user->getSchoolHouse()->getHouse() : '',
         ];
     }
 }
