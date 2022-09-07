@@ -98,13 +98,14 @@ export const useCodesStore = defineStore('csCodesStore', {
                 return;
             }
             try {
-                const response = await fetch(`${apiEndpoint}/${id}?descendants=1&enabled=1`);
+                const response = await fetch(`${apiEndpoint}/${id}?descendants=1`);
                 if (response.ok) {
                     const newNode = await response.json();
-                    newNode.children.forEach((node) => useSelectedCodesStore().addIsSelected(node));
+                    const newNodeChildrenEnabled = newNode.children.filter((node) => (node.enabled)); //only show those nodes with children enabled, this can be handled with enabled=1 on just topLevelOnly
+                    newNodeChildrenEnabled.forEach((node) => useSelectedCodesStore().addIsSelected(node));
                     const oldNode = findById(this.codes.children, id);
                     useSelectedCodesStore().addIsSelected(oldNode);
-                    oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property that was previously null
+                    oldNode.children = newNodeChildrenEnabled; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
                     console.warn(response);
                     this.hasLoadError = true;
@@ -125,7 +126,7 @@ export const useCodesStore = defineStore('csCodesStore', {
         updateNodes (nodes) { //we add them to .children so the top level structure is consistent with the levels below
             this.codes = {
                 id: UNSET_ID,
-                name: 'Curriculums',
+                name: 'Curricula',
                 children: nodes,
                 enabled: true,
             }
