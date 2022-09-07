@@ -313,7 +313,7 @@ export default {
                 <!-- If you can edit the reason... -->
                 <template v-if="award._links.awardUpdate">
                     <!-- If there's no value here, provide empty state -->
-                    <template v-if="'' === award.reason.toString()">
+                    <template v-if="!(award.reason && award.reason.length)">
                         <div class="empty-state" v-if="this.allowReasonEdit">
                             <i class="icon-badge"></i>
                             <p>Provide <a @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected">evidence</a> for this badge.</p>
