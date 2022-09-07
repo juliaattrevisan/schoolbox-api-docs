@@ -1331,7 +1331,7 @@ class Controller extends Assessment\Controller
             // If the 'submissionWasOnTime' parameter is true, then this is a late acknowledgement of an event that occurred earlier.
             // Otherwise, set submission time to 'now' to align with the behaviour before parameter 'submissionWasOnTime' was introduced.
             $submittedLate  = !$this->getRequest()->post->getBool('submissionWasOnTime', false);
-            $submissionTime = ($submittedLate)? Alaress_Date_Format::now(): $assessment->getDueAt()->addSeconds(-1); // 1 second before due time.
+            $submissionTime = ($submittedLate) ? Alaress_Date_Format::now() : $assessment->getDueAt()->addSeconds(-1); // 1 second before due time.
         } else {
             $submittedLate  = false;
             $submissionTime = Alaress_Date_Format::now();
