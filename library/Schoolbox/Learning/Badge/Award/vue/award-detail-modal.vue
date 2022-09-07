@@ -330,7 +330,7 @@ export default {
                             :proxy="'reason-proxy'"
                             :value="award.reason"
                             :allow-edit="true"
-                            :allow-submit="true"
+                            :allow-submit="!(award._links.goalAward && award.isGoal && !award.award)"
                             :spawn-immediately="true"
                             :is-processing="true"
                             :cdn-prefix="this.cdnPrefix"
