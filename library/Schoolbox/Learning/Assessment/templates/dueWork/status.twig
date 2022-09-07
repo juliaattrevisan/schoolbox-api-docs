@@ -559,8 +559,8 @@
                     });
 
                     {# Handle clicks on confirm popup buttons #}
-                    $('#confirm-dialog .button[data-yes]').click(function () {postSobo(true );});
-                    $('#confirm-dialog .button[data-no]' ).click(function () {postSobo(false);});
+                    $('#confirm-dialog [data-yes]').click(function () {postSobo(true );});
+                    $('#confirm-dialog [data-no]' ).click(function () {postSobo(false);});
 
                     /**
                      * Send a post request to the server, notifying that:
