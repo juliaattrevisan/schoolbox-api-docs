@@ -262,7 +262,7 @@
             {%- apply spaceless %}
                 {% if pAckReceipt %}
                     {% set soboTitle = 'Acknowledge receipt of student submission' %}
-                    <button class="button" data-sobo title="{{ soboTitle }}" href="{{ pAckReceipt }}">Mark as Submitted</button>
+                    <button data-sobo title="{{ soboTitle }}" href="{{ pAckReceipt }}">Mark as Submitted</button>
                 {% endif %}
                 {% set draftSaveTitle = 'You can discard this draft from the Grading Overview screen' %}
                 {% set draftSaveHtml = isDraftFeedback ? 'Saved as Draft' : '' %}
