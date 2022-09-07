@@ -166,12 +166,8 @@ export default {
              * we do this to avoid issues around ckeditor instantiation coupled with modals
              * where opening, closing, then re-opening a modal causes the ckeditor to break
              */
-            hasSelectedModify: false,
-            /* Decide if the edit button for the Reason is available
-             * (presuming you have access to the update route)
-             * This toggles to false when you spawn the ckeditor
-             */
-            allowReasonEdit: true,
+            isModalOpen: false,
+            reason: '', //the reason the badge(s) are being awarded
         }
     },
     computed: {
@@ -240,11 +236,14 @@ export default {
             this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
 
-            /* TODO How to reach into ckeditor value
-             */
-            let reason = document.querySelector('textarea[name="reason"]').value;
+            // /* TODO How to reach into ckeditor value
+            //  */
+            // let reason = document.querySelector('textarea[name="reason"]').value;
+            // let reason = CKEDITOR.instances['reason'].getData() maybe
 
-            axios.post(this.endpoint, {users: this.selected, reason: reason})
+            console.log(this.reason);
+
+            axios.post(this.endpoint, {users: this.selected, reason: this.reason})
                 .then(() => {
                     // Clear the select, so they don't show next time this opens
                     this.selected = [];
@@ -280,29 +279,20 @@ export default {
         },
 
         /**
-         * to be able to udpate the reason using dynamic-input.vue
-         */
-        onEditReasonSelected () {
-            this.hasSelectedModify = true;
-            this.allowReasonEdit = false;
-        },
-
-        /**
-         * post the changed reason value to the backend
-         * and then close the modal
+         * To keep track of the reason, that's being updated by dynamic-input.vue
          *
          * @param { string }
          */
-        onSaveReasonSelected (value) {
-            console.warn(value);
+        onReasonChanged (newValue) {
+            this.reason = newValue;
         },
 
         /**
-         * The modal is now completely closed
+         * The modal is now completely closed so reset
          */
         onModalClosed () {
-            this.hasSelectedModify = false;
-            this.allowReasonEdit = true;
+            this.isModalOpen = false;
+            this.reason = '';
         },
     },
 }
@@ -324,13 +314,12 @@ export default {
 
         <div>
             <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
-            <button v-if="this.allowReasonEdit" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
+
             <dynamic-input
-                v-if="hasSelectedModify"
+                v-if="true"
                 preset-unique-id="reason"
                 inputName="reason"
-                singular="reason"
-                :proxy="'reason-proxy'"
+                singular="''"
                 :value="''"
                 :allow-edit="true"
                 :allow-submit="false"
@@ -338,7 +327,7 @@ export default {
                 :is-processing="true"
                 :cdn-prefix="this.cdnPrefix"
                 :site-version="this.siteVersion"
-                @post="onSaveReasonSelected"
+                @value-changed="onReasonChanged"
             ></dynamic-input>
         </div>
 
