@@ -12,6 +12,12 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Mail\Mailer;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use DomainException;
+use Exception;
+use InvalidArgumentException;
+use JetBrains\PhpStorm\NoReturn;
+use LogicException;
+use OutOfRangeException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter\Codec;
 use External_ClassInterface;
@@ -29,6 +35,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\UserMapper;
+use Throwable;
 use Timetable_ColourMapper;
 use Alaress_Date_Format;
 use Schoolbox\Filter;
@@ -47,48 +54,41 @@ use function func_get_args;
  */
 class Controller extends Base
 {
-    /**
-     * @var TermMapper
-     */
-    private $termMapper;
+    /** @var TermMapper */
+    private TermMapper $termMapper;
 
-    /**
-     * @var FolderMapper
-     */
-    private $folderMapper;
-    /**
-     * @var AssessmentMapperProxy
-     */
-    private $assessmentMapperProxy;
+    /** @var FolderMapper */
+    private FolderMapper $folderMapper;
+
+    /** @var AssessmentMapperProxy */
+    private AssessmentMapperProxy $assessmentMapperProxy;
 
     /** @var Timetable_ColourMapper */
-    private $timetableColourMapper;
+    private Timetable_ColourMapper $timetableColourMapper;
 
     /** @var Filter\Selection\Mapper */
-    private $filterSelectionMapper;
-
+    private Filter\Selection\Mapper $filterSelectionMapper;
 
     /** @var AssessmentFilters\IdFinder */
-    private $assessmentIdFinder;
+    private AssessmentFilters\IdFinder $assessmentIdFinder;
 
     /** @var Folder\ClassListFactory */
-    private $classListFactory;
+    private Folder\ClassListFactory $classListFactory;
 
     /** @var UserMapper */
-    private $userMapper;
+    private UserMapper $userMapper;
 
     /** @var Folder\Log\Mapper */
-    private $logMapper;
+    private Folder\Log\Mapper $logMapper;
 
     /** @var External_ClassInterface */
-    private $externalClass;
+    private External_ClassInterface $externalClass;
 
     /**
      * For translating Terminology
-     *
      * @var RosettaStone
      */
-    private $rosettaStone;
+    private RosettaStone $rosettaStone;
 
     /**
      * for building the assessment query
@@ -132,20 +132,19 @@ class Controller extends Base
         RosettaStone $rosettaStone,
         IConnector $database
     ) {
-        $this->assessmentMapperProxy      = $assessmentMapperProxy;
-        $this->termMapper                 = $termMapper;
-        $this->folderMapper               = $folderMapper;
-        $this->timetableColourMapper      = $timetableColourMapper;
-        $this->filterSelectionMapper      = $filterSelectionMapper;
-        $this->assessmentIdFinder         = $assessmentIdFinder;
-        $this->classListFactory           = $classListFactory;
-        $this->userMapper                 = $userMapper;
-        $this->logMapper                  = $logMapper;
-        $this->externalClass              = $externalClass;
-        $this->rosettaStone               = $rosettaStone;
-        $this->database               = $database;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
+        $this->termMapper            = $termMapper;
+        $this->folderMapper          = $folderMapper;
+        $this->timetableColourMapper = $timetableColourMapper;
+        $this->filterSelectionMapper = $filterSelectionMapper;
+        $this->assessmentIdFinder    = $assessmentIdFinder;
+        $this->classListFactory      = $classListFactory;
+        $this->userMapper            = $userMapper;
+        $this->logMapper             = $logMapper;
+        $this->externalClass         = $externalClass;
+        $this->rosettaStone          = $rosettaStone;
+        $this->database              = $database;
     }
-
 
     /**
      * Redirects to current user
@@ -170,7 +169,6 @@ class Controller extends Base
         ]));
     }
 
-
     /**
      * Displays a blank page with collapsed filter panel
      *
@@ -178,12 +176,10 @@ class Controller extends Base
      * @since 165
      * @param User                   $viewee The user whose pending assessments we are viewing.
      * @param Filter\IFactoryFactory $filterFactoryFactory
-     * @var mixed[][] $_GET. Comma-separated keys, indexed by filter.id. Eg '1=&2=weighted&3=1,2,3' (1 => [], 2 => [weighted], 3 => [1,2,3])
+     * @var array[]                  $_GET   . Comma-separated keys, indexed by filter.id. Eg '1=&2=weighted&3=1,2,3' (1 => [], 2 => [weighted], 3 => [1,2,3])
      * @throws RouteNotFound
-     * @throws \InvalidArgumentException
-     * @throws Mapper\Exception
-     * @throws \ReflectionException If unable to find the class for a filter registered on this page
-     * @throws \DomainException     If filter factoryFactory has not defined the entity it is filtering
+     * @throws InvalidArgumentException
+     * @throws DomainException      If filter factoryFactory has not defined the entity it is filtering
      * @throws NotFound             If $viewee is not staff
      */
     public function getPendingAssessmentsForUser(User $viewee, Filter\IFactoryFactory $filterFactoryFactory): void
@@ -192,10 +188,9 @@ class Controller extends Base
             throw new NotFound('Only staff have pending assessments. Found: ' . $viewee->getRole()->getType());
         }
 
-        $page      = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
-        $route     = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
-        $queryArgs = $this->getRequest()->query->getArrayCopy();
-
+        $page        = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
+        $route       = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
+        $queryArgs   = $this->getRequest()->query->getArrayCopy();
         $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, func_get_args(), $queryArgs);
 
         $title = 'Pending Assessments';
@@ -211,7 +206,6 @@ class Controller extends Base
         );
     }
 
-
     /**
      * Displays a list of Assessments that require marking, and Assessments currently unsubmitted
      *
@@ -220,11 +214,11 @@ class Controller extends Base
      * @param User                   $viewee The user whose pending assessments we are viewing.
      * @param Filter\IFactoryFactory $filterFactoryFactory
      * @var  string[][]              $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
-     * @throws \LogicException
-     * @throws \DomainException
-     * @throws \OutOfRangeException
-     * @throws \Exception
-     * @throws \InvalidArgumentException
+     * @throws LogicException
+     * @throws DomainException
+     * @throws OutOfRangeException
+     * @throws Exception
+     * @throws InvalidArgumentException
      */
     public function postPendingAssessmentsForUser(User $viewee, Filter\IFactoryFactory $filterFactoryFactory): void
     {
@@ -233,21 +227,19 @@ class Controller extends Base
 
         try {
             $postFilterSelections = $this->request->post['filter_selection'] ?: [];
-
             $content = $this->generatePendingAssessmentReport($filterFactoryFactory, $viewee, $postFilterSelections);
 
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'status'  => 200,
                 'content' => $content,
             ]));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // TODO - can remove this block when we abandon PHP 5 support
             $this->returnJsonError($e);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->returnJsonError($e);
         }
     }
-
 
     /**
      * Generate a pending assessment report as HTML string
@@ -256,42 +248,37 @@ class Controller extends Base
      * @param User                   $viewee
      * @param string[][]             $request - Indexed by filter.id, then concrete key
      * @return string
-     * @throws \InvalidArgumentException
-     * @throws \DomainException
-     * @throws \LogicException
-     * @throws \ReflectionException If the specified class does not exist
-     * @throws Filter\BrokenFilterException If a injected filter is unable to be processed
-     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
-     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws InvalidArgumentException
+     * @throws DomainException
+     * @throws LogicException
+     * @throws Filter\BrokenFilterException If an injected filter is unable to be processed
+     * @throws DefinitionException If join $name isn't on this mapper
+     * @throws Mapper\Exception If an alias is incorrect
      * @throws UnexpectedValueException
      */
-    protected function generatePendingAssessmentReport(Filter\IFactoryFactory $filterFactoryFactory, User $viewee, array $request)
+    protected function generatePendingAssessmentReport(Filter\IFactoryFactory $filterFactoryFactory, User $viewee, array $request): string
     {
-        $page                = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
+        $page = Filter\Page\Model::PAGE_PENDING_ASSESSMENTS;
 
-        // Convert Request to Selection models
+        // Convert request to selection models.
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
 
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
 
         $filters = $filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
-
         $filters = $filterFactoryFactory->checkTeacherFolders($filters, $viewee);
 
-        // Ensure that assessments are not Assessment Specs
-        $filters = array_merge($filters, [
-            AssessmentFilters\NullableContext\UnitSpec\Definition::class   => [],
-        ]);
-
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+        // Ensure that assessments are not assessment specs.
+        $filters = array_merge($filters, [AssessmentFilters\NullableContext\UnitSpec\Definition::class => []]);
 
         // Fetch assessments & participants
-        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+        $assessments   = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
+        $assessments   = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
 
-        $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
-        $totalAssessmentsToMark = 0;
+        $toChaseLimit            = Alaress_Date_Format::now()->addDays(1);
+        $totalAssessmentsToMark  = 0;
         $totalAssessmentsToChase = 0;
 
         /**
@@ -343,13 +330,12 @@ class Controller extends Base
         ])->getAsString();
     }
 
-
     /**
      * Returns a JSON representation of an exception suitable for AJAX HTML alert divs
      *
-     * @param \Throwable $e
+     * @param Throwable $e
      */
-    protected function returnJsonError($e)
+    protected function returnJsonError(Throwable $e): void
     {
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 500,
@@ -360,9 +346,8 @@ class Controller extends Base
         ]));
     }
 
-
     /**
-     * Displays a list of classes for the current logged in user
+     * Displays a list of classes for the current logged-in user
      *
      * If the term includes now (ie is current) then we use current enrollment.
      * Else term is historical, so we display classes where a student has submitted responses or received feedback
@@ -374,7 +359,7 @@ class Controller extends Base
      * @throws DefinitionException
      * @throws UnexpectedValueException
      */
-    public function getClasses(Term $term)
+    public function getClasses(Term $term): void
     {
         $now           = Alaress_Date_Format::now();
         $isTermCurrent = $term->contains($now);
@@ -408,11 +393,9 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', $gridData)->setTab('classes'));
     }
 
-
     /**
      * @param Folder\Model $folder
      *
-     * @throws Mapper\Exception
      * @throws RouteNotFound
      */
     public function getStudentListByClassId(Folder\Model $folder): void
@@ -434,7 +417,6 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildJsonOutput($students));
     }
-
 
     /**
      * @param Folder\Model $folder
@@ -460,7 +442,6 @@ class Controller extends Base
             ])->setTab('classes')->setTitle($folder->getName())
         );
     }
-
 
     /**
      * @return string
@@ -502,12 +483,11 @@ class Controller extends Base
     /**
      * downloads csv of all assessments within a folder
      *
-     *
      * @api   GET /learning/assessment-audit/{folder}
      *
      * @param Folder\Model $folder
      */
-    public function getAssessmentAudit(Folder\Model $folder)
+    #[NoReturn] public function getAssessmentAudit(Folder\Model $folder): void
     {
         $assessmentAudit = new AssessmentAudit($this->folderMapper, $this->database, $this->getConfigLoader()->get('site_school_code'));
         $assessmentAudit->getAssessmentAudit($folder);
