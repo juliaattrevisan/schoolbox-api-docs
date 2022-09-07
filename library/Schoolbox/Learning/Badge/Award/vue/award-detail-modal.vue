@@ -215,6 +215,8 @@ export default {
                 .catch(() => {
                     this.toastError('Failed to award achievement')
                 })
+
+            this.$refs.modal.close();
         },
 
         /**
