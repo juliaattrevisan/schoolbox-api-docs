@@ -11,7 +11,7 @@ import cloneDeep from 'lodash/cloneDeep';
 const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
 const CAPPED_RESULTS_LENGTH = 50; //the maximum amount of results to show
 
-export const useSearchResultsStore = defineStore('csSearchResultsStore', {
+export const useSearchStore = defineStore('csSearchStore', {
 
     state: () => ({
         query: '', //current search term to filter the active codes
@@ -20,11 +20,11 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
     }),
 
     getters: {
-        
+
         /**
          * To only start showing search results once enough characters
-         * have been added 
-         * 
+         * have been added
+         *
          * @return { Boolean }
          */
         isSearchActive () {
@@ -33,7 +33,7 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
 
         /**
          * To search the curriculum codes
-         * 
+         *
          * @return { Array }
          */
         codes () {
@@ -43,8 +43,8 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
         /**
          * no children descendents, all put in an array one level deep
          * for search results
-         * 
-         * @returns { Array } 
+         *
+         * @returns { Array }
          */
         codesFlattened () {
             if (this.isSearchActive) {
@@ -69,11 +69,11 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
             const commaSeparated = queryTrimmed.split(re) ?? []; //split the string into a comma separated list
             return commaSeparated.filter(word => word.length > 0); //and ensure each contains a character
         },
-        
+
         /**
          * When the search is active, will return any codes
          * that match the current search query
-         * 
+         *
          * @return { Array }
          */
         results () {
@@ -83,14 +83,14 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
                 this.resultsNotShownCount = fullResults.length - CAPPED_RESULTS_LENGTH; //and how many are actually capped
                 return fullResults.slice(0, CAPPED_RESULTS_LENGTH);
             } else { //otherwise just return them all
-                this.isResultsCapped = false; 
+                this.isResultsCapped = false;
                 return fullResults;
             }
         },
 
         /**
          * To show that no codes march the current search
-         * 
+         *
          * @return { Boolean }
          */
         hasNoResults () {
@@ -98,9 +98,9 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
         },
 
     },
-   
+
     actions: {
-    
+
         /**
          * find all those results that match any search words
          * within the the code, name or breadcrumb fields
@@ -143,13 +143,13 @@ export const useSearchResultsStore = defineStore('csSearchResultsStore', {
         },
 
     },
-   
+
 });
 
 /**
  * The codes are nested with children:[], so we pull them all
- * out into a single level when searching 
- * 
+ * out into a single level when searching
+ *
  * @param { Object }
  */
 export function flattenCodes (obj) {
@@ -158,7 +158,7 @@ export function flattenCodes (obj) {
         obj.children.forEach((child) => {
             array = [...array, ...flattenCodes(child)];
         });
-        obj.children = []; 
+        obj.children = [];
     }
     return array;
 }

@@ -6,21 +6,21 @@
  */
 
 import { computed  } from 'vue';
-import { useSearchResultsStore  } from './store/csSearchResultsStore';
+import { useSearchStore  } from './store/csSearchStore';
 import CsSelectAllSearchResults from './cs-select-all-search-results.vue';
 import CsSearchResult from './cs-search-result.vue';
 
 
-const searchResultsStore = useSearchResultsStore();
+const searchStore = useSearchStore();
 
 /**
- * show select all option for adding / removing codes only if there's 
+ * show select all option for adding / removing codes only if there's
  * more than one search result
- * 
- * @returns { Boolean } 
+ *
+ * @returns { Boolean }
  */
 const showSelectAll = computed(() => {
-    return searchResultsStore.results.length > 1;
+    return searchStore.results.length > 1;
 });
 
 </script>
@@ -29,11 +29,11 @@ const showSelectAll = computed(() => {
     <div class="search-results-container">
         <div class="search-results">
             <ul>
-                <li v-if="searchResultsStore.isResultsCapped" class="search-refine-note">{{ searchResultsStore.resultsNotShownCount }} search results not shown, try refining your search further.</li>
+                <li v-if="searchStore.isResultsCapped" class="search-refine-note">{{ searchStore.resultsNotShownCount }} search results not shown, try refining your search further.</li>
                 <li v-if="showSelectAll">
                     <cs-select-all-search-results />
                 </li>
-                <li v-for="result in searchResultsStore.results" :key="result.id">
+                <li v-for="result in searchStore.results" :key="result.id">
                     <cs-search-result :result="result"/>
                 </li>
             </ul>

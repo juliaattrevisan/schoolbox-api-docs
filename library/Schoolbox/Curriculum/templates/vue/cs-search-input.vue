@@ -4,15 +4,15 @@
  * To search for codes or select the browse button to open the modal
  */
 
-import { ref, computed, onMounted, onUnmounted } from 'vue'; 
-import { useStore } from './store/curriculumSelectorStore'; 
-import { useModalStore } from './store/csModalStore'; 
-import { useSearchResultsStore } from './store/csSearchResultsStore'; 
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useStore } from './store/curriculumSelectorStore';
+import { useModalStore } from './store/csModalStore';
+import { useSearchStore } from './store/csSearchStore';
 
 
 const store = useStore();
 const modalStore = useModalStore();
-const searchResultsStore = useSearchResultsStore();
+const searchStore = useSearchStore();
 const queryInputEl = ref(null); //to deterch if the search input is currently active
 
 
@@ -27,8 +27,8 @@ const props = defineProps({
 
 /**
  * notify of loading, a load error or that we are right to get searching
- * 
- * @returns { String } 
+ *
+ * @returns { String }
  */
 const inputPlaceholder = computed(() => {
     if (store.isLoading) {
@@ -38,7 +38,7 @@ const inputPlaceholder = computed(() => {
     } else {
         return 'Search for curriculum codes or keywords...';
     }
-    
+
 });
 
 /**
@@ -61,7 +61,7 @@ onUnmounted(() => {
 
 /**
  * prevent the <form> from being submitted on enter
- * 
+ *
  * @param { Event }
  */
 function onKeyDown (event) {
@@ -74,7 +74,7 @@ function onKeyDown (event) {
  * so we can select enter when adding codes
  * useful if we copy/paste a bunch of codes,
  * then we can just select enter to add them all
- * 
+ *
  * @param { Event }
  */
 function onKeyUp (event) {
@@ -89,23 +89,23 @@ function onKeyUp (event) {
 }
 
 /**
- * enter the manual entry or select the currently 
+ * enter the manual entry or select the currently
  * highlighted search result
  */
 function onEnterKeySelected () {
-    searchResultsStore.addAllResults();
-    searchResultsStore.clear();
+    searchStore.addAllResults();
+    searchStore.clear();
 }
 
 /**
  * to be able to close the search results
  * when selection outside is made
- * 
+ *
  * @param { Event }
  */
 function onMouseClick (event) {
-    if (searchResultsStore.isSearchActive && props.curriculumSelectorEl && !props.curriculumSelectorEl.contains(event.target)) {
-        searchResultsStore.clear();
+    if (searchStore.isSearchActive && props.curriculumSelectorEl && !props.curriculumSelectorEl.contains(event.target)) {
+        searchStore.clear();
     }
 }
 
@@ -121,7 +121,7 @@ function onBrowseSelected () {
 <template>
     <div v-if="!store.isReadOnly" class="input-group">
         <input
-            v-model="searchResultsStore.query"
+            v-model="searchStore.query"
             ref="queryInputEl"
             type="text"
             class="search-input"
@@ -129,11 +129,11 @@ function onBrowseSelected () {
             :placeholder="inputPlaceholder"
             @input="$event.target.composing = false"
         />
-        <button 
-            v-if="store.hasLoadedOk" 
-            class="button icon-curriculum" 
-            title="Browse and select from the Curriculum" 
-            @click.prevent="onBrowseSelected" 
+        <button
+            v-if="store.hasLoadedOk"
+            class="button icon-curriculum"
+            title="Browse and select from the Curriculum"
+            @click.prevent="onBrowseSelected"
             @keyup.enter="onBrowseSelected">
             Browse
         </button>
@@ -142,9 +142,9 @@ function onBrowseSelected () {
 
 <style scoped>
 
-input, 
+input,
 button {
-    margin-bottom: 0; 
+    margin-bottom: 0;
 }
 
 </style>

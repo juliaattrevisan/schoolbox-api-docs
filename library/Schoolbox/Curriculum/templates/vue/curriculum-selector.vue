@@ -7,7 +7,7 @@
 import { ref, onMounted } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
-import { useSearchResultsStore } from './store/csSearchResultsStore';
+import { useSearchStore } from './store/csSearchStore';
 import { useModalStore } from './store/csModalStore';
 import { useModalActiveCodesStore } from './store/csModalActiveCodesStore';
 import CsSearchInput from './cs-search-input.vue';
@@ -77,7 +77,7 @@ onMounted(() => {
 function checkForStorybook () {
     if (typeof STORYBOOK_ENV !== 'undefined') {
         useSelectedCodesStore().$reset();
-        useSearchResultsStore().$reset();
+        useSearchStore().$reset();
         useModalStore().$reset();
         useModalActiveCodesStore().$reset();
         useStore().$reset();

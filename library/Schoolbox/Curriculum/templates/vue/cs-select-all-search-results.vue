@@ -6,42 +6,42 @@
  */
 
 import { computed } from 'vue';
-import { useSearchResultsStore } from './store/csSearchResultsStore'; 
-import { useSelectedCodesStore } from './store/csSelectedCodesStore'; 
+import { useSearchStore } from './store/csSearchStore';
+import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 
 
-const searchResultsStore = useSearchResultsStore();
+const searchStore = useSearchStore();
 const selectedCodesStore = useSelectedCodesStore();
 
 /**
- * To determine the behaviour of the 'Select all' button, whether to 
+ * To determine the behaviour of the 'Select all' button, whether to
  * add all codes or remove all codes
- * 
- * @returns { Boolean } 
+ *
+ * @returns { Boolean }
  */
 const isAllResultsSelected = computed(() => {
     if (selectedCodesStore.codes.length > 0) {
-        const alreadySelectedCodes = searchResultsStore.results.filter((resultItem) => {
+        const alreadySelectedCodes = searchStore.results.filter((resultItem) => {
             return selectedCodesStore.codes.some((code) => resultItem.id === code.id);
-        }); 
-        return alreadySelectedCodes.length === searchResultsStore.results.length ? true : false;
+        });
+        return alreadySelectedCodes.length === searchStore.results.length ? true : false;
     } else {
         return false;
     }
 });
 
 /**
- * To add the 'indeterminate' class to the select all checkbox to show some 
+ * To add the 'indeterminate' class to the select all checkbox to show some
  * in the search results are already selected
- * 
- * @returns { Boolean } 
+ *
+ * @returns { Boolean }
  */
 const isSomeResultsSelected = computed(() => {
     if (selectedCodesStore.codes.length > 0) {
-        const alreadySelectedCodes = searchResultsStore.results.filter((resultItem) => {
+        const alreadySelectedCodes = searchStore.results.filter((resultItem) => {
             return selectedCodesStore.codes.some((code) => resultItem.id === code.id);
-        }); 
-        return alreadySelectedCodes.length >= 1 && alreadySelectedCodes.length !== searchResultsStore.results.length ? true : false;
+        });
+        return alreadySelectedCodes.length >= 1 && alreadySelectedCodes.length !== searchStore.results.length ? true : false;
     } else {
         return false;
     }
@@ -50,7 +50,7 @@ const isSomeResultsSelected = computed(() => {
 /**
  * To determine the check display of the checkbox
  *
- * @returns { Boolean } 
+ * @returns { Boolean }
  */
 const isChecked = computed(() => isAllResultsSelected.value ? true : false);
 
@@ -62,17 +62,17 @@ function onSelectAll () {
 }
 
 /**
- * pull all results out 
+ * pull all results out
  */
 function removeAllResults () {
-    searchResultsStore.removeAllResults();
+    searchStore.removeAllResults();
 }
 
 /**
- * add all results in 
+ * add all results in
  */
 function addAllResults () {
-    searchResultsStore.addAllResults();
+    searchStore.addAllResults();
 }
 
 </script>
@@ -83,7 +83,7 @@ function addAllResults () {
         @keyup.enter="onSelectAll"
     >
         <div class="checklist">
-            <input 
+            <input
                 id="checkbox-select-all"
                 type="checkbox"
                 :checked="isChecked"
