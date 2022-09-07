@@ -345,8 +345,8 @@ class Mapper extends BaseMapper
 
         $sql = "
             {$this->getSelectString()}
-            WHERE
-                  (
+            WHERE `{$this->getTable()}`.`deleted_at` IS NULL
+                  AND (
                       `uses_relative_date` = 1
                       OR
                       (
