@@ -539,10 +539,6 @@
                         }
                     });
 
-                    {# This allows the clicked button to be passed to postSobo() function indirectly. #}
-                    {# Note that confirm popup is displayed in between click of button and calling of postSoho(), so cannot pass directly. #}
-                    let $buttonClicked = null;
-
                     {# Handle clicks on 'Submission Received' buttons #}
                     $('[data-sobo]').on('click', function () {
                         $buttonClicked = $(this);
@@ -550,17 +546,17 @@
                         if (!confirmDialogDisabled) {
                             if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
                                 $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
+
+                                {# Handle clicks on confirm popup buttons #}
+                                $('#confirm-dialog [data-yes]').click(function () {postSobo($buttonClicked, true );});
+                                $('#confirm-dialog [data-no]' ).click(function () {postSobo($buttonClicked, false);});
                             } else {
-                                postSobo(false); {# Submission was not confirmed to be on-time. #}
+                                postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
                             }
                         } else {
-                            postSobo(confirmDialogDisabledOnTimeValue); {# Use default value for whether submission was confirmed to be on-time. #}
+                            postSobo($buttonClicked, confirmDialogDisabledOnTimeValue); {# Use default value for whether submission was confirmed to be on-time. #}
                         }
                     });
-
-                    {# Handle clicks on confirm popup buttons #}
-                    $('#confirm-dialog [data-yes]').click(function () {postSobo(true );});
-                    $('#confirm-dialog [data-no]' ).click(function () {postSobo(false);});
 
                     /**
                      * Send a post request to the server, notifying that:
@@ -569,9 +565,8 @@
                      *
                      * @param {boolean} submissionWasOnTime - true if the submission was received on time.
                      */
-                    function postSobo(submissionWasOnTime) {
-                        let $button      = $buttonClicked,
-                            buttonText   = $button.html(),
+                    function postSobo($button, submissionWasOnTime) {
+                        let buttonText   = $button.html(),
                             $actionBar   = $button.closest('[data-action-bar]'),
                             $participant = $actionBar.closest('[data-participant]'),
                             $statusIcon  = $participant.find('[data-status]'),
