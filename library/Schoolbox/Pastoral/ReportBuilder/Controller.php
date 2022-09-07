@@ -548,9 +548,9 @@ class Controller extends Base
         // For years and houses, either no-house/year or years/houses need to be selected
         if (
             !strlen($post->get('name'))
-            || !count($post->get('types'))
-            || !($includeStudentsWithoutYear || count($post->get('years')))
-            || !($includeStudentsWithoutHouse || count($post->get('houses')))
+            || empty($post->get('types'))
+            || (!$includeStudentsWithoutYear && empty($post->get('years')))
+            || (!$includeStudentsWithoutHouse && empty($post->get('houses')))
         ) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
