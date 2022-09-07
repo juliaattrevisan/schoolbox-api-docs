@@ -209,6 +209,12 @@ export default {
             default: 'Award selected achievements',
         },
 
+        /* Either "goal" or "achievement" depending on the context of this badge
+         * being awarded - there are nuanced behaviours depending on whether this
+         * badge was awarded as an achievemtn, or set as a goal
+         */
+        type: String,
+
         /* Used to spawn ckeditor files from cdn somewhere
          */
         siteVersion: {
@@ -464,26 +470,27 @@ export default {
                         <div>
                             <badge-image :badge="badge"></badge-image>
                             <h3>{{ badge.name }}</h3>
-                            <h3>{{ badge.reason }}</h3>
                         </div>
                     </div>
                 </li>
             </ul>
 
-            <dynamic-input
-                v-if="isModalOpen"
-                preset-unique-id="reason"
-                inputName="reason"
-                singular="reason"
-                :value="reason"
-                :allow-edit="true"
-                :allow-submit="false"
-                :spawn-immediately="true"
-                :is-processing="true"
-                :cdn-prefix="this.cdnPrefix"
-                :site-version="this.siteVersion"
-                @value-changed="onReasonChanged"
-            ></dynamic-input>
+            <template v-if="'achievement' === this.type">
+                <dynamic-input
+                    v-if="isModalOpen"
+                    preset-unique-id="reason"
+                    inputName="reason"
+                    singular="reason"
+                    :value="reason"
+                    :allow-edit="true"
+                    :allow-submit="false"
+                    :spawn-immediately="true"
+                    :is-processing="true"
+                    :cdn-prefix="this.cdnPrefix"
+                    :site-version="this.siteVersion"
+                    @value-changed="onReasonChanged"
+                ></dynamic-input>
+            </template>
 
             <template v-if="!awardToSelfOnly">
                 <hr />
