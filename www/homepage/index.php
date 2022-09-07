@@ -120,7 +120,7 @@ $readonly = !empty($_GET['readonly']);
 
 // If write level user, downgrade to read access.
 $virtualPermission = (
-    ($actualPermission > UserAccess::ACCESS_READ && $readonly)? UserAccess::ACCESS_READ: $actualPermission
+    ($actualPermission > UserAccess::ACCESS_READ && $readonly) ? UserAccess::ACCESS_READ : $actualPermission
 );
 
 // Set up the homepage handler.
@@ -246,7 +246,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     if ($total = $definitionCollection->count()) {
         $i        = 0;
         $previous = new Component_Definition();
-        $folderId = ($folder instanceof Schoolbox\Resource\Folder\Model)? $folder->getId(): null;
+        $folderId = ($folder instanceof Schoolbox\Resource\Folder\Model) ? $folder->getId() : null;
 
         foreach ($definitionCollection as $component) {
             /** @var Component_Definition $component */
@@ -370,7 +370,7 @@ renderTemplateForAnalyticsSection($this, $manageClassController, $sessionUser);
 
 $this->parse('page_controls_block', 'page_controls');
 
-$codeString = ($sessionUser->getRole()->isStaff())? Scrub::text($folder->getTruncatedCodeString()): '';
+$codeString = ($sessionUser->getRole()->isStaff()) ? Scrub::text($folder->getTruncatedCodeString()) : '';
 
 $this->setVar(array(
     'HEADING'            => Scrub::text($folder->getName()) . ($codeString ? ' (' . $codeString . ')' : ''),
