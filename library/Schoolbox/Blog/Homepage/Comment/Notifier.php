@@ -146,7 +146,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ->setNamespace($this->getSlug())
             ->setBody($comment->getBody())
             ->setFolderId($folderId)
-            ->setByline($author->formatName("{givenname} wrote"));
+            ->setByline($author->formatName("{preferredname} wrote"));
 
         return $bob;
     }

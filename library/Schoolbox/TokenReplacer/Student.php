@@ -52,7 +52,6 @@ class Student
             $body,
             [
                 '[firstname]'     => $student->getFirstname(),
-                '[givenname]'     => $student->getGivenName(),
                 '[preferredname]' => $student->getPreferredName(),
                 '[surname]'       => $student->getLastname(),
                 '[fullname]'      => $student->getFullName(),

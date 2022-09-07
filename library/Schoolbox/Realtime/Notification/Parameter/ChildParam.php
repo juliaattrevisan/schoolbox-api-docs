@@ -21,7 +21,7 @@ class ChildParam extends UserParam
     /**
      * @inheritdoc
      */
-    public function __construct($user, $stacking = self::STACKING_APPEND, $format = '{givenname}')
+    public function __construct($user, $stacking = self::STACKING_APPEND, $format = '{preferredname}')
     {
         parent::__construct($user, $stacking, $format);
     }

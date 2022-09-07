@@ -395,7 +395,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         if (isset($diff['comment'])) {
             $bob->setTitle(":user commented on the :eotc event :note")
-                ->setByline($effector->formatName('{givenname}') . " wrote")
+                ->setByline($effector->formatName('{preferredname}') . " wrote")
                 ->setBody($diff['comment'][0]);
         } else {
             $bob->setTitle(":user updated the :eotc event :note");

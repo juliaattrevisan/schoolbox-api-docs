@@ -512,7 +512,6 @@ class Controller extends Base
                         '[title]'         => $this->getUser()->getTitle(),
                         '[firstname]'     => $this->getUser()->getFirstname(),
                         '[surname]'       => $this->getUser()->getLastname(),
-                        '[givenname]'     => $this->getUser()->getGivenName(),
                         '[preferredname]' => $this->getUser()->getPreferredName(),
                         '[fullname]'      => $this->getUser()->getFullName(),
                         '[email]'         => sprintf('<a href="mailto:%s">%s</a>', $this->getUser()->getEmail(), $this->getUser()->getEmail()),
