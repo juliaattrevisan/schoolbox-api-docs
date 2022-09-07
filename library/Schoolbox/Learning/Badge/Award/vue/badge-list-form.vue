@@ -476,6 +476,8 @@ export default {
             </ul>
 
             <template v-if="'achievement' === this.type">
+                <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
+
                 <dynamic-input
                     v-if="isModalOpen"
                     preset-unique-id="reason"
