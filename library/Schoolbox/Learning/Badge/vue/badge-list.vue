@@ -9,10 +9,17 @@ import BadgeGoalWithdrawModal from '../Award/vue/badge-goal-withdraw-modal';
 import BadgeImage from './badge-image';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import mixinFilter from '@schoolboxVue/mixins/filter';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 export default {
-
+    /**
+     * Mixins.
+     * Basically traits for vue; allows you to share javascript between components in the same
+     * manner as a php trait. They must already be imported at the top of the file and will
+     * be superpositioned on top of this javascript here, inside export default {}
+     */
     mixins: [
+        cdnPrefixMixin,
         mixinFilter
     ],
 
@@ -56,6 +63,7 @@ export default {
                 return []
             },
         },
+        siteVersion: String
     },
 
     data () {
@@ -256,10 +264,7 @@ export default {
         onBadgeSelected (badge, isChecked) {
             this.$emit('on-badge-selected', badge, isChecked);
         },
-
-
     }
-
 }
 </script>
 
@@ -365,6 +370,8 @@ export default {
                 :badge="currentBadge"
                 :endpoint="currentBadge._links.awardAsAchievement"
                 :expiry="currentBadge.achievementExpiry"
+                :cdn-prefix="this.cdnPrefix"
+                :site-version="this.siteVersion"
                 @cancel="closeAwardAsAchievementModal"
                 @done="closeAwardAsAchievementModal"
                 placeholder="Search for users to award achievement to"
@@ -393,6 +400,8 @@ export default {
                 :badge="currentBadge"
                 :endpoint="currentBadge._links.setAsGoal"
                 :expiry="currentBadge.goalExpiry"
+                :cdn-prefix="this.cdnPrefix"
+                :site-version="this.siteVersion"
                 @cancel="closeSetAsGoalModal"
                 @done="closeSetAsGoalModal"
                 placeholder="Search for users to set a goal for"

@@ -419,6 +419,8 @@ export default {
             :allow-selection="true"
             :show-badge-menus="false"
             :selected-badges="selectedBadges"
+            :cdn-prefix="this.cdnPrefix"
+            :site-version="this.siteVersion"
             @on-badge-selected="onBadgeSelected"
         ></badge-list>
 
@@ -518,17 +520,17 @@ export default {
     height: 50px;
 }
 
-    .selected-container__count {
-        margin-right: 1rem;
-        @media (max-width: 800px) {
-            font-size: 0.8rem;
-        }
+.selected-container__count {
+    margin-right: 1rem;
+    @media (max-width: 800px) {
+        font-size: 0.8rem;
     }
+}
 
-    .selected-container__badges {
-        flex: 1 1 auto; //fill up all the space that __count doesn't occupy
-        min-width: 50%; //and don't get too small when shrunk down
-    }
+.selected-container__badges {
+    flex: 1 1 auto; //fill up all the space that __count doesn't occupy
+    min-width: 50%; //and don't get too small when shrunk down
+}
 
 .selected-badges__item {
     display: inline-block;

@@ -45,7 +45,10 @@
             <badge-list get-badges-route="{{ routeLookup('learningBadge.getBadgeJsonList') }}"
                         get-badge-create-form-route="{{ createFormRoute }}"
                         expiry-date-format="{{ config.date_long | dayjsFormat }}"
-                        :show-badge-menus={{ createFormRoute is null ? 'false' : 'true' }}>
+                        cdn-prefix="{{ CDN_PREFIX }}"
+                        site-version="{{ config.site_version }}"
+                        :show-badge-menus={{ createFormRoute is null ? 'false' : 'true' }}
+            >
             </badge-list>
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/badgeList.js?v={{ config.site_version }}"></script>

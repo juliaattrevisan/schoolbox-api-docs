@@ -9,6 +9,8 @@ import Toast from "@schoolboxVue/components/toast";
 import vSelect from "vue-select";
 import debounce from "lodash/debounce";
 import "vue-select/dist/vue-select.css";
+import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 // Render a custom template for the deselect icon.
 // Partially documented on https://github.com/sagalbot/vue-select/issues/994
@@ -37,11 +39,26 @@ const SEARCH_RESULT_RETRIEVE_DELAY = 350;
  * @emits cancel The award badge action was cancelled
  */
 export default {
+    /**
+     * Mixins.
+     * Basically traits for vue; allows you to share javascript between components in the same
+     * manner as a php trait. They must already be imported at the top of the file and will
+     * be superpositioned on top of this javascript here, inside export default {}
+     */
+    mixins: [
+        cdnPrefixMixin,
+    ],
     components: {
         BadgeImage,
         Toast,
-        vSelect
+        vSelect,
+        DynamicInput
     },
+    /**
+     * Props.
+     * Immutable props that were passed to this component, usually via twig, in our setup.
+     * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
+     */
     props: {
         /**
          * The badge to display in this detail panel.
@@ -134,14 +151,27 @@ export default {
         expiry: {
             type: Number,
             default: null,
-        }
+        },
+
+        siteVersion: String
     },
     data() {
         return {
             options: [],
             selected: [],
             reason: null,
-            isFormSubmitActive: false
+            isFormSubmitActive: false,
+            /**
+             * so dynamic-input.vue is only in the dom while the modal is active
+             * we do this to avoid issues around ckeditor instantiation coupled with modals
+             * where opening, closing, then re-opening a modal causes the ckeditor to break
+             */
+            hasSelectedModify: false,
+            /* Decide if the edit button for the Reason is available
+             * (presuming you have access to the update route)
+             * This toggles to false when you spawn the ckeditor
+             */
+            allowReasonEdit: true,
         }
     },
     computed: {
@@ -209,7 +239,12 @@ export default {
         onSubmit() {
             this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
-            axios.post(this.endpoint, {users: this.selected, reason: this.reason})
+
+            /* TODO How to reach into ckeditor value
+             */
+            let reason = document.querySelector('textarea[name="reason"]').value;
+
+            axios.post(this.endpoint, {users: this.selected, reason: reason})
                 .then(() => {
                     // Clear the select, so they don't show next time this opens
                     this.selected = [];
@@ -243,6 +278,32 @@ export default {
         onCancel() {
             this.$emit(EVENTS.cancel);
         },
+
+        /**
+         * to be able to udpate the reason using dynamic-input.vue
+         */
+        onEditReasonSelected () {
+            this.hasSelectedModify = true;
+            this.allowReasonEdit = false;
+        },
+
+        /**
+         * post the changed reason value to the backend
+         * and then close the modal
+         *
+         * @param { string }
+         */
+        onSaveReasonSelected (value) {
+            console.warn(value);
+        },
+
+        /**
+         * The modal is now completely closed
+         */
+        onModalClosed () {
+            this.hasSelectedModify = false;
+            this.allowReasonEdit = true;
+        },
     },
 }
 </script>
@@ -262,9 +323,23 @@ export default {
         </div>
 
         <div>
-            <!-- TODO Add bastardised version of add-comment-input.vue here -->
-            <!-- such that it can be reused without being so specific -->
-            <textarea v-model="reason" rows="5" cols="50"></textarea>
+            <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
+            <button v-if="this.allowReasonEdit" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
+            <dynamic-input
+                v-if="hasSelectedModify"
+                preset-unique-id="reason"
+                inputName="reason"
+                singular="reason"
+                :proxy="'reason-proxy'"
+                :value="''"
+                :allow-edit="true"
+                :allow-submit="true"
+                :spawn-immediately="true"
+                :is-processing="true"
+                :cdn-prefix="this.cdnPrefix"
+                :site-version="this.siteVersion"
+                @post="onSaveReasonSelected"
+            ></dynamic-input>
         </div>
 
         <!--
