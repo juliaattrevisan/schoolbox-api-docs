@@ -181,6 +181,31 @@
         return init(config);
     };
 
+    /**
+     * Retrieve a basic configuration for comment CKEditor instance
+     * With no audio / video / image embeds
+     *
+     * @param { Object } overrideConfig any overrides of the default configuration
+     *
+     * @returns { Object }
+     */
+     $.alaressEditorConfigBasic = function (overrideConfig = {}) {
+        const config = {
+            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed,schoolboxiframe',
+            removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+            toolbarGroups: [
+                { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+                { name: 'paragraph', groups: ['list', 'blocks', 'bidi'] },
+                { name: 'insert', groups: ['insert'] },
+            ],
+            height: '4rem',
+            resize_enabled: true,
+            toolbarCanCollapse: false,
+            ...overrideConfig
+        }
+        return init(config);
+    };
+
 
     /**
      * Retrieve a configuration for a CKEditor instance, including user tokens

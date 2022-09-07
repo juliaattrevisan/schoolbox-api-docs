@@ -9,6 +9,8 @@ import Toast from "@schoolboxVue/components/toast";
 import vSelect from "vue-select";
 import debounce from "lodash/debounce";
 import "vue-select/dist/vue-select.css";
+import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 // Render a custom template for the deselect icon.
 // Partially documented on https://github.com/sagalbot/vue-select/issues/994
@@ -37,11 +39,26 @@ const SEARCH_RESULT_RETRIEVE_DELAY = 350;
  * @emits cancel The award badge action was cancelled
  */
 export default {
+    /**
+     * Mixins.
+     * Basically traits for vue; allows you to share javascript between components in the same
+     * manner as a php trait. They must already be imported at the top of the file and will
+     * be superpositioned on top of this javascript here, inside export default {}
+     */
+    mixins: [
+        cdnPrefixMixin,
+    ],
     components: {
         BadgeImage,
         Toast,
-        vSelect
+        vSelect,
+        DynamicInput
     },
+    /**
+     * Props.
+     * Immutable props that were passed to this component, usually via twig, in our setup.
+     * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
+     */
     props: {
         /**
          * The badge to display in this detail panel.
@@ -134,13 +151,23 @@ export default {
         expiry: {
             type: Number,
             default: null,
-        }
+        },
+
+        /* Either "goal" or "achievement" depending on the context of this badge
+         * being awarded - there are nuanced behaviours depending on whether this
+         * badge was awarded as an achievemtn, or set as a goal
+         */
+        type: String,
+
+        isModalOpen: Boolean,
+        siteVersion: String
     },
     data() {
         return {
             options: [],
             selected: [],
-            isFormSubmitActive: false
+            isFormSubmitActive: false,
+            reason: '', //the reason the badge(s) are being awarded
         }
     },
     computed: {
@@ -208,7 +235,8 @@ export default {
         onSubmit() {
             this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
-            axios.post(this.endpoint, {users: this.selected})
+
+            axios.post(this.endpoint, {users: this.selected, reason: this.reason})
                 .then(() => {
                     // Clear the select, so they don't show next time this opens
                     this.selected = [];
@@ -242,6 +270,23 @@ export default {
         onCancel() {
             this.$emit(EVENTS.cancel);
         },
+
+        /**
+         * To keep track of the reason, that's being updated by dynamic-input.vue
+         *
+         * @param { string }
+         */
+        onReasonChanged (newValue) {
+            this.reason = newValue;
+        },
+
+        /**
+         * The modal is now completely closed so reset
+         */
+        onModalClosed () {
+            this.isModalOpen = false;
+            this.reason = '';
+        },
     },
 }
 </script>
@@ -258,6 +303,28 @@ export default {
                 <badge-image :badge="badge"></badge-image>
                 <h3>{{ badge.name }}</h3>
             </div>
+        </div>
+
+        <div>
+            <!-- Only achievements can do this -->
+            <template v-if="'achievement' === type">
+                <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
+
+                <dynamic-input
+                    v-if="this.isModalOpen"
+                    preset-unique-id="reason"
+                    inputName="reason"
+                    singular="''"
+                    :value="''"
+                    :allow-edit="true"
+                    :allow-submit="false"
+                    :spawn-immediately="true"
+                    :is-processing="true"
+                    :cdn-prefix="this.cdnPrefix"
+                    :site-version="this.siteVersion"
+                    @value-changed="onReasonChanged"
+                ></dynamic-input>
+            </template>
         </div>
 
         <!--

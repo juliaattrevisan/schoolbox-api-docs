@@ -30,6 +30,8 @@
         get-student-lists-endpoint="{{ routeLookup('learningBadgeAward.getListByFolderId', {folderId: folder.getId, folder: folder}) }}"
         return-url-name="{{ RETURN_URL.name }}"
         encoded-return-url="{{ RETURN_URL.current }}"
+        cdn-prefix="{{ CDN_PREFIX }}"
+        site-version="{{ config.site_version }}"
     >
     </badge-report>
 </div>

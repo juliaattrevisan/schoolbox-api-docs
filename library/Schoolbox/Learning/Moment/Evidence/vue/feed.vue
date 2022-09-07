@@ -467,7 +467,7 @@ export default {
             </ul>
         </reveal-modal>
 
-        <award-detail-modal ref="awardDetailModal"></award-detail-modal>
+        <award-detail-modal ref="awardDetailModal" :cdn-prefix="this.cdnPrefix" :site-version="this.siteVersion"></award-detail-modal>
 
         <toast ref="toast"></toast>
     </div>
