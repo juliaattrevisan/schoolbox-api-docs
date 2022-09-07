@@ -13,7 +13,7 @@ export const DIRECTION = {
     BACKWARDS: 'backwards',
 }
 
-export const useModalActiveCodesStore = defineStore(`csModelActive-${randomId()}`, {
+export const useModalActiveCodesStore = defineStore(`csModelActive__${randomId()}`, {
 
     state: () => ({
         idList: [], //ids of the selected nodes

@@ -8,8 +8,9 @@ import { useCodesStore } from './csCodesStore';
 
 
 export let apiEndpoint = '';
+// export let uniqueId = 0;
 
-export const useStore = defineStore(`curriculumSelector-${randomId()}`, {
+export const useStore = defineStore(`curriculumSelector__${randomId()}`, {
 
     state: () => ({
         isLoading: true, //to display loading note
@@ -34,7 +35,7 @@ export const useStore = defineStore(`curriculumSelector-${randomId()}`, {
     actions: {
 
         /**
-         * load the top level curriculums
+         * load the top level curricula
          *
          * @param { String }
          */

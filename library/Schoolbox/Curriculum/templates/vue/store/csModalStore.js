@@ -7,7 +7,7 @@ import { randomId } from '@js/util/jsUtils';
 import { useModalSelectedCodesStore } from './csModalSelectedCodesStore';
 
 
-export const useModalStore = defineStore(`csModal-${randomId()}`, {
+export const useModalStore = defineStore(`csModal__${randomId()}`, {
 
     state: () => ({
         isOpen: false, //to notify that the modal is opened / closed

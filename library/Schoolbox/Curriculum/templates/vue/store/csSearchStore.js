@@ -11,7 +11,7 @@ import { useSelectedCodesStore } from './csSelectedCodesStore';
 const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
 const CAPPED_RESULTS_LENGTH = 50; //the maximum amount of results to show
 
-export const useSearchStore = defineStore(`csSearch-${randomId()}`, {
+export const useSearchStore = defineStore(`csSearch__${randomId()}`, {
 
     state: () => ({
         isProcessing: false, //to notify that an action is taking place,
