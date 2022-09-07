@@ -6,7 +6,13 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Database\Predicate\InvalidColumnException;
+use Aura\Router\Exception\RouteNotFound;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Assessment\Term\Model;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
@@ -19,14 +25,14 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     /**
      * @var Term\Mapper
      */
-    private $termMapper;
+    private Term\Mapper $termMapper;
 
     /**
      * Is the external DB enabled in the admin config?
      *
      * @var bool
      */
-    private $externalDbEnabled;
+    private bool $externalDbEnabled;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -34,7 +40,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      * @return bool Whether to continue on and attempt Component render
      * @throws InvalidArgumentException If unable to find a specified mapper class
      */
-    public function execute()
+    public function execute(): bool
     {
         /** @var Term\Mapper $termMapper */
         $termMapper              = $this->getMapperFactory()->get(Term\Mapper::class);
@@ -46,6 +52,15 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     }
 
     /**
+     * @return Model
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function getCurrentTerm(): Model
+    {
+        return $this->termMapper->findForDateAndYearLevel(Alaress_Date_Format::now(), $this->getContext()->getYearLevels()->first());
+    }
+
+    /**
      * Renders the data into the SitePage. Presentation logic.
      *
      * @param String $templateHandle
@@ -54,13 +69,13 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      * @throws LogicException
      * @throws PDOException
      * @throws RuntimeException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws InvalidColumnException
+     * @throws NotFoundExceptionInterface|ContainerExceptionInterface
+     * @throws RouteNotFound
+     * @throws DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function renderTemplate($templateHandle)
+    public function renderTemplate($templateHandle): bool
     {
         $isGroupPage  = $this->getContext()->isGroup();
         $isClassPage  = $this->getContext()->isClass();
@@ -68,7 +83,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $isUnitPage   = $this->getContext()->hasUnitSpecification();
         $isCoursePage = $this->getContext()->hasCourseSpecification();
         $lmsEnabled   = $this->getConfigLoader()->get(ConfigMapper::NAME_LMS_ENABLED);
-
 
         // If context is not a group, unit or class, render nothing
         if (!$isGroupPage && !$isClassPage && !$wasClassPage && !$isUnitPage && !$isCoursePage) {
@@ -108,7 +122,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'qrcode_link', 'qrcode_link_block');
 
         // Determine the term for the grades link
-        $currentTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getContext()->getYearLevels()->first());
+        $currentTerm = $this->getCurrentTerm();
 
         // Show markbook link to staff on class or group pages
         $this->setVar('markbook_link_block');
@@ -177,7 +191,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->parse('award_list_link_block', 'award_list_link');
             $hasClassActions = true;
         } else {
-            $this->setVar('award_list_link_block', '');
+            $this->setVar('award_list_link_block');
         }
 
         /* Assessment Calendar Link
@@ -221,7 +235,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->parse('qrcode_link_block', 'qrcode_link');
             $hasClassActions = true;
         } else {
-            $this->setVar('qrcode_link_block', '');
+            $this->setVar('qrcode_link_block');
         }
 
         $involvedInGroup = $isGroupPage && $this->getAccess()->involvedInGroup(
@@ -243,20 +257,20 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         ];
         if (
             ($involvedInGroup || $involvedInClass)
-            && UserAccess::ACCESS_READ === $this->getContentPermission()
             && $lmsEnabled
+            && UserAccess::ACCESS_READ === $this->getContentPermission()
             && $this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())
         ) {
             $this->setVar('STUDENT_GRADE_LINK', $this->getRouter()->generate($route, $params));
             $this->parse('student_grades_block', 'student_grades');
             $hasClassActions = true;
         } else {
-            $this->setVar('student_grades_block', '');
+            $this->setVar('student_grades_block');
         }
 
         // Not a class, or externalDB disabled, or no write access?
         if (!$isClassPage || !$this->externalDbEnabled || $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-            $this->setVar('class_list_block', '');
+            $this->setVar('class_list_block');
         } else {
             $this->parse('class_list_block', 'class_list');
             $hasClassActions = true;
@@ -300,7 +314,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         // Output course modify link if course page
-        $this->setVar('course_link_block', '');
+        $this->setVar('course_link_block');
 
         /* Decide if you have WRITE permissions before providing Modify link
          */
@@ -308,55 +322,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('PAGE_COURSE_ID', (string)$this->getContext()->getCourseSpecification()->getId());
             $this->parse('course_link_block', 'course_link');
             $hasClassActions = true;
-        }
-
-        //analytics space
-        $this->setVar('analytics_section_block', '');
-        $hasAnalytics = false;
-        // Class analytics link
-        $this->setVar('class_analytics_link_block', '');
-        if ($isClassPage) {
-            $cohortProfileRoute = 'intellischool.getClassAnalytics';
-            $params             = [
-                'folder'   => $this->getContext(),
-                'folderId' => $this->getContext()->getId(),
-            ];
-            if ($this->getAuthorizer()->isPathAuthorizedForUser($cohortProfileRoute, $params, $this->getUser())) {
-                $hasAnalytics = true;
-                $this->setVar('CLASS_ANALYTICS_LINK', $this->getRouter()->generate($cohortProfileRoute, $params));
-                $this->parse('class_analytics_link_block', 'class_analytics_link');
-            }
-        }
-
-        //schoolbox analytics
-        $this->setVar('schoolbox_analytics_link_block', '');
-        /**
-         * grab magic code to grab course IDs this is part of
-         */
-        $classListFactory = new Folder\ClassListFactory($this->getSitePage()->getDi()->get('databaseInternal'));
-        $courses = $classListFactory->findFoldersWithDueImportedAssessments(
-            [$this->getContext()->getId()],
-            $currentTerm->getStart(),
-            $currentTerm->getActualFinish()
-        );
-        if (0 !== count($courses[$this->getContext()->getId()])) {
-            $schoolboxAnalytics = 'learningAnalytics.folderWithTerm';
-            foreach ($courses[$this->getContext()->getId()] as $courseid => $courseTitle) {
-                $params = [
-                    'courseSpecId' => $courseid,
-                    'folderId'     => $this->getContext()->getId(),
-                    'termCode'     => $currentTerm->getCode(),
-                ];
-                if ($this->getAuthorizer()->isPathAuthorizedForUser($schoolboxAnalytics, $params, $this->getUser())) {
-                    $hasAnalytics = true;
-                    $this->setVar('SCHOOLBOX_ANALYTICS_LINK', $this->getRouter()->generate($schoolboxAnalytics, $params));
-                    $this->setVar('SCHOOLBOX_ANALYTICS_LINK_TITLE', $courseTitle);
-                    $this->parse('schoolbox_analytics_link_block', 'schoolbox_analytics_link', true);
-                }
-            }
-        }
-        if ($hasAnalytics) {
-            $this->parse('analytics_section_block', 'analytics_section');
         }
 
         return $hasClassActions;
@@ -368,8 +333,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      *
      * @return string|null
      * @throws RuntimeException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws NotFoundExceptionInterface|ContainerExceptionInterface
+     * @throws RouteNotFound
      */
     private function buildMarkbookLink(): ?string
     {
@@ -394,10 +359,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      *
      * @param bool $isUnitPage
      * @param bool $isCoursePage
-     * @return string
+     * @return ?string
      * @throws RuntimeException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws NotFoundExceptionInterface|ContainerExceptionInterface
+     * @throws RouteNotFound
      */
     private function buildCourseMarkbookLink(bool $isUnitPage, bool $isCoursePage): ?string
     {
