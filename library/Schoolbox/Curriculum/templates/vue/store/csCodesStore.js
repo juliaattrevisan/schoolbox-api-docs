@@ -5,7 +5,7 @@
 import { defineStore } from 'pinia';
 import { useStore, apiEndpoint } from './curriculumSelectorStore';
 import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
-// import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
+import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
 
 export const UNSET_ID = 0;
 
@@ -110,7 +110,9 @@ export const useCodesStore = defineStore('csCodesStore', {
                 const response = await fetch(`${apiEndpoint}/${id}?descendants=1`);
                 if (response.ok) {
                     const newNode = await response.json();
+                    newNode.children.forEach((node) => useSelectedCodesStore().addIsSelected(node));
                     const oldNode = findById(this.codes.children, id);
+                    useSelectedCodesStore().addIsSelected(oldNode);
                     oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
                     console.warn(response);
@@ -136,6 +138,7 @@ export const useCodesStore = defineStore('csCodesStore', {
                 children: nodes,
                 enabled: true,
             }
+            nodes.forEach((node) => useSelectedCodesStore().addIsSelected(node));
         },
 
     },

@@ -9,7 +9,7 @@ import { ref, computed, onMounted } from 'vue';
 import { gsap } from 'gsap/all';
 import { useModalActiveCodesStore, DIRECTION } from '../store/csModalActiveCodesStore';
 // import { useSearchStore } from '../store/mcSearchStore';
-// import CsModalCodeCheckbox from './cs-modal-code-checkbox.vue';
+import CsModalCodeCheckbox from './cs-modal-code-checkbox.vue';
 import CsModalCodeName from './cs-modal-code-name.vue';
 
 
@@ -115,9 +115,9 @@ const title = computed(() => hasCode.value ? `[${props.code.code}] ${props.code.
 <template>
     <li ref="viewNodeEl">
         <div :class="`buttons-container`">
-            <!-- <cs-modal-code-checkbox
+            <cs-modal-code-checkbox
                 :code="props.code"
-            /> -->
+            />
             <cs-modal-code-name
                 :code="props.code"
                 :depth="props.depth"

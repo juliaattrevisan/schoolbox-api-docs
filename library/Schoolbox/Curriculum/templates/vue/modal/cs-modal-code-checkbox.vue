@@ -6,13 +6,13 @@
  */
 
 import { computed } from 'vue';
-import { UNSET_ID } from '../store/mcNodesStore';
-import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
-import { useSearchStore } from '../store/mcSearchStore';
+import { UNSET_ID } from '../store/csCodesStore';
+import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
+// import { useSearchStore } from '../store/mcSearchStore';
 
 
-const selectedNodesStore = useSelectedNodesStore();
-const searchStore = useSearchStore();
+const modalSelectedCodesStore = useModalSelectedCodesStore();
+// const searchStore = useSearchStore();
 
 
 const props = defineProps({
@@ -40,21 +40,25 @@ const props = defineProps({
 const isIdSet = computed(() => props.code.id !== UNSET_ID);
 
 /**
- * if the node is a child of one that's selected but is not in
- * the selected list it should be disabled
+ * If there's a code available, which means it can be selected
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => {
-    return props.code.isSelected && !selectedNodesStore.codesIds.includes(props.code.id);
-});
+const hasCode = computed(() => props.code.code && props.code.code !== '');
+
+/**
+ * Only show the checkbox if the node has an ide and a code
+ *
+ * @returns { Boolean }
+ */
+const isVisible = computed(() => isIdSet.value && hasCode.value);
 
 /**
  * Update the status of the checkbox based on whether it's selected or not
  *
  * @returns { Boolean }
  */
-const isChecked = computed(() => props.code.isSelected);
+const isChecked = computed(() => modalSelectedCodesStore.isSelected(props.code));
 
 /**
  * add or remove based on the current status
@@ -62,18 +66,17 @@ const isChecked = computed(() => props.code.isSelected);
  * @param { boolean }
  */
 function onChange (isChecked) {
-    selectedNodesStore.switch(props.code, isChecked);
+    modalSelectedCodesStore.switch(props.code, isChecked);
 }
 
 </script>
 
 <template>
-    <div v-if="isIdSet" class="checklist">
+    <div v-if="isVisible" class="checklist">
         <input
             :id="`checkbox-${props.code.id}`"
             type="checkbox"
             :value="props.code.id"
-            :disabled="isDisabled"
             :checked="isChecked"
             @change="onChange($event.target.checked)"
         />

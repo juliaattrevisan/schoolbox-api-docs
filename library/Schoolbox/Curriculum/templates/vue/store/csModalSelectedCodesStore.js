@@ -1,4 +1,4 @@
-/** 
+/**
  * Manages the currently selected codes relevant to the curent modal session
  */
 
@@ -7,20 +7,29 @@ import { useSelectedCodesStore } from './csSelectedCodesStore';
 
 
 export const useModalSelectedCodesStore = defineStore('csModalSelectedCodesStore', {
-    
+
     state: () => ({
         codes: [], //the currently selected codes in the current modal session, with any previously selected also considered
     }),
 
     getters: {
-       
+
         /**
          * Do we have any selected codes?
-         * 
+         *
          * @return { Boolean }
          */
         hasNoCodes () {
             return this.codes.length === 0;
+        },
+
+        /**
+         * just return an array of ids, used to compare if a code is selected or not
+         *
+         * @return { array }
+         */
+        codesIds () {
+            return this.codes.map((node) => node.id);
         },
 
     },
@@ -35,8 +44,8 @@ export const useModalSelectedCodesStore = defineStore('csModalSelectedCodesStore
         },
 
         /**
-         * add a code 
-         * 
+         * add a code
+         *
          * @param { Object }
          */
         add (codeToAdd) {
@@ -44,12 +53,22 @@ export const useModalSelectedCodesStore = defineStore('csModalSelectedCodesStore
         },
 
         /**
-         * remove a code 
-         * 
+         * remove a code
+         *
          * @param { Object }
          */
         remove (codeToRemove) {
             this.codes = this.codes.filter((code) => code.id !== codeToRemove.id);
+        },
+
+        /**
+         * to switch a nodes selection status
+         *
+         * @param { object }
+         * @param { boolean }
+         */
+        switch (node, isChecked) {
+            isChecked ? this.add(node) : this.remove(node);
         },
 
         /**
@@ -66,6 +85,17 @@ export const useModalSelectedCodesStore = defineStore('csModalSelectedCodesStore
             useSelectedCodesStore().update(this.codes);
         },
 
+        /**
+         * to check if a code is selected
+         *
+         * @param { Object }
+         *
+         * @returns { boolean }
+         */
+        isSelected (code) {
+            return this.codesIds.includes(code.id);
+        },
+
     },
-    
+
 })
