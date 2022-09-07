@@ -6,11 +6,9 @@
  */
 
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
-import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 
 const viewNodesStore = useViewNodesStore();
-const activeNodeStore = useActiveNodeStore();
 
 /**
  * to display the just selected node
@@ -25,10 +23,9 @@ function onSelected (depth, id) {
 </script>
 
 <template>
-    <ul class="breadcrumb">
-        <li v-for="(breadcrumb) in viewNodesStore.breadcrumbs">
+    <TransitionGroup name="list" class="breadcrumb" tag="ul">
+        <li v-for="(breadcrumb) in viewNodesStore.breadcrumbs" :key="breadcrumb.id">
             <a
-                :class="`${ activeNodeStore.isActive ? 'disabled' : '' }`"
                 :href="`/curricululm/${breadcrumb.id}`"
                 :title="`View ${breadcrumb.name}`"
                 @click.prevent="onSelected(breadcrumb.depth, breadcrumb.id)"
@@ -37,13 +34,22 @@ function onSelected (depth, id) {
                 {{ breadcrumb.name }}
             </a>
         </li>
-    </ul>
+    </TransitionGroup>
 </template>
 
 <style lang="scss" scoped>
 
-.disabled {
-    opacity: 0.5;
+.list-enter-active,
+.list-leave-active {
+    transition: all 0.3s ease;
+}
+.list-enter-from {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+.list-leave-to {
+    opacity: 0;
+    transform: translateX(10px);
 }
 
 </style>
