@@ -315,8 +315,7 @@ export default {
                     <!-- If there's no value here, provide empty state -->
                     <template v-if="!(award.reason && award.reason.length)">
                         <div class="empty-state" v-if="this.allowReasonEdit">
-                            <i class="icon-badge"></i>
-                            <p>Provide <a @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected">evidence</a> for this badge.</p>
+                            <p><a @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected">Provide evidence</a> to demonstrate how this was achieved.</p>
                         </div>
                     </template>
                 </template>
