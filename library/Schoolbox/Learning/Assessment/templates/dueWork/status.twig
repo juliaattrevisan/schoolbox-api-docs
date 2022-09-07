@@ -559,9 +559,8 @@
                     });
 
                     {# Handle clicks on confirm popup buttons #}
-                    $('#confirm-dialog .button.yes'   ).click(function () {postSobo(true );});
-                    $('#confirm-dialog .button.no'    ).click(function () {postSobo(false);});
-                    $('#confirm-dialog .button.cancel').click(function () {$('#confirm-dialog').foundation('reveal', 'close');});
+                    $('#confirm-dialog .button[data-yes]').click(function () {postSobo(true );});
+                    $('#confirm-dialog .button[data-no]' ).click(function () {postSobo(false);});
 
                     /**
                      * Send a post request to the server, notifying that:
@@ -712,8 +711,8 @@
                 <p>Did the student submit their work on time?</p>
             </div>
             <ul class="flex-list buttons">
-                <li><a class="button no" data-no>No, they submitted late</a></li>
-                <li><a class="button submit yes" data-yes>Yes, they submitted on-time</a></li>
+                <li><a class="button" data-no>No, they submitted late</a></li>
+                <li><a class="button submit" data-yes>Yes, they submitted on-time</a></li>
             </ul>
         </div>
 
