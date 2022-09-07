@@ -74,6 +74,7 @@ export default {
                 count: null,
                 cursor: null,
             },
+            isModalOpen: false,
             showSkeletonLoader: true,
             selectedFilters: null,
         }
@@ -123,6 +124,7 @@ export default {
          * @param {Object} badge
          */
         openAwardAsAchievementModal(badge) {
+            this.isModalOpen = true;
             this.currentBadge = badge;
             this.$refs.awardAsAchievementModal.open();
         },
@@ -131,6 +133,7 @@ export default {
          * Closes the modal window for the award form.
          */
         closeAwardAsAchievementModal() {
+            this.isModalOpen = false;
             this.$refs.awardAsAchievementModal.close();
         },
 
@@ -140,6 +143,7 @@ export default {
          * @param {Object} badge
          */
         openSetAsGoalModal (badge) {
+            this.isModalOpen = true;
             this.currentBadge = badge;
             this.$refs.setAsGoalModal.open();
         },
@@ -150,6 +154,7 @@ export default {
          * @param {Object} badge
          */
         closeSetAsGoalModal (badge) {
+            this.isModalOpen = false;
             this.$refs.setAsGoalModal.close();
         },
 
@@ -264,6 +269,13 @@ export default {
         onBadgeSelected (badge, isChecked) {
             this.$emit('on-badge-selected', badge, isChecked);
         },
+
+        /**
+         * The modal is now completely closed so reset
+         */
+        onModalClosed () {
+            this.isModalOpen = false;
+        },
     }
 }
 </script>
@@ -363,7 +375,7 @@ export default {
             <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>
         </reveal-modal>
 
-        <reveal-modal size="medium" ref="awardAsAchievementModal" :closeOnBackgroundClick="false">
+        <reveal-modal size="medium" ref="awardAsAchievementModal" :closeOnBackgroundClick="false" @closed="onModalClosed">
             <badge-award
                 v-if="currentBadge"
                 :key="'awardAchievement-' + String(currentBadge.id)"
@@ -372,6 +384,7 @@ export default {
                 :expiry="currentBadge.achievementExpiry"
                 :cdn-prefix="this.cdnPrefix"
                 :site-version="this.siteVersion"
+                :is-modal-open="this.isModalOpen"
                 @cancel="closeAwardAsAchievementModal"
                 @done="closeAwardAsAchievementModal"
                 placeholder="Search for users to award achievement to"
@@ -393,7 +406,7 @@ export default {
             </badge-award>
         </reveal-modal>
 
-        <reveal-modal size="medium" ref="setAsGoalModal" :closeOnBackgroundClick="false">
+        <reveal-modal size="medium" ref="setAsGoalModal" :closeOnBackgroundClick="false" @closed="onModalClosed">
             <badge-award
                 v-if="currentBadge"
                 :key="'setGoal-' + String(currentBadge.id)"

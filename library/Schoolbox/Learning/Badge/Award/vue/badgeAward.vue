@@ -153,20 +153,14 @@ export default {
             default: null,
         },
 
+        isModalOpen: Boolean,
         siteVersion: String
     },
     data() {
         return {
             options: [],
             selected: [],
-            reason: null,
             isFormSubmitActive: false,
-            /**
-             * so dynamic-input.vue is only in the dom while the modal is active
-             * we do this to avoid issues around ckeditor instantiation coupled with modals
-             * where opening, closing, then re-opening a modal causes the ckeditor to break
-             */
-            isModalOpen: false,
             reason: '', //the reason the badge(s) are being awarded
         }
     },
@@ -316,7 +310,7 @@ export default {
             <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
 
             <dynamic-input
-                v-if="true"
+                v-if="this.isModalOpen"
                 preset-unique-id="reason"
                 inputName="reason"
                 singular="''"
