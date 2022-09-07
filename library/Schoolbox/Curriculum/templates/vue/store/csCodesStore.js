@@ -22,21 +22,12 @@ export const useCodesStore = defineStore('csCodesStore', {
     actions: {
 
         /**
-         * Add in all the codes for display
-         *
-         * @param { Array }
-         */
-        // load (codes) {
-        //     this.codes = codes;
-        // },
-
-        /**
          * check if the top level is loaded in the session storage already
          * so we don't reload
          */
          initTopLevel () {
             /**
-             * Hold off on this for now, I'll need to think a bit more on what to store in the session storage
+             * @TODO - Hold off on this for now, I'll need to think a bit more on what to store in the session storage
              * before I enable this.
              */
             // if (sessionStorage.getItem(SB_CURRICULUM_TOP_LEVEL)) {
@@ -63,7 +54,7 @@ export const useCodesStore = defineStore('csCodesStore', {
          async loadTopLevel () {
             const store = useStore();
             try {
-                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1`);
+                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1`);
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     // sessionStorage.setItem(SB_CURRICULUM_TOP_LEVEL, JSON.stringify(topLevelNodes)); //session storage vars need to be saved as strings only
@@ -107,7 +98,7 @@ export const useCodesStore = defineStore('csCodesStore', {
                 return;
             }
             try {
-                const response = await fetch(`${apiEndpoint}/${id}?descendants=1`);
+                const response = await fetch(`${apiEndpoint}/${id}?descendants=1&enabled=1`);
                 if (response.ok) {
                     const newNode = await response.json();
                     newNode.children.forEach((node) => useSelectedCodesStore().addIsSelected(node));

@@ -14,7 +14,7 @@ import CsSearchInput from './cs-search-input.vue';
 import CsSelectedCodes from './cs-selected-codes.vue';
 import CsSearchResults from './cs-search-results.vue';
 import CsModal from './modal/cs-modal.vue';
-// import CsActiveSelectedCodeModal from './cs-active-selected-code-modal.vue';
+import CsActiveSelectedCodeModal from './cs-active-selected-code-modal.vue';
 
 
 const props = defineProps({
@@ -93,7 +93,7 @@ function checkForStorybook () {
         <cs-search-results />
     </div>
     <cs-modal />
-    <!-- <cs-active-selected-code-modal /> -->
+    <cs-active-selected-code-modal />
 </template>
 
 <style lang="scss" scoped>
