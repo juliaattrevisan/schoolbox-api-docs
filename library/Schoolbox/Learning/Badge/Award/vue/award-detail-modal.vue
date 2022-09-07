@@ -84,6 +84,8 @@ export default {
              * This toggles to false when you spawn the ckeditor
              */
             allowReasonEdit: true,
+
+            reason: '', //the reason the badge(s) are being awarded
         }
     },
 
@@ -196,7 +198,7 @@ export default {
          */
         awardAchievement () {
             this.toastActivate('Awarding...');
-            this.convertToAchievement(this.award)
+            this.convertToAchievement(this.award, this.reason)
                 .then((response) => {
                     this.toastSuccess('Achievement awarded');
 
@@ -224,6 +226,15 @@ export default {
         },
 
         /**
+         * To keep track of the reason, that's being updated by dynamic-input.vue
+         *
+         * @param { string }
+         */
+        onReasonChanged (newValue) {
+            this.reason = newValue;
+        },
+
+        /**
          * post the changed reason value to the backend
          * and then close the modal
          *
@@ -239,6 +250,7 @@ export default {
         onModalClosed () {
             this.hasSelectedModify = false;
             this.allowReasonEdit = true;
+            this.reason = '';
         },
     }
 }
@@ -324,6 +336,7 @@ export default {
                             :cdn-prefix="this.cdnPrefix"
                             :site-version="this.siteVersion"
                             @post="onSaveReasonSelected"
+                            @value-changed="onReasonChanged"
                         ></dynamic-input>
                     </form>
                 </template>
