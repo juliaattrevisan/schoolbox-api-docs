@@ -230,13 +230,6 @@ export default {
             this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
 
-            // /* TODO How to reach into ckeditor value
-            //  */
-            // let reason = document.querySelector('textarea[name="reason"]').value;
-            // let reason = CKEDITOR.instances['reason'].getData() maybe
-
-            console.log(this.reason);
-
             axios.post(this.endpoint, {users: this.selected, reason: this.reason})
                 .then(() => {
                     // Clear the select, so they don't show next time this opens
