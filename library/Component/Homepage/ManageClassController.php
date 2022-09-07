@@ -84,7 +84,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $isCoursePage = $this->getContext()->hasCourseSpecification();
         $lmsEnabled   = $this->getConfigLoader()->get(ConfigMapper::NAME_LMS_ENABLED);
 
-
         // If context is not a group, unit or class, render nothing
         if (!$isGroupPage && !$isClassPage && !$wasClassPage && !$isUnitPage && !$isCoursePage) {
             return false;
