@@ -6,7 +6,7 @@ import { defineStore } from 'pinia';
 import { useSelectedCodesStore } from './csSelectedCodesStore';
 
 
-export const useModalSelectedCodesStore = defineStore('csModalSelectedCodesStore', {
+export const useModalSelectedCodesStore = defineStore('csModalSelectedCodes', {
 
     state: () => ({
         codes: [], //the currently selected codes in the current modal session, with any previously selected also considered

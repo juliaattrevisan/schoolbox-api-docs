@@ -8,7 +8,7 @@ import { useCodesStore } from './csCodesStore';
 
 export let apiEndpoint = '';
 
-export const useStore = defineStore('curriculumSelectorStore', {
+export const useStore = defineStore('curriculumSelector', {
 
     state: () => ({
         isLoading: true, //to display loading note

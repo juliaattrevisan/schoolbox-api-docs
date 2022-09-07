@@ -5,7 +5,7 @@
 import { defineStore } from 'pinia';
 
 
-export const useSelectedCodesStore = defineStore('csSelectedCodesStore', {
+export const useSelectedCodesStore = defineStore('csSelectedCodes', {
 
     state: () => ({
         codes: [], //the currently selected codes

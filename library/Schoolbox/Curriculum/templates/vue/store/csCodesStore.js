@@ -10,7 +10,7 @@ import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
 export const UNSET_ID = 0;
 
 
-export const useCodesStore = defineStore('csCodesStore', {
+export const useCodesStore = defineStore('csCodes', {
 
     state: () => ({
         codes: [], //all the codes currenty loaded
