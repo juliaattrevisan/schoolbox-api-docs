@@ -134,13 +134,13 @@
                     <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
                         {%- apply spaceless %}
                             {% if pActionResponses %}
-                                <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}" data-inline-grader>View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
+                                <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.givenName }}" data-inline-grader>View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
                             {% endif %}
                             {% if pActionSummary %}
-                                <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ responseHistory }}</a></li>
+                                <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.givenName }}'s history">{{ responseHistory }}</a></li>
                             {% endif %}
                             {% if pActionSobo %}
-                                <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.firstName }}">Submit on behalf of {{ participant.user.firstName }}</a></li>
+                                <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.givenName }}">Submit on behalf of {{ participant.user.givenName }}</a></li>
                             {% endif %}
                         {% endapply -%}
                     </ul>
@@ -336,8 +336,8 @@
              role="dialog">
             <h2>Acknowledge Receipt of Submission</h2>
             <p id="checkbox-switch-container">
-                The due date for this work has passed.<br/>
-                Did all students below submit their work on time?
+                <span class="alert-box warning">{{ assessment.title }} is now overdue</span>
+                Did these students submit their work on time? <br />
                 <span class="switch">
                     <input id="onTimeCheckboxSwitch" type="checkbox" checked="">
                     <label for="onTimeCheckboxSwitch">
@@ -704,9 +704,9 @@
 
         <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
             <div>
-                <h2>The due date for this work has passed.</h2>
-                <a class="close-reveal-modal" aria-label="Close">x</a>
-                <p>Did the student submit their work on time?</p>
+                <h2>Please confirm if this student has submitted their work on time?</h2>
+                <a class="close-reveal-modal" aria-label="Close">×</a>
+                <p>{{ assessment.title }} is currently overdue, please confirm if you would like to acknowledge the students submission before the due date. If you answer no, the students work will be marked as submitted late.</p>
             </div>
             <ul class="flex-list buttons">
                 <li><a class="button" data-no>No, they submitted late</a></li>

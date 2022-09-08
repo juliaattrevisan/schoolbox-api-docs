@@ -697,6 +697,7 @@ class Controller extends Base
 
         $user->setTitle($post['title']);
         $user->setFirstname($post['firstname']);
+        $user->setPreferredName($post['preferred_name']);
         $user->setLastname($post['lastname']);
         $user->setExternalId($post['database_id'] == '' ? null : $post['database_id']);
         $user->getRole()->setId($post['group']);

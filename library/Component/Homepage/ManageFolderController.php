@@ -11,7 +11,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_ManageFolderController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var Group
      */
@@ -50,7 +49,6 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         if (!parent::loadTemplate($templateHandle, 'manageFolder')) {
             return false;
         }
-//        $this->parseConfig();
 
         $this->setBlock($templateHandle, "manage_page", "manage_page_block");
         $this->setBlock($templateHandle, "stats_data", "stats_data_block");

@@ -61,6 +61,7 @@ class ModelToArrayTest extends TestCase
             'enabled'          => false,
             'title'            => null,
             'firstName'        => null,
+            'preferredName'    => null,
             'lastName'         => null,
             'fullName'         => 'Unknown User',
             'isEmailDerived'   => null,
@@ -113,6 +114,7 @@ class ModelToArrayTest extends TestCase
             ->setEnabled(true)
             ->setTitle('Mr')
             ->setFirstname('John')
+            ->setPreferredName('Jack')
             ->setLastname('Doe')
             ->setLocalEmail(false)
             ->setAltEmail('mrjohndoe@mail.com')
@@ -166,6 +168,7 @@ class ModelToArrayTest extends TestCase
                 'enabled'          => true,
                 'title'            => 'Mr',
                 'firstName'        => 'John',
+                'preferredName'    => 'Jack',
                 'lastName'         => 'Doe',
                 'fullName'         => 'Mr John Doe',
                 'isEmailDerived'   => false,

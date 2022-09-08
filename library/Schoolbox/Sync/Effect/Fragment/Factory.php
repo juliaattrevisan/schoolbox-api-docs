@@ -23,7 +23,6 @@ use Schoolbox\Config\Loader as ConfigLoader;
  */
 class Factory
 {
-
     /**
      * Various types
      */
@@ -54,6 +53,7 @@ class Factory
 
         'title' => 'Title' ,
         'firstname' => 'Firstname',
+        'preferredName' => 'Preferred Name',
         'lastname' => 'Surname',
         'year' => 'Year Level',
         'positionTitle' => 'Position Title',

@@ -55,6 +55,14 @@ class Model implements ISoftDeletable
 
 
     /**
+     * The reason a badge was awarded to someone
+     *
+     * @var string|null
+     */
+    private ?string $reason = null;
+
+
+    /**
      * @var User
      */
     private User $awardedBy;
@@ -165,6 +173,26 @@ class Model implements ISoftDeletable
     public function setStatus(string $status): self
     {
         $this->status = $status;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getReason(): ?string
+    {
+        return $this->reason;
+    }
+
+
+    /**
+     * @param string|null $reason
+     * @return Model
+     */
+    public function setReason(?string $reason): self
+    {
+        $this->reason = $reason;
         return $this;
     }
 

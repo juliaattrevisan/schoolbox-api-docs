@@ -100,13 +100,13 @@ Usage:
             // Reset checkboxes
             $filterPanel.find('input[type=checkbox][data-value-default]').each(function(idx, elem){
                 let $checkbox = $(elem);
-                $checkbox.prop('checked', $checkbox.data('value-default'));
+                $checkbox.prop('checked', $checkbox.data('value-default')).trigger('change');
             });
 
             // Reset text inputs
             $filterPanel.find('input[type=text][data-value-default]').each(function(idx, elem){
                 let $input = $(elem);
-                $input.val($input.data('value-default'));
+                $input.val($input.data('value-default')).trigger('change');
             });
 
             // Reset selectizes
@@ -645,12 +645,15 @@ Usage:
 
                 // Labels are keyed by value for now, because the label could
                 // be in both a selectize and a standard option.
-                componentsInUse[filterId]['labels'] = {};
+                componentsInUse[filterId]['labels'] = [];
 
                 // Build list of labels from the selectize, if there is one
                 if (selectize) {
                     selectize.items.forEach(function (v) {
-                        componentsInUse[filterId]['labels'][v] = determineLabelFromSelectize(selectize, v);
+                        componentsInUse[filterId]['labels'].push({
+                            value: v,
+                            label: determineLabelFromSelectize(selectize, v),
+                        });
                     });
                 }
 
@@ -670,8 +673,13 @@ Usage:
                             label = label ? label : $component.find('label[for='+$elem.attr('id')+']').html();
                             value = $elem.attr('data-key');
                         }
-                        if (value && !(value in componentsInUse[filterId]['labels'])) {
-                            componentsInUse[filterId]['labels'][value] = label;
+
+                        // Don't add this label if it's already been added once
+                        if (value && !componentsInUse[filterId]['labels'].some(v => v.value === value)) {
+                            componentsInUse[filterId]['labels'].push({
+                                value: value,
+                                label: label,
+                            });
                         }
                     });
 
@@ -682,7 +690,7 @@ Usage:
                     // but it's impossible to tell if all are selected if there
                     // is a selectize, so keep the filter in that case.
                     if (!hasSelectize && $selected.length === $available.length) {
-                        componentsInUse[filterId]['labels'] = {};
+                        componentsInUse[filterId]['labels'] = [];
                     }
                 }
 
@@ -693,16 +701,17 @@ Usage:
                         // Try splitting on space
                         values.forEach(function (value) {
                             if (value.length > 0) {
-                                componentsInUse[filterId]['labels'][value] = value;
+                                componentsInUse[filterId]['labels'].push({
+                                    value: value,
+                                    label: value,
+                                });
                             }
                         });
                     });
                 }
 
-                // Flatten the list of selected labels into an array
-                componentsInUse[filterId]['labels'] = Array.from(
-                    Object.values(componentsInUse[filterId]['labels'])
-                );
+                // Flatten the list of selected labels into a unique set
+                componentsInUse[filterId]['labels'] = componentsInUse[filterId]['labels'].map(v => v.label);
 
                 // Remove components with no selected options
                 if (componentsInUse[filterId].labels.length === 0) {

@@ -42,12 +42,11 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
             {% endif %}
             <div data-cs-container>
                 <curriculum-selector
-                        :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
-                        :selected-codes="{{ codeList|json_encode }}"
-                        data-endpoint="{{ routeLookup('curriculumApi.getTree') }}"
-                        {% if group %}form-value-name="crits[{{ group.id }}][curriculumCode][]"{% endif %}
+                    :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
+                    :selected-codes="{{ codeList|json_encode }}"
+                    data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
+                    {% if group %}form-value-name="crits[{{ group.id }}][curriculumCode][]"{% endif %}
                 />
-
             </div>
         {% endif %}
     </div>

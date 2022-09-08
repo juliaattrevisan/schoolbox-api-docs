@@ -233,9 +233,9 @@ export default {
         /**
          * Format the date as specified
          *
-         * @param { Date } 
-         * @param { String } 
-         * 
+         * @param { Date }
+         * @param { String }
+         *
          * @returns { String }
          */
         formatDate (date, format) {
@@ -318,7 +318,7 @@ export default {
                                 <div class="tags">
                                   <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
                                       Tags:
-                                      <template v-for="(curriculumNode, index) in evidence.object.curriculumNodes" :key="`${index}-${curriculumNode.code}`"> 
+                                      <template v-for="(curriculumNode, index) in evidence.object.curriculumNodes" :key="`${index}-${curriculumNode.code}`">
                                           <template v-if="index !== 0">, </template>
                                           <span :title="curriculumNode.name">{{ curriculumNode.code }}</span>
                                       </template>
@@ -331,7 +331,7 @@ export default {
                             </div>
 
                             <div class="feed-comments small-12 columns">
-                                <comment-thread 
+                                <comment-thread
                                     :thread="evidence.object.discussionThread"
                                     :create-thread-endpoint="evidence.object._links.createThread"
                                     :can-comment="config.canComment"
@@ -408,7 +408,7 @@ export default {
 
                 <template v-else>
                     <!-- Parent or student -->
-                    <p>{{ config.student.firstname }} doesn't have any activity yet.</p>
+                    <p>{{ config.student.givenName }} doesn't have any activity yet.</p>
 
                     <!-- What can the current user do? -->
 
@@ -444,7 +444,7 @@ export default {
 
                     <!-- Can't share moments? -->
                     <p v-else>
-                        When {{ config.student.firstname }} or their teacher shares learning, it will appear here.
+                        When {{ config.student.givenName }} or their teacher shares learning, it will appear here.
                     </p>
 
                 </template>
@@ -467,7 +467,7 @@ export default {
             </ul>
         </reveal-modal>
 
-        <award-detail-modal ref="awardDetailModal"></award-detail-modal>
+        <award-detail-modal ref="awardDetailModal" :cdn-prefix="this.cdnPrefix" :site-version="this.siteVersion"></award-detail-modal>
 
         <toast ref="toast"></toast>
     </div>

@@ -1,0 +1,74 @@
+<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script>
+    $(function() {
+        $.fn.alaressEditor({
+            targetElements: $('#reason'),
+            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed,schoolboxiframe',
+            /* Why does EqnEditor stop my images loading?
+             */
+            removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
+            toolbarGroups: [
+                { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+                { name: 'paragraph', groups: ['list', 'blocks', 'bidi'] },
+                { name: 'insert', groups: ['insert'] },
+                { name: 'schoolbox', groups: ['schoolboxlink'] },
+            ],
+            resize_enabled: true,
+            toolbarCanCollapse: false
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ award.badge.name }}</h1>
+
+        <ul class="meta">
+            {% set recipientProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id}) %}
+            {% set awarderProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
+
+            <li class="icon-staff-students"><a href="{{ recipientProfileRoute }}">{{ award.recipient.fullname }}</a></li>
+            <li class="icon-view">Category: {{ award.badge.category.name }}</li>
+            <li class="icon-view">Awarded {{ award.awardedAt.relativeTime }} by
+                <a href="{{ awarderProfileRoute }}">{{ award.awardedBy.fullname }}</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            {# One of these visual representations was chosen
+             # Visual representation was mandatory in Badge Create
+             #}
+            <div class="badge-img-container content">
+                {% if award.badge.icon %}
+                    <img src=" {{ CDN_PREFIX }}{{ award.badge.icon }}" class="badge-image" alt="{{ award.badge.name }}" title="{{ award.badge.name }}" />
+                {% elseif award.badge.image.hash %}
+                    <img src="/storage/image.php?hash={{ award.badge.image.hash }}" class="badge-image" alt="{{ award.badge.name }}" title="{{ award.badge.name }}" />
+                {% endif %}
+            </div>
+
+            <article>{{ award.badge.body|purify }}</article>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
+
+        <form action="{{ postRoute }}" method="post">
+            <section>
+                <fieldset>
+                    <label>Reason</label>
+                    <textarea id="reason" name="reason">{{ award.reason }}</textarea>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Save" />
+        </form>
+    </div>
+</div>

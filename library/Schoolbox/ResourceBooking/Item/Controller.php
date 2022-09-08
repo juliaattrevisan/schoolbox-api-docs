@@ -31,7 +31,6 @@ use Schoolbox\Resource\Attachment\Zone;
 
 class Controller extends Base
 {
-
     /**
      * @var Mapper
      */
@@ -341,7 +340,6 @@ class Controller extends Base
                 $model->setImage($image);
             } catch (ResourceException $e) {
                 error(ErrorMapper::ERROR_USER_NOT_FOUND);
-                exit;
             }
         } else {
             $model->setImage(null);

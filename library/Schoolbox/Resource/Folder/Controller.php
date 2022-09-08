@@ -819,8 +819,7 @@ class Controller extends BaseController
 
                 $this->userAccessMapper->save($uA);
 
-                // TODO replace with routeLookup once it exists
-                return '/group/modify/' . $model->getId();
+                return $this->router->generate('group.getModify', ['folderId' => $model->getId(), 'folder' => $model]) . '?new=1';
             } else {
                 throw new UnexpectedValueException("I find your lack of access disturbing.");
             }

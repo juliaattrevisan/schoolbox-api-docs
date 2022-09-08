@@ -60,12 +60,12 @@ class EmailFactory
      *
      * @param string                    $template
      * @param string                    $subject
-     * @param string|array|Address|User $to
+     * @param Address|User|null         $to
      * @return TwigEmail
      * @see TwigEmail::__construct()
      *
      */
-    public function buildTwigEmail(string $template, string $subject, string | array | Address | User $to): TwigEmail
+    public function buildTwigEmail(string $template, string $subject, Address | User | null $to): TwigEmail
     {
         $twigEmail = new TwigEmail($subject, $to, $this->config, $this->dkimMapper);
         $twigEmail->setTemplate($template);
@@ -78,10 +78,10 @@ class EmailFactory
      * Non-twig email builder
      *
      * @param string                    $subject
-     * @param string|array|Address|User $to
+     * @param Address|User|null $to
      * @return Mailer
      */
-    public function buildSimpleEmail(string $subject, string | array | Address | User $to): Mailer
+    public function buildSimpleEmail(string $subject, Address | User | null $to): Mailer
     {
         return new Mailer($subject, $to, $this->config, $this->dkimMapper);
     }

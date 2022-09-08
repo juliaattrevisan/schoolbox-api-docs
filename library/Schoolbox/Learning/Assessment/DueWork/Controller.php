@@ -1594,7 +1594,11 @@ class Controller extends Assessment\Controller
 
         $rubricZone = new Zone('rubric');
         // JS file.type isn't set reliably enough to use text/csv mime filter
-        $rubricZone->setFileVar('rb_attach[]')->setAttachPrompt('Import a rubric');//->setMimeFilter('text/csv');
+        $rubricZone
+            ->setFileVar('rb_attach[]')
+            ->setAttachPrompt('Import a rubric')
+            ->useImportExpiryDate();
+        //->setMimeFilter('text/csv');
         $data['rubricAttachZone'] = $rubricZone->getTwigContext();
 
         $resultSets = $this->resultSetMapper->findAll();

@@ -132,7 +132,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             /* Get all the students belonging to this category code
              */
             $userMapper       = UserMapper::getInstance();
-            $synergyIds       = [];
+            $studentUserIds   = [];
 
             $studentPhotoHidden   = $this->getConfigLoader()->get('protect_student_photo');
             $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
@@ -149,7 +149,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
                 /* Accumulate this for a giant parent-based bcc
                  */
-                $synergyIds[] = $currentStudent['synergy_id'];
+                $studentUserIds[] = $user->getId();
 
                 $this->setVar(
                     [
@@ -202,8 +202,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             ) {
                 $this->setVar(
                     [
-                        'REPLY_TO'           => $this->getUser()->getEmail(),
-                        'EMAIL_ALL_STUDENTS' => implode(',', $synergyIds),
+                        'STUDENTS_USER_IDS' => implode(',', $studentUserIds),
                     ]
                 );
 
@@ -215,7 +214,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             /* Parent bulk email
              */
             if (
-                count($synergyIds)
+                count($studentUserIds)
                 && $this->getContentPermission() > UserAccess::ACCESS_READ
                 && $this->getConfigLoader()->get('email_all_parents')
                 && $this->getConfigLoader()->get('mail_enable')
@@ -223,8 +222,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             ) {
                 $this->setVar(
                     [
-                        'REPLY_TO'          => $this->getUser()->getEmail(),
-                        'EMAIL_ALL_PARENTS' => implode(',', $synergyIds),
+                        'STUDENTS_USER_IDS' => implode(',', $studentUserIds),
                     ]
                 );
 

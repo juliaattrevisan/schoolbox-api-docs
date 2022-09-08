@@ -17,7 +17,7 @@ const modalEl = ref(null);
  */
 watch(() => selectedCodesStore.hasActiveCode, (hasActiveCode) => {
     if (hasActiveCode) {
-        modalEl.value.open() 
+        modalEl.value.open()
     }
 });
 
@@ -44,14 +44,14 @@ function onModalClosed () {
 </script>
 
 <template>
-    <reveal-modal 
-        ref="modalEl" 
+    <reveal-modal
+        ref="modalEl"
         @closed="onModalClosed"
     >
         <template v-if="selectedCodesStore.hasActiveCode">
             <h2>{{ title }}</h2>
             <p class="meta">{{ selectedCodesStore.activeCode.breadcrumb }}</p>
-            <p>{{ selectedCodesStore.activeCode.description }}</p>
+            <div v-html="selectedCodesStore.activeCode.description"></div>
         </template>
     </reveal-modal>
 </template>

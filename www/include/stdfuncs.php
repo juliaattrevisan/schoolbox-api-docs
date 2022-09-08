@@ -22,6 +22,7 @@ use Alaress\Lumberjack\Logger;
  * @param string $message Replaces '%MESSAGE%' in $ec
  * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
  * @throws Exception
+ * @return never-return
  */
 function error($ec, $message = "", $code = 400)
 {
@@ -36,6 +37,7 @@ if (PHP_SAPI !== 'cli') {
      *
      * @param $code    - the HTTP code to send
      * @param $message - if numeric, will be looked up in the error table on the DB, otherwise displayed as-is
+     * @return never-return
      */
     function httpError($code, $message)
     {

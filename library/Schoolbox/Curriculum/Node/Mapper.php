@@ -44,7 +44,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertHeritage']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'disableChildren']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'disableOrReEnableChildren']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteChildren']);
     }
 
@@ -64,11 +64,12 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         }
 
         $i = 0;
+        /** @var Model $child */
         foreach ($model->getChildren() as $child) {
             $child
                 ->setLearningArea($model->getLearningArea())
                 ->setLearningLevel($model->getLearningLevel())
-                ->setParent($model->getId())
+                ->setParent($model)
                 ->setOrder($i++);
             $this->saveTree($child);
         }
@@ -138,34 +139,37 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     }
 
     /**
-     * Post-save callback: if this node is no longer enabled, disable all child
-     * nodes of the given node.
+     * Post-save callback:
+     * * if this node is no longer enabled, disable all child nodes
+     * * if this node was not enabled but is now, enable all child nodes
      *
-     * Note the reverse doesn't apply: enabling a node which was disabled
-     * doesn't re-enable its children. This is because the node might have
-     * children which should remain disabled.
+     * AS: I don't think enabling a node which was disabled should re-enable
+     * its children, because the node might have children which should remain
+     * disabled.
      *
      * This method applies recursively to each node's children: the action of
-     * disabling a node will call this method on the children.
+     * disabling or re-enabling a node will call this method on the children.
      *
      * @param Model      $model
      * @param Model|null $previous
      */
-    public function disableChildren(Model $model, Model $previous = null)
+    public function disableOrReEnableChildren(Model $model, Model $previous = null)
     {
-        $isEnabled  = $model->getEnabled();
-        $wasEnabled = $previous?->getEnabled() ?? true;
-        if (!$isEnabled && $wasEnabled) {
-            $this->updateAll(
-                $this->findByColumn(
-                    'curriculum_node_parent_id',
-                    $model->getId(),
-                ),
-                'enabled',
-                false,
-                self::CALLBACK_PRESAVE,
-                self::CALLBACK_POSTSAVE,
-            );
+        if ($previous) {
+            $isEnabled  = $model->getEnabled();
+            $wasEnabled = $previous->getEnabled();
+            if ($isEnabled !== $wasEnabled) {
+                $this->updateAll(
+                    $this->findByColumn(
+                        'curriculum_node_parent_id',
+                        $model->getId(),
+                    ),
+                    'enabled',
+                    $isEnabled,
+                    self::CALLBACK_PRESAVE,
+                    self::CALLBACK_POSTSAVE,
+                );
+            }
         }
     }
 
@@ -190,19 +194,23 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $sortDirection = 'DESC'
     ) {
         // Load all ancestors, no descendants
-        return $this->findByKeyword($keyword, $limit, $offset, 50, 0, false);
+        return $this->findByKeyword($keyword, $limit, $offset, 50, 0, false, null, null);
     }
 
     /**
      * Find all nodes which match a keyword.
      *
-     * @param string $keyword      The keyword to search for
-     * @param int    $limit        The max number of nodes to return
-     * @param int    $offset       The number of matching nodes to skip in the
-     *                             result
-     * @param int    $ancestors    How many levels of parent node to include
-     * @param int    $descendants  How many levels of child node to include
-     * @param bool   $topLevelOnly If true, return only nodes with no parent
+     * @param string    $keyword      The keyword to search for
+     * @param int       $limit        The max number of nodes to return
+     * @param int       $offset       The number of matching nodes to skip in
+     *                                the result
+     * @param int       $ancestors    How many levels of parent node to include
+     * @param int       $descendants  How many levels of child node to include
+     * @param bool      $topLevelOnly If true, return only nodes with no parent
+     * @param int|null  $parentId     If not null, search only within this
+     *                                node's descendants
+     * @param bool|null $enabled      If not null: return only nodes which are
+     *                                enabled (if true) or disabled (if false)
      * @return Collection|Model[]
      */
     public function findByKeyword(
@@ -212,23 +220,49 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         int $ancestors,
         int $descendants,
         bool $topLevelOnly,
+        ?int $parentId,
+        ?bool $enabled,
     ): Collection {
+        $filteredIds = null;
+        if (isset($parentId)) {
+            // Collate a list of descendant IDs
+            // (impossible without recursive query)
+            $filteredIds = $this->findDescendantIds([$parentId], 'curriculum_node_parent_id');
+            if (count($filteredIds) === 0) {
+                return $this->createCollection();
+            }
+        }
         $query = "
             SELECT
                 {$this->getColumnString('n')}
             FROM {$this->getTable()} n
-            WHERE n.deleted_at IS NULL
-            AND   (n.code LIKE :codeLike OR (n.code != '' AND n.name LIKE :nameLike))
         ";
+        $quotedLike = $this->getDatabase()->getQuoter()->escapeForLike($keyword);
+        $pb = $this->getPredicateBuilder()
+            ->isNull('n.deleted_at');
+        if ($keyword !== '') {
+            $pb = $pb->any(
+                $this->getPredicateBuilder()
+                    ->like('n.code', $quotedLike . '%')
+                    ->all(
+                        $this->getPredicateBuilder()
+                            ->notEquals('n.code', '')
+                            ->like('n.name', '%' . $quotedLike . '%')
+                    )
+            );
+        }
         if ($topLevelOnly) {
-            $query .= ' AND n.curriculum_node_parent_id IS NULL';
+            $pb = $pb->isNull('n.curriculum_node_parent_id');
+        }
+        if (isset($filteredIds)) {
+            $pb = $pb->in('n.id', $filteredIds);
+        }
+        if (isset($enabled)) {
+            $pb = $pb->equals('n.enabled', $enabled);
         }
 
-        $quotedLike = $this->getDatabase()->getQuoter()->escapeForLike($keyword);
-        $params     = [
-            'codeLike' => $quotedLike . '%',
-            'nameLike' => '%' . $quotedLike . '%',
-        ];
+        $query .= ' WHERE ' . $pb->getWhereIntersect() . ' ORDER BY n.name ASC, n.id ASC';
+        $params = $pb->getParams();
         if ($limit > 0) {
             $query .= ' LIMIT :limit';
         }
@@ -252,6 +286,20 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $result = $this->loadDescendants($result, 'parent', 'children', $descendants);
         return $result;
     }
+
+    /**
+     * Order by the name field, then by ID.
+     *
+     * @return array
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return [
+            'name' => 'asc',
+            'id'   => 'asc',
+        ];
+    }
+
 
     /**
      * Hydrates a curriculum node, with joins to area+source and level+source.
@@ -308,7 +356,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
-            'assessmentId' => $assessmentId
+            'assessmentId' => $assessmentId,
         ]);
 
         return $this;
@@ -333,7 +381,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         foreach ($curriculumNodes as $currentNode) {
             $statement->execute([
                 'curriculumNodeId' => $currentNode->getId(),
-                'assessmentId' => $assessmentId
+                'assessmentId' => $assessmentId,
             ]);
         }
 

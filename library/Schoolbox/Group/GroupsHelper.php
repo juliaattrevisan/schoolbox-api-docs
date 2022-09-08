@@ -24,7 +24,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Timetable_ColourMapper;
 
 class GroupsHelper
@@ -295,40 +294,6 @@ class GroupsHelper
             return null;
         }
         return $userPerms->first();
-    }
-
-    /**
-     * Get all users in the group
-     * @param Group $group
-     * @return array
-     */
-    public function getGroupUsers(Group $group): array
-    {
-        /** @var UserMapper $userMapper */
-        $userMapper     = $this->userAccessMapper->getJoinMapper('user');
-        $userAccessList = $this->userAccessMapper->findForFolder($group->getFolder())
-                                                 ->indexByCallback(static function (UserAccess $userAccess) {
-                                                     return $userAccess->getUser()->getId();
-                                                 });
-
-        $memberList = $userMapper->findByColumn('id', $userAccessList->keys());
-
-        $members = [];
-        foreach ($memberList as $member) {
-            /** @var UserAccess $userAccess */
-            $userAccess = $userAccessList->offsetGet($member->getId());
-            $members[]  = [
-                'id'         => $member->getId(),
-                'firstName'  => $member->getFirstname(),
-                'lastName'   => $member->getLastname(),
-                'userId'     => $member->getId(),
-                'accessType' => UserAccess::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()],
-                'role'       => $member->getRole()->getName(),
-                'campus'     => implode(', ', $member->getCampusCollection()->getPropertyValues('name')),
-                'yearLevel'  => ($member->getYear() && $member->getYear()->getName()) ? $member->getYear()->getLongName() : '',
-            ];
-        }
-        return $members;
     }
 
     /**

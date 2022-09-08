@@ -101,11 +101,9 @@
 
                                     <label>
                                         Image
-                                        <!-- BEGIN has_image_modify -->
-                                        <img src='/storage/image.php?size=square64&hash={LIST_ITEM_IMAGEHASH}' />
-                                        <!-- END has_image_modify -->
-                                        <input type='file' name='imagehash' value='' />
                                     </label>
+
+                                    {IMAGEHASH_MODIFY_ATTACH_ZONE}
 
                                     <input type='submit' value='Update' />
                                 </form>
@@ -152,8 +150,8 @@
 
                         <label>
                             Image
-                            <input type='file' name='imagehash' value='' />
                         </label>
+                        {IMAGEHASH_CREATE_ATTACH_ZONE}
 
                         <input type='submit' value='Add item' />
                     </form>

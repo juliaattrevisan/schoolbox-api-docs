@@ -71,7 +71,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     {
         $query = "SELECT
                       assess_attempt.attempt_id,
-                      assess_attempt.user_id, synergy_id, firstname, lastname, user.deleted_at as user_deleted_at,
+                      assess_attempt.user_id, synergy_id, firstname, preferred_name, lastname, user.deleted_at as user_deleted_at,
                       assess_attempt.start, assess_attempt.finish,
                       (UNIX_TIMESTAMP(assess_attempt.finish) - UNIX_TIMESTAMP(assess_attempt.start)) AS timeTaken,
                       SUM(assess_response.mark) AS totalMarks,
@@ -100,7 +100,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     {
         $query = "SELECT
                       assess_attempt.attempt_id,
-                      assess_attempt.user_id, firstname, lastname,
+                      assess_attempt.user_id, firstname, preferred_name, lastname,
                       assess_attempt.start, assess_attempt.finish,
                       (UNIX_TIMESTAMP(assess_attempt.finish) - UNIX_TIMESTAMP(assess_attempt.start)) AS timeTaken,
                       SUM(assess_response.mark) AS totalMarks,
@@ -129,7 +129,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     {
         $query = "SELECT
                       assess_attempt.attempt_id,
-                      assess_attempt.user_id, user.synergy_id, firstname, lastname,
+                      assess_attempt.user_id, user.synergy_id, firstname, preferred_name, lastname,
                       assess_attempt.start, assess_attempt.finish,
                       (UNIX_TIMESTAMP(assess_attempt.finish) - UNIX_TIMESTAMP(assess_attempt.start)) AS timeTaken,
                       SUM(assess_response.mark) AS totalMarks,
@@ -330,7 +330,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     public function getUser($attempt_id)
     {
         $query = "
-            SELECT `user`.firstname, `user`.lastname
+            SELECT `user`.firstname, `user`.preferred_name, `user`.lastname
             FROM assess_attempt
             LEFT JOIN `user` ON assess_attempt.user_id = `user`.id
             WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "

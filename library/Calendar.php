@@ -38,39 +38,6 @@ class Calendar extends DeprecatedModel
     }
 
     /**
-     * Get a list of upcoming events with a summary tally of attendances
-     * for both Pending and Approved statuses
-     *
-     * @return array|bool
-     */
-    public function getUpcomingEventAttendance()
-    {
-        $query = "
-			SELECT
-				event.id,
-				event.title,
-				event.start_datetime,
-				event.end_datetime,
-				event.location,
-				event.owner,
-				user.firstname,
-				user.lastname,
-				SUM(IF(event_attendance.status = 1, 1, 0)) AS numPending,
-				SUM(IF(event_attendance.status = 2, 1, 0)) AS numApproved
-			FROM event
-			LEFT JOIN event_attendance ON event.id = event_attendance.event_id
-			LEFT JOIN `user` ON event.owner = user.id
-			WHERE attendance = 1
-			AND event.deleted_at IS NULL
-			AND publish_date < NOW()
-			GROUP BY event.id
-			ORDER BY event.start_datetime DESC
-		";
-
-        return $this->db->getAll($query);
-    }
-
-    /**
      * Get a list of people who are attending/pending for a particular
      * event attendance
      *
@@ -304,7 +271,7 @@ class Calendar extends DeprecatedModel
 				e.location, e.attendance, e.detail, e.publish_date, e.allday,
 				DATE_FORMAT(e.start_datetime, '" . Config::get('calendar_time_format') . "') startTime,
 				DATE_FORMAT(e.end_datetime, '" . Config::get('calendar_time_format') . "') endTime,
-				u.title AS userTitle, u.firstname, u.lastname
+				u.title AS userTitle, u.firstname, u.preferred_name, u.lastname
 			FROM {$this->_table} e
 			LEFT JOIN user u ON u.id = e.owner
 			WHERE e.{$this->_index} = $eventID
@@ -381,7 +348,7 @@ class Calendar extends DeprecatedModel
                 TIME_TO_SEC(end_datetime) as endTimestamp,
                 start_datetime, end_datetime,
                 type, event.title, access, location, detail,
-                user.id as uid, user.title AS userTitle, firstname, lastname,
+                user.id as uid, user.title AS userTitle, firstname, preferred_name, lastname,
                 eventType, eventColour,
                 MATCH (`event`.`title`, `detail`, `location`) AGAINST ('$keyword') AS `score`
             FROM event
@@ -622,6 +589,7 @@ class Calendar extends DeprecatedModel
                 user.id as uid,
                 user.title as userTitle,
                 firstname,
+                preferred_name,
                 lastname,
                 eventType,
                 event.variant AS eventVariant,
@@ -668,7 +636,11 @@ class Calendar extends DeprecatedModel
             foreach ($allEvents as $currentEvent) {
                 $event = new Event();
 
-                $event->setAuthorName($currentEvent['firstname'] . ' ' . $currentEvent['lastname']);
+                $event->setAuthorName(
+                    (new User\Formatter\Factory())->buildFromNothing()->formatArray(
+                        ['title' => ''] + $currentEvent
+                    )
+                );
                 $event->setAuthorId($currentEvent['uid']);
                 $event->setEventId($currentEvent['id']);
                 $event->setStartTime(
@@ -849,14 +821,14 @@ class Calendar extends DeprecatedModel
             error(34);
         }
 
-        $groupList  = $event['groupList'];
-        $campusList = $event['campusList'];
+        $groupList  = $event['groupList'] ?? null;
+        $campusList = $event['campusList'] ?? null;
 
         unset($event['groupList']);
         unset($event['campusList']);
 
         /* Clear attendance if it has changed from true to false */
-        if ($event['attendance'] < $cleanEvent['attendance']) {
+        if (($event['attendance'] ?? null) < $cleanEvent['attendance']) {
             $this->removeAttendanceByEvent($event['id']);
         }
 

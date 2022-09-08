@@ -18,13 +18,11 @@ use Aura\Web\Request\Values as RequestValues;
 use Exception;
 use External_Pastoral;
 use InvalidArgumentException;
-use PDOException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -64,7 +62,6 @@ use Schoolbox\RoleMapper;
 use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -407,8 +404,8 @@ class Controller extends Base
         $auditRecord->setUser($this->getUser());
         $this->pastoralAuditMapper->save($auditRecord);
 
-        $typeId    = is_numeric($get['type']) ? (int)$get['type'] : null;
-        $subtypeId = is_numeric($get['subtype']) ? (int)$get['subtype'] : null;
+        $typeId    = filter_var($get['type'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $subtypeId = filter_var($get['subtype'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
 
         // Limit the number of pastoral records to display on each page of pastoral records
         $resultsPerPage = (int)$this->config->get('pastoral_page_size');
@@ -444,19 +441,20 @@ class Controller extends Base
             [
                 'template' => '@pastoral/student_linked.twig',
                 'data'     => [
-                    'user'            => $this->getUser(),
-                    'recordCount'     => $recordCount,
-                    'records'         => $pageRecords,
-                    'student'         => $student,
-                    'linkedStudent'   => $linkedStudent,
-                    'pageCurrent'     => $pageCurrent,
-                    'types'           => $this->pastoralTypeMapper->findAll(),
-                    'subtypes'        => $this->pastoralSubTypeMapper->findAll(),
-                    'linkedStudents'  => $linkedCounts,
-                    'typeSelected'    => $typeId,
-                    'subtypeSelected' => $subtypeId,
-                    'resultsPerPage'  => $resultsPerPage,
-                    'pagesToDisplay'  => $maxPage,
+                    'user'                => $this->getUser(),
+                    'recordCount'         => $recordCount,
+                    'records'             => $pageRecords,
+                    'student'             => $student,
+                    'linkedStudent'       => $linkedStudent,
+                    'pageCurrent'         => $pageCurrent,
+                    'types'               => $this->pastoralTypeMapper->findAll(),
+                    'subtypes'            => $this->pastoralSubTypeMapper->findAll(),
+                    'linkedStudents'      => $linkedCounts,
+                    'typeSelected'        => $typeId,
+                    'subtypeSelected'     => $subtypeId,
+                    'resultsPerPage'      => $resultsPerPage,
+                    'pagesToDisplay'      => $maxPage,
+                    'countSummaryByMonth' => ['recordCount' => 0],
                 ],
                 'title'    => 'Linked Records',
             ]
@@ -571,7 +569,7 @@ class Controller extends Base
      */
     public function getStudentRecordUpdateForm($record): void
     {
-        if (!$this->getConfigLoader()->get('pastoral_severity')) {
+        if (!$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
             $severities = [];
         } else {
             $severities = $this->pastoralSeverityMapper->findAll();
@@ -805,9 +803,8 @@ class Controller extends Base
      * if these tags once existed
      *
      * @param string $tagCsv
+     * @return Collection
      * @throws MapperException
-     * @throws PDOException
-     * @throws UnexpectedValueException
      */
     private function prepareTags(string $tagCsv): Collection
     {
@@ -824,7 +821,7 @@ class Controller extends Base
                      */
 
                     /** @var PastoralTagsModel $tag */
-                    $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagCurrent, ['cache' => false]);
+                    $tag = $this->pastoralTagMapper->findOneByColumn('id', $tagCurrent, ['cache' => false]);
                 } catch (MapperDeletedException $e) {
                     /* Restore this tag to active duty SA-2737
                      * This was put here to reduce dupe tags from original implementation
@@ -853,6 +850,7 @@ class Controller extends Base
     /**
      * @param RequestValues $post
      * @return Collection
+     * @throws MapperException
      */
     private function prepareAccesses(RequestValues $post): Collection
     {
@@ -1338,6 +1336,8 @@ class Controller extends Base
      * Download an attachment from file system, permissions are applied via routing system
      *
      * @param PastoralAttachmentModel $attachment
+     * @return void
+     * @throws \League\Flysystem\FilesystemException
      */
     public function getStudentRecordAttachment(PastoralAttachmentModel $attachment): void
     {
@@ -1496,6 +1496,23 @@ class Controller extends Base
             $data['error'] = $e->getMessage();
             $this->getResponse()->status->setCode(400);
         }
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+    /**
+     * @api   GET /searchTags
+     * @since 21.1
+     */
+    public function searchTags()
+    {
+        $tags = $this->pastoralTagMapper->findForTag($this->getUser(), $this->request->query->get('query'));
+        $data = $tags->map(function ($tag) {
+            /** @var Tag\Model $tag */
+            return [
+                'id'   => $tag->getId(),
+                'name' => $tag->getName(),
+            ];
+        });
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 }

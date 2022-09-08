@@ -849,7 +849,7 @@ class Mapper extends BaseMapper
             $this->filters[]              = '`pastoral`.`created_at` >= :afterDate';
         }
 
-        if ($severity && $this->getConfigLoader()->get('pastoral_severity')) {
+        if ($severity && $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
             $this->bindings[':severity'] = $severity->getSequence();
             $this->filters[]             = '`sv`.`sequence` >= :severity';
         }
@@ -875,7 +875,7 @@ class Mapper extends BaseMapper
         foreach ($order as $orderCurrent) {
             switch ($orderCurrent) {
                 case 'student':
-                    $orderParts[] = "`s`.lastname, `s`.firstname";
+                    $orderParts[] = "`s`.lastname, `s`.chosen_name";
                     break;
                 case 'severity':
                     $orderParts[] = "`sv`.sequence";
@@ -896,7 +896,7 @@ class Mapper extends BaseMapper
                     $orderParts[] = "`sy`.sequence asc";
                     break;
                 case 'author':
-                    $orderParts[] = "`o`.lastname, `o`.firstname";
+                    $orderParts[] = "`o`.lastname, `o`.chosen_name";
                     break;
                 case 'house':
                     $orderParts[] = "`s`.`house`";
@@ -1048,7 +1048,7 @@ class Mapper extends BaseMapper
 
         if ($years->count()) {
             $pbArray = PredicateBuilder::getArrayBindings(
-                $years->getAll(),
+                $years->getPropertyValues('id'),
                 's_year' . self::$placeholderIndex
             );
 

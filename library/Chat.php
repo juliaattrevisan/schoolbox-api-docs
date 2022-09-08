@@ -35,11 +35,20 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param int  $not_user_id
      * @return array|bool
      */
-    public function get_logs($category_id, $last_poll = null, $not_user_id = 0)
+    public function getLogs($category_id, $last_poll = null, $not_user_id = 0)
     {
-        $query = "SELECT title, firstname, lastname, synergy_id AS user_ext_id, c.*
-                  FROM {$this->_table} c LEFT JOIN user ON c.user_id = user.id
-                  WHERE `category_id` = $category_id";
+        $query = "
+            SELECT
+                title,
+                firstname,
+                preferred_name,
+                lastname,
+                synergy_id AS user_ext_id,
+                c.*
+            FROM {$this->_table} c
+            LEFT JOIN user ON c.user_id = user.id
+            WHERE `category_id` = $category_id
+        ";
 
         if (!empty($not_user_id)) {
             $query .= " AND `user_id` != $not_user_id";
@@ -86,7 +95,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @return int
      * @throws InvalidArgumentException
      */
-    public function create_log($category_id, $user_id, $body, $type = 'user')
+    public function createLog($category_id, $user_id, $body, $type = 'user')
     {
         $now = new Alaress_Date_Format(time(), 'U');
 
@@ -105,7 +114,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param int $user_id
      * @return bool|PDOStatement
      */
-    public function update_poll($category_id, $user_id)
+    public function updatePoll($category_id, $user_id)
     {
         if (!is_numeric($user_id)) {
             return false;
@@ -126,12 +135,19 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param int $category_id
      * @return array|bool
      */
-    public function get_users($category_id)
+    public function getUsers($category_id)
     {
         // retrieve users as well as their membership. If no staff present, deactivate the chat.
         $time  = new DateTime(self::CHAT_POLL_EXPIRY);
         $query = "
-            SELECT title, firstname, lastname, synergy_id AS user_ext_id, group_type, chat_poll.*
+            SELECT
+                title,
+                firstname,
+                preferred_name,
+                lastname,
+                synergy_id AS user_ext_id,
+                group_type,
+                chat_poll.*
             FROM chat_poll
             LEFT JOIN `user` ON chat_poll.user_id = user.id
             LEFT JOIN `groups` ON user.`group_id` = `groups`.`id`
@@ -159,7 +175,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @return PDOStatement
      * @throws Exception
      */
-    public function prune_users($category_id)
+    public function pruneUsers($category_id)
     {
         $time = new DateTime(self::CHAT_POLL_EXPIRY);
 
@@ -214,7 +230,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             }
         }
 
-        $chats = $this->get_logs($categoryID);
+        $chats = $this->getLogs($categoryID);
 
         // go through and extract the years and months
         $occupiedDates = [];

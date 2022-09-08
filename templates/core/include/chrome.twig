@@ -72,8 +72,10 @@
             schoolboxUser.impersonated   = Boolean('{{ user.impersonated }}');
             schoolboxUser.communityLogin = Boolean('{{ user.communityLogin }}');
 
-            // Reluctantly add the CDN prefix as a global JS variable
+            // Reluctantly add the CDN prefix and site version as global JS variables
             window.cdnPrefix = "{{ CDN_PREFIX }}";
+            window.siteVersion = "{{ config.site_version }}";
+
         </script>
         {% endautoescape %}
 
@@ -346,7 +348,8 @@
                         // launch the notifier
                         $('#msgs').notifier({
                             unread:   Number('{{ ws.unread }}'),
-                            maxstack: Number('{{ ws.stackLimit }}')
+                            maxstack: Number('{{ ws.stackLimit }}'),
+                            itemTimeFormat: dateDisplayFormats.dayjsDatetime
                         });
 
                         $('#alert-dialog').on('click', 'a.action', function (e) {

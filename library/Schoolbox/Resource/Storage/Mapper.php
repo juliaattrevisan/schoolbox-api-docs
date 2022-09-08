@@ -29,6 +29,7 @@ use Schoolbox\Video\QueueMapper;
  * @package Schoolbox\Resource\Storage
  * @method GenericCollection|Model[] findAll($options = [])
  * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
  */
 class Mapper extends BaseMapper implements IReceiver
 {
@@ -59,8 +60,45 @@ class Mapper extends BaseMapper implements IReceiver
 
         $this->joinsVia('allowedFileExtension', MimetypeMapper::class, 'fileTypeID', 'fileTypeID', 'extension', 'ext', self::TYPE_MODEL, self::COLUMN_JOIN_READONLY, 'mimetype');
 
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'preventExpiredAtDecrement']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteStorage']);
+    }
+
+    /**
+     * Pre-save callback: prevent `$storage->expiryAt` from being set to a value
+     * less than its previous.
+     *
+     * This prevents files with no expiry from being uploaded with an expiry,
+     * and thus suddenly having an expiry date when they were never intended to
+     * have one.
+     *
+     * @param Model $storage
+     * @param Model|null $previous
+     * @return bool
+     */
+    public function preventExpiredAtDecrement(Model $storage, ?Model $previous = null): bool
+    {
+        // Only check against previous expiry if there's a previous storage file
+        if ($previous) {
+            $expiryAt = $storage->getExpiryAt();
+            // Only check against previous expiry if the new storage file
+            // actually has an expiry
+            if ($expiryAt && !$expiryAt->isNull()) {
+                $previousExpiryAt = $previous->getExpiryAt();
+                // Allow update of expiry only if the new expiry is after the
+                // previous
+                if ($previousExpiryAt && !$previousExpiryAt->isNull()) {
+                    $updateExpiry = $expiryAt->gt($previousExpiryAt);
+                } else {
+                    $updateExpiry = false;
+                }
+                if (!$updateExpiry) {
+                    $storage->setExpiryAt($previousExpiryAt ? clone $previousExpiryAt : null);
+                }
+            }
+        }
+        return true;
     }
 
     /**

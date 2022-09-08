@@ -14,7 +14,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant as ParticipantObject;
 use Schoolbox\Learning\Assessment\Plan as PlanObject;
 use Schoolbox\Assessment\Participant;
@@ -35,7 +34,6 @@ use DomainException;
  */
 class DataSource
 {
-
     /**
      * Data source for class lists
      *
@@ -594,11 +592,14 @@ class DataSource
 
 
     /**
-     * @return Participant\Mapper|\Schoolbox\Mapper
+     * @return Participant\Mapper
      * @throws DefinitionException
      */
     public function getParticipantMapper()
     {
-        return $this->getPlanMapper()->getJoinMapper('participants');
+        /** @var \Schoolbox\Assessment\Participant\Mapper $participantMapper */
+        $participantMapper = $this->getPlanMapper()->getJoinMapper('participants');
+
+        return $participantMapper;
     }
 }

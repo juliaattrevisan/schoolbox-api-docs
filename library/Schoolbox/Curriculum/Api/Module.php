@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\Role;
 
 /**
  * Module for the curriculum API.
@@ -26,29 +27,35 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        // For now: superusers and curriculum service only
-        $hasApiAccess = new Rule\All(
+        $hasApiReadAccess = new Rule\All(
             new Rule\IsLoggedIn(),
+            new Rule\HasRole(Role::STAFF),
+        );
+        $hasApiWriteAccess = new Rule\All(
+            $hasApiReadAccess,
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(
                     UserAccess::SERVICE_CURRICULUM,
                     UserAccess::ACCESS_WRITE
                 )
-            )
+            ),
         );
         $preload = function (array $params) {
-            return [
-                'node' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
-            ];
+            if (isset($params['id'])) {
+                return [
+                    'node' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
+                ];
+            }
+            return [];
         };
-        $this->register(self::METHOD_GET, '', 'searchNode', $hasApiAccess);
-        $this->register(self::METHOD_GET, '/{id:\\d+}', 'getNode', $hasApiAccess, $preload);
-        $this->register(self::METHOD_GET, '/tree', 'getTree', $hasApiAccess);
-        $this->register(self::METHOD_POST, '', 'postNode', $hasApiAccess);
-        $this->register(self::METHOD_PUT, '/{id:\\d+}', 'putNode', $hasApiAccess, $preload);
-        $this->register(self::METHOD_PATCH, '/{id:\\d+}', 'patchNode', $hasApiAccess, $preload);
-        $this->register(self::METHOD_DELETE, '/{id:\\d+}', 'deleteNode', $hasApiAccess, $preload);
+        $this->register(self::METHOD_GET, '', 'searchNode', $hasApiReadAccess);
+        $this->register(self::METHOD_GET, '/{id:\\d+}', 'getNode', $hasApiReadAccess, $preload);
+        $this->register(self::METHOD_GET, '/tree', 'getTree', $hasApiReadAccess);
+        $this->register(self::METHOD_POST, '{/id:\\d+}', 'postNode', $hasApiWriteAccess, $preload);
+        $this->register(self::METHOD_PUT, '/{id:\\d+}', 'putNode', $hasApiWriteAccess, $preload);
+        $this->register(self::METHOD_PATCH, '/{id:\\d+}', 'patchNode', $hasApiWriteAccess, $preload);
+        $this->register(self::METHOD_DELETE, '/{id:\\d+}', 'deleteNode', $hasApiWriteAccess, $preload);
     }
 
     /**

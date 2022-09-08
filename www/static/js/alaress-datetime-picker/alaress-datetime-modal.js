@@ -538,7 +538,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
         // Remove selected on all days for a blank state
         $byTimetable.find('[data-tt-day].selected').removeClass('selected');
-        
+
         var activeDate = dayjs(getTimetablePickerValue(), adtp.dayjsFormats.databaseShort);
         $byTimetable.find('[data-date=' + activeDate.format(adtp.dayjsFormats.databaseShort) + ']').addClass('selected');
         $byTimetable.find('[data-tt-selected-date]').text(activeDate.format(adtp.dayjsFormats.nice));
@@ -661,7 +661,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 html += '<div class="top-due-work" data-adtp-top-due>';
                 html += '<div class="compact card small-12">';
                 html += '<img src="/portrait.php?id=' + data.students[0].id + '&amp;size=square80">';
-                html += '<h3>' + data.students[0].firstname + ' ' + data.students[0].lastname + '</h3>';
+                html += '<h3>' + data.students[0].fullName + '</h3>';
                 html += '<p class="meta">' + data.students[0].assessmentsDue + ' due' + '</p>';
                 html += '</div>';
                 html += '<div class="icon-next" data-show-full-due="due-work-list-' + target + '-' + dayjs(data.date).format('YYYY-m-d') + '" title="Show all students and work due"></div>';
@@ -681,7 +681,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     html += '<div class="expander" data-collapser="collap-' + i + '"></div>';
                     html += '<div class="card compact small-12">';
                     html += '<img src="/portrait.php?id=' + data.students[i].id + '&amp;size=square80">';
-                    html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
+                    html += '<h3>' + data.students[i].fullName + '</h3>';
                     html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
                     html += '</div>';
                     html += '</div>';
@@ -1159,7 +1159,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      * @param date (database short format)
      */
     function setTimetablePickerValue(date) {
-        
+
         var $button = $byTimetable.find('[data-timetable-value]');
         $button.attr('data-timetable-value', date);
 
@@ -1221,7 +1221,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
             // Create a dayjs object from the input value
             var activeDate = dayjs(getInputValue(), [dateDisplayFormats.dayjsDatetime, dateDisplayFormats.dayjs]);
-            
+
             // Set date on flatpickr to the input date
             window.pickerInstance[twigVars.id].setDate(activeDate.toISOString());
 

@@ -1,4 +1,4 @@
-Delete?,Schoolbox User ID,Username,External ID,Title,First Name,Surname,Position Title,Role,Campus,Password,Alt Email,Year,House,Residential House,E-Portfolio?,Hide Contact Details?,Hide Timetable?,Email Address From Username?,Use External Mail Client?,Enable Webmail Tab?,Display Graph on Student Grade Card?,Superuser?,Account Enabled?
-,,jerome092,1256,Mr,Jerome,Spartan,,Senior Students,Senior,,,,,,Y,N,N,Y,N,Y,Y,N,Y
-,,alice130,4562,Mrs,Alice,Spartan,Admissions Manager,Teachers,"Junior, Senior",,,,,,Y,N,Y,Y,N,Y,Y,N,Y
-,,douglas042,2346,,Douglas,Spartan,,Parents,"ELC, Senior",,douglasAlt@alaress.com.au,,,,Y,Y,N,N,N,Y,Y,N,Y
+Delete?,Schoolbox User ID,Username,External ID,Title,First Name,Preferred Name,Surname,Position Title,Role,Campus,Password,Alt Email,Year,House,Residential House,E-Portfolio?,Hide Contact Details?,Hide Timetable?,Email Address From Username?,Use External Mail Client?,Enable Webmail Tab?,Display Graph on Student Grade Card?,Superuser?,Account Enabled?
+,,jerome092,1256,Mr,Jerome,Jerry,Spartan,,Senior Students,Senior,,,,,,Y,N,N,Y,N,Y,Y,N,Y
+,,alice130,4562,Mrs,Alice,,Spartan,Admissions Manager,Teachers,"Junior, Senior",,,,,,Y,N,Y,Y,N,Y,Y,N,Y
+,,douglas042,2346,,Douglas,,Spartan,,Parents,"ELC, Senior",,douglasAlt@alaress.com.au,,,,Y,Y,N,N,N,Y,Y,N,Y

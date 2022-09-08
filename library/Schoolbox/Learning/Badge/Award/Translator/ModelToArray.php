@@ -80,7 +80,6 @@ class ModelToArray
      */
     public function __invoke(Model $model, bool $translateParentAward = true): array
     {
-
         /* Convert a User instance to its array equivalent
          *
          * When a user can't be found (soft- or hard-deleted, broken data somehow, etc)
@@ -104,6 +103,7 @@ class ModelToArray
             'id'        => $model->getId(),
             'badge'     => call_user_func($this->badgeTranslator, $model->getBadge()),
             'status'    => $model->getStatus(),
+            'reason'    => $model->getReason(),
             'isGoal'    => $model->isGoal(),
             'award'     => $translateParentAward && $model->getAward()
                 ? $this->__invoke($model->getAward(), false)

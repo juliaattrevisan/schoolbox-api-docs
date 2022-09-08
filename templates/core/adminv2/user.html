@@ -5,12 +5,9 @@
     $(function() {
         var modifyForm = $('form[data-action="modify-user"]');
         modifyForm.find('input[data-selectizeuser]')
-                .selectizeSelector({
+                .userSelectizeSelector({
                     ajax: {
-                        url:      '/ajax/user.php',
-                        type:     'GET',
                         data:     {groupID: 0},
-                        dataType: 'json'
                     }
                 })
                 .on('selectize.item_add', function() {

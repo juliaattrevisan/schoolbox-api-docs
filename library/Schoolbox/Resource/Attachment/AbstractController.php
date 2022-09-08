@@ -59,7 +59,8 @@ abstract class AbstractController implements ControllerInterface
      */
     public function getUrl()
     {
-        /* Finally I found this place
+        /* SC: Finally I found this place
+         * AS: Finally I found this place (or its child implementations) too
          */
         $prefix = sprintf('/ajax/resources/%s/%s', $this->getSlug(), $this->multi ? 'multi' : 'single');
 

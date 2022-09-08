@@ -12,23 +12,17 @@
             targetElements: $('[data-html-editor]')
         });
 
-        $('[data-suggest=staff]').selectizeSelector({
+        $('[data-suggest=staff]').userSelectizeSelector({
             ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
                 data:     {roleTypeID: 'staff', showCampus: true},
-                dataType: 'json'
             },
             value: {EVENT_STAFF},
             multiple: true
         });
 
-        $('[data-suggest=teacher-in-charge]').selectizeSelector({
+        $('[data-suggest=teacher-in-charge]').userSelectizeSelector({
             ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
                 data:     {roleTypeID: 'staff', showCampus: true},
-                dataType: 'json'
             },
             value: {EVENT_TEACHER_IN_CHARGE},
             multiple: false

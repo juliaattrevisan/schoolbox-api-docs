@@ -340,13 +340,10 @@
          */
         function initAddPlayerToDivisionSelectize() {
             $('[data-role="userSelector"]')
-                .selectizeSelector({
+                .userSelectizeSelector({
                     multiple: true,
                     ajax: {
-                        url: '/ajax/user.php',
-                        type: 'GET',
                         data: {groupID: 0},
-                        dataType: 'json'
                     }
                 });
         }

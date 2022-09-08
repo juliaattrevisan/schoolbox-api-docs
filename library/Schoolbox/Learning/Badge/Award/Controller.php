@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Badge\Award;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use Exception;
 use PDOException;
@@ -409,6 +410,7 @@ class Controller extends Base
         $collection = $this->mapper->createCollection();
         $userIds    = array_column($data['users'], 'id');
         $users      = $this->userMapper->findByColumn('id', $userIds);
+        $reason     = trim((string)$data['reason']);
 
         // Are any of those users not students? Error out
         foreach ($users as $user) {
@@ -435,6 +437,7 @@ class Controller extends Base
                 ->setRecipient($user)
                 ->setBadge($badge)
                 ->setStatus($status)
+                ->setReason($reason)
                 ->setAwardedBy($this->getUser())
                 ->setAwardedAt(Alaress_Date_Format::now());
             $award = $award->setExpiresAt((new ExpiryHelper())->determineExpiry($award));
@@ -620,6 +623,56 @@ class Controller extends Base
 
         $award->setViewedOn(\Alaress_Date_Format::now());
         $this->mapper->save($award);
+    }
+
+
+    /**
+     * For the $award given, update its properties
+     *
+     * @api GET /learning/badge/award/{awardId}/update
+     * @param \Schoolbox\Learning\Badge\Award\Model $award
+     * @return void
+     */
+    public function getAwardUpdate(AwardModel $award): void
+    {
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadgeAward/awardUpdate.twig',
+                [
+                    'award' => $award
+                ],
+                'Edit award'
+            )
+        );
+    }
+
+
+    /**
+     * For the $award given, update its properties
+     *
+     * @param AwardModel $award
+     * @return void
+     * @throws MapperException
+     * @throws PDOException
+     * @throws RouteNotFound
+     * @throws UnexpectedValueException
+     * @api POST /learning/badge/award/{awardId}/update
+     */
+    public function postAwardUpdate(AwardModel $award): void
+    {
+        $award->setReason($this->request->post['reason']);
+
+        $this->mapper->save($award);
+
+        /* Redirect back to a guy's feed, I guess
+         * That's the only place where you can spawn the edit button which
+         * gets you to the award edit form
+         *
+         * TODO Maybe a return url is more ideal
+         */
+        $this->response->redirect->to($this->router->generate('searchUser.getProfile', [
+            'userId' => $award->getRecipient()->getId()
+        ]));
     }
 
 

@@ -61,7 +61,7 @@ class Factory extends AbstractFactory
      */
     public function buildKeyConverter(Model $filter): IKeyConverter
     {
-        return new KeyConverter($filter, $this->pastoralTypeMapper->findAllIds());
+        return new KeyConverter($filter, $this->pastoralTypeMapper->findAll());
     }
 
     /**

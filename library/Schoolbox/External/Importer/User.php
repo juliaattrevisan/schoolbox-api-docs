@@ -33,7 +33,6 @@ use Schoolbox\YearLevel;
  */
 class User extends AbstractImporter
 {
-
     /**
      * @var Service
      */
@@ -109,6 +108,7 @@ class User extends AbstractImporter
             'External ID'                          => 'The user\'s ID number in your external system',
             'Title'                                => '',
             'First Name'                           => '',
+            'Preferred Name'                       => '',
             'Surname'                              => '',
             'Position Title'                       => 'The user\'s position title (e.g. Admissions Manager)',
             'Role'                                 => 'The Schoolbox role for this user',
@@ -196,6 +196,7 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Campus('Campus', $this->campusList);
         $this->userHydrators[] = new User\Hydrator\Field('Title', 'setTitle', true);
         $this->userHydrators[] = new User\Hydrator\Field('First Name', 'setFirstname', true);
+        $this->userHydrators[] = new User\Hydrator\Field('Preferred Name', 'setPreferredName', true);
         $this->userHydrators[] = new User\Hydrator\Field('Surname', 'setLastname', true);
         $this->userHydrators[] = new User\Hydrator\Field('Position Title', 'setPositionTitle', true);
         $this->userHydrators[] = new User\Hydrator\Field('Alt Email', 'setAltEmail', true);

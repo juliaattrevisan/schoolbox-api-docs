@@ -2,7 +2,6 @@
 
 class Blog extends DeprecatedModel
 {
-
     /**
      * @deprecated
      */
@@ -28,7 +27,7 @@ class Blog extends DeprecatedModel
     {
         $keyword = $this->db->quote($keyword);
 
-        $query = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
+        $query = "SELECT `blog`.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.preferred_name, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                         FROM `blog`
                         JOIN `folder` ON `folder`.id = `blog`.folder_id AND `folder`.deleted_At IS NULL

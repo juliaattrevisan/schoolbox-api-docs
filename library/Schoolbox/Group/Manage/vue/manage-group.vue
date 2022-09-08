@@ -5,20 +5,35 @@
  */
 
 import { ref, onBeforeMount, onMounted } from 'vue';
-import Endpoints from './manageGroupEndpoints';
+import Endpoints from './mgEndpoints';
 import { useStore } from './store/manageGroupStore';
-import ManageGroupHeading from './manage-group-heading.vue';
+import { useMembersStore } from './store/mgMembersStore';
+import MgHeading from './mg-heading.vue';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table';
-import ManageGroupAddMembers from './manage-group-add-members.vue';
-import ManageGroupMembers from './manage-group-members.vue';
-import ManageGroupSelect from './manage-group-select.vue';
-import ManageGroupRemoveMembers from './manage-group-remove-members.vue';
-import ManageGroupUpdateSettings from './manage-group-update-settings.vue';
-import ManageGroupDisbandGroup from './manage-group-disband-group.vue';
+import MgAddMembers from './addMembers/mg-add-members.vue';
+import MgMembers from './currentMembers/mg-members.vue';
+import MgSelect from './currentMembers/mg-select.vue';
+import MgRemoveMembers from './currentMembers/mg-remove-members.vue';
+import MgUpdateSettings from './mg-update-settings.vue';
+import MgDisbandGroup from './mg-disband-group.vue';
 import Toast from '@schoolboxVue/components/toast.vue';
 
 
 const props = defineProps({
+    /**
+     * whether to restrict only staff to be a group manager
+     */
+    groupStaffOnly: {
+        type: String,
+        required: true,
+    },
+    /**
+     * whether to show setting dialog
+     */
+    showSetting: {
+        type: String,
+        required: true,
+    },
     /**
      * the endpoint to retrieve all the group data from
      */
@@ -92,9 +107,22 @@ onBeforeMount(() => {
  */
 onMounted(() => {
     store.toastEl = toastEl;
-    store.$reset(); //ensure the store state is as it's initially set, this is just for Storybook when switching between stories
+    store.showSetting = (props.showSetting === '1');
+    store.groupStaffOnly = props.groupStaffOnly;
+    checkForStorybook();
     store.loadData();
 });
+
+/**
+ * When switching between stories, we need to reset the data models
+ * as they persist between the stories otherwise
+ */
+function checkForStorybook () {
+    if (typeof STORYBOOK_ENV !== 'undefined') {
+        store.$reset();
+        useMembersStore().$reset();
+    }
+}
 
 /**
  * Reload the page to try loading again
@@ -106,7 +134,7 @@ function onRefreshSelected () {
 </script>
 
 <template>
-    <manage-group-heading />
+    <mg-heading />
     <div v-if="store.isLoading" class="row">
         <div class="small-12 island">
             <loading-table  />
@@ -122,12 +150,12 @@ function onRefreshSelected () {
         </div>
     </div>
     <template v-else-if="store.hasLoadedOk">
-        <manage-group-add-members />
-        <manage-group-members />
-        <manage-group-select />
-        <manage-group-remove-members />
-        <manage-group-update-settings />
-        <manage-group-disband-group />
+        <mg-add-members />
+        <mg-members />
+        <mg-select />
+        <mg-remove-members />
+        <mg-update-settings />
+        <mg-disband-group />
         <toast ref="toastEl"></toast>
     </template>
 </template>

@@ -310,7 +310,7 @@ export default {
                 <template v-if="!isInitialLoad">
                     <div v-show="isThreadEnabled">
                         <template v-if="isPublished">
-                            <add-comment-input 
+                            <add-comment-input
                                 :cdn-prefix="cdnPrefix"
                                 :is-processing="isProcessing"
                                 :site-version="siteVersion"
@@ -361,7 +361,7 @@ export default {
                             <media-article v-html="comment.content"></media-article>
                         </li>
                     </ul>
-                    <a v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessing">Show older comments</a>
+                    <button v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessing">Show older comments</button>
                 </template>
             </div>
         </section>

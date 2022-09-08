@@ -32,10 +32,10 @@ function onModalClosed () {
 </script>
 
 <template>
-    <reveal-modal 
-        ref="modalEl" 
-        :is-close-disabled="false" 
-        :close-on-background-click="false" 
+    <reveal-modal
+        ref="modalEl"
+        :is-close-disabled="false"
+        :close-on-background-click="false"
         size="large"
         @closed="onModalClosed"
     >

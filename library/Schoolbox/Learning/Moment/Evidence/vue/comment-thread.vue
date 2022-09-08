@@ -125,13 +125,6 @@ export default {
     methods: {
 
         /**
-         * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
-         */
-        onAddCommentSelected () {
-            this.cKEditor_init(EDITOR_CONFIG_FOR_COMMENTS);
-        },
-
-        /**
          * Loads the next cursor of comments.
          */
         loadMoreComments() {
@@ -162,7 +155,7 @@ export default {
          * Posts a comment to this thread.
          * If there's no thread yet: this method will create one, and then
          * post the comment to it.
-         * 
+         *
          * @param { String }
          */
         postComment(newComment) {
@@ -242,28 +235,28 @@ export default {
         /**
          * Format the date as specified
          *
-         * @param { Date } 
-         * @param { String } 
-         * 
+         * @param { Date }
+         * @param { String }
+         *
          * @returns { String }
          */
         formatDate (date, format) {
             return dayjs(date).format(format);
-        },        
+        },
 
         /**
          * Get the date as from now
          *
-         * @param { Date } 
-         * 
+         * @param { Date }
+         *
          * @returns { String } ie: 2 hours ago
          */
         fromNow (date) {
             return dayjs(date).fromNow();
-        },  
+        },
 
     }
-    
+
 }
 </script>
 
@@ -273,7 +266,7 @@ export default {
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
                 <template v-if="canComment">
-                    <add-comment-input 
+                    <add-comment-input
                         :cdn-prefix="cdnPrefix"
                         :is-processing="isProcessing"
                         :site-version="siteVersion"

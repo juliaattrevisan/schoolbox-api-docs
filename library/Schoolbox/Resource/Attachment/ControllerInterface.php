@@ -13,18 +13,8 @@ use SitePage;
 
 interface ControllerInterface
 {
-
     const RENDER_INLINE = 'inline';
     const RENDER_IFRAME = 'iframe';
-
-
-    /**
-     * @param bool   $multi
-     * @param string $mimeFilter
-     * @param bool   $useFolder
-     */
-    public function __construct($multi, $mimeFilter = null, $useFolder = true);
-
 
     /**
      * @param SitePage $page

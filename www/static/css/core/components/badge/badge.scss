@@ -1,244 +1,275 @@
+/* The default foundation formula makes content noncentered
+ * when it should be centered - caused by having short titles
+ * and this max-width: calc(100% - 2.5rem);
+ */
+.reveal-modal .badge-modal {
+    h1, h2, h3, h4, h5, h6 {
+        max-width: initial;
+    }
+}
+
 .badge-grid {
-  .badge {
-    flex: 1 0 250px;
-    border: 1px solid #EDEDED;
-    box-shadow: 0 2px 3px 0 rgba(0,0,0,0.1);
-    padding: 0;
-    margin: 0 1rem 1rem 0;
-    max-width: 250px;
+    .badge {
+        flex: 1 0 250px;
+        border: 1px solid #EDEDED;
+        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+        padding: 0;
+        margin: 0 1rem 1rem 0;
+        max-width: 250px;
 
-    &:last-child,
-    &:only-child {
-      margin: 0 0 1rem 0;
-    }
-
-    .card-feature-image {
-      background-color: $vapor;
-      position: relative;
-
-      > a > div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: rem-calc(200);
-      }
-      img {
-        margin: 0;
-      }
-      .badge-image {
-        max-height: rem-calc(200);
-        width: auto;
-      }
-      .badge-icon {
-        width: 11rem;
-      }
-    }
-    .card-content {
-      padding: 1rem;
-      overflow: inherit;
-
-      h3, p, .checkbox-label {
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
-      h3 {
-        margin-bottom: .5rem;
-      }
-      nav {
-        top: 0;
-      }
-      &.actions-small-1 {
-        // has to be done because the mixin has important on it
-        > .list-item {
-          padding-right: 2rem !important;
+        &:last-child,
+        &:only-child {
+            margin: 0 0 1rem 0;
         }
-        h3 {
-          padding-right: 0;
+
+        .card-feature-image {
+            background-color: $vapor;
+            position: relative;
+
+            > a > div {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: rem-calc(200);
+            }
+
+            img {
+                margin: 0;
+            }
+
+            .badge-image {
+                max-height: rem-calc(200);
+                width: auto;
+            }
+
+            .badge-icon {
+                width: 11rem;
+            }
         }
-      }
+
+        .card-content {
+            padding: 1rem;
+            overflow: inherit;
+
+            h3, p, .checkbox-label {
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+
+            h3 {
+                margin-bottom: .5rem;
+            }
+
+            nav {
+                top: 0;
+            }
+
+            &.actions-small-1 {
+                // has to be done because the mixin has important on it
+                > .list-item {
+                    padding-right: 2rem !important;
+                }
+
+                h3 {
+                    padding-right: 0;
+                }
+            }
+        }
+
+        .checkbox-label {
+            font-size: $h3-font-size;
+        }
     }
-    .checkbox-label {
-      font-size: $h3-font-size;
-    }
-  }
 }
 
 @media #{$small-only} {
-  .badge-grid .badge {
-    flex: 1 0 50%;
-    max-width: calc(50% - 1rem);
+    .badge-grid .badge {
+        flex: 1 0 50%;
+        max-width: calc(50% - 1rem);
 
-    .card-feature-image {
-      > a > div {
-        height: 8rem;
-      }
-      .badge-image {
-        max-height: 8rem;
-      }
-      .badge-icon {
-        max-width: 7rem;
-      }
+        .card-feature-image {
+            > a > div {
+                height: 8rem;
+            }
+
+            .badge-image {
+                max-height: 8rem;
+            }
+
+            .badge-icon {
+                max-width: 7rem;
+            }
+        }
     }
-  }
 }
 
 .award-count {
-  background-color: $white;
-  border-radius: 50%;
-  border: 1px solid $base;
-  box-shadow: 0 0 3px 0 rgba(0,0,0,.1);
-  position: absolute;
-  top: .35rem;
-  right: .35rem;
-  padding: .3rem 0;
-  font-size: rem-calc(12);
-  width: 30px;
-  height: 30px;
-  text-align: center;
+    background-color: $white;
+    border-radius: 50%;
+    border: 1px solid $base;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, .1);
+    position: absolute;
+    top: .35rem;
+    right: .35rem;
+    padding: .3rem 0;
+    font-size: rem-calc(12);
+    width: 30px;
+    height: 30px;
+    text-align: center;
 }
 
 // Badge Modal
 .badge-modal {
-  h2, .meta {
-    text-align: center;
-  }
-  h2 {
-    max-width: 100%;
-    margin-bottom: .5rem;
-  }
-  article {
-    max-width: 40rem;
-    margin: 1rem auto 0 auto;
-  }
+    h2, .meta {
+        text-align: center;
+    }
+
+    h2 {
+        max-width: 100%;
+        margin-bottom: .5rem;
+    }
+
+    article {
+        max-width: 40rem;
+        margin: 1rem auto 1rem auto;
+    }
 }
 
 .badge-img-container {
-  background-color: $vapor;
-  position: relative;
-  display: grid;
-  margin-bottom: 1rem;
-  max-height: rem-calc(300);
-  overflow: hidden;
-  place-items: center;
-  img {
+    background-color: $vapor;
+    position: relative;
+    display: grid;
+    margin-bottom: 1rem;
     max-height: rem-calc(300);
-    width: auto;
-  }
-  .badge-icon {
-    width: 17rem;
-    margin: 1rem 0;
-  }
-  .award-count {
-    font-size: 1rem;
-    width: 40px;
-    height: 40px;
-    top: .75rem;
-    right: .75rem;
-    padding: .35rem 0;
-  }
+    overflow: hidden;
+    place-items: center;
+
+    img {
+        max-height: rem-calc(300);
+        width: auto;
+    }
+
+    .badge-icon {
+        width: 17rem;
+        margin: 1rem 0;
+    }
+
+    .award-count {
+        font-size: 1rem;
+        width: 40px;
+        height: 40px;
+        top: .75rem;
+        right: .75rem;
+        padding: .35rem 0;
+    }
 }
 
-    .badge-img-container__background,
-    .badge-img-container__foreground {
-        grid-area: 1/-1; //place the background/foreground on top of each other
-    }
+.badge-img-container__background,
+.badge-img-container__foreground {
+    grid-area: 1/-1; //place the background/foreground on top of each other
+}
 
-    .badge-img-container__background {
-        z-index: 1;
-    }
-    
-    .badge-img-container__foreground { 
-        z-index: 2;
-    }
+.badge-img-container__background {
+    z-index: 1;
+}
+
+.badge-img-container__foreground {
+    z-index: 2;
+}
 
 #badge-list-form-container {
-  .flex-list.buttons li {
-    flex: 1 50%;
+    .flex-list.buttons li {
+        flex: 1 50%;
 
-    @media #{$small-only} {
-      flex: 1 auto;
+        @media #{$small-only} {
+            flex: 1 auto;
+        }
     }
-  }
 }
 
 .reveal-modal {
-  .badge-card {
-    margin-bottom: 1rem;
-  }
-  .achievements-grid {
-    margin-bottom: 1rem;
-    li {
-      border: 0;
-      box-shadow: none;
-      p {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-      }
+    .badge-card {
+        margin-bottom: 1rem;
     }
-  }
-  @media #{$small-only} {
-    .achievements-grid li {
-      width: 50%;
+
+    .achievements-grid {
+        margin-bottom: 1rem;
+
+        li {
+            border: 0;
+            box-shadow: none;
+
+            p {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+        }
     }
-  }
+
+    @media #{$small-only} {
+        .achievements-grid li {
+            width: 50%;
+        }
+    }
 }
 
 // Create badge page
 [data-icon-selection] {
-  background-color: $vapor;
-  text-align: center;
-  margin-bottom: .5rem;
+    background-color: $vapor;
+    text-align: center;
+    margin-bottom: .5rem;
 
-  img {
-    margin: .5rem;
-  }
+    img {
+        margin: .5rem;
+    }
 }
 
 .awards, .activity-feed, .badge-modal, .badges {
-  /* Goals are greyscaled
-   * Achievements are full colour
-   */
-  img.goal {
-    filter: grayscale(100%);
-  }
+    /* Goals are greyscaled
+     * Achievements are full colour
+     */
+    img.goal {
+        filter: grayscale(100%);
+    }
 }
 
 /* Icon Picker Modal has a lot of categories in it, we need
  * to add some vertical scroll for small viewport guys
  */
 .icon-picker {
-  .icon-category-list-container {
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-  img {
-    margin-right: .5rem;
-    margin-bottom: .5rem;
-    padding: .25rem;
-    width: 4.5rem;
-
-    &:hover {
-      background-color: $content-ui-hover;
-      cursor: pointer;
+    .icon-category-list-container {
+        max-height: 80vh;
+        overflow-y: auto;
     }
-  }
+
+    img {
+        margin-right: .5rem;
+        margin-bottom: .5rem;
+        padding: .25rem;
+        width: 4.5rem;
+
+        &:hover {
+            background-color: $content-ui-hover;
+            cursor: pointer;
+        }
+    }
 }
 
 .badge.skeleton {
-  display: inline-block;
-  margin-bottom: 1rem;
-
-  > .img {
-    width: 12rem;
-    height: 8rem;
-    float: none;
+    display: inline-block;
     margin-bottom: 1rem;
-    margin-right: 0;
 
-    @media #{$small-only} {
-      width: 8rem;
-      height: 5rem;
+    > .img {
+        width: 12rem;
+        height: 8rem;
+        float: none;
+        margin-bottom: 1rem;
+        margin-right: 0;
+
+        @media #{$small-only} {
+            width: 8rem;
+            height: 5rem;
+        }
     }
-  }
 }

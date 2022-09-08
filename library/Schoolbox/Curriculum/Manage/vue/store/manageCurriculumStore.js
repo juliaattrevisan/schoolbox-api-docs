@@ -3,10 +3,12 @@
  */
 
 import { defineStore } from 'pinia';
-import { useCodesStore } from './mcCodesStore';
+import { useNodesStore } from './mcNodesStore';
 
 
-export const useStore = defineStore('curriculumSelectorStore', {
+export let apiEndpoint = '';
+
+export const useStore = defineStore('manageCurriculum', {
 
     state: () => ({
         isLoading: true, //to display loading note
@@ -31,27 +33,14 @@ export const useStore = defineStore('curriculumSelectorStore', {
     actions: {
 
         /**
-         * load all the curriculum data
+         * load the top level curriculums
          *
          * @param { String }
          */
-        async load (dataEndpoint) {
-            try {
-                const response = await fetch(dataEndpoint);
-                if (response.ok) {
-                    const responseJson = await response.json();
-                    const codesStore = useCodesStore();
-                    codesStore.load(responseJson);
-                } else {
-                    console.warn(response);
-                    this.hasLoadError = true; //show the load error display state
-                }
-            } catch (error) {
-                console.warn(error);
-                this.hasLoadError = true; //show the load error display state
-            } finally {
-                this.isLoading = false; //otherwise show the table
-            }
+        load (endpoint) {
+            apiEndpoint = endpoint;
+            const nodesStore = useNodesStore();
+            nodesStore.initTopLevel();
         },
 
     },

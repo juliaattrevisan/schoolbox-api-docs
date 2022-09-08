@@ -89,8 +89,8 @@ class Query
             $userIds,
             [
                 'order' => [
-                    'lastname'  => 'ASC',
-                    'firstname' => 'ASC',
+                    'lastname'   => 'ASC',
+                    'chosen_name' => 'ASC',
                 ]
             ]
         );
@@ -99,6 +99,7 @@ class Query
             $result[$key]['id']             = $user->getId();
             $result[$key]['externalId']     = $user->getExternalId();
             $result[$key]['firstname']      = $user->getFirstname();
+            $result[$key]['preferredName']  = $user->getPreferredName();
             $result[$key]['lastname']       = $user->getLastname();
             $result[$key]['formattedName']  = $user->formatName();
             $result[$key]['metadata']       = $user->formatMetadata();
@@ -125,7 +126,7 @@ class Query
         $statement = $this->db->prepareQuery(
             'SELECT DISTINCT u.id FROM user u INNER JOIN `groups` g ON u.group_id = g.id'
             . $where
-            . ' ORDER BY u.lastname, u.firstname ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
+            . ' ORDER BY u.lastname, u.chosen_name ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
         );
 
         $statement->execute($params);
@@ -172,8 +173,11 @@ class Query
             '(
                 CONCAT_WS(" ", u.title, u.firstname, u.lastname) LIKE :firstLastNameWithTitle
                 OR CONCAT_WS(" ", u.firstname, u.lastname) LIKE :firstAndLastNameOnly
+                OR CONCAT_WS(" ", u.title, u.preferred_name, u.lastname) LIKE :preferredLastNameWithTitle
+                OR CONCAT_WS(" ", u.preferred_name, u.lastname) LIKE :preferredAndLastNameOnly
                 OR CONCAT_WS(" ", u.title, u.lastname) LIKE :titleAndLastnameOnly
                 OR u.firstname LIKE :firstname
+                OR u.preferred_name LIKE :preferred_name
                 OR u.lastname LIKE :lastname
                 OR u.username LIKE :username
             )',
@@ -181,12 +185,15 @@ class Query
         ];
 
         $params = [
-            'firstLastNameWithTitle'    => $searchString,
-            'firstAndLastNameOnly'      => $searchString,
-            'titleAndLastnameOnly'      => $searchString,
-            'firstname'                 => $searchString,
-            'lastname'                  => $searchString,
-            'username'                  => $searchString,
+            'firstLastNameWithTitle'     => $searchString,
+            'firstAndLastNameOnly'       => $searchString,
+            'preferredLastNameWithTitle' => $searchString,
+            'preferredAndLastNameOnly'   => $searchString,
+            'titleAndLastnameOnly'       => $searchString,
+            'firstname'                  => $searchString,
+            'preferred_name'             => $searchString,
+            'lastname'                   => $searchString,
+            'username'                   => $searchString,
         ];
 
         /**

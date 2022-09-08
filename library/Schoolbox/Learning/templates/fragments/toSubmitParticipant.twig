@@ -20,7 +20,7 @@
     <div class="compact card small-11">
         <div>
             {% include 'include/portrait.twig' with {user: participant.user, description: participant.user.fullName} only %}
-            <p>{{ participant.user.firstname }} {{ participant.user.lastname }}</p>
+            <p>{{ participant.user.fullName }}</p>
         </div>
     </div>
     <div class="small-1 columns no-pad">
@@ -52,7 +52,7 @@
                 <div class="compact card">
                     <div>
                         {% include 'include/portrait.twig' with {user: participant.user, description: participant.user.fullName} only %}
-                        <p>{{ participant.user.firstname }} {{ participant.user.lastname }}</p>
+                        <p>{{ participant.user.fullName }}</p>
                     </div>
                 </div>
             </a>

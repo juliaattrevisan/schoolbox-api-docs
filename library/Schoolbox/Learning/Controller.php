@@ -15,7 +15,6 @@ use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use Exception;
 use InvalidArgumentException;
-use JetBrains\PhpStorm\NoReturn;
 use LogicException;
 use OutOfRangeException;
 use Schoolbox\Config\ConfigMapper;
@@ -54,48 +53,6 @@ use function func_get_args;
  */
 class Controller extends Base
 {
-    /** @var TermMapper */
-    private TermMapper $termMapper;
-
-    /** @var FolderMapper */
-    private FolderMapper $folderMapper;
-
-    /** @var AssessmentMapperProxy */
-    private AssessmentMapperProxy $assessmentMapperProxy;
-
-    /** @var Timetable_ColourMapper */
-    private Timetable_ColourMapper $timetableColourMapper;
-
-    /** @var Filter\Selection\Mapper */
-    private Filter\Selection\Mapper $filterSelectionMapper;
-
-    /** @var AssessmentFilters\IdFinder */
-    private AssessmentFilters\IdFinder $assessmentIdFinder;
-
-    /** @var Folder\ClassListFactory */
-    private Folder\ClassListFactory $classListFactory;
-
-    /** @var UserMapper */
-    private UserMapper $userMapper;
-
-    /** @var Folder\Log\Mapper */
-    private Folder\Log\Mapper $logMapper;
-
-    /** @var External_ClassInterface */
-    private External_ClassInterface $externalClass;
-
-    /**
-     * For translating Terminology
-     * @var RosettaStone
-     */
-    private RosettaStone $rosettaStone;
-
-    /**
-     * for building the assessment query
-     * @var IConnector $database
-     */
-    private IConnector $database;
-
     private const LABEL_KEY = 'label';
 
     private const ISCHECKED_KEY = 'isChecked';
@@ -119,31 +76,19 @@ class Controller extends Base
      * @param IConnector                 $database
      */
     public function __construct(
-        AssessmentMapperProxy $assessmentMapperProxy,
-        FolderMapper $folderMapper,
-        TermMapper $termMapper,
-        Timetable_ColourMapper $timetableColourMapper,
-        Filter\Selection\Mapper $filterSelectionMapper,
-        AssessmentFilters\IdFinder $assessmentIdFinder,
-        Folder\ClassListFactory $classListFactory,
-        UserMapper $userMapper,
-        Folder\Log\Mapper $logMapper,
-        External_ClassInterface $externalClass,
-        RosettaStone $rosettaStone,
-        IConnector $database
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private FolderMapper $folderMapper,
+        private TermMapper $termMapper,
+        private Timetable_ColourMapper $timetableColourMapper,
+        private Filter\Selection\Mapper $filterSelectionMapper,
+        private AssessmentFilters\IdFinder $assessmentIdFinder,
+        private Folder\ClassListFactory $classListFactory,
+        private UserMapper $userMapper,
+        private Folder\Log\Mapper $logMapper,
+        private External_ClassInterface $externalClass,
+        private RosettaStone $rosettaStone,
+        private IConnector $database
     ) {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->termMapper            = $termMapper;
-        $this->folderMapper          = $folderMapper;
-        $this->timetableColourMapper = $timetableColourMapper;
-        $this->filterSelectionMapper = $filterSelectionMapper;
-        $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->classListFactory      = $classListFactory;
-        $this->userMapper            = $userMapper;
-        $this->logMapper             = $logMapper;
-        $this->externalClass         = $externalClass;
-        $this->rosettaStone          = $rosettaStone;
-        $this->database              = $database;
     }
 
     /**
@@ -312,7 +257,7 @@ class Controller extends Base
                 foreach ($assessment->getAllParticipants() as $participant) {
                     if ($participant->isResponseRequired()) {
                         $student = $participant->getUser();
-                        $assessmentStudentsToEmail[$assessment->getId()][$student->getId()] = $student->getFormattedEmailDisplay();
+                        $assessmentStudentsToEmail[$assessment->getId()][] = $student->getId();
                     }
                 }
             }
@@ -326,7 +271,6 @@ class Controller extends Base
             'assessmentsToMark'         => $assessmentsToMark,
             'assessmentsToChase'        => $assessmentsToChase,
             'assessmentStudentsToEmail' => $assessmentStudentsToEmail,
-            'emailSeparator'            => Mailer::implodeGlue(),
         ])->getAsString();
     }
 
@@ -426,7 +370,6 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learning/classLists.twig', [
                 'specialNeeds'           => $this->rosettaStone->translate('specialNeeds', true, true),
-                'replyTo'                => $this->getUser()->getEmail(),
                 'mailEnabled'            => $this->getConfigLoader()->get('mail_enable'),
                 'pastoralEnabled'        => $this->getConfigLoader()->get('pastoral_enabled') && $this->getUser()->isStaffWithPastoralAccess(),
                 'learningMomentsEnabled' =>
@@ -452,21 +395,21 @@ class Controller extends Base
         $availableEmailGroups = [
             'email_all_parents'  => [
                 self::LABEL_KEY   => 'Parents of selected students',
-                self::LABEL_VALUE => 'parents',
+                self::LABEL_VALUE => 'parents_of',
             ],
             'email_housemasters' => [
                 self::LABEL_KEY   => 'Head of House for selected students',
-                self::LABEL_VALUE => 'housemasters',
+                self::LABEL_VALUE => 'housemasters_of',
             ],
             'email_tutors' => [
                 self::LABEL_KEY   => 'Tutor for selected students',
-                self::LABEL_VALUE => 'tutors',
+                self::LABEL_VALUE => 'tutors_of',
             ],
         ];
 
         $result[] = [
             self::LABEL_KEY     => 'Selected students',
-            self::LABEL_VALUE   => 'students',
+            self::LABEL_VALUE   => 'self',
             self::ISCHECKED_KEY => true,
         ];
 
@@ -487,7 +430,7 @@ class Controller extends Base
      *
      * @param Folder\Model $folder
      */
-    #[NoReturn] public function getAssessmentAudit(Folder\Model $folder): void
+    public function getAssessmentAudit(Folder\Model $folder): void
     {
         $assessmentAudit = new AssessmentAudit($this->folderMapper, $this->database, $this->getConfigLoader()->get('site_school_code'));
         $assessmentAudit->getAssessmentAudit($folder);
