@@ -56,98 +56,31 @@ class Controller extends Base
     protected const UPCOMING_WORK_LIMIT = 20;
 
     /**
-     * External Class data source
-     *
-     * @var External_ClassInterface
-     */
-    protected $externalClass;
-
-    /**
-     * Folder data source
-     *
-     * @var FolderMapper
-     */
-    protected $folderMapper;
-
-    /**
-     * User data source
-     *
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * Term data source
-     *
-     * @var TermMapper
-     */
-    protected $termMapper;
-
-    /**
-     * Assessment data source
-     *
-     * @var AssessmentMapperProxy
-     */
-    protected $assessmentDataSource;
-
-    /**
-     * Participant data source
-     *
-     * @var ParticipantDataSource
-     */
-    protected $participantDataSource;
-
-    /** @var Filter\IFactoryFactory */
-    private $filterFactoryFactory;
-
-    /** @var Filter\Filters\Assessment\IdFinder */
-    private $assessmentIdFinder;
-
-    /** @var Filter\Selection\Mapper */
-    private $filterSelectionMapper;
-
-    /** @var Access */
-    private $access;
-
-
-    /**
      * Constructor
      *
-     * @param External_ClassInterface            $externalClass
-     * @param FolderMapper                       $folderMapper
-     * @param UserMapper                         $userMapper
-     * @param TermMapper                         $termMapper
-     * @param AssessmentMapperProxy              $assessmentDataSource
-     * @param ParticipantDataSource              $participantDataSource
+     * @param External_ClassInterface            $externalClass         - External Class data source.
+     * @param FolderMapper                       $folderMapper          - Folder data source.
+     * @param UserMapper                         $userMapper            - User data source.
+     * @param TermMapper                         $termMapper            - Term data source.
+     * @param AssessmentMapperProxy              $assessmentDataSource  - Assessment data source.
+     * @param ParticipantDataSource              $participantDataSource - Participant data source.
      * @param Filter\IFactoryFactory             $filterFactoryFactory
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Filter\Selection\Mapper            $filterSelectionMapper
      * @param Access                             $access
      */
     public function __construct(
-        External_ClassInterface $externalClass,
-        FolderMapper $folderMapper,
-        UserMapper $userMapper,
-        TermMapper $termMapper,
-        AssessmentMapperProxy $assessmentDataSource,
-        ParticipantDataSource $participantDataSource,
-        Filter\IFactoryFactory $filterFactoryFactory,
-        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Filter\Selection\Mapper $filterSelectionMapper,
-        Access $access
-    ) {
-        $this->externalClass         = $externalClass;
-        $this->folderMapper          = $folderMapper;
-        $this->userMapper            = $userMapper;
-        $this->termMapper            = $termMapper;
-        $this->assessmentDataSource  = $assessmentDataSource;
-        $this->participantDataSource = $participantDataSource;
-        $this->filterFactoryFactory  = $filterFactoryFactory;
-        $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->filterSelectionMapper = $filterSelectionMapper;
-        $this->access                = $access;
-    }
-
+        protected External_ClassInterface $externalClass,
+        protected FolderMapper $folderMapper,
+        protected UserMapper $userMapper,
+        protected TermMapper $termMapper,
+        protected AssessmentMapperProxy $assessmentDataSource,
+        protected ParticipantDataSource $participantDataSource,
+        private Filter\IFactoryFactory $filterFactoryFactory,
+        private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        private Filter\Selection\Mapper $filterSelectionMapper,
+        private Access $access
+    ) {}
 
     /**
      * Redirects to the upcoming work screen for the current user.
@@ -164,7 +97,6 @@ class Controller extends Base
             )
         );
     }
-
 
     /**
      * Displays upcoming work for the given user.
@@ -289,7 +221,6 @@ class Controller extends Base
         );
     }
 
-
     /** @noinspection PhpUnused */
     /**
      * Returns a JSON payload containing a HTML fragment where the HTML fragment is a filtered list of assessments.
@@ -365,7 +296,6 @@ class Controller extends Base
             'content' => $this->buildUnthemedHtmlOutput('@learningUpcoming/upcomingInner.twig', $data)->getAsString(),
         ]));
     }
-
 
     /**
      * Returns a array that maps filter ids to slugs so we can apply semantics to the IDs
