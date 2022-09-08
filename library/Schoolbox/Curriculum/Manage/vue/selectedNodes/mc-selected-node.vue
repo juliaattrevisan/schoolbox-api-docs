@@ -5,6 +5,7 @@
  * further details revealed via a modal
  */
 
+import { computed } from 'vue';
 import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
 
 
@@ -27,6 +28,19 @@ const props = defineProps({
 });
 
 const selectedCodesStore = useSelectedNodesStore();
+
+/**
+ * Add in the code if it's available otherwise just show the title
+ *
+ * @returns { String }
+ */
+const title = computed(() => {
+    if (props.node.code && props.node.code !== '') {
+        return `[${props.node.code}]`;
+    } else {
+        return props.node.name;
+    }
+});
 
 /**
  * To open a modal that shows further info on the selected code
@@ -52,7 +66,7 @@ function onRemoveSelected () {
             @click.prevent="onTitleSelected"
             @keyup.enter="onTitleSelected"
             data-test-title-button>
-            {{ props.node.name }}
+            {{ title }}
         </button>
         <button
             class="remove-button icon-close"
