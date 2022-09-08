@@ -17,6 +17,7 @@ import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
 import McViewNodeCheckbox from './mc-view-node-checkbox.vue';
 import McViewNodeName from './mc-view-node-name.vue';
 import McViewNodeActions from './mc-view-node-actions.vue';
+import McViewNodeToast from './mc-view-node-toast.vue';
 import McAddSubsection from '../activeNode/mc-add-subsection.vue';
 import McUpdateNode from '../activeNode/mc-update-node.vue';
 
@@ -200,10 +201,10 @@ async function onLeave (el, done) {
                 :isAdding="isAdding"
                 :isUpdatingOrAdding="isUpdatingOrAdding"
             />
-            <!-- <div class="alert-box success messsage-container">
-                Node successfully updated
-                <a href="" class="close">×</a>
-            </div> -->
+            <mc-view-node-toast
+                :node="props.node"
+                :title="title"
+            />
         </div>
         <Transition @enter="onEnter" @leave="onLeave">
             <mc-add-subsection v-if="isAdding" :depth="props.depth" />
@@ -229,17 +230,10 @@ async function onLeave (el, done) {
     border-bottom: 1px solid v-bind(borderBottomColour);
     display: flex;
     margin: 0 0 0 v-bind(marginLeft);
+    min-height: 52px;
     padding: 2px;
     position: relative;
-    transition: 0.3s;
-}
-
-.messsage-container {
-    height: 100%;
-    left: 0;
-    top: 0;
-    position: absolute;
-    width: 100%;
+    transition: opacity 0.3s;
 }
 
 ul {
