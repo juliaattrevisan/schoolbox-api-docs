@@ -110,7 +110,7 @@ function onCancelSelected () {
                         <textarea :id="ckeditorInstance" rows="6"></textarea>
                     </div>
                     <div class="small-12 columns">
-                        <ul class="flex-list buttons">
+                        <ul class="flex-list">
                             <li>
                                 <button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button icon-close" :disabled="addCurriculumStore.isProcessing">Cancel</button>
                             </li>
