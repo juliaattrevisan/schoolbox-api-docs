@@ -6,14 +6,13 @@
 
 import { ref, onMounted, computed } from 'vue';
 import { timeout } from '@js/util/jsUtils';
-import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
+import { useAddCurriculumStore } from '../store/mcAddCurriculumStore';
 import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
 import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
 
 
-// const activeNodeStore = useActiveNodeStore();
+const addCurriculumStore = useAddCurriculumStore();
 const addSubsectionStore = useAddSubsectionStore();
-// const updateNodeStore = useUpdateNodeStore();
 
 
 const props = defineProps({
@@ -52,6 +51,9 @@ onMounted(() => {
     if (props.node.id === addSubsectionStore.id) {
         display('added');
         addSubsectionStore.unsetId();
+    } else if (props.node.id === addCurriculumStore.id) {
+        display('added');
+        addCurriculumStore.unsetId();
     }
 });
 
@@ -131,7 +133,8 @@ function onCloseSelected () {
     top: 0;
     width: 100%;
     .close {
-        right: 0.25rem;
+        top: 2px;
+        right: 0.2rem;
     }
 }
 

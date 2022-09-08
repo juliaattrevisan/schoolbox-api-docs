@@ -5,6 +5,10 @@
 import { defineStore } from 'pinia';
 import { apiEndpoint } from './manageCurriculumStore';
 import { useNodesStore } from './mcNodesStore';
+import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
+
+
+const UNSET_ID = -1;
 
 
 export const useAddCurriculumStore = defineStore('mcAddCurriculum', {
@@ -13,6 +17,7 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', {
         isProcessing: false,
         isOpen: false, //to notify that the prompt is opened / closed
         curriculum: {},
+        id: UNSET_ID, //the id of the last updated node
     }),
 
     actions: {
@@ -41,10 +46,13 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', {
                 });
                 if (response.ok) {
                     const newCurriculum = await response.json();
+                    this.id = newCurriculum.id;
                     const nodesStore = useNodesStore();
                     nodesStore.addNewCurriculum(newCurriculum);
+                    useViewNodesStore().reset();
                     this.isProcessing = false;
                     this.cancel();
+                    return newCurriculum.id;
                 } else {
                     throw new Error();
                 }
@@ -58,6 +66,13 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', {
          */
         cancel () {
             this.isOpen = false;
+        },
+
+        /**
+         * to unset the id, called when the toast has already been displayed once
+         */
+        unsetId () {
+            this.id = UNSET_ID;
         },
 
     },
