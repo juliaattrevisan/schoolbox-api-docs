@@ -3,11 +3,10 @@
  */
 
 import { defineStore } from 'pinia';
-import { randomId } from '@js/util/jsUtils';
 import { useSelectedCodesStore } from './csSelectedCodesStore';
 
 
-export const useModalSelectedCodesStore = defineStore(`csModalSelectedCodes__${randomId()}`, {
+export const useModalSelectedCodesStore = defineStore(`csModalSelectedCodes`, {
 
     state: () => ({
         codes: [], //the currently selected codes in the current modal session, with any previously selected also considered

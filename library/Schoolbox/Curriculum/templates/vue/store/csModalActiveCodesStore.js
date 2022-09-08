@@ -4,7 +4,6 @@
  */
 
 import { defineStore } from 'pinia';
-import { randomId } from '@js/util/jsUtils';
 import { useCodesStore, findById } from './csCodesStore';
 import { useModalSearchStore } from './csModalSearchStore';
 
@@ -13,7 +12,7 @@ export const DIRECTION = {
     BACKWARDS: 'backwards',
 }
 
-export const useModalActiveCodesStore = defineStore(`csModelActive__${randomId()}`, {
+export const useModalActiveCodesStore = defineStore(`csModelActive`, {
 
     state: () => ({
         idList: [], //ids of the selected nodes

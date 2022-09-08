@@ -3,11 +3,10 @@
  */
 
 import { defineStore } from 'pinia';
-import { randomId } from '@js/util/jsUtils';
 import { useModalSelectedCodesStore } from './csModalSelectedCodesStore';
 
 
-export const useModalStore = defineStore(`csModal__${randomId()}`, {
+export const useModalStore = defineStore(`csModal`, {
 
     state: () => ({
         isOpen: false, //to notify that the modal is opened / closed
