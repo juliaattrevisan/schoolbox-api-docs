@@ -8,8 +8,10 @@
 
 namespace Schoolbox\Learning\Upcoming;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
 use DomainException;
@@ -33,17 +35,20 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme\Factory;
-use Schoolbox\Mapper;
 use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use UnderflowException;
 use UnexpectedValueException;
 
-use function func_get_args;
+use function array_merge;
+use function array_unique;
+use function count;
 
 /**
  * Controller for the upcoming work screen.
@@ -86,7 +91,7 @@ class Controller extends Base
      * Redirects to the upcoming work screen for the current user.
      *
      * @api GET /learning/due/
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     public function getUpcoming(): void
     {
@@ -101,18 +106,17 @@ class Controller extends Base
     /**
      * Displays upcoming work for the given user.
      *
-     * @api   GET /learning/due/:studentId{/:date}
      * @param User                $student
      * @param Alaress_Date_Format $date
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws InvalidColumnException
+     * @throws RouteNotFound
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws DefinitionException
-     * @throws \UnderflowException
-     * @throws UnexpectedValueException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException|Exception
+     * @api   GET /learning/due/:studentId{/:date}
      */
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date): void
     {
@@ -140,16 +144,15 @@ class Controller extends Base
 
         // Calculate whether we need to load participation so we can calculate class aggregate grades
         $displayGradesForFolders = [];
-        $isStaff                   = $this->getUser()->getRole()->isStaff();
-        $isStudentOrParent         = $this->getUser()->getRole()->isStudent() || $this->getUser()->getRole()->isParent();
+        $isStaff                 = $this->getUser()->getRole()->isStaff();
 
         foreach ($folders as $folder) {
             // Load teachers for this subject (if this subject has them)
             $teachers = [];
-            if (\count($folder->getCodes())) {
+            if (count($folder->getCodes())) {
                 // Actual teachers only
                 $teacherCodes = $this->externalClass->getTeachers($folder->getCodeString());
-                if (\count($teacherCodes)) {
+                if (count($teacherCodes)) {
                     $pb       = $this->userMapper->getPredicateBuilder()
                                                  ->in('synergy_id', $teacherCodes)
                                                  ->equals('g.group_type', Role::STAFF);
@@ -158,9 +161,9 @@ class Controller extends Base
             }
             $perm = $this->access->getFolderAccess($this->getUser(), $folder->getId());
 
-            // We need to fetch assessments so we can show overall grades for each folder if:
+            // We need to fetch assessments, so we can show overall grades for each folder if:
             // * viewer is staff/instructor
-            // * viewer is student/parent && 'show_overall_grade' is ON .. will be taken care of later
+            // * viewer is student/parent && 'show_overall_grade' is ON ... will be taken care of later
             if ($isStaff || $perm >= UserAccess::ACCESS_WRITE) {
                 $displayGradesForFolders[] = $folder;
             }
@@ -176,7 +179,7 @@ class Controller extends Base
 
         $markSchemeFactory = new Factory($this->getConfigLoader());
 
-        if (\count($displayGradesForFolders)) {
+        if (count($displayGradesForFolders)) {
             $visibility = new Visibility($this->access);
             // Student's work
             $workPerFolder = $this->assessmentDataSource
@@ -223,7 +226,7 @@ class Controller extends Base
 
     /** @noinspection PhpUnused */
     /**
-     * Returns a JSON payload containing a HTML fragment where the HTML fragment is a filtered list of assessments.
+     * Returns a JSON payload containing an HTML fragment where the HTML fragment is a filtered list of assessments.
      *
      * @api /learning/due/{studentId:\d+}
      *
@@ -233,7 +236,7 @@ class Controller extends Base
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws DefinitionException
-     * @throws Mapper\Exception
+     * @throws Exception
      * @throws UnexpectedValueException
      */
     public function postUpcomingForStudent(User $student): void
@@ -246,7 +249,7 @@ class Controller extends Base
 
         // Only fetch assessments that are:
         // * assessment impls
-        $filters = \array_merge($filters, [
+        $filters = array_merge($filters, [
             Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
         ]);
 
@@ -285,7 +288,7 @@ class Controller extends Base
             'student'         => $student,
             'upcomingWork'    => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
             'returnUrl'       => Redirect::queryString(RequestUriParser::parseUrlPath($this->request->server->getArrayCopy())),
-            'readableFolders' => \array_unique($readableFolders),
+            'readableFolders' => array_unique($readableFolders),
             'isFiltered'      => (new Filter\RequestChecker())->isFilteredRequest($request),
         ];
 
@@ -298,7 +301,7 @@ class Controller extends Base
     }
 
     /**
-     * Returns a array that maps filter ids to slugs so we can apply semantics to the IDs
+     * Returns an array that maps filter ids to slugs, so we can apply semantics to the IDs
      *
      * @param Filter\Panel $filterPanel
      * @return array
@@ -315,7 +318,7 @@ class Controller extends Base
 
     /**
      * @param User $student
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Exception
      */
     public function getEvents(User $student): void
     {
