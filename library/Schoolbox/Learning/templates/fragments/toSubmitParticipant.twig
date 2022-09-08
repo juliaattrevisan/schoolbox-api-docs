@@ -9,6 +9,7 @@
         isQuiz:       bool                   (optional) Override to indicate to render as Quiz
         isDueWork:    bool                   (optional) Override to indicate to render as DueWork
 #}
+
 {# Enable insertion of non IAssessable instance data transfer objects #}
 {% set isTask     = isTask    ?? assessment is task %}
 {% set isQuiz     = isQuiz    ?? assessment is quiz %}
@@ -58,7 +59,10 @@
         </div>
         {% if ackReceipt %}
             <div class="small-6 medium-4 columns no-pad component-action text-right">
-                <a class="button" data-sobo title="Acknowledge receipt of student submission" href="{{ ackReceipt }}">Mark as Submitted</a>
+                <a class="button" data-sobo data-assessment-due-at-unix="{{ assessment.dueAt.unixTimestamp }}"
+                 title="Acknowledge receipt of student submission" href="{{ ackReceipt }}">
+                    Mark as Submitted
+                </a>
             </div>
         {% endif %}
     {% endif %}

@@ -1324,20 +1324,17 @@ class Controller extends Assessment\Controller
      */
     public function postStatusAcknowledge(IAssessable $assessment, User $student): void
     {
-        // NOTE: We do not use $assessment->isOverdue() because that will return true only if now is between dueAt and closeAt.
-        //       For assessments able to be submitted offline (which we deal with here), closeAt will always equal dueAt, and
-        //       so isOverdue() will return false if now is after dueAt/closeAt.  Therefore function isOverdue() is not applicable here.
-        if (Alaress_Date_Format::now()->gt($assessment->getDueAt())) {
-            // If the 'submissionWasOnTime' parameter is true, then this is a late acknowledgement of an event that occurred earlier.
-            // Otherwise, set submission time to 'now' to align with the behaviour before parameter 'submissionWasOnTime' was introduced.
-            $submittedLate  = !$this->getRequest()->post->getBool('submissionWasOnTime', false);
-            $submissionTime = ($submittedLate)? Alaress_Date_Format::now(): $assessment->getDueAt()->addSeconds(-1); // 1 second before due time.
-        } else {
-            $submittedLate  = false;
-            $submissionTime = Alaress_Date_Format::now();
-        }
-
         try {
+            if ($assessment->isOverdue() || $assessment->isPastClose()) {
+                // If the 'submissionWasOnTime' parameter is true, then this is a late acknowledgement of an event that occurred earlier.
+                // Otherwise, set submission time to 'now' to align with the behaviour before parameter 'submissionWasOnTime' was introduced.
+                $submittedLate  = !$this->getRequest()->post->getBool('submissionWasOnTime', false);
+                $submissionTime = ($submittedLate)? Alaress_Date_Format::now(): $assessment->getDueAt()->addSeconds(-1); // 1 second before due time.
+            } else {
+                $submittedLate  = false;
+                $submissionTime = Alaress_Date_Format::now();
+            }
+
             $response = $this->persistAcknowledgementResponse($assessment, $student, $submissionTime);
             $data     = [
                 'success'       => true,
@@ -1354,6 +1351,56 @@ class Controller extends Assessment\Controller
         }
         $this->getResponse()->status->set($code);
         $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+
+    /**
+     * Acknowledge receipt of (potentially offline) submission
+     *
+     * Creates an empty SOBO. Needs a different route to postCreateResponse()
+     * to cater for different auth rules.
+     *
+     * @param IAssessable|Model $assessment
+     * @param User              $student
+     * @throws UnexpectedValueException
+     * @api   POST /learning/assessments/:assessmentId/:studentId/ack
+     * @since 17.0
+     */
+    public function postPendingAcknowledge(IAssessable $assessment, User $student): void
+    {
+        try {
+            if ($assessment->isOverdue() || $assessment->isPastClose()) {
+                // If the 'submissionWasOnTime' parameter is true, then this is a late acknowledgement of an event that occurred earlier.
+                // Otherwise, set submission time to 'now' to align with the behaviour before parameter 'submissionWasOnTime' was introduced.
+                $submittedLate  = !$this->getRequest()->post->getBool('submissionWasOnTime', false);
+                $submissionTime = ($submittedLate)? Alaress_Date_Format::now(): $assessment->getDueAt()->addSeconds(-1); // 1 second before due time.
+            } else {
+                $submissionTime = Alaress_Date_Format::now();
+            }
+
+            $this->persistAcknowledgementResponse($assessment, $student, $submissionTime);
+            $participant = $assessment->getParticipant($student);
+            $this->getResponse()->content->set(
+                $this->buildUnthemedHtmlOutput(
+                    '@learning/fragments/toMarkParticipant.twig', [
+                        'participant' => $participant,
+                        'assessment'  => $participant->getAssessable(),
+                    ]
+                )
+            );
+            $code = 200;
+        } catch (PDOException $e) {
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput(
+                    [
+                        'success' => false,
+                        'message' => $e->getMessage(),
+                    ]
+                )
+            );
+            $code = 403;
+        }
+        $this->getResponse()->status->set($code);
     }
 
 
@@ -1424,48 +1471,6 @@ class Controller extends Assessment\Controller
         }
         $this->getResponse()->status->set($code);
         $this->getResponse()->content->set($this->buildJsonOutput($data));
-    }
-
-
-    /**
-     * Acknowledge receipt of (potentially offline) submission
-     *
-     * Creates an empty SOBO. Needs a different route to postCreateResponse()
-     * to cater for different auth rules.
-     *
-     * @param IAssessable|Model $assessment
-     * @param User              $student
-     * @throws UnexpectedValueException
-     * @api   POST /learning/assessments/:assessmentId/:studentId/ack
-     * @since 17.0
-     */
-    public function postPendingAcknowledge(IAssessable $assessment, User $student): void
-    {
-        try {
-            $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
-            $participant = $assessment->getParticipant($student);
-            $this->getResponse()->content->set(
-                $this->buildUnthemedHtmlOutput(
-                    '@learning/fragments/toMarkParticipant.twig',
-                    [
-                    'participant' => $participant,
-                    'assessment'  => $participant->getAssessable(),
-                    ]
-                )
-            );
-            $code = 200;
-        } catch (PDOException $e) {
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput(
-                    [
-                        'success' => false,
-                        'message' => $e->getMessage(),
-                    ]
-                )
-            );
-            $code = 403;
-        }
-        $this->getResponse()->status->set($code);
     }
 
 
