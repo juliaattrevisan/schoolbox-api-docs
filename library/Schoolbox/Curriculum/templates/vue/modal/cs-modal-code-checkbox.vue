@@ -6,12 +6,13 @@
  */
 
 import { computed } from 'vue';
+import { randomId } from '@js/util/jsUtils';
 import { UNSET_ID } from '../store/csCodesStore';
 import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
 
 
 const modalSelectedCodesStore = useModalSelectedCodesStore();
-
+const extraId = randomId(); //to ensure a an id is unique
 
 const props = defineProps({
     /**
@@ -72,13 +73,13 @@ function onChange (isChecked) {
 <template>
     <div v-if="isVisible" class="checklist">
         <input
-            :id="`checkbox-${props.code.id}`"
+            :id="`checkbox-${props.code.id}__${extraId}`"
             type="checkbox"
             :value="props.code.id"
             :checked="isChecked"
             @change="onChange($event.target.checked)"
         />
-        <label :for="`checkbox-${props.code.id}`"></label>
+        <label :for="`checkbox-${props.code.id}__${extraId}`"></label>
     </div>
 </template>
 

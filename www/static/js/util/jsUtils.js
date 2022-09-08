@@ -52,7 +52,7 @@ export const escapeRegExp = (string) => {
 }
 
 /**
- *
+ * generate a random string to ensure an id is unique
  *
  * @returns { String }
  */
