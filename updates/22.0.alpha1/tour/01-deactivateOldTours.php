@@ -18,6 +18,7 @@ $app = new class extends CliTool\App {
             '21.1 Release',
             '22.0 Release',
         ];
+
         $now = (\Alaress_Date_Format::now())->getDatabase();
         foreach ($titles as $title) {
             $query = $this->getDatabaseInternal()->executeQuery(
@@ -25,6 +26,10 @@ $app = new class extends CliTool\App {
                 ['title' => $title]
             );
             $tourUuid = $query->fetchColumn();
+
+            if (!$tourUuid) {
+                continue;
+            }
 
             $deleteStep = $this->getDatabaseInternal()->prepareQuery(
                 "UPDATE `tour_step` SET `deleted_at` = :now WHERE `tour_uuid` = :uuid"
@@ -36,6 +41,16 @@ $app = new class extends CliTool\App {
                  (SELECT `uuid` FROM `tour_step` WHERE `tour_uuid` = :uuid)"
             );
             $deleteModal->execute(['uuid' => $tourUuid, 'now' => $now]);
+
+            $deleteTrigger = $this->getDatabaseInternal()->prepareQuery(
+                "UPDATE `tour_trigger` SET `deleted_at` = :now WHERE `tour_uuid` = :uuid"
+            );
+            $deleteTrigger->execute(['uuid' => $tourUuid, 'now' => $now]);
+
+            $deleteTour = $this->getDatabaseInternal()->prepareQuery(
+                "UPDATE `tour` SET `deleted_at` = :now WHERE `uuid` = :uuid"
+            );
+            $deleteTour->execute(['uuid' => $tourUuid, 'now' => $now]);
         }
     }
 };
