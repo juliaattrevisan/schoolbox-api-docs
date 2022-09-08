@@ -16,17 +16,13 @@
                     {% if record.owner.isDeleted() %}
                         {{ profile.imageSquare64(record.owner) }}
                         <span class="neutral label right">Author</span>
-                        <p>
-                            {{ record.owner.firstname }} {{ record.owner.lastname }}
-                        </p>
+                        <p>{{ record.owner.fullName }}</p>
                         <p class="meta">Author</p>
                     {% else %}
                         <a href="{{ profile.link(record.owner) }}">
                             {{ profile.imageSquare64(record.owner) }}
                             <span class="neutral label right">Author</span>
-                            <p>
-                                {{ record.owner.firstname }} {{ record.owner.lastname }}
-                            </p>
+                            <p>{{ record.owner.fullName }}</p>
                         </a>
                         <p class="meta">Author</p>
                     {% endif %}

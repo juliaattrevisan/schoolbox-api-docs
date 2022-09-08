@@ -926,11 +926,6 @@ parameters:
 			path: library/Component/Homepage/ImageController.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Component/Homepage/MembersController.php
-
-		-
 			message: "#^Variable \\$partCount might not be defined\\.$#"
 			count: 1
 			path: library/Component/Homepage/PinterestController.php
@@ -5271,16 +5266,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/IResponse.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:restoreResponsesAndFeedbacks\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:softDeleteResponsesAndFeedbacks\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/ListController.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/ListController.php
@@ -6066,11 +6051,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/CommandLineTool/AttachmentUploader.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Pastoral/ReportBuilder/Module.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getId\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Revision/Mapper.php
@@ -6446,29 +6426,9 @@ parameters:
 			path: library/Schoolbox/Resource/Attachment/Collector/StorageHandler.php
 
 		-
-			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\MyfileController has an unused parameter \\$useFolder\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Filesystem/MyfileController.php
-
-		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\Teams\\\\ValidTeamsMeetingUrl\\:\\:isSatisifiedBy\\(\\) should return int\\|false but returns bool\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Attachment/Filesystem/Teams/ValidTeamsMeetingUrl.php
-
-		-
-			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\TeamsController has an unused parameter \\$defaultFolderId\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Filesystem/TeamsController.php
-
-		-
-			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\TeamsController has an unused parameter \\$rosetta\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Filesystem/TeamsController.php
-
-		-
-			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\TeamsController has an unused parameter \\$useFolder\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Filesystem/TeamsController.php
 
 		-
 			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
@@ -7430,19 +7390,3 @@ parameters:
 			message: "#^Variable \\$type might not be defined\\.$#"
 			count: 1
 			path: www/modules/conference/index.php
-		-
-			message: "#^Undefined variable\\: \\$this$#"
-			count: 2
-			path: www/custom/tigs/deans-comments.php
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: www/custom/tigs/deans-comments.php
-		-
-			message: "#^Call to an undefined method Psr\\\\Log\\\\LoggerInterface\\:\\:getResults\\(\\)\\.$#"
-			count: 2
-			path: www/custom/tigs/deans-comments.php
-		-
-			message: "#^Call to an undefined method Psr\\\\Log\\\\LoggerInterface\\:\\:hasErrors\\(\\)\\.$#"
-			count: 1
-			path: www/custom/tigs/deans-comments.php

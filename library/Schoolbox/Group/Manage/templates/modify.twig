@@ -2,6 +2,8 @@
 {{ bread.crumbsArray(breadcrumbs) }}
 <div id="manage-group-container">
     <manage-group
+            show-setting="{{ showSetting }}"
+            group-staff-only="{{ config.group_staff_only }}"
             group-data-endpoint="{{ routeLookupIfAuthorized('group.getData', {'folderId': folder.id, 'folder': folder}) }}"
             remove-members-endpoint="{{ routeLookupIfAuthorized('group.removeMembers', {'folderId': folder.id, 'folder': folder}) }}"
             update-members-endpoint="{{ routeLookupIfAuthorized('group.updateMembers', {'folderId': folder.id, 'folder': folder}) }}"

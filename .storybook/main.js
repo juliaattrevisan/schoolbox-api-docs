@@ -36,6 +36,7 @@ module.exports = {
 
         config.resolve.alias['@js'] = path.resolve(__dirname, '../www/static/js');
         config.resolve.alias['@schoolboxVue'] = path.resolve(__dirname, '../vue');
+        config.resolve.alias['@css'] = path.resolve(__dirname, '../www/static/css');
         config.resolve.alias['@library'] = path.resolve(__dirname, '../library');
 
         // Return the altered config

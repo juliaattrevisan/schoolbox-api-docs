@@ -11,12 +11,9 @@
 <script type="text/javascript" src="{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
     $(function() {
-        $('[data-studentsuggest]').selectizeSelector({
+        $('[data-studentsuggest]').userSelectizeSelector({
             ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
                 data:     {groupID: '{STUDENT_GROUP_TYPE_IDS}', showCampus: true},
-                dataType: 'json'
             },
             multiple: true
         })

@@ -47,7 +47,6 @@ class Browser extends Source\BrowserAbstract
      */
     public function getLearningAreas()
     {
-
         // Fetch a list of all standard documents.
         // Then, group by available education levels?
         $sparql = 'prefix asn: <http://purl.org/ASN/schema/core/>
@@ -169,8 +168,7 @@ class Browser extends Source\BrowserAbstract
      */
     public function getOutcomes(LearningArea\Model $area, LearningLevel\Model $level)
     {
-
-        $collection = new Collection();
+        $collection = $this->nodeMapper->createCollection();
         // Get everything out of the manifest instead of out of RDF queries.
         $curl = new Alaress_Curl_Url($area->getReference() . '-manifest.json');
         $curl->addOptions([CURLOPT_FOLLOWLOCATION => true]);

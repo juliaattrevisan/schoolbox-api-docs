@@ -28,7 +28,6 @@ use Alaress_Date_NullDate;
  */
 class Mapper extends BaseMapper
 {
-
     public function mapping(): void
     {
         $this->hasTable('participant');
@@ -237,6 +236,48 @@ class Mapper extends BaseMapper
 
         // should not get here, but.
         return 0;
+    }
+
+
+    /**
+     * Find a list of participant_plan_id that were assigned for the given assessment
+     *
+     * Users are only meant to have one participation plan, at most.
+     * (Having multiple plans is an error state)
+     *
+     * @param int $assessmentId
+     * @return array
+     * @throws \PDOException
+     */
+    public function findAssignedPlans(int $assessmentId): array
+    {
+        /* Find Plans associated with an assessment
+         *
+         * Multiplayer schoolbox allows $plans to be different upon saving
+         * so you can't use it as a source of truth - $plans ids in one tab
+         * is different to $plans ids in another tab, allowing a misunderstanding
+         * to occur that inadvertently lets a person have multiple plans
+         */
+        $query = "
+            SELECT participant_plan_id
+            FROM {$this->getTable()} p
+            INNER JOIN participant_plan pp ON p.participant_plan_id = pp.id
+            WHERE assessment_id = :assessmentId
+            AND pp.deleted_at IS NULL
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'assessmentId' => $assessmentId,
+        ]);
+
+        $planIds = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $planIds[] = $row['participant_plan_id'];
+        }
+
+        return $planIds;
     }
 
 

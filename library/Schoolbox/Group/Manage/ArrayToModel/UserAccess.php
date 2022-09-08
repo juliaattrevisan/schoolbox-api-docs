@@ -9,31 +9,45 @@ declare(strict_types=1);
 
 namespace Schoolbox\Group\Manage\ArrayToModel;
 
-use Schoolbox\API\Translator\ArrayToModel\Base;
+use InvalidArgumentException;
 use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
 
 /**
  * Translator for translating an array representation of UserAccess into a model.
  */
-class UserAccess extends Base
+class UserAccess
 {
+    /**
+     * @param bool $groupStaffOnly config of whether only staff can be a group admin
+     * @return void
+     */
+    public function __construct(private bool $groupStaffOnly)
+    {
+    }
+
     /**
      * Translate the array representation of the group access into a model.
      */
-    public function __invoke(array $array, ?object $model = null): object
+    public function __invoke(array $array, ?object $model): object
     {
-        if (!isset($model)) {
+        if (!$model) {
             $model = (new UserAccessModel())
                 ->setFavourite(true)
                 ->setService(UserAccessModel::SERVICE_HOMEPAGE)
                 ->setAccessLevel(UserAccessModel::ACCESS_READ);
         }
 
-        $accessLevel = 0;
+        // Only staff can be admin, if $groupStaffOnly is true
         if (isset($array['accessType'])) {
-            $accessLevel = UserAccessModel::ACCESS_NAME_TO_LEVEL[$array['accessType']];
+            if (
+                $this->groupStaffOnly
+                && $array['accessType'] === UserAccessModel::MEMBERSHIP_ADMIN
+                && !$model->getUser()->getRole()->isStaff()
+            ) {
+                throw new InvalidArgumentException('Only staff can be a group admin');
+            }
+            $model->setAccessLevel(UserAccessModel::ACCESS_NAME_TO_LEVEL[$array['accessType']]);
         }
-        $model->setAccessLevel($accessLevel);
         return $model;
     }
 }

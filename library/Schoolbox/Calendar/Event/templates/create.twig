@@ -313,12 +313,9 @@
                                 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
                                 <script type="text/javascript">
                                     $(function() {
-                                        $('#add-guests').selectizeSelector({
+                                        $('#add-guests').userSelectizeSelector({
                                             ajax: {
-                                                url:      '/ajax/user.php',
-                                                type:     'GET',
                                                 data:     {groupID: 0, showCampus: true},
-                                                dataType: 'json'
                                             },
                                             value: [
                                                 {% for guest in guests %}

@@ -24,7 +24,6 @@ use Schoolbox\User;
  */
 class Links
 {
-
     /**
      * The router object, as required to generate a link to content.
      */
@@ -85,13 +84,21 @@ class Links
             ]
         );
 
-
         /* End point for awarding goal
         */
         $translation['goalAward'] = $this->getRouteIfAuthorized(
             'learningBadgeAward.awardAsAchievement',
             [
                 'badgeId' => $award->getBadge()->getId(),
+            ]
+        );
+
+        /* End point for updating properties about an Awarding
+         */
+        $translation['awardUpdate'] = $this->getRouteIfAuthorized(
+            'learningBadgeAward.getAwardUpdate',
+            [
+                'awardId' => $award->getId()
             ]
         );
 

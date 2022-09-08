@@ -29,16 +29,13 @@
         //<!-- END student_autocomplete_javascript -->
 
 		$('[data-selectizeuser]')
-            .selectizeSelector({
+            .userSelectizeSelector({
                 ajax: {
-                    url:      '/ajax/user.php',
-                    type:     'GET',
-					data:     {
+                    data:     {
                         groupID: "{STUDENT_GROUP_IDS}",
                         residentialHouseID: "{RESIDENTIAL_HOUSE_IDS}",
                         showCampus: true
                     },
-                    dataType: 'json'
                 }
             })
         ;

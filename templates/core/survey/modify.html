@@ -135,9 +135,7 @@
     <form action="/survey/import/xml/{ASSESS_CATEGORY_ID}" method="post" enctype="multipart/form-data">
         <input type='hidden' name="is_task" value="{ASSESS_IS_TASK}" />
         <input type="hidden" name="unit_id" value="{ASSESS_UNIT_ID}" />
-        <label>
-            <input name="importXML" type="file" />
-        </label>
+        {ASSESS_IMPORT_ATTACH_ZONE}
         <label>
             <input type="submit" value="Import from XML file" />
         </label>

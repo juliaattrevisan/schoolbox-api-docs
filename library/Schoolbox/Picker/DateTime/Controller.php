@@ -499,8 +499,7 @@ class Controller extends Base
                 $students[] = [
                     'id'             => $studentCurrent->getId(),         // Required for link to student profile
                     'externalId'     => $studentCurrent->getExternalId(), // Required for rendering student photo
-                    'firstname'      => $studentCurrent->getFirstname(),
-                    'lastname'       => $studentCurrent->getLastname(),
+                    'fullName'       => $studentCurrent->getFullName(),
                     'assessmentList' => array_values($assessmentList),
                     'assessmentsDue' => $assessmentsDue,                  // Number of assessments they have due on the date
                 ];

@@ -6,6 +6,7 @@
 
 # Global constants
 readonly cache_dir='/usr/share/schoolbox/vagrantcache'
+readonly VAGRANT_TIMESTAMP_MIN=1660612589              # Box must have been built at or after this
 
 # Global vars
 declare instance_registry_url_override
@@ -54,14 +55,15 @@ function create_mount_dir() {
 
 # Ensure running an appropriate era vagrant box
 function check_vagrant_box_version() {
-  if [ "$(cat /home/vagrant/.vagrant.buildtimestamp)" -gt 1612117411 ]; then
-    echo "[SB][$(date +%Y-%m-%d\ %X)] Vagrant box meets minimum requirements: 1612117411 Current: $(cat /home/vagrant/.vagrant.buildtimestamp)"
+  if [ "$(cat /home/vagrant/.vagrant.buildtimestamp)" -ge $VAGRANT_TIMESTAMP_MIN ]; then
+    echo "[SB][$(date +%Y-%m-%d\ %X)] Vagrant box meets minimum requirements: $VAGRANT_TIMESTAMP_MIN Current: $(cat /home/vagrant/.vagrant.buildtimestamp)"
   else
-    echo "Error: Your vagrant box is out of date. Please ensure you are using the latest version (>= 1612117411). Current: $(cat /home/vagrant/.vagrant.buildtimestamp)" >&2
+    echo "Error: Your vagrant box is out of date. Please ensure you are using the latest version (>= $VAGRANT_TIMESTAMP_MIN). Current: $(cat /home/vagrant/.vagrant.buildtimestamp)" >&2
     echo "To fix this:"
     echo "  vagrant destroy;"
     echo "  vagrant box remove ubuntu-1404-php71;"
     echo "  vagrant box remove ubuntu-1804-php71;"
+    echo "  vagrant box remove ubuntu-1804-php74;"
     if [ -f /usr/share/schoolbox/vagrant.yaml ] && [ "$(grep vagrant_box /usr/share/schoolbox/vagrant.yaml | grep -vc '#')" -gt 0 ]; then
       echo "then:"
       echo "  remove the 'vagrant_box' line from your vagrant.yaml file"

@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\User\Formatter\Factory;
+
 /**
  * Evaluation_Export_Graph
  *
@@ -187,6 +189,7 @@ class Evaluation_Export_Graph
      */
     public function getSectionValues()
     {
+        $formatter = (new Factory())->buildFromNothing();
 
         /* Determine whether to get all sections, or just the one belonging to
          * the question by which to filter
@@ -259,7 +262,7 @@ class Evaluation_Export_Graph
 
                                     $this->sectionValues[$k]['questions'][$i]['attempts'][$j] = array(
                                         'synergy_id' => $currentAttempt['synergy_id'],
-                                        'name' => $currentAttempt['firstname'] . ' ' . $currentAttempt['lastname'],
+                                        'name' => $formatter->formatArray($currentAttempt),
                                         'responses' => $data['responses'],
                                         'responsesData' => $data['responsesData'],
                                         'comment' => html_entity_decode(str_replace("\n", '', strip_tags($commentValues)), ENT_QUOTES),

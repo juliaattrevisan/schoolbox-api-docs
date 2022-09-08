@@ -34,6 +34,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Mapper;
 use Schoolbox\Assessment\Participant\Model as ParticipantModel;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as Folder;
@@ -634,7 +635,7 @@ class ListController extends Web\Controller\Base
             //    - any plans UPDATED by this method will be ID INDEXED
             $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
 
-            $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
+            $this->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
         } catch (\Exception $e) {
             $db->rollback();
             // cast
@@ -660,14 +661,14 @@ class ListController extends Web\Controller\Base
      * @param array                         $userPlanIndices userId => planId
      * @throws MapperException
      */
-    private function saveParticipationData(GenericCollection $plans, array $inclusionFlags, array $userPlanIndices): void
+    private function saveParticipationData(IAssessable $assessment, GenericCollection $plans, array $inclusionFlags, array $userPlanIndices): void
     {
         $participantMapper = $this->participantDataSource->getParticipantMapper();
 
         // plans are saved; persistipation
         foreach ($inclusionFlags as $userId => $userIncluded) {
             /** @var ParticipantModel|null $existingParticipation */
-            $existingParticipation = $this->getExistingParticipation($plans, $userId);
+            $existingParticipation = $this->getExistingParticipation($assessment, $userId);
             /** @var PlanModel $userPlan */
             $userPlan = $plans[$userPlanIndices[$userId]];
             if ($userIncluded) {
@@ -737,20 +738,32 @@ class ListController extends Web\Controller\Base
 
 
     /**
-     * Gets existing participation
-     * @param GenericCollection $plans
+     * Gets existing participations, indexed using (user id, plan id) tuples
+     *
+     * @param IAssessable       $assessment
      * @param int               $userId
      * @return ParticipantModel|null
      * @throws DomainException
-     * @throws Mapper\DefinitionException
+     * @throws DefinitionException
+     * @throws \PDOException
      */
-    private function getExistingParticipation(GenericCollection $plans, int $userId): ?ParticipantModel
+    private function getExistingParticipation(IAssessable $assessment, int $userId): ?ParticipantModel
     {
         // If haven't got participation data, get it
         if (!$this->existingParticipationPerUser) {
             $participantMapper = $this->participantDataSource->getParticipantMapper();
-            $planIds           = $plans->getPropertyValues('id');
 
+            /* For each of those assigned plans, find out if $userId is associated with it
+             * If it is, then this person already has a plan - index them with a
+             * (user id, plan id) tuple. This is the actual truth about which user
+             * has a plan in a given assessment; you cannot trust the GenericCollection
+             * $plans to contain the source of truth
+             */
+            $planIds = $participantMapper->findAssignedPlans($assessment->getId());
+
+            /* Shank it into the same struct so we can find out which plan
+             * was given to a particular user
+             */
             $allExistingParticipation = $participantMapper->findByColumnList([
                 'participant_plan_id' => $planIds,
             ], ['cache' => false]);

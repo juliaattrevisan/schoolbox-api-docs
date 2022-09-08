@@ -7,7 +7,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Mail\Mailer;
 use Schoolbox\Resource\Folder\NNIAN;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -159,7 +158,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 /* Manager bulk email
                  */
                 if ($manager->getEmail()) {
-                    $emailAll[] = Scrub::text($manager->getFormattedEmailDisplay());
+                    $emailAll[] = $manager->getId();
                 }
 
                 /* Manager cards
@@ -226,14 +225,11 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             if (
                 \count($emailAll)
                 && $this->getUser()->hasEmail()
-                && $this->getConfigLoader()->get('mail_enable')
+                && $this->getConfigLoader()->get(\Schoolbox\Config\ConfigMapper::NAME_MAIL_ENABLED)
                 && $this->getUser()->getRole()->isStaff()
             ) {
-                $this->setVar([
-                                  "REPLYTO" => $this->getUser()->getEmail(),
-                                  "EMAILALL" => implode(Mailer::implodeGlue(), array_unique($emailAll)),
-                ]);
-
+                $this->setVar('EMAIL_TARGET', 'userIds');
+                $this->setVar('EMAIL_VALUE', implode(',', $emailAll));
                 $this->parse("member_email_block", "member_email");
             } else {
                 $this->setVar('member_email_block', '');

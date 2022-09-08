@@ -46,6 +46,7 @@
             allowedFiles: null,
             multi: false,
             useFolder: true,
+            expiryDate: null,
 
             /* Optional Filesystem context
              * This is used by /resources/attachment.php to provide Filesystem options
@@ -108,8 +109,13 @@
 
 
         // wrap ourselves around an instance of dropzone
+        let dropzoneUrl = new URL(window.location.href);
+        dropzoneUrl.pathname = opt.url;
+        if (opt.expiryDate) {
+            dropzoneUrl.searchParams.append('expiryDate', opt.expiryDate);
+        }
         azone.dropzone({
-            url: opt.url,
+            url: dropzoneUrl,
             paramName: opt.paramName,
             // The dropzone is clickable if the modal is disabled
             clickable: opt.useModal ? false : dzone[0],
@@ -348,21 +354,26 @@
 
 
     ResourceAttach.prototype.getQueryString = function () {
-        var qString = 'multi=' + (this.options.multi ? '1' : '0');
+        let urlSearchParams = new URLSearchParams();
+        urlSearchParams.append('multi', this.options.multi ? '1' : '0');
 
         if (this.options.allowedFiles) {
-            qString += '&mime=' + this.options.allowedFiles;
+            urlSearchParams.append('mime', this.options.allowedFiles);
         }
 
         if (this.options.useFolder) {
-            qString += '&f=1';
+            urlSearchParams.append('f', '1');
         }
 
         if (this.options.fs) {
-            qString += '&fs=' + this.options.fs;
+            urlSearchParams.append('fs', this.options.fs);
         }
 
-        return qString;
+        if (this.options.expiryDate) {
+            urlSearchParams.append('expiryDate', this.options.expiryDate);
+        }
+
+        return urlSearchParams.toString();
     };
 
 

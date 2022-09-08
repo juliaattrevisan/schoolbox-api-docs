@@ -16,11 +16,8 @@ use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 
-use function implode;
-
 class User extends SimpleStrategy
 {
-
     /**
      * @return string
      */
@@ -69,7 +66,9 @@ class User extends SimpleStrategy
      */
     public function getAudiencingSql(\Schoolbox\User $user, string $searchPlaceholder = null): ?string
     {
-        $keywordFilter = null === $searchPlaceholder ? '' : "AND (firstname LIKE :{$searchPlaceholder} OR lastname LIKE :{$searchPlaceholder})";
+        $keywordFilter = null === $searchPlaceholder
+            ? ''
+            : "AND (firstname LIKE :{$searchPlaceholder} OR preferred_name LIKE :{$searchPlaceholder} OR lastname LIKE :{$searchPlaceholder})";
 
         $entityType = self::getEntityType();
         return "

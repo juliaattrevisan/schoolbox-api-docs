@@ -1,13 +1,13 @@
 <script>
 
-import axios from 'axios';
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badge-list';
 import toastMixin from '@schoolboxVue/components/toast-mixin';
 import HorizontalScoller from '@schoolboxVue/components/scroll/horizontal-scoller';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
-
+import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 /**
  * Form for awarding badges to users, by selecting them from a list of badges.
@@ -20,14 +20,18 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [toastMixin],
+    mixins: [
+        cdnPrefixMixin,
+        toastMixin
+    ],
 
     components: {
         BadgeList,
         BadgeImage,
         RevealModal,
         HorizontalScoller, //so badges are contained in one line when a lot are selected
-        BottomDrawer //to pop out when +1 badges is selected
+        BottomDrawer, //to pop out when +1 badges is selected
+        DynamicInput,
     },
     props: {
         /**
@@ -204,12 +208,31 @@ export default {
             type: String,
             default: 'Award selected achievements',
         },
+
+        /* Either "goal" or "achievement" depending on the context of this badge
+         * being awarded - there are nuanced behaviours depending on whether this
+         * badge was awarded as an achievemtn, or set as a goal
+         */
+        type: String,
+
+        /* Used to spawn ckeditor files from cdn somewhere
+         */
+        siteVersion: {
+            type: String
+        }
     },
     data() {
         return {
             selectedBadges: [],
             badgeListChangeEvent: 'EVENT_CHANGE',
-            hasContentChange: false //to track badge addition changes
+            hasContentChange: false, //to track badge addition changes
+            /**
+             * so dynamic-input.vue is only in the dom while the modal is active
+             * we do this to avoid issues around ckeditor instantiation coupled with modals
+             * where opening, closing, then re-opening a modal causes the ckeditor to break
+             */
+            isModalOpen: false,
+            reason: '', //the reason the badge(s) are being awarded
         }
     },
     computed: {
@@ -258,10 +281,10 @@ export default {
             if (this.selectedBadgeCount > 0) {
                 const plural = this.selectedBadgeCount > 1 ? 's' : '';
                 const typeSelected = this.confirmButtonText.includes('goal') ? `goal${plural} selected` : `achievement${plural} selected`;
-                return `${this.selectedBadgeCount} ${typeSelected}`;  
+                return `${this.selectedBadgeCount} ${typeSelected}`;
             } else {
                 return '';
-            }  
+            }
         }
     },
     watch: {
@@ -269,13 +292,13 @@ export default {
         /**
          * We need to wait for the transition animation to complete before we re-evaluate
          * the status of horizontal-scroller.
-         * @TODO - consider using ResizeObserver once Safari 15 is released, as 
+         * @TODO - consider using ResizeObserver once Safari 15 is released, as
          * this could be handled much better by the feature
          */
         selectedBadges (newSelectedBadges, oldSelectedBadges) {
             if (newSelectedBadges.length !== oldSelectedBadges.length) { //if the number of badges has changed
                 setTimeout(() => { //notify horizontal-scroller.vue once enought time to allow the animation to complete has passed
-                    this.hasContentChange = true; 
+                    this.hasContentChange = true;
                     this.$nextTick(() => this.hasContentChange = false); //set back to false for another possibile filtration
                 }, 400);
             }
@@ -301,9 +324,9 @@ export default {
 
         /**
          * When a badge is selected, update the list depending on the selections status
-         * 
-         * @params { Object } 
-         * @params { Boolean } 
+         *
+         * @params { Object }
+         * @params { Boolean }
          */
         onBadgeSelected (badge, isChecked) {
             if (isChecked) {
@@ -321,6 +344,38 @@ export default {
         },
 
         /**
+         * Open the award modal to confirm and submit the goals/awards
+         */
+        onConfirmSelected () {
+            this.isModalOpen = true;
+            this.$refs.awardModal.open();
+        },
+
+        /**
+         * To keep track of the reason, that's being updated by dynamic-input.vue
+         *
+         * @param { string }
+         */
+        onReasonChanged (newValue) {
+            this.reason = newValue;
+        },
+
+        /**
+         * close the modal
+         */
+        onCancelSelected () {
+            this.$refs.awardModal.close();
+        },
+
+        /**
+         * The modal is now completely closed so reset
+         */
+        onModalClosed () {
+            this.isModalOpen = false;
+            this.reason = '';
+        },
+
+        /**
          * Submit action for this form.
          *
          * Award badges, and then go back to the return URL once done.
@@ -328,10 +383,21 @@ export default {
         onSubmit() {
             this.toastActivate(this.toastActivateMessage);
             this.$refs.awardModalSubmit.disabled = true;
-            let payload = this.awardToSelfOnly ? null : {users: this.users};
+
             Promise
-                .all(this.selectedBadges.map(v => {
-                    axios.post(v._links[this.postAwardRouteLookup], payload)
+                .all(this.selectedBadges.map((badge) => {
+
+                    /* Construct each payload for each badge uniquely
+                     */
+                    const payload = this.awardToSelfOnly ? null : { users: this.users, reason: this.reason };
+
+                    fetch(badge._links[this.postAwardRouteLookup], {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload),
+                    });
                 }))
                 .then(() => {
                     this.toastSuccess(this.toastSuccessMessage);
@@ -352,13 +418,15 @@ export default {
 
 <template>
     <div class="badge-list-form">
-        <badge-list 
+        <badge-list
             ref="badgeList"
             :get-badges-route="getBadgesRoute"
             :get-badge-create-form-route="getBadgeCreateFormRoute"
             :allow-selection="true"
             :show-badge-menus="false"
             :selected-badges="selectedBadges"
+            :cdn-prefix="this.cdnPrefix"
+            :site-version="this.siteVersion"
             @on-badge-selected="onBadgeSelected"
         ></badge-list>
 
@@ -370,7 +438,7 @@ export default {
             <div class="selected-container">
                 <h3 class="selected-container__count"><em>{{ selectedBadgeText }}</em></h3>
                 <div class="selected-container__badges">
-                    <horizontal-scoller 
+                    <horizontal-scoller
                         :hasButtons="false"
                         :height="36"
                         :has-content-change="hasContentChange"
@@ -388,12 +456,12 @@ export default {
                     <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
                 </li>
                 <li>
-                    <button @click.prevent="$refs.awardModal.open" @keyup.enter="$refs.awardModal.open" class="submit">{{ confirmButtonText }}</button>
+                    <button @click.prevent="onConfirmSelected" @keyup.enter="onConfirmSelected" class="submit">{{ confirmButtonText }}</button>
                 </li>
             </ul>
         </bottom-drawer>
 
-        <reveal-modal ref="awardModal" size="large">
+        <reveal-modal ref="awardModal" size="large" @closed="onModalClosed">
             <h2>{{ confirmModalHeader }}</h2>
             <p class="meta">{{ confirmModalBadgeListMeta }}</p>
             <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
@@ -406,6 +474,25 @@ export default {
                     </div>
                 </li>
             </ul>
+
+            <template v-if="'achievement' === this.type">
+                <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
+
+                <dynamic-input
+                    v-if="isModalOpen"
+                    preset-unique-id="reason"
+                    inputName="reason"
+                    singular="reason"
+                    :value="reason"
+                    :allow-edit="true"
+                    :allow-submit="false"
+                    :spawn-immediately="true"
+                    :is-processing="true"
+                    :cdn-prefix="this.cdnPrefix"
+                    :site-version="this.siteVersion"
+                    @value-changed="onReasonChanged"
+                ></dynamic-input>
+            </template>
 
             <template v-if="!awardToSelfOnly">
                 <hr />
@@ -423,7 +510,7 @@ export default {
             </template>
 
             <ul class="flex-list buttons">
-                <li><a @click.prevent="$refs.awardModal.close" @keyup.enter="$refs.awardModal.close" class="button">Cancel</a></li>
+                <li><a @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button">Cancel</a></li>
                 <li><button ref="awardModalSubmit" @click.prevent="onSubmit" @keyup.enter="onSubmit" class="submit">Confirm</button></li>
             </ul>
         </reveal-modal>
@@ -442,17 +529,17 @@ export default {
     height: 50px;
 }
 
-    .selected-container__count {
-        margin-right: 1rem;
-        @media (max-width: 800px) {
-            font-size: 0.8rem;
-        }
+.selected-container__count {
+    margin-right: 1rem;
+    @media (max-width: 800px) {
+        font-size: 0.8rem;
     }
+}
 
-    .selected-container__badges {
-        flex: 1 1 auto; //fill up all the space that __count doesn't occupy 
-        min-width: 50%; //and don't get too small when shrunk down
-    }
+.selected-container__badges {
+    flex: 1 1 auto; //fill up all the space that __count doesn't occupy
+    min-width: 50%; //and don't get too small when shrunk down
+}
 
 .selected-badges__item {
     display: inline-block;
@@ -460,7 +547,7 @@ export default {
     transition: all 0.3s;
 }
 
-.selected-badges-enter, 
+.selected-badges-enter,
 .selected-badges-leave-to {
     opacity: 0;
     transform: translateY(30px);

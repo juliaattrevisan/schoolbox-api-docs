@@ -16,7 +16,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 {
-
     /**
      * The template file to use
      *
@@ -56,6 +55,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
             array(
                 'USER_FIRSTNAME' => $user->getFirstname(),
                 'USER_LASTNAME' => $user->getLastname(),
+                'USER_FULLNAME' => $user->getFullName(),
             )
         );
 

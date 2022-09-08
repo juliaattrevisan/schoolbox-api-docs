@@ -110,7 +110,8 @@
         "psr/container": "^1.1.0",
         "enqueue/enqueue": "^0.10.15",
         "enqueue/redis": "^0.10.9",
-        "imangazaliev/didom": "^2.0"
+        "imangazaliev/didom": "^2.0",
+        "egulias/email-validator": "^3.2"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",

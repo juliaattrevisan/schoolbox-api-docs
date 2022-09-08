@@ -509,6 +509,7 @@ class Controller extends Base
                 vrm.assessment_id                  AS assessment_id,
                 vrm.student_id                     AS student_id,
                 u.firstname                        AS student_firstname,
+                u.preferred_name                   AS student_preferred_name,
                 u.lastname                         AS student_lastname,
                 vrm.capability_id                  AS capability_id,
                 vrm.capability_mark                AS capability_mark,
@@ -596,10 +597,11 @@ class Controller extends Base
 
             // Stuff everything about the students marks into an array
             $students[$row['student_id']] = [
-                'firstname'   => $row['student_firstname'],
-                'lastname'    => $row['student_lastname'],
-                'assessments' => $assessmentsForStudent,
-                'profileLink' => '/search/user/' . $row['student_id'],
+                'firstname'      => $row['student_firstname'],
+                'preferred_name' => $row['student_preferred_name'],
+                'lastname'       => $row['student_lastname'],
+                'assessments'    => $assessmentsForStudent,
+                'profileLink'    => '/search/user/' . $row['student_id'],
             ];
 
             $lastObservedAssessmentId = $row['assessment_id'];

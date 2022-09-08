@@ -5,7 +5,7 @@
 import ManageCurriculum from '@library/Schoolbox/Curriculum/Manage/vue/manage-curriculum.vue';
 import { rest } from 'msw';
 import { data as allCurriculumData } from '../../curriculumSelector/dataCurriculumSelector';
-// import { data as vicCurriculumData } from '../../curriculumSelector/dataVicCurriculum';
+import { data as vicCurriculumData } from '../../curriculumSelector/dataVicCurriculum';
 // import { data as nswCurriculumData } from '../../curriculumSelector/dataNswCurriculum';
 
 
@@ -82,3 +82,13 @@ readOnly.args = {
     ...Default.args,
     isReadOnly: true,
 }
+
+export const editModal = Template.bind({});
+editModal.decorators = [
+    () => ({
+        template: `
+        <story />
+        <p style="margin: 1rem;"><em>To view a node with full info, navigate to Victorian Curriculum > The Arts > Dance > Level A > Explore and Express Ideas > Experience dance, safe movement possibilities and move their body parts intentionally in response to stimulus</em></p>
+        `
+    })
+];

@@ -8,6 +8,8 @@
 
 namespace Schoolbox\Resource\Attachment\Filesystem;
 
+use Alaress_Date_Format;
+use Laminas\Uri\Uri;
 use Schoolbox\Resource\Attachment\AbstractController;
 use Scrub;
 use SitePage;
@@ -25,6 +27,43 @@ class UploadController extends AbstractController
      */
     private const DEFAULT_MAX_FILES = 256;
 
+    /**
+     * Constructor
+     *
+     * @param bool                     $multi
+     * @param string                   $mimeFilter
+     * @param bool                     $useFolder
+     * @param int                      $defaultFolderId
+     * @param Alaress_Date_Format|null $expiryDate
+     */
+    public function __construct(
+        $multi,
+        $mimeFilter = null,
+        $useFolder = true,
+        $defaultFolderId = 0,
+        private ?Alaress_Date_Format $expiryDate = null,
+    ) {
+        parent::__construct($multi, $mimeFilter, $useFolder, $defaultFolderId);
+    }
+
+    /**
+     * Include expiry date in URL as well
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        $url = parent::getUrl();
+        if (!$this->expiryDate || $this->expiryDate->isNull()) {
+            return $url;
+        }
+
+        $urlObject = new Uri($url);
+        $urlObject->setQuery(
+            $urlObject->getQueryAsArray() + ['expiryDate' => $this->expiryDate->toRfc3339String()],
+        );
+        return $urlObject->toString();
+    }
 
     /**
      * @param SitePage $page
@@ -37,10 +76,16 @@ class UploadController extends AbstractController
             $mime = "'" . Scrub::text($this->mimeFilter) . "'";
         }
 
-        $page->setVar(array(
+        $uploadUrl = new Uri('/storage/asyncUpload.php');
+        if ($this->expiryDate && !$this->expiryDate->isNull()) {
+            $uploadUrl = $uploadUrl->setQuery(['expiryDate' => $this->expiryDate->toRfc3339String()]);
+        }
+
+        $page->setVar([
+            'UPLOAD_URL'     => $uploadUrl->toString(),
             'MAX_FILES'      => $this->multi ? self::DEFAULT_MAX_FILES : '1',
             'ACCEPTED_FILES' => $mime,
-        ));
+        ]);
     }
 
 

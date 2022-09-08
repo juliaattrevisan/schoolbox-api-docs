@@ -12,10 +12,10 @@ namespace Schoolbox\Resource\Attachment;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\NodeFactory;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 
 class GenericZone extends Zone
 {
-
     /** @var string */
     protected $prefix;
 
@@ -38,7 +38,7 @@ class GenericZone extends Zone
      * worthwhile using a Mapper than returns FileInterfaces.
      *
      * @param string $id
-     * @return IFile
+     * @return StorageModel
      */
     protected function findFile($id)
     {

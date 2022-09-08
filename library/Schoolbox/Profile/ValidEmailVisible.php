@@ -11,6 +11,7 @@ namespace Schoolbox\Profile;
 
 use External_UserInterface;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 /**
@@ -24,25 +25,13 @@ use Schoolbox\User;
 class ValidEmailVisible
 {
     /**
-     * @var External_UserInterface
-     */
-    private $externalUser;
-
-    /**
-     * @var IConfigLoader
-     */
-    private $config;
-
-    /**
      * Constructor
      *
      * @param External_UserInterface $externalUser
      * @param IConfigLoader          $config
      */
-    public function __construct(External_UserInterface $externalUser, IConfigLoader $config)
+    public function __construct(private External_UserInterface $externalUser, private IConfigLoader $config)
     {
-        $this->externalUser = $externalUser;
-        $this->config       = $config;
     }
 
     /**
@@ -71,5 +60,31 @@ class ValidEmailVisible
          * based on role types and other settings
          */
         return (new ValidDetailsVisible($this->externalUser, $this->config))->isSatisfiedBy($viewee, $viewer);
+    }
+
+    /**
+     * @param string $vieweeRoleType
+     * @param Role   $viewerRole
+     * @param bool   $isSuperUser
+     * @return bool
+     */
+    public function isSatisfiedByRole(string $vieweeRoleType, Role $viewerRole, bool $isSuperUser): bool
+    {
+        /* Students can always see other students' email addresses, specifically
+         */
+        if ($viewerRole->isStudent() && $vieweeRoleType === Role::STUDENT) {
+            return true;
+        }
+        return (new ValidDetailsVisible($this->externalUser, $this->config))->isSatisfiedByRole($vieweeRoleType, $viewerRole, $isSuperUser);
+    }
+
+    /**
+     * @param User $viewee
+     * @param User $viewer
+     * @return bool
+     */
+    public function isSatisfiedByParent(User $viewee, User $viewer): bool
+    {
+        return (new ValidDetailsVisible($this->externalUser, $this->config))->isSatisfiedByParent($viewee, $viewer);
     }
 }

@@ -9,6 +9,7 @@ import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import toastMixin from '@schoolboxVue/components/toast-mixin';
 import userProfileConstants from '../../../vue/user-profile/constants';
 import userProfileMixin from '../../../vue/user-profile/mixin';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 export default {
 
@@ -26,6 +27,7 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
+        cdnPrefixMixin,
         foundationMixin,
         goalMixin,
         toastMixin,
@@ -37,8 +39,9 @@ export default {
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-    ],
+    props: {
+        siteVersion: String
+    },
 
     /**
      * Components.
@@ -166,7 +169,7 @@ export default {
                 console.warn(error);
             } finally {
                 this.loading = false;
-            }    
+            }
         },
 
         /**
@@ -279,16 +282,16 @@ export default {
                 </template>
                 <template v-else>
                     <!-- Parent or student -->
-                    <p>{{ config.student.firstname }} doesn't have any achievements yet.</p>
+                    <p>{{ config.student.givenName }} doesn't have any achievements yet.</p>
                     <p v-if="config.routes.getAwardAsAchievementForm">
                         <a :href="config.routes.getAwardAsAchievementForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                           title="Award an achievement">Award an achievement</a> for {{ config.student.firstname }}.
+                           title="Award an achievement">Award an achievement</a> for {{ config.student.givenName }}.
                     </p>
                 </template>
             </div>
         </template>
 
-        <award-detail-modal ref="awardDetailModal"></award-detail-modal>
+        <award-detail-modal ref="awardDetailModal" :cdn-prefix="this.cdnPrefix" :site-version="this.siteVersion"></award-detail-modal>
 
         <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="emitUpdateToAllUserProfileFeeds"></achievement-withdraw-modal>
         <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="emitUpdateToAllUserProfileFeeds"></goal-withdraw-modal>

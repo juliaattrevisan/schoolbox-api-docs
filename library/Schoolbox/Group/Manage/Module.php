@@ -26,6 +26,7 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model;
 use Schoolbox\Resource\GroupMapper;
+use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -40,7 +41,7 @@ class Module extends BaseModule
      */
     public function registerRoutes(): void
     {
-        $perm = new All(
+        $permManage = new All(
             new IsLoggedIn(),
             new Any(
                 new IsSuperuser(),
@@ -57,17 +58,22 @@ class Module extends BaseModule
             )
         );
 
+        $permSearch = new IsLoggedIn();
+
         $preloadFolder = function ($params) {
             return $this->preloadFolder($params);
         };
 
-        $this->register(self::METHOD_GET, '/modify/{folderId:\d+}', 'getModify', $perm, $preloadFolder);
-        $this->register(self::METHOD_GET, '/getData/{folderId:\d+}', 'getData', $perm, $preloadFolder);
-        $this->register(self::METHOD_DELETE, '/removeMembers/{folderId:\d+}', 'removeMembers', $perm, $preloadFolder);
-        $this->register(self::METHOD_PATCH, '/updateMembers/{folderId:\d+}', 'updateMembers', $perm, $preloadFolder);
-        $this->register(self::METHOD_POST, '/addMembers/{folderId:\d+}', 'addMembers', $perm, $preloadFolder);
-        $this->register(self::METHOD_POST, '/updateSettings/{folderId:\d+}', 'updateSettings', $perm, $preloadFolder);
-        $this->register(self::METHOD_POST, '/disband/{folderId:\d+}', 'disband', $perm, $preloadFolder);
+        $this->register(self::METHOD_GET, '/modify/{folderId:\d+}', 'getModify', $permManage, $preloadFolder);
+        $this->register(self::METHOD_GET, '/getData/{folderId:\d+}', 'getData', $permManage, $preloadFolder);
+        $this->register(self::METHOD_DELETE, '/removeMembers/{folderId:\d+}', 'removeMembers', $permManage, $preloadFolder);
+        $this->register(self::METHOD_PATCH, '/updateMembers/{folderId:\d+}', 'updateMembers', $permManage, $preloadFolder);
+        $this->register(self::METHOD_POST, '/addMembers/{folderId:\d+}', 'addMembers', $permManage, $preloadFolder);
+        $this->register(self::METHOD_POST, '/updateSettings/{folderId:\d+}', 'updateSettings', $permManage, $preloadFolder);
+        $this->register(self::METHOD_POST, '/disband/{folderId:\d+}', 'disband', $permManage, $preloadFolder);
+        $this->register(self::METHOD_GET, '/searchGroups', 'searchGroups', $permSearch);
+        $this->register(self::METHOD_GET, '/searchRoles', 'searchRoles', $permSearch);
+        $this->register(self::METHOD_GET, '/searchUsers', 'searchUsers', $permSearch);
     }
 
     /**
@@ -80,6 +86,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(GroupMapper::class),
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(FolderMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
             $this->getMapperFactory()->get(RerouteOverrideMapper::class),
         );

@@ -84,7 +84,9 @@ class Controller extends Base
      */
     public function recoverSession(): void
     {
-        $_SESSION = $_SESSION['previous'];
+        if (array_key_exists('previous', $_SESSION)) {
+            $_SESSION = $_SESSION['previous'];
+        }
         $this->getResponse()->redirect->found('/');
     }
 

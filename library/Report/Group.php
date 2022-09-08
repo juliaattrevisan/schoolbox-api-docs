@@ -21,6 +21,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
         'synergy_id'          => 'External ID',
         'title'               => 'Title',
         'firstname'           => 'First Name',
+        'preferred_name'      => 'Preferred Name',
         'lastname'            => 'Surname',
         'position_title'      => 'Position Title',
         'role'                => 'Role',
@@ -42,7 +43,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
 
 
     // fields that we will permit sorting on
-    private $sortable = ['firstname', 'lastname', 'username', 'synergy_id', 'campus', 'year', 'alt_email'];
+    private $sortable = ['firstname', 'preferred_name', 'lastname', 'username', 'synergy_id', 'campus', 'year', 'alt_email'];
     private $defaultOrderBy = 'lastname';
 
     public function __construct($page)
@@ -207,15 +208,16 @@ class Report_Group extends Report_Abstract implements Report_IReport
             $email   = $address ? "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>" : '';
 
             $page->setVar([
-                'UID'             => Scrub::text($user['id']),
-                'USER_TITLE'      => Scrub::text($user['title']),
-                'USER_FIRSTNAME'  => Scrub::text($user['firstname']),
-                'USER_SURNAME'    => Scrub::text($user['lastname']),
-                'USER_USERNAME'   => Scrub::text($user['username']),
-                'USER_SYNERGY_ID' => Scrub::text($user['synergy_id']),
-                'USER_EMAIL'      => $email,
-                'USER_YEAR'       => empty($user['year']) && (string)$user['year'] != '0' ? '' : "Year {$user['year']}",
-                'USER_CAMPUS'     => Scrub::text($user['campus']),
+                'UID'                 => Scrub::text($user['id']),
+                'USER_TITLE'          => Scrub::text($user['title']),
+                'USER_FIRSTNAME'      => Scrub::text($user['firstname']),
+                'USER_PREFERRED_NAME' => Scrub::text($user['preferred_name']),
+                'USER_SURNAME'        => Scrub::text($user['lastname']),
+                'USER_USERNAME'       => Scrub::text($user['username']),
+                'USER_SYNERGY_ID'     => Scrub::text($user['synergy_id']),
+                'USER_EMAIL'          => $email,
+                'USER_YEAR'           => empty($user['year']) && (string)$user['year'] != '0' ? '' : "Year {$user['year']}",
+                'USER_CAMPUS'         => Scrub::text($user['campus']),
             ]);
 
             if (!$_SESSION['su']) {

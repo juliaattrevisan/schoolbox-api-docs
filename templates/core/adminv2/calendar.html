@@ -59,8 +59,7 @@
                         <section>
                             <fieldset class="content">
                                     <div class="small-12 columns">
-                                        <label>Select File</label>
-                                        <input type="file" name="bulkadd" />
+                                        {BULKADD_ATTACH_ZONE}
                                     </div>
                                     <div class="small-12 medium-6 columns">
                                         <label>
@@ -310,12 +309,9 @@
         });
 
         $('#name')
-                .selectizeSelector({
+                .userSelectizeSelector({
                     ajax: {
-                        url:      '/ajax/user.php',
-                        type:     'GET',
                         data:     {groupID: 0},
-                        dataType: 'json'
                     }
                 })
                 .on('selectize.item_add', function(event, value) {

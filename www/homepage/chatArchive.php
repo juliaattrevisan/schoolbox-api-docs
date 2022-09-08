@@ -76,7 +76,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
 
 // collate the full list of chat the current user is allowed to see in the current context
 // this is used to populate the category headers
-$visibleList = $chatHandler->get_logs($folder->getId());
+$visibleList = $chatHandler->getLogs($folder->getId());
 
 
 // sanitise filter inputs

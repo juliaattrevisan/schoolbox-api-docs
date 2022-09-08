@@ -30,7 +30,7 @@
 
                 <tr data-user-id="{{ userAccess.user.id }}">
                     <td class="small-2">User</td>
-                    <td class="small-3">{{ userAccess.user.firstname }} {{ userAccess.user.lastname }} ({{ userAccess.user.role.name }})</td>
+                    <td class="small-3">{{ userAccess.user.fullName }} ({{ userAccess.user.role.name }})</td>
                     <td class="small-2">
                         <input type="radio" name="user[{{ userAccess.user.id }}]" id="userDeny{{ userAccess.user.id }}" value="0" {{ checkedDeny }}>
                         <label class="radio-label" for="userDeny{{ userAccess.user.id }}"></label>
@@ -90,7 +90,7 @@
                     //noinspection JSUnresolvedVariable
                     let html = $('[data-user-permission-clone]').html()
                         .replace(/{TYPE_NAME}/g, 'User')
-                        .replace(/{NAME}/g, user.first_name + ' ' + user.last_name)
+                        .replace(/{NAME}/g, user.full_name)
                         .replace(/{ID}/g, user.id)
                         .replace(/{ROLE}/g, user.role);
 

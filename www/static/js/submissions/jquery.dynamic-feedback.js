@@ -210,7 +210,6 @@
          *
          */
         function publishFeedback (selectedButton) {
-
             var $participant = findParticipantElement($(selectedButton)),
                 $form = $participant.find('[data-feedback-form]'),
                 $actionBar = $participant.find('[data-action-bar]'),
@@ -218,6 +217,11 @@
                 $btnPublish = $actionBar.find('[data-draft=publish]'),
                 participantId = $participant.data('participant'),
                 commentBoxId = "comment-" + participantId;
+
+            /* Force blur in case you directly go from fiddling with the mark
+             * straight to the publish
+             */
+            $participant.find('[data-mark-input]').blur();
 
             // We can safely clear this timeout now that we're publishing
             window.clearTimeout(commentBoxTimeouts[commentBoxId]);

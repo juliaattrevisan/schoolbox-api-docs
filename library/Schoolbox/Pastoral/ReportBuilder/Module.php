@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Module\Module as BaseModule;
@@ -16,14 +17,15 @@ use Alaress\Web\Router\PathMatcher;
 use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Authorizer\Rule\IsReportOwner;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
+use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\User;
 
 // These mappers are injected into controllers where required
 
@@ -39,7 +41,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $permissionStaff =
+        $permissionStaff        =
             new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -50,24 +52,44 @@ class Module extends BaseModule
                     )
                 )
             );
-        $permissionReportOwner = new Rule\All(new IsReportOwner(), $permissionStaff);
+        $permissionModifyReport = new Rule\All($permissionStaff, new IsReportOwner());
+        $permissionReadReport   =
+            new Rule\All(
+                $permissionStaff,
+                new Rule\Callback(
+                    static function (array $params, User $user) {
+                        if (!isset($params['report']) || !($params['report'] instanceof PastoralReport)) {
+                            throw new Unauthorized();
+                        }
+                        if ($params['report']->getOwner()->getId() == $user->getId()) {
+                            return true;
+                        }
+                        if (in_array($user->getId(), $params['report']->getMemberUserIds())) {
+                            return true;
+                        }
+                        throw new Unauthorized();
+                    }
+                )
+            );
 
-        $this->registerRoutesArray([
-            'GET'  => [
-                ''                               => ['getIndex' => $permissionStaff],
-                '/insert'                        => ['getReportInsert' => $permissionStaff],
-                '/update/{reportId:\d+}'         => ['getReportUpdate' => $permissionReportOwner],
-                '/results/{reportId:\d+}'        => ['getReportResults' => $permissionStaff],
-                '/results/tag/{tagId:\d+}'       => ['getReportTags' => $permissionStaff],
-                '/results/{reportId:\d+}/print'  => ['getReportResultsPrint' => $permissionStaff],
-                '/results/{reportId:\d+}/export' => ['getReportResultsExport' => $permissionStaff],
-            ],
-            'POST' => [
-                '/modify'                => ['postReportModify' => $permissionReportOwner],
-                '/delete/{reportId:\d+}' => ['postReportDelete' => $permissionReportOwner],
-                '/dashboard/modify'      => ['postReportDashboardModify' => $permissionStaff],
-            ],
-        ]);
+        $this->registerRoutesArray(
+            [
+                'GET'  => [
+                    ''                               => ['getIndex' => $permissionStaff],
+                    '/insert'                        => ['getReportInsert' => $permissionStaff],
+                    '/update/{reportId:\d+}'         => ['getReportUpdate' => $permissionModifyReport],
+                    '/results/{reportId:\d+}'        => ['getReportResults' => $permissionReadReport],
+                    '/results/tag/{tagId:\d+}'       => ['getReportTags' => $permissionStaff],
+                    '/results/{reportId:\d+}/print'  => ['getReportResultsPrint' => $permissionReadReport],
+                    '/results/{reportId:\d+}/export' => ['getReportResultsExport' => $permissionReadReport],
+                ],
+                'POST' => [
+                    '/modify'                => ['postReportModify' => $permissionModifyReport],
+                    '/delete/{reportId:\d+}' => ['postReportDelete' => $permissionModifyReport],
+                    '/dashboard/modify'      => ['postReportDashboardModify' => $permissionStaff],
+                ],
+            ]
+        );
     }
 
     /**
@@ -134,7 +156,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Mapper|ErrorMapper
+     * @return ErrorMapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getErrorMapper()

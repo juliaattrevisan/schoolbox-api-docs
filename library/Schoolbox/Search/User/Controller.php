@@ -569,13 +569,13 @@ class Controller extends BaseController
                 break;
         }
 
-        $emails = [];
+        $allTeacherIds = [];
 
         foreach ($subjects as $subject) {
             foreach ($subject as $class) {
                 /** @var User $teacher */
                 foreach ($class["teachers"] as $teacher) {
-                    $emails[] = $teacher->getFormattedEmailDisplay();
+                    $allTeacherIds[] = $teacher->getId();
                 }
             }
         }
@@ -584,11 +584,10 @@ class Controller extends BaseController
 
         foreach ($teacherEmails as $object) {
             if ($object instanceof User) {
-                $emails[] = $object->getFormattedEmailDisplay();
+                $allTeacherIds[] = $object->getId();
             }
         }
-
-        $allTeacherEmails = implode(Mailer::implodeGlue(), array_filter(array_unique($emails)));
+        $allTeacherIds = array_unique(array_filter($allTeacherIds));
 
         $pd = null;
         if (strtolower($this->getConfigLoader()->get('site_school_code')) === 'help') {
@@ -687,10 +686,9 @@ class Controller extends BaseController
                     'studentCoach'             => $studentCoach,
                     'isParentOfStudent'        => $isParentOfStudent,
                     'isPrimaryCarer'           => $isPrimaryCarer,
-                    'allTeacherEmails'         => $allTeacherEmails,
+                    'allTeacherIds'            => implode(',', $allTeacherIds),
                     'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
                     'pd'                       => $pd,
-                    'emailSeparator'           => Mailer::implodeGlue(),
                     'showDetails'              => $showDetails,
                     'showEmail'                => $showEmails,
                     'travelLogs'               => $travelLogs,

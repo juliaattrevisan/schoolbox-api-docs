@@ -1,19 +1,46 @@
 <script setup>
 
 /**
- * The heading for the Manage Curriclum page including actions to
- * create a new curriculum and import a curriculum
+ *
  */
 
+import { slideDown, slideUp } from '@js/util/animateUtils';
 import { useStore } from './store/manageCurriculumStore';
+import { useAddCurriculumStore } from './store/mcAddCurriculumStore';
+import McAddCurriculum from './mc-add-curriculum.vue';
 
 const store = useStore();
+const addCurriculumStore = useAddCurriculumStore();
 
 /**
- * Reload the page to try loading again
+ * To show / hide the add curriculum display
  */
 function onCreateNewSelected () {
-    console.warn('onCreateNewSelected')
+    if (addCurriculumStore.isOpen) {
+        addCurriculumStore.cancel();
+    } else {
+        addCurriculumStore.prompt();
+    }
+}
+
+/**
+ * Slide down to show the add curriculum display
+ *
+ * @param { DOMElement }
+ */
+async function onEnter (el, done) {
+    await slideDown(el);
+    done()
+}
+
+/**
+ * Slide up on close or when the curriculum is added
+ *
+ * @param { DOMElement }
+ */
+async function onLeave (el, done) {
+    await slideUp(el);
+    done()
 }
 
 </script>
@@ -30,17 +57,19 @@ function onCreateNewSelected () {
                 <a
                     href="#create-curriculum"
                     data-interaction="create-curriculum"
-                    class="icon icon-add"
+                    :class="`icon ${ addCurriculumStore.isOpen ? 'icon-close' : 'icon-add' }`"
                     title="Create New Curriculum"
                     @click.prevent="onCreateNewSelected"
                     @keyup.enter="onCreateNewSelected"
                 >
                 </a>
                 <a href="/curriculum/import" class="icon icon-upload" title="Import Curriculum"></a>
-                <a href="#" class="icon-more show-for-small" data-dropdown="tab-control" title="Actions"></a>
             </nav>
         </template>
     </div>
+    <Transition @enter="onEnter" @leave="onLeave" >
+        <mc-add-curriculum v-if="addCurriculumStore.isOpen" />
+    </Transition>
 </template>
 
 <style scoped>

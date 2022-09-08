@@ -65,7 +65,23 @@ class IdFinder extends AbstractIdFinder
         // Type/subtype selection
         $typeSelection = $completeFilters[Type\Definition::class] ?? null;
         if (isset($typeSelection)) {
-            $pb = $pb->in('p.type_id', $typeSelection);
+            $allTypesSelectionPb = null;
+            foreach ($typeSelection as $typeKey) {
+                $allTypesSelectionPb ??= $this->getMapper()->getPredicateBuilder();
+
+                // Construct predicate builder for type/subtype:
+                // If there's a subtype: both it and the type must match
+                $typeSelectionPb = $this->getMapper()->getPredicateBuilder();
+                $keyParts        = Type\KeyConverter::extractTypeAndSubtype($typeKey);
+                $typeSelectionPb = $typeSelectionPb->equals('p.type_id', $keyParts['type']);
+                if (isset($keyParts['subtype'])) {
+                    $typeSelectionPb = $typeSelectionPb->equals('p.subtype_id', $keyParts['subtype']);
+                }
+                $allTypesSelectionPb = $allTypesSelectionPb->all($typeSelectionPb);
+            }
+            if ($allTypesSelectionPb) {
+                $pb = $pb->any($allTypesSelectionPb);
+            }
         }
 
         // Severity selection

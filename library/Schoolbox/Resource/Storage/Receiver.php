@@ -15,6 +15,7 @@ use League\Flysystem\Filesystem;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\Sanitizer\ISanitizer;
 use Schoolbox\User;
 
@@ -143,9 +144,7 @@ class Receiver implements IReceiver
             );
         }
 
-        if (null !== $expiryAt) {
-            $storage->setExpiryAt($expiryAt);
-        }
+        $storage->setExpiryAt($expiryAt);
 
         $this->storageMapper->save($storage);
 

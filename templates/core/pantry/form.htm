@@ -514,21 +514,15 @@
                         <script type="text/javascript" src="{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js"></script>
                         <script type="text/javascript">
                             $(function() {
-                                $('#user').selectizeSelector({
+                                $('#user').userSelectizeSelector({
                                     ajax: {
-                                        url:      '/ajax/user.php',
-                                        type:     'GET',
                                         data:     {groupID: 0, showCampus: true},
-                                        dataType: 'json'
                                     }
                                 });
 
-                                $('#users').selectizeSelector({
+                                $('#users').userSelectizeSelector({
                                     ajax: {
-                                        url:      '/ajax/user.php',
-                                        type:     'GET',
                                         data:     {groupID: 0, showCampus: true},
-                                        dataType: 'json'
                                     },
                                     multiple: true
                                 });

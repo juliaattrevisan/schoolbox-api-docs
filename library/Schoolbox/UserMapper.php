@@ -45,7 +45,6 @@ use UnexpectedValueException;
  */
 class UserMapper extends Mapper
 {
-
     // The username of the special 'Alaress Admin' user used by Schoolbox staff
     public const USERNAME_ALARESS_ADMIN = 'alaress';
 
@@ -101,6 +100,7 @@ class UserMapper extends Mapper
         $this->uses('password', self::TYPE_STRING);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('firstname', self::TYPE_STRING);
+        $this->uses('preferred_name', self::TYPE_STRING);
         $this->uses('lastname', self::TYPE_STRING);
         $this->uses('local_email', self::TYPE_BOOLEAN);
         $this->uses('alt_email', self::TYPE_STRING);
@@ -560,7 +560,12 @@ class UserMapper extends Mapper
         $yearLevelMapper = \Schoolbox\YearLevel\Mapper::getInstance();
 
         $pb = $this->getPredicateBuilder();
-        $pb->any($this->getPredicateBuilder()->like('u.firstname', "%$name%")->like('u.lastname', "%$name%"));
+        $pb->any(
+            $this->getPredicateBuilder()
+                 ->like('u.firstname', "%$name%")
+                 ->like('u.preferred_name', "%$name%")
+                 ->like('u.lastname', "%$name%")
+        );
         $pb->in('u.group_id', $permittedValues);
 
         $query = "
@@ -634,8 +639,10 @@ class UserMapper extends Mapper
 
                     $foundValidKeyword = true;
 
-                    $pb->like('firstname', "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%")
-                        ->like('lastname', "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%");
+                    $searchLike = "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%";
+                    $pb->like('firstname', $searchLike)
+                       ->like('preferred_name', $searchLike)
+                       ->like('lastname', $searchLike);
                 }
             }
 

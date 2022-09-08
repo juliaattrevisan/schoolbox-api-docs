@@ -51,11 +51,12 @@ class Student
         return $this->tokenReplacer->replace(
             $body,
             [
-                '[firstname]' => $student->getFirstname(),
-                '[surname]'   => $student->getLastname(),
-                '[fullname]'  => $student->getFullName(),
-                '[year]'      => $student->getYear() ? $student->getYear()->getLongName() : '',
-                '[house]'     => $student->getSchoolHouse() ? $student->getSchoolHouse()->getHouse() : '',
+                '[firstname]'     => $student->getFirstname(),
+                '[preferredname]' => $student->getPreferredName(),
+                '[surname]'       => $student->getLastname(),
+                '[fullname]'      => $student->getFullName(),
+                '[year]'          => $student->getYear() ? $student->getYear()->getLongName() : '',
+                '[house]'         => $student->getSchoolHouse() ? $student->getSchoolHouse()->getHouse() : '',
             ]
         );
     }

@@ -9,7 +9,6 @@
  * @link       http://selectize.github.io/selectize.js/
  */
 
-use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Fixtures\Coach;
 use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 use Schoolbox\UserMapper;
@@ -26,7 +25,6 @@ $di = $this->getDi();
 
 /* Note: Insert new tag types here. */
 $registry = [
-    'pastoral'       => $di->lazyNew(PastoralTagMapper::class),
     'sport_position' => $di->lazyNew(PositionMapper::class),
     'sport_coach'    => $di->lazyNew(Coach\TagCloud::class, [
         'mapper'     => $di->lazy([Coach\Mapper::class, 'getInstance']),

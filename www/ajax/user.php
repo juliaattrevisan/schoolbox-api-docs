@@ -21,7 +21,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $userHandler = new User();
 $groupHandler = new Group();
-/** @var SitePage $page */
+/** @var SitePage $pageHandler */
 $pageHandler = $kernel->get('sitePage');
 $pageHandler->initSession();
 
@@ -141,13 +141,21 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                 if ($userSchoolbox && $emailVisible->isSatisfiedBy($userSchoolbox, $_SESSION['user'])) {
                     if ($userSchoolbox->getEmail()) {
                         $return[] = [
-                            'name' => $userSchoolbox->getFormattedEmailDisplay(),
-                            'id'   => $userSchoolbox->getFormattedEmailDisplay(),
+                            'name'        => $userSchoolbox->getFormattedEmailDisplay(),
+                            'id'          => $userSchoolbox->getFormattedEmailDisplay(),
+                            'first_name'  => $userSchoolbox->getFirstname(),
+                            'last_name'   => $userSchoolbox->getLastname(),
+                            'full_name'   => $userSchoolbox->formatName(),
+                            'role'        => $userSchoolbox->getRole()->getName(),
+                            'role_id'     => $userSchoolbox->getRole()->getId(),
+                            'roleType'    => $userSchoolbox->getRole()->getType(),
+                            'external_id' => $userSchoolbox->getExternalId(),
                         ];
                     }
                 }
             } else {
-                $person = "{$user['firstname']} {$user['lastname']} - ";
+                $fullName = $userHandler->formatName($user);
+                $person = "{$fullName} - ";
 
                 if ($user['year']) {
                     $person .= "Year {$user['year']}, ";
@@ -168,10 +176,11 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                     'id' => $userId,
                     'first_name' => $user['firstname'],
                     'last_name' => $user['lastname'],
+                    'full_name' => $fullName,
                     'role' => $user['gname'],
                     'role_id' => $user['gid'],
                     'roleType' => $user['gtype'],
-                    'external_id' => $user['synergy_id']
+                    'external_id' => $user['synergy_id'],
                 ];
             }
         }

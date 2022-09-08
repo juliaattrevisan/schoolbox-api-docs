@@ -6,8 +6,8 @@
  */
 
 use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
+use Schoolbox\User\Formatter;
 
 class User extends DeprecatedModel
 {
@@ -39,20 +39,9 @@ class User extends DeprecatedModel
         return $this->userNotifier;
     }
 
-    public function getAllInCategory($categoryID)
-    {
-        $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id
-                  FROM user, userAccess
-                  WHERE id = uid AND service = '" . UserAccess::SERVICE_HOMEPAGE . "' AND sid = '" . $categoryID . "'
-                  AND type > 0
-                  AND user.deleted_at IS NULL
-                  ORDER BY lastname, firstname";
-        return $this->db->getAll($query);
-    }
-
     public function getByID($id)
     {
-        $query = "SELECT user.id as uid, title, firstname, lastname, username, `groups`.name AS gname, group_id, lu_year_level.name AS year, `key`, hash, eportfolio_enabled,
+        $query = "SELECT user.id as uid, title, firstname, preferred_name, lastname, username, `groups`.name AS gname, group_id, lu_year_level.name AS year, `key`, hash, eportfolio_enabled,
                         position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, webmail, userCampus.campus, luCampus.name as campusName,
                         IF(superusers.id, 1, 0) as su, house, residential_house_id as residential_house, mail_handler, enabled
                 FROM user
@@ -68,7 +57,7 @@ class User extends DeprecatedModel
 
     public function getByUsername($username)
     {
-        $query = "SELECT user.id as uid, title, firstname, lastname, username, `groups`.name AS gname, group_id, lyl.name AS year, eportfolio_enabled,`key`, hash,
+        $query = "SELECT user.id as uid, title, firstname, preferred_name, lastname, username, `groups`.name AS gname, group_id, lyl.name AS year, eportfolio_enabled,`key`, hash,
                         position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, webmail, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler, calendar_view, enabled
                 FROM user
                     LEFT JOIN `groups` ON user.group_id = `groups`.id
@@ -82,7 +71,7 @@ class User extends DeprecatedModel
 
     public function getSuperusers()
     {
-        $query = "SELECT user.id uid, title, firstname, lastname, username, local_email, alt_email
+        $query = "SELECT user.id uid, title, firstname, preferred_name, lastname, username, local_email, alt_email
                 FROM superusers JOIN user ON superusers.id = user.id
                 WHERE user.deleted_at IS NULL";
         return $this->db->getAll($query);
@@ -187,8 +176,11 @@ class User extends DeprecatedModel
             $wherePart .= sprintf(
                 " OR CONCAT_WS(' ', title, firstname, lastname) LIKE '%1\$s'
                 OR CONCAT_WS(' ', firstname, lastname) LIKE '%1\$s'
+                OR CONCAT_WS(' ', title, preferred_name, lastname) LIKE '%1\$s'
+                OR CONCAT_WS(' ', preferred_name, lastname) LIKE '%1\$s'
                 OR CONCAT_WS(' ', title, lastname) LIKE '%1\$s'
                 OR firstname LIKE '%1\$s'
+                OR preferred_name LIKE '%1\$s'
                 OR lastname LIKE '%1\$s'
                 OR username LIKE '%1\$s' ",
                 $this->db->quote('%' . $this->db->escapeForLike($keyword) . '%')
@@ -218,7 +210,7 @@ class User extends DeprecatedModel
             LEFT JOIN `lu_year_level` ON `user`.year_id = `lu_year_level`.id AND `lu_year_level`.deleted_at IS NULL
             WHERE $wherePart
         ";
-        $query .= " ORDER BY lastname, firstname ASC
+        $query .= " ORDER BY lastname, chosen_name ASC
                         LIMIT $offset, $limit;";
         // retreive count
         $count_query = "SELECT COUNT(*) FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id WHERE $wherePart";
@@ -262,19 +254,25 @@ class User extends DeprecatedModel
         $query = "SELECT user.*, `groups`.name AS group_name
                     FROM `user`
                     LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-                    WHERE ( firstname = '$keyword'
-                    OR lastname = '$keyword'
-                    OR username = '$keyword' )
+                    WHERE (
+                        firstname = '$keyword'
+                        OR preferred_name = '$keyword'
+                        OR lastname = '$keyword'
+                        OR username = '$keyword'
+                    )
                     $wherePart
-                    ORDER BY lastname, firstname ASC
+                    ORDER BY lastname, chosen_name ASC
                     LIMIT $offset, $limit;";
         // retreive count
         $count_query = "SELECT COUNT(*)
                                 FROM `user`
                                 LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-                                WHERE ( firstname = '$keyword'
-                                OR lastname = '$keyword'
-                                OR username = '$keyword' )
+                                WHERE (
+                                    firstname = '$keyword'
+                                    OR preferred_name = '$keyword'
+                                    OR lastname = '$keyword'
+                                    OR username = '$keyword'
+                                )
                                 $wherePart";
         $count       = $this->db->getOne($count_query);
         return $this->db->getAll($query);
@@ -299,6 +297,7 @@ class User extends DeprecatedModel
                 user.id AS uid,
                 title,
                 firstname,
+                preferred_name,
                 lastname,
                 username,
                 `groups`.name AS gname,
@@ -320,13 +319,24 @@ class User extends DeprecatedModel
                 $param = $this->db->quote($keyword);
                 $query .= "( synergy_id = $param  ) ";
             } else {
+                // TODO account for preferred name:
+                //      alternately remove and replace with API search
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
                     $firstName = $this->db->escapeForLike($name[1]);
                     $lastName  = $this->db->escapeForLike($name[2]);
-                    $query .= "( firstname like '%{$firstName}%' and lastname like '%{$lastName}%' ) ";
+                    $query .= "
+                        ( firstname like '%{$firstName}%' and lastname like '%{$lastName}%' )
+                        or
+                        ( preferred_name like '%{$firstName}%' and lastname like '%{$lastName}%' )
+                    ";
                 } else {
                     $param = $this->db->escapeForLike($keyword);
-                    $query .= "( firstname like '%$param%' or lastname like '%$param%' or username like '%$param%' ) ";
+                    $query .= "(
+                        firstname like '%$param%'
+                        or preferred_name like '%$param%'
+                        or lastname like '%$param%'
+                        or username like '%$param%'
+                    ) ";
                 }
             }
             if (is_array($group)) {
@@ -358,7 +368,7 @@ class User extends DeprecatedModel
         if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
             $query .= ' AND ' . $searchFilter;
         }
-        $query .= "ORDER BY group_id, lyl.sequence, lastname, firstname";
+        $query .= "ORDER BY group_id, lyl.sequence, lastname, chosen_name";
         if (is_numeric($limit)) {
             $query .= " LIMIT $limit";
         }
@@ -430,42 +440,16 @@ class User extends DeprecatedModel
     /**
      * Format a name from a user object
      *
-     * @param  array $userInfo
+     * @param array  $userInfo
      * @param string $format
-     * @param bool   $useNonBreakingSpace
      *
      * @return mixed|null|string
      */
-    public function formatName($userInfo, $format = null, $useNonBreakingSpace = false)
+    public function formatName($userInfo, $format = null)
     {
-        // Check for custom format
-        if (empty($format)) {
-            $format = Config::get('name_format');
-        }
-        /* Replace tags */
-        preg_match_all('|{\w+}|', $format, $tags);
-        if (empty($tags) || empty($userInfo)) {
-            return 'Unknown User';
-        }
-        foreach ($tags[0] as $tag) {
-            $key = trim($tag, '{}');
-
-            if (isset($userInfo[$key]) && is_string($userInfo[$key])) {
-                $value = $userInfo[$key];
-            } else {
-                $value = '';
-            }
-            $format = str_replace($tag, $value, $format);
-        }
-        if ($format = trim($format)) {
-            if ($useNonBreakingSpace) {
-                $format = preg_replace("#[\s]#", '&nbsp;', $format);
-            }
-            return $format;
-        } elseif ($useNonBreakingSpace) {
-            return 'Unknown&nbsp;User';
-        } else {
-            return 'Unknown User';
-        }
+        $formatter = empty($format)
+            ? (new Formatter\Factory())->buildFromNothing()
+            : new Formatter\Formatter($format);
+        return $formatter->formatArray($userInfo);
     }
 }

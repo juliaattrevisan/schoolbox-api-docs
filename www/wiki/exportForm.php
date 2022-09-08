@@ -2,6 +2,7 @@
 
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User\Formatter\Factory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
@@ -48,7 +49,7 @@ if (isset($_GET['wikiID'])) {
     $modifiedDate = new Alaress_Date_Format($wikiContents['modified'], 'U');
 
     $output = [
-        'AUTHOR'       => $wikiContents['firstname'] . ' ' . $wikiContents['lastname'],
+        'AUTHOR'       => (new Factory())->buildFromNothing()->formatArray($wikiContents),
         'HEADING'      => Scrub::text($wikiContents['heading']),
         'BODY'         => $body,
         'LASTMODIFIED' => $modifiedDate->getLong(),

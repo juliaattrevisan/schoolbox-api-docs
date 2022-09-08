@@ -38,7 +38,7 @@
                      * $query var
                      */
                     $.ajax({
-                        url: '/ajax/tags/pastoral',
+                        url: '{{ routeLookup('pastoral.searchTags') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: { query: query }
@@ -51,7 +51,7 @@
             },
             value: [
                 {% for tag in record.tags %}
-                {{ tag | json_encode | raw }}{% if not loop.last %},{% endif %}
+                {'id': '{{ tag.id }}', 'name': '{{ tag.name | escape('js') }}'},
                 {% endfor %}
             ]
         });
@@ -115,16 +115,13 @@
 
         {# Create Duplicate Record Selectize #}
 
-        $('#duplicateIds').selectizeSelector({
+        $('#duplicateIds').userSelectizeSelector({
             multiple: true,
             ajax: {
-                url: '/ajax/user.php',
-                type: 'GET',
                 data: {
                     roleTypeID: 'student',
                     excludeID: '{{ record.student ? record.student.id : '' }}'
                 },
-                dataType: 'json'
             },
             value: {{ students | raw}}
         });
@@ -270,8 +267,7 @@
                 {% if audience.user %}
                 window.modalUserAdded({
                     'id': {{ audience.user.id }},
-                    'first_name': "{{ audience.user.firstname }}",
-                    'last_name': "{{ audience.user.lastname }}",
+                    'full_name': "{{ audience.user.full_name }}",
                     'role': "{{ audience.user.role.name }}",
                 }, "{{ audience.access }}", visibilityLocked);
                 {% endif %}

@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Resource\Attachment;
 
+use Alaress_Date_Format;
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
@@ -20,7 +21,6 @@ use Schoolbox\User;
  */
 class Factory
 {
-
     /**
      * Filesystem controllers follow this nomenclature
      */
@@ -73,6 +73,13 @@ class Factory
      * @var User
      */
     private $user;
+
+
+    /**
+     * The expiry date to use for any files uploaded to the controllers this
+     * factory creates, or null if not provided.
+     */
+    private ?Alaress_Date_Format $expiryDate = null;
 
 
     /**
@@ -166,6 +173,17 @@ class Factory
 
 
     /**
+     * @param Alaress_Date_Format|null $expiryDate
+     * @return static
+     */
+    public function setExpiryDate(?Alaress_Date_Format $expiryDate): self
+    {
+        $this->expiryDate = $expiryDate;
+        return $this;
+    }
+
+
+    /**
      * @param string $source
      * @return ControllerInterface
      * @throws OutOfRangeException
@@ -178,21 +196,58 @@ class Factory
             throw new OutOfRangeException("No controller found: {$source}");
         }
 
-        $controller = new $classname(
-            $this->multi,
-            $this->mime,
-            $this->conf,
-            $this->rosetta,
-            $this->useFolder,
-            $this->defaultFolderId,
-            $this->user
-        );
-
-        if (!$controller instanceof ControllerInterface) {
-            throw new OutOfRangeException('Controller does not implement ControllerInterface');
-        }
-
-        return $controller;
+        $classname = ltrim($classname, '\\');
+        return match ($classname) {
+            Filesystem\WebdavController::class => new Filesystem\WebdavController(
+                $this->multi,
+                $this->mime,
+                $this->useFolder,
+            ),
+            Filesystem\MyfileController::class => new Filesystem\MyfileController(
+                $this->multi,
+                $this->mime,
+            ),
+            Filesystem\BrowseController::class => new Filesystem\BrowseController(
+                $this->multi,
+                $this->mime,
+                $this->conf,
+                $this->rosetta,
+                $this->useFolder,
+                $this->defaultFolderId,
+            ),
+            Filesystem\Office365Controller::class => new Filesystem\Office365Controller(
+                $this->multi,
+                $this->mime,
+                $this->conf,
+                $this->rosetta,
+                $this->useFolder,
+            ),
+            Filesystem\GoogleController::class => new Filesystem\GoogleController(
+                $this->multi,
+                $this->mime,
+                $this->conf,
+            ),
+            Filesystem\TeamsController::class => new Filesystem\TeamsController(
+                $this->multi,
+                $this->mime,
+                $this->conf,
+                $this->user,
+            ),
+            Filesystem\UploadController::class => new Filesystem\UploadController(
+                $this->multi,
+                $this->mime,
+                $this->useFolder,
+                $this->defaultFolderId,
+                $this->expiryDate,
+            ),
+            Filesystem\UsermediaController::class => new Filesystem\UsermediaController(
+                $this->multi,
+                $this->mime,
+                $this->useFolder,
+                $this->defaultFolderId,
+            ),
+            default => throw new OutOfRangeException('Controller does not implement ControllerInterface'),
+        };
     }
 
 

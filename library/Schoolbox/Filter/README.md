@@ -525,7 +525,11 @@ Now, you can start writing the controller action which loads the actual content.
 
 * Create a [Key Converter](#key-converter) in the namespace determined above,
   extending `\Schoolbox\Filter\AbstractKeyConverter`
-  * implement `getItem`: have it `return (int)$key` for now
+  * implement `getItem`: have it include the below for now:
+    ```php
+    $this->assertValidKey($key, $user, $page);
+    return $key;
+    ```
   * implement `assertValidKey`: have it do nothing for now
   * implement `possibleItemCount`: have it `return 0` for now
 

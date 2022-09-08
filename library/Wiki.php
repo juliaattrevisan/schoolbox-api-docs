@@ -51,7 +51,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     public function getByID($wikiID, $revisionID = 0)
     {
         $query = "SELECT r.*, w.categoryID, w.locked, w.slug, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
-                  u.title, u.firstname, u.lastname, r.userID authorID
+                  u.title, u.firstname, u.preferred_name, u.lastname, r.userID authorID
                   FROM " . $this->_revisionTable . " r
                   LEFT JOIN " . $this->_table . " w ON w.wikiID = r.wikiID
                   LEFT JOIN user u ON u.id = r.userID
@@ -74,7 +74,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      */
     public function getRevisionList($wikiID)
     {
-        $query = "SELECT r.*, UNIX_TIMESTAMP(r.created) created, u.title, u.firstname, u.lastname
+        $query = "SELECT r.*, UNIX_TIMESTAMP(r.created) created, u.title, u.firstname, u.preferred_name, u.lastname
                   FROM " . $this->_revisionTable . " r
                   LEFT JOIN user u ON u.id = r.userID
                   WHERE wikiID = '{$this->db->quote($wikiID)}'
@@ -106,7 +106,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             $orderBySQL = 'ORDER BY ' . $orderBy;
         }
 
-        $query = "SELECT r.*, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname,
+        $query = "SELECT r.*, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.preferred_name, u.lastname,
                   w.locked, w.categoryID, w.slug
                   FROM wiki w
                   LEFT JOIN " . $this->_revisionTable . " r ON r.revisionID = (SELECT r.revisionID FROM " . $this->_revisionTable . " r WHERE r.wikiID = w.wikiID ORDER BY r.created DESC LIMIT 1)
@@ -240,7 +240,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         $limit    = intval($limit);
         $sort_dir = (strtolower($sort_dir) === 'desc' ? 'desc' : 'asc');
 
-        $query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.lastname,
+        $query = "SELECT wiki.*, wikiRevision.*, `user`.id AS `uid`, `user`.title, `user`.firstname, `user`.preferred_name, `user`.lastname,
                             MATCH(`heading`,`body`) AGAINST ('$keyword') AS `score`
                         FROM `wikiRevision`
                         LEFT JOIN `wiki` ON `wikiRevision`.wikiID = `wiki`.wikiID AND `wikiRevision`.revisionID = `wiki`.latestRevision
@@ -328,7 +328,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         $query = "SELECT r.*,
                     w.categoryID, w.locked, UNIX_TIMESTAMP(w.created) created, w.slug,
                     UNIX_TIMESTAMP(r.created) modified, latestRevision, r.userID authorID,
-                    u.title, u.firstname, u.lastname
+                    u.title, u.firstname, u.preferred_name, u.lastname
                   FROM {$this->_revisionTable} r
                   LEFT JOIN {$this->_table} w ON w.wikiID = r.wikiID
                   LEFT JOIN user u ON u.id = r.userID

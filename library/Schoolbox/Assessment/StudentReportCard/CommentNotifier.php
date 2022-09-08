@@ -18,6 +18,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -27,7 +28,6 @@ use Schoolbox\UserMapper;
 
 class CommentNotifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_COMMENTED = 'commented';
 
     /** @var FolderMapper */
@@ -200,7 +200,7 @@ class CommentNotifier extends AbstractModuleNotifier
         // send to parents (if relevant)
         if ($comment->getParentVisibility()) {
             // parents don't need to see their child's surname in the message
-            $bob->setParam('student', new UserParam($student, ParameterInterface::STACKING_APPEND, '{firstname}'));
+            $bob->setParam('student', new ChildParam($student, ParameterInterface::STACKING_APPEND));
             $envelope->targetToParent($student->getId(), $bob->build());
         }
 

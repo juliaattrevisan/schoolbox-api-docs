@@ -11,9 +11,19 @@ import BadgeReportHeader from './badge-report-header';
 import BadgeReportStudent from './badge-report-student';
 import AwardDetailModal from './award-detail-modal';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
-
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 export default {
+
+    /**
+     * Mixins.
+     * Basically traits for vue; allows you to share javascript between components in the same
+     * manner as a php trait. They must already be imported at the top of the file and will
+     * be superpositioned on top of this javascript here, inside export default {}
+     */
+    mixins: [
+        cdnPrefixMixin,
+    ],
 
     components: {
         BadgeReportHeader,
@@ -39,6 +49,10 @@ export default {
             type: String,
             required: true,
         },
+        siteVersion: {
+            type: String,
+            required: true,
+        }
     },
     
     data () {
@@ -229,6 +243,8 @@ export default {
                 <award-detail-modal 
                     ref="awardDetailModal"
                     @on-achievement-awarded="onAchievementAwarded"
+                    :cdn-prefix="this.cdnPrefix"
+                    :site-version="this.siteVersion"
                 />
             </div>
 

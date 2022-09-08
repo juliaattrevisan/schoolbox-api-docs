@@ -58,6 +58,9 @@
                                 <h3>{{ report.name }}</h3>
                             </a>
                             <p class="meta">
+                                {% if report.notificationEnabled %}
+                                    <i title="Notification Enabled" class="icon-bell"></i>
+                                {% endif %}
                                 <i title="{{ locale.pastoral.proper }} Groups" class="icon-group"></i>
                                 {% if report.groups | length %}
                                     {% for group in report.groups %}
