@@ -40,11 +40,13 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', {
                 const enableResponses = nodeEnables.map((response) => response.ok);
                 const isAllResponsesOk = enableResponses.every((response) => response === true);
                 if (isAllResponsesOk) {
+                    const successMessage = this.getSuccessMessage();
                     const selectedNodesStore = useSelectedNodesStore();
                     selectedNodesStore.nodes.forEach((node) => this.enableAllChildren(node)); //set the enabled on each node
                     selectedNodesStore.empty();
                     this.isProcessing = false;
                     this.cancel();
+                    return successMessage;
                 } else {
                     throw new Error();
                 }
@@ -74,6 +76,18 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', {
                 }));
             });
             return fetchList;
+        },
+
+        /**
+         * To notify the user of success status
+         *
+         * @returns { string }
+         */
+        getSuccessMessage () {
+            const selectedNodesStore = useSelectedNodesStore();
+            const nodeSingleOrPlural = `node${selectedNodesStore.count > 1  ? 's' : ''}`;
+            const enabledOrDisabled = `${ selectedNodesStore.nodes[0].enabled ? 'disabled' : 'enabled'}`
+            return `${selectedNodesStore.count} ${nodeSingleOrPlural} successfully ${enabledOrDisabled}`;
         },
 
         /**

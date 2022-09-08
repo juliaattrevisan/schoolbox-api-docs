@@ -38,11 +38,13 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
                 const deleteResponses = nodeDeletions.map((response) => response.ok);
                 const isAllResponsesOk = deleteResponses.every((response) => response === true);
                 if (isAllResponsesOk) {
+                    const successMessage = this.getSuccessMessage();
                     const selectedNodesStore = useSelectedNodesStore();
                     selectedNodesStore.nodes.forEach((node) => this.deleteNode(node)); //delete each node from the tree
                     selectedNodesStore.empty();
                     this.isProcessing = false;
                     this.cancel();
+                    return successMessage;
                 } else {
                     throw new Error();
                 }
@@ -69,6 +71,17 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
                 }));
             });
             return fetchList;
+        },
+
+        /**
+         * To notify the user of success status
+         *
+         * @returns { string }
+         */
+        getSuccessMessage () {
+            const selectedNodesStore = useSelectedNodesStore();
+            const nodeSingleOrPlural = `node${selectedNodesStore.count > 1  ? 's' : ''}`;
+            return `${selectedNodesStore.count} ${nodeSingleOrPlural} successfully deleted`;
         },
 
         /**

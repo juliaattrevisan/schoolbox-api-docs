@@ -5,11 +5,13 @@
  */
 
 import { ref, computed, watch } from 'vue';
+import { useStore } from '../store/manageCurriculumStore';
 import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
 import { useDeleteNodesStore } from './store/mcDeleteNodesStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
+const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
 const deleteNodesStore = useDeleteNodesStore();
 const modalEl = ref(null);
@@ -34,10 +36,9 @@ function onDeleteSelected () {
  */
 deleteNodesStore.$onAction(({ name, after, onError }) => {
     if (name === 'delete') {
-        // store.toastEl.activate('Disbanding...');
+        store.toastEl.activate('Deleting...');
         after((result) => {
-            console.warn('success');
-            // store.toastEl.timeout('Group successfully disbanded', true, 5000);
+            store.toastEl.timeout(result, true, 5000);
         });
         onError((error) => {
             console.warn(error);

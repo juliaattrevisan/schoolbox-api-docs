@@ -5,11 +5,13 @@
  */
 
 import { ref, computed, watch } from 'vue';
+import { useStore } from '../store/manageCurriculumStore';
 import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
 import { useEnableNodesStore } from './store/mcEnableNodesStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
+const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
 const enableNodesStore = useEnableNodesStore();
 const modalEl = ref(null);
@@ -33,11 +35,10 @@ function onEnableSelected () {
  * and update the UI accordingly
  */
 enableNodesStore.$onAction(({ name, after, onError }) => {
-    if (name === 'enabled') {
-        // store.toastEl.activate('Disbanding...');
-        after(() => {
-            console.warn('success');
-            // store.toastEl.timeout('Group successfully disbanded', true, 5000);
+    if (name === 'enable') {
+        store.toastEl.activate('Processing...');
+        after((result) => {
+            store.toastEl.timeout(result, true, 5000);
         });
         onError((error) => {
             console.warn(error);

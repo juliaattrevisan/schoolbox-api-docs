@@ -5,7 +5,7 @@
  * CRUD individual nodes
  */
 
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useViewNodesStore } from './viewNodes/store/mcViewNodesStore';
 import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
@@ -15,6 +15,7 @@ import McSelectedNodes from './selectedNodes/mc-selected-nodes.vue';
 import McEnableNodes from './selectedNodes/mc-enable-nodes.vue';
 import McDeleteNodes from './selectedNodes/mc-delete-nodes.vue';
 import McActiveSelectedNodeModal from './selectedNodes/mc-active-selected-node-modal.vue';
+import Toast from '@schoolboxVue/components/toast.vue';
 
 
 const props = defineProps({
@@ -36,6 +37,8 @@ const props = defineProps({
     },
 });
 
+const toastEl = ref(null);
+
 /**
  * Start loading the curriculum data
  */
@@ -43,6 +46,7 @@ onMounted(() => {
     checkForStorybook();
     const store = useStore();
     store.isReadOnly = props.isReadOnly;
+    store.toastEl = toastEl;
     if (props.dataEndpoint !== '') { //only load when we need to
         store.load(props.dataEndpoint);
     }
@@ -69,6 +73,7 @@ function checkForStorybook () {
     <mc-enable-nodes />
     <mc-delete-nodes />
     <mc-active-selected-node-modal />
+    <toast ref="toastEl"></toast>
 </template>
 
 <style lang="scss" scoped>
