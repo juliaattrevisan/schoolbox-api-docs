@@ -9,12 +9,16 @@ import { useActiveNodeStore } from './mcActiveNodeStore';
 import { useViewNodesStore } from '../../viewNodes/store/mcViewNodesStore';
 
 
+const UNSET_ID = -1;
+
+
 export const useAddSubsectionStore = defineStore('mcAddSubsection', {
 
     state: () => ({
         isProcessing: false,
         isOpen: false, //to notify that the prompt is opened / closed
         subsection: {},
+        id: UNSET_ID, //the id of the last updated node
     }),
 
     actions: {
@@ -47,6 +51,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
                 });
                 if (response.ok) {
                     const newNode = await response.json();
+                    this.id = newNode.id;
                     await this.addSubsection(newNode);
                     this.isProcessing = false;
                     this.cancel();
@@ -78,7 +83,6 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
             const viewNodesStore = useViewNodesStore();
             if (viewNodesStore.current.id !== newNode.parent.id) { //if we aren't on the new nodes level move down so we can see the new node
                 viewNodesStore.setNextSelected(newNode.parent.id);
-                console.warn('setNextSelected');
             }
         },
 
@@ -89,6 +93,13 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
             const activeNodeStore = useActiveNodeStore();
             activeNodeStore.unset();
             this.isOpen = false;
+        },
+
+        /**
+         * to unset the id, called when the toast has already been displayed once
+         */
+        unsetId () {
+            this.id = UNSET_ID;
         },
 
     },
