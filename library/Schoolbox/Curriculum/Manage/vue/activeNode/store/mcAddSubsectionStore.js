@@ -6,6 +6,10 @@ import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useNodesStore } from '../../store/mcNodesStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
+import { useViewNodesStore } from '../../viewNodes/store/mcViewNodesStore';
+
+
+const UNSET_ID = -1;
 
 
 export const useAddSubsectionStore = defineStore('mcAddSubsection', {
@@ -14,6 +18,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
         isProcessing: false,
         isOpen: false, //to notify that the prompt is opened / closed
         subsection: {},
+        id: UNSET_ID, //the id of the last updated node
     }),
 
     actions: {
@@ -37,8 +42,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
             this.isProcessing = true;
             try {
                 this.isProcessing = false;
-                const activeNodeStore = useActiveNodeStore();
-                const response = await fetch(`${apiEndpoint}/${activeNodeStore.node.id}`, {
+                const response = await fetch(`${apiEndpoint}/${useActiveNodeStore().node.id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -47,15 +51,38 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
                 });
                 if (response.ok) {
                     const newNode = await response.json();
-                    const nodesStore = useNodesStore();
-                    await nodesStore.addSubsection(newNode);
+                    this.id = newNode.id;
+                    await this.addSubsection(newNode);
                     this.isProcessing = false;
                     this.cancel();
+                    return newNode.id;
                 } else {
                     throw new Error();
                 }
             } catch (error) {
                 console.warn(error);
+            }
+        },
+
+        /**
+         * Add in a new subsection to the active node
+         *
+         * @param { object }
+         */
+        async addSubsection (newNode) {
+            const activeNodeStore = useActiveNodeStore();
+            const nodesStore = useNodesStore();
+            if (activeNodeStore.node.children === null) { //if the children aren't loaded, load them in - which will also return the newly added node
+                await nodesStore.loadChildren(activeNodeStore.node.id);
+            } else { //otherwise we need to push the newNode in as the children are already loaded
+                /**
+                 * @TODO - place in sorted alphabetically
+                 */
+                activeNodeStore.node.children.push(newNode);
+            }
+            const viewNodesStore = useViewNodesStore();
+            if (viewNodesStore.current.id !== newNode.parent.id) { //if we aren't on the new nodes level move down so we can see the new node
+                viewNodesStore.setNextSelected(newNode.parent.id);
             }
         },
 
@@ -66,6 +93,13 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
             const activeNodeStore = useActiveNodeStore();
             activeNodeStore.unset();
             this.isOpen = false;
+        },
+
+        /**
+         * to unset the id, called when the toast has already been displayed once
+         */
+        unsetId () {
+            this.id = UNSET_ID;
         },
 
     },

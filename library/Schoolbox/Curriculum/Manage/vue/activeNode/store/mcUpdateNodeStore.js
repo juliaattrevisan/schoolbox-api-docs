@@ -12,7 +12,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
     state: () => ({
         isProcessing: false,
         isOpen: false, //to notify that the prompt is opened / closed
-        activeNodeCopy: {},
+        activeNodeCopy: {}, //hold a copy of the changes, only update once we confirm the changes
     }),
 
     actions: {
@@ -39,7 +39,8 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
             try {
                 this.isProcessing = false;
                 const activeNodeStore = useActiveNodeStore();
-                const response = await fetch(`${apiEndpoint}/${activeNodeStore.node.id}`, {
+                const nodeId = activeNodeStore.node.id;
+                const response = await fetch(`${apiEndpoint}/${nodeId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -50,6 +51,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
                     activeNodeStore.update(this.activeNodeCopy);
                     this.isProcessing = false;
                     this.cancel();
+                    return nodeId;
                 } else {
                     throw new Error();
                 }

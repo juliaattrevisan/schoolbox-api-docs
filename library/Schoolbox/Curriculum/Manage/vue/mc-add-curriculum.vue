@@ -32,15 +32,15 @@ onMounted(() => {
  */
 async function loadCKEditor () {
     try {
-        const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`;
+        const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
         if (!isScriptAdded(ckeditorScript)) {
             await injectScript(ckeditorScript);
         }
-        const jqueryEditorScript = `${cdnPrefix}/js/editor/jquery.editor.js?v=${siteVersion}`
+        const jqueryEditorScript = `${cdnPrefix}/js/editor/jquery.editor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
         if (!isScriptAdded(jqueryEditorScript)) {
             await injectScript(jqueryEditorScript);
         }
-        $.fn.alaressEditor($.alaressEditorConfigForComments(getVueSpecificConfig()));
+        $.fn.alaressEditor($.alaressEditorConfigBasic(getVueSpecificConfig()));
     } catch (error) {
         console.warn(error);
     }
@@ -110,9 +110,13 @@ function onCancelSelected () {
                         <textarea :id="ckeditorInstance" rows="6"></textarea>
                     </div>
                     <div class="small-12 columns">
-                        <ul class="flex-list buttons">
-                            <li><button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button" :disabled="addCurriculumStore.isProcessing">Cancel</button></li>
-                            <li><button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button submit" :disabled="addCurriculumStore.isProcessing">{{ addButtonText }}</button></li>
+                        <ul class="flex-list">
+                            <li>
+                                <button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button icon-close" :disabled="addCurriculumStore.isProcessing">Cancel</button>
+                            </li>
+                            <li>
+                                <button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button icon-add submit" :disabled="addCurriculumStore.isProcessing">{{ addButtonText }}</button>
+                            </li>
                         </ul>
                     </div>
                 </fieldset>

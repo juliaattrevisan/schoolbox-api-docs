@@ -7,6 +7,9 @@
 
 import { computed } from 'vue';
 import { UNSET_ID } from '../store/mcNodesStore';
+import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
+
+const selectedNodesStore = useSelectedNodesStore();
 
 
 const props = defineProps({
@@ -38,7 +41,35 @@ const props = defineProps({
  *
  * @returns { Boolean }
  */
- const isIdSet = computed(() => props.node.id !== UNSET_ID);
+const isIdSet = computed(() => props.node.id !== UNSET_ID);
+
+/**
+ * if the node is a child of one that's selected but is not in
+ * the selected list it should be disabled
+ *
+ * @returns { Boolean }
+ */
+const isDisabled = computed(() => {
+    return props.node.isSelected && !selectedNodesStore.nodesIds.includes(props.node.id);
+});
+
+/**
+ * Update the status of the checkbox based on whether it's selected or not
+ *
+ * @returns { Boolean }
+ */
+const isChecked = computed(() => {
+    return props.node.isSelected;
+});
+
+/**
+ * add or remove based on the current status
+ *
+ * @param { boolean }
+ */
+function onChange (isChecked) {
+    selectedNodesStore.switch(props.node, isChecked);
+}
 
 </script>
 
@@ -48,8 +79,9 @@ const props = defineProps({
             :id="`checkbox-${props.node.id}`"
             type="checkbox"
             :value="props.node.id"
-            :checked="false"
-            :disabled="props.isUpdatingOrAdding"
+            :disabled="isDisabled"
+            :checked="isChecked"
+            @change="onChange($event.target.checked)"
         />
         <label :for="`checkbox-${props.node.id}`"></label>
     </div>

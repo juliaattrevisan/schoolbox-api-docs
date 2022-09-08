@@ -5,46 +5,40 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useActiveNodeStore } from './store/mcActiveNodeStore';
-import { useDeleteNodeStore } from './store/mcDeleteNodeStore';
+import { useStore } from '../store/manageCurriculumStore';
+import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
+import { useDeleteNodesStore } from './store/mcDeleteNodesStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const activeNodeStore = useActiveNodeStore();
-const deleteNodeStore = useDeleteNodeStore();
+const store = useStore();
+const selectedNodesStore = useSelectedNodesStore();
+const deleteNodesStore = useDeleteNodesStore();
 const modalEl = ref(null);
 
 /**
  * to open the modal when requested
  */
-watch(() => deleteNodeStore.isOpen, (isOpen) => {
+watch(() => deleteNodesStore.isOpen, (isOpen) => {
     isOpen ? modalEl.value.open() : modalEl.value.close();
 });
-
-/**
- * also highlight that you'll be deleting all the children within as well
- *
- * @returns { String }
- */
-const childrenWarning = computed(() => activeNodeStore?.node?.children?.length > 0 ? ' and all of its children' : '');
 
 /**
  * delete the node when confirmed
  */
 function onDeleteSelected () {
-    deleteNodeStore.delete();
+    deleteNodesStore.delete();
 }
 
 /**
  * so we can track the progress of the node removal
  * and update the UI accordingly
  */
-deleteNodeStore.$onAction(({ name, after, onError }) => {
+deleteNodesStore.$onAction(({ name, after, onError }) => {
     if (name === 'delete') {
-        // store.toastEl.activate('Disbanding...');
-        after(() => {
-            console.warn('success');
-            // store.toastEl.timeout('Group successfully disbanded', true, 5000);
+        store.toastEl.activate('Deleting...');
+        after((result) => {
+            store.toastEl.timeout(result, true, 5000);
         });
         onError((error) => {
             console.warn(error);
@@ -59,7 +53,7 @@ deleteNodeStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const deleteButtonText = computed(() => deleteNodeStore.isProcessing ? 'Deleting...' : 'Yes');
+const deleteButtonText = computed(() => deleteNodesStore.isProcessing ? 'Deleting...' : 'Yes');
 
 /**
  * to prevent the user from moving away from the modal while
@@ -67,13 +61,13 @@ const deleteButtonText = computed(() => deleteNodeStore.isProcessing ? 'Deleting
  *
  * @returns { Boolean }
  */
-const isModalDisabled = computed(() => deleteNodeStore.isProcessing);
+const isModalDisabled = computed(() => deleteNodesStore.isProcessing);
 
 /**
  * to close the modal
  */
 function onCancelSelected () {
-    deleteNodeStore.cancel();
+    deleteNodesStore.cancel();
 }
 
 /**
@@ -81,7 +75,7 @@ function onCancelSelected () {
  * as we can currently also use foundation to close the modal
  */
 function onModalClosed () {
-    deleteNodeStore.cancel();
+    deleteNodesStore.cancel();
 }
 
 </script>
@@ -94,10 +88,14 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
-        <p>Are you sure you wish to delete {{ activeNodeStore.title }} and all of its children?</p>
-        <ul class="flex-list buttons">
-            <li><button @click.prevent="onDeleteSelected" class="button submit" :disabled="deleteNodeStore.isProcessing">{{ deleteButtonText }}</button></li>
-            <li><button @click.prevent="onCancelSelected" class="button" :disabled="deleteNodeStore.isProcessing">Cancel</button></li>
+        <p>Are you sure you wish to delete the {{ selectedNodesStore.countWithName }} selected and all of {{ selectedNodesStore.count > 1 ? 'their' : 'its' }} children?</p>
+        <ul class="flex-list">
+            <li>
+                <button @click.prevent="onDeleteSelected" class="button icon-approve submit" :disabled="deleteNodesStore.isProcessing">{{ deleteButtonText }}</button>
+            </li>
+            <li>
+                <button @click.prevent="onCancelSelected" class="button icon-close" :disabled="deleteNodesStore.isProcessing">Cancel</button>
+            </li>
         </ul>
     </reveal-modal>
 </template>

@@ -15,6 +15,7 @@ export const useStore = defineStore('manageCurriculum', {
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place, like updating a member access
         isReadOnly: true, //can only view the currently selected codes, not edit them
+        toastEl: null, //so we don't need to pass it all around as a prop
     }),
 
     getters: {

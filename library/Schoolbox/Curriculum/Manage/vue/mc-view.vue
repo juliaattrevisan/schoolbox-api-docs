@@ -35,7 +35,7 @@ function onRefreshSelected () {
             </section>
         </div>
     </div>
-    <div v-else class="row">
+    <div v-else class="row view-nodes">
         <div class="small-12 island">
             <section>
                 <fieldset class="content">
@@ -50,5 +50,9 @@ function onRefreshSelected () {
 </template>
 
 <style scoped>
+
+.view-nodes {
+    margin-bottom: 180px; /* provide a minimum space to allow the bottom-drawer.vue */
+}
 
 </style>

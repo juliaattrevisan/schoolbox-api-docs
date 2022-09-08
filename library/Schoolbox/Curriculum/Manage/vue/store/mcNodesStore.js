@@ -5,6 +5,7 @@
 import { defineStore } from 'pinia';
 import { useStore, apiEndpoint } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
+import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 export const UNSET_ID = 0;
@@ -28,7 +29,7 @@ export const useNodesStore = defineStore('mcNodes', {
          */
         initTopLevel () {
             /**
-             * Hold off on this for now, I'll need to think a bit more on what to store in the session storage
+             * @TODO - Hold off on this for now, I'll need to think a bit more on what to store in the session storage
              * before I enable this.
              */
             // if (sessionStorage.getItem(SB_CURRICULUM_TOP_LEVEL)) {
@@ -52,7 +53,7 @@ export const useNodesStore = defineStore('mcNodes', {
         /**
          * load in the top level nodes from the api
          */
-         async loadTopLevel () {
+        async loadTopLevel () {
             const store = useStore();
             try {
                 const response = await fetch(`${apiEndpoint}/?topLevelOnly=1`);
@@ -102,7 +103,9 @@ export const useNodesStore = defineStore('mcNodes', {
                 const response = await fetch(`${apiEndpoint}/${id}?descendants=1`);
                 if (response.ok) {
                     const newNode = await response.json();
+                    newNode.children.forEach((node) => useSelectedNodesStore().addIsSelected(node));
                     const oldNode = findById(this.nodes.children, id);
+                    useSelectedNodesStore().addIsSelected(oldNode);
                     oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
                     console.warn(response);
@@ -124,10 +127,11 @@ export const useNodesStore = defineStore('mcNodes', {
         updateNodes (nodes) { //we add them to .children so the top level structure is consistent with the levels below
             this.nodes = {
                 id: UNSET_ID,
-                name: 'Curriculums',
+                name: 'Curricula',
                 children: nodes,
                 enabled: true,
             }
+            nodes.forEach((node) => useSelectedNodesStore().addIsSelected(node));
         },
 
         /**
@@ -136,63 +140,15 @@ export const useNodesStore = defineStore('mcNodes', {
          * @param { object }
          */
         addNewCurriculum (curriculum) {
+            /**
+             * @TODO - place in sorted alphabetically
+             */
             this.nodes.children.push(curriculum);
-        },
-
-        /**
-         * Add in a new subsection to the active node
-         *
-         * @param { object }
-         */
-        async addSubsection (newNode) {
-            const activeNodeStore = useActiveNodeStore();
-            if (activeNodeStore.node.children === null) { //if the children aren't loaded, load them in - which will also return the newly added node
-                await this.loadChildren(activeNodeStore.node.id);
-            } else { //otherwise we need to push the newNode in as the children are already loaded
-                activeNodeStore.node.children.push(newNode);
-            }
-            const viewNodesStore = useViewNodesStore();
-            if (viewNodesStore.current.id !== newNode.parent.id) { //if we aren't on the new nodes level move down so we can see the new node
-                viewNodesStore.setNextSelected(newNode.parent.id);
-            }
-        },
-
-        /**
-         * Pull the active node out of the list
-         */
-        deleteNode () {
-            const activeNodeStore = useActiveNodeStore();
-            const activeNodeRemoved = removeId(this.nodes.children, activeNodeStore.node.id);
-            this.updateNodes(activeNodeRemoved);
-            activeNodeStore.unset();
         },
 
     },
 
 });
-
-/**
- * To return an array with any objects containing the specified id removed
- * we move through the object, looping recursively through .children and remove
- * any with the id that's being removed
- *
- * @param { array }
- * @param { number }
- *
- * @returns { object }
- */
-export function removeId (data, id) {
-    if (data !== null) { // .children wont always be available if the node hasn't been loaded yet
-        return data.reduce((previousValue, currentValue) => {
-            if (currentValue.id !== id) {
-                previousValue.push( { ...currentValue, children: removeId(currentValue.children, id) } );
-            }
-            return previousValue;
-        }, []);
-    } else {
-        return data;
-    }
-}
 
 /**
  * To just return the node containing the specified id

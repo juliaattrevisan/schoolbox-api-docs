@@ -50,15 +50,15 @@ onMounted(() => {
  */
 async function loadCKEditor () {
     try {
-        const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`;
+        const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
         if (!isScriptAdded(ckeditorScript)) {
             await injectScript(ckeditorScript);
         }
-        const jqueryEditorScript = `${cdnPrefix}/js/editor/jquery.editor.js?v=${siteVersion}`
+        const jqueryEditorScript = `${cdnPrefix}/js/editor/jquery.editor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
         if (!isScriptAdded(jqueryEditorScript)) {
             await injectScript(jqueryEditorScript);
         }
-        $.fn.alaressEditor($.alaressEditorConfigForComments(getVueSpecificConfig()));
+        $.fn.alaressEditor($.alaressEditorConfigBasic(getVueSpecificConfig()));
     } catch (error) {
         console.warn(error);
     }
@@ -127,9 +127,13 @@ function onCancelSelected () {
                     <textarea :id="ckeditorInstance" rows="6"></textarea>
                 </div>
                 <div class="small-12 columns">
-                    <ul class="flex-list buttons">
-                        <li><button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button" :disabled="updateNodeStore.isProcessing">Cancel</button></li>
-                        <li><button @click.prevent="onUpdateSelected" @keyup.enter="onUpdateSelected" class="button submit" :disabled="updateNodeStore.isProcessing">{{ updateButtonText }}</button></li>
+                    <ul class="flex-list">
+                        <li>
+                            <button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button icon-close" :disabled="updateNodeStore.isProcessing">Cancel</button>
+                        </li>
+                        <li>
+                            <button @click.prevent="onUpdateSelected" @keyup.enter="onUpdateSelected" class="button icon-modify submit" :disabled="updateNodeStore.isProcessing">{{ updateButtonText }}</button>
+                        </li>
                     </ul>
                 </div>
             </fieldset>
