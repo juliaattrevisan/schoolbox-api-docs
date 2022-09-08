@@ -1,10 +1,8 @@
 /**
- * Manages the currently visible nodes in mc-view-nodes
- * those filtered by both <select> and also the search <input>
+ * Manages the currently visible nodes in mc-modal-codes
  */
 
 import { defineStore } from 'pinia';
-import { randomId } from '@js/util/jsUtils';
 import { useCodesStore, findById } from './csCodesStore';
 import { useModalSearchStore } from './csModalSearchStore';
 
@@ -13,7 +11,7 @@ export const DIRECTION = {
     BACKWARDS: 'backwards',
 }
 
-export const useModalActiveCodesStore = defineStore(`csModelActive__${randomId()}`, {
+export const useModalActiveCodesStore = defineStore(`csModelActive`, {
 
     state: () => ({
         idList: [], //ids of the selected nodes

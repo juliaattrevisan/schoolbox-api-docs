@@ -1,17 +1,17 @@
 <script setup>
 
 /**
- * A curriculum node to select to traverse further down the tree,
- * or to CRUD via the actions
+ * to select a code within the current modal session
  */
 
 import { computed } from 'vue';
+import { generateUUID } from '@js/util/jsUtils';
 import { UNSET_ID } from '../store/csCodesStore';
 import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
 
 
 const modalSelectedCodesStore = useModalSelectedCodesStore();
-
+const extraId = generateUUID(); //to ensure the input/label id is unique
 
 const props = defineProps({
     /**
@@ -72,13 +72,13 @@ function onChange (isChecked) {
 <template>
     <div v-if="isVisible" class="checklist">
         <input
-            :id="`checkbox-${props.code.id}`"
+            :id="`checkbox-${props.code.id}__${extraId}`"
             type="checkbox"
             :value="props.code.id"
             :checked="isChecked"
             @change="onChange($event.target.checked)"
         />
-        <label :for="`checkbox-${props.code.id}`"></label>
+        <label :for="`checkbox-${props.code.id}__${extraId}`"></label>
     </div>
 </template>
 

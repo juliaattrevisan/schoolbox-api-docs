@@ -1,9 +1,8 @@
 /**
- * Store the current search results when searcing from cs-search-input
+ * Store the current search results when searcing from cs-modal-header-search-input
  */
 
 import { defineStore } from 'pinia';
-import { randomId } from '@js/util/jsUtils';
 import { apiEndpoint } from './curriculumSelectorStore';
 import { useSelectedCodesStore } from './csSelectedCodesStore';
 import { useModalActiveCodesStore } from './csModalActiveCodesStore';
@@ -12,7 +11,7 @@ import { useModalActiveCodesStore } from './csModalActiveCodesStore';
 const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
 const CAPPED_RESULTS_LENGTH = 50; //the maximum amount of results to show
 
-export const useModalSearchStore = defineStore(`csModalSearch__${randomId()}`, {
+export const useModalSearchStore = defineStore(`csModalSearch`, {
 
     state: () => ({
         isProcessing: false, //to notify that an action is taking place,
