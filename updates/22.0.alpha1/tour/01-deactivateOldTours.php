@@ -8,16 +8,35 @@ use Schoolbox\Application\CliTool;
 require_once __DIR__ . '/../../../conf/core/require.php';
 
 /**
- * Copies ETHERPAD_HOST config from file to instance database
+ * Soft deletes old release tours
  */
 $app = new class extends CliTool\App {
 
     public function run(): void
     {
-        $tourMapper = \Schoolbox\Tour\Mapper::getInstance();
-        $tourMapper->deleteByColumn('title', '21.0 Release');
-        $tourMapper->deleteByColumn('title', '21.1 Release');
-        $tourMapper->deleteByColumn('title', '22.0 Release');
+        $titles = [
+            '21.0 Release',
+            '21.1 Release',
+            '22.0 Release',
+        ];
+        foreach ($titles as $title) {
+            $query = $this->getDatabaseInternal()->executeQuery(
+                "SELECT `uuid` FROM `tour` WHERE `title` = :title",
+                ['title' => $title]
+            );
+            $tourUuid = $query->fetchColumn();
+
+            $deleteStep = $this->getDatabaseInternal()->prepareQuery(
+                "UPDATE `tour_step` SET `deleted_at` = now() WHERE `tour_uuid` = :uuid"
+            );
+            $deleteStep->execute(['uuid' => $tourUuid]);
+
+            $deleteModal = $this->getDatabaseInternal()->prepareQuery(
+                "UPDATE `tour_step_modal` SET `deleted_at` = now() WHERE `tour_step_uuid` IN
+                 (SELECT `uuid` FROM `tour_step` WHERE `tour_uuid` = :uuid)"
+            );
+            $deleteModal->execute(['uuid' => $tourUuid]);
+        }
     }
 };
 
