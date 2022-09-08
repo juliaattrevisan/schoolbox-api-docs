@@ -6,6 +6,7 @@ import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useNodesStore } from '../../store/mcNodesStore';
 import { useSelectedNodesStore } from './mcSelectedNodesStore';
+import { useViewNodesStore } from '../../viewNodes/store/mcViewNodesStore';
 
 
 export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
@@ -76,6 +77,7 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
          * @param { object }
          */
         deleteNode (node) {
+            useViewNodesStore().checkDeletedNode(node);
             const nodesStore = useNodesStore();
             const nodeRemoved = this.removeId(nodesStore.nodes.children, node.id);
             nodesStore.updateNodes(nodeRemoved);
