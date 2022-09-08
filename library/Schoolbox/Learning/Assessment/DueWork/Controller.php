@@ -105,52 +105,6 @@ use function count;
  */
 class Controller extends Assessment\Controller
 {
-    /** @var RubricResultSetMapper */
-    private RubricResultSetMapper $resultSetMapper;
-
-    /** @var RubricDataSource */
-    private RubricDataSource $rubricMapper;
-
-    /** @var DueWorkResponseMapper */
-
-    private DueWorkResponseMapper $dueWorkResponseMapper;
-
-    /** @var ParticipantMapper */
-    private ParticipantMapper $participantMapper;
-
-    /** @var SingleFile\Mapper */
-    private SingleFile\Mapper $submissionFileMapper;
-
-    /** @var Kami\Connector */
-    private Kami\Connector $kamiConnector;
-
-    /** @var Kami\Mapper */
-    private Kami\Mapper $kamiMapper;
-
-    /**
-     * PDF generator, as used by the `downloadSubmissions` method.
-     */
-    private Gotenberg\Client $pdfGenerator;
-
-
-    /**
-     * Turnitin File Mapper, for generating the Similarity Report
-     *
-     * @var Mapper
-     */
-    private Mapper $turnitinFileMapper;
-
-
-    /** @var Assessment\Feedback\IFeedbackDataSource */
-    private Assessment\Feedback\IFeedbackDataSource $feedbackDataSource;
-
-
-    /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
-
-
     /**
      * @param UserMapper                        $userMapper
      * @param Error\Mapper                      $errorMapper
@@ -171,8 +125,8 @@ class Controller extends Assessment\Controller
      * @param CourseSpecificationMapper         $courseSpecificationMapper
      * @param UnitSpecificationMapper           $unitSpecificationMapper
      * @param Replicator                        $replicator
-     * @param Client                            $pdfGenerator
-     * @param Mapper                            $turnitinFileMapper
+     * @param Client                            $pdfGenerator       - PDF generator, as used by the `downloadSubmissions` method.
+     * @param Mapper                            $turnitinFileMapper - for generating the Similarity Report.
      * @param IFeedbackDataSource               $feedbackDataSource
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      * @param LatestViewMapper                  $latestViewMapper
@@ -186,22 +140,22 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
-        RubricDataSource $rubricMapper,
-        RubricResultSetMapper $resultSetMapper,
-        DueWorkResponseMapper $dueWorkResponseMapper,
-        ParticipantMapper $participantMapper,
+        private RubricDataSource $rubricMapper,
+        private RubricResultSetMapper $resultSetMapper,
+        private DueWorkResponseMapper $dueWorkResponseMapper,
+        private ParticipantMapper $participantMapper,
         Term\Mapper $termMapper,
-        SingleFile\Mapper $submissionFileMapper,
-        Kami\Connector $kamiConnector,
-        Kami\Mapper $kamiMapper,
+        private SingleFile\Mapper $submissionFileMapper,
+        private Kami\Connector $kamiConnector,
+        private Kami\Mapper $kamiMapper,
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
-        Gotenberg\Client $pdfGenerator,
-        Mapper $turnitinFileMapper,
-        Assessment\Feedback\IFeedbackDataSource $feedbackDataSource,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        private Gotenberg\Client $pdfGenerator,
+        private Mapper $turnitinFileMapper,
+        private Assessment\Feedback\IFeedbackDataSource $feedbackDataSource,
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         LatestViewMapper $latestViewMapper,
         private FilesystemProxy $filesystemProxy,
     ) {
@@ -220,17 +174,6 @@ class Controller extends Assessment\Controller
             $replicator,
             $latestViewMapper
         );
-        $this->resultSetMapper       = $resultSetMapper;
-        $this->rubricMapper          = $rubricMapper;
-        $this->dueWorkResponseMapper = $dueWorkResponseMapper;
-        $this->participantMapper     = $participantMapper;
-        $this->submissionFileMapper  = $submissionFileMapper;
-        $this->kamiConnector         = $kamiConnector;
-        $this->kamiMapper            = $kamiMapper;
-        $this->pdfGenerator          = $pdfGenerator;
-        $this->turnitinFileMapper    = $turnitinFileMapper;
-        $this->feedbackDataSource    = $feedbackDataSource;
-        $this->folderMapper          = $folderMapper;
     }
 
 
