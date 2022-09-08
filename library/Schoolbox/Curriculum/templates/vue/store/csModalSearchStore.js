@@ -79,7 +79,7 @@ export const useModalSearchStore = defineStore(`csModalSearch__${randomId()}`, {
             this.isProcessing = true;
             try {
                 const modalActiveCodesStore = useModalActiveCodesStore();
-                const response = await fetch(`${apiEndpoint}?parentId=${modalActiveCodesStore.current.id}&query=${this.query}`, {
+                const response = await fetch(`${apiEndpoint}?parentId=${modalActiveCodesStore.current.id}&query=${this.query}&enabled=1`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

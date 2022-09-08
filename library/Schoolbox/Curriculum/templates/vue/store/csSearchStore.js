@@ -78,7 +78,7 @@ export const useSearchStore = defineStore(`csSearch__${randomId()}`, {
          async search () {
             this.isProcessing = true;
             try {
-                const response = await fetch(`${apiEndpoint}?query=${this.query}`, {
+                const response = await fetch(`${apiEndpoint}?query=${this.query}&enabled=1`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
