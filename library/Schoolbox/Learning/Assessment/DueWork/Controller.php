@@ -1527,12 +1527,11 @@ class Controller extends Assessment\Controller
     /**
      * Common logic when generating Rubrics
      *
-     * @param $dueWork
+     * @param IAssessable $dueWork
      * @return array
      * @throws MapperException
-     * @throws UnexpectedValueException
      */
-    private function generateRubricTwigData($dueWork): array
+    private function generateRubricTwigData(IAssessable $dueWork): array
     {
         $data = [];
 
