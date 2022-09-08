@@ -77,7 +77,7 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
          * @param { object }
          */
         deleteNode (node) {
-            useViewNodesStore().checkDeletedNode(node);
+            useViewNodesStore().checkDeletedNode(node); //check we aren't on the deleted node currently
             const nodesStore = useNodesStore();
             const nodeRemoved = this.removeId(nodesStore.nodes.children, node.id);
             nodesStore.updateNodes(nodeRemoved);
