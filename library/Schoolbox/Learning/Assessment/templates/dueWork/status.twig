@@ -549,7 +549,7 @@
 
                                 {# Handle clicks on confirm popup buttons. #}
                                 {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
-                                {# Because we bind here, we must first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clickec. #}
+                                {# Because we bind here, we first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clicked. #}
                                 $('#confirm-dialog [data-yes]').unbind('click').click(function () {postSobo($buttonClicked, true );});
                                 $('#confirm-dialog [data-no]' ).unbind('click').click(function () {postSobo($buttonClicked, false);});
                             } else {
