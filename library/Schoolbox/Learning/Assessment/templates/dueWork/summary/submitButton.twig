@@ -1,11 +1,11 @@
 {#
 Data:
-    submissionsBlocked    false|string  A string message if blocked, false if not blocked
-    acknowlegementBlocked false|string  A string message if blocked, false if not blocked
-    selfAcknowledgeRoute  string
-    assessment            DueWork\Model
-    student               User
-    returnUrl             string
+    submissionsBlocked     false|string  A string message if blocked, false if not blocked
+    acknowledgementBlocked false|string  A string message if blocked, false if not blocked
+    selfAcknowledgeRoute   string
+    assessment             DueWork\Model
+    student                User
+    returnUrl              string
 #}
 <div class="row">
     <div class="small-12 columns">
@@ -25,7 +25,7 @@ Data:
                 {% endapply %}{% endset %}
                 <a class="submit button" href="{{ submitRoute }}">{{ submitText }}</a>
             {% endif %}
-        {% elseif not acknowlegementBlocked %}
+        {% elseif not acknowledgementBlocked %}
             {% if selfAcknowledgeRoute %}
                 {% if USER.id == student.id %}
                     {% set requiresReflection = assessment.isSelfAssessable %}
