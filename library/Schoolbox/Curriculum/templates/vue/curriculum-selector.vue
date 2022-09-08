@@ -5,7 +5,7 @@
  */
 
 import { ref, onMounted } from 'vue';
-import { useStore, uniqueId } from './store/curriculumSelectorStore';
+import { useStore } from './store/curriculumSelectorStore';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 import { useSearchStore } from './store/csSearchStore';
 import { useModalStore } from './store/csModalStore';
