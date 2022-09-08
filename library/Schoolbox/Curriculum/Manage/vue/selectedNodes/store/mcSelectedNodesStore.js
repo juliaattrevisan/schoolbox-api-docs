@@ -94,8 +94,12 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
                 const enabledNodes = this.nodes.filter((node) => !node.enabled);
                 const nodesStore = useNodesStore();
                 const noChildEnabledNodes = enabledNodes.filter((node) => { //prevent enabling child nodes of disabled parents
-                    const parentNode = findById(nodesStore.nodes.children, node.parent.id);
-                    return parentNode.enabled ? true : false;
+                    if (node.parent) { //could be the root level node, so won't have a parent
+                        const parentNode = findById(nodesStore.nodes.children, node.parent.id);
+                        return parentNode.enabled ? true : false;
+                    } else {
+                        return node.enabled ? false : true;
+                    }
                 });
                 return noChildEnabledNodes.length === this.nodes.length;
             } else {
