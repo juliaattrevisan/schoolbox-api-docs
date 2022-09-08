@@ -5,13 +5,13 @@
  */
 
 import { computed } from 'vue';
-import { randomId } from '@js/util/jsUtils';
+import { generateUUID } from '@js/util/jsUtils';
 import { UNSET_ID } from '../store/csCodesStore';
 import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
 
 
 const modalSelectedCodesStore = useModalSelectedCodesStore();
-const extraId = randomId(); //to ensure the input/label id is unique
+const extraId = generateUUID(); //to ensure the input/label id is unique
 
 const props = defineProps({
     /**
