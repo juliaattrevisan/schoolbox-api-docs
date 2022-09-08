@@ -38,8 +38,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
             this.isProcessing = true;
             try {
                 this.isProcessing = false;
-                const activeNodeStore = useActiveNodeStore();
-                const response = await fetch(`${apiEndpoint}/${activeNodeStore.node.id}`, {
+                const response = await fetch(`${apiEndpoint}/${useActiveNodeStore().node.id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -51,6 +50,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
                     await this.addSubsection(newNode);
                     this.isProcessing = false;
                     this.cancel();
+                    return newNode.id;
                 } else {
                     throw new Error();
                 }
@@ -78,6 +78,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
             const viewNodesStore = useViewNodesStore();
             if (viewNodesStore.current.id !== newNode.parent.id) { //if we aren't on the new nodes level move down so we can see the new node
                 viewNodesStore.setNextSelected(newNode.parent.id);
+                console.warn('setNextSelected');
             }
         },
 

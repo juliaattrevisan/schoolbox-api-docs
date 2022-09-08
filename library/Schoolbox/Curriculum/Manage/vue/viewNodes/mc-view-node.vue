@@ -231,6 +231,7 @@ async function onLeave (el, done) {
     display: flex;
     margin: 0 0 0 v-bind(marginLeft);
     min-height: 52px;
+    overflow: hidden;
     padding: 2px;
     position: relative;
     transition: opacity 0.3s;

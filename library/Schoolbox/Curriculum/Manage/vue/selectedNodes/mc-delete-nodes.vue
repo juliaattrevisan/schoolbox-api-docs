@@ -35,7 +35,7 @@ function onDeleteSelected () {
 deleteNodesStore.$onAction(({ name, after, onError }) => {
     if (name === 'delete') {
         // store.toastEl.activate('Disbanding...');
-        after(() => {
+        after((result) => {
             console.warn('success');
             // store.toastEl.timeout('Group successfully disbanded', true, 5000);
         });
