@@ -1,5 +1,5 @@
 /**
- * Stores all the curriculum codes and determines display of nodes
+ * Stores all the curriculum codes and load in subsequent children
  */
 
 import { defineStore } from 'pinia';

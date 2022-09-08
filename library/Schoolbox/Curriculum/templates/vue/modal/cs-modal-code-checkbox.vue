@@ -1,8 +1,7 @@
 <script setup>
 
 /**
- * A curriculum node to select to traverse further down the tree,
- * or to CRUD via the actions
+ * to select a code within the current modal session
  */
 
 import { computed } from 'vue';
@@ -12,7 +11,7 @@ import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
 
 
 const modalSelectedCodesStore = useModalSelectedCodesStore();
-const extraId = randomId(); //to ensure a an id is unique
+const extraId = randomId(); //to ensure the input/label id is unique
 
 const props = defineProps({
     /**

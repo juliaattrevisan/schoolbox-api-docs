@@ -1,6 +1,5 @@
 /**
- * Manages the currently visible nodes in mc-view-nodes
- * those filtered by both <select> and also the search <input>
+ * Manages the currently visible nodes in mc-modal-codes
  */
 
 import { defineStore } from 'pinia';

@@ -1,5 +1,5 @@
 /**
- * Store the current search results when searcing from cs-search-input
+ * Store the current search results when searcing from cs-modal-header-search-input
  */
 
 import { defineStore } from 'pinia';
