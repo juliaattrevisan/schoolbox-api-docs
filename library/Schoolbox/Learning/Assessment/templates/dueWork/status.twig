@@ -541,7 +541,7 @@
 
                     {# Handle clicks on 'Submission Received' buttons #}
                     $('[data-sobo]').on('click', function () {
-                        $buttonClicked = $(this);
+                        let $buttonClicked = $(this);
 
                         if (!confirmDialogDisabled) {
                             if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
@@ -565,6 +565,7 @@
                      *  * the student (identified by the button clicked)
                      *  * has submitted the assessment task (identified by the button href).
                      *
+                     * @param $button
                      * @param {boolean} submissionWasOnTime - true if the submission was received on time.
                      */
                     function postSobo($button, submissionWasOnTime) {
