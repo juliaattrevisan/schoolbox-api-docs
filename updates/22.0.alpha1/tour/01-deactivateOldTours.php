@@ -11,7 +11,6 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  * Soft deletes old release tours
  */
 $app = new class extends CliTool\App {
-
     public function run(): void
     {
         $titles = [
