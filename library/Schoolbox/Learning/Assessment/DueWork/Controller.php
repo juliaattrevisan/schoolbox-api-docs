@@ -1130,7 +1130,7 @@ class Controller extends Assessment\Controller
                     $response
                 );
 
-                $feedback      = $dueWorkFeedbackFactory->produce();
+                $feedback = $dueWorkFeedbackFactory->produce();
 
                 // Save the feedback, or delete it if the latest feedback is an...un-feedback
                 // TODO do we want to allow students self reflecting to undo their feedback?
@@ -1448,12 +1448,12 @@ class Controller extends Assessment\Controller
     /**
      * Common logic for 'dueWork status' and 'pending assessments' pages 'acknowledgement of submission receipt'.
      *
-     * @param IAssessable              $dueWork
+     * @param Model                    $dueWork
      * @param User                     $student
      * @param Alaress_Date_Format|null $submittedDate Date this was submitted at, null if draft
      * @return Submission
      */
-    private function persistAcknowledgementResponse(IAssessable $dueWork, User $student, ?Alaress_Date_Format $submittedDate): Response\Model
+    private function persistAcknowledgementResponse(Model $dueWork, User $student, ?Alaress_Date_Format $submittedDate): Response\Model
     {
         $response = $this->dueWorkResponseMapper->createModel()
                                                 ->setAssessable($dueWork)
