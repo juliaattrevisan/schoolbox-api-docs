@@ -33,7 +33,7 @@ export default {
         convertToAchievement(award, reason) {
             return axios.request({
                 url: award._links.goalAward,
-                data: {users: [award.recipient], reason: reason},
+                data: {users: [award.recipient], reason: reason, conversion: true},
                 method: 'post',
                 responseType: 'json'
             });

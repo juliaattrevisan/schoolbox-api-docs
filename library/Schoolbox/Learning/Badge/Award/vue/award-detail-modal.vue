@@ -198,7 +198,7 @@ export default {
          */
         awardAchievement () {
             this.toastActivate('Awarding...');
-            this.convertToAchievement(this.award, this.reason)
+            this.convertToAchievement(this.award, this.award.reason)
                 .then((response) => {
                     this.toastSuccess('Achievement awarded');
 
@@ -305,7 +305,7 @@ export default {
                         <nav>
                             <!-- Provide the button to make the change -->
                             <!-- Nonzero-length reason gets a button -->
-                            <button v-if="this.allowReasonEdit" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
+                            <button v-if="award._links.awardUpdate" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
                         </nav>
                     </div>
                 </template>
@@ -314,7 +314,7 @@ export default {
                 <template v-if="award._links.awardUpdate">
                     <!-- If there's no value here, provide empty state -->
                     <template v-if="!(award.reason && award.reason.length)">
-                        <div class="empty-state" v-if="this.allowReasonEdit">
+                        <div class="empty-state" v-if="award._links.awardUpdate">
                             <p><a @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected">Provide evidence</a> to demonstrate how this was achieved.</p>
                         </div>
                     </template>
@@ -331,7 +331,7 @@ export default {
                             :proxy="'reason-proxy'"
                             :value="award.reason"
                             :allow-edit="true"
-                            :allow-submit="!(award._links.goalAward && award.isGoal && !award.award)"
+                            :allow-submit="true"
                             :spawn-immediately="true"
                             :is-processing="true"
                             :cdn-prefix="this.cdnPrefix"
