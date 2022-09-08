@@ -410,18 +410,7 @@ class Controller extends Base
         $collection = $this->mapper->createCollection();
         $userIds    = array_column($data['users'], 'id');
         $users      = $this->userMapper->findByColumn('id', $userIds);
-
-        /* Decide which Reason text to use
-         *
-         * If we specifically Converted from a Goal to Achievement,
-         * $data['conversion'] will be set and we can steal the Goal's
-         * Reason and use it for the Achievement's reason
-         *
-         * Otherwise, you've just awarded this Achievement directly without
-         * having had a Goal prior; in this case, directly use the $data['reason']
-         * that was provided by the user
-         */
-        $reason = trim((string)$data['reason']);
+        $reason     = trim((string)$data['reason']);
 
         // Are any of those users not students? Error out
         foreach ($users as $user) {

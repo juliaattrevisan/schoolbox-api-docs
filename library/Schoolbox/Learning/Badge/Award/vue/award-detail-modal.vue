@@ -198,7 +198,7 @@ export default {
          */
         awardAchievement () {
             this.toastActivate('Awarding...');
-            this.convertToAchievement(this.award, this.reason)
+            this.convertToAchievement(this.award, this.award.reason)
                 .then((response) => {
                     this.toastSuccess('Achievement awarded');
 
