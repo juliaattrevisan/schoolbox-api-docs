@@ -10,7 +10,11 @@ namespace Schoolbox\Filter;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
+
+use function count;
+use function is_array;
 
 /**
  * Responsible:
@@ -22,31 +26,18 @@ use Schoolbox\User;
  */
 class Codec
 {
-
-    /**
-     * @var Mapper
-     */
-    private $filterMapper;
-
-    /**
-     * @var Selection\Mapper
-     */
-    private $selectionMapper;
-
-
     /**
      * @param Mapper           $filterMapper
      * @param Selection\Mapper $selectionMapper
      */
-    public function __construct(Mapper $filterMapper, Selection\Mapper $selectionMapper)
-    {
-        $this->filterMapper    = $filterMapper;
-        $this->selectionMapper = $selectionMapper;
-    }
-
+    public function __construct(private Mapper $filterMapper, private Selection\Mapper $selectionMapper) {}
 
     /**
-     * @inheritDoc
+     * @param User  $user
+     * @param       $page
+     * @param array $request
+     * @return GenericCollection
+     * @throws Exception
      */
     public function convertRequestToSelections(User $user, $page, array $request): GenericCollection
     {
@@ -54,8 +45,7 @@ class Codec
         $selections = new GenericCollection(GenericCollection::class);
 
         // Has any data been passed in? (will be empty if no filters enabled on this page)
-        if (\count($request)) {
-
+        if (count($request)) {
             /** @var string[]|bool[] $filterSelectionArray */
             foreach ($request as $filterId => $filterSelectionArray) {
                 // Create the collection before checking if empty.
@@ -64,7 +54,7 @@ class Codec
                 $selections[$filterId] = $filterSelections;
 
                 // Not an array, this happens for empty sets, eg '?2='
-                if (!\is_array($filterSelectionArray)) {
+                if (!is_array($filterSelectionArray)) {
                     continue;
                 }
 
@@ -86,9 +76,9 @@ class Codec
         return $selections;
     }
 
-
     /**
-     * @inheritDoc
+     * @param Collection $selections
+     * @return string
      */
     public function convertSelectionsToQueryString(Collection $selections): string
     {
@@ -102,7 +92,7 @@ class Codec
 
             if (0 === $filterSelections->count()) {
                 // Note that this is NOT array syntax, eg '1=&2=' meaning both 1 and 2 are empty arrays
-                $queryStrings[] = "{$filterId}=";
+                $queryStrings[] = "$filterId=";
                 continue;
             }
 
