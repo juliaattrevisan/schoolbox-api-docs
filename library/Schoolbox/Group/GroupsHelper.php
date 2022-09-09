@@ -196,7 +196,8 @@ class GroupsHelper
     }
 
     /**
-     * get all groups a user is in, and could request or enroll.
+     * Get all groups a user is in, and could request or enroll.
+     * This excludes groups without homepage.
      * @param User $user
      * @return array
      */
@@ -229,7 +230,7 @@ class GroupsHelper
              * (sales data folder 62, is apparently a group, but does not have a db entry in userGroups, and has no 'access' set
              * so lets check if the group object / settings exist and if not ignore that folder
              */
-            if (null === $folder->getGroup()) {
+            if (null === $folder->getGroup() || !$folder->getHomepage()) {
                 continue;
             }
             /** @var UserGroupAccess|null $userPerm */
