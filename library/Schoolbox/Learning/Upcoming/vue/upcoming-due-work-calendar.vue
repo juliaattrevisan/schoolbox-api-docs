@@ -80,7 +80,7 @@ export default {
                 },
                 week: {
                     dayHeaderFormat: (date) => {
-                        return dayjs(date.date.array).format(this.formats.displayWeekDay); 
+                        return dayjs(date.date.array).format(this.formats.displayWeekDay);
                     },
                     titleFormat: (date) => {
                         return this.fullCalendarHelper_titleFormatWeek(date);
@@ -139,7 +139,6 @@ export default {
         // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
         const quickSwitchIcon = document.createElement('a');
         quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
-        quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
 
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
 

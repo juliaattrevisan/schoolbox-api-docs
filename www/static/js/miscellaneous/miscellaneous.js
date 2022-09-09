@@ -112,33 +112,6 @@ $(function () {
         $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
     });
 
-    var splash, d, x, y, splashTimeout;
-    $(document).on('click', ".button, button, .sub-nav a, .pagination a, .flex-list a, [data-component-palette]", function (e) {
-
-        splash = $(this).find(".splash");
-        splash.removeClass('animate');
-        clearTimeout(splashTimeout);
-
-        if (splash.length === 0) {
-            $(this).prepend("<span class='splash'></span>");
-        }
-
-        if (!splash.height() && !splash.width()) {
-            d = Math.max($(this).outerWidth(), $(this).outerHeight());
-            splash.css({height: d, width: d});
-        }
-
-        x = e.pageX - $(this).offset().left - splash.width() / 2;
-        y = e.pageY - $(this).offset().top - splash.height() / 2;
-
-        splash.css({top: y + 'px', left: x + 'px'}).addClass("animate");
-
-        // Remove the animation after a bit of time, otherwise this animation will happen every time the element hides and becomes visible again
-        splashTimeout = setTimeout(function () {
-            splash.removeClass('animate');
-        }, 300);
-    });
-
     // Set up lightboxes globally, group galleries by lightbox relation.
     var lightboxGroups = {};
 

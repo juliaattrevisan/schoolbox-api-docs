@@ -83,7 +83,7 @@ export default {
                     allDaySlot: false,
                     titleFormat: (date) => {
                         return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong); // will produce something like "Tuesday July 16th 2021"
-                    } 
+                    }
                 },
                 week: {
                     dayHeaderFormat: (date) => {
@@ -92,7 +92,7 @@ export default {
                     allDaySlot: false,
                     titleFormat: (date) => {
                         return this.fullCalendarHelper_titleFormatWeek(date);
-                    } 
+                    }
                 }
             },
             eventTimeFormat: (date) => {
@@ -160,7 +160,6 @@ export default {
         // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
         let quickSwitchIcon = document.createElement('a');
         quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
-        quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
 
     },

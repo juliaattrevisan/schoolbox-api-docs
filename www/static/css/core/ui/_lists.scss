@@ -1,5 +1,5 @@
 /*
-    Any lists 
+    Any lists
 */
 
 // We use this mixin to create inline lists
@@ -17,8 +17,8 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
         float: $default-float;
         list-style: none;
         margin-#{$default-float}: $inline-list-default-float-list-margin;
-        > * { 
-            display: block; 
+        > * {
+            display: block;
         }
     }
 }
@@ -308,7 +308,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
         padding-left: 0.5rem;
     }
     a {
-        // Button splash & .actions-small-# a[class*="icon-"] specificity causes this
+        // .actions-small-# a[class*="icon-"] specificity causes this
         overflow: inherit !important;
         opacity: 1 !important;
     }

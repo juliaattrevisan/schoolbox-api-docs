@@ -241,9 +241,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             $datebtn.addClass("no-text");
         }
 
-        element
-            .data("dateButton", $datebtn)
-            .after($datebtn.append($('<span class="splash animate"/>')));
+        element.data("dateButton", $datebtn);
     }
 
     var $datepickerButton = $(this).siblings("[data-adtp-btn]");
