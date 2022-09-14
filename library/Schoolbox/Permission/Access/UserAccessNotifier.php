@@ -10,7 +10,6 @@
 namespace Schoolbox\Permission\Access;
 
 use Alaress\Async\Notification\Instance\Builder;
-use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Mapper;
@@ -22,19 +21,30 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class UserAccessNotifier extends AbstractModuleNotifier
 {
-
-    const TRIGGER_JOINED = 'joined';
-    const TRIGGER_LEFT = 'left';
+    const TRIGGER_JOINED    = 'joined';
+    const TRIGGER_LEFT      = 'left';
     const TRIGGER_REQUESTED = 'requested';
-    const TRIGGER_APPROVED = 'approved';
+    const TRIGGER_APPROVED  = 'approved';
 
+    const USER_JOINED                   = ':user joined :groupname';
+    const USER_REQUESTED                = ":user asked to join :groupname";
+    const USER_LEFT                     = ':user left :groupname';
+    const EFFECTOR_ADDED_USER           = ':effector added :user to :groupname';
+    const EFFECTOR_REMOVED_USER         = ':effector removed :user from :groupname';
+    const EFFECTOR_ADDED_YOU            = ':effector has added you to :groupname';
+    const EFFECTOR_REMOVED_YOU          = ':effector has removed you from :groupname';
+    const EFFECTOR_MADE_YOU_A_MEMBER    = ':effector has made you a member of :groupname';
+    const EFFECTOR_ALLOWED_YOU_TO_WRITE = ':effector has allowed you to create content for :groupname';
+    const EFFECTOR_MADE_YOU_ADMIN       = ':effector has made you an administrator of :groupname';
+
+    private FolderMapper $folderMapper;
 
     /**
      * @return string
@@ -44,6 +54,16 @@ class UserAccessNotifier extends AbstractModuleNotifier
         return NSMapper::NS_GROUP;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function loadDependencies($dependencies = null)
+    {
+        if (empty($dependencies['folderMapper'])) {
+            $dependencies['folderMapper'] = FolderMapper::getInstance();
+        }
+        parent::loadDependencies($dependencies);
+    }
 
     /**
      * @param TriggerBundle $bundle
@@ -95,78 +115,40 @@ class UserAccessNotifier extends AbstractModuleNotifier
     /**
      * @param string     $body
      * @param string     $label
+     * @param Folder     $folder
      * @param UserAccess $userAccess
      * @param User|null  $effector
      * @return Envelope
      */
-    protected function notifyAdmin(string $body, string $label, UserAccess $userAccess, ?User $effector = null)
+    protected function notifyAdmin(string $body, string $label, Folder $folder, UserAccess $userAccess, ?User $effector): Envelope
     {
         $envelope = new Envelope();
-
-        $bob = new Builder();
-
-        try {
-            $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
-            $user = UserMapper::getInstance()->findById($userAccess->getUser()->getId());
-        } catch (Exception $e) {
-            return $envelope;
-        }
-
-        /** @var ParameterInterface[] $params */
-        $params = [
-            'user'      => new UserParam($user),
-            'groupname' => new CategoryParam($cat)
-        ];
-
-        if ($effector) {
-            $params['effector'] = new UserParam($effector);
-        }
-
-        $bob->setTitle($body)
-            ->setHref("/group/modify/" . $cat->getId())
-            ->setIcon($this->getUserIcon($effector ?? $user))
-            ->setNamespace($this->getSlug())
-            ->setSeverity(Logger::NOTICE)
-            ->addTopic("group.{$cat->getId()}.$label")
-            ->setParams($params);
-
-        $envelope->broadcastToCategory($cat, UserAccess::ACCESS_FULL, $bob->build());
-
+        $bob      = $this->getBob($body, $label, $folder, $userAccess, $effector, true);
+        $envelope->broadcastToCategory($folder, UserAccess::ACCESS_FULL, $bob->build());
         return $envelope;
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @return Envelope
      */
-    protected function notifyJoined(UserAccess $userAccess, User $user): Envelope
+    protected function notifyJoined(UserAccess $userAccess, User $effector): Envelope
     {
         try {
-            $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
+            $folder = $this->folderMapper->findById($userAccess->getServiceIdentifier());
         } catch (Exception $e) {
             return new Envelope();
         }
 
-        if ($userAccess->getUser()->getId() == $user->getId()) {
-            $envelope = $this->notifyAdmin(':user joined :groupname', self::TRIGGER_JOINED, $userAccess);
+        if ($userAccess->getUser()->getId() === $effector->getId()) {
+            $envelope = $this->notifyAdmin(self::USER_JOINED, self::TRIGGER_JOINED, $folder, $userAccess, $effector);
         } else {
-            $envelope = $this->notifyAdmin(':effector added :user to :groupname', self::TRIGGER_JOINED, $userAccess, $user);
+            $envelope = $this->notifyAdmin(self::EFFECTOR_ADDED_USER, self::TRIGGER_JOINED, $folder, $userAccess, $effector);
         }
 
-        $bob = new Builder();
-        $bob->setTitle(':moderator has added you to :groupname')
-            ->setSeverity(Logger::NOTICE)
-            ->setHref('/')
-            ->setIcon($this->getUserIcon($user))
-            ->setNamespace($this->getSlug())
-            ->setParams([
-                'moderator' => new UserParam($user),
-                'groupname' => new CategoryParam($cat, Param::STACKING_APPEND),
-            ])
-            ->addTopic("group.{$cat->getId()}." . self::TRIGGER_APPROVED);
-
+        $bob = $this->getBob(self::EFFECTOR_ADDED_YOU, self::TRIGGER_APPROVED, $folder, $userAccess, $effector, false);
         $envelope->targetToUser($userAccess->getUser(), $bob->build());
 
         return $envelope;
@@ -178,7 +160,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param User       $user
      * @return Envelope
      */
-    public function notifyStaffJoined($userAccess, $user)
+    public function notifyStaffJoined(UserAccess $userAccess, User $user): Envelope
     {
         return $this->notifyJoined($userAccess, $user);
     }
@@ -189,7 +171,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param User       $user
      * @return Envelope
      */
-    public function notifyStudentJoined($userAccess, $user)
+    public function notifyStudentJoined(UserAccess $userAccess, User $user): Envelope
     {
         return $this->notifyJoined($userAccess, $user);
     }
@@ -200,7 +182,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param User       $user
      * @return Envelope
      */
-    public function notifyParentJoined($userAccess, $user)
+    public function notifyParentJoined(UserAccess $userAccess, User $user): Envelope
     {
         return $this->notifyJoined($userAccess, $user);
     }
@@ -208,132 +190,130 @@ class UserAccessNotifier extends AbstractModuleNotifier
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @return Envelope
      */
-    protected function notifyLeft(UserAccess $userAccess, User $user): Envelope
+    protected function notifyLeft(UserAccess $userAccess, User $effector): Envelope
     {
         try {
-            $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
+            $folder = $this->folderMapper->findById($userAccess->getServiceIdentifier());
         } catch (Exception $e) {
             return new Envelope();
         }
-        if ($userAccess->getUser()->getId() == $user->getId()) {
-            $envelope = $this->notifyAdmin(':user left :groupname', self::TRIGGER_LEFT, $userAccess);
+
+        if ($userAccess->getUser()->getId() === $effector->getId()) {
+            $envelope = $this->notifyAdmin(self::USER_LEFT, self::TRIGGER_LEFT, $folder, $userAccess, $effector);
         } else {
-            $envelope = $this->notifyAdmin(':effector removed :user from :groupname', self::TRIGGER_LEFT, $userAccess, $user);
+            $envelope = $this->notifyAdmin(self::EFFECTOR_REMOVED_USER, self::TRIGGER_LEFT, $folder, $userAccess, $effector);
         }
 
-        $bob = new Builder();
-
-        $bob->setTitle(':moderator has removed you from :groupname')
-            ->setSeverity(Logger::NOTICE)
-            ->setHref('/')
-            ->setIcon($this->getUserIcon($user))
-            ->setNamespace($this->getSlug())
-            ->setParams([
-                'moderator' => new UserParam($user),
-                'groupname' => new CategoryParam($cat, Param::STACKING_APPEND),
-            ])
-            // Adding information of the target user, so that it won't stack the same messages to the different members.
-            ->putMeta('member', $userAccess->getUser()->getId())
-            ->addTopic("group.{$cat->getId()}." . self::TRIGGER_APPROVED);
-
+        $bob = $this->getBob(self::EFFECTOR_REMOVED_YOU, self::TRIGGER_APPROVED, $folder, $userAccess, $effector, false);
+        $bob->setHref('/');
         $envelope->targetToUser($userAccess->getUser(), $bob->build());
-
         return $envelope;
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @return Envelope
      */
-    public function notifyStaffLeft($userAccess, $user)
+    public function notifyStaffLeft(UserAccess $userAccess, User $effector): Envelope
     {
-        return $this->notifyLeft($userAccess, $user);
+        return $this->notifyLeft($userAccess, $effector);
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @return Envelope
      */
-    public function notifyStudentLeft($userAccess, $user)
+    public function notifyStudentLeft(UserAccess $userAccess, User $effector): Envelope
     {
-        return $this->notifyLeft($userAccess, $user);
+        return $this->notifyLeft($userAccess, $effector);
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @return Envelope
      */
-    public function notifyParentLeft($userAccess, $user)
+    public function notifyParentLeft(UserAccess $userAccess, User $effector): Envelope
     {
-        return $this->notifyLeft($userAccess, $user);
+        return $this->notifyLeft($userAccess, $effector);
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @return Envelope
      */
-    protected function notifyRequested($userAccess, $user)
+    protected function notifyRequested(UserAccess $userAccess, User $effector): Envelope
     {
-        return $this->notifyAdmin(":user asked to join :groupname", self::TRIGGER_REQUESTED, $userAccess);
+        try {
+            $folder = $this->folderMapper->findById($userAccess->getServiceIdentifier());
+        } catch (Exception $e) {
+            return new Envelope();
+        }
+        return $this->notifyAdmin(self::USER_REQUESTED, self::TRIGGER_REQUESTED, $folder, $userAccess, $effector);
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @return Envelope
      */
-    public function notifyStaffRequested($userAccess, $user)
+    public function notifyStaffRequested(UserAccess $userAccess, User $effector): Envelope
     {
-        return $this->notifyRequested($userAccess, $user);
+        return $this->notifyRequested($userAccess, $effector);
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @return Envelope
      */
-    public function notifyStudentRequested($userAccess, $user)
+    public function notifyStudentRequested(UserAccess $userAccess, User $effector): Envelope
     {
-        return $this->notifyRequested($userAccess, $user);
+        return $this->notifyRequested($userAccess, $effector);
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @return Envelope
      */
-    public function notifyParentRequested($userAccess, $user)
+    public function notifyParentRequested(UserAccess $userAccess, User $effector): Envelope
     {
-        return $this->notifyRequested($userAccess, $user);
+        return $this->notifyRequested($userAccess, $effector);
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
      */
-    protected function notifyApproved(UserAccess $userAccess, User $user, ?array $diff = null): Envelope
+    protected function notifyApproved(UserAccess $userAccess, User $effector, ?array $diff = null): Envelope
     {
-        if ($userAccess->getUser()->getId() == $user->getId()) {
-            $envelope = $this->notifyAdmin(':user joined :groupname', self::TRIGGER_JOINED, $userAccess);
+        try {
+            $folder = $this->folderMapper->findById($userAccess->getServiceIdentifier());
+        } catch (Exception $e) {
+            return new Envelope();
+        }
+
+        if ($userAccess->getUser()->getId() == $effector->getId()) {
+            $envelope = $this->notifyAdmin(self::USER_JOINED, self::TRIGGER_JOINED, $folder, $userAccess, $effector);
         } else {
-            $envelope = $this->notifyAdmin(':effector added :user to :groupname', self::TRIGGER_JOINED, $userAccess, $user);
+            $envelope = $this->notifyAdmin(self::EFFECTOR_ADDED_USER, self::TRIGGER_JOINED, $folder, $userAccess, $effector);
         }
 
         // TODO uncomment these bits of the method to make it more informative once the Mapper can handle composite IDs
@@ -346,85 +326,114 @@ class UserAccessNotifier extends AbstractModuleNotifier
 //      $newAccess = $diff['accessLevel'][0];
 //      $oldAccess = $diff['accessLevel'][1];
 
-        try {
-            $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
-        } catch (Exception $e) {
-            return new Envelope();
-        }
-
         // Customize the approval message
         switch ($userAccess->getAccessLevel()) {
             case UserAccess::ACCESS_DENY:
-                $messageText = ':moderator has removed your access to :groupname';
+                $messageText = self::EFFECTOR_REMOVED_YOU;
                 break;
             case UserAccess::ACCESS_READ:
-                $messageText = ':moderator has made you a member of :groupname';
+                $messageText = self::EFFECTOR_MADE_YOU_A_MEMBER;
                 break;
             case UserAccess::ACCESS_WRITE:
-                $messageText = ':moderator has allowed you to create content for :groupname';
+                $messageText = self::EFFECTOR_ALLOWED_YOU_TO_WRITE;
                 break;
             case UserAccess::ACCESS_FULL:
-                $messageText = ':moderator has made you an administrator of :groupname';
+                $messageText = self::EFFECTOR_MADE_YOU_ADMIN;
                 break;
             default:
                 // can't handle this: bail out and send nothing
                 return $envelope;
         }
 
-        $bob = new Builder();
-
-        $bob->setTitle($messageText)
-            ->setSeverity(Logger::NOTICE)
-            ->setHref("/homepage/{$cat->getId()}")
-            ->setIcon($this->getUserIcon($user))
-            ->setNamespace($this->getSlug())
-            ->setParams([
-                'moderator' => new UserParam($user),
-                'groupname' => new CategoryParam($cat)
-            ])
-            // Adding information of the target user, so that it won't stack the same messages to the different members.
-            ->putMeta('member', $userAccess->getUser()->getId())
-            ->addTopic("group.{$cat->getId()}.approved")
-        ;
-
+        $bob = $this->getBob($messageText, self::TRIGGER_APPROVED, $folder, $userAccess, $effector, false);
+        $bob->putMeta('time', (\Alaress_Date_Format::now())->getUnixTimeStamp());
         $envelope->targetToUser($userAccess->getUser(), $bob->build());
-
         return $envelope;
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStaffApproved($userAccess, $user, $diff = null)
+    public function notifyStaffApproved(UserAccess $userAccess, User $effector, ?array $diff = null): Envelope
     {
-        return $this->notifyApproved($userAccess, $user, $diff);
+        return $this->notifyApproved($userAccess, $effector, $diff);
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentApproved($userAccess, $user, $diff = null)
+    public function notifyStudentApproved(UserAccess $userAccess, User $effector, ?array $diff = null): Envelope
     {
-        return $this->notifyApproved($userAccess, $user, $diff);
+        return $this->notifyApproved($userAccess, $effector, $diff);
     }
 
 
     /**
      * @param UserAccess $userAccess
-     * @param User       $user
+     * @param User       $effector
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentApproved($userAccess, $user, $diff = null)
+    public function notifyParentApproved(UserAccess $userAccess, User $effector, ?array $diff = null): Envelope
     {
-        return $this->notifyApproved($userAccess, $user, $diff);
+        return $this->notifyApproved($userAccess, $effector, $diff);
+    }
+
+    /**
+     * @param string     $body
+     * @param string     $label
+     * @param Folder     $folder
+     * @param UserAccess $userAccess
+     * @param User|null  $effector
+     * @param bool       $isAdmin
+     * @return Builder
+     */
+    private function getBob(string $body, string $label, Folder $folder, UserAccess $userAccess, ?User $effector, bool $isAdmin): Builder
+    {
+        $bob = new Builder();
+
+        /** @var ParameterInterface[] $params */
+        $params = [
+            'groupname' => new CategoryParam($folder, ParameterInterface::STACKING_APPEND),
+        ];
+
+        if (str_contains($body, ':user')) {
+            $params['user'] = new UserParam($userAccess->getUser(), ParameterInterface::STACKING_APPEND);
+        }
+        if ($effector && (str_contains($body, ':effector'))) {
+            $params['effector'] = new UserParam($effector);
+        }
+
+        $href = $isAdmin ? "/group/modify/" . $folder->getId() : "/homepage/" . $folder->getId();
+
+        $bob->setTitle($body)
+            ->setHref($href)
+            ->setIcon($this->getUserIcon($effector ?? $userAccess->getUser()))
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::NOTICE)
+            ->addTopic("group.{$folder->getId()}.$label")
+            ->setTimestamp((\Alaress_Date_Format::now())->getUnixTimeStamp())
+            ->putMeta('time', $userAccess->getCreatedAt())
+            ->setParams($params);
+
+        return $bob;
+    }
+
+    /**
+     * @param FolderMapper $folderMapper
+     * @return static
+     */
+    protected function setFolderMapper(FolderMapper $folderMapper): static
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
     }
 }

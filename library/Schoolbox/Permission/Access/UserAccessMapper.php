@@ -55,6 +55,7 @@ class UserAccessMapper extends Mapper
         $this->uses('sid', self::TYPE_INTEGER, null, 'serviceIdentifier');
         $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
         $this->uses('favourite', self::TYPE_BOOLEAN, null, 'favourite');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'calculateUserSubscription' ]);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'calculateUserSubscription' ]);

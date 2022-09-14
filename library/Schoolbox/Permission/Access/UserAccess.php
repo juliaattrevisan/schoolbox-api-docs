@@ -11,11 +11,13 @@ namespace Schoolbox\Permission\Access;
 
 use Schoolbox\IModel;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\User;
 
 class UserAccess implements IModel
 {
     use CreateCollection;
+    use CreatedAtDate;
 
     /**
      * Value for $this->service:
