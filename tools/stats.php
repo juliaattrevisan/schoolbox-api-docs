@@ -117,7 +117,7 @@ $app = new class extends CliTool\App {
             'groups_favourite'   => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE . ' AND favourite = 1',
             'views_total'       => 'SELECT SUM(hitcount) FROM homepage_log',
             'views_groups'      => 'SELECT SUM(hitcount) FROM homepage_log JOIN userGroups u on homepage_log.folder_id = u.cid',
-            'views_classes'     => 'SELECT SUM(hitcount) FROM homepage_log JOIN (SELECT * FROM folder_code WHERE folder_code.code IN (SELECT MAX(code) FROM folder_code GROUP BY folder_id)) AS folder_id_max ON homepage_log.folder_id = folder_id_max.folder_id;',
+            'views_classes'     => 'SELECT SUM(hitcount) FROM homepage_log JOIN (SELECT * FROM folder_code WHERE folder_code.code IN (SELECT MAX(code) FROM folder_code GROUP BY folder_id)) AS folder_id_max ON homepage_log.folder_id = folder_id_max.folder_id',
             'views_course_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_specification cs ON homepage_log.folder_id = cs.folder_id',
             'views_course_unit_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_unit_specification ON course_unit_specification.folder_id = homepage_log.folder_id',
 
