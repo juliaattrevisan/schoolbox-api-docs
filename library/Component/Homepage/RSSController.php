@@ -107,7 +107,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
                     [
                         'RSS_TITLE'              => Scrub::text($currentRss['title']),
                         'RSS_URL'                => urlencode(base64_encode($currentRss['link'])),
-                        'RSS_BRIEF'              => Scrub::html($currentRss['content'] ? $currentRss['content'] : $currentRss['description']),
+                        'RSS_BRIEF'              => Scrub::html($currentRss['content'] ?? $currentRss['description']),
                         'rss_brief_output_block' => '',
                     ]
                 );
