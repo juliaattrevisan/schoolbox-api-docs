@@ -70,7 +70,6 @@ use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
-use Schoolbox\Learning\Turnitin\File\Mapper;
 use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Mapper\DefinitionException;
@@ -126,7 +125,7 @@ class Controller extends Assessment\Controller
      * @param UnitSpecificationMapper           $unitSpecificationMapper
      * @param Replicator                        $replicator
      * @param Client                            $pdfGenerator       - PDF generator, as used by the `downloadSubmissions` method.
-     * @param Mapper                            $turnitinFileMapper - for generating the Similarity Report.
+     * @param Turnitin\File\Mapper              $turnitinFileMapper - for generating the Similarity Report.
      * @param IFeedbackDataSource               $feedbackDataSource
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      * @param LatestViewMapper                  $latestViewMapper
@@ -153,7 +152,7 @@ class Controller extends Assessment\Controller
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
         private Gotenberg\Client $pdfGenerator,
-        private Mapper $turnitinFileMapper,
+        private Turnitin\File\Mapper $turnitinFileMapper,
         private Assessment\Feedback\IFeedbackDataSource $feedbackDataSource,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         LatestViewMapper $latestViewMapper,
@@ -1190,7 +1189,7 @@ class Controller extends Assessment\Controller
              * Specifically enable turnitin if its api key was set
              */
             if ((new TurnitinHelper($this->getConfigLoader()))->isConfigured()) {
-                $turnitinMapper = Mapper::getInstance();
+                $turnitinMapper = Turnitin\File\Mapper::getInstance();
 
                 /* Set up a turnitin stub record
                  * This allows it to be picked up and processed by an async script later
@@ -1227,7 +1226,7 @@ class Controller extends Assessment\Controller
                     $processor = (new Turnitin\File\Process\Transmit(
                         $instanceIdentifier,
                         $api,
-                        Mapper::getInstance(),
+                        Turnitin\File\Mapper::getInstance(),
                         Turnitin\Group\Mapper::getInstance(),
                         UserMapper::getInstance(),
                         SubmissionBoxMapper::getInstance(),
