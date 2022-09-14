@@ -632,8 +632,8 @@ class Controller extends Assessment\Controller
     /**
      * Get rubric marks given for each indicator.
      *
-     * @param ICollection $participants
-     * @return array Grouped in sets indexed by user.id
+     * @param ICollection|Participant[] $participants
+     * @return IndicatorMark[][] grouped in sets indexed by user.id
      */
     private function getMarks(ICollection $participants): array
     {
