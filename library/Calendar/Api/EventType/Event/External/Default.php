@@ -175,7 +175,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
                 $owner = $this->userMapper->getUnknownUser();
             }
 
-            $event->setAuthorId($externalEvent['owner']);
+            $event->setAuthorId($owner->getId());
             $event->setAuthorName($owner->formatName());
 
             /* Assign event colours - rely on cache, sorry :/
