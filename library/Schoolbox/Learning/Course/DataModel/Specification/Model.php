@@ -39,6 +39,8 @@ class Model extends AbstractCourse
      */
     private $courseImplementations;
 
+    private null|string $subjectCode;
+
 
     /**
      * Constructor
@@ -105,5 +107,15 @@ class Model extends AbstractCourse
     {
         $this->courseImplementations->replaceWith($courseImplementations);
         return $this;
+    }
+
+    public function setSubjectCode(?string $subjectCode)
+    {
+        $this->subjectCode = $subjectCode;
+        return $this;
+    }
+    public function getSubjectCode()
+    {
+        return $this->subjectCode;
     }
 }

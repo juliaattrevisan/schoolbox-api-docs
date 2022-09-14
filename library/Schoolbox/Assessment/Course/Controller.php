@@ -677,6 +677,7 @@ class Controller extends Base\Base
         $courseSpecFolder       = $this->folderMapper->findById($courseSpec->getFolder()->getId());
         $newCurriculumCodes     = array_filter(explode(',', $post['curriculumCodes'][0] ?? ''));
         $currentCurriculumCodes = $courseSpecFolder->getCurriculumNodes()->getPropertyValues('id');
+        $subjectCode            = trim($post->get('subjectCode', ''));
 
         // If anything changed for course
         if (
@@ -684,6 +685,7 @@ class Controller extends Base\Base
             || array_diff($currentCurriculumCodes, $newCurriculumCodes)
             || array_diff($newCurriculumCodes, $currentCurriculumCodes)
             || $originalParentFolderId !== $parentFolderId
+            || $courseSpec->getSubjectCode() !== $subjectCode
         ) {
             if ($this->access->getFolderAccess($this->getUser(), $courseSpecFolder->getId()) < UserAccess::ACCESS_WRITE) {
                 $this->sendError(new Base\Exception('Cannot update course. ', ["You don't have permission to update {$courseSpecFolder->getName()}."]));
@@ -693,6 +695,7 @@ class Controller extends Base\Base
             // curriculumCodes is not set when curriculum is disabled
             $courseSpecFolder->setName($newCourseName);
             $courseSpec->setFolder($courseSpecFolder);
+            $courseSpec->setSubjectCode($subjectCode);
 
             // Save the Course
             $this->courseSpecificationMapper->save($courseSpec);

@@ -92,6 +92,7 @@ class Helper
                 'name' => $row['folderName'],
                 'code' => $this->getFolderCode($row['folderId']),
                 'yearLevel' => $yearLevel,
+                'subjectCode' => $row['subjectCode'],
             ];
             $project = null;
             if (null !== $row['project']) {
@@ -190,6 +191,10 @@ class Helper
             if(project.id, 'Project', null)
         ) as `assessmentType`,
     folder.name as `folderName`,
+    (SELECT course_specification.subject_code from course_specification
+                                              join course_implementation on (course_implementation.course_specification_id = course_specification.id and
+                                                                             v_assessment_relation.course_implementation_id = course_implementation.id)
+                                              ) as `subjectCode`,
     (SELECT group_concat(id) from lu_year_level
                                       LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
      where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`,
