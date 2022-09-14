@@ -64,8 +64,8 @@
 
                     <p class="meta">
                         <span>
-                            <template v-if="article.sticky"><span class="icon-pin"></span>Pinned by</template>
-                            <template v-else>By</template>
+                            <template v-if="article.sticky"><span class="icon-pin"></span>Pinned by&nbsp;</template>
+                            <template v-else>By&nbsp;</template>
                             <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">{{ article.author.fullname }}</a>
                             <template v-else>{{ article.author.fullname }}</template>
                         </span>
