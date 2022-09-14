@@ -185,6 +185,12 @@ class Controller extends Base
         //set default fields
 
         $this->setUserFields($newUser, $data);
+
+        /**
+         * set default response code to 201 (created)
+         * if there are errors they will set their own code
+         */
+        $this->response->status->setCode(201);
     }
 
     /**
