@@ -60,6 +60,8 @@ $app = new class extends CliTool\App {
             'student_submissions' => 'SELECT COUNT(*) FROM student_submission WHERE deleted_at IS NULL',
             'feedback_self_graded' => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "self-grading"',
             'feedback_teacher'  => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "instructor"',
+            'assessment_student_views'    => 'SELECT COUNT(*) FROM assessment_view WHERE user_id = participant_id',
+            'assessment_parent_views'     => 'SELECT COUNT(*) FROM assessment_view WHERE user_id != participant_id',
             'lti_response'      => 'SELECT COUNT(*) FROM lti_assessment_score WHERE deleted_at IS NULL AND is_response = 1',
             'lti_feedback'      => 'SELECT COUNT(*) FROM lti_assessment_score WHERE deleted_at IS NULL AND is_feedback = 1',
             'course_unit_implementations' => 'SELECT count(*) FROM course_unit_implementation ci WHERE ci.deleted_at IS NULL',
@@ -91,6 +93,7 @@ $app = new class extends CliTool\App {
             'turnitin_docs'     => 'SELECT count(*) FROM turnitin_report WHERE status = "complete" and deleted_at is null',
             'turnitin_assessments' => 'SELECT COUNT(*) FROM turnitin_group WHERE status = "complete" AND deleted_at is null',
             'turnitin_errors'   => 'SELECT count(*) FROM turnitin_report WHERE status = "error" and deleted_at is null',
+            'summative_report'  => 'SELECT count(*) FROM summative_report WHERE deleted_at is null',
 
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted` <> "true"',
@@ -114,7 +117,7 @@ $app = new class extends CliTool\App {
             'groups_favourite'   => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE . ' AND favourite = 1',
             'views_total'       => 'SELECT SUM(hitcount) FROM homepage_log',
             'views_groups'      => 'SELECT SUM(hitcount) FROM homepage_log JOIN userGroups u on homepage_log.folder_id = u.cid',
-            'views_classes'     => 'SELECT SUM(hitcount) FROM homepage_log JOIN folder_code fc ON homepage_log.folder_id = fc.folder_id',
+            'views_classes'     => 'SELECT SUM(hitcount) FROM homepage_log JOIN (SELECT * FROM folder_code WHERE folder_code.code IN (SELECT MAX(code) FROM folder_code GROUP BY folder_id)) AS folder_id_max ON homepage_log.folder_id = folder_id_max.folder_id',
             'views_course_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_specification cs ON homepage_log.folder_id = cs.folder_id',
             'views_course_unit_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_unit_specification ON course_unit_specification.folder_id = homepage_log.folder_id',
 
