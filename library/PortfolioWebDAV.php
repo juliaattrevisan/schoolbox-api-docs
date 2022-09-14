@@ -259,11 +259,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         foreach ($response as $filepath => $info) {
             $filename = basename($filepath);
 
-            $type = null;
-            //fix php 8 bug when `{DAV:}resourcetype` is not a parameter of $info
-            if (isset($info['{DAV:}resourcetype'])) {
-                $type =  $this->parseResourceType($info['{DAV:}resourcetype']);
-            }
+            $type =  $this->parseResourceType($info['{DAV:}resourcetype'] ?? null);
 
             $index = null;
 
@@ -502,7 +498,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 'path' => $url,
                 'name' => $filename,
                 'description' => $filename,
-                'type' => $this->parseResourceType($response['{DAV:}resourcetype']),
+                'type' => $this->parseResourceType($response['{DAV:}resourcetype'] ?? null),
                 'file_size' => $response['{DAV:}getcontentlength'] ?? '',
                 'submitted' => $response['{DAV:}getlastmodified'] ?? '',
                 'ctime' => $response['{DAV:}creationdate'] ?? '',
@@ -536,10 +532,10 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     /**
      * Parses the resource type - is it a dir or a file?
      *
-     * @param  Sabre\DAV\Xml\Property\ResourceType $resourceType
+     * @param  Sabre\DAV\Xml\Property\ResourceType|null $resourceType
      * @return string
      */
-    protected function parseResourceType($resourceType)
+    protected function parseResourceType($resourceType): string
     {
         if (!($resourceType instanceof Sabre\DAV\Xml\Property\ResourceType)) {
             return 'file';
