@@ -19,15 +19,16 @@ use Predis\ClientInterface;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\MessageList\Listed;
 use Schoolbox\Realtime\MessageList\Unread;
-use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\User;
 
 class Controller extends Base
 {
+    private ClientInterface $redisStorage;
+
     public function __construct(
-        private ClientInterface $redisStorage,
-        private WritableCache $subscriptionCache
+        ClientInterface $redisStorage
     ) {
+        $this->redisStorage = $redisStorage;
     }
 
     /**
@@ -55,16 +56,5 @@ class Controller extends Base
             new Unread($this->redisStorage, INSTANCE_ID, $user->getId())
         );
         $composite->push($bob->build());
-    }
-
-    /**
-     * Refreshes notification bindings
-     *
-     * @return void
-     * @api GET /api/user/refreshBindingCache
-     */
-    public function apiRefreshBindingCache()
-    {
-        $this->subscriptionCache->cacheRedirects(INSTANCE_ID);
     }
 }

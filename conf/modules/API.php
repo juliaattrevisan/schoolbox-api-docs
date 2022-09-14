@@ -20,8 +20,6 @@ class API extends ModuleLoader
      */
     public function configure(ContainerInterface $di): void
     {
-        $this->loadModule($di, Schoolbox\APIUser\Notify\Module::class, '/api/user');
-
         $this->loadModule($di, Schoolbox\API\Module::class, '/api');
 
         $this->loadModule($di, Schoolbox\Admin\API\Module::class, '/api/admin');
@@ -29,6 +27,8 @@ class API extends ModuleLoader
         $this->loadModule($di, Schoolbox\Group\API\Module::class, '/api/user');
 
         $this->loadModule($di, Schoolbox\APIUser\Module::class, '/api/user');
+
+        $this->loadModule($di, Schoolbox\APIUser\Notify\Module::class, '/api/user');
 
         $this->loadModule($di, Schoolbox\APIAssessment\Module::class, '/api/assessment');
     }
