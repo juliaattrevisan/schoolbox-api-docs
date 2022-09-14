@@ -92,7 +92,6 @@ class Helper
                 'name' => $row['folderName'],
                 'code' => $this->getFolderCode($row['folderId']),
                 'yearLevel' => $yearLevel,
-                'subjectCode' => $row['subjectCode'],
             ];
             $project = null;
             if (null !== $row['project']) {
@@ -113,6 +112,7 @@ class Helper
                         'id'   => $row['workTypeId']
                     ],
                     'folder'           => $folder,
+                    'subjectCode'      => $row['subjectCode'],
                     'project'          => $project,
                     'weight'           => (float)$row['weight'],
                     'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
@@ -329,6 +329,16 @@ WHERE
                 $params = array_merge($params, $folderCodesBindings->getParams());
             }
             $where .= " ) ";
+        }
+        //subject code limit
+        if (array_key_exists('subjectCode', $filter)) {
+            $subjectCodesBindings = Builder::getBindings($filter['subjectCode'], 'codes');
+
+            $from .= " JOIN course_implementation on v_assessment_relation.course_implementation_id = course_implementation.id
+                JOIN course_specification on (course_implementation.course_specification_id = course_specification.id and
+                course_specification.subject_code in ({$subjectCodesBindings->getPlaceholder()}))
+            ";
+            $params = array_merge($params, $subjectCodesBindings->getParams());
         }
 
         return [
