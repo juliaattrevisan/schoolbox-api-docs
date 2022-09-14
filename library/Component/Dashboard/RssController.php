@@ -61,7 +61,7 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
                         'ON_OFF' => ++$j % 2 ? '' : 'dark',
                         'RSS_TITLE' => Scrub::text($item['title']),
                         'RSS_URL' => urlencode(base64_encode($item['link'])),
-                        'RSS_BRIEF' => Scrub::html($item['content'] ? $item['content'] : $item['description']),
+                        'RSS_BRIEF' => Scrub::html($item['content'] ?? $item['description']),
                         'rss_brief_output_block' => '',
                     )
                 );
