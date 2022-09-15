@@ -1515,8 +1515,10 @@ class Controller extends Assessment\Controller
             ],
         ];
 
-        // ...append rubric-related data...
-        $data = array_merge($data, $this->generateRubricTwigData($assessment));
+        if ($assessment instanceof Model) {
+            // ...append rubric-related data...
+            $data = array_merge($data, $this->generateRubricTwigData($assessment));
+        }
 
         // ...and scene.
         return $data;
@@ -1526,11 +1528,11 @@ class Controller extends Assessment\Controller
     /**
      * Common logic when generating Rubrics
      *
-     * @param IAssessable $dueWork
+     * @param Model $dueWork
      * @return array
      * @throws MapperException
      */
-    private function generateRubricTwigData(IAssessable $dueWork): array
+    private function generateRubricTwigData(Model $dueWork): array
     {
         $data = [];
 
