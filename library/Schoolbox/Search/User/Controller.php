@@ -32,7 +32,7 @@ use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Profile\ValidDetailsVisible;
 use Schoolbox\Profile\ValidEmailVisible;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
-use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
+use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -292,7 +292,7 @@ class Controller extends BaseController
         $subjects      = [];
         $splitSubjects = $this->getConfigLoader()->get('mysubjects_split');
         $teacherRoles  = $this->roleMapper->findByColumn('group_type', Role::STAFF)->getPropertyValues('id');
-        $codeMatcher   = (new SubjectCodeMatchFactory())->build($this->getConfigLoader()->get('external_type'));
+        $codeMatcher   = (new ClassCodeMatchFactory())->build($this->getConfigLoader()->get('external_type'));
         $subjectList   = $this->externalUser->getSubjectList($student);
         foreach ($subjectList as $subject) {
             /* Decide whether the currently logged in user can see a link

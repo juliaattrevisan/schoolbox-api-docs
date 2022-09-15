@@ -1127,7 +1127,7 @@ class AccessTest extends TestCase
             $this->getMockFolderCodeMapper($folderTree, $folderCodeData ?? self::FOLDER_CODE_DATA),
             $this->getMockExternalUserInterface($externalUserData ?? self::EXTERNAL_USER_DATA),
             $this->getMockIConfigLoader($config ?? self::CONFIG),
-            (new Folder\Code\SubjectCodeMatchFactory())->build('synergetic'),
+            (new Folder\Code\ClassCodeMatchFactory())->build('synergetic'),
             $enableCache,
             Folder\NNIAN::getInstance($mockFolderMapper)
         );

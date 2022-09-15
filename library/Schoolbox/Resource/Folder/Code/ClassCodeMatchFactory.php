@@ -12,7 +12,7 @@ namespace Schoolbox\Resource\Folder\Code;
 use External\Pcschools;
 use External\Synergetic;
 
-class SubjectCodeMatchFactory
+class ClassCodeMatchFactory
 {
     /**
      * Returns an implementation suitable for the specified external type

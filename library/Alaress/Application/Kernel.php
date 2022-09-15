@@ -150,7 +150,7 @@ use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
+use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\HashGenerator;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -674,7 +674,7 @@ abstract class Kernel
                             $externalUser,
                             $folderMapper,
                             $externalClass,
-                            (new SubjectCodeMatchFactory())->build($di->get('config')->get('external_type'))
+                            (new ClassCodeMatchFactory())->build($di->get('config')->get('external_type'))
                         ),
                         $strategyFactory->makeAllSimpleStrategies(),
                         $complexMapper,
@@ -721,7 +721,7 @@ abstract class Kernel
                             $externalUser,
                             $folderMapper,
                             $externalClass,
-                            (new SubjectCodeMatchFactory())->build($di->get('config')->get('external_type'))
+                            (new ClassCodeMatchFactory())->build($di->get('config')->get('external_type'))
                         ),
                         $strategyFactory
                     );

@@ -156,7 +156,7 @@ class Access
                 $folderCodeMapper ?? Folder\Code\Mapper::getInstance(),
                 $externalUser,
                 $config,
-                $subjectMatcher ?? (new Folder\Code\SubjectCodeMatchFactory())->build($config->get(Config\ConfigMapper::NAME_EXTERNAL_TYPE)),
+                $subjectMatcher ?? (new Folder\Code\ClassCodeMatchFactory())->build($config->get(Config\ConfigMapper::NAME_EXTERNAL_TYPE)),
                 $enableCache ?? PHP_SAPI !== 'cli',
                 $folderNnian ?? Folder\NNIAN::getInstance($folderMapper)
             );

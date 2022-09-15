@@ -11,7 +11,7 @@ namespace Schoolbox\Resource\Folder\Code\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Resource\Folder\Code\ISubjectMatcher;
-use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
+use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 
 /**
  * Test that the ISubjectMatcher implementations behave as expected
@@ -25,7 +25,7 @@ class SubjectMatcherTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        self::$factory = new SubjectCodeMatchFactory();
+        self::$factory = new ClassCodeMatchFactory();
     }
 
     /**
