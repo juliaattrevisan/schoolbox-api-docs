@@ -17,6 +17,7 @@ use Alaress\Web\Router\PathMatcher;
 use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Authorizer\Rule\IsReportOwner;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
@@ -59,7 +60,14 @@ class Module extends BaseModule
                 new Rule\Callback(
                     static function (array $params, User $user) {
                         if (!isset($params['report']) || !($params['report'] instanceof PastoralReport)) {
-                            throw new Unauthorized();
+                            if (!isset($params['reportId'])) {
+                                throw new Unauthorized();
+                            }
+                            try {
+                                $params['report'] = PastoralReportMapper::getInstance()->findById($params['reportId']);
+                            } catch (Exception $e) {
+                                throw new Unauthorized();
+                            }
                         }
                         if ($params['report']->getOwner()->getId() == $user->getId()) {
                             return true;

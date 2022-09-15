@@ -54,7 +54,7 @@
                             <a href="{{ profile.link(user) }}">
                                 {{ profile.imageSquare64(user) }}
                             </a>
-                            <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id}) }}'>
+                            <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id, report: report}) }}'>
                                 <h3>{{ report.name }}</h3>
                             </a>
                             <p class="meta">
@@ -82,7 +82,7 @@
                             <span class="icon-star alert"></span>
                         </label>
                         <a class="icon-modify no-text"
-                           href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id}) }}"
+                           href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id, report: report}) }}"
                            title="Modify Report"></a>
                         <a class="icon-delete no-text" data-delete="{{ report.id }}" href="#" title="Delete Report"></a>
                     </nav>
@@ -119,7 +119,7 @@
                         <a href="{{ profile.link(report.owner) }}">
                             {{ profile.imageSquare64(report.owner) }}
                         </a>
-                        <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id}) }}'>
+                        <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id, report: report}) }}'>
                             <h3>{{ report.name }}</h3>
                         </a>
                         <p class="meta">
