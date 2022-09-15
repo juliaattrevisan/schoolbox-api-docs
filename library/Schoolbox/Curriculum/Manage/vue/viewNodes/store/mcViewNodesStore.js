@@ -36,8 +36,8 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
          * @return { Array }
          */
         breadcrumbs () {
-            const nodesStore = useNodesStore();
             let breadcrumbs = [];
+            const nodesStore = useNodesStore();
             if (!nodesStore.hasSingleCurriculum) { //we only need this breadcrumb if there's more than one Curriculum, otherwise we jump straight to the single node with no option of returning back
                 breadcrumbs.push( { id: nodesStore.nodes.id, name: nodesStore.nodes.name, depth: 0 } );
             }

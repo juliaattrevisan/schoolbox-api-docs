@@ -22,21 +22,6 @@ export const useModalActiveCodesStore = defineStore(`csModelActive`, {
     getters: {
 
         /**
-         * If there's only one curriculum, we can select it
-         * straight away, otherwise we allow the user to make the selection
-         *
-         * @return { Boolean }
-         */
-        hasSingleCurriculum () {
-            const codesStore = useCodesStore();
-            if (codesStore.codes.children?.length === 1) {
-                return true;
-            } else {
-                return false;
-            }
-        },
-
-        /**
          * Can now use the search input when we have selected at least one node
          *
          * @return { Boolean }
@@ -51,9 +36,9 @@ export const useModalActiveCodesStore = defineStore(`csModelActive`, {
          * @return { Array }
          */
         breadcrumbs () {
-            const codesStore = useCodesStore();
             let breadcrumbs = [];
-            if (!this.hasSingleCurriculum) { //we only need this breadcrumb if there's more than one Curriculum, otherwise we jump straight to the single node with no option of returning back
+            const codesStore = useCodesStore();
+            if (!codesStore.hasSingleCurriculum) { //we only need this breadcrumb if there's more than one Curriculum, otherwise we jump straight to the single node with no option of returning back
                 breadcrumbs.push( { id: codesStore.codes.id, name: codesStore.codes.name, depth: 0 } );
             }
             this.idList.forEach((id, index) => { //add in a breadcrumb for each selected node

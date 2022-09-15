@@ -6,12 +6,14 @@
  */
 
 import { ref, computed, watch } from 'vue';
+import { useStore } from '../store/manageCurriculumStore';
 import { useNodesStore } from '../store/mcNodesStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useAddCurriculumStore } from '../store/mcAddCurriculumStore';
 import McViewNode from './mc-view-node.vue'
 
 
+const store = useStore();
 const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
 const addCurriculumStore = useAddCurriculumStore();
@@ -56,8 +58,10 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
     <div v-if="nodesStore.hasNoCurriculum" class="empty-state">
         <i class="icon-curriculum"></i>
         <p>There's currently no Curriculum loaded to display.</p>
-        <button @click.prevent="onCreateNewSelected" @keyup.enter="onCreateNewSelected" title="Create a new Curriculum">Create a new Curriculum</button>
-        <a href="/curriculum/import" title="Import Curriculum">Import Curriculum</a>
+        <template v-if="store.hasLoadedOk && !store.isReadOnly">
+            <button @click.prevent="onCreateNewSelected" @keyup.enter="onCreateNewSelected" title="Create a new Curriculum">Create a new Curriculum</button>
+            <a href="/curriculum/import" title="Import Curriculum">Import Curriculum</a>
+        </template>
     </div>
     <div v-else-if="viewNodesStore.hasNoSearchResults" class="empty-state">
         <i class="icon-curriculum"></i>
