@@ -279,9 +279,9 @@ class Classes implements IStrategy
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
 
-                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Library Lunch Time Duty'])) {
-                        continue;
-                    }
+//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Library Lunch Time Duty'])) {
+//                        continue;
+//                    }
 
                     /* We only care about certain activities.
                      *
@@ -736,20 +736,20 @@ print_r($combinedInstances);
         }
 
         print_r($enrolments);
-        /* Alternatively, this might also have additional participating teachers
-         */
-        if (!\count($enrolments['teachers'])) {
-            $this->log->debug(sprintf(
-                '%s: no additional teachers involved',
-                $activityName
-            ));
-        } else {
-            foreach ($enrolments['teachers'] as $externalId) {
-                $this->saveStaffInvolvement([
-                    'externalId' => $externalId
-                ], $event);
-            }
-        }
+//        /* Alternatively, this might also have additional participating teachers
+//         */
+//        if (!\count($enrolments['teachers'])) {
+//            $this->log->debug(sprintf(
+//                '%s: no additional teachers involved',
+//                $activityName
+//            ));
+//        } else {
+//            foreach ($enrolments['teachers'] as $externalId) {
+//                $this->saveStaffInvolvement([
+//                    'externalId' => $externalId
+//                ], $event);
+//            }
+//        }
 
         /* Save sis_class_user involvements
          * This is the student(s) and they're associated with all instances
