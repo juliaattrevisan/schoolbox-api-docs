@@ -109,11 +109,19 @@ class Model extends AbstractCourse
         return $this;
     }
 
+    /**
+     * @param string|null $subjectCode
+     * @return $this
+     */
     public function setSubjectCode(?string $subjectCode)
     {
         $this->subjectCode = $subjectCode;
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
     public function getSubjectCode()
     {
         return $this->subjectCode;
