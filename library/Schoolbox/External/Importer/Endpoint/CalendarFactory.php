@@ -11,6 +11,7 @@ namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
+use Schoolbox\External\Connector\Compass\Base\Endpoint as CompassEndpoint;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
 
@@ -28,6 +29,7 @@ class CalendarFactory implements IFactory
      * The family of importers that we can spawn
      */
     public const TASS_API = 'tassapi';
+    public const COMPASS = 'compass';
 
 
     /**
@@ -106,6 +108,20 @@ class CalendarFactory implements IFactory
                     \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
                     \Schoolbox\External\Event\Campus\Mapper::getInstance(),
                     \Schoolbox\External\Event\User\Mapper::getInstance(),
+                    RoleMapper::getInstance()
+                ))->produce();
+
+            case self::COMPASS:
+                return (new CompassEndpoint\Calendar\Factory(
+                    $this->logger,
+                    $this->perform,
+                    $this->host,
+                    $this->key,
+                    \Schoolbox\CampusMapper::getInstance(),
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper::getInstance(),
+                    \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
+                    \Schoolbox\External\Event\Campus\Mapper::getInstance(),
                     RoleMapper::getInstance()
                 ))->produce();
 
