@@ -459,24 +459,17 @@ $(function() {
         {%- endif -%}
     {%- endset -%}
     {% if allowModifyUsed %}
-        <p>If you remove it:</p>
-        <ul>
-            <li>
-                it will not be available to add to future {{ locale.assessment.plural }}
-                in this {{ classTerm }}
-            </li>
-            <li>
-                it will be removed from any {{ locale.assessment.plural }}
-                in this {{ classTerm }}
-            </li>
-            {% if folder.isSpecFolder %}
-            <li>
-                however, it will <em>not</em> be removed from any class folders
-                which have imported it, nor will it be removed from any
-                {{ locale.assessment.plural }} on those class folders
-            </li>
-            {% endif %}
-        </ul>
+        <p>
+            If you remove it, it will be removed from all
+            {{ locale.assessment.plural }} in this {{ classTerm }}
+            and will be unavailable for use in future
+            {{ locale.assessment.plural }}.
+        </p>
+        <p>
+            Please note, it will not be removed from
+            {{ locale.assessment.plural }} on class pages that currently have
+            the {{ locale.rubricCriterion }} imported and in use.
+        </p>
     {% else %}
         <p>
             If you remove it, it will not be available to add to future
