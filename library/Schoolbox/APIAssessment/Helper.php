@@ -73,6 +73,10 @@ class Helper
          * build the whole thing
          */
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $weighted = false;
+            if ('0.00' !== $row['weight']) {
+                $weighted = true;
+            }
             $yearLevel = null;
             /**
              * check if folder has yearlevels?
@@ -113,6 +117,7 @@ class Helper
                     ],
                     'folder'           => $folder,
                     'project'          => $project,
+                    'weighted'         => $weighted,
                     'weight'           => (float)$row['weight'],
                     'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
                     'rubric'           => $rubric,
