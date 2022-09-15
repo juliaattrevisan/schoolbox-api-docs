@@ -480,6 +480,7 @@ class Controller extends Base\Base
 
             $courseSpec = $this->courseSpecificationMapper->createModel();
             $courseSpec->setFolder($courseFolder);
+            $courseSpec->setSubjectCode(trim($post->get('subjectCode', '')));
             $courseFolder->setCourseSpecification($courseSpec);
 
             $this->courseSpecificationMapper->save($courseSpec);
