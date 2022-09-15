@@ -444,19 +444,30 @@ $(function() {
 <!-- Hidden text for remove criterion -->
 <div class="hide" id="criterion-remove-text">
     <p>
-        Are you sure you wish to remove {{ locale.rubricCriterion }}
+        Are you sure you wish to remove the {{ locale.rubricCriterion }}
         &ldquo;<span data-rubric-criterion-name></span>&rdquo;?
     </p>
+    {%- set classTerm -%}
+        {%- if folder.hasCourseSpecification -%}
+            course
+        {%- elseif folder.hasUnitSpecification -%}
+            {{ locale.unit }}
+        {%- elseif folder.isClass -%}
+            class page
+        {%- else -%}
+            folder
+        {%- endif -%}
+    {%- endset -%}
     {% if allowModifyUsed %}
         <p>If you remove it:</p>
         <ul>
             <li>
                 it will not be available to add to future {{ locale.assessment.plural }}
-                in this folder
+                in this {{ classTerm }}
             </li>
             <li>
                 it will be removed from any {{ locale.assessment.plural }}
-                in this folder
+                in this {{ classTerm }}
             </li>
             {% if folder.isSpecFolder %}
             <li>
@@ -469,7 +480,7 @@ $(function() {
     {% else %}
         <p>
             If you remove it, it will not be available to add to future
-            {{ locale.assessment.plural }} in this folder.
+            {{ locale.assessment.plural }} in this {{ classTerm -}}.
         </p>
     {% endif %}
     <p>
