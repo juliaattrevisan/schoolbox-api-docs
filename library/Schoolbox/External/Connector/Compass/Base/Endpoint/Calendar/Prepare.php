@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Calendar;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 /**
@@ -46,6 +47,12 @@ class Prepare implements IStrategy
 
 
     /**
+     * @var \Schoolbox\External\Event\Overrides\Mapper
+     */
+    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+
+
+    /**
      * Event source is an arbitrary string that helps identify the thing that imported
      * them into the local event table so you can do a mass remove if needed
      *
@@ -57,20 +64,23 @@ class Prepare implements IStrategy
     /**
      * Base constructor.
      *
-     * @param LoggerInterface                  $log
-     * @param bool                             $perform
-     * @param \Schoolbox\External\Event\Mapper $eventMapper
-     * @param string                           $source
+     * @param LoggerInterface                            $log
+     * @param bool                                       $perform
+     * @param Mapper                                     $eventMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+     * @param string                                     $source
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         \Schoolbox\External\Event\Mapper $eventMapper,
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         string $source
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->eventMapper = $eventMapper;
+        $this->overridesMapper = $overridesMapper;
 
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
@@ -92,6 +102,11 @@ class Prepare implements IStrategy
          * Anything that updates them will be safe from cleanup later
          */
         if ($this->perform) {
+            /* Delete any overrides that existed
+             */
+            $this->overridesMapper->truncate();
+            $this->log->debug('Purged timetable event overrides');
+
             $query = "
                 UPDATE
                 {$this->eventMapper->getTable()}

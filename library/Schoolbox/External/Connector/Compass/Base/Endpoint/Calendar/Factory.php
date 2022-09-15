@@ -135,6 +135,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->eventMapper,
+                $this->overridesMapper,
                 self::SOURCE_NAME
             ))
             ->add(new NonAcademicEvents(
