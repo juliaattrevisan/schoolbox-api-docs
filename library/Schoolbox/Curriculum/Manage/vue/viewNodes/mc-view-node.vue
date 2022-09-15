@@ -182,7 +182,8 @@ async function onLeave (el, done) {
 
 <template>
     <li ref="viewNodeEl">
-        <div :class="`buttons-container ${ isUpdatingAnother || isAddingAnother ? 'inactive' : '' } ${ props.node.enabled ? '' : 'not-enabled' }`">
+        <div :class="`buttons-container ${ isUpdatingAnother || isAddingAnother ? 'inactive' : '' }`">
+
             <mc-view-node-checkbox
                 v-if="showActions"
                 :node="props.node"
@@ -202,10 +203,10 @@ async function onLeave (el, done) {
                 :isAdding="isAdding"
                 :isUpdatingOrAdding="isUpdatingOrAdding"
             />
-            <mc-view-node-toast
+            <!-- <mc-view-node-toast
                 :node="props.node"
                 :title="title"
-            />
+            /> -->
         </div>
         <Transition @enter="onEnter" @leave="onLeave">
             <mc-add-subsection v-if="isAdding" :depth="props.depth" />

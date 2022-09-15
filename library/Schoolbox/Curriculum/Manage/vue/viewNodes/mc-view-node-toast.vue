@@ -39,7 +39,7 @@ const props = defineProps({
     },
 });
 
-const showToast = ref(false); //to show hide the toast
+const showToast = ref(true); //to show hide the toast
 const action = ref(''); //to help describe what action took place, ie 'updated' or 'added'
 
 
