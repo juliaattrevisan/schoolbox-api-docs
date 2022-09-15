@@ -22,8 +22,8 @@ Usage: include 'sub/subjectSelector.twig
 
 {% if year is empty %}
 <div class="subject">
-    <select id="context-selector-subject" title="Select a {{ locale.subject }}">
-        <option disabled="" selected="" label="Select a {{ locale.subject }}">Select a {{ locale.subject }}</option>
+    <select id="context-selector-subject" title="Select a {{ locale.class }}">
+        <option disabled="" selected="" label="Select a {{ locale.class }}">Select a {{ locale.class }}</option>
         {% for folder in subjects %}
             <option data-href="{{ routeLookup('learningGrades.getGradesForSubject', routeArgs|merge({subjectId: folder.id, subject: folder})) }}" {% if currentSubject is defined and folder.id == currentSubject.id %}selected{% endif %} value="{{ folder.id }}">
                 {#- dessicate -#}{{ folder.nameWithCodes }}{#- dessicate -#}

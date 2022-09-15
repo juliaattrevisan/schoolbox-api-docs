@@ -324,13 +324,10 @@ Usage:
                     {% endif %}
 
                     <div class="small-12 column">
-                        <label for="name">Subject Code</label>
-                        <input type="text"
-                               name="subjectCode"
-                               id="subjectCode"
-                               value="{{ courseSpec.subjectCode ?? '' }}"
-                               maxlength="20"
-                        />
+                        <label for="subjectCode">
+                            {{ locale.subject.proper }} Code
+                            <input id="subjectCode" type="text" name="subjectCode" size="40" value="{{ courseSpec.subjectCode ?? '' }}" maxlength="20" />
+                        </label>
                     </div>
 
                     {% if curriculumEnabled %}
