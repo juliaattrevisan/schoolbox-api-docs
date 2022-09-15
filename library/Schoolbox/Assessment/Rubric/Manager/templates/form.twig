@@ -451,7 +451,7 @@ $(function() {
         {%- if folder.hasCourseSpecification -%}
             course
         {%- elseif folder.hasUnitSpecification -%}
-            {{ locale.unit }}
+            {{ locale.unit }} (and its course)
         {%- elseif folder.isClass -%}
             class page
         {%- else -%}
