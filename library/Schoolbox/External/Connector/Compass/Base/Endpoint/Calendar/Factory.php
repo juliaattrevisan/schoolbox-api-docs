@@ -12,12 +12,12 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Calendar;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\ApiCertification;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\Calendar\NonAcademicEvents;
+use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
-use Schoolbox\RoleMapper;
 
 /**
  * Class Factory
@@ -35,18 +35,6 @@ class Factory
      * them into the local event table so you can do a mass remove if needed
      */
     public const SOURCE_NAME = 'suds_compass';
-
-
-    /**
-     * Collect events from this many months in the past (a negative int)
-     */
-    private const FROM = -1;
-
-
-    /**
-     * Collect events to this many months in the future
-     */
-    private const TO = 12;
 
 
     /**
@@ -76,12 +64,6 @@ class Factory
 
 
     /**
-     * @var CampusMapper
-     */
-    private \Schoolbox\CampusMapper $campusMapper;
-
-
-    /**
      * @var EventTypeMapper
      */
     private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper;
@@ -94,59 +76,38 @@ class Factory
 
 
     /**
-     * @var \Schoolbox\External\Event\Roletype\Mapper
+     * @var \Schoolbox\External\Event\Overrides\Mapper
      */
-    private \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Campus\Mapper
-     */
-    private \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper;
-
-
-    /**
-     * @var RoleMapper
-     */
-    private RoleMapper $roleMapper;
+    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
 
 
     /**
      * Factory constructor.
      *
-     * @param LoggerInterface                           $log
-     * @param bool                                      $perform
-     * @param string                                    $host
-     * @param string                                    $key
-     * @param CampusMapper                              $campusMapper
-     * @param EventTypeMapper                           $eventTypeMapper
-     * @param \Schoolbox\External\Event\Mapper          $eventMapper
-     * @param \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper
-     * @param \Schoolbox\External\Event\Campus\Mapper   $campusRelationMapper
-     * @param RoleMapper                                $roleMapper
+     * @param LoggerInterface                            $log
+     * @param bool                                       $perform
+     * @param string                                     $host
+     * @param string                                     $key
+     * @param EventTypeMapper                            $eventTypeMapper
+     * @param Mapper                                     $eventMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         string $host,
         string $key,
-        \Schoolbox\CampusMapper $campusMapper,
         \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
-        \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
-        RoleMapper $roleMapper
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
-        $this->campusMapper = $campusMapper;
         $this->eventTypeMapper = $eventTypeMapper;
         $this->eventMapper = $eventMapper;
-        $this->roletypeRelationMapper = $roletypeRelationMapper;
-        $this->campusRelationMapper = $campusRelationMapper;
-        $this->roleMapper = $roleMapper;
+        $this->overridesMapper = $overridesMapper;
     }
 
 
@@ -175,6 +136,15 @@ class Factory
                 $this->perform,
                 $this->eventMapper,
                 self::SOURCE_NAME
+            ))
+            ->add(new NonAcademicEvents(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->eventMapper,
+                $this->overridesMapper,
+                $from,
+                $to
             ))
             ->add(new Cleanup(
                 $this->log,

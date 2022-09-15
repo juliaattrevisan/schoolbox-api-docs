@@ -17,7 +17,10 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Attendees;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\Mapper\Exception;
+
 
 /**
  * Import all the classes for a student, saving them as sis_event records
@@ -66,11 +69,11 @@ class Classes implements IStrategy
         ],
         2 => [
             'name' => 'Event',
-            'allowed' => true
+            'allowed' => false
         ],
         3 => [
             'name' => 'Meeting',
-            'allowed' => true
+            'allowed' => false
         ],
         4 => [
             'name' => 'Assembly',
@@ -78,7 +81,7 @@ class Classes implements IStrategy
         ],
         5 => [
             'name' => 'Generic',
-            'allowed' => true
+            'allowed' => false
         ],
         6 => [
             'name' => 'Duty',
@@ -246,13 +249,13 @@ class Classes implements IStrategy
 
         /* Generate a list of staff members
          */
-        $this->log->debug('Preloading staff compassPersonIds for non-academic classes...');
+        $this->log->debug('Preloading staff compassPersonIds for academic classes...');
 
         $staffLookup = (new Lookup\Staff($this->api))->generate($this->lBound, $this->uBound);
 
         /* Generate a list of students
          */
-        $this->log->debug('Preloading student compassPersonIds for non-academic classes...');
+        $this->log->debug('Preloading student compassPersonIds for academic classes...');
 
         $studentLookup = (new Lookup\Student($this->api))->generate($this->lBound, $this->uBound);
 
@@ -383,7 +386,7 @@ class Classes implements IStrategy
                     /* Combine sessions and instances
                      */
                     $combinedInstances = (new RecombineSessions())->recombine($activity['instances'], $enrolments['sessions']);
-print_r($combinedInstances);
+
                     /* These are instances of classes that occur throughout the year/timetable cycle
                      * We only care about a certain subset of these instances.
                      *
@@ -669,7 +672,7 @@ print_r($combinedInstances);
 
         foreach ($activityInstance['attendees'] as $attendeeTeacher) {
             /* FIXME Multiple teachers might exist here
-             *  It's possibel that multiple Attendee might be a staff member
+             *  It's possible that multiple Attendee might be a staff member
              *  in which case the intent would be "multiple teachers of this class"
              *  but there's no specimen to verify that hearsay
              */
@@ -732,24 +735,8 @@ print_r($combinedInstances);
                 $teacherCompassIds
             ));
 
-            $this->saveStaffInvolvement($teacher, $event);
+            $this->saveStaffInvolvement($event, $teacher);
         }
-
-        print_r($enrolments);
-//        /* Alternatively, this might also have additional participating teachers
-//         */
-//        if (!\count($enrolments['teachers'])) {
-//            $this->log->debug(sprintf(
-//                '%s: no additional teachers involved',
-//                $activityName
-//            ));
-//        } else {
-//            foreach ($enrolments['teachers'] as $externalId) {
-//                $this->saveStaffInvolvement([
-//                    'externalId' => $externalId
-//                ], $event);
-//            }
-//        }
 
         /* Save sis_class_user involvements
          * This is the student(s) and they're associated with all instances
@@ -761,7 +748,7 @@ print_r($combinedInstances);
             ));
         } else {
             foreach ($enrolments['students'] as $externalId) {
-                $this->saveStudentInvolvement($event, $classEntry, $externalId, $externalId);
+                $this->saveStudentInvolvement($event, $classEntry, $externalId);
             }
         }
     }
@@ -779,8 +766,8 @@ print_r($combinedInstances);
      * @throws \UnexpectedValueException
      */
     private function saveStaffInvolvement(
-        array $teacher,
-        \Schoolbox\External\Event\Model $event
+        \Schoolbox\External\Event\Model $event,
+        array $teacher
     ): void {
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
@@ -811,19 +798,17 @@ print_r($combinedInstances);
      * Save an involvement for user $externalId, whose name is $name,
      * for the sis_event $event
      *
-     * @param \Schoolbox\External\Event\Model $event
-     * @param ClassEntry                      $classEntry
-     * @param string                          $name
-     * @param string                          $externalId
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @param string     $externalId
      * @return void
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \UnexpectedValueException
      */
     private function saveStudentInvolvement(
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry,
-        string $name,
         string $externalId
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {

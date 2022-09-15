@@ -26,7 +26,6 @@ use Schoolbox\External\TimetablePeriodMapper;
  */
 class Prepare implements IStrategy
 {
-
     /**
      * An arbitrarily-chosen string to denote where these events came from
      */
