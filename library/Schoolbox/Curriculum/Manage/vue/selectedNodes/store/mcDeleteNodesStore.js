@@ -1,12 +1,10 @@
 /**
- * Handles the store to disband the group
+ * Delete the currently selected nodes
  */
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
-import { useNodesStore } from '../../store/mcNodesStore';
 import { useSelectedNodesStore } from './mcSelectedNodesStore';
-import { useViewNodesStore } from '../../viewNodes/store/mcViewNodesStore';
 
 
 export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
@@ -39,9 +37,7 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
                 const isAllResponsesOk = deleteResponses.every((response) => response === true);
                 if (isAllResponsesOk) {
                     const successMessage = this.getSuccessMessage();
-                    const selectedNodesStore = useSelectedNodesStore();
-                    selectedNodesStore.nodes.forEach((node) => this.deleteNode(node)); //delete each node from the tree
-                    selectedNodesStore.empty();
+                    useSelectedNodesStore().deleteNodes();
                     this.isProcessing = false;
                     this.cancel();
                     return successMessage;
@@ -82,41 +78,6 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
             const selectedNodesStore = useSelectedNodesStore();
             const nodeSingleOrPlural = `node${selectedNodesStore.count > 1  ? 's' : ''}`;
             return `${selectedNodesStore.count} ${nodeSingleOrPlural} successfully deleted`;
-        },
-
-        /**
-         * Pull the node out of the list
-         *
-         * @param { object }
-         */
-        deleteNode (node) {
-            useViewNodesStore().checkDeletedNode(node); //check we aren't on the deleted node currently
-            const nodesStore = useNodesStore();
-            const nodeRemoved = this.removeId(nodesStore.nodes.children, node.id);
-            nodesStore.updateNodes(nodeRemoved);
-        },
-
-        /**
-         * To return an array with any objects containing the specified id removed
-         * we move through the object, looping recursively through .children and remove
-         * any with the id that's being removed
-         *
-         * @param { array }
-         * @param { number }
-         *
-         * @returns { object }
-         */
-         removeId (data, id) {
-            if (data !== null) { // .children wont always be available if the node hasn't been loaded yet
-                return data.reduce((previousValue, currentValue) => {
-                    if (currentValue.id !== id) {
-                        previousValue.push( { ...currentValue, children: this.removeId(currentValue.children, id) } );
-                    }
-                    return previousValue;
-                }, []);
-            } else {
-                return data;
-            }
         },
 
         /**

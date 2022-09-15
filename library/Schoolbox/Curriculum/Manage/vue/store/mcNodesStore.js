@@ -153,6 +153,17 @@ export const useNodesStore = defineStore('mcNodes', {
             sortByName(parentNode.children);
         },
 
+        /**
+         * Pull the node out of the list
+         *
+         * @param { object }
+         */
+        deleteNode (node) {
+            useViewNodesStore().checkDeletedNode(node); //check we aren't on the deleted node currently
+            const nodeRemoved = removeId(this.nodes.children, node.id);
+            this.updateNodes(nodeRemoved);
+        },
+
     },
 
 });
@@ -184,11 +195,34 @@ export function findById (array, id) {
  *
  * @param { array }
  */
- export function sortByName (array, id) {
+export function sortByName (array, id) {
     array.sort((a, b) => {
         return a.name.localeCompare(b.name, undefined, {
             numeric: true,
             sensitivity: 'base'
         });
     });
+}
+
+/**
+ * To return an array with any objects containing the specified id removed
+ * we move through the object, looping recursively through .children and remove
+ * any with the id that's being removed
+ *
+ * @param { array }
+ * @param { number }
+ *
+ * @returns { object }
+ */
+function removeId (data, id) {
+    if (data !== null) { // .children wont always be available if the node hasn't been loaded yet
+        return data.reduce((previousValue, currentValue) => {
+            if (currentValue.id !== id) {
+                previousValue.push( { ...currentValue, children: removeId(currentValue.children, id) } );
+            }
+            return previousValue;
+        }, []);
+    } else {
+        return data;
+    }
 }

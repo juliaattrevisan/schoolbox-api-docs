@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore, enabledNodes, findById } from '../../store/mcNodesStore';
+import { useNodesStore, deleteNode, findById } from '../../store/mcNodesStore';
 
 
 export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
@@ -226,6 +226,15 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
          */
         setActiveNode (node) {
             this.activeNode = node;
+        },
+
+        /**
+         * Delete all the seleced nodes from the tree structure
+         */
+        deleteNodes () {
+            const nodesStore = useNodesStore();
+            this.nodes.forEach((node) => nodesStore.deleteNode(node)); //delete each node from the tree
+            this.empty();
         },
 
     },
