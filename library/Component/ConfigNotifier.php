@@ -103,6 +103,8 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
             return;
         }
 
+        // Detach existing reload request
+        $bundle->detach(self::TRIGGER_RELOAD);
         // Trigger refreshing subscription cache after 10 seconds
         $now = (\Alaress_Date_Format::now())->addSeconds(10);
         $bundle->attach(self::TRIGGER_RELOAD, $now->getUnixTimeStamp());
