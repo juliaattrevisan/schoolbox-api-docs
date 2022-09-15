@@ -9,7 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\User;
 
 /**
  * Get a list of events for a given user.
@@ -37,6 +40,12 @@ class EventUsers
 
 
     /**
+     * @var Overrides\Mapper
+     */
+    private \Schoolbox\External\Event\Overrides\Mapper $overrideMapper;
+
+
+    /**
      * @var \Schoolbox\Resource\Folder\Mapper
      */
     private \Schoolbox\Resource\Folder\Mapper $folderMapper;
@@ -49,19 +58,21 @@ class EventUsers
 
 
     /**
-     * @param Mapper          $eventMapper
-     * @param Campus\Mapper   $campusMapper
-     * @param Roletype\Mapper $roletypeMapper
+     * @param \Schoolbox\External\Event\Mapper        $eventMapper
+     * @param \Schoolbox\External\Event\Campus\Mapper $campusMapper
+     * @param Roletype\Mapper                         $roletypeMapper
+     * @param Overrides\Mapper                        $overrideMapper
      */
     public function __construct(
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Campus\Mapper $campusMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper
+        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper,
+        \Schoolbox\External\Event\Overrides\Mapper $overrideMapper
     ) {
         $this->eventMapper = $eventMapper;
         $this->campusMapper = $campusMapper;
         $this->roletypeMapper = $roletypeMapper;
-
+        $this->overrideMapper = $overrideMapper;
         $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
         $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
     }
@@ -87,6 +98,35 @@ class EventUsers
     {
         $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
+
+        $stack = $this->eventMapper->createCollection();
+        $stack->merge($this->findByRoletypeAndCampus($user, $startDatetime, $finishDatetime, $folderCodes));
+
+        return $stack;
+    }
+
+
+    /**
+     * Find events where you were involved by the (roletype, campus) combination
+     * Optionally filtered by folder codes
+     *
+     * @param User                   $user
+     * @param string                 $startDatetime
+     * @param string                 $finishDatetime
+     * @param GenericCollection|null $folderCodes
+     * @return GenericCollection
+     * @throws Exception
+     * @throws InvalidColumnException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    private function findByRoletypeAndCampus(
+        \Schoolbox\User $user,
+        string $startDatetime,
+        string $finishDatetime,
+        ?GenericCollection $folderCodes = null
+    ): GenericCollection {
 
         /* Campus requirement
          */
@@ -201,5 +241,102 @@ class EventUsers
         }
 
         return $stack;
+    }
+
+
+    /**
+     * Find events where you were involved by overrides specifically
+     *
+     * @param User                   $user
+     * @param int                    $startTimestamp
+     * @param int                    $endTimestamp
+     * @param GenericCollection|null $folderCodes
+     * @return void
+     * @throws InvalidColumnException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     */
+    private function findByOverrides(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null)
+    {
+        $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
+        $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
+
+        /* Find a list of events which have overrides that might affect $user
+         * If there are overrides, process each one specially
+         */
+        $overrideEventIds = $this->generateOverrideEventIds($user, $startDatetime, $finishDatetime, $folderCodes);
+
+    }
+
+
+    /**
+     * Get a list of events between $startDatetime and $finishDatetime
+     * where each event has some kind of override that can affect $user's
+     * usual involvement via sis_class_user, or the involvement with other
+     * people (such as multiple staff teaching this class where one staff
+     * is specified via an override)
+     *
+     * Optionally filters to $folderCode
+     *
+     * @param string          $startDatetime
+     * @param string          $finishDatetime
+     * @param GenericCollection|null $folderCodes
+     * @param \Schoolbox\User        $user
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     */
+    private function generateOverrideEventIds(\Schoolbox\User $user, string $startDatetime, string $finishDatetime, ?GenericCollection $folderCodes = null): array
+    {
+        $query = "
+            SELECT se.id
+            FROM {$this->eventMapper->getTable()} se
+            INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
+            WHERE se.classification = :classification
+            AND se.start_at >= :startDatetime
+            AND se.finish_at <= :finishDatetime
+            AND seuo.external_id = :externalId
+        ";
+
+        $params = [
+            'externalId' => $user->getExternalId(),
+            'startDatetime' => $startDatetime,
+            'finishDatetime' => $finishDatetime,
+            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_EVENT,
+        ];
+
+        if (null === $folderCodes) {
+            /* $folderCodes was never set; you're looking for data via the main calendar
+             * No filtering required
+             */
+        } elseif ($folderCodes->count()) {
+            /* $folderCodes was set, but now we have to check the counts
+             * Folders which do have a code should be filtered to that code specifically
+             */
+            $pb = $this->eventMapper->getPredicateBuilder();
+            $pb->in('se.code', $folderCodes->keys());
+
+            $where = $pb->getWhere()[0];
+            $params = array_merge($params, $pb->getParams());
+
+            $query .= " AND {$where}";
+        } else {
+            /* $folderCodes was set, but now we have to check the counts
+             * Folders which don't have a code should display nothing from this subscription
+             */
+            return [];
+        }
+
+        $statement = $this->overrideMapper->getDatabase()->prepare($query);
+        $statement->execute($params);
+
+        $overrideEventIds = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $overrideEventIds[$row['id']] = $row['id'];
+        }
+
+        return $overrideEventIds;
     }
 }
