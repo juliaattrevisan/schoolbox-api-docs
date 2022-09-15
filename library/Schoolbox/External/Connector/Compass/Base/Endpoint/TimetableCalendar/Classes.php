@@ -279,9 +279,9 @@ class Classes implements IStrategy
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
 
-//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Muay Thai excursion'])) {
-//                        continue;
-//                    }
+                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Library Lunch Time Duty'])) {
+                        continue;
+                    }
 
                     /* We only care about certain activities.
                      *
@@ -383,7 +383,7 @@ class Classes implements IStrategy
                     /* Combine sessions and instances
                      */
                     $combinedInstances = (new RecombineSessions())->recombine($activity['instances'], $enrolments['sessions']);
-
+print_r($combinedInstances);
                     /* These are instances of classes that occur throughout the year/timetable cycle
                      * We only care about a certain subset of these instances.
                      *
@@ -735,6 +735,7 @@ class Classes implements IStrategy
             $this->saveStaffInvolvement($teacher, $event);
         }
 
+        print_r($enrolments);
         /* Alternatively, this might also have additional participating teachers
          */
         if (!\count($enrolments['teachers'])) {

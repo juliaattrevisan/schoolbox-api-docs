@@ -203,34 +203,34 @@ class Factory
         return (new GenericCollection(IStrategy::class))
             /* Purge previously-imported profile relationships and classes
              */
-            ->add(new Profile\Prepare(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Profile(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
+//            ->add(new Profile\Prepare(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+//            ->add(new Profile\Profile(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+//            ->add(new Profile\Cleanup(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
             ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,
