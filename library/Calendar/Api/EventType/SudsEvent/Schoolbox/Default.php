@@ -43,6 +43,12 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
 
 
     /**
+     * @var \Schoolbox\External\Profile\Staff\Mapper
+     */
+    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
+
+
+    /**
      * @var GenericCollection|null
      */
     private ?GenericCollection $folderCodes;
