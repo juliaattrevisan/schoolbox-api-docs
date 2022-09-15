@@ -20,6 +20,29 @@ export const useNodesStore = defineStore('mcNodes', {
         isProcessing: false, //to notify that an action is taking place
     }),
 
+    getters: {
+
+        /**
+         * If there's only no Curriculum, display an empty state
+         *
+         * @return { Boolean }
+         */
+        hasNoCurriculum () {
+            return this.nodes.children && this.nodes.children.length === 0 ? true : false;
+        },
+
+        /**
+         * If there's only one curriculum, we can select it
+         * straight away, otherwise we allow the user to make the selection
+         *
+         * @return { Boolean }
+         */
+        hasSingleCurriculum () {
+            return this.nodes.children && this.nodes.children.length === 1 ? true : false;
+        },
+
+    },
+
     actions: {
 
         /**

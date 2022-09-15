@@ -33,13 +33,6 @@ const selectedNodesSummary = computed(() => {
 });
 
 /**
- * Clear the current selection
- */
-function onClearMemberSelection () {
-    selectedNodesStore.empty();
-}
-
-/**
  * So the selected nodes can be enabled / disabled
  *
  * @param { boolean }

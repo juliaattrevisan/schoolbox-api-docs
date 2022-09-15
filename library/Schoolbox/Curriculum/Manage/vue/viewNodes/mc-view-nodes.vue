@@ -8,24 +8,16 @@
 import { ref, computed, watch } from 'vue';
 import { useNodesStore } from '../store/mcNodesStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
+import { useAddCurriculumStore } from '../store/mcAddCurriculumStore';
 import McViewNode from './mc-view-node.vue'
 
 
 const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
+const addCurriculumStore = useAddCurriculumStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
 const nodesContainerEl = ref(null); //to scroll back to top on any selection change
 
-
-/**
- * To list the parent node titles, separated by a command and or for the last
- *
- * @returns { String }
- */
-const parentNodeTitles = computed(() => {
-    const parentTitlesList = nodesStore.nodes.children.map((code) => code.name); //just get the titles
-    return parentTitlesList.join(', ').replace(/, ([^,]*)$/, ' or $1'); //or on the last
-});
 
 /**
  * To further clarify where the current search term hasn't found any code matches
@@ -33,6 +25,13 @@ const parentNodeTitles = computed(() => {
  * @returns { String }
  */
 const currentSelectedNodeTitle = computed(() => viewNodesStore.current.name);
+
+/**
+ * Display the prompt to create a new curriculum
+ */
+function onCreateNewSelected () {
+    addCurriculumStore.prompt();
+}
 
 /**
  * Clear the current search query
@@ -54,7 +53,13 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
 </script>
 
 <template>
-    <div v-if="viewNodesStore.hasNoSearchResults" class="empty-state">
+    <div v-if="nodesStore.hasNoCurriculum" class="empty-state">
+        <i class="icon-curriculum"></i>
+        <p>There's currently no Curriculum loaded to display.</p>
+        <button @click.prevent="onCreateNewSelected" @keyup.enter="onCreateNewSelected" title="Create a new Curriculum">Create a new Curriculum</button>
+        <a href="/curriculum/import" title="Import Curriculum">Import Curriculum</a>
+    </div>
+    <div v-else-if="viewNodesStore.hasNoSearchResults" class="empty-state">
         <i class="icon-curriculum"></i>
         <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
         <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>

@@ -22,21 +22,6 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
     getters: {
 
         /**
-         * If there's only one curriculum, we can select it
-         * straight away, otherwise we allow the user to make the selection
-         *
-         * @return { Boolean }
-         */
-        hasSingleCurriculum () {
-            const nodesStore = useNodesStore();
-            if (nodesStore.nodes.children.length === 1) {
-                return true;
-            } else {
-                return false;
-            }
-        },
-
-        /**
          * Can now use the search input when we have selected at least one node
          *
          * @return { Boolean }
@@ -53,7 +38,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
         breadcrumbs () {
             const nodesStore = useNodesStore();
             let breadcrumbs = [];
-            if (!this.hasSingleCurriculum) { //we only need this breadcrumb if there's more than one Curriculum, otherwise we jump straight to the single node with no option of returning back
+            if (!nodesStore.hasSingleCurriculum) { //we only need this breadcrumb if there's more than one Curriculum, otherwise we jump straight to the single node with no option of returning back
                 breadcrumbs.push( { id: nodesStore.nodes.id, name: nodesStore.nodes.name, depth: 0 } );
             }
             this.idList.forEach((id, index) => { //add in a breadcrumb for each selected node
