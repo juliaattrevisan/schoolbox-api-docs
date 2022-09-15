@@ -557,9 +557,15 @@ class Classes implements IStrategy
          */
         $type = '';
 
-        /* Cram in everything else
+        /* Try to recycle based on guid
          */
-        $event = $this->eventMapper->createModel()
+        trY {
+            $event = $this->eventMapper->findOneByColumn('guid', $guid);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $event = $this->eventMapper->createModel();
+        }
+
+        $event
             ->setTitle($title)
             ->setDetail($detail)
             ->setLocation($room)
