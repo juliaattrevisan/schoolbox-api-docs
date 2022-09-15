@@ -104,19 +104,34 @@ class Prepare implements IStrategy
         if ($this->perform) {
             /* Delete any overrides that existed
              */
-            $this->overridesMapper->truncate();
-            $this->log->debug('Purged timetable event overrides');
+            $statement =$this->overridesMapper->getDatabase()->prepare("
+                DELETE seuo
+                FROM {$this->overridesMapper->getTable()} seuo
+                INNER JOIN {$this->eventMapper->getTable()} ON seuo.event_id = {$this->eventMapper->getTable()}.id
+                WHERE {$this->eventMapper->getTable()}.classification = :classification
+                AND {$this->eventMapper->getTable()}.`source` = :source
+            ");
+
+            $statement->execute([
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_EVENT,
+                'source' => $this->source,
+            ]);
+
+            $this->log->debug('Purged calendar event overrides');
 
             $query = "
                 UPDATE
                 {$this->eventMapper->getTable()}
+                INNER JOIN {$this->overridesMapper->getTable()} seuo ON seuo.event_id = {$this->eventMapper->getTable()}.id
                 SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
-                WHERE {$this->eventMapper->getTable()}.`source` = :source
+                WHERE {$this->eventMapper->getTable()}.classification = :classification
+                AND {$this->eventMapper->getTable()}.`source` = :source  
             ";
 
             $statement = $this->eventMapper->getDatabase()->prepare($query);
             $statement->execute([
-                'source' => $this->source
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_EVENT,
+                'source' => $this->source,
             ]);
 
             $this->log->debug(sprintf(

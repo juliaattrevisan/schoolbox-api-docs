@@ -30,6 +30,13 @@ use UnexpectedValueException;
 class Factory
 {
     /**
+     * Event source is an arbitrary string that helps identify the thing that imported
+     * them into the local event table so you can do a mass remove if needed
+     */
+    public const SOURCE_NAME = 'suds_compass';
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -240,6 +247,7 @@ class Factory
                 $this->classPeriodMapper,
                 $this->periodMapper,
                 $this->overridesMapper,
+                self::SOURCE_NAME
             ))
             ->add(new TimetableCalendar\Classes(
                 $this->log,

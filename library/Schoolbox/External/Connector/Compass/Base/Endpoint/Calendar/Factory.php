@@ -14,7 +14,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\ApiCertification;
-use Schoolbox\External\Connector\Compass\Base\Endpoint\Calendar\NonAcademicEvents;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
@@ -29,7 +28,6 @@ use Schoolbox\GenericCollection;
  */
 class Factory
 {
-
     /**
      * Event source is an arbitrary string that helps identify the thing that imported
      * them into the local event table so you can do a mass remove if needed

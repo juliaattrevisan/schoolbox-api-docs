@@ -81,6 +81,15 @@ class Prepare implements IStrategy
 
 
     /**
+     * Event source is an arbitrary string that helps identify the thing that imported
+     * them into the local event table so you can do a mass remove if needed
+     *
+     * @var string
+     */
+    private string $source;
+
+
+    /**
      * Prepare constructor.
      *
      * @param LoggerInterface                            $log
@@ -91,6 +100,7 @@ class Prepare implements IStrategy
      * @param ClassPeriodMapper                          $classPeriodMapper
      * @param TimetablePeriodMapper                      $periodMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+     * @param string                                     $source
      */
     public function __construct(
         LoggerInterface $log,
@@ -100,7 +110,8 @@ class Prepare implements IStrategy
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper,
         TimetablePeriodMapper $periodMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        string $source
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -110,6 +121,11 @@ class Prepare implements IStrategy
         $this->classPeriodMapper = $classPeriodMapper;
         $this->periodMapper = $periodMapper;
         $this->overridesMapper = $overridesMapper;
+
+        /* Event source is an arbitrary string that helps identify the thing that imported
+         * them into the local event table so you can do a mass remove if needed
+         */
+        $this->source = $source;
     }
 
 
@@ -121,16 +137,35 @@ class Prepare implements IStrategy
         if ($this->perform) {
             /* Delete any overrides that existed
              */
-            $this->overridesMapper->truncate();
+            $query = "
+                DELETE seuo
+                FROM {$this->overridesMapper->getTable()} seuo
+                INNER JOIN {$this->eventMapper->getTable()} ON seuo.event_id = {$this->eventMapper->getTable()}.id
+                WHERE {$this->eventMapper->getTable()}.classification = :classification
+                AND {$this->eventMapper->getTable()}.`source` = :source
+            ";
+
+            $statement =$this->overridesMapper->getDatabase()->prepare($query);
+            $statement->execute([
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                'source' => $this->source
+            ]);
+
             $this->log->debug('Purged timetable event overrides');
 
-            /* Delete existing timetable events
-             */
-            $this->eventMapper->deleteByColumn('classification', \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE);
-            $this->log->debug(sprintf(
-                'Purged timetable events classified as %s',
-                \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE
-            ));
+            $query = "
+                UPDATE {$this->eventMapper->getTable()}
+                INNER JOIN {$this->overridesMapper->getTable()} seuo ON seuo.event_id = {$this->eventMapper->getTable()}.id
+                SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
+                WHERE {$this->eventMapper->getTable()}.classification = :classification
+                AND {$this->eventMapper->getTable()}.`source` = :source  
+            ";
+
+            $statement = $this->eventMapper->getDatabase()->prepare($query);
+            $statement->execute([
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                'source' => $this->source,
+            ]);
 
             /* Truncate other data entirely
              */
