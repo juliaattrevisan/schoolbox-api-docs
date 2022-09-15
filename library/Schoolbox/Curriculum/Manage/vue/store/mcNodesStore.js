@@ -172,8 +172,12 @@ export const useNodesStore = defineStore('mcNodes', {
          * @param { object }
          */
         nodeUpdated (node) {
-            const parentNode = findById(this.nodes.children, node.parent.id);
-            sortByName(parentNode.children);
+            if (node.parent) {
+                const parentNode = findById(this.nodes.children, node.parent.id);
+                sortByName(parentNode.children);
+            } else {
+                sortByName(this.nodes.children);
+            }
         },
 
         /**
