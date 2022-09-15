@@ -3,7 +3,8 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore, deleteNode, findById } from '../../store/mcNodesStore';
+import { useNodesStore, findById } from '../../store/mcNodesStore';
+import { useEnableNodesStore } from './mcEnableNodesStore';
 
 
 export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
@@ -226,6 +227,31 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
          */
         setActiveNode (node) {
             this.activeNode = node;
+        },
+
+        /**
+         * Update the .enabled status on eac node and all its children
+         *
+         * @param { object }
+         */
+        enableNodes () {
+            const enabled = useEnableNodesStore().enabled;
+            this.nodes.forEach((node) => this.enableAllChildren(node, enabled)); //set the enabled on each node
+            this.empty();
+        },
+
+        /**
+         * Loop through recursively and update all
+         * children to the parents updated enabled state
+         *
+         * @param { array }
+         * @param { boolean }
+         */
+        enableAllChildren (node, enabled) {
+            node.enabled = enabled;
+            node.children?.forEach((innerNode) => {
+                this.enableAllChildren(innerNode, enabled);
+            });
         },
 
         /**
