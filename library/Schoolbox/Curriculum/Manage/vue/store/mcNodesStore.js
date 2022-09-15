@@ -143,6 +143,16 @@ export const useNodesStore = defineStore('mcNodes', {
             sortByName(this.nodes.children);
         },
 
+        /**
+         * A node has been updated, so we should check if the name change would prompt a sort change
+         *
+         * @param { object }
+         */
+        nodeUpdated (node) {
+            const parentNode = findById(this.nodes.children, node.parent.id);
+            sortByName(parentNode.children);
+        },
+
     },
 
 });

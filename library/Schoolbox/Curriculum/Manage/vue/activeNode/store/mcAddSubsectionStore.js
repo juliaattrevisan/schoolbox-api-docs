@@ -1,5 +1,5 @@
 /**
- * Handles the store to disband the group
+ * Handles the store add a new subsection to an existing node
  */
 
 import { defineStore } from 'pinia';

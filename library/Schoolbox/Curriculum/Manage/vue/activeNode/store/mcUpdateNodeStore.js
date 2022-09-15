@@ -23,8 +23,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
          * @param { object }
          */
         prompt (node) {
-            const activeNodeStore = useActiveNodeStore();
-            activeNodeStore.set(node);
+            useActiveNodeStore().set(node);
             this.activeNodeCopy = getActiveNodeCopy(node);
             this.isOpen = true;
         },
@@ -64,8 +63,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
          * to hide the update details prompt
          */
         cancel () {
-            const activeNodeStore = useActiveNodeStore();
-            activeNodeStore.unset();
+            useActiveNodeStore().unset();
             this.isOpen = false;
         },
 

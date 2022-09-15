@@ -58,10 +58,16 @@ export const useActiveNodeStore = defineStore('mcActiveNode', {
          * @param { Object }
          */
         update (node) {
-            this.node.name = node.name;
-            this.node.code = node.code;
-            this.node.reference = node.reference;
-            this.node.description = node.description;
+            if (node.name !== this.node.name) {
+                this.node.name = node.name;
+                useNodesStore().nodeUpdated(this.node); //notify to prompt a sort
+            }
+            if (node.code !== this.node.code) {
+                this.node.code = node.code;
+            }
+            if (node.description !== this.node.description) {
+                this.node.description = node.description;
+            }
         },
 
         /**
