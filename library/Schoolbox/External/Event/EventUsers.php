@@ -109,8 +109,8 @@ class EventUsers
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
 
         $stack = $this->eventMapper->createCollection();
-        $stack->merge($this->findByRoletypeAndCampus($user, $startDatetime, $finishDatetime, $folderCodes));
-        $stack->merge($this->findByOverrides($user, $startDatetime, $finishDatetime, $folderCodes));
+        $stack = $stack->merge($this->findByRoletypeAndCampus($user, $startDatetime, $finishDatetime, $folderCodes));
+        $stack = $stack->merge($this->findByOverrides($user, $startDatetime, $finishDatetime, $folderCodes));
 
         return $stack;
     }
