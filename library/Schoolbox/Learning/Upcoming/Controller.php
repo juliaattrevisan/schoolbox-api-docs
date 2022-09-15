@@ -326,20 +326,12 @@ class Controller extends Base
         $this->extendExecutionTime();
 
         $request             = $this->request->query->get('filters', []);
+        $request             = $this->fillInMissingKeysAndValues($request, $this->getDefaultRequest());
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
         $filters             = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
-
-        if (count($filters) === 0) {
-            // If no filters were supplied, the result set was found to include events that were irrelevant to the user,
-            // and should not be seen by that user (see SA-14181).  The easiest solution (suggested by James) was just to
-            // forbid requests that do not include a valid filter.  Note an invalid filter query would have caused an error
-            // above in the filter factory.
-            throw ErrorMapper::getInstance()->generateException(0, null, "URL parameter 'filters' is required.");
-        }
-
-        $visibility = new Visibility($this->access);
+        $visibility          = new Visibility($this->access);
 
         // User must have provided a start and end date: error out otherwise
         $start = filter_var($this->request->query->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
@@ -370,5 +362,75 @@ class Controller extends Base
         $this->response->content->set($this->buildJsonOutput(
             array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON))
         ));
+    }
+
+    /**
+     * @param array $array1
+     * @param array $array2
+     * @return array
+     */
+    private function fillInMissingKeysAndValues(array $array1, array $array2)
+    {
+        foreach ($array2 as $key => $value) {
+            if (is_array($value)) {
+                $array1[$key] = [];
+                foreach ($value as $keyInner => $valueInner) {
+                    if (!array_key_exists($keyInner, $array1[$key])) {
+                        $array1[$key][$keyInner] = $valueInner;
+                    }
+                }
+            } else {
+                if (!array_key_exists($key, $array1)) {
+                    $array1[$key] = $value;
+                }
+            }
+        }
+
+        return $array1;
+    }
+
+    private function getDefaultRequest()
+    {
+        return [
+            1 => [
+                'project' => '0',
+                'quiz'    => '0',
+                'dueWork' => '0',
+                'task'    => '0',
+                'lti'     => '0',
+            ],
+            3 => [
+                50  => '0',
+                56  => '0',
+                69  => '0',
+                72  => '0',
+                74  => '0',
+                78  => '0',
+                80  => '0',
+                85  => '0',
+                102 => '0',
+                189 => '0',
+                190 => '0',
+                191 => '0',
+            ],
+            10 => [
+                'cap_upcoming' => '0',
+                'cap_open'     => '0',
+                'cap_overdue'  => '0',
+                'cap_closed'   => '0',
+            ],
+            11 => [
+                'unweighted' => '0',
+                'weighted'   => '0',
+            ],
+            12 => [
+                1      => '0',
+                2      => '0',
+                3      => '0',
+                4      => '0',
+                5      => '0',
+                'none' => '0',
+            ]
+        ];
     }
 }
