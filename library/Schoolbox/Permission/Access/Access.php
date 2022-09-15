@@ -51,7 +51,6 @@ use const PHP_SAPI;
  */
 class Access
 {
-
     /**
      * Permission/access level constants
      */
