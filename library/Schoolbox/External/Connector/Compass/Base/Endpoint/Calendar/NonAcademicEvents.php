@@ -385,6 +385,16 @@ class NonAcademicEvents implements IStrategy
                             continue;
                         }
 
+                        /* Override the activity name with something nice
+                         */
+                        $activity['longName'] = $schedules['subjects'][$activity['subjectImportIdentifier']] ?? $activity['name'];
+
+                        $this->log->debug(sprintf(
+                            'Activity %s is now known as %s',
+                            $activity['name'],
+                            $activity['longName']
+                        ));
+
                         /* Start manufacturing events and relationships for each person
                          * in $enrolments, then save it
                          */
@@ -465,7 +475,7 @@ class NonAcademicEvents implements IStrategy
 
         $period = null;
         $room = trim((string)$activityInstance['location']);
-        $title = $activityName;
+        $title = $activity['longName'];
 
         /* Datetimes for when this class occurs
          */
