@@ -60,7 +60,8 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Campus\Mapper $campusMapper,
         \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overrideMapper
+        \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
+        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
@@ -70,6 +71,7 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         $this->campusMapper = $campusMapper;
         $this->roletypeMapper = $roletypeMapper;
         $this->overrideMapper = $overrideMapper;
+        $this->staffProfileMapper = $staffProfileMapper;
     }
 
 
@@ -116,7 +118,8 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
             $this->eventMapper,
             $this->campusMapper,
             $this->roletypeMapper,
-            $this->overrideMapper
+            $this->overrideMapper,
+            $this->staffProfileMapper
         ))->findForUser(
             $this->getUser(),
             $startTimestamp,

@@ -46,6 +46,12 @@ class EventUsers
 
 
     /**
+     * @var \Schoolbox\External\Profile\Staff\Mapper
+     */
+    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
+
+
+    /**
      * @var \Schoolbox\Resource\Folder\Mapper
      */
     private \Schoolbox\Resource\Folder\Mapper $folderMapper;
@@ -58,21 +64,24 @@ class EventUsers
 
 
     /**
-     * @param \Schoolbox\External\Event\Mapper        $eventMapper
-     * @param \Schoolbox\External\Event\Campus\Mapper $campusMapper
-     * @param Roletype\Mapper                         $roletypeMapper
-     * @param Overrides\Mapper                        $overrideMapper
+     * @param \Schoolbox\External\Event\Mapper         $eventMapper
+     * @param \Schoolbox\External\Event\Campus\Mapper  $campusMapper
+     * @param Roletype\Mapper                          $roletypeMapper
+     * @param Overrides\Mapper                         $overrideMapper
+     * @param \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
      */
     public function __construct(
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Campus\Mapper $campusMapper,
         \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overrideMapper
+        \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
+        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
     ) {
         $this->eventMapper = $eventMapper;
         $this->campusMapper = $campusMapper;
         $this->roletypeMapper = $roletypeMapper;
         $this->overrideMapper = $overrideMapper;
+        $this->staffProfileMapper = $staffProfileMapper;
         $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
         $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
     }
@@ -101,6 +110,7 @@ class EventUsers
 
         $stack = $this->eventMapper->createCollection();
         $stack->merge($this->findByRoletypeAndCampus($user, $startDatetime, $finishDatetime, $folderCodes));
+        $stack->merge($this->findByOverrides($user, $startDatetime, $finishDatetime, $folderCodes));
 
         return $stack;
     }
@@ -127,7 +137,6 @@ class EventUsers
         string $finishDatetime,
         ?GenericCollection $folderCodes = null
     ): GenericCollection {
-
         /* Campus requirement
          */
         $campusPb = $this->campusMapper
@@ -248,95 +257,135 @@ class EventUsers
      * Find events where you were involved by overrides specifically
      *
      * @param User                   $user
-     * @param int                    $startTimestamp
-     * @param int                    $endTimestamp
+     * @param string                 $startDatetime
+     * @param string                 $finishDatetime
      * @param GenericCollection|null $folderCodes
-     * @return void
-     * @throws InvalidColumnException
+     * @return GenericCollection
      * @throws \PDOException
-     * @throws \UnderflowException
      */
-    private function findByOverrides(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null)
+    private function findByOverrides(
+        \Schoolbox\User $user,
+        string $startDatetime,
+        string $finishDatetime,
+        ?GenericCollection $folderCodes = null
+    ): GenericCollection
     {
-        $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
-        $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
-
-        /* Find a list of events which have overrides that might affect $user
-         * If there are overrides, process each one specially
+        /* Micromanage a stack of minimal event data with overrides
          */
-        $overrideEventIds = $this->generateOverrideEventIds($user, $startDatetime, $finishDatetime, $folderCodes);
+        $lookup = [];
+        $stack = [];
 
+        /* Find all the events within the time interval specified, because $user
+         * could have been affected by any of their overrides - you won't know
+         * until you play through all the mutations
+         */
+        $query = "
+            SELECT se.code, se.title, se.id, seuo.*
+            FROM sis_event se
+            INNER JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
+            WHERE se.classification = :classification
+            AND se.start_at >= :from
+            AND se.start_at <= :to
+            ORDER BY se.id, seuo.sequence
+        ";
+
+        $statement = $this->eventMapper->getDatabase()->prepare($query);
+        $statement->execute([
+            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_EVENT,
+            'from' => $startDatetime,
+            'to' => $finishDatetime,
+        ]);
+
+        /* Collate all the overrides and group them so we can mutate everything
+         * in a convenient manner
+         */
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            if (!isset($lookup[$row['id']])) {
+                $lookup[$row['id']] = [
+                    'name' => $row['title'],
+                    'code' => $row['code'],
+                    /* The guys who are usually involved in this event
+                     */
+                    'usuals' => [],
+                    /* A list of overrides index by event id since each event
+                     * has its own list of overrides
+                     */
+                    'overrides' => [],
+                    /* A list of people who survived all the mutations
+                     * and transformations in this algorithm, for each event instance
+                     */
+                    'manifest' => [],
+                ];
+            }
+
+            /* Manufacture a list of overrides for each event id
+             */
+            $lookup[$row['id']]['overrides'][] = [
+                'external_id' => $row['external_id'],
+                'action' => $row['action']
+            ];
+        }
+
+        /* For every thing we found in $lookup,
+         * Play back all the overrides against $usuals
+         * then collate the list of surviving guys in $manifest
+         */
+        foreach ($lookup as $eventId => &$data) {
+            $data['manifest'] = $this->applyOverrides($data['usuals'], $data['overrides']);
+
+            /* Remember the event id for which you are involved via overrides
+             */
+            if (isset($data['manifest'][$user->getExternalId()])) {
+                $stack[$eventId] = $eventId;
+            }
+        }
+
+        unset($data);
+
+        $eventIds = array_values($stack);
+
+        return $this->eventMapper->findByColumn('id', $eventIds);
     }
 
 
     /**
-     * Get a list of events between $startDatetime and $finishDatetime
-     * where each event has some kind of override that can affect $user's
-     * usual involvement via sis_class_user, or the involvement with other
-     * people (such as multiple staff teaching this class where one staff
-     * is specified via an override)
+     * Apply $overrides to a set of usual guys $usuals,
+     * to see who still remains. Everyone still surviving
+     * is the event's $manifest
      *
-     * Optionally filters to $folderCode
-     *
-     * @param string          $startDatetime
-     * @param string          $finishDatetime
-     * @param GenericCollection|null $folderCodes
-     * @param \Schoolbox\User        $user
+     * @param array $usuals
+     * @param array $overrides
      * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
-     * @throws \UnderflowException
      */
-    private function generateOverrideEventIds(\Schoolbox\User $user, string $startDatetime, string $finishDatetime, ?GenericCollection $folderCodes = null): array
+    private function applyOverrides(array $usuals, array $overrides): array
     {
-        $query = "
-            SELECT se.id
-            FROM {$this->eventMapper->getTable()} se
-            INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
-            WHERE se.classification = :classification
-            AND se.start_at >= :startDatetime
-            AND se.finish_at <= :finishDatetime
-            AND seuo.external_id = :externalId
-        ";
+        $manifest = $usuals;
 
-        $params = [
-            'externalId' => $user->getExternalId(),
-            'startDatetime' => $startDatetime,
-            'finishDatetime' => $finishDatetime,
-            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_EVENT,
-        ];
+        foreach ($overrides as $override) {
+            if (\Schoolbox\External\Event\Overrides\Model::SUBTRACT === $override['action']) {
+                unset($manifest[$override['external_id']]);
+            } elseif (\Schoolbox\External\Event\Overrides\Model::ADD === $override['action']) {
+                $manifest[$override['external_id']] = $override['external_id'];
+            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override['action']) {
+                $manifest = [];
+            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override['action']) {
+                /* If we haven't got this already, get it and remember it
+                 * in case we needed it again and again and again
+                 */
+                if (null === $this->staffExternalIds) {
+                    $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
+                }
 
-        if (null === $folderCodes) {
-            /* $folderCodes was never set; you're looking for data via the main calendar
-             * No filtering required
-             */
-        } elseif ($folderCodes->count()) {
-            /* $folderCodes was set, but now we have to check the counts
-             * Folders which do have a code should be filtered to that code specifically
-             */
-            $pb = $this->eventMapper->getPredicateBuilder();
-            $pb->in('se.code', $folderCodes->keys());
-
-            $where = $pb->getWhere()[0];
-            $params = array_merge($params, $pb->getParams());
-
-            $query .= " AND {$where}";
-        } else {
-            /* $folderCodes was set, but now we have to check the counts
-             * Folders which don't have a code should display nothing from this subscription
-             */
-            return [];
+                /* Get a list of staff members,
+                 * then do some array magic between $usualUsers
+                 * and this list of staff ids, to exclude staff
+                 * from $usualUsers
+                 */
+                $manifest = array_diff($manifest, $this->staffExternalIds);
+            }
         }
 
-        $statement = $this->overrideMapper->getDatabase()->prepare($query);
-        $statement->execute($params);
-
-        $overrideEventIds = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $overrideEventIds[$row['id']] = $row['id'];
-        }
-
-        return $overrideEventIds;
+        return $manifest;
     }
 }
