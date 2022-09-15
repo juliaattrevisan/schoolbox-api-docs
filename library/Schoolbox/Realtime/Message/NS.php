@@ -11,7 +11,6 @@ namespace Schoolbox\Realtime\Message;
 
 class NS
 {
-
     /** @var int */
     protected $id;
     /** @var string */
@@ -71,7 +70,7 @@ class NS
     /**
      * @return string
      */
-    function __toString()
+    public function __toString()
     {
         return $this->getSlug();
     }

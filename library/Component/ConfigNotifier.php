@@ -20,10 +20,13 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
     const TRIGGER_DELETED = 'deleted';
     const TRIGGER_RELOAD  = 'reload';
 
-    private Component_InstanceMapper         $componentInstanceMapper;
-    private Component_DefinitionMapper       $componentDefinitionMapper;
+    private Component_InstanceMapper $componentInstanceMapper;
+
+    private Component_DefinitionMapper $componentDefinitionMapper;
+
     private Component_ConfigDefinitionMapper $componentConfigDefinitionMapper;
-    private WriteCache                       $subscriptionCache;
+
+    private WriteCache $subscriptionCache;
 
     /**
      * @return string

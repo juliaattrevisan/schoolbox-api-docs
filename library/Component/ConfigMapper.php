@@ -79,9 +79,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
 
         if ($collection->count()) {
             return $collection->first()->getValue();
-        } /* Otherwise spawn default values
-         */
-        else {
+        } else {
             $componentConfigDefinition = \Component_ConfigDefinitionMapper::getInstance()->findByColumn('key', $key);
 
             return $componentConfigDefinition->first()->getDefaultValue();
@@ -94,7 +92,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
      * @param int $definitionId
      * @throws \Schoolbox\Mapper\Exception
      */
-    function injectDefaultConfigCollection(int $instanceId, int $definitionId): void
+    public function injectDefaultConfigCollection(int $instanceId, int $definitionId): void
     {
         $collection                 = $this->createCollection();
         $componentConfigDefinitions = \Component_ConfigDefinitionMapper::getInstance()->findByColumn(
