@@ -12,12 +12,12 @@ import { useStore } from '../store/manageCurriculumStore';
 import { UNSET_ID } from '../store/mcNodesStore';
 import { useViewNodesStore, DIRECTION } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
+import { useAddCurriculumStore } from '../store/mcAddCurriculumStore';
 import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
 import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
 import McViewNodeCheckbox from './mc-view-node-checkbox.vue';
 import McViewNodeName from './mc-view-node-name.vue';
 import McViewNodeActions from './mc-view-node-actions.vue';
-import McViewNodeToast from './mc-view-node-toast.vue';
 import McAddSubsection from '../activeNode/mc-add-subsection.vue';
 import McUpdateNode from '../activeNode/mc-update-node.vue';
 
@@ -49,9 +49,13 @@ const props = defineProps({
 const store = useStore();
 const viewNodesStore = useViewNodesStore();
 const activeNodeStore = useActiveNodeStore();
+const addCurriculumStore = useAddCurriculumStore();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
 const viewNodeEl = ref(null); //to animate the node
+const isNew = ref(false); //to highlight if the node has just been added
+const justUpdated = ref(false); //to highlight if the node has just been updated
+
 
 /**
  * to animate on the node
@@ -60,7 +64,29 @@ onMounted(() => {
     if (props.depth === 0) { //we only need to animate the first node, as the rest are contained within
         animateOn();
     }
+    if (props.node.id === addSubsectionStore.id) {
+        displayAnimation(isNew);
+        addSubsectionStore.unsetId();
+    } else if (props.node.id === addCurriculumStore.id) {
+        displayAnimation(isNew);
+        addCurriculumStore.unsetId();
+    }
 });
+
+/**
+ * we listen for the actions we want to respond with
+ * https://pinia.vuejs.org/core-concepts/actions.html#without-setup
+ */
+useUpdateNodeStore().$onAction(({ name, after }) => {
+    if (name === 'update') {
+        after((nodeId) => {
+            if (props.node.id === nodeId) {
+                displayAnimation(justUpdated);
+            }
+        });
+    }
+});
+
 
 /**
  * animate to help show which direction we are currently moving through the tree
@@ -78,6 +104,18 @@ function animateOn () {
         opacity: 1,
         x: 0
     } );
+}
+
+/**
+ * show an animation when the node has been added or updated
+ * we add the relevant boolean ref to show the animation then remove
+ *
+ * @param { ref }
+ */
+async function displayAnimation (change) {
+    change.value = true;
+    await timeout(3000);
+    change.value = false;
 }
 
 /**
@@ -182,8 +220,12 @@ async function onLeave (el, done) {
 
 <template>
     <li ref="viewNodeEl">
-        <div :class="`buttons-container ${ isUpdatingAnother || isAddingAnother ? 'inactive' : '' }`">
-
+        <div
+            class="buttons-container"
+            :data-is-inactive="`${ isUpdatingAnother || isAddingAnother ? true : false }`"
+            :data-is-new="isNew"
+            :data-just-updated="justUpdated"
+        >
             <mc-view-node-checkbox
                 v-if="showActions"
                 :node="props.node"
@@ -203,10 +245,6 @@ async function onLeave (el, done) {
                 :isAdding="isAdding"
                 :isUpdatingOrAdding="isUpdatingOrAdding"
             />
-            <!-- <mc-view-node-toast
-                :node="props.node"
-                :title="title"
-            /> -->
         </div>
         <Transition @enter="onEnter" @leave="onLeave">
             <mc-add-subsection v-if="isAdding" :depth="props.depth" />
@@ -227,6 +265,8 @@ async function onLeave (el, done) {
 
 <style lang="scss" scoped>
 
+@import '@css/core/base/colors';
+
 .buttons-container {
     align-items: center;
     border-bottom: 1px solid v-bind(borderBottomColour);
@@ -239,15 +279,41 @@ async function onLeave (el, done) {
     transition: opacity 0.3s;
 }
 
+    .buttons-container[data-is-inactive="true"] {
+        opacity: 0.2;
+        pointer-events: none;
+    }
+
+    .buttons-container[data-is-new="true"] {
+        @extend .change-animation;
+        animation-name: isNewAnimation;
+    }
+
+    .buttons-container[data-just-updated="true"] {
+        @extend .change-animation;
+        animation-name: justUpdatedAnimation;
+    }
+
+.change-animation {
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+}
+
+@keyframes isNewAnimation {
+    0% { background-color: $success-color; }
+    100% { background-color: white; }
+}
+
+@keyframes justUpdatedAnimation {
+    0% { background-color: var(--accent-background); }
+    100% { background-color: white; }
+}
+
 ul {
     list-style: none; //don't use any dots
     margin: 0; //and spacing is controlled by props.depth
 }
 
-.inactive {
-    opacity: 0.2;
-    pointer-events: none;
-}
 
 @import '../style/mcStyle';
 
