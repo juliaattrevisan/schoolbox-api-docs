@@ -713,13 +713,18 @@ class Controller extends Assessment\Controller
 
             if (count($marks)) {
                 foreach ($allIndicatorUsageIds as $indicatorUsageId) {
-                    if ($marks[$indicatorUsageId] instanceof IndicatorMark) {
-                        $descriptor = $marks[$indicatorUsageId]->getDescriptor();
-                        $row[]      = $descriptor ? $descriptor->getDescription() : '';
-                        $row[]      = $marks[$indicatorUsageId]->getValue();
-                        $sum        += $marks[$indicatorUsageId]->getValue();
+                    if (in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                        if ($marks[$indicatorUsageId] instanceof IndicatorMark) {
+                            $descriptor = $marks[$indicatorUsageId]->getDescriptor();
+                            $row[]      = $descriptor ? $descriptor->getDescription() : '';
+                            $row[]      = $marks[$indicatorUsageId]->getValue();
+                            $sum        += $marks[$indicatorUsageId]->getValue();
+                        } else {
+                            $row[] = $marks[$indicatorUsageId];
+                            $row[] = '';
+                        }
                     } else {
-                        $row[] = $marks[$indicatorUsageId];
+                        $row[] = '';
                         $row[] = '';
                     }
                 }
