@@ -60,7 +60,7 @@ class NS
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSlug()
     {

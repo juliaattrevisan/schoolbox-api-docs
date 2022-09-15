@@ -81,8 +81,8 @@ if (is_numeric($_REQUEST['cid'])) {
             $componentInstanceMapper->delete($instance);
         } catch (Schoolbox\Mapper\Exception $e) {
         }
-    } elseif (is_numeric($cid) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) { // POST new component to page and output render of component
-        if (is_numeric($_POST['add'])) {
+    } elseif (is_numeric($cid) && (is_numeric($_POST['add'] ?? false) || is_numeric($_POST['reload']))) { // POST new component to page and output render of component
+        if (is_numeric($_POST['add'] ?? false)) {
             $newComp = new Component_Instance();
             $newComp
                 ->setDefinitionId($_POST['add'])

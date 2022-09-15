@@ -7,25 +7,14 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Permission\Access\UserAccess;
+
 /**
  * @method Component_Config createModel($idValue = null)
  * @method Component_Config findOneByColumnList($columnList, array $options = [])
  */
 class Component_ConfigMapper extends \Schoolbox\Mapper
 {
-    /** @var Component_ConfigNotifier */
-    private $moduleNotifierObject;
-
-
-    /**
-     * Default setup for any other objects which compose the mapper.
-     */
-    protected function postSetup()
-    {
-        $this->moduleNotifierObject = new Component_ConfigNotifier($this->getConfigLoader());
-    }
-
-
     protected function mapping()
     {
         $this->hasTable('component_config_instance');
@@ -39,38 +28,30 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
         // infrastructure limitations, they need to happen synchronously here
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, function (Component_Config $model, Component_Config $previous = null) {
+            if (!$this->definitionIsSource($model)) {
+                return;
+            }
             if ($previous) {
-                $this->moduleNotifierObject->notifySystemUpdated($model, $this->getSessionUser(), $this->diff($model, $previous));
+                $this->updateMsgRedirect($model, $this->diff($model, $previous));
             } else {
-                $this->moduleNotifierObject->notifySystemCreated($model, $this->getSessionUser());
+                $this->createMsgRedirect($model);
             }
         });
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, function (Component_Config $model) {
-            $this->moduleNotifierObject->notifySystemDeleted($model, $this->getSessionUser());
+            if (!$this->definitionIsSource($model)) {
+                return;
+            }
+            $this->deleteMsgRedirect($model);
         });
     }
 
-
-    /**
-     * Due to the synchronous "notification" handling above, there is no need to raise notifications the normal way
-     *
-     * @param object $object
-     * @param string $verb
-     * @param null $previous
-     * @return bool
-     */
-    protected function raiseNotification($object, $verb, $previous = null)
-    {
-        // noop
-        return false;
-    }
 
     /**
      * Find the value of a particular component instance's config instance
      *
      * @param string $key
-     * @param int $instanceId
+     * @param int    $instanceId
      * @return mixed
      */
     public function findValue($key, $instanceId)
@@ -133,5 +114,178 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
 
         // Save the config
         $this->save($collection);
+    }
+
+    /**
+     * @param Component_Config $model
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function createMsgRedirect(Component_Config $model)
+    {
+        $this->handleCreate($this->getInstanceFromConfig($model), (int)$model->getValue());
+    }
+
+    /**
+     * @param Component_Config $model
+     * @param array            $diff
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function updateMsgRedirect(Component_Config $model, array $diff = [])
+    {
+        $instance = $this->getInstanceFromConfig($model);
+
+        // update is a delete-and-replace action
+        $this->handleDelete($instance, (int)$diff['value'][1]);
+        $this->handleCreate($instance, (int)$diff['value'][0]);
+    }
+
+    /**
+     * KNOWN LIMITATION:  If two components point to the exact same alt-source (same ID and NS) the redirect will
+     *                    be deleted, despite the fact that there is still a component pointing to that alt-source.
+     *
+     * @param Component_Config $model
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function deleteMsgRedirect(Component_Config $model)
+    {
+        $this->handleDelete($this->getInstanceFromConfig($model), (int)$model->getValue());
+    }
+
+    /**
+     * @param Component_Instance $instance
+     * @param int                $altSourceId
+     */
+    private function handleCreate(Component_Instance $instance, int $altSourceId)
+    {
+        $this->handle(
+            'INSERT INTO msg_redirect (`from`, `to`) VALUES (:from, :to) ON DUPLICATE KEY UPDATE `to` = :to',
+            $instance,
+            $altSourceId
+        );
+    }
+
+    /**
+     * @param Component_Instance $instance
+     * @param int                $altSourceId
+     */
+    private function handleDelete(Component_Instance $instance, int $altSourceId)
+    {
+        $this->handle(
+            'DELETE FROM msg_redirect WHERE `from` = :from AND `to` = :to',
+            $instance,
+            $altSourceId
+        );
+    }
+
+    /**
+     * Run query
+     * @param string             $query
+     * @param Component_Instance $instance
+     * @param int                $altSourceId
+     */
+    private function handle(string $query, Component_Instance $instance, int $altSourceId)
+    {
+        if (!$this->verifyWorkToBeDone($instance, $altSourceId)) {
+            return;
+        }
+
+        foreach ([UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL] as $access) {
+            $from = $this->determineSourcePath($instance, $access, $altSourceId);
+            $to   = $this->determineDestinationPath($instance, $access);
+
+            if (isset($from)) {
+                $this->getDatabase()->query($query, ['from' => $from, 'to' => $to]);
+            }
+        }
+    }
+
+    /**
+     * @param Component_Instance $instance
+     * @param int                $altSourceId
+     * @return bool
+     */
+    private function verifyWorkToBeDone(Component_Instance $instance, int $altSourceId)
+    {
+        $hostFolderId = $instance->getIdentifier();
+
+        if (!$altSourceId || (int)$hostFolderId === (int)$altSourceId) {
+            return false;
+        }
+
+        $ns = $instance->getDefinition()->getNamespace();
+
+        if (!$ns) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Determines what the source path should be for the message redirect.
+     *
+     * @param Component_Instance $instance
+     * @param int                $access
+     * @param int                $altSourceId
+     * @return null|string
+     */
+    private function determineSourcePath(Component_Instance $instance, int $access, int $altSourceId): ?string
+    {
+        $namespace = $instance->getDefinition()->getNamespace();
+        if (!$namespace) {
+            return null;
+        }
+        $namespaceSlug = $namespace->getSlug();
+        if ($namespaceSlug === null) {
+            return null;
+        }
+        $namespaceSuffix = $instance->getDefinition()->getNamespaceSuffix();
+        if ($namespaceSuffix === null) {
+            return null;
+        }
+        $service = UserAccess::SERVICE_HOMEPAGE;
+        return "*.notify.service.$service.$altSourceId.$access.$namespaceSlug.$namespaceSuffix";
+    }
+
+    /**
+     * Determines what the destination path should be for the message redirect.
+     *
+     * @param Component_Instance $instance
+     * @param int                $access
+     * @return string
+     */
+    private function determineDestinationPath(Component_Instance $instance, int $access): string
+    {
+        $hostFolderId = $instance->getIdentifier();
+        $service      = UserAccess::SERVICE_HOMEPAGE;
+        return "*.notify.service.$service.$hostFolderId.$access.#";
+    }
+
+    /**
+     * @param Component_Config $model
+     * @return Component_Instance
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function getInstanceFromConfig(Component_Config $model): Component_Instance
+    {
+        $instance = \Component_InstanceMapper::getInstance()->findById($model->getInstanceId());
+
+        // ensure definition hydrated
+        $instance->setDefinition(\Component_DefinitionMapper::getInstance()->findById($instance->getDefinitionId()));
+
+        return $instance;
+    }
+
+    /**
+     * @param Component_Config $model
+     * @return bool
+     */
+    private function definitionIsSource(Component_Config $model): bool
+    {
+        $definitions = Component_ConfigDefinitionMapper::getInstance()->findIdsByColumn('key', 'src');
+        return in_array($model->getConfigDefinitionId(), $definitions, false);
     }
 }
