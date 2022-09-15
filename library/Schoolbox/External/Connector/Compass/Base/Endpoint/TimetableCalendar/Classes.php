@@ -102,6 +102,15 @@ class Classes implements IStrategy
             'name' => 'LearningTask',
             'allowed' => false
         ],
+        /* This is an unlisted Activity Type that Nick Swan couldn't understand
+         * I think it corresponds to other event types that aren't documented
+         *
+         * So far only MECS have used it where we found On Call events
+         */
+        12 => [
+            'name' => 'On call',
+            'allowed' => false
+        ]
     ];
 
 
@@ -281,7 +290,7 @@ class Classes implements IStrategy
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
 
-//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Library Lunch Time Duty'])) {
+//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['On call'])) {
 //                        continue;
 //                    }
 

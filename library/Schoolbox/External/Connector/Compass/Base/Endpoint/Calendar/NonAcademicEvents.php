@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Calendar;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Lookup;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Watchlist;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -98,6 +99,15 @@ class NonAcademicEvents implements IStrategy
             'name' => 'LearningTask',
             'allowed' => true
         ],
+        /* This is an unlisted Activity Type that Nick Swan couldn't understand
+         * I think it corresponds to other event types that aren't documented
+         *
+         * So far only MECS have used it where we found On Call events
+         */
+        12 => [
+            'name' => 'On call',
+            'allowed' => true
+        ]
     ];
 
 
@@ -232,7 +242,7 @@ class NonAcademicEvents implements IStrategy
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
 
-//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Library Lunch Time Duty'])) {
+//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['On call'])) {
 //                        continue;
 //                    }
 
