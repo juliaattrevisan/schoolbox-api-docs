@@ -145,15 +145,19 @@ $(function() {
     // logic for removing inputs
     form.find('[data-role="remove-criterion"]').click(function(e) {
         e.preventDefault();
-        var self      = $(this);
-        var container = self.closest('[data-rubric-criterion-row]');
+        let self          = $(this),
+            container     = self.closest('[data-rubric-criterion-row]'),
+            name          = self.attr('data-rubric-criterion-name'),
+            dialogContent = $('#criterion-remove-text');
+        dialogContent.find('[data-rubric-criterion-name]').text(name);
 
         // Is this new? if so no dialog
         if (container.is('[data-rubric-unsaved]')) {
             container.remove();
         } else {
             self.confirmDialog({
-                text: $('#criterion-remove-text').text(),
+                text: dialogContent.html(),
+                format: 'html',
                 confirmEvent: function() {
                     container.remove();
                 }
@@ -439,12 +443,41 @@ $(function() {
 
 <!-- Hidden text for remove criterion -->
 <div class="hide" id="criterion-remove-text">
-    If you remove this {{ locale.rubricCriterion }}, it
+    <p>
+        Are you sure you wish to remove the {{ locale.rubricCriterion }}
+        &ldquo;<span data-rubric-criterion-name></span>&rdquo;?
+    </p>
+    {%- set classTerm -%}
+        {%- if folder.hasCourseSpecification -%}
+            course
+        {%- elseif folder.hasUnitSpecification -%}
+            {{ locale.unit }} (and its course)
+        {%- elseif folder.isClass -%}
+            class page
+        {%- else -%}
+            folder
+        {%- endif -%}
+    {%- endset -%}
     {% if allowModifyUsed %}
-        will be removed from any assessments which already use it, and
+        <p>
+            If you remove it, it will be removed from all
+            {{ locale.assessment.plural }} in this {{ classTerm }}
+            and will be unavailable for use in future
+            {{ locale.assessment.plural }}.
+        </p>
+        <p>
+            Please note, it will not be removed from
+            {{ locale.assessment.plural }} on class pages that currently have
+            the {{ locale.rubricCriterion }} imported and in use.
+        </p>
+    {% else %}
+        <p>
+            If you remove it, it will not be available to add to future
+            {{ locale.assessment.plural }} in this {{ classTerm -}}.
+        </p>
     {% endif %}
-    will not be available to add to future {{ locale.assessment.plural }}.
-    Are you sure you want to do this?
-    (Make sure you click save at the end of this form to save all changes you have made.)
+    <p>
+        (Make sure you click save at the end of this form to save all changes you have made.)
+    </p>
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>
