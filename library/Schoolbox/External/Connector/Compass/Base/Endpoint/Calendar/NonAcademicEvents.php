@@ -11,7 +11,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Calendar;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
-use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Attendees;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\Lookup;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -202,27 +202,26 @@ class NonAcademicEvents implements IStrategy
          */
         $this->log->debug('Preloading staff compassPersonIds for non-academic classes...');
 
-        $staffLookup = (new \Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Staff($this->api))->generate($this->lBound, $this->uBound);
+        $staffLookup = (new Lookup\Staff($this->api))->generate($this->lBound, $this->uBound);
 
         /* Generate a list of students
          */
         $this->log->debug('Preloading student compassPersonIds for non-academic classes...');
 
-        $studentLookup = (new \Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Student($this->api))->generate($this->lBound, $this->uBound);
+        $studentLookup = (new Lookup\Student($this->api))->generate($this->lBound, $this->uBound);
 
         /* Gotta use this to figure out who everyone is, given
          * a compass person id (disgusting)
          */
-        $attendeesLookup = new Attendees($this->log, $staffLookup, $studentLookup);
+        $attendeesLookup = new Lookup\Attendees($this->log, $staffLookup, $studentLookup);
 
         /* We'll need this for later
          */
         $now = \Alaress_Date_Format::now();
-        $enrolmentsLookup = new \Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Enrolments($this->log, $this->api);
 
         /* Get a list of Schedules to consume
          */
-        $academicGroupSchedules = (new \Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Schedules($this->log, $this->api))->generate();
+        $academicGroupSchedules = (new Lookup\Schedules($this->log, $this->api))->generate();
 
         $this->log->info('Mining all the Schedules for their Activity Instances...');
 

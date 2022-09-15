@@ -14,13 +14,12 @@ use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
-use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Attendees;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\Lookup;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
-
 
 /**
  * Import all the classes for a student, saving them as sis_event records
@@ -262,7 +261,7 @@ class Classes implements IStrategy
         /* Gotta use this to figure out who everyone is, given
          * a compass person id (disgusting)
          */
-        $attendeesLookup = new Attendees($this->log, $staffLookup, $studentLookup);
+        $attendeesLookup = new Lookup\Attendees($this->log, $staffLookup, $studentLookup);
 
         /* We'll need this for later
          */

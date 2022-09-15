@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup;
+namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Lookup;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
