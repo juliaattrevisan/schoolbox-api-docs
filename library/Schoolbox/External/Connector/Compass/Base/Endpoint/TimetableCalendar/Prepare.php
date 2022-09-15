@@ -145,7 +145,7 @@ class Prepare implements IStrategy
                 AND {$this->eventMapper->getTable()}.`source` = :source
             ";
 
-            $statement =$this->overridesMapper->getDatabase()->prepare($query);
+            $statement = $this->overridesMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
                 'source' => $this->source

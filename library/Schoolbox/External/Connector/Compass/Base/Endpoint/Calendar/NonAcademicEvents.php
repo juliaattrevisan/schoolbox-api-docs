@@ -490,7 +490,7 @@ class NonAcademicEvents implements IStrategy
 
         /* Try to recycle based on guid
          */
-        trY {
+        try {
             $event = $this->eventMapper->findOneByColumn('guid', $guid);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $event = $this->eventMapper->createModel();

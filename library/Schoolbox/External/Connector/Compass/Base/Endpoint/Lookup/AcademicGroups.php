@@ -21,7 +21,6 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
  */
 class AcademicGroups
 {
-
     /**
      * @var LoggerInterface
      */

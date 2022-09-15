@@ -104,7 +104,7 @@ class Prepare implements IStrategy
         if ($this->perform) {
             /* Delete any overrides that existed
              */
-            $statement =$this->overridesMapper->getDatabase()->prepare("
+            $statement = $this->overridesMapper->getDatabase()->prepare("
                 DELETE seuo
                 FROM {$this->overridesMapper->getTable()} seuo
                 INNER JOIN {$this->eventMapper->getTable()} ON seuo.event_id = {$this->eventMapper->getTable()}.id
