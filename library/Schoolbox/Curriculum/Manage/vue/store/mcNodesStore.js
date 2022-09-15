@@ -6,7 +6,6 @@ import { defineStore } from 'pinia';
 import { useStore, apiEndpoint } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
-import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
 export const UNSET_ID = 0;
 const SB_CURRICULUM_TOP_LEVEL = 'SB_CURRICULUM_TOP_LEVEL'; //to id to store the top level session storage with
@@ -140,10 +139,8 @@ export const useNodesStore = defineStore('mcNodes', {
          * @param { object }
          */
         addNewCurriculum (curriculum) {
-            /**
-             * @TODO - place in sorted alphabetically
-             */
             this.nodes.children.push(curriculum);
+            sortByName(this.nodes.children);
         },
 
     },
@@ -152,6 +149,8 @@ export const useNodesStore = defineStore('mcNodes', {
 
 /**
  * To just return the node containing the specified id
+ * We recursively loop through the object until we find the
+ * matched object or undefined if not found
  *
  * @param { array }
  * @param { number }
@@ -168,4 +167,18 @@ export function findById (array, id) {
             }
         }
     }
+}
+
+/**
+ * Sort the passed through curriculum nodes by their .name property
+ *
+ * @param { array }
+ */
+ export function sortByName (array, id) {
+    array.sort((a, b) => {
+        return a.name.localeCompare(b.name, undefined, {
+            numeric: true,
+            sensitivity: 'base'
+        });
+    });
 }
