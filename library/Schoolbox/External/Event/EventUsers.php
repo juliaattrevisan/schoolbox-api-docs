@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Event;
 
 use Alaress\Database\Predicate\InvalidColumnException;
+use Schoolbox\External\Event\Overrides\Applicator;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
@@ -268,8 +269,7 @@ class EventUsers
         string $startDatetime,
         string $finishDatetime,
         ?GenericCollection $folderCodes = null
-    ): GenericCollection
-    {
+    ): GenericCollection {
         /* Micromanage a stack of minimal event data with overrides
          */
         $lookup = [];
@@ -330,8 +330,10 @@ class EventUsers
          * Play back all the overrides against $usuals
          * then collate the list of surviving guys in $manifest
          */
+        $overrideApplicator = new Applicator($this->staffProfileMapper);
+
         foreach ($lookup as $eventId => &$data) {
-            $data['manifest'] = $this->applyOverrides($data['usuals'], $data['overrides']);
+            $data['manifest'] = $overrideApplicator->apply($data['usuals'], $data['overrides']);
 
             /* Remember the event id for which you are involved via overrides
              */
@@ -345,47 +347,5 @@ class EventUsers
         $eventIds = array_values($stack);
 
         return $this->eventMapper->findByColumn('id', $eventIds);
-    }
-
-
-    /**
-     * Apply $overrides to a set of usual guys $usuals,
-     * to see who still remains. Everyone still surviving
-     * is the event's $manifest
-     *
-     * @param array $usuals
-     * @param array $overrides
-     * @return array
-     * @throws \PDOException
-     */
-    private function applyOverrides(array $usuals, array $overrides): array
-    {
-        $manifest = $usuals;
-
-        foreach ($overrides as $override) {
-            if (\Schoolbox\External\Event\Overrides\Model::SUBTRACT === $override['action']) {
-                unset($manifest[$override['external_id']]);
-            } elseif (\Schoolbox\External\Event\Overrides\Model::ADD === $override['action']) {
-                $manifest[$override['external_id']] = $override['external_id'];
-            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override['action']) {
-                $manifest = [];
-            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override['action']) {
-                /* If we haven't got this already, get it and remember it
-                 * in case we needed it again and again and again
-                 */
-                if (null === $this->staffExternalIds) {
-                    $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
-                }
-
-                /* Get a list of staff members,
-                 * then do some array magic between $usualUsers
-                 * and this list of staff ids, to exclude staff
-                 * from $usualUsers
-                 */
-                $manifest = array_diff($manifest, $this->staffExternalIds);
-            }
-        }
-
-        return $manifest;
     }
 }
