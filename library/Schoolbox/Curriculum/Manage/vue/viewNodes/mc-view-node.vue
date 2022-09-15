@@ -184,6 +184,7 @@ async function onLeave (el, done) {
     <li ref="viewNodeEl">
         <div :class="`buttons-container ${ isUpdatingAnother || isAddingAnother ? 'inactive' : '' } ${ props.node.enabled ? '' : 'not-enabled' }`">
             <mc-view-node-checkbox
+                v-if="showActions"
                 :node="props.node"
                 :isUpdatingOrAdding="isUpdatingOrAdding"
             />
