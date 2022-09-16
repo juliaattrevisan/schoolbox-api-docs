@@ -47,9 +47,9 @@ class Prepare implements IStrategy
 
 
     /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
+     * @var \Schoolbox\External\Event\User\Mapper
      */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+    private \Schoolbox\External\Event\User\Mapper $eventUserMapper;
 
 
     /**
@@ -64,23 +64,23 @@ class Prepare implements IStrategy
     /**
      * Base constructor.
      *
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param Mapper                                     $eventMapper
-     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
-     * @param string                                     $source
+     * @param LoggerInterface                       $log
+     * @param bool                                  $perform
+     * @param Mapper                                $eventMapper
+     * @param \Schoolbox\External\Event\User\Mapper $eventUserMapper
+     * @param string                                $source
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        \Schoolbox\External\Event\User\Mapper $eventUserMapper,
         string $source
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->eventMapper = $eventMapper;
-        $this->overridesMapper = $overridesMapper;
+        $this->eventUserMapper = $eventUserMapper;
 
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
@@ -102,27 +102,28 @@ class Prepare implements IStrategy
          * Anything that updates them will be safe from cleanup later
          */
         if ($this->perform) {
-            /* Delete any overrides that existed
+            /* Delete any user involvements that existed
              */
-            $statement = $this->overridesMapper->getDatabase()->prepare("
-                DELETE seuo
-                FROM {$this->overridesMapper->getTable()} seuo
-                INNER JOIN {$this->eventMapper->getTable()} ON seuo.event_id = {$this->eventMapper->getTable()}.id
+            $query = "
+                DELETE seu
+                FROM {$this->eventUserMapper->getTable()} seu
+                INNER JOIN {$this->eventMapper->getTable()} ON seu.event_id = {$this->eventMapper->getTable()}.id
                 WHERE {$this->eventMapper->getTable()}.classification = :classification
                 AND {$this->eventMapper->getTable()}.`source` = :source
-            ");
+            ";
 
+            $statement = $this->eventUserMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_EVENT,
                 'source' => $this->source,
             ]);
 
-            $this->log->debug('Purged calendar event overrides');
+            $this->log->debug('Purged calendar event user involvement');
 
+            /* Mark all suds events for deletion
+             */
             $query = "
-                UPDATE
-                {$this->eventMapper->getTable()}
-                INNER JOIN {$this->overridesMapper->getTable()} seuo ON seuo.event_id = {$this->eventMapper->getTable()}.id
+                UPDATE {$this->eventMapper->getTable()}
                 SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
                 WHERE {$this->eventMapper->getTable()}.classification = :classification
                 AND {$this->eventMapper->getTable()}.`source` = :source  

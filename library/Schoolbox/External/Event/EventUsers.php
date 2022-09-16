@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Event;
 
 use Alaress\Database\Predicate\InvalidColumnException;
-use Schoolbox\External\Event\Overrides\Applicator;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
@@ -41,12 +40,6 @@ class EventUsers
 
 
     /**
-     * @var \Schoolbox\External\Profile\Staff\Mapper
-     */
-    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
      * @var \Schoolbox\Resource\Folder\Mapper
      */
     private \Schoolbox\Resource\Folder\Mapper $folderMapper;
@@ -62,18 +55,15 @@ class EventUsers
      * @param \Schoolbox\External\Event\Mapper         $eventMapper
      * @param \Schoolbox\External\Event\Campus\Mapper  $campusMapper
      * @param Roletype\Mapper                          $roletypeMapper
-     * @param \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
      */
     public function __construct(
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Campus\Mapper $campusMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper,
-        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
+        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper
     ) {
         $this->eventMapper = $eventMapper;
         $this->campusMapper = $campusMapper;
         $this->roletypeMapper = $roletypeMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
         $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
         $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
     }
@@ -100,11 +90,7 @@ class EventUsers
         $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
 
-        $stack = $this->eventMapper->createCollection();
-        $stack = $stack->merge($this->findByRoletypeAndCampus($user, $startDatetime, $finishDatetime, $folderCodes));
-        $stack = $stack->merge($this->findByOverrides($user, $startDatetime, $finishDatetime, $folderCodes));
-
-        return $stack;
+        return $this->findByRoletypeAndCampus($user, $startDatetime, $finishDatetime, $folderCodes);
     }
 
 
@@ -155,6 +141,9 @@ class EventUsers
         /* Perhaps controversial:
          * In order for you to be involved in an event, you have to be in
          * both the campus and the roletype
+         *
+         * Unions with events where you are directly involved with them
+         * via sis_event_user relationship table (roughly equivalent to personal events)
          */
         $query = "
             SELECT DISTINCT
@@ -242,101 +231,5 @@ class EventUsers
         }
 
         return $stack;
-    }
-
-
-    /**
-     * Find events where you were involved by overrides specifically
-     *
-     * @param User                   $user
-     * @param string                 $startDatetime
-     * @param string                 $finishDatetime
-     * @param GenericCollection|null $folderCodes
-     * @return GenericCollection
-     * @throws \PDOException
-     */
-    private function findByOverrides(
-        \Schoolbox\User $user,
-        string $startDatetime,
-        string $finishDatetime,
-        ?GenericCollection $folderCodes = null
-    ): GenericCollection {
-        /* Micromanage a stack of minimal event data with overrides
-         */
-        $lookup = [];
-        $stack = [];
-
-        /* Find all the events within the time interval specified, because $user
-         * could have been affected by any of their overrides - you won't know
-         * until you play through all the mutations
-         */
-        $query = "
-            SELECT se.code, se.title, se.id, seuo.*
-            FROM sis_event se
-            INNER JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
-            WHERE se.classification = :classification
-            AND se.start_at >= :from
-            AND se.start_at <= :to
-            ORDER BY se.id, seuo.sequence
-        ";
-
-        $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute([
-            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_EVENT,
-            'from' => $startDatetime,
-            'to' => $finishDatetime,
-        ]);
-
-        /* Collate all the overrides and group them so we can mutate everything
-         * in a convenient manner
-         */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if (!isset($lookup[$row['id']])) {
-                $lookup[$row['id']] = [
-                    'name' => $row['title'],
-                    'code' => $row['code'],
-                    /* The guys who are usually involved in this event
-                     */
-                    'usuals' => [],
-                    /* A list of overrides index by event id since each event
-                     * has its own list of overrides
-                     */
-                    'overrides' => [],
-                    /* A list of people who survived all the mutations
-                     * and transformations in this algorithm, for each event instance
-                     */
-                    'manifest' => [],
-                ];
-            }
-
-            /* Manufacture a list of overrides for each event id
-             */
-            $lookup[$row['id']]['overrides'][] = [
-                'external_id' => $row['external_id'],
-                'action' => $row['action']
-            ];
-        }
-
-        /* For every thing we found in $lookup,
-         * Play back all the overrides against $usuals
-         * then collate the list of surviving guys in $manifest
-         */
-        $overrideApplicator = new Applicator($this->staffProfileMapper);
-
-        foreach ($lookup as $eventId => &$data) {
-            $data['manifest'] = $overrideApplicator->apply($data['usuals'], $data['overrides']);
-
-            /* Remember the event id for which you are involved via overrides
-             */
-            if (isset($data['manifest'][$user->getExternalId()])) {
-                $stack[$eventId] = $eventId;
-            }
-        }
-
-        unset($data);
-
-        $eventIds = array_values($stack);
-
-        return $this->eventMapper->findByColumn('id', $eventIds);
     }
 }

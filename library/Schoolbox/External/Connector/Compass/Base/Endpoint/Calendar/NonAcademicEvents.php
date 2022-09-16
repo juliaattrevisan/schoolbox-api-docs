@@ -138,9 +138,9 @@ class NonAcademicEvents implements IStrategy
 
 
     /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
+     * @var \Schoolbox\External\Event\User\Mapper
      */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+    private \Schoolbox\External\Event\User\Mapper $eventUserMapper;
 
 
     /**
@@ -158,20 +158,20 @@ class NonAcademicEvents implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param IApi                                       $api
-     * @param Mapper                                     $eventMapper
-     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
-     * @param string                                     $fromDate
-     * @param string                                     $toDate
+     * @param LoggerInterface                       $log
+     * @param bool                                  $perform
+     * @param IApi                                  $api
+     * @param Mapper                                $eventMapper
+     * @param \Schoolbox\External\Event\User\Mapper $eventUserMapper
+     * @param string                                $fromDate
+     * @param string                                $toDate
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         IApi $api,
         \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        \Schoolbox\External\Event\User\Mapper $eventUserMapper,
         string $fromDate,
         string $toDate
     ) {
@@ -179,7 +179,7 @@ class NonAcademicEvents implements IStrategy
         $this->perform = $perform;
         $this->api = $api;
         $this->eventMapper = $eventMapper;
-        $this->overridesMapper = $overridesMapper;
+        $this->eventUserMapper = $eventUserMapper;
 
         /* Data is obtained daily; remember lower and upper bound values
          * for api calls. It needs to be in a specific format so might
@@ -433,7 +433,6 @@ class NonAcademicEvents implements IStrategy
         array $enrolments,
         array $staffLookup
     ): void {
-
         /* Save sis_event record
          */
         $event = $this->createEvent($activity, $activityInstance);
@@ -458,7 +457,6 @@ class NonAcademicEvents implements IStrategy
         array $activity,
         array $activityInstance
     ): \Schoolbox\External\Event\Model {
-
         /* Name is the same as the Code, in compass
          */
         $activityName = trim((string)$activity['name']);
@@ -606,11 +604,9 @@ class NonAcademicEvents implements IStrategy
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
          */
-        $override = $this->overridesMapper->createModel()
+        $involvement = $this->eventUserMapper->createModel()
             ->setEventId($event->getId())
-            ->setExternalId($teacher['externalId'])
-            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
-            ->setSequence(1);
+            ->setExternalId($teacher['externalId']);
 
         $this->log->debug(sprintf(
             'Creating new override for %s in timetable event %s - %s, %s, %s-%s',
@@ -623,7 +619,7 @@ class NonAcademicEvents implements IStrategy
         ));
 
         if ($this->perform) {
-            $this->overridesMapper->save($override);
+            $this->eventUserMapper->save($involvement);
         }
     }
 
@@ -646,11 +642,9 @@ class NonAcademicEvents implements IStrategy
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
          */
-        $override = $this->overridesMapper->createModel()
+        $involvement = $this->eventUserMapper->createModel()
             ->setEventId($event->getId())
-            ->setExternalId($externalId)
-            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
-            ->setSequence(1);
+            ->setExternalId($externalId);
 
         $this->log->debug(sprintf(
             'Creating new override for %s in timetable event %s - %s-%s',
@@ -661,7 +655,7 @@ class NonAcademicEvents implements IStrategy
         ));
 
         if ($this->perform) {
-            $this->overridesMapper->save($override);
+            $this->eventUserMapper->save($involvement);
         }
     }
 }

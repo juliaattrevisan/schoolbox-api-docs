@@ -115,8 +115,7 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         $events = (new \Schoolbox\External\Event\EventUsers(
             $this->eventMapper,
             $this->campusMapper,
-            $this->roletypeMapper,
-            $this->staffProfileMapper
+            $this->roletypeMapper
         ))->findForUser(
             $this->getUser(),
             $startTimestamp,

@@ -67,20 +67,20 @@ class Factory
 
 
     /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
+     * @var \Schoolbox\External\Event\User\Mapper
      */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+    private \Schoolbox\External\Event\User\Mapper $eventUserMapper;
 
 
     /**
      * Factory constructor.
      *
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param string                                     $host
-     * @param string                                     $key
-     * @param Mapper                                     $eventMapper
-     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+     * @param LoggerInterface                       $log
+     * @param bool                                  $perform
+     * @param string                                $host
+     * @param string                                $key
+     * @param Mapper                                $eventMapper
+     * @param \Schoolbox\External\Event\User\Mapper $eventUserMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -88,14 +88,14 @@ class Factory
         string $host,
         string $key,
         \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+        \Schoolbox\External\Event\User\Mapper $eventUserMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
         $this->eventMapper = $eventMapper;
-        $this->overridesMapper = $overridesMapper;
+        $this->eventUserMapper = $eventUserMapper;
     }
 
 
@@ -123,7 +123,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->eventMapper,
-                $this->overridesMapper,
+                $this->eventUserMapper,
                 self::SOURCE_NAME
             ))
             ->add(new NonAcademicEvents(
@@ -131,7 +131,7 @@ class Factory
                 $this->perform,
                 $api,
                 $this->eventMapper,
-                $this->overridesMapper,
+                $this->eventUserMapper,
                 $from,
                 $to
             ))
