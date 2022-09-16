@@ -180,7 +180,7 @@ class TimetableUsers
         $query = "
             SELECT se.id, se.code, seuo.*
             FROM sis_event se
-            INNER JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
+            INNER JOIN sis_class_user_overrides seuo ON se.id = seuo.event_id
             WHERE se.code = :classCode
             AND se.classification = :classification
             AND se.start_at >= :from
@@ -322,7 +322,7 @@ class TimetableUsers
         $query = "
             SELECT se.code, se.title, se.id, seuo.*
             FROM sis_event se
-            INNER JOIN sis_event_user_overrides seuo ON se.id = seuo.event_id
+            INNER JOIN sis_class_user_overrides seuo ON se.id = seuo.event_id
             WHERE se.classification = :classification
             AND se.start_at >= :from
             AND se.start_at <= :to
