@@ -838,12 +838,8 @@ class Profile implements IStrategy
                 ));
             }
 
-            /* Prioritise preferred names over official names
-             */
-            $firstname = (new FirstMeaningfulValue())->find([
-                $parent['preferredFirstName'],
-                $parent['firstName']
-            ]);
+            $firstname = (string)$parent['firstName'];
+            $firstnamePreferred = (string)$parent['preferredFirstName'];
 
             /* Prioritise preferred names over official names
              */
@@ -885,6 +881,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it
