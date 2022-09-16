@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Calendar;
 
 use GuzzleHttp\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\ApiCertification;
 use Schoolbox\External\Event\Mapper;
@@ -62,12 +61,6 @@ class Factory
 
 
     /**
-     * @var EventTypeMapper
-     */
-    private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper;
-
-
-    /**
      * @var \Schoolbox\External\Event\Mapper
      */
     private \Schoolbox\External\Event\Mapper $eventMapper;
@@ -86,7 +79,6 @@ class Factory
      * @param bool                                       $perform
      * @param string                                     $host
      * @param string                                     $key
-     * @param EventTypeMapper                            $eventTypeMapper
      * @param Mapper                                     $eventMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
@@ -95,7 +87,6 @@ class Factory
         bool $perform,
         string $host,
         string $key,
-        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
@@ -103,7 +94,6 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
-        $this->eventTypeMapper = $eventTypeMapper;
         $this->eventMapper = $eventMapper;
         $this->overridesMapper = $overridesMapper;
     }

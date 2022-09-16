@@ -275,7 +275,7 @@ class Classes implements IStrategy
         /* We'll need this for later
          */
         $now = \Alaress_Date_Format::now();
-        $enrolmentsLookup = new Lookup\Enrolments($this->log, $this->api);
+        $enrolmentsLookup = new Lookup\Enrolments($this->api);
 
         /* Get a list of Schedules to consume
          */
