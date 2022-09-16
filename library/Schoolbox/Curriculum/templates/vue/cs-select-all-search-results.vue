@@ -64,7 +64,8 @@ function onSelectAll () {
 </script>
 
 <template>
-    <button class="search-result"
+    <button
+        class="search-result"
         @click.prevent="onSelectAll"
         @keyup.enter="onSelectAll"
     >
@@ -95,8 +96,10 @@ function onSelectAll () {
         background: var(--content-ui-hover);
     }
 }
-.search-result-active {
-    background: var(--content-ui-hover);
+
+.checklist {
+    flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it
+    margin: 0;
 }
 
 input[type=checkbox]:not(.plain) + label {

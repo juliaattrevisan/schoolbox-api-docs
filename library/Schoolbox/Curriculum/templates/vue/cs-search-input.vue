@@ -165,7 +165,7 @@ button {
 }
 
 .input-group {
-    flex-direction: column;
+    flex-direction: column; /* @TODO - this needs to be on resize observer */
 }
 
 </style>

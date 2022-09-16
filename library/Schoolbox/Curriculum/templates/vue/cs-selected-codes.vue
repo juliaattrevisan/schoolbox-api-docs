@@ -4,7 +4,7 @@
  * To list all the currently selected Curriculum codes
  */
 
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 import CsSelectedCode from './cs-selected-code.vue';
@@ -13,6 +13,16 @@ import CsSelectedCode from './cs-selected-code.vue';
 const store = useStore();
 const selectedCodesStore = useSelectedCodesStore();
 const valuesAndLabelsEl = ref(null);
+
+
+/**
+ * to listen for any clears of the selected codes from outside the Vue app
+ */
+onMounted(() => {
+    document.addEventListener('CURRICULUM-SELECTOR__CLEAR_SELECTED_CODES', (event) => {
+        selectedCodesStore.empty();
+    });
+});
 
 /**
  * Add a comma separated string of the ids of the selected codes

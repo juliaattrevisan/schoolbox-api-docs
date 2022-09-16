@@ -138,6 +138,7 @@ function onSelected () {
 
 .checklist {
     flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it
+    margin: 0;
 }
 
 input[type=checkbox]:not(.plain) + label {

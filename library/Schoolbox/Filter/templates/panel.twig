@@ -79,6 +79,8 @@ Usage:
             var $filterTab = $(this).closest('[data-applied-filter-tab]');
             clearFilter($filterTab.data('applied-filter-tab'));
             $filterTab.remove();
+            //dispatch an event for curriculum-selector to listen to?
+            document.dispatchEvent(new CustomEvent('CURRICULUM-SELECTOR__CLEAR_SELECTED_CODES', { detail: { id: 0 } } ) );
             return false; // don't bubble
         });
 
