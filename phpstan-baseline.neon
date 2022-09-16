@@ -3301,11 +3301,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Compass/Base/Endpoint/Status.php
 
 		-
-			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Compass\\\\Base\\\\Endpoint\\\\TimetableCalendar\\\\Lookup\\\\Enrolments\\:\\:\\$log is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Compass/Base/Endpoint/TimetableCalendar/Lookup/Enrolments.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\CustomSync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/CustomSync.php
