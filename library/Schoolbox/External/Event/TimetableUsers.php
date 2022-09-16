@@ -142,9 +142,9 @@ class TimetableUsers
          */
         $query = "
             SELECT DISTINCT se.code, scu.*
-            FROM sis_class_user scu
-            INNER JOIN sis_class sc ON scu.class_id = sc.id
-            INNER JOIN sis_event se ON sc.code = se.code
+            FROM {$this->classInvolvementMapper->getTable()} scu
+            INNER JOIN {$this->classEntryMapper->getTable()} sc ON scu.class_id = sc.id
+            INNER JOIN {$this->eventMapper->getTable()} se ON sc.code = se.code
             WHERE sc.code = :classCode
             AND se.classification = :classification
             ORDER BY sc.id ASC
@@ -180,8 +180,8 @@ class TimetableUsers
          */
         $query = "
             SELECT se.id, se.code, seuo.*
-            FROM sis_event se
-            INNER JOIN sis_class_user_overrides seuo ON se.id = seuo.event_id
+            FROM {$this->eventMapper->getTable()} se
+            INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
             WHERE se.code = :classCode
             AND se.classification = :classification
             AND se.start_at >= :from
@@ -269,9 +269,9 @@ class TimetableUsers
          */
         $query = "
             SELECT se.code, sc.name, scu.*
-            FROM sis_class_user scu
-            INNER JOIN sis_class sc ON scu.class_id = sc.id
-            INNER JOIN sis_event se ON sc.code = se.code
+            FROM {$this->classInvolvementMapper->getTable()} scu
+            INNER JOIN {$this->classEntryMapper->getTable()} sc ON scu.class_id = sc.id
+            INNER JOIN {$this->eventMapper->getTable()} se ON sc.code = se.code
             WHERE scu.external_id = :externalId
             AND se.classification = :classification
             AND se.start_at >= :from
@@ -322,8 +322,8 @@ class TimetableUsers
          */
         $query = "
             SELECT se.code, se.title, se.id, seuo.*
-            FROM sis_event se
-            INNER JOIN sis_class_user_overrides seuo ON se.id = seuo.event_id
+            FROM {$this->eventMapper->getTable()} se
+            INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
             WHERE se.classification = :classification
             AND se.start_at >= :from
             AND se.start_at <= :to
