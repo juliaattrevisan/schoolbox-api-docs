@@ -223,6 +223,7 @@ async function onLeave (el, done) {
     <li ref="viewNodeEl">
         <div
             class="buttons-container"
+            :data-enabled="props.node.enabled"
             :data-is-inactive="`${ isUpdatingAnother || isAddingAnother ? true : false }`"
             :data-is-new="isNew"
             :data-just-updated="justUpdated"
@@ -280,17 +281,17 @@ async function onLeave (el, done) {
     transition: opacity 0.3s;
 }
 
-    .buttons-container[data-is-inactive="true"] {
+    [data-is-inactive="true"] {
         opacity: 0.2;
         pointer-events: none;
     }
 
-    .buttons-container[data-is-new="true"] {
+    [data-is-new="true"] {
         @extend .change-animation;
         animation-name: isNewAnimation;
     }
 
-    .buttons-container[data-just-updated="true"] {
+    [data-just-updated="true"] {
         @extend .change-animation;
         animation-name: justUpdatedAnimation;
     }
