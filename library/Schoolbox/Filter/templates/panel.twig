@@ -72,6 +72,8 @@ Usage:
             updateFiltersInUseLabel();
         });
 
+        //add a custom event listener here
+
         // Listen for user removing an applied filter
         $appliedFilters.on('click', '[data-close]', function(){
             var $filterTab = $(this).closest('[data-applied-filter-tab]');
@@ -655,6 +657,8 @@ Usage:
                             label: determineLabelFromSelectize(selectize, v),
                         });
                     });
+                    debugger;
+                    console.warn(componentsInUse[filterId]['labels']);
                 }
 
                 // Build list of labels from selected options or checkboxes,

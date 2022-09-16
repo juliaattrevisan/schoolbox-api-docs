@@ -4,7 +4,7 @@
  * To list all the currently selected Curriculum codes
  */
 
-import { computed } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 import CsSelectedCode from './cs-selected-code.vue';
@@ -12,6 +12,7 @@ import CsSelectedCode from './cs-selected-code.vue';
 
 const store = useStore();
 const selectedCodesStore = useSelectedCodesStore();
+const valuesAndLabelsEl = ref(null);
 
 /**
  * Add a comma separated string of the ids of the selected codes
@@ -19,9 +20,32 @@ const selectedCodesStore = useSelectedCodesStore();
  *
  * @returns { String }
  */
-const curriculumCodes = computed(() => {
-    const justIds = selectedCodesStore.codes.map((code) => code.id);
-    return justIds.join(',');
+const ids = computed(() => {
+    return selectedCodesStore.codesIds.join(',');
+});
+
+/**
+ * This is currently exclusively for use in library/Schoolbox/Filter/templates/panel.twig
+ * We decode this array on the other side to display the Curriculum codes within the selected filters panel
+ *
+ * @returns { String }
+ */
+const valuesAndLabels = computed(() => {
+    const justIdsAndLabels = selectedCodesStore.codes.map((code) => {
+        return { value: code.id, label: code.code }
+    });
+    return JSON.stringify(justIdsAndLabels);
+});
+
+/**
+ * To manually dispatch a change event when there's been a change in the selected codes
+ * We listen for this in library/Schoolbox/Filter/templates/panel.twig
+ */
+watch(() => selectedCodesStore.codesIds, () => {
+    nextTick(() => { //nextTick to ensure the dom has updated the value property
+        const event = new Event('change');
+        valuesAndLabelsEl.value.dispatchEvent(event);
+    });
 });
 
 </script>
@@ -38,7 +62,8 @@ const curriculumCodes = computed(() => {
     <div v-else-if="selectedCodesStore.hasNoCodes && store.isReadOnly" class="selected-codes-container" data-test-container>
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
-    <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="curriculumCodes" />
+    <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />
+    <input ref="valuesAndLabelsEl" type="hidden" tabindex="-1" :value="valuesAndLabels" data-selected-curriculum-codes />
 </template>
 
 <style lang="scss" scoped>

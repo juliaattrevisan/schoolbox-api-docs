@@ -2,7 +2,7 @@
     var defaults = {
         value: [],
         ajax: {
-            url:      '/curriculum/search',
+            url:      '/api/curriculum/',
             type:     'GET',
             data:     {},
             dataType: 'json'
