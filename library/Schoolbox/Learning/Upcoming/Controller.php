@@ -85,8 +85,7 @@ class Controller extends Base
         private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         private Filter\Selection\Mapper $filterSelectionMapper,
         private Access $access
-    )
-    {
+    ) {
     }
 
     /**
