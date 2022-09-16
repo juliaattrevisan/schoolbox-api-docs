@@ -37,12 +37,6 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
 
 
     /**
-     * @var \Schoolbox\External\Profile\Staff\Mapper
-     */
-    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
      * @var GenericCollection|null
      */
     private ?GenericCollection $folderCodes;
@@ -59,8 +53,7 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Campus\Mapper $campusMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper,
-        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
+        \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper
     ) {
         parent::__construct($connectorId, $user, $viewer);
 
@@ -69,7 +62,6 @@ class Calendar_Api_EventType_SudsEvent_Schoolbox_Default extends Calendar_Api_Ev
         $this->eventMapper = $eventMapper;
         $this->campusMapper = $campusMapper;
         $this->roletypeMapper = $roletypeMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
     }
 
 
