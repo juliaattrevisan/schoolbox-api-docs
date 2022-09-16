@@ -2,11 +2,12 @@
 
 /**
  * A curriculum node to select to traverse further down the tree,
- * or to CRUD via the actions
+ * and add subsections or update the details on
  */
 
 import { ref, computed, onMounted } from 'vue';
 import { gsap } from 'gsap/all';
+import { timeout } from '@js/util/jsUtils';
 import { slideDown, slideUp } from '@js/util/animateUtils';
 import { useStore } from '../store/manageCurriculumStore';
 import { UNSET_ID } from '../store/mcNodesStore';
@@ -79,8 +80,8 @@ onMounted(() => {
  */
 useUpdateNodeStore().$onAction(({ name, after }) => {
     if (name === 'update') {
-        after((nodeId) => {
-            if (props.node.id === nodeId) {
+        after((result) => {
+            if (props.node.id === result.id) {
                 displayAnimation(justUpdated);
             }
         });

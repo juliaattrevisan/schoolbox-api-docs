@@ -48,18 +48,19 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
                     },
                     body: getFormData(this.subsection),
                 });
+                const responseJson = await response.json();
                 if (response.ok) {
-                    const newNode = await response.json();
+                    const newNode = responseJson;
                     this.id = newNode.id;
                     await activeNodeStore.addSubsection(newNode);
                     this.isProcessing = false;
                     this.cancel();
-                    return newNode.id;
+                    return { id: newNode.id, message: `${this.subsection.name} successfully added` };
                 } else {
-                    throw new Error();
+                    throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error.message, error.options);
             }
         },
 

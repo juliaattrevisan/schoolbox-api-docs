@@ -46,16 +46,17 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
                     },
                     body: getFormData(this.activeNodeCopy),
                 });
+                const responseJson = await response.json();
                 if (response.ok) {
                     activeNodeStore.update(this.activeNodeCopy);
                     this.isProcessing = false;
                     this.cancel();
-                    return nodeId;
+                    return { id: nodeId, message: `${this.activeNodeCopy.name} successfully updated` };
                 } else {
-                    throw new Error();
+                    throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error.message, error.options);
             }
         },
 

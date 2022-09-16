@@ -6,6 +6,7 @@
 
 import { computed, onMounted } from 'vue';
 import { isScriptAdded, injectScript } from '@js/util/domUtils';
+import { useStore } from '../store/manageCurriculumStore';
 import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import { useAddSubsectionStore } from './store/mcAddSubsectionStore';
 
@@ -20,6 +21,7 @@ const props = defineProps({
     },
 });
 
+const store = useStore();
 const activeNodeStore = useActiveNodeStore();
 const addSubsectionStore = useAddSubsectionStore();
 
@@ -98,6 +100,22 @@ const addButtonText = computed(() => addSubsectionStore.isProcessing ? 'Adding..
 function onAddSubsectionSelected () {
     addSubsectionStore.add();
 }
+
+/**
+ * to display the toast on subsection added / failed
+ */
+ addSubsectionStore.$onAction(({ name, after, onError }) => {
+    if (name === 'add') {
+        store.toastEl.activate('Adding...');
+        after((result) => {
+            store.toastEl.timeout(result.message, true, 5000);
+        });
+        onError((error) => {
+            console.warn(error);
+            store.toastEl.timeout('Unable to add subsection', false, 5000);
+        });
+    }
+});
 
 /**
  * close the addSubsection view

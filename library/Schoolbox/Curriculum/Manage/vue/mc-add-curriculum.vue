@@ -6,10 +6,12 @@
 
 import { computed, onMounted } from 'vue';
 import { isScriptAdded, injectScript } from '@js/util/domUtils';
+import { useStore } from './store/manageCurriculumStore';
 import { useAddCurriculumStore } from './store/mcAddCurriculumStore';
 
 
 
+const store = useStore();
 const addCurriculumStore = useAddCurriculumStore();
 
 
@@ -18,7 +20,7 @@ const addCurriculumStore = useAddCurriculumStore();
  *
  * @returns { String }
  */
-const ckeditorInstance = computed(() => `new-curriculum` );
+const ckeditorInstance = computed(() => `new-curriculum`);
 
 /**
  * to load the ckeditor when ready
@@ -81,6 +83,22 @@ const addButtonText = computed(() => addCurriculumStore.isProcessing ? 'Adding..
 function onAddSubsectionSelected () {
     addCurriculumStore.add();
 }
+
+/**
+ * to display the toast on curriculum added / failed
+ */
+addCurriculumStore.$onAction(({ name, after, onError }) => {
+    if (name === 'add') {
+        store.toastEl.activate('Adding...');
+        after((result) => {
+            store.toastEl.timeout(result.message, true, 5000);
+        });
+        onError((error) => {
+            console.warn(error);
+            store.toastEl.timeout('Unable to add Curriculum', false, 5000);
+        });
+    }
+});
 
 /**
  * close the addSubsection view
