@@ -97,7 +97,7 @@ class Schedules
 
             /* Dig out the actual names of an Activity
              */
-            $this->log->info(sprintf(
+            $this->log->debug(sprintf(
                 'Mining all the Subjects in year %s for their nice human readable names...',
                 $year
             ));
