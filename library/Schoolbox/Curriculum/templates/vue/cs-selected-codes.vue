@@ -78,10 +78,6 @@ watch(() => selectedCodesStore.codesIds, () => {
     padding: 0.5rem;
 }
 
-    .selected-codes-container__disabled {
-        opacity: 0.7;
-    }
-
 .no-codes-note {
     margin-top: 0.35rem;
 }

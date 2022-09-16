@@ -164,4 +164,8 @@ button {
     margin-bottom: 0;
 }
 
+.input-group {
+    flex-direction: column;
+}
+
 </style>

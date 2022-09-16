@@ -35,7 +35,7 @@ Usage:
         var $panelComponents     = $filterPanel.find('[data-component]');
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
         var $submitButton        = $('#submit_button');
-        var $optionInputs        = $filterPanel.find('input[type=checkbox], input[type=hidden], input[type=text], select');
+        var $optionInputs        = $filterPanel.find('input[type=checkbox], input[type=hidden], input[type=text], select, [data-selected-curriculum-codes]');
         var $toast               = $('[data-relation="submit-label"]');
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
@@ -639,7 +639,9 @@ Usage:
                     $textInputs  = $component.find('input[type=text]'),
                     $selectize   = $component.find('select[data-selectize]'),
                     hasSelectize = $selectize.length > 0,
-                    selectize    = hasSelectize ? $selectize[0].selectize : null;
+                    selectize    = hasSelectize ? $selectize[0].selectize : null
+                    $curriculumSelector = $component.find('[data-selected-curriculum-codes]');
+                    hasCurriculumSelector = $curriculumSelector.length > 0;
 
                 // These will be deleted if the filter's not in use
                 componentsInUse[filterId]         = {};
@@ -657,8 +659,6 @@ Usage:
                             label: determineLabelFromSelectize(selectize, v),
                         });
                     });
-                    debugger;
-                    console.warn(componentsInUse[filterId]['labels']);
                 }
 
                 // Build list of labels from selected options or checkboxes,
@@ -698,8 +698,18 @@ Usage:
                     }
                 }
 
+                if (hasCurriculumSelector) {
+                    const valuesAndLabels = JSON.parse($curriculumSelector.val());
+                    valuesAndLabels.forEach(function (item) {
+                        componentsInUse[filterId]['labels'].push({
+                            value: item.value,
+                            label: item.label,
+                        });
+                    });
+                }
+
                 // Build list of labels from text inputs, if they are there
-                if (!hasSelectize && $textInputs.length !== 0) {
+                if (!hasSelectize && !hasCurriculumSelector && $textInputs.length !== 0) {
                     $textInputs.each(function () {
                         let values = this.value.split(/\s+/);
                         // Try splitting on space
