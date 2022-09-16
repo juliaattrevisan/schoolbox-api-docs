@@ -187,7 +187,6 @@ class Calendar_Api_Factory
                 \Schoolbox\External\Event\Mapper::getInstance(),
                 \Schoolbox\External\Event\Campus\Mapper::getInstance(),
                 \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                 \Schoolbox\External\Profile\Staff\Mapper::getInstance()
             ));
         }
@@ -372,7 +371,6 @@ class Calendar_Api_Factory
                     \Schoolbox\External\Event\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Campus\Mapper ::getInstance(),
                     \Schoolbox\External\Event\Roletype\Mapper ::getInstance(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
                     \Schoolbox\External\Profile\Staff\Mapper::getInstance()
                 );
             default:

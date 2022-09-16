@@ -41,12 +41,6 @@ class EventUsers
 
 
     /**
-     * @var Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overrideMapper;
-
-
-    /**
      * @var \Schoolbox\External\Profile\Staff\Mapper
      */
     private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
@@ -68,20 +62,17 @@ class EventUsers
      * @param \Schoolbox\External\Event\Mapper         $eventMapper
      * @param \Schoolbox\External\Event\Campus\Mapper  $campusMapper
      * @param Roletype\Mapper                          $roletypeMapper
-     * @param Overrides\Mapper                         $overrideMapper
      * @param \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
      */
     public function __construct(
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Campus\Mapper $campusMapper,
         \Schoolbox\External\Event\Roletype\Mapper $roletypeMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
         \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
     ) {
         $this->eventMapper = $eventMapper;
         $this->campusMapper = $campusMapper;
         $this->roletypeMapper = $roletypeMapper;
-        $this->overrideMapper = $overrideMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
         $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
