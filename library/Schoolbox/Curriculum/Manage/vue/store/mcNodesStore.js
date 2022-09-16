@@ -78,18 +78,23 @@ export const useNodesStore = defineStore('mcNodes', {
         async loadTopLevel () {
             const store = useStore();
             try {
-                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1`);
+                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     sessionStorage.setItem(SB_CURRICULUM_TOP_LEVEL, JSON.stringify(topLevelNodes)); //session storage vars need to be saved as strings only
                     await this.setTopLevel(topLevelNodes);
+                } else if (response.status === 401) {
+                    store.hasPermissionDeniedError = true; //show a permission denied error
                 } else {
-                    console.warn(response);
                     store.hasLoadError = true; //show the load error display state
                 }
             } catch (error) {
-                console.warn(error);
                 store.hasLoadError = true; //show the load error display state
+                throw new Error(error.message);
             } finally {
                 store.isLoading = false; //otherwise show the tree
             }
@@ -122,16 +127,21 @@ export const useNodesStore = defineStore('mcNodes', {
                 return;
             }
             try {
-                const response = await fetch(`${apiEndpoint}/${id}?descendants=1`);
+                const response = await fetch(`${apiEndpoint}/${id}?descendants=1`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                const responseJson = await response.json();
                 if (response.ok) {
-                    const newNode = await response.json();
+                    const newNode = responseJson;
                     newNode.children.forEach((node) => useSelectedNodesStore().addIsSelected(node));
                     const oldNode = findById(this.nodes.children, id);
                     useSelectedNodesStore().addIsSelected(oldNode);
                     oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
-                    console.warn(response);
-                    this.hasLoadError = true;
+                    debugger;
+                    throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {
                 console.warn(error);

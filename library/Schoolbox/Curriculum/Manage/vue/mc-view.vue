@@ -26,6 +26,15 @@ function onRefreshSelected () {
             <loading-table  />
         </div>
     </div>
+    <div v-else-if="store.hasPermissionDeniedError" class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <div tableData-alert class="alert-box alert">
+                    You do not have permission to view this page.
+                </div>
+            </section>
+        </div>
+    </div>
     <div v-else-if="store.hasLoadError" class="row">
         <div class="small-12 island">
             <section class="content">
