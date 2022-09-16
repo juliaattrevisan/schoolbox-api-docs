@@ -414,6 +414,10 @@ class Controller extends Base
      *     * Note that we must also ensure that any folderId specified in the URL is accessible by the user.
      *       This is done in $this->removeInaccessibleFolderIdsFromFiltersRequest().
      *
+     * TODO: (Maybe) This problem likely exists in other controllers.  A more general solution might be to do something
+     *       similar to this in library/Schoolbox/Filter/AbstractIdFinder::normaliseFilters().
+     *       A boolean parameter $useDefaultFilterInsteadOfNull (defaulting to false) could be added to that function.
+     *
      * Example return array:
      * [
      *     1 => [
