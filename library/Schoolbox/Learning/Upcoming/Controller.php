@@ -373,7 +373,10 @@ class Controller extends Base
     {
         foreach ($array2 as $key => $value) {
             if (is_array($value)) {
-                $array1[$key] = [];
+                if (!array_key_exists($key, $array1)) {
+                    $array1[$key] = [];
+                }
+
                 foreach ($value as $keyInner => $valueInner) {
                     if (!array_key_exists($keyInner, $array1[$key])) {
                         $array1[$key][$keyInner] = $valueInner;
