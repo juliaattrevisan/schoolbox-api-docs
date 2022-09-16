@@ -326,7 +326,7 @@ class Controller extends Base
         $this->extendExecutionTime();
 
         $request             = $this->request->query->get('filters', []);
-        $request             = $this->fillInMissingKeysAndValues($request, $this->getDefaultRequest());
+        $request             = $this->fillInMissingKeysAndValues($request, $this->getDefaultFiltersRequestForGetEvents($student));
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
@@ -389,48 +389,96 @@ class Controller extends Base
         return $array1;
     }
 
-    private function getDefaultRequest()
+    /**
+     * The purpose of this function is to generate the same request that would have been generated automatically
+     * had $this->request->query->get('filters', []) been empty in $this->getEvents().
+     * If $this->request->query->get('filters', []) had been empty, the request would have been generated in Javascript
+     * by inspecting the filter HTML form.
+     *
+     * Example return array:
+     * [
+     *     1 => [
+     *         'project' => '0',
+     *         'quiz'    => '0',
+     *         'dueWork' => '0',
+     *         'task'    => '0',
+     *         'lti'     => '0',
+     *     ],
+     *     3 => [
+     *         // FolderIds to which the user has access.
+     *         50  => '0',
+     *         56  => '0',
+     *         69  => '0',
+     *         72  => '0',
+     *         74  => '0',
+     *         78  => '0',
+     *         80  => '0',
+     *         85  => '0',
+     *         102 => '0',
+     *         189 => '0',
+     *         190 => '0',
+     *         191 => '0',
+     *     ],
+     *     10 => [
+     *         'cap_upcoming' => '0',
+     *         'cap_open'     => '0',
+     *         'cap_overdue'  => '0',
+     *         'cap_closed'   => '0',
+     *     ],
+     *     11 => [
+     *         'unweighted' => '0',
+     *         'weighted'   => '0',
+     *     ],
+     *     12 => [
+     *         1      => '0',
+     *         2      => '0',
+     *         3      => '0',
+     *         4      => '0',
+     *         5      => '0',
+     *         'none' => '0',
+     *     ]
+     * ];
+     *
+     * @param User $student
+     * @return array
+     * @see Javascript in library/Schoolbox/Filter/templates/panel.twig.
+     */
+    private function getDefaultFiltersRequestForGetEvents(User $student)
     {
-        return [
-            1 => [
-                'project' => '0',
-                'quiz'    => '0',
-                'dueWork' => '0',
-                'task'    => '0',
-                'lti'     => '0',
-            ],
-            3 => [
-                50  => '0',
-                56  => '0',
-                69  => '0',
-                72  => '0',
-                74  => '0',
-                78  => '0',
-                80  => '0',
-                85  => '0',
-                102 => '0',
-                189 => '0',
-                190 => '0',
-                191 => '0',
-            ],
-            10 => [
-                'cap_upcoming' => '0',
-                'cap_open'     => '0',
-                'cap_overdue'  => '0',
-                'cap_closed'   => '0',
-            ],
-            11 => [
-                'unweighted' => '0',
-                'weighted'   => '0',
-            ],
-            12 => [
-                1      => '0',
-                2      => '0',
-                3      => '0',
-                4      => '0',
-                5      => '0',
-                'none' => '0',
-            ]
-        ];
+        $folders = $this->folderMapper->findForUser(
+            $student, !$student->getHideTimetable(), UserAccess::ACCESS_READ, false, true
+        );
+
+        $zeroByFolderId = [];
+        foreach ($folders as $folder) {
+            $zeroByFolderId[$folder->getId()] = '0';
+        }
+
+        $filterState = $this->filterFactoryFactory->buildCurrentState(
+            Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
+            false
+        );
+
+        $defaultRequest = [];
+        foreach ($filterState as $item) {
+            $filter = $item->getFilter();
+
+            if ($filter->getId() === 3) {
+                $optionIsEnabledByKey = $zeroByFolderId;
+            } else {
+                foreach ($filter->getPages() as $page) {
+                    $optionIsEnabledByKey = [];
+                    foreach ($page->getOptions() as $option) {
+                        if ($option->getAvailable()) {
+                            $optionIsEnabledByKey[$option->getKey()] = '0';
+                        }
+                    }
+                }
+            }
+
+            $defaultRequest[$filter->getId()] = $optionIsEnabledByKey;
+        }
+
+        return $defaultRequest;
     }
 }
