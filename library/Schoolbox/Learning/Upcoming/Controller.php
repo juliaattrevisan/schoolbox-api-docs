@@ -85,7 +85,9 @@ class Controller extends Base
         private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         private Filter\Selection\Mapper $filterSelectionMapper,
         private Access $access
-    ) {}
+    )
+    {
+    }
 
     /**
      * Redirects to the upcoming work screen for the current user.
@@ -480,7 +482,8 @@ class Controller extends Base
             // Magic constant 3 here is the URL parameter key used to specify the 'folders' filter.
             if ($filter->getId() === 3) {
                 $optionIsEnabledByKey = array_combine(
-                    $accessibleFolderIds, array_fill(0, count($accessibleFolderIds), '0')
+                    $accessibleFolderIds,
+                    array_fill(0, count($accessibleFolderIds), '0')
                 );
             } else {
                 $optionIsEnabledByKey = [];
@@ -507,7 +510,11 @@ class Controller extends Base
     {
         $folderIds = [];
         $folders   = $this->folderMapper->findForUser(
-            $user, !$user->getHideTimetable(), UserAccess::ACCESS_READ, false, true
+            $user,
+            !$user->getHideTimetable(),
+            UserAccess::ACCESS_READ,
+            false,
+            true
         );
 
         foreach ($folders as $folder) {

@@ -30,7 +30,9 @@ class Codec
      * @param Mapper           $filterMapper
      * @param Selection\Mapper $selectionMapper
      */
-    public function __construct(private Mapper $filterMapper, private Selection\Mapper $selectionMapper) {}
+    public function __construct(private Mapper $filterMapper, private Selection\Mapper $selectionMapper)
+    {
+    }
 
     /**
      * @param User  $user
