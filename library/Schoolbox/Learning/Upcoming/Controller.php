@@ -325,8 +325,10 @@ class Controller extends Base
         // Due work calendar could take a while
         $this->extendExecutionTime();
 
+        $accessibleFolderIds = $this->getFolderIdsAccessibleToUser($student);
         $request             = $this->request->query->get('filters', []);
-        $request             = $this->fillInMissingKeysAndValues($request, $this->getDefaultFiltersRequestForGetEvents($student));
+        $request             = $this->fillInMissingKeysAndValues($request, $this->getDefaultFiltersRequestForGetEvents($accessibleFolderIds));
+        $request             = $this->removeInaccessibleFolderIdsFromFiltersRequest($request, $accessibleFolderIds);
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
@@ -369,7 +371,7 @@ class Controller extends Base
      * @param array $array2
      * @return array
      */
-    private function fillInMissingKeysAndValues(array $array1, array $array2)
+    private function fillInMissingKeysAndValues(array $array1, array $array2): array
     {
         foreach ($array2 as $key => $value) {
             if (is_array($value)) {
@@ -397,6 +399,20 @@ class Controller extends Base
      * had $this->request->query->get('filters', []) been empty in $this->getEvents().
      * If $this->request->query->get('filters', []) had been empty, the request would have been generated in Javascript
      * by inspecting the filter HTML form.
+     *
+     * This is done because if an expected filters parameter was left off the URL, and this function was not used, the
+     * response might contain events to which the user should not have access.
+     *
+     * To see why this happens, here is a brief explanation of how the filter system works:
+     *    Using the folderIds filters as an example,
+     *     * If filters are specified in the URL like: learning/due/$userId?3[50]=0&3[56]=0&3[69]=0
+     *       meaning:                                  learning/due/$userId (filtered to include only events in folders {50, 56, 69})
+     *       The response will be events contained in those three folders only.
+     *     * However, if we don't specify any folders: learning/due/$userId
+     *       The response will be events contained in any folder.
+     *     * To get around this problem we must ensure that the filters folder parameter always exists and contains folderIds.
+     *     * Note that we must also ensure that any folderId specified in the URL is accessible by the user.
+     *       This is done in $this->removeInaccessibleFolderIdsFromFiltersRequest().
      *
      * Example return array:
      * [
@@ -442,21 +458,12 @@ class Controller extends Base
      *     ]
      * ];
      *
-     * @param User $student
+     * @param array $accessibleFolderIds
      * @return array
      * @see Javascript in library/Schoolbox/Filter/templates/panel.twig.
      */
-    private function getDefaultFiltersRequestForGetEvents(User $student)
+    private function getDefaultFiltersRequestForGetEvents(array $accessibleFolderIds): array
     {
-        $folders = $this->folderMapper->findForUser(
-            $student, !$student->getHideTimetable(), UserAccess::ACCESS_READ, false, true
-        );
-
-        $zeroByFolderId = [];
-        foreach ($folders as $folder) {
-            $zeroByFolderId[$folder->getId()] = '0';
-        }
-
         $filterState = $this->filterFactoryFactory->buildCurrentState(
             Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
             false
@@ -466,8 +473,11 @@ class Controller extends Base
         foreach ($filterState as $item) {
             $filter = $item->getFilter();
 
+            // Magic constant 3 here is the URL parameter key used to specify the 'folders' filter.
             if ($filter->getId() === 3) {
-                $optionIsEnabledByKey = $zeroByFolderId;
+                $optionIsEnabledByKey = array_combine(
+                    $accessibleFolderIds, array_fill(0, count($accessibleFolderIds), '0')
+                );
             } else {
                 foreach ($filter->getPages() as $page) {
                     $optionIsEnabledByKey = [];
@@ -483,5 +493,44 @@ class Controller extends Base
         }
 
         return $defaultRequest;
+    }
+
+    /**
+     * @param User $user
+     * @return array
+     */
+    private function getFolderIdsAccessibleToUser(User $user): array
+    {
+        $folderIds = [];
+        $folders   = $this->folderMapper->findForUser(
+            $user, !$user->getHideTimetable(), UserAccess::ACCESS_READ, false, true
+        );
+
+        foreach ($folders as $folder) {
+            $folderIds[] = $folder->getId();
+        }
+
+        return $folderIds;
+    }
+
+    /**
+     * @param array $request
+     * @param array $accessibleFolderIds
+     * @return array
+     * @throws \Exception
+     */
+    private function removeInaccessibleFolderIdsFromFiltersRequest(array $request, array $accessibleFolderIds): array
+    {
+        // Magic constant 3 here is the URL parameter key used to specify the 'folders' filter.
+        if (!array_key_exists(3, $request)) {
+            throw ErrorMapper::getInstance()->generateException(0, null, "Expected key '3' not found in filters request array.");
+        }
+
+        // Magic constant 3 here is the URL parameter key used to specify the 'folders' filter.
+        $folderIds  = array_keys($request[3]);
+        $folderIds  = array_intersect($folderIds, $accessibleFolderIds);
+        $request[3] = array_combine($folderIds, array_fill(0, count($folderIds), '0'));
+
+        return $request;
     }
 }
