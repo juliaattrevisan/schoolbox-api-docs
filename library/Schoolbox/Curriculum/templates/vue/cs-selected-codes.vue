@@ -20,7 +20,9 @@ const valuesAndLabelsEl = ref(null);
  */
 onMounted(() => {
     document.addEventListener('CURRICULUM-SELECTOR__CLEAR_SELECTED_CODES', (event) => {
-        selectedCodesStore.empty();
+        if (selectedCodesElementId.value === event.detail.elementId) { //just in case there are multiple on the page
+            selectedCodesStore.empty();
+        }
     });
 });
 
@@ -32,6 +34,15 @@ onMounted(() => {
  */
 const ids = computed(() => {
     return selectedCodesStore.codesIds.join(',');
+});
+
+/**
+ *
+ *
+ * @returns { String }
+ */
+const selectedCodesElementId = computed(() => {
+    return `${store.formValueName}-selected-codes`;
 });
 
 /**
@@ -73,7 +84,7 @@ watch(() => selectedCodesStore.codesIds, () => {
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
     <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />
-    <input ref="valuesAndLabelsEl" type="hidden" tabindex="-1" :value="valuesAndLabels" data-selected-curriculum-codes />
+    <input :id="selectedCodesElementId" ref="valuesAndLabelsEl" type="hidden" tabindex="-1" :value="valuesAndLabels" data-selected-curriculum-codes />
 </template>
 
 <style lang="scss" scoped>
