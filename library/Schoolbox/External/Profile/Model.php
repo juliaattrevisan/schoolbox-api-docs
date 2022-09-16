@@ -19,24 +19,34 @@ class Model
     use ModelTrait\UpdatedAtDate;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $externalId;
+    private ?string $externalId = null;
+
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $title;
+    private ?string $title = null;
+
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $firstname;
+    private ?string $firstname = null;
+
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $lastname;
+    private ?string $firstnamePreferred = null;
+
+
+    /**
+     * @var string|null
+     */
+    private ?string $lastname = null;
+
 
     /**
      * Portrait images are stored in storage now
@@ -45,36 +55,13 @@ class Model
      */
     private ?Storage\Model $portrait = null;
 
+
     /**
      * @return string $externalId
      */
     public function getExternalId(): string
     {
         return $this->externalId;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getFirstname(): ?string
-    {
-        return $this->firstname;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getLastname(): ?string
-    {
-        return $this->lastname;
     }
 
 
@@ -88,6 +75,16 @@ class Model
         return $this;
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+
     /**
      * @param string|null $title
      * @return Model
@@ -97,6 +94,16 @@ class Model
         $this->title = $title;
         return $this;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
 
     /**
      * @param string|null $firstname
@@ -108,6 +115,36 @@ class Model
         return $this;
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getFirstnamePreferred(): ?string
+    {
+        return $this->firstnamePreferred;
+    }
+
+
+    /**
+     * @param string|null $firstnamePreferred
+     * @return Model
+     */
+    public function setFirstnamePreferred(?string $firstnamePreferred): self
+    {
+        $this->firstnamePreferred = $firstnamePreferred;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+
     /**
      * @param string|null $lastname
      * @return Model
@@ -118,6 +155,7 @@ class Model
         return $this;
     }
 
+
     /**
      * @return Storage\Model|null
      */
@@ -125,6 +163,7 @@ class Model
     {
         return $this->portrait;
     }
+
 
     /**
      * @param Storage\Model|null $portrait

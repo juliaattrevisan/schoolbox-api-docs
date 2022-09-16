@@ -269,13 +269,8 @@ class Profile implements IStrategy
             $campusName = $this->findCampusName($student['organisationMilestones']);
             $dob = $this->findDate($student['dateOfBirth']);
             $email = $this->findEmail($student['studentDetails']);
-
-            /* Prioritise preferred names over official names
-             */
-            $firstname = (new FirstMeaningfulValue())->find([
-                $student['preferredFirstName'],
-                $student['firstName']
-            ]);
+            $firstname = (string)$student['firstName'];
+            $firstnamePreferred = (string)$student['preferredFirstName'];
 
             $form = $this->findForm($student['organisationMilestones']);
             $gender = trim((string)$student['gender']);
@@ -375,6 +370,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it
@@ -455,8 +451,9 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding student profile for %s (%s)',
+                'Adding student profile for %s (preferred: %s) (%s)',
                 trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                $firstnamePreferred,
                 $externalId
             ));
 
