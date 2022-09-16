@@ -107,10 +107,10 @@ class Classes implements IStrategy
          *
          * So far only MECS have used it where we found On Call events
          */
-        12 => [
-            'name' => 'On call',
-            'allowed' => false
-        ]
+//        12 => [
+//            'name' => 'On call',
+//            'allowed' => false
+//        ]
     ];
 
 

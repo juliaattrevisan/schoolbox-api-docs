@@ -104,10 +104,10 @@ class NonAcademicEvents implements IStrategy
          *
          * So far only MECS have used it where we found On Call events
          */
-        12 => [
-            'name' => 'On call',
-            'allowed' => true
-        ]
+//        12 => [
+//            'name' => 'On call',
+//            'allowed' => true
+//        ]
     ];
 
 
