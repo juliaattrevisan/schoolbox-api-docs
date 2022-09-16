@@ -36,12 +36,12 @@ class Codec
 
     /**
      * @param User  $user
-     * @param       $page
+     * @param string $page
      * @param array $request
      * @return GenericCollection
      * @throws Exception
      */
-    public function convertRequestToSelections(User $user, $page, array $request): GenericCollection
+    public function convertRequestToSelections(User $user, string $page, array $request): GenericCollection
     {
         /** @var GenericCollection|GenericCollection[]|Selection\Model[][] $selections */
         $selections = new GenericCollection(GenericCollection::class);
