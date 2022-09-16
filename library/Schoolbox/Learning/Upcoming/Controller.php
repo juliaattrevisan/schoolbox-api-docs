@@ -483,8 +483,8 @@ class Controller extends Base
                     $accessibleFolderIds, array_fill(0, count($accessibleFolderIds), '0')
                 );
             } else {
+                $optionIsEnabledByKey = [];
                 foreach ($filter->getPages() as $page) {
-                    $optionIsEnabledByKey = [];
                     foreach ($page->getOptions() as $option) {
                         if ($option->getAvailable()) {
                             $optionIsEnabledByKey[$option->getKey()] = '0';
