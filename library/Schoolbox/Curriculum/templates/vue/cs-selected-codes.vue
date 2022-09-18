@@ -19,7 +19,7 @@ const codesInputEl = ref(null);
  * to listen for any clears of the selected codes from outside the Vue app
  */
 onMounted(() => {
-    document.addEventListener('CURRICULUM-SELECTOR__CLEAR_SELECTED_CODES', (event) => {
+    document.addEventListener('FILTERS__CLEAR_FILTER', (event) => {
         if (codesInput.value === event.detail.elementId) { //just in case there are multiple on the page
             selectedCodesStore.empty();
         }

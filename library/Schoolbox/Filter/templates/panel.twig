@@ -75,12 +75,16 @@ Usage:
         //add a custom event listener here
 
         // Listen for user removing an applied filter
-        $appliedFilters.on('click', '[data-close]', function(){
+        $appliedFilters.on('click', '[data-close]', function(event){
             var $filterTab = $(this).closest('[data-applied-filter-tab]');
             clearFilter($filterTab.data('applied-filter-tab'));
             $filterTab.remove();
-            //dispatch an event for curriculum-selector to listen to?
-            document.dispatchEvent(new CustomEvent('CURRICULUM-SELECTOR__CLEAR_SELECTED_CODES', { detail: { elementId: $filterPanel.find('[data-selected-curriculum-codes]').attr('id') } } ) );
+            //dispatch an event for curriculum-selector to listen to
+            const $curriculumSelector = $filterPanel.find('[data-selected-curriculum-codes]');
+            const clearedFilterTitle = event.currentTarget.parentElement.querySelector('[data-filter-name]').innerText
+            if ($curriculumSelector.length > 0 && clearedFilterTitle === 'Curriculum Codes') {
+                document.dispatchEvent(new CustomEvent('FILTERS__CLEAR_FILTER', { detail: { elementId: $curriculumSelector.attr('id') } } ) );
+            }
             return false; // don't bubble
         });
 
@@ -119,6 +123,11 @@ Usage:
                 if (selectize) {
                     selectize.setValue(JSON.parse(this.dataset.valueDefault));
                 }
+            });
+
+            // Reset curriculum selector
+            $filterPanel.find('[data-selected-curriculum-codes]').each(function () {
+                document.dispatchEvent(new CustomEvent('FILTERS__CLEAR_FILTER', { detail: { elementId: $(this).attr('id') } } ) );
             });
 
             updateFiltersInUseLabel();
