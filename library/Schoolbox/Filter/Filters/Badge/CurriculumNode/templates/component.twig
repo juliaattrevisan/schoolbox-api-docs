@@ -13,7 +13,7 @@
         <div data-cs-container>
             <curriculum-selector
                 :is-read-only="false"
-                :selected-codes="{{ (selectedNodes ?? []) | json_encode | raw }}"
+                :selected-codes="{{ (selectedNodes ?? []) | json_encode }}"
                 data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
                 form-value-name="filter_selection[{{ definition.filter.id }}]"
             />
