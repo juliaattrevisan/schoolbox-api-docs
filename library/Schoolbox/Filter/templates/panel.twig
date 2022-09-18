@@ -704,8 +704,8 @@ Usage:
                     const valuesAndLabels = JSON.parse($curriculumSelector.val());
                     valuesAndLabels.forEach(function (item) {
                         componentsInUse[filterId]['labels'].push({
-                            value: item.value,
-                            label: item.label,
+                            value: item.id,
+                            label: item.code,
                         });
                     });
                 }

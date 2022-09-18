@@ -12,7 +12,7 @@ import CsSelectedCode from './cs-selected-code.vue';
 
 const store = useStore();
 const selectedCodesStore = useSelectedCodesStore();
-const valuesAndLabelsEl = ref(null);
+const codesInputEl = ref(null);
 
 
 /**
@@ -20,7 +20,7 @@ const valuesAndLabelsEl = ref(null);
  */
 onMounted(() => {
     document.addEventListener('CURRICULUM-SELECTOR__CLEAR_SELECTED_CODES', (event) => {
-        if (selectedCodesElementId.value === event.detail.elementId) { //just in case there are multiple on the page
+        if (codesInput.value === event.detail.elementId) { //just in case there are multiple on the page
             selectedCodesStore.empty();
         }
     });
@@ -37,23 +37,23 @@ const ids = computed(() => {
 });
 
 /**
- *
+ * We use to compare the curriculum selector that's just been cleared in the CLEAR_SELECTED_CODES event
  *
  * @returns { String }
  */
-const selectedCodesElementId = computed(() => {
+const codesInput = computed(() => {
     return `${store.formValueName}-selected-codes`;
 });
 
 /**
  * This is currently exclusively for use in library/Schoolbox/Filter/templates/panel.twig
- * We decode this array on the other side to display the Curriculum codes within the selected filters panel
+ * We JSON.parse() this string on the other side to display the Curriculum codes within the selected filters panel
  *
  * @returns { String }
  */
-const valuesAndLabels = computed(() => {
+const codes = computed(() => {
     const justIdsAndLabels = selectedCodesStore.codes.map((code) => {
-        return { value: code.id, label: code.code }
+        return { id: code.id, code: code.code }
     });
     return JSON.stringify(justIdsAndLabels);
 });
@@ -65,7 +65,7 @@ const valuesAndLabels = computed(() => {
 watch(() => selectedCodesStore.codesIds, () => {
     nextTick(() => { //nextTick to ensure the dom has updated the value property
         const event = new Event('change');
-        valuesAndLabelsEl.value.dispatchEvent(event);
+        codesInputEl.value.dispatchEvent(event);
     });
 });
 
@@ -84,7 +84,7 @@ watch(() => selectedCodesStore.codesIds, () => {
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
     <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />
-    <input :id="selectedCodesElementId" ref="valuesAndLabelsEl" type="hidden" tabindex="-1" :value="valuesAndLabels" data-selected-curriculum-codes />
+    <input :id="codesInput" ref="codesInputEl" type="hidden" tabindex="-1" :value="codes" data-selected-curriculum-codes />
 </template>
 
 <style lang="scss" scoped>
