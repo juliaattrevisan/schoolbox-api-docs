@@ -399,7 +399,7 @@ class Controller extends Base
      * The purpose of this function is to generate the same request that would have been generated automatically
      * had $this->request->query->get('filters', []) been empty in $this->getEvents().
      * If $this->request->query->get('filters', []) had been empty, the request would have been generated in Javascript
-     * by inspecting the filter HTML form.
+     * by inspecting the filter HTML form and extracting the necessary details for the request from there.
      *
      * This is done because if an expected filters parameter was left off the URL, and this function was not used, the
      * response might contain events to which the user should not have access.
@@ -410,10 +410,17 @@ class Controller extends Base
      *       meaning:                                  learning/due/$userId (filtered to include only events in folders {50, 56, 69})
      *       The response will be events contained in those three folders only.
      *     * However, if we don't specify any folders: learning/due/$userId
-     *       The response will be events contained in any folder.
-     *     * To get around this problem we must ensure that the filters folder parameter always exists and contains folderIds.
-     *     * Note that we must also ensure that any folderId specified in the URL is accessible by the user.
-     *       This is done in $this->removeInaccessibleFolderIdsFromFiltersRequest().
+     *       The response will be events contained in any folder.  This is a problem because most folders have nothing
+     *       to do with the logged in user, and should not be visible to that user.
+     *     * To get around this problem we must ensure that the filters folder parameter always exists and contains only
+     *       folderIds that are accessible by the logged in user.
+     *
+     * Note that the explanation of how the filter system works above, applies also to other filters besides folderIds.
+     * However, the problem that exists for folderIds does not exist for most other filters.  To see why this is the
+     * case, consider the 'Assessment Type' filter - with options {'project', 'quiz', 'dueWork', 'task', 'lti'}.  If no
+     * Assessment Type filter options are provided in the URL, events of all assessment types will be included in the
+     * response data.  That is no problem at all, because there are no permission rules restricting access to different
+     * assessment types.  Folders are different, because folders have associated permission rules.
      *
      * TODO: (Maybe) This problem likely exists in other controllers.  A more general solution might be to do something
      *       similar to this in library/Schoolbox/Filter/AbstractIdFinder::normaliseFilters().
@@ -524,6 +531,11 @@ class Controller extends Base
     }
 
     /**
+     * This function is required because the folderIds in the $request may have been input directly to the URL by a
+     * malicious user.
+     * Note that $this->fillInMissingKeysAndValues() only adds missing data to the request.  It will not remove
+     * folderIds that have been input directly to the URL by a malicious user.
+     *
      * @param array $request
      * @param array $accessibleFolderIds
      * @return array
