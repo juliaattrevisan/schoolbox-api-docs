@@ -125,6 +125,15 @@ function onCancelSelected () {
     updateNodeStore.cancel();
 }
 
+/**
+ * Only enable the button once the conditions are met
+ *
+ * @returns { Boolean }
+ */
+const isUpdateDisabled = computed(() => {
+    return updateNodeStore.activeNodeCopy.name.trim().length === 0 || updateNodeStore.isProcessing;
+});
+
 </script>
 
 <template>
@@ -133,16 +142,16 @@ function onCancelSelected () {
             <fieldset class="content">
                 <legend>Update {{ activeNodeStore.title }}</legend>
                 <div class="small-12 columns">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" v-model="updateNodeStore.activeNodeCopy.name">
+                    <label for="name" class="required">Name</label>
+                    <input type="text" id="name" v-model="updateNodeStore.activeNodeCopy.name" maxlength="2048" required>
                 </div>
                 <div class="small-12 columns">
                     <label for="code">Code</label>
-                    <input type="text" id="code" v-model="updateNodeStore.activeNodeCopy.code">
+                    <input type="text" id="code" v-model="updateNodeStore.activeNodeCopy.code" maxlength="64">
                 </div>
                 <div class="small-12 columns">
                     <label for="description">Description</label>
-                    <textarea :id="ckeditorInstance" rows="6"></textarea>
+                    <textarea :id="ckeditorInstance" rows="6" maxlength="65000"></textarea>
                 </div>
                 <div class="small-12 columns">
                     <ul class="flex-list">
@@ -150,7 +159,7 @@ function onCancelSelected () {
                             <button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button icon-close" :disabled="updateNodeStore.isProcessing">Cancel</button>
                         </li>
                         <li>
-                            <button @click.prevent="onUpdateSelected" @keyup.enter="onUpdateSelected" class="button icon-modify submit" :disabled="updateNodeStore.isProcessing">{{ updateButtonText }}</button>
+                            <button @click.prevent="onUpdateSelected" @keyup.enter="onUpdateSelected" class="button icon-modify submit" :disabled="isUpdateDisabled">{{ updateButtonText }}</button>
                         </li>
                     </ul>
                 </div>
