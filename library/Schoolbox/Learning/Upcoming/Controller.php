@@ -339,24 +339,19 @@ class Controller extends Base
         $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
         $filterByClassName   = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
-        if (array_key_exists(self::FOLDER_FILTER_CLASS_NAME, $filterByClassName)) {
+        $filterByClassName[self::FOLDER_FILTER_CLASS_NAME] = (
+            (array_key_exists(self::FOLDER_FILTER_CLASS_NAME, $filterByClassName))?
             // We cannot trust that the user has access to the folders that have been specified in the URL.  It is
             // fine to do that for other filter types, because those filter types do not have associated permission
             // rules.  Folders do have permission rules, so here we filter the folderIds in the filter to include
             // only those that are accessible to the user.
             $filterByClassName[self::FOLDER_FILTER_CLASS_NAME]->filter(
                 static function ($folderId) use($accessibleFolderIds) {return in_array($folderId, $accessibleFolderIds, true);}
-            );
-        } else {
+            ):
             // We can't just include all folders if none have been specified in the URL.  We prevent that from
             // happening later, by here adding a folders filter containing all accessible folderIds.
-            $filterByClassName[self::FOLDER_FILTER_CLASS_NAME] = new Collection(
-                array_combine(
-                    $accessibleFolderIds,
-                    $accessibleFolderIds
-                )
-            );
-        }
+            new Collection(array_combine($accessibleFolderIds, $accessibleFolderIds))
+        );
 
         $visibility = new Visibility($this->access);
 
