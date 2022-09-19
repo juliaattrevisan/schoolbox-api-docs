@@ -132,6 +132,11 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
      */
     public function updateMsgRedirect(Component_Config $model, array $diff = [])
     {
+        // if src value is not changed, do nothing.
+        if (!isset($diff['value'])) {
+            return;
+        }
+
         $instance = $this->getInstanceFromConfig($model);
 
         // update is a delete-and-replace action
