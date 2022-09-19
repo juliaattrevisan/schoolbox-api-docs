@@ -59,7 +59,7 @@ class Controller extends Base
      * Name of class used for filtering folders.
      * Not sure whether we need to account for Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved\Definition also?
      */
-    private const FOLDER_FILTER_CLASS_NAME = 'Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions\Definition';
+    private const FOLDER_FILTER_CLASS_NAME = \Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions\Definition::class;
 
     /**
      * Limit of upcoming assessments shown in list
@@ -256,9 +256,7 @@ class Controller extends Base
 
         // Only fetch assessments that are:
         // * assessment impls
-        $filters = array_merge($filters, [
-            Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
-        ]);
+        $filters = array_merge($filters, [Filters\Assessment\NullableContext\UnitSpec\Definition::class => []]);
 
         // If there's a huge number of IDs, we may need to chunk them and query
         // on each chunk.
