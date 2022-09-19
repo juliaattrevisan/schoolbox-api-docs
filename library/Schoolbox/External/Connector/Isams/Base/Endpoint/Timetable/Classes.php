@@ -139,7 +139,6 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
          *
@@ -274,7 +273,6 @@ class Classes implements IStrategy
      */
     private function createTimetableClass(array $subject): ClassEntry
     {
-
         /* See if one exists already; if so, reuse it
          */
         try {
@@ -323,7 +321,6 @@ class Classes implements IStrategy
      */
     private function createTimetableClassPeriod(array $users, array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
     {
-
         /* create record for class_period - should have all the data from $class iterator output
          * so you can look up individual pieces of the puzzle
          *
