@@ -8,8 +8,10 @@
 
 namespace Schoolbox\Learning\Upcoming;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
 use DomainException;
@@ -33,17 +35,20 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme\Factory;
-use Schoolbox\Mapper;
 use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use UnderflowException;
 use UnexpectedValueException;
 
-use function func_get_args;
+use function array_merge;
+use function array_unique;
+use function count;
 
 /**
  * Controller for the upcoming work screen.
@@ -51,109 +56,48 @@ use function func_get_args;
 class Controller extends Base
 {
     /**
+     * Name of class used for filtering folders.
+     */
+    private const FOLDER_FILTER_CLASS_NAME = \Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions\Definition::class;
+
+    /**
      * Limit of upcoming assessments shown in list
      */
     protected const UPCOMING_WORK_LIMIT = 20;
 
     /**
-     * External Class data source
-     *
-     * @var External_ClassInterface
-     */
-    protected $externalClass;
-
-    /**
-     * Folder data source
-     *
-     * @var FolderMapper
-     */
-    protected $folderMapper;
-
-    /**
-     * User data source
-     *
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * Term data source
-     *
-     * @var TermMapper
-     */
-    protected $termMapper;
-
-    /**
-     * Assessment data source
-     *
-     * @var AssessmentMapperProxy
-     */
-    protected $assessmentDataSource;
-
-    /**
-     * Participant data source
-     *
-     * @var ParticipantDataSource
-     */
-    protected $participantDataSource;
-
-    /** @var Filter\IFactoryFactory */
-    private $filterFactoryFactory;
-
-    /** @var Filter\Filters\Assessment\IdFinder */
-    private $assessmentIdFinder;
-
-    /** @var Filter\Selection\Mapper */
-    private $filterSelectionMapper;
-
-    /** @var Access */
-    private $access;
-
-
-    /**
      * Constructor
      *
-     * @param External_ClassInterface            $externalClass
-     * @param FolderMapper                       $folderMapper
-     * @param UserMapper                         $userMapper
-     * @param TermMapper                         $termMapper
-     * @param AssessmentMapperProxy              $assessmentDataSource
-     * @param ParticipantDataSource              $participantDataSource
+     * @param External_ClassInterface            $externalClass         - External Class data source.
+     * @param FolderMapper                       $folderMapper          - Folder data source.
+     * @param UserMapper                         $userMapper            - User data source.
+     * @param TermMapper                         $termMapper            - Term data source.
+     * @param AssessmentMapperProxy              $assessmentDataSource  - Assessment data source.
+     * @param ParticipantDataSource              $participantDataSource - Participant data source.
      * @param Filter\IFactoryFactory             $filterFactoryFactory
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Filter\Selection\Mapper            $filterSelectionMapper
      * @param Access                             $access
      */
     public function __construct(
-        External_ClassInterface $externalClass,
-        FolderMapper $folderMapper,
-        UserMapper $userMapper,
-        TermMapper $termMapper,
-        AssessmentMapperProxy $assessmentDataSource,
-        ParticipantDataSource $participantDataSource,
-        Filter\IFactoryFactory $filterFactoryFactory,
-        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Filter\Selection\Mapper $filterSelectionMapper,
-        Access $access
+        protected External_ClassInterface $externalClass,
+        protected FolderMapper $folderMapper,
+        protected UserMapper $userMapper,
+        protected TermMapper $termMapper,
+        protected AssessmentMapperProxy $assessmentDataSource,
+        protected ParticipantDataSource $participantDataSource,
+        private Filter\IFactoryFactory $filterFactoryFactory,
+        private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        private Filter\Selection\Mapper $filterSelectionMapper,
+        private Access $access
     ) {
-        $this->externalClass         = $externalClass;
-        $this->folderMapper          = $folderMapper;
-        $this->userMapper            = $userMapper;
-        $this->termMapper            = $termMapper;
-        $this->assessmentDataSource  = $assessmentDataSource;
-        $this->participantDataSource = $participantDataSource;
-        $this->filterFactoryFactory  = $filterFactoryFactory;
-        $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->filterSelectionMapper = $filterSelectionMapper;
-        $this->access                = $access;
     }
-
 
     /**
      * Redirects to the upcoming work screen for the current user.
      *
      * @api GET /learning/due/
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     public function getUpcoming(): void
     {
@@ -165,22 +109,20 @@ class Controller extends Base
         );
     }
 
-
     /**
      * Displays upcoming work for the given user.
      *
-     * @api   GET /learning/due/:studentId{/:date}
      * @param User                $student
      * @param Alaress_Date_Format $date
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws InvalidColumnException
+     * @throws RouteNotFound
      * @throws DomainException
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws DefinitionException
-     * @throws \UnderflowException
-     * @throws UnexpectedValueException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException|Exception
+     * @api   GET /learning/due/:studentId{/:date}
      */
     public function getUpcomingForStudent(User $student, Alaress_Date_Format $date): void
     {
@@ -208,16 +150,15 @@ class Controller extends Base
 
         // Calculate whether we need to load participation so we can calculate class aggregate grades
         $displayGradesForFolders = [];
-        $isStaff                   = $this->getUser()->getRole()->isStaff();
-        $isStudentOrParent         = $this->getUser()->getRole()->isStudent() || $this->getUser()->getRole()->isParent();
+        $isStaff                 = $this->getUser()->getRole()->isStaff();
 
         foreach ($folders as $folder) {
             // Load teachers for this subject (if this subject has them)
             $teachers = [];
-            if (\count($folder->getCodes())) {
+            if (count($folder->getCodes())) {
                 // Actual teachers only
                 $teacherCodes = $this->externalClass->getTeachers($folder->getCodeString());
-                if (\count($teacherCodes)) {
+                if (count($teacherCodes)) {
                     $pb       = $this->userMapper->getPredicateBuilder()
                                                  ->in('synergy_id', $teacherCodes)
                                                  ->equals('g.group_type', Role::STAFF);
@@ -226,9 +167,9 @@ class Controller extends Base
             }
             $perm = $this->access->getFolderAccess($this->getUser(), $folder->getId());
 
-            // We need to fetch assessments so we can show overall grades for each folder if:
+            // We need to fetch assessments, so we can show overall grades for each folder if:
             // * viewer is staff/instructor
-            // * viewer is student/parent && 'show_overall_grade' is ON .. will be taken care of later
+            // * viewer is student/parent && 'show_overall_grade' is ON ... will be taken care of later
             if ($isStaff || $perm >= UserAccess::ACCESS_WRITE) {
                 $displayGradesForFolders[] = $folder;
             }
@@ -244,7 +185,7 @@ class Controller extends Base
 
         $markSchemeFactory = new Factory($this->getConfigLoader());
 
-        if (\count($displayGradesForFolders)) {
+        if (count($displayGradesForFolders)) {
             $visibility = new Visibility($this->access);
             // Student's work
             $workPerFolder = $this->assessmentDataSource
@@ -289,10 +230,9 @@ class Controller extends Base
         );
     }
 
-
     /** @noinspection PhpUnused */
     /**
-     * Returns a JSON payload containing a HTML fragment where the HTML fragment is a filtered list of assessments.
+     * Returns a JSON payload containing an HTML fragment where the HTML fragment is a filtered list of assessments.
      *
      * @api /learning/due/{studentId:\d+}
      *
@@ -302,7 +242,7 @@ class Controller extends Base
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws DefinitionException
-     * @throws Mapper\Exception
+     * @throws Exception
      * @throws UnexpectedValueException
      */
     public function postUpcomingForStudent(User $student): void
@@ -315,13 +255,11 @@ class Controller extends Base
 
         // Only fetch assessments that are:
         // * assessment impls
-        $filters = \array_merge($filters, [
-            Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
-        ]);
+        $filters = array_merge($filters, [Filters\Assessment\NullableContext\UnitSpec\Definition::class => []]);
 
         // If there's a huge number of IDs, we may need to chunk them and query
         // on each chunk.
-        $ids     = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+        $ids = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         if (count($ids) > 0) {
             $allWork = $this->assessmentDataSource
                 ->findAllByStudentBetweenDates($student, true, null, null, ['ids' => $ids]);
@@ -354,7 +292,7 @@ class Controller extends Base
             'student'         => $student,
             'upcomingWork'    => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
             'returnUrl'       => Redirect::queryString(RequestUriParser::parseUrlPath($this->request->server->getArrayCopy())),
-            'readableFolders' => \array_unique($readableFolders),
+            'readableFolders' => array_unique($readableFolders),
             'isFiltered'      => (new Filter\RequestChecker())->isFilteredRequest($request),
         ];
 
@@ -366,9 +304,8 @@ class Controller extends Base
         ]));
     }
 
-
     /**
-     * Returns a array that maps filter ids to slugs so we can apply semantics to the IDs
+     * Returns an array that maps filter ids to slugs, so we can apply semantics to the IDs
      *
      * @param Filter\Panel $filterPanel
      * @return array
@@ -385,26 +322,35 @@ class Controller extends Base
 
     /**
      * @param User $student
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Exception
      */
     public function getEvents(User $student): void
     {
         // Due work calendar could take a while
         $this->extendExecutionTime();
 
+        $accessibleFolderIds = $this->getFolderIdsAccessibleToUser($student);
         $request             = $this->request->query->get('filters', []);
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
-        $filters             = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
+        $filterByClassName   = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
-        if (count($filters) === 0) {
-            // If no filters were supplied, the result set was found to include events that were irrelevant to the user,
-            // and should not be seen by that user (see SA-14181).  The easiest solution (suggested by James) was just to
-            // forbid requests that do not include a valid filter.  Note an invalid filter query would have caused an error
-            // above in the filter factory.
-            throw ErrorMapper::getInstance()->generateException(0, null, "URL parameter 'filters' is required.");
-        }
+        $filterByClassName[self::FOLDER_FILTER_CLASS_NAME] = (
+            (array_key_exists(self::FOLDER_FILTER_CLASS_NAME, $filterByClassName)) ?
+            // We cannot trust that the user has access to the folders that have been specified in the URL.  It is
+            // fine to do that for other filter types, because those filter types do not have associated permission
+            // rules.  Folders do have permission rules, so here we filter the folderIds in the filter to include
+            // only those that are accessible to the user.
+            $filterByClassName[self::FOLDER_FILTER_CLASS_NAME]->filter(
+                static function ($folderId) use ($accessibleFolderIds) {
+                    return in_array($folderId, $accessibleFolderIds, true);
+                }
+            ) :
+            // We can't just include all folders if none have been specified in the URL.  We prevent that from
+            // happening later, by here adding a folders filter containing all accessible folderIds.
+            new Collection(array_combine($accessibleFolderIds, $accessibleFolderIds))
+        );
 
         $visibility = new Visibility($this->access);
 
@@ -424,7 +370,7 @@ class Controller extends Base
                 $this->assessmentDataSource,
                 $visibility,
                 $this->assessmentIdFinder,
-                $filters
+                $filterByClassName
             ),
             $start,
             $end,
@@ -437,5 +383,27 @@ class Controller extends Base
         $this->response->content->set($this->buildJsonOutput(
             array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON))
         ));
+    }
+
+    /**
+     * @param User $user
+     * @return array
+     */
+    private function getFolderIdsAccessibleToUser(User $user): array
+    {
+        $folderIds = [];
+        $folders   = $this->folderMapper->findForUser(
+            $user,
+            !$user->getHideTimetable(),
+            UserAccess::ACCESS_READ,
+            false,
+            true
+        );
+
+        foreach ($folders as $folder) {
+            $folderIds[] = $folder->getId();
+        }
+
+        return $folderIds;
     }
 }
