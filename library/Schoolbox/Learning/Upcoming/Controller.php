@@ -25,6 +25,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters;
+use Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions\Definition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Calendar\Events\Api;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -57,7 +58,6 @@ class Controller extends Base
 {
     /**
      * Name of class used for filtering folders.
-     * Not sure whether we need to account for Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved\Definition also?
      */
     private const FOLDER_FILTER_CLASS_NAME = \Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions\Definition::class;
 
@@ -338,14 +338,16 @@ class Controller extends Base
         $filterByClassName   = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
         $filterByClassName[self::FOLDER_FILTER_CLASS_NAME] = (
-            (array_key_exists(self::FOLDER_FILTER_CLASS_NAME, $filterByClassName))?
+            (array_key_exists(self::FOLDER_FILTER_CLASS_NAME, $filterByClassName)) ?
             // We cannot trust that the user has access to the folders that have been specified in the URL.  It is
             // fine to do that for other filter types, because those filter types do not have associated permission
             // rules.  Folders do have permission rules, so here we filter the folderIds in the filter to include
             // only those that are accessible to the user.
             $filterByClassName[self::FOLDER_FILTER_CLASS_NAME]->filter(
-                static function ($folderId) use($accessibleFolderIds) {return in_array($folderId, $accessibleFolderIds, true);}
-            ):
+                static function ($folderId) use ($accessibleFolderIds) {
+                    return in_array($folderId, $accessibleFolderIds, true);
+                }
+            ) :
             // We can't just include all folders if none have been specified in the URL.  We prevent that from
             // happening later, by here adding a folders filter containing all accessible folderIds.
             new Collection(array_combine($accessibleFolderIds, $accessibleFolderIds))
