@@ -128,7 +128,7 @@
                         refreshData: {cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}'},
                         dictDefaultMessage: 'You can drag files into this space.',
                         showIfEmpty: false,
-                        reloadContent: false,
+                        reloadContent: true,
                         sending: function (file, xhr, formData) {
                             var desc = file.name.substr(0, file.name.lastIndexOf('.'));
                             if(desc.length > 0){
