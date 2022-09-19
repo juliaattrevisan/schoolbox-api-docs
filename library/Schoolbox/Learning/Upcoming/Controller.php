@@ -496,8 +496,7 @@ class Controller extends Base
         foreach ($filterState as $item) {
             $filter = $item->getFilter();
 
-            // Magic constant 3 here is the URL parameter key used to specify the 'folders' filter.
-            if ($filter->getId() === 3) {
+            if ($filter->getClass() === 'Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions\Definition') { // TODO: Maybe can replace with constant?
                 $optionIsEnabledByKey = array_combine(
                     $accessibleFolderIds,
                     array_fill(0, count($accessibleFolderIds), '0')
