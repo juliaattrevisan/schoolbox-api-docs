@@ -72,12 +72,6 @@ class BindingLoader implements ILoader
         $a = microtime(true);
 
         foreach ($userIds as $i => $userId) {
-            try {
-                $user = $this->userMapper->findById($userId);
-            } catch (Exception $e) {
-                // should not happen, but just in case
-                continue;
-            }
             $routeCount = 0;
             foreach (array_keys($this->getUserSubscriptions($userId)) as $userSub) {
                 $router->add($userSub, $userId, true);
@@ -86,12 +80,11 @@ class BindingLoader implements ILoader
             }
             $this->log->debug(
                 sprintf(
-                    "$progressPattern %3d routes loaded for user %5d (%s)",
+                    "$progressPattern %3d routes loaded for user %5d",
                     $i + 1,
                     $userCount,
                     $routeCount,
-                    $userId,
-                    $user->getUsername()
+                    $userId
                 )
             );
         }

@@ -821,21 +821,6 @@ parameters:
 			path: library/Chat.php
 
 		-
-			message: "#^Parameter \\#3 \\$previous \\(null\\) of method Component_ConfigMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
-			count: 1
-			path: library/Component/ConfigMapper.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between string and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Component/ConfigNotifier.php
-
-		-
-			message: "#^Variable \\$to in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Component/ConfigNotifier.php
-
-		-
 			message: "#^PHPDoc tag @return with type object is not subtype of native type Alaress\\\\Authorizer\\\\Authorizer\\.$#"
 			count: 1
 			path: library/Component/ControllerAbstract.php
