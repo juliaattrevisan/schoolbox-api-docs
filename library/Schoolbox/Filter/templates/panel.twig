@@ -35,7 +35,7 @@ Usage:
         var $panelComponents     = $filterPanel.find('[data-component]');
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
         var $submitButton        = $('#submit_button');
-        var $optionInputs        = $filterPanel.find('input[type=checkbox], input[type=hidden], input[type=text], select, [data-selected-curriculum-codes]');
+        var $optionInputs        = $filterPanel.find('input[type=checkbox], input[type=hidden], input[type=text], select, input[data-selected-curriculum-codes]');
         var $toast               = $('[data-relation="submit-label"]');
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
@@ -100,6 +100,7 @@ Usage:
                     selectize.setValue(JSON.parse(this.dataset.valueOriginal));
                 }
             });
+            //set curriculum selector back to default selection
             updateFiltersInUseLabel();
         });
 
@@ -125,7 +126,7 @@ Usage:
                 }
             });
 
-            // Reset curriculum selector
+            // Reset curriculum selector to default
             $filterPanel.find('[data-selected-curriculum-codes]').each(function () {
                 document.dispatchEvent(new CustomEvent('FILTERS__CLEAR_FILTER', { detail: { elementId: $(this).attr('id') } } ) );
             });
@@ -205,6 +206,7 @@ Usage:
             var href        = $submitButton.data('href'),
                 data        = $optionInputs.serializeArray(),
                 decodedData = deserialize(data);
+            console.warn(decodedData);
             $submitButton.val($submitButton.data('working'));
 
             disableInputs();
@@ -681,6 +683,16 @@ Usage:
                     });
                 }
 
+                if (hasCurriculumSelector) {
+                    const valuesAndLabels = JSON.parse($curriculumSelector.val());
+                    valuesAndLabels.forEach(function (item) {
+                        componentsInUse[filterId]['labels'].push({
+                            value: item.id,
+                            label: item.code,
+                        });
+                    });
+                }
+                console.warn($selected.length)
                 // Build list of labels from selected options or checkboxes,
                 // if there are any.
                 if ($selected.length !== 0) {
@@ -699,7 +711,7 @@ Usage:
                         }
 
                         // Don't add this label if it's already been added once
-                        if (value && !componentsInUse[filterId]['labels'].some(v => v.value === value)) {
+                        if (value && !componentsInUse[filterId]['labels'].some(v => v.value === parseInt(value))) {
                             componentsInUse[filterId]['labels'].push({
                                 value: value,
                                 label: label,
@@ -717,17 +729,6 @@ Usage:
                         componentsInUse[filterId]['labels'] = [];
                     }
                 }
-
-                if (hasCurriculumSelector) {
-                    const valuesAndLabels = JSON.parse($curriculumSelector.val());
-                    valuesAndLabels.forEach(function (item) {
-                        componentsInUse[filterId]['labels'].push({
-                            value: item.id,
-                            label: item.code,
-                        });
-                    });
-                }
-
                 // Build list of labels from text inputs, if they are there
                 if (!hasSelectize && !hasCurriculumSelector && $textInputs.length !== 0) {
                     $textInputs.each(function () {

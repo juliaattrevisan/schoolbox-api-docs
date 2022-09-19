@@ -7,7 +7,7 @@ import { useCodesStore } from './csCodesStore';
 
 
 export let apiEndpoint = '';
-// export let uniqueId = 0;
+
 
 export const useStore = defineStore(`curriculumSelector`, {
 
@@ -16,6 +16,7 @@ export const useStore = defineStore(`curriculumSelector`, {
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place, like updating a member access
         isReadOnly: true, //can only view the currently selected codes, not edit them
+        containerWidth: 0,
     }),
 
     getters: {
@@ -27,6 +28,15 @@ export const useStore = defineStore(`curriculumSelector`, {
          */
         hasLoadedOk () {
             return !this.isLoading && !this.hasLoadError;
+        },
+
+        /**
+         * To tweak the design of the selector when small
+         *
+         * @returns { Boolean }
+         */
+        isSmallContainer () {
+            return this.containerWidth < 500;
         },
 
     },
@@ -42,6 +52,16 @@ export const useStore = defineStore(`curriculumSelector`, {
             apiEndpoint = endpoint;
             const codesStore = useCodesStore();
             codesStore.initTopLevel();
+        },
+
+        /**
+         * to track the width of the container the curriculum selector is in,
+         * so we can update the design when appropriate
+         *
+         * @param { number }
+         */
+        updateContainerWidth (width) {
+            this.containerWidth = width;
         },
 
     },

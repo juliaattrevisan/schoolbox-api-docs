@@ -4,7 +4,9 @@
  * To select Curriculum Codes to assign to something like a Due Work
  */
 
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
+import { ResizeObserver } from 'vue3-resize';
+import 'vue3-resize/dist/vue3-resize.css';
 import { useStore } from './store/curriculumSelectorStore';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 import { useSearchStore } from './store/csSearchStore';
@@ -52,6 +54,7 @@ const props = defineProps({
     }
 });
 
+const store = useStore();
 const curriculumSelectorEl = ref(null);
 
 
@@ -60,7 +63,6 @@ const curriculumSelectorEl = ref(null);
  */
 onMounted(() => {
     checkForStorybook();
-    const store = useStore();
     store.isReadOnly = props.isReadOnly;
     store.formValueName = props.formValueName;
     if (!store.isReadOnly && props.dataEndpoint !== '') { //only load when we need to
@@ -69,6 +71,7 @@ onMounted(() => {
     if (props.selectedCodes?.length > 0) { //add in any codes that have been selected previously
         useSelectedCodesStore().add(props.selectedCodes);
     }
+    checkContainerWidth();
 });
 
 /**
@@ -85,6 +88,21 @@ function checkForStorybook () {
     }
 }
 
+/**
+ * so can respond to dimenion changes if required
+ */
+async function checkContainerWidth () {
+    await nextTick();
+    store.updateContainerWidth(curriculumSelectorEl.value.offsetWidth);
+}
+
+/**
+ * Any changes to the element size are tracked by ResizeObserver so can update dimensions
+ */
+function onContainerResize () {
+    checkContainerWidth();
+}
+
 </script>
 
 <template>
@@ -92,15 +110,12 @@ function checkForStorybook () {
         <cs-selected-codes />
         <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
         <cs-search-results />
+        <resize-observer @notify="onContainerResize" />
     </div>
     <cs-modal />
     <cs-active-selected-code-modal />
 </template>
 
 <style lang="scss" scoped>
-
-.columns {
-    margin-bottom: 1rem;
-}
 
 </style>

@@ -8,6 +8,7 @@
 {% endblock filterComponent %}
 
 {% block userOptions %}
+    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
     <li>
     {% if isUserConfigurable %}
         <div data-cs-container>
