@@ -404,7 +404,7 @@ class Controller extends BaseController
 
             $group['owners'] = $this->userMapper->findByAccess(
                 UserAccess::SERVICE_HOMEPAGE,
-                UserAccess::ACCESS_WRITE,
+                UserAccess::ACCESS_FULL,
                 $groupFolder->getId(),
             )->sortNaturally('lastname');
 
