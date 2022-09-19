@@ -75,6 +75,11 @@ class Mimetype implements ISoftDeletable
     protected $deleted;
 
     /**
+     * should the system serve the transcoded file or the original file
+     */
+    protected $transcodable = true;
+
+    /**
      * Get icon class by deriving it from the iconFile
      *
      * This previously abused the \Url class, but now it's all self-contained here and independent.
@@ -333,6 +338,31 @@ class Mimetype implements ISoftDeletable
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function getTranscodable()
+    {
+        return $this->isTranscodable();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTranscodable()
+    {
+        return $this->transcodable;
+    }
+
+    /**
+     * @param bool $transcodable
+     * @return $this
+     */
+    public function setTranscodable(bool $transcodable)
+    {
+        $this->transcodable = $transcodable;
+        return $this;
+    }
 
     /**
      * Is this file streamable? (Audio and video are streamable, others are not)

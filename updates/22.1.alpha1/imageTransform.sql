@@ -14,3 +14,8 @@ VALUES ((SELECT fileTypeID from allowedFileTypes where description = 'Apple HEIC
 
 INSERT INTO allowedFileExtension (fileTypeID, extension)
 VALUES ((SELECT fileTypeID from allowedFileTypes where description = 'Apple HEIF'), 'heif');
+
+
+alter table allowedFileTypes
+    add transcodable enum ('true', 'false') default 'true';
+
