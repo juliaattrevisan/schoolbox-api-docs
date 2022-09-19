@@ -4,11 +4,11 @@
  * to show further info in a modal on a code that's been selected
  */
 
-import { computed, onMounted } from 'vue';
-import { isScriptAdded, injectScript } from '@js/util/domUtils';
 import { useStore } from '../store/manageCurriculumStore';
+import { computed, watch } from 'vue';
 import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import { useAddSubsectionStore } from './store/mcAddSubsectionStore';
+import { useCKEditor } from '../composable/useCKEditor';
 
 
 const props = defineProps({
@@ -37,54 +37,19 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
  *
  * @returns { String }
  */
-const ckeditorInstance = computed(() => `description-${activeNodeStore.node?.id}` );
+const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}`);
 
 /**
- * to load the ckeditor when ready
+ * Use a customised ckeditor for the description field
  */
-onMounted(() => {
-    loadCKEditor();
+ const descriptionField = useCKEditor(addSubsectionStore.subsection.description, ckeditorInstance.value);
+
+/**
+ * And watch for changes on this field so we can update the description in the store
+ */
+watch(descriptionField, (newValue) => {
+    addSubsectionStore.subsection.description = newValue;
 });
-
-/**
- * load the ckeditor into the browser
- */
-async function loadCKEditor () {
-    try {
-        const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
-        if (!isScriptAdded(ckeditorScript)) {
-            await injectScript(ckeditorScript);
-        }
-        const jqueryEditorScript = `${cdnPrefix}/js/editor/jquery.editor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
-        if (!isScriptAdded(jqueryEditorScript)) {
-            await injectScript(jqueryEditorScript);
-        }
-        $.fn.alaressEditor($.alaressEditorConfigBasic(getVueSpecificConfig()));
-    } catch (error) {
-        console.warn(error);
-    }
-}
-
-/**
- * The config that needs to be passed to CKEditor in order to for it to work in Vue land
- *
- * @returns { Object }
- */
-function getVueSpecificConfig () {
-    return {
-        on: {
-            change: () => { // Bind the content of CKEditor into the description model on change
-                addSubsectionStore.subsection.description = CKEDITOR.instances[ckeditorInstance.value].getData();
-            },
-            instanceReady: (event) => { //can display the loaded CKEditor now
-                if (addSubsectionStore.subsection.description !== null) {
-                    event.editor.setData(addSubsectionStore.subsection.description); //set the initial data
-                }
-            }
-        },
-        targetElements: $(`#${ckeditorInstance.value}`),
-    }
-}
 
 /**
  * To instantly notify the user that the subsection is being added

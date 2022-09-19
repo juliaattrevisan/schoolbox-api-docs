@@ -38,7 +38,7 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
  *
  * @returns { String }
  */
-const ckeditorInstance = computed(() => `description-${activeNodeStore.node?.id}` );
+const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}`);
 
 /**
  * Use a customised ckeditor for the description field
