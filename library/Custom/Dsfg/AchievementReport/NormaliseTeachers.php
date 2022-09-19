@@ -14,7 +14,6 @@ namespace Custom\Dsfg\AchievementReport;
  */
 class NormaliseTeachers
 {
-
     /**
      * Numerical indices that contain teacher data
      * Denormalised records suggest three columns which might contain teachers
