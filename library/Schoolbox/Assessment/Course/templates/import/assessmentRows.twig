@@ -121,7 +121,7 @@
                         <span class="{{ icon.renderClass(assessment) }}" title="{{ assessment.defaultTypeName }}"></span>
                         <span>{{ assessment.title }} {% if assessment.workType.name %}<span class="pipe meta">{{ assessment.workType.name }}</span>{% endif %}</span>
                         {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
-                            <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
+                            <br><span class="meta">Imported from '{{ assessmentSpec.title }}'</span>
                         {% endif %}
                     </label>
 
