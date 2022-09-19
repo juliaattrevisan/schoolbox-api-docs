@@ -22,8 +22,6 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
 
     private Component_InstanceMapper $componentInstanceMapper;
 
-    private Component_DefinitionMapper $componentDefinitionMapper;
-
     private Component_ConfigDefinitionMapper $componentConfigDefinitionMapper;
 
     private WriteCache $subscriptionCache;
@@ -46,7 +44,6 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
 
         return [
             'setComponentInstanceMapper'         => $mf->get(Component_InstanceMapper::class),
-            'setComponentDefinitionMapper'       => $mf->get(Component_DefinitionMapper::class),
             'setComponentConfigDefinitionMapper' => $mf->get(Component_ConfigDefinitionMapper::class),
             'setSubscriptionCache'               => $di->get('subscriptionCache'),
         ];
@@ -71,15 +68,6 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param Component_DefinitionMapper $componentDefinitionMapper
-     * @return void
-     */
-    public function setComponentDefinitionMapper(Component_DefinitionMapper $componentDefinitionMapper)
-    {
-        $this->componentDefinitionMapper = $componentDefinitionMapper;
-    }
-
-    /**
      * @param Component_ConfigDefinitionMapper $componentConfigDefinitionMapper
      * @return void
      */
@@ -97,14 +85,25 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         /** @var Component_Config $model */
         $model = $bundle->getEvent()->getObject();
 
-        // if not src, do not trigger
+        // * The subscription cache needs to be rebuilt if:
+        // * * the component has an alt source
+        // * * the component's definition includes a notification namespace
         $definitions = $this->componentConfigDefinitionMapper->findIdsByColumn('key', 'src');
         if (!in_array($model->getConfigDefinitionId(), $definitions, false)) {
             return;
         }
+        try {
+            $instance = $this->componentInstanceMapper->findById($model->getInstanceId());
+            if (!$instance->getDefinition()->getNamespace()) {
+                return;
+            }
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->log->debug("Failed to find instance: {$model->getInstanceId()} " . $e->getMessage());
+            return;
+        }
 
-        // Detach existing reload request
-        $bundle->detach(self::TRIGGER_RELOAD);
+        // Detach existing reload request TODO: disabling this for now
+        // $bundle->detach(self::TRIGGER_RELOAD);
         // Trigger refreshing subscription cache after 10 seconds
         $now = (\Alaress_Date_Format::now())->addSeconds(10);
         $bundle->attach(self::TRIGGER_RELOAD, $now->getUnixTimeStamp());
@@ -126,24 +125,14 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
 
 
     /**
-     * Rebuild the subscription cache if required.
-     *
-     * The subscription cache needs to be rebuilt if:
-     * * the component has an alt source
-     * * the component's definition includes a notification namespace
+     * Rebuild the subscription cache.
      *
      * @param Component_Config $model
      * @param User|null        $effector
      * @return void
-     * @throws \Schoolbox\Mapper\Exception
      */
     public function notifySystemReload(Component_Config $model, User $effector = null)
     {
-        $instance = $this->componentInstanceMapper->findById($model->getInstanceId());
-
-        // ensure definition hydrated
-        $instance->setDefinition($this->componentDefinitionMapper->findById($instance->getDefinitionId()));
-
         $this->subscriptionCache->cacheRedirects(INSTANCE_ID);
     }
 }
