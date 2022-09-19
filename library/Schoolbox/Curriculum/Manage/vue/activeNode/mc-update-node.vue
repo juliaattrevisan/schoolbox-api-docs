@@ -60,7 +60,7 @@ async function loadCKEditor () {
         if (!isScriptAdded(jqueryEditorScript)) {
             await injectScript(jqueryEditorScript);
         }
-        $.fn.alaressEditor($.alaressEditorConfigBasic(getVueSpecificConfig()));
+        $.fn.alaressEditor($.alaressEditorConfigForComments(getVueSpecificConfig()));
     } catch (error) {
         console.warn(error);
     }
@@ -80,11 +80,24 @@ function getVueSpecificConfig () {
             instanceReady: (event) => { //can display the loaded CKEditor now
                 if (updateNodeStore.activeNodeCopy.description !== null) {
                     event.editor.setData(updateNodeStore.activeNodeCopy.description); //set the initial data
+                    removeMediaEmbedButtons(event.editor.container.$);
                 }
             }
         },
         targetElements: $(`#${ckeditorInstance.value}`),
     }
+}
+
+/**
+ * Remove these buttons as media shouldn't be added to the description field
+ *
+ * @returns { HTMLElement }
+ */
+function removeMediaEmbedButtons (ckeditor) {
+    const videoAudioButton = ckeditor.querySelector('.cke_button__schoolboxresourcemedia');
+    videoAudioButton.style.display = 'none';
+    const imageButton = ckeditor.querySelector('.cke_button__schoolboxresourceimage');
+    imageButton.style.display = 'none';
 }
 
 /**
