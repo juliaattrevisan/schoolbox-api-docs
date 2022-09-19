@@ -256,7 +256,7 @@ class Controller extends Base
 
         // If there's a huge number of IDs, we may need to chunk them and query
         // on each chunk.
-        $ids     = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+        $ids = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         if (count($ids) > 0) {
             $allWork = $this->assessmentDataSource
                 ->findAllByStudentBetweenDates($student, true, null, null, ['ids' => $ids]);
@@ -329,12 +329,23 @@ class Controller extends Base
         $accessibleFolderIds = $this->getFolderIdsAccessibleToUser($student);
         $request             = $this->request->query->get('filters', []);
         $request             = $this->fillInMissingKeysAndValues($request, $this->getDefaultFiltersRequestForGetEvents($accessibleFolderIds));
-        $request             = $this->removeInaccessibleFolderIdsFromFiltersRequest($request, $accessibleFolderIds);
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
-        $filters             = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
-        $visibility          = new Visibility($this->access);
+        $filterByClassName   = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
+
+        foreach ($filterByClassName as $className => $filter) {
+            if ($className === 'Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions\Definition') { // TODO: Maybe can replace with constant?
+                // The folders filter needs to be treated differently from the other filters, because folders have
+                // permission rules.  So we can't just include all folders if none are specified in the URL, or trust
+                // that the user has access to the folders that have been specified in the URL.  It is fine to do that
+                // for the other filter types, because those filter types do not have associated permission rules.
+                // So here we filter the folderIds in the filter to include only those that are accessible to the user.
+                $filter->filter(static function ($folderId) use($accessibleFolderIds) {return in_array($folderId, $accessibleFolderIds, true);});
+            }
+        }
+
+        $visibility = new Visibility($this->access);
 
         // User must have provided a start and end date: error out otherwise
         $start = filter_var($this->request->query->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
@@ -352,7 +363,7 @@ class Controller extends Base
                 $this->assessmentDataSource,
                 $visibility,
                 $this->assessmentIdFinder,
-                $filters
+                $filterByClassName
             ),
             $start,
             $end,
@@ -528,31 +539,5 @@ class Controller extends Base
         }
 
         return $folderIds;
-    }
-
-    /**
-     * This function is required because the folderIds in the $request may have been input directly to the URL by a
-     * malicious user.
-     * Note that $this->fillInMissingKeysAndValues() only adds missing data to the request.  It will not remove
-     * folderIds that have been input directly to the URL by a malicious user.
-     *
-     * @param array $request
-     * @param array $accessibleFolderIds
-     * @return array
-     * @throws \Exception
-     */
-    private function removeInaccessibleFolderIdsFromFiltersRequest(array $request, array $accessibleFolderIds): array
-    {
-        // Magic constant 3 here is the URL parameter key used to specify the 'folders' filter.
-        if (!array_key_exists(3, $request)) {
-            throw ErrorMapper::getInstance()->generateException(0, null, "Expected key '3' not found in filters request array.");
-        }
-
-        // Magic constant 3 here is the URL parameter key used to specify the 'folders' filter.
-        $folderIds  = array_keys($request[3]);
-        $folderIds  = array_intersect($folderIds, $accessibleFolderIds);
-        $request[3] = array_combine($folderIds, array_fill(0, count($folderIds), '0'));
-
-        return $request;
     }
 }
