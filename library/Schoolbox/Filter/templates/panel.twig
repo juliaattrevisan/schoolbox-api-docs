@@ -691,8 +691,9 @@ Usage:
                             label: item.code,
                         });
                     });
+                    console.warn(valuesAndLabels);
                 }
-                console.warn($selected.length)
+
                 // Build list of labels from selected options or checkboxes,
                 // if there are any.
                 if ($selected.length !== 0) {

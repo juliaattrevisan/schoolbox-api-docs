@@ -52,10 +52,10 @@ const codesInput = computed(() => {
  * @returns { String }
  */
 const codes = computed(() => {
-    const justIdsAndLabels = selectedCodesStore.codes.map((code) => {
+    const codes = selectedCodesStore.codes.map((code) => {
         return { id: parseInt(code.id), code: code.code }
     });
-    return JSON.stringify(justIdsAndLabels);
+    return JSON.stringify(codes);
 });
 
 /**
@@ -83,7 +83,7 @@ watch(() => selectedCodesStore.codesIds, () => {
     <div v-else-if="selectedCodesStore.hasNoCodes && store.isReadOnly" class="selected-codes-container" data-test-container>
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
-    <!-- <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" /> -->
+    <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />
     <input :id="codesInput" ref="codesInputEl" type="hidden" tabindex="-1" :value="codes" data-selected-curriculum-codes />
     <select :id="`${store.formValueName}[]`" :name="`${store.formValueName}[]`" multiple tabindex="-1" style="display: none;">
         <option
