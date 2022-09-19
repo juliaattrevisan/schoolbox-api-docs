@@ -254,7 +254,7 @@ class Controller extends BaseController
         $parentFolderId = $this->request->post->getInt('parent');
         //the UI is marking the folder field as required, so lets check that here
         if (0 === $parentFolderId) {
-            $this->throwNotSelectedError('You must select a Folder.');
+            $this->throwNotSelectedError('You must select a folder.');
             return;
         }
         $baseFolder = $this->folderMapper->findById($parentFolderId);
