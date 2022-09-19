@@ -314,6 +314,7 @@ class Importer
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
                 ->setFirstname($row['Firstname'])
+                ->setFirstnamePreferred($row['Preferred Firstname'])
                 ->setLastname($row['Surname']);
 
             /* Date of birth - strtotime doesn't understand empty cells and returns false
@@ -550,6 +551,7 @@ class Importer
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
                 ->setFirstname($row['Firstname'])
+                ->setFirstnamePreferred($row['Preferred Firstname'])
                 ->setLastname($row['Surname']);
 
             $staffProfile
@@ -661,6 +663,7 @@ class Importer
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
                 ->setFirstname($row['Firstname'])
+                ->setFirstnamePreferred($row['Preferred Firstname'])
                 ->setLastname($row['Surname']);
 
             $parentProfile
