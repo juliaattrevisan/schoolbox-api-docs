@@ -25,7 +25,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters;
-use Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions\Definition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Calendar\Events\Api;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
