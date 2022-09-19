@@ -24,7 +24,6 @@ use Schoolbox\Role;
  */
 class Mapping
 {
-
     /**
      * Strings that denote a csv file
      */
