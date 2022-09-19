@@ -19,7 +19,6 @@ use Schoolbox\ISoftDeletable;
  */
 class Mimetype implements ISoftDeletable
 {
-
     /**
      * Allowed File id
      *
