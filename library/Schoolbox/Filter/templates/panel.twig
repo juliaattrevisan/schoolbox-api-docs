@@ -165,7 +165,15 @@ Usage:
                         .attr('data-value-original', itemsJson);
                 }
             });
+
             //do the same for curriculum selector as selectize
+            $filterPanel.find('[data-selected-curriculum-codes]').each(function () {
+                const valuesAndLabels = JSON.parse($(this).val());
+                const itemsJson = JSON.stringify(valuesAndLabels.map((item) => item.id));
+                $(this).data('valueOriginal', itemsJson)
+                $(this).attr('data-value-original', itemsJson);
+            });
+
             updateFiltersInUseLabel();
         }
 
