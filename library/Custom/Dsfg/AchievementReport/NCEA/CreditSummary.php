@@ -10,7 +10,6 @@ namespace Custom\Dsfg\AchievementReport\NCEA;
 
 class CreditSummary extends Base
 {
-
     /**
      * Heading
      *
@@ -99,7 +98,7 @@ class CreditSummary extends Base
             $internalExternal = $current['InternalorExternalAssessment'];
             $letter = $current['StrippedResult'];
 
-            if (!is_array($finalStack[$level])) {
+            if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
                     'totalEnteredCredits' => 0,
                     'IN' => [
@@ -179,7 +178,7 @@ class CreditSummary extends Base
             $level = $current['Level'];
             $internalExternal = $current['InternalorExternalAssessment'];
 
-            if (!is_array($finalStack[$level])) {
+            if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
                     'achieved' => 0,
                     'available' => 0,
@@ -237,7 +236,7 @@ class CreditSummary extends Base
             $level = $current['Level'];
             $internalExternal = $current['InternalorExternalAssessment'];
 
-            if (!is_array($finalStack[$level])) {
+            if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
                     'unit' => 0,
                     'achievement' => 0,
@@ -297,7 +296,7 @@ class CreditSummary extends Base
             $level = $current['Level'];
             $internalExternal = $current['InternalorExternalAssessment'];
 
-            if (!is_array($finalStack[$level])) {
+            if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
                     'IN' => 0,
                     'EX' => 0,
@@ -353,7 +352,7 @@ class CreditSummary extends Base
             $level = $current['Level'];
             $internalExternal = $current['InternalorExternalAssessment'];
 
-            if (!is_array($finalStack[$level])) {
+            if (!isset($finalStack[$level])) {
                 $finalStack[$level] = array_fill_keys($this->achievementLetterRegistry, 0);
 
                 $finalStack[$level]['available'] = 0;

@@ -64,11 +64,13 @@
         <div class="small-12 island">
             <section class="content">
                 <p class="subheading">Comments</p>
-                <p>{{ subjectData.comment }}
-                    {% if subjectData.comment is not empty and subjectData.staffName is not empty %}
-                        &mdash; <a href="mailto:{{ subjectData.staffEmail }}">{{ subjectData.staffName }}</a>
+                {% for comment in subjectData.comments ?? [] %}
+                <p>{{ comment.comment }}
+                    {% if comment.comment is not empty and comment.staffName is not empty %}
+                        &mdash; <a href="mailto:{{ comment.staffEmail }}">{{ comment.staffName }}</a>
                     {% endif %}
                 </p>
+                {% endfor %}
             </section>
         </div>
     </div>

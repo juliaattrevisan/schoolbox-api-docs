@@ -47,7 +47,7 @@ class Base extends AchievementReportBase
                 ShortHeading,
                 HdgAbbrev1,
                 ResultNumeric,
-                Comment,
+                -- Comment,
                 StaffMailNamePrimary,
                 StaffEmail
             FROM
@@ -59,6 +59,7 @@ class Base extends AchievementReportBase
         ";
 
         $rows     = $this->db->executeQuery($query, $params)->fetchAll();
+        $comments = $this->getComments();
         $mypData  = [];
         $headings = [];
         foreach ($rows as $row) {
@@ -92,7 +93,7 @@ class Base extends AchievementReportBase
                 $mypData[$classCode] = [
                     'topics'     => [],
                     'overview'   => $row['Overview'],
-                    'comment'    => $row['Comment'],
+                    'comments'   => $comments[$classCode] ?? [],
                     'staffName'  => $staffName,
                     'staffEmail' => $staffEmail,
                 ];
@@ -115,6 +116,52 @@ class Base extends AchievementReportBase
             'data'     => $mypData,
             'headings' => $headings,
         ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getComments(): array
+    {
+        $params = [
+            'externalId' => $this->getExternalUserId(),
+            'year'       => $this->year,
+            'resultType' => 'MYPGRADE',
+        ];
+
+        $query = '
+            SELECT
+--                StudentYear,
+                Term,
+                ClassCode,
+--                CourseDescription,
+                Comment,
+                ClassTeacher1,
+                ClassTeacher1Email,
+--                ClassTeacher2,
+--                ClassTeacher2Email,
+--                ClassTeacher3,
+--                ClassTeacher3Email,
+                ResultType
+            FROM dbo.uvSchoolBoxReportComments
+            WHERE id = :externalId
+            AND StudentYear = :year
+            AND ResultType = :resultType
+            ORDER BY ClassCode, Term
+        ';
+        $rows  = $this->db->executeQuery($query, $params)->fetchAll();
+
+        $commentData = [];
+        foreach ($rows as $row) {
+            $commentData[$row['ClassCode']]   ??= [];
+            $commentData[$row['ClassCode']][] =
+                [
+                    'comment'    => sprintf('Term %s - %s', trim($row['Term']), trim($row['Comment'])),
+                    'staffName'  => $row['ClassTeacher1'],
+                    'staffEmail' => $row['ClassTeacher1Email'],
+                ];
+        }
+        return $commentData;
     }
 
     /**

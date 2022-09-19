@@ -10,7 +10,6 @@ namespace Custom\Dsfg\AchievementReport\NCEA;
 
 class EntriesAndResults extends Base
 {
-
     /**
      * Heading
      *
@@ -81,12 +80,11 @@ class EntriesAndResults extends Base
                 'EnteredCredits' => $current['EnteredCredits'],
                 'Result' => $result,
                 'StrippedResult' => $strippedResult,
-                'ResultBrackets' => $current['ResultBrackets']
             ];
 
             /* Letter summary stuff
              */
-            if (!is_array($finalStack[$courseName]['summary'])) {
+            if (!isset($finalStack[$courseName]['summary'])) {
                 $finalStack[$courseName]['summary'] = [
                     'level' => '',
                     'totalEnteredCredits' => 0,

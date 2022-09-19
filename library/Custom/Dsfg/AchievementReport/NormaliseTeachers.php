@@ -14,7 +14,6 @@ namespace Custom\Dsfg\AchievementReport;
  */
 class NormaliseTeachers
 {
-
     /**
      * Numerical indices that contain teacher data
      * Denormalised records suggest three columns which might contain teachers
@@ -46,6 +45,10 @@ class NormaliseTeachers
         foreach (self::TEACHER_INDEXES as $currentTeacherIndex) {
             $key = "ClassTeacher{$currentTeacherIndex}";
             $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
+
+            if (!isset($current[$key])) {
+                continue;
+            }
 
             /* Teacher's name is in this field
              */
