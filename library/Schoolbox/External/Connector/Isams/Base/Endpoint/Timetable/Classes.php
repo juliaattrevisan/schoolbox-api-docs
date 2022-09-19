@@ -247,7 +247,7 @@ class Classes implements IStrategy
                         /* Throw warning, but assign them anyway
                          */
                         if (!isset($users[$student['username']])) {
-                            $this->log->warning(sprintf(
+                            $this->log->debug(sprintf(
                                 'Tried to assign nonexistent schoolbox account %s to class %s %s; username might not exist in schoolbox user table',
                                 $student['username'],
                                 $timetableClass->getName(),
