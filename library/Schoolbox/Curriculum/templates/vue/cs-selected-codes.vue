@@ -12,7 +12,6 @@ import CsSelectedCode from './cs-selected-code.vue';
 
 const store = useStore();
 const selectedCodesStore = useSelectedCodesStore();
-const codesInputEl = ref(null);
 const selectEl = ref(null);
 
 
@@ -21,7 +20,7 @@ const selectEl = ref(null);
  */
 onMounted(() => {
     document.addEventListener('FILTERS__CLEAR_FILTER', (event) => {
-        if (codesInput.value === event.detail.elementId) { //just in case there are multiple on the page
+        if (selectEl.value.getAttribute('id') === event.detail.elementId) { //just in case there are multiple on the page
             selectedCodesStore.empty();
         }
     });
@@ -89,8 +88,7 @@ watch(() => selectedCodesStore.codesIds, () => {
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
     <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />
-    <!-- <input :id="codesInput" ref="codesInputEl" type="hidden" tabindex="-1" :value="codes" data-selected-curriculum-codes /> -->
-    <select :id="`${store.formValueName}[]`" :name="`${store.formValueName}[]`" multiple tabindex="-1" ref="selectEl" style="display: none;">
+    <select :id="`${store.formValueName}[]`" :name="`${store.formValueName}[]`" multiple ref="selectEl" data-search-select tabindex="-1">
         <option
             v-for="code in selectedCodesStore.codes"
             :key="code.id"
@@ -116,6 +114,10 @@ watch(() => selectedCodesStore.codesIds, () => {
 
 .no-codes-note {
     margin-top: 0.35rem;
+}
+
+select[data-search-select] {
+    display: none;
 }
 
 </style>

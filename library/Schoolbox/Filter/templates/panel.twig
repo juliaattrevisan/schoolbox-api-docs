@@ -35,7 +35,7 @@ Usage:
         var $panelComponents     = $filterPanel.find('[data-component]');
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
         var $submitButton        = $('#submit_button');
-        var $optionInputs        = $filterPanel.find('input[type=checkbox], input[type=hidden], input[type=text], select, input[data-selected-curriculum-codes]');
+        var $optionInputs        = $filterPanel.find('input[type=checkbox], input[type=hidden], input[type=text], select');
         var $toast               = $('[data-relation="submit-label"]');
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
@@ -69,23 +69,14 @@ Usage:
 
         // Listen for user checking filter options
         $optionInputs.on('change', function(){
-            console.warn('change');
             updateFiltersInUseLabel();
         });
 
-        //add a custom event listener here
-
         // Listen for user removing an applied filter
-        $appliedFilters.on('click', '[data-close]', function(event){
+        $appliedFilters.on('click', '[data-close]', function(){
             var $filterTab = $(this).closest('[data-applied-filter-tab]');
             clearFilter($filterTab.data('applied-filter-tab'));
             $filterTab.remove();
-            //dispatch an event for curriculum-selector to listen to
-            const $curriculumSelector = $filterPanel.find('[data-selected-curriculum-codes]');
-            const clearedFilterTitle = event.currentTarget.parentElement.querySelector('[data-filter-name]').innerText
-            if ($curriculumSelector.length > 0 && clearedFilterTitle === 'Curriculum Codes') {
-                document.dispatchEvent(new CustomEvent('FILTERS__CLEAR_FILTER', { detail: { elementId: $curriculumSelector.attr('id') } } ) );
-            }
             return false; // don't bubble
         });
 
@@ -101,7 +92,6 @@ Usage:
                     selectize.setValue(JSON.parse(this.dataset.valueOriginal));
                 }
             });
-            //set curriculum selector back to default selection
             updateFiltersInUseLabel();
         });
 
@@ -125,11 +115,6 @@ Usage:
                 if (selectize) {
                     selectize.setValue(JSON.parse(this.dataset.valueDefault));
                 }
-            });
-
-            // Reset curriculum selector to default
-            $filterPanel.find('[data-selected-curriculum-codes]').each(function () {
-                document.dispatchEvent(new CustomEvent('FILTERS__CLEAR_FILTER', { detail: { elementId: $(this).attr('id') } } ) );
             });
 
             updateFiltersInUseLabel();
@@ -167,15 +152,6 @@ Usage:
                         .attr('data-value-original', itemsJson);
                 }
             });
-
-            //do the same for curriculum selector as selectize
-            $filterPanel.find('[data-selected-curriculum-codes]').each(function () {
-                const valuesAndLabels = JSON.parse($(this).val());
-                const itemsJson = JSON.stringify(valuesAndLabels.map((item) => item.id));
-                $(this).data('valueOriginal', itemsJson)
-                $(this).attr('data-value-original', itemsJson);
-            });
-
             updateFiltersInUseLabel();
         }
 
@@ -207,7 +183,6 @@ Usage:
             var href        = $submitButton.data('href'),
                 data        = $optionInputs.serializeArray(),
                 decodedData = deserialize(data);
-            console.warn(decodedData);
             $submitButton.val($submitButton.data('working'));
 
             disableInputs();
@@ -662,9 +637,7 @@ Usage:
                     $textInputs  = $component.find('input[type=text]'),
                     $selectize   = $component.find('select[data-selectize]'),
                     hasSelectize = $selectize.length > 0,
-                    selectize    = hasSelectize ? $selectize[0].selectize : null
-                    $curriculumSelector = $component.find('[data-selected-curriculum-codes]');
-                    hasCurriculumSelector = $curriculumSelector.length > 0;
+                    selectize    = hasSelectize ? $selectize[0].selectize : null;
 
                 // These will be deleted if the filter's not in use
                 componentsInUse[filterId]         = {};
@@ -684,19 +657,6 @@ Usage:
                     });
                 }
 
-                if (hasCurriculumSelector) {
-                    const valuesAndLabels = JSON.parse($curriculumSelector.val());
-                    valuesAndLabels.forEach(function (item) {
-                        componentsInUse[filterId]['labels'].push({
-                            value: item.id,
-                            label: item.code,
-                        });
-                    });
-                    console.warn(valuesAndLabels);
-                }
-
-                console.warn(componentsInUse[filterId]['labels']);
-
                 // Build list of labels from selected options or checkboxes,
                 // if there are any.
                 if ($selected.length !== 0) {
@@ -715,7 +675,7 @@ Usage:
                         }
 
                         // Don't add this label if it's already been added once
-                        if (value && !componentsInUse[filterId]['labels'].some(v => v.value === parseInt(value))) {
+                        if (value && !componentsInUse[filterId]['labels'].some(v => v.value === value)) {
                             componentsInUse[filterId]['labels'].push({
                                 value: value,
                                 label: label,
@@ -733,8 +693,9 @@ Usage:
                         componentsInUse[filterId]['labels'] = [];
                     }
                 }
+
                 // Build list of labels from text inputs, if they are there
-                if (!hasSelectize && !hasCurriculumSelector && $textInputs.length !== 0) {
+                if (!hasSelectize && $textInputs.length !== 0) {
                     $textInputs.each(function () {
                         let values = this.value.split(/\s+/);
                         // Try splitting on space
