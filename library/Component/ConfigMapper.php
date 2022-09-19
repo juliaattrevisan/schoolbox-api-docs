@@ -31,10 +31,19 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
             if (!$this->definitionIsSource($model)) {
                 return;
             }
+            $instance = $this->getInstanceFromConfig($model);
             if ($previous) {
-                $this->updateMsgRedirect($model, $this->diff($model, $previous));
+                $diff = $this->diff($model, $previous);
+                // if src value is not changed, do nothing.
+                if (!isset($diff['value'])) {
+                    return;
+                }
+
+                // update is a delete-and-replace action
+                $this->handleDelete($instance, (int)$diff['value'][1]);
+                $this->handleCreate($instance, (int)$diff['value'][0]);
             } else {
-                $this->createMsgRedirect($model);
+                $this->handleCreate($instance, (int)$model->getValue());
             }
         });
 
@@ -42,7 +51,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
             if (!$this->definitionIsSource($model)) {
                 return;
             }
-            $this->deleteMsgRedirect($model);
+            $this->handleDelete($this->getInstanceFromConfig($model), (int)$model->getValue());
         });
     }
 
@@ -114,48 +123,6 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
         $this->save($collection);
     }
 
-    /**
-     * @param Component_Config $model
-     * @return void
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    public function createMsgRedirect(Component_Config $model)
-    {
-        $this->handleCreate($this->getInstanceFromConfig($model), (int)$model->getValue());
-    }
-
-    /**
-     * @param Component_Config $model
-     * @param array            $diff
-     * @return void
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    public function updateMsgRedirect(Component_Config $model, array $diff = [])
-    {
-        // if src value is not changed, do nothing.
-        if (!isset($diff['value'])) {
-            return;
-        }
-
-        $instance = $this->getInstanceFromConfig($model);
-
-        // update is a delete-and-replace action
-        $this->handleDelete($instance, (int)$diff['value'][1]);
-        $this->handleCreate($instance, (int)$diff['value'][0]);
-    }
-
-    /**
-     * KNOWN LIMITATION:  If two components point to the exact same alt-source (same ID and NS) the redirect will
-     *                    be deleted, despite the fact that there is still a component pointing to that alt-source.
-     *
-     * @param Component_Config $model
-     * @return void
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    public function deleteMsgRedirect(Component_Config $model)
-    {
-        $this->handleDelete($this->getInstanceFromConfig($model), (int)$model->getValue());
-    }
 
     /**
      * @param Component_Instance $instance
