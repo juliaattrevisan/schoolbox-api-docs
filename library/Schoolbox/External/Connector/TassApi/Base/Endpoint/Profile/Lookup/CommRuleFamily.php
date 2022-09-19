@@ -167,10 +167,8 @@ class CommRuleFamily
             $externalId = $this->deriveExternalId($nodePrefix, (string)$commRule['parent_code'], $familiesLookup);
 
             $stack[$externalId] = [
-                'firstname' => (new FirstMeaningfulValue())->find([
-                    $commRule["{$nodePrefix}_preferred_name"],
-                    $commRule["{$nodePrefix}_first_name"]
-                ]),
+                'firstname' => trim((string)$commRule["{$nodePrefix}_first_name"]),
+                'firstnamePreferred' => trim((string)$commRule["{$nodePrefix}_preferred_name"]),
                 'surname' =>  $commRule["{$nodePrefix}_surname"],
                 'mobile' => (new FirstMeaningfulValue())->find([
                     $commRule['mobile_phone_1'],
