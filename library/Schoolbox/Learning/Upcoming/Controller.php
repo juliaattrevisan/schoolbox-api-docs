@@ -56,6 +56,12 @@ use function count;
 class Controller extends Base
 {
     /**
+     * Name of class used for filtering folders.
+     * Not sure whether we need to account for Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved\Definition also?
+     */
+    private const FOLDER_FILTER_CLASS_NAME = 'Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions\Definition';
+
+    /**
      * Limit of upcoming assessments shown in list
      */
     protected const UPCOMING_WORK_LIMIT = 20;
@@ -328,21 +334,28 @@ class Controller extends Base
 
         $accessibleFolderIds = $this->getFolderIdsAccessibleToUser($student);
         $request             = $this->request->query->get('filters', []);
-        $request             = $this->fillInMissingKeysAndValues($request, $this->getDefaultFiltersRequestForGetEvents($accessibleFolderIds));
         $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $codec               = new Codec(Filter\Mapper::getInstance(), $this->filterSelectionMapper);
         $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
         $filterByClassName   = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
-        foreach ($filterByClassName as $className => $filter) {
-            if ($className === 'Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions\Definition') { // TODO: Maybe can replace with constant?
-                // The folders filter needs to be treated differently from the other filters, because folders have
-                // permission rules.  So we can't just include all folders if none are specified in the URL, or trust
-                // that the user has access to the folders that have been specified in the URL.  It is fine to do that
-                // for the other filter types, because those filter types do not have associated permission rules.
-                // So here we filter the folderIds in the filter to include only those that are accessible to the user.
-                $filter->filter(static function ($folderId) use($accessibleFolderIds) {return in_array($folderId, $accessibleFolderIds, true);});
-            }
+        if (array_key_exists(self::FOLDER_FILTER_CLASS_NAME, $filterByClassName)) {
+            // We cannot trust that the user has access to the folders that have been specified in the URL.  It is
+            // fine to do that for other filter types, because those filter types do not have associated permission
+            // rules.  Folders do have permission rules, so here we filter the folderIds in the filter to include
+            // only those that are accessible to the user.
+            $filterByClassName[self::FOLDER_FILTER_CLASS_NAME]->filter(
+                static function ($folderId) use($accessibleFolderIds) {return in_array($folderId, $accessibleFolderIds, true);}
+            );
+        } else {
+            // We can't just include all folders if none have been specified in the URL.  We prevent that from
+            // happening later, by here adding a folders filter containing all accessible folderIds.
+            $filterByClassName[self::FOLDER_FILTER_CLASS_NAME] = new Collection(
+                array_combine(
+                    $accessibleFolderIds,
+                    $accessibleFolderIds
+                )
+            );
         }
 
         $visibility = new Visibility($this->access);
@@ -376,146 +389,6 @@ class Controller extends Base
         $this->response->content->set($this->buildJsonOutput(
             array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON))
         ));
-    }
-
-    /**
-     * @param array $array1
-     * @param array $array2
-     * @return array
-     */
-    private function fillInMissingKeysAndValues(array $array1, array $array2): array
-    {
-        foreach ($array2 as $key => $value) {
-            if (is_array($value)) {
-                if (!array_key_exists($key, $array1)) {
-                    $array1[$key] = [];
-                }
-
-                foreach ($value as $keyInner => $valueInner) {
-                    if (!array_key_exists($keyInner, $array1[$key])) {
-                        $array1[$key][$keyInner] = $valueInner;
-                    }
-                }
-            } else {
-                if (!array_key_exists($key, $array1)) {
-                    $array1[$key] = $value;
-                }
-            }
-        }
-
-        return $array1;
-    }
-
-    /**
-     * The purpose of this function is to generate the same request that would have been generated automatically
-     * had $this->request->query->get('filters', []) been empty in $this->getEvents().
-     * If $this->request->query->get('filters', []) had been empty, the request would have been generated in Javascript
-     * by inspecting the filter HTML form and extracting the necessary details for the request from there.
-     *
-     * This is done because if an expected filters parameter was left off the URL, and this function was not used, the
-     * response might contain events to which the user should not have access.
-     *
-     * To see why this happens, here is a brief explanation of how the filter system works:
-     *    Using the folderIds filters as an example,
-     *     * If filters are specified in the URL like: learning/due/$userId?3[50]=0&3[56]=0&3[69]=0
-     *       meaning:                                  learning/due/$userId (filtered to include only events in folders {50, 56, 69})
-     *       The response will be events contained in those three folders only.
-     *     * However, if we don't specify any folders: learning/due/$userId
-     *       The response will be events contained in any folder.  This is a problem because most folders have nothing
-     *       to do with the logged in user, and should not be visible to that user.
-     *     * To get around this problem we must ensure that the filters folder parameter always exists and contains only
-     *       folderIds that are accessible by the logged in user.
-     *
-     * Note that the explanation of how the filter system works above, applies also to other filters besides folderIds.
-     * However, the problem that exists for folderIds does not exist for most other filters.  To see why this is the
-     * case, consider the 'Assessment Type' filter - with options {'project', 'quiz', 'dueWork', 'task', 'lti'}.  If no
-     * Assessment Type filter options are provided in the URL, events of all assessment types will be included in the
-     * response data.  That is no problem at all, because there are no permission rules restricting access to different
-     * assessment types.  Folders are different, because folders have associated permission rules.
-     *
-     * TODO: (Maybe) This problem likely exists in other controllers.  A more general solution might be to do something
-     *       similar to this in library/Schoolbox/Filter/AbstractIdFinder::normaliseFilters().
-     *       A boolean parameter $useDefaultFilterInsteadOfNull (defaulting to false) could be added to that function.
-     *
-     * Example return array:
-     * [
-     *     1 => [
-     *         'project' => '0',
-     *         'quiz'    => '0',
-     *         'dueWork' => '0',
-     *         'task'    => '0',
-     *         'lti'     => '0',
-     *     ],
-     *     3 => [
-     *         // FolderIds to which the user has access.
-     *         50  => '0',
-     *         56  => '0',
-     *         69  => '0',
-     *         72  => '0',
-     *         74  => '0',
-     *         78  => '0',
-     *         80  => '0',
-     *         85  => '0',
-     *         102 => '0',
-     *         189 => '0',
-     *         190 => '0',
-     *         191 => '0',
-     *     ],
-     *     10 => [
-     *         'cap_upcoming' => '0',
-     *         'cap_open'     => '0',
-     *         'cap_overdue'  => '0',
-     *         'cap_closed'   => '0',
-     *     ],
-     *     11 => [
-     *         'unweighted' => '0',
-     *         'weighted'   => '0',
-     *     ],
-     *     12 => [
-     *         1      => '0',
-     *         2      => '0',
-     *         3      => '0',
-     *         4      => '0',
-     *         5      => '0',
-     *         'none' => '0',
-     *     ]
-     * ];
-     *
-     * @param array $accessibleFolderIds
-     * @return array
-     * @see Javascript in library/Schoolbox/Filter/templates/panel.twig.
-     */
-    private function getDefaultFiltersRequestForGetEvents(array $accessibleFolderIds): array
-    {
-        $filterState = $this->filterFactoryFactory->buildCurrentState(
-            Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
-            false
-        );
-
-        $defaultRequest = [];
-        foreach ($filterState as $item) {
-            $filter = $item->getFilter();
-
-            if ($filter->getClass() === 'Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions\Definition') { // TODO: Maybe can replace with constant?
-                $optionIsEnabledByKey = array_combine(
-                    $accessibleFolderIds,
-                    array_fill(0, count($accessibleFolderIds), '0')
-                );
-            } else {
-                $optionIsEnabledByKey = [];
-                foreach ($filter->getPages() as $page) {
-                    foreach ($page->getOptions() as $option) {
-                        if ($option->getAvailable()) {
-                            $optionIsEnabledByKey[$option->getKey()] = '0';
-                        }
-                    }
-                }
-            }
-
-            $defaultRequest[$filter->getId()] = $optionIsEnabledByKey;
-        }
-
-        return $defaultRequest;
     }
 
     /**
