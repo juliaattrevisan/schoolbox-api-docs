@@ -136,7 +136,7 @@ function onBrowseSelected () {
 </script>
 
 <template>
-    <div v-if="!store.isReadOnly" class="input-group">
+    <div v-if="!store.isReadOnly" class="input-group" :data-is-small-container="store.isSmallContainer">
         <input
             v-model="searchStore.query"
             ref="queryInputEl"
@@ -164,8 +164,8 @@ button {
     margin-bottom: 0;
 }
 
-.input-group {
-    flex-direction: column; /* @TODO - this needs to be on resize observer */
+.input-group[data-is-small-container="true"] {
+    flex-direction: column; /*stack the input and button when the container is small */
 }
 
 </style>
