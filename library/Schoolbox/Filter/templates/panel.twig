@@ -69,6 +69,7 @@ Usage:
 
         // Listen for user checking filter options
         $optionInputs.on('change', function(){
+            console.warn('change');
             updateFiltersInUseLabel();
         });
 
@@ -693,6 +694,8 @@ Usage:
                     });
                     console.warn(valuesAndLabels);
                 }
+
+                console.warn(componentsInUse[filterId]['labels']);
 
                 // Build list of labels from selected options or checkboxes,
                 // if there are any.

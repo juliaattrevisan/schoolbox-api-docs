@@ -13,6 +13,7 @@ import CsSelectedCode from './cs-selected-code.vue';
 const store = useStore();
 const selectedCodesStore = useSelectedCodesStore();
 const codesInputEl = ref(null);
+const selectEl = ref(null);
 
 
 /**
@@ -64,8 +65,12 @@ const codes = computed(() => {
  */
 watch(() => selectedCodesStore.codesIds, () => {
     nextTick(() => { //nextTick to ensure the dom has updated the value property
+        const options = selectEl.value.querySelectorAll('option');
+        options.forEach((option) => {
+            option.setAttribute('selected', 'selected');
+        });
         const event = new Event('change');
-        // codesInputEl.value.dispatchEvent(event);
+        selectEl.value.dispatchEvent(event);
     });
 });
 
@@ -84,13 +89,12 @@ watch(() => selectedCodesStore.codesIds, () => {
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
     <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />
-    <input :id="codesInput" ref="codesInputEl" type="hidden" tabindex="-1" :value="codes" data-selected-curriculum-codes />
-    <select :id="`${store.formValueName}[]`" :name="`${store.formValueName}[]`" multiple tabindex="-1" style="display: none;">
+    <!-- <input :id="codesInput" ref="codesInputEl" type="hidden" tabindex="-1" :value="codes" data-selected-curriculum-codes /> -->
+    <select :id="`${store.formValueName}[]`" :name="`${store.formValueName}[]`" multiple tabindex="-1" ref="selectEl" style="display: none;">
         <option
             v-for="code in selectedCodesStore.codes"
             :key="code.id"
             :value="code.id"
-            selected="true"
         >
             {{ code.code }}
         </option>
