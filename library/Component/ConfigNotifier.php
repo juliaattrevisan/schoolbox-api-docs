@@ -85,6 +85,12 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         /** @var Component_Config $model */
         $model = $bundle->getEvent()->getObject();
 
+        $diff = $bundle->getEvent()->getDiff();
+        if (\Schoolbox\Mapper::METHOD_UPDATE === $bundle->getMethod() && !isset($diff['value'])) {
+            // simpler way to get rid of non src config
+            return;
+        }
+
         // * The subscription cache needs to be rebuilt if:
         // * * the component has an alt source
         // * * the component's definition includes a notification namespace
