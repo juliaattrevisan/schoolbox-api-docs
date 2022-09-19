@@ -190,9 +190,13 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
                 //set name
                 if ($file->getFilename() != "") {
+                    $fileUrl = '/send.php?id=' . $file->getId();
+                    if ($file->getMimetype()->isImage() && $file->getMimetype()->isTranscodable()) {
+                        $fileUrl = "/storage/image.php?hash={$file->getHash()}";
+                    }
                     $this->setVar(
                         [
-                            'FILE_URL'          => '/send.php?id=' . $file->getId(),
+                            'FILE_URL'          => $fileUrl,
                             'FILE_TARGET'       => '_blank',
                             'file_no_url_block' => '',
                         ]

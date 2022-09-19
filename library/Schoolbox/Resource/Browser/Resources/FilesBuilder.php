@@ -124,10 +124,14 @@ class FilesBuilder
      */
     private function buildFile(File $file, string $returnURL): array
     {
+        $fileUrl = '/send.php?id=' . $file->getId();
+        if ($file->getMimetype()->isTranscodable()) {
+            $fileUrl = "/storage/image.php?hash={$file->getHash()}";
+        }
         return [
             'name'          => $file->getTitle(),
             'id'            => $file->getId(),
-            'url'           => '/send.php?id=' . $file->getId(),
+            'url'           => $fileUrl,
             'mime'          => [
                 'mimeType'    => $file->getStorage()->getMimetype()->getMime(),
                 'iconFile'    => $file->getStorage()->getMimetype()->getIconFile(),
