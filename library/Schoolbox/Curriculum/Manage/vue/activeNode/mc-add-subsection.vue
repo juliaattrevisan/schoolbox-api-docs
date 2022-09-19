@@ -124,6 +124,15 @@ function onCancelSelected () {
     addSubsectionStore.cancel();
 }
 
+/**
+ * Only enable the button once the conditions are met
+ *
+ * @returns { Boolean }
+ */
+const isAddDisabled = computed(() => {
+    return addSubsectionStore.subsection.name.trim().length === 0 || addSubsectionStore.isProcessing;
+});
+
 </script>
 
 <template>
@@ -132,16 +141,16 @@ function onCancelSelected () {
             <fieldset class="content">
                 <legend>Add subsection to {{ activeNodeStore.title }}</legend>
                 <div class="small-12 columns">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" v-model="addSubsectionStore.subsection.name">
+                    <label for="name" class="required">Name</label>
+                    <input type="text" id="name" v-model="addSubsectionStore.subsection.name" maxlength="2048" required>
                 </div>
                 <div class="small-12 columns">
                     <label for="code">Code</label>
-                    <input type="text" id="code" v-model="addSubsectionStore.subsection.code">
+                    <input type="text" id="code" v-model="addSubsectionStore.subsection.code" maxlength="64">
                 </div>
                 <div class="small-12 columns">
                     <label for="description">Description</label>
-                    <textarea :id="ckeditorInstance" rows="6"></textarea>
+                    <textarea :id="ckeditorInstance" rows="6" maxlength="65000"></textarea>
                 </div>
                 <div class="small-12 columns">
                     <ul class="flex-list">
@@ -149,7 +158,7 @@ function onCancelSelected () {
                             <button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button icon-close" :disabled="addSubsectionStore.isProcessing">Cancel</button>
                         </li>
                         <li>
-                            <button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button icon-add submit" :disabled="addSubsectionStore.isProcessing">{{ addButtonText }}</button>
+                            <button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button icon-add submit" :disabled="isAddDisabled">{{ addButtonText }}</button>
                         </li>
                     </ul>
                 </div>
