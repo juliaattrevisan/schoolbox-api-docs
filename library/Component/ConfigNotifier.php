@@ -86,7 +86,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         $model = $bundle->getEvent()->getObject();
 
         $diff = $bundle->getEvent()->getDiff();
-        if (\Schoolbox\Mapper::METHOD_UPDATE === $bundle->getMethod() && !isset($diff['value'])) {
+        if (\Schoolbox\Mapper::METHOD_UPDATE === $bundle->getMethod() && !($diff && isset($diff['value']))) {
             // simpler way to get rid of non src config
             return;
         }
