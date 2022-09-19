@@ -43,6 +43,7 @@ class Mapping
         'Username' => 'username',
         'Title' => 'title',
         'Firstname' => 'firstname',
+        'Preferred Firstname' => 'preferred_firstname',
         'Surname' => 'lastname',
         'Email' => 'email',
 
@@ -61,6 +62,7 @@ class Mapping
         'Username' => 'username',
         'Title' => 'title',
         'Firstname' => 'firstname',
+        'Preferred Firstname' => 'preferred_firstname',
         'Surname' => 'lastname',
         'Email' => 'email',
 
@@ -115,6 +117,7 @@ class Mapping
         'Username' => 'username',
         'Title' => 'title',
         'Firstname' => 'firstname',
+        'Preferred Firstname' => 'preferred_firstname',
         'Surname' => 'lastname',
         'Email' => 'email',
 
