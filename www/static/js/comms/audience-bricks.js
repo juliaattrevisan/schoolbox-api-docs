@@ -10,7 +10,6 @@
  * * no point using public methods as they need to proxy through privileged to hit private.
  */
 
-
 /**
  * Codec (Encoder + Decoder)
  *
@@ -125,7 +124,7 @@ function Codec() {
         // [X:1^S ∩ Y:2^S] and [Y:2^S ∩ X:1^S] - ie entityType ordering
         // [X:1^S ∩ X:2^S] and [X:2^S ∩ X:1^S] - ie entityValue ordering
         // [X:1^S ∩ X:1^P] and [X:1^P ∩ X:1^S] - ie entityModifier ordering
-        for (var i in childSegments) {
+        for (var i = 0; i < childSegments.length; ++i) {
             childParts.push(encodeSimple(childSegments[i]));
         }
         var encodedChildren = childParts.join(delimiterChildren);
@@ -146,7 +145,7 @@ function Codec() {
         var children = [];
         var encodedChildrenArray = encodedChildren.split(delimiterChildren);
         var childSegment;
-        for (var i in encodedChildrenArray) {
+        for (var i = 0; i < encodedChildrenArray.length; ++i) {
             childSegment = decodeSimple(encodedChildrenArray[i]);
             // Cannot have nested non-self modifiers
             if('self' !== modifier && 'self' !== childSegment.getModifier()){
@@ -160,7 +159,7 @@ function Codec() {
         /** @var {null|Segment} firstSegment */
         var firstSegment = null;
         var inEqualChildFound = false;
-        for(var j in children){
+        for(var j = 0; j < children.length; ++j){
             if(!firstSegment){
                 firstSegment = children[j];
             } else {
@@ -216,7 +215,6 @@ function Codec() {
         throw new Error('Unable to distinguish composite segment children for sort. EntityType: ' + left.getEntityType() + ', EntityValue: ' + left.getEntityValue());
     }
 }
-
 
 /**
  * An Audience Segment
@@ -312,7 +310,7 @@ function Segment(entityType, entityValue, modifier, children)
         } else {
             // Composite case
             var childStrings = [];
-            for(var i in this.children){
+            for(var i = 0; i < this.children.length; ++i){
                 childStrings.push(this.children[i].toString());
             }
             parts.push('value: [' + childStrings.join(';') + ']');
@@ -347,9 +345,9 @@ function Segment(entityType, entityValue, modifier, children)
         }
 
         // Ensure each child of other segment is a child of this segment. Ignores permutation.
-        for(var i in this.children){
+        for(var i = 0; i < this.children.length; ++i){
             var matchingChildFound = false;
-            for(var j in this.children){
+            for(var j = 0; j < this.children.length; ++j){
                 if(this.children[i].equals(other.getChildren()[j])){
                     matchingChildFound = true;
                     break;
@@ -373,8 +371,6 @@ function Segment(entityType, entityValue, modifier, children)
         return entityTypeComposite === this.entityType;
     };
 }
-
-
 
 /**
  * Encapsulates an entityType, set of entityValues, and modifier
@@ -433,7 +429,7 @@ function Dimension(entityType, entityValue, modifier) {
         if(this.entityValues.length !== otherValues.length){
             return 1;
         } else {
-            for(var i in otherValues){
+            for(var i = 0; i < otherValues.length; ++i){
                 if(!otherValues.hasOwnProperty(i)){
                     continue;
                 }
@@ -455,7 +451,6 @@ function Dimension(entityType, entityValue, modifier) {
         return 0 === this.computeDOF(other);
     };
 
-
     /**
      * Attempts to another dimension's entityValues to this dimension.
      * Returns whether any values were added
@@ -471,7 +466,7 @@ function Dimension(entityType, entityValue, modifier) {
         }
         var valuesAdded = false,
             otherValues = other.getEntityValues();
-        for(var i in otherValues){
+        for(var i = 0; i < otherValues.length; ++i){
             var otherValue = otherValues[i];
             if (-1 === this.entityValues.indexOf(otherValue)){
                 this.entityValues.push(otherValue);
@@ -481,8 +476,6 @@ function Dimension(entityType, entityValue, modifier) {
         return valuesAdded;
     }
 }
-
-
 
 /**
  * A Brick is composed of 1:N Segments. It also contains its own data structures for efficient DOF analysis
@@ -521,9 +514,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         throw new Error('Invalid Brick constructor args: ' + "\n" + errors.join("\n"));
     }
 
-
-    var _isComposite = segment.isComposite();
-
+    var _isComposite   = segment.isComposite();
     var self           = this;                    // So private methods can access public properties
     this.segments      = [segment];               // Required to be stored so we can remove from selectize if we remove this brick
     this.dimensions    = [];                      // eg [{folder, [A,B]}, {folder, [Y]}, {role, [Z]}]
@@ -537,7 +528,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         this.dimensions.push(new Dimension(segment.getEntityType(), segment.getEntityValue(), 'self'));
     } else {
         var childSegment, childSegments = segment.getChildren();
-        for(var i in childSegments){
+        for(var i = 0; i < childSegments.length; ++i){
             childSegment = childSegments[i];
             this.dimensions.push(new Dimension(childSegment.getEntityType(), childSegment.getEntityValue(), childSegment.getModifier()));
         }
@@ -550,7 +541,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
 
     if(_isComposite){
         this.modalData = [];
-        for(var j in this.dimensions){
+        for(var j = 0; j < this.dimensions.length; ++j){
             var dimension = this.dimensions[j];
             this.modalData[j] = {};
             this.modalData[j].typeLabel = this.typeLabelMap[dimension.entityType];
@@ -559,7 +550,6 @@ function Brick(segment, typeLabelMap, valueLabelMap)
     }
 
     this.updateLabels();
-
 
     /**
      * Returns this Brick's segments
@@ -622,16 +612,14 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         }
     };
 
-
     /**
      * Returns whether another brick is a logical subset of this brick
      * @return boolean
      */
     this.containsBrick = function(other){
-
         // Check brick modifiers
         var otherModifiers = other.getModifiers();
-        for(var i in otherModifiers){
+        for(var i = 0; i < otherModifiers.length; ++i){
             if(-1 === this.modifiers.indexOf(otherModifiers[i])){
                 return false;
             }
@@ -655,10 +643,11 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         // Each host dimension must contain a distinct guest dimension. Hence we must remove guest dimensions if they match a host to avoid double matches.
         var otherDimensions = other.dimensions.slice(0);
 
-        for(var j in this.dimensions){
+        for(var j = 0; j < this.dimensions.length; ++j){
             var thisDimension  = this.dimensions[j];
             var isSuperSet = false;
-            for(var k in otherDimensions){
+
+            for(var k = 0; k < otherDimensions.length; ++k){
                 if(!otherDimensions.hasOwnProperty(k)){
                     continue;
                 }
@@ -667,7 +656,8 @@ function Brick(segment, typeLabelMap, valueLabelMap)
                     continue;
                 }
                 var isExtraValue = false;
-                for(var l in otherDimension.entityValues){
+
+                for(var l = 0; l < otherDimension.entityValues.length; ++l){
                     if(!otherDimension.entityValues.hasOwnProperty(l)) {
                         continue;
                     }
@@ -688,8 +678,8 @@ function Brick(segment, typeLabelMap, valueLabelMap)
                 return false;
             }
         }
-        return true; // No dimension on this brick is not a superset of a dimension on the other brick
 
+        return true; // No dimension on this brick is not a superset of a dimension on the other brick
     };
 
     /**
@@ -716,7 +706,8 @@ function Brick(segment, typeLabelMap, valueLabelMap)
 
         // Would we need to increase the brick modifiers?
         var brickModifierDOF = 0;
-        for(var i in other.modifiers){
+
+        for(var i = 0; i < other.modifiers.length; ++i){
             if(!other.modifiers.hasOwnProperty(i)){
                 continue;
             }
@@ -727,18 +718,17 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         }
 
         var filteredDimensions = strip0dofDimensionPairs(this.dimensions, other.dimensions);
-
-        var thisDimensions  = filteredDimensions[0];
-        var otherDimensions = filteredDimensions[1];
-
+        var thisDimensions     = filteredDimensions[0];
+        var otherDimensions    = filteredDimensions[1];
 
         // Need to find count of dimensions that can be merged (but not subset);
         var countCompatibleDim = 0;
-        for(var j in otherDimensions){
+
+        for(var j = 0; j < otherDimensions.length; ++j){
             var otherDimension = otherDimensions[j];
 
             var minDof = 2;
-            for(var k in thisDimensions){
+            for(var k = 0; k < thisDimensions.length; ++k){
                 var thisDimension = thisDimensions[k];
                 minDof = Math.min(minDof, thisDimension.computeDOF(otherDimension));
                 if(0 === minDof){
@@ -765,7 +755,6 @@ function Brick(segment, typeLabelMap, valueLabelMap)
 
     };
 
-
     /**
      * In some cases, we need to traverse the dimensions without 0DOF pairs matching as 1DOF pairs.
      * To do so, we must remove them from both arrays.
@@ -778,8 +767,8 @@ function Brick(segment, typeLabelMap, valueLabelMap)
      */
     var strip0dofDimensionPairs = function(thisDimensions, otherDimensions){
         var zeroDofs = [];
-        for(var i in thisDimensions){
-            for(var j in otherDimensions){
+        for(var i = 0; i < thisDimensions.length; ++i){
+            for(var j = 0; j < otherDimensions.length; ++j){
                 if(thisDimensions[i].equals(otherDimensions[j])){
                     zeroDofs.push(thisDimensions[i]);
                     break;
@@ -788,7 +777,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         }
 
         function filterODofs(dimension){
-            for(var k in zeroDofs){
+            for(var k = 0; k < zeroDofs.length; ++k){
                 if(zeroDofs[k].equals(dimension)){
                     return false;
                 }
@@ -801,7 +790,6 @@ function Brick(segment, typeLabelMap, valueLabelMap)
 
         return [filteredThis, filteredThat];
     };
-
 
     /**
      * Attempts to absorb another brick. Returns whether this Brick was mutated to absorb the other Brick.
@@ -818,7 +806,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         // Are we just mutating the brick modifier?
         if(computeBrickModifierDOF(other)){
             var otherModifiers = other.getModifiers();
-            for(var i in otherModifiers){
+            for(var i = 0; i < otherModifiers.length; ++i){
                 if(-1 === this.modifiers.indexOf(otherModifiers[i])){
                     this.modifiers.push(otherModifiers[i]);
                     this.updateLabels();
@@ -828,14 +816,13 @@ function Brick(segment, typeLabelMap, valueLabelMap)
             throw new Error('Unable to aggregate brick by modifier');
         }
 
-
         // Need to strip all 0-DOF dimensions as destination candidates
         var candidateDimensions = this.dimensions.slice(0),
             otherDimensions     = other.getDimensions(),
             sourceDimension     = null;
 
         // For each other dimension
-        for(var k in otherDimensions){
+        for(var k = 0; k < otherDimensions.length; ++k){
             var otherDimension = otherDimensions[k],
                 is0DOF         = false;
 
@@ -868,7 +855,6 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         return true;
     };
 
-
     /**
      * Inserts all the other Brick's segments into this Brick
      *
@@ -876,11 +862,10 @@ function Brick(segment, typeLabelMap, valueLabelMap)
      */
     var absorbBrickSegments = function(other){
         var otherSegments = other.getSegments();
-        for(var i in otherSegments){
+        for(var i = 0; i < otherSegments.length; ++i){
             self.segments.push(otherSegments[i]);
         }
     };
-
 
     /**
      * Returns DOF between this Brick and another Brick's modifiers
@@ -895,7 +880,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
             return 1;
         } else {
             // Same length, need to check each of the other modifiers are present in these modifiers.
-            for(var i in otherBrickModifiers){
+            for(var i = 0; i < otherBrickModifiers.length; ++i){
                 if(otherBrickModifiers.hasOwnProperty(i) && -1 === self.modifiers.indexOf(otherBrickModifiers[i])){
                     return 1;
                 }
@@ -904,7 +889,6 @@ function Brick(segment, typeLabelMap, valueLabelMap)
         return 0
     };
 
-
     /**
      * Explodes this Brick into N bricks, each containing 1 Segment only
 
@@ -912,7 +896,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
      */
     this.explode = function() {
         var bricks = [];
-        for(var i in this.segments){
+        for(var i = 0; i < this.segments.length; ++i){
             if(this.segments.hasOwnProperty(i)){
                 var segment     = this.segments[i],
                     entityNames = {};
@@ -950,7 +934,7 @@ function Brick(segment, typeLabelMap, valueLabelMap)
 
         // Recursive case
         var childSegments = segment.getChildren();
-        for(var i in childSegments){
+        for(var i = 0; i < childSegments.length; ++i){
             copySegmentValueLabels(childSegments[i], entityNames);
         }
     }
@@ -967,11 +951,11 @@ Brick.prototype.updateLabels = function(){
 
     if(this.modalData) {
         var label;
-        for (var i in this.dimensions) {
+        for (var i = 0; i < this.dimensions.length; ++i) {
             var dimension  = this.dimensions[i],
                 entityType = dimension.entityType;
 
-            for(var j in dimension.entityValues){
+            for(var j = 0; j < dimension.entityValues.length; ++j){
                 if(dimension.entityValues.hasOwnProperty(j)){
                     var encodedValue = dimension.entityValues[j];
 
@@ -988,9 +972,8 @@ Brick.prototype.updateLabels = function(){
     }
 };
 
-
 /**
- * Returns a human-friendly name for the bricks's entity values.
+ * Returns a human-friendly name for the bricks' entity values.
  * Falls back to raw (encoded) entity value if unable to find a translated form
  * @return string
  */
@@ -1009,13 +992,14 @@ Brick.prototype.getNameLabel = function(){
     var sortedDimensions = this.dimensions.slice(0).sort(this.sortDimensions),
         parts            = [];
 
-    for(var i in sortedDimensions){
+    for(var i = 0; i < sortedDimensions.length; ++i){
         var dimension = sortedDimensions[i];
         var name = dimension.getEntityValues().length + " " + this.getTypeLabel(dimension.getEntityType(), (dimension.getEntityValues().length > 1));
         parts.push(name);
     }
     return parts.join(' & ');
 };
+
 /**
  * A function to sort dimensions
  * @param {Dimension} left
@@ -1091,6 +1075,7 @@ Brick.prototype.getModifierLabel = function(modifiers){
     };
     return modifierLabels[this.getModifiersBitMap(modifiers)];
 };
+
 /**
  * Returns bitmap integer that represents a set of modifiers
  *
@@ -1103,7 +1088,6 @@ Brick.prototype.getModifiersBitMap = function(modifiers){
     var isTeachers = -1 !== modifiers.indexOf('teachers_of') ? 1 : 0;
     return isSelf + 2 * isParents + 4 * isTeachers;
 };
-
 
 /**
  * A BrickManager knows how to build Bricks out of Segments and other Bricks.
@@ -1164,7 +1148,7 @@ function BrickManager(codec, entityTypeLabelMap) {
 
      * @param {Selectize}  selectize
      * @param {Brick[]}    bricks
-     * @param {string}     key              - The audience segment identifier, eg 'folder:Mzgx:parents_of'
+     * @param {string}     key                - The audience segment identifier, eg 'folder:Mzgx:parents_of'
      * @param {string}     name               - The audience segment label, eg "Senior ∩ Junior Students", "English 34 (ENG34)"
      * @param {jQuery}     $item              - The jQuery wrapper of the DOM element that is displayed in default selectize
      * @param {string[][]} segmentValueLabels - Translated names. Indexed by [entityType][encodedEntityValue]
@@ -1174,7 +1158,7 @@ function BrickManager(codec, entityTypeLabelMap) {
         var newBrick        = new Brick(codec.decode(key), this.entityTypeLabelMap, segmentValueLabels),
             brickCandidates = [];
 
-        for (var i in bricks) {
+        for(var i = 0; i < bricks.length; ++i){
             var brick = bricks[i];
             if(brick.containsBrick(newBrick)){
                 selectize.removeItem(key);
@@ -1184,6 +1168,7 @@ function BrickManager(codec, entityTypeLabelMap) {
                 brickCandidates.push(brick);
             }
         }
+
         // Did we find any suitable candidate bricks?
         if(brickCandidates.length){
             // Find the optimal brick and insert segment there
@@ -1229,13 +1214,13 @@ function BrickManager(codec, entityTypeLabelMap) {
 
         // TODO temp implementation for POC. This assumes that composite bricks have 'self' dim + brick modifiers
         var logical1dBrickWithMultiValues = null; // TODO in reality this needs to be a set, probably indexed by modifier bitmask
-        for(var i in bricks){
+        for(var i = 0; i < bricks.length; ++i){
             var brick = bricks[i];
             if(brick.isSimple() && entityType === brick.dimensions[0].entityType && -1 !== brick.modifiers.indexOf('self')){
                 // First one encountered? TODO needs to consider brick modifiers
                 if(!logical1dBrickWithMultiValues){
                     logical1dBrickWithMultiValues = new Brick(brick.segments[0], {}, {});
-                    for(var j in brick.segments){
+                    for(var j = 0; j < brick.segments.length; ++j){
                         if(!brick.segments.hasOwnProperty(j)){
                             continue;
                         }
@@ -1267,7 +1252,7 @@ function BrickManager(codec, entityTypeLabelMap) {
 
         var bricksToRemove = [];
         // Now that we have built this logical 1D brick, see if it logically contains any composites
-        for(var k in bricks){
+        for(var k = 0; k < bricks.length; ++k){
             brick = bricks[k];
             if(brick.isSimple()){
                 continue;
@@ -1278,12 +1263,10 @@ function BrickManager(codec, entityTypeLabelMap) {
             }
         }
 
-        for(var l in bricksToRemove){
+        for(var l = 0; l < bricksToRemove.length; ++l){
             this.removeBrick(selectize, bricks, bricksToRemove[l]);
         }
     };
-
-
 
     /**
      * Called when we remove an item from audienceSelectize. (either because we clicked X icon on audienceSelectize item, or programmatically)
@@ -1294,7 +1277,6 @@ function BrickManager(codec, entityTypeLabelMap) {
         // TODO, find the brick that contains this segment, explode it, call brick changed on each brick
     };
 
-
     /**
      * Called when a brick changes so that we can check whether it can now be aggregated with another brick
      * @param {Selectize} selectize
@@ -1302,7 +1284,7 @@ function BrickManager(codec, entityTypeLabelMap) {
      * @param {Brick} changedBrick
      */
     var onBrickChanged = function (selectize, bricks, changedBrick) {
-        for(var i in bricks){
+        for(var i = 0; i < bricks.length; ++i){
             if (JSON.stringify(changedBrick) === JSON.stringify(bricks[i])) {
                 continue;
             }
@@ -1334,14 +1316,13 @@ function BrickManager(codec, entityTypeLabelMap) {
      * @param {Brick} brick
      */
     this.removeBrick = function(selectize, bricks, brick){
-        for(var j in brick.segments){
+        for(var j = 0; j < brick.segments.length; ++j){
             if(brick.segments.hasOwnProperty(j)){
                 selectize.removeItem(codec.encode(brick.segments[j]));
             }
         }
         bricks.splice(bricks.indexOf(brick), 1);
     };
-
 
     /**
      * When it's possible to add a Brick to multiple Bricks, this method reliably returns the preferred one.
