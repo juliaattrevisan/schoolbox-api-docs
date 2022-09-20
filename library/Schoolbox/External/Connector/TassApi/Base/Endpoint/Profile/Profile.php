@@ -324,12 +324,8 @@ class Profile implements IStrategy
             $dob = trim((string)$student['general_details']['date_of_birth']);
             $email = trim((string)$student['school_details']['email_address']);
 
-            /* Preferred Name (if it contains a truthy value) takes precedence over First Name
-             */
-            $firstname = (new FirstMeaningfulValue())->find([
-                $student['general_details']['preferred_name'],
-                $student['general_details']['first_name']
-            ]);
+            $firstname = trim((string)$student['general_details']['first_name']);
+            $firstnamePreferred = trim((string)$student['general_details']['preferred_name']);
 
             $form = trim((string)$student['school_details']['form_class']);
             $gender = trim((string)$student['general_details']['gender']);
@@ -364,6 +360,11 @@ class Profile implements IStrategy
             $enrolment = $this->findDate(trim((string)$student['general_details']['date_of_entry']));
             $leaving = $this->findDate(trim((string)$student['general_details']['date_of_leaving']));
 
+            /* A shortcut for convenience in logging
+             * (Sometimes people don't have all the parts of their name; odd but ok)
+             */
+            $fullname = trim("{$firstname} {$lastname}");
+
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
              *
@@ -393,13 +394,13 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             if ($this->includePhoto && isset($student['general_details']['student_photo']['file_info']['image'])) {
                 $this->log->debug(sprintf(
-                    'Importing profile picture for %s %s (%s)',
-                    $firstname,
-                    $lastname,
+                    'Importing profile picture for %s (%s)',
+                    $fullname,
                     $externalId
                 ));
 
@@ -500,8 +501,9 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding student profile for %s (%s)',
-                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                'Adding student profile for %s (preferred: %s) (%s)',
+                $fullname,
+                $firstnamePreferred,
                 $externalId
             ));
 
@@ -633,7 +635,6 @@ class Profile implements IStrategy
      */
     private function findMedicalAlert(string $studentCode): ?string
     {
-
         /* Specifically handle a 401 Unauthorized which occurred unexpectedly at shalom
          */
         try {
@@ -681,6 +682,7 @@ class Profile implements IStrategy
     private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, ?array $commRulesLookup, ?array $familiesLookup): void
     {
         $studentId = $studentBaseProfile->getExternalId();
+        $studentFullname = trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
 
         /* Time for importing parents
          */
@@ -691,7 +693,7 @@ class Profile implements IStrategy
         if (!\count($family)) {
             $this->log->warning(sprintf(
                 'No parents found for student %s (%s)',
-                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                $studentFullname,
                 $studentId
             ));
 
@@ -706,12 +708,18 @@ class Profile implements IStrategy
              */
             $email = trim((string)$parent['email']);
             $firstname = trim((string)$parent['firstname']);
+            $firstnamePreferred = trim((string)$parent['firstnamePreferred']);
             $lastname = trim((string)$parent['surname']);
             $phoneHome = trim((string)$parent['home']);
             $phoneMobile = trim((string)$parent['mobile']);
             $phoneWork = trim((string)$parent['work']);
             $relationship = trim((string)$parent['relationship']);
             $title = '';
+
+            /* A shortcut for convenience in logging
+             * (Sometimes people don't have all the parts of their name; odd but ok)
+             */
+            $fullname = trim("{$firstname} {$lastname}");
 
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
@@ -742,6 +750,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it
@@ -759,8 +768,9 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding parent profile for %s (%s)',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                'Adding parent profile for %s (preferred: %s) (%s)',
+                $fullname,
+                $firstnamePreferred,
                 $externalId
             ));
 
@@ -776,11 +786,12 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding relation between %s (%s), the %s of %s (%s)',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                'Adding relation between %s (preferred: %s) (%s), the %s of %s (%s)',
+                $fullname,
+                $firstnamePreferred,
                 $externalId,
-                trim($relationship),
-                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                $relationship,
+                $studentFullname,
                 $studentId
             ));
 
@@ -980,16 +991,18 @@ class Profile implements IStrategy
              *
              * Order of precedence:
              *
-             * preferred_name, if it exists
              * first_name, if it exists
              * given_names, if it exists
              * default to empty string
              */
             $firstname = (new FirstMeaningfulValue())->find([
-                $staff['preferred_name'] ?? null,
                 $staff['first_name'] ?? null,
                 $staff['given_names'] ?? null
             ]);
+
+            /* This sometimes isn't here
+             */
+            $firstnamePreferred = trim((string)($staff['preferred_name'] ?? null));
 
             $lastname = trim((string)$staff['surname']);
             $phone = '';
@@ -1021,6 +1034,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             if ($this->includePhoto && isset($staff['teacher_photo']['file_info']['image'])) {
@@ -1059,8 +1073,9 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding staff profile for %s (%s)',
+                'Adding staff profile for %s (preferred: %s) (%s)',
                 trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
+                $firstnamePreferred,
                 $externalId
             ));
 
