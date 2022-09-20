@@ -84,10 +84,6 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Sentry\State\HubInterface;
 use TheCodingMachine\Gotenberg;
-use TheCodingMachine\Gotenberg\Client;
-use TheCodingMachine\Gotenberg\ClientException;
-use TheCodingMachine\Gotenberg\FilesystemException;
-use TheCodingMachine\Gotenberg\RequestException;
 use UnexpectedValueException;
 use Url;
 use ZipStream;
@@ -124,7 +120,7 @@ class Controller extends Assessment\Controller
      * @param CourseSpecificationMapper         $courseSpecificationMapper
      * @param UnitSpecificationMapper           $unitSpecificationMapper
      * @param Replicator                        $replicator
-     * @param Client                            $pdfGenerator       - PDF generator, as used by the `downloadSubmissions` method.
+     * @param Gotenberg\Client                  $pdfGenerator       - PDF generator, as used by the `downloadSubmissions` method.
      * @param Turnitin\File\Mapper              $turnitinFileMapper - for generating the Similarity Report.
      * @param IFeedbackDataSource               $feedbackDataSource
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
@@ -422,9 +418,9 @@ class Controller extends Assessment\Controller
     /**
      * Download all student submissions for a given assessable
      * @param IAssessable $assessment
-     * @throws ClientException
-     * @throws FilesystemException
-     * @throws RequestException
+     * @throws Gotenberg\ClientException
+     * @throws Gotenberg\FilesystemException
+     * @throws Gotenberg\RequestException
      * @throws MapperException
      * @throws RouteNotFound
      * @throws FileNotFoundException
