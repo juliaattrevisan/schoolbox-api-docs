@@ -922,7 +922,7 @@ class Profile implements IStrategy
 //                $detail = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
 //                    'date' => date('d/m/Y'),
 //                    'code' => (string)$employee['user_code'],
-//                    'includephoto'  => $this->includePhoto,
+//                    'includephoto' => true,
 //                ]);
 //            }
         }
