@@ -342,14 +342,6 @@ class Mimetype implements ISoftDeletable
      */
     public function getTranscodable()
     {
-        return $this->isTranscodable();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTranscodable()
-    {
         return $this->transcodable;
     }
 

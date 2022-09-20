@@ -20,7 +20,7 @@ class Image extends Base
      */
     public function test()
     {
-        if ($this->getItem()->getMimetype()->isImage() && $this->getItem()->getMimetype()->isTranscodable()) {
+        if ($this->getItem()->getMimetype()->isImage() && $this->getItem()->getMimetype()->getTranscodable()) {
             return [
                 'type' => 'image',
                 // /storage/image using hash works, as both Storage\Model|File\Model id's won't match, but the hash's do, so use that
