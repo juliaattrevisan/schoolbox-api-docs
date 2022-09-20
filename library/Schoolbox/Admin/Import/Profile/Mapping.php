@@ -24,7 +24,6 @@ use Schoolbox\Role;
  */
 class Mapping
 {
-
     /**
      * Strings that denote a csv file
      */
@@ -43,6 +42,7 @@ class Mapping
         'Username' => 'username',
         'Title' => 'title',
         'Firstname' => 'firstname',
+        'Preferred Firstname' => 'preferred_firstname',
         'Surname' => 'lastname',
         'Email' => 'email',
 
@@ -61,6 +61,7 @@ class Mapping
         'Username' => 'username',
         'Title' => 'title',
         'Firstname' => 'firstname',
+        'Preferred Firstname' => 'preferred_firstname',
         'Surname' => 'lastname',
         'Email' => 'email',
 
@@ -115,6 +116,7 @@ class Mapping
         'Username' => 'username',
         'Title' => 'title',
         'Firstname' => 'firstname',
+        'Preferred Firstname' => 'preferred_firstname',
         'Surname' => 'lastname',
         'Email' => 'email',
 
