@@ -87,7 +87,7 @@ watch(() => selectedCodesStore.codesIds, () => {
             v-for="code in selectedCodesStore.codes"
             :key="code.id"
             :value="code.id"
-            :data-selected-object="JSON.stringify(code)"
+            :data-selected-object="JSON.stringify(selectedCodesStore.trimCode(code))"
         >
             {{ code.code }}
         </option>
