@@ -1207,11 +1207,8 @@ class Controller extends Assessment\Controller
                 /* Set up detached function so turnitin can continue in the background
                  */
                 $instanceIdentifier = $this->getConfigLoader()->get('site_type');
-
-                /** @var AssessmentDataSource $assessmentMapperProxy */
-                $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
-
-                $detachedFunction = static function () use ($api, $models, $instanceIdentifier, $assessmentMapperProxy) {
+                $assessmentMapper   = $this->getAssessmentMapper();
+                $detachedFunction   = static function () use ($api, $models, $instanceIdentifier, $assessmentMapper) {
                     /* Set up a record processor
                      */
                     $processor = (new Turnitin\File\Process\Transmit(
@@ -1222,7 +1219,7 @@ class Controller extends Assessment\Controller
                         UserMapper::getInstance(),
                         SubmissionBoxMapper::getInstance(),
                         SingleFile\Mapper::getInstance(),
-                        $assessmentMapperProxy,
+                        $assessmentMapper,
                     ));
 
                     /* Shank them all up
