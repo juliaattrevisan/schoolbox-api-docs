@@ -211,11 +211,24 @@ class Profile implements IStrategy
             $boardingHouseName = '';
             $dob = strtotime(trim((string)$student->DOB));
             $firstname = trim((string)$student->Forename);
+
+            /* It's "Preferredname" here, specifically, but not in other places
+             * where the N is capitalised.
+             *
+             * Disgusting.
+             */
+            $firstnamePreferred = trim((string)$student->Preferredname);
+
             $form = trim((string)$student->Form);
             $lastname = trim((string)$student->Surname);
             $studentId = trim((string)$student->xpath('@Id')[0]);
             $username = trim((string)$student->UserName);
             $yearLevel = trim((string)$student->NCYear);
+
+            /* A shortcut for convenience in logging
+             * (Sometimes people don't have all the parts of their name; odd but ok)
+             */
+            $fullname = trim("{$firstname} {$lastname}");
 
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
@@ -246,6 +259,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle(trim((string)$student->Title))
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it
@@ -356,8 +370,10 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding student profile for %s',
-                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                'Adding student profile for %s (preferred: %s) (%s)',
+                $fullname,
+                $studentBaseProfile->getFirstnamePreferred(),
+                $externalId
             ));
 
             /* Then save it
@@ -679,8 +695,17 @@ class Profile implements IStrategy
          * it's not a Normalised Data Structure object here
          */
         foreach ($parents as $parent) {
+            /* Parents/Concats don't have a preferred firstname available
+             * Just use their regular one
+             */
             $firstname = trim((string)$parent->Forename);
+            $firstnamePreferred = $firstname;
             $lastname = trim((string)$parent->Surname);
+
+            /* A shortcut for convenience in logging
+             * (Sometimes people don't have all the parts of their name; odd but ok)
+             */
+            $fullname = trim("{$firstname} {$lastname}");
 
             /* Inspect the xpath for attributes
              *
@@ -691,9 +716,8 @@ class Profile implements IStrategy
 
             if (!\count($attributes)) {
                 $this->log->warning(sprintf(
-                    'Parent %s %s missing personId attribute; skipping',
-                    $firstname,
-                    $lastname
+                    'Parent %s missing personId attribute; skipping',
+                    $fullname
                 ));
 
                 continue;
@@ -739,6 +763,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle(trim((string)$parent->Title))
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it
@@ -758,7 +783,7 @@ class Profile implements IStrategy
              */
             $this->log->info(sprintf(
                 'Adding parent profile for %s',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+                $fullname
             ));
 
             /* Then save it
@@ -774,7 +799,7 @@ class Profile implements IStrategy
              */
             $this->log->info(sprintf(
                 'Adding relation between %s, the %s of %s',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                $fullname,
                 trim($relationship),
                 trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
             ));
@@ -816,7 +841,20 @@ class Profile implements IStrategy
             $externalId = trim((string)$staff->xpath('@PersonId')[0]->PersonId);
             $username = trim((string)$staff->UserName);
             $firstname = trim((string)$staff->Forename);
+
+            /* It's "PreferredName" here, specifically
+             * It's uppercase here, unlike in Pupils nodes where it's lowercase.
+             *
+             * Disgusting.
+             */
+            $firstnamePreferred = trim((string)$staff->PreferredName);
+
             $lastname = trim((string)$staff->Surname);
+
+            /* A shortcut for convenience in logging
+             * (Sometimes people don't have all the parts of their name; odd but ok)
+             */
+            $fullname = trim("{$firstname} {$lastname}");
 
             /* Find out if this externalId already has a staff profile
              * If one already exists, load it, update it, then save it
@@ -841,6 +879,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle(trim((string)$staff->Title))
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it
@@ -865,9 +904,9 @@ class Profile implements IStrategy
              */
             if (strlen($positionTitle) >= self::MAX_POSITION_LENGTH) {
                 $this->log->warning(sprintf(
-                    'Staff member %s %s (%s) has a truncated position_title',
-                    $firstname,
-                    $lastname,
+                    'Staff member %s (preferred: %s) (%s) has a truncated position_title',
+                    $fullname,
+                    $firstnamePreferred,
                     $externalId
                 ));
             }
@@ -900,8 +939,10 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding staff profile for %s',
-                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+                'Adding staff profile for %s (preferred: %s) (%s)',
+                $fullname,
+                $firstnamePreferred,
+                $externalId
             ));
 
             /* Then save it
