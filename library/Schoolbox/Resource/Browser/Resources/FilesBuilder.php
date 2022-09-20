@@ -124,15 +124,10 @@ class FilesBuilder
      */
     private function buildFile(File $file, string $returnURL): array
     {
-        //if image can be converted, lets send the convertable image, else, just return the file
-        $fileUrl = '/send.php?id=' . $file->getId();
-        if ($file->getMimetype()->isImage() && $file->getMimetype()->isTranscodable()) {
-            $fileUrl = "/storage/image.php?hash={$file->getHash()}";
-        }
         return [
             'name'          => $file->getTitle(),
             'id'            => $file->getId(),
-            'url'           => $fileUrl,
+            'url'           => '/send.php?id=' . $file->getId(),
             'mime'          => [
                 'mimeType'    => $file->getStorage()->getMimetype()->getMime(),
                 'iconFile'    => $file->getStorage()->getMimetype()->getIconFile(),

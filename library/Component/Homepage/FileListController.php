@@ -12,6 +12,7 @@ use Schoolbox\User;
 
 class Component_Homepage_FileListController extends Component_Homepage_ControllerAbstract
 {
+
     /**
      * @var Schoolbox\Resource\File\Mapper
      */
@@ -189,14 +190,9 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
                 //set name
                 if ($file->getFilename() != "") {
-                    //if image can be converted, lets send the convertable image, else, just return the file
-                    $fileUrl = '/send.php?id=' . $file->getId();
-                    if ($file->getMimetype()->isImage() && $file->getMimetype()->isTranscodable()) {
-                        $fileUrl = "/storage/image.php?hash={$file->getHash()}";
-                    }
                     $this->setVar(
                         [
-                            'FILE_URL'          => $fileUrl,
+                            'FILE_URL'          => '/send.php?id=' . $file->getId(),
                             'FILE_TARGET'       => '_blank',
                             'file_no_url_block' => '',
                         ]

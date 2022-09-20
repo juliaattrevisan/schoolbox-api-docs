@@ -387,7 +387,7 @@ class Zone
     protected function deriveSitePageVars(IStorage $file): array
     {
         // if it's an image, render it out, otherwise use its mime thumbnail
-        if ($file->getMimetype()->isImage() && $file->getMimetype()->isTranscodable()) {
+        if ($file->getMimetype()->isImage()) {
             $href    = "/storage/image.php?hash={$file->getHash()}&size=square{$this->size}";
             $isImage = true;
         } else {

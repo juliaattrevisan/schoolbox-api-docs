@@ -74,11 +74,7 @@ class MimetypeMapper extends Schoolbox\Mapper
 
         $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);
 
-        $this->hasMap(array(
-                          'column'     => 'transcodable',
-                          'property'   => 'transcodable',
-                          'type'       => self::TYPE_BOOL_ENUM,
-                      ));
+        $this->uses('transcodable', self::TYPE_BOOLEAN);
     }
 
     /**

@@ -33,11 +33,7 @@ $data = {
                 <div class="card small-12">
                     <img {% if not attachment.isImage %}class="mime"{% endif %} alt="{{ attachment.name }}" src="{{ attachment.preview }}" />
                     <p class="filename" data-dz-name>
-                        {% if attachment.isImage %}
-                            <a href="/storage/image.php?hash={{ attachment.hash|split(':')[1] }}&width=2048&height=2048" data-plugin="preview">{{ attachment.name }}</a>
-                        {% else %}
-                            <a href="/storage/fetch.php?hash={{ attachment.hash|split(':')[1] }}" data-plugin="preview">{{ attachment.name }}</a>
-                        {% endif %}
+                        <a href="/storage/fetch.php?save=1&hash={{ attachment.hash|split(':')[1] }}" data-plugin="preview">{{ attachment.name }}</a>
                     </p>
                 </div>
             </div>

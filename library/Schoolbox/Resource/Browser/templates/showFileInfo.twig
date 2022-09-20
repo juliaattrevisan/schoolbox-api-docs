@@ -8,21 +8,21 @@ These are its args, which is given for you
 
 {% if namespace == 'resourceBrowser' %}
     {% set send   = '/send.php?id=' %}
-    {% set image  = '/storage/image.php?hash=' ~ file.hash %}
+    {% set image  = '/cms/image.php?id=' %}
     {% set modify = '/cms/file/' %}
     {% set delete = '/cms/fileForm.php?ajax=1&delete=' %}
     {% set type   = 'sbfs' %}
 
 {% elseif namespace == 'myFilesBrowser' %}
     {% set send   = '/cms/sendMyFile.php?id=' %}
-    {% set image  = '/cms/myImage.php?id=' ~ file.id %}
+    {% set image  = '/cms/myImage.php?id=' %}
     {% set modify = '/cms/myFile/' %}
     {% set delete = '/cms/myFileForm.php?ajax=1&delete=' %}
     {% set type   = 'myfile' %}
 
 {% else %}
     {% set send   = '/cms/sendNetworkFile.php?id=' %}
-    {% set image  = '/cms/networkImage.php?id=' ~ file.id %}
+    {% set image  = '/cms/networkImage.php?id=' %}
     {% set modify = '/cms/networkFile/' %}
     {% set delete = '/cms/networkFileForm.php?ajax=1&delete=' %}
     {% set type   = 'storage' %}
@@ -44,10 +44,10 @@ These are its args, which is given for you
     {% endfor %}
 </ul>
 <div class="card small-12 column meta-preview">
-    {# is image and can display inline (selectable from in /adminv2/allowed-file #}
-    {% if file.mimetype.isImage and file.mimetype.isTranscodable %}
-        <a data-plugin="preview" href="{{ image }}">
-            <img class="icon" src="{{ image }}&size=square64" alt="{{ file.title }}" />
+    {# images that are transcodable should be able to preview, both by clicking the mime image and the file title #}
+    {% if file.mimetype.isImage and file.mimetype.transcodable %}
+        <a data-plugin="preview" href="{{ send ~ file.id }}&width=2048&height=2048">
+            <img class="icon" src="{{ image ~ file.id }}&width=64&height=64" alt="{{ file.title }}" />
         </a>
     {% elseif file.mimetype.isAudio %}
         <audio id="schoolbox_video_preview"
@@ -75,11 +75,7 @@ These are its args, which is given for you
         </a>
     {% endif %}
     <h3>
-        {% if file.mimetype.isImage and file.mimetype.isTranscodable %}
-            <a href="{{ image }}" data-plugin="preview">{{ file.title }}</a>
-        {% else %}
-            <a href="{{ send ~ file.id }}" target="_blank">{{ file.title }}</a>
-        {% endif %}
+        <a data-plugin="preview" href="{{ send ~ file.id }}" target="_blank">{{ file.title }}</a>
         <span class="hint has-tip" data-reveal-id="modal-file-{{ file.id }}" title="View file information">?</span>
     </h3>
     {% if namespace == 'resourceBrowser' and file.description %}

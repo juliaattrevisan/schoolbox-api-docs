@@ -20,10 +20,11 @@ class Image extends Base
      */
     public function test()
     {
-        if ($this->getItem()->getMimetype()->isImage()) {
+        if ($this->getItem()->getMimetype()->isImage() && $this->getItem()->getMimetype()->isTranscodable()) {
             return [
                 'type' => 'image',
-                'src' => $this->getUrl()
+                // /storage/image using hash works, as both Storage\Model|File\Model id's won't match, but the hash's do, so use that
+                'src' => "/storage/image.php?hash={$this->getItem()->getHash()}"
             ];
         }
 
