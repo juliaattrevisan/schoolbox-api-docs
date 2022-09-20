@@ -1037,7 +1037,7 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding parent profile for %s (preferred; %s) (%s)',
+                'Adding parent profile for %s (preferred: %s) (%s)',
                 $fullname,
                 $firstnamePreferred,
                 $externalId
