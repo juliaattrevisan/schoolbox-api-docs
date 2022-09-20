@@ -145,6 +145,7 @@ function onBrowseSelected () {
             :readonly="!store.hasLoadedOk"
             :placeholder="inputPlaceholder"
             @input="$event.target.composing = false"
+            data-search-select-search-input
         />
         <button
             v-if="store.hasLoadedOk"

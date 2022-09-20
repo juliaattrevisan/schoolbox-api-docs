@@ -634,10 +634,12 @@ Usage:
                     filterId     = $component.data('component'),
                     $available   = $component.find('input[type=checkbox]'),
                     $selected    = $component.find('input:checked[type=checkbox], :selected'),
-                    $textInputs  = $component.find('input[type=text]'),
+                    $textInputs  = $component.find('input[type=text]:not([data-search-select-search-input])'),
                     $selectize   = $component.find('select[data-selectize]'),
                     hasSelectize = $selectize.length > 0,
-                    selectize    = hasSelectize ? $selectize[0].selectize : null;
+                    selectize    = hasSelectize ? $selectize[0].selectize : null,
+                    $searchSelect = $component.find('select[data-search-select]'),
+                    hasSearchSelect = $searchSelect.length > 0;
 
                 // These will be deleted if the filter's not in use
                 componentsInUse[filterId]         = {};
@@ -657,10 +659,21 @@ Usage:
                     });
                 }
 
+                // Build list of labels from the search select, if there is one
+                if (hasSearchSelect) {
+                    const options = $searchSelect[0].querySelectorAll('option');
+                    options.forEach((option) => {
+                        componentsInUse[filterId]['labels'].push({
+                            value: option.value,
+                            label: option.innerText,
+                        });
+                    });
+                }
+
                 // Build list of labels from selected options or checkboxes,
                 // if there are any.
                 if ($selected.length !== 0) {
-                    // Not a selectize, or it's not yet initialized
+                    // Not a selectize/search-select, or it's not yet initialized
                     // Filter is being applied, add its name and selected option labels.
                     $selected.each(function(idx, elem) {
                         let $elem = $(elem),
@@ -673,7 +686,6 @@ Usage:
                             label = label ? label : $component.find('label[for='+$elem.attr('id')+']').html();
                             value = $elem.attr('data-key');
                         }
-
                         // Don't add this label if it's already been added once
                         if (value && !componentsInUse[filterId]['labels'].some(v => v.value === value)) {
                             componentsInUse[filterId]['labels'].push({
@@ -684,18 +696,18 @@ Usage:
                     });
 
                     // Hide the filter in use if all its options are selected,
-                    // and the filter has no selectize (whether or not it is
+                    // and the filter has no selectize/serach-select (whether or not it is
                     // initialized yet).
                     // All options is functionally equivalent to none selected,
                     // but it's impossible to tell if all are selected if there
-                    // is a selectize, so keep the filter in that case.
-                    if (!hasSelectize && $selected.length === $available.length) {
+                    // is a selectize/search-select, so keep the filter in that case.
+                    if (!hasSelectize && !hasSearchSelect && $selected.length === $available.length) {
                         componentsInUse[filterId]['labels'] = [];
                     }
                 }
 
                 // Build list of labels from text inputs, if they are there
-                if (!hasSelectize && $textInputs.length !== 0) {
+                if (!hasSelectize && !hasSearchSelect && $textInputs.length !== 0) {
                     $textInputs.each(function () {
                         let values = this.value.split(/\s+/);
                         // Try splitting on space
