@@ -41,7 +41,7 @@ class DSN implements IDSN
     public const MODULE_STUDENT_DETAILS = 'studentdetails';
     public const MODULE_IDENTITY_MANAGEMENT = 'identitymanagement';
     public const MODULE_SCHOOL_CALENDAR_AND_NOTICES = 'schoolcalendarandnotices';
-    public const MODULE_EMPLOYEE_HR = 'employee-hr';
+    public const MODULE_EMPLOYEE_HR = 'employeehr';
 
 
     /**
@@ -128,7 +128,7 @@ class DSN implements IDSN
             /* Check the dsn format matches correctly
              */
             if (!count($suppliedPieces)) {
-                throw new DomainException('Tass API DSN: could not decode; missing all credentials/bad format. Check company code, app code and token format');
+                throw new DomainException('TASS API DSN: could not decode; missing all credentials/bad format. Check company code, app code and token format');
             }
 
             /* Check that each module comes with the expected number of key-value pairs
@@ -136,7 +136,7 @@ class DSN implements IDSN
              * original dsn string + module + \count(expected_tuple) = 1 + 1 + 3 = 5
              */
             if (count($matches) !== count(self::EXPECTED_TUPLE) + 2) {
-                throw new DomainException('Tass API DSN: could not decode; missing some credentials. Check company code, app code and token format');
+                throw new DomainException('TASS API DSN: could not decode; missing some credentials. Check company code, app code and token format');
             }
 
             $struct['modules'][$matches[1]] = [
