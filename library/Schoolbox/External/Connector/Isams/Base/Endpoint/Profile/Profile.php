@@ -211,7 +211,14 @@ class Profile implements IStrategy
             $boardingHouseName = '';
             $dob = strtotime(trim((string)$student->DOB));
             $firstname = trim((string)$student->Forename);
-            $firstnamePreferred = trim((string)$student->PreferredName);
+
+            /* It's "Preferredname" here, specifically, but not in other places
+             * where the N is capitalised.
+             *
+             * Disgusting.
+             */
+            $firstnamePreferred = trim((string)$student->Preferredname);
+
             $form = trim((string)$student->Form);
             $lastname = trim((string)$student->Surname);
             $studentId = trim((string)$student->xpath('@Id')[0]);
@@ -834,7 +841,14 @@ class Profile implements IStrategy
             $externalId = trim((string)$staff->xpath('@PersonId')[0]->PersonId);
             $username = trim((string)$staff->UserName);
             $firstname = trim((string)$staff->Forename);
+
+            /* It's "PreferredName" here, specifically
+             * It's uppercase here, unlike in Pupils nodes where it's lowercase.
+             *
+             * Disgusting.
+             */
             $firstnamePreferred = trim((string)$staff->PreferredName);
+
             $lastname = trim((string)$staff->Surname);
 
             /* A shortcut for convenience in logging
