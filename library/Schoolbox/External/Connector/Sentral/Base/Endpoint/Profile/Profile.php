@@ -13,6 +13,7 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -231,7 +232,16 @@ class Profile implements IStrategy
                 $comments = '';
                 $dob = (string)$student['relationships']['person']['data']['attributes']['dateOfBirth'];
                 $email = (string)$student['relationships']['person']['data']['attributes']['email'];
-                $firstname = (string)$student['relationships']['person']['data']['attributes']['firstName'];
+
+                /* Find the first meaningful value out of this set
+                 */
+                $firstname = (new FirstMeaningfulValue())->find([
+                    $student['relationships']['person']['data']['attributes']['firstName'],
+                    $student['relationships']['person']['data']['attributes']['givenNames']
+                ]);
+
+                $firstnamePreferred = trim((string)$student['relationships']['person']['data']['attributes']['preferredName']);
+
                 $form = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['rollClass'];
                 $gender = (string)$student['relationships']['person']['data']['attributes']['gender'];
                 $lastname = (string)$student['relationships']['person']['data']['attributes']['lastName'];
@@ -256,6 +266,11 @@ class Profile implements IStrategy
                 $ib = false;
                 $ilp = false;
                 $specialNeeds = false;
+
+                /* A shortcut for convenience in logging
+                 * (Sometimes people don't have all the parts of their name; odd but ok)
+                 */
+                $fullname = trim("{$firstname} {$lastname}");
 
                 /* Parents might inadvertently have the same externalId as someone else's
                  * base profile (e.g. parent has same external id as student)
@@ -286,6 +301,7 @@ class Profile implements IStrategy
                     ->setExternalId($externalId)
                     ->setTitle($title)
                     ->setFirstname($firstname)
+                    ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
 
                 /* Then save it
@@ -448,8 +464,9 @@ class Profile implements IStrategy
                 /* Log it
                  */
                 $this->log->info(sprintf(
-                    'Adding student profile for %s (%s)',
-                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                    'Adding student profile for %s (preferred: %s) (%s)',
+                    $fullname,
+                    $firstnamePreferred,
                     $externalId
                 ));
 
@@ -477,6 +494,7 @@ class Profile implements IStrategy
                         'type' => self::TYPE_STUDENT,
                         'externalId' => $externalId,
                         'firstname' => $studentBaseProfile->getFirstname(),
+                        'firstnamePreferred' => $studentBaseProfile->getFirstnamePreferred(),
                         'lastname' => $studentBaseProfile->getLastname()
                     ],
                 ]);
@@ -890,7 +908,7 @@ class Profile implements IStrategy
              * Siblings and the student themselves might appear here
              * for no apparent reason, but ok
              */
-            $relationshipName = (string)$contact['attributes']['relationName'];
+            $relationshipName = trim((string)$contact['attributes']['relationName']);
 
             /* Skip Sibling relationships
              */
@@ -926,13 +944,27 @@ class Profile implements IStrategy
              */
             $externalId = (string)$parent['data']['attributes']['contactCode'];
             $email = (string)$parent['data']['attributes']['email'];
-            $firstname = (string)$parent['data']['attributes']['firstName'];
+
+            /* Find the first meaningful value out of this set
+             */
+            $firstname = (new FirstMeaningfulValue())->find([
+                $parent['data']['attributes']['firstName'],
+                $parent['data']['attributes']['givenNames']
+            ]);
+
+            $firstnamePreferred = trim((string)$parent['data']['attributes']['preferredName']);
+
             $lastname = (string)$parent['data']['attributes']['lastName'];
             $phoneHome = $numbers[self::HOME_TELEPHONE_NUMBER] ?? '';
             $phoneMobile = $numbers[self::MOBILE_TELEPHONE_NUMBER] ?? '';
             $phoneWork = $numbers[self::WORK_TELEPHONE_NUMBER] ?? '';
             $title = (string)$parent['data']['attributes']['title'];
             $username = '';
+
+            /* A shortcut for convenience in logging
+             * (Sometimes people don't have all the parts of their name; odd but ok)
+             */
+            $fullname = trim("{$firstname} {$lastname}");
 
             /* The student appeared as a contact of themselves
              * Not sure if misconfiguration or third party vendor tomfoolery
@@ -941,8 +973,8 @@ class Profile implements IStrategy
             if ($externalId === $studentBaseProfile->getExternalId()) {
                 $this->log->warning(sprintf(
                     'Student %s %s appeared as contact of themselves - skipping. Double-check with endpoint: %s',
-                    $firstname,
-                    $lastname,
+                    $studentBaseProfile->getFirstname(),
+                    $studentBaseProfile->getLastname(),
                     $endpoint
                 ));
 
@@ -952,7 +984,7 @@ class Profile implements IStrategy
             if ('' === trim($externalId)) {
                 $this->log->warning(sprintf(
                     'External Id for parent %s is empty; skipping',
-                    trim("{$firstname} {$lastname}")
+                    $fullname
                 ));
 
                 continue;
@@ -1005,8 +1037,9 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding parent profile for %s (%s)',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                'Adding parent profile for %s (preferred: %s) (%s)',
+                $fullname,
+                $firstnamePreferred,
                 $externalId
             ));
 
@@ -1023,9 +1056,9 @@ class Profile implements IStrategy
              */
             $this->log->info(sprintf(
                 'Adding relation between %s (%s), the %s of %s (%s)',
-                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                $fullname,
                 $externalId,
-                trim($relationshipName),
+                $relationshipName,
                 trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
                 $studentBaseProfile->getExternalId()
             ));
@@ -1061,7 +1094,16 @@ class Profile implements IStrategy
 
             foreach ($payload['data'] as $staff) {
                 $externalId = (string)$staff['attributes']['staffCode'];
-                $firstname = (string)$staff['relationships']['person']['data']['attributes']['firstName'];
+
+                /* Find the first meaningful value out of this set
+                 */
+                $firstname = (new FirstMeaningfulValue())->find([
+                    $staff['relationships']['person']['data']['attributes']['firstName'],
+                    $staff['relationships']['person']['data']['attributes']['givenNames']
+                ]);
+
+                $firstnamePreferred = trim((string)$staff['relationships']['person']['data']['attributes']['preferredName']);
+
                 $building = '';
                 $campusName = '';
                 $category = (string)$staff['attributes']['employmentClassification'];
@@ -1073,12 +1115,17 @@ class Profile implements IStrategy
                 $title = (string)$staff['relationships']['person']['data']['attributes']['title'];
                 $username = (string)$staff['attributes']['timetableCode'];
 
+                /* A shortcut for convenience in logging
+                 * (Sometimes people don't have all the parts of their name; odd but ok)
+                 */
+                $fullname = trim("{$firstname} {$lastname}");
+
                 /* Disregard inactive staff
                  */
                 if (!(int)$staff['attributes']['isActive']) {
                     $this->log->warning(sprintf(
                         'Skipping base profile for staff %s - staff is inactive',
-                        trim("{$firstname} {$lastname}")
+                        $fullname
                     ));
 
                     continue;
@@ -1089,7 +1136,7 @@ class Profile implements IStrategy
                 if (self::STAFF_EMPLOYMENT_STATUS_DEPARTED === $staff['attributes']['employmentStatus']) {
                     $this->log->warning(sprintf(
                         'Skipping base profile for staff %s - staff is departed',
-                        trim("{$firstname} {$lastname}")
+                        $fullname
                     ));
 
                     continue;
@@ -1109,7 +1156,7 @@ class Profile implements IStrategy
                      */
                     $this->log->warning(sprintf(
                         'Skipping base profile for staff %s - bad payload',
-                        trim("{$firstname} {$lastname}")
+                        $fullname
                     ));
 
                     continue;
@@ -1121,7 +1168,7 @@ class Profile implements IStrategy
                 $this->log->debug(sprintf(
                     'Secondary api inspection at %s for phone numbers belonging to %s',
                     $endpoint,
-                    trim("{$firstname} {$lastname}")
+                    $fullname
                 ));
 
                 /* Catalog each of this guy's phone numbers so we can try and assign some
@@ -1181,8 +1228,9 @@ class Profile implements IStrategy
                 /* Log it
                  */
                 $this->log->info(sprintf(
-                    'Adding staff profile for %s (%s)',
-                    trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
+                    'Adding staff profile for %s (preferred: %s) (%s)',
+                    $fullname,
+                    $firstnamePreferred,
                     $externalId
                 ));
 
@@ -1204,6 +1252,7 @@ class Profile implements IStrategy
                         'type' => self::TYPE_STAFF,
                         'externalId' => $externalId,
                         'firstname' => $staffBaseProfile->getFirstname(),
+                        'firstnamePreferred' => $staffBaseProfile->getFirstnamePreferred(),
                         'lastname' => $staffBaseProfile->getLastname()
                     ],
                 ]);
