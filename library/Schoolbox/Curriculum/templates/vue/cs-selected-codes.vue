@@ -89,7 +89,16 @@ watch(() => selectedCodesStore.codesIds, () => {
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
     <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />
-    <select :id="`${store.formValueName}[]`" :name="`${store.formValueName}[]`" multiple ref="selectEl" data-search-select tabindex="-1">
+    <select
+        ref="selectEl"
+        :id="`${store.formValueName}[]`"
+        :name="`${store.formValueName}[]`"
+        :data-selected-original="JSON.stringify(store.selectedOriginal)"
+        :data-selected-default="JSON.stringify(store.selectedDefault)"
+        tabindex="-1"
+        multiple
+        data-search-select
+    >
         <option
             v-for="code in selectedCodesStore.codes"
             :key="code.id"

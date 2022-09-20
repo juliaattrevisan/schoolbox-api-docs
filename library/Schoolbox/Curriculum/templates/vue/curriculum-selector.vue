@@ -51,7 +51,23 @@ const props = defineProps({
         type: String,
         required: false,
         default: 'curriculumCodes[]',
-    }
+    },
+    /**
+     * an 'original' selection, saved by the user
+     */
+     selectedOriginal: {
+        type: Array,
+        required: false,
+        default: [],
+    },
+    /**
+     * the default selection relevant to the current user role
+     */
+     selectedDefault: {
+        type: Array,
+        required: false,
+        default: [],
+    },
 });
 
 const store = useStore();

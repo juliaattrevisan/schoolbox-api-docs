@@ -16,13 +16,15 @@ export const useStore = defineStore(`curriculumSelector`, {
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place, like updating a member access
         isReadOnly: true, //can only view the currently selected codes, not edit them
-        containerWidth: 0,
+        containerWidth: 0, //currently so can tweak the styling when the selector is small
+        selectedOriginal: [], //an 'original' selection, saved by the user
+        selectedDefault: [], //the default selection relevant to the current user role
     }),
 
     getters: {
 
         /**
-         * When load is complete and and was a success
+         * When load is complete and was a success
          *
          * @returns { Boolean }
          */
@@ -50,8 +52,7 @@ export const useStore = defineStore(`curriculumSelector`, {
          */
         load (endpoint) {
             apiEndpoint = endpoint;
-            const codesStore = useCodesStore();
-            codesStore.initTopLevel();
+            useCodesStore().initTopLevel();
         },
 
         /**
