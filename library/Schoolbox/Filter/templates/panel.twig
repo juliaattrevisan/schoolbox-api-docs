@@ -92,6 +92,14 @@ Usage:
                     selectize.setValue(JSON.parse(this.dataset.valueOriginal));
                 }
             });
+            $filterPanel.find('[data-seach-select]').each(function () {
+                document.dispatchEvent(new CustomEvent('FILTERS__CLEAR_FILTER', {
+                    detail: {
+                        elementId: $(this).attr('id'),
+                        selection: this.dataset.valueOriginal,
+                    }
+                }));
+            });
             updateFiltersInUseLabel();
         });
 
@@ -115,6 +123,16 @@ Usage:
                 if (selectize) {
                     selectize.setValue(JSON.parse(this.dataset.valueDefault));
                 }
+            });
+
+            // Reset search select
+            $filterPanel.find('[data-search-select]').each(function () {
+                document.dispatchEvent(new CustomEvent('FILTERS__CLEAR_FILTER', {
+                    detail: {
+                        elementId: $(this).attr('id'),
+                        selection: this.dataset.valueDefault,
+                    }
+                }));
             });
 
             updateFiltersInUseLabel();
@@ -152,6 +170,13 @@ Usage:
                         .attr('data-value-original', itemsJson);
                 }
             });
+            $filterPanel.find('[data-search-select]').each(function () {
+                const options = $(this)[0].querySelectorAll('option');
+                const optionValues = options.map((option) => option.dataset.selectedObject);
+                const optionValuesJson = JSON.stringify(optionValues);
+                $(this).data('valueOriginal', optionValuesJson);
+                $(this).attr('data-value-original', optionValuesJson);
+            });
             updateFiltersInUseLabel();
         }
 
@@ -165,11 +190,21 @@ Usage:
             let $panelComponent = $panelComponents.filter('[data-component='+filterId+']'),
                 $selectize      = $panelComponent.find('[data-selectize]'),
                 selectize       = ($selectize.length ? $selectize[0].selectize : null),
+                $searchSelect   = $panelComponent.find('[data-search-select]'),
+                hasSearchSelect = $searchSelect.length > 0,
                 $textInput      = $panelComponent.find('input[type=text]');
             $panelComponent.find('input[type=checkbox]').prop('checked', false);
             $textInput.val('');
             if (selectize) {
                 selectize.clear(true);
+            }
+            if (hasSearchSelect) {
+                document.dispatchEvent(new CustomEvent('FILTERS__CLEAR_FILTER', {
+                    detail: {
+                        elementId: $searchSelect.attr('id'),
+                        selection: JSON.stringify([]),
+                    }
+                }));
             }
             updateFiltersInUseLabel();
         }

@@ -21,7 +21,8 @@ const selectEl = ref(null);
 onMounted(() => {
     document.addEventListener('FILTERS__CLEAR_FILTER', (event) => {
         if (selectEl.value.getAttribute('id') === event.detail.elementId) { //just in case there are multiple on the page
-            selectedCodesStore.empty();
+            const newSelection = JSON.parse(event.detail.selection);
+            selectedCodesStore.update(newSelection);
         }
     });
 });
@@ -93,6 +94,7 @@ watch(() => selectedCodesStore.codesIds, () => {
             v-for="code in selectedCodesStore.codes"
             :key="code.id"
             :value="code.id"
+            :data-selected-object="JSON.stringify(code)"
         >
             {{ code.code }}
         </option>
