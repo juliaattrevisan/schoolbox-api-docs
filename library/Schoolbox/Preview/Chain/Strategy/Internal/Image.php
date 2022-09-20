@@ -15,7 +15,6 @@ use Schoolbox\Resource\Storage;
 
 class Image extends Base
 {
-
     /**
      * Image files
      *
