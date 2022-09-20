@@ -16,6 +16,7 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
@@ -883,6 +884,10 @@ class Profile implements IStrategy
 
         unset($teacher);
 
+        /* Decide whether we should try to compile profile pictures for Employees too
+         */
+        $employeeProfilePictures = $this->includePhoto && isset($this->api[Codec\DSN::MODULE_EMPLOYEE_HR]);
+
         /* Reformat the Employee struct to be similar to teaching struct
          */
         $employeeSetReformatted = [];
@@ -901,6 +906,29 @@ class Profile implements IStrategy
                  $employee['title']
              ]);
 
+            /* For employees, this seems to be the only way to get photo
+             *
+             * Since we did a little preprocessing using a different endpoint we need to supply
+             * each Employee's picture manually; alternatively you can download them all upfront
+             * but you wouldn't be able to exclude a particular demographic (we already got the
+             * Teacher's pictures previously and we don't need those again)
+             */
+            $teacherPhoto = [];
+
+            if ($employeeProfilePictures) {
+                $photoPayload = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
+                    'date' => date('d/m/Y'),
+                    'code' => (string)$employee['user_code'],
+                    'includephoto' => true,
+                ], Api::VERSION_2);
+
+                /* Find the piece of $photoPayload that closely resembles teacher_photo
+                 *
+                 * TODO When we get access, fill in the blank and it should just work
+                 */
+                $teacherPhoto = $photoPayload;
+            }
+
             /* Apparently there's both title and salutation for some bizarre reason
              */
             $employeeSetReformatted[] = [
@@ -915,16 +943,8 @@ class Profile implements IStrategy
                 'department' => $employee['departments'],
                 'portal_user_code' => $employee['username'],
                 'active_flag' => null,
+                'teacher_photo' => $teacherPhoto
             ];
-
-            // For employees, this seems to be the only way to get photo
-//            if ($this->includePhoto && isset($this->api[Codec\DSN::MODULE_EMPLOYEE_HR])) {
-//                $detail = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
-//                    'date' => date('d/m/Y'),
-//                    'code' => (string)$employee['user_code'],
-//                    'includephoto' => true,
-//                ]);
-//            }
         }
 
         /* Combine the two sets; this contains all the staff members
