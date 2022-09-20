@@ -531,11 +531,12 @@
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
                         onSubmit: function (toSubmit) {
-                            confirmDialogDisabled            = true;
                             confirmDialogDisabledOnTimeValue = $('#onTimeCheckboxSwitch').prop('checked');
+                            confirmDialogDisabled            = true; // Disable the confirm dialog within the 'each' loop below.
                             toSubmit.each(function () {
                                 $(this).find('[data-sobo]').trigger('click');
                             });
+                            confirmDialogDisabled = false; // Re-enable the confirm dialog.
                         }
                     });
 
