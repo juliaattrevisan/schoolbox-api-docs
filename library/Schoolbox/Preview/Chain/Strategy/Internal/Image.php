@@ -10,6 +10,9 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\Storage;
+
 class Image extends Base
 {
 
@@ -21,10 +24,22 @@ class Image extends Base
     public function test()
     {
         if ($this->getItem()->getMimetype()->isImage() && $this->getItem()->getMimetype()->getTranscodable()) {
+            //set the original url by default, if everything fails, fallback to the original.
+            $src = $this->getUrl();
+            /**
+             * if the user is requesting the hash, they SHOULD HAVE already done the perm checks for the object
+             * where if the user is requesting based on the id, we should forward them to cms/image as that accepts an id
+             * and will complete permission checks for that object.
+             */
+            if ($this->getItem() instanceof Storage\Model) {
+                $src = "/storage/image.php?hash={$this->getItem()->getHash()}";
+            } elseif ($this->getItem() instanceof File\Model) {
+                $src = "/cms/image.php?id={$this->getItem()->getId()}&height=2048&width=2048";
+            }
+
             return [
                 'type' => 'image',
-                // /storage/image using hash works, as both Storage\Model|File\Model id's won't match, but the hash's do, so use that
-                'src' => "/storage/image.php?hash={$this->getItem()->getHash()}"
+                'src' => $src
             ];
         }
 
