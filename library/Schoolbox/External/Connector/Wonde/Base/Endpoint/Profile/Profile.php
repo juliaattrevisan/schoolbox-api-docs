@@ -242,7 +242,12 @@ class Profile implements IStrategy
                     $student['contact_details']['data']['emails']['email'],
                 ]);
 
-                $firstname      = trim((string)$student['forename']);
+                /* I think legal_forename would be the most formal
+                 * so it goes into $firstname, and forename goes into preferred_name
+                 */
+                $firstname = trim((string)$student['legal_forename']);
+                $firstnamePreferred = trim((string)$student['forename']);
+
                 $form           = '';
                 $gender         = trim((string)$student['gender']);
                 $lastname       = trim((string)$student['surname']);
@@ -325,6 +330,11 @@ class Profile implements IStrategy
                     );
                 }
 
+                /* A shortcut for convenience in logging
+                 * (Sometimes people don't have all the parts of their name; odd but ok)
+                 */
+                $fullname = trim("{$firstname} {$lastname}");
+
                 /* Parents might inadvertently have the same externalId as someone else's
                  * base profile (e.g. parent has same external id as student)
                  *
@@ -354,6 +364,7 @@ class Profile implements IStrategy
                     ->setExternalId($externalId)
                     ->setTitle($title)
                     ->setFirstname($firstname)
+                    ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
 
                 /* Then save it
@@ -433,8 +444,9 @@ class Profile implements IStrategy
                 /* Log it
                  */
                 $this->log->info(sprintf(
-                    'Adding student profile for %s (%s)',
-                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                    'Adding student profile for %s (preferred: %s) (%s)',
+                    $fullname,
+                    $firstnamePreferred,
                     $externalId
                 ));
 
@@ -850,7 +862,13 @@ class Profile implements IStrategy
              */
             foreach ($staffs['data'] as $staff) {
                 $externalId = trim((string)$staff['mis_id']);
-                $firstname = trim((string)$staff['forename']);
+
+                /* I think legal_forename would be the most formal
+                 * so it goes into $firstname, and forename goes into preferred_name
+                 */
+                $firstname = trim((string)$staff['legal_forename']);
+                $firstnamePreferred = trim((string)$staff['forename']);
+
                 $lastname = trim((string)$staff['surname']);
                 $building = '';
                 $campusName = '';
@@ -897,6 +915,11 @@ class Profile implements IStrategy
                     $staff['identifiers']['data']['username'],
                 ]);
 
+                /* A shortcut for convenience in logging
+                 * (Sometimes people don't have all the parts of their name; odd but ok)
+                 */
+                $fullname = trim("{$firstname} {$lastname}");
+
                 /* Find out if this externalId already has a staff profile
                  * If one already exists, load it, update it, then save it
                  * Otherwise make a new one for the given id
@@ -920,6 +943,7 @@ class Profile implements IStrategy
                     ->setExternalId($externalId)
                     ->setTitle($title)
                     ->setFirstname($firstname)
+                    ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
 
                 /* Then save it
@@ -942,8 +966,9 @@ class Profile implements IStrategy
                 /* Log it
                  */
                 $this->log->info(sprintf(
-                    'Adding staff profile for %s (%s)',
-                    trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
+                    'Adding staff profile for %s (preferred: %s) (%s)',
+                    $fullname,
+                    $firstnamePreferred,
                     $externalId
                 ));
 
