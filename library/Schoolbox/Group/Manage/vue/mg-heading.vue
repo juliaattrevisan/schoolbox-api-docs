@@ -77,10 +77,10 @@ function onDisbandSelected () {
             <li>
                 <a href="#update-group-settings" class="icon-settings" id="updateGroupSettings" @click.prevent="onUpdateSettingsSelected">Update Group Settings</a>
             </li>
-            <li v-if="membersStore.hasGroupMembers">
+            <li v-if="store.emailEnabled && membersStore.hasGroupMembers">
                 <a href="#email-group-members" class="icon-email" id="emailAllGroup" @click.prevent="onEmailGroupSelected">Email Group Members</a>
             </li>
-            <li v-if="membersStore.hasGroupMembers">
+            <li v-if="store.emailEnabled && membersStore.hasGroupMembers">
                 <a href="#email-group-parents" class="icon-staff" id="emailAllParents" title="Includes parents of students in the group, as well as parents directly in the group." @click.prevent="onEmailGroupParentsSelected">Email Group Parents</a>
             </li>
             <li>

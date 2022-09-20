@@ -28,6 +28,13 @@ const props = defineProps({
         required: true,
     },
     /**
+     * whether email is enabled in config
+     */
+    emailEnabled: {
+        type: String,
+        required: true,
+    },
+    /**
      * whether to show setting dialog
      */
     showSetting: {
@@ -109,6 +116,7 @@ onMounted(() => {
     store.toastEl = toastEl;
     store.showSetting = (props.showSetting === '1');
     store.groupStaffOnly = props.groupStaffOnly;
+    store.emailEnabled = props.emailEnabled;
     checkForStorybook();
     store.loadData();
 });
