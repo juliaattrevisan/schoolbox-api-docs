@@ -57,6 +57,9 @@ Usage:
         // A selected option in the modal's option list
         var $modalListItem     = null;
 
+        // To reference the search-select throughout
+        const SEARCH_SELECT_SELECTOR = '[data-search-select]';
+
         // ============== Event Handlers
 
         // Listen for clicks on the submit button
@@ -92,8 +95,8 @@ Usage:
                     selectize.setValue(JSON.parse(this.dataset.valueOriginal));
                 }
             });
-            $filterPanel.find('[data-seach-select]').each(function () {
-                document.dispatchEvent(new CustomEvent('FILTERS__CLEAR_FILTER', {
+            $filterPanel.find(SEARCH_SELECT_SELECTOR).each(function () {
+                document.dispatchEvent(new CustomEvent('SEARCH_SELECT__UPDATE_SELECTION', {
                     detail: {
                         elementId: $(this).attr('id'),
                         selection: this.dataset.selectedOriginal,
@@ -126,8 +129,8 @@ Usage:
             });
 
             // Reset search select
-            $filterPanel.find('[data-search-select]').each(function () {
-                document.dispatchEvent(new CustomEvent('FILTERS__CLEAR_FILTER', {
+            $filterPanel.find(SEARCH_SELECT_SELECTOR).each(function () {
+                document.dispatchEvent(new CustomEvent('SEARCH_SELECT__UPDATE_SELECTION', {
                     detail: {
                         elementId: $(this).attr('id'),
                         selection: this.dataset.selectedDefault,
@@ -170,12 +173,17 @@ Usage:
                         .attr('data-value-original', itemsJson);
                 }
             });
-            $filterPanel.find('[data-search-select]').each(function () {
+            /**
+             * Each <option> has a data-selected-object attribute, which is used to store the linked selected object.
+             * We loop through these and update the selectedOriginal atttribute so if required they can be returned if
+             * the clear all button is selected. Note that this is just while events occur on the page.
+             * If the page is reloaded the selectedOriginal comes back through via the Vue component.
+             */
+            $filterPanel.find(SEARCH_SELECT_SELECTOR).each(function () {
                 const options = $(this)[0].querySelectorAll('option');
                 const optionValues = Array.from(options).map((option) => option.dataset.selectedObject);
                 const optionValuesJson = JSON.stringify(optionValues);
                 $(this).data('selectedOriginal', optionValuesJson);
-                $(this).attr('data-selected-original', optionValuesJson);
             });
             updateFiltersInUseLabel();
         }
@@ -190,7 +198,7 @@ Usage:
             let $panelComponent = $panelComponents.filter('[data-component='+filterId+']'),
                 $selectize      = $panelComponent.find('[data-selectize]'),
                 selectize       = ($selectize.length ? $selectize[0].selectize : null),
-                $searchSelect   = $panelComponent.find('[data-search-select]'),
+                $searchSelect   = $panelComponent.find(SEARCH_SELECT_SELECTOR),
                 hasSearchSelect = $searchSelect.length > 0,
                 $textInput      = $panelComponent.find('input[type=text]');
             $panelComponent.find('input[type=checkbox]').prop('checked', false);
@@ -199,10 +207,10 @@ Usage:
                 selectize.clear(true);
             }
             if (hasSearchSelect) {
-                document.dispatchEvent(new CustomEvent('FILTERS__CLEAR_FILTER', {
+                document.dispatchEvent(new CustomEvent('SEARCH_SELECT__UPDATE_SELECTION', {
                     detail: {
                         elementId: $searchSelect.attr('id'),
-                        selection: JSON.stringify([]),
+                        selection: JSON.stringify([]), //we pass through an empty array to be cleared in the Vue component
                     }
                 }));
             }
@@ -673,7 +681,7 @@ Usage:
                     $selectize   = $component.find('select[data-selectize]'),
                     hasSelectize = $selectize.length > 0,
                     selectize    = hasSelectize ? $selectize[0].selectize : null,
-                    $searchSelect = $component.find('select[data-search-select]'),
+                    $searchSelect = $component.find(SEARCH_SELECT_SELECTOR),
                     hasSearchSelect = $searchSelect.length > 0;
 
                 // These will be deleted if the filter's not in use
@@ -695,6 +703,8 @@ Usage:
                 }
 
                 // Build list of labels from the search select, if there is one
+                // We use the dummy <select> that is kept up to date within the Vue component to
+                // retrieve the latest selections
                 if (hasSearchSelect) {
                     const options = $searchSelect[0].querySelectorAll('option');
                     options.forEach((option) => {

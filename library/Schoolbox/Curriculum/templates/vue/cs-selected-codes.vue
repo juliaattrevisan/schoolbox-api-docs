@@ -19,7 +19,7 @@ const selectEl = ref(null);
  * to listen for any clears of the selected codes from outside the Vue app
  */
 onMounted(() => {
-    document.addEventListener('FILTERS__CLEAR_FILTER', (event) => {
+    document.addEventListener('SEARCH_SELECT__UPDATE_SELECTION', (event) => {
         if (selectEl.value.getAttribute('id') === event.detail.elementId) { //just in case there are multiple on the page
             const newSelection = JSON.parse(event.detail.selection);
             selectedCodesStore.update(newSelection);
@@ -38,34 +38,18 @@ const ids = computed(() => {
 });
 
 /**
- * We use to compare the curriculum selector that's just been cleared in the CLEAR_SELECTED_CODES event
- *
- * @returns { String }
- */
-const codesInput = computed(() => {
-    return `${store.formValueName}-selected-codes`;
-});
-
-/**
- * This is currently exclusively for use in library/Schoolbox/Filter/templates/panel.twig
- * We JSON.parse() this string on the other side to display the Curriculum codes within the selected filters panel
- *
- * @returns { String }
- */
-const codes = computed(() => {
-    const codes = selectedCodesStore.codes.map((code) => {
-        return { id: parseInt(code.id), code: code.code }
-    });
-    return JSON.stringify(codes);
-});
-
-/**
- * To manually dispatch a change event when there's been a change in the selected codes
+ * To manually dispatch a <select> change event when there's been a change in the selected codes
  * We listen for this in library/Schoolbox/Filter/templates/panel.twig
  */
 watch(() => selectedCodesStore.codesIds, () => {
-    nextTick(() => { //nextTick to ensure the dom has updated the value property
+    nextTick(() => { //nextTick to ensure the dom has updated so we can access with the latest changes
         const options = selectEl.value.querySelectorAll('option');
+        /**
+         * Vue currently removes the selected attribute from an <option> even though a v-model isn't linked
+         * So we have to add them in manually rather than in the template
+         * We add these in so within the filters library/Schoolbox/Filter/templates/panel.twig,
+         * The selected values can be serialised using $optionInputs.serializeArray()
+         */
         options.forEach((option) => {
             option.setAttribute('selected', 'selected');
         });
