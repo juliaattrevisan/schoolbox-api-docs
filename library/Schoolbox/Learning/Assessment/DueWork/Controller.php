@@ -1617,8 +1617,8 @@ class Controller extends Assessment\Controller
      *
      * Must be called *after* the files are saved to ensure their IDs exist
      *
-     * @param Collection $files
-     * @return GenericCollection
+     * @param Collection|SubmissionFile[] $files
+     * @return GenericCollection|Kami\Model[]
      * @throws MapperException
      */
     private function enqueueKamiUploads(Collection $files): GenericCollection
