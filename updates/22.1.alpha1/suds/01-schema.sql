@@ -28,3 +28,7 @@ ADD CONSTRAINT `fk_sis_class_user_overrides`
   REFERENCES `sis_event` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+-- Add preferred_name
+ALTER TABLE `sis_user_profile`
+ADD COLUMN `preferred_firstname` VARCHAR(255) NULL DEFAULT NULL AFTER `firstname`;

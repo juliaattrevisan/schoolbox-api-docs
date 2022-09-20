@@ -31,7 +31,6 @@ use UnexpectedValueException;
  */
 class Profile implements IStrategy
 {
-
     /**
      * Maximum number of emergency contacts we've permitted (3 by default)
      */
@@ -269,13 +268,8 @@ class Profile implements IStrategy
             $campusName = $this->findCampusName($student['organisationMilestones']);
             $dob = $this->findDate($student['dateOfBirth']);
             $email = $this->findEmail($student['studentDetails']);
-
-            /* Prioritise preferred names over official names
-             */
-            $firstname = (new FirstMeaningfulValue())->find([
-                $student['preferredFirstName'],
-                $student['firstName']
-            ]);
+            $firstname = (string)$student['firstName'];
+            $firstnamePreferred = (string)$student['preferredFirstName'];
 
             $form = $this->findForm($student['organisationMilestones']);
             $gender = trim((string)$student['gender']);
@@ -375,6 +369,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it
@@ -455,8 +450,9 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding student profile for %s (%s)',
+                'Adding student profile for %s (preferred: %s) (%s)',
                 trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                $firstnamePreferred,
                 $externalId
             ));
 
@@ -770,7 +766,6 @@ class Profile implements IStrategy
      */
     private function importParentsOfStudent(array $relationships, UserProfile\Model $studentBaseProfile, array $families): void
     {
-
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
          * Otherwise make a new one for the given id
@@ -842,12 +837,8 @@ class Profile implements IStrategy
                 ));
             }
 
-            /* Prioritise preferred names over official names
-             */
-            $firstname = (new FirstMeaningfulValue())->find([
-                $parent['preferredFirstName'],
-                $parent['firstName']
-            ]);
+            $firstname = (string)$parent['firstName'];
+            $firstnamePreferred = (string)$parent['preferredFirstName'];
 
             /* Prioritise preferred names over official names
              */
@@ -889,6 +880,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it
@@ -969,13 +961,8 @@ class Profile implements IStrategy
         foreach ($staffs['d'] as $staff) {
             $externalId = $this->helper->findExternalId($staff['importIdentifiers']);
             $campusName = $this->findCampusName($staff['organisationMilestones']);
-
-            /* Prioritise preferred names over official names
-             */
-            $firstname = (new FirstMeaningfulValue())->find([
-                $staff['preferredFirstName'],
-                $staff['firstName']
-            ]);
+            $firstname = (string)$staff['firstName'];
+            $firstnamePreferred = (string)$staff['preferredFirstName'];
 
             /* Prioritise preferred names over official names
              */
@@ -1014,11 +1001,6 @@ class Profile implements IStrategy
              * private; so we will just import the extension.
              */
             $phone = $this->findDetailsField($staff['staffDetails'], 'phoneExtension');
-//            $phone = (new FirstMeaningfulValue())->find([
-//                $this->findDetailsField($staff['staffDetails'], 'phoneExtension'),
-//                $staff['homePhoneNumber'],
-//                $staff['mobileNumber']
-//            ]);
 
             $positionTitle = $this->findDetailsField($staff['staffDetails'], 'roleInSchool');
 
@@ -1053,8 +1035,8 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
-
 
             /* Then save it
              */
