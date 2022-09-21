@@ -124,15 +124,15 @@ export default {
                     dayHeaders: false,
                     titleFormat: (date) => {
                         return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong); // will produce something like "Tuesday July 16th 2021"
-                    } 
+                    }
                 },
                 week: {
                     dayHeaderFormat: (date) => {
-                        return dayjs(date.date.array).format(this.formats.displayWeekDay); 
+                        return dayjs(date.date.array).format(this.formats.displayWeekDay);
                     },
                     titleFormat: (date) => {
                         return this.fullCalendarHelper_titleFormatWeek(date);
-                    } 
+                    }
                 },
                 list: {
                     buttonText: 'List',
@@ -216,7 +216,6 @@ export default {
         // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
         let quickSwitchIcon = document.createElement('a');
         quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
-        quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
 
     },
@@ -501,7 +500,7 @@ export default {
             // * FullCalendar events are exclusive
             // This means that all-day events need their end date set back
             // one day before being sent to Schoolbox.
-            if (event.allDay && dayjs(event.end).isValid()) { 
+            if (event.allDay && dayjs(event.end).isValid()) {
                 data.end = dayjs(event.end).add(dayjs.duration({days: -1})).format();
             } else if (dayjs(event.end).isValid()) { //there isn't always an end date, so only add in when it's available
                 data.end = dayjs(event.end).format();
@@ -514,7 +513,7 @@ export default {
                 ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
                 qs.stringify(data)
             );
-            
+
         },
 
         /**
@@ -650,7 +649,7 @@ export default {
 
                             this.duration.days = this.fullCalendarHelper_dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
                             this.calendarApi.gotoDate(startDateValue.format('YYYY-MM-DD'));
-                            
+
                         }
                     }
                 });

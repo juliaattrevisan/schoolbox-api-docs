@@ -92,28 +92,6 @@ button.load-more, .button.load-more {
 	flex-wrap: wrap;
 }
 
-/* Splash effect when clicking buttons
-*/
-.splash {
-	display: block;
-	position: absolute;
-	background-color: $content-ui-foreground;
-	border-radius: 100%;
-	opacity: 0.5;
-    transform: scale(0);
-}
-
-/* On.click animation effect on buttons
-*/
-.splash.animate {
-	animation: ripple 0.3s linear;
-}
-	@keyframes ripple {
-		/* Scale 200% to safely cover the entire button and fade it out
-		 */
-		100% { opacity: 0; transform: scale(2); }
-}
-
 /* Arbitrary <button> element
  */
 button {
@@ -166,10 +144,6 @@ button {
 a.submit,
 button.submit {
 	@extend [type="submit"];
-
-	.splash {
-		background-color: $submit-button-color;
-	}
 }
 
 /* Flex List Action Buttons
