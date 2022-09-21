@@ -9,7 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\User;
 
 /**
  * Get a list of events for a given user.
@@ -49,9 +52,9 @@ class EventUsers
 
 
     /**
-     * @param Mapper          $eventMapper
-     * @param Campus\Mapper   $campusMapper
-     * @param Roletype\Mapper $roletypeMapper
+     * @param \Schoolbox\External\Event\Mapper         $eventMapper
+     * @param \Schoolbox\External\Event\Campus\Mapper  $campusMapper
+     * @param Roletype\Mapper                          $roletypeMapper
      */
     public function __construct(
         \Schoolbox\External\Event\Mapper $eventMapper,
@@ -61,7 +64,6 @@ class EventUsers
         $this->eventMapper = $eventMapper;
         $this->campusMapper = $campusMapper;
         $this->roletypeMapper = $roletypeMapper;
-
         $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
         $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
     }
@@ -88,6 +90,31 @@ class EventUsers
         $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
 
+        return $this->findByRoletypeAndCampus($user, $startDatetime, $finishDatetime, $folderCodes);
+    }
+
+
+    /**
+     * Find events where you were involved by the (roletype, campus) combination
+     * Optionally filtered by folder codes
+     *
+     * @param User                   $user
+     * @param string                 $startDatetime
+     * @param string                 $finishDatetime
+     * @param GenericCollection|null $folderCodes
+     * @return GenericCollection
+     * @throws Exception
+     * @throws InvalidColumnException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    private function findByRoletypeAndCampus(
+        \Schoolbox\User $user,
+        string $startDatetime,
+        string $finishDatetime,
+        ?GenericCollection $folderCodes = null
+    ): GenericCollection {
         /* Campus requirement
          */
         $campusPb = $this->campusMapper
@@ -114,6 +141,9 @@ class EventUsers
         /* Perhaps controversial:
          * In order for you to be involved in an event, you have to be in
          * both the campus and the roletype
+         *
+         * Unions with events where you are directly involved with them
+         * via sis_event_user relationship table (roughly equivalent to personal events)
          */
         $query = "
             SELECT DISTINCT

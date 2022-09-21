@@ -11,6 +11,7 @@ namespace Schoolbox\External\Event;
 
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Event\Overrides\Applicator;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -141,9 +142,9 @@ class TimetableUsers
          */
         $query = "
             SELECT DISTINCT se.code, scu.*
-            FROM sis_class_user scu
-            INNER JOIN sis_class sc ON scu.class_id = sc.id
-            INNER JOIN sis_event se ON sc.code = se.code
+            FROM {$this->classInvolvementMapper->getTable()} scu
+            INNER JOIN {$this->classEntryMapper->getTable()} sc ON scu.class_id = sc.id
+            INNER JOIN {$this->eventMapper->getTable()} se ON sc.code = se.code
             WHERE sc.code = :classCode
             AND se.classification = :classification
             ORDER BY sc.id ASC
@@ -179,8 +180,8 @@ class TimetableUsers
          */
         $query = "
             SELECT se.id, se.code, seuo.*
-            FROM sis_event se
-            INNER JOIN sis_class_user_overrides seuo ON se.id = seuo.event_id
+            FROM {$this->eventMapper->getTable()} se
+            INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
             WHERE se.code = :classCode
             AND se.classification = :classification
             AND se.start_at >= :from
@@ -218,7 +219,7 @@ class TimetableUsers
 
         /* Perform mutations
          */
-        $manifest = $this->applyOverrides(
+        $manifest = (new Applicator($this->staffProfileMapper))->apply(
             $stack[$classCode]['usuals'] ?? [],
             $stack[$classCode]['overrides'] ?? [],
         );
@@ -268,9 +269,9 @@ class TimetableUsers
          */
         $query = "
             SELECT se.code, sc.name, scu.*
-            FROM sis_class_user scu
-            INNER JOIN sis_class sc ON scu.class_id = sc.id
-            INNER JOIN sis_event se ON sc.code = se.code
+            FROM {$this->classInvolvementMapper->getTable()} scu
+            INNER JOIN {$this->classEntryMapper->getTable()} sc ON scu.class_id = sc.id
+            INNER JOIN {$this->eventMapper->getTable()} se ON sc.code = se.code
             WHERE scu.external_id = :externalId
             AND se.classification = :classification
             AND se.start_at >= :from
@@ -321,8 +322,8 @@ class TimetableUsers
          */
         $query = "
             SELECT se.code, se.title, se.id, seuo.*
-            FROM sis_event se
-            INNER JOIN sis_class_user_overrides seuo ON se.id = seuo.event_id
+            FROM {$this->eventMapper->getTable()} se
+            INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
             WHERE se.classification = :classification
             AND se.start_at >= :from
             AND se.start_at <= :to
@@ -372,7 +373,7 @@ class TimetableUsers
          */
         foreach ($lookup as $classCode => &$data) {
             foreach ($data['overrides'] as $eventId => $overrides) {
-                $data['manifest'][$eventId] = $this->applyOverrides($data['usuals'], $overrides);
+                $data['manifest'][$eventId] = (new Applicator($this->staffProfileMapper))->apply($data['usuals'], $overrides);
 
                 /* If you were involved in this class at any point within the
                  * time interval specified, I suppose you can pile its class code
@@ -394,48 +395,6 @@ class TimetableUsers
         unset($data);
 
         return array_values($stack);
-    }
-
-
-    /**
-     * Apply $overrides to a set of usual guys $usuals,
-     * to see who still remains. Everyone still surviving
-     * is the event's $manifest
-     *
-     * @param array $usuals
-     * @param array $overrides
-     * @return array
-     * @throws \PDOException
-     */
-    private function applyOverrides(array $usuals, array $overrides): array
-    {
-        $manifest = $usuals;
-
-        foreach ($overrides as $override) {
-            if (\Schoolbox\External\Event\Overrides\Model::SUBTRACT === $override['action']) {
-                unset($manifest[$override['external_id']]);
-            } elseif (\Schoolbox\External\Event\Overrides\Model::ADD === $override['action']) {
-                $manifest[$override['external_id']] = $override['external_id'];
-            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR === $override['action']) {
-                $manifest = [];
-            } elseif (\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF === $override['action']) {
-                /* If we haven't got this already, get it and remember it
-                 * in case we needed it again and again and again
-                 */
-                if (null === $this->staffExternalIds) {
-                    $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
-                }
-
-                /* Get a list of staff members,
-                 * then do some array magic between $usualUsers
-                 * and this list of staff ids, to exclude staff
-                 * from $usualUsers
-                 */
-                $manifest = array_diff($manifest, $this->staffExternalIds);
-            }
-        }
-
-        return $manifest;
     }
 
 

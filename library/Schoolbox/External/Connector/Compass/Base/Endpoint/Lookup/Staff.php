@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup;
+namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Lookup;
 
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
@@ -19,7 +19,7 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
  *
  * That means you gotta look up dudes separately, which is annoying
  */
-class Student
+class Staff
 {
     /**
      * @var IApi
@@ -55,16 +55,16 @@ class Student
     {
         $stack = [];
 
-        $students = $this->api->retrieveDocument('person/v1/GetStudents', [
+        $staffs = $this->api->retrieveDocument('person/v1/GetStaff', [
             'lBound' => $lBound,
             'uBound' => $uBound,
         ]);
 
-        foreach ($students['d'] as $student) {
-            $stack[$student['compassPersonId']] = [
-                'externalId' => $this->helper->findExternalId($student['importIdentifiers']),
-                'firstname' => $student['firstName'],
-                'lastname' => $student['lastName'],
+        foreach ($staffs['d'] as $staff) {
+            $stack[$staff['compassPersonId']] = [
+                'externalId' => $this->helper->findExternalId($staff['importIdentifiers']),
+                'firstname' => $staff['firstName'],
+                'lastname' => $staff['lastName'],
             ];
         }
 

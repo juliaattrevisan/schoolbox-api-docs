@@ -1,0 +1,144 @@
+<?php
+
+/**
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Calendar;
+
+use Psr\Log\LoggerInterface;
+use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
+
+/**
+ * Purge existing events so we don't have to worry about diffing their
+ * relationships and stuff. It's going to be wrapped in a transaction
+ * anyway, so if anything dies we roll back.
+ */
+class Prepare implements IStrategy
+{
+    /**
+     * An arbitrarily-chosen string to denote where these events came from
+     */
+    public const EVENT_IMPORT_IDENTIFIER = 'suds_compass';
+
+
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $log;
+
+
+    /**
+     * The "perform" flag from the cli tool
+     *
+     * @var bool
+     */
+    private bool $perform;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Mapper
+     */
+    private \Schoolbox\External\Event\Mapper $eventMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\User\Mapper
+     */
+    private \Schoolbox\External\Event\User\Mapper $eventUserMapper;
+
+
+    /**
+     * Event source is an arbitrary string that helps identify the thing that imported
+     * them into the local event table so you can do a mass remove if needed
+     *
+     * @var string
+     */
+    private string $source;
+
+
+    /**
+     * Base constructor.
+     *
+     * @param LoggerInterface                       $log
+     * @param bool                                  $perform
+     * @param Mapper                                $eventMapper
+     * @param \Schoolbox\External\Event\User\Mapper $eventUserMapper
+     * @param string                                $source
+     */
+    public function __construct(
+        LoggerInterface $log,
+        bool $perform,
+        \Schoolbox\External\Event\Mapper $eventMapper,
+        \Schoolbox\External\Event\User\Mapper $eventUserMapper,
+        string $source
+    ) {
+        $this->log = $log;
+        $this->perform = $perform;
+        $this->eventMapper = $eventMapper;
+        $this->eventUserMapper = $eventUserMapper;
+
+        /* Event source is an arbitrary string that helps identify the thing that imported
+         * them into the local event table so you can do a mass remove if needed
+         */
+        $this->source = $source;
+    }
+
+
+    /**
+     * Purge existing events so we don't have to worry about diffing their
+     * relationships and stuff. It's going to be wrapped in a transaction
+     * anyway, so if anything dies we roll back.
+     *
+     * @throws \PDOException
+     */
+    public function import(): void
+    {
+        /* Set SUDS Events updated_at to something obvious
+         * Anything that updates them will be safe from cleanup later
+         */
+        if ($this->perform) {
+            /* Delete any user involvements that existed
+             */
+            $query = "
+                DELETE seu
+                FROM {$this->eventUserMapper->getTable()} seu
+                INNER JOIN {$this->eventMapper->getTable()} ON seu.event_id = {$this->eventMapper->getTable()}.id
+                WHERE {$this->eventMapper->getTable()}.classification = :classification
+                AND {$this->eventMapper->getTable()}.`source` = :source
+            ";
+
+            $statement = $this->eventUserMapper->getDatabase()->prepare($query);
+            $statement->execute([
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_EVENT,
+                'source' => $this->source,
+            ]);
+
+            $this->log->debug('Purged calendar event user involvement');
+
+            /* Mark all suds events for deletion
+             */
+            $query = "
+                UPDATE {$this->eventMapper->getTable()}
+                SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
+                WHERE {$this->eventMapper->getTable()}.classification = :classification
+                AND {$this->eventMapper->getTable()}.`source` = :source  
+            ";
+
+            $statement = $this->eventMapper->getDatabase()->prepare($query);
+            $statement->execute([
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_EVENT,
+                'source' => $this->source,
+            ]);
+
+            $this->log->debug(sprintf(
+                'Marking all %s events for deletion',
+                $this->source
+            ));
+        }
+    }
+}

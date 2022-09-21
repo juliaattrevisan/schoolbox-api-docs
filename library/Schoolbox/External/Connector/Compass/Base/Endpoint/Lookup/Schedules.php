@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup;
+namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Lookup;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
@@ -68,6 +68,7 @@ class Schedules
         $academicGroups = (new AcademicGroups($this->log, $this->api))->generate();
 
         $stack = [];
+        $subjectLookup = new Subject($this->api);
 
         foreach ($academicGroups as $academicGroup) {
             $year = $academicGroup['academicGroupCode'];
@@ -81,27 +82,29 @@ class Schedules
                 'year' => $year
             ]);
 
-            /* Schedules come with an allowImport flag which I presume we obey
-             * There isn't any definition for what that actually means, but I presume
-             * it denotes whether this schedule can be imported into other software
-             * such as us.
+            /* Consume all Schedules for the permitted Activity Types contained therein
+             * Crack open they eggs!
              */
             foreach ($schedules as $schedule) {
-                if ($schedule['allowImport']) {
-                    $this->log->info(sprintf(
-                        'Schedule %s with %s activities allows import',
-                        $schedule['name'],
-                        \count($schedule['activities'])
-                    ));
+                $this->log->info(sprintf(
+                    'Processing Schedule %s with %s activities',
+                    $schedule['name'],
+                    \count($schedule['activities'])
+                ));
 
-                    $stack[$year]['schedules'][] = $schedule;
-                } else {
-                    $this->log->debug(sprintf(
-                        'Schedule %s does not allow import; skipping',
-                        $schedule['name']
-                    ));
-                }
+                $stack[$year]['schedules'][] = $schedule;
             }
+
+            /* Dig out the actual names of an Activity
+             */
+            $this->log->debug(sprintf(
+                'Mining all the Subjects in year %s for their nice human readable names...',
+                $year
+            ));
+
+            /* Compile all the identifiers from every schedule this year
+             */
+            $stack[$year]['subjects'] = array_merge($stack[$year]['subjects'] ?? [], $subjectLookup->generate($year));
         }
 
         /* This definitely gets super expensive, so cache this thing

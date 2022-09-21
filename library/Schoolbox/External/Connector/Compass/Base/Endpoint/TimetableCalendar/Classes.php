@@ -14,10 +14,12 @@ use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
-use Schoolbox\External\Connector\Compass\Base\Endpoint\TimetableCalendar\Lookup\Attendees;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\Lookup;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Import all the classes for a student, saving them as sis_event records
@@ -66,11 +68,11 @@ class Classes implements IStrategy
         ],
         2 => [
             'name' => 'Event',
-            'allowed' => true
+            'allowed' => false
         ],
         3 => [
             'name' => 'Meeting',
-            'allowed' => true
+            'allowed' => false
         ],
         4 => [
             'name' => 'Assembly',
@@ -78,7 +80,7 @@ class Classes implements IStrategy
         ],
         5 => [
             'name' => 'Generic',
-            'allowed' => true
+            'allowed' => false
         ],
         6 => [
             'name' => 'Duty',
@@ -100,6 +102,15 @@ class Classes implements IStrategy
             'name' => 'LearningTask',
             'allowed' => false
         ],
+        /* This is an unlisted Activity Type that Nick Swan couldn't understand
+         * I think it corresponds to other event types that aren't documented
+         *
+         * So far only MECS have used it where we found On Call events
+         */
+//        12 => [
+//            'name' => 'On call',
+//            'allowed' => false
+//        ]
     ];
 
 
@@ -246,25 +257,25 @@ class Classes implements IStrategy
 
         /* Generate a list of staff members
          */
-        $this->log->debug('Preloading staff compassPersonIds for non-academic classes...');
+        $this->log->debug('Preloading staff compassPersonIds for academic classes...');
 
         $staffLookup = (new Lookup\Staff($this->api))->generate($this->lBound, $this->uBound);
 
         /* Generate a list of students
          */
-        $this->log->debug('Preloading student compassPersonIds for non-academic classes...');
+        $this->log->debug('Preloading student compassPersonIds for academic classes...');
 
         $studentLookup = (new Lookup\Student($this->api))->generate($this->lBound, $this->uBound);
 
         /* Gotta use this to figure out who everyone is, given
          * a compass person id (disgusting)
          */
-        $attendeesLookup = new Attendees($this->log, $staffLookup, $studentLookup);
+        $attendeesLookup = new Lookup\Attendees($this->log, $staffLookup, $studentLookup);
 
         /* We'll need this for later
          */
         $now = \Alaress_Date_Format::now();
-        $enrolmentsLookup = new Lookup\Enrolments($this->log, $this->api);
+        $enrolmentsLookup = new Lookup\Enrolments($this->api);
 
         /* Get a list of Schedules to consume
          */
@@ -279,7 +290,7 @@ class Classes implements IStrategy
                 foreach ($schedule['activities'] as $activity) {
                     $activityType = (int)$activity['activityType'];
 
-//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['Muay Thai excursion'])) {
+//                    if (!(new Watchlist())->isOnWatchlist($activity['name'], ['On call'])) {
 //                        continue;
 //                    }
 
@@ -439,6 +450,16 @@ class Classes implements IStrategy
                             continue;
                         }
 
+                        /* Override the activity name with something nice
+                         */
+                        $activity['longName'] = $schedules['subjects'][$activity['subjectImportIdentifier']] ?? $activity['name'];
+
+                        $this->log->debug(sprintf(
+                            'Activity %s is now known as %s',
+                            $activity['name'],
+                            $activity['longName']
+                        ));
+
                         /* Start manufacturing events and relationships for each person
                          * in $enrolments, then save it
                          */
@@ -523,7 +544,7 @@ class Classes implements IStrategy
 
         $period = null;
         $room = trim((string)$activityInstance['location']);
-        $title = $activityName;
+        $title = $activity['longName'];
 
         /* Datetimes for when this class occurs
          */
@@ -536,9 +557,15 @@ class Classes implements IStrategy
          */
         $type = '';
 
-        /* Cram in everything else
+        /* Try to recycle based on guid
          */
-        $event = $this->eventMapper->createModel()
+        try {
+            $event = $this->eventMapper->findOneByColumn('guid', $guid);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $event = $this->eventMapper->createModel();
+        }
+
+        $event
             ->setTitle($title)
             ->setDetail($detail)
             ->setLocation($room)
@@ -669,7 +696,7 @@ class Classes implements IStrategy
 
         foreach ($activityInstance['attendees'] as $attendeeTeacher) {
             /* FIXME Multiple teachers might exist here
-             *  It's possibel that multiple Attendee might be a staff member
+             *  It's possible that multiple Attendee might be a staff member
              *  in which case the intent would be "multiple teachers of this class"
              *  but there's no specimen to verify that hearsay
              */
@@ -732,22 +759,7 @@ class Classes implements IStrategy
                 $teacherCompassIds
             ));
 
-            $this->saveStaffInvolvement($teacher, $event);
-        }
-
-        /* Alternatively, this might also have additional participating teachers
-         */
-        if (!\count($enrolments['teachers'])) {
-            $this->log->debug(sprintf(
-                '%s: no additional teachers involved',
-                $activityName
-            ));
-        } else {
-            foreach ($enrolments['teachers'] as $externalId) {
-                $this->saveStaffInvolvement([
-                    'externalId' => $externalId
-                ], $event);
-            }
+            $this->saveStaffInvolvement($event, $teacher);
         }
 
         /* Save sis_class_user involvements
@@ -760,7 +772,7 @@ class Classes implements IStrategy
             ));
         } else {
             foreach ($enrolments['students'] as $externalId) {
-                $this->saveStudentInvolvement($event, $classEntry, $externalId, $externalId);
+                $this->saveStudentInvolvement($event, $classEntry, $externalId);
             }
         }
     }
@@ -778,8 +790,8 @@ class Classes implements IStrategy
      * @throws \UnexpectedValueException
      */
     private function saveStaffInvolvement(
-        array $teacher,
-        \Schoolbox\External\Event\Model $event
+        \Schoolbox\External\Event\Model $event,
+        array $teacher
     ): void {
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
@@ -810,19 +822,17 @@ class Classes implements IStrategy
      * Save an involvement for user $externalId, whose name is $name,
      * for the sis_event $event
      *
-     * @param \Schoolbox\External\Event\Model $event
-     * @param ClassEntry                      $classEntry
-     * @param string                          $name
-     * @param string                          $externalId
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @param string     $externalId
      * @return void
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \UnexpectedValueException
      */
     private function saveStudentInvolvement(
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry,
-        string $name,
         string $externalId
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
