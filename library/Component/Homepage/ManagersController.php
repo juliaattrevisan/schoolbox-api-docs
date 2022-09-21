@@ -52,14 +52,14 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $nianFolder   = NNIAN::getInstance($folderMapper)->findNearestNonInheritingAncestralNode($this->getContext());
             $managerList  = $userMapper->findByAccess(
                 UserAccess::SERVICE_HOMEPAGE,
-                UserAccess::ACCESS_FULL,
+                UserAccess::ACCESS_WRITE,
                 $nianFolder->getId(),
                 ['lastname' => 'asc']
             );
         } else {
             $managerList = $userMapper->findByAccess(
                 UserAccess::SERVICE_HOMEPAGE,
-                UserAccess::ACCESS_FULL,
+                UserAccess::ACCESS_WRITE,
                 $this->getContext()->getId(),
                 ['lastname' => 'asc']
             );
