@@ -904,20 +904,12 @@ class Profile implements IStrategy
              $salutation = (new FirstMeaningfulValue())->find([
                  $employee['salutation'],
                  $employee['title']
-             ]);
+            ]);
 
-            /* For employees, this seems to be the only way to get photo
-             *
-             * Since we did a little preprocessing using a different endpoint we need to supply
-             * each Employee's picture manually; alternatively you can download them all upfront
-             * but you wouldn't be able to exclude a particular demographic (we already got the
-             * Teacher's pictures previously and we don't need those again)
-             */
-            $teacherPhoto = [];
-
-            /* Init a position
+            /* Init a position and photo struct
              */
             $position = '';
+            $teacherPhoto = [];
 
             /* Apparently there's both title and salutation for some bizarre reason
              */
@@ -959,9 +951,6 @@ class Profile implements IStrategy
                 'includephoto' => true,
             ], Api::VERSION_2);
 
-            /* Fetch each Employee's picture if Load Photos From SIS is enabled
-             * Find the piece of $photoPayload that closely resembles teacher_photo
-             */
             $employeeLookup = [];
 
             foreach ($details['employees'] as $employeeDetail) {
@@ -977,8 +966,13 @@ class Profile implements IStrategy
                  */
                 $employeeDetail['position'] = $employeeLookup[$employeeCode]['general']['position_title'];
 
-                /* Only need to reassign Employee pictures if enabled
-                 * We got the staff ones separately
+                /* Fetch each Employee's picture if Load Photos From SIS is enabled
+                 * Find the piece that closely resembles teacher_photo
+                 *
+                 * Only need to reassign Employee pictures if enabled;
+                 * we got the staff ones separately and don't need to assign them again
+                 *
+                 * For employees, this seems to be the only way to get photo
                  */
                 if ($this->includePhoto && self::EMPLOYEE === $employeeDetail['category']) {
                     $this->log->debug(sprintf(
