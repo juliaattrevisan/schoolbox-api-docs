@@ -244,8 +244,8 @@ class Profile implements IStrategy
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
-        $this->importStudents();
+//        $this->log->info('Processing students and their parents.');
+//        $this->importStudents();
 
         /* Import staff profile data
          */
@@ -919,50 +919,10 @@ class Profile implements IStrategy
              */
             $position = '';
 
-            /* Obtain profile pictures and position title info from this Employee HR place if enabled
-             */
-            if ($employeeHREnabled) {
-                /* Note: it's possible that the employee's user_code is invalid in this endpoint
-                 * (It can happen if you put a staff member's alphanumeric identifier here
-                 * instead of an employee's numerical one)
-                 *
-                 * Not sure that it actually happens in the wild though
-                 */
-                try {
-                    $details = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
-                        'date' => date('d/m/Y'),
-                        'code' => (string)$employee['user_code'],
-                        'includephoto' => true,
-                    ], Api::VERSION_2);
-
-                    /* Fetch each Employee's picture if Load Photos From SIS is enabled
-                     * Find the piece of $photoPayload that closely resembles teacher_photo
-                     */
-                    if ($this->includePhoto) {
-                        $this->log->debug(sprintf(
-                            'Fetching picture for employee %s',
-                            (string)$employee['user_code']
-                        ));
-
-                        $teacherPhoto = $details['employees'][0]['general']['employee_photo'];
-                    }
-
-                    /* Get the position
-                     */
-                    $position = $details['employees'][0]['general']['position_title'];
-
-                } catch (\RuntimeException $e) {
-                    $this->log->debug(sprintf(
-                        'Bad endpoint for employee %s details: %s. Skipping',
-                        $employee['user_code'],
-                        $e->getMessage()
-                    ));
-                }
-            }
-
             /* Apparently there's both title and salutation for some bizarre reason
              */
             $employeeSetReformatted[] = [
+                'employee_code' => $employee['user_code'],
                 'teacher_code' => $employeeCodec->encode((string)$employee['user_code']),
                 'salutation' => $salutation,
                 'first_name' => $employee['first_name'],
@@ -983,7 +943,59 @@ class Profile implements IStrategy
          * Both teaching and non-teaching, though you can't distinguish
          * between them in UPS except by the contents of teacher_code
          */
-        return array_merge($teachers['teachers'], $employeeSetReformatted);
+        $combinedSet = array_merge($teachers['teachers'], $employeeSetReformatted);
+
+        /* Obtain profile pictures and position title info from this Employee HR place if enabled
+         */
+        if ($employeeHREnabled) {
+            /* Note: it's possible that the employee's user_code is invalid in this endpoint
+             * (It can happen if you put a staff member's alphanumeric identifier here
+             * instead of an employee's numerical one)
+             *
+             * Not sure that it actually happens in the wild though
+             */
+            $details = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
+                'date' => date('d/m/Y'),
+                'includephoto' => true,
+            ], Api::VERSION_2);
+
+            /* Fetch each Employee's picture if Load Photos From SIS is enabled
+             * Find the piece of $photoPayload that closely resembles teacher_photo
+             */
+            $employeeLookup = [];
+
+            foreach ($details['employees'] as $employeeDetail) {
+                $employeeLookup[$employeeDetail['general']['employee_code']] = $employeeDetail;
+            }
+
+            /* Decorate the $combinedSet with the new parts we found elsewhere
+             */
+            foreach ($combinedSet as &$employeeDetail) {
+                $employeeCode = $employeeDetail['employee_code'];
+
+                /* Get the position for every guy
+                 */
+                $employeeDetail['position'] = $employeeLookup[$employeeCode]['general']['position_title'];
+
+                /* Only need to reassign Employee pictures if enabled
+                 * We got the staff ones separately
+                 */
+                if ($this->includePhoto && self::EMPLOYEE === $employeeDetail['category']) {
+                    $this->log->debug(sprintf(
+                        'Fetching picture for employee %s %s (%s)',
+                        $employeeDetail['first_name'],
+                        $employeeDetail['surname'],
+                        $employeeDetail['teacher_code']
+                    ));
+
+                    $employeeDetail['teacher_photo'] = $employeeLookup[$employeeCode]['general']['employee_photo'];
+                }
+            }
+
+            unset($employeeDetail);
+        }
+
+        return $combinedSet;
     }
 
 
@@ -1047,7 +1059,7 @@ class Profile implements IStrategy
 
             $lastname = trim((string)$staff['surname']);
             $phone = '';
-            $position = '';
+            $position = trim((string)$staff['position']);
             $room = '';
             $title = trim((string)$staff['salutation']);
             $username = trim((string)$staff['portal_user_code']);
