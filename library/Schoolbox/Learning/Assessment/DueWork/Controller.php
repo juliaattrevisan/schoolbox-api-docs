@@ -935,8 +935,6 @@ class Controller extends Assessment\Controller
      * @throws MapperException If unable to create new Response object
      * @throws Deleted If specified Response is deleted
      * @throws RouteNotFound If unable to generate a specified Route
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      * @throws \Schoolbox\File\Exception
      * @api POST /learning/assessments/:assessmentId/:studentId/submit
      */
