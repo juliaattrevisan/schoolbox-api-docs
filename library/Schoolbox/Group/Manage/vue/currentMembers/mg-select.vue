@@ -94,7 +94,7 @@ function onRemoveMembersSelected () {
         <button @click.prevent="onClearMemberSelection" class="button-clear" :disable="store.isProcessing">Clear member selection</button>
         <ul class="flex-list">
             <mg-select-access />
-            <li>
+            <li v-if="store.emailEnabled">
                 <button @click.prevent="onEmailMembersSelected" class="button submit icon-email" :disabled="store.isProcessing">Email {{ membersStore.selectedMembersPlural }}</button>
             </li>
             <li>
