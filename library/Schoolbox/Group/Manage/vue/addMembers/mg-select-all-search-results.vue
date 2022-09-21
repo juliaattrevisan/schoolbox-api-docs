@@ -53,24 +53,10 @@ const isSomeResultsSelected = computed(() => {
 const isChecked = computed(() => isAllResultsSelected.value ? true : false);
 
 /**
- * dispatch to parent so can move to relevant settings page
+ * Add or remove all current search results
  */
 function onSelectAll () {
-    isChecked.value ? removeAllResults() : addAllResults();
-}
-
-/**
- * pull all results out
- */
-function removeAllResults () {
-    searchStore.removeAllResults();
-}
-
-/**
- * add all results in
- */
-function addAllResults () {
-    searchStore.addAllResults();
+    isChecked.value ? searchStore.removeAllResults() : searchStore.addAllResults();
 }
 
 </script>

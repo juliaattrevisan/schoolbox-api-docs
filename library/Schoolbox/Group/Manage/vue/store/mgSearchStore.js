@@ -135,27 +135,10 @@ export const useSearchStore = defineStore('mgSearch', {
         },
 
         /**
-         * add a search result
-         *
-         * @param { Object }
+         * clear the currently selected results
          */
-        addResult (searchResult) {
-            const addMembersStore = useAddMembersStore();
-            const searchResultWithFromType = {
-                ...searchResult,
-                // list returns search result in the same format as name
-                fromType: addMembersStore.fromType === 'list' ? 'name' : addMembersStore.fromType,
-            }
-            this.selectedResults  = [...this.selectedResults, searchResultWithFromType];
-        },
-
-        /**
-         * remove a search result
-         *
-         * @param { Object }
-         */
-        removeResult (searchResult) {
-            this.selectedResults = this.selectedResults.filter((selectedResultsItem) => selectedResultsItem.id !== searchResult.id);
+        clearSelectedResults () {
+            this.selectedResults = [];
         },
 
         /**
@@ -168,10 +151,41 @@ export const useSearchStore = defineStore('mgSearch', {
         },
 
         /**
+         * add a search result
+         *
+         * @param { Object }
+         */
+        addResult (searchResult) {
+            const addMembersStore = useAddMembersStore();
+            const searchResultWithFromType = {
+                ...searchResult,
+                // list returns search result in the same format as name
+                fromType: addMembersStore.fromType === 'list' ? 'name' : addMembersStore.fromType,
+            }
+            const hasMatch = this.selectedResults.some((result) => { //confirm that the member is not in the list already
+                return result.id === searchResult.id && result.fromType === searchResultWithFromType.fromType;
+            });
+            if (!hasMatch) {
+                this.selectedResults = [...this.selectedResults, searchResultWithFromType];
+            }
+        },
+
+        /**
          * remove all found results from the selectedResults
          */
         removeAllResults () {
-            this.selectedResults  = [];
+            this.filteredResults.forEach((result) => {
+                this.removeResult(result);
+            });
+        },
+
+        /**
+         * remove a search result
+         *
+         * @param { Object }
+         */
+        removeResult (searchResult) {
+            this.selectedResults = this.selectedResults.filter((selectedResultsItem) => selectedResultsItem.id !== searchResult.id);
         },
 
     },

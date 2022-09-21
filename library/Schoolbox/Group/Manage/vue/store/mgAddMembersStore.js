@@ -44,8 +44,7 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
                             justUpdated: false, //to highlight members that have just been changed
                         }
                     });
-                    const searchStore = useSearchStore();
-                    searchStore.removeAllResults(); //the members have been added so clear the search
+                    useSearchStore().clearSelectedResults(); //the members have been added so clear the selection
                     const membersStore = useMembersStore();
                     membersStore.members = [...membersStore.members, ...newMembers]; //add in the new members to the table
                 } else {
