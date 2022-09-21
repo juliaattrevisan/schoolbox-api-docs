@@ -270,7 +270,8 @@ class Factory
         $modules = [
             Codec\DSN::MODULE_LMS_INTEGRATION,
             Codec\DSN::MODULE_STUDENT_DETAILS,
-            Codec\DSN::MODULE_IDENTITY_MANAGEMENT
+            Codec\DSN::MODULE_IDENTITY_MANAGEMENT,
+            Codec\DSN::MODULE_EMPLOYEE_HR
         ];
 
         $api = [];

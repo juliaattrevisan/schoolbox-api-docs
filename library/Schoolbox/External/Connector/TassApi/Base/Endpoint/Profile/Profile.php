@@ -916,6 +916,17 @@ class Profile implements IStrategy
             $teacherPhoto = [];
 
             if ($employeeProfilePictures) {
+                $this->log->debug(sprintf(
+                    'Fetching picture for employee %s',
+                    (string)$employee['user_code']
+                ));
+
+                /* Note: it's possible that the employee's user_code is invalid in this endpoint
+                 * (It can happen if you put a staff member's alphnumeric identifier here
+                 * instead of an employee's numerical one)
+                 *
+                 * Not sure that it actually happens in the wild though
+                 */
                 $photoPayload = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
                     'date' => date('d/m/Y'),
                     'code' => (string)$employee['user_code'],
@@ -923,8 +934,6 @@ class Profile implements IStrategy
                 ], Api::VERSION_2);
 
                 /* Find the piece of $photoPayload that closely resembles teacher_photo
-                 *
-                 * TODO When we get access, fill in the blank and it should just work
                  */
                 $teacherPhoto = $photoPayload;
             }
