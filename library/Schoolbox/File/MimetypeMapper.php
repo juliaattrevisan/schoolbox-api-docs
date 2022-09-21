@@ -72,7 +72,8 @@ class MimetypeMapper extends Schoolbox\Mapper
             'type'       => self::TYPE_INTEGER,
         ));
 
-        $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);}
+        $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);
+    }
 
     /**
      * Retrieves whether filename has a valid mimetype.
