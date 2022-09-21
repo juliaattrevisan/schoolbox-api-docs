@@ -4,7 +4,7 @@
 # @param null|Participant\Model       participant
 # @param Collection                   breadcrumbs
 # @param false|string                 submissionsBlocked      A string message if blocked, false if not blocked
-# @param false|string                 acknowlegementBlocked   A string message if blocked, false if not blocked
+# @param false|string                 acknowledgementBlocked  A string message if blocked, false if not blocked
 # @param null|DueWork\Feedback\Model  authoritativeFeedback
 # @param null|FullTimeline            timeline
 # @param bool                         canShowcase
@@ -145,7 +145,7 @@
 {% if timeline is not empty %}
     {% include '@learningAssessment/dueWork/summary/submitButton.twig' with {
         submissionsBlocked: submissionsBlocked,
-        acknowlegementBlocked: acknowlegementBlocked,
+        acknowledgementBlocked: acknowledgementBlocked,
         selfAcknowledgeRoute: selfAcknowledgeRoute,
         assessment: assessment,
         student: student,
@@ -158,7 +158,7 @@
 {% if timeline is empty %}
     {% include '@learningAssessment/dueWork/summary/submitButton.twig' with {
         submissionsBlocked: submissionsBlocked,
-        acknowlegementBlocked: acknowlegementBlocked,
+        acknowledgementBlocked: acknowledgementBlocked,
         selfAcknowledgeRoute: selfAcknowledgeRoute,
         assessment: assessment,
         student: student,

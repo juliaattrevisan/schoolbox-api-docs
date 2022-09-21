@@ -531,25 +531,28 @@
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
                         onSubmit: function (toSubmit) {
-                            confirmDialogDisabled            = true;
                             confirmDialogDisabledOnTimeValue = $('#onTimeCheckboxSwitch').prop('checked');
+                            confirmDialogDisabled            = true; // Disable the confirm dialog within the 'each' loop below.
                             toSubmit.each(function () {
                                 $(this).find('[data-sobo]').trigger('click');
                             });
+                            confirmDialogDisabled = false; // Re-enable the confirm dialog.
                         }
                     });
 
                     {# Handle clicks on 'Submission Received' buttons #}
                     $('[data-sobo]').on('click', function () {
-                        $buttonClicked = $(this);
+                        let $buttonClicked = $(this);
 
                         if (!confirmDialogDisabled) {
                             if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
                                 $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
 
-                                {# Handle clicks on confirm popup buttons #}
-                                $('#confirm-dialog [data-yes]').click(function () {postSobo($buttonClicked, true );});
-                                $('#confirm-dialog [data-no]' ).click(function () {postSobo($buttonClicked, false);});
+                                {# Handle clicks on confirm popup buttons. #}
+                                {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
+                                {# Because we bind here, we first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clicked. #}
+                                $('#confirm-dialog [data-yes]').unbind('click').click(function () {postSobo($buttonClicked, true );});
+                                $('#confirm-dialog [data-no]' ).unbind('click').click(function () {postSobo($buttonClicked, false);});
                             } else {
                                 postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
                             }
@@ -563,6 +566,7 @@
                      *  * the student (identified by the button clicked)
                      *  * has submitted the assessment task (identified by the button href).
                      *
+                     * @param $button
                      * @param {boolean} submissionWasOnTime - true if the submission was received on time.
                      */
                     function postSobo($button, submissionWasOnTime) {
@@ -701,9 +705,9 @@
 
         <div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
             <div>
-                <h2>Please confirm if this student has submitted their work on time?</h2>
+                <h2>Please confirm if this student has submitted their work on time</h2>
                 <a class="close-reveal-modal" aria-label="Close">×</a>
-                <p>{{ assessment.title }} is currently overdue, please confirm if you would like to acknowledge the students submission before the due date. If you answer no, the students work will be marked as submitted late.</p>
+                <p>{{ assessment.title }} is currently overdue.  Please confirm if you would like to acknowledge the students submission before the due date. If you answer no, the students work will be marked as submitted late.</p>
             </div>
             <ul class="flex-list buttons">
                 <li><a class="button" data-no>No, they submitted late</a></li>

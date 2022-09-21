@@ -12,17 +12,24 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
+use CFPropertyList\IOException;
+use CFPropertyList\PListException;
 use DomainException;
+use DOMException;
 use Eportfolio\ShowcaseMapper;
+use Eportfolio_Authenticator;
 use External\Canvas\Importer\CanvasDb;
 use ICollection;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\L10n\RosettaStoneFactory;
+use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -47,7 +54,6 @@ use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradableWithResponse;
@@ -67,6 +73,7 @@ use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -77,7 +84,10 @@ use Schoolbox\UserMapper;
 use Sentry\State\HubInterface;
 use TheCodingMachine\Gotenberg;
 use UnexpectedValueException;
+use Url;
 use ZipStream;
+
+use function count;
 
 /**
  * Class Controller
@@ -86,77 +96,32 @@ use ZipStream;
  */
 class Controller extends Assessment\Controller
 {
-    /** @var RubricResultSetMapper */
-    private $resultSetMapper;
-
-    /** @var RubricDataSource */
-    private $rubricMapper;
-
-    /** @var DueWorkResponseMapper */
-
-    private $dueWorkResponseMapper;
-
-    /** @var ParticipantMapper */
-    private $participantMapper;
-
-    /** @var SingleFile\Mapper */
-    private $submissionFileMapper;
-
-    /** @var Kami\Connector */
-    private $kamiConnector;
-
-    /** @var Kami\Mapper */
-    private $kamiMapper;
-
     /**
-     * PDF generator, as used by the `downloadSubmissions` method.
-     */
-    private Gotenberg\Client $pdfGenerator;
-
-
-    /**
-     * Turnitin File Mapper, for generating the Similarity Report
-     *
-     * @var Turnitin\File\Mapper
-     */
-    private \Schoolbox\Learning\Turnitin\File\Mapper $turnitinFileMapper;
-
-
-    /** @var Assessment\Feedback\IFeedbackDataSource */
-    private $feedbackDataSource;
-
-
-    /**
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private \Schoolbox\Resource\Folder\Mapper $folderMapper;
-
-
-    /**
-     * @param UserMapper                              $userMapper
-     * @param Error\Mapper                            $errorMapper
-     * @param AssessmentDataSource                    $assessmentMapper
-     * @param WorkTypeMapper                          $workTypeMapper
-     * @param Access                                  $access
-     * @param Transactor                              $transactor
-     * @param Assessment\Breadcrumb\Factory           $bakery
-     * @param RubricDataSource                        $rubricMapper
-     * @param RubricResultSetMapper                   $resultSetMapper
-     * @param DueWorkResponseMapper                   $dueWorkResponseMapper
-     * @param ParticipantMapper                       $participantMapper
-     * @param Term\Mapper                             $termMapper
-     * @param SingleFile\Mapper                       $submissionFileMapper
-     * @param Kami\Connector                          $kamiConnector
-     * @param Kami\Mapper                             $kamiMapper
-     * @param Participant\DataSource                  $participantDataSource
-     * @param CourseSpecificationMapper               $courseSpecificationMapper
-     * @param UnitSpecificationMapper                 $unitSpecificationMapper
-     * @param Replicator                              $replicator
-     * @param Gotenberg\Client                        $pdfGenerator
-     * @param Turnitin\File\Mapper                    $turnitinFileMapper
-     * @param Assessment\Feedback\IFeedbackDataSource $feedbackDataSource
-     * @param \Schoolbox\Resource\Folder\Mapper       $folderMapper
-     * @param LatestViewMapper                        $latestViewMapper
+     * @param UserMapper                        $userMapper
+     * @param Error\Mapper                      $errorMapper
+     * @param AssessmentDataSource              $assessmentMapper
+     * @param WorkTypeMapper                    $workTypeMapper
+     * @param Access                            $access
+     * @param Transactor                        $transactor
+     * @param Assessment\Breadcrumb\Factory     $bakery
+     * @param RubricDataSource                  $rubricMapper
+     * @param RubricResultSetMapper             $resultSetMapper
+     * @param DueWorkResponseMapper             $dueWorkResponseMapper
+     * @param ParticipantMapper                 $participantMapper
+     * @param Term\Mapper                       $termMapper
+     * @param SingleFile\Mapper                 $submissionFileMapper
+     * @param Kami\Connector                    $kamiConnector
+     * @param Kami\Mapper                       $kamiMapper
+     * @param ParticipantMapper                 $participantDataSource
+     * @param CourseSpecificationMapper         $courseSpecificationMapper
+     * @param UnitSpecificationMapper           $unitSpecificationMapper
+     * @param Replicator                        $replicator
+     * @param Gotenberg\Client                  $pdfGenerator       - PDF generator, as used by the `downloadSubmissions` method.
+     * @param Turnitin\File\Mapper              $turnitinFileMapper - for generating the Similarity Report.
+     * @param IFeedbackDataSource               $feedbackDataSource
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @param LatestViewMapper                  $latestViewMapper
+     * @param FilesystemProxy                   $filesystemProxy
      */
     public function __construct(
         UserMapper $userMapper,
@@ -166,22 +131,22 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
-        RubricDataSource $rubricMapper,
-        RubricResultSetMapper $resultSetMapper,
-        DueWorkResponseMapper $dueWorkResponseMapper,
-        ParticipantMapper $participantMapper,
+        private RubricDataSource $rubricMapper,
+        private RubricResultSetMapper $resultSetMapper,
+        private DueWorkResponseMapper $dueWorkResponseMapper,
+        private ParticipantMapper $participantMapper,
         Term\Mapper $termMapper,
-        SingleFile\Mapper $submissionFileMapper,
-        Kami\Connector $kamiConnector,
-        Kami\Mapper $kamiMapper,
+        private SingleFile\Mapper $submissionFileMapper,
+        private Kami\Connector $kamiConnector,
+        private Kami\Mapper $kamiMapper,
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
-        Gotenberg\Client $pdfGenerator,
-        Turnitin\File\Mapper $turnitinFileMapper,
-        Assessment\Feedback\IFeedbackDataSource $feedbackDataSource,
-        \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        private Gotenberg\Client $pdfGenerator,
+        private Turnitin\File\Mapper $turnitinFileMapper,
+        private Assessment\Feedback\IFeedbackDataSource $feedbackDataSource,
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         LatestViewMapper $latestViewMapper,
         private FilesystemProxy $filesystemProxy,
     ) {
@@ -200,17 +165,6 @@ class Controller extends Assessment\Controller
             $replicator,
             $latestViewMapper
         );
-        $this->resultSetMapper       = $resultSetMapper;
-        $this->rubricMapper          = $rubricMapper;
-        $this->dueWorkResponseMapper = $dueWorkResponseMapper;
-        $this->participantMapper     = $participantMapper;
-        $this->submissionFileMapper  = $submissionFileMapper;
-        $this->kamiConnector         = $kamiConnector;
-        $this->kamiMapper            = $kamiMapper;
-        $this->pdfGenerator          = $pdfGenerator;
-        $this->turnitinFileMapper    = $turnitinFileMapper;
-        $this->feedbackDataSource    = $feedbackDataSource;
-        $this->folderMapper          = $folderMapper;
     }
 
 
@@ -303,14 +257,14 @@ class Controller extends Assessment\Controller
 
     /**
      * @param Model $assessment
-     * @param User              $student
+     * @param User  $student
      * @throws MapperException
-     * @throws PDOException
      * @throws RouteNotFound
-     * @throws UnexpectedValueException
+     * @throws IOException
+     * @throws PListException
+     * @throws DOMException
      * @api   GET /learning/assessments/:assessmentId/:userId
      * @since 165
-     *
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -383,10 +337,10 @@ class Controller extends Assessment\Controller
                     '',
                 ]
             ),
-            'assessment'  => $assessment,
-            'student'     => $student,
-            'participant' => $participant,
-            'returnUrl'   => $returnUrl,
+            'assessment'             => $assessment,
+            'student'                => $student,
+            'participant'            => $participant,
+            'returnUrl'              => $returnUrl,
             'timeline'               => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
             'authoritativeFeedback'  => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
             'selfAssessmentFeedback' => $participant ? $participant->findMostRecentSelfAssessedPublishedFeedback() : null,
@@ -399,8 +353,8 @@ class Controller extends Assessment\Controller
 
             /* Eportfolio Showcase - whether to show the "send to showcase" trophy button
              */
-            'canShowcase'            => $assessment->isImplementation() && (new \Eportfolio_Authenticator($this->getUser(), $student))->canModify(),
-            /* Whether or not this assessment is showcased on the user's eportfolio
+            'canShowcase'            => $assessment->isImplementation() && (new Eportfolio_Authenticator($this->getUser(), $student))->canModify(),
+            /* Whether this assessment is showcased on the user's eportfolio
              */
             'isShowcased'            => ShowcaseMapper::getInstance()->isShowcased((int)$assessment->getId(), (int)$student->getId()),
 
@@ -417,21 +371,21 @@ class Controller extends Assessment\Controller
         ];
 
         if ($assessment->isSelfAssessable()) {
-            $twigData['acknowlegementBlocked'] = false === $this->getRouteIfAuthorized('learningAssessment.postSelfAcknowledge', $routeArgs);
+            $twigData['acknowledgementBlocked'] = false === $this->getRouteIfAuthorized('learningAssessment.postSelfAcknowledge', $routeArgs);
         } else {
             // if not self-assessable, the ack routes are always blocked
-            $twigData['acknowlegementBlocked'] = true;
+            $twigData['acknowledgementBlocked'] = true;
         }
 
         try {
             $assessment->assertAcceptSubmission($participant);
             $twigData['submissionsBlocked']    = false;
-            $twigData['acknowlegementBlocked'] = false;
+            $twigData['acknowledgementBlocked'] = false;
         } catch (DomainException $e) {
             $twigData['submissionsBlocked'] = $this->getErrorMapper()->generateException($e->getCode())->getMessage();
 
             // detect the combination of "accept none + self-assess" and allow ACK in this case
-            $twigData['acknowlegementBlocked'] = false === ($assessment->isSelfAssessable() && $assessment->isAcceptNone());
+            $twigData['acknowledgementBlocked'] = false === ($assessment->isSelfAssessable() && $assessment->isAcceptNone());
         }
 
         $this->getResponse()->content->set(
@@ -451,7 +405,7 @@ class Controller extends Assessment\Controller
      * @param string $string
      * @return string
      */
-    private function sanitizeForFilename($string): string
+    private function sanitizeForFilename(string $string): string
     {
         return preg_replace("/[^A-Za-z0-9\-. ]/", '_', $string);
     }
@@ -460,7 +414,15 @@ class Controller extends Assessment\Controller
     /**
      * Download all student submissions for a given assessable
      * @param IAssessable $assessment
+     * @throws Gotenberg\ClientException
+     * @throws Gotenberg\FilesystemException
+     * @throws Gotenberg\RequestException
      * @throws MapperException
+     * @throws RouteNotFound
+     * @throws ZipStream\Exception\FileNotFoundException
+     * @throws ZipStream\Exception\FileNotReadableException
+     * @throws ZipStream\Exception\OverflowException
+     * @throws \League\Flysystem\FilesystemException
      * @api   GET /learning/assessments/:assessmentId/submissions/download
      * @since 165
      */
@@ -485,14 +447,14 @@ class Controller extends Assessment\Controller
 
         $zipOptions = new ZipStream\Option\Archive();
         $zipOptions->setSendHttpHeaders(true);
-        $zipStream = new ZipStream\ZipStream("{$titleSanitized}-{$dateNow}.zip", $zipOptions);
+        $zipStream = new ZipStream\ZipStream("$titleSanitized-$dateNow.zip", $zipOptions);
 
         // Iterate participants and get their responses
         /** @var Participant $participant */
         foreach ($participants as $participant) {
             // Short-circuit if there's no interactions
             // (draft feedback does count, though)
-            if ($participant->getAllFeedbacks()->count() === 0 && !$participant->hasSubmittedResponse()) {
+            if (!$participant->hasSubmittedResponse() && $participant->getAllFeedbacks()->count() === 0) {
                 continue;
             }
 
@@ -605,6 +567,7 @@ class Controller extends Assessment\Controller
      * @throws MapperException
      * @throws UnexpectedValueException
      * @throws Exception
+     * @throws \Exception
      * @since 165
      * @api   GET /learning/assessments/:assessmentId/overview/export?format=csv
      */
@@ -617,7 +580,7 @@ class Controller extends Assessment\Controller
         $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
         $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
-        $basename = (new \Url($assessment->getTitle()))->getSlug();
+        $basename = (new Url($assessment->getTitle()))->getSlug();
         $content  = $this->array2csv($this->collateResultSquare($rubricGrid, $assessment->getAllParticipants()));
         $headers  = $this->getResponse()->headers;
 
@@ -661,7 +624,7 @@ class Controller extends Assessment\Controller
      * Get rubric marks given for each indicator.
      *
      * @param ICollection|Participant[] $participants
-     * @return IndicatorMark[][] Grouped in sets indexed by user.id
+     * @return array<int, array<int, IndicatorMark>> grouped in sets indexed by user.id
      */
     private function getMarks(ICollection $participants): array
     {
@@ -675,7 +638,7 @@ class Controller extends Assessment\Controller
 
             try {
                 $markedGrid = $this->rubricMapper->retrieveMarkedGrid($feedback);
-            } catch (MapperException $e) {
+            } catch (MapperException) {
                 // can't really do anything
                 continue;
             }
@@ -693,8 +656,8 @@ class Controller extends Assessment\Controller
     /**
      * Creates a CSV structure for this rubric grid and its participants.
      *
-     * @param Grid                     $grid
-     * @param Collection|Participant[] $participants
+     * @param Grid       $grid
+     * @param Collection $participants
      * @return array
      */
     private function collateResultSquare(Grid $grid, Collection $participants): array
@@ -743,15 +706,10 @@ class Controller extends Assessment\Controller
             if (count($marks)) {
                 foreach ($allIndicatorUsageIds as $indicatorUsageId) {
                     if (in_array($indicatorUsageId, $markedIndicatorIds, true)) {
-                        if ($marks[$indicatorUsageId] instanceof IndicatorMark) {
-                            $descriptor = $marks[$indicatorUsageId]->getDescriptor();
-                            $row[]      = $descriptor ? $descriptor->getDescription() : '';
-                            $row[]      = $marks[$indicatorUsageId]->getValue();
-                            $sum        += $marks[$indicatorUsageId]->getValue();
-                        } else {
-                            $row[] = $marks[$indicatorUsageId];
-                            $row[] = '';
-                        }
+                        $descriptor = $marks[$indicatorUsageId]->getDescriptor();
+                        $row[]      = $descriptor ? $descriptor->getDescription() : '';
+                        $row[]      = $marks[$indicatorUsageId]->getValue();
+                        $sum        += $marks[$indicatorUsageId]->getValue();
                     } else {
                         $row[] = '';
                         $row[] = '';
@@ -790,7 +748,9 @@ class Controller extends Assessment\Controller
      * Displays a form enabling a student to create Submission for a Due Work
      *
      * @param Model $assessment
-     * @param User              $student
+     * @param User  $student
+     * @throws MapperException
+     * @throws \League\Flysystem\FilesystemException
      * @since 165
      * @api   GET /learning/assessments/:assessmentId/:participantId/submit
      */
@@ -856,8 +816,8 @@ class Controller extends Assessment\Controller
                  */
                 $dangerZone = $attachZoneFactory->buildForDueWorkResponse($latestResponse);
 
-                /* Load in the wizzywig instead of a file attachment,
-                 * if the $file uses the wizzywig editor
+                /* Load in the wysiwyg instead of a file attachment,
+                 * if the $file uses the wysiwyg editor
                  */
                 foreach ($latestResponse->getAllFiles() as $file) {
                     if ($file->getEditableInline()) {
@@ -903,8 +863,8 @@ class Controller extends Assessment\Controller
              */
             'errors' => [],
 
-            'reviewRoute'       => $reviewRoute,
-            'studentView'       => true,
+            'reviewRoute'    => $reviewRoute,
+            'studentView'    => true,
             'student'        => $student,
             'participant'    => $participant,
             'feedback'       => $feedback,
@@ -913,15 +873,15 @@ class Controller extends Assessment\Controller
             'editorContents' => $editorContents,
             'policy'         => $this->getConfigLoader()->get('lms_student_policy'),
             'errorMessage'   => $errorMessage,
-            'readonly'      => $isInteractionLocked,
+            'readonly'       => $isInteractionLocked,
             'selfReflect'    => $selfReflect,
             'selfAssess'     => $selfAssess,
             'acceptsOnline'  => $acceptsOnlineSubmissions,
 
             /* Only show these things if the assessment is self-gradable */
             'showDescriptorValue' => $selfAssess,
-            'showGroupTotal' => $selfAssess && ($assessment->getCapabilityMarkType() !== SubmissionBox\MarkType::SLUG_NONE),
-            'showRubricTotal' => $selfAssess
+            'showGroupTotal'      => $selfAssess && ($assessment->getCapabilityMarkType() !== SubmissionBox\MarkType::SLUG_NONE),
+            'showRubricTotal'     => $selfAssess
         ];
 
         $this->getResponse()->content->set(
@@ -966,14 +926,10 @@ class Controller extends Assessment\Controller
      * @param Model $assessment
      * @param User  $student
      * @return void
-     * @throws Exception
      * @throws InvalidStatusCode
      * @throws MapperException If unable to create new Response object
-     * @throws MapperException\Deleted If specified Response is deleted
-     * @throws PDOException If unable to save the Response
+     * @throws Deleted If specified Response is deleted
      * @throws RouteNotFound If unable to generate a specified Route
-     * @throws UnexpectedValueException
-     * @throws LogicException If files are not saved prior to insertion into kami upload queue
      * @throws \Schoolbox\File\Exception
      * @api POST /learning/assessments/:assessmentId/:studentId/submit
      */
@@ -997,9 +953,14 @@ class Controller extends Assessment\Controller
             } catch (DomainException $e) {
                 // Report errors in this thing
                 if ($this->getDi()->has('sentry')) {
-                    /** @var HubInterface $sentry */
-                    $sentry = $this->getDi()->get('sentry');
-                    $sentry->captureException($e);
+                    try {
+                        /** @var HubInterface $sentry */
+                        $sentry = $this->getDi()->get('sentry');
+                        $sentry->captureException($e);
+                    } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
+                        // This should never happen, since we have already checked has('sentry') above.
+                        // Do nothing here, and just allow the exception generated below to be thrown.
+                    }
                 }
 
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_SUBMISSION_WINDOW_EXCEEDED);
@@ -1032,7 +993,7 @@ class Controller extends Assessment\Controller
         /* Add the online submission to this response's list of files
          * only if there is content in it.
          */
-        if (strlen(trim(strip_tags($body)))) {
+        if (trim(strip_tags($body)) !== '') {
             $response->attachOnlineSubmissionContent($body);
         }
 
@@ -1042,7 +1003,7 @@ class Controller extends Assessment\Controller
             // Validate attachment list can actually be built
             try {
                 $attachments = $factory->build($rq->post->get('attachment'))->getAll();
-            } catch (InvalidArgumentException $e) {
+            } catch (InvalidArgumentException) {
                 $errorMessage = 'One or more files were not able to be attached';
                 $redirect     = $this->getRouter()->generate(
                     'learningAssessment.getCreateResponseForm',
@@ -1059,7 +1020,7 @@ class Controller extends Assessment\Controller
             foreach ($attachments as $attachment) {
                 /* Don't stack the online-submission.html file here, it should never
                  * appear in the attached files list at all (it should always be
-                 * loaded into the wizzywig)
+                 * loaded into the wysiwyg)
                  */
                 $attachedFile = $this->submissionFileMapper->createModel()
                                                            ->setStorage($attachment)
@@ -1072,7 +1033,7 @@ class Controller extends Assessment\Controller
             }
         }
 
-        // If we're saving the final version of the submission (ie. not a draft) ram the current datetime in
+        // If we're saving the final version of the submission (i.e. not a draft) ram the current datetime in
         if ($isFinal) {
             $acceptsOnline = $assessment->getAcceptOnline();
             $notSubmittedInPerson = !$rq->post->getBool('submitted_in_person');
@@ -1108,7 +1069,7 @@ class Controller extends Assessment\Controller
 
         // Students can't mark themselves as requiring resubmission
         $resubmissionRequired = false;
-        // Self-reflecters can't attach files to feedback, so this will always be null
+        // Self-reflectors can't attach files to feedback, so this will always be null
         $attachment = null;
         // And we only need to know if the feedback was submitted from the inline grader in order to determine if
         // we need to process attachments, so this is a nope too
@@ -1158,9 +1119,9 @@ class Controller extends Assessment\Controller
                     $response
                 );
 
-                $feedback      = $dueWorkFeedbackFactory->produce();
+                $feedback = $dueWorkFeedbackFactory->produce();
 
-                // Save the feedback, or delete it if the latest feedback is an...unfeedback
+                // Save the feedback, or delete it if the latest feedback is an...un-feedback
                 // TODO do we want to allow students self reflecting to undo their feedback?
                 // The only way this could happen is if they gave themselves feedback in a draft, then came back and deleted the draft feedback completely and submitted
                 $isNewFeedback = $feedback->getId() === null;
@@ -1207,7 +1168,7 @@ class Controller extends Assessment\Controller
          * Self-reflection's Similarity Check stubs saving .......happens elsewhere
          *
          * Similarity Check must be enabled to use plag or turnitin
-         * This is processed in a detached function so it doesn't hang the ui
+         * This is processed in a detached function, so it doesn't hang the ui
          * while it's executing, since accessing third party api can be slow
          */
         $detachedFunction = null;
@@ -1245,11 +1206,8 @@ class Controller extends Assessment\Controller
                 /* Set up detached function so turnitin can continue in the background
                  */
                 $instanceIdentifier = $this->getConfigLoader()->get('site_type');
-
-                /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy */
-                $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
-
-                $detachedFunction = static function () use ($api, $models, $instanceIdentifier, $assessmentMapperProxy) {
+                $assessmentMapper   = $this->getAssessmentMapper();
+                $detachedFunction   = static function () use ($api, $models, $instanceIdentifier, $assessmentMapper) {
                     /* Set up a record processor
                      */
                     $processor = (new Turnitin\File\Process\Transmit(
@@ -1260,7 +1218,7 @@ class Controller extends Assessment\Controller
                         UserMapper::getInstance(),
                         SubmissionBoxMapper::getInstance(),
                         SingleFile\Mapper::getInstance(),
-                        $assessmentMapperProxy,
+                        $assessmentMapper,
                     ));
 
                     /* Shank them all up
@@ -1282,12 +1240,12 @@ class Controller extends Assessment\Controller
             ];
         }
 
-        /* Asynchronously shove it into plagscan so we don't make the user wait ages
+        /* Asynchronously shove it into plagscan, so we don't make the user wait ages
          * for it to read 1 byte at a time >_<
          */
         $this->getResponse()->content->set($output);
 
-        /* Saving drafts from the wizzywig
+        /* Saving drafts from the wysiwyg
          */
         if ($rq->isXhr()) {
             $result['success'] = true;
@@ -1297,7 +1255,7 @@ class Controller extends Assessment\Controller
             $rs->status->setCode(200);
             $rs->content->set($this->buildJsonOutput($result));
         } else {
-            // Redirect after saving to Due Work Summary For Particular Student
+            // Redirect after saving to Due Work Summary for particular student.
             $rs->redirect->to(
                 $this->getRouter()->generate(
                     'learningAssessment.getSummary',
@@ -1324,20 +1282,17 @@ class Controller extends Assessment\Controller
      */
     public function postStatusAcknowledge(IAssessable $assessment, User $student): void
     {
-        // NOTE: We do not use $assessment->isOverdue() because that will return true only if now is between dueAt and closeAt.
-        //       For assessments able to be submitted offline (which we deal with here), closeAt will always equal dueAt, and
-        //       so isOverdue() will return false if now is after dueAt/closeAt.  Therefore function isOverdue() is not applicable here.
-        if (Alaress_Date_Format::now()->gt($assessment->getDueAt())) {
-            // If the 'submissionWasOnTime' parameter is true, then this is a late acknowledgement of an event that occurred earlier.
-            // Otherwise, set submission time to 'now' to align with the behaviour before parameter 'submissionWasOnTime' was introduced.
-            $submittedLate  = !$this->getRequest()->post->getBool('submissionWasOnTime', false);
-            $submissionTime = ($submittedLate) ? Alaress_Date_Format::now() : $assessment->getDueAt()->addSeconds(-1); // 1 second before due time.
-        } else {
-            $submittedLate  = false;
-            $submissionTime = Alaress_Date_Format::now();
-        }
-
         try {
+            if ($assessment->isOverdue() || $assessment->isPastClose()) {
+                // If the 'submissionWasOnTime' parameter is true, then this is a late acknowledgement of an event that occurred earlier.
+                // Otherwise, set submission time to 'now' to align with the behaviour before parameter 'submissionWasOnTime' was introduced.
+                $submittedLate  = !$this->getRequest()->post->getBool('submissionWasOnTime', false);
+                $submissionTime = ($submittedLate) ? Alaress_Date_Format::now() : $assessment->getDueAt()->addSeconds(-1); // 1 second before due time.
+            } else {
+                $submittedLate  = false;
+                $submissionTime = Alaress_Date_Format::now();
+            }
+
             $response = $this->persistAcknowledgementResponse($assessment, $student, $submissionTime);
             $data     = [
                 'success'       => true,
@@ -1358,6 +1313,56 @@ class Controller extends Assessment\Controller
 
 
     /**
+     * Acknowledge receipt of (potentially offline) submission
+     *
+     * Creates an empty SOBO. Needs a different route to postCreateResponse()
+     * to cater for different auth rules.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @api   POST /learning/assessments/:assessmentId/:studentId/ack
+     * @since 17.0
+     */
+    public function postPendingAcknowledge(IAssessable $assessment, User $student): void
+    {
+        try {
+            if ($assessment->isOverdue() || $assessment->isPastClose()) {
+                // If the 'submissionWasOnTime' parameter is true, then this is a late acknowledgement of an event that occurred earlier.
+                // Otherwise, set submission time to 'now' to align with the behaviour before parameter 'submissionWasOnTime' was introduced.
+                $submittedLate  = !$this->getRequest()->post->getBool('submissionWasOnTime', false);
+                $submissionTime = ($submittedLate) ? Alaress_Date_Format::now() : $assessment->getDueAt()->addSeconds(-1); // 1 second before due time.
+            } else {
+                $submissionTime = Alaress_Date_Format::now();
+            }
+
+            $this->persistAcknowledgementResponse($assessment, $student, $submissionTime);
+            $participant = $assessment->getParticipant($student);
+            $this->getResponse()->content->set(
+                $this->buildUnthemedHtmlOutput(
+                    '@learning/fragments/toMarkParticipant.twig',
+                    [
+                        'participant' => $participant,
+                        'assessment'  => $participant->getAssessable(),
+                    ]
+                )
+            );
+            $code = 200;
+        } catch (PDOException $e) {
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput(
+                    [
+                        'success' => false,
+                        'message' => $e->getMessage(),
+                    ]
+                )
+            );
+            $code = 403;
+        }
+        $this->getResponse()->status->set($code);
+    }
+
+
+    /**
      * Action for a due work participant to create an empty acknowledgement
      * response.
      *
@@ -1373,10 +1378,9 @@ class Controller extends Assessment\Controller
      *
      * TODO merge common code w/ postPendingAcknowledge, postStatusAcknowledge
      *
-     * @param IAssessable|Model $assessment
-     * @param User              $student
+     * @param IAssessable $assessment
+     * @param User        $student
      * @throws RouteNotFound
-     * @throws UnexpectedValueException
      * @api   POST /learning/assessments/:assessmentId/:studentId/ackDraft
      * @since 18.0
      */
@@ -1428,56 +1432,12 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Acknowledge receipt of (potentially offline) submission
-     *
-     * Creates an empty SOBO. Needs a different route to postCreateResponse()
-     * to cater for different auth rules.
-     *
-     * @param IAssessable|Model $assessment
-     * @param User              $student
-     * @throws UnexpectedValueException
-     * @api   POST /learning/assessments/:assessmentId/:studentId/ack
-     * @since 17.0
-     */
-    public function postPendingAcknowledge(IAssessable $assessment, User $student): void
-    {
-        try {
-            $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
-            $participant = $assessment->getParticipant($student);
-            $this->getResponse()->content->set(
-                $this->buildUnthemedHtmlOutput(
-                    '@learning/fragments/toMarkParticipant.twig',
-                    [
-                    'participant' => $participant,
-                    'assessment'  => $participant->getAssessable(),
-                    ]
-                )
-            );
-            $code = 200;
-        } catch (PDOException $e) {
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput(
-                    [
-                        'success' => false,
-                        'message' => $e->getMessage(),
-                    ]
-                )
-            );
-            $code = 403;
-        }
-        $this->getResponse()->status->set($code);
-    }
-
-
-    /**
      * Common logic for 'dueWork status' and 'pending assessments' pages 'acknowledgement of submission receipt'.
      *
      * @param Model                    $dueWork
      * @param User                     $student
      * @param Alaress_Date_Format|null $submittedDate Date this was submitted at, null if draft
      * @return Submission
-     * @throws PDOException If something went wrong in the save process
-     * @throws UnexpectedValueException
      */
     private function persistAcknowledgementResponse(Model $dueWork, User $student, ?Alaress_Date_Format $submittedDate): Response\Model
     {
@@ -1506,9 +1466,8 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * @param Model|IAssessable $assessment
+     * @param IAssessable $assessment
      * @return array
-     * @throws UnexpectedValueException
      * @throws MapperException
      */
     protected function getAssessmentTwigData(IAssessable $assessment): array
@@ -1543,8 +1502,10 @@ class Controller extends Assessment\Controller
             ],
         ];
 
-        // ...append rubric-related data...
-        $data = array_merge($data, $this->generateRubricTwigData($assessment));
+        if ($assessment instanceof Model) {
+            // ...append rubric-related data...
+            $data = array_merge($data, $this->generateRubricTwigData($assessment));
+        }
 
         // ...and scene.
         return $data;
@@ -1557,7 +1518,6 @@ class Controller extends Assessment\Controller
      * @param Model $dueWork
      * @return array
      * @throws MapperException
-     * @throws UnexpectedValueException
      */
     private function generateRubricTwigData(Model $dueWork): array
     {
@@ -1599,7 +1559,7 @@ class Controller extends Assessment\Controller
 
         // The rubric grid can be used as is without Twig-wrangling
         $rubricGrid = $this->rubricMapper->retrieveGrid($dueWork, true);
-        if (\count($rubricGrid->getLevels()) === 0) {
+        if (count($rubricGrid->getLevels()) === 0) {
             // Two fake levels
             $rubricGrid->getLevels()
                        ->add(new Level())
@@ -1639,7 +1599,7 @@ class Controller extends Assessment\Controller
             $submitBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
             $submitBox->setSkipUnsubmitted($skipUnsubmitted);
             SubmissionBoxMapper::getInstance()->save($submitBox);
-        } catch (MapperException $e) {
+        } catch (MapperException) {
             // noop - submission box doesn't exist
         }
 
@@ -1656,8 +1616,6 @@ class Controller extends Assessment\Controller
      * @param Collection|SubmissionFile[] $files
      * @return GenericCollection|Kami\Model[]
      * @throws MapperException
-     * @throws PDOException
-     * @throws UnexpectedValueException
      */
     private function enqueueKamiUploads(Collection $files): GenericCollection
     {
@@ -1709,7 +1667,7 @@ class Controller extends Assessment\Controller
              */
             try {
                 $kamiModel = $this->kamiMapper->findOneByColumn('student_submission_file_id', $file->getId(), ['cache' => false]);
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (MapperException) {
                 /* Create a new one if it didn't already exist
                  */
                 $kamiModel = $this->kamiMapper->createModel()
@@ -1795,7 +1753,7 @@ class Controller extends Assessment\Controller
      * Index screen
      *
      * @param IAssessable $assessment
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     public function getSimilarityReport(IAssessable $assessment): void
     {
@@ -1822,7 +1780,7 @@ class Controller extends Assessment\Controller
     /**
      * Get a list of all the students' most recent submissions, their files,
      * and corresponding turnitin reports and assorted metadata. This is used
-     * as the payload endpoint for the Similarity Report report.
+     * as the payload endpoint for the Similarity Report.
      */
     public function getSimilarityReportPayload(IAssessable $assessment): void
     {

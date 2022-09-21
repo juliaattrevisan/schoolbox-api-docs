@@ -5111,11 +5111,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Dehydrator.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php
-
-		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Controller.php

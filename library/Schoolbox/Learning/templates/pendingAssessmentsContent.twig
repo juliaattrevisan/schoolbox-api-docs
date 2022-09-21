@@ -12,7 +12,7 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
 <script type="text/javascript">
-    $(function() {
+    $(function () {
         // Save form for task completion
         $('form[data-progress-tick-form]').progressTickForm({
             transitions: {
@@ -27,14 +27,13 @@
     });
 </script>
 
-
 <div id="pending_assessments" class="small-12 island">
     <h2 data-heading-to-mark class="subheader {% if not assessmentsToMark|length %}hide{% endif %}">Requires {{ locale.assessment.proper }} ({{ totalAssessmentsToMark }})</h2>
     <div data-list-to-mark>
         {% for assessment in assessmentsToMark %}
             {% include '@learning/fragments/toMarkAssessment.twig' with {
-                assessment:        assessment,
-                stats:             statistics[assessment.id]
+                assessment: assessment,
+                stats:      statistics[assessment.id]
             } only %}
         {% endfor %}
     </div>
@@ -70,49 +69,82 @@
             context:         null
         },
         stats: {
-            countParticipants:     0,
-            countResponseRequired: 0,
-            countFeedbackRequired: 0,
-            countReviewComplete:   0,
+            countParticipants:          0,
+            countResponseRequired:      0,
+            countFeedbackRequired:      0,
+            countReviewComplete:        0,
             percentageResponseRequired: 0,
-            percentageReviewComplete: 0
+            percentageReviewComplete:   0
         },
         isDueWork: true
     } only %}
 </div>
 
+<div id="confirm-dialog" class="reveal-modal" data-reveal role="dialog">
+    <div>
+        <h2>Please confirm if the student has submitted their work on time</h2>
+        <a class="close-reveal-modal" aria-label="Close">×</a>
+        <p>
+            This assessment is currently overdue.  Please confirm if you would like to acknowledge the students
+            submission before the due date.  If you answer no, the student's work will be marked as submitted late.
+        </p>
+    </div>
+    <ul class="flex-list buttons">
+        <li><a class="button no" data-no>No, they submitted late</a></li>
+        <li><a class="button submit yes" data-yes>Yes, they submitted on-time</a></li>
+    </ul>
+</div>
+
 <script type="text/javascript">
-    $(function() {
 
-        // get handles to static DOM elements
-        var $toast                 = $('[data-toast]'),
-            $toMarkHeading         = $('[data-heading-to-mark]'),
-            $toMarkList            = $('[data-list-to-mark]'),
-            $dueWorkToMarkTemplate = $('#template-assessment-to-mark').find('[data-assessment]').detach(),
-            $toChaseHeading        = $('[data-heading-to-chase]'),
-            $toChaseList           = $('[data-list-to-chase]');
-
+    $(function () {
         {# Handle clicks on 'Submission Received' buttons #}
         $('[data-sobo]').on('click', function (event) {
             event.preventDefault();
 
-            var $button            = $(this),
-                buttonText         = $button.html();
+            let $buttonClicked      = $(this);
+            let assessmentDueAtUnix = $buttonClicked.attr('data-assessment-due-at-unix');
+
+            if ((Date.now() / 1000) > Number(assessmentDueAtUnix)) {
+                $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
+
+                {# Handle clicks on confirm popup buttons. #}
+                {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
+                {# Because we bind here, we first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clicked. #}
+                $('#confirm-dialog [data-yes]').unbind('click').click(function () {postSobo($buttonClicked, true );});
+                $('#confirm-dialog [data-no]' ).unbind('click').click(function () {postSobo($buttonClicked, false);});
+            } else {
+                postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
+            }
+        });
+
+        /**
+         * Send a post request to the server, notifying that:
+         *  * the student (identified by the button clicked)
+         *  * has submitted the assessment task (identified by the button href).
+         *
+         * @param {boolean} submissionWasOnTime - true if the submission was received on time.
+         */
+        function postSobo($button, submissionWasOnTime) {
+            let buttonText = $button.html();
+            let $toast     = $('[data-toast]');
 
             $toast.toastActivate({text: 'Marking submission as received...'});
             $button.html('Working...');
             $button.attr('disabled', '');
 
-            $.post($button.attr('href'))
-                .done(function (response) {
-                    soboSuccess($button, response);
-                    $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
-                })
-                .fail(function () {
-                    soboFailure($button, buttonText);
-                    $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
-                });
-        });
+            $.post($button.attr('href'), {'submissionWasOnTime': submissionWasOnTime})
+            .done(function (response) {
+                soboSuccess($button, response);
+                $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
+            })
+            .fail(function () {
+                soboFailure($button, buttonText);
+                $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
+            });
+
+            $('#confirm-dialog').foundation('reveal', 'close');
+        }
 
         /**
          * Handle an 'acknowledgment of submission receipt' success
@@ -120,25 +152,26 @@
          * @param {jQuery} $button
          * @param {string} participantHtml
          */
-        function soboSuccess($button, participantHtml)
-        {
-            var $participantToChase = $button.closest('[data-participant]'),
+        function soboSuccess($button, participantHtml) {
+            let $toMarkHeading      = $('[data-heading-to-mark]'),
+                $toMarkList         = $('[data-list-to-mark]'),
+                $participantToChase = $button.closest('[data-participant]'),
                 $assessmentToChase  = $participantToChase.closest('[data-assessment]'),
                 assessmentId        = $assessmentToChase.attr('data-assessment'),
-                $assessmentToMark   = $toMarkList.find('[data-assessment='+assessmentId+']');
+                $assessmentToMark   = $toMarkList.find('[data-assessment=' + assessmentId + ']');
 
             // Ensure the 'Requires Assessment' list is visible
-            if($toMarkHeading.hasClass('hide')){
+            if ($toMarkHeading.hasClass('hide')) {
                 $toMarkHeading.removeClass('hide'); // TODO make this transition slide down for smoothness
             }
 
             // Ensure the assessment exists in the 'Requires Assessment' list
-            if(!$assessmentToMark.length){
+            if (!$assessmentToMark.length) {
                 $assessmentToMark = insertAssessmentToMark($assessmentToChase, assessmentId);
             }
 
             // Insert the participant in the 'to-mark' assessment
-            var $participantsToMarkList = $assessmentToMark.find('[data-participant-list]');
+            let $participantsToMarkList = $assessmentToMark.find('[data-participant-list] ul.information-list');
             $participantsToMarkList.append(participantHtml);
 
             updateParticipationCounts($assessmentToMark, $assessmentToChase);
@@ -151,10 +184,9 @@
          * @param {jQuery} $assessmentToMark
          * @param {jQuery} $assessmentToChase
          */
-        function updateParticipationCounts($assessmentToMark, $assessmentToChase)
-        {
+        function updateParticipationCounts($assessmentToMark, $assessmentToChase) {
             // Get handles to DOM elements
-            var $toMarkProgress       = $assessmentToMark.find('[data-progress]'),
+            let $toMarkProgress       = $assessmentToMark.find('[data-progress]'),
                 $toMarkMeter          = $assessmentToMark.find('[data-meter]'),
                 $toMarkPipe           = $assessmentToMark.find('[data-pipe]'),
                 $toMarkSummary        = $assessmentToMark.find('[data-count-to-mark]'),
@@ -173,7 +205,7 @@
             countResponseRequired--;
             countFeedbackRequired++;
 
-            var cssWidth = (100 - (countResponseRequired / countTotal * 100)) + '%',
+            let cssWidth = (100 - (countResponseRequired / countTotal * 100)) + '%',
                 cssLeft  = (countReviewComplete / countTotal * 100) + '%';
 
             // Update data attributes, CSS + titles
@@ -210,21 +242,17 @@
          * @param {int}    assessmentId
          * @return {jQuery}
          */
-        function insertAssessmentToMark($assessmentToChase, assessmentId)
-        {
-            var $assessmentToMark = $dueWorkToMarkTemplate.clone();
+        function insertAssessmentToMark($assessmentToChase, assessmentId) {
+            let $assessmentToMark = $('#template-assessment-to-mark').find('[data-assessment]').clone();
             $assessmentToMark.attr('data-assessment', assessmentId);
-            var dueTimestamp = parseInt($assessmentToChase.attr('data-due-timestamp'));
+            let dueTimestamp = parseInt($assessmentToChase.attr('data-due-timestamp'));
             $assessmentToMark.attr('data-due-timestamp', dueTimestamp);
-
             $assessmentToMark.find('[data-collapser]').attr('data-collapser', 'to-mark-' + assessmentId);
             $assessmentToMark.find('[data-collapsable]').attr('data-collapsable', 'to-mark-' + assessmentId);
-
             $assessmentToMark.find('[data-title]').html($assessmentToChase.find('[data-title]').html());
 
-            var href = $assessmentToMark.find('[data-title]').attr('href');
+            let href = $assessmentToMark.find('[data-title]').attr('href');
             $assessmentToMark.find('[data-title]').attr('href', href.replace(/\d+/, assessmentId));
-
             $assessmentToMark.find('[data-crumbs]').html($assessmentToChase.find('[data-crumbs]').html());
             $assessmentToMark.find('[data-due-date]').html($assessmentToChase.find('[data-due-date]').html());
             $assessmentToMark.css({
@@ -232,9 +260,10 @@
                 overflow:     'hidden'
             });
 
-            var insertIndex = 0;
-            $toMarkList.find('[data-assessment]').each(function(idx, elem){
-                var currentTimestamp = parseInt($(elem).attr('data-due-timestamp'));
+            let insertIndex = 0;
+            let $toMarkList = $('[data-list-to-mark]');
+            $toMarkList.find('[data-assessment]').each(function (idx, elem) {
+                let currentTimestamp = parseInt($(elem).attr('data-due-timestamp'));
                 insertIndex = idx;
                 return currentTimestamp <= dueTimestamp;
             });
@@ -257,21 +286,21 @@
          * @param {jQuery} $assessmentToChase
          * @param {jQuery} $participantToChase
          */
-        function removeParticipant($assessmentToChase, $participantToChase)
-        {
-            var
+        function removeParticipant($assessmentToChase, $participantToChase) {
+            let $toChaseHeading          = $('[data-heading-to-chase]'),
+                $toChaseList             = $('[data-list-to-chase]'),
                 $participantsToChaseList = $assessmentToChase.find('[data-participant-list]'),
                 isLastParticipant        = 1 === $participantsToChaseList.find('[data-participant]').length,
                 isLastAssessment         = 1 === $toChaseList.find('[data-assessment]').length;
 
-            if(isLastParticipant) {
-                if(isLastAssessment){
+            if (isLastParticipant) {
+                if (isLastAssessment) {
                     // Last participant in last assessment: Remove whole list
                     $toChaseHeading.hide();
                     $toChaseList.slideUp();
                 } else {
                     // Last participant in assessment, other assessments remain: Remove assessment
-                    $assessmentToChase.slideUp({done: function(){
+                    $assessmentToChase.slideUp({done: function () {
                         $assessmentToChase.remove();
                     }})
                 }
@@ -292,14 +321,13 @@
          * @param {jQuery} $assessmentToChase
          * @param {jQuery} $participantsToChaseList
          */
-        function updateEmailList($assessmentToChase, $participantsToChaseList)
-        {
-            var studentEmailArr = [],
+        function updateEmailList($assessmentToChase, $participantsToChaseList) {
+            let studentEmailArr = [],
                 $emailList      = $assessmentToChase.find('[data-email-students]');
 
-            $participantsToChaseList.find('[data-participant]').each(function(idx, elem){
-                var email = $(elem).attr('data-email');
-                if(email){
+            $participantsToChaseList.find('[data-participant]').each(function (idx, elem) {
+                let email = $(elem).attr('data-email');
+                if (email) {
                     studentEmailArr.push(email);
                 }
             });
@@ -312,12 +340,9 @@
          * @param {jQuery} $button
          * @param {string} buttonText
          */
-        function soboFailure($button, buttonText)
-        {
+        function soboFailure($button, buttonText) {
             $button.html(buttonText);
             $button.removeAttr('disabled');
         }
     });
 </script>
-
-
