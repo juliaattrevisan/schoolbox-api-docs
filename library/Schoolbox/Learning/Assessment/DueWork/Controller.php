@@ -19,6 +19,7 @@ use DOMException;
 use Eportfolio\ShowcaseMapper;
 use Eportfolio_Authenticator;
 use External\Canvas\Importer\CanvasDb;
+use Faker\Extension\ContainerException;
 use ICollection;
 use InvalidArgumentException;
 use LogicException;
@@ -960,8 +961,13 @@ class Controller extends Assessment\Controller
                 // Report errors in this thing
                 if ($this->getDi()->has('sentry')) {
                     /** @var HubInterface $sentry */
-                    $sentry = $this->getDi()->get('sentry');
-                    $sentry->captureException($e);
+                    try {
+                        $sentry = $this->getDi()->get('sentry');
+                        $sentry->captureException($e);
+                    } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
+                        // This should never happen, since we have already checked has('sentry') above.
+                        // Do nothing here, and just allow the exception generated below to be thrown.
+                    }
                 }
 
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_SUBMISSION_WINDOW_EXCEEDED);
