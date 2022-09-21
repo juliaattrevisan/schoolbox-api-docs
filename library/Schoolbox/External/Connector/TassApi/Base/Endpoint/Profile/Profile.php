@@ -1053,7 +1053,7 @@ class Profile implements IStrategy
 
             $lastname = trim((string)$staff['surname']);
             $phone = '';
-            $position = trim((string)$staff['position']);
+            $position = trim((string)($staff['position'] ?? ''));
             $room = '';
             $title = trim((string)$staff['salutation']);
             $username = trim((string)$staff['portal_user_code']);
