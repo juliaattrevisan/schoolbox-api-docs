@@ -958,8 +958,8 @@ class Controller extends Assessment\Controller
             } catch (DomainException $e) {
                 // Report errors in this thing
                 if ($this->getDi()->has('sentry')) {
-                    /** @var HubInterface $sentry */
                     try {
+                        /** @var HubInterface $sentry */
                         $sentry = $this->getDi()->get('sentry');
                         $sentry->captureException($e);
                     } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
