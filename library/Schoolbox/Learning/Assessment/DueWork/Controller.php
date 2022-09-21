@@ -19,7 +19,6 @@ use DOMException;
 use Eportfolio\ShowcaseMapper;
 use Eportfolio_Authenticator;
 use External\Canvas\Importer\CanvasDb;
-use Faker\Extension\ContainerException;
 use ICollection;
 use InvalidArgumentException;
 use LogicException;
@@ -67,7 +66,6 @@ use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
-use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
@@ -88,9 +86,6 @@ use TheCodingMachine\Gotenberg;
 use UnexpectedValueException;
 use Url;
 use ZipStream;
-use ZipStream\Exception\FileNotFoundException;
-use ZipStream\Exception\FileNotReadableException;
-use ZipStream\Exception\OverflowException;
 
 use function count;
 
@@ -115,7 +110,7 @@ class Controller extends Assessment\Controller
      * @param ParticipantMapper                 $participantMapper
      * @param Term\Mapper                       $termMapper
      * @param SingleFile\Mapper                 $submissionFileMapper
-     * @param Connector                         $kamiConnector
+     * @param Kami\Connector                    $kamiConnector
      * @param Kami\Mapper                       $kamiMapper
      * @param ParticipantMapper                 $participantDataSource
      * @param CourseSpecificationMapper         $courseSpecificationMapper
@@ -424,9 +419,9 @@ class Controller extends Assessment\Controller
      * @throws Gotenberg\RequestException
      * @throws MapperException
      * @throws RouteNotFound
-     * @throws FileNotFoundException
-     * @throws FileNotReadableException
-     * @throws OverflowException
+     * @throws ZipStream\Exception\FileNotFoundException
+     * @throws ZipStream\Exception\FileNotReadableException
+     * @throws ZipStream\Exception\OverflowException
      * @throws \League\Flysystem\FilesystemException
      * @api   GET /learning/assessments/:assessmentId/submissions/download
      * @since 165
