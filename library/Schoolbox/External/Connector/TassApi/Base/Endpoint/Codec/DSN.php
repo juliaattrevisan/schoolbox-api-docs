@@ -33,7 +33,6 @@ use function count;
  */
 class DSN implements IDSN
 {
-
     /**
      * Consts corresponding to each of the Tass systems
      */
