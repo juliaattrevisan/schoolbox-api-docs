@@ -1107,15 +1107,8 @@ class Profile implements IStrategy
         }
 
         /* Start validating the contents of $fileInfo to ensure we have what we need
-         */
-        $this->log->debug(sprintf(
-            'Importing profile picture for %s %s (%s)',
-            $baseProfile->getFirstname(),
-            $baseProfile->getLastname(),
-            $baseProfile->getExternalId()
-        ));
-
-        /* file_info node might not exist; if it doesn't, skip it
+         *
+         * file_info node might not exist; if it doesn't, skip it
          */
         if (!isset($fileInfo['image'])) {
             $this->log->debug(sprintf(
@@ -1143,6 +1136,15 @@ class Profile implements IStrategy
 
             return;
         }
+
+        /* Start the part where we save the image
+         */
+        $this->log->debug(sprintf(
+            'Importing profile picture for %s %s (%s)',
+            $baseProfile->getFirstname(),
+            $baseProfile->getLastname(),
+            $baseProfile->getExternalId()
+        ));
 
         /* Only try to persist images if perform mode is activated
          */
