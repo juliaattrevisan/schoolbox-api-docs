@@ -338,24 +338,6 @@ class Mimetype implements ISoftDeletable
     }
 
     /**
-     * @return bool
-     */
-    public function getTranscodable()
-    {
-        return $this->transcodable;
-    }
-
-    /**
-     * @param bool $transcodable
-     * @return $this
-     */
-    public function setTranscodable(bool $transcodable)
-    {
-        $this->transcodable = $transcodable;
-        return $this;
-    }
-
-    /**
      * Is this file streamable? (Audio and video are streamable, others are not)
      *
      * @return bool
