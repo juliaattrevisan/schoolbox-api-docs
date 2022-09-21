@@ -151,7 +151,7 @@ class Controller extends BaseController
 
         // None: render an error
         if ($curriculumPlanId === 0) {
-            $this->throwNoCurriculumPlanSelectedError();
+            $this->throwNotSelectedError('You must select a curriculum plan.');
             return;
         }
 
@@ -189,7 +189,7 @@ class Controller extends BaseController
 
         // None: render an error
         if ($curriculumPlanId === 0) {
-            $this->throwNoCurriculumPlanSelectedError();
+            $this->throwNotSelectedError('You must select a curriculum plan.');
             return;
         }
 
@@ -198,6 +198,12 @@ class Controller extends BaseController
             $curriculumPlan = $this->apiBridge->getCurriculum($curriculumPlanId, Module::ENABLE_ATTACHMENT_IMPORT);
         } catch (\Throwable $e) {
             $this->throwCurriculumPlanFetchError($e);
+            return;
+        }
+
+        $unit = $this->request->post->get('unit');
+        if (null === $unit) {
+            $this->throwNotSelectedError('You must select a unit.');
             return;
         }
 
@@ -226,7 +232,7 @@ class Controller extends BaseController
 
         // None: render an error
         if ($curriculumPlanId === 0) {
-            $this->throwNoCurriculumPlanSelectedError();
+            $this->throwNotSelectedError('You must select a curriculum plan.');
             return;
         }
 
@@ -238,13 +244,20 @@ class Controller extends BaseController
             return;
         }
 
+        $unit = $this->request->post->get('unit');
+        if (null === $unit) {
+            $this->throwNotSelectedError('You must select a unit.');
+            return;
+        }
+
         // Get the folder the course is to be imported into
         $parentFolderId = $this->request->post->getInt('parent');
-        if ($parentFolderId) {
-            $baseFolder = $this->folderMapper->findById($parentFolderId);
-        } else {
-            $baseFolder = $this->courseSpecMapper->getFacultyRootFolder();
+        //the UI is marking the folder field as required, so lets check that here
+        if (0 === $parentFolderId) {
+            $this->throwNotSelectedError('You must select a folder.');
+            return;
         }
+        $baseFolder = $this->folderMapper->findById($parentFolderId);
 
         // Import:
         // Pass through plan, folder, selected units
@@ -252,7 +265,7 @@ class Controller extends BaseController
             $this->importer->import(
                 $curriculumPlan,
                 $baseFolder,
-                $this->request->post->get('unit')
+                $unit
             );
             $this->response->content->set($this->buildJsonOutput([]));
             // SHUP.
@@ -274,7 +287,7 @@ class Controller extends BaseController
     /**
      * Render an error if no plan was selected when I needed one.
      */
-    private function throwNoCurriculumPlanSelectedError(): void
+    private function throwNotSelectedError(string $message): void
     {
         // SHUP.
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -284,7 +297,7 @@ class Controller extends BaseController
                 'sub/mage-error.twig',
                 [
                     'error' => [
-                        'problem' => 'You must select a curriculum plan.',
+                        'problem' => $message,
                     ],
                 ]
             )
