@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Exception\MissingModule;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
@@ -277,7 +278,11 @@ class Factory
         $api = [];
 
         foreach ($modules as $module) {
-            $api[$module] = new Api($this->host, $this->key, $module);
+            try {
+                $api[$module] = new Api($this->host, $this->key, $module);
+            } catch (MissingModule $e) {
+                // noop: module misconfigured, or optionally left unconfigured
+            }
         }
 
         /* Cache a list of known users and periods

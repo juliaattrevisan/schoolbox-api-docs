@@ -44,6 +44,15 @@ class DSN implements IDSN
 
 
     /**
+     * These modules are optional and may not be configured at all
+     */
+    private const MODULES_OPTIONAL = [
+        self::MODULE_SCHOOL_CALENDAR_AND_NOTICES,
+        self::MODULE_EMPLOYEE_HR
+    ];
+
+
+    /**
      * DSN format
      *
      * Product Module (e.g. Student Details API, Identity Management API, LMS Integration API)
@@ -117,10 +126,10 @@ class DSN implements IDSN
                 $matches[4] ?? null
             ]);
 
-            /* Only add the optional schoolcalendarandnotices tuple if it was meaningful
-             * If schoolcalendarandnotices had no credentials; skip it
+            /* Only add the optional tuple if it was meaningful
+             * If the optional tuple had no credentials, skip it
              */
-            if (isset($matches[1]) && self::MODULE_SCHOOL_CALENDAR_AND_NOTICES === $matches[1] && !\count($suppliedPieces)) {
+            if (isset($matches[1]) && in_array($matches[1], self::MODULES_OPTIONAL, true) && !\count($suppliedPieces)) {
                 continue;
             }
 
