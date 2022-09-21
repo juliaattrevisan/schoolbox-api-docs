@@ -326,42 +326,42 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ))
-//            ->add(new TimetableCalendar\Prepare(
-//                $this->log,
-//                $this->perform,
-//                $this->eventMapper,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper,
-//                $this->periodMapper,
-//                $this->overridesMapper,
-//            ))
-//            ->add(new TimetableCalendar\AdditionalSubjects(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $lookup,
-//                $this->watchlist,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper
-//            ))
-//            ->add(new TimetableCalendar\Classes(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $lookup,
-//                $this->watchlist,
-//                $this->dateLocalFormat,
-//                $this->eventMapper,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->overridesMapper
-//            ))
-//            ->add(new TimetableCalendar\Cleanup(
-//                $this->log,
-//                $this->perform,
-//                $this->eventMapper
-//            ))
+            ->add(new TimetableCalendar\Prepare(
+                $this->log,
+                $this->perform,
+                $this->eventMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper,
+                $this->periodMapper,
+                $this->overridesMapper,
+            ))
+            ->add(new TimetableCalendar\AdditionalSubjects(
+                $this->log,
+                $this->perform,
+                $api,
+                $lookup,
+                $this->watchlist,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper
+            ))
+            ->add(new TimetableCalendar\Classes(
+                $this->log,
+                $this->perform,
+                $api,
+                $lookup,
+                $this->watchlist,
+                $this->dateLocalFormat,
+                $this->eventMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->overridesMapper
+            ))
+            ->add(new TimetableCalendar\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->eventMapper
+            ))
             ->add(new ApiCertification(
                 $this->log,
                 $api
