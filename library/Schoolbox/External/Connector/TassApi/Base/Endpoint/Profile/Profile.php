@@ -397,20 +397,9 @@ class Profile implements IStrategy
                 ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
-            if ($this->includePhoto && isset($student['general_details']['student_photo']['file_info']['image'])) {
-                $this->log->debug(sprintf(
-                    'Importing profile picture for %s (%s)',
-                    $fullname,
-                    $externalId
-                ));
-
-                if ($this->perform) {
-                    $studentBaseProfile = $this->importPortrait(
-                        $studentBaseProfile,
-                        $student['general_details']['student_photo']['file_info']
-                    );
-                }
-            }
+            /* Import profile pictures
+             */
+            $this->importPortrait($studentBaseProfile, $student['general_details']['student_photo']['file_info'] ?? []);
 
             /* Then save it
              */
@@ -1037,21 +1026,9 @@ class Profile implements IStrategy
                 ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
-            if ($this->includePhoto && isset($staff['teacher_photo']['file_info']['image'])) {
-                $this->log->debug(sprintf(
-                    'Importing profile picture for %s %s (%s)',
-                    $firstname,
-                    $lastname,
-                    $externalId
-                ));
-
-                if ($this->perform) {
-                    $staffBaseProfile = $this->importPortrait(
-                        $staffBaseProfile,
-                        $staff['teacher_photo']['file_info']
-                    );
-                }
-            }
+            /* Import profile pictures
+             */
+            $this->importPortrait($staffBaseProfile, $staff['teacher_photo']['file_info'] ?? []);
 
             /* Then save it
              */
@@ -1087,27 +1064,93 @@ class Profile implements IStrategy
         }
     }
 
+
     /**
+     * Import a profile picture for the given $baseProfile
+     *
+     * Importing a profile picture requires you to enable photo_from_sis config var
+     * ("Load Photos From SIS" needs to be on)
+     *
+     * This populates the portrait_hash in $baseProfile
+     *
      * @param UserProfile\Model $baseProfile
      * @param array             $fileInfo
-     * @return UserProfile\Model
+     * @return void
      */
-    private function importPortrait(UserProfile\Model $baseProfile, array $fileInfo): UserProfile\Model
+    private function importPortrait(UserProfile\Model $baseProfile, array $fileInfo): void
     {
-        $image = base64_decode($fileInfo['image']);
-        if (!$image) {
-            return $baseProfile;
+        /* Check if config setting allows photos from sis
+         * If it's enabled, continue importing pics
+         */
+        if (!$this->includePhoto) {
+            return;
         }
 
-        // Not using $fileInfo['file_name'] and $fileInfo['mime_type'] for now
+        /* Start validating the contents of $fileInfo to ensure we have what we need
+         */
+        $this->log->debug(sprintf(
+            'Importing profile picture for %s %s (%s)',
+            $baseProfile->getFirstname(),
+            $baseProfile->getLastname(),
+            $baseProfile->getExternalId()
+        ));
+
+        /* file_info node might not exist; if it doesn't, skip it
+         */
+        if (!isset($fileInfo['image'])) {
+            $this->log->debug(sprintf(
+                'Profile picture: no data found for %s %s (%s)',
+                $baseProfile->getFirstname(),
+                $baseProfile->getLastname(),
+                $baseProfile->getExternalId()
+            ));
+
+            return;
+        }
+
+        /* Try decoding the encoded data
+         * If you can't, leave quietly
+         */
+        $image = base64_decode($fileInfo['image']);
+
+        if (!$image) {
+            $this->log->debug(sprintf(
+                'Profile picture: could not decode image data for %s %s (%s)',
+                $baseProfile->getFirstname(),
+                $baseProfile->getLastname(),
+                $baseProfile->getExternalId()
+            ));
+
+            return;
+        }
+
+        /* Only try to persist images if perform mode is activated
+         */
+        if (!$this->perform) {
+            return;
+        }
+
+        /* Otherwise, all the parts are here and valid; continue with the persistence
+         * to storage and assignation to the $baseProfile by reference
+         *
+         * Not using $fileInfo['file_name'] and $fileInfo['mime_type'] for now
+         */
         try {
             $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . '.jpg', $image);
+
+            /* You get a picture if any of the following occur:
+             *     - you don't have a portrait yet; you can get one added
+             *     - your existing picture is different to the one we just got; update it
+             */
             if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
                 $baseProfile->setPortrait($portrait);
             }
         } catch (\Exception $e) {
-            // noop
+            // noop, but warn the cli that something unusual has transpired
+            $this->log->warning(sprintf(
+                'Profile picture: exception thrown. %s',
+                $e->getMessage()
+            ));
         }
-        return $baseProfile;
     }
 }
