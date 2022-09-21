@@ -152,14 +152,13 @@
          * @param {jQuery} $button
          * @param {string} participantHtml
          */
-        function soboSuccess($button, participantHtml)
-        {
+        function soboSuccess($button, participantHtml) {
             let $toMarkHeading      = $('[data-heading-to-mark]'),
                 $toMarkList         = $('[data-list-to-mark]'),
                 $participantToChase = $button.closest('[data-participant]'),
                 $assessmentToChase  = $participantToChase.closest('[data-assessment]'),
                 assessmentId        = $assessmentToChase.attr('data-assessment'),
-                $assessmentToMark   = $toMarkList.find('[data-assessment='+assessmentId+']');
+                $assessmentToMark   = $toMarkList.find('[data-assessment=' + assessmentId + ']');
 
             // Ensure the 'Requires Assessment' list is visible
             if ($toMarkHeading.hasClass('hide')) {
@@ -172,7 +171,7 @@
             }
 
             // Insert the participant in the 'to-mark' assessment
-            let $participantsToMarkList = $assessmentToMark.find('[data-participant-list]');
+            let $participantsToMarkList = $assessmentToMark.find('[data-participant-list] ul.information-list');
             $participantsToMarkList.append(participantHtml);
 
             updateParticipationCounts($assessmentToMark, $assessmentToChase);
@@ -185,8 +184,7 @@
          * @param {jQuery} $assessmentToMark
          * @param {jQuery} $assessmentToChase
          */
-        function updateParticipationCounts($assessmentToMark, $assessmentToChase)
-        {
+        function updateParticipationCounts($assessmentToMark, $assessmentToChase) {
             // Get handles to DOM elements
             let $toMarkProgress       = $assessmentToMark.find('[data-progress]'),
                 $toMarkMeter          = $assessmentToMark.find('[data-meter]'),
@@ -244,21 +242,17 @@
          * @param {int}    assessmentId
          * @return {jQuery}
          */
-        function insertAssessmentToMark($assessmentToChase, assessmentId)
-        {
-            let $assessmentToMark = $dueWorkToMarkTemplate.clone();
+        function insertAssessmentToMark($assessmentToChase, assessmentId) {
+            let $assessmentToMark = $('#template-assessment-to-mark').find('[data-assessment]').clone();
             $assessmentToMark.attr('data-assessment', assessmentId);
             let dueTimestamp = parseInt($assessmentToChase.attr('data-due-timestamp'));
             $assessmentToMark.attr('data-due-timestamp', dueTimestamp);
-
             $assessmentToMark.find('[data-collapser]').attr('data-collapser', 'to-mark-' + assessmentId);
             $assessmentToMark.find('[data-collapsable]').attr('data-collapsable', 'to-mark-' + assessmentId);
-
             $assessmentToMark.find('[data-title]').html($assessmentToChase.find('[data-title]').html());
 
             let href = $assessmentToMark.find('[data-title]').attr('href');
             $assessmentToMark.find('[data-title]').attr('href', href.replace(/\d+/, assessmentId));
-
             $assessmentToMark.find('[data-crumbs]').html($assessmentToChase.find('[data-crumbs]').html());
             $assessmentToMark.find('[data-due-date]').html($assessmentToChase.find('[data-due-date]').html());
             $assessmentToMark.css({
@@ -292,8 +286,7 @@
          * @param {jQuery} $assessmentToChase
          * @param {jQuery} $participantToChase
          */
-        function removeParticipant($assessmentToChase, $participantToChase)
-        {
+        function removeParticipant($assessmentToChase, $participantToChase) {
             let $toChaseHeading          = $('[data-heading-to-chase]'),
                 $toChaseList             = $('[data-list-to-chase]'),
                 $participantsToChaseList = $assessmentToChase.find('[data-participant-list]'),
@@ -328,8 +321,7 @@
          * @param {jQuery} $assessmentToChase
          * @param {jQuery} $participantsToChaseList
          */
-        function updateEmailList($assessmentToChase, $participantsToChaseList)
-        {
+        function updateEmailList($assessmentToChase, $participantsToChaseList) {
             let studentEmailArr = [],
                 $emailList      = $assessmentToChase.find('[data-email-students]');
 
@@ -348,8 +340,7 @@
          * @param {jQuery} $button
          * @param {string} buttonText
          */
-        function soboFailure($button, buttonText)
-        {
+        function soboFailure($button, buttonText) {
             $button.html(buttonText);
             $button.removeAttr('disabled');
         }
