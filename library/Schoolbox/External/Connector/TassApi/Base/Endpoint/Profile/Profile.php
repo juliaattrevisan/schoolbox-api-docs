@@ -886,7 +886,7 @@ class Profile implements IStrategy
 
         /* Decide whether we should try to compile profile pictures for Employees too
          */
-        $employeeProfilePictures = $this->includePhoto && isset($this->api[Codec\DSN::MODULE_EMPLOYEE_HR]);
+        $employeeHREnabled = isset($this->api[Codec\DSN::MODULE_EMPLOYEE_HR]);
 
         /* Reformat the Employee struct to be similar to teaching struct
          */
@@ -915,12 +915,13 @@ class Profile implements IStrategy
              */
             $teacherPhoto = [];
 
-            if ($employeeProfilePictures) {
-                $this->log->debug(sprintf(
-                    'Fetching picture for employee %s',
-                    (string)$employee['user_code']
-                ));
+            /* Init a position
+             */
+            $position = '';
 
+            /* Obtain profile pictures and position title info from this Employee HR place if enabled
+             */
+            if ($employeeHREnabled) {
                 /* Note: it's possible that the employee's user_code is invalid in this endpoint
                  * (It can happen if you put a staff member's alphanumeric identifier here
                  * instead of an employee's numerical one)
@@ -928,18 +929,31 @@ class Profile implements IStrategy
                  * Not sure that it actually happens in the wild though
                  */
                 try {
-                    $photoPayload = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
+                    $details = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
                         'date' => date('d/m/Y'),
                         'code' => (string)$employee['user_code'],
                         'includephoto' => true,
                     ], Api::VERSION_2);
 
-                    /* Find the piece of $photoPayload that closely resembles teacher_photo
+                    /* Fetch each Employee's picture if Load Photos From SIS is enabled
+                     * Find the piece of $photoPayload that closely resembles teacher_photo
                      */
-                    $teacherPhoto = $photoPayload;
+                    if ($this->includePhoto) {
+                        $this->log->debug(sprintf(
+                            'Fetching picture for employee %s',
+                            (string)$employee['user_code']
+                        ));
+
+                        $teacherPhoto = $details['employees'][0]['general']['employee_photo'];
+                    }
+
+                    /* Get the position
+                     */
+                    $position = $details['employees'][0]['general']['position_title'];
+
                 } catch (\RuntimeException $e) {
                     $this->log->debug(sprintf(
-                        'Bad endpoint for employee %s profile picture: %s. Skipping',
+                        'Bad endpoint for employee %s details: %s. Skipping',
                         $employee['user_code'],
                         $e->getMessage()
                     ));
@@ -960,7 +974,8 @@ class Profile implements IStrategy
                 'department' => $employee['departments'],
                 'portal_user_code' => $employee['username'],
                 'active_flag' => null,
-                'teacher_photo' => $teacherPhoto
+                'teacher_photo' => $teacherPhoto,
+                'position' => $position
             ];
         }
 
