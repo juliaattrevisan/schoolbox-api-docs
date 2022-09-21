@@ -19,7 +19,6 @@ use Schoolbox\ISoftDeletable;
  */
 class Mimetype implements ISoftDeletable
 {
-
     /**
      * Allowed File id
      *
@@ -332,7 +331,6 @@ class Mimetype implements ISoftDeletable
         $this->deleted = $deleted;
         return $this;
     }
-
 
     /**
      * Is this file streamable? (Audio and video are streamable, others are not)

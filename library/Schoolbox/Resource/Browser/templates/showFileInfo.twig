@@ -44,8 +44,8 @@ These are its args, which is given for you
     {% endfor %}
 </ul>
 <div class="card small-12 column meta-preview">
-    {# is image and can display inline (selectable from in /adminv2/allowed-file #}
-    {% if file.mimetype.isImage and file.mimetype.getInline %}
+    {# images that are transcodable should be able to preview, both by clicking the mime image and the file title #}
+    {% if file.mimetype.isImage %}
         <a data-plugin="preview" href="{{ send ~ file.id }}&width=2048&height=2048">
             <img class="icon" src="{{ image ~ file.id }}&width=64&height=64" alt="{{ file.title }}" />
         </a>
@@ -75,7 +75,7 @@ These are its args, which is given for you
         </a>
     {% endif %}
     <h3>
-        <a href="{{ send ~ file.id }}" target="_blank">{{ file.title }}</a>
+        <a data-plugin="preview" href="{{ send ~ file.id }}" target="_blank">{{ file.title }}</a>
         <span class="hint has-tip" data-reveal-id="modal-file-{{ file.id }}" title="View file information">?</span>
     </h3>
     {% if namespace == 'resourceBrowser' and file.description %}

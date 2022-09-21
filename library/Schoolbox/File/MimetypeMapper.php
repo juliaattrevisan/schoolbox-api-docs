@@ -24,7 +24,6 @@ use Schoolbox;
  */
 class MimetypeMapper extends Schoolbox\Mapper
 {
-
     protected function mapping()
     {
         $this->hasTable('allowedFileTypes');
