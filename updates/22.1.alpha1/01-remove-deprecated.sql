@@ -22,7 +22,7 @@ ALTER TABLE `pastoral`
 ALTER TABLE `lu_pastoral_subtype`
     DROP COLUMN `_external_id`;
 ALTER TABLE `submission_box`
-    DROP COLUMN `_rubric_mark_per_capability`;
+    DROP COLUMN IF EXISTS `_rubric_mark_per_capability`;
 ALTER TABLE `ups_effect`
     DROP COLUMN `_arguments`;
 ALTER TABLE `pastoral_access`
