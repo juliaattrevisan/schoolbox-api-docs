@@ -63,6 +63,10 @@ fi
 # Need to read the actual run-time value, rather than puppet-configured value, as it's possible to
 # `vagrant up` without a `vagrant provision` so the puppet value may not have yet been applied
 rabbitmq_management_port=$(rabbitmqctl status | grep -Eo "http,[0-9]+" | awk -F',' '{ print $2 }')
+# get port for newer rabbit versions
+if [[ -z $rabbitmq_management_port ]]; then
+  rabbitmq_management_port=$(rabbitmqctl status | grep -E "http" | awk -F',| ' '{print $5}')
+fi
 
 # This will fail to start when VM booted because /usr/share/schoolbox may not yet be mounted
 eval "service php${primary_php_majver}-fpm restart"
