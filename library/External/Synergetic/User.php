@@ -268,14 +268,14 @@ class External_Synergetic_User implements External_UserInterface
                         House.HeadOfHouseID,
                         vStudentsAll.StudentFormStaffName,
                         vStudentsAll.StudentTutorDescription,
-                        luForm.ID AS TeacherFormID,
+                        CASE WHEN luForm.ID = 0 THEN null ELSE luForm.ID END AS TeacherFormID,
                         vStudentsAll.StudentForm,
-                        luTutor.ID AS TeacherTutorID,
+                        CASE WHEN luTutor.ID = 0 THEN null ELSE luTutor.ID END AS TeacherTutorID,
                         vStudentsAll.StudentHouseDescription,
                         vStudentsAll.StudentHouse,
                         vStudentsAll.StudentYearLevel,
                         vStudentsAll.StudentYearLevelCoordinator,
-                        luYearLevel.YearLevelCoordID,
+                        CASE WHEN luYearLevel.YearLevelCoordID = 0 THEN null ELSE luYearLevel.YearLevelCoordID END AS YearLevelCoordID,
                         vStudentsAll.StudentEmergencyName,
                         vStudentsAll.StudentEmergencyPhone,
                         vStudentsAll.StudentEmergencyPhoneAlt,
@@ -721,8 +721,8 @@ class External_Synergetic_User implements External_UserInterface
                                     WHEN rs.UseEmail = 'O' THEN a.StudentContactSpouseOccupEmail
                                     WHEN rs.UseEmail = 'P' THEN a.StudentContactSpouseEmail
                                     WHEN rs.UseEmail = 'D' THEN a.StudentContactSpouseDefaultEmail
-                                    ELSE '' 
-                                END 
+                                    ELSE ''
+                                END
                             END AS StudentContactSpouseDefaultEmail,
                             a.StudentContactType,
                             CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseRelation END AS StudentContactSpouseRelation,
