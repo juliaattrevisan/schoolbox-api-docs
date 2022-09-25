@@ -98,7 +98,7 @@ const isAddDisabled = computed(() => {
                     </div>
                     <div class="small-12 columns">
                         <label for="description">Description</label>
-                        <textarea :id="ckeditorInstance" rows="6" maxlength="65000"></textarea>
+                        <textarea :id="ckeditorInstance" rows="6"></textarea>
                     </div>
                     <div class="small-12 columns">
                         <ul class="flex-list">
