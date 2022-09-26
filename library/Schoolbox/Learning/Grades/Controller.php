@@ -50,44 +50,6 @@ use function func_get_args;
 class Controller extends Base
 {
     /**
-     * @var Term\Mapper
-     */
-    private $termMapper;
-
-    /**
-     * @var Folder\Mapper
-     */
-    private $folderMapper;
-
-    /**
-     * @var AssessmentMapperProxy
-     */
-    private $assessmentMapperProxy;
-
-    /**
-     * @var RubricDataSource
-     */
-    private $rubricMapper;
-
-    /**
-     * @var Access
-     */
-    private $access;
-
-    /** @var FilterSelection\Mapper */
-    private $selectionMapper;
-
-
-    /** @var AssessmentFilters\IdFinder */
-    private $assessmentIdFinder;
-
-    /**
-     * @var Filter\IFactoryFactory
-     */
-    private $filterFactoryFactory;
-
-
-    /**
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param Folder\Mapper              $folderMapper
      * @param Term\Mapper                $termMapper
@@ -98,25 +60,16 @@ class Controller extends Base
      * @param Filter\IFactoryFactory     $filterFactoryFactory
      */
     public function __construct(
-        AssessmentMapperProxy $assessmentMapperProxy,
-        Folder\Mapper $folderMapper,
-        Term\Mapper $termMapper,
-        RubricDataSource $rubricMapper,
-        FilterSelection\Mapper $filterSelectionMapper,
-        Access $access,
-        AssessmentFilters\IdFinder $assessmentIdFinder,
-        Filter\IFactoryFactory $filterFactoryFactory
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private Folder\Mapper $folderMapper,
+        private Term\Mapper $termMapper,
+        private RubricDataSource $rubricMapper,
+        private FilterSelection\Mapper $filterSelectionMapper,
+        private Access $access,
+        private AssessmentFilters\IdFinder $assessmentIdFinder,
+        private Filter\IFactoryFactory $filterFactoryFactory
     ) {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->termMapper            = $termMapper;
-        $this->folderMapper          = $folderMapper;
-        $this->rubricMapper          = $rubricMapper;
-        $this->access                = $access;
-        $this->filterFactoryFactory  = $filterFactoryFactory;
-        $this->selectionMapper       = $filterSelectionMapper;
-        $this->assessmentIdFinder    = $assessmentIdFinder;
     }
-
 
     /**
      * Redirect user to their own grades page for the current term
@@ -145,7 +98,6 @@ class Controller extends Base
             )
         );
     }
-
 
     /**
      * Display the grade summary page. With a list of classes/groups that have student interactions
@@ -219,7 +171,6 @@ class Controller extends Base
             'yearUrl'          => $yearUrl,
         ])->setTab('grade'));
     }
-
 
     /**
      * Generate the page with filter panel where we will insert a filtered grades report
@@ -358,7 +309,7 @@ class Controller extends Base
         $userSelections  = $codec->convertRequestToSelections($this->getUser(), $page, $request);
 
         // TODO don't save selections for non user-configurable page filters
-        $this->selectionMapper->updateSelections($this->getUser(), $page, $userSelections);
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $userSelections);
 
         $filters = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $this->getUser(), $page);
 
@@ -516,7 +467,6 @@ class Controller extends Base
             }
         }
 
-
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
             'content' => $this->buildUnthemedHtmlOutput('@learningGrades/gradesInner.twig', [
@@ -576,7 +526,6 @@ class Controller extends Base
         $propertyValues = array_unique($folder->getYearLevels()->getPropertyValues($propertyName));
         return count($propertyValues) > 1 ? true : (bool)$propertyValues[0];
     }
-
 
     /**
      * Builds an array of data used by twig to render the assessment box-and-whiskers graph
@@ -682,7 +631,6 @@ class Controller extends Base
         ];
     }
 
-
     /**
      * @param GenericCollection|IAssessable[] $assessments
      * @param User                            $student
@@ -723,7 +671,6 @@ class Controller extends Base
         return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student, $includeComparison);
     }
 
-
     /**
      * @param array $filters
      * @param User  $viewee
@@ -752,7 +699,6 @@ class Controller extends Base
             });
         return $assessments;
     }
-
 
     /**
      * @param int $vieweeId
