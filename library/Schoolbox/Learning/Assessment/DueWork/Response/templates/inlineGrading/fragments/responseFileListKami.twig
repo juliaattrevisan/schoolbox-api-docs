@@ -1,0 +1,68 @@
+{##
+ # Make a list of files that were in this IResponse
+ # Clicking one loads it into a preview mechanism
+ #
+ # IAssessable assessment
+ # IResponse response
+ # Participant participant
+ # bool kamiEnabled Schoolbox-configured var that determines whether kami export is available
+ #}
+{% if response and response.allFiles.count %}
+    {% if kamiEnabled %}
+        <script src="{{ CDN_PREFIX }}/js/submissions/jquery.kami-export.js?v={{ config.site_version }}"></script>
+        <script>
+            $(function() {
+                // Activate export of Kami Documents
+                $('[data-kami-export]').kamiExport({
+                    toast: $('#toaster')
+                });
+            });
+        </script>
+    {% endif %}
+
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Files</h2>
+            <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2">
+                {% for currentFile in response.allFiles %}
+                    {% if currentFile.kami and kamiEnabled %}
+                    {% set selected = '' %}
+                    {% if (selectedFileHash is defined and currentFile.hash == selectedFileHash) or (loop.index0 == 0 and not selectedFileHash) %}
+                        {% set selected = 'selected' %}
+                    {% endif %}
+
+                    <li class="actions-small-2 {{ selected }} inline-grader-file">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                {% set responseRoute = routeLookup('learningDueWorkResponse.getKamiView', {kamiId: currentFile.kami.id}) %}
+                                <a href="{{ responseRoute }}" title="{{ currentFile.filename }}">
+                                    <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" class="mime" />
+                                    <p>{{ currentFile.filename }}</p>
+                                </a>
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-download" title="" data-dropdown="download-options-{{ currentFile.id }}"></a>
+                        </nav>
+
+                        <ul id="download-options-{{ currentFile.id }}" class="f-dropdown" data-dropdown-content>
+                            {% set kamiExportRoute = routeLookupIfAuthorized('learningDueWorkResponse.getKamiExport', {
+                                kamiId:       currentFile.kami.id,
+                                assessment:   response.assessable,
+                                feedback:     latestFeedback,
+                                response: response
+                            }) %}
+                            {% if kamiExportRoute %}
+                                <li><a href="{{ kamiExportRoute }}" data-kami-export class="icon-download" title="Download annotated document">Download annotated document</a></li>
+                            {% endif %}
+                            <li>
+                                <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=true" class='icon-download' title="Download original">Download original</a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endif %}
