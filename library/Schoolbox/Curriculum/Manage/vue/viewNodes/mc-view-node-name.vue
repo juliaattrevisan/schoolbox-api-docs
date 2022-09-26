@@ -82,6 +82,13 @@ const isButton = computed(() => {
 });
 
 /**
+ * Only use bold on the title when
+ *
+ * @returns { string }
+ */
+ const fontWeight = computed(() => isParentNode.value && !viewNodesStore.isSearchActive ? 'bold' : 'normal');
+
+/**
  * traverse to the next nodel level
  */
  function onNameSelected () {
@@ -148,7 +155,6 @@ function highlightSearchInElement (toHighlight) {
     <div
         v-else
         class="name"
-        :data-is-parent-node="isParentNode"
     >
         <span v-html="highlightTitleSearch"></span>
         <aside v-if="viewNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
@@ -171,12 +177,9 @@ function highlightSearchInElement (toHighlight) {
     color: var(--body-foreground-h1);
     opacity: 1;
     font-size: 1rem;
+    font-weight: v-bind(fontWeight);
     width: 100%;
 }
-
-    [data-is-parent-node="true"] {
-        font-weight: bold;
-    }
 
 aside {
     font-size: 0.725rem;
