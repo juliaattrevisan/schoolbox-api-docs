@@ -399,4 +399,9 @@ HELP
             substr($uuid, 16, 4) . "-" .
             substr($uuid, 20, 12);
     }
+
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
 }
