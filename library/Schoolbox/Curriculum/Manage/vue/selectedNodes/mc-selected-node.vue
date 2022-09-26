@@ -36,7 +36,7 @@ const selectedCodesStore = useSelectedNodesStore();
  */
 const title = computed(() => {
     if (props.node.code && props.node.code !== '') {
-        return `[${props.node.code}]`;
+        return `${props.node.code}`;
     } else {
         return props.node.name;
     }

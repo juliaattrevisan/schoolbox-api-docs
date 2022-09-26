@@ -35,6 +35,20 @@ const title = computed(() => {
 });
 
 /**
+ * Display the list of breadcrumbs to provide context on where the selected node comes from
+ *
+ * @returns { String }
+ */
+const breadcrumbs = computed(() => {
+    if (selectedNodesStore.activeNode.breadcrumbs.length > 0) {
+        const justNames = selectedNodesStore.activeNode.breadcrumbs.map((breadcrumb) => breadcrumb.name);
+        return justNames.join(' > ');
+    } else {
+        return '';
+    }
+});
+
+/**
  * close the modal, setting the activeNode to null so we can allow another selection
  */
 function onModalClosed () {
@@ -50,7 +64,7 @@ function onModalClosed () {
     >
         <template v-if="selectedNodesStore.hasActiveNode">
             <h2>{{ title }}</h2>
-            <p class="meta">{{ selectedNodesStore.activeNode.breadcrumb }}</p>
+            <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
             <div v-html="selectedNodesStore.activeNode.description"></div>
         </template>
     </reveal-modal>

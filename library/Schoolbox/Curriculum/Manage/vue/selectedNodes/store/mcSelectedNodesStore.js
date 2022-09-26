@@ -3,7 +3,8 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore, findById } from '../../store/mcNodesStore';
+import { apiEndpoint } from '../../store/manageCurriculumStore';
+import { useNodesStore, findById, getBreadcrumbs } from '../../store/mcNodesStore';
 import { useEnableNodesStore } from './mcEnableNodesStore';
 
 
@@ -13,6 +14,8 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
         nodes: [], //the currently selected nodes
         activeNode: null, //to show extra info on a selected code in a modal
         hasDisabledChildNodes: false,
+        isLoading: false, //to display loading note
+        hasLoadError: false, //to display loading error
     }),
 
     getters: {
@@ -227,7 +230,27 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
          *
          * @param { Object }
          */
-        setActiveNode (node) {
+        async setActiveNode (node) {
+            if (node === null) { //we only need to grab the nodes breadcrumbs if there's actually a node
+                this.activeNode = node;
+                return;
+            }
+            try {
+                this.isLoading = true;
+                const response = await fetch(`${apiEndpoint}/${node.id}?ancestors=50`);
+                if (response.ok) {
+                    const nodeWithParents = await response.json();
+                    node.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
+                } else {
+                    console.warn(response);
+                    this.hasLoadError = true;
+                }
+            } catch (error) {
+                console.warn(error);
+                this.hasLoadError = true;
+            } finally {
+                this.isLoading = false;
+            }
             this.activeNode = node;
         },
 

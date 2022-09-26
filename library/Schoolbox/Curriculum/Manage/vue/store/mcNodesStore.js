@@ -7,6 +7,7 @@ import { useStore, apiEndpoint } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
 
+
 export const UNSET_ID = 0;
 const SB_CURRICULUM_TOP_LEVEL = 'SB_CURRICULUM_TOP_LEVEL'; //to id to store the top level session storage with
 
@@ -261,5 +262,20 @@ function removeId (data, id) {
         }, []);
     } else {
         return data;
+    }
+}
+
+/**
+ * Recursively loop through the parents adding in a breadcrumb for each
+ *
+ * @param { object }
+ * @param { array }
+ */
+export function getBreadcrumbs (node, currentBreadcrumbs) {
+    if (node.hasOwnProperty('parent') && node.parent !== null) { //if there's a parent to use as a breadcrumb
+        let breadcrumbs = [ { id: node.parent.id, name: node.parent.name }, ...currentBreadcrumbs ]; //add it in to the front of the list
+        return breadcrumbs = getBreadcrumbs(node.parent, breadcrumbs); //and then check the next node up the list
+    } else { //otherwise we must be at the top of the breadcrumb list
+        return currentBreadcrumbs; //so we can return now
     }
 }
