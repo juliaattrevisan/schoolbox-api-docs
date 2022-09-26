@@ -39,20 +39,12 @@ const ids = computed(() => {
 
 /**
  * To manually dispatch a <select> change event when there's been a change in the selected codes
+ * As this is being handled by Vue rather than user input, the change event won't fire otherwise
+ * except when the <select> is first displayed in the DOM.
  * We listen for this in library/Schoolbox/Filter/templates/panel.twig
  */
 watch(() => selectedCodesStore.codesIds, () => {
     nextTick(() => { //nextTick to ensure the dom has updated so we can access with the latest changes
-        const options = selectEl.value.querySelectorAll('option');
-        /**
-         * Vue currently removes the selected attribute from an <option> even though a v-model isn't linked
-         * So we have to add them in manually rather than in the template
-         * We add these in so within the filters library/Schoolbox/Filter/templates/panel.twig,
-         * The selected values can be serialised using $optionInputs.serializeArray()
-         */
-        options.forEach((option) => {
-            option.setAttribute('selected', 'selected');
-        });
         const event = new Event('change');
         selectEl.value.dispatchEvent(event);
     });
@@ -87,6 +79,7 @@ watch(() => selectedCodesStore.codesIds, () => {
             v-for="code in selectedCodesStore.codes"
             :key="code.id"
             :value="code.id"
+            :selected.attr="`selected`"
             :data-selected-object="JSON.stringify(selectedCodesStore.trimCode(code))"
         >
             {{ code.code }}
