@@ -297,10 +297,12 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         /*
          * Render the class_pastoral_report_link_block if:
          *  * the page is a class page AND
+         *  * pastoral module is enabled AND
          *  * the user is authorised to access the link destination
          */
         if (
             $isClassPage &&
+            $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED) &&
             $authorizer->isPathAuthorizedForUser('pastoralClassReportModule.getReport', $folderParams, $this->getUser())
         ) {
             $this->setVar(
