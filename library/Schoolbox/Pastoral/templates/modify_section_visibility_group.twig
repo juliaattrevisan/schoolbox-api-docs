@@ -24,16 +24,18 @@
 
                 <tr data-group-id="{{ userAccess.group.id }}">
                     <td class="small-2">
-                        Pastoral Group
+                        {{ locale.pastoral.proper }} Group
                     </td>
-                    <td class="small-3">
+                    <td class="small-{{ reportPage ? 5 : 3 }}">
                         {{ userAccess.group.name }}
                     </td>
+                    {% if not reportPage %}
                     <td class="small-2">
                         <input type="radio" name="group[{{ userAccess.group.id }}]" id="groupDeny{{ userAccess.group.id }}"
                                value="0" {{ checkedDeny }}>
                         <label class="radio-label" for="groupDeny{{ userAccess.group.id }}"></label>
                     </td>
+                    {% endif %}
                     <td class="small-2">
                         <input type="radio" name="group[{{ userAccess.group.id }}]" id="groupPublic{{ userAccess.group.id }}"
                                value="1" {{ checkedPublic }}>
@@ -57,7 +59,7 @@
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
     <div id="modal-group" class="reveal-modal" data-reveal role="dialog">
-        <h2>Add Pastoral Group</h2>
+        <h2>Add {{ locale.pastoral.proper }} Group</h2>
         <section>
             <ul class="information-list">
                 {% for group in groups %}
@@ -66,7 +68,7 @@
                             <div class="card small-12">
                                 <i class="icon-group alert size-32"></i>
                                 <p>{{ group.name }}</p>
-                                <p class="meta">Pastoral Group ({{ group.membersWithPermission | length }} Users)</p>
+                                <p class="meta">{{ locale.pastoral.proper }} Group ({{ group.membersWithPermission | length }} Users)</p>
                             </div>
                         </a>
                     </li>

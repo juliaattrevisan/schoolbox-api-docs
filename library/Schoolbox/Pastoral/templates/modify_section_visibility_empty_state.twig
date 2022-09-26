@@ -5,7 +5,7 @@
         <a href="#" data-user-search="{{ guid }}" title="Add User">user</a>
     {%- endif -%}
     {% if groups | length > 0 %}
-        or <a href="#" data-reveal-id="modal-group" title="Add Pastoral Group">pastoral group</a>
+        or <a href="#" data-reveal-id="modal-group" title="Add {{ locale.pastoral.proper }} Group">{{ locale.pastoral.proper }} group</a>
     {%- endif %}
 {% endset %}
 <span id="visibility_empty_state">

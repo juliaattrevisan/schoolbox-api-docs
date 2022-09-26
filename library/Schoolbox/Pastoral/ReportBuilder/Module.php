@@ -19,14 +19,15 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Pastoral\Authorizer\Rule\IsReportOwner;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 // These mappers are injected into controllers where required
 
@@ -53,31 +54,15 @@ class Module extends BaseModule
                     )
                 )
             );
-        $permissionModifyReport = new Rule\All($permissionStaff, new IsReportOwner());
+        $permissionModifyReport =
+            new Rule\All(
+                $permissionStaff,
+                $this->getPermRule(true)
+            );
         $permissionReadReport   =
             new Rule\All(
                 $permissionStaff,
-                new Rule\Callback(
-                    static function (array $params, User $user) {
-                        if (!isset($params['report']) || !($params['report'] instanceof PastoralReport)) {
-                            if (!isset($params['reportId'])) {
-                                throw new Unauthorized();
-                            }
-                            try {
-                                $params['report'] = PastoralReportMapper::getInstance()->findById($params['reportId']);
-                            } catch (Exception $e) {
-                                throw new Unauthorized();
-                            }
-                        }
-                        if ($params['report']->getOwner()->getId() == $user->getId()) {
-                            return true;
-                        }
-                        if (in_array($user->getId(), $params['report']->getMemberUserIds())) {
-                            return true;
-                        }
-                        throw new Unauthorized();
-                    }
-                )
+                $this->getPermRule(false)
             );
 
         $this->registerRoutesArray(
@@ -92,7 +77,8 @@ class Module extends BaseModule
                     '/results/{reportId:\d+}/export' => ['getReportResultsExport' => $permissionReadReport],
                 ],
                 'POST' => [
-                    '/modify'                => ['postReportModify' => $permissionModifyReport],
+                    '/create'                => ['postReportCreate' => $permissionStaff],
+                    '/modify/{reportId:\d+}' => ['postReportModify' => $permissionModifyReport],
                     '/delete/{reportId:\d+}' => ['postReportDelete' => $permissionModifyReport],
                     '/dashboard/modify'      => ['postReportDashboardModify' => $permissionStaff],
                 ],
@@ -120,6 +106,9 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\YearLevel\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Pastoral\Action\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Pastoral\Report\Access\Mapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
         );
     }
 
@@ -170,5 +159,34 @@ class Module extends BaseModule
     protected function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+    /**
+     * @param bool $writeOnly
+     * @return Rule\Callback
+     */
+    private function getPermRule(bool $writeOnly)
+    {
+        return new Rule\Callback(
+            static function (array $params, User $user) use ($writeOnly) {
+                if (!isset($params['report']) || !($params['report'] instanceof PastoralReport)) {
+                    if (!isset($params['reportId'])) {
+                        throw new Unauthorized();
+                    }
+                    try {
+                        $params['report'] = PastoralReportMapper::getInstance()->findById($params['reportId']);
+                    } catch (Exception $e) {
+                        throw new Unauthorized();
+                    }
+                }
+                if ($params['report']->getOwner()->getId() === $user->getId()) {
+                    return true;
+                }
+                if (in_array($user->getId(), $params['report']->getUserIds($writeOnly))) {
+                    return true;
+                }
+                throw new Unauthorized();
+            }
+        );
     }
 }

@@ -61,14 +61,16 @@
                                 {% if report.notificationEnabled %}
                                     <i title="Notification Enabled" class="icon-bell"></i>
                                 {% endif %}
-                                <i title="{{ locale.pastoral.proper }} Groups" class="icon-group"></i>
-                                {% if report.groups | length %}
-                                    {% for group in report.groups %}
-                                        {{ group.name }}{% if not loop.last %},{% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    This report has not been shared with any groups
-                                {% endif %}
+                                {% set firstGroup = true %}
+                                {% for access in report.access %}
+                                    {% if access.group %}
+                                        {% if firstGroup %}
+                                        <i title="{{ locale.pastoral.proper }} Groups" class="icon-group"></i>
+                                            {% set firstGroup = false %}
+                                        {% endif %}
+                                        {{ access.group.name }}{% if not loop.last %},{% endif %}
+                                    {% endif %}
+                                {% endfor %}
                             </p>
                         </div>
                     </div>
@@ -101,12 +103,13 @@
             {% set found = 0 %}
 
             {% for report in reportsGroup %}
+                {% set firstGroup = true %}
 
                 {% if loop.first %}
 
                     {% set found = 1 %}
                     <h2 class="subheader">Shared Reports<span data-tooltip
-                                                              title="These reports have been shared with you based on your {{ locale.pastoral }} group membership"
+                                                              title="These reports have been shared with you"
                                                               class="hint has-tip tip-top">?</span></h2>
 
                     <section>
@@ -123,9 +126,14 @@
                             <h3>{{ report.name }}</h3>
                         </a>
                         <p class="meta">
-                            <i title="{{ locale.pastoral.proper }} Groups" class="icon-group"></i>
-                            {% for group in report.groups %}
-                                {{ group.name }}{% if not loop.last %},{% endif %}
+                            {% for access in report.access ?? [] %}
+                                {% if access.group %}
+                                    {% if firstGroup %}
+                                        <i title="{{ locale.pastoral.proper }} Groups" class="icon-group"></i>
+                                        {% set firstGroup = false %}
+                                    {% endif %}
+                                {{ access.group.name }}{% if not loop.last %},{% endif %}
+                                {% endif %}
                             {% endfor %}
                         </p>
                     </div>
@@ -138,6 +146,12 @@
                                title="Show report on dashboard">
                             <span class="icon-star alert"></span>
                         </label>
+                        {% if report.canEdit(USER) %}
+                        <a class="icon-modify no-text"
+                           href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id, report: report}) }}"
+                           title="Modify Report"></a>
+                        <a class="icon-delete no-text" data-delete="{{ report.id }}" href="#" title="Delete Report"></a>
+                        {% endif %}
                     </nav>
                 </li>
             {% endfor %}

@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Pastoral\Report;
 
-use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use PDOStatement;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -16,9 +15,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
-use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
-use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
+use Schoolbox\Pastoral\Report\Access\Mapper as ReportAccessMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
@@ -76,66 +73,44 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(Mapper::CALLBACK_POSTSAVE, [$this, 'saveGroups']);
+        $this->hasJoin(
+            'access',
+            [
+                'multiple'  => true,
+                'mapper'    => ReportAccessMapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'pastoral_report_id',
+            ]
+        );
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveAccess']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteAccess']);
     }
 
     /**
-     * Update group access to the pastoral report
+     * Update access to the pastoral report
      *
      * @param Model $model
+     * @return void
+     * @throws MapperException
      */
-    public function saveGroups(Model $model)
+    public function saveAccess(Model $model)
     {
-        $groupIds = [];
+        $reportAccessMapper = $this->getJoinMapper('access');
+        $reportAccessMapper->deleteByColumn('pastoral_report_id', $model->getId());
+        $reportAccessMapper->save($model->getAccess());
+    }
 
-        if ($model->getGroups()->count() > 0) {
-            foreach ($model->getGroups() as $group) {
-                $groupIds[] = $group->getId();
-            }
-
-            $bindings = PredicateBuilder::getArrayBindings($groupIds, 'group');
-
-            // Delete any existing pastoral groups from the report that are no longer to be given access
-
-            $sql = "
-                DELETE FROM `pastoral_report_groups`
-                WHERE       `report_id` = :reportId AND
-                            `group_id` NOT IN ({$bindings['placeholders']})
-            ";
-
-            $statement = $this->getDatabase()->prepare($sql);
-            $statement->execute(array_merge($bindings['bindings'], [
-                'reportId' => $model->getId(),
-            ]));
-        } else {
-            $statement = $this->getDatabase()->prepare("
-                DELETE FROM `pastoral_report_groups`
-                WHERE       `report_id` = :reportId
-            ");
-
-            $statement->execute(['reportId' => $model->getId()]);
-        }
-
-        // Insert any new groups
-
-        foreach ($groupIds as $groupId) {
-            $sql = "
-                INSERT IGNORE INTO `pastoral_report_groups` (
-                    report_id,
-                    group_id
-                )
-                VALUES (
-                  :reportId,
-                  :groupId
-                )
-            ";
-
-            $statement = $this->getDatabase()->prepare($sql);
-            $statement->execute([
-                'reportId'      => $model->getId(),
-                'groupId'       => $groupId,
-            ]);
-        }
+    /**
+     * Delete access to the pastoral report
+     *
+     * @param Model $model
+     * @return void
+     */
+    public function deleteAccess(Model $model)
+    {
+        $reportAccessMapper = $this->getJoinMapper('access');
+        $reportAccessMapper->deleteByColumn('pastoral_report_id', $model->getId());
     }
 
     /**
@@ -182,7 +157,7 @@ class Mapper extends BaseMapper
             $model->setAuthors($this->getCollection(UserMapper::getInstance(), $row['authors']));
             $model->setStudents($this->getCollection(UserMapper::getInstance(), $row['students']));
             $model->setTags($this->getCollection(PastoralTagMapper::getInstance(), $row['tags']));
-            $model->setGroups($this->getCollection(PastoralGroupMapper::getInstance(), $row['groups']));
+            $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_report_id', $row['id']));
             $model->setHouses($this->getCollection(\HouseMapper::getInstance(), $row['houses']));
             $model->setCampuses($this->getCollection(CampusMapper::getInstance(), $row['campuses']));
             if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
@@ -195,139 +170,42 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @inheritdoc
-     */
-    protected function getSelectString()
-    {
-        return "
-
-            SELECT      {$this->getColumnString()},
-                        GROUP_CONCAT(`pastoral_report_groups`.`group_id`) as `groups`
-            FROM        {$this->getTable()}
-            LEFT JOIN   `pastoral_report_groups` ON
-                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id`
-        ";
-    }
-
-    /**
      * Retrieve all report definitions the user has access to
      *
      * @param User $user
-     *
-     * @return Collection|\Schoolbox\GenericCollection
+     * @param bool $dashboardOnly
+     * @return GenericCollection
      */
-    public function findForUser(User $user)
+    public function findForUser(User $user, bool $dashboardOnly): GenericCollection
     {
-        $userId = $this->getDatabase()->quote($user->getId());
-
-        $groupsMembership = PastoralGroupMemberMapper::getInstance()->findByColumn('user_id', $user->getId());
-
-        $groupIds = [];
-
-        /** @var PastoralGroupMember $groupMember */
-        foreach ($groupsMembership as $groupMember) {
-            $groupIds[] = $groupMember->getGroup()->getId();
-        }
-
-        $bindings = PredicateBuilder::getArrayBindings($groupIds, 'group');
-
-        if (!empty($bindings['placeholders'])) {
-            $groupSql = "`group_id` IN ({$bindings['placeholders']}) ";
-        } else {
-            // match no reports by group
-            $groupSql = 'TRUE = FALSE';
-        }
+        $dashboardJoin = $dashboardOnly ? 'JOIN' : 'LEFT JOIN';
 
         $sql = "
-
-            SELECT      {$this->getColumnString()},
-                        GROUP_CONCAT(`pastoral_report_groups`.`group_id`) as `groups`,
-                        `pastoral_report_dashboard`.`id` as `dashboard_id`
-            FROM        {$this->getTable()}
-            LEFT JOIN   `pastoral_report_groups` ON
-                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id`
-            LEFT JOIN   `pastoral_report_dashboard` ON
-                            `pastoral_report_dashboard`.`report_id` = `pastoral_report`.`id` AND
-                            `pastoral_report_dashboard`.`user_id` = {$userId} AND
-                            `pastoral_report_dashboard`.`deleted_at` IS NULL
-            WHERE       (`pastoral_report`.`owner_id` = :userId OR (
-                            `pastoral_report`.`id` IN (
-                                SELECT    `report_id`
-                                FROM      `pastoral_report_groups`
-                                WHERE     {$groupSql}
-                            )
-                        )) AND
-                        `pastoral_report`.`deleted_at` IS NULL
-            GROUP BY    `pastoral_report`.`id`
+            SELECT {$this->getColumnString('report')},
+                   `dashboard`.`id` as dashboard_id,
+                   {$this->getJoinColumnString('access', 'access')}
+            FROM `{$this->getTable()}` `report`
+                LEFT JOIN `pastoral_report_access` `access` ON `access`.`pastoral_report_id` = `report`.`id`
+                {$dashboardJoin} `pastoral_report_dashboard` `dashboard` ON `dashboard`.`report_id` = `report`.`id`
+                                                                 AND `dashboard`.`user_id` = :userId
+                                                                 AND `dashboard`.`deleted_at` IS NULL
+            WHERE `report`.`deleted_at` IS NULL
+              AND (
+                    `report`.`owner_id` = :userId
+                    OR
+                    (`access`.`user_id` = :userId)
+                    OR
+                    (`access`.`group_id` IN
+                      (SELECT id FROM `pastoral_group` WHERE `user_id` = :userId AND `deleted_at` IS NULL)
+                    )
+                  )
         ";
 
         $statement = $this->getDatabase()->prepare($sql);
-        $statement->execute(array_merge($bindings['bindings'], [
-            'userId' => $user->getId(),
-        ]));
+        $statement->execute(['userId' => $user->getId()]);
 
-        return $this->hydrateSelect($statement);
+        return $this->getHydratedResult($statement);
     }
-
-    /**
-     * Retrieve all report definitions that should display on users dashboard
-     *
-     * @param User $user
-     *
-     * @return Collection|\Schoolbox\GenericCollection
-     */
-    public function findForUserDashboard(User $user)
-    {
-        $userId = $this->getDatabase()->quote($user->getId());
-
-        $groupsMembership = PastoralGroupMemberMapper::getInstance()->findByColumn('user_id', $user->getId());
-
-        $groupIds = [];
-
-        /** @var PastoralGroupMember $groupMember */
-        foreach ($groupsMembership as $groupMember) {
-            $groupIds[] = $groupMember->getGroup()->getId();
-        }
-
-        $bindings = PredicateBuilder::getArrayBindings($groupIds, 'group');
-
-        if (!empty($bindings['placeholders'])) {
-            $groupSql = "`group_id` IN ({$bindings['placeholders']}) ";
-        } else {
-            // match no reports by group
-            $groupSql = 'TRUE = FALSE';
-        }
-
-        $sql = "
-
-            SELECT      {$this->getColumnString()},
-                        GROUP_CONCAT(`pastoral_report_groups`.`group_id`) as `groups`
-            FROM        {$this->getTable()}
-            LEFT JOIN   `pastoral_report_groups` ON
-                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id`
-            JOIN        `pastoral_report_dashboard` ON
-                            `pastoral_report_dashboard`.`report_id` = `pastoral_report`.`id` AND
-                            `pastoral_report_dashboard`.`user_id` = {$userId} AND
-                            `pastoral_report_dashboard`.`deleted_at` IS NULL
-            WHERE       `pastoral_report`.`deleted_at` IS NULL AND
-            (`pastoral_report`.`owner_id` = :userId OR (
-                            `pastoral_report`.`id` IN (
-                                SELECT    `report_id`
-                                FROM      `pastoral_report_groups`
-                                WHERE     {$groupSql}
-                            )
-                        ))
-            GROUP BY    `pastoral_report`.`id`
-        ";
-
-        $statement = $this->getDatabase()->prepare($sql);
-        $statement->execute(array_merge($bindings['bindings'], [
-            'userId' => $user->getId(),
-        ]));
-
-        return $this->hydrateSelect($statement);
-    }
-
 
     /**
      * Find reports which criteria match the pastoral record provided
@@ -344,19 +222,22 @@ class Mapper extends BaseMapper
         // For now, this does not check date, when uses_relative_date is true.
 
         $sql = "
-            {$this->getSelectString()}
-            WHERE `{$this->getTable()}`.`deleted_at` IS NULL
+            SELECT {$this->getColumnString('report')},
+                   {$this->getJoinColumnString('access', 'access')}
+            FROM `{$this->getTable()}` `report`
+            LEFT JOIN `pastoral_report_access` `access` ON `access`.`pastoral_report_id` = `report`.`id`
+            WHERE `report`.`deleted_at` IS NULL
                   AND (
-                      `uses_relative_date` = 1
+                      `report`.`uses_relative_date` = 1
                       OR
                       (
-                          (`after_date` IS NULL OR `after_date` <= :createdAt)
+                          (`report`.`after_date` IS NULL OR `report`.`after_date` <= :createdAt)
                           AND
-                          (`before_date` IS NULL OR :createdAt <= `before_date`)
+                          (`report`.`before_date` IS NULL OR :createdAt <= `report`.`before_date`)
                       )
                   )
-                  AND (`authors` IS NULL OR CONCAT(',', `authors`, ',') LIKE :authorLike)
-                  AND (`students` IS NULL OR CONCAT(',', `students`, ',') LIKE :studentLike)
+                  AND (`report`.`authors` IS NULL OR CONCAT(',', `report`.`authors`, ',') LIKE :authorLike)
+                  AND (`report`.`students` IS NULL OR CONCAT(',', `report`.`students`, ',') LIKE :studentLike)
      ";
 
         $wheres = [];
@@ -452,12 +333,11 @@ class Mapper extends BaseMapper
             $wheres[] = "`notification_enabled` = 1";
         }
 
-        $sql .= ' AND ' . implode(' AND ', $wheres) . ' GROUP BY `pastoral_report`.`id`';
+        $sql .= ' AND ' . implode(' AND ', $wheres) . ' GROUP BY `report`.`id`';
 
         $statement = $this->getDatabase()->prepare($sql);
         $statement->execute($params);
-
-        return $this->hydrateSelect($statement);
+        return $this->getHydratedResult($statement);
     }
 
     /**
@@ -490,6 +370,56 @@ class Mapper extends BaseMapper
             }
         }
 
+        return $collection;
+    }
+
+    /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     */
+    private function getHydratedResult(PDOStatement $statement): GenericCollection
+    {
+        $reportAccessMapper = $this->getJoinMapper('access');
+
+        $collection = $this->createCollection();
+        foreach ($statement as $row) {
+            if ($collection->offsetExists($row['report.id'])) {
+                $model = $collection->offsetGet($row['report.id']);
+            } else {
+                try {
+                    $model = $this->hydrate($row, 'report');
+                    if ($row['dashboard_id'] !== null) {
+                        $model->setDashboard(true);
+                    }
+                } catch (MapperException $e) {
+                    continue;
+                }
+            }
+            try {
+                $accessList = $reportAccessMapper
+                    ->findByColumn('pastoral_report_id', $model->getId())
+                    ->sortByCallback(static function ($a, $b) {
+                        /** @var \Schoolbox\Pastoral\Report\Access\Model $a */
+                        /** @var \Schoolbox\Pastoral\Report\Access\Model $b */
+                        if ($a->getUser() && $b->getUser()) {
+                            if ($a->getUser()->getLastname() === $b->getUser()->getLastname()) {
+                                return strnatcasecmp($a->getUser()->getFirstname(), $b->getUser()->getFirstname());
+                            }
+                            return strnatcasecmp($a->getUser()->getLastname(), $b->getUser()->getLastName());
+                        }
+                        if ($a->getGroup() && $b->getGroup()) {
+                            return strnatcasecmp($a->getGroup()->getName(), $b->getGroup()->getName());
+                        }
+                        if ($a->getGroup() === null) {
+                            return -1;
+                        }
+                        return 1;
+                    });
+                $model->setAccess($accessList);
+            } catch (MapperException $e) {
+            }
+            $collection->offsetSet($row['report.id'], $model);
+        }
         return $collection;
     }
 }

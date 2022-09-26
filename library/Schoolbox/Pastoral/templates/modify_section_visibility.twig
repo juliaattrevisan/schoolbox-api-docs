@@ -1,5 +1,23 @@
+{#
+    @param record
+    @param allowIndividual
+    @param groups
+    @param allowParents
+    @param roles: roles,
+    @param roleTypes: roleTypes,
+    @param roleUserCounts: roleUserCounts,
+    @param rolesWithUsers: rolesWithUsers,
+    @param moderatorIds: moderatorIds,
+    @param bulkCreate: true, if creating from class page
+    @param managePage
+    @param reportPage
+#}
 <h2 class="subheader">
+    {%- if reportPage -%}
+        Shared Report
+    {%- else -%}
     <i id="record-visibility-header" title="This type of record does not allow visibility to be adjusted"></i>Record Visibility
+    {%- endif -%}
 </h2>
 <section id="visibility-section">
 
@@ -17,14 +35,21 @@
         <thead>
             <tr>
                 <th class="small-2">Type</th>
-                <th class="small-3">Audience</th>
-                <th class="small-2">Deny</th>
-                <th class="small-2">General</th>
-                <th class="small-2">General + {{ locale.pastoralPrivate.proper }}</th>
+                <th class="small-{{ reportPage ? 5 : 3 }}">Audience</th>
+                {% if reportPage %}
+                    <th class="small-2">Read</th>
+                    <th class="small-2">Modify</th>
+                {% else %}
+                    <th class="small-2">Deny</th>
+                    <th class="small-2">General</th>
+                    <th class="small-2">General + {{ locale.pastoralPrivate.proper }}</th>
+                {% endif %}
                 <th class="text-right small-1">Delete</th>
             </tr>
         </thead>
+        {%- if not reportPage %}
         {% include '@pastoral/modify_section_visibility_role.twig' %}
+        {%- endif %}
         {% include '@pastoral/modify_section_visibility_user.twig' %}
         {% include '@pastoral/modify_section_visibility_group.twig' %}
     </table>
@@ -39,7 +64,9 @@
             {# we can't get it to just tell us what the unique identifier of the modal is. So we have to create it here and then #}
             {# pass it into the macro #}
 
+            {% if not reportPage %}
             <a href="#" data-button="add-role" class="button" data-reveal-id="modal-role">Add Role</a>
+            {% endif %}
 
             {% if allowIndividual %}
                 <a href="#" data-button="add-user" class="button" data-user-search="{{ guid }}">Add User</a>
@@ -162,28 +189,36 @@
 
 <div class="empty-state" id="visibility-empty">
     <i class="icon-locked"></i>
-    {% include '@pastoral/modify_section_visibility_empty_state.twig' %}
+    {% if reportPage %}
+        {% include '@pastoral/modify_section_visibility_empty_state_report.twig' %}
+    {% else %}
+        {% include '@pastoral/modify_section_visibility_empty_state.twig' %}
+    {% endif %}
 </div>
 
 
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 {# Cloneable HTML For Permission #}
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-{% for accessType in ['user', 'group', 'role'] %}
+{% set colsize = reportPage ? 2 : 3 %}
+{% set accessTypes = reportPage ? ['user', 'group'] : ['user', 'group', 'role'] %}
+{% for accessType in accessTypes %}
     <table class="hide">
         <tbody data-{{ accessType }}-permission-clone>
         <tr data-{{ accessType }}-id="{ID}">
             <td class="small-2">{TYPE_NAME}</td>
             <td class="small-3">{NAME}</td>
-            <td class="small-2">
+            {% if not reportPage %}
+            <td class="small-{{ colsize }}">
                 <input type="radio" name="{{ accessType }}[{ID}]" id="{{ accessType }}Deny{ID}" value="0">
                 <label class="radio-label" for="{{ accessType }}Deny{ID}"></label>
             </td>
-            <td class="small-2">
+            {% endif %}
+            <td class="small-{{ colsize }}">
                 <input type="radio" name="{{ accessType }}[{ID}]" id="{{ accessType }}Public{ID}" value="1">
                 <label class="radio-label" for="{{ accessType }}Public{ID}"></label>
             </td>
-            <td class="small-2">
+            <td class="small-{{ colsize }}">
                 <input type="radio" name="{{ accessType }}[{ID}]" id="{{ accessType }}Private{ID}" value="2">
                 <label class="radio-label" for="{{ accessType }}Private{ID}"></label>
             </td>

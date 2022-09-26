@@ -1,0 +1,10 @@
+<span id="visibility_empty_state">
+    <p>This report is not shared.</p>
+    <p>Select a <a href="#" data-user-search="{{ guid }}" title="Add User">user</a>
+    {% if groups | length > 0 %}
+        or <a href="#" data-reveal-id="modal-group"
+              title="Add {{ locale.pastoral.proper }} Group">{{ locale.pastoral.proper }} group</a>
+    {%- endif %}
+        to share this report.
+    </p>
+</span>

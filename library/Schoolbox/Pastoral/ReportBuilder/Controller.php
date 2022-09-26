@@ -12,7 +12,6 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Aura\Router\Exception\RouteNotFound;
 use HouseMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\CampusMapper;
@@ -24,6 +23,7 @@ use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Model as PastoralRecord;
+use Schoolbox\Pastoral\Report\Access\Mapper as ReportAccessMapper;
 use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
@@ -34,75 +34,32 @@ use Schoolbox\Pastoral\Action\Mapper as ActionMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\RoleMapper;
+use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
 
 class Controller extends Base
 {
-    /** @var ErrorMapper $errorMapper */
-    private ErrorMapper $errorMapper;
-
-    /** @var PastoralDataSource $pastoralDataSource */
-    private PastoralDataSource $pastoralDataSource;
-
-    /** @var PastoralTagMapper $pastoralTagMapper */
-    private PastoralTagMapper $pastoralTagMapper;
-
-    /** @var PastoralTypeMapper $pastoralTypeMapper */
-    private PastoralTypeMapper $pastoralTypeMapper;
-
-    /** @var PastoralSubTypeMapper $pastoralSubTypeMapper */
-    private PastoralSubTypeMapper $pastoralSubTypeMapper;
-
-    /** @var PastoralSeverityMapper $pastoralSeverityMapper */
-    private PastoralSeverityMapper $pastoralSeverityMapper;
-
-    /** @var PastoralReportMapper $pastoralReportMapper */
-    private PastoralReportMapper $pastoralReportMapper;
-
-    /** @var PastoralReportDashboardMapper $pastoralReportDashboardMapper */
-    private PastoralReportDashboardMapper $pastoralReportDashboardMapper;
-
-    /** @var PastoralGroupMapper $pastoralGroupMapper */
-    private PastoralGroupMapper $pastoralGroupMapper;
-
-    /** @var HouseMapper $houseMapper */
-    private HouseMapper $houseMapper;
-
-    /** @var CampusMapper $campusMapper */
-    private CampusMapper $campusMapper;
-
-
-    /** @var Term\Mapper $termMapper */
-    private Term\Mapper $termMapper;
-
-    /**
-     * @var YearLevel\Mapper
-     */
-    private YearLevel\Mapper $yearLevelMapper;
-
-    /** @var ActionMapper $actionMapper */
-    private ActionMapper $actionMapper;
-
     // Strings that can be converted to actual dates using strtotime
-    private const THIS_YEAR = 'first day of january';
-    private const THIS_TERM = 'this term'; // this is the only one that isn't a strtotime string
-    private const PAST_6_MONTHS = '6 months ago';
-    private const PAST_3_MONTHS = '3 months ago';
-    private const PAST_MONTH = '1 month ago';
+    private const THIS_YEAR      = 'first day of january';
+    private const THIS_TERM      = 'this term'; // this is the only one that isn't a strtotime string
+    private const PAST_6_MONTHS  = '6 months ago';
+    private const PAST_3_MONTHS  = '3 months ago';
+    private const PAST_MONTH     = '1 month ago';
     private const PAST_FORTNIGHT = '14 days ago';
-    private const PAST_WEEK = '7 days ago';
-    private const TODAY = 'today';
+    private const PAST_WEEK      = '7 days ago';
+    private const TODAY          = 'today';
 
     // Mappings of strings to labels that will be shown in the UI
     private const RELATIVE_DATE_PRESETS = [
-        self::THIS_YEAR => 'This year',
-        self::THIS_TERM => 'This term',
-        self::PAST_6_MONTHS => 'Past 6 months',
-        self::PAST_3_MONTHS => 'Past 3 months',
-        self::PAST_MONTH => 'Past month',
+        self::THIS_YEAR      => 'This year',
+        self::THIS_TERM      => 'This term',
+        self::PAST_6_MONTHS  => 'Past 6 months',
+        self::PAST_3_MONTHS  => 'Past 3 months',
+        self::PAST_MONTH     => 'Past month',
         self::PAST_FORTNIGHT => 'Past fortnight',
-        self::PAST_WEEK => 'Past week',
-        self::TODAY => 'Today'
+        self::PAST_WEEK      => 'Past week',
+        self::TODAY          => 'Today',
     ];
 
     /**
@@ -122,37 +79,29 @@ class Controller extends Base
      * @param Term\Mapper                   $termMapper
      * @param YearLevel\Mapper              $yearLevelMapper
      * @param ActionMapper                  $actionMapper
+     * @param ReportAccessMapper            $reportAccessMapper
+     * @param UserMapper                    $userMapper
+     * @param RoleMapper                    $roleMapper
      */
     public function __construct(
-        ErrorMapper $errorMapper,
-        PastoralDataSource $pastoralDataSource,
-        PastoralTagMapper $pastoralTagMapper,
-        PastoralTypeMapper $pastoralTypeMapper,
-        PastoralSubTypeMapper $pastoralSubTypeMapper,
-        PastoralSeverityMapper $pastoralSeverityMapper,
-        HouseMapper $houseMapper,
-        CampusMapper $campusMapper,
-        PastoralGroupMapper $pastoralGroupMapper,
-        PastoralReportMapper $pastoralReportMapper,
-        PastoralReportDashboardMapper $pastoralReportDashboardMapper,
-        Term\Mapper $termMapper,
-        YearLevel\Mapper $yearLevelMapper,
-        ActionMapper $actionMapper
+        private ErrorMapper $errorMapper,
+        private PastoralDataSource $pastoralDataSource,
+        private PastoralTagMapper $pastoralTagMapper,
+        private PastoralTypeMapper $pastoralTypeMapper,
+        private PastoralSubTypeMapper $pastoralSubTypeMapper,
+        private PastoralSeverityMapper $pastoralSeverityMapper,
+        private HouseMapper $houseMapper,
+        private CampusMapper $campusMapper,
+        private PastoralGroupMapper $pastoralGroupMapper,
+        private PastoralReportMapper $pastoralReportMapper,
+        private PastoralReportDashboardMapper $pastoralReportDashboardMapper,
+        private Term\Mapper $termMapper,
+        private YearLevel\Mapper $yearLevelMapper,
+        private ActionMapper $actionMapper,
+        private ReportAccessMapper $reportAccessMapper,
+        private UserMapper $userMapper,
+        private RoleMapper $roleMapper,
     ) {
-        $this->errorMapper                   = $errorMapper;
-        $this->pastoralDataSource            = $pastoralDataSource;
-        $this->pastoralTagMapper             = $pastoralTagMapper;
-        $this->pastoralTypeMapper            = $pastoralTypeMapper;
-        $this->pastoralSubTypeMapper         = $pastoralSubTypeMapper;
-        $this->pastoralSeverityMapper        = $pastoralSeverityMapper;
-        $this->houseMapper                   = $houseMapper;
-        $this->campusMapper                  = $campusMapper;
-        $this->pastoralGroupMapper           = $pastoralGroupMapper;
-        $this->pastoralReportMapper          = $pastoralReportMapper;
-        $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
-        $this->termMapper                    = $termMapper;
-        $this->yearLevelMapper               = $yearLevelMapper;
-        $this->actionMapper                  = $actionMapper;
     }
 
     /**
@@ -160,19 +109,17 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $reportsAll = $this->pastoralReportMapper->findForUser($this->getUser());
+        $reportsAll = $this->pastoralReportMapper->findForUser($this->getUser(), false);
 
         $reportsMine  = [];
         $reportsGroup = [];
 
         /** @var PastoralReport $reportCurrent */
         foreach ($reportsAll as $reportCurrent) {
-            if ($reportCurrent->getOwner()->getId() == $this->getUser()->getId()) {
+            if ($reportCurrent->getOwner()->getId() === $this->getUser()->getId()) {
                 $reportsMine[] = $reportCurrent;
             } else {
-                if ($reportCurrent->hasAccess($this->getUser())) {
-                    $reportsGroup[] = $reportCurrent;
-                }
+                $reportsGroup[] = $reportCurrent;
             }
         }
 
@@ -186,7 +133,7 @@ class Controller extends Base
                     'reportsMine'  => $reportsMine,
                     'reportsGroup' => $reportsGroup,
                 ],
-                'title' => 'Pastoral Reports',
+                'title'    => 'Pastoral Reports',
             ]
         );
     }
@@ -275,7 +222,7 @@ class Controller extends Base
             'points',
             'year',
             'house',
-            'campus'
+            'campus',
         ];
 
         // Only show severity if it is enabled by policy
@@ -294,10 +241,12 @@ class Controller extends Base
         }
 
         try {
-            $this->pastoralReportDashboardMapper->findOneByColumnList([
-                'user_id'   => $report->getOwner()->getId(),
-                'report_id' => $report->getId(),
-            ]);
+            $this->pastoralReportDashboardMapper->findOneByColumnList(
+                [
+                    'user_id'   => $report->getOwner()->getId(),
+                    'report_id' => $report->getId(),
+                ]
+            );
 
             $report->setDashboard(true);
         } catch (MapperException $e) {
@@ -312,33 +261,46 @@ class Controller extends Base
          */
         $yearLevels = $this->yearLevelMapper->findAll();
 
+        //This is fudged using the same audience screen from the record. So to get the saved records to display, it is easiest to attach them to $record
+        $fakeRecord                         = [];
+        $fakeRecord['id']                   = "fakeId";
+        $fakeRecord['accessWithPermission'] = $this->reportAccessMapper->findByColumn('pastoral_report_id', $report->getId());
+        $roles                              = $this->roleMapper->findByColumnList([
+                                                                                      'group_type'      => 'staff',
+                                                                                      'access_pastoral' => true,
+                                                                                  ]
+        );
+
         // And render this thing out
         $this->getResponse()->content->set(
             [
                 'template' => '@pastoralReportBuilder/modify.twig',
                 'data'     => [
-                    'moderator'        => $this->getUser()->getAccessList()->filterBy(
-                        'service',
-                        UserAccess::SERVICE_PASTORAL
-                    )->count() > 0,
-                    'years'            => $yearLevels,
-                    'houses'           => $this->houseMapper->findAll()->sortBy('sequence', 'asc'),
-                    'campuses'         => $this->campusMapper->findAll()->sortBy('sequence', 'asc'),
-                    'types'            => $this->pastoralTypeMapper->findAll(),
-                    'subTypes'         => $this->pastoralSubTypeMapper->findAll(),
-                    'severities'       => $severities,
-                    'tags'             => $this->pastoralTagMapper->findAll(),
-                    'actions'          => $availableActions,
-                    'groups'           => $this->pastoralGroupMapper->findAll(['order' => ['name' => 'asc']]),
-                    'studentsSelected' => $studentsSelected,
-                    'authorsSelected'  => $authorsSelected,
-                    'tagsSelected'     => $tagsSelected,
-                    'actionsSelected'  => $actionsSelected,
-                    'report'           => $report,
-                    'datePresets'      => self::RELATIVE_DATE_PRESETS,
-                    'selectedRelativeDate' => $report->getRelativeDateString()
+                    'moderator'            => $this->getUser()->getAccessList()->filterBy(
+                            'service',
+                            UserAccess::SERVICE_PASTORAL
+                        )->count() > 0,
+                    'years'                => $yearLevels,
+                    'houses'               => $this->houseMapper->findAll()->sortBy('sequence', 'asc'),
+                    'campuses'             => $this->campusMapper->findAll()->sortBy('sequence', 'asc'),
+                    'types'                => $this->pastoralTypeMapper->findAll(),
+                    'subTypes'             => $this->pastoralSubTypeMapper->findAll(),
+                    'severities'           => $severities,
+                    'tags'                 => $this->pastoralTagMapper->findAll(),
+                    'actions'              => $availableActions,
+                    'groups'               => $this->pastoralGroupMapper->findAll(['order' => ['name' => 'asc']]),
+                    'studentsSelected'     => $studentsSelected,
+                    'authorsSelected'      => $authorsSelected,
+                    'tagsSelected'         => $tagsSelected,
+                    'actionsSelected'      => $actionsSelected,
+                    'report'               => $report,
+                    'datePresets'          => self::RELATIVE_DATE_PRESETS,
+                    'selectedRelativeDate' => $report->getRelativeDateString(),
+                    'record'               => $fakeRecord,
+                    'moderatorIds'         => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
+                    'roles'                => $roles,
                 ],
-                'title' => 'Pastoral Report',
+                'title'    => 'Pastoral Report',
             ]
         );
     }
@@ -401,11 +363,11 @@ class Controller extends Base
             [
                 'template' => '@pastoralReportBuilder/report_results.twig',
                 'data'     => [
-                    'results' => $records,
-                    'report'  => $report,
+                    'results'      => $records,
+                    'report'       => $report,
                     'showSeverity' => $this->getConfigLoader()->get('pastoral_severity'),
                 ],
-                'title' => $report->getName(),
+                'title'    => $report->getName(),
             ]
         );
     }
@@ -532,12 +494,25 @@ class Controller extends Base
     }
 
     /**
-     * Insert/update pastoral report
+     * Create pastoral report
+     * @return void
      * @throws MapperException
-     * @throws RouteNotFound
-     * @throws \Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function postReportModify(): void
+    public function postReportCreate()
+    {
+        $pastoralReport = $this->pastoralReportMapper->createModel();
+        $this->postReportModify($pastoralReport);
+    }
+
+    /**
+     * Update pastoral report
+     * @param PastoralReport $report
+     * @return void
+     * @throws MapperException
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function postReportModify(PastoralReport $report): void
     {
         $post = $this->request->post;
 
@@ -555,81 +530,93 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        if (empty($post->getInt('id'))) {
-            $pastoralReport = $this->pastoralReportMapper->createModel();
-        } else {
-            $pastoralReport = $this->pastoralReportMapper->findByIdWithFallback($post->getInt('id'));
-        }
-
-        $pastoralReport->setOwner($this->getUser());
-        $pastoralReport->setName($post->get('name'));
-        $pastoralReport->setDescription($post->get('description'));
-        $pastoralReport->setOrderCsv($post->get('order'));
-        $pastoralReport->setInvolved($post->getBool('involved', false));
+        $report->setOwner($this->getUser());
+        $report->setName($post->get('name'));
+        $report->setDescription($post->get('description'));
+        $report->setOrderCsv($post->get('order'));
+        $report->setInvolved($post->getBool('involved', false));
 
         // Only save severity if it is enabled by policy
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
-            $pastoralReport->setSeverity($this->pastoralSeverityMapper->createModel($post->get('severity')));
+            $report->setSeverity($this->pastoralSeverityMapper->createModel($post->get('severity')));
         }
 
         if (!empty($post->get('date-option')) && $post->get('date-option') === PastoralReport::ABSOLUTE_DATE) {
-            $pastoralReport->setUsesRelativeDate(false);
+            $report->setUsesRelativeDate(false);
 
             if (!empty($post->get('before'))) {
-                $pastoralReport->setBeforeDate(Alaress_Date_Format::newLocalShort($post->get('before')));
+                $report->setBeforeDate(Alaress_Date_Format::newLocalShort($post->get('before')));
             }
 
             if (!empty($post->get('after'))) {
-                $pastoralReport->setAfterDate(Alaress_Date_Format::newLocalShort($post->get('after')));
+                $report->setAfterDate(Alaress_Date_Format::newLocalShort($post->get('after')));
             }
         } else {
-            $pastoralReport->setUsesRelativeDate(true);
-            $pastoralReport->setRelativeDateString(self::THIS_YEAR);
+            $report->setUsesRelativeDate(true);
+            $report->setRelativeDateString(self::THIS_YEAR);
 
             // Update with POSTed relative date if it's valid
             $relativeDateString = $post->get('relative-dates-dropdown');
             if (!empty($relativeDateString) && array_key_exists($relativeDateString, self::RELATIVE_DATE_PRESETS)) {
-                $pastoralReport->setRelativeDateString($relativeDateString);
+                $report->setRelativeDateString($relativeDateString);
             }
         }
 
-        $pastoralReport->setTypesCsv($this->getCsv($post->get('types')));
-        $pastoralReport->setSubTypesCsv($this->getCsv($post->get('subtypes')));
-        $pastoralReport->setAuthorsCsv($this->getCsv($post->get('authors')));
-        $pastoralReport->setStudentsCsv($this->getCsv($post->get('students')));
-        $pastoralReport->setTagsCsv($this->getCsv($post->get('tags')));
-        $pastoralReport->setYearsCsv($this->getCsv($post->get('years')));
-        $pastoralReport->setHousesCsv($this->getCsv($post->get('houses')));
-        $pastoralReport->setCampusesCsv($this->getCsv($post->get('campuses')));
+        $report->setTypesCsv($this->getCsv($post->get('types')));
+        $report->setSubTypesCsv($this->getCsv($post->get('subtypes')));
+        $report->setAuthorsCsv($this->getCsv($post->get('authors')));
+        $report->setStudentsCsv($this->getCsv($post->get('students')));
+        $report->setTagsCsv($this->getCsv($post->get('tags')));
+        $report->setYearsCsv($this->getCsv($post->get('years')));
+        $report->setHousesCsv($this->getCsv($post->get('houses')));
+        $report->setCampusesCsv($this->getCsv($post->get('campuses')));
 
-        $pastoralReport->setIncludeStudentsWithoutYear($includeStudentsWithoutYear);
-        $pastoralReport->setIncludeStudentsWithoutHouse($includeStudentsWithoutHouse);
+        $report->setIncludeStudentsWithoutYear($includeStudentsWithoutYear);
+        $report->setIncludeStudentsWithoutHouse($includeStudentsWithoutHouse);
 
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
-            $pastoralReport->setActionsCsv($this->getCsv($post->get('actions')));
-            $pastoralReport->setIncludeRecordsWithoutAction($post->getBool('includeRecordsWithoutAction', false));
-            $pastoralReport->setIncludeUncompletedActionsOnly($post->getBool('includeUncompletedActionsOnly', false));
+            $report->setActionsCsv($this->getCsv($post->get('actions')));
+            $report->setIncludeRecordsWithoutAction($post->getBool('includeRecordsWithoutAction', false));
+            $report->setIncludeUncompletedActionsOnly($post->getBool('includeUncompletedActionsOnly', false));
         }
 
         // Save groups the report is shared with
+        $report->setAccess($this->reportAccessMapper->createCollection());
 
         if (is_array($post->get('group') ?? false)) {
-            $groupsCollection = $this->pastoralGroupMapper->createCollection();
-
-            foreach ($post->get('group') as $groupId => $checked) {
-                if ($checked) {
-                    $groupsCollection->add($this->pastoralGroupMapper->createModel($groupId));
+            $selectedGroups = $post->get('group');
+            $validGroups    = $this->pastoralGroupMapper->findByColumn('id', array_keys($selectedGroups))->indexBy('id');
+            foreach ($selectedGroups as $groupId => $checked) {
+                if ($validGroups->offsetExists($groupId)) {
+                    $groupAccess = $this->reportAccessMapper->createModel()
+                                                            ->setGroup($validGroups->offsetGet($groupId))
+                                                            ->setAccess((int)$checked)
+                                                            ->setPastoralReport($report);
+                    $report->getAccess()->add($groupAccess);
                 }
             }
-
-            $pastoralReport->setGroups($groupsCollection);
         }
-        $pastoralReport->setNotificationEnabled($post->getBool('notificationEnabled', false));
 
-        $this->pastoralReportMapper->save($pastoralReport);
+        if (is_array($post->get('user') ?? false)) {
+            $selectedUsers = $post->get('user');
+            $validUsers    = $this->userMapper->findByColumn('id', array_keys($selectedUsers))->indexBy('id');
+            foreach ($selectedUsers as $userId => $checked) {
+                if ($validUsers->offsetExists($userId)) {
+                    $userAccess = $this->reportAccessMapper->createModel()
+                                                           ->setUser($validUsers->offsetGet($userId))
+                                                           ->setAccess((int)$checked)
+                                                           ->setPastoralReport($report);
+                    $report->getAccess()->add($userAccess);
+                }
+            }
+        }
+
+        $report->setNotificationEnabled($post->getBool('notificationEnabled', false));
+
+        $this->pastoralReportMapper->save($report);
 
         // Update display on pastoral dashboard status
-        $this->updatePastoralDashboard($pastoralReport, $post->getBool('dashboard', false));
+        $this->updatePastoralDashboard($report, $post->getBool('dashboard', false));
 
         // Go back to the reports list
 
@@ -652,13 +639,15 @@ class Controller extends Base
 
         $result = $this->updatePastoralDashboard($report, (bool)$post->get('display'));
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => $this->buildJsonOutput([
-                'status' => 'OK',
-                'result' => $result,
-            ]),
-        ]);
+        $this->getResponse()->content->set(
+            [
+                'format' => 'json',
+                'data'   => $this->buildJsonOutput([
+                                                       'status' => 'OK',
+                                                       'result' => $result,
+                                                   ]),
+            ]
+        );
     }
 
     /**
@@ -675,10 +664,12 @@ class Controller extends Base
         try {
             // Check if the report is already on the dashboard
 
-            $pastoralReportDashboard = $this->pastoralReportDashboardMapper->findOneByColumnList([
-                'user_id'   => $this->getUser()->getId(),
-                'report_id' => $report->getId(),
-            ]);
+            $pastoralReportDashboard = $this->pastoralReportDashboardMapper->findOneByColumnList(
+                [
+                    'user_id'   => $this->getUser()->getId(),
+                    'report_id' => $report->getId(),
+                ]
+            );
 
             // We found the report on the dashboard, check if we need to remove it
 
