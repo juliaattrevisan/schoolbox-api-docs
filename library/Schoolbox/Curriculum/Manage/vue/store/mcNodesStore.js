@@ -122,10 +122,6 @@ export const useNodesStore = defineStore('mcNodes', {
          * @param { number }
          */
         async loadChildren (id) {
-            const oldNode = findById(this.nodes.children, id);
-            if (oldNode.children !== null) { //we don't need to load them again
-                return;
-            }
             try {
                 this.isLoading = true;
                 const response = await fetch(`${apiEndpoint}/${id}?descendants=2`, {

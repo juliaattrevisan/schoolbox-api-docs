@@ -115,10 +115,6 @@ export const useCodesStore = defineStore(`csCodes`, {
          * @param { number }
          */
         async loadChildren (id) {
-            const oldNode = findById(this.codes.children, id);
-            if (oldNode.children !== null) { //we don't need to load them again
-                return;
-            }
             try {
                 this.isLoading = true;
                 const response = await fetch(`${apiEndpoint}/${id}?descendants=2`);
