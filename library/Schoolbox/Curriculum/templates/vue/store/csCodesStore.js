@@ -117,7 +117,7 @@ export const useCodesStore = defineStore(`csCodes`, {
         async loadChildren (id) {
             try {
                 this.isLoading = true;
-                const response = await fetch(`${apiEndpoint}/${id}?descendants=2`);
+                const response = await fetch(`${apiEndpoint}/${id}?descendants=2`); //we go two levels deep so we can check for children on two levels
                 if (response.ok) {
                     const newNode = await response.json();
                     const newNodeChildrenEnabled = newNode.children.filter((node) => (node.enabled)); //only show those nodes with children enabled, this can be handled with enabled=1 on just topLevelOnly
