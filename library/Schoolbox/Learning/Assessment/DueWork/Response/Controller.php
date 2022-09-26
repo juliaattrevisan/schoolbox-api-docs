@@ -314,10 +314,13 @@ class Controller extends Base
             $session = $this->kamiConnector->viewSession($kami->getKamiDocumentId(), $this->getUser(), false);
         }
 
+        $participant = $response->getAssessable()->getParticipant($response->getSubmittedOnBehalfOf());
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/kamiView.twig', [
             'kami'     => $kami,
             'session'  => $session,
             'response' => $response,
+            'participant'   => $participant,
         ]));
     }
 

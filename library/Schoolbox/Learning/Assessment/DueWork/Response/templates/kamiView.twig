@@ -68,3 +68,18 @@
         {% endif %}
     </div>
 </div>
+
+{# A list of files in the current response #}
+{% block responseFileList %}
+    {% include '@learningDueWorkResponse/inlineGrading/fragments/responseFileList.twig' with {
+        assessment: response.assessable,
+        participant: participant,
+        response: response,
+        latestFeedback: response.findMostRecentInstructorGivenPublishedFeedback,
+        kamiEnabled: true,
+        plagscanApiEnabled: false,
+        turnitinApiEnabled: false,
+        selectedFileHash: kami.studentSubmissionFile.Storage.hash,
+        blindMode: false
+    } only %}
+{% endblock %}
