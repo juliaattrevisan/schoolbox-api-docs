@@ -27,10 +27,10 @@ watch(() => selectedNodesStore.hasActiveNode, (hasActiveNode) => {
  * @returns { String }
  */
 const title = computed(() => {
-    if (selectedNodesStore.activeNode.code && selectedNodesStore.activeNode.code !== '') {
+    if (selectedNodesStore.activeNode?.code && selectedNodesStore.activeNode.code !== '') {
         return `[${selectedNodesStore.activeNode.code}] ${selectedNodesStore.activeNode.name}`;
     } else {
-        return selectedNodesStore.activeNode.name;
+        return selectedNodesStore.activeNode?.name;
     }
 });
 
@@ -40,7 +40,7 @@ const title = computed(() => {
  * @returns { String }
  */
 const breadcrumbs = computed(() => {
-    if (selectedNodesStore.activeNode.breadcrumbs.length > 0) {
+    if (selectedNodesStore.activeNode?.breadcrumbs.length > 0) {
         const justNames = selectedNodesStore.activeNode.breadcrumbs.map((breadcrumb) => breadcrumb.name);
         return justNames.join(' > ');
     } else {

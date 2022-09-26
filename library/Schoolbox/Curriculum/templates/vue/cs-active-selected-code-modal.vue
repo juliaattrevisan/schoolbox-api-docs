@@ -27,10 +27,24 @@ watch(() => selectedCodesStore.hasActiveCode, (hasActiveCode) => {
  * @returns { String }
  */
 const title = computed(() => {
-    if (selectedCodesStore.activeCode.code && selectedCodesStore.activeCode.code !== '') {
+    if (selectedCodesStore.activeCode?.code && selectedCodesStore.activeCode.code !== '') {
         return `[${selectedCodesStore.activeCode.code}] ${selectedCodesStore.activeCode.name}`;
     } else {
-        return selectedCodesStore.activeCode.name;
+        return selectedCodesStore.activeCode?.name;
+    }
+});
+
+/**
+ * Display the list of breadcrumbs to provide context on where the selected node comes from
+ *
+ * @returns { String }
+ */
+const breadcrumbs = computed(() => {
+    if (selectedCodesStore.activeCode?.breadcrumbs.length > 0) {
+        const justNames = selectedCodesStore.activeCode.breadcrumbs.map((breadcrumb) => breadcrumb.name);
+        return justNames.join(' > ');
+    } else {
+        return '';
     }
 });
 
@@ -50,7 +64,7 @@ function onModalClosed () {
     >
         <template v-if="selectedCodesStore.hasActiveCode">
             <h2>{{ title }}</h2>
-            <p class="meta">{{ selectedCodesStore.activeCode.breadcrumb }}</p>
+            <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
             <div v-html="selectedCodesStore.activeCode.description"></div>
         </template>
     </reveal-modal>

@@ -227,6 +227,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
         /**
          * set the active node, which would prompt the mc-active-selected-code-modal to open
          * and if it's set to null we can listen for it to be set again
+         * We also load the ancestors or the node to display the breadcrumbs in the modal
          *
          * @param { Object }
          */
@@ -237,7 +238,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
             }
             try {
                 this.isLoading = true;
-                const response = await fetch(`${apiEndpoint}/${node.id}?ancestors=50`);
+                const response = await fetch(`${apiEndpoint}/${node.id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
                 if (response.ok) {
                     const nodeWithParents = await response.json();
                     node.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
