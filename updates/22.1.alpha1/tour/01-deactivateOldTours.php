@@ -52,6 +52,11 @@ $app = new class extends CliTool\App {
             $deleteTour->execute(['uuid' => $tourUuid, 'now' => $now]);
         }
     }
+
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
