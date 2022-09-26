@@ -117,7 +117,7 @@
         {% if not is_cloud %}
         // check if https://api.schoolbox.cloud/urlCheck?url=http://$current_domain/.well-known/ping is accessible
         $.ajax({
-            url: "{{ api_url }}/v2/?url=" + encodeURIComponent("http://" + location.hostname + "/.well-known/acme-challenge/ping"),
+            url: "{{ api_url }}/urlCheck/v2/?url=" + encodeURIComponent("http://" + location.hostname + "/.well-known/acme-challenge/ping"),
             success: function(result, status, xhr) {
                 if (xhr.responseJSON.message !== "Request timeout occurred") {
                     if (xhr.responseJSON.response.status === 200) {
