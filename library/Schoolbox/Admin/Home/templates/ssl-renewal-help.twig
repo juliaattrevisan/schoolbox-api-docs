@@ -1,35 +1,50 @@
+{#
+data:
+    pageCurrent:    string     - current breakcrumb path
+    allBreadcrumbs: string[][] - all breadcrumbs to render
+    is_cloud:       bool       - is this a cloud instance
+    api_url:        string     - Lamda API URL (without the path. If you're testing with local API you may need to edit API_ENDPOINT below)
+#}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
-{% set
-    PORT_80_BLOCKED,
-    HTTPS_UPGRADE,
-    UPSTREAM_ERROR,
-    USER_AGENT_BLOCKING,
-    GEOBLOCKING
-    =
-    'ssl_port_80',
-    'ssl_https_upgrade',
-    'ssl_upstream_error',
-    'ssl_user_agent',
-    'ssl_geoblocking'
-%}
+{# Used by both HTML + JS #}
+{% set USER_AGENT_STRING_LETS_ENCRYPT = 'Mozilla/5.0 (compatible; Let\'s Encrypt validation server; +https://letsencrypt.org)' %}
+{% set USER_AGENT_STRING_CHROME       = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36' %}
+
 
 <script>
-    const LETS_ENCRYPT_USER_AGENT_STRING = 'Mozilla/5.0 (compatible; Let\'s Encrypt validation server; +https://letsencrypt.org)';
-    const CHROME_USER_AGENT_STRING = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
+    const USER_AGENT_STRING_LETS_ENCRYPT = '{{ USER_AGENT_STRING_LETS_ENCRYPT }}';
+    const USER_AGENT_STRING_CHROME       = '{{ USER_AGENT_STRING_CHROME }}';
+    const EXPECTED_RESPONSE_BODY         = "port 80 accessible from your location\n"
+    const EXPECTED_SERVER_HEADER         = "nginx"
+    const API_ENDPOINT                   = '/urlCheck/v2';
+    const CURRENT_HOSTNAME               = location.hostname;
+    const URL_TO_CHECK                   = 'http://' + CURRENT_HOSTNAME + '/.well-known/acme-challenge/ping';
 
-    const PORT_80_BLOCKED     = '{{ PORT_80_BLOCKED }}';
-    const HTTPS_UPGRADE       = '{{ HTTPS_UPGRADE }}';
-    const UPSTREAM_ERROR      = '{{ UPSTREAM_ERROR }}';
-    const USER_AGENT_BLOCKING = '{{ USER_AGENT_BLOCKING }}';
-    const GEOBLOCKING         = '{{ GEOBLOCKING }}';
 
-    const API_ENDPOINT = '/urlCheck/v2';
-    const CURRENT_HOSTNAME = location.hostname;
-    const URL_TO_CHECK = 'http://' + CURRENT_HOSTNAME + '/.well-known/acme-challenge/ping';
+    /**
+     * Escapes the provided HTML string and returns the escaped value.
+     *
+     * @param {string} html
+     * @returns {string}
+     */
+    function escapeHtml(html) {
+        return html
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;")
+                .replace(/\n/g, "<br>");
+    }
 
-    //General function for building a string of the keys and values in an object
+    /**
+     * General function for building a string of the keys and values in an object
+     *
+     * @param {object} headersObj
+     * @returns {string}
+     */
     function buildHeadersString(headersObj) {
         let headersString = '';
         for (const [key, value] of Object.entries(headersObj)) {
@@ -38,151 +53,294 @@
         return headersString
     }
 
-    //General function for updating labels
+    /**
+     * Updates the 'DIAGNOSTICS' alert box
+     *
+     * @param {string} html   Text to display
+     * @param {string} colour A CSS class
+     */
+    function updateDiagnosticsAlertBox(html, colour){
+        let elem = document.getElementById("diagnostics")
+        elem.innerHTML = html;
+        elem.classList.add(colour)
+    }
+
+    /**
+     * Updates the 'COMMON CAUSES' text.
+     *
+     * noop if text is an empty string.
+     *
+     * @param {string} innerHtml
+     */
+    function displayCommonCauses(innerHtml){
+        if(innerHtml !== ""){
+            document.getElementById("common-causes-wrap").classList.remove("hide")
+            document.getElementById("common-causes").innerHTML = innerHtml
+        }
+    }
+
+    /**
+     * Updates the 'RESOLUTION' text
+     *
+     * @param {string} innerHtml
+     */
+    function displayResolutionText(innerHtml){
+        document.getElementById("resolution-wrap").classList.remove("hide")
+        document.getElementById("resolution").innerHTML = innerHtml
+    }
+
+    /**
+     * Displays details of the response received by Lambda API from Schoolbox
+     *
+     * @param {string} userAgent
+     * @param {object} response
+     */
+    function displayResponseDetails(userAgent, response){
+        let status  = Object.hasOwn(response, "status") ? response.status : "";
+        let headers = Object.hasOwn(response, "headers") ? response.headers : {};
+        let body    = Object.hasOwn(response, "body") ? response.body : "";
+        switch(userAgent){
+            case USER_AGENT_STRING_LETS_ENCRYPT:
+                displayLetsEncryptResponseDetails(status, headers, body)
+                return;
+            case USER_AGENT_STRING_CHROME:
+                displayChromeResponseDetails(status, headers, body)
+                return;
+        }
+        throw new Error('Unrecognised userAgent: ' + userAgent);
+    }
+
+    /**
+     * General function for updating labels
+     *
+     * @param {string} dataLight
+     * @param {string} text
+     * @param {string} colour
+     */
     function updateStatusBar(dataLight, text, colour) {
         $('[data-light=' + dataLight + ']').html(text).removeClass('neutral').addClass(colour);
     }
 
-    //If present, shows the server header on the page so that the user knows what service is causing the issue
-    function updateServer(text) {
-        const span = document.getElementById("https_upgrade_server_span");
-        const div = document.getElementById("https_upgrade_server_div");
-        span.innerText = text;
-        div.classList.remove('hide');
+    /**
+     * Displays the details of the response received by Lambda API when userAgent is LE
+     *
+     * @param {int} statusCode
+     * @param {object} headers
+     * @param {string} body
+     */
+    function displayLetsEncryptResponseDetails(statusCode, headers, body) {
+        document.getElementById("request-response-letsencrypt").classList.remove("hide")
+        document.getElementById("response-status-letsencrypt").innerHTML = statusCode.toString();
+        document.getElementById("response-headers-letsencrypt").innerText = buildHeadersString(headers);
+        document.getElementById("response-body-letsencrypt").innerText = body;
     }
 
-    //Populate the request details part of the page
-    function updateRequestDetails(type, uri, headersString) {
-        document.getElementById("request_type").innerText = type;
-        document.getElementById("request_uri").innerText = uri;
-        document.getElementById("request_headers").innerText = headersString;
-    }
-
-    //Shows the user what response the API is getting
-    function updateResponseDetails(statusCode, headersString, body, createLinkOnStatusCode = false) {
-        let statusCodeHTMLString;
-        if (createLinkOnStatusCode) {
-            const statusCodeATag = document.createElement("a");
-            statusCodeATag.setAttribute("href", "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/" + statusCode);
-            statusCodeATag.innerText = statusCode;
-            statusCodeHTMLString = statusCodeATag.outerHTML;
-        } else {
-            statusCodeHTMLString = statusCode;
-        }
-
-        document.getElementById("response_status").innerHTML = statusCodeHTMLString ? statusCodeHTMLString : "(nothing to show)";
-        document.getElementById("response_headers").innerText = headersString ? headersString : "(nothing to show)";
-        document.getElementById("response_body").innerText = body ? body : "(nothing to show)";
+    /**
+     * Displays the details of the response received by Lambda API when userAgent is Chrome
+     *
+     * @param {int} statusCode
+     * @param {object} headers
+     * @param {string} body
+     */
+    function displayChromeResponseDetails(statusCode, headers, body) {
+        document.getElementById("request-response-chrome").classList.remove("hide")
+        let headersString = buildHeadersString(headers);
+        document.getElementById("response-status-chrome").innerHTML = statusCode ? statusCode : "(nothing to show)";
+        document.getElementById("response-headers-chrome").innerText = headersString ? headersString : "(nothing to show)";
+        document.getElementById("response-body-chrome").innerText = body ? body : "(nothing to show)";
     }
 
     $(window).on('load', function () {
-        updateRequestDetails(
-                "GET",
-                URL_TO_CHECK,
-                buildHeadersString({
-                    "user-agent": LETS_ENCRYPT_USER_AGENT_STRING,
-                }),
-        );
+        // Set the Request URI. Need to execute this via JS to read domain being presented to client.
+        document.getElementById("request-uri-letsencrypt").innerText = URL_TO_CHECK;
+        document.getElementById("request-uri-chrome").innerText = URL_TO_CHECK;
 
-        const baseCheck = $.ajax({
-            url: "{{ api_url }}" + API_ENDPOINT + "?url=" + encodeURIComponent(URL_TO_CHECK),
-            success: function (result, status, xhr) {
-                if (xhr.responseJSON.message === "Request timeout occurred") {
-                    updateResponseDetails("", "", "", false);
-                    updateStatusBar(PORT_80_BLOCKED, "Fail: Timeout", "alert");
-                    updateStatusBar(HTTPS_UPGRADE, "Indeterminate", "warning");
-                    updateStatusBar(UPSTREAM_ERROR, "Fail: Timeout", "alert");
-                } else {
-                    updateResponseDetails(
-                            xhr.responseJSON.response.status,
-                            buildHeadersString(xhr.responseJSON.response.headers),
-                            xhr.responseJSON.response.body,
-                            true
-                    );
-                    if (xhr.responseJSON.response.status === 200) {
-                        updateStatusBar(PORT_80_BLOCKED, "Pass", "success");
-                        updateStatusBar(HTTPS_UPGRADE, "Pass", "success");
-                        updateStatusBar(UPSTREAM_ERROR, "Pass", "success");
-                    } else {
-                        updateStatusBar(PORT_80_BLOCKED, "Fail", "alert");
-                        updateStatusBar(UPSTREAM_ERROR, "Fail", "alert");
-                        if ('location' in xhr.responseJSON.response.headers) {
-                            if (xhr.responseJSON.response.headers['location'].startsWith("https")) {
-                                if ('server' in xhr.responseJSON.response.headers) {
-                                    const serverResponseHeader = xhr.responseJSON.response.headers['server']
-                                    updateStatusBar(HTTPS_UPGRADE, "Fail: Check " + serverResponseHeader, "alert");
-                                    updateServer(serverResponseHeader);
-                                } else {
-                                    updateStatusBar(HTTPS_UPGRADE, "Fail", "alert");
-                                }
-                            } else {
-                                updateStatusBar(HTTPS_UPGRADE, "Indeterminate", "warning");
-                            }
-                        } else {
-                            updateStatusBar(HTTPS_UPGRADE, "Indeterminate", "warning");
-                        }
-                    }
-                }
-            },
-            error: function (xhr, status, error) {
-                updateResponseDetails("", "", "", false);
 
-                let errorMessage;
-                if (status === 400) {
-                    errorMessage = 'Schoolbox error';
-                } else if (status === 500) {
-                    errorMessage = 'API error';
-                } else {
-                    errorMessage = 'Unknown error';
-                }
-
-                updateStatusBar(PORT_80_BLOCKED, errorMessage, "alert");
-                updateStatusBar(HTTPS_UPGRADE, errorMessage, "alert");
-                updateStatusBar(UPSTREAM_ERROR, errorMessage, "alert");
-            },
-        });
-
+        // Call LambdaAPI w/ UserAgent=LetsEncrypt
+        // Cases:
+        //  1. connection closed
+        //  2. 200, message="Response received", response.status=200, response.body="port 80 accessible from your location"   > PASS
+        //  3. 200, message="Response received", response.status=200, response.body=!"port 80 accessible from your location"  > FAIL - Not Schoolbox
+        //  4. 200, message="Response received", response.status=!200                                                         > FAIL - Not Schoolbox
+        //  5. 200, message="Request timeout occurred"
+        //  6. 200, message=null
+        //  7. 400, message="No URL supplied"
+        //  8. 400, message="Malformed URL supplied - unable to decode"
+        //  9. 400, message="Malformed URL supplied - not a valid URL string"
+        // 10. 400, message="Malformed User-Agent supplied - unable to decode"
+        // 11. 400, message=null                                                                                              > FAIL - NOT API
+        // 12. 500, message="Internal error encountered"                                                                      > FAIL - API Error
+        // 13. 500, message=null                                                                                              > FAIL - Not API | Uncaught error
+        // 14. !in(200,400,500)                                                                                               > FAIL - NOT API
         $.ajax({
-            url: "{{ api_url }}" + API_ENDPOINT + "?url=" + encodeURIComponent(URL_TO_CHECK) + "&useragent=" + encodeURIComponent(CHROME_USER_AGENT_STRING),
-            success: function (chromeResult, chromeStatus, chromeXhr) {
-                // wait for baseCheck to complete
-                $.when(baseCheck).then(
-                    function (baseResult, baseStatus, baseXhr) {
-                        //if neither url check timed out
-                        if (chromeXhr.responseJSON.message === "Response received" && baseXhr.responseJSON.message === "Response received") {
-                            //if both checks pass
-                            if (chromeXhr.responseJSON.response.status === 200 && chromeXhr.responseJSON.response.status === 200) {
-                                updateStatusBar(USER_AGENT_BLOCKING, "Pass", "success");
-                            }
-                            //if chrome user agent check passes but let's encrypt user agent check fails
-                            else if (chromeXhr.responseJSON.response.status !== 200 && chromeXhr.responseJSON.response.status === 200) {
-                                updateStatusBar(USER_AGENT_BLOCKING, "Fail", "alert");
-                            } else {
-                                updateStatusBar(USER_AGENT_BLOCKING, "Indeterminate", "warning");
-                            }
-                        }
-                        //if either or both url checks timed out
-                        else {
-                            updateStatusBar(USER_AGENT_BLOCKING, "Indeterminate", "warning");
-                        }
-                    },
-                    function (baseXhr, baseStatus, baseError) {
-                        updateStatusBar(USER_AGENT_BLOCKING, "Indeterminate", "warning");
-                    }
-                )
-            },
-            error: function (xhr, status, error) {
-                let errorMessage;
-                if (status === 400) {
-                    errorMessage = 'Schoolbox error';
-                } else if (status === 500) {
-                    errorMessage = 'API error';
-                } else {
-                    errorMessage = 'Unknown error';
+            url: "{{ api_url }}" + API_ENDPOINT + "?url=" + encodeURIComponent(URL_TO_CHECK),
+
+            complete: function(xhr){
+                // Unable to communicate w/ Lambda API
+                // * Lambda API offline
+                // * Network issues between browser + Lambda API
+                if(xhr.readyState !== 4){
+                    updateDiagnosticsAlertBox("Diagnostic API offline", "alert")
+                    displayResolutionText("<p>Check your internet connection. If issue persists, please report issue to Schoolbox Support</p>");
+                    return;
                 }
-                updateStatusBar(USER_AGENT_BLOCKING, errorMessage, "alert");
+
+                // Unrecognised Lambda API response?
+                // * request intercepted (e.g. by outbound firewall) and not coming from our Lambda API
+                // * invalid Lambda API response structure
+                if(!Object.hasOwn(xhr, "responseJSON") || !Object.hasOwn(xhr.responseJSON, "message")){
+                    updateDiagnosticsAlertBox("Unrecognised Diagnostic API response", "alert")
+                    displayResolutionText("<p>Check your internet connection. If issue persists, please report issue to Schoolbox Support</p>");
+                    return;
+                }
+
+                let message = xhr.responseJSON.message;
+
+                // Handle Lambda API response
+                switch(xhr.status){
+                    case 200:
+                        // Lambda API was able to issue a request to Schoolbox.
+                        if(message === "Cannot resolve DNS"){
+                            // Lambda API unable to resolve 'url' DNS?
+                            updateDiagnosticsAlertBox("Unable to resolve DNS for <strong>" + CURRENT_HOSTNAME + "</strong>", "alert")
+                            displayCommonCauses("<p>No public DNS records configured for " + CURRENT_HOSTNAME + "</p>")
+                            displayResolutionText("<p>Check public DNS records exist for <strong>" + CURRENT_HOSTNAME + "</strong></p>");
+                        } else if(message in ["Connection refused", "Request timeout occurred"]){
+                            // Was Lambda unable to connect to port 80 (either rejected or timeout)?
+                            let diagnostic = message === "Connection refused"
+                                    ? "Connection refused"
+                                    : "Timeout connecting to " + URL_TO_CHECK;
+                            let commonCauses =
+                                    "<ul>" +
+                                    "<li>A firewall may be restricting traffic on port 80</li>" +
+                                    "<li>A firewall may be restricting HTTP requests</li>" +
+                                    "<li>A firewall if restricting traffic from the US/EU (see Geoblocking)</li>" +
+                                    "<li>The ISP may be blocking inbound port 80 traffic</li>" +
+                                    "</li>";
+                            testChromeUserAgent(xhr, diagnostic, commonCauses, "<p>Check that port 80 traffic is being routed to Schoolbox server</p>");
+                        } else if(message === "Response received"){
+                            // Did Lambda API get a response from requested 'url' on port 80?
+                            let response = xhr.responseJSON.response;
+                            // Was the response from Schoolbox nginx?
+                            if(response.status === 200 && response.body === EXPECTED_RESPONSE_BODY){
+                                updateDiagnosticsAlertBox("SSL Renewal simulation successful. ", "success")
+                            } else {
+                                // Generate diff b/w expected + actual
+                                let diff = {}
+                                if (response.status !== 200){
+                                    diff["status"] = [200, response.status]
+                                }
+                                if (!Object.hasOwn(response.headers, "server")){
+                                    diff["server"] = [EXPECTED_SERVER_HEADER, ""]
+                                } else if(response.headers.server !== EXPECTED_SERVER_HEADER) {
+                                    diff["server"] = [EXPECTED_SERVER_HEADER, response.headers.server]
+                                }
+                                if(response.body !== EXPECTED_RESPONSE_BODY){
+                                    diff["body"] = [EXPECTED_RESPONSE_BODY, escapeHtml(response.body)]
+                                }
+                                if ('location' in response.headers) {
+                                    diff["location header"] = ["", response.headers['location']]
+                                }
+                                let html = "<table>" +
+                                        "<tr><th></th><th>Expected</th><th>Actual</th></tr>";
+                                for (let key in diff) {
+                                    let aDiff = diff[key]
+                                    html += "<tr><th>"+key+"</th><td>" + aDiff[0] + "</td><td>"+aDiff[1]+"</td></tr>"
+                                }
+                                html += "</table>";
+
+                                let commonCauses = "";
+                                let resolutionText;
+
+                                // Is this a case of HTTP to HTTPS redirection?
+                                if ('location' in response.headers && response.headers['location'].startsWith("https")) {
+                                    commonCauses = "An upstream firewall/service performing HTTP to HTTPS redirection"
+                                    if ('server' in response.headers) {
+                                        resolutionText = "Test results indicate the service generating the redirect identifies itself as <code>"+response.headers.server+"</code>. " +
+                                                "Please review the configuration of this service and remove any HTTP to HTTPS redirection."
+                                    } else {
+                                        resolutionText = "Check no upstream network components are performing HTTP to HTTPS redirection."
+                                    }
+                                } else {
+                                    resolutionText = "Check that port 80 traffic is being routed to Schoolbox server";
+                                }
+                                testChromeUserAgent(xhr, "Unexpected response to domain verification request<br><br>" + html, commonCauses, "<p>"+resolutionText+"</p>");
+                            }
+                            displayResponseDetails(USER_AGENT_STRING_LETS_ENCRYPT, xhr.responseJSON.response)
+                        } else {
+                            // Lambda API has returned a 200, but this code doesn't know how to handle it.
+                            // Probably a bug that needs fixing here.
+                            updateDiagnosticsAlertBox("Unrecognised Diagnostic API response: " + xhr.responseJSON.message, "alert")
+                            displayResolutionText("<p>If issue persists, please report issue to Schoolbox Support</p>");
+                        }
+                        return;
+
+                    case 400:
+                        // Lambda API refused to check URL because request was invalid
+                        updateDiagnosticsAlertBox("Schoolbox error. " + message + ". Unable to check " + URL_TO_CHECK, "alert")
+                        displayResolutionText("<p>If issue persists, please report issue to Schoolbox Support</p>");
+                        return;
+
+                    // Lambda API encountered an unexpected error
+                    case 500:
+                        updateDiagnosticsAlertBox("Diagnostic API error.", "alert")
+                        displayResolutionText("<p>If issue persists, please report issue to Schoolbox Support</p>");
+                        return;
+
+                    // Lambda API returned an unexpected response
+                    default:
+                        updateDiagnosticsAlertBox("Diagnostic API error. Unrecognised status code: " + xhr.status, "alert")
+                        displayResolutionText("<p>If issue persists, please report issue to Schoolbox Support</p>");
+                        return;
+                }
             },
         });
+
+
+        /**
+         * Test URL w/ Chrome userAgent to determine if that is the sole reason for failure.
+         *
+         * If the Chrome test fails too, then just render the LE diagnosis/common-causes/resolution.
+         * If the Chrome test succeeds, we can assume the issue is userAgent-dependent filtering.
+         *
+         * @param failedLetsEncryptXhr The failing XHR with the LE UserAgent
+         * @param diagnosticHtml       Diagnostics for the LE request
+         * @param commonCausesHtml     Common Causes of the failure of the LE request
+         * @param resolutionHtml       Suggested resolution
+         */
+        function testChromeUserAgent(failedLetsEncryptXhr, diagnosticHtml, commonCausesHtml, resolutionHtml){
+            $.ajax({
+                url: "{{ api_url }}" + API_ENDPOINT + "?url=" + encodeURIComponent(URL_TO_CHECK) + "&useragent=" + encodeURIComponent(USER_AGENT_STRING_CHROME),
+                complete: function (chromeXhr){
+                    // Did the Chrome request succeeds where the LE request failed?
+                    if(
+                            chromeXhr.status === 200 &&
+                            Object.hasOwn(chromeXhr.responseJSON, "message") &&
+                            chromeXhr.responseJSON.message === "Response received" &&
+                            chromeXhr.responseJSON.response.body === EXPECTED_RESPONSE_BODY
+                    ) {
+                        diagnosticHtml += "<p>An upstream network component appears to be blocking the LetsEncrypt user agent (<code>"+USER_AGENT_STRING_LETS_ENCRYPT+"</code>).</p>";
+                        updateDiagnosticsAlertBox(diagnosticHtml, "alert")
+                        displayCommonCauses(
+                                "<ul>" +
+                                "<li>A firewall/service placed in front may be filtering Let's Encrypt requests based on their use of the <code>acme-challenge</code> application protocol</li>" +
+                                "<li>A firewall/service placed in front of the Schoolbox server may be blocking requests with the Let's Encrypt user agent.</li>" +
+                                "</ul>"
+                        );
+                        displayResolutionText(
+                                "<p>Test results indicate requests are being filtered depending on the value of UserAgent request header." +
+                                "Check the configuration of any security infrastructure placed in front of Schoolbox and ensure that Let's Encrypt traffic is able to reach the Schoolbox server directly.</p>"
+                        );
+                        displayResponseDetails(USER_AGENT_STRING_CHROME, chromeXhr.responseJSON.response)
+                    } else {
+                        // Both LE + Chrome test failed. Just render LE failure.
+                        updateDiagnosticsAlertBox(diagnosticHtml, "alert")
+                        displayCommonCauses(commonCausesHtml)
+                        displayResolutionText(resolutionHtml)
+                    }
+                },
+            });
+        }
     });
     $(function () {
         $('[data-collapser]').collapsable();
@@ -200,279 +358,97 @@
             <section class="content">
                 <article>
                     <p>
-                        This page is intended to assist IT systems administrators who manage their school's firewall and
-                        on-premises Schoolbox server in troubleshooting their firewall and network configuration to
-                        allow automatic SSL renewal.
+                        This page performs diagnostics to assist IT systems administrators troubleshoot common firewall
+                        and network configuration issues that prevent automatic SSL certificate renewal.
                     </p>
-                    <h3>Schoolbox's SSL certificate policy</h3>
+                    <h3>SSL certificate renewal process</h3>
                     <p>
-                        Schoolbox uses Let's Encrypt as a certificate provider and uses Certbot to manage these
-                        certificates. Our Certbot scripts are configured to provision certs with 3 months of validity.
-                        Certbot will automatically attempt to renew SSL certificates when the current certs have less
+                        Certificates are managed via Certbot and issued by Let's Encrypt with 3 months of validity.
+                        Certbot will automatically attempt to renew SSL certificates when the current certificates have
+                        less
                         than 30 days of validity.
+                        Domain verification is performed using the <a
+                                href="https://letsencrypt.org/docs/challenge-types/#http-01-challenge" target="_blank">HTTP-01
+                            challenge</a> which can only be done on port 80.
+                        Port 80 is <strong>only</strong> used for domain verification. All other traffic is redirected
+                        to HTTPS.
                     </p>
-                    <p>
-                        There are times when this automatic certificate renewal process fails. Most of the time, all is
-                        needed is a small change in the firewall configuration to allow this traffic through to the
-                        Schoolbox server. This page is intended to assist in diagnosing the cause and finding the change
-                        that needs to be made.
-                    </p>
+                    <h3>Test logic</h3>
+                    <p>This page attempts to send a request from a cloud-based service to the Schoolbox server. The request is designed to simulate
+                       domain verification requests sent from LetsEncrypt servers during SSL certificate generation.</p>
                     <div class="alert-box highlight no-margin">
                         <p>
-                            While this page attempts to aid self-diagnosis of SSL renewal issues using the tests above,
-                            the accuracy of the results cannot be guaranteed. The information on this page is provided
-                            to aid troubleshooting and should not be taken as 100% fact. Schoolbox takes no
-                            responsibility for the changes made to your firewall as a result of the information provided
-                            by this page.
+                            Failure to route port 80 traffic to the server will cause domain verification and SSL certificate generation to fail.
                         </p>
                     </div>
                 </article>
             </section>
         </div>
+
         <div class="small-12 island">
-            <h3 class="subheader">Troubleshooting</h3>
-            <section>
-                <ol class="information-list expandable-card">
-                    <li>
-                        <div id="{{ PORT_80_BLOCKED }}">
-                            <div class="expander icon-down-arrow" data-collapser="{{ PORT_80_BLOCKED }}"></div>
-                            <div class="column-left columns content">
-                                <h3 class="no-margin">Port 80 timeout</h3>
-                            </div>
-                            <div class="column-right content">
-                                <span class="full-width no-margin neutral label"
-                                      data-light="{{ PORT_80_BLOCKED }}"><span class="loader"></span></span>
-                            </div>
-                        </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed"
-                             data-collapsable="{{ PORT_80_BLOCKED }}" style="display: none;">
-                            <article>
-                                <h5>Problem</h5>
-                                <p>Let's Encrypt sends domain verification requests via HTTP on port 80. If port 80
-                                    traffic is restricted, that could be causing SSL certificate renewal requests to
-                                    fail.</p>
-                                <h5>Common causes</h5>
-                                <ol>
-                                    <li>A firewall may be restricting traffic on port 80</li>
-                                    <li>A firewall may be restricting HTTP requests</li>
-                                    <li>A firewall if restricting traffic from the US/EU (see <a
-                                                href="#{{ GEOBLOCKING }}">Geoblocking</a>)
-                                    </li>
-                                </ol>
-                                <h5>Resolution steps</h5>
-                                <p>Review the firewall configuration and ensure that HTTP traffic on port 80 is able to
-                                    reach the Schoolbox server directly. For more information, visit <a
-                                            href="https://help.schoolbox.com.au/homepage/483#component6918">Schoolbox
-                                        Help - System Requirements - Security, Firewall and Ports</a>.</p>
-                            </article>
-                        </div>
-                    </li>
-                    <li>
-                        <div id="{{ HTTPS_UPGRADE }}">
-                            <div class="expander icon-down-arrow" data-collapser="{{ HTTPS_UPGRADE }}"></div>
-                            <div class="column-left columns content">
-                                <h3 class="no-margin">HTTP > HTTPS upgrade</h3>
-                            </div>
-                            <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="{{ HTTPS_UPGRADE }}"><span
-                                            class="loader"></span></span>
-                            </div>
-                        </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed"
-                             data-collapsable="{{ HTTPS_UPGRADE }}" style="display: none;">
-                            <article>
-                                <h5>Problem</h5>
-                                <p>Let's Encrypt domain verification requests are made with HTTP. If these requests are
-                                    escalated to HTTPS, Schoolbox will redirect this unauthenticated traffic to the
-                                    Schoolbox login page and the SSL certificate renewal process will fail.</p>
-                                <h5>Common cause</h5>
-                                <ul>
-                                    <li>A service upstream of the Schoolbox server may be intercepting Let's Encrypt's
-                                        requests and escalating it from HTTP to HTTPS
-                                    </li>
-                                </ul>
-                                <h5>Resolution steps</h5>
-                                <p>Review the firewall configuration and ensure that HTTP traffic on port 80 is able to
-                                    reach the Schoolbox server directly. For more information, visit <a
-                                            href="https://help.schoolbox.com.au/homepage/483#component6918">Schoolbox
-                                        Help - System Requirements - Security, Firewall and Ports</a>.</p>
-                                <div id="https_upgrade_server_div" class="alert-box highlight no-margin hide">
-                                    <p>
-                                        Our test has identified that the service causing the HTTP to HTTPS escalation
-                                        identifies itself as
-                                        <code id="https_upgrade_server_span" class=""></code>.
-                                        Please review the configuration of this service and remove the rules that are
-                                        redirecting HTTP requests to HTTPS.
-                                    </p>
-                                </div>
-                            </article>
-                        </div>
-                    </li>
-                    <li>
-                        <div id="{{ UPSTREAM_ERROR }}">
-                            <div class="expander icon-down-arrow" data-collapser="{{ UPSTREAM_ERROR }}"></div>
-                            <div class="column-left columns content">
-                                <h3 class="no-margin">Upstream error</h3>
-                            </div>
-                            <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="{{ UPSTREAM_ERROR }}"><span
-                                            class="loader"></span></span>
-                            </div>
-                        </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed"
-                             data-collapsable="{{ UPSTREAM_ERROR }}" style="display: none;">
-                            <article>
-                                <h5>Problem</h5>
-                                <p>'Upstream error' is an umbrella term for any number of issues that could be
-                                    restricting the Let's Encrypt requests trying to reach the Schoolbox server.</p>
-                                <h5>Common causes</h5>
-                                <ol>
-                                    <li>A firewall/service may be severing the connection that Let's Encrypt is trying
-                                        to establish
-                                    </li>
-                                    <li>A firewall/service may be filtering Let's Encrypt requests based on some kind of
-                                        'smart filtering' feature
-                                    </li>
-                                    <li>A firewall/service placed in front may be filtering Let's Encrypt requests based
-                                        on their use of the <code>acme-challenge</code> application protocol
-                                    </li>
-                                </ol>
-                                <h5>Resolution steps</h5>
-                                <p>Check the configuration of any security infrastructure placed in front of Schoolbox
-                                    and ensure that Let's Encrypt traffic is able to reach the Schoolbox server
-                                    directly.</p>
-                            </article>
-                        </div>
-                    </li>
-                    <li>
-                        <div id="{{ USER_AGENT_BLOCKING }}">
-                            <div class="expander icon-down-arrow" data-collapser="{{ USER_AGENT_BLOCKING }}"></div>
-                            <div class="column-left columns content">
-                                <h3 class="no-margin">User agent blocking</h3>
-                            </div>
-                            <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="{{ USER_AGENT_BLOCKING }}"><span
-                                            class="loader"></span></span>
-                            </div>
-                        </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed"
-                             data-collapsable="{{ USER_AGENT_BLOCKING }}" style="display: none;">
-                            <article>
-                                <h5>Problem</h5>
-                                <p>Let's Encrypt domain verification requests use the user-agent header <code>Mozilla/5.0
-                                        (compatible; Let's Encrypt validation server; +https://letsencrypt.org)</code>.
-                                    Some firewalls may block this user-agent when they do not recognise it.</p>
-                                <h5>Common causes</h5>
-                                <ul>
-                                    <li>A firewall/service placed in front of the Schoolbox server may be blocking
-                                        requests with the Let's Encrypt user agent.
-                                    </li>
-                                </ul>
-                                <h5>Resolution steps</h5>
-                                <p>Whitelist traffic matching the Let's Encrypt domain verification requests (see <a
-                                            href="#request-details">Let's Encrypt request details</a>).</p>
-                            </article>
-                        </div>
-                    </li>
-                    <li>
-                        <div id="{{ GEOBLOCKING }}">
-                            <div class="expander icon-down-arrow" data-collapser="{{ GEOBLOCKING }}"></div>
-                            <div class="column-left columns content">
-                                <h3 class="no-margin">Geoblocking</h3>
-                            </div>
-                            <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="{{ GEOBLOCKING }}">No test available</span>
-                            </div>
-                        </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed"
-                             data-collapsable="{{ GEOBLOCKING }}" style="display: none;">
-                            <article>
-                                <h5>Problem</h5>
-                                <p>Let's Encrypt domain verification requests can come from a range of IP addresses
-                                    around world including the US, EU, etc. Blocking web requests from specific regions
-                                    can cause Let's Encrypt domain verification to fail.</p>
-                                <h5>Common causes</h5>
-                                <ul>
-                                    <li>A firewall/service placed in front of Schoolbox may be blocking web requests
-                                        from certain regions based on IP ranges (aka 'geoblocking')
-                                    </li>
-                                </ul>
-                                <h5>Resolution steps</h5>
-                                <ul>
-                                    <li>Review the firewall configuration and remove any rules that are geoblocking HTTP
-                                        requests on port 80.
-                                    </li>
-                                </ul>
-                            </article>
-                        </div>
-                    </li>
-                </ol>
+            <h3 class="subheader">Diagnostics</h3>
+            <section class="content">
+                <div id="diagnostics" data-alart class="alert-box"><span class="loader"></span>Testing in progress, please wait...</div>
             </section>
         </div>
-        <div id="request-details">
-            <div class="medium-12 large-6 island">
-                <h3 class="subheader">Let's Encrypt request details</h3>
-                <section>
-                    <ol class="information-list">
-                        <li class="">
-                            <div class="large-12 xlarge-3 columns content">
-                                <h5 class="no-margin">Request type:</h5>
-                            </div>
-                            <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
-                                <pre id="request_type">Loading...</pre>
-                            </div>
-                        </li>
-                        <li class="">
-                            <div class="large-12 xlarge-3 columns content">
-                                <h5 class="no-margin">Request URI:</h5>
-                            </div>
-                            <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
-                                <pre id="request_uri">Loading...</pre>
-                            </div>
-                        </li>
-                        <li class="">
-                            <div class="large-12 xlarge-3 columns content">
-                                <h5 class="no-margin">Request headers:</h5>
-                            </div>
-                            <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
-                                <pre id="request_headers">Loading...</pre>
-                            </div>
-                        </li>
-                    </ol>
-                </section>
+
+        <div id="common-causes-wrap" class="small-12 island hide">
+            <h3 class="subheader">Common Causes</h3>
+            <section class="content">
+                <article id="common-causes"></article>
+            </section>
+        </div>
+
+        <div id="resolution-wrap" class="small-12 island hide">
+            <h3 class="subheader">Resolution</h3>
+            <section class="content">
+                <article id="resolution"></article>
+            </section>
+        </div>
+
+        <div id="request-response-letsencrypt" class="hide">
+            <div id="request-details-le">
+                <div class="medium-12 large-6 island">
+                    <h3 class="subheader">Request (User Agent: Let's Encrypt)</h3>
+                    <table>
+                        <tr><th>Method:</th><td>GET</td></tr>
+                        <tr><th>URI:</th><td id="request-uri-letsencrypt">Loading...</td></tr>
+                        <tr><th>Headers:</th><td>user-agent: {{ USER_AGENT_STRING_LETS_ENCRYPT }}</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div id="response-details">
+                <div class="medium-12 large-6 island">
+                    <h3 class="subheader">Response</h3>
+                    <table>
+                        <tr><th>Status Code:</th><td id="response-status-letsencrypt"><span class="loader"></span>.</td></tr>
+                        <tr><th>Headers:</th><td id="response-headers-letsencrypt"><span class="loader"></span></td></tr>
+                        <tr><th>Body:</th><td id="response-body-letsencrypt"><span class="loader"></span></td></tr>
+                    </table>
+                </div>
             </div>
         </div>
-        <div id="response-details">
-            <div class="medium-12 large-6 island">
-                <h3 class="subheader">Response details</h3>
-                <section>
-                    <ol class="information-list">
-                        <li class="">
-                            <div class="large-12 xlarge-3 columns content">
-                                <h5 class="no-margin">Response status code:</h5>
-                            </div>
-                            <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
-                                <pre id="response_status"><span class="loader"></span></pre>
-                            </div>
-                        </li>
-                        <li class="">
-                            <div class="large-12 xlarge-3 columns content">
-                                <h5 class="no-margin">Response headers:</h5>
-                            </div>
-                            <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
-                                <pre id="response_headers"><span class="loader"></span></pre>
-                            </div>
-                        </li>
-                        <li class="">
-                            <div class="large-12 xlarge-3 columns content">
-                                <h5 class="no-margin">Response body:</h5>
-                            </div>
-                            <div class="large-12 xlarge-9 alert-box highlight columns no-margin">
-                                <pre id="response_body"><span class="loader"></span></pre>
-                            </div>
-                        </li>
-                    </ol>
-                </section>
+
+        <div id="request-response-chrome" class="hide">
+            <div id="request-details-chrome">
+                <div class="medium-12 large-6 island">
+                    <h3 class="subheader">Request (User Agent: Chrome)</h3>
+                    <table>
+                        <tr><th>Method:</th><td>GET</td></tr>
+                        <tr><th>URI:</th><td id="request-uri-chrome">Loading...</td></tr>
+                        <tr><th>Headers:</th><td>user-agent: {{ USER_AGENT_STRING_CHROME }}</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div id="response-details">
+                <div class="medium-12 large-6 island">
+                    <h3 class="subheader">Response</h3>
+                    <table>
+                        <tr><th>Status Code:</th><td id="response-status-chrome"><span class="loader"></span>.</td></tr>
+                        <tr><th>Headers:</th><td id="response-headers-chrome"><span class="loader"></span></td></tr>
+                        <tr><th>Body:</th><td id="response-body-chrome"><span class="loader"></span></td></tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

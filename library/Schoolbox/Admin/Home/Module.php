@@ -1,8 +1,6 @@
 <?php
 
 /**
- * Course builder admin page
- *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -11,6 +9,7 @@
 namespace Schoolbox\Admin\Home;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -19,6 +18,7 @@ use Aura\Router\Router;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\Log\Mapper as LogMapper;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
+use Schoolbox\Version\Version;
 
 class Module extends BaseModule
 {
@@ -51,7 +51,17 @@ class Module extends BaseModule
                      new Rule\IsSuperuser(),
                      new Rule\IsConfigOn(DisasterRecovery::CONFIG_DR_VISIBILITY, $this->getConfig())
                  )
-             );
+             )
+            ->addRoutePermission(
+                $authorizer,
+                'getSslRenewalHelp',
+                new Rule\Callback(function () {
+                    // Page not accessible in cloud
+                    if ($this->getConfig()->get('site_environment') === Version::SITE_ENVIRONMENT_CLOUD_SAAS) {
+                        throw new InvalidPath();
+                    }
+                })
+            );
     }
 
     /**

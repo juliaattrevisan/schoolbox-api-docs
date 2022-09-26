@@ -229,19 +229,21 @@ class Controller extends Base
 
     /**
      * Shows a page of common troubleshooting steps to help users troubleshoot SSL renewal being offline
+     *
+     * @api GET /adminv2/home/ssl-renewal-help
      */
-    public function getSslRenewalHelp()
+    public function getSslRenewalHelp(): void
     {
         $this->response->content->set(
-            array(
+            [
                 'template' => '@adminHome/ssl-renewal-help.twig',
-                'data' => array(
-                    'pageCurrent' => $this->router->generate('adminHome.getIndex'),
+                'data'     => [
+                    'pageCurrent'    => $this->router->generate('adminHome.getIndex'),
                     'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
-                    'is_cloud'  => $this->isCloudHosted(),
-                    'api_url'   => $this->getConfigLoader()->get('schoolbox_api_url'),
-                ),
-            )
+                    'is_cloud'       => $this->isCloudHosted(),
+                    'api_url'        => $this->getConfigLoader()->get('schoolbox_api_url'),
+                ],
+            ]
         );
     }
 
