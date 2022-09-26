@@ -126,7 +126,7 @@ export const useSelectedCodesStore = defineStore(`csSelectedCodes`, {
         /**
          * set the active node, which would prompt the cs-active-selected-code-modal to open
          * and if it's set to null we can listen for it to be set again
-         * We also load the ancestors or the node to display the breadcrumbs in the modal
+         * We also load the ancestors of the node to display the breadcrumbs in the modal
          *
          * @param { Object }
          */

@@ -30,7 +30,7 @@ const props = defineProps({
 const selectedNodesStore = useSelectedNodesStore();
 
 /**
- * Prevent rapid fire while loading the the selected node
+ * Prevent rapid fire while loading the selected node
  *
  * @returns { boolean }
  */

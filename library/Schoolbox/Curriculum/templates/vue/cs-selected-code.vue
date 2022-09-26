@@ -32,7 +32,7 @@ const store = useStore();
 const selectedCodesStore = useSelectedCodesStore();
 
 /**
- * Prevent rapid fire while loading the the selected node
+ * Prevent rapid fire while loading the selected node
  *
  * @returns { boolean }
  */
