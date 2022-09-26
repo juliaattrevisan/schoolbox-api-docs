@@ -265,9 +265,9 @@ class Controller extends Base
         $fakeRecord                         = [];
         $fakeRecord['id']                   = "fakeId";
         $fakeRecord['accessWithPermission'] = $this->reportAccessMapper->findByColumn('pastoral_report_id', $report->getId());
-        $roles = $this->roleMapper->findByColumnList(
+        $roles                              = $this->roleMapper->findByColumnList(
             [
-                'group_type' => 'staff',
+                'group_type'      => 'staff',
                 'access_pastoral' => true,
             ]
         );
@@ -277,10 +277,7 @@ class Controller extends Base
             [
                 'template' => '@pastoralReportBuilder/modify.twig',
                 'data'     => [
-                    'moderator'            => $this->getUser()->getAccessList()->filterBy(
-                            'service',
-                            UserAccess::SERVICE_PASTORAL
-                        )->count() > 0,
+                    'moderator'            => $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0,
                     'years'                => $yearLevels,
                     'houses'               => $this->houseMapper->findAll()->sortBy('sequence', 'asc'),
                     'campuses'             => $this->campusMapper->findAll()->sortBy('sequence', 'asc'),
