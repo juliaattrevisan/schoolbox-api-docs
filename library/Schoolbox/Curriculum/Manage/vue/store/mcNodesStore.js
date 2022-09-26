@@ -127,7 +127,7 @@ export const useNodesStore = defineStore('mcNodes', {
                 return;
             }
             try {
-                const response = await fetch(`${apiEndpoint}/${id}?descendants=1`, {
+                const response = await fetch(`${apiEndpoint}/${id}?descendants=2`, {
                     headers: {
                         'Content-Type': 'application/json',
                     }

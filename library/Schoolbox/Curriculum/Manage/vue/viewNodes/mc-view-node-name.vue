@@ -50,6 +50,18 @@ const props = defineProps({
 
 const viewNodesStore = useViewNodesStore();
 
+/**
+ * To distinguish the parent node
+ *
+ * @returns { Boolean }
+ */
+ const isParentNode = computed(() => {
+    if (props.depth === 0) {
+        return true;
+    } else {
+        return false;
+    }
+});
 
 /**
  * To help distinguish those nodes that aren't selectable,
@@ -57,13 +69,15 @@ const viewNodesStore = useViewNodesStore();
  *
  * @returns { Boolean }
  */
-const notButton = computed(() => {
-    if (props.depth === 0) { //we can't go back any further
-        return true;
-    } else if (viewNodesStore.isSearchActive) { //cant do any navigation while search is active
-        return true;
-    } else {
+const isButton = computed(() => {
+    if (isParentNode.value) { //is the parent node, which we don't
         return false;
+    } else if (props.node.children?.length === 0) { //there's no children to display, so no point going further
+        return false;
+    } else if (viewNodesStore.isSearchActive) { //cant do any navigation while search is active
+        return false;
+    } else {
+        return true;
     }
 });
 
@@ -121,16 +135,9 @@ function highlightSearchInElement (toHighlight) {
 </script>
 
 <template>
-    <div
-        v-if="notButton"
-        :class="`name`"
-    >
-        <span v-html="highlightTitleSearch"></span>
-        <aside v-if="viewNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
-    </div>
     <button
-        v-else
-        :class="`button-name`"
+        v-if="isButton"
+        class="button-name"
         :title="`Expand ${props.title}`"
         :disabled="props.isUpdatingOrAdding"
         @click.prevent="onNameSelected"
@@ -138,30 +145,42 @@ function highlightSearchInElement (toHighlight) {
     >
         {{ props.title }}
     </button>
+    <div
+        v-else
+        class="name"
+        :data-is-parent-node="isParentNode"
+    >
+        <span v-html="highlightTitleSearch"></span>
+        <aside v-if="viewNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
+    </div>
+
 </template>
 
 <style lang="scss" scoped>
 
 @import './style/mcViewNode';
 
-.name {
-    color: var(--body-foreground-h1);
-    opacity: 1;
-    font-size: 1rem;
-    font-weight: bold;
-    width: 100%;
-}
-
-aside {
-    font-size: 0.725rem;
-    font-style: italic;
-}
-
 .button-name {
     @extend .button;
     padding-left: 0.25rem;
     transition: background 0.2s;
     width: 100%;
+}
+
+.name {
+    color: var(--body-foreground-h1);
+    opacity: 1;
+    font-size: 1rem;
+    width: 100%;
+}
+
+    [data-is-parent-node="true"] {
+        font-weight: bold;
+    }
+
+aside {
+    font-size: 0.725rem;
+    font-style: italic;
 }
 
 </style>
