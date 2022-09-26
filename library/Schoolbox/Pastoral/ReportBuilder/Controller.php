@@ -265,10 +265,11 @@ class Controller extends Base
         $fakeRecord                         = [];
         $fakeRecord['id']                   = "fakeId";
         $fakeRecord['accessWithPermission'] = $this->reportAccessMapper->findByColumn('pastoral_report_id', $report->getId());
-        $roles                              = $this->roleMapper->findByColumnList([
-                                                                                      'group_type'      => 'staff',
-                                                                                      'access_pastoral' => true,
-                                                                                  ]
+        $roles = $this->roleMapper->findByColumnList(
+            [
+                'group_type' => 'staff',
+                'access_pastoral' => true,
+            ]
         );
 
         // And render this thing out
