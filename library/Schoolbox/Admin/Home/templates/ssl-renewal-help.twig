@@ -19,11 +19,11 @@
     const LETS_ENCRYPT_USER_AGENT_STRING = 'Mozilla/5.0 (compatible; Let\'s Encrypt validation server; +https://letsencrypt.org)';
     const CHROME_USER_AGENT_STRING = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36';
 
-    const PORT_80_BLOCKED        = '{{ PORT_80_BLOCKED }}';
-    const HTTPS_UPGRADE          = '{{ HTTPS_UPGRADE }}';
-    const UPSTREAM_ERROR         = '{{ UPSTREAM_ERROR }}';
-    const USER_AGENT_BLOCKING    = '{{ USER_AGENT_BLOCKING }}';
-    const GEOBLOCKING            = '{{ GEOBLOCKING }}';
+    const PORT_80_BLOCKED     = '{{ PORT_80_BLOCKED }}';
+    const HTTPS_UPGRADE       = '{{ HTTPS_UPGRADE }}';
+    const UPSTREAM_ERROR      = '{{ UPSTREAM_ERROR }}';
+    const USER_AGENT_BLOCKING = '{{ USER_AGENT_BLOCKING }}';
+    const GEOBLOCKING         = '{{ GEOBLOCKING }}';
 
     const API_ENDPOINT = '/urlCheck/v2';
     const CURRENT_HOSTNAME = location.hostname;
@@ -32,7 +32,7 @@
     //General function for building a string of the keys and values in an object
     function buildHeadersString(headersObj) {
         let headersString = '';
-        for (const [key,value] of Object.entries(headersObj)) {
+        for (const [key, value] of Object.entries(headersObj)) {
             headersString += key + ': ' + value + "\n";
         }
         return headersString
@@ -59,7 +59,7 @@
     }
 
     //Shows the user what response the API is getting
-    function updateResponseDetails(statusCode, headersString, body, createLinkOnStatusCode=false) {
+    function updateResponseDetails(statusCode, headersString, body, createLinkOnStatusCode = false) {
         let statusCodeHTMLString;
         if (createLinkOnStatusCode) {
             const statusCodeATag = document.createElement("a");
@@ -147,7 +147,7 @@
             success: function (chromeResult, chromeStatus, chromeXhr) {
                 // wait for baseCheck to complete
                 $.when(baseCheck).then(
-                    function(baseResult, baseStatus, baseXhr) {
+                    function (baseResult, baseStatus, baseXhr) {
                         //if neither url check timed out
                         if (chromeXhr.responseJSON.message === "Response received" && baseXhr.responseJSON.message === "Response received") {
                             //if both checks pass
@@ -157,8 +157,7 @@
                             //if chrome user agent check passes but let's encrypt user agent check fails
                             else if (chromeXhr.responseJSON.response.status !== 200 && chromeXhr.responseJSON.response.status === 200) {
                                 updateStatusBar(USER_AGENT_BLOCKING, "Fail", "alert");
-                            }
-                            else {
+                            } else {
                                 updateStatusBar(USER_AGENT_BLOCKING, "Indeterminate", "warning");
                             }
                         }
@@ -167,7 +166,7 @@
                             updateStatusBar(USER_AGENT_BLOCKING, "Indeterminate", "warning");
                         }
                     },
-                    function(baseXhr, baseStatus, baseError) {
+                    function (baseXhr, baseStatus, baseError) {
                         updateStatusBar(USER_AGENT_BLOCKING, "Indeterminate", "warning");
                     }
                 )
@@ -198,18 +197,30 @@
             <section class="content">
                 <article>
                     <p>
-                        This page is intended to assist IT systems administrators who manage their school's firewall and on-premises Schoolbox server in troubleshooting their firewall and network configuration to allow automatic SSL renewal.
+                        This page is intended to assist IT systems administrators who manage their school's firewall and
+                        on-premises Schoolbox server in troubleshooting their firewall and network configuration to
+                        allow automatic SSL renewal.
                     </p>
                     <h3>Schoolbox's SSL certificate policy</h3>
                     <p>
-                        Schoolbox uses Let's Encrypt as a certificate provider and uses Certbot to manage these certificates. Our Certbot scripts are configured to provision certs with 3 months of validity. Certbot will automatically attempt to renew SSL certificates when the current certs have less than 30 days of validity.
+                        Schoolbox uses Let's Encrypt as a certificate provider and uses Certbot to manage these
+                        certificates. Our Certbot scripts are configured to provision certs with 3 months of validity.
+                        Certbot will automatically attempt to renew SSL certificates when the current certs have less
+                        than 30 days of validity.
                     </p>
                     <p>
-                        There are times when this automatic certificate renewal process fails. Most of the time, all is needed is a small change in the firewall configuration to allow this traffic through to the Schoolbox server. This page is intended to assist in diagnosing the cause and finding the change that needs to be made.
+                        There are times when this automatic certificate renewal process fails. Most of the time, all is
+                        needed is a small change in the firewall configuration to allow this traffic through to the
+                        Schoolbox server. This page is intended to assist in diagnosing the cause and finding the change
+                        that needs to be made.
                     </p>
                     <div class="alert-box highlight no-margin">
                         <p>
-                            While this page attempts to aid self-diagnosis of SSL renewal issues using the tests above, the accuracy of the results cannot be guaranteed. The information on this page is provided to aid troubleshooting and should not be taken as 100% fact. Schoolbox takes no responsibility for the changes made to your firewall as a result of the information provided by this page.
+                            While this page attempts to aid self-diagnosis of SSL renewal issues using the tests above,
+                            the accuracy of the results cannot be guaranteed. The information on this page is provided
+                            to aid troubleshooting and should not be taken as 100% fact. Schoolbox takes no
+                            responsibility for the changes made to your firewall as a result of the information provided
+                            by this page.
                         </p>
                     </div>
                 </article>
@@ -226,21 +237,30 @@
                                 <h3 class="no-margin">Port 80 timeout</h3>
                             </div>
                             <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="{{ PORT_80_BLOCKED }}"><span class="loader"></span></span>
+                                <span class="full-width no-margin neutral label"
+                                      data-light="{{ PORT_80_BLOCKED }}"><span class="loader"></span></span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="{{ PORT_80_BLOCKED }}" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed"
+                             data-collapsable="{{ PORT_80_BLOCKED }}" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
-                                <p>Let's Encrypt sends domain verification requests via HTTP on port 80. If port 80 traffic is restricted, that could be causing SSL certificate renewal requests to fail.</p>
+                                <p>Let's Encrypt sends domain verification requests via HTTP on port 80. If port 80
+                                    traffic is restricted, that could be causing SSL certificate renewal requests to
+                                    fail.</p>
                                 <h5>Common causes</h5>
                                 <ol>
                                     <li>A firewall may be restricting traffic on port 80</li>
                                     <li>A firewall may be restricting HTTP requests</li>
-                                    <li>A firewall if restricting traffic from the US/EU (see <a href="#{{ GEOBLOCKING }}">Geoblocking</a>)</li>
+                                    <li>A firewall if restricting traffic from the US/EU (see <a
+                                                href="#{{ GEOBLOCKING }}">Geoblocking</a>)
+                                    </li>
                                 </ol>
                                 <h5>Resolution steps</h5>
-                                <p>Review the firewall configuration and ensure that HTTP traffic on port 80 is able to reach the Schoolbox server directly. For more information, visit <a href="https://help.schoolbox.com.au/homepage/483#component6918">Schoolbox Help - System Requirements - Security, Firewall and Ports</a>.</p>
+                                <p>Review the firewall configuration and ensure that HTTP traffic on port 80 is able to
+                                    reach the Schoolbox server directly. For more information, visit <a
+                                            href="https://help.schoolbox.com.au/homepage/483#component6918">Schoolbox
+                                        Help - System Requirements - Security, Firewall and Ports</a>.</p>
                             </article>
                         </div>
                     </li>
@@ -251,24 +271,35 @@
                                 <h3 class="no-margin">HTTP > HTTPS upgrade</h3>
                             </div>
                             <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="{{ HTTPS_UPGRADE }}"><span class="loader"></span></span>
+                                <span class="full-width no-margin neutral label" data-light="{{ HTTPS_UPGRADE }}"><span
+                                            class="loader"></span></span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="{{ HTTPS_UPGRADE }}" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed"
+                             data-collapsable="{{ HTTPS_UPGRADE }}" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
-                                <p>Let's Encrypt domain verification requests are made with HTTP. If these requests are escalated to HTTPS, Schoolbox will redirect this unauthenticated traffic to the Schoolbox login page and the SSL certificate renewal process will fail.</p>
+                                <p>Let's Encrypt domain verification requests are made with HTTP. If these requests are
+                                    escalated to HTTPS, Schoolbox will redirect this unauthenticated traffic to the
+                                    Schoolbox login page and the SSL certificate renewal process will fail.</p>
                                 <h5>Common cause</h5>
                                 <ul>
-                                    <li>A service upstream of the Schoolbox server may be intercepting Let's Encrypt's requests and escalating it from HTTP to HTTPS</li>
+                                    <li>A service upstream of the Schoolbox server may be intercepting Let's Encrypt's
+                                        requests and escalating it from HTTP to HTTPS
+                                    </li>
                                 </ul>
                                 <h5>Resolution steps</h5>
-                                <p>Review the firewall configuration and ensure that HTTP traffic on port 80 is able to reach the Schoolbox server directly. For more information, visit <a href="https://help.schoolbox.com.au/homepage/483#component6918">Schoolbox Help - System Requirements - Security, Firewall and Ports</a>.</p>
+                                <p>Review the firewall configuration and ensure that HTTP traffic on port 80 is able to
+                                    reach the Schoolbox server directly. For more information, visit <a
+                                            href="https://help.schoolbox.com.au/homepage/483#component6918">Schoolbox
+                                        Help - System Requirements - Security, Firewall and Ports</a>.</p>
                                 <div id="https_upgrade_server_div" class="alert-box highlight no-margin hide">
                                     <p>
-                                        Our test has identified that the service causing the HTTP to HTTPS escalation identifies itself as
+                                        Our test has identified that the service causing the HTTP to HTTPS escalation
+                                        identifies itself as
                                         <code id="https_upgrade_server_span" class=""></code>.
-                                        Please review the configuration of this service and remove the rules that are redirecting HTTP requests to HTTPS.
+                                        Please review the configuration of this service and remove the rules that are
+                                        redirecting HTTP requests to HTTPS.
                                     </p>
                                 </div>
                             </article>
@@ -281,21 +312,32 @@
                                 <h3 class="no-margin">Upstream error</h3>
                             </div>
                             <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="{{ UPSTREAM_ERROR }}"><span class="loader"></span></span>
+                                <span class="full-width no-margin neutral label" data-light="{{ UPSTREAM_ERROR }}"><span
+                                            class="loader"></span></span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="{{ UPSTREAM_ERROR }}" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed"
+                             data-collapsable="{{ UPSTREAM_ERROR }}" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
-                                <p>'Upstream error' is an umbrella term for any number of issues that could be restricting the Let's Encrypt requests trying to reach the Schoolbox server.</p>
+                                <p>'Upstream error' is an umbrella term for any number of issues that could be
+                                    restricting the Let's Encrypt requests trying to reach the Schoolbox server.</p>
                                 <h5>Common causes</h5>
                                 <ol>
-                                    <li>A firewall/service may be severing the connection that Let's Encrypt is trying to establish</li>
-                                    <li>A firewall/service may be filtering Let's Encrypt requests based on some kind of 'smart filtering' feature</li>
-                                    <li>A firewall/service placed in front may be filtering Let's Encrypt requests based on their use of the <code>acme-challenge</code> application protocol</li>
+                                    <li>A firewall/service may be severing the connection that Let's Encrypt is trying
+                                        to establish
+                                    </li>
+                                    <li>A firewall/service may be filtering Let's Encrypt requests based on some kind of
+                                        'smart filtering' feature
+                                    </li>
+                                    <li>A firewall/service placed in front may be filtering Let's Encrypt requests based
+                                        on their use of the <code>acme-challenge</code> application protocol
+                                    </li>
                                 </ol>
                                 <h5>Resolution steps</h5>
-                                <p>Check the configuration of any security infrastructure placed in front of Schoolbox and ensure that Let's Encrypt traffic is able to reach the Schoolbox server directly.</p>
+                                <p>Check the configuration of any security infrastructure placed in front of Schoolbox
+                                    and ensure that Let's Encrypt traffic is able to reach the Schoolbox server
+                                    directly.</p>
                             </article>
                         </div>
                     </li>
@@ -306,19 +348,26 @@
                                 <h3 class="no-margin">User agent blocking</h3>
                             </div>
                             <div class="column-right content">
-                                <span class="full-width no-margin neutral label" data-light="{{ USER_AGENT_BLOCKING }}"><span class="loader"></span></span>
+                                <span class="full-width no-margin neutral label" data-light="{{ USER_AGENT_BLOCKING }}"><span
+                                            class="loader"></span></span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="{{ USER_AGENT_BLOCKING }}" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed"
+                             data-collapsable="{{ USER_AGENT_BLOCKING }}" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
-                                <p>Let's Encrypt domain verification requests use the user-agent header <code>Mozilla/5.0 (compatible; Let's Encrypt validation server; +https://letsencrypt.org)</code>. Some firewalls may block this user-agent when they do not recognise it.</p>
+                                <p>Let's Encrypt domain verification requests use the user-agent header <code>Mozilla/5.0
+                                        (compatible; Let's Encrypt validation server; +https://letsencrypt.org)</code>.
+                                    Some firewalls may block this user-agent when they do not recognise it.</p>
                                 <h5>Common causes</h5>
                                 <ul>
-                                    <li>A firewall/service placed in front of the Schoolbox server may be blocking requests with the Let's Encrypt user agent.</li>
+                                    <li>A firewall/service placed in front of the Schoolbox server may be blocking
+                                        requests with the Let's Encrypt user agent.
+                                    </li>
                                 </ul>
                                 <h5>Resolution steps</h5>
-                                <p>Whitelist traffic matching the Let's Encrypt domain verification requests (see <a href="#request-details">Let's Encrypt request details</a>).</p>
+                                <p>Whitelist traffic matching the Let's Encrypt domain verification requests (see <a
+                                            href="#request-details">Let's Encrypt request details</a>).</p>
                             </article>
                         </div>
                     </li>
@@ -332,17 +381,24 @@
                                 <span class="full-width no-margin neutral label" data-light="{{ GEOBLOCKING }}">No test available</span>
                             </div>
                         </div>
-                        <div class="content small-12 column" data-collapse-state="collapsed" data-collapsable="{{ GEOBLOCKING }}" style="display: none;">
+                        <div class="content small-12 column" data-collapse-state="collapsed"
+                             data-collapsable="{{ GEOBLOCKING }}" style="display: none;">
                             <article>
                                 <h5>Problem</h5>
-                                <p>Let's Encrypt domain verification requests can come from a range of IP addresses around world including the US, EU, etc. Blocking web requests from specific regions can cause Let's Encrypt domain verification to fail.</p>
+                                <p>Let's Encrypt domain verification requests can come from a range of IP addresses
+                                    around world including the US, EU, etc. Blocking web requests from specific regions
+                                    can cause Let's Encrypt domain verification to fail.</p>
                                 <h5>Common causes</h5>
                                 <ul>
-                                    <li>A firewall/service placed in front of Schoolbox may be blocking web requests from certain regions based on IP ranges (aka 'geoblocking')</li>
+                                    <li>A firewall/service placed in front of Schoolbox may be blocking web requests
+                                        from certain regions based on IP ranges (aka 'geoblocking')
+                                    </li>
                                 </ul>
                                 <h5>Resolution steps</h5>
                                 <ul>
-                                    <li>Review the firewall configuration and remove any rules that are geoblocking HTTP requests on port 80.</li>
+                                    <li>Review the firewall configuration and remove any rules that are geoblocking HTTP
+                                        requests on port 80.
+                                    </li>
                                 </ul>
                             </article>
                         </div>
