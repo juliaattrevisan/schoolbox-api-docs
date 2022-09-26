@@ -62,10 +62,14 @@ Usage: include 'sub/semesterSelector.twig
                     {% endif %}
                 {% endif %}
             {% endif %}
-            <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code and not selected%}selected{% endif %}>
+            <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code})) }}" value="{{ term.code }}" {% if currentTerm.code == term.code and not selected %}{% set selected = true %}selected{% endif %}>
                 {#- dessicate -#}{{ term.title }} ({{ term.start.dateOnly }} - {{ term.displayFinish.dateOnly }}){#- dessicate -#}
             </option>
         {% endfor %}
+        {% if not selected %}
+            {# This is to cover the case where there are no terms in the schoolbox.terms database table matching the requested year. #}
+            <option selected>{{ year }} Grades Summary</option>
+        {% endif %}
     </select>
 </div>
 <nav>

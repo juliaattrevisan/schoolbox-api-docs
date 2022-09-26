@@ -174,7 +174,9 @@ class Controller extends Base
      * @return void
      * @throws MapperException
      */
-    private function getCustomGrades(User $viewee, Term\Model $term, ?Alaress_Date_Format $from = null, ?Alaress_Date_Format $to = null): void
+    private function getCustomGrades(
+        User $viewee, Term\Model $term, ?Alaress_Date_Format $from = null, ?Alaress_Date_Format $to = null, $termIsWholeYear = false
+    ): void
     {
         $from = $from ?: $term->getStart();
         $to = $to ?: $term->getActualFinish();
@@ -207,7 +209,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
-            'year'             => null,
+            'year'             => (($termIsWholeYear)? $from->getYear(): null),
             'terms'            => $terms,
             'folders'          => $folders,
             'assessmentTasks'  => $assessmentTasks,
@@ -321,13 +323,14 @@ class Controller extends Base
         $to = (new Alaress_Date_Format())->setYear($year)->endOfYear();
         // find a term from the from date to get actual term code
         $term = $this->termMapper->findForDate($from);
+
         // fake its period to match the year
         $term->setTitle($year)
             ->setStart($from)
             ->setDisplayFinish($to)
             ->setActualFinish($to);
 
-        $this->getCustomGrades($viewee, $term, $from, $to);
+        $this->getCustomGrades($viewee, $term, $from, $to, true);
     }
 
     /**
