@@ -1,10 +1,11 @@
 <script setup>
 
 /**
- * A selected Curriculum code, it can be deleted and 
+ * A selected Curriculum code, it can be deleted and
  * further details revealed via a modal
  */
 
+import { computed } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 
@@ -31,6 +32,13 @@ const store = useStore();
 const selectedCodesStore = useSelectedCodesStore();
 
 /**
+ * Prevent rapid fire while loading the the selected node
+ *
+ * @returns { boolean }
+ */
+const isDisabled = computed(() => selectedCodesStore.isLoading);
+
+/**
  * To open a modal that shows further info on the selected code
  */
 function onTitleSelected () {
@@ -48,20 +56,21 @@ function onRemoveSelected () {
 
 <template>
    <div class="selected-code">
-        <button 
-            class="title-button" 
+        <button
+            class="title-button"
             :title="`View ${props.code.name}`"
-            @click.prevent="onTitleSelected" 
+            :disabled="isDisabled"
+            @click.prevent="onTitleSelected"
             @keyup.enter="onTitleSelected"
             data-test-title-button>
             {{ props.code.code }}
         </button>
-        <button 
-            v-if="!store.isReadOnly" 
-            class="remove-button icon-close" 
-            :title="`Remove ${props.code.name}`" 
-            @click.prevent="onRemoveSelected" 
-            @keyup.enter="onRemoveSelected" 
+        <button
+            v-if="!store.isReadOnly"
+            class="remove-button icon-close"
+            :title="`Remove ${props.code.name}`"
+            @click.prevent="onRemoveSelected"
+            @keyup.enter="onRemoveSelected"
             data-test-remove-button>
         </button>
     </div>

@@ -27,7 +27,14 @@ const props = defineProps({
     },
 });
 
-const selectedCodesStore = useSelectedNodesStore();
+const selectedNodesStore = useSelectedNodesStore();
+
+/**
+ * Prevent rapid fire while loading the the selected node
+ *
+ * @returns { boolean }
+ */
+const isDisabled = computed(() => selectedNodesStore.isLoading);
 
 /**
  * Add in the code if it's available otherwise just show the title
@@ -46,14 +53,14 @@ const title = computed(() => {
  * To open a modal that shows further info on the selected code
  */
 function onTitleSelected () {
-    selectedCodesStore.setActiveNode(props.node);
+    selectedNodesStore.setActiveNode(props.node);
 }
 
 /**
  * To remove from the selected list
  */
 function onRemoveSelected () {
-    selectedCodesStore.remove(props.node);
+    selectedNodesStore.remove(props.node);
 }
 
 </script>
@@ -66,6 +73,7 @@ function onRemoveSelected () {
         <button
             class="title-button"
             :title="`View ${props.node.name}`"
+            :disabled="isDisabled"
             @click.prevent="onTitleSelected"
             @keyup.enter="onTitleSelected"
             data-test-title-button>
