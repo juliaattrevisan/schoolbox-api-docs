@@ -15,7 +15,7 @@ export const useNodesStore = defineStore('mcNodes', {
 
     state: () => ({
         nodes: {}, //all the nodes currently loaded
-        isLoading: true, //to display loading note
+        isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place
     }),
@@ -127,6 +127,7 @@ export const useNodesStore = defineStore('mcNodes', {
                 return;
             }
             try {
+                this.isLoading = true;
                 const response = await fetch(`${apiEndpoint}/${id}?descendants=2`, {
                     headers: {
                         'Content-Type': 'application/json',

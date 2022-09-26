@@ -7,6 +7,7 @@
 
 import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
+import { useNodesStore } from '../store/mcNodesStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 
 
@@ -48,7 +49,23 @@ const props = defineProps({
     },
 });
 
+const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
+
+/**
+ * To disable selection on certain sitatuions
+ *
+ * @returns { Boolean }
+ */
+const isDisabled = computed(() => {
+    if (props.isUpdatingOrAdding) { //while the node is being updated
+        return true;
+    } else if (nodesStore.isLoading) { //or while a load is in progress
+        return true;
+    } else {
+        return false;
+    }
+});
 
 /**
  * To distinguish the parent node
@@ -146,7 +163,7 @@ function highlightSearchInElement (toHighlight) {
         v-if="isButton"
         class="button-name"
         :title="`Expand ${props.title}`"
-        :disabled="props.isUpdatingOrAdding"
+        :disabled="isDisabled"
         @click.prevent="onNameSelected"
         @keyup.enter="onNameSelected"
     >

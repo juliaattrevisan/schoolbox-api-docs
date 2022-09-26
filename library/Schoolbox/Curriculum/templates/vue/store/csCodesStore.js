@@ -13,7 +13,7 @@ export const useCodesStore = defineStore(`csCodes`, {
 
     state: () => ({
         codes: [], //all the codes currenty loaded
-        isLoading: true, //to display loading note
+        isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place
     }),
@@ -120,6 +120,7 @@ export const useCodesStore = defineStore(`csCodes`, {
                 return;
             }
             try {
+                this.isLoading = true;
                 const response = await fetch(`${apiEndpoint}/${id}?descendants=2`);
                 if (response.ok) {
                     const newNode = await response.json();

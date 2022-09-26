@@ -7,6 +7,7 @@
 
 import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
+import { useCodesStore } from '../store/csCodesStore';
 import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
 import { useModalSearchStore } from '../store/csModalSearchStore';
 
@@ -42,9 +43,22 @@ const props = defineProps({
     },
 });
 
+const codesStore = useCodesStore();
 const modalActiveCodesStore = useModalActiveCodesStore();
 const modalSearchStore = useModalSearchStore();
 
+/**
+ * To disable selection on certain sitatuions
+ *
+ * @returns { Boolean }
+ */
+const isDisabled = computed(() => {
+    if (codesStore.isLoading) { //while a load is in progress
+        return true;
+    } else {
+        return false;
+    }
+});
 
 /**
  * To distinguish the parent node
@@ -129,6 +143,7 @@ function highlightSearchInElement (toHighlight) {
         v-if="isButton"
         class="button-name"
         :title="`View ${props.title}`"
+        :disabled="isDisabled"
         @click.prevent="onNameSelected"
         @keyup.enter="onNameSelected"
     >
