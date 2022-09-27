@@ -18,7 +18,7 @@ data:
     const USER_AGENT_STRING_CHROME       = '{{ USER_AGENT_STRING_CHROME }}';
     const EXPECTED_RESPONSE_BODY         = "port 80 accessible from your location\n"
     const EXPECTED_SERVER_HEADER         = "nginx"
-    const API_ENDPOINT                   = '/urlCheck/v2';
+    const API_ENDPOINT                   = '/urlCheck/v2';            // Set to "/v2" if testing against local SAM api
     const CURRENT_HOSTNAME               = location.hostname;
     const URL_TO_CHECK                   = 'http://' + CURRENT_HOSTNAME + '/.well-known/acme-challenge/ping';
 
@@ -59,7 +59,7 @@ data:
      * @param {string} html   Text to display
      * @param {string} colour A CSS class
      */
-    function updateDiagnosticsAlertBox(html, colour){
+    function updateDiagnosticsAlertBox(html, colour) {
         let elem = document.getElementById("diagnostics")
         elem.innerHTML = html;
         elem.classList.add(colour)
@@ -72,8 +72,8 @@ data:
      *
      * @param {string} innerHtml
      */
-    function displayCommonCauses(innerHtml){
-        if(innerHtml !== ""){
+    function displayCommonCauses(innerHtml) {
+        if (innerHtml !== "") {
             document.getElementById("common-causes-wrap").classList.remove("hide")
             document.getElementById("common-causes").innerHTML = innerHtml
         }
@@ -84,7 +84,7 @@ data:
      *
      * @param {string} innerHtml
      */
-    function displayResolutionText(innerHtml){
+    function displayResolutionText(innerHtml) {
         document.getElementById("resolution-wrap").classList.remove("hide")
         document.getElementById("resolution").innerHTML = innerHtml
     }
@@ -95,11 +95,11 @@ data:
      * @param {string} userAgent
      * @param {object} response
      */
-    function displayResponseDetails(userAgent, response){
-        let status  = Object.hasOwn(response, "status") ? response.status : "";
+    function displayResponseDetails(userAgent, response) {
+        let status  = Object.hasOwn(response, "status") ? response.status : null;
         let headers = Object.hasOwn(response, "headers") ? response.headers : {};
         let body    = Object.hasOwn(response, "body") ? response.body : "";
-        switch(userAgent){
+        switch (userAgent) {
             case USER_AGENT_STRING_LETS_ENCRYPT:
                 displayLetsEncryptResponseDetails(status, headers, body)
                 return;
@@ -124,28 +124,29 @@ data:
     /**
      * Displays the details of the response received by Lambda API when userAgent is LE
      *
-     * @param {int} statusCode
+     * @param {int|null} statusCode
      * @param {object} headers
      * @param {string} body
      */
     function displayLetsEncryptResponseDetails(statusCode, headers, body) {
+        let headersString = buildHeadersString(headers);
         document.getElementById("request-response-letsencrypt").classList.remove("hide")
-        document.getElementById("response-status-letsencrypt").innerHTML = statusCode.toString();
-        document.getElementById("response-headers-letsencrypt").innerText = buildHeadersString(headers);
-        document.getElementById("response-body-letsencrypt").innerText = body;
+        document.getElementById("response-status-letsencrypt").innerHTML = statusCode !== null ? statusCode.toString() : "(nothing to show)";
+        document.getElementById("response-headers-letsencrypt").innerText = headersString ? headersString : "(nothing to show)";
+        document.getElementById("response-body-letsencrypt").innerText = body ? body : "(nothing to show)";
     }
 
     /**
      * Displays the details of the response received by Lambda API when userAgent is Chrome
      *
-     * @param {int} statusCode
+     * @param {int|null} statusCode
      * @param {object} headers
      * @param {string} body
      */
     function displayChromeResponseDetails(statusCode, headers, body) {
-        document.getElementById("request-response-chrome").classList.remove("hide")
         let headersString = buildHeadersString(headers);
-        document.getElementById("response-status-chrome").innerHTML = statusCode ? statusCode : "(nothing to show)";
+        document.getElementById("request-response-chrome").classList.remove("hide")
+        document.getElementById("response-status-chrome").innerHTML = statusCode !== null ? statusCode.toString() : "(nothing to show)";
         document.getElementById("response-headers-chrome").innerText = headersString ? headersString : "(nothing to show)";
         document.getElementById("response-body-chrome").innerText = body ? body : "(nothing to show)";
     }
@@ -154,7 +155,6 @@ data:
         // Set the Request URI. Need to execute this via JS to read domain being presented to client.
         document.getElementById("request-uri-letsencrypt").innerText = URL_TO_CHECK;
         document.getElementById("request-uri-chrome").innerText = URL_TO_CHECK;
-
 
         // Call LambdaAPI w/ UserAgent=LetsEncrypt
         // Cases:
@@ -174,12 +174,11 @@ data:
         // 14. !in(200,400,500)                                                                                               > FAIL - NOT API
         $.ajax({
             url: "{{ api_url }}" + API_ENDPOINT + "?url=" + encodeURIComponent(URL_TO_CHECK),
-
-            complete: function(xhr){
+            complete: function (xhr) {
                 // Unable to communicate w/ Lambda API
                 // * Lambda API offline
                 // * Network issues between browser + Lambda API
-                if(xhr.readyState !== 4){
+                if (xhr.readyState !== 4) {
                     updateDiagnosticsAlertBox("Diagnostic API offline", "alert")
                     displayResolutionText("<p>Check your internet connection. If issue persists, please report issue to Schoolbox Support</p>");
                     return;
@@ -188,7 +187,7 @@ data:
                 // Unrecognised Lambda API response?
                 // * request intercepted (e.g. by outbound firewall) and not coming from our Lambda API
                 // * invalid Lambda API response structure
-                if(!Object.hasOwn(xhr, "responseJSON") || !Object.hasOwn(xhr.responseJSON, "message")){
+                if (!Object.hasOwn(xhr, "responseJSON") || !Object.hasOwn(xhr.responseJSON, "message")) {
                     updateDiagnosticsAlertBox("Unrecognised Diagnostic API response", "alert")
                     displayResolutionText("<p>Check your internet connection. If issue persists, please report issue to Schoolbox Support</p>");
                     return;
@@ -197,15 +196,15 @@ data:
                 let message = xhr.responseJSON.message;
 
                 // Handle Lambda API response
-                switch(xhr.status){
+                switch (xhr.status) {
                     case 200:
                         // Lambda API was able to issue a request to Schoolbox.
-                        if(message === "Cannot resolve DNS"){
+                        if (message === "Cannot resolve DNS") {
                             // Lambda API unable to resolve 'url' DNS?
                             updateDiagnosticsAlertBox("Unable to resolve DNS for <strong>" + CURRENT_HOSTNAME + "</strong>", "alert")
                             displayCommonCauses("<p>No public DNS records configured for " + CURRENT_HOSTNAME + "</p>")
                             displayResolutionText("<p>Check public DNS records exist for <strong>" + CURRENT_HOSTNAME + "</strong></p>");
-                        } else if(["Connection refused", "Request timeout occurred"].indexOf(message) !== -1){
+                        } else if (["Connection refused", "Request timeout occurred"].indexOf(message) !== -1) {
                             // Was Lambda unable to connect to port 80 (either rejected or timeout)?
                             let diagnostic = message === "Connection refused"
                                     ? "Connection refused when"
@@ -218,25 +217,28 @@ data:
                                     "<li>A firewall may be restricting traffic from the US/EU (Geoblocking)</li>" +
                                     "<li>The ISP may be blocking inbound port 80 traffic</li>" +
                                     "</li>";
+                            displayResponseDetails(USER_AGENT_STRING_LETS_ENCRYPT, {})
                             testChromeUserAgent(xhr, diagnostic, commonCauses, "<p>Check that port 80 traffic is being routed to Schoolbox server.</p>");
-                        } else if(message === "Response received"){
+                        } else if (message === "Response received") {
                             // Did Lambda API get a response from requested 'url' on port 80?
                             let response = xhr.responseJSON.response;
+                            displayResponseDetails(USER_AGENT_STRING_LETS_ENCRYPT, response)
+
                             // Was the response from Schoolbox nginx?
-                            if(response.status === 200 && response.body === EXPECTED_RESPONSE_BODY){
+                            if (response.status === 200 && response.body === EXPECTED_RESPONSE_BODY) {
                                 updateDiagnosticsAlertBox("SSL Renewal simulation successful. ", "success")
                             } else {
                                 // Generate diff b/w expected + actual
                                 let diff = {}
-                                if (response.status !== 200){
+                                if (response.status !== 200) {
                                     diff["status"] = [200, response.status]
                                 }
-                                if (!Object.hasOwn(response.headers, "server")){
+                                if (!Object.hasOwn(response.headers, "server")) {
                                     diff["server"] = [EXPECTED_SERVER_HEADER, ""]
-                                } else if(response.headers.server !== EXPECTED_SERVER_HEADER) {
+                                } else if (response.headers.server !== EXPECTED_SERVER_HEADER) {
                                     diff["server"] = [EXPECTED_SERVER_HEADER, response.headers.server]
                                 }
-                                if(response.body !== EXPECTED_RESPONSE_BODY){
+                                if (response.body !== EXPECTED_RESPONSE_BODY) {
                                     diff["body"] = [EXPECTED_RESPONSE_BODY, escapeHtml(response.body)]
                                 }
                                 if ('location' in response.headers) {
@@ -246,7 +248,7 @@ data:
                                         "<tr><th></th><th>Expected</th><th>Actual</th></tr>";
                                 for (let key in diff) {
                                     let aDiff = diff[key]
-                                    html += "<tr><th>"+key+"</th><td>" + aDiff[0] + "</td><td>"+aDiff[1]+"</td></tr>"
+                                    html += "<tr><th>" + key + "</th><td>" + aDiff[0] + "</td><td>" + aDiff[1] + "</td></tr>"
                                 }
                                 html += "</table>";
 
@@ -257,7 +259,7 @@ data:
                                 if ('location' in response.headers && response.headers['location'].startsWith("https")) {
                                     commonCauses = "An upstream firewall/service performing HTTP to HTTPS redirection"
                                     if ('server' in response.headers) {
-                                        resolutionText = "Test results indicate the service generating the redirect identifies itself as <code>"+response.headers.server+"</code>. " +
+                                        resolutionText = "Test results indicate the service generating the redirect identifies itself as <code>" + response.headers.server + "</code>. " +
                                                 "Please review the configuration of this service and remove any HTTP to HTTPS redirection."
                                     } else {
                                         resolutionText = "Check no upstream network components are performing HTTP to HTTPS redirection."
@@ -265,13 +267,12 @@ data:
                                 } else {
                                     resolutionText = "Check that port 80 traffic is being routed to Schoolbox server";
                                 }
-                                testChromeUserAgent(xhr, "Unexpected response to domain verification request<br><br>" + html, commonCauses, "<p>"+resolutionText+"</p>");
+                                testChromeUserAgent(xhr, "Unexpected response to domain verification request<br><br>" + html, commonCauses, "<p>" + resolutionText + "</p>");
                             }
-                            displayResponseDetails(USER_AGENT_STRING_LETS_ENCRYPT, xhr.responseJSON.response)
                         } else {
                             // Lambda API has returned a 200, but this code doesn't know how to handle it.
                             // Probably a bug that needs fixing here.
-                            updateDiagnosticsAlertBox("Unrecognised Diagnostic API response: " + xhr.responseJSON.message, "alert")
+                            updateDiagnosticsAlertBox("Unrecognised Diagnostic API response: " + message, "alert")
                             displayResolutionText("<p>If issue persists, please report issue to Schoolbox Support</p>");
                         }
                         return;
@@ -282,14 +283,14 @@ data:
                         displayResolutionText("<p>If issue persists, please report issue to Schoolbox Support</p>");
                         return;
 
-                    // Lambda API encountered an unexpected error
                     case 500:
+                        // Lambda API encountered an unexpected error
                         updateDiagnosticsAlertBox("Diagnostic API error.", "alert")
                         displayResolutionText("<p>If issue persists, please report issue to Schoolbox Support</p>");
                         return;
 
-                    // Lambda API returned an unexpected response
                     default:
+                        // Lambda API returned an unexpected response
                         updateDiagnosticsAlertBox("Diagnostic API error. Unrecognised status code: " + xhr.status, "alert")
                         displayResolutionText("<p>If issue persists, please report issue to Schoolbox Support</p>");
                         return;
@@ -309,18 +310,18 @@ data:
          * @param commonCausesHtml     Common Causes of the failure of the LE request
          * @param resolutionHtml       Suggested resolution
          */
-        function testChromeUserAgent(failedLetsEncryptXhr, diagnosticHtml, commonCausesHtml, resolutionHtml){
+        function testChromeUserAgent(failedLetsEncryptXhr, diagnosticHtml, commonCausesHtml, resolutionHtml) {
             $.ajax({
                 url: "{{ api_url }}" + API_ENDPOINT + "?url=" + encodeURIComponent(URL_TO_CHECK) + "&useragent=" + encodeURIComponent(USER_AGENT_STRING_CHROME),
-                complete: function (chromeXhr){
+                complete: function (chromeXhr) {
                     // Did the Chrome request succeeds where the LE request failed?
-                    if(
+                    if (
                             chromeXhr.status === 200 &&
                             Object.hasOwn(chromeXhr.responseJSON, "message") &&
                             chromeXhr.responseJSON.message === "Response received" &&
                             chromeXhr.responseJSON.response.body === EXPECTED_RESPONSE_BODY
                     ) {
-                        diagnosticHtml += "<p>An upstream network component appears to be blocking the LetsEncrypt user agent (<code>"+USER_AGENT_STRING_LETS_ENCRYPT+"</code>).</p>";
+                        diagnosticHtml += "<p>An upstream network component appears to be blocking the LetsEncrypt user agent (<code>" + USER_AGENT_STRING_LETS_ENCRYPT + "</code>).</p>";
                         updateDiagnosticsAlertBox(diagnosticHtml, "alert")
                         displayCommonCauses(
                                 "<ul>" +
@@ -329,7 +330,7 @@ data:
                                 "</ul>"
                         );
                         displayResolutionText(
-                                "<p>Test results indicate requests are being filtered depending on the value of UserAgent request header." +
+                                "<p>Test results indicate requests are being filtered depending on the value of UserAgent request header. " +
                                 "Check the configuration of any security infrastructure placed in front of Schoolbox and ensure that Let's Encrypt traffic is able to reach the Schoolbox server directly.</p>"
                         );
                         displayResponseDetails(USER_AGENT_STRING_CHROME, chromeXhr.responseJSON.response)
@@ -374,11 +375,13 @@ data:
                         to HTTPS.
                     </p>
                     <h3>Test logic</h3>
-                    <p>This page attempts to send a request from a cloud-based service to the Schoolbox server. The request is designed to simulate
-                       domain verification requests sent from LetsEncrypt servers during SSL certificate generation.</p>
+                    <p>This page attempts to send a request from a cloud-based service to the Schoolbox server. The
+                        request is designed to simulate domain verification requests sent from LetsEncrypt servers
+                        during SSL certificate generation.</p>
                     <div class="alert-box highlight no-margin">
                         <p>
-                            Failure to route port 80 traffic to the server will cause domain verification and SSL certificate generation to fail.
+                            Failure to route port 80 traffic to the server will cause domain verification and SSL
+                            certificate generation to fail.
                         </p>
                     </div>
                 </article>
@@ -388,7 +391,9 @@ data:
         <div class="small-12 island">
             <h3 class="subheader">Diagnostics</h3>
             <section class="content">
-                <div id="diagnostics" data-alart class="alert-box"><span class="loader"></span>Testing in progress, please wait...</div>
+                <div id="diagnostics" data-alart class="alert-box"><span class="loader"></span>Testing in progress,
+                    please wait...
+                </div>
             </section>
         </div>
 
@@ -411,9 +416,18 @@ data:
                 <div class="medium-12 large-6 island">
                     <h3 class="subheader">Request (User Agent: Let's Encrypt)</h3>
                     <table>
-                        <tr><th>Method:</th><td>GET</td></tr>
-                        <tr><th>URI:</th><td id="request-uri-letsencrypt">Loading...</td></tr>
-                        <tr><th>Headers:</th><td>user-agent: {{ USER_AGENT_STRING_LETS_ENCRYPT }}</td></tr>
+                        <tr>
+                            <th>Method:</th>
+                            <td>GET</td>
+                        </tr>
+                        <tr>
+                            <th>URI:</th>
+                            <td id="request-uri-letsencrypt">Loading...</td>
+                        </tr>
+                        <tr>
+                            <th>Headers:</th>
+                            <td>user-agent: {{ USER_AGENT_STRING_LETS_ENCRYPT }}</td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -421,9 +435,18 @@ data:
                 <div class="medium-12 large-6 island">
                     <h3 class="subheader">Response</h3>
                     <table>
-                        <tr><th>Status Code:</th><td id="response-status-letsencrypt"><span class="loader"></span>.</td></tr>
-                        <tr><th>Headers:</th><td id="response-headers-letsencrypt"><span class="loader"></span></td></tr>
-                        <tr><th>Body:</th><td id="response-body-letsencrypt"><span class="loader"></span></td></tr>
+                        <tr>
+                            <th>Status Code:</th>
+                            <td id="response-status-letsencrypt"><span class="loader"></span>.</td>
+                        </tr>
+                        <tr>
+                            <th>Headers:</th>
+                            <td id="response-headers-letsencrypt"><span class="loader"></span></td>
+                        </tr>
+                        <tr>
+                            <th>Body:</th>
+                            <td id="response-body-letsencrypt"><span class="loader"></span></td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -434,9 +457,18 @@ data:
                 <div class="medium-12 large-6 island">
                     <h3 class="subheader">Request (User Agent: Chrome)</h3>
                     <table>
-                        <tr><th>Method:</th><td>GET</td></tr>
-                        <tr><th>URI:</th><td id="request-uri-chrome">Loading...</td></tr>
-                        <tr><th>Headers:</th><td>user-agent: {{ USER_AGENT_STRING_CHROME }}</td></tr>
+                        <tr>
+                            <th>Method:</th>
+                            <td>GET</td>
+                        </tr>
+                        <tr>
+                            <th>URI:</th>
+                            <td id="request-uri-chrome">Loading...</td>
+                        </tr>
+                        <tr>
+                            <th>Headers:</th>
+                            <td>user-agent: {{ USER_AGENT_STRING_CHROME }}</td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -444,9 +476,18 @@ data:
                 <div class="medium-12 large-6 island">
                     <h3 class="subheader">Response</h3>
                     <table>
-                        <tr><th>Status Code:</th><td id="response-status-chrome"><span class="loader"></span>.</td></tr>
-                        <tr><th>Headers:</th><td id="response-headers-chrome"><span class="loader"></span></td></tr>
-                        <tr><th>Body:</th><td id="response-body-chrome"><span class="loader"></span></td></tr>
+                        <tr>
+                            <th>Status Code:</th>
+                            <td id="response-status-chrome"><span class="loader"></span>.</td>
+                        </tr>
+                        <tr>
+                            <th>Headers:</th>
+                            <td id="response-headers-chrome"><span class="loader"></span></td>
+                        </tr>
+                        <tr>
+                            <th>Body:</th>
+                            <td id="response-body-chrome"><span class="loader"></span></td>
+                        </tr>
                     </table>
                 </div>
             </div>
