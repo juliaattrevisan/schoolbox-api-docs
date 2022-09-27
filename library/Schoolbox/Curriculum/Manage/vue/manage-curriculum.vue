@@ -7,8 +7,6 @@
 
 import { ref, onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
-import { useViewNodesStore } from './viewNodes/store/mcViewNodesStore';
-import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
 import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';
 import McSelectedNodes from './selectedNodes/mc-selected-nodes.vue';
@@ -38,47 +36,13 @@ const props = defineProps({
 });
 
 const toastEl = ref(null);
-const store = useStore();
 
 /**
  * Start loading the curriculum data
  */
 onMounted(() => {
-    checkForNodeHash();
-    checkForStorybook();
-    store.isReadOnly = props.isReadOnly;
-    store.toastEl = toastEl;
-    if (props.dataEndpoint !== '') { //only load when we need to
-        store.load(props.dataEndpoint);
-    }
+    useStore().init(props, toastEl);
 });
-
-/**
- * a node id could be passed into the page via the hash,
- * if so we need to traverse to this node on load
- */
-function checkForNodeHash () {
-    const documentURL = document.URL;
-    const hashCount = (documentURL.match(/#/g) || []).length;
-    if (hashCount === 1) {
-        const hash = documentURL.substring(documentURL.indexOf('#')+1, documentURL.length);
-        store.hasHash = true;
-        store.hash = hash;
-        console.warn(hash);
-    }
-}
-
-/**
- * When switching between stories, we need to reset the data models
- * as they persist between the stories otherwise
- */
-function checkForStorybook () {
-    if (typeof STORYBOOK_ENV !== 'undefined') {
-        useStore().$reset();
-        useViewNodesStore().$reset();
-        useActiveNodeStore().$reset();
-    }
-}
 
 </script>
 
