@@ -42,7 +42,7 @@ export const useStore = defineStore('manageCurriculum', {
         load (endpoint) {
             apiEndpoint = endpoint;
             const nodesStore = useNodesStore();
-            nodesStore.initTopLevel();
+            nodesStore.loadTopLevel();
         },
 
     },
