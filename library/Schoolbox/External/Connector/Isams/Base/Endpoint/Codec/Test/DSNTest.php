@@ -34,12 +34,12 @@ class DSNTest extends TestCase
             /* Batch XML only
              */
             'Valid DSN 1' => [
-                [
-                    'batch:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
-                ],
+                'batch:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
                 [
                     'modules' => [
-                        'batch' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h'
+                        'batch' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
                     ]
                 ]
             ],
@@ -47,42 +47,50 @@ class DSNTest extends TestCase
             /* Batch XML and Staff Photos
              */
             'Valid DSN 2' =>[
-                [
-                    'batch:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777'
-                ],
+                'batch:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777',
                 [
                     'modules' => [
-                        'batch' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
-                        'staffphoto' => 'zka7ght5-pp91-k28dy-zm28g-e1janv9777'
+                        'batch' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
+                        'staffphoto' => [
+                            'key' => 'zka7ght5-pp91-k28dy-zm28g-e1janv9777',
+                        ],
                     ]
                 ]
             ],
 
             /* Batch XML and Student Photos
              */
-            'Valid DSN 3' =>[
-                [
-                    'batch:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
-                ],
+            'Valid DSN 3' => [
+                'batch:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a',
                 [
                     'modules' => [
-                        'batch' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
-                        'studentphoto' => 'aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
+                        'batch' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
+                        'studentphoto' => [
+                            'key' => 'aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
+                        ]
                     ]
                 ]
             ],
 
             /* Batch XML, Staff Photos, Student Photos
              */
-            'Valid DSN 4' =>[
-                [
-                    'batch:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
-                ],
+            'Valid DSN 4' => [
+                'batch:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a',
                 [
                     'modules' => [
-                        'batch' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
-                        'staffphoto' => 'zka7ght5-pp91-k28dy-zm28g-e1janv9777',
-                        'studentphoto' => 'aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
+                        'batch' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
+                        'staffphoto' => [
+                            'key' => 'zka7ght5-pp91-k28dy-zm28g-e1janv9777',
+                        ],
+                        'studentphoto' => [
+                            'key' => 'aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
+                        ]
                     ]
                 ]
             ],
@@ -98,7 +106,7 @@ class DSNTest extends TestCase
      * @param array  $expected
      * @throws DomainException
      */
-    public function testValidDSNDecode(string $dsn, $expected): void
+    public function testValidDSNDecode(string $dsn, array $expected): void
     {
         $codec = new DSN();
 
@@ -175,7 +183,7 @@ class DSNTest extends TestCase
      * @param array  $expected
      * @throws DomainException
      */
-    public function testInvalidDSNDecode(string $dsn, $expected): void
+    public function testInvalidDSNDecode(string $dsn, array $expected): void
     {
         $this->expectException(DomainException::class);
 
