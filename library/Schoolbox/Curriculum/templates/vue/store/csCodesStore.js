@@ -76,7 +76,7 @@ export const useCodesStore = defineStore(`csCodes`, {
          async loadTopLevel () {
             const store = useStore();
             try {
-                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1`);
+                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1&descendants=1`);
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     // sessionStorage.setItem(SB_CURRICULUM_TOP_LEVEL, JSON.stringify(topLevelNodes)); //session storage vars need to be saved as strings only

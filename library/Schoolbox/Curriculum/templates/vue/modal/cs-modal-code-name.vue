@@ -82,6 +82,8 @@ const isParentNode = computed(() => {
 const isButton = computed(() => {
     if (isParentNode.value) { //is the parent node, which we don't
         return false;
+    } else if (props.node.children === null) { //the children haven't been loaded
+        return false;
     } else if (props.code.children?.length === 0) { //there's no children to display, so no point going further
         return false;
     } else if (modalSearchStore.isActive) { //cant do any navigation while search is active
