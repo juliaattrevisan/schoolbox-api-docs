@@ -14,6 +14,6 @@ CREATE TABLE `pastoral_report_access` (
 );
 
 INSERT INTO `pastoral_report_access` (`pastoral_report_id`, `group_id`, `access`)
-SELECT `report_id`, `group_id`, 0 FROM `pastoral_report_groups`;
+SELECT `report_id`, `group_id`, 1 FROM `pastoral_report_groups`;
 
 RENAME TABLE `pastoral_report_groups` TO `_pastoral_report_groups`;
