@@ -410,6 +410,23 @@ class Receiver
      */
     public function publishClasses(Request $message): Response
     {
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator(
+            $this->externalEnable,
+            $this->externalType,
+            $this->username,
+            $this->password,
+            $this->schoolCode,
+            $this->log(),
+            $message->getParam(0)
+        ))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        $this->log->info(json_encode($message->getParam(2)->me['array']));
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+
 //        /* Requires schoolbox connector
 //         */
 //        if (!$this->isSchoolboxConnector()) {
