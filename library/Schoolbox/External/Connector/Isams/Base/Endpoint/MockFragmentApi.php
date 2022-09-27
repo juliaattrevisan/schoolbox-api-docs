@@ -20,7 +20,6 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
  */
 class MockFragmentApi implements IApi
 {
-
     /**
      * A chunk of xml from which to read
      *

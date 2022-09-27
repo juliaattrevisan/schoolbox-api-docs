@@ -46,7 +46,7 @@ class DSNTest extends TestCase
 
             /* Batch XML and Staff Photos
              */
-            'Valid DSN 2' =>[
+            'Valid DSN 2' => [
                 'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777',
                 [
                     'modules' => [

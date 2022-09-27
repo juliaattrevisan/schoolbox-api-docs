@@ -29,7 +29,6 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
  */
 class DayCalibrator
 {
-
     /**
      * @var array
      */

@@ -18,7 +18,6 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
  */
 interface IApi
 {
-
     /**
      * Retrieves a XML document representing the result from the API call.
      *

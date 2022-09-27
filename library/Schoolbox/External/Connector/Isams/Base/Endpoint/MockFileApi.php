@@ -20,7 +20,6 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
  */
 class MockFileApi implements IApi
 {
-
     /**
      * Path to the local xml file from which to read
      *

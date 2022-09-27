@@ -33,7 +33,6 @@ use UnexpectedValueException;
  */
 class Factory
 {
-
     /**
      * @var LoggerInterface
      */
