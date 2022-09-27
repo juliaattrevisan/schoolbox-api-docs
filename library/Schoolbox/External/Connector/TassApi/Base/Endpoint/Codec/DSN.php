@@ -33,7 +33,6 @@ use function count;
  */
 class DSN implements IDSN
 {
-
     /**
      * Consts corresponding to each of the Tass systems
      */
@@ -41,7 +40,16 @@ class DSN implements IDSN
     public const MODULE_STUDENT_DETAILS = 'studentdetails';
     public const MODULE_IDENTITY_MANAGEMENT = 'identitymanagement';
     public const MODULE_SCHOOL_CALENDAR_AND_NOTICES = 'schoolcalendarandnotices';
-    public const MODULE_EMPLOYEE_HR = 'employee-hr';
+    public const MODULE_EMPLOYEE_HR = 'employeehr';
+
+
+    /**
+     * These modules are optional and may not be configured at all
+     */
+    private const MODULES_OPTIONAL = [
+        self::MODULE_SCHOOL_CALENDAR_AND_NOTICES,
+        self::MODULE_EMPLOYEE_HR
+    ];
 
 
     /**
@@ -118,17 +126,17 @@ class DSN implements IDSN
                 $matches[4] ?? null
             ]);
 
-            /* Only add the optional schoolcalendarandnotices tuple if it was meaningful
-             * If schoolcalendarandnotices had no credentials; skip it
+            /* Only add the optional tuple if it was meaningful
+             * If the optional tuple had no credentials, skip it
              */
-            if (isset($matches[1]) && self::MODULE_SCHOOL_CALENDAR_AND_NOTICES === $matches[1] && !\count($suppliedPieces)) {
+            if (isset($matches[1]) && in_array($matches[1], self::MODULES_OPTIONAL, true) && !\count($suppliedPieces)) {
                 continue;
             }
 
             /* Check the dsn format matches correctly
              */
             if (!count($suppliedPieces)) {
-                throw new DomainException('Tass API DSN: could not decode; missing all credentials/bad format. Check company code, app code and token format');
+                throw new DomainException('TASS API DSN: could not decode; missing all credentials/bad format. Check company code, app code and token format');
             }
 
             /* Check that each module comes with the expected number of key-value pairs
@@ -136,7 +144,7 @@ class DSN implements IDSN
              * original dsn string + module + \count(expected_tuple) = 1 + 1 + 3 = 5
              */
             if (count($matches) !== count(self::EXPECTED_TUPLE) + 2) {
-                throw new DomainException('Tass API DSN: could not decode; missing some credentials. Check company code, app code and token format');
+                throw new DomainException('TASS API DSN: could not decode; missing some credentials. Check company code, app code and token format');
             }
 
             $struct['modules'][$matches[1]] = [

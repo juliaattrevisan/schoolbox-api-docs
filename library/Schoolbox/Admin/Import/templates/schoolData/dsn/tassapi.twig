@@ -98,6 +98,26 @@
 
                 <hr />
 
+                <h4 class="no-margin">Employee HR</h4>
+                <p class="meta">This is an optional module. If you don't wish to use it, leave the fields empty.</p>
+
+                <div class="row">
+                    <div class="small-12 medium-3 columns">
+                        <label>Company Code</label>
+                        <input type="text" name="dsn[tassapi][modules][employeehr][companycode]" value="{{ modules.employeehr.companycode ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-3 columns">
+                        <label>App Code</label>
+                        <input type="text" name="dsn[tassapi][modules][employeehr][appcode]" value="{{ modules.employeehr.appcode ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>Token</label>
+                        <input type="text" class='suds-crypto' name="dsn[tassapi][modules][employeehr][token]" value="{{ modules.employeehr.token ?? ''}}" />
+                    </div>
+                </div>
+
+                <hr />
+
                 <h4 class="no-margin">TASS Academic Periods</h4>
                 <p class="meta">
                     <strong>This only affects staff timetables.</strong> Put your school's start of Academic Period Dates in here, according to your TASS timetable setup.

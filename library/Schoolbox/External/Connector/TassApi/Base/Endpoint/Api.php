@@ -157,7 +157,7 @@ class Api implements IApi
         $dsnParts = (new Codec\DSN())->decode($dsn);
 
         if (!isset($dsnParts['modules'][$module])) {
-            throw new MissingModule("Tass API DSN: Invalid module name {$module}");
+            throw new MissingModule("TASS API DSN: Invalid module name {$module}");
         }
 
         /* Remember the module's credentials
