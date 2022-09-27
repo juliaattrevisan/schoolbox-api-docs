@@ -321,7 +321,7 @@ data:
                             chromeXhr.responseJSON.message === "Response received" &&
                             chromeXhr.responseJSON.response.body === EXPECTED_RESPONSE_BODY
                     ) {
-                        diagnosticHtml += "<p>An upstream network component appears to be blocking the LetsEncrypt user agent (<code>" + USER_AGENT_STRING_LETS_ENCRYPT + "</code>).</p>";
+                        diagnosticHtml += "<p>An upstream network component appears to be blocking the Let's Encrypt user agent (<code>" + USER_AGENT_STRING_LETS_ENCRYPT + "</code>).</p>";
                         updateDiagnosticsAlertBox(diagnosticHtml, "alert")
                         displayCommonCauses(
                                 "<ul>" +
@@ -330,8 +330,13 @@ data:
                                 "</ul>"
                         );
                         displayResolutionText(
-                                "<p>Test results indicate requests are being filtered depending on the value of UserAgent request header. " +
-                                "Check the configuration of any security infrastructure placed in front of Schoolbox and ensure that Let's Encrypt traffic is able to reach the Schoolbox server directly.</p>"
+                                "<p>Test results indicate requests are being filtered depending on the value of the <strong>user-agent</strong> request header.<br>" +
+                                "A request with <strong>user-agent</strong> set to <code>" + USER_AGENT_STRING_LETS_ENCRYPT + "</code> failed, " +
+                                "whereas a request with <strong>user-agent</strong> set to <code>" + USER_AGENT_STRING_CHROME + "</code> succeeded.<br>" +
+                                "The former is used by real domain validation requests sent from Let's Encrypt servers. " +
+                                "The latter is commonly used by browsers.<br>" +
+                                "Check the configuration of any security infrastructure placed in front of Schoolbox and ensure that Let's Encrypt " +
+                                "traffic is able to reach the Schoolbox server directly.</p>"
                         );
                         displayResponseDetails(USER_AGENT_STRING_CHROME, chromeXhr.responseJSON.response)
                     } else {
@@ -376,7 +381,7 @@ data:
                     </p>
                     <h3>Test logic</h3>
                     <p>This page attempts to send a request from a cloud-based service to the Schoolbox server. The
-                        request is designed to simulate domain verification requests sent from LetsEncrypt servers
+                        request is designed to simulate domain verification requests sent from Let's Encrypt servers
                         during SSL certificate generation.</p>
                     <div class="alert-box highlight no-margin">
                         <p>
