@@ -30,11 +30,13 @@
 
                 <tr data-user-id="{{ userAccess.user.id }}">
                     <td class="small-2">User</td>
-                    <td class="small-3">{{ userAccess.user.fullName }} ({{ userAccess.user.role.name }})</td>
+                    <td class="small-{{ reportPage ? 5 : 3 }}">{{ userAccess.user.fullName }} ({{ userAccess.user.role.name }})</td>
+                    {% if not reportPage %}
                     <td class="small-2">
                         <input type="radio" name="user[{{ userAccess.user.id }}]" id="userDeny{{ userAccess.user.id }}" value="0" {{ checkedDeny }}>
                         <label class="radio-label" for="userDeny{{ userAccess.user.id }}"></label>
                     </td>
+                    {% endif %}
                     <td class="small-2">
                         <input type="radio" name="user[{{ userAccess.user.id }}]" id="userPublic{{ userAccess.user.id }}" value="1" {{ checkedPublic }}>
                         <label class="radio-label" for="userPublic{{ userAccess.user.id }}"></label>

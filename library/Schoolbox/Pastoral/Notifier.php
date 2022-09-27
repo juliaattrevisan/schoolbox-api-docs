@@ -284,8 +284,8 @@ class Notifier extends AbstractModuleNotifier
             $reportHref = sprintf("/pastoral/report/results/%d", $report->getId());
             $builder    = new Builder();
             $builder->setTitle($messageTitle)
-                    ->setParam('record', new Param($recordName, $recordHref, ParameterInterface::STACKING_IGNORE))
-                    ->setParam('report', new Param($report->getName(), $reportHref, ParameterInterface::STACKING_IGNORE))
+                    ->setParam('record', new Param($recordName, $recordHref, ParameterInterface::STACKING_REPLACE))
+                    ->setParam('report', new Param($report->getName(), $reportHref, ParameterInterface::STACKING_APPEND))
                     ->setIcon($this->getUserIcon($effector))
                     ->setHref($reportHref)
                     ->setNamespace($this->getSlug())
@@ -407,7 +407,7 @@ class Notifier extends AbstractModuleNotifier
     {
         $targetUsers = $this->userMapper->createCollection();
         // target users are the report owner and report members
-        $reportUserIds   = $report->getMemberUserIds();
+        $reportUserIds   = $report->getUserIds(\Schoolbox\Pastoral\Report\Access\Model::READ);
         $reportUserIds[] = $report->getOwner()->getId();
         // check access for this pastoral record for each of the users, and add to targetUsers
         foreach ($reportUserIds as $reportUserId) {

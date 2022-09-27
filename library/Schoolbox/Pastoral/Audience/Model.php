@@ -204,7 +204,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getAccess(): ?int
     {

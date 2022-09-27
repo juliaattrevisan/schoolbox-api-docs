@@ -1,13 +1,15 @@
 {% if report.id is empty %}
     {% set pageTitle = 'Add New Report' %}
+    {% set action = routeLookup('pastoralReportBuilder.postReportCreate') %}
 {% else %}
     {% set pageTitle = 'Modify Report' %}
+    {% set action = routeLookup('pastoralReportBuilder.postReportModify', {report: report, reportId: report.id}) %}
 {% endif %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-    [ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
-    [ 'Reports',            routeLookup('pastoralReportBuilder.getIndex') ],
+    [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
+    [ 'Reports', routeLookup('pastoralReportBuilder.getIndex') ],
     [ pageTitle ]
 ) }}
 
@@ -27,7 +29,7 @@
 <div class="row">
     <div class="small-12 island">
 
-        <form id="formReport" action="{{ routeLookup('pastoralReportBuilder.postReportModify') }}" method="post">
+        <form id="formReport" action="{{ action }}" method="post">
             <input type="hidden" id="order" name="order">
             <input type="hidden" name="id" value="{{ report.id }}">
 
@@ -574,35 +576,22 @@
                 </ul>
             </section>
 
-            {% if groups | length %}
-                <h2 class="subheader">Shared Report</h2>
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>
-                                {{ locale.pastoral.proper }} Groups
-                                <span class="hint has-tip tip-top" data-tooltip
-                                      title="Select the {{ locale.pastoral }} groups you would like to share this report with.">?</span>
-                            </label>
-                            <ul class="option-list">
-                                {% for group in groups %}
-                                    <li>
-                                        <input type="hidden" name="group[{{ group.id }}]" value="0"/>
-                                        <input type="checkbox"
-                                               name="group[{{ group.id }}]"
-                                               {% for reportGroup in (report.groups ?? []) | filter(reportGroup=>reportGroup.id == group.id) %}checked{% endfor %}
-                                               id="group[{{ group.id }}]"
-                                               value="1"
-                                        />
-                                        <label for="group[{{ group.id }}]"
-                                               class="checkbox-label">{{ group.name }}</label>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </fieldset>
-                </section>
-            {% endif %}
+                {% include "@pastoral/modify_section_visibility.twig" with
+                    {
+                        record: record,
+                        allowIndividual: true,
+                        groups: groups,
+                        allowParents: false,
+                        roles: roles,
+                        roleTypes: [],
+                        roleUserCounts: [],
+                        rolesWithUsers: [],
+                        moderatorIds: moderatorIds,
+                        bulkCreate: false,
+                        managePage: false,
+                        reportPage: true,
+                        visibilityLocked: false,
+                    } only %}
             <input type="submit" value="Save Report"/>
         </form>
     </div>

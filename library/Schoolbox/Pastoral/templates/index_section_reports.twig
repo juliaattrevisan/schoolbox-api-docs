@@ -14,14 +14,16 @@
                             <h3>{{ report.name }}</h3>
                         </a>
                         <p class="meta">
-                            <i title="{{ locale.pastoralCare.proper }} Groups" class="icon-group"></i>
-                            {% if report.groups | length %}
-                                {% for group in report.groups %}
-                                    {{ group.name }}{% if not loop.last %},{% endif %}
-                                {% endfor %}
-                            {% else %}
-                                This report has not been shared with any groups
-                            {% endif %}
+                            {% set firstGroup = true %}
+                            {% for access in report.access %}
+                                {% if access.group %}
+                                    {% if firstGroup %}
+                                        <i title="{{ locale.pastoralCare.proper }} Groups" class="icon-group"></i>
+                                        {% set firstGroup = false %}
+                                    {% endif %}
+                                {{ access.group.name }}{% if not loop.last %},{% endif %}
+                                {% endif %}
+                            {% endfor %}
                         </p>
                     </div>
                 </li>

@@ -20,7 +20,6 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\SubType as PastoralSubType;
-use Schoolbox\Pastoral\Group as PastoralGroup;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag as PastoralTag;
 use Schoolbox\Pastoral\Type as PastoralType;
@@ -156,9 +155,8 @@ class Model implements ISoftDeletable
      */
     private ?PastoralSeverity $severity = null;
 
-    /** @var GenericCollection $groups */
-    private GenericCollection $groups;
-
+    /** @var GenericCollection $access */
+    private GenericCollection $access;
 
     /**
      * Are students without a year level included in this report?
@@ -208,7 +206,7 @@ class Model implements ISoftDeletable
         $this->years    = new GenericCollection(\Schoolbox\YearLevel\Model::class);
 
         // This is a collection of groups that have access to this report
-        $this->groups = new GenericCollection(PastoralGroup\Model::class);
+        $this->access = new GenericCollection(Access\Model::class);
     }
 
     /**
@@ -776,13 +774,13 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param GenericCollection $groups
+     * @param GenericCollection $access
      *
      * @return self
      */
-    public function setGroups(GenericCollection $groups): self
+    public function setAccess(GenericCollection $access): self
     {
-        $this->groups = $groups;
+        $this->access = $access;
 
         return $this;
     }
@@ -790,9 +788,9 @@ class Model implements ISoftDeletable
     /**
      * @return GenericCollection
      */
-    public function getGroups(): GenericCollection
+    public function getAccess(): GenericCollection
     {
-        return $this->groups;
+        return $this->access;
     }
 
     /**
@@ -910,38 +908,40 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * Whether the given user can edit this report
      * @param User $user
      * @return bool
      */
-    public function hasAccess(User $user): bool
+    public function getCanEdit(User $user): bool
     {
-        if ($this->getOwner()->getId() == $user->getId()) {
-            return true;
-        }
-
-        foreach ($this->getGroups() as $group) {
-            foreach ($group->getMembers() as $member) {
-                if ($member->getUser()->getId() == $user->getId()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return in_array($user->getId(), $this->getUserIds(\Schoolbox\Pastoral\Report\Access\Model::WRITE));
     }
 
     /**
+     * @param int<1,2> $accessLevel least required level
      * @return array
      */
-    public function getMemberUserIds(): array
+    public function getUserIds(int $accessLevel): array
     {
-        $userIds = [];
-        $groups = $this->getGroups();
-        foreach ($groups as $group) {
-            $memberIds = $group->getMembers()->map(function ($member) {
-                return $member->getUser()->getId();
-            })->getAll();
-            $userIds   = array_unique(array_merge($userIds, $memberIds));
+        $userIds  = [];
+        $accesses = $this->getAccess();
+        /** @var Access\Model $access */
+        foreach ($accesses as $access) {
+            if ($accessLevel > $access->getAccess()) {
+                continue;
+            }
+            if ($access->getGroup()) {
+                $memberIds = $access->getGroup()->getMembers()->map(function ($member) {
+                    return $member->getUser()->getId();
+                })->getAll();
+                $userIds   = array_unique(array_merge($userIds, $memberIds));
+            }
+            if ($access->getUser() && !in_array($access->getUser()->getId(), $userIds)) {
+                $userIds[] = $access->getUser()->getId();
+            }
+        }
+        if (!$this->getOwner()->isDeleted() && !in_array($this->getOwner()->getId(), $userIds)) {
+            $userIds[] = $this->getOwner()->getId();
         }
         return $userIds;
     }

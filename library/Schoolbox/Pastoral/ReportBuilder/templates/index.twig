@@ -1,4 +1,3 @@
-{% import '@pastoral/macros/profile.twig' as profile %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
@@ -48,45 +47,7 @@
                     <section>
                     <ul id="studentsList" class="information-list">
                 {% endif %}
-                <li class="actions-small-3">
-                    <div class="list-item">
-                        <div class="card small-12">
-                            <a href="{{ profile.link(user) }}">
-                                {{ profile.imageSquare64(user) }}
-                            </a>
-                            <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id, report: report}) }}'>
-                                <h3>{{ report.name }}</h3>
-                            </a>
-                            <p class="meta">
-                                {% if report.notificationEnabled %}
-                                    <i title="Notification Enabled" class="icon-bell"></i>
-                                {% endif %}
-                                <i title="{{ locale.pastoral.proper }} Groups" class="icon-group"></i>
-                                {% if report.groups | length %}
-                                    {% for group in report.groups %}
-                                        {{ group.name }}{% if not loop.last %},{% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    This report has not been shared with any groups
-                                {% endif %}
-                            </p>
-                        </div>
-                    </div>
-                    <nav>
-                        <input id="report-dashboard-{{ report.id }}"
-                               {% if report.dashboard %}checked{% endif %}
-                               data-report-dashboard="{{ report.id }}"
-                               type="checkbox">
-                        <label for="report-dashboard-{{ report.id }}" class="input-toggle"
-                               title="Show report on dashboard">
-                            <span class="icon-star alert"></span>
-                        </label>
-                        <a class="icon-modify no-text"
-                           href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id, report: report}) }}"
-                           title="Modify Report"></a>
-                        <a class="icon-delete no-text" data-delete="{{ report.id }}" href="#" title="Delete Report"></a>
-                    </nav>
-                </li>
+                {% include '@pastoralReportBuilder/report_row.twig' with {report: report} %}
             {% endfor %}
 
             {% if found == 1 %}
@@ -101,45 +62,20 @@
             {% set found = 0 %}
 
             {% for report in reportsGroup %}
+                {% set firstGroup = true %}
 
                 {% if loop.first %}
 
                     {% set found = 1 %}
                     <h2 class="subheader">Shared Reports<span data-tooltip
-                                                              title="These reports have been shared with you based on your {{ locale.pastoral }} group membership"
+                                                              title="These reports have been shared with you"
                                                               class="hint has-tip tip-top">?</span></h2>
 
                     <section>
                     <ul id="studentsList" class="information-list">
 
                 {% endif %}
-
-                <li class="actions-small-3">
-                    <div class="card small-12">
-                        <a href="{{ profile.link(report.owner) }}">
-                            {{ profile.imageSquare64(report.owner) }}
-                        </a>
-                        <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id, report: report}) }}'>
-                            <h3>{{ report.name }}</h3>
-                        </a>
-                        <p class="meta">
-                            <i title="{{ locale.pastoral.proper }} Groups" class="icon-group"></i>
-                            {% for group in report.groups %}
-                                {{ group.name }}{% if not loop.last %},{% endif %}
-                            {% endfor %}
-                        </p>
-                    </div>
-                    <nav>
-                        <input id="report-dashboard-{{ report.id }}"
-                               {% if report.dashboard %}checked{% endif %}
-                               data-report-dashboard="{{ report.id }}"
-                               type="checkbox">
-                        <label for="report-dashboard-{{ report.id }}" class="input-toggle"
-                               title="Show report on dashboard">
-                            <span class="icon-star alert"></span>
-                        </label>
-                    </nav>
-                </li>
+                {% include '@pastoralReportBuilder/report_row.twig' with {report: report} %}
             {% endfor %}
 
             {% if found == 1 %}
