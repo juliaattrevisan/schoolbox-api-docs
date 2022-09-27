@@ -284,7 +284,7 @@ class Notifier extends AbstractModuleNotifier
             $reportHref = sprintf("/pastoral/report/results/%d", $report->getId());
             $builder    = new Builder();
             $builder->setTitle($messageTitle)
-                    ->setParam('record', new Param($recordName, $recordHref, ParameterInterface::STACKING_APPEND))
+                    ->setParam('record', new Param($recordName, $recordHref, ParameterInterface::STACKING_REPLACE))
                     ->setParam('report', new Param($report->getName(), $reportHref, ParameterInterface::STACKING_APPEND))
                     ->setIcon($this->getUserIcon($effector))
                     ->setHref($reportHref)

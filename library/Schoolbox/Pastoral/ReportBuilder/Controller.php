@@ -129,7 +129,6 @@ class Controller extends Base
             [
                 'template' => '@pastoralReportBuilder/index.twig',
                 'data'     => [
-                    'user'         => $this->getUser(),
                     'reportsMine'  => $reportsMine,
                     'reportsGroup' => $reportsGroup,
                 ],

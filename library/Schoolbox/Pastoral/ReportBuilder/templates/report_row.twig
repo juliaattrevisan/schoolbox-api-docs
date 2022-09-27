@@ -1,0 +1,44 @@
+{% import '@pastoral/macros/profile.twig' as profile %}
+<li class="actions-small-3">
+    <div class="list-item">
+        <div class="card small-12">
+            <a href="{{ profile.link(report.owner) }}">
+                {{ profile.imageSquare64(report.owner) }}
+            </a>
+            <a href='{{ routeLookup('pastoralReportBuilder.getReportResults', {reportId: report.id, report: report}) }}'>
+                <h3>{{ report.name }}</h3>
+            </a>
+            <p class="meta">
+                {% if report.notificationEnabled %}
+                    <i title="Notification Enabled" class="icon-bell"></i>
+                {% endif %}
+                {% set firstGroup = true %}
+                {% for access in report.access %}
+                    {% if access.group %}
+                        {% if firstGroup %}
+                            <i title="{{ locale.pastoral.proper }} Groups" class="icon-group"></i>
+                            {% set firstGroup = false %}
+                        {% endif %}
+                        {{ access.group.name }}{% if not loop.last %},{% endif %}
+                    {% endif %}
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+    <nav>
+        <input id="report-dashboard-{{ report.id }}"
+               {% if report.dashboard %}checked{% endif %}
+               data-report-dashboard="{{ report.id }}"
+               type="checkbox">
+        <label for="report-dashboard-{{ report.id }}" class="input-toggle"
+               title="Show report on dashboard">
+            <span class="icon-star alert"></span>
+        </label>
+        {% if report.canEdit(USER) %}
+            <a class="icon-modify no-text"
+               href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id, report: report}) }}"
+               title="Modify Report"></a>
+            <a class="icon-delete no-text" data-delete="{{ report.id }}" href="#" title="Delete Report"></a>
+        {% endif %}
+    </nav>
+</li>

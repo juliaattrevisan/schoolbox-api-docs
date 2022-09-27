@@ -322,7 +322,7 @@ class Mapper extends BaseMapper
                 $params["actionLike$i"] = "%,{$action->getId()},%";
             }
             if ($pastoral->getRecordActions()->count() === 0) {
-                $wheres[] = "`actions` IS NULL OR `include_records_without_action` = 1";
+                $wheres[] = "(`actions` IS NULL OR `include_records_without_action` = 1)";
             } else {
                 $wheres[] = sprintf("(`actions` IS NULL OR %s)", implode(' OR ', $actionWheres));
             }
@@ -388,7 +388,7 @@ class Mapper extends BaseMapper
             } else {
                 try {
                     $model = $this->hydrate($row, 'report');
-                    if ($row['dashboard_id'] !== null) {
+                    if (isset($row['dashboard_id'])) {
                         $model->setDashboard(true);
                     }
                 } catch (MapperException $e) {
