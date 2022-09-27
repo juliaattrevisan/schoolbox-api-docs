@@ -17,6 +17,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\MockFragmentApi;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable\DayCalibrator;
 
@@ -166,13 +167,14 @@ class DayCalibratorTest extends TestCase
 
         /* Build the thing which gets the stuff
          */
-        $api = new MockFragmentApi($xml);
-        $batchxml = new Batchxml($api);
+        $api = [
+            DSN::MODULE_BATCHXML => new Batchxml(new MockFragmentApi($xml))
+        ];
 
         /* Figure out which schoolbox day corresponds to the given isams day
          * This schoolbox day is the actual ui Day e,g, Day 1 to Day 5, not the array index
          */
-        $outcome = (new DayCalibrator($batchxml))->determineSchoolboxDay($isamsDay);
+        $outcome = (new DayCalibrator($api))->determineSchoolboxDay($isamsDay);
 
         /* There are other assertions that you can try (ctrl-click to follow)
          */
