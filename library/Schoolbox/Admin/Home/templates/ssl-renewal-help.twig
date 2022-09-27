@@ -205,19 +205,20 @@ data:
                             updateDiagnosticsAlertBox("Unable to resolve DNS for <strong>" + CURRENT_HOSTNAME + "</strong>", "alert")
                             displayCommonCauses("<p>No public DNS records configured for " + CURRENT_HOSTNAME + "</p>")
                             displayResolutionText("<p>Check public DNS records exist for <strong>" + CURRENT_HOSTNAME + "</strong></p>");
-                        } else if(message in ["Connection refused", "Request timeout occurred"]){
+                        } else if(["Connection refused", "Request timeout occurred"].indexOf(message) !== -1){
                             // Was Lambda unable to connect to port 80 (either rejected or timeout)?
                             let diagnostic = message === "Connection refused"
-                                    ? "Connection refused"
-                                    : "Timeout connecting to " + URL_TO_CHECK;
+                                    ? "Connection refused when"
+                                    : "Timeout";
+                            diagnostic += " connecting to <strong>" + URL_TO_CHECK + "</strong>";
                             let commonCauses =
                                     "<ul>" +
                                     "<li>A firewall may be restricting traffic on port 80</li>" +
                                     "<li>A firewall may be restricting HTTP requests</li>" +
-                                    "<li>A firewall if restricting traffic from the US/EU (see Geoblocking)</li>" +
+                                    "<li>A firewall may be restricting traffic from the US/EU (Geoblocking)</li>" +
                                     "<li>The ISP may be blocking inbound port 80 traffic</li>" +
                                     "</li>";
-                            testChromeUserAgent(xhr, diagnostic, commonCauses, "<p>Check that port 80 traffic is being routed to Schoolbox server</p>");
+                            testChromeUserAgent(xhr, diagnostic, commonCauses, "<p>Check that port 80 traffic is being routed to Schoolbox server.</p>");
                         } else if(message === "Response received"){
                             // Did Lambda API get a response from requested 'url' on port 80?
                             let response = xhr.responseJSON.response;
@@ -365,8 +366,7 @@ data:
                     <p>
                         Certificates are managed via Certbot and issued by Let's Encrypt with 3 months of validity.
                         Certbot will automatically attempt to renew SSL certificates when the current certificates have
-                        less
-                        than 30 days of validity.
+                        less than 30 days till expiry.
                         Domain verification is performed using the <a
                                 href="https://letsencrypt.org/docs/challenge-types/#http-01-challenge" target="_blank">HTTP-01
                             challenge</a> which can only be done on port 80.

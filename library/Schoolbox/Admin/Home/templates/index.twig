@@ -119,12 +119,12 @@
         $.ajax({
             url: "{{ api_url }}/urlCheck/v2/?url=" + encodeURIComponent("http://" + location.hostname + "/.well-known/acme-challenge/ping"),
             success: function(result, status, xhr) {
-                if (xhr.responseJSON.message !== "Request timeout occurred") {
-                    if (xhr.responseJSON.response.status === 200) {
-                        $('[data-light="port_80"]').html('Online').removeClass('neutral').addClass('success');
-                    } else {
-                        $('[data-light="port_80"]').html('Offline').removeClass('neutral').addClass('alert');
-                    }
+                if (
+                        "message" in xhr.responseJSON &&
+                        xhr.responseJSON.message === "Response received" &&
+                        xhr.responseJSON.response.body === "port 80 accessible from your location\n"
+                ) {
+                    $('[data-light="port_80"]').html('Online').removeClass('neutral').addClass('success');
                 } else {
                     $('[data-light="port_80"]').html('Offline').removeClass('neutral').addClass('alert');
                 }
