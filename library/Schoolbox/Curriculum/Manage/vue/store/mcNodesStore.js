@@ -78,7 +78,7 @@ export const useNodesStore = defineStore('mcNodes', {
         async loadTopLevel () {
             const store = useStore();
             try {
-                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1`, {
+                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&descendants=1`, {
                     headers: {
                         'Content-Type': 'application/json',
                     }
