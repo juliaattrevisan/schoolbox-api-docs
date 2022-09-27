@@ -15,21 +15,21 @@
                 <div class="row">
                     <div class="small-12 columns">
                         <label class="required">Batch XML Key</label>
-                        <input type="text" class='required suds-crypto' name="dsn[isams][batch][key]" value="{{ batch.key ?? ''}}" />
+                        <input type="text" class='required suds-crypto' name="dsn[isams][modules][batch][key]" value="{{ modules.batch.key ?? ''}}" />
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="small-12 columns">
                         <label>Staff Photos Key</label>
-                        <input type="text" class='suds-crypto' name="dsn[isams][staffphoto][key]" value="{{ staffphoto.key ?? ''}}" />
+                        <input type="text" class='suds-crypto' name="dsn[isams][modules][staffphoto][key]" value="{{ modules.staffphoto.key ?? ''}}" />
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="small-12 columns">
                         <label>Student Photos Key</label>
-                        <input type="text" class='suds-crypto' name="dsn[isams][studentphoto][key]" value="{{ studentphoto.key ?? ''}}" />
+                        <input type="text" class='suds-crypto' name="dsn[isams][modules][studentphoto][key]" value="{{ modules.studentphoto.key ?? ''}}" />
                     </div>
                 </div>
             </div>

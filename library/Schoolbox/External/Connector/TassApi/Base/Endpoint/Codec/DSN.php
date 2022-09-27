@@ -70,7 +70,7 @@ class DSN implements IDSN
 
 
     /**
-     * This character separates module configuration tuples from each otehr
+     * This character separates module configuration tuples from each other
      */
     private const MODULE_TUPLE_SEPARATOR = ';';
 
