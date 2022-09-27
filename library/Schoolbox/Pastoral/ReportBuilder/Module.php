@@ -19,6 +19,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Report\Access\Model as ReportAccess;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
@@ -57,12 +58,12 @@ class Module extends BaseModule
         $permissionModifyReport =
             new Rule\All(
                 $permissionStaff,
-                $this->getPermRule(true)
+                $this->getPermRule(ReportAccess::WRITE)
             );
         $permissionReadReport   =
             new Rule\All(
                 $permissionStaff,
-                $this->getPermRule(false)
+                $this->getPermRule(ReportAccess::READ)
             );
 
         $this->registerRoutesArray(
@@ -162,13 +163,13 @@ class Module extends BaseModule
     }
 
     /**
-     * @param bool $writeOnly
+     * @param int<1,2> $accessLevel
      * @return Rule\Callback
      */
-    private function getPermRule(bool $writeOnly)
+    private function getPermRule(int $accessLevel): Rule\Callback
     {
         return new Rule\Callback(
-            static function (array $params, User $user) use ($writeOnly) {
+            static function (array $params, User $user) use ($accessLevel) {
                 if (!isset($params['report']) || !($params['report'] instanceof PastoralReport)) {
                     if (!isset($params['reportId'])) {
                         throw new Unauthorized();
@@ -182,7 +183,7 @@ class Module extends BaseModule
                 if ($params['report']->getOwner()->getId() === $user->getId()) {
                     return true;
                 }
-                if (in_array($user->getId(), $params['report']->getUserIds($writeOnly))) {
+                if (in_array($user->getId(), $params['report']->getUserIds($accessLevel))) {
                     return true;
                 }
                 throw new Unauthorized();

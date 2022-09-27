@@ -499,6 +499,7 @@ class Controller extends Base
     public function postReportCreate()
     {
         $pastoralReport = $this->pastoralReportMapper->createModel();
+        $pastoralReport->setOwner($this->getUser());
         $this->postReportModify($pastoralReport);
     }
 
@@ -527,7 +528,6 @@ class Controller extends Base
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $report->setOwner($this->getUser());
         $report->setName($post->get('name'));
         $report->setDescription($post->get('description'));
         $report->setOrderCsv($post->get('order'));

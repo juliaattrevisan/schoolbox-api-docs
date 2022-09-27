@@ -407,7 +407,7 @@ class Notifier extends AbstractModuleNotifier
     {
         $targetUsers = $this->userMapper->createCollection();
         // target users are the report owner and report members
-        $reportUserIds   = $report->getUserIds(false);
+        $reportUserIds   = $report->getUserIds(\Schoolbox\Pastoral\Report\Access\Model::READ);
         $reportUserIds[] = $report->getOwner()->getId();
         // check access for this pastoral record for each of the users, and add to targetUsers
         foreach ($reportUserIds as $reportUserId) {

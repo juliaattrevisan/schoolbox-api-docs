@@ -914,20 +914,20 @@ class Model implements ISoftDeletable
      */
     public function getCanEdit(User $user): bool
     {
-        return in_array($user->getId(), $this->getUserIds(true));
+        return in_array($user->getId(), $this->getUserIds(\Schoolbox\Pastoral\Report\Access\Model::WRITE));
     }
 
     /**
-     * @param bool $writeOnly
+     * @param int<1,2> $accessLevel least required level
      * @return array
      */
-    public function getUserIds(bool $writeOnly): array
+    public function getUserIds(int $accessLevel): array
     {
         $userIds  = [];
         $accesses = $this->getAccess();
         /** @var Access\Model $access */
         foreach ($accesses as $access) {
-            if ($writeOnly && $access->getAccess() < \Schoolbox\Pastoral\Report\Access\Model::WRITE) {
+            if ($accessLevel > $access->getAccess()) {
                 continue;
             }
             if ($access->getGroup()) {
