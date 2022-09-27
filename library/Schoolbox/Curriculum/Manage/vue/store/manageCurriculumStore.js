@@ -50,7 +50,8 @@ export const useStore = defineStore('manageCurriculum', {
             this.isReadOnly = props.isReadOnly;
             this.toastEl = toastEl;
             if (props.dataEndpoint !== '') { //only load when we need to
-                this.load(props.dataEndpoint);
+                apiEndpoint = props.dataEndpoint;
+                useNodesStore().loadTopLevel(); //load the top level curricula
             }
         },
 
@@ -79,17 +80,6 @@ export const useStore = defineStore('manageCurriculum', {
                 useViewNodesStore().$reset();
                 useActiveNodeStore().$reset();
             }
-        },
-
-        /**
-         * load the top level curriculums
-         *
-         * @param { String }
-         */
-        load (endpoint) {
-            apiEndpoint = endpoint;
-            const nodesStore = useNodesStore();
-            nodesStore.loadTopLevel();
         },
 
     },

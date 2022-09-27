@@ -17,7 +17,6 @@ export const useNodesStore = defineStore('mcNodes', {
         nodes: {}, //all the nodes currently loaded
         isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
-        isProcessing: false, //to notify that an action is taking place
     }),
 
     getters: {
@@ -79,11 +78,49 @@ export const useNodesStore = defineStore('mcNodes', {
          */
         async setTopLevel (nodes) {
             this.updateNodes(nodes);
-            const viewNodesStore = useViewNodesStore();
-            if (viewNodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
-                const singleCurriculumId = this.nodes.children[0].id;
-                await this.loadChildren(singleCurriculumId); //load in its children for initial display
-                viewNodesStore.setSelected(1, singleCurriculumId); //then select the node
+            const store = useStore();
+            if (store.hasId) {
+                this.loadId(store.id);
+            } else if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
+                this.loadSingleCurriculum();
+            }
+        },
+
+        /**
+         *
+         */
+        async loadSingleCurriculum () {
+            const singleCurriculumId = this.nodes.children[0].id;
+            await this.loadChildren(singleCurriculumId); //load in its children for initial display
+            useViewNodesStore().setSelected(1, singleCurriculumId); //then select the node
+        },
+
+        /**
+         *
+         *
+         * @param { number }
+         */
+        async loadId (id) {
+            try {
+                this.isLoading = true;
+                const response = await fetch(`${apiEndpoint}/${id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
+                if (response.ok) {
+                    const nodeWithParents = await response.json();
+                    node.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
+                    console.warn(node.breadcrumbs);
+                } else {
+                    this.hasId = false;
+                    if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
+                        this.loadSingleCurriculum();
+                    }
+                    console.warn(response);
+                    this.hasLoadError = true;
+                }
+            } catch (error) {
+                console.warn(error);
+                this.hasLoadError = true;
+            } finally {
+                this.isLoading = false;
             }
         },
 
