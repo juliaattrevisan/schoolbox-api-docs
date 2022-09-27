@@ -212,9 +212,9 @@ class Factory
             /* Connect and shank data for all the modules we know about
              */
             $api = [
-                DSN::MODULE_BATCHXML => new Api($this->host, $this->key, DSN::MODULE_BATCHXML),
-                DSN::MODULE_STAFFPHOTO => new Api($this->host, $this->key, DSN::MODULE_STAFFPHOTO),
-                DSN::MODULE_STUDENTPHOTO => new Api($this->host, $this->key, DSN::MODULE_STUDENTPHOTO),
+                DSN::MODULE_BATCHXML => new Batchxml(new Api($this->host, $this->key, DSN::MODULE_BATCHXML)),
+                DSN::MODULE_STAFFPHOTO => new Batchxml(new Api($this->host, $this->key, DSN::MODULE_STAFFPHOTO)),
+                DSN::MODULE_STUDENTPHOTO => new Batchxml(new Api($this->host, $this->key, DSN::MODULE_STUDENTPHOTO)),
             ];
         }
 
