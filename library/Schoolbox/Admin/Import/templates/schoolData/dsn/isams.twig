@@ -12,12 +12,20 @@
             <div class="small-12 columns">
                 <h3>iSAMS Configuration</h3>
 
+                <h4 class="no-margin">Profile/Timetable Data</h4>
+                <p class="meta">Staff/Student/Parent profile data and Timetable contents are found in this Batch XML module.</p>
+
                 <div class="row">
                     <div class="small-12 columns">
                         <label class="required">Batch XML Key</label>
-                        <input type="text" class='required suds-crypto' name="dsn[isams][modules][batch][key]" value="{{ modules.batch.key ?? ''}}" />
+                        <input type="text" class='required suds-crypto' name="dsn[isams][modules][batchxml][key]" value="{{ modules.batchxml.key ?? ''}}" />
                     </div>
                 </div>
+
+                <hr />
+
+                <h4 class="no-margin">Photos</h4>
+                <p class="meta">Staff and Student photos endpoints are configured independently and optionally.</p>
 
                 <div class="row">
                     <div class="small-12 columns">

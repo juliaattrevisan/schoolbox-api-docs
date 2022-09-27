@@ -25,7 +25,7 @@ class DSN implements IDSN
      * These correspond to the modules we found by configuring the DSN
      * (Each module is an array key in the decoded DSN)
      */
-    public const MODULE_BATCHXML = 'batch';
+    public const MODULE_BATCHXML = 'batchxml';
     public const MODULE_STAFFPHOTO = 'staffphoto';
     public const MODULE_STUDENTPHOTO = 'studentphoto';
 
