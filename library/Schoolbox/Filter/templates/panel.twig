@@ -57,6 +57,9 @@ Usage:
         // A selected option in the modal's option list
         var $modalListItem     = null;
 
+        // To reference the search-select throughout
+        const SEARCH_SELECT_SELECTOR = '[data-search-select]';
+
         // ============== Event Handlers
 
         // Listen for clicks on the submit button
@@ -92,6 +95,14 @@ Usage:
                     selectize.setValue(JSON.parse(this.dataset.valueOriginal));
                 }
             });
+            $filterPanel.find(SEARCH_SELECT_SELECTOR).each(function () {
+                document.dispatchEvent(new CustomEvent('SEARCH_SELECT__UPDATE_SELECTION', {
+                    detail: {
+                        elementId: $(this).attr('id'),
+                        selection: this.dataset.selectedOriginal,
+                    }
+                }));
+            });
             updateFiltersInUseLabel();
         });
 
@@ -115,6 +126,16 @@ Usage:
                 if (selectize) {
                     selectize.setValue(JSON.parse(this.dataset.valueDefault));
                 }
+            });
+
+            // Reset search select
+            $filterPanel.find(SEARCH_SELECT_SELECTOR).each(function () {
+                document.dispatchEvent(new CustomEvent('SEARCH_SELECT__UPDATE_SELECTION', {
+                    detail: {
+                        elementId: $(this).attr('id'),
+                        selection: this.dataset.selectedDefault,
+                    }
+                }));
             });
 
             updateFiltersInUseLabel();
@@ -152,6 +173,18 @@ Usage:
                         .attr('data-value-original', itemsJson);
                 }
             });
+            /**
+             * Each <option> has a data-selected-object attribute, which is used to store the linked selected object.
+             * We loop through these and update the selectedOriginal atttribute so if required they can be returned if
+             * the clear all button is selected. Note that this is just while events occur on the page.
+             * If the page is reloaded the selectedOriginal comes back through via the Vue component.
+             */
+            $filterPanel.find(SEARCH_SELECT_SELECTOR).each(function () {
+                const options = $(this)[0].querySelectorAll('option');
+                const optionValues = Array.from(options).map((option) => option.dataset.selectedObject);
+                const optionValuesJson = JSON.stringify(optionValues);
+                $(this).data('selectedOriginal', optionValuesJson);
+            });
             updateFiltersInUseLabel();
         }
 
@@ -165,11 +198,21 @@ Usage:
             let $panelComponent = $panelComponents.filter('[data-component='+filterId+']'),
                 $selectize      = $panelComponent.find('[data-selectize]'),
                 selectize       = ($selectize.length ? $selectize[0].selectize : null),
+                $searchSelect   = $panelComponent.find(SEARCH_SELECT_SELECTOR),
+                hasSearchSelect = $searchSelect.length > 0,
                 $textInput      = $panelComponent.find('input[type=text]');
             $panelComponent.find('input[type=checkbox]').prop('checked', false);
             $textInput.val('');
             if (selectize) {
                 selectize.clear(true);
+            }
+            if (hasSearchSelect) {
+                document.dispatchEvent(new CustomEvent('SEARCH_SELECT__UPDATE_SELECTION', {
+                    detail: {
+                        elementId: $searchSelect.attr('id'),
+                        selection: JSON.stringify([]), //we pass through an empty array to be cleared in the Vue component
+                    }
+                }));
             }
             updateFiltersInUseLabel();
         }
@@ -634,10 +677,12 @@ Usage:
                     filterId     = $component.data('component'),
                     $available   = $component.find('input[type=checkbox]'),
                     $selected    = $component.find('input:checked[type=checkbox], :selected'),
-                    $textInputs  = $component.find('input[type=text]'),
+                    $textInputs  = $component.find('input[type=text]:not([data-search-select-search-input])'),
                     $selectize   = $component.find('select[data-selectize]'),
                     hasSelectize = $selectize.length > 0,
-                    selectize    = hasSelectize ? $selectize[0].selectize : null;
+                    selectize    = hasSelectize ? $selectize[0].selectize : null,
+                    $searchSelect = $component.find(SEARCH_SELECT_SELECTOR),
+                    hasSearchSelect = $searchSelect.length > 0;
 
                 // These will be deleted if the filter's not in use
                 componentsInUse[filterId]         = {};
@@ -657,10 +702,23 @@ Usage:
                     });
                 }
 
+                // Build list of labels from the search select, if there is one
+                // We use the dummy <select> that is kept up to date within the Vue component to
+                // retrieve the latest selections
+                if (hasSearchSelect) {
+                    const options = $searchSelect[0].querySelectorAll('option');
+                    options.forEach((option) => {
+                        componentsInUse[filterId]['labels'].push({
+                            value: option.value,
+                            label: option.innerText,
+                        });
+                    });
+                }
+
                 // Build list of labels from selected options or checkboxes,
                 // if there are any.
                 if ($selected.length !== 0) {
-                    // Not a selectize, or it's not yet initialized
+                    // Not a selectize/search-select, or it's not yet initialized
                     // Filter is being applied, add its name and selected option labels.
                     $selected.each(function(idx, elem) {
                         let $elem = $(elem),
@@ -673,7 +731,6 @@ Usage:
                             label = label ? label : $component.find('label[for='+$elem.attr('id')+']').html();
                             value = $elem.attr('data-key');
                         }
-
                         // Don't add this label if it's already been added once
                         if (value && !componentsInUse[filterId]['labels'].some(v => v.value === value)) {
                             componentsInUse[filterId]['labels'].push({
@@ -684,18 +741,18 @@ Usage:
                     });
 
                     // Hide the filter in use if all its options are selected,
-                    // and the filter has no selectize (whether or not it is
+                    // and the filter has no selectize/serach-select (whether or not it is
                     // initialized yet).
                     // All options is functionally equivalent to none selected,
                     // but it's impossible to tell if all are selected if there
-                    // is a selectize, so keep the filter in that case.
-                    if (!hasSelectize && $selected.length === $available.length) {
+                    // is a selectize/search-select, so keep the filter in that case.
+                    if (!hasSelectize && !hasSearchSelect && $selected.length === $available.length) {
                         componentsInUse[filterId]['labels'] = [];
                     }
                 }
 
                 // Build list of labels from text inputs, if they are there
-                if (!hasSelectize && $textInputs.length !== 0) {
+                if (!hasSelectize && !hasSearchSelect && $textInputs.length !== 0) {
                     $textInputs.each(function () {
                         let values = this.value.split(/\s+/);
                         // Try splitting on space

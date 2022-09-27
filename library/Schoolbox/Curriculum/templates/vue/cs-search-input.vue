@@ -136,7 +136,7 @@ function onBrowseSelected () {
 </script>
 
 <template>
-    <div v-if="!store.isReadOnly" class="input-group">
+    <div v-if="!store.isReadOnly" class="input-group" :data-is-small-container="store.isSmallContainer">
         <input
             v-model="searchStore.query"
             ref="queryInputEl"
@@ -145,6 +145,7 @@ function onBrowseSelected () {
             :readonly="!store.hasLoadedOk"
             :placeholder="inputPlaceholder"
             @input="$event.target.composing = false"
+            data-search-select-search-input
         />
         <button
             v-if="store.hasLoadedOk"
@@ -162,6 +163,10 @@ function onBrowseSelected () {
 input,
 button {
     margin-bottom: 0;
+}
+
+.input-group[data-is-small-container="true"] {
+    flex-direction: column; /*stack the input and button when the container is small */
 }
 
 </style>

@@ -4,7 +4,7 @@
  * To list all the currently selected Curriculum codes
  */
 
-import { computed } from 'vue';
+import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
 import { useSelectedCodesStore } from './store/csSelectedCodesStore';
 import CsSelectedCode from './cs-selected-code.vue';
@@ -12,6 +12,20 @@ import CsSelectedCode from './cs-selected-code.vue';
 
 const store = useStore();
 const selectedCodesStore = useSelectedCodesStore();
+const selectEl = ref(null);
+
+
+/**
+ * to listen for any clears of the selected codes from outside the Vue app
+ */
+onMounted(() => {
+    document.addEventListener('SEARCH_SELECT__UPDATE_SELECTION', (event) => {
+        if (selectEl.value.getAttribute('id') === event.detail.elementId) { //just in case there are multiple on the page
+            const newSelection = JSON.parse(event.detail.selection);
+            selectedCodesStore.update(newSelection);
+        }
+    });
+});
 
 /**
  * Add a comma separated string of the ids of the selected codes
@@ -19,9 +33,21 @@ const selectedCodesStore = useSelectedCodesStore();
  *
  * @returns { String }
  */
-const curriculumCodes = computed(() => {
-    const justIds = selectedCodesStore.codes.map((code) => code.id);
-    return justIds.join(',');
+const ids = computed(() => {
+    return selectedCodesStore.codesIds.join(',');
+});
+
+/**
+ * To manually dispatch a <select> change event when there's been a change in the selected codes
+ * As this is being handled by Vue rather than user input, the change event won't fire otherwise
+ * except when the <select> is first displayed in the DOM.
+ * We listen for this in library/Schoolbox/Filter/templates/panel.twig
+ */
+watch(() => selectedCodesStore.codesIds, () => {
+    nextTick(() => { //nextTick to ensure the dom has updated so we can access with the latest changes
+        const event = new Event('change');
+        selectEl.value.dispatchEvent(event);
+    });
 });
 
 </script>
@@ -38,7 +64,28 @@ const curriculumCodes = computed(() => {
     <div v-else-if="selectedCodesStore.hasNoCodes && store.isReadOnly" class="selected-codes-container" data-test-container>
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
-    <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="curriculumCodes" />
+    <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />
+    <select
+        ref="selectEl"
+        :id="`${store.formValueName}[]`"
+        :name="`${store.formValueName}[]`"
+        :data-selected-original="JSON.stringify(store.selectedOriginal)"
+        :data-selected-default="JSON.stringify(store.selectedDefault)"
+        tabindex="-1"
+        multiple
+        data-search-select
+    >
+        <option
+            v-for="code in selectedCodesStore.codes"
+            :key="code.id"
+            :value="code.id"
+            :selected.attr="`selected`"
+            :data-selected-object="JSON.stringify(selectedCodesStore.trimCode(code))"
+        >
+            {{ code.code }}
+        </option>
+    </select>
+
 </template>
 
 <style lang="scss" scoped>
@@ -53,12 +100,12 @@ const curriculumCodes = computed(() => {
     padding: 0.5rem;
 }
 
-    .selected-codes-container__disabled {
-        opacity: 0.7;
-    }
-
 .no-codes-note {
     margin-top: 0.35rem;
+}
+
+select[data-search-select] {
+    display: none;
 }
 
 </style>

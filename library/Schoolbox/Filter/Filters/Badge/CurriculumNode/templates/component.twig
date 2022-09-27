@@ -9,52 +9,22 @@
 
 {% block userOptions %}
     <li>
-    {# Empty input is required so that filter works if not user-configurable, or
-       nothing is selected #}
-    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
-
     {% if isUserConfigurable %}
-        {# Selectize is only created if the item is user-configurable #}
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
-
-        {# Selectize for something #}
-        {% autoescape 'js' %}
-            <script type="text/javascript">
-                $(function () {
-                    var $filterSelector = $('#filter-selector-curriculum-node');
-                    $filterSelector.curriculumSelector({
-                        value: {{ (selectedNodes ?? []) | json_encode | raw }},
-                        selectize: {
-                            maxOptions: 10,
-                        },
-                    });
-                });
-
-                // TODO set up the selectize renderer to make it show just the code in the panel
-            </script>
-        {% endautoescape %}
-
-        <select id="filter-selector-curriculum-node"
-                name="filter_selection[{{ definition.filter.id }}][]"
-                multiple
-                placeholder="Enter one or more curriculum codes"
-                data-selectize
-                data-value-original="{{ userSelectionIds | json_encode | e('html_attr') }}"
-                data-value-default="{{ roleSelectionIds | json_encode | e('html_attr') }}"
-        >
-            {% for selectedNode in selectedNodes %}
-                {% include '@filters/_option.twig' with {
-                    roleSelection:      roleSelections[selectedNode.id] ?? null,
-                    userSelection:      userSelections[selectedNode.id] ?? null,
-                    label:              selectedNode.code,
-                    value:              selectedNode.id,
-                    disabled:           isDisabled,
-                    DEBUG_WRAP:         false,
-                } only %}
-            {% endfor %}
-        </select>
+        <div data-cs-container>
+            <curriculum-selector
+                :is-read-only="false"
+                :selected-codes="{{ (selectedNodes ?? []) | json_encode }}"
+                data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
+                form-value-name="filter_selection[{{ definition.filter.id }}]"
+                :selected-original="{{ userSelectionIds | json_encode }}"
+                :selected-default="{{ roleSelectionIds | json_encode }}"
+            />
+        </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>
     {% else %}
+        {# Empty input is required so that filter works if not user-configurable, or
+        nothing is selected #}
+        <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
         {{ parent() }}
     {% endif %}
     </li>

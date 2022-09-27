@@ -154,6 +154,20 @@ export const useSelectedCodesStore = defineStore(`csSelectedCodes`, {
             this.activeCode = code;
         },
 
+        /**
+         * A code can have .children and .parent properties which aren't always needed
+         * and will bloat the selected objects. As such we remove these properties
+         * to slim down the object.
+         *
+         * @param { Object }
+         */
+         trimCode (code) {
+            const copiedCode = { ...code };
+            delete copiedCode.children;
+            delete copiedCode.parent;
+            return copiedCode;
+        },
+
     },
 
 })
