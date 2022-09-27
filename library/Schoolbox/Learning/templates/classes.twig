@@ -22,7 +22,7 @@
                 {% if term.contains(now) or hideTimetable %}
                     <p>You are currently not enrolled in any {{ locale.class.plural }}.</p>
                 {% else %}
-                    <p>You were not enrolled in any classes during {{ term.title }}.</p>
+                    <p>You were not enrolled in any {{ locale.class.plural }} during {{ term.title }}.</p>
                 {% endif %}
                 <p>If you expect to have {{ locale.class.plural }} please contact your system administrator.</p>
             </div>
