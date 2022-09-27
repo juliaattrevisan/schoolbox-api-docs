@@ -59,7 +59,10 @@ function onRemoveSelected () {
 </script>
 
 <template>
-   <div :class="`selected-node ${ props.node.enabled ? '' : 'not-enabled' }`">
+   <div
+        class="selected-node"
+        :data-enabled="props.node.enabled"
+    >
         <button
             class="title-button"
             :title="`View ${props.node.name}`"

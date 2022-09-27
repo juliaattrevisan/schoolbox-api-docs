@@ -6,6 +6,7 @@
 
 import { computed, onMounted } from 'vue';
 import { isScriptAdded, injectScript } from '@js/util/domUtils';
+import { useStore } from '../store/manageCurriculumStore';
 import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import { useUpdateNodeStore } from './store/mcUpdateNodeStore';
 
@@ -20,6 +21,7 @@ const props = defineProps({
     },
 });
 
+const store = useStore();
 const activeNodeStore = useActiveNodeStore();
 const updateNodeStore = useUpdateNodeStore();
 
@@ -36,7 +38,7 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
  *
  * @returns { String }
  */
-const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}` );
+const ckeditorInstance = computed(() => `description-${activeNodeStore.node?.id}` );
 
 /**
  * to load the ckeditor when ready
@@ -99,6 +101,22 @@ const updateButtonText = computed(() => updateNodeStore.isProcessing ? 'Updating
 function onUpdateSelected () {
     updateNodeStore.update();
 }
+
+/**
+ * to display the toast on subsection added / failed
+ */
+updateNodeStore.$onAction(({ name, after, onError }) => {
+    if (name === 'update') {
+        store.toastEl.activate('Updating...');
+        after((result) => {
+            store.toastEl.timeout(result.message, true, 5000);
+        });
+        onError((error) => {
+            console.warn(error);
+            store.toastEl.timeout('Unable to update node', false, 5000);
+        });
+    }
+});
 
 /**
  * close the update view

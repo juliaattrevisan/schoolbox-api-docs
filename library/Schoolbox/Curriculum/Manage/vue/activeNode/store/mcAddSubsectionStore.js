@@ -1,12 +1,10 @@
 /**
- * Handles the store to disband the group
+ * Handles the store add a new subsection to an existing node
  */
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
-import { useNodesStore } from '../../store/mcNodesStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
-import { useViewNodesStore } from '../../viewNodes/store/mcViewNodesStore';
 
 
 const UNSET_ID = -1;
@@ -39,50 +37,30 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
          * pass the new subsections details to the backend
          */
         async add () {
+            const activeNodeStore = useActiveNodeStore();
             this.isProcessing = true;
             try {
                 this.isProcessing = false;
-                const response = await fetch(`${apiEndpoint}/${useActiveNodeStore().node.id}`, {
+                const response = await fetch(`${apiEndpoint}/${activeNodeStore.node.id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: getFormData(this.subsection),
                 });
+                const responseJson = await response.json();
                 if (response.ok) {
-                    const newNode = await response.json();
+                    const newNode = responseJson;
                     this.id = newNode.id;
-                    await this.addSubsection(newNode);
+                    await activeNodeStore.addSubsection(newNode);
                     this.isProcessing = false;
                     this.cancel();
-                    return newNode.id;
+                    return { id: newNode.id, message: `${this.subsection.name} successfully added` };
                 } else {
-                    throw new Error();
+                    throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {
-                console.warn(error);
-            }
-        },
-
-        /**
-         * Add in a new subsection to the active node
-         *
-         * @param { object }
-         */
-        async addSubsection (newNode) {
-            const activeNodeStore = useActiveNodeStore();
-            const nodesStore = useNodesStore();
-            if (activeNodeStore.node.children === null) { //if the children aren't loaded, load them in - which will also return the newly added node
-                await nodesStore.loadChildren(activeNodeStore.node.id);
-            } else { //otherwise we need to push the newNode in as the children are already loaded
-                /**
-                 * @TODO - place in sorted alphabetically
-                 */
-                activeNodeStore.node.children.push(newNode);
-            }
-            const viewNodesStore = useViewNodesStore();
-            if (viewNodesStore.current.id !== newNode.parent.id) { //if we aren't on the new nodes level move down so we can see the new node
-                viewNodesStore.setNextSelected(newNode.parent.id);
+                throw new Error(error.message, error.options);
             }
         },
 

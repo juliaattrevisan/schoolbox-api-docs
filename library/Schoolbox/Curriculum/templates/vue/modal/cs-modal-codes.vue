@@ -7,6 +7,7 @@
 
 import { ref, computed, watch } from 'vue';
 import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
+import { useCodesStore } from '../store/csCodesStore';
 import { useModalSearchStore } from '../store/csModalSearchStore';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
 import CsModalCode from './cs-modal-code.vue'
@@ -14,6 +15,7 @@ import CsModalCode from './cs-modal-code.vue'
 
 const modalActiveCodesStore = useModalActiveCodesStore();
 const modalSearchStore = useModalSearchStore();
+const codesStore = useCodesStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
 const codesContainerEl = ref(null); //to scroll back to top on any selection change
 
@@ -49,7 +51,11 @@ watch(() => modalActiveCodesStore.codes, () => {
     <div v-if="modalSearchStore.isProcessing">
         <loading-table />
     </div>
-    <div v-else-if="modalSearchStore.isActive && modalSearchStore.hasNoResults" class="empty-state">
+    <div v-else-if="codesStore.hasNoCurriculum" class="empty-state">
+        <i class="icon-curriculum"></i>
+        <p>There's currently no Curriculum loaded to display.</p>
+    </div>
+    <div v-else-if="codesStore.isActive && modalSearchStore.hasNoResults" class="empty-state">
         <i class="icon-curriculum"></i>
         <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
         <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>

@@ -23,8 +23,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
          * @param { object }
          */
         prompt (node) {
-            const activeNodeStore = useActiveNodeStore();
-            activeNodeStore.set(node);
+            useActiveNodeStore().set(node);
             this.activeNodeCopy = getActiveNodeCopy(node);
             this.isOpen = true;
         },
@@ -47,16 +46,17 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
                     },
                     body: getFormData(this.activeNodeCopy),
                 });
+                const responseJson = await response.json();
                 if (response.ok) {
                     activeNodeStore.update(this.activeNodeCopy);
                     this.isProcessing = false;
                     this.cancel();
-                    return nodeId;
+                    return { id: nodeId, message: `${this.activeNodeCopy.name} successfully updated` };
                 } else {
-                    throw new Error();
+                    throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error.message, error.options);
             }
         },
 
@@ -64,8 +64,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
          * to hide the update details prompt
          */
         cancel () {
-            const activeNodeStore = useActiveNodeStore();
-            activeNodeStore.unset();
+            useActiveNodeStore().unset();
             this.isOpen = false;
         },
 

@@ -44,20 +44,21 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', {
                     },
                     body: getFormData(this.curriculum),
                 });
+                const responseJson = await response.json();
                 if (response.ok) {
-                    const newCurriculum = await response.json();
+                    const newCurriculum = responseJson;
                     this.id = newCurriculum.id;
                     const nodesStore = useNodesStore();
                     nodesStore.addNewCurriculum(newCurriculum);
                     useViewNodesStore().reset();
                     this.isProcessing = false;
                     this.cancel();
-                    return newCurriculum.id;
+                    return { id: newCurriculum.id, message: `${this.curriculum.name} successfully added` };
                 } else {
-                    throw new Error();
+                    throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {
-                console.warn(error);
+                throw new Error(error.message, error.options);
             }
         },
 

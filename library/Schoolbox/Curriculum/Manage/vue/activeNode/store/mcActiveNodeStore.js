@@ -3,6 +3,8 @@
  */
 
 import { defineStore } from 'pinia';
+import { useNodesStore, sortByName } from '../../store/mcNodesStore';
+import { useViewNodesStore } from '../../viewNodes/store/mcViewNodesStore';
 
 
 export const useActiveNodeStore = defineStore('mcActiveNode', {
@@ -56,10 +58,34 @@ export const useActiveNodeStore = defineStore('mcActiveNode', {
          * @param { Object }
          */
         update (node) {
-            this.node.name = node.name;
-            this.node.code = node.code;
-            this.node.reference = node.reference;
-            this.node.description = node.description;
+            if (node.name !== this.node.name) {
+                this.node.name = node.name;
+                useNodesStore().nodeUpdated(this.node); //notify to prompt a sort
+            }
+            if (node.code !== this.node.code) {
+                this.node.code = node.code;
+            }
+            if (node.description !== this.node.description) {
+                this.node.description = node.description;
+            }
+        },
+
+        /**
+         * Add in a new subsection to the active node
+         *
+         * @param { object }
+         */
+        async addSubsection (newNode) {
+            if (this.node.children === null) { //if the children aren't loaded, load them in - which will also return the newly added node
+                await useNodesStore().loadChildren(this.node.id);
+            } else { //otherwise we need to push the newNode in as the children are already loaded
+                this.node.children.push(newNode);
+                sortByName(this.node.children); //and sort again with the new node added
+            }
+            const viewNodesStore = useViewNodesStore();
+            if (viewNodesStore.current.id !== newNode.parent.id) { //if we aren't on the new nodes level move down so we can see the new node
+                viewNodesStore.setNextSelected(newNode.parent.id);
+            }
         },
 
         /**

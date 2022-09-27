@@ -19,6 +19,7 @@ use Aura\Router\Router;
 use Schoolbox\Permission\Access\UserAccess;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\Role;
 
 class Module extends BaseModule
 {
@@ -67,7 +68,14 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this
-            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                '.*',
+                new Rule\All(
+                    new Rule\IsLoggedIn(),
+                    new Rule\HasRole(Role::STAFF)
+                ),
+            )
             ->addRoutePermission(
                 $authorizer,
                 '(?:edit|add|delete|create|update|replace)',

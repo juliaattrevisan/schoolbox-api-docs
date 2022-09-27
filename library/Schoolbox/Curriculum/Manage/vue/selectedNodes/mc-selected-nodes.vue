@@ -33,13 +33,6 @@ const selectedNodesSummary = computed(() => {
 });
 
 /**
- * Clear the current selection
- */
-function onClearMemberSelection () {
-    selectedNodesStore.empty();
-}
-
-/**
  * So the selected nodes can be enabled / disabled
  *
  * @param { boolean }
@@ -66,6 +59,7 @@ function onDeleteNodesSelected () {
                 :node="node"
             />
         </div>
+        <p v-if="selectedNodesStore.hasDisabledChildNodes && !selectedNodesStore.allNodesEnabled" class="meta">If you wish to re-enable disabled nodes, please enable the disabled parent.</p>
         <ul class="flex-list">
             <li v-if="selectedNodesStore.allNodesEnabled">
                 <button class="button icon-view-hollow" @click.prevent="onEnableNodesSelected(false)" @keyup.enter="onEnableNodesSelected(false)">Disable {{ selectedNodesSummary }}</button>
@@ -90,24 +84,6 @@ function onDeleteNodesSelected () {
     margin-bottom: 0.5rem;
     min-height: 50px;
     padding: 0.5rem;
-}
-
-.selected-count {
-    margin-right: 1rem;
-}
-
-.button-clear, .button-delete, .selected-count {
-    display: inline-block;
-}
-
-.button-clear {
-    background: none;
-    font-size: 0.8rem;
-    padding: 0px;
-    vertical-align: baseline;
-    &:hover {
-        background: none;
-    }
 }
 
 select,

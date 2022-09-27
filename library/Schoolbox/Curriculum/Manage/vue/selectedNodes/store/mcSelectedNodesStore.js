@@ -3,7 +3,8 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore, enabledNodes, findById } from '../../store/mcNodesStore';
+import { useNodesStore, findById } from '../../store/mcNodesStore';
+import { useEnableNodesStore } from './mcEnableNodesStore';
 
 
 export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
@@ -11,6 +12,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
     state: () => ({
         nodes: [], //the currently selected nodes
         activeNode: null, //to show extra info on a selected code in a modal
+        hasDisabledChildNodes: false,
     }),
 
     getters: {
@@ -101,6 +103,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
                         return node.enabled ? false : true;
                     }
                 });
+                this.hasDisabledChildNodes = noChildEnabledNodes.length !== this.nodes.length ? true : false; //show a note in the the UI that enabling child nodes of disabled parents is not possible
                 return noChildEnabledNodes.length === this.nodes.length;
             } else {
                 return false;
@@ -226,6 +229,40 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
          */
         setActiveNode (node) {
             this.activeNode = node;
+        },
+
+        /**
+         * Update the .enabled status on eac node and all its children
+         *
+         * @param { object }
+         */
+        enableNodes () {
+            const enabled = useEnableNodesStore().enabled;
+            this.nodes.forEach((node) => this.enableAllChildren(node, enabled)); //set the enabled on each node
+            this.empty();
+        },
+
+        /**
+         * Loop through recursively and update all
+         * children to the parents updated enabled state
+         *
+         * @param { array }
+         * @param { boolean }
+         */
+        enableAllChildren (node, enabled) {
+            node.enabled = enabled;
+            node.children?.forEach((innerNode) => {
+                this.enableAllChildren(innerNode, enabled);
+            });
+        },
+
+        /**
+         * Delete all the seleced nodes from the tree structure
+         */
+        deleteNodes () {
+            const nodesStore = useNodesStore();
+            this.nodes.forEach((node) => nodesStore.deleteNode(node)); //delete each node from the tree
+            this.empty();
         },
 
     },

@@ -41,9 +41,7 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', {
                 const isAllResponsesOk = enableResponses.every((response) => response === true);
                 if (isAllResponsesOk) {
                     const successMessage = this.getSuccessMessage();
-                    const selectedNodesStore = useSelectedNodesStore();
-                    selectedNodesStore.nodes.forEach((node) => this.enableAllChildren(node)); //set the enabled on each node
-                    selectedNodesStore.empty();
+                    useSelectedNodesStore().enableNodes();
                     this.isProcessing = false;
                     this.cancel();
                     return successMessage;
@@ -88,20 +86,6 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', {
             const nodeSingleOrPlural = `node${selectedNodesStore.count > 1  ? 's' : ''}`;
             const enabledOrDisabled = `${ selectedNodesStore.nodes[0].enabled ? 'disabled' : 'enabled'}`
             return `${selectedNodesStore.count} ${nodeSingleOrPlural} successfully ${enabledOrDisabled}`;
-        },
-
-        /**
-         * Loop through recursively and update all
-         * children to the parents updated enabled state
-         *
-         * @param { array }
-         * @param { boolean }
-         */
-        enableAllChildren (node) {
-            node.enabled = this.enabled;
-            node.children?.forEach((innerNode) => {
-                this.enableAllChildren(innerNode);
-            });
         },
 
         /**
