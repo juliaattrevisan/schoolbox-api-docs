@@ -11,6 +11,9 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use Alaress_Curl_Url;
+use Laminas\Uri\Exception\InvalidArgumentException;
+use Laminas\Uri\Exception\InvalidUriException;
+use Laminas\Uri\Exception\InvalidUriPartException;
 use RuntimeException;
 use Laminas\Uri\Exception;
 use Laminas\Uri\Uri;
@@ -23,7 +26,6 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
  */
 class Api implements IApi
 {
-
     /**
      * The host of the iSAMS server
      *
@@ -41,6 +43,15 @@ class Api implements IApi
 
 
     /**
+     * The iSAMS module that you're accessing;
+     * corresponds to one of the DSN consts
+     *
+     * @var string
+     */
+    private string $module;
+
+
+    /**
      * @var Uri|null
      */
     private ?Uri $url = null;
@@ -51,26 +62,29 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $apiKey
+     * @param string $module
      */
-    public function __construct(string $host, string $apiKey)
+    public function __construct(string $host, string $apiKey, string $module)
     {
         $this->host   = $host;
         $this->apiKey = $apiKey;
+        $this->module = $module;
     }
 
 
     /**
      * Retrieves a XML document representing the result from the API call.
      *
-     * @param string $filter An XML document representing a filter
      * @return string|null
+     * @throws InvalidArgumentException
+     * @throws InvalidUriException
+     * @throws InvalidUriPartException
      * @throws RuntimeException if the retrieval of the XML doc failed
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
+     * @throws \DomainException
      */
-    public function retrieveDocument(string $filter = ''): ?string
+    public function retrieveDocument(): ?string
     {
-        $curl = $this->initCurl($filter);
+        $curl = $this->initCurl();
         $curl->exec();
 
         if (empty($curl->getErrors())) {
@@ -104,8 +118,8 @@ class Api implements IApi
             $this->url = (new Uri())
                 ->setScheme('https')
                 ->setHost($this->host)
-                ->setPath('/api/batch/1.0/xml.ashx')
-                ->setQuery(['apikey' => $credentials['key']]);
+                ->setPath('/xml.ashx')
+                ->setQuery(['apikey' => $credentials['modules'][$this->module]['key']]);
         }
 
         return $this->url;
@@ -115,24 +129,15 @@ class Api implements IApi
     /**
      * Set up curl instance
      *
-     * @param string $filter
      * @return Alaress_Curl_Url
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriException
+     * @throws InvalidUriPartException
+     * @throws \DomainException
      */
-    private function initCurl(string $filter = ''): \Alaress_Curl_Url
+    private function initCurl(): \Alaress_Curl_Url
     {
-        $curl = new Alaress_Curl_Url($this->getUrl()->toString());
-
-        if ('' !== $filter) {
-            $curl->addOptions([
-                CURLOPT_HTTPHEADER => ['Content-Type: text/xml'],
-                CURLOPT_POST       => true,
-                CURLOPT_POSTFIELDS => $filter,
-            ]);
-        }
-
-        return $curl;
+        return new Alaress_Curl_Url($this->getUrl()->toString());
     }
 
 

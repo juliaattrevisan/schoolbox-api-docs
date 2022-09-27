@@ -23,21 +23,28 @@ use Laminas\Uri\Exception\InvalidUriPartException;
  */
 class Specification implements ISpecification
 {
+    /**
+     * @var string
+     */
+    private string $host;
+
 
     /**
-     * @var Batchxml
+     * @var string
      */
-    private Batchxml $batchxml;
+    private string $dsn;
 
 
     /**
      * Specification constructor.
      *
-     * @param Batchxml $batchxml
+     * @param string $host
+     * @param string $dsn
      */
-    public function __construct(Batchxml $batchxml)
+    public function __construct(string $host, string $dsn)
     {
-        $this->batchxml = $batchxml;
+        $this->host = $host;
+        $this->dsn = $dsn;
     }
 
 

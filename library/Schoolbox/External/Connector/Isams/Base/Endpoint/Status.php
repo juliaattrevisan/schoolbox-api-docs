@@ -21,22 +21,28 @@ use Laminas\Uri\Exception\InvalidUriPartException;
  */
 class Status implements IStatus
 {
+    /**
+     * @var string
+     */
+    private string $host;
+
 
     /**
-     * @var Api
+     * @var string
      */
-    private Api $api;
+    private string $dsn;
 
 
     /**
      * Status constructor.
      *
      * @param string $host
-     * @param string $key
+     * @param string $dsn
      */
-    public function __construct(string $host, string $key)
+    public function __construct(string $host, string $dsn)
     {
-        $this->api = new Api($host, $key);
+        $this->host = $host;
+        $this->dsn = $dsn;
     }
 
 
@@ -46,6 +52,7 @@ class Status implements IStatus
      * @return bool
      * @throws InvalidArgumentException
      * @throws InvalidUriPartException
+     * @throws \DomainException
      */
     public function isReachable(): bool
     {
@@ -54,7 +61,9 @@ class Status implements IStatus
          *
          * Use an ultra cheep way at the cost of some neatness
          */
-        $result = @get_headers((string)$this->api->getUrl());
+        $api = new Api($this->host, $this->dsn, Codec\DSN::MODULE_BATCHXML);
+
+        $result = @get_headers((string)$api->getUrl());
 
         if (is_array($result)) {
             return strpos($result[0], '200') > -1;
@@ -73,7 +82,7 @@ class Status implements IStatus
      */
     public function getReport(): array
     {
-        $specification = new Specification(new Batchxml($this->api));
+        $specification = new Specification($this->host, $this->dsn);
 
         try {
             return $specification->check();
