@@ -101,11 +101,9 @@ export const useCodesStore = defineStore(`csCodes`, {
          */
         async setTopLevel (nodes) {
             this.updateNodes(nodes);
-            const modalActiveCodesStore = useModalActiveCodesStore();
-            if (modalActiveCodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
+            if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
                 const singleCurriculumId = this.codes.children[0].id;
-                await this.loadChildren(singleCurriculumId); //load in its children for initial display
-                modalActiveCodesStore.setSelected(1, singleCurriculumId); //then select the node
+                await useModalActiveCodesStore().setNextSelected(singleCurriculumId); //load in its children for initial display
             }
         },
 
