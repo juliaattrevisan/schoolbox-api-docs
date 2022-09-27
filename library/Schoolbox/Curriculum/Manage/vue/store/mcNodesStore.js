@@ -87,7 +87,7 @@ export const useNodesStore = defineStore('mcNodes', {
         },
 
         /**
-         *
+         * load the single curriculum for display straight away
          */
         async loadSingleCurriculum () {
             const singleCurriculumId = this.nodes.children[0].id;
@@ -96,7 +96,7 @@ export const useNodesStore = defineStore('mcNodes', {
         },
 
         /**
-         *
+         * load the node, retrieving all its parents so we can traverse directly to it
          *
          * @param { number }
          */
@@ -106,8 +106,12 @@ export const useNodesStore = defineStore('mcNodes', {
                 const response = await fetch(`${apiEndpoint}/${id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
                 if (response.ok) {
                     const nodeWithParents = await response.json();
-                    node.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
-                    console.warn(node.breadcrumbs);
+                    const breadcrumbs = getBreadcrumbs(nodeWithParents, []);
+                    breadcrumbs.push( { id: id, name: nodeWithParents.name } ); //add in the actual node as the last
+                    const viewNodesStore = useViewNodesStore();
+                    for (const breadcrumb of breadcrumbs) { //recursively load in each parent and traverse down
+                        await viewNodesStore.setNextSelected(breadcrumb.id);
+                    }
                 } else {
                     this.hasId = false;
                     if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
