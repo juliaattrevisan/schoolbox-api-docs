@@ -28,7 +28,6 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable\DayCalibrator;
  */
 class DayCalibratorTest extends TestCase
 {
-
     /* These are two xml fragments that we encountered in the wild
      * I've reduced the xml to the relevant parts (the rest aren't used)
      * and modified some of the contents for brevity
