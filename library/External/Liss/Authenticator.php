@@ -85,7 +85,7 @@ class External_Liss_Authenticator
     public function isAuthenticated()
     {
         $struct = $this->dataObject->me['struct'];
-$this->log->info(json_encode($struct));die();
+
         $isUsernameCorrect = (string)$struct['UserName']->me['string'] == $this->username;
         $isPasswordCorrect = (string)$struct['Password']->me['string'] == $this->password;
 

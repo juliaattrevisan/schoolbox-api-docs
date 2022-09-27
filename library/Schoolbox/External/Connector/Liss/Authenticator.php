@@ -23,6 +23,36 @@ use PhpXmlRpc\Value;
 class Authenticator
 {
     /**
+     * Arbitrary const that denotes we're on the schoolbox connector
+     * TODO This might be found elsewhere, can't remember where
+     */
+    private const SCHOOLBOX_CONNECTOR = 'schoolbox';
+
+
+    /**
+     * Default logging message when attempting to use liss with a non-schoolbox connector
+     */
+    private const WRONG_CONNECTOR_MESSAGE = 'External Database must be activated and the selected connector must be schoolbox; exiting';
+
+
+    /**
+     * Whether the external db was enabled
+     *
+     * @var int|null
+     */
+    private ?int $externalEnable = null;
+
+
+    /**
+     * Whether the external db is the "schoolbox" connector
+     * or something else (it only works with "schoolbox" connector)
+     *
+     * @var string|null
+     */
+    private ?string $externalType = null;
+
+
+    /**
      * Username
      *
      * @var string|null
@@ -62,6 +92,8 @@ class Authenticator
     /**
      * Constructor.
      *
+     * @param int    $externalEnable
+     * @param string $externalType
      * @param string $username
      * @param string $password
      * @param string $schoolCode
@@ -69,12 +101,16 @@ class Authenticator
      * @param Value  $dataObject
      */
     public function __construct(
+        int $externalEnable,
+        string $externalType,
         string $username,
         string $password,
         string $schoolCode,
         Logger $log,
         Value $dataObject
     ) {
+        $this->externalEnable = $externalEnable;
+        $this->externalType = $externalType;
         $this->username = $username;
         $this->password = $password;
         $this->schoolCode = $schoolCode;
@@ -87,21 +123,39 @@ class Authenticator
      * Determine whether the request contains a valid
      * authentication object (that is always 0th element)
      */
-    public function isAuthenticated()
+    public function isAuthenticated(): bool
     {
+        /* Must be using external database and schoolbox connector
+         */
+        $externalEnable = (bool)$this->externalEnable;
+        $externalType = self::SCHOOLBOX_CONNECTOR === $this->externalType;
+
+        if (!($externalEnable && $externalType)) {
+            $this->log->info(self::WRONG_CONNECTOR_MESSAGE);
+            return false;
+        }
+
+        /* Check the username/passwor/schoolcode tuple
+         */
         $struct = $this->dataObject->me['struct'];
 
-        $isUsernameCorrect = (string)$struct['UserName']->me['string'] === $this->username;
-        $isPasswordCorrect = (string)$struct['Password']->me['string'] === $this->password;
-        $isSchoolCodeCorrect = (string)$struct['School']->me['string'] === $this->schoolCode;
+        $username = (string)$struct['UserName']->me['string'];
+        $schoolCode = (string)$struct['School']->me['string'];
+        $password = (string)$struct['Password']->me['string'];
 
-        /* (username, password, schoolCode) tuple must match what's transmitted
+        $isUsernameCorrect = $username === $this->username;
+        $isPasswordCorrect = $password === $this->password;
+        $isSchoolCodeCorrect = $schoolCode === $this->schoolCode;
+
+        /* external_enable must be truthy
+         * external_type must be "schoolbox"
+         * (username, password, schoolCode) tuple must match what's transmitted
          */
         if ($isUsernameCorrect && $isPasswordCorrect && $isSchoolCodeCorrect) {
             $this->log->info(sprintf(
                 'User %s at school %s has been authenticated',
-                (string)$struct['UserName']->me['string'],
-                (string)$struct['School']->me['string']
+                $username,
+                $schoolCode
             ));
 
             return true;
@@ -109,8 +163,8 @@ class Authenticator
 
         $this->log->error(sprintf(
             'User %s at school %s has failed to authenticate',
-            (string)$struct['UserName']->me['string'],
-            (string)$struct['School']->me['string']
+            $username,
+            $schoolCode
         ));
 
         return false;

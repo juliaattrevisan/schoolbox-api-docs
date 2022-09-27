@@ -46,12 +46,6 @@ class Receiver
 
 
     /**
-     * Default logging message when attempting to use liss with a non-schoolbox connector
-     */
-    private const WRONG_CONNECTOR_MESSAGE = 'External Database must be activated and the selected connector must be schoolbox; exiting';
-
-
-    /**
      * Whether the external db was enabled
      *
      * @var int|null
@@ -467,14 +461,18 @@ class Receiver
     {
         /* Requires schoolbox connector
          */
-        if (!$this->isSchoolboxConnector()) {
-            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
-            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
+        if (!(new Authenticator(
+            $this->externalEnable,
+            $this->externalType,
+            $this->username,
+            $this->password,
+            $this->schoolCode,
+            $this->log(),
+            $message->getParam(0)
+        ))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
-//
-//        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
-//
-//        if ($authenticator->isAuthenticated()) {
+
 //            $this->log()->info('publishTimetable: processing request');
 //
 //            $timetablePeriodMapper = new TimetablePeriodMapper();
@@ -546,7 +544,7 @@ class Receiver
 //            return $this->generateResponse('Timetable Imported');
 //        }
 //
-        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+
     }
 
 
@@ -959,25 +957,6 @@ class Receiver
 //        }
 //
         return $this->generateResponse(self::AUTHENTICATION_FAILED);
-    }
-
-
-    /**
-     * This installation is currently using the schoolbox connector
-     *
-     * @return bool
-     */
-    private function isSchoolboxConnector(): bool
-    {
-//        /* External must be enabled
-//         */
-//        if (!$this->config->get('external_enable')) {
-//            return false;
-//        }
-//
-//        /* External must also be schoolbox connector
-//         */
-//        return $this->config->get('external_type') === 'schoolbox';
     }
 
 
