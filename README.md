@@ -65,7 +65,6 @@ This file is internal use and is not shipped to clients.
   aws_iam_secret: xxxx
 ```
 * You can get your `aws_iam_key` and `aws_iam_secret` from the infrastructure team #infrastructure-support
-* Place your `.env` file in the project's root directory (contents in Lastpass "Schoolbox Vagrant .env file")
 * In your schoolbox directory import your vagrant box and bring it up for the first time
 ```
   vagrant box add ubuntu-1804-php74 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-1804-php74.box;

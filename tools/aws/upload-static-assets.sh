@@ -9,8 +9,8 @@ readonly ARG_HELP_LONG="help"
 readonly ARG_AWS_BUCKET="bucket"
 readonly ARG_AWS_ACCESS_KEY_ID="access-key"
 readonly ARG_AWS_SECRET_ACCESS_KEY="secret-key"
-readonly AWS_ACCESS_KEY_ID_ENV="AWS_ACCESS_KEY_ID"           # Name of var in .env file
-readonly AWS_SECRET_ACCESS_KEY_ENV="AWS_SECRET_ACCESS_KEY"   # Name of var in .env file
+readonly VAGRANT_YAML_KEY_AWS_ACCESS_KEY="aws_iam_key"      # Name of var in vagrant.yaml file
+readonly VAGRANT_YAML_KEY_AWS_SECRET_KEY="aws_iam_secret"   # Name of var in vagrant.yaml file
 
 # Global vars
 declare site_root
@@ -75,7 +75,7 @@ function help_msg(){
   echo "Does not build/publish assets. You need to do that prior to invoking this tool with npm"
   echo "Requires AWS S3 credentials to a development account. These credentials will be derived in following order:"
   echo "1. Via CLI args"
-  echo "2. From .env file"
+  echo "2. From vagrant.yaml file"
   echo "3. Prompted at run-time"
   echo ""
   echo "To use this script, you must first:"
@@ -138,17 +138,21 @@ function derive_site_root(){
   site_root=$(readlink -f "$dir_path"/../../);
 }
 
-# Function to fetch value from .env file by key
-function read_env_var() {
-    VAR=$(grep -E "^\s*$1" "$site_root"/.env | xargs)
-    IFS="=" read -ra VAR <<< "$VAR"
-    echo "${VAR[1]}"
+# Function to fetch value from vagrant.yaml file by key
+function read_var_from_vagrant_yaml() {
+  file="$site_root"/vagrant.yaml
+  if [[ ! -f $file ]]; then
+    return
+  fi
+  VAR=$(grep -E "^\s*$1" "$file" | xargs)
+  IFS=":" read -ra VAR <<< "$VAR"
+  echo "${VAR[1]}"
 }
 
 function load_access_and_secret_keys(){
   # Access Key
   if [[ -z $aws_access_key_id ]]; then
-    aws_access_key_id=$(read_env_var $AWS_ACCESS_KEY_ID_ENV)
+    aws_access_key_id=$(read_var_from_vagrant_yaml $VAGRANT_YAML_KEY_AWS_ACCESS_KEY)
   fi
   while [[ -z $aws_access_key_id ]]; do
      read -r -p "AWS Access key: " aws_access_key_id
@@ -159,7 +163,7 @@ function load_access_and_secret_keys(){
 
   # Secret Key
   if [[ -z $aws_secret_access_key ]]; then
-    aws_secret_access_key=$(read_env_var $AWS_SECRET_ACCESS_KEY_ENV)
+    aws_secret_access_key=$(read_var_from_vagrant_yaml $VAGRANT_YAML_KEY_AWS_SECRET_KEY)
   fi
   while [[ -z $aws_secret_access_key ]]; do
      read -r -p "AWS Secret key: " aws_secret_access_key
