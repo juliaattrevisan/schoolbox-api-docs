@@ -253,7 +253,7 @@ class Controller extends Base
                     'user'             => $user,
                     'recentStudents'   => $this->pastoralAuditMapper->findRecentlyViewedStudentsForUser($user),
                     'recentDashboard'  => $this->pastoralDataSource->findRecentDashboard($user),
-                    'reportsDashboard' => $this->pastoralReportMapper->findForUser($user, true),
+                    'reportsDashboard' => $this->pastoralReportMapper->findForUser($user, dashboardOnly: true),
                     'groups'           => $groupsMemberships,
                 ],
                 'title'    => 'Dashboard',

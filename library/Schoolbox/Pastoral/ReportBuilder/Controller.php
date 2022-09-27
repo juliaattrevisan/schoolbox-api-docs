@@ -109,7 +109,7 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $reportsAll = $this->pastoralReportMapper->findForUser($this->getUser(), false);
+        $reportsAll = $this->pastoralReportMapper->findForUser($this->getUser(), dashboardOnly: false);
 
         $reportsMine  = [];
         $reportsGroup = [];

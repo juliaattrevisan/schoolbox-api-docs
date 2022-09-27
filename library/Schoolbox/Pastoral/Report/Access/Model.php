@@ -122,7 +122,7 @@ class Model
     }
 
     /**
-     * @return int
+     * @return int<1,2>
      */
     public function getAccess(): int
     {
