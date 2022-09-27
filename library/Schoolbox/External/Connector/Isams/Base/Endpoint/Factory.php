@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -207,12 +208,16 @@ class Factory
             $api = new MockFileApi($this->file);
         } else {
             $this->log->info('Accessing api endpoint');
-            $api = new Api($this->host, $this->key);
+
+            /* Connect and shank data for all the modules we know about
+             */
+            $batchxmls = [
+                DSN::MODULE_BATCHXML => new Api($this->host, $this->key, DSN::MODULE_BATCHXML),
+                DSN::MODULE_STAFFPHOTO => new Api($this->host, $this->key, DSN::MODULE_STAFFPHOTO),
+                DSN::MODULE_STUDENTPHOTO => new Api($this->host, $this->key, DSN::MODULE_STUDENTPHOTO),
+            ];
         }
 
-        /* Connect and shank data
-         */
-        $batchxml = new Batchxml($api);
 
         /* Cache a list of known users and periods
          * Every student timetable processing uses info stored there
@@ -234,7 +239,7 @@ class Factory
             ->add(new Profile\Profile(
                 $this->log,
                 $this->perform,
-                $batchxml,
+                $batchxmls,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
@@ -261,19 +266,19 @@ class Factory
             ->add(new Timetable\Identifier(
                 $this->log,
                 $this->perform,
-                $batchxml
+                $batchxmls
             ))
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,
-                $batchxml,
+                $batchxmls,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
             ->add(new Timetable\Classes(
                 $this->log,
                 $this->perform,
-                $batchxml,
+                $batchxmls,
                 $lookup,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,

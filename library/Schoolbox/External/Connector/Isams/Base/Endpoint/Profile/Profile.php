@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Profile as UserProfile;
@@ -61,9 +62,9 @@ class Profile implements IStrategy
 
 
     /**
-     * @var Batchxml
+     * @var array
      */
-    private Batchxml $batchxml;
+    private array $batchxmls;
 
 
     /**
@@ -101,7 +102,7 @@ class Profile implements IStrategy
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
-     * @param Batchxml                        $batchxml
+     * @param array                           $batchxmls
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -111,7 +112,7 @@ class Profile implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Batchxml $batchxml,
+        array $batchxmls,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -120,7 +121,7 @@ class Profile implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->batchxml = $batchxml;
+        $this->batchxmls = $batchxmls;
 
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
@@ -200,7 +201,7 @@ class Profile implements IStrategy
          */
         $campusMapping = $this->prefetchCampuses();
 
-        $students = $this->batchxml->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
+        $students = $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
         /* $student is a stdclass derived from xml data,
          * it's not a Normalised Data Structure object here
@@ -432,7 +433,7 @@ class Profile implements IStrategy
      */
     private function findComments(string $studentId): string
     {
-        $nodes = $this->batchxml->fetchXml("/iSAMS/SENManager/Requirements/Type[@PupilId='{$studentId}']");
+        $nodes =  $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/SENManager/Requirements/Type[@PupilId='{$studentId}']");
 
         $comments = [];
 
@@ -471,7 +472,7 @@ class Profile implements IStrategy
     private function findHousemaster(string $houseName): array
     {
         $houseName = trim($houseName);
-        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[Name[text()='{$houseName}']]");
+        $nodes =  $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/SchoolManager/AcademicHouses/House[Name[text()='{$houseName}']]");
 
         if ($nodes) {
             return $this->findStaffMemberById(trim((string)$nodes[0]->HouseMaster));
@@ -494,7 +495,7 @@ class Profile implements IStrategy
     private function findFormTeacher(string $form): array
     {
         $form = trim($form);
-        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Forms/Form[@Id='{$form}']");
+        $nodes =  $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/SchoolManager/Forms/Form[@Id='{$form}']");
 
         if ($nodes) {
             return $this->findStaffMemberById(trim((string)$nodes[0]->Tutor));
@@ -517,7 +518,7 @@ class Profile implements IStrategy
     private function findYearLevelCoordinator(string $year): array
     {
         $year = trim($year);
-        $nodes = $this->batchxml->fetchXml("/iSAMS/SchoolManager/Years/Year[Code[text()='{$year}']]");
+        $nodes =  $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/SchoolManager/Years/Year[Code[text()='{$year}']]");
 
         if ($nodes) {
             return $this->findStaffMemberById(trim((string)$nodes[0]->Tutor));
@@ -553,7 +554,7 @@ class Profile implements IStrategy
 
         /* Otherwise, go hunting for them
          */
-        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$id}']]");
+        $node =  $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$id}']]");
 
         /* Unknown staff: can't find it via its UserCode
          */
@@ -580,7 +581,7 @@ class Profile implements IStrategy
      */
     private function findMedicalAlert(string $studentId): ?string
     {
-        $node = $this->batchxml->fetchXml("/iSAMS/PupilManager/CurrentPupilsHealth/Pupil[@Id='{$studentId}']");
+        $node =  $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/PupilManager/CurrentPupilsHealth/Pupil[@Id='{$studentId}']");
 
         /* TODO: HealthNotes DentalNotes HearingNotes OpthalmicNotes could denote Medical Alerts
          * We keep it simple for now
@@ -603,7 +604,7 @@ class Profile implements IStrategy
      */
     private function findSpecialNeeds(string $studentId): bool
     {
-        $node = $this->batchxml->fetchXml("/iSAMS/SENManager/SEN/Register[@PupilId='{$studentId}']/RegisterFlag[. > 0]");
+        $node =  $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/SENManager/SEN/Register[@PupilId='{$studentId}']/RegisterFlag[. > 0]");
 
         if ($node) {
             return true;
@@ -621,7 +622,7 @@ class Profile implements IStrategy
      */
     private function prefetchCampuses(): array
     {
-        $campuses = $this->batchxml->fetchXml('/iSAMS/SchoolManager/SchoolDivisions/SchoolDivision');
+        $campuses =  $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/SchoolManager/SchoolDivisions/SchoolDivision');
 
         $mapping = [];
 
@@ -666,7 +667,7 @@ class Profile implements IStrategy
          * ($student contains multiple ids, some of which seem internal to isams)
          */
         $path = "/iSAMS/PupilManager/CurrentPupils/Pupil[contains(SchoolId, '{$studentExternalId}')]";
-        $node = $this->batchxml->fetchXml($path)[0];
+        $node =  $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml($path)[0];
 
         /* This isn't the primary identifier that we use in $student
          * This is some sort of internal relation id in the xml
@@ -680,7 +681,7 @@ class Profile implements IStrategy
          * If isams changes this structure, this will snap (obviously) so yeah, we should pay attention
          */
         $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
-        $parents = $this->batchxml->fetchXml($path);
+        $parents =  $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml($path);
 
         /* As per Duane's conclusion:
          * A contact's aggregated SOS field equates to Message Alerts for their student
@@ -832,7 +833,7 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
-        $staffs = $this->batchxml->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
+        $staffs =  $this->batchxmls[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
 
         /* $staff is a stdclass derived from xml data,
          * it's not a Normalised Data Structure object here
