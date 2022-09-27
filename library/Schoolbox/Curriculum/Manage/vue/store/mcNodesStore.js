@@ -137,7 +137,6 @@ export const useNodesStore = defineStore('mcNodes', {
                     useSelectedNodesStore().addIsSelected(oldNode);
                     oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
-                    debugger;
                     throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {
