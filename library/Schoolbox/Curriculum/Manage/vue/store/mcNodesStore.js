@@ -113,12 +113,13 @@ export const useNodesStore = defineStore('mcNodes', {
                     if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
                         this.loadSingleCurriculum();
                     }
-                    console.warn(response);
-                    this.hasLoadError = true;
+                    if (response.status === 404) { //we assume the id can't be found
+                        throw new Error(`No node id matching ${id} has been found`);
+                    }
                 }
             } catch (error) {
-                console.warn(error);
                 this.hasLoadError = true;
+                throw new Error(error.message, error.options);
             } finally {
                 this.isLoading = false;
             }

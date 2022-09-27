@@ -7,6 +7,7 @@
 
 import { ref, onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
+import { useNodesStore } from './store/mcNodesStore';
 import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';
 import McSelectedNodes from './selectedNodes/mc-selected-nodes.vue';
@@ -14,6 +15,11 @@ import McEnableNodes from './selectedNodes/mc-enable-nodes.vue';
 import McDeleteNodes from './selectedNodes/mc-delete-nodes.vue';
 import McActiveSelectedNodeModal from './selectedNodes/mc-active-selected-node-modal.vue';
 import Toast from '@schoolboxVue/components/toast.vue';
+
+
+const store = useStore();
+const nodesStore = useNodesStore();
+const toastEl = ref(null);
 
 
 const props = defineProps({
@@ -35,13 +41,24 @@ const props = defineProps({
     },
 });
 
-const toastEl = ref(null);
-
 /**
  * Start loading the curriculum data
  */
 onMounted(() => {
-    useStore().init(props, toastEl);
+    store.init(props, toastEl);
+});
+
+/**
+ *
+ */
+nodesStore.$onAction(({ name, onError }) => {
+    if (name === 'loadId') {
+        onError((error) => {
+            console.warn(error.message);
+            store.toastEl.activate();
+            store.toastEl.timeout(error.message, false, 5000);
+        });
+    }
 });
 
 </script>
