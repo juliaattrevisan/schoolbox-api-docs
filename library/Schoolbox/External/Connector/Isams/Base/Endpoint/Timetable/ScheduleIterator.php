@@ -13,6 +13,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 use Iterator;
 use RuntimeException;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use SimpleXMLElement;
 use Laminas\Uri\Exception\InvalidArgumentException;
 use Laminas\Uri\Exception\InvalidUriPartException;
@@ -131,7 +132,7 @@ class ScheduleIterator implements Iterator
      */
     private function findSubject(string $setCode): array
     {
-        $node = $this->batchxml->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
 
         /* Unknown subject: can't find it via its setCode
          */
@@ -164,7 +165,7 @@ class ScheduleIterator implements Iterator
 
         $periodPath = "/iSAMS/TimetableManager/Structure/Week/Days/Day/Periods/Period[@Id='{$periodId}']";
 
-        $period = $this->batchxml->fetchXml($periodPath);
+        $period = $this->api[DSN::MODULE_BATCHXML]->fetchXml($periodPath);
 
         /* Unknown period
          */
@@ -184,7 +185,7 @@ class ScheduleIterator implements Iterator
          */
         $dayPath = "{$periodPath}/ancestor::*[position()=2]";
 
-        $day = $this->batchxml->fetchXml($dayPath);
+        $day = $this->api[DSN::MODULE_BATCHXML]->fetchXml($dayPath);
 
         /* Unknown day
          */
@@ -225,7 +226,7 @@ class ScheduleIterator implements Iterator
      */
     private function findRoom(string $roomId): array
     {
-        $node = $this->batchxml->fetchXml("/iSAMS/EstateManager/Buildings/Building/Classrooms/Classroom[@Id='{$roomId}']");
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/EstateManager/Buildings/Building/Classrooms/Classroom[@Id='{$roomId}']");
 
         if (empty($node)) {
             return [
@@ -270,7 +271,7 @@ class ScheduleIterator implements Iterator
 
         /* Otherwise, go hunting for them
          */
-        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$teacherCode}']]");
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$teacherCode}']]");
 
         /* Unknown teacher: can't find it via its setCode
          */
@@ -300,7 +301,7 @@ class ScheduleIterator implements Iterator
      */
     private function findStudents(string $setCode): array
     {
-        $node = $this->batchxml->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
 
         /* Unknown subject: can't find it via its setCode
          */
@@ -316,12 +317,12 @@ class ScheduleIterator implements Iterator
 
         /* Select all the SetList nodes where any of its SetId subnodes contains the value $setId exactly
          */
-        $setListNodes = $this->batchxml->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[SetId[text()='{$setId}']]");
+        $setListNodes = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[SetId[text()='{$setId}']]");
 
         foreach ($setListNodes as $current) {
             $studentId = trim((string)$current->xpath('@PupilId')[0]);
 
-            $student = $this->batchxml->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+            $student = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
 
             /* Unknown student; can't find it via its studentId
              */
@@ -337,7 +338,6 @@ class ScheduleIterator implements Iterator
                 'username' => trim((string)$student->SchoolCode),
             ];
         }
-
 
         return $students;
     }
