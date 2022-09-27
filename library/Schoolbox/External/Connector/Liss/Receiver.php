@@ -46,6 +46,29 @@ class Receiver
 
 
     /**
+     * Default logging message when attempting to use liss with a non-schoolbox connector
+     */
+    private const WRONG_CONNECTOR_MESSAGE = 'External Database must be activated and the selected connector must be schoolbox; exiting';
+
+
+    /**
+     * Whether the external db was enabled
+     *
+     * @var int|null
+     */
+    private ?int $externalEnable = null;
+
+
+    /**
+     * Whether the external db is the "schoolbox" connector
+     * or something else (it only works with "schoolbox" connector)
+     *
+     * @var string|null
+     */
+    private ?string $externalType = null;
+
+
+    /**
      * @var string|null
      */
     private ?string $username = null;
@@ -79,17 +102,23 @@ class Receiver
     /**
      * Constructor.
      *
+     * @param int    $externalEnable
+     * @param string $externalType
      * @param string $username
      * @param string $password
      * @param string $schoolCode
      * @param string $logDir
      */
     public function __construct(
+        int $externalEnable,
+        string $externalType,
         string $username,
         string $password,
         string $schoolCode,
         string $logDir
     ) {
+        $this->externalEnable = $externalEnable;
+        $this->externalType = $externalType;
         $this->username = $username;
         $this->password = $password;
         $this->schoolCode = $schoolCode;
@@ -275,7 +304,7 @@ class Receiver
 //            return $this->generateResponse('Teachers Imported');
 //        }
 //
-//        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
 
@@ -308,7 +337,7 @@ class Receiver
 //            return $this->generateResponse('Students Imported');
 //        }
 //
-//        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
 
@@ -375,7 +404,7 @@ class Receiver
 //            return $this->generateResponse('Rooms Imported');
 //        }
 //
-//        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
     }
 
 
