@@ -205,7 +205,14 @@ class Factory
     {
         if ($this->file) {
             $this->log->info("Loading from locally-cached xml file: {$this->file}");
-            $api = new MockFileApi($this->file);
+
+            /* Forge an equivalent that reads from a local file where possible
+             * Staff and Students photos does nothing, intentionally, atm.
+             * Only the xml files can/should be stored and read locally afaict
+             */
+            $api = [
+                DSN::MODULE_BATCHXML => new Batchxml(new MockFileApi($this->file)),
+            ];
         } else {
             $this->log->info('Accessing api endpoint');
 
