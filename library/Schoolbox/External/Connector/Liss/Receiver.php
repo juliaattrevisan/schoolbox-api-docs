@@ -473,6 +473,9 @@ class Receiver
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
+        $this->log->info(json_encode($message->getParam(1)->me['array']));
+        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+
 //            $this->log()->info('publishTimetable: processing request');
 //
 //            $timetablePeriodMapper = new TimetablePeriodMapper();
