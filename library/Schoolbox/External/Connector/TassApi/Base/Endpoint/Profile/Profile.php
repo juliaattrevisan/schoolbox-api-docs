@@ -948,7 +948,7 @@ class Profile implements IStrategy
              */
             $details = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
                 'date' => date('d/m/Y'),
-                'includephoto' => true,
+                'includephoto' => $this->includePhoto,
             ], Api::VERSION_2);
 
             $employeeLookup = [];
