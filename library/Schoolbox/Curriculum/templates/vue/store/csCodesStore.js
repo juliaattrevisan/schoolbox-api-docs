@@ -13,7 +13,7 @@ export const useCodesStore = defineStore(`csCodes`, {
 
     state: () => ({
         codes: [], //all the codes currenty loaded
-        isLoading: true, //to display loading note
+        isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place
     }),
@@ -76,7 +76,7 @@ export const useCodesStore = defineStore(`csCodes`, {
          async loadTopLevel () {
             const store = useStore();
             try {
-                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1`);
+                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1&descendants=1`);
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     // sessionStorage.setItem(SB_CURRICULUM_TOP_LEVEL, JSON.stringify(topLevelNodes)); //session storage vars need to be saved as strings only
@@ -101,11 +101,9 @@ export const useCodesStore = defineStore(`csCodes`, {
          */
         async setTopLevel (nodes) {
             this.updateNodes(nodes);
-            const modalActiveCodesStore = useModalActiveCodesStore();
-            if (modalActiveCodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
+            if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
                 const singleCurriculumId = this.codes.children[0].id;
-                await this.loadChildren(singleCurriculumId); //load in its children for initial display
-                modalActiveCodesStore.setSelected(1, singleCurriculumId); //then select the node
+                await useModalActiveCodesStore().setNextSelected(singleCurriculumId); //load in its children for initial display
             }
         },
 
@@ -115,12 +113,9 @@ export const useCodesStore = defineStore(`csCodes`, {
          * @param { number }
          */
         async loadChildren (id) {
-            const oldNode = findById(this.codes.children, id);
-            if (oldNode.children !== null) { //we don't need to load them again
-                return;
-            }
             try {
-                const response = await fetch(`${apiEndpoint}/${id}?descendants=1`);
+                this.isLoading = true;
+                const response = await fetch(`${apiEndpoint}/${id}?descendants=2`); //we go two levels deep so we can check for children on two levels
                 if (response.ok) {
                     const newNode = await response.json();
                     const newNodeChildrenEnabled = newNode.children.filter((node) => (node.enabled)); //only show those nodes with children enabled, this can be handled with enabled=1 on just topLevelOnly

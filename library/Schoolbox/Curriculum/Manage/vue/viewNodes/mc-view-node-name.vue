@@ -7,6 +7,7 @@
 
 import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
+import { useNodesStore } from '../store/mcNodesStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 
 
@@ -48,8 +49,36 @@ const props = defineProps({
     },
 });
 
+const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
 
+/**
+ * To disable selection on certain sitatuions
+ *
+ * @returns { Boolean }
+ */
+const isDisabled = computed(() => {
+    if (props.isUpdatingOrAdding) { //while the node is being updated
+        return true;
+    } else if (nodesStore.isLoading) { //or while a load is in progress
+        return true;
+    } else {
+        return false;
+    }
+});
+
+/**
+ * To distinguish the parent node
+ *
+ * @returns { Boolean }
+ */
+ const isParentNode = computed(() => {
+    if (props.depth === 0) {
+        return true;
+    } else {
+        return false;
+    }
+});
 
 /**
  * To help distinguish those nodes that aren't selectable,
@@ -57,15 +86,26 @@ const viewNodesStore = useViewNodesStore();
  *
  * @returns { Boolean }
  */
-const notButton = computed(() => {
-    if (props.depth === 0) { //we can't go back any further
-        return true;
-    } else if (viewNodesStore.isSearchActive) { //cant do any navigation while search is active
-        return true;
-    } else {
+const isButton = computed(() => {
+    if (isParentNode.value) { //is the parent node, which we don't
         return false;
+    } else if (props.node.children === null) { //the children haven't been loaded
+        return false;
+    } else if (props.node.children?.length === 0) { //there's no children to display, so no point going further
+        return false;
+    } else if (viewNodesStore.isSearchActive) { //cant do any navigation while search is active
+        return false;
+    } else {
+        return true;
     }
 });
+
+/**
+ * Only use bold on the title when
+ *
+ * @returns { string }
+ */
+ const fontWeight = computed(() => isParentNode.value && !viewNodesStore.isSearchActive ? 'bold' : 'normal');
 
 /**
  * traverse to the next nodel level
@@ -121,47 +161,48 @@ function highlightSearchInElement (toHighlight) {
 </script>
 
 <template>
-    <div
-        v-if="notButton"
-        :class="`name`"
-    >
-        <span v-html="highlightTitleSearch"></span>
-        <aside v-if="viewNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
-    </div>
     <button
-        v-else
-        :class="`button-name`"
+        v-if="isButton"
+        class="button-name"
         :title="`Expand ${props.title}`"
-        :disabled="props.isUpdatingOrAdding"
+        :disabled="isDisabled"
         @click.prevent="onNameSelected"
         @keyup.enter="onNameSelected"
     >
         {{ props.title }}
     </button>
+    <div
+        v-else
+        class="name"
+    >
+        <span v-html="highlightTitleSearch"></span>
+        <aside v-if="viewNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
+    </div>
+
 </template>
 
 <style lang="scss" scoped>
 
 @import './style/mcViewNode';
 
+.button-name {
+    @extend .button;
+    padding-left: 0.25rem;
+    transition: background 0.2s;
+    width: 100%;
+}
+
 .name {
     color: var(--body-foreground-h1);
     opacity: 1;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: v-bind(fontWeight);
     width: 100%;
 }
 
 aside {
     font-size: 0.725rem;
     font-style: italic;
-}
-
-.button-name {
-    @extend .button;
-    padding-left: 0.25rem;
-    transition: background 0.2s;
-    width: 100%;
 }
 
 </style>

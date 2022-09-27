@@ -16,7 +16,7 @@ export const useNodesStore = defineStore('mcNodes', {
 
     state: () => ({
         nodes: {}, //all the nodes currently loaded
-        isLoading: true, //to display loading note
+        isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place
     }),
@@ -79,7 +79,7 @@ export const useNodesStore = defineStore('mcNodes', {
         async loadTopLevel () {
             const store = useStore();
             try {
-                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1`, {
+                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&descendants=1`, {
                     headers: {
                         'Content-Type': 'application/json',
                     }
@@ -123,12 +123,9 @@ export const useNodesStore = defineStore('mcNodes', {
          * @param { number }
          */
         async loadChildren (id) {
-            const oldNode = findById(this.nodes.children, id);
-            if (oldNode.children !== null) { //we don't need to load them again
-                return;
-            }
             try {
-                const response = await fetch(`${apiEndpoint}/${id}?descendants=1`, {
+                this.isLoading = true;
+                const response = await fetch(`${apiEndpoint}/${id}?descendants=2`, {
                     headers: {
                         'Content-Type': 'application/json',
                     }
@@ -141,7 +138,6 @@ export const useNodesStore = defineStore('mcNodes', {
                     useSelectedNodesStore().addIsSelected(oldNode);
                     oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
-                    debugger;
                     throw new Error(responseJson.title, { ...responseJson } );
                 }
             } catch (error) {

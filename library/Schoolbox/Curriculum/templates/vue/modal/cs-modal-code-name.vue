@@ -7,6 +7,7 @@
 
 import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
+import { useCodesStore } from '../store/csCodesStore';
 import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
 import { useModalSearchStore } from '../store/csModalSearchStore';
 
@@ -42,20 +43,17 @@ const props = defineProps({
     },
 });
 
+const codesStore = useCodesStore();
 const modalActiveCodesStore = useModalActiveCodesStore();
 const modalSearchStore = useModalSearchStore();
 
-
 /**
- * To help distinguish those nodes that aren't selectable,
- * we disable and remove the default button colour
+ * To disable selection on certain sitatuions
  *
  * @returns { Boolean }
  */
-const notButton = computed(() => {
-    if (props.depth === 0) { //we can't go back any further
-        return true;
-    } else if (modalSearchStore.isActive) { //cant do any navigation while search is active
+const isDisabled = computed(() => {
+    if (codesStore.isLoading) { //while a load is in progress
         return true;
     } else {
         return false;
@@ -63,11 +61,44 @@ const notButton = computed(() => {
 });
 
 /**
- * dont use bold when searching, as it clutters the ui bit too much
+ * To distinguish the parent node
+ *
+ * @returns { Boolean }
+ */
+const isParentNode = computed(() => {
+    if (props.depth === 0) {
+        return true;
+    } else {
+        return false;
+    }
+});
+
+/**
+ * To help distinguish those nodes that aren't selectable,
+ * we disable and remove the default button colour
+ *
+ * @returns { Boolean }
+ */
+const isButton = computed(() => {
+    if (isParentNode.value) { //is the parent node, which we don't
+        return false;
+    } else if (props.code.children === null) { //the children haven't been loaded
+        return false;
+    } else if (props.code.children?.length === 0) { //there's no children to display, so no point going further
+        return false;
+    } else if (modalSearchStore.isActive) { //cant do any navigation while search is active
+        return false;
+    } else {
+        return true;
+    }
+});
+
+/**
+ * Only use bold on the title when
  *
  * @returns { string }
  */
-const fontWeight = computed(() => modalSearchStore.isActive ? 'normal' : 'bold');
+const fontWeight = computed(() => isParentNode.value && !modalSearchStore.isActive ? 'bold' : 'normal');
 
 /**
  * traverse to the next nodel level
@@ -110,33 +141,25 @@ function highlightSearchInElement (toHighlight) {
 </script>
 
 <template>
-    <div
-        v-if="notButton"
-        class="name"
-    >
-        <span v-html="highlightTitleSearch"></span>
-    </div>
     <button
-        v-else
+        v-if="isButton"
         class="button-name"
         :title="`View ${props.title}`"
+        :disabled="isDisabled"
         @click.prevent="onNameSelected"
         @keyup.enter="onNameSelected"
     >
         {{ props.title }}
     </button>
+    <div
+        v-else
+        class="name"
+    >
+        <span v-html="highlightTitleSearch"></span>
+    </div>
 </template>
 
 <style lang="scss" scoped>
-
-.name {
-    color: var(--body-foreground-h1);
-    opacity: 1;
-    padding: 0.5rem 0;
-    font-size: 1rem;
-    font-weight: v-bind(fontWeight);
-    width: 100%;
-}
 
 .button-name {
     background: none;
@@ -158,6 +181,15 @@ function highlightSearchInElement (toHighlight) {
         font-size: 0.8rem;
         padding: 0.25rem;
     }
+}
+
+.name {
+    color: var(--body-foreground-h1);
+    opacity: 1;
+    padding: 0.5rem 0;
+    font-size: 1rem;
+    font-weight: v-bind(fontWeight);
+    width: 100%;
 }
 
 </style>
