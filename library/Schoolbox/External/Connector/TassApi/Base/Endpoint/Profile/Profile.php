@@ -904,7 +904,7 @@ class Profile implements IStrategy
              $salutation = (new FirstMeaningfulValue())->find([
                  $employee['salutation'],
                  $employee['title']
-            ]);
+             ]);
 
             /* Init a position and photo struct
              */
