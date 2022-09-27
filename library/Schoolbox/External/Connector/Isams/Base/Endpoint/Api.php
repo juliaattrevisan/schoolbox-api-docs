@@ -115,10 +115,15 @@ class Api implements IApi
         $credentials = (new DSN())->decode($this->apiKey);
 
         if (!$this->url) {
+            /* Find the path corresponding to the module we found
+             * The module we found is in $matches[1]
+             */
+            $path = DSN::PATHS[$this->module];
+
             $this->url = (new Uri())
                 ->setScheme('https')
                 ->setHost($this->host)
-                ->setPath('/xml.ashx')
+                ->setPath("/{$path}")
                 ->setQuery(['apikey' => $credentials['modules'][$this->module]['key']]);
         }
 

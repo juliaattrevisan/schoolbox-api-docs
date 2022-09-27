@@ -31,6 +31,17 @@ class DSN implements IDSN
 
 
     /**
+     * Each module const has a corresponding path which isn't conveniently known,
+     * so I just append them when decoding and ignore them when encoding DSNs
+     */
+    public const PATHS = [
+        self::MODULE_BATCHXML => 'xml.ashx',
+        self::MODULE_STAFFPHOTO => 'staffphotos.ashx',
+        self::MODULE_STUDENTPHOTO => 'photos.ashx'
+    ];
+
+
+    /**
      * DSN format
      *
      * iSAMS Module (e.g. Batch XML, Staff Photos, Student Photos)
