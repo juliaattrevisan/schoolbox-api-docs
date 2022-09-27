@@ -122,7 +122,7 @@ class Api implements IApi
 
             $this->url = (new Uri())
                 ->setScheme('https')
-                ->setHost($this->host)
+                ->setHost(rtrim($this->host, "/ \n\r\t\v\x00"))
                 ->setPath("/{$path}")
                 ->setQuery(['apikey' => $credentials['modules'][$this->module]['key']]);
         }
