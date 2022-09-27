@@ -40,9 +40,9 @@ class ScheduleIterator implements Iterator
 
 
     /**
-     * @var Batchxml
+     * @var array
      */
-    private Batchxml $batchxml;
+    private array $api;
 
 
     /**
@@ -54,13 +54,13 @@ class ScheduleIterator implements Iterator
     /**
      * TimetableClassIterator constructor.
      *
-     * @param Batchxml         $batchxml
+     * @param array            $api
      * @param SimpleXMLElement $timetable
      * @throws RuntimeException
      */
-    public function __construct(Batchxml $batchxml, SimpleXMLElement $timetable)
+    public function __construct(array $api, SimpleXMLElement $timetable)
     {
-        $this->batchxml = $batchxml;
+        $this->api = $api;
 
         /* Published timetables might, or might not, have Schedules nodes
          * because classes haven't been assigned to a timetable yet
@@ -70,7 +70,7 @@ class ScheduleIterator implements Iterator
         }
 
         $this->schedules = $timetable->xpath('Schedules')[0]->Schedule;
-        $this->dayCalibrator = new DayCalibrator($batchxml);
+        $this->dayCalibrator = new DayCalibrator($api);
     }
 
 

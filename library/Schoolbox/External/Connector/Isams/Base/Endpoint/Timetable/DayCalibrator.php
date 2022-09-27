@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 
 /**
  * Class DayCalibrator
@@ -31,9 +31,9 @@ class DayCalibrator
 {
 
     /**
-     * @var Batchxml
+     * @var array
      */
-    private Batchxml $batchxml;
+    private array $api;
 
 
     /**
@@ -45,11 +45,11 @@ class DayCalibrator
     /**
      * DayCalibrator constructor.
      *
-     * @param Batchxml $batchxml
+     * @param array $api
      */
-    public function __construct(Batchxml $batchxml)
+    public function __construct(array $api)
     {
-        $this->batchxml = $batchxml;
+        $this->api = $api;
         $this->offset = $this->calculateOffset();
     }
 
@@ -62,7 +62,7 @@ class DayCalibrator
     {
         /* Find the first Day node
          */
-        $firstDayIndex = (int)$this->batchxml->fetchXml("/iSAMS/TimetableManager/Structure/Week/Days/Day")[0]->Day[0];
+        $firstDayIndex = (int)$this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TimetableManager/Structure/Week/Days/Day")[0]->Day[0];
 
         /* Calculate the difference between that Day's value and 1
          * This is the offset that needs to apply to all Days in this import

@@ -211,13 +211,12 @@ class Factory
 
             /* Connect and shank data for all the modules we know about
              */
-            $batchxmls = [
+            $api = [
                 DSN::MODULE_BATCHXML => new Api($this->host, $this->key, DSN::MODULE_BATCHXML),
                 DSN::MODULE_STAFFPHOTO => new Api($this->host, $this->key, DSN::MODULE_STAFFPHOTO),
                 DSN::MODULE_STUDENTPHOTO => new Api($this->host, $this->key, DSN::MODULE_STUDENTPHOTO),
             ];
         }
-
 
         /* Cache a list of known users and periods
          * Every student timetable processing uses info stored there
@@ -239,7 +238,7 @@ class Factory
             ->add(new Profile\Profile(
                 $this->log,
                 $this->perform,
-                $batchxmls,
+                $api,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
@@ -266,19 +265,19 @@ class Factory
             ->add(new Timetable\Identifier(
                 $this->log,
                 $this->perform,
-                $batchxmls
+                $api
             ))
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,
-                $batchxmls,
+                $api,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
             ->add(new Timetable\Classes(
                 $this->log,
                 $this->perform,
-                $batchxmls,
+                $api,
                 $lookup,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,

@@ -13,6 +13,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
@@ -52,9 +53,9 @@ class Definition implements IStrategy
 
 
     /**
-     * @var Batchxml
+     * @var array
      */
-    private Batchxml $batchxml;
+    private array $api;
 
 
     /**
@@ -80,23 +81,23 @@ class Definition implements IStrategy
      *
      * @param LoggerInterface       $log
      * @param bool                  $perform
-     * @param Batchxml              $batchxml
+     * @param array                 $api
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Batchxml $batchxml,
+        array $api,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->batchxml = $batchxml;
+        $this->api = $api;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
-        $this->dayCalibrator = new DayCalibrator($batchxml);
+        $this->dayCalibrator = new DayCalibrator($api);
     }
 
 
@@ -111,7 +112,7 @@ class Definition implements IStrategy
     {
         /* Find a way to identify this Cycle
          */
-        $publishedTimetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
+        $publishedTimetables = $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
         /* Exit if you can't identify the cycle
          */
@@ -126,7 +127,7 @@ class Definition implements IStrategy
          * Also, we haven't seen any evidence that they have multiple timetables or multiple
          * timetable definitions; their xml, however, suggests that it possible in theory
          */
-        $cycles = $this->batchxml->fetchXml('/iSAMS/TimetableManager/Structure/Week');
+        $cycles = $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/TimetableManager/Structure/Week');
 
         foreach ($cycles as $cycle) {
             /* Multiple cycles might exist for a given publishedTimetable

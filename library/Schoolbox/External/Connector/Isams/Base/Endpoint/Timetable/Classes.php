@@ -20,7 +20,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\Mapper\Exception;
@@ -52,9 +52,9 @@ class Classes implements IStrategy
 
 
     /**
-     * @var Batchxml
+     * @var array
      */
-    private Batchxml $batchxml;
+    private array $api;
 
 
     /**
@@ -86,7 +86,7 @@ class Classes implements IStrategy
      *
      * @param LoggerInterface        $log
      * @param bool                   $perform
-     * @param Batchxml               $batchxml
+     * @param array                  $api
      * @param Lookup                 $lookup
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
@@ -95,7 +95,7 @@ class Classes implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Batchxml $batchxml,
+        array $api,
         Lookup $lookup,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
@@ -103,7 +103,7 @@ class Classes implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->batchxml = $batchxml;
+        $this->api = $api;
         $this->lookup = $lookup;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
@@ -151,7 +151,7 @@ class Classes implements IStrategy
 
         /* Get a list of all the timetables to process
          */
-        $timetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
+        $timetables = $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
         /* If there aren't any timetables, log it and exit
          */
@@ -163,7 +163,7 @@ class Classes implements IStrategy
         /* Multiple cycles might exist
          * Apply $timetable structure to each as best we know
          */
-        $cycles = $this->batchxml->fetchXml('/iSAMS/TimetableManager/Structure/Week');
+        $cycles = $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/TimetableManager/Structure/Week');
 
         foreach ($cycles as $cycle) {
             /* Multiple cycles might exist for a given publishedTimetable
@@ -196,7 +196,7 @@ class Classes implements IStrategy
                  * a convenient struct which we can then just ram home
                  */
                 try {
-                    $classes = new ScheduleIterator($this->batchxml, $timetable);
+                    $classes = new ScheduleIterator($this->api, $timetable);
                 } catch (\RuntimeException $e) {
                     /* This occurs when a PublishedTimetable exists, but there aren't any Schedules
                      * inside it, perhaps because there are no Sets. Nothing to process.
@@ -411,8 +411,8 @@ class Classes implements IStrategy
         /* Create new relation
          */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-                                                                  ->setExternalId($person['externalId'])
-                                                                  ->setClass($timetableClass);
+            ->setExternalId($person['externalId'])
+            ->setClass($timetableClass);
 
         $this->log->info(sprintf(
             'Creating class involvement %s %s for %s (%s)',
