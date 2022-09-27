@@ -196,7 +196,10 @@ class Mapper extends BaseMapper
                     (`access`.`user_id` = :userId)
                     OR
                     (`access`.`group_id` IN
-                      (SELECT id FROM `pastoral_group` WHERE `user_id` = :userId AND `deleted_at` IS NULL)
+                      (SELECT `group_id` FROM `pastoral_group` JOIN `pastoral_group_member` ON `pastoral_group`.`id` = `pastoral_group_member`.`group_id`
+                        AND `pastoral_group_member`.`user_id` = :userId
+                        AND `pastoral_group_member`.`deleted_at` IS NULL
+                        AND `pastoral_group`.`deleted_at` IS NULL)
                     )
                   )
         ";
