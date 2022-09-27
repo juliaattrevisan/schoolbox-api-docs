@@ -66,8 +66,6 @@ export const useNodesStore = defineStore('mcNodes', {
             } catch (error) {
                 store.hasLoadError = true; //show the load error display state
                 throw new Error(error.message);
-            } finally {
-                store.isLoading = false; //otherwise show the tree
             }
         },
 
@@ -80,10 +78,11 @@ export const useNodesStore = defineStore('mcNodes', {
             this.updateNodes(nodes);
             const store = useStore();
             if (store.hasId) {
-                this.loadId(store.id);
+                await this.loadId(store.id);
             } else if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
-                this.loadSingleCurriculum();
+                await this.loadSingleCurriculum();
             }
+            store.isLoading = false;
         },
 
         /**
@@ -91,8 +90,7 @@ export const useNodesStore = defineStore('mcNodes', {
          */
         async loadSingleCurriculum () {
             const singleCurriculumId = this.nodes.children[0].id;
-            await this.loadChildren(singleCurriculumId); //load in its children for initial display
-            useViewNodesStore().setSelected(1, singleCurriculumId); //then select the node
+            await useViewNodesStore().setNextSelected(singleCurriculumId);
         },
 
         /**
@@ -109,8 +107,8 @@ export const useNodesStore = defineStore('mcNodes', {
                     const breadcrumbs = getBreadcrumbs(nodeWithParents, []);
                     breadcrumbs.push( { id: id, name: nodeWithParents.name } ); //add in the actual node as the last
                     const viewNodesStore = useViewNodesStore();
-                    for (const breadcrumb of breadcrumbs) { //recursively load in each parent and traverse down
-                        await viewNodesStore.setNextSelected(breadcrumb.id);
+                    for (let i = 0; i < breadcrumbs.length; i++) { //recursively load in each parent and traverse down
+                        await viewNodesStore.setNextSelected(breadcrumbs[i].id);
                     }
                 } else {
                     this.hasId = false;
