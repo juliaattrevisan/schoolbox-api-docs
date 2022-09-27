@@ -1,6 +1,6 @@
 <div class="row">
     <div class="small-12 large-6 columns">
-        <h1>My Classes</h1>
+        <h1>My {{ locale.class.properPlural }}</h1>
     </div>
     <div class="small-12 large-6 columns">
         <div class="context-switch clearfix">
@@ -20,11 +20,11 @@
             <div class = "empty-state">
                 <i class="icon-class-list"></i>
                 {% if term.contains(now) or hideTimetable %}
-                    <p>You are currently not enrolled in any class.</p>
+                    <p>You are currently not enrolled in any {{ locale.class.plural }}.</p>
                 {% else %}
                     <p>You were not enrolled in any classes during {{ term.title }}.</p>
                 {% endif %}
-                <p>If you expect to have classes please contact your system administrator.</p>
+                <p>If you expect to have {{ locale.class.plural }} please contact your system administrator.</p>
             </div>
         </div>
     {% else %}
