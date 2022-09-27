@@ -38,19 +38,35 @@ const props = defineProps({
 });
 
 const toastEl = ref(null);
+const store = useStore();
 
 /**
  * Start loading the curriculum data
  */
 onMounted(() => {
+    checkForNodeHash();
     checkForStorybook();
-    const store = useStore();
     store.isReadOnly = props.isReadOnly;
     store.toastEl = toastEl;
     if (props.dataEndpoint !== '') { //only load when we need to
         store.load(props.dataEndpoint);
     }
 });
+
+/**
+ * a node id could be passed into the page via the hash,
+ * if so we need to traverse to this node on load
+ */
+function checkForNodeHash () {
+    const documentURL = document.URL;
+    const hashCount = (documentURL.match(/#/g) || []).length;
+    if (hashCount === 1) {
+        const hash = documentURL.substring(documentURL.indexOf('#')+1, documentURL.length);
+        store.hasHash = true;
+        store.hash = hash;
+        console.warn(hash);
+    }
+}
 
 /**
  * When switching between stories, we need to reset the data models

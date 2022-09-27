@@ -16,6 +16,8 @@ export const useStore = defineStore('manageCurriculum', {
         isProcessing: false, //to notify that an action is taking place, like updating a member access
         isReadOnly: true, //can only view the currently selected codes, not edit them
         hasPermissionDeniedError: false, //to notify the user doesn't have access
+        hasHash: false, //whether we should traverse to a node id
+        hash: '', //the id of the hash
         toastEl: null, //so we don't need to pass it all around as a prop
     }),
 
