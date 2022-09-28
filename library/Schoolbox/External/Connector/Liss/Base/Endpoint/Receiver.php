@@ -114,12 +114,6 @@ class Receiver
 
 
     /**
-     * @var string|null
-     */
-    private ?string $logDir = null;
-
-
-    /**
      * Logs the things that happened, in a text file
      *
      * @var Logger|null
@@ -169,8 +163,6 @@ class Receiver
         /* Path to a log file which you can: tail -n100 -f
          * so you can see what's going on. Continuously appends.
          */
-        $this->logDir = $logDir;
-
         $logFile = fopen(sprintf(
             '%s/%s',
             $logDir,
