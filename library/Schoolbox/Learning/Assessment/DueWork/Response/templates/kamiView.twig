@@ -68,18 +68,19 @@
         {% endif %}
     </div>
 </div>
-
-{# A list of files in the current response #}
-{% block responseFileList %}
-    {% include '@learningDueWorkResponse/inlineGrading/fragments/responseFileListKami.twig' with {
-        assessment: response.assessable,
-        participant: participant,
-        response: response,
-        latestFeedback: response.findMostRecentInstructorGivenPublishedFeedback,
-        kamiEnabled: true,
-        plagscanApiEnabled: false,
-        turnitinApiEnabled: false,
-        selectedFileHash: kami.studentSubmissionFile.Storage.hash,
-        kami, kami
-    } only %}
-{% endblock %}
+{% if response.allFiles > 1 %}
+    {# A list of files in the current response #}
+    {% block responseFileList %}
+        {% include '@learningDueWorkResponse/inlineGrading/fragments/responseFileListKami.twig' with {
+            assessment: response.assessable,
+            participant: participant,
+            response: response,
+            latestFeedback: response.findMostRecentInstructorGivenPublishedFeedback,
+            kamiEnabled: true,
+            plagscanApiEnabled: false,
+            turnitinApiEnabled: false,
+            selectedFileHash: kami.studentSubmissionFile.Storage.hash,
+            kami, kami
+        } only %}
+    {% endblock %}
+{% endif %}
