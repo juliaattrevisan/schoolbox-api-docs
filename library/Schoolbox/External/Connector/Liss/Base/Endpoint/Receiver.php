@@ -78,6 +78,7 @@ class Receiver
      */
     private string $username;
 
+
     /**
      * @var string
      */
