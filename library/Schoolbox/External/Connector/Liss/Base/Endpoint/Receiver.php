@@ -199,6 +199,14 @@ class Receiver
                     'function' => [$this,'getRooms'],
                 ],
 
+                /* Time-based variant of timetable data is found here
+                 */
+                'liss.publishDailyData' => [
+                    'function' => [$this, 'publishDailyData'],
+                ],
+
+                /* All these ones fulfil a cyclic timetable afaict
+                 */
                 'liss.publishTimetable' => [
                     'function' => [$this, 'publishTimetable'],
                 ],
@@ -213,10 +221,6 @@ class Receiver
 
                 'liss.publishBellTimes' => [
                     'function' => [$this, 'publishBellTimes'],
-                ],
-
-                'liss.publishDailyData' => [
-                    'function' => [$this, 'publishDailyData'],
                 ],
 
                 /* Not implemented; returns a placeholder Response
@@ -280,7 +284,7 @@ class Receiver
 
         /* Do the import
          */
-        (new Classes())->import($this->log(), $message, $this->defaultType, $this->exclusions);
+        (new Classes())->import($this->log(), $message, $this->defaultType, $this->exclusions, $this->teacherIdentifier);
 
         /* Cleanup after ourselves
          */
@@ -310,9 +314,7 @@ class Receiver
      */
     public function getRooms(Request $message): Response
     {
-//        $this->log()->info('getRooms: unable to process request, not implemented');
-//
-        return $this->generateResponse('got rooms');
+        return $this->generateResponse('getRooms finished.');
     }
 
 
@@ -792,16 +794,7 @@ class Receiver
 
 
 
-    /**
-     * Decide if we're going to use teacherIds as the externalId for staff
-     * or whether we use teacherCodes instead
-     *
-     * @return bool
-     */
-    private function isTeacherIds(): bool
-    {
-//        return self::TEACHER_IDENTIFIER_ID === trim((string)$this->config->get('external_liss_teacher_identifier'));
-    }
+
 
 
     /**

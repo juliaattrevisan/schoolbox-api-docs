@@ -26,6 +26,14 @@ use Schoolbox\External\Connector\Liss\Base\Endpoint\Helper;
 class Classes
 {
     /**
+     * This const corresponds to the enum for the config var external_liss_default_event_type
+     * This is used to decide if we use numeric teacher ids, or alphanumeric teacher codes
+     * If you're not using teacherId, you're presumed to be using teacherCode instead
+     */
+    private const TEACHER_IDENTIFIER_ID = 'teacherId';
+
+
+    /**
      * Import into suds timetable
      *
      * @param LoggerInterface $log
@@ -39,7 +47,8 @@ class Classes
         LoggerInterface $log,
         Request $message,
         string $defaultType,
-        array $exclusions
+        array $exclusions,
+        string $teacherIdentifier
     ): void {
         /* Make all the data easier to manipulate by rearranging their guts
          */
@@ -188,4 +197,16 @@ class Classes
     {
     }
 
+
+    /**
+     * Decide if we're going to use teacherIds as the externalId for staff
+     * or whether we use teacherCodes instead
+     *
+     * @param string $teacherIdentifier
+     * @return bool
+     */
+    private function isTeacherIds(string $teacherIdentifier): bool
+    {
+        return self::TEACHER_IDENTIFIER_ID === $teacherIdentifier;
+    }
 }
