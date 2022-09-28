@@ -124,6 +124,14 @@ class Classes
 
 
     /**
+     * The data sent to us by the school
+     *
+     * @var Request
+     */
+    private Request $message;
+
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface                            $log
@@ -135,6 +143,7 @@ class Classes
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
+     * @param Request                                    $message
      */
     public function __construct(
         LoggerInterface $log,
@@ -145,7 +154,8 @@ class Classes
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper
+        ClassInvolvementMapper $classInvolvementMapper,
+        Request $message
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -156,21 +166,24 @@ class Classes
         $this->overridesMapper = $overridesMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
+        $this->message = $message;
     }
 
 
     /**
      * Import into suds timetable
      *
-     * @param Request $message
      * @return void
+     * @throws Exception
      * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function import(Request $message): void {
+    public function import(): void {
         /* Make all the data easier to manipulate by rearranging their guts
          */
         $helper = new Helper();
-        $allDailyData = $helper->reformatAllEvents($message->getParam(3)->me['array']);
+        $allDailyData = $helper->reformatAllEvents($this->message->getParam(3)->me['array']);
 
         /* Keep track of all the problems we encountered
          */
