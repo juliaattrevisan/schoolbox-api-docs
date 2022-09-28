@@ -15,7 +15,7 @@ export default {
         },
         colour: { //the colour chosen
             type: String,
-            required: true
+            required: false
         },
     },
 
@@ -41,14 +41,14 @@ export default {
          */
         initColourPicker () {
             $(this.$el).spectrum({
-                allowEmpty: false,
+                allowEmpty: true,
                 showAlpha: false,
                 showInput: true,
                 preferredFormat: 'hex',
                 clickoutFiresChange: true,
                 showInitial: true,
                 change: (color) => {
-                    this.$emit('input', color.toHexString())
+                    this.$emit('input', color ? color.toHexString() : null)
                 }
             });
         }

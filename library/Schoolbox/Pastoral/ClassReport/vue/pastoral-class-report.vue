@@ -217,6 +217,7 @@ export default {
                                                      :title="`Created by ${ record.createdBy.fullName }`"
                                                      class="portrait"/>
                                                 <span>{{ record.heading }}</span>
+                                                <span v-if="record.severity?.color" class="circle" :style="'background-color:'+record.severity?.color" :title="record.severity?.name"></span>
                                             </a>
                                             <div class="time-container">
                                                 <template v-if="record.createdAt !== record.updatedAt">
@@ -383,6 +384,18 @@ input[type=radio]:not(.plain) + label.input-toggle {
                             padding-right: 1rem;
                             text-align: right;
                         }
+                    }
+
+                    .circle {
+                        border-radius: 2rem;
+                        transform: rotate(360deg);
+                        width: 0.75rem;
+                        height: 0.75rem;
+                        min-width: 0.75rem;
+                        min-height: 0.75rem;
+                        display: inline-block;
+                        vertical-align: middle;
+                        margin-left: 0.4rem;
                     }
                 }
 

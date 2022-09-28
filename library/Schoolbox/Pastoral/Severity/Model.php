@@ -21,18 +21,24 @@ class Model implements ISoftDeletable, Sequential
     use ModelTrait\UpdatedBy;
     use ModelTrait\HasSequence;
 
-    /** @var string */
-    protected $name;
+    /** @var string|null */
+    protected ?string $name = null;
 
     /** @var bool $dashboard */
-    protected $dashboard;
+    protected bool $dashboard = false;
+
+    /**
+     * Colour of severity. Keeping this string rather than Color object to fit in admin list controller
+     * @var string|null
+     */
+    protected ?string $color = null;
 
     /**
      * @param string $name
      *
-     * @return self
+     * @return static
      */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -40,9 +46,9 @@ class Model implements ISoftDeletable, Sequential
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getName()
+    public function getName(): string | null
     {
         return $this->name;
     }
@@ -50,9 +56,9 @@ class Model implements ISoftDeletable, Sequential
     /**
      * @param bool $dashboard
      *
-     * @return self
+     * @return static
      */
-    public function setDashboard($dashboard)
+    public function setDashboard(bool $dashboard): self
     {
         $this->dashboard = $dashboard;
 
@@ -62,8 +68,26 @@ class Model implements ISoftDeletable, Sequential
     /**
      * @return bool
      */
-    public function getDashboard()
+    public function getDashboard(): bool
     {
         return $this->dashboard;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    /**
+     * @param string|null $color
+     * @return static
+     */
+    public function setColor(?string $color): self
+    {
+        $this->color = $color;
+        return $this;
     }
 }

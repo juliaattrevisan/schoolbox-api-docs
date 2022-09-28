@@ -19,8 +19,12 @@ use Alaress\Color\Transformer;
  */
 class ColorHelper
 {
-    public const BASE_BACKGROUND_COLOR_DARK = '#333333';
+    public const BASE_BACKGROUND_COLOR_DARK  = '#333333';
     public const BASE_BACKGROUND_COLOR_LIGHT = '#DDDDDD';
+
+    private Transformer $transformer;
+
+    private ColorFactory $colorFactory;
 
     /**
      * Calculates the background color for a flag, given its foreground.
@@ -31,10 +35,43 @@ class ColorHelper
      */
     public function calculateBackground(?Color $color): Color
     {
-        $transformer    = new Transformer();
-        $colorFactory   = new ColorFactory();
-        $baseDark       = $colorFactory->build(self::BASE_BACKGROUND_COLOR_DARK);
-        $baseLight      = $colorFactory->build(self::BASE_BACKGROUND_COLOR_LIGHT);
-        return $transformer->calculateShadedBackgroundColor($color, $baseLight, $baseDark);
+        $baseDark  = $this->getColorFactory()->build(self::BASE_BACKGROUND_COLOR_DARK);
+        $baseLight = $this->getColorFactory()->build(self::BASE_BACKGROUND_COLOR_LIGHT);
+        return $this->getTransformer()->calculateShadedBackgroundColor($color, $baseLight, $baseDark);
+    }
+
+    /**
+     * Calculates the foreground color, given its background.
+     *
+     * @param Color $color The background color
+     * @return Color
+     */
+    public function calculateForeground(Color $color): Color
+    {
+        $baseDark  = $this->getColorFactory()->build(self::BASE_BACKGROUND_COLOR_DARK);
+        $baseLight = $this->getColorFactory()->build(self::BASE_BACKGROUND_COLOR_LIGHT);
+        return $this->getTransformer()->calculateForegroundColor($color, 1, 0.5, $baseLight, $baseDark);
+    }
+
+    /**
+     * @return Transformer
+     */
+    private function getTransformer(): Transformer
+    {
+        if (!isset($this->transformer)) {
+            $this->transformer = new Transformer();
+        }
+        return $this->transformer;
+    }
+
+    /**
+     * @return ColorFactory
+     */
+    public function getColorFactory(): ColorFactory
+    {
+        if (!isset($this->colorFactory)) {
+            $this->colorFactory = new ColorFactory();
+        }
+        return $this->colorFactory;
     }
 }

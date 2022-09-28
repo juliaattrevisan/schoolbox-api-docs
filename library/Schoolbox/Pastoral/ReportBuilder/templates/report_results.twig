@@ -3,18 +3,20 @@
 <ul class="breadcrumb hide-on-print">
     <li><a href="{{ routeLookup('pastoral.getIndex') }}">{{ locale.pastoralCare.proper }}</a></li>
     <li><a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}">Reports</a></li>
-    <li class="active"><span>{{ report.name }}</span></li>
+    <li class="active"><span>{{ title }}</span></li>
 </ul>
 
 <div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>{{ report.name }}</h1>
+            <h1>{{ title }}</h1>
         </div>
     </div>
     <nav>
         {% if results | length %}
+            {% if export %}
             <a href="{{ routeLookupIfAuthorized('pastoralReportBuilder.getReportResultsExport', {reportId: report.id}) }}" class="icon-download"></a>
+            {% endif %}
             <a href="#" data-print class="icon-print" title="Print Report Results"></a>
         {% endif %}
     </nav>
@@ -46,11 +48,15 @@
                                     {# Pastoral event type #}
                                     {{ record.type.name }} {% if record.subtype.name is defined %}({{ record.subtype.name }}){% endif %}
                                     |
-
                                     {% if showSeverity ?? false %}
                                         {# Pastoral event severity #}
-                                        {{ record.severity.name ?? '' }} |
+                                        {% if severityColors[record.severity.id] ?? false %}
+                                            <span class="label" style="background-color:{{ severityColors[record.severity.id]['back'] }};color:{{ severityColors[record.severity.id]['fore'] }}">{{ record.severity.name }}</span>|
+                                        {% else %}
+                                            {{ record.severity.name ?? '' }} |
+                                        {% endif %}
                                     {% endif %}
+
 
                                     {# Indicate if not audience has been set #}
                                     {% if record.accessWithPermission | length == 0 %}No Audience Set{% endif %}
@@ -131,7 +137,7 @@
 
                                             {# Show comment body #}
                                             <p class="spaced">
-                                                {{ comment.body | purify }}
+                                                {{ comment.body | purify | nl2br }}
                                             </p>
                                         </div>
                                     </div>

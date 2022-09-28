@@ -601,7 +601,7 @@ class Controller extends Base
                         'caption'   => 'Event Colour',
                         'colour'    => true,
                         'width'     => 1,
-                        'default'   => '',
+                        'default'   => '#000000',
                     ]
                 ]
             ],
@@ -750,7 +750,7 @@ class Controller extends Base
                         'caption'   => 'Event Colours',
                         'colour'    => true,
                         'width'     => 11,
-                        'default'   => '',
+                        'default'   => '#000000',
                     ],
                 ]
             ],
@@ -897,10 +897,16 @@ class Controller extends Base
                     ],
                     'dashboard' => [
                         'caption'   => 'Show On Pastoral Dashboard',
-                        'width'     => 3,
+                        'width'     => 2,
                         'mandatory' => true,
                         'checkbox'  => true,
                         'default'   => false,
+                    ],
+                    'color'         => [
+                        'caption'   => 'Severity Colour',
+                        'colour'    => true,
+                        'width'     => 1,
+                        'default'   => '',
                     ],
                 ]
             ];

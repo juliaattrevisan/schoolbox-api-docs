@@ -30,6 +30,7 @@ use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
+use Schoolbox\Pastoral\Audience\ColorHelper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Comment\Model as PastoralComment;
@@ -519,6 +520,14 @@ class Controller extends Base
         $access['public']  = $accessLevel > PastoralAccessMapper::ACCESS_DENY;
         $access['private'] = $accessLevel > PastoralAccessMapper::ACCESS_PUBLIC;
 
+        $showSeverity = $this->getConfigLoader()->get('pastoral_severity');
+        $severityForegroundColor = null;
+        if ($showSeverity && $record->getSeverity()->getColor()) {
+            $transformer             = new ColorHelper();
+            $severityColor           = $transformer->getColorFactory()->build($record->getSeverity()->getColor());
+            $severityForegroundColor = $transformer->calculateForeground($severityColor)->getAsRgba();
+        }
+
         // Lets render this thing
 
         $this->getResponse()->content->set(
@@ -532,7 +541,8 @@ class Controller extends Base
                     'commentsPrivate'    => $commentsPrivate->map($this->pastoralCommentTranslator)->reindex(),
                     'moderator'          => $moderator,
                     'user'               => $this->getUser(),
-                    'showSeverity'       => $this->getConfigLoader()->get('pastoral_severity'),
+                    'showSeverity'       => $showSeverity,
+                    'severityColor'      => $severityForegroundColor,
                     'access'             => $access,
                     'linkedStudents'     => [],
                 ],
