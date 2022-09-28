@@ -180,7 +180,8 @@ class Classes implements IStrategy
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function import(): void {
+    public function import(): void
+    {
         /* Make all the data easier to manipulate by rearranging their guts
          */
         $helper = new Helper();
@@ -201,7 +202,6 @@ class Classes implements IStrategy
          * to persist data to the db
          */
         foreach ($allDailyData as $currentEvent) {
-            $this->log->info(json_encode($currentEvent));
             /* Event doesn't have a type; see if we specified one in config
              * If we did, give it that event type instead, then carry onwards
              */
