@@ -206,6 +206,7 @@ class Receiver
                 ],
 
                 /* All these ones fulfil a cyclic timetable afaict
+                 * We don't need them
                  */
                 'liss.publishTimetable' => [
                     'function' => [$this, 'publishTimetable'],
@@ -329,7 +330,21 @@ class Receiver
      */
     public function getRooms(Request $message): Response
     {
-        return $this->generateResponse('getRooms finished.');
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator(
+            $this->externalEnable,
+            $this->externalType,
+            $this->username,
+            $this->password,
+            $this->schoolCode,
+            $this->log(),
+            $message->getParam(0)
+        ))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        return $this->generateResponse('getRooms finished but unused.');
     }
 
 
@@ -341,52 +356,21 @@ class Receiver
      */
     public function publishClassMemberships(Request $message): Response
     {
-//        /* Requires schoolbox connector
-//         */
-//        if (!$this->isSchoolboxConnector()) {
-//            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
-//            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
-//        }
-//
-//        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
-//
-//        if ($authenticator->isAuthenticated()) {
-//            $this->log()->info('publishClassMemberships: processing request');
-//            $classInvolvementMapper = new ClassInvolvementMapper();
-//            $classEntryMapper = new ClassEntryMapper();
-//
-//            $classInvolvementMapper->truncate();
-//
-//            $allData = $message->getParam(1)->me['array'];
-//            $classAll = $classEntryMapper->findAll();
-//            $classAll->indexBy('code');
-//
-//            $queryItems = array();
-//            foreach ($allData as $currentData) {
-//                $struct = $currentData->me['struct'];
-//                $class = $classAll[trim((string)$struct['ClassCode']->me['string'])];
-//                $external_id = trim((string)$struct['StudentId']->me['string']);
-//                if ($class instanceof ClassEntry) {
-//                    $queryItems[] = "(NULL, '" . $class->getId() . "', '" . $external_id . "')";
-//                }
-//            }
-//
-//            if (count($queryItems) > 0) {
-//                $fullQuery = 'INSERT INTO sis_class_user (id, class_id, external_id) VALUES ' . implode(',', $queryItems) . ';';
-//                try {
-//                    // Manual bulk insert into the DB of "$fullquery"
-//                    $this->externalDb->executeQuery($fullQuery);
-//                } catch (Exception $e) {
-//                    $this->log()->error(sprintf('publishClassMemberships: Failed to save class memberships: %s', $e->getMessage()));
-//                }
-//            }
-//
-//            $this->log()->info('publishClassMemberships: completed request');
-//
-//            return $this->generateResponse('Class Memberships imported');
-//        }
-//
-        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator(
+            $this->externalEnable,
+            $this->externalType,
+            $this->username,
+            $this->password,
+            $this->schoolCode,
+            $this->log(),
+            $message->getParam(0)
+        ))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        return $this->generateResponse('publishClassMemberships finished but unused.');
     }
 
 
@@ -398,28 +382,21 @@ class Receiver
      */
     public function publishTeachers(Request $message): Response
     {
-//        /* Requires schoolbox connector
-//         */
-//        if (!$this->isSchoolboxConnector()) {
-//            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
-//            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
-//        }
-//
-//        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
-//
-//        if ($authenticator->isAuthenticated()) {
-//            /* Respond without doing anything to avoid errors
-//             */
-//            $this->log()->info('publishTeachers: unable to process request, not implemented');
-//
-//            /* Log data for use */
-//            $allData = $message->getParam(1)->me['array'];
-//            $this->log()->info('publishTeachers: ' . json_encode($allData));
-//
-//            return $this->generateResponse('Teachers Imported');
-//        }
-//
-        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator(
+            $this->externalEnable,
+            $this->externalType,
+            $this->username,
+            $this->password,
+            $this->schoolCode,
+            $this->log(),
+            $message->getParam(0)
+        ))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        return $this->generateResponse('publishTeachers finished but unused.');
     }
 
 
@@ -431,28 +408,21 @@ class Receiver
      */
     public function publishStudents(Request $message): Response
     {
-//        /* Requires schoolbox connector
-//         */
-//        if (!$this->isSchoolboxConnector()) {
-//            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
-//            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
-//        }
-//
-//        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
-//
-//        if ($authenticator->isAuthenticated()) {
-//            /* Respond without doing anything to avoid errors
-//             */
-//            $this->log()->info('publishStudents: unable to process request, not implemented');
-//
-//            /* Log data for use */
-//            $allData = $message->getParam(1)->me['array'];
-//            $this->log()->info('publishStudents: ' . json_encode($allData));
-//
-//            return $this->generateResponse('Students Imported');
-//        }
-//
-        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator(
+            $this->externalEnable,
+            $this->externalType,
+            $this->username,
+            $this->password,
+            $this->schoolCode,
+            $this->log(),
+            $message->getParam(0)
+        ))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        return $this->generateResponse('publishStudents finished but unused.');
     }
 
 
@@ -464,28 +434,21 @@ class Receiver
      */
     public function publishCalendar(Request $message): Response
     {
-//        /* Requires schoolbox connector
-//         */
-//        if (!$this->isSchoolboxConnector()) {
-//            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
-//            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
-//        }
-//
-//        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
-//
-//        if ($authenticator->isAuthenticated()) {
-//            /* Respond without doing anything to avoid errors
-//             */
-//            $this->log()->info('publishCalendar: unable to process request, not implemented');
-//
-//            /* Log data for use */
-//            $allData = $message->getParam(1)->me['array'];
-//            $this->log()->info('publishCalendar: ' . json_encode($allData));
-//
-//            return $this->generateResponse('Calendar Imported');
-//        }
-//
-        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator(
+            $this->externalEnable,
+            $this->externalType,
+            $this->username,
+            $this->password,
+            $this->schoolCode,
+            $this->log(),
+            $message->getParam(0)
+        ))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        return $this->generateResponse('publishCalendar finished but unused.');
     }
 
 
@@ -497,29 +460,21 @@ class Receiver
      */
     public function publishRooms(Request $message)
     {
-//        /* Requires schoolbox connector
-//         */
-//        if (!$this->isSchoolboxConnector()) {
-//            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
-//            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
-//        }
-//
-//        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
-//
-//        if ($authenticator->isAuthenticated()) {
-//            /* Respond without doing anything to avoid errors
-//             */
-//
-//            $this->log()->info('publishRooms: unable to process request, not implemented');
-//
-//            /* Log data for use */
-//            $allData = $message->getParam(1)->me['array'];
-//            $this->log()->info('publishRooms: ' . json_encode($allData));
-//
-//            return $this->generateResponse('Rooms Imported');
-//        }
-//
-        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        /* Requires schoolbox connector
+         */
+        if (!(new Authenticator(
+            $this->externalEnable,
+            $this->externalType,
+            $this->username,
+            $this->password,
+            $this->schoolCode,
+            $this->log(),
+            $message->getParam(0)
+        ))->isAuthenticated()) {
+            return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        }
+
+        return $this->generateResponse('publishRooms finished but unused.');
     }
 
 
@@ -545,47 +500,7 @@ class Receiver
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
-        $this->log->info(json_encode($message->getParam(2)->me['array']));
-        return $this->generateResponse(self::AUTHENTICATION_FAILED);
-
-//        /* Requires schoolbox connector
-//         */
-//        if (!$this->isSchoolboxConnector()) {
-//            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
-//            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
-//        }
-//
-//        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
-//
-//        if ($authenticator->isAuthenticated()) {
-//            $this->log()->info('publishClasses: processing request');
-//
-//            /* Truncate everything before re-adding
-//             */
-//            $classEntryMapper = new ClassEntryMapper();
-//            $classEntryMapper->truncate();
-//
-//            $allData = $message->getParam(2)->me['array'];
-//            $classCount = 0;
-//
-//            foreach ($allData as $currentData) {
-//                $struct = $currentData->me['struct'];
-//
-//                $classEntry = $classEntryMapper->createModel();
-//                $classEntry->setName((string)$struct['CourseName']->me['string']);
-//                $classEntry->setCode(trim((string)$struct['ClassCode']->me['string']));
-//                $classEntry->setDescription('');
-//
-//                $classEntryMapper->save($classEntry);
-//                $classCount++;
-//            }
-//
-//            $this->log()->info(sprintf('publishClasses: completed adding %d classes', $classCount));
-//
-//            return $this->generateResponse('Classes Imported');
-//        }
-
-        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse('publishClasses finished but unused.');
     }
 
 
@@ -611,81 +526,7 @@ class Receiver
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
-        $this->log->info(json_encode($message->getParam(1)->me['array']));
-        return $this->generateResponse(self::AUTHENTICATION_FAILED);
-
-//            $this->log()->info('publishTimetable: processing request');
-//
-//            $timetablePeriodMapper = new TimetablePeriodMapper();
-//            $classEntryMapper = new ClassEntryMapper();
-//
-//            /* Truncate everything before re-adding
-//             */
-//            $classPeriodMapper = new ClassPeriodMapper();
-//            $classPeriodMapper->truncate();
-//
-//            /* Decide which externalId format to use via config var
-//             */
-//            $isTeacherIds = $this->isTeacherIds();
-//
-//            $allData = $message->getParam(1)->me['array'];
-//
-//            foreach ($allData as $currentData) {
-//                /* An example $currentData that you can paste into a test.json
-//                 * so you have a meaningful example of what you're working with
-//                 * This came straight outta their 2020 devkit
-//                 *
-//                 * {"me":{"struct":{"DayNumber":{"me":{"i4":1},"mytype":1,"_php_class":null},"Period":{"me":{"string":"3"},"mytype":1,"_php_class":null},"ClassCode":{"me":{"string":"7PDH 2"},"mytype":1,"_php_class":null},"EdvalClassCode":{"me":{"string":"7PDH2"},"mytype":1,"_php_class":null},"TeacherId":{"me":{"string":"79455"},"mytype":1,"_php_class":null},"TeacherCode":{"me":{"string":"ANDN"},"mytype":1,"_php_class":null},"RoomCode":{"me":{"string":"B3"},"mytype":1,"_php_class":null}}},"mytype":3,"_php_class":null}
-//                 */
-//                $struct = $currentData->me['struct'];
-//
-//                /* Find the Period data
-//                 */
-//                $allPeriods = $timetablePeriodMapper->findByColumnList([
-//                    'day' => trim((string)$struct['DayNumber']->me['i4']),
-//                    'title' => trim((string)$struct['Period']->me['string'])
-//                ]);
-//
-//                /* Find the Class
-//                 */
-//                $allClasses = $classEntryMapper->findByColumn('code', trim($struct['ClassCode']->me['string']));
-//
-//                /* Decide which externalId format to use via config var
-//                 */
-//                if ($isTeacherIds) {
-//                    $externalId = trim((string)$struct['TeacherId']->me['string']);
-//                } else {
-//                    $externalId = trim((string)$struct['TeacherCode']->me['string']);
-//                }
-//
-//                /* Check that all three are provided
-//                 * Save it!
-//                 */
-//                if ($allPeriods->count() && $allClasses->count()) {
-//                    $classPeriod = $classPeriodMapper->createModel();
-//                    $classPeriod->setClass($allClasses->first()->getId());
-//                    $classPeriod->setPeriod($allPeriods->first()->getId());
-//                    $classPeriod->setTeacher($externalId);
-//                    $classPeriod->setRoom(trim((string)$struct['RoomCode']->me['string']));
-//                    $classPeriodMapper->save($classPeriod);
-//                } else {
-//                    /* These ones are broken */
-//                    if ($allPeriods->count() === 0) {
-//                        $this->log()->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
-//                    }
-//
-//                    if ($allClasses->count() === 0) {
-//                        $this->log()->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
-//                    }
-//                }
-//            }
-//
-//            $this->log()->info("publishTimetable: completed request");
-//
-//            return $this->generateResponse('Timetable Imported');
-//        }
-//
-
+        return $this->generateResponse('publishTimetable finished but unused.');
     }
 
 
@@ -711,105 +552,8 @@ class Receiver
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
-        $this->log->info(json_encode($message->getParam(2)->me['array']));
-        return $this->generateResponse(self::AUTHENTICATION_FAILED);
-
-//        /* Requires schoolbox connector
-//         */
-//        if (!$this->isSchoolboxConnector()) {
-//            $this->log()->info(self::WRONG_CONNECTOR_MESSAGE);
-//            return $this->generateResponse(self::WRONG_CONNECTOR_MESSAGE);
-//        }
-//
-//        $authenticator = new External_Liss_Authenticator($message->getParam(0), $this->log, $this->config);
-//
-//        if ($authenticator->isAuthenticated()) {
-//            /* Index everything in a hash lookup, indexed hierarchically by cycle/day/period
-//             * It turns out schools have multiple cycles of varying day lengths
-//             */
-//            $lookup = [];
-//
-//            $this->log()->info('publishBellTimes: processing request');
-//
-//            $allData = $message->getParam(2)->me['array'];
-//
-//            /* Truncate everything before re-adding */
-//            $timetablePeriodMapper = new TimetablePeriodMapper();
-//            $timetablePeriodMapper->truncate();
-//
-//            foreach ($allData as $currentData) {
-//                $struct = $currentData->me['struct'];
-//
-//                /* Use $currentData['TtStructure']'s value as the cycle identifier
-//                 * and load that if it exists, creating a new one if it doesn't
-//                 */
-//                $cycleIdentifier = (string)$struct['TtStructure']->me['string'];
-//                $cycle           = $this->getCycle($cycleIdentifier);
-//
-//                $dayNumber = (string)$struct['DayNumber']->me['i4'];
-//
-//                $timetablePeriod = $timetablePeriodMapper->createModel()
-//                    ->setCycle($cycle)
-//                    ->setTitle((string)$struct['Period']->me['string'])
-//                    ->setDay($dayNumber)
-//                    ->setStart(new \Alaress_Date_Format((string)$struct['StartTime']->me['string'], 'H:i'))
-//                    ->setFinish(new \Alaress_Date_Format((string)$struct['EndTime']->me['string'], 'H:i'));
-//
-//                /* TODO: Undo these hardcoded values at some point
-//                  */
-//                $timetablePeriod->setUsable(1);
-//
-//                /* Build a hash lookup of cycles, days and their periods
-//                 */
-//                if (!isset($lookup[$cycle->getId()][$dayNumber])) {
-//                    $lookup[$cycle->getId()][$dayNumber] = [];
-//                }
-//
-//                $lookup[$cycle->getId()][$dayNumber][] = $timetablePeriod;
-//            }
-//
-//            /* Now traverse $lookup and assign sequence
-//             * Take into account non-uniform day lengths by cross-referencing with $counts
-//             */
-//            foreach ($lookup as $cycleId => $dayData) {
-//                $this->log()->info(sprintf(
-//                    'publishBellTimes: Cycle %s has %s days',
-//                    $cycleId,
-//                    \count($dayData)
-//                ));
-//
-//                foreach ($dayData as $dayIndex => $periods) {
-//                    $this->log()->info(sprintf(
-//                        'publishBellTimes: Cycle %s, day %s has %s periods',
-//                        $cycleId,
-//                        $dayIndex,
-//                        \count($periods)
-//                    ));
-//
-//                    /* Apply sequencing to every period in this day in this cycle
-//                     */
-//                    $i = 0;
-//
-//                    foreach ($periods as $timetablePeriod) {
-//                        $timetablePeriod->setSequence($i);
-//                        $timetablePeriodMapper->save($timetablePeriod);
-//
-//                        $i++;
-//                    }
-//                }
-//            }
-//
-//            $this->log()->info(sprintf("publishBellTimes: Saved timetable periods, process completed"));
-//
-//            return $this->generateResponse('BellTimes Imported');
-//        }
-//
-        return $this->generateResponse(self::AUTHENTICATION_FAILED);
+        return $this->generateResponse('publishBellTimes finished but unused.');
     }
-
-
-
-
 
 
     /**
