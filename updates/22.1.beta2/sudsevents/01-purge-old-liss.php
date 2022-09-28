@@ -130,8 +130,7 @@ HELP;
                 SET e.updated_at = '{$purgeDate}'
                 WHERE s.source_name LIKE '{$importIdentifier}'
             ",
-            'params' => [
-            ]
+            'params' => null
         ];
 
         /* Avoid using the eventSourceMapper to delete things via objects etc.
@@ -147,8 +146,7 @@ HELP;
                 INNER JOIN event_source s ON e.id = s.event_id
                 WHERE s.source_name LIKE '{$importIdentifier}'
             ",
-            'params' => [
-            ]
+            'params' => null
         ];
 
         $queries['Event Campus Relations'] = [
@@ -159,8 +157,7 @@ HELP;
                 INNER JOIN event_source s ON e.id = s.event_id
                 WHERE s.source_name LIKE '{$importIdentifier}'
             ",
-            'params' => [
-            ]
+            'params' => null
         ];
 
         $queries['Event Folder Relations'] = [
@@ -171,8 +168,7 @@ HELP;
                 INNER JOIN event_source s ON e.id = s.event_id
                 WHERE s.source_name LIKE '{$importIdentifier}'
             ",
-            'params' => [
-            ]
+            'params' => null
         ];
 
         $queries['Event Role Relations'] = [
@@ -183,8 +179,7 @@ HELP;
                 INNER JOIN event_source s ON e.id = s.event_id
                 WHERE s.source_name LIKE '{$importIdentifier}'
             ",
-            'params' => [
-            ]
+            'params' => null
         ];
 
         $queries['Event User Relations'] = [
@@ -195,8 +190,7 @@ HELP;
                 INNER JOIN event_source s ON e.id = s.event_id
                 WHERE s.source_name LIKE '{$importIdentifier}'
             ",
-            'params' => [
-            ]
+            'params' => null
         ];
 
         $queries['Event Source'] = [
@@ -204,8 +198,7 @@ HELP;
                 DELETE FROM event_source
                 WHERE source_name LIKE '{$importIdentifier}'
             ",
-            'params' => [
-            ]
+            'params' => null
         ];
 
         $queries['Event Detonator'] = [
