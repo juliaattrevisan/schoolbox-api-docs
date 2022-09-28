@@ -273,18 +273,24 @@ class Receiver
         (new Prepare(
             $this->log(),
             true,
-            new \Schoolbox\External\Event\Mapper(),
-            new \Schoolbox\External\ClassEntryMapper(),
-            new \Schoolbox\External\ClassInvolvementMapper(),
-            new \Schoolbox\External\ClassPeriodMapper(),
-            new \Schoolbox\External\TimetablePeriodMapper(),
-            new \Schoolbox\External\Event\Overrides\Mapper(),
+            \Schoolbox\External\Event\Mapper::getInstance(),
+            \Schoolbox\External\ClassEntryMapper::getInstance(),
+            \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+            \Schoolbox\External\ClassPeriodMapper::getInstance(),
+            \Schoolbox\External\TimetablePeriodMapper::getInstance(),
+            \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
             self::SOURCE_NAME
         ))->import();
 
         /* Do the import
          */
-        (new Classes())->import($this->log(), $message, $this->defaultType, $this->exclusions, $this->teacherIdentifier);
+        (new Classes(
+            $this->log(),
+            $this->defaultType,
+            $this->exclusions,
+            $this->teacherIdentifier,
+            \Schoolbox\External\Event\Mapper::getInstance()
+        ))->import($message);
 
         /* Cleanup after ourselves
          */

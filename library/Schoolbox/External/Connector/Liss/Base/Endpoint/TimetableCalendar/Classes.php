@@ -12,6 +12,10 @@ namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 use PhpXmlRpc\Request;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Helper;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
+use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Event\Model;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class Classes
@@ -34,21 +38,79 @@ class Classes
 
 
     /**
-     * Import into suds timetable
+     * Since we are receiving a push from schools,
+     * we are always in perform mode
+     *
+     * @var bool
+     */
+    private bool $perform = true;
+
+
+    /**
+     * A csv list of event types that we should skip
+     *
+     * @var array|null
+     */
+    private ?array $exclusions = null;
+
+
+    /**
+     * A string denoting an arbitrary event type that we attribute
+     * when the supplied type is non-meaningful
+     *
+     * @var string|null
+     */
+    private ?string $defaultType = null;
+
+
+    /**
+     * Decide whether to use teacherIds or teacherCodes
+     * Configured in admin
+     *
+     * @var string|null
+     */
+    private ?string $teacherIdentifier = null;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Mapper
+     */
+    private \Schoolbox\External\Event\Mapper $eventMapper;
+
+
+    /**
+     * Constructor.
      *
      * @param LoggerInterface $log
-     * @param Request         $message
      * @param string          $defaultType
      * @param array           $exclusions
+     * @param string          $teacherIdentifier
+     * @param Mapper          $eventMapper
+     */
+    public function __construct(
+        LoggerInterface $log,
+        string $defaultType,
+        array $exclusions,
+        string $teacherIdentifier,
+        \Schoolbox\External\Event\Mapper $eventMapper
+    ) {
+        $this->log = $log;
+        $this->exclusions = $exclusions;
+        $this->defaultType = $defaultType;
+        $this->teacherIdentifier = $teacherIdentifier;
+        $this->eventMapper = $eventMapper;
+    }
+
+
+    /**
+     * Import into suds timetable
+     *
+     * @param Request $message
      * @return void
      * @throws \InvalidArgumentException
      */
     public function import(
-        LoggerInterface $log,
-        Request $message,
-        string $defaultType,
-        array $exclusions,
-        string $teacherIdentifier
+        Request $message
     ): void {
         /* Make all the data easier to manipulate by rearranging their guts
          */
@@ -77,8 +139,8 @@ class Classes
                 /* Skip events that don't have a type, because we didn't define
                  * a default event type in config
                  */
-                if ('' === $defaultType) {
-                    $log->warning(sprintf(
+                if ('' === $this->defaultType) {
+                    $this->log->warning(sprintf(
                         'Skipping "%s" with code "%s" (%s): no type',
                         $currentEvent['name'],
                         $currentEvent['code'],
@@ -98,11 +160,11 @@ class Classes
                 /* Assign a default one and carry on as if this event
                  * always had this type to start with
                  */
-                $currentEvent['type'] = $defaultType;
+                $currentEvent['type'] = $this->defaultType;
 
-                $log->debug(sprintf(
+                $this->log->debug(sprintf(
                     'Assigning default event type "%s" to "%s" with code "%s" (%s)',
-                    $defaultType,
+                    $this->defaultType,
                     $currentEvent['name'],
                     $currentEvent['code'],
                     $currentEvent['guid']
@@ -112,8 +174,8 @@ class Classes
             /* Skip events that have a particular type
              * This also applies if you exclude the default one you chose in config
              */
-            if (\in_array($currentEvent['type'], $exclusions, false)) {
-                $log->warning(sprintf(
+            if (\in_array($currentEvent['type'], $this->exclusions, false)) {
+                $this->log->warning(sprintf(
                     'Skipping "%s" with code "%s" (%s): has excluded type "%s"',
                     $currentEvent['name'],
                     $currentEvent['code'],
@@ -135,7 +197,7 @@ class Classes
              * This supposedly never happens, but I don't trust
              */
             if ('' === $currentEvent['code']) {
-                $log->warning(sprintf(
+                $this->log->warning(sprintf(
                     'Skipping "%s" with code "%s" (%s): no class codes provided',
                     $currentEvent['name'],
                     $currentEvent['code'],
@@ -154,7 +216,7 @@ class Classes
 
             /* TODO Process events here
              */
-            $this->processDailyData($currentEvent);
+            $this->processClass($currentEvent);
         }
 
         /* Log diagnostics
@@ -162,14 +224,14 @@ class Classes
         $total = \count($allDailyData);
         $processed = $total - $skipCount['total'];
 
-        $log->info('');
-        $log->info('----------------------------------------------');
-        $log->info("Total Processed: {$processed}/{$total}");
-        $log->info("Total Skipped: {$skipCount['total']}/{$total}");
-        $log->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
-        $log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
-        $log->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
-        $log->info("Unknown user assignations: {$skipCount['unknownUser']}");
+        $this->log->info('');
+        $this->log->info('----------------------------------------------');
+        $this->log->info("Total Processed: {$processed}/{$total}");
+        $this->log->info("Total Skipped: {$skipCount['total']}/{$total}");
+        $this->log->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
+        $this->log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
+        $this->log->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
+        $this->log->info("Unknown user assignations: {$skipCount['unknownUser']}");
 
         /* A list of all the unknown user ids
          */
@@ -180,10 +242,10 @@ class Classes
 
             $unknownUserIds = implode(', ', $unknownUserIds);
 
-            $log->info("Unknown user ids: {$unknownUserIds}");
+            $this->log->info("Unknown user ids: {$unknownUserIds}");
         }
 
-        $log->info('');
+        $this->log->info('');
     }
 
 
@@ -193,8 +255,94 @@ class Classes
      * @param array $currentEvent
      * @return void
      */
-    private function processDailyData(array $currentEvent): void
+    private function processClass(array $currentEvent): void
     {
+        $this->log->info(json_encode($currentEvent));die();
+
+        /* Save sis_event record
+         */
+        $event = $this->createEvent($currentEvent);
+//
+//        /* Save sis_class record
+//         */
+//        $classEntry = $this->createClassEntry($activity, $event);
+//
+//        /* Save the involvements
+//         */
+//        $this->createInvolvements($activity, $activityInstance, $enrolments, $staffLookup, $event, $classEntry);
+    }
+
+
+    /**
+     * Create a new SUDS Timetable Event with all the class and lesson pieces
+     *
+     * @param array $currentEvent
+     * @return Model
+     * @throws \PDOException
+     * @throws Exception
+     * @throws \UnexpectedValueException
+     */
+    private function createEvent(array $currentEvent): \Schoolbox\External\Event\Model {
+        /* Fill in these vars as usual
+         */
+        $classCode = $currentEvent['code'];
+        $day = null;
+        $detail = $currentEvent['detail'];
+        $guid = $currentEvent['guid'];
+        $period = $currentEvent['period'];
+        $room = $currentEvent['rooms'];
+        $title = $currentEvent['name'];
+
+        /* Datetimes for when this class occurs
+         */
+        $startAt = $currentEvent['startDateTime'];
+        $finishAt = $currentEvent['endDateTime'];
+
+        /* This is pretty optional - this is the sis' equivalent of our luEventType
+         * Sometimes it's provided, sometimes it's not - we can record it here if
+         * possible. If you can't get it, dw about it
+         */
+        $type = $currentEvent['type'];
+
+        /* Try to recycle based on guid
+         */
+        try {
+            $event = $this->eventMapper->findOneByColumn('guid', $guid);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $event = $this->eventMapper->createModel();
+        }
+
+        $event
+            ->setTitle($title)
+            ->setDetail($detail)
+            ->setLocation($room)
+            ->setCode($classCode)
+            ->setDay($day)
+            ->setPeriod($period)
+            ->setStartAt($startAt)
+            ->setFinishAt($finishAt)
+            ->setType($type)
+            ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+            ->setGuid($guid)
+            ->setSource(Receiver::SOURCE_NAME);
+
+        /* Save it and remember what we saw in case we need to reuse this later
+         */
+        $this->log->debug(sprintf(
+            'Creating new timetable event %s (%s) on day %s, period %s, %s-%s',
+            $event->getTitle(),
+            $event->getCode(),
+            $event->getDay(),
+            $event->getPeriod(),
+            $event->getStartAt()->getDatabase(),
+            $event->getFinishAt()->getDatabase()
+        ));
+
+        if ($this->perform) {
+            $this->eventMapper->save($event);
+        }
+
+        return $event;
     }
 
 
@@ -202,11 +350,10 @@ class Classes
      * Decide if we're going to use teacherIds as the externalId for staff
      * or whether we use teacherCodes instead
      *
-     * @param string $teacherIdentifier
      * @return bool
      */
-    private function isTeacherIds(string $teacherIdentifier): bool
+    private function isTeacherIds(): bool
     {
-        return self::TEACHER_IDENTIFIER_ID === $teacherIdentifier;
+        return self::TEACHER_IDENTIFIER_ID === $this->teacherIdentifier;
     }
 }
