@@ -18,16 +18,16 @@ class ClassCodeMatchFactory
      * Returns an implementation suitable for the specified external type
      *
      * @param string $externalType
-     * @return ISubjectMatcher
+     * @return IClassMatcher
      */
-    public function build(string $externalType): ISubjectMatcher
+    public function build(string $externalType): IClassMatcher
     {
         if ($externalType === 'synergetic') {
-            return new Synergetic\SubjectMatcher();
+            return new Synergetic\ClassMatcher();
         }
         if ($externalType === 'pcschools') {
-            return new Pcschools\SubjectMatcher();
+            return new Pcschools\ClassMatcher();
         }
-        return new SubjectMatcherBase();
+        return new ClassMatcherBase();
     }
 }

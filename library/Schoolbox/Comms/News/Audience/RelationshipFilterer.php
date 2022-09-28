@@ -38,15 +38,15 @@ class RelationshipFilterer
      * @param External_UserInterface      $externalUser
      * @param Folder\Mapper               $folderMapper
      * @param External_ClassInterface     $externalClass
-     * @param Folder\Code\ISubjectMatcher $subjectMatcher
+     * @param Folder\Code\IClassMatcher   $classMatcher
      */
     public function __construct(
-        private IConnector $db,
-        private UserMapper $userMapper,
-        private External_UserInterface $externalUser,
-        private Folder\Mapper $folderMapper,
-        private External_ClassInterface $externalClass,
-        private Folder\Code\ISubjectMatcher $subjectMatcher,
+        private IConnector                $db,
+        private UserMapper                $userMapper,
+        private External_UserInterface    $externalUser,
+        private Folder\Mapper             $folderMapper,
+        private External_ClassInterface   $externalClass,
+        private Folder\Code\IClassMatcher $classMatcher,
     ) {
     }
 
@@ -177,7 +177,7 @@ class RelationshipFilterer
             // Find all folders where the user is a class student or learner-only.
             $subjects = $this->externalUser->getSubjectList($student);
             foreach ($subjects as $subject) {
-                $classCode = $this->subjectMatcher::generateFolderCode($subject['campusCode'], $subject['code']);
+                $classCode = $this->classMatcher::generateFolderCode($subject['campusCode'], $subject['code']);
                 if (!in_array($classCode, $classCodes)) {
                     $classCodes[] = $classCode;
                 }

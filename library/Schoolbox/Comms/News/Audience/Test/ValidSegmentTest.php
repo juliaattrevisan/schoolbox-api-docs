@@ -63,7 +63,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 Folder\Code\Mapper::getInstance(),
                 new External_Offline_User(),
                 new TestLoader(),
-                new Folder\Code\SubjectMatcherBase()
+                new Folder\Code\ClassMatcherBase()
             ),
             new External_Offline_User(),
             $mockConnector,

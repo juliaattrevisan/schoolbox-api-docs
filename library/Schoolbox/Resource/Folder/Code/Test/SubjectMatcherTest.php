@@ -10,12 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Folder\Code\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Resource\Folder\Code\ISubjectMatcher;
+use Schoolbox\Resource\Folder\Code\IClassMatcher;
 use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 
 /**
  * Test that the ISubjectMatcher implementations behave as expected
- * @see ISubjectMatcher
+ * @see IClassMatcher
  * @codeCoverageIgnore
  */
 class SubjectMatcherTest extends TestCase
@@ -29,7 +29,7 @@ class SubjectMatcherTest extends TestCase
     }
 
     /**
-     * @covers       \Schoolbox\Resource\Folder\Code\SubjectMatcherBase::isMatch
+     * @covers       \Schoolbox\Resource\Folder\Code\ClassMatcherBase::isMatch
      * @dataProvider providerDefault
      * @param string      $folderCode
      * @param string|null $sisCampus
@@ -44,7 +44,7 @@ class SubjectMatcherTest extends TestCase
     }
 
     /**
-     * @covers       \External\Synergetic\SubjectMatcher::isMatch
+     * @covers       \External\Synergetic\ClassMatcher::isMatch
      * @dataProvider providerSynergetic
      * @param string      $folderCode
      * @param string|null $sisCampus
@@ -59,7 +59,7 @@ class SubjectMatcherTest extends TestCase
     }
 
     /**
-     * @covers       \External\Pcschools\SubjectMatcher::isMatch
+     * @covers       \External\Pcschools\ClassMatcher::isMatch
      * @dataProvider providerPcschool
      * @param string      $folderCode
      * @param string|null $sisCampus

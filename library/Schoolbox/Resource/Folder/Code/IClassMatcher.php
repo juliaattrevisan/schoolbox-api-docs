@@ -16,7 +16,7 @@ namespace Schoolbox\Resource\Folder\Code;
  *
  * The implementation of this interface is SIS-specific.
  */
-interface ISubjectMatcher
+interface IClassMatcher
 {
     /**
      * Returns whether a Schoolbox folder code is an exact match for a SIS subject's campus+class codes
@@ -26,7 +26,7 @@ interface ISubjectMatcher
      * @param string      $sisClass     A SIS subject's class code
      * @return bool
      * @TODO WARNING, this can return false positives for Synergetic
-     * @see  \External\Synergetic\SubjectMatcher for details
+     * @see  \External\Synergetic\ClassMatcher for details
      */
     public function isMatch(string $sbFolderCode, ?string $sisCampus, string $sisClass): bool;
 

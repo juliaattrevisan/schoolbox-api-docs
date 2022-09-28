@@ -9,13 +9,12 @@ declare(strict_types=1);
 
 namespace External\Synergetic;
 
-use Schoolbox\Resource\Folder\Code\SubjectMatcherBase;
+use Schoolbox\Resource\Folder\Code\ClassMatcherBase;
 
 use function trim;
 
-class SubjectMatcher extends SubjectMatcherBase
+class ClassMatcher extends ClassMatcherBase
 {
-
     /**
      * @inheritDoc
      */
