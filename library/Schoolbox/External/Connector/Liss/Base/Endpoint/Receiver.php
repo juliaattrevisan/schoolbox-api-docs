@@ -180,6 +180,8 @@ class Receiver
             self::LOG_FILE
         ), 'ab');
 
+        /* TODO Reset this log level to INFO once we are safely on the way
+         */
         $this->log = new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
 
         /* Log the import in the suds control panel
