@@ -14,11 +14,11 @@ use Schoolbox\Resource\Folder\Code\IClassMatcher;
 use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 
 /**
- * Test that the ISubjectMatcher implementations behave as expected
+ * Test that the IClassMatcher implementations behave as expected
  * @see IClassMatcher
  * @codeCoverageIgnore
  */
-class SubjectMatcherTest extends TestCase
+class ClassMatcherTest extends TestCase
 {
     private static $factory;
 
