@@ -7,14 +7,15 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Liss;
+namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
 use Alaress\Lumberjack\Logger;
 use PhpXmlRpc\Request;
 use PhpXmlRpc\Response;
 use PhpXmlRpc\Server;
 use PhpXmlRpc\Value;
-
+use Schoolbox\External\Connector\Liss\Base\Endpoint\PublishDailyData\Cleanup;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\PublishDailyData\Prepare;
 
 /**
  * Class Receiver
@@ -33,6 +34,12 @@ use PhpXmlRpc\Value;
  */
 class Receiver
 {
+    /**
+     * An arbitrarily-chosen string to denote where these events came from
+     */
+    public const SOURCE_NAME = 'suds_liss';
+
+
     /**
      * A file in your vagrant: /var/log/schoolbox/vagrantx
      */
@@ -256,6 +263,20 @@ class Receiver
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
+        /* Pave the way
+         */
+        (new Prepare(
+            $this->log(),
+            true,
+            new \Schoolbox\External\Event\Mapper(),
+            new \Schoolbox\External\ClassEntryMapper(),
+            new \Schoolbox\External\ClassInvolvementMapper(),
+            new \Schoolbox\External\ClassPeriodMapper(),
+            new \Schoolbox\External\TimetablePeriodMapper(),
+            new \Schoolbox\External\Event\Overrides\Mapper(),
+            self::SOURCE_NAME
+        ))->import();
+
         /* Make all the data easier to manipulate by rearranging their guts
          */
         $helper = new Helper();
@@ -360,6 +381,7 @@ class Receiver
 
             /* TODO Process events here
              */
+            $this->processDailyData($currentEvent);
         }
 
         /* Log diagnostics
@@ -387,6 +409,17 @@ class Receiver
 
             $this->log()->info("Unknown user ids: {$unknownUserIds}");
         }
+
+        $this->log()->info('');
+
+        /* Cleanup after ourselves
+         */
+        (new Cleanup(
+            $this->log(),
+            true,
+            new \Schoolbox\External\Event\Mapper(),
+            self::SOURCE_NAME
+        ))->import();
 
         return $this->generateResponse(self::AUTHENTICATION_FAILED);
 
@@ -686,6 +719,17 @@ class Receiver
 //        }
 //
         return $this->generateResponse(self::AUTHENTICATION_FAILED);
+    }
+
+
+    /**
+     * Put this $currentEvent into the SUDS Timetable
+     *
+     * @param array $currentEvent
+     * @return void
+     */
+    private function processDailyData(array $currentEvent): void
+    {
     }
 
 

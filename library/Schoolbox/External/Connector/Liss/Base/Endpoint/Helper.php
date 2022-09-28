@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Liss;
+namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
 use PhpXmlRpc\Value;
 

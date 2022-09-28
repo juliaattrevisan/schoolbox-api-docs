@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-use Schoolbox\External\Connector\Liss\Receiver;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
