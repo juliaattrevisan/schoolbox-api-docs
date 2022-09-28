@@ -13,6 +13,7 @@ use PhpXmlRpc\Request;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
 use Schoolbox\External\Event\Mapper;
@@ -81,9 +82,21 @@ class Classes
 
 
     /**
+     * @var \Schoolbox\External\Event\Overrides\Mapper
+     */
+    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+
+
+    /**
      * @var ClassEntryMapper
      */
     private ClassEntryMapper $classEntryMapper;
+
+
+    /**
+     * @var ClassInvolvementMapper
+     */
+    private ClassInvolvementMapper $classInvolvementMapper;
 
 
     /**
@@ -95,14 +108,24 @@ class Classes
 
 
     /**
+     * A list of classInvolvements that we saw previously
+     *
+     * @var array
+     */
+    private array $classInvolvements = [];
+
+
+    /**
      * Constructor.
      *
-     * @param LoggerInterface  $log
-     * @param string           $defaultType
-     * @param array            $exclusions
-     * @param string           $teacherIdentifier
-     * @param Mapper           $eventMapper
-     * @param ClassEntryMapper $classEntryMapper
+     * @param LoggerInterface                            $log
+     * @param string                                     $defaultType
+     * @param array                                      $exclusions
+     * @param string                                     $teacherIdentifier
+     * @param Mapper                                     $eventMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+     * @param ClassEntryMapper                           $classEntryMapper
+     * @param ClassInvolvementMapper                     $classInvolvementMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -110,14 +133,18 @@ class Classes
         array $exclusions,
         string $teacherIdentifier,
         \Schoolbox\External\Event\Mapper $eventMapper,
-        ClassEntryMapper $classEntryMapper
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        ClassEntryMapper $classEntryMapper,
+        ClassInvolvementMapper $classInvolvementMapper
     ) {
         $this->log = $log;
         $this->exclusions = $exclusions;
         $this->defaultType = $defaultType;
         $this->teacherIdentifier = $teacherIdentifier;
         $this->eventMapper = $eventMapper;
+        $this->overridesMapper = $overridesMapper;
         $this->classEntryMapper = $classEntryMapper;
+        $this->classInvolvementMapper = $classInvolvementMapper;
     }
 
 
@@ -128,9 +155,7 @@ class Classes
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function import(
-        Request $message
-    ): void {
+    public function import(Request $message): void {
         /* Make all the data easier to manipulate by rearranging their guts
          */
         $helper = new Helper();
@@ -273,11 +298,12 @@ class Classes
      *
      * @param array $currentEvent
      * @return void
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function processClass(array $currentEvent): void
     {
-        $this->log->info(json_encode($currentEvent));die();
-
         /* Save sis_event record
          */
         $event = $this->createEvent($currentEvent);
@@ -285,10 +311,10 @@ class Classes
         /* Save sis_class record
          */
         $classEntry = $this->createClassEntry($currentEvent, $event);
-//
-//        /* Save the involvements
-//         */
-//        $this->createInvolvements($activity, $activityInstance, $enrolments, $staffLookup, $event, $classEntry);
+
+        /* Save the involvements
+         */
+        $this->createInvolvements($currentEvent, $event, $classEntry);
     }
 
 
@@ -400,6 +426,126 @@ class Classes
         }
 
         return $classEntry;
+    }
+
+
+    /**
+     * Save all the involvements for a given $class
+     *
+     * For teachers, decide which format of external identifier to use
+     * as determined by the config vars
+     *
+     * @param array      $currentEvent
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @return void
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function createInvolvements(array $currentEvent, \Schoolbox\External\Event\Model $event, ClassEntry $classEntry)
+    {
+        if ($this->isTeacherIds()) {
+            $staffs = $currentEvent['teacherIds'];
+        } else {
+            $staffs = $currentEvent['teacherCodes'];
+        }
+
+        foreach ($staffs as $externalId) {
+            $this->saveStaffInvolvement($event, (string)$externalId);
+        }
+
+        foreach ($currentEvent['students'] as $externalId) {
+            $this->saveStudentInvolvement($event, $classEntry, (string)$externalId);
+        }
+    }
+
+
+    /**
+     * Save staff involvements as Overrides
+     *
+     * @param Model  $event
+     * @param string $externalId
+     * @return void
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function saveStaffInvolvement(\Schoolbox\External\Event\Model $event, string $externalId): void
+    {
+        /* We use the Overrides system to specify a particular person's involvement
+         * in a particular sis_event instance, rather than being associated with all
+         */
+        $override = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId($externalId)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
+            ->setSequence(1);
+
+        $this->log->debug(sprintf(
+            'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+            $externalId,
+            $event->getTitle(),
+            $event->getDay(),
+            $event->getPeriod(),
+            $event->getStartAt()->getDatabase(),
+            $event->getFinishAt()->getDatabase()
+        ));
+
+        if ($this->perform) {
+            $this->overridesMapper->save($override);
+        }
+    }
+
+
+    /**
+     * Save an involvement for user $externalId, whose name is $name,
+     * for the sis_event $event
+     *
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @param string     $externalId
+     * @return void
+     * @throws \PDOException
+     * @throws Exception
+     * @throws \UnexpectedValueException
+     */
+    private function saveStudentInvolvement(
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry,
+        string $externalId
+    ): void {
+        if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
+            $this->log->debug(sprintf(
+                'Reusing previous class involvement for %s in timetable event %s - %s, %s, %s-%s',
+                $externalId,
+                $event->getTitle(),
+                $event->getDay(),
+                $event->getPeriod(),
+                $event->getStartAt()->getDatabase(),
+                $event->getFinishAt()->getDatabase()
+            ));
+        } else {
+            $classInvolvement = $this->classInvolvementMapper->createModel()
+                ->setClass($classEntry)
+                ->setExternalId($externalId);
+
+            if ($this->perform) {
+                $this->classInvolvementMapper->save($classInvolvement);
+            }
+
+            $this->classInvolvements[$classEntry->getId()][$externalId] = true;
+
+            $this->log->debug(sprintf(
+                'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+                $externalId,
+                $event->getTitle(),
+                $event->getDay(),
+                $event->getPeriod(),
+                $event->getStartAt()->getDatabase(),
+                $event->getFinishAt()->getDatabase()
+            ));
+        }
     }
 
 

@@ -289,7 +289,10 @@ class Receiver
             $this->defaultType,
             $this->exclusions,
             $this->teacherIdentifier,
-            \Schoolbox\External\Event\Mapper::getInstance()
+            \Schoolbox\External\Event\Mapper::getInstance(),
+            \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+            \Schoolbox\External\ClassEntryMapper::getInstance(),
+            \Schoolbox\External\ClassInvolvementMapper::getInstance(),
         ))->import($message);
 
         /* Cleanup after ourselves
@@ -298,7 +301,6 @@ class Receiver
             $this->log(),
             true,
             new \Schoolbox\External\Event\Mapper(),
-            \Schoolbox\External\ClassEntryMapper::getInstance(),
             self::SOURCE_NAME
         ))->import();
 
