@@ -1,0 +1,96 @@
+<?php
+
+/**
+ * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\External\Connector\Liss;
+
+use PhpXmlRpc\Value;
+
+/**
+ * Class Helper
+ *
+ * Some additional lower-level functionality that makes the liss data
+ * a bit easier to work with
+ */
+class Helper
+{
+    /**
+     * Preprocess all this stuff
+     * Make it easier to understand because their data structure is blasphemously terrible
+     *
+     * @param array $allData
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    public function reformatAllEvents(array $allData): array
+    {
+        $allEvents = [];
+
+        foreach ($allData as $currentEvent) {
+            $allEvents[] = $this->reformatEvent($currentEvent);
+        }
+
+        return $allEvents;
+    }
+
+
+    /**
+     * Preprocess all this stuff
+     * Make it easier to understand because their data structure is blasphemously terrible
+     *
+     * @param Value $currentEvent
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    private function reformatEvent(Value $currentEvent): array
+    {
+        $date = date('Y-m-d', strtotime($currentEvent->me['struct']['Date']->me['dateTime.iso8601']));
+        $startDateTime = "{$date} {$currentEvent->me['struct']['StartTime']->me['string']}:00";
+        $endDateTime = "{$date} {$currentEvent->me['struct']['EndTime']->me['string']}:00";
+
+        /* Recompile everything
+         */
+        $restructured = [
+            'guid' => trim((string)$currentEvent->me['struct']['Guid']->me['string']),
+
+            /* Timing
+             */
+            'period' => trim((string)$currentEvent->me['struct']['Period']->me['string']),
+            'startDateTime' => new \Alaress_Date_Format($startDateTime, \Alaress_Date_Format::DATABASE_FORMAT),
+            'endDateTime' => new \Alaress_Date_Format($endDateTime, \Alaress_Date_Format::DATABASE_FORMAT),
+
+            /* Detail
+             */
+            'code' => trim((string)$currentEvent->me['struct']['ClassCode']->me['string']),
+            'mame' => trim((string)$currentEvent->me['struct']['ClassName']->me['string']),
+            'rooms' => trim((string)$currentEvent->me['struct']['Rooms']->me['string']),
+            'type' => trim((string)$currentEvent->me['struct']['Type']->me['string']),
+            'detail' => '',
+
+            /* Involvements
+             */
+            'students' => [],
+
+            /* Assemble numeric Teacher Ids and alphanumeric Teacher Codes
+             * No idea why this has to be a csv, but students is an array...wevs
+             */
+            'teacherCodes' => array_filter(explode(',', (string)$currentEvent->me['struct']['TeacherCodes']->me['string'])),
+            'teacherIds' => array_filter(explode(',', (string)$currentEvent->me['struct']['TeacherIds']->me['string'])),
+        ];
+
+        /* Assemble Students
+         */
+        if (isset($currentEvent->me['struct']['Students'])) {
+            foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
+                $restructured['students'][] = (string)$currentStudent->me['string'];
+            }
+        }
+
+        return $restructured;
+    }
+}
