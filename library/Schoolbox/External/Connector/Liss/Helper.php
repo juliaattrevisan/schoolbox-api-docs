@@ -67,7 +67,7 @@ class Helper
             /* Detail
              */
             'code' => trim((string)$currentEvent->me['struct']['ClassCode']->me['string']),
-            'mame' => trim((string)$currentEvent->me['struct']['ClassName']->me['string']),
+            'name' => trim((string)$currentEvent->me['struct']['ClassName']->me['string']),
             'rooms' => trim((string)$currentEvent->me['struct']['Rooms']->me['string']),
             'type' => trim((string)$currentEvent->me['struct']['Type']->me['string']),
             'detail' => '',

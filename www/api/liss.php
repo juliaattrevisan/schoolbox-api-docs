@@ -20,6 +20,9 @@ $liss = new Receiver(
     $config->get('external_liss_username'),
     $config->get('external_liss_password'),
     $config->get('external_liss_schoolcode'),
+    $config->get('external_liss_exclusions'),
+    $config->get('external_liss_default_event_type'),
+    $config->get('external_liss_teacher_identifier'),
     $config->get('logs_dir')
 );
 

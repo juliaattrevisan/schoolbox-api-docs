@@ -80,6 +80,32 @@ class Receiver
 
 
     /**
+     * A csv list of event types that we should skip
+     *
+     * @var array|null
+     */
+    private ?array $exclusions = null;
+
+
+    /**
+     * A string denoting an arbitrary event type that we attribute
+     * when the supplied type is non-meaningful
+     *
+     * @var string|null
+     */
+    private ?string $defaultType = null;
+
+
+    /**
+     * Decide whether to use teacherIds or teacherCodes
+     * Configured in admin
+     *
+     * @var string|null
+     */
+    private ?string $teacherIdentifier = null;
+
+
+    /**
      * @var string|null
      */
     private ?string $logDir = null;
@@ -101,6 +127,9 @@ class Receiver
      * @param string $username
      * @param string $password
      * @param string $schoolCode
+     * @param string $exclusions
+     * @param string $defaultType
+     * @param string $teacherIdentifier
      * @param string $logDir
      */
     public function __construct(
@@ -109,6 +138,9 @@ class Receiver
         string $username,
         string $password,
         string $schoolCode,
+        string $exclusions,
+        string $defaultType,
+        string $teacherIdentifier,
         string $logDir
     ) {
         $this->externalEnable = $externalEnable;
@@ -116,11 +148,21 @@ class Receiver
         $this->username = $username;
         $this->password = $password;
         $this->schoolCode = $schoolCode;
-        $this->logDir = $logDir;
+
+        /* (configured in admin) A csv list of event types that should be ignored
+         * and a default event type that should be attributed to a liss event
+         * when it didn't specify a type (note that it will be possible that you
+         * can specify a default event type this is also excluded)
+         */
+        $this->exclusions = array_map('trim', explode(',', $exclusions));
+        $this->defaultType = trim($defaultType);
+        $this->teacherIdentifier = trim($teacherIdentifier);
 
         /* Path to a log file which you can: tail -n100 -f
          * so you can see what's going on. Continuously appends.
          */
+        $this->logDir = $logDir;
+
         $logFile = fopen(sprintf(
             '%s/%s',
             $logDir,
@@ -191,12 +233,12 @@ class Receiver
     }
 
 
-
     /**
      * publish daily timetable and room changes to schoolbox
      *
      * @param Request $message
      * @return Response
+     * @throws \InvalidArgumentException
      */
     public function publishDailyData(Request $message): Response
     {
@@ -214,14 +256,136 @@ class Receiver
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
+        /* Make all the data easier to manipulate by rearranging their guts
+         */
         $helper = new Helper();
         $allDailyData = $helper->reformatAllEvents($message->getParam(3)->me['array']);
 
-        foreach ($allDailyData as $dailyData) {
-            if (\count($dailyData['students'])) {
-                $this->log->info(json_encode($dailyData));
-                die();
+        /* Keep track of all the problems we encountered
+         */
+        $skipCount = [
+            'noClassCode' => 0,
+            'noType' => 0,
+            'invalidType' => 0,
+            'unknownUser' => 0,
+            'unknownUserIds' => [],
+            'total' => 0,
+        ];
+
+        /* Let's go, trying to skip as many as we can before we try
+         * to persist data to the db
+         */
+        foreach ($allDailyData as $currentEvent) {
+            /* Event doesn't have a type; see if we specified one in config
+             * If we did, give it that event type instead, then carry onwards
+             */
+            if ('' === $currentEvent['type']) {
+                /* Skip events that don't have a type, because we didn't define
+                 * a default event type in config
+                 */
+                if ('' === $this->defaultType) {
+                    $this->log()->warning(sprintf(
+                        'Skipping "%s" with code "%s" (%s): no type',
+                        $currentEvent['name'],
+                        $currentEvent['code'],
+                        $currentEvent['guid']
+                    ));
+
+                    /* Update counts
+                     */
+                    $skipCount['noType']++;
+                    $skipCount['total']++;
+
+                    /* Skip processing this event entirely
+                     */
+                    continue;
+                }
+
+                /* Assign a default one and carry on as if this event
+                 * always had this type to start with
+                 */
+                $currentEvent['type'] = $this->defaultType;
+
+                $this->log()->debug(sprintf(
+                    'Assigning default event type "%s" to "%s" with code "%s" (%s)',
+                    $this->defaultType,
+                    $currentEvent['name'],
+                    $currentEvent['code'],
+                    $currentEvent['guid']
+                ));
             }
+
+            /* Skip events that have a particular type
+             * This also applies if you exclude the default one you chose in config
+             */
+            if (\in_array($currentEvent['type'], $this->exclusions, false)) {
+                $this->log->warning(sprintf(
+                    'Skipping "%s" with code "%s" (%s): has excluded type "%s"',
+                    $currentEvent['name'],
+                    $currentEvent['code'],
+                    $currentEvent['guid'],
+                    $currentEvent['type']
+                ));
+
+                /* Update counts
+                 */
+                $skipCount['invalidType']++;
+                $skipCount['total']++;
+
+                /* Skip processing this event entirely
+                 */
+                continue;
+            }
+
+            /* Skip events that don't have any classCode value
+             * This supposedly never happens, but I don't trust
+             */
+            if ('' === $currentEvent['code']) {
+                $this->log()->warning(sprintf(
+                    'Skipping "%s" with code "%s" (%s): no class codes provided',
+                    $currentEvent['name'],
+                    $currentEvent['code'],
+                    $currentEvent['guid'],
+                ));
+
+                /* Update counts
+                 */
+                $skipCount['noClassCode']++;
+                $skipCount['total']++;
+
+                /* Skip processing this event entirely
+                 */
+                continue;
+            }
+
+            /* TODO Process events here
+             */
+        }
+
+        /* Log diagnostics
+         */
+        $total = \count($allDailyData);
+        $processed = $total - $skipCount['total'];
+
+        $this->log()->info('');
+        $this->log()->info('----------------------------------------------');
+        $this->log()->info("Total Processed: {$processed}/{$total}");
+        $this->log()->info("Total Skipped: {$skipCount['total']}/{$total}");
+        $this->log()->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
+        $this->log()->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
+        $this->log()->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
+        $this->log()->info("Unknown user assignations: {$skipCount['unknownUser']}");
+
+        /* A list of all the unknown user ids
+         */
+        $unknownUserIds = array_filter($skipCount['unknownUserIds']);
+
+        if (count($unknownUserIds)) {
+            asort($unknownUserIds);
+
+            $unknownUserIds = implode(', ', $unknownUserIds);
+
+            $this->log()->info("Unknown user ids: {$unknownUserIds}");
         }
 
         return $this->generateResponse(self::AUTHENTICATION_FAILED);
