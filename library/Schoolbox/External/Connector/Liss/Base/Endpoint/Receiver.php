@@ -14,8 +14,9 @@ use PhpXmlRpc\Request;
 use PhpXmlRpc\Response;
 use PhpXmlRpc\Server;
 use PhpXmlRpc\Value;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\PublishDailyData\Cleanup;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\PublishDailyData\Prepare;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Classes;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Cleanup;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Prepare;
 
 /**
  * Class Receiver
@@ -277,140 +278,9 @@ class Receiver
             self::SOURCE_NAME
         ))->import();
 
-        /* Make all the data easier to manipulate by rearranging their guts
+        /* Do the import
          */
-        $helper = new Helper();
-        $allDailyData = $helper->reformatAllEvents($message->getParam(3)->me['array']);
-
-        /* Keep track of all the problems we encountered
-         */
-        $skipCount = [
-            'noClassCode' => 0,
-            'noType' => 0,
-            'invalidType' => 0,
-            'unknownUser' => 0,
-            'unknownUserIds' => [],
-            'total' => 0,
-        ];
-
-        /* Let's go, trying to skip as many as we can before we try
-         * to persist data to the db
-         */
-        foreach ($allDailyData as $currentEvent) {
-            /* Event doesn't have a type; see if we specified one in config
-             * If we did, give it that event type instead, then carry onwards
-             */
-            if ('' === $currentEvent['type']) {
-                /* Skip events that don't have a type, because we didn't define
-                 * a default event type in config
-                 */
-                if ('' === $this->defaultType) {
-                    $this->log()->warning(sprintf(
-                        'Skipping "%s" with code "%s" (%s): no type',
-                        $currentEvent['name'],
-                        $currentEvent['code'],
-                        $currentEvent['guid']
-                    ));
-
-                    /* Update counts
-                     */
-                    $skipCount['noType']++;
-                    $skipCount['total']++;
-
-                    /* Skip processing this event entirely
-                     */
-                    continue;
-                }
-
-                /* Assign a default one and carry on as if this event
-                 * always had this type to start with
-                 */
-                $currentEvent['type'] = $this->defaultType;
-
-                $this->log()->debug(sprintf(
-                    'Assigning default event type "%s" to "%s" with code "%s" (%s)',
-                    $this->defaultType,
-                    $currentEvent['name'],
-                    $currentEvent['code'],
-                    $currentEvent['guid']
-                ));
-            }
-
-            /* Skip events that have a particular type
-             * This also applies if you exclude the default one you chose in config
-             */
-            if (\in_array($currentEvent['type'], $this->exclusions, false)) {
-                $this->log->warning(sprintf(
-                    'Skipping "%s" with code "%s" (%s): has excluded type "%s"',
-                    $currentEvent['name'],
-                    $currentEvent['code'],
-                    $currentEvent['guid'],
-                    $currentEvent['type']
-                ));
-
-                /* Update counts
-                 */
-                $skipCount['invalidType']++;
-                $skipCount['total']++;
-
-                /* Skip processing this event entirely
-                 */
-                continue;
-            }
-
-            /* Skip events that don't have any classCode value
-             * This supposedly never happens, but I don't trust
-             */
-            if ('' === $currentEvent['code']) {
-                $this->log()->warning(sprintf(
-                    'Skipping "%s" with code "%s" (%s): no class codes provided',
-                    $currentEvent['name'],
-                    $currentEvent['code'],
-                    $currentEvent['guid'],
-                ));
-
-                /* Update counts
-                 */
-                $skipCount['noClassCode']++;
-                $skipCount['total']++;
-
-                /* Skip processing this event entirely
-                 */
-                continue;
-            }
-
-            /* TODO Process events here
-             */
-            $this->processDailyData($currentEvent);
-        }
-
-        /* Log diagnostics
-         */
-        $total = \count($allDailyData);
-        $processed = $total - $skipCount['total'];
-
-        $this->log()->info('');
-        $this->log()->info('----------------------------------------------');
-        $this->log()->info("Total Processed: {$processed}/{$total}");
-        $this->log()->info("Total Skipped: {$skipCount['total']}/{$total}");
-        $this->log()->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
-        $this->log()->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
-        $this->log()->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
-        $this->log()->info("Unknown user assignations: {$skipCount['unknownUser']}");
-
-        /* A list of all the unknown user ids
-         */
-        $unknownUserIds = array_filter($skipCount['unknownUserIds']);
-
-        if (count($unknownUserIds)) {
-            asort($unknownUserIds);
-
-            $unknownUserIds = implode(', ', $unknownUserIds);
-
-            $this->log()->info("Unknown user ids: {$unknownUserIds}");
-        }
-
-        $this->log()->info('');
+        (new Classes())->import($this->log(), $message, $this->defaultType, $this->exclusions);
 
         /* Cleanup after ourselves
          */
@@ -719,17 +589,6 @@ class Receiver
 //        }
 //
         return $this->generateResponse(self::AUTHENTICATION_FAILED);
-    }
-
-
-    /**
-     * Put this $currentEvent into the SUDS Timetable
-     *
-     * @param array $currentEvent
-     * @return void
-     */
-    private function processDailyData(array $currentEvent): void
-    {
     }
 
 

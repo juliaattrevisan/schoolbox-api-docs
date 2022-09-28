@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Liss\Base\Endpoint\PublishDailyData;
+namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
@@ -21,7 +21,7 @@ use Schoolbox\External\TimetablePeriodMapper;
  *
  * Clears data from a db in preparation for an import
  *
- * @package Schoolbox\External\Connector\Liss\Base\Endpoint\PublishDailyData
+ * @package Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar
  */
 class Prepare
 {

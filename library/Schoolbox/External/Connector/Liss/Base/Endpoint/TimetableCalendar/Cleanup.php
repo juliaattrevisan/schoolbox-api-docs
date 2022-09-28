@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Liss\Base\Endpoint\PublishDailyData;
+namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Event\Mapper;
@@ -17,7 +17,7 @@ use Schoolbox\External\Event\Mapper;
  *
  * Remove any stale timetable events
  *
- * @package Schoolbox\External\Connector\Liss\Base\Endpoint\PublishDailyData
+ * @package Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar
  */
 class Cleanup
 {
