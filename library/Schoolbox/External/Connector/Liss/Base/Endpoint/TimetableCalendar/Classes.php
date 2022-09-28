@@ -201,6 +201,7 @@ class Classes implements IStrategy
          * to persist data to the db
          */
         foreach ($allDailyData as $currentEvent) {
+            $this->log->info(json_encode($currentEvent));
             /* Event doesn't have a type; see if we specified one in config
              * If we did, give it that event type instead, then carry onwards
              */
@@ -283,7 +284,7 @@ class Classes implements IStrategy
                 continue;
             }
 
-            /* TODO Process events here
+            /* Process events here
              */
             $this->processClass($currentEvent);
         }

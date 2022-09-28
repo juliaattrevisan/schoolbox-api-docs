@@ -184,7 +184,7 @@ class Receiver
             self::LOG_FILE
         ), 'ab');
 
-        $this->log = new Logger($logFile, $logFile, \Monolog\Logger::INFO, [], true);
+        $this->log = new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
 
         /* Log the import in the suds control panel
          */

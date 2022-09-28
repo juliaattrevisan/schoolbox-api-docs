@@ -31,6 +31,6 @@ $log = $liss->log();
 
 try {
     $liss->start();
-} catch (Throwable $e) {
+} catch (\Exception | \Throwable $e) {
     $log->critical("Internal Error: {$e->getMessage()}");
 }
