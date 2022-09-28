@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
-use Alaress\Lumberjack\Logger;
 use PhpXmlRpc\Value;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Authenticator
@@ -38,47 +38,48 @@ class Authenticator
     /**
      * Whether the external db was enabled
      *
-     * @var int|null
+     * @var int
      */
-    private ?int $externalEnable = null;
+    private int $externalEnable;
 
 
     /**
      * Whether the external db is the "schoolbox" connector
      * or something else (it only works with "schoolbox" connector)
      *
-     * @var string|null
+     * @var string
      */
-    private ?string $externalType = null;
+    private string $externalType;
 
 
     /**
      * Username
      *
-     * @var string|null
+     * @var string
      */
-    private ?string $username = null;
+    private string $username;
 
     /**
      * Password
      *
-     * @var string|null
+     * @var string
      */
-    private ?string $password = null;
+    private string $password;
 
     /**
      * School code
      *
-     * @var string|null
+     * @var string
      */
-    private ?string $schoolCode = null;
+    private string $schoolCode;
 
 
     /**
      * Log location
-     * @var Logger $log
+     *
+     * @var LoggerInterface $log
      */
-    private Logger $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -92,13 +93,13 @@ class Authenticator
     /**
      * Constructor.
      *
-     * @param int    $externalEnable
-     * @param string $externalType
-     * @param string $username
-     * @param string $password
-     * @param string $schoolCode
-     * @param Logger $log
-     * @param Value  $dataObject
+     * @param int             $externalEnable
+     * @param string          $externalType
+     * @param string          $username
+     * @param string          $password
+     * @param string          $schoolCode
+     * @param LoggerInterface $log
+     * @param Value           $dataObject
      */
     public function __construct(
         int $externalEnable,
@@ -106,7 +107,7 @@ class Authenticator
         string $username,
         string $password,
         string $schoolCode,
-        Logger $log,
+        LoggerInterface $log,
         Value $dataObject
     ) {
         $this->externalEnable = $externalEnable;
@@ -132,6 +133,7 @@ class Authenticator
 
         if (!($externalEnable && $externalType)) {
             $this->log->info(self::WRONG_CONNECTOR_MESSAGE);
+
             return false;
         }
 

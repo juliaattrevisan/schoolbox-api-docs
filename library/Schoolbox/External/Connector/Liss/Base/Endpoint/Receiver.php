@@ -14,6 +14,7 @@ use PhpXmlRpc\Request;
 use PhpXmlRpc\Response;
 use PhpXmlRpc\Server;
 use PhpXmlRpc\Value;
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Classes;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Cleanup;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Prepare;
@@ -56,69 +57,69 @@ class Receiver
     /**
      * Whether the external db was enabled
      *
-     * @var int|null
+     * @var int
      */
-    private ?int $externalEnable = null;
+    private int $externalEnable;
 
 
     /**
      * Whether the external db is the "schoolbox" connector
      * or something else (it only works with "schoolbox" connector)
      *
-     * @var string|null
+     * @var string
      */
-    private ?string $externalType = null;
+    private string $externalType;
 
 
     /**
-     * @var string|null
+     * @var string
      */
-    private ?string $username = null;
+    private string $username;
 
     /**
-     * @var string|null
+     * @var string
      */
-    private ?string $password = null;
+    private string $password;
 
 
     /**
-     * @var string|null
+     * @var string
      */
-    private ?string $schoolCode = null;
+    private string $schoolCode;
 
 
     /**
      * A csv list of event types that we should skip
      *
-     * @var array|null
+     * @var array
      */
-    private ?array $exclusions = null;
+    private array $exclusions;
 
 
     /**
      * A string denoting an arbitrary event type that we attribute
      * when the supplied type is non-meaningful
      *
-     * @var string|null
+     * @var string
      */
-    private ?string $defaultType = null;
+    private string $defaultType;
 
 
     /**
      * Decide whether to use teacherIds or teacherCodes
      * Configured in admin
      *
-     * @var string|null
+     * @var string
      */
-    private ?string $teacherIdentifier = null;
+    private string $teacherIdentifier;
 
 
     /**
      * Logs the things that happened, in a text file
      *
-     * @var Logger|null
+     * @var Logger
      */
-    private ?Logger $log = null;
+    private Logger $log;
 
 
     /**
@@ -563,9 +564,9 @@ class Receiver
     /**
      * Get the logger
      *
-     * @return Logger
+     * @return LoggerInterface
      */
-    public function log(): Logger
+    public function log(): LoggerInterface
     {
         return $this->log;
     }

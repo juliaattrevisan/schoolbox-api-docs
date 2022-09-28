@@ -41,6 +41,14 @@ class Classes
 
 
     /**
+     * Logs the things that happened, in a text file
+     *
+     * @var LoggerInterface
+     */
+    private LoggerInterface $log;
+
+
+    /**
      * Since we are receiving a push from schools,
      * we are always in perform mode
      *
@@ -52,27 +60,27 @@ class Classes
     /**
      * A csv list of event types that we should skip
      *
-     * @var array|null
+     * @var array
      */
-    private ?array $exclusions = null;
+    private array $exclusions;
 
 
     /**
      * A string denoting an arbitrary event type that we attribute
      * when the supplied type is non-meaningful
      *
-     * @var string|null
+     * @var string
      */
-    private ?string $defaultType = null;
+    private string $defaultType;
 
 
     /**
      * Decide whether to use teacherIds or teacherCodes
      * Configured in admin
      *
-     * @var string|null
+     * @var string
      */
-    private ?string $teacherIdentifier = null;
+    private string $teacherIdentifier;
 
 
     /**
