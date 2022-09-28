@@ -298,6 +298,7 @@ class Receiver
             $this->log(),
             true,
             new \Schoolbox\External\Event\Mapper(),
+            \Schoolbox\External\ClassEntryMapper::getInstance(),
             self::SOURCE_NAME
         ))->import();
 

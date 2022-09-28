@@ -11,6 +11,8 @@ namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
 use PhpXmlRpc\Request;
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\ClassEntry;
+use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
 use Schoolbox\External\Event\Mapper;
@@ -79,26 +81,43 @@ class Classes
 
 
     /**
+     * @var ClassEntryMapper
+     */
+    private ClassEntryMapper $classEntryMapper;
+
+
+    /**
+     * A list of classEntries that we saw previously
+     *
+     * @var array
+     */
+    private array $classEntries = [];
+
+
+    /**
      * Constructor.
      *
-     * @param LoggerInterface $log
-     * @param string          $defaultType
-     * @param array           $exclusions
-     * @param string          $teacherIdentifier
-     * @param Mapper          $eventMapper
+     * @param LoggerInterface  $log
+     * @param string           $defaultType
+     * @param array            $exclusions
+     * @param string           $teacherIdentifier
+     * @param Mapper           $eventMapper
+     * @param ClassEntryMapper $classEntryMapper
      */
     public function __construct(
         LoggerInterface $log,
         string $defaultType,
         array $exclusions,
         string $teacherIdentifier,
-        \Schoolbox\External\Event\Mapper $eventMapper
+        \Schoolbox\External\Event\Mapper $eventMapper,
+        ClassEntryMapper $classEntryMapper
     ) {
         $this->log = $log;
         $this->exclusions = $exclusions;
         $this->defaultType = $defaultType;
         $this->teacherIdentifier = $teacherIdentifier;
         $this->eventMapper = $eventMapper;
+        $this->classEntryMapper = $classEntryMapper;
     }
 
 
@@ -262,10 +281,10 @@ class Classes
         /* Save sis_event record
          */
         $event = $this->createEvent($currentEvent);
-//
-//        /* Save sis_class record
-//         */
-//        $classEntry = $this->createClassEntry($activity, $event);
+
+        /* Save sis_class record
+         */
+        $classEntry = $this->createClassEntry($currentEvent, $event);
 //
 //        /* Save the involvements
 //         */
@@ -343,6 +362,44 @@ class Classes
         }
 
         return $event;
+    }
+
+
+    /**
+     * Create (or reuse) a ClassEntry corresponding to $event
+     *
+     * @param array $currentEvent
+     * @param Model $event
+     * @return ClassEntry
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function createClassEntry(array $currentEvent, \Schoolbox\External\Event\Model $event): ClassEntry
+    {
+        /* Constraints in the schema are case insensitive, unlike
+         * these array keys - class codes sometimes appear like
+         * "Speech Therapy" and "Speech therapy" so inserting them
+         * twice will cause it to pack a sad. The classEntries array
+         * treats these as unique whereas the db didn't
+         */
+        $existingKey = strtolower($event->getCode());
+
+        if (isset($this->classEntries[$existingKey])) {
+            $classEntry = $this->classEntries[$existingKey];
+        } else {
+            $classEntry = $this->classEntryMapper->createModel()
+                ->setName($currentEvent['name'])
+                ->setCode($currentEvent['code']);
+
+            if ($this->perform) {
+                $this->classEntryMapper->save($classEntry);
+            }
+
+            $this->classEntries[strtolower($event->getCode())] = $classEntry;
+        }
+
+        return $classEntry;
     }
 
 
