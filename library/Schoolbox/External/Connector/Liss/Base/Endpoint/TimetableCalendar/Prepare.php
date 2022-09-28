@@ -14,6 +14,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriodMapper;
 
 /**
@@ -23,7 +24,7 @@ use Schoolbox\External\TimetablePeriodMapper;
  *
  * @package Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar
  */
-class Prepare
+class Prepare implements IStrategy
 {
     /**
      * @var LoggerInterface

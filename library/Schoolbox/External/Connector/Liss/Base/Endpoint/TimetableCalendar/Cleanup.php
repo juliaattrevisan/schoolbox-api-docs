@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 /**
  * Class Cleanup
@@ -19,7 +20,7 @@ use Schoolbox\External\Event\Mapper;
  *
  * @package Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar
  */
-class Cleanup
+class Cleanup implements IStrategy
 {
     /**
      * @var LoggerInterface

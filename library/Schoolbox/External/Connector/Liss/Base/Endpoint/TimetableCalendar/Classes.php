@@ -18,6 +18,7 @@ use Schoolbox\External\Connector\Liss\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
 
 /**
@@ -30,7 +31,7 @@ use Schoolbox\Mapper\Exception;
  * strats as per suds tradition. We take a $message as input since
  * the school pushes data to us; we don't retrieve data ourselves
  */
-class Classes
+class Classes implements IStrategy
 {
     /**
      * This const corresponds to the enum for the config var external_liss_default_event_type
