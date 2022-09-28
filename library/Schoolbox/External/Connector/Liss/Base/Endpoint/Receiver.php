@@ -9,15 +9,21 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
+use Alaress\IDatabase;
 use Alaress\Lumberjack\Logger;
 use PhpXmlRpc\Request;
 use PhpXmlRpc\Response;
 use PhpXmlRpc\Server;
 use PhpXmlRpc\Value;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Classes;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Cleanup;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Prepare;
+use Schoolbox\External\Connector\Log\Mapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
+
 
 /**
  * Class Receiver
@@ -123,6 +129,12 @@ class Receiver
 
 
     /**
+     * @var \Schoolbox\External\Connector\Log\Mapper
+     */
+    private \Schoolbox\External\Connector\Log\Mapper $importLogMapper;
+
+
+    /**
      * Constructor.
      *
      * @param int    $externalEnable
@@ -134,6 +146,7 @@ class Receiver
      * @param string $defaultType
      * @param string $teacherIdentifier
      * @param string $logDir
+     * @param Mapper $importLogMapper
      */
     public function __construct(
         int $externalEnable,
@@ -144,7 +157,8 @@ class Receiver
         string $exclusions,
         string $defaultType,
         string $teacherIdentifier,
-        string $logDir
+        string $logDir,
+        \Schoolbox\External\Connector\Log\Mapper $importLogMapper
     ) {
         $this->externalEnable = $externalEnable;
         $this->externalType = $externalType;
@@ -171,6 +185,10 @@ class Receiver
         ), 'ab');
 
         $this->log = new Logger($logFile, $logFile, \Monolog\Logger::INFO, [], true);
+
+        /* Log the import in the suds control panel
+         */
+        $this->importLogMapper = $importLogMapper;
     }
 
 
@@ -244,7 +262,10 @@ class Receiver
      *
      * @param Request $message
      * @return Response
-     * @throws \InvalidArgumentException
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \Throwable
+     * @throws \UnexpectedValueException
      */
     public function publishDailyData(Request $message): Response
     {
@@ -262,49 +283,109 @@ class Receiver
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
-        /* Since we are receiving a push from schools,
+        /* This is the equivalent of a combined Scheduler.php and Factory.php
+         * since the liss receiver immediately processes upon receiving data
+         *
+         * Since we are receiving a push from schools,
          * we are always in Perform mode
          */
-        $perform = true;
-
-        /* Pave the way
-         */
-        (new Prepare(
+        $composites = (new Factory())->produce(
             $this->log(),
-            $perform,
-            \Schoolbox\External\Event\Mapper::getInstance(),
-            \Schoolbox\External\ClassEntryMapper::getInstance(),
-            \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-            \Schoolbox\External\ClassPeriodMapper::getInstance(),
-            \Schoolbox\External\TimetablePeriodMapper::getInstance(),
-            \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-            self::SOURCE_NAME
-        ))->import();
-
-        /* Do the import
-         */
-        (new Classes(
-            $this->log(),
-            $perform,
+            true,
+            self::SOURCE_NAME,
             $this->defaultType,
             $this->exclusions,
             $this->teacherIdentifier,
-            \Schoolbox\External\Event\Mapper::getInstance(),
-            \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-            \Schoolbox\External\ClassEntryMapper::getInstance(),
-            \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-        ))->import($message);
+            $message
+        );
 
-        /* Cleanup after ourselves
+        /* Shank a database instance
          */
-        (new Cleanup(
-            $this->log(),
-            $perform,
-            new \Schoolbox\External\Event\Mapper(),
-            self::SOURCE_NAME
-        ))->import();
+        $this->transact($this->importLogMapper->getDatabase(), $composites);
 
         return $this->generateResponse('publishDailyData finished.');
+    }
+
+
+    /**
+     * Execute each strat in sequence, just like Scheduler does
+     *
+     * @param IDatabase         $db
+     * @param GenericCollection $composites
+     * @return void
+     * @throws \PDOException
+     * @throws Exception
+     * @throws \Throwable
+     * @throws \UnexpectedValueException
+     */
+    private function transact(IDatabase $db, GenericCollection $composites): void
+    {
+        /* Borrow some scheduler.php pieces
+         */
+        $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+        $scriptName = \Schoolbox\External\Importer\Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME;
+
+        /* Always log the start of the run
+         */
+        $importLog = $this->importLogMapper->start($runId, $scriptName);
+
+        try {
+            $this->log()->debug(sprintf(
+                'Beginning transaction'
+            ));
+
+            $db->beginTransaction();
+
+            foreach ($composites as $composite) {
+                $composite->import();
+            }
+
+            /* Augment the Factory's recipe with the finisher
+             *
+             * This way you don't have to remember doing it in every factory;
+             * you literally cannot forget to do it. It'll only log the finish
+             * if you didn't crash somewhere in the process
+             */
+            $this->importLogMapper->finish($importLog);
+
+            /* Trim away ancient logs
+             */
+            $this->importLogMapper->prune();
+
+            $this->log()->debug(sprintf(
+                'Committing transaction'
+            ));
+
+            $db->commit();
+        } catch (RuntimeException $e) {
+            $this->log()->critical("Cannot access api endpoint: {$e->getMessage()}");
+
+            $this->log()->debug(sprintf(
+                'Rollback transaction'
+            ));
+
+            $db->rollBack();
+
+            /* Something happened with the api; log it
+             */
+            $this->importLogMapper->error($importLog, $e->getMessage());
+        } catch (\Throwable | \Exception $e) {
+            $this->log()->critical("Cannot access api endpoint: {$e->getMessage()}");
+
+            $this->log()->debug(sprintf(
+                'Rollback transaction'
+            ));
+
+            $db->rollBack();
+
+            /* Some kind of unexpected fatal; log it
+             */
+            $this->importLogMapper->error($importLog, $e->getMessage());
+
+            /* Also rethrow it, so you get an error in the face
+             */
+            throw $e;
+        }
     }
 
 
