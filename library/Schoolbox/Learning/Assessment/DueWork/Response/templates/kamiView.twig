@@ -74,8 +74,7 @@
         {% include '@learningDueWorkResponse/inlineGrading/fragments/responseFileListKami.twig' with {
             response: response,
             latestFeedback: response.findMostRecentInstructorGivenPublishedFeedback,
-            selectedFileHash: kami.studentSubmissionFile.Storage.hash,
-            kami, kami
+            selectedFileHash: kami.studentSubmissionFile.Storage.hash
         } only %}
     {% endblock %}
 {% endif %}
