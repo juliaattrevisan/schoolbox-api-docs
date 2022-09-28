@@ -469,7 +469,7 @@ class Classes implements IStrategy
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function createInvolvements(array $currentEvent, \Schoolbox\External\Event\Model $event, ClassEntry $classEntry)
+    private function createInvolvements(array $currentEvent, \Schoolbox\External\Event\Model $event, ClassEntry $classEntry): void
     {
         if ($this->isTeacherIds()) {
             $staffs = $currentEvent['teacherIds'];
