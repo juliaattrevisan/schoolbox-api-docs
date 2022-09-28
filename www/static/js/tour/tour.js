@@ -44,7 +44,7 @@ $(function () {
                 $(tour.steps).each(function (i, step) {
                     if (step.type === 'tooltip') {
                         stepsToDisplay.push({
-                            intro: step.body,
+                            intro: step.body.replaceAll("{CDN_PREFIX}", window.cdnPrefix),
                             element: step.selector,
                             tooltipClass: step.css_class+" closeable-tooltip",
                             uuid: step.uuid,
@@ -62,7 +62,7 @@ $(function () {
                         modalContent += step.body;
 
                         stepsToDisplay.push({
-                            intro: modalContent,
+                            intro: modalContent.replaceAll("{CDN_PREFIX}", window.cdnPrefix),
                             tooltipClass: step.css_class,
                             uuid: step.uuid,
                             type: step.type
