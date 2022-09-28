@@ -107,9 +107,9 @@ HELP;
          */
         $username = '' !== trim((string)$this->getConfig()->get('external_liss_username'));
         $password = '' !== trim((string)$this->getConfig()->get('external_liss_password'));
-        $schoolCode = '' !== trim((string)$this->getConfig()->get('external_liss_schoolCode'));
+        $schoolCode = '' !== trim((string)$this->getConfig()->get('external_liss_schoolcode'));
 
-        if ($username && $password && $schoolCode) {
+        if (!($username && $password && $schoolCode)) {
             $this->getLogger()->info('LISS purge did not run: this schoolbox instance did not have a valid a LISS configuration. No changes required; exiting');
             exit;
         }
