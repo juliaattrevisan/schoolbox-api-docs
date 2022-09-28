@@ -46,7 +46,7 @@ class Classes
      *
      * @var bool
      */
-    private bool $perform = true;
+    private bool $perform;
 
 
     /**
@@ -119,6 +119,7 @@ class Classes
      * Constructor.
      *
      * @param LoggerInterface                            $log
+     * @param bool                                       $perform
      * @param string                                     $defaultType
      * @param array                                      $exclusions
      * @param string                                     $teacherIdentifier
@@ -129,6 +130,7 @@ class Classes
      */
     public function __construct(
         LoggerInterface $log,
+        bool $perform,
         string $defaultType,
         array $exclusions,
         string $teacherIdentifier,
@@ -138,6 +140,7 @@ class Classes
         ClassInvolvementMapper $classInvolvementMapper
     ) {
         $this->log = $log;
+        $this->perform = $perform;
         $this->exclusions = $exclusions;
         $this->defaultType = $defaultType;
         $this->teacherIdentifier = $teacherIdentifier;

@@ -268,11 +268,16 @@ class Receiver
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
+        /* Since we are receiving a push from schools,
+         * we are always in Perform mode
+         */
+        $perform = true;
+
         /* Pave the way
          */
         (new Prepare(
             $this->log(),
-            true,
+            $perform,
             \Schoolbox\External\Event\Mapper::getInstance(),
             \Schoolbox\External\ClassEntryMapper::getInstance(),
             \Schoolbox\External\ClassInvolvementMapper::getInstance(),
@@ -286,6 +291,7 @@ class Receiver
          */
         (new Classes(
             $this->log(),
+            $perform,
             $this->defaultType,
             $this->exclusions,
             $this->teacherIdentifier,
@@ -299,7 +305,7 @@ class Receiver
          */
         (new Cleanup(
             $this->log(),
-            true,
+            $perform,
             new \Schoolbox\External\Event\Mapper(),
             self::SOURCE_NAME
         ))->import();
