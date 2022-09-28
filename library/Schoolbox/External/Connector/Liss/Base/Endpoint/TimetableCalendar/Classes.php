@@ -353,7 +353,8 @@ class Classes implements IStrategy
      * @throws Exception
      * @throws \UnexpectedValueException
      */
-    private function createEvent(array $currentEvent): \Schoolbox\External\Event\Model {
+    private function createEvent(array $currentEvent): \Schoolbox\External\Event\Model
+    {
         /* Fill in these vars as usual
          */
         $classCode = $currentEvent['code'];
