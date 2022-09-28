@@ -59,7 +59,7 @@ $(function () {
                             modalContent += '<h2>' + step.title + '</h2>';
                         }
 
-                        modalContent += step.body;
+                        modalContent += step.body.replace("{CDN_PREFIX}", window.cdnPrefix);
 
                         stepsToDisplay.push({
                             intro: modalContent,
