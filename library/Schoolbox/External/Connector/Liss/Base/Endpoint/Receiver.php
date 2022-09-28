@@ -117,9 +117,9 @@ class Receiver
     /**
      * Logs the things that happened, in a text file
      *
-     * @var Logger
+     * @var LoggerInterface
      */
-    private Logger $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -451,7 +451,7 @@ class Receiver
      * @param Request $message
      * @return Response
      */
-    public function publishRooms(Request $message)
+    public function publishRooms(Request $message): Response
     {
         /* Requires schoolbox connector
          */
@@ -555,7 +555,7 @@ class Receiver
      * @param string $message
      * @return Response
      */
-    private function generateResponse($message): Response
+    private function generateResponse(string $message): Response
     {
         return new Response(new Value($message, 'string'));
     }
@@ -563,6 +563,7 @@ class Receiver
 
     /**
      * Get the logger
+     * (This is also used to log random crashes in the liss.php)
      *
      * @return LoggerInterface
      */
