@@ -193,8 +193,6 @@ class Classes implements IStrategy
             'noClassCode' => 0,
             'noType' => 0,
             'invalidType' => 0,
-            'unknownUser' => 0,
-            'unknownUserIds' => [],
             'total' => 0,
         ];
 
@@ -301,20 +299,6 @@ class Classes implements IStrategy
         $this->log->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
         $this->log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
         $this->log->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
-        $this->log->info("Unknown user assignations: {$skipCount['unknownUser']}");
-
-        /* A list of all the unknown user ids
-         */
-        $unknownUserIds = array_filter($skipCount['unknownUserIds']);
-
-        if (count($unknownUserIds)) {
-            asort($unknownUserIds);
-
-            $unknownUserIds = implode(', ', $unknownUserIds);
-
-            $this->log->info("Unknown user ids: {$unknownUserIds}");
-        }
-
         $this->log->info('');
     }
 
