@@ -311,7 +311,7 @@ Usage:
                             />
                     </div>
 
-                    <div class="small-12 column">
+                    <div class="small-6 column">
                         {% include '@course/sub/sourceSelector.twig' with {
                             courseSpec: courseSpec,
                         } only %}
@@ -323,7 +323,7 @@ Usage:
                         </div>
                     {% endif %}
 
-                    <div class="small-12 column">
+                    <div class="small-6 column">
                         <label for="subjectCode">
                             {{ locale.subject.proper }} Code
                             <input id="subjectCode" type="text" name="subjectCode" size="40" value="{{ courseSpec.subjectCode ?? '' }}" maxlength="20" />
