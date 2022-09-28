@@ -194,62 +194,56 @@ class Receiver
      */
     public function start(): void
     {
-        new Server(
-            [
-                /* A test that appears on the Authorisation tab in the
-                 * liss client app; checks whether your authorisation
-                 * settings were correct but gives no user feedback:
-                 * response window opens and shuts immediately of its
-                 * own accord.
-                 */
-                'liss.getHello' => [
-                    'function' => [$this,'getRooms'],
-                ],
+        new Server([
+            /* A test that appears on the Authorisation tab in the
+             * liss client app; checks whether your authorisation
+             * settings were correct but gives no user feedback:
+             * response window opens and shuts immediately of its
+             * own accord.
+             */
+            'liss.getHello' => [
+                'function' => [$this,'getRooms'],
+            ],
 
-                /* Time-based variant of timetable data is found here
-                 */
-                'liss.publishDailyData' => [
-                    'function' => [$this, 'publishDailyData'],
-                ],
+            /* Time-based variant of timetable data is found here
+             */
+            'liss.publishDailyData' => [
+                'function' => [$this, 'publishDailyData'],
+            ],
 
-                /* All these ones fulfil a cyclic timetable afaict
-                 * We don't need them
-                 */
-                'liss.publishTimetable' => [
-                    'function' => [$this, 'publishTimetable'],
-                ],
-
-                'liss.publishClasses' => [
-                    'function' => [$this, 'publishClasses'],
-                ],
-
-                'liss.publishClassMemberships' => [
-                    'function' => [$this, 'publishClassMemberships'],
-                ],
-
-                'liss.publishBellTimes' => [
-                    'function' => [$this, 'publishBellTimes'],
-                ],
-
-                /* Not implemented; returns a placeholder Response
-                 */
-                'liss.getRooms' => [
-                    'function' => [$this,'getRooms'],
-                ],
-                'liss.publishStudents' => [
-                    'function' => [$this,'publishStudents'],
-                ],
-                'liss.publishTeachers' => [
-                    'function' => [$this,'publishTeachers'],
-                ],
-                'liss.publishCalendar' => [
-                    'function' => [$this, 'publishCalendar'],
-                ],
-                'liss.publishRooms' => [
-                    'function' => [$this, 'publishRooms'],
-                ],
-            ]
-        );
+            /* All these ones fulfil a cyclic timetable afaict
+             * We don't need them
+             *
+             * Returns a placeholder Response
+             */
+            'liss.publishTimetable' => [
+                'function' => [$this, 'publishTimetable'],
+            ],
+            'liss.publishClasses' => [
+                'function' => [$this, 'publishClasses'],
+            ],
+            'liss.publishClassMemberships' => [
+                'function' => [$this, 'publishClassMemberships'],
+            ],
+            'liss.publishBellTimes' => [
+                'function' => [$this, 'publishBellTimes'],
+            ],
+            'liss.getRooms' => [
+                'function' => [$this,'getRooms'],
+            ],
+            'liss.publishStudents' => [
+                'function' => [$this,'publishStudents'],
+            ],
+            'liss.publishTeachers' => [
+                'function' => [$this,'publishTeachers'],
+            ],
+            'liss.publishCalendar' => [
+                'function' => [$this, 'publishCalendar'],
+            ],
+            'liss.publishRooms' => [
+                'function' => [$this, 'publishRooms'],
+            ],
+        ]);
     }
 
 
