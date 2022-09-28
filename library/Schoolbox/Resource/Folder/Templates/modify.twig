@@ -419,13 +419,13 @@
 
                         {# Only superusers can change subject codes#}
                         {% if canChangeClassCodes %}
-                            {% set codeTitle = 'If you want this folder to be a ' ~ locale.subject ~ ' enter its code here. You may enter multiple codes by separating them with a comma' %}
+                            {% set codeTitle = 'If you want this folder to be a ' ~ locale.class ~ ' enter its code here. You may enter multiple codes by separating them with a comma' %}
                         {% else %}
-                            {% set codeTitle = 'Only superusers and CMS Moderators may administer ' ~ locale.subject.proper  ~ ' Codes' %}
+                            {% set codeTitle = 'Only superusers and CMS Moderators may administer ' ~ locale.class.proper  ~ ' Codes' %}
                         {% endif %}
 
                         <label>
-                            {{ database }} {{ locale.subject.proper }} Codes
+                            {{ database }} {{ locale.class.proper }} Codes
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="{{ codeTitle }}">?</span>
                             <input type="text" name="code" size="40" value="{{ folder.getCodeString }}"{% if not canChangeClassCodes %} disabled{% endif %}/>
                         </label>

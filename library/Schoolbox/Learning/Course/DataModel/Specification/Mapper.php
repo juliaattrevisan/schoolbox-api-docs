@@ -47,6 +47,7 @@ class Mapper extends AbstractCourseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->uses('subject_code', self::TYPE_STRING);
 
         // SoftDelete/Restore UnitSpecifications in CourseSpecification
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteUnits'));

@@ -8,7 +8,7 @@
  */
 
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
+use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 use Schoolbox\Role;
 
 class Component_Homepage_TeachersController extends Component_Homepage_ControllerAbstract
@@ -123,7 +123,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                 ) {
                     $classCodesRetained = [];
                     $classCodesComplete = explode(",", $classCodeString);
-                    $codeMatcher        = (new SubjectCodeMatchFactory())->build(
+                    $codeMatcher        = (new ClassCodeMatchFactory())->build(
                         $this->getConfigLoader()->get('external_type')
                     );
 

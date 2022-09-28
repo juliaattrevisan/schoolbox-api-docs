@@ -11,9 +11,8 @@ namespace Schoolbox\Resource\Folder\Code;
 
 use function trim;
 
-class SubjectMatcherBase implements ISubjectMatcher
+class ClassMatcherBase implements IClassMatcher
 {
-
     /** @inheritDoc */
     public function isMatch(string $sbFolderCode, ?string $sisCampus, string $sisClass): bool
     {

@@ -51,7 +51,6 @@ use const PHP_SAPI;
  */
 class Access
 {
-
     /**
      * Permission/access level constants
      */
@@ -104,8 +103,8 @@ class Access
     /** @var IConfigLoader */
     private $config;
 
-    /** @var Folder\Code\ISubjectMatcher */
-    private $subjectMatcher;
+    /** @var Folder\Code\IClassMatcher */
+    private Folder\Code\IClassMatcher $classMatcher;
 
     /**
      * Returns whether results may be returned from cache
@@ -130,7 +129,7 @@ class Access
      * @param Folder\Code\Mapper|null          $folderCodeMapper
      * @param External_UserInterface|null      $externalUser
      * @param IConfigLoader|null               $config
-     * @param Folder\Code\ISubjectMatcher|null $subjectMatcher
+     * @param Folder\Code\IClassMatcher|null   $classMatcher
      * @param bool|null                        $enableCache
      * @param Folder\NNIAN|null                $folderNnian
      * @return static
@@ -142,7 +141,7 @@ class Access
         Folder\Code\Mapper $folderCodeMapper = null,
         External_UserInterface $externalUser = null,
         IConfigLoader $config = null,
-        Folder\Code\ISubjectMatcher $subjectMatcher = null,
+        Folder\Code\IClassMatcher $classMatcher = null,
         bool $enableCache = null,
         Folder\NNIAN $folderNnian = null
     ): Access {
@@ -156,7 +155,7 @@ class Access
                 $folderCodeMapper ?? Folder\Code\Mapper::getInstance(),
                 $externalUser,
                 $config,
-                $subjectMatcher ?? (new Folder\Code\SubjectCodeMatchFactory())->build($config->get(Config\ConfigMapper::NAME_EXTERNAL_TYPE)),
+                $classMatcher ?? (new Folder\Code\ClassCodeMatchFactory())->build($config->get(Config\ConfigMapper::NAME_EXTERNAL_TYPE)),
                 $enableCache ?? PHP_SAPI !== 'cli',
                 $folderNnian ?? Folder\NNIAN::getInstance($folderMapper)
             );
@@ -174,7 +173,7 @@ class Access
      * @param Folder\Code\Mapper          $folderCodeMapper
      * @param null|External_UserInterface $externalUser
      * @param IConfigLoader               $config
-     * @param Folder\Code\ISubjectMatcher $subjectMatcher
+     * @param Folder\Code\IClassMatcher $classMatcher
      * @param bool                        $enableCache
      * @param Folder\NNIAN                $folderNnian
      */
@@ -185,7 +184,7 @@ class Access
         Folder\Code\Mapper $folderCodeMapper,
         ?External_UserInterface $externalUser,
         IConfigLoader $config,
-        Folder\Code\ISubjectMatcher $subjectMatcher,
+        Folder\Code\IClassMatcher $classMatcher,
         bool $enableCache,
         Folder\NNIAN $folderNnian
     ) {
@@ -195,7 +194,7 @@ class Access
         $this->folderCodeMapper = $folderCodeMapper;
         $this->externalUser     = $externalUser;
         $this->config           = $config;
-        $this->subjectMatcher   = $subjectMatcher;
+        $this->classMatcher     = $classMatcher;
         $this->enableCache      = $enableCache;
         $this->folderNnian      = $folderNnian;
     }
@@ -362,7 +361,7 @@ class Access
         $codes = explode(',', $folderCodeString);
         foreach ($externalSubjectList as $subject) {
             foreach ($codes as $code) {
-                if ($this->subjectMatcher->isMatch($code, $subject['campusCode'], $subject['code'])) {
+                if ($this->classMatcher->isMatch($code, $subject['campusCode'], $subject['code'])) {
                     return true;
                 }
             }

@@ -29,7 +29,6 @@ use External_Offline_User;
  */
 class ValidSegmentTest extends PHPUnit\Framework\TestCase
 {
-
     /** @var Specification\ISpecification */
     private $validSegmentSpec;
 
@@ -63,7 +62,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 Folder\Code\Mapper::getInstance(),
                 new External_Offline_User(),
                 new TestLoader(),
-                new Folder\Code\SubjectMatcherBase()
+                new Folder\Code\ClassMatcherBase()
             ),
             new External_Offline_User(),
             $mockConnector,

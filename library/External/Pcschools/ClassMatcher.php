@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace External\Pcschools;
 
-use Schoolbox\Resource\Folder\Code\SubjectMatcherBase;
+use Schoolbox\Resource\Folder\Code\ClassMatcherBase;
 
 use function trim;
 
@@ -18,7 +18,7 @@ use function trim;
  *
  * Allows for leading/trailing spaces on the SIS campus and class values.
  */
-class SubjectMatcher extends SubjectMatcherBase
+class ClassMatcher extends ClassMatcherBase
 {
     /**
      * @inheritDoc

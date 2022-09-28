@@ -57,10 +57,10 @@
 
 <div data-reveal id="faculty-selector-modal" class="reveal-modal"></div>
 
-<label class="required">{{ locale.faculty.proper }} / {{ locale.subject.proper }} Folder</label>
+<label class="required">{{ locale.faculty.proper }} / {{ locale.class.proper }} Folder</label>
 
 <a data-course-parent-selector data-source="parent"
-   title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
+   title="Click to change the {{ locale.faculty }} / {{ locale.class }} this course belongs to"
    class="source-select icon-folder {% if not courseSpec %}placeholder{% endif %}"
    href="#" >
    {{ courseSpec ? courseSpec.folder.parent.name : '(Click to select)' }}

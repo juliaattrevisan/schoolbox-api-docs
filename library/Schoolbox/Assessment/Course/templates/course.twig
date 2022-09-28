@@ -112,7 +112,7 @@ Usage:
             },
             messages: {
                 name: "Please enter a name for this course.",
-                parent: "Please select a {{ locale.faculty }} or {{ locale.subject }} for this course.",
+                parent: "Please select a {{ locale.faculty }} or {{ locale.class }} for this course.",
                 newUnitName: 'Please create at least one {{ locale.unit }} for this course.'
             },
             onfocusout: false,
@@ -194,7 +194,7 @@ Usage:
                 },
                 messages: {
                     name: "Please enter a name for this course",
-                    parent: "Please select a {{ locale.faculty }} or {{ locale.subject }} for this course"
+                    parent: "Please select a {{ locale.faculty }} or {{ locale.class }} for this course"
                 }
             }
         });
@@ -322,6 +322,13 @@ Usage:
                             {% include '@course/sub/invalidFacultyRoot.twig' %}
                         </div>
                     {% endif %}
+
+                    <div class="small-12 column">
+                        <label for="subjectCode">
+                            {{ locale.subject.proper }} Code
+                            <input id="subjectCode" type="text" name="subjectCode" size="40" value="{{ courseSpec.subjectCode ?? '' }}" maxlength="20" />
+                        </label>
+                    </div>
 
                     {% if curriculumEnabled %}
                         <div class="small-12 column">

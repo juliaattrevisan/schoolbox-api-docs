@@ -26,7 +26,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
+use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Pastoral;
 
@@ -1149,7 +1149,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function loadTeachers()
     {
         if (!$this->teachersLoaded) {
-            $codeMatcher       = (new SubjectCodeMatchFactory())->build($this->getConfigLoader()->get('external_type'));
+            $codeMatcher       = (new ClassCodeMatchFactory())->build($this->getConfigLoader()->get('external_type'));
             $teacherCollection = new Collection();
 
             // TODO remove handler dependency
