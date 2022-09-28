@@ -1,14 +1,14 @@
 <script setup>
 
 /**
- * to show further info in a modal on a code that's been selected
+ * to be able to update a nodes name, code and description
  */
 
-import { computed, onMounted } from 'vue';
-import { isScriptAdded, injectScript } from '@js/util/domUtils';
+import { computed, watch } from 'vue';
 import { useStore } from '../store/manageCurriculumStore';
 import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import { useUpdateNodeStore } from './store/mcUpdateNodeStore';
+import { useCKEditor } from '../composable/useCKEditor';
 
 
 const props = defineProps({
@@ -38,54 +38,19 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
  *
  * @returns { String }
  */
-const ckeditorInstance = computed(() => `description-${activeNodeStore.node?.id}` );
+const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}`);
 
 /**
- * to load the ckeditor when ready
+ * Use a customised ckeditor for the description field
  */
-onMounted(() => {
-    loadCKEditor();
+const descriptionField = useCKEditor(updateNodeStore.activeNodeCopy.description, ckeditorInstance.value);
+
+/**
+ * And watch for changes on this field so we can update the description in the store
+ */
+watch(descriptionField, (newValue) => {
+    updateNodeStore.activeNodeCopy.description = newValue;
 });
-
-/**
- * load the ckeditor into the browser
- */
-async function loadCKEditor () {
-    try {
-        const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
-        if (!isScriptAdded(ckeditorScript)) {
-            await injectScript(ckeditorScript);
-        }
-        const jqueryEditorScript = `${cdnPrefix}/js/editor/jquery.editor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
-        if (!isScriptAdded(jqueryEditorScript)) {
-            await injectScript(jqueryEditorScript);
-        }
-        $.fn.alaressEditor($.alaressEditorConfigBasic(getVueSpecificConfig()));
-    } catch (error) {
-        console.warn(error);
-    }
-}
-
-/**
- * The config that needs to be passed to CKEditor in order to for it to work in Vue land
- *
- * @returns { Object }
- */
-function getVueSpecificConfig () {
-    return {
-        on: {
-            change: () => { // Bind the content of CKEditor into the description model on change
-                updateNodeStore.activeNodeCopy.description = CKEDITOR.instances[ckeditorInstance.value].getData();
-            },
-            instanceReady: (event) => { //can display the loaded CKEditor now
-                if (updateNodeStore.activeNodeCopy.description !== null) {
-                    event.editor.setData(updateNodeStore.activeNodeCopy.description); //set the initial data
-                }
-            }
-        },
-        targetElements: $(`#${ckeditorInstance.value}`),
-    }
-}
 
 /**
  * To instantly notify the user that the node is being updated
@@ -125,6 +90,15 @@ function onCancelSelected () {
     updateNodeStore.cancel();
 }
 
+/**
+ * Only enable the button once the conditions are met
+ *
+ * @returns { Boolean }
+ */
+const isUpdateDisabled = computed(() => {
+    return updateNodeStore.activeNodeCopy.name.trim().length === 0 || updateNodeStore.isProcessing;
+});
+
 </script>
 
 <template>
@@ -133,12 +107,12 @@ function onCancelSelected () {
             <fieldset class="content">
                 <legend>Update {{ activeNodeStore.title }}</legend>
                 <div class="small-12 columns">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" v-model="updateNodeStore.activeNodeCopy.name">
+                    <label for="name" class="required">Name</label>
+                    <input type="text" id="name" v-model="updateNodeStore.activeNodeCopy.name" maxlength="2048" required>
                 </div>
                 <div class="small-12 columns">
                     <label for="code">Code</label>
-                    <input type="text" id="code" v-model="updateNodeStore.activeNodeCopy.code">
+                    <input type="text" id="code" v-model="updateNodeStore.activeNodeCopy.code" maxlength="64">
                 </div>
                 <div class="small-12 columns">
                     <label for="description">Description</label>
@@ -150,7 +124,7 @@ function onCancelSelected () {
                             <button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button icon-close" :disabled="updateNodeStore.isProcessing">Cancel</button>
                         </li>
                         <li>
-                            <button @click.prevent="onUpdateSelected" @keyup.enter="onUpdateSelected" class="button icon-modify submit" :disabled="updateNodeStore.isProcessing">{{ updateButtonText }}</button>
+                            <button @click.prevent="onUpdateSelected" @keyup.enter="onUpdateSelected" class="button icon-modify submit" :disabled="isUpdateDisabled">{{ updateButtonText }}</button>
                         </li>
                     </ul>
                 </div>

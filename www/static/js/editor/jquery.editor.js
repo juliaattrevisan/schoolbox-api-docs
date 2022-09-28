@@ -165,17 +165,26 @@
      */
     $.alaressEditorConfigForComments = function (overrideConfig = {}) {
         const config = {
-            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed,schoolboxiframe',
+            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,autolink,autoembed,schoolboxiframe',
             removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
             toolbarGroups: [
                 { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
-                { name: 'paragraph', groups: ['list', 'blocks', 'bidi'] },
+                { name: 'paragraph', groups: ['list', 'blocks', 'bidi', 'wordcount'] },
                 { name: 'insert', groups: ['insert'] },
                 { name: 'schoolbox', groups: ['schoolboxlink'] },
             ],
             height: '4rem',
             resize_enabled: true,
             toolbarCanCollapse: false,
+            wordcount: {
+                showParagraphs: true,
+                showWordCount: true,
+                showCharCount: true,
+                countSpacesAsChars: true,
+                countHTML: true,
+                maxWordCount: -1, // Maximum allowed Word Count, -1 is default for unlimited
+                maxCharCount: 65000,
+            },
             ...overrideConfig
         }
         return init(config);

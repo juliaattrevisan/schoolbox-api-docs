@@ -4,11 +4,10 @@
  * to show further info in a modal on a code that's been selected
  */
 
-import { computed, onMounted } from 'vue';
-import { isScriptAdded, injectScript } from '@js/util/domUtils';
+import { computed, watch } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useAddCurriculumStore } from './store/mcAddCurriculumStore';
-
+import { useCKEditor } from './composable/useCKEditor';
 
 
 const store = useStore();
@@ -23,51 +22,16 @@ const addCurriculumStore = useAddCurriculumStore();
 const ckeditorInstance = computed(() => `new-curriculum`);
 
 /**
- * to load the ckeditor when ready
+ * Use a customised ckeditor for the description field
  */
-onMounted(() => {
-    loadCKEditor();
+const descriptionField = useCKEditor(addCurriculumStore.curriculum.description, ckeditorInstance.value);
+
+/**
+ * And watch for changes on this field so we can update the description in the store
+ */
+watch(descriptionField, (newValue) => {
+    addCurriculumStore.curriculum.description = newValue;
 });
-
-/**
- * load the ckeditor into the browser
- */
-async function loadCKEditor () {
-    try {
-        const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
-        if (!isScriptAdded(ckeditorScript)) {
-            await injectScript(ckeditorScript);
-        }
-        const jqueryEditorScript = `${cdnPrefix}/js/editor/jquery.editor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
-        if (!isScriptAdded(jqueryEditorScript)) {
-            await injectScript(jqueryEditorScript);
-        }
-        $.fn.alaressEditor($.alaressEditorConfigBasic(getVueSpecificConfig()));
-    } catch (error) {
-        console.warn(error);
-    }
-}
-
-/**
- * The config that needs to be passed to CKEditor in order to for it to work in Vue land
- *
- * @returns { Object }
- */
-function getVueSpecificConfig () {
-    return {
-        on: {
-            change: () => { // Bind the content of CKEditor into the description model on change
-                addCurriculumStore.curriculum.description = CKEDITOR.instances[ckeditorInstance.value].getData();
-            },
-            instanceReady: (event) => { //can display the loaded CKEditor now
-                if (addCurriculumStore.curriculum.description !== null) {
-                    event.editor.setData(addCurriculumStore.curriculum.description); //set the initial data
-                }
-            }
-        },
-        targetElements: $(`#${ckeditorInstance.value}`),
-    }
-}
 
 /**
  * To instantly notify the user that the subsection is being added
@@ -107,6 +71,15 @@ function onCancelSelected () {
     addCurriculumStore.cancel();
 }
 
+/**
+ * Only enable the button once the conditions are met
+ *
+ * @returns { Boolean }
+ */
+const isAddDisabled = computed(() => {
+    return addCurriculumStore.curriculum.name.trim().length === 0 || addCurriculumStore.isProcessing;
+});
+
 </script>
 
 <template>
@@ -116,12 +89,12 @@ function onCancelSelected () {
                 <fieldset class="content">
                     <legend>Add new Curriculum</legend>
                     <div class="small-12 columns">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" v-model="addCurriculumStore.curriculum.name">
+                        <label for="name" class="required">Name</label>
+                        <input type="text" id="name" v-model="addCurriculumStore.curriculum.name" maxlength="2048" required>
                     </div>
                     <div class="small-12 columns">
                         <label for="code">Code</label>
-                        <input type="text" id="code" v-model="addCurriculumStore.curriculum.code">
+                        <input type="text" id="code" v-model="addCurriculumStore.curriculum.code" maxlength="64">
                     </div>
                     <div class="small-12 columns">
                         <label for="description">Description</label>
@@ -133,7 +106,7 @@ function onCancelSelected () {
                                 <button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button icon-close" :disabled="addCurriculumStore.isProcessing">Cancel</button>
                             </li>
                             <li>
-                                <button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button icon-add submit" :disabled="addCurriculumStore.isProcessing">{{ addButtonText }}</button>
+                                <button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button icon-add submit" :disabled="isAddDisabled">{{ addButtonText }}</button>
                             </li>
                         </ul>
                     </div>
