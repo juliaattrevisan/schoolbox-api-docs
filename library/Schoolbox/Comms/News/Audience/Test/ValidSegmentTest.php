@@ -29,7 +29,6 @@ use External_Offline_User;
  */
 class ValidSegmentTest extends PHPUnit\Framework\TestCase
 {
-
     /** @var Specification\ISpecification */
     private $validSegmentSpec;
 

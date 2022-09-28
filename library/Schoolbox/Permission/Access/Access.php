@@ -135,15 +135,15 @@ class Access
      * @return static
      */
     public static function getInstance(
-        UserAccessMapper          $userAccessMapper = null,
-        RoleAccessMapper          $roleAccessMapper = null,
-        Folder\Mapper             $folderMapper = null,
-        Folder\Code\Mapper        $folderCodeMapper = null,
-        External_UserInterface    $externalUser = null,
-        IConfigLoader             $config = null,
+        UserAccessMapper $userAccessMapper = null,
+        RoleAccessMapper $roleAccessMapper = null,
+        Folder\Mapper $folderMapper = null,
+        Folder\Code\Mapper $folderCodeMapper = null,
+        External_UserInterface $externalUser = null,
+        IConfigLoader $config = null,
         Folder\Code\IClassMatcher $classMatcher = null,
-        bool                      $enableCache = null,
-        Folder\NNIAN              $folderNnian = null
+        bool $enableCache = null,
+        Folder\NNIAN $folderNnian = null
     ): Access {
         if (!self::$instance) {
             $config         = $config ?? new Config\Loader();
@@ -178,15 +178,15 @@ class Access
      * @param Folder\NNIAN                $folderNnian
      */
     private function __construct(
-        UserAccessMapper          $userAccessMapper,
-        RoleAccessMapper          $roleAccessMapper,
-        Folder\Mapper             $folderMapper,
-        Folder\Code\Mapper        $folderCodeMapper,
-        ?External_UserInterface   $externalUser,
-        IConfigLoader             $config,
+        UserAccessMapper $userAccessMapper,
+        RoleAccessMapper $roleAccessMapper,
+        Folder\Mapper $folderMapper,
+        Folder\Code\Mapper $folderCodeMapper,
+        ?External_UserInterface $externalUser,
+        IConfigLoader $config,
         Folder\Code\IClassMatcher $classMatcher,
-        bool                      $enableCache,
-        Folder\NNIAN              $folderNnian
+        bool $enableCache,
+        Folder\NNIAN $folderNnian
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->roleAccessMapper = $roleAccessMapper;

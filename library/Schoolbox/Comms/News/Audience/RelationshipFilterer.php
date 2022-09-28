@@ -41,11 +41,11 @@ class RelationshipFilterer
      * @param Folder\Code\IClassMatcher   $classMatcher
      */
     public function __construct(
-        private IConnector                $db,
-        private UserMapper                $userMapper,
-        private External_UserInterface    $externalUser,
-        private Folder\Mapper             $folderMapper,
-        private External_ClassInterface   $externalClass,
+        private IConnector $db,
+        private UserMapper $userMapper,
+        private External_UserInterface $externalUser,
+        private Folder\Mapper $folderMapper,
+        private External_ClassInterface $externalClass,
         private Folder\Code\IClassMatcher $classMatcher,
     ) {
     }
