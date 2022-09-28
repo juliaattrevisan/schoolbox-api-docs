@@ -70,7 +70,7 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * User-friendly description
      */
-    protected ?string $description = '';
+    protected string $description = '';
 
     /**
      * Is this node enabled?
@@ -96,19 +96,19 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @param string|null $description
+     * @param string $description
      * @return $this
      */
-    public function setDescription(?string $description): self
+    public function setDescription(string $description): self
     {
         $this->description = $description;
         return $this;
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description;
     }
