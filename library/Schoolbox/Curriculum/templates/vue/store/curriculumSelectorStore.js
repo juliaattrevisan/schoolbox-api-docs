@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-// import { useNodesStore } from './csNodesStore';
+import { useNodesStore } from './csNodesStore';
 
 
 export let apiEndpoint = '';
@@ -52,7 +52,7 @@ export const useStore = defineStore(`curriculumSelector`, {
          */
         load (endpoint) {
             apiEndpoint = endpoint;
-            // useNodesStore().initTopLevel();
+            useNodesStore().initTopLevel();
         },
 
         /**
