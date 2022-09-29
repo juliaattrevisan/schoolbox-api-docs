@@ -11,7 +11,7 @@ export const DIRECTION = {
     BACKWARDS: 'backwards',
 }
 
-export const useModalActiveNodesStore = defineStore(`csModelActive`, {
+export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
 
     state: () => ({
         idList: [], //ids of the selected nodes
@@ -70,11 +70,11 @@ export const useModalActiveNodesStore = defineStore(`csModelActive`, {
          * @returns { Array }
          */
         nodes () {
-            const searchStore = useModalSearchStore();
-            if (searchStore.hasNoResults) {
-                return [this.current];
+            const modalSearchStore = useModalSearchStore();
+            if (modalSearchStore.isActive) {
+                return modalSearchStore.results;
             } else {
-                return searchStore.results;
+                return [this.current];
             }
         },
 

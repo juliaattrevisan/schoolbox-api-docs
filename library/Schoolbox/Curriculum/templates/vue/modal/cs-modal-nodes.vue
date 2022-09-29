@@ -60,7 +60,7 @@ watch(() => modalActiveNodesStore.nodes, () => {
         <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
         <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
     </div>
-    <ul ref="nodesContainerEl">
+    <ul v-else ref="nodesContainerEl">
         <cs-modal-node
             v-for="node in modalActiveNodesStore.nodes"
             :key="node.id"
