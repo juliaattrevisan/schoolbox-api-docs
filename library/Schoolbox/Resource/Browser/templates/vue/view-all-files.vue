@@ -491,13 +491,13 @@ export default {
                         <div>
                             <a v-if="props.row.mime.inline" data-plugin="preview" :href="props.row.url" rel="external">
                                 <h3 class="name" :style="{ opacity: props.row.hidden ? '0.3' : '1' }">
-                                    <img class="mime" :src="`/static/${props.row.mime.url}`" height="32" width="32" :title="props.row.mime.description">
+                                    <img class="mime" :src="cdnPrefix + `${props.row.mime.url}`" height="32" width="32" :title="props.row.mime.description">
                                     {{ props.row.name }}
                                 </h3>
                             </a>
                             <a v-else :href="props.row.url" rel="external">
                                 <h3 class="name" :style="{ opacity: props.row.hidden ? '0.3' : '1' }">
-                                    <img class="mime" :src="`/static/${props.row.mime.url}`" height="32" width="32" :title="props.row.mime.description">
+                                    <img class="mime" :src="`${cdnPrefix}${props.row.mime.url}`" height="32" width="32" :title="props.row.mime.description">
                                     {{ props.row.name }}
                                 </h3>
                             </a>
