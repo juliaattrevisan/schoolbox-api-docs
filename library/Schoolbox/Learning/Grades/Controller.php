@@ -146,7 +146,7 @@ class Controller extends Base
      * @param Boolean    $termIsWholeYear
      * @return void
      */
-    private function getCustomGrades(User $viewee, Term\Model $term, $termIsWholeYear = false): void
+    private function getCustomGrades(User $viewee, Term\Model $term, bool $termIsWholeYear = false): void
     {
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $gradeHelper       = new Helper(
