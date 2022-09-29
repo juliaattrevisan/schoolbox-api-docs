@@ -106,7 +106,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
                         return node.enabled ? false : true;
                     }
                 });
-                this.hasDisabledChildNodes = noChildEnabledNodes.length !== this.nodes.length ? true : false; //show a note in the the UI that enabling child nodes of disabled parents is not possible
+                this.hasDisabledChildNodes = noChildEnabledNodes.length !== enabledNodes.length ? true : false; //show a note in the the UI that enabling child nodes of disabled parents is not possible
                 return noChildEnabledNodes.length === this.nodes.length;
             } else {
                 return false;
