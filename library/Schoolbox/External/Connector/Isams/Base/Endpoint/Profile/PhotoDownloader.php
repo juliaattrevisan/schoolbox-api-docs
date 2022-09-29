@@ -11,6 +11,8 @@ use Laminas\Uri\Exception\InvalidUriException;
 use Laminas\Uri\Exception\InvalidUriPartException;
 use Laminas\Uri\Uri;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use ZipArchive;
+
 
 /**
  * Class PhotoDownloader
@@ -83,6 +85,7 @@ class PhotoDownloader
     public function downloadStudentPhotos(): void
     {
         $this->download('photos.ashx', $this->key);
+
     }
 
 
@@ -129,5 +132,26 @@ class PhotoDownloader
         }
 
         fclose($filepointer);
+
+        $this->extract($filename);
+    }
+
+
+    /**
+     * Extract to zip dir for now I suppose
+     *
+     * @param string $filename
+     * @return void
+     */
+    private function extract(string $filename): void
+    {
+        $zipArchive = new ZipArchive();
+
+        $result = $zipArchive->open($filename);
+
+        if (true === $result) {
+            $zipArchive->extractTo($this->zipDir);
+            $zipArchive->close();
+        }
     }
 }
