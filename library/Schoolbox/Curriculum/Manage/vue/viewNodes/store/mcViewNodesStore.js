@@ -114,7 +114,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
         },
 
         /**
-         * Move back to a previous node
+         * Move up to a previous node
          *
          * @param { number }
          */
@@ -124,7 +124,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
         },
 
         /**
-         *
+         * If the deleted node is currently the node visible, we need to move up one depth on the tree
          *
          * @param { object }
          */

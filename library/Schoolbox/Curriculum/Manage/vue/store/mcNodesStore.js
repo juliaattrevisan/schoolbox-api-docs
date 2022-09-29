@@ -47,7 +47,7 @@ export const useNodesStore = defineStore('mcNodes', {
         /**
          * load in the top level nodes from the api
          */
-        async loadTopLevel () {
+        async load () {
             const store = useStore();
             try {
                 const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&descendants=1`, {
@@ -58,14 +58,13 @@ export const useNodesStore = defineStore('mcNodes', {
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     await this.setTopLevel(topLevelNodes);
-                } else if (response.status === 401) {
-                    store.hasPermissionDeniedError = true; //show a permission denied error
                 } else {
                     store.hasLoadError = true; //show the load error display state
                 }
             } catch (error) {
-                store.hasLoadError = true; //show the load error display state
-                throw new Error(error.message);
+                console.warn(error);
+            } finally {
+                store.isLoading = false;
             }
         },
 
@@ -82,7 +81,6 @@ export const useNodesStore = defineStore('mcNodes', {
             } else if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
                 await this.loadSingleCurriculum();
             }
-            store.isLoading = false;
         },
 
         /**
@@ -106,16 +104,15 @@ export const useNodesStore = defineStore('mcNodes', {
                     const nodeWithParents = await response.json();
                     const breadcrumbs = getBreadcrumbs(nodeWithParents, []);
                     breadcrumbs.push( { id: id, name: nodeWithParents.name } ); //add in the actual node as the last
-                    const viewNodesStore = useViewNodesStore();
                     for (let i = 0; i < breadcrumbs.length; i++) { //recursively load in each parent and traverse down
-                        await viewNodesStore.setNextSelected(breadcrumbs[i].id);
+                        await useViewNodesStore().setNextSelected(breadcrumbs[i].id);
                     }
                 } else {
-                    this.hasId = false;
-                    if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
-                        this.loadSingleCurriculum();
+                    this.hasId = false; //as the id couldn't be found
+                    if (this.hasSingleCurriculum) { //we should still jump straight to the only node available if there's only one
+                        await this.loadSingleCurriculum();
                     }
-                    if (response.status === 404) { //we assume the id can't be found
+                    if (response.status === 404) { //and we assume the id can't be found, displaying an error
                         throw new Error(`No node id matching ${id} has been found`);
                     }
                 }
@@ -128,7 +125,7 @@ export const useNodesStore = defineStore('mcNodes', {
         },
 
         /**
-         * Load in another level of children of the target node
+         * Load in another level of children of the target node id
          *
          * @param { number }
          */
@@ -144,9 +141,9 @@ export const useNodesStore = defineStore('mcNodes', {
                 if (response.ok) {
                     const newNode = responseJson;
                     newNode.children.forEach((node) => useSelectedNodesStore().addIsSelected(node));
-                    const oldNode = findById(this.nodes.children, id);
+                    const oldNode = findById(this.nodes.children, id); //grab the old node to update
                     useSelectedNodesStore().addIsSelected(oldNode);
-                    oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property that was previously null
+                    oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property
                 } else {
                     throw new Error(responseJson.title, { ...responseJson } );
                 }
@@ -189,10 +186,10 @@ export const useNodesStore = defineStore('mcNodes', {
          * @param { object }
          */
         nodeUpdated (node) {
-            if (node.parent) {
+            if (node.parent) { //sort via the parent node
                 const parentNode = findById(this.nodes.children, node.parent.id);
                 sortByName(parentNode.children);
-            } else {
+            } else { //otherwise sort on the children
                 sortByName(this.nodes.children);
             }
         },
@@ -203,7 +200,7 @@ export const useNodesStore = defineStore('mcNodes', {
          * @param { object }
          */
         deleteNode (node) {
-            useViewNodesStore().checkDeletedNode(node); //check we aren't on the deleted node currently
+            useViewNodesStore().checkDeletedNode(node); //check we aren't on the deleted node currently, if so we could move traverse backwards
             const nodeRemoved = removeId(this.nodes.children, node.id);
             this.updateNodes(nodeRemoved);
         },

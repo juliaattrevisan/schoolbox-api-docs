@@ -18,7 +18,6 @@ import Toast from '@schoolboxVue/components/toast.vue';
 
 
 const store = useStore();
-const nodesStore = useNodesStore();
 const toastEl = ref(null);
 
 
@@ -46,20 +45,25 @@ const props = defineProps({
  */
 onMounted(() => {
     store.init(props, toastEl);
+    if (store.hasId) {
+        initErrorListener();
+    }
 });
 
 /**
- *
+ * Display an error if we cant find the node id that we jump to straight on page load
  */
-nodesStore.$onAction(({ name, onError }) => {
-    if (name === 'loadId') {
-        onError((error) => {
-            console.warn(error.message);
-            store.toastEl.activate();
-            store.toastEl.timeout(error.message, false, 5000);
-        });
-    }
-});
+function initErrorListener () {
+    useNodesStore().$onAction(({ name, onError }) => {
+        if (name === 'loadId') {
+            onError((error) => {
+                console.warn(error.message);
+                store.toastEl.activate();
+                store.toastEl.timeout(error.message, false, 5000);
+            });
+        }
+    });
+}
 
 </script>
 

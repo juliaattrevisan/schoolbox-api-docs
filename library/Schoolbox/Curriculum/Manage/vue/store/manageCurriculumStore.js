@@ -17,8 +17,7 @@ export const useStore = defineStore('manageCurriculum', {
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place, like updating a member access
         isReadOnly: true, //can only view the currently selected codes, not edit them
-        hasPermissionDeniedError: false, //to notify the user doesn't have access
-        hasId: false, //whether we should traverse to a node id
+        hasId: false, //whether we should traverse directly to a node id on page load
         id: 0, //the id of the node to traverse directly to
         toastEl: null, //so we don't need to pass it all around as a prop
     }),
@@ -51,7 +50,7 @@ export const useStore = defineStore('manageCurriculum', {
             this.toastEl = toastEl;
             if (props.dataEndpoint !== '') { //only load when we need to
                 apiEndpoint = props.dataEndpoint;
-                useNodesStore().loadTopLevel(); //load the top level curricula
+                useNodesStore().load(); //load the top level curricula
             }
         },
 
