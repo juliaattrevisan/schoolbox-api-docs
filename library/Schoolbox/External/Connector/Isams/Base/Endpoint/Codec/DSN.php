@@ -26,8 +26,6 @@ class DSN implements IDSN
      * (Each module is an array key in the decoded DSN)
      */
     public const MODULE_BATCHXML = 'batchxml';
-    public const MODULE_STAFFPHOTO = 'staffphoto';
-    public const MODULE_STUDENTPHOTO = 'studentphoto';
 
 
     /**
@@ -36,8 +34,6 @@ class DSN implements IDSN
      */
     public const PATHS = [
         self::MODULE_BATCHXML => 'xml.ashx',
-        self::MODULE_STAFFPHOTO => 'staffphotos.ashx',
-        self::MODULE_STUDENTPHOTO => 'photos.ashx'
     ];
 
 
