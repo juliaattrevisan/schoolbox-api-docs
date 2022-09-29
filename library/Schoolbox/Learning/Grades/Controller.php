@@ -174,7 +174,7 @@ class Controller extends Base
      * @return void
      * @throws MapperException
      */
-    private function getCustomGrades(User $viewee, Term\Model $term, ?Alaress_Date_Format $from = null, ?Alaress_Date_Format $to = null): void
+    private function getCustomGrades(User $viewee, Term\Model $term, ?Alaress_Date_Format $from = null, ?Alaress_Date_Format $to = null, $year = null): void
     {
         $from = $from ?: $term->getStart();
         $to = $to ?: $term->getActualFinish();

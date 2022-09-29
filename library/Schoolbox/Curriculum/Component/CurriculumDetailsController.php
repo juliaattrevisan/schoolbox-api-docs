@@ -14,6 +14,7 @@ namespace Schoolbox\Curriculum\Component;
 
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 
@@ -21,17 +22,13 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
 {
     /**
      * The curriculum to display.
-     *
-     * @var Node\Model
      */
-    protected $curriculumNode = null;
+    protected ?GenericCollection $curriculumNodes = null;
 
     /**
      * Is curriculum tagging turned on
-     *
-     * @var bool
      */
-    protected $curriculumTagging = null;
+    protected bool $curriculumTagging = false;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -55,18 +52,20 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
         /** @var Folder\Model $context */
         $context = $this->getContext();
         if ($context->getCurriculumNodes()->count()) {
-            // No curriculum item selected? just use the first.
-            $this->curriculumNode = $context->getCurriculumNodes()->first();
+            $nodeMapper            = Node\Mapper::getInstance();
+            $this->curriculumNodes = $nodeMapper->createCollection();
+
             foreach ($context->getCurriculumNodes() as $node) {
-                if ($node->getCode() == $this->getConfig('curriculumCode')) {
-                    $this->curriculumNode = $node;
-                    break;
+                if (!$node->getEnabled()) {
+                    continue;
+                }
+                if (empty($this->getConfig('curriculumCode')) || ($node->getCode() == $this->getConfig('curriculumCode'))) {
+                    $this->curriculumNodes->add($node);
                 }
             }
         } elseif ($this->getContentPermission() <= UserAccess::ACCESS_READ) {
             return false;
         }
-
         return true;
     }
 
@@ -82,7 +81,7 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
             '@curriculum/component/curriculumDetails.twig',
             [
                 'context'           => $this->getContext(),
-                'node'              => $this->curriculumNode,
+                'nodes'             => $this->curriculumNodes,
                 'curriculumTagging' => $this->curriculumTagging,
             ]
         );
