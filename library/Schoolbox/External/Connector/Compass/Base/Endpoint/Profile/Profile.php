@@ -353,7 +353,7 @@ class Profile implements IStrategy
             /* If they're not in this baseRole, skip them
              */
             if (!$this->isInBaseRole(self::BASEROLE_STUDENT, $student['organisationMilestones'])) {
-                $this->log->warning(sprintf(
+                $this->log->debug(sprintf(
                     'Skipping %s %s (%s) - they are not in the student baseRole',
                     $firstname,
                     $lastname,
@@ -842,7 +842,7 @@ class Profile implements IStrategy
             /* If they're not in this baseRole, skip them
              */
             if (!$this->isInBaseRole(self::BASEROLE_PARENT, $parent['organisationMilestones'])) {
-                $this->log->warning(sprintf(
+                $this->log->debug(sprintf(
                     'Skipping %s %s (%s) - they are not in the parent baseRole',
                     $parent['firstName'],
                     $parent['lastName'],
@@ -1024,7 +1024,7 @@ class Profile implements IStrategy
             /* If they're not in this baseRole, skip them
              */
             if (!$this->isInBaseRole(self::BASEROLE_STAFF, $staff['organisationMilestones'])) {
-                $this->log->warning(sprintf(
+                $this->log->debug(sprintf(
                     'Skipping %s %s (%s) - they are not in the staff baseRole',
                     $firstname,
                     $lastname,
