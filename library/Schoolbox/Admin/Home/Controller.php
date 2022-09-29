@@ -215,6 +215,7 @@ class Controller extends Base
                     'ssh_status' => $ssh_status,
                     'is_cloud'  => $this->isCloudHosted(),
                     'api_url'   => $this->getConfigLoader()->get('schoolbox_api_url'),
+                    'kami_enabled' => $this->getConfigLoader()->get('kami_enabled'),
 
                     /* SUDS panel
                      */

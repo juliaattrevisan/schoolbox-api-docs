@@ -308,6 +308,7 @@
             }
         });
         {% endif %}
+        {% if kami_enabled %}
         // get kami status
         $.ajax({
             url: "/ajax/adminStats.php",
@@ -319,6 +320,7 @@
                 $('[data-light="kami"]').html(data.kami_status).removeClass('neutral').addClass(data.kami_light);
             }
         });
+        {% endif %}
     });
 </script>
 
@@ -423,12 +425,14 @@
                                 </div>
                             </li>
                             {% endif %}
+                            {% if kami_enabled %}
                                 <li>
                                     <div class="small-5 columns content"><a href="https://status.kamihq.com/" target="_blank">Kami</a></div>
                                     <div class="small-7 columns content">
                                         <span class="full-width neutral label" data-light="kami">Testing...</span>
                                     </div>
                                 </li>
+                            {% endif %}
                             {% set drRoute = routeLookupIfAuthorized('adminHome.getDisasterRecovery') %}
                             {% if drRoute %}
                                 <li>
