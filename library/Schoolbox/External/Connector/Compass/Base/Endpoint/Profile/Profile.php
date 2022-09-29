@@ -66,6 +66,16 @@ class Profile implements IStrategy
 
 
     /**
+     * For inexplicable reasons Compass decided to entertain the idea that multiple
+     * roletype humans get mixed up in each endpoint and we have to manually sort them
+     * out using this mechanism
+     */
+    private const BASEROLE_STUDENT = 1;
+    private const BASEROLE_STAFF = 2;
+    private const BASEROLE_PARENT = 3;
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -335,6 +345,19 @@ class Profile implements IStrategy
                     'Skipping %s %s (no external identifier)',
                     $firstname,
                     $lastname
+                ));
+
+                continue;
+            }
+
+            /* If they're not in this baseRole, skip them
+             */
+            if (!$this->isInBaseRole(self::BASEROLE_STUDENT, $student['organisationMilestones'])) {
+                $this->log->debug(sprintf(
+                    'Skipping %s %s (%s) - they are not in the student baseRole',
+                    $firstname,
+                    $lastname,
+                    $externalId
                 ));
 
                 continue;
@@ -731,6 +754,20 @@ class Profile implements IStrategy
 
 
     /**
+     * Decide if this person's organisationMilestones indicates that they're a student, parent or staff
+     * in accordance with the consts
+     *
+     * @param int   $roleIdentifier
+     * @param array $organisationMilestones
+     * @return bool
+     */
+    private function isInBaseRole(int $roleIdentifier, array $organisationMilestones): bool
+    {
+        return $roleIdentifier === (int)$this->findOrganisationMilestoneField($organisationMilestones, 'baseRole');
+    }
+
+
+    /**
      * Find a particular field inside the set of $organisationMilestones tuples
      *
      * @param array  $organisationMilestones
@@ -743,7 +780,7 @@ class Profile implements IStrategy
             if ($this->helper->matchesHost($organisationMilestone['organisationName'])) {
                 if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
                     if ('' !== trim((string)$organisationMilestone[$field])) {
-                        return $organisationMilestone[$field];
+                        return (string)$organisationMilestone[$field];
                     }
                 }
             }
@@ -797,6 +834,19 @@ class Profile implements IStrategy
                 $this->log->warning(sprintf(
                     'Skipping parent %s (no external identifier)',
                     $relationship['compassPersonToId']
+                ));
+
+                continue;
+            }
+
+            /* If they're not in this baseRole, skip them
+             */
+            if (!$this->isInBaseRole(self::BASEROLE_PARENT, $parent['organisationMilestones'])) {
+                $this->log->debug(sprintf(
+                    'Skipping %s %s (%s) - they are not in the parent baseRole',
+                    $parent['firstName'],
+                    $parent['lastName'],
+                    $externalId
                 ));
 
                 continue;
@@ -961,8 +1011,8 @@ class Profile implements IStrategy
         foreach ($staffs['d'] as $staff) {
             $externalId = $this->helper->findExternalId($staff['importIdentifiers']);
             $campusName = $this->findCampusName($staff['organisationMilestones']);
-            $firstname = (string)$staff['firstName'];
-            $firstnamePreferred = (string)$staff['preferredFirstName'];
+            $firstname = trim((string)$staff['firstName']);
+            $firstnamePreferred = trim((string)$staff['preferredFirstName']);
 
             /* Prioritise preferred names over official names
              */
@@ -970,6 +1020,19 @@ class Profile implements IStrategy
                 $staff['preferredLastName'],
                 $staff['lastName']
             ]);
+
+            /* If they're not in this baseRole, skip them
+             */
+            if (!$this->isInBaseRole(self::BASEROLE_STAFF, $staff['organisationMilestones'])) {
+                $this->log->debug(sprintf(
+                    'Skipping %s %s (%s) - they are not in the staff baseRole',
+                    $firstname,
+                    $lastname,
+                    $externalId
+                ));
+
+                continue;
+            }
 
             /* Haven't encountered data this specific
              */
