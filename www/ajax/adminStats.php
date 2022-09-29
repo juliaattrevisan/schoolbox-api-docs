@@ -348,11 +348,11 @@ switch ($_POST['module']) {
         ];
         break;
     case 'service_saml_cert':
-        // TODO this probably needs to be an instance rather than a static now that we are injecting dependecies
-        $samlWidget = SamlCertHelper::buildWidget(
+        $samlCertHelper = new SamlCertHelper;
+
+        $samlWidget = $samlCertHelper->buildWidget(
             $config->get('saml_idp_certificate') ?? "",
-            $config->get('saml_idp_metadata_url') ?? "",
-            new Alaress_Saml_Cache()
+            $config->get('saml_idp_metadata_url') ?? ""
         );
         $output[] = [
             'SAML_LIGHT'   => $samlWidget->getLight(),
