@@ -36,10 +36,17 @@ puppet_sync_type: "pull"
 force_upgrade: false
 
 # Optional extra hostnames (domain hardcoded to dev.schoolbox.cloud) that this vagrant will serve.
-# eg 'aaa' will add 'aaa.dev.schoolbox.cloud' to vagrant vhost. AWS IAM credentials required to download wildcard cert
+# eg 'aaa' will add 'aaa.dev.schoolbox.cloud' to vagrant vhost. Company AWS IAM credentials required to download wildcard cert
 extra_hostname:
+
+# These credentials are for an IAM user in the Schoolbox company AWS account.
 aws_iam_key: ''
 aws_iam_secret: ''
+
+# A developer's IAM credentials to their personal (ie not company) AWS account.
+# Used by features that interact with a developer's personal AWS account.
+aws_personal_iam_key: ''
+aws_personal_iam_secret: ''
 
 # Which PHP major version should be enabled? Supported options: ['8.0']
 primary_php_majver: '8.0'
