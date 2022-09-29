@@ -66,6 +66,16 @@ class Profile implements IStrategy
 
 
     /**
+     * For inexplicable reasons Compass decided to entertain the idea that multiple
+     * roletype humans get mixed up in each endpoint and we have to manually sort them
+     * out using this mechanism
+     */
+    private const BASEROLE_STUDENT = 1;
+    private const BASEROLE_STAFF = 2;
+    private const BASEROLE_PARENT = 3;
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -261,6 +271,7 @@ class Profile implements IStrategy
         ]);
 
         foreach ($students['d'] as $student) {
+            print_r($student);die();
             $externalId = $this->helper->findExternalId($student['importIdentifiers']);
             $academicHouse = $this->findHouse($student['organisationMilestones']);
             $boardingHouseName = '';
@@ -727,6 +738,42 @@ class Profile implements IStrategy
     private function findYearLevel(array $organisationMilestones): ?string
     {
         return $this->findOrganisationMilestoneField($organisationMilestones, 'yearLevel');
+    }
+
+
+    /**
+     * Decide if this person's organisationMilestones indicates that they're a student
+     *
+     * @param array $organisationMilestones
+     * @return bool
+     */
+    private function isStudentBaseRole(array $organisationMilestones): bool
+    {
+        return self::BASEROLE_STUDENT === (int)$this->findOrganisationMilestoneField($organisationMilestones, 'baseRole');
+    }
+
+
+    /**
+     * Decide if this person's organisationMilestones indicates that they're a staff
+     *
+     * @param array $organisationMilestones
+     * @return bool
+     */
+    private function isStaffBaseRole(array $organisationMilestones): bool
+    {
+        return self::BASEROLE_STAFF === (int)$this->findOrganisationMilestoneField($organisationMilestones, 'baseRole');
+    }
+
+
+    /**
+     * Decide if this person's organisationMilestones indicates that they're a parent
+     *
+     * @param array $organisationMilestones
+     * @return bool
+     */
+    private function isParentBaseRole(array $organisationMilestones): bool
+    {
+        return self::BASEROLE_PARENT === (int)$this->findOrganisationMilestoneField($organisationMilestones, 'baseRole');
     }
 
 
