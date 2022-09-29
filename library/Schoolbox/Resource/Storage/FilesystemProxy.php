@@ -186,16 +186,18 @@ class FilesystemProxy
                 FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
                 FilesystemFactory::FILE_SYSTEM_STORAGE => $this->filesystem,
             ]);
-            $mountManager->move(
+
+            // Moving a file using the mount manager move() overrides any existing
+            // file's visibility. (even with $config)
+            // Need to use copy() to set the file's permissions to the filesystem's default
+            // visibility (public for local, private for s3)
+            $config = ['visibility' => $this->defaultVisibility];
+            $mountManager->copy(
                 FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
                 FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
+                $config
             );
-
-            // Moving a file using the mount manager overrides any existing
-            // file's visibility.
-            // Need to set the file's permissions to the filesystem's default
-            // visibility (public for local, private for s3)
-            $this->filesystem->setVisibility($storagePath, $this->defaultVisibility);
+            $mountManager->delete(FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath);
 
             // The file may already exist in the storage backend.
             // This is fine, because the storage file's contents determine the
