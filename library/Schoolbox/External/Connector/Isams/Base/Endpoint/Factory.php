@@ -219,8 +219,6 @@ class Factory
              */
             $api = [
                 DSN::MODULE_BATCHXML => new Batchxml(new Api($this->host, $this->key, DSN::MODULE_BATCHXML)),
-                DSN::MODULE_STAFFPHOTO => new Batchxml(new Api($this->host, $this->key, DSN::MODULE_STAFFPHOTO)),
-                DSN::MODULE_STUDENTPHOTO => new Batchxml(new Api($this->host, $this->key, DSN::MODULE_STUDENTPHOTO)),
             ];
         }
 
