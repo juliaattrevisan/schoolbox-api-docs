@@ -120,6 +120,9 @@ class Api implements IApi
              */
             $path = DSN::PATHS[$this->module];
 
+            /* Only the url changes; the api key remains the same
+             * for everything you do in isams
+             */
             $this->url = (new Uri())
                 ->setScheme('https')
                 ->setHost(rtrim($this->host, "/ \n\r\t\v\x00"))
