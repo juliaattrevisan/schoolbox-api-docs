@@ -1,18 +1,18 @@
 <script setup>
 
 /**
- * To cancel or confirm the current code selection
+ * To cancel or confirm the current node selection
  */
 
 import { computed } from 'vue';
 import { useModalStore } from '../store/csModalStore';
-import { useSelectedCodesStore } from '../store/csSelectedNodesStore';
-import { useModalSelectedCodesStore } from '../store/csModalSelectedNodesStore';
+import { useSelectedNodesStore } from '../store/csSelectedNodesStore';
+import { useModalSelectedNodesStore } from '../store/csModalSelectedNodesStore';
 
 
 const modalStore = useModalStore();
-const selectedCodesStore = useSelectedCodesStore();
-const modalSelectedCodesStore = useModalSelectedCodesStore();
+const selectedNodesStore = useSelectedNodesStore();
+const modalSelectedNodesStore = useModalSelectedNodesStore();
 
 /**
  * Close the modal
@@ -23,27 +23,27 @@ function onCancelled () {
 
 /**
  * The selection has been confirmed, so close the modal
- * and insert into the current codes
+ * and insert into the current nodes
  */
 function onSelected () {
     modalStore.select();
 }
 
 /**
- * If there's currently no selected codes, we are Selecting codes,
+ * If there's currently no selected nodes, we are Selecting nodes,
  * otherwise we are Updating
  *
  * @returns { String }
  */
-const saveText = computed(() => selectedCodesStore.hasNoCodes ? 'Select' : 'Update');
+const saveText = computed(() => selectedNodesStore.hasNoNodes ? 'Select' : 'Update');
 
 /**
- * If there's no codes currently selected and we haven't selected any
+ * If there's no nodes currently selected and we haven't selected any
  * yet, there's no need to have the save enabled
  *
  * @returns { String }
  */
-const isSaveDisabled = computed(() => selectedCodesStore.hasNoCodes && modalSelectedCodesStore.hasNoCodes);
+const isSaveDisabled = computed(() => selectedNodesStore.hasNoNodes && modalSelectedNodesStore.hasNoNodes);
 
 </script>
 

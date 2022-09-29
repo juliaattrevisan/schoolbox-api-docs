@@ -7,17 +7,17 @@
 
 import { ref, computed, onMounted } from 'vue';
 import { gsap } from 'gsap/all';
-import { useModalActiveCodesStore, DIRECTION } from '../store/csModalActiveNodesStore';
+import { useModalActiveNodesStore, DIRECTION } from '../store/csModalActiveNodesStore';
 import { useModalSearchStore } from '../store/csModalSearchStore';
-import CsModalCodeCheckbox from './cs-modal-code-checkbox.vue';
-import CsModalCodeName from './cs-modal-code-name.vue';
+import CsModalNodeCheckbox from './cs-modal-node-checkbox.vue';
+import CsModalNodeName from './cs-modal-node-name.vue';
 
 
 const props = defineProps({
     /**
      * the assigned node to display
      */
-    code: {
+    node: {
         type: Object,
         required: true,
         default() {
@@ -37,7 +37,7 @@ const props = defineProps({
     },
 });
 
-const modalActiveCodesStore = useModalActiveCodesStore();
+const modalActiveNodesStore = useModalActiveNodesStore();
 const modalSearchStore = useModalSearchStore();
 const viewNodeEl = ref(null); //to animate the node
 
@@ -55,7 +55,7 @@ onMounted(() => {
  * fade on the node and slide it from forwards/backwards depending on the currentDirection
  */
 function animateOn () {
-    const xStart = modalActiveCodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
+    const xStart = modalActiveNodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
     gsap.set(viewNodeEl.value, {
         opacity: 0,
         x: xStart
@@ -93,41 +93,41 @@ const borderBottomColour = computed(() => {
  *
  * @returns { Boolean }
  */
-const showChildren = computed(() => props.code.children && props.code.children.length > 0 && (props.depth+1) < 2);
+const showChildren = computed(() => props.node.children && props.node.children.length > 0 && (props.depth+1) < 2);
 
 /**
  * If there's a code available, which means it can be added to the name
  *
  * @returns { Boolean }
  */
-const hasCode = computed(() => props.code.code && props.code.code !== '');
+const hasCode = computed(() => props.node.code && props.node.code !== '');
 
 /**
  * Add in the code if it's available otherwise just show the title
  *
  * @returns { String }
  */
-const title = computed(() => hasCode.value ? `[${props.code.code}] ${props.code.name}` : `${props.code.name}`);
+const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`);
 
 </script>
 
 <template>
     <li ref="viewNodeEl">
         <div :class="`buttons-container`">
-            <cs-modal-code-checkbox
-                :code="props.code"
+            <cs-modal-node-checkbox
+                :node="props.node"
             />
-            <cs-modal-code-name
-                :code="props.code"
+            <cs-modal-node-name
+                :node="props.node"
                 :depth="props.depth"
                 :title="title"
             />
         </div>
         <ul v-if="showChildren">
-            <cs-modal-code
-                v-for="code in props.code.children"
-                :key="code.id"
-                :code="code"
+            <cs-modal-node
+                v-for="node in props.node.children"
+                :key="node.id"
+                :node="node"
                 :depth="props.depth+1"
             />
         </ul>

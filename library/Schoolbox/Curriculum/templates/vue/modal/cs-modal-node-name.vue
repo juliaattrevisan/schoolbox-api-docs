@@ -7,8 +7,8 @@
 
 import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
-import { useCodesStore } from '../store/csNodesStore';
-import { useModalActiveCodesStore } from '../store/csModalActiveNodesStore';
+import { useNodesStore } from '../store/csNodesStore';
+import { useModalActiveNodesStore } from '../store/csModalActiveNodesStore';
 import { useModalSearchStore } from '../store/csModalSearchStore';
 
 
@@ -16,7 +16,7 @@ const props = defineProps({
     /**
      * the assigned node to display
      */
-    code: {
+    node: {
         type: Object,
         required: true,
         default() {
@@ -43,8 +43,8 @@ const props = defineProps({
     },
 });
 
-const codesStore = useCodesStore();
-const modalActiveCodesStore = useModalActiveCodesStore();
+const nodesStore = useNodesStore();
+const modalActiveNodesStore = useModalActiveNodesStore();
 const modalSearchStore = useModalSearchStore();
 
 /**
@@ -53,7 +53,7 @@ const modalSearchStore = useModalSearchStore();
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    if (codesStore.isLoading) { //while a load is in progress
+    if (nodesStore.isLoading) { //while a load is in progress
         return true;
     } else {
         return false;
@@ -82,9 +82,9 @@ const isParentNode = computed(() => {
 const isButton = computed(() => {
     if (isParentNode.value) { //is the parent node, which we don't
         return false;
-    } else if (props.code.children === null) { //the children haven't been loaded
+    } else if (props.node.children === null) { //the children haven't been loaded
         return false;
-    } else if (props.code.children?.length === 0) { //there's no children to display, so no point going further
+    } else if (props.node.children?.length === 0) { //there's no children to display, so no point going further
         return false;
     } else if (modalSearchStore.isActive) { //cant do any navigation while search is active
         return false;
@@ -104,7 +104,7 @@ const fontWeight = computed(() => isParentNode.value && !modalSearchStore.isActi
  * traverse to the next nodel level
  */
 function onNameSelected () {
-    modalActiveCodesStore.setNextSelected(props.code.id);
+    modalActiveNodesStore.setNextSelected(props.node.id);
 }
 
 /**

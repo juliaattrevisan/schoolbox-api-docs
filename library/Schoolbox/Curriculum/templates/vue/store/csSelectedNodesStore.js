@@ -1,5 +1,5 @@
 /**
- * Manage the currently selected curriculum codes
+ * Manage the currently selected curriculum nodes
  */
 
 import { defineStore } from 'pinia';
@@ -7,11 +7,11 @@ import { apiEndpoint } from './curriculumSelectorStore';
 import { getBreadcrumbs } from './csNodesStore';
 
 
-export const useSelectedCodesStore = defineStore(`csSelectedCodes`, {
+export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
 
     state: () => ({
-        codes: [], //the currently selected codes
-        activeCode: null, //to show extra info on a selected code in a modal
+        nodes: [], //the currently selected nodes
+        activeNode: null, //to show extra info on a selected node in a modal
         isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
     }),
@@ -19,39 +19,39 @@ export const useSelectedCodesStore = defineStore(`csSelectedCodes`, {
     getters: {
 
         /**
-         * Do we have any selected codes?
+         * Do we have any selected nodes?
          *
          * @return { Boolean }
          */
-        hasNoCodes () {
-            return this.codes.length === 0;
+        hasNoNodes () {
+            return this.nodes.length === 0;
         },
 
         /**
-         * Do we have any selected codes?
+         * Do we have any selected nodes?
          *
          * @return { Boolean }
          */
-        hasCodes () {
-            return this.codes.length > 0;
+        hasNodes () {
+            return this.nodes.length > 0;
         },
 
         /**
-         * To show further info on a selected code
+         * To show further info on a selected node
          *
          * @return { Boolean }
          */
-        hasActiveCode () {
-            return this.activeCode !== null ? true : false;
+        hasActiveNode () {
+            return this.activeNode !== null ? true : false;
         },
 
         /**
-         * just return an array of ids, used to compare if a code is selected or not
+         * just return an array of ids, used to compare if a node is selected or not
          *
          * @return { array }
          */
-        codesIds () {
-            return this.codes.map((code) => code.id);
+        nodesIds () {
+            return this.nodes.map((node) => node.id);
         },
 
     },
@@ -59,88 +59,88 @@ export const useSelectedCodesStore = defineStore(`csSelectedCodes`, {
     actions: {
 
         /**
-         * add a code
+         * add a node
          *
-         * @param { Object or Array } either a single code, or mulitple can be added
+         * @param { Object or Array } either a single node, or mulitple can be added
          */
-        add (codeToAdd) {
-            if (Array.isArray(codeToAdd)) {
-                this.codes  = [...this.codes, ...codeToAdd];
+        add (nodeToAdd) {
+            if (Array.isArray(nodeToAdd)) {
+                this.nodes  = [...this.nodes, ...nodeToAdd];
             } else {
-                this.codes  = [...this.codes, codeToAdd];
+                this.nodes  = [...this.nodes, nodeToAdd];
             }
         },
 
         /**
-         * remove a code
+         * remove a node
          *
          * @param { Object }
          */
-        remove (codeToRemove) {
-            if (Array.isArray(codeToRemove)) {
-                codeToRemove.forEach((code) => {
-                    this.codes = this.codes.filter((selectedCode) => selectedCode.id !== code.id);
+        remove (nodeToRemove) {
+            if (Array.isArray(nodeToRemove)) {
+                nodeToRemove.forEach((node) => {
+                    this.nodes = this.nodes.filter((selectedNode) => selectedNode.id !== node.id);
                 });
             } else {
-                this.codes = this.codes.filter((code) => code.id !== codeToRemove.id);
+                this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id);
             }
         },
 
         /**
-         * to check if a code is selected
+         * to check if a node is selected
          *
          * @param { Object }
          *
          * @returns { boolean }
          */
-        isSelected (code) {
-            return this.codesIds.includes(code.id);
+        isSelected (node) {
+            return this.nodesIds.includes(node.id);
         },
 
         /**
-         * to switch a codes selection status
+         * to switch a nodes selection status
          *
          * @param { object }
          * @param { boolean }
          */
-        switch (code, isChecked) {
-            isChecked ? this.add(code) : this.remove(code);
+        switch (node, isChecked) {
+            isChecked ? this.add(node) : this.remove(node);
         },
 
         /**
-         * completely update the codes with a new array
+         * completely update the nodes with a new array
          *
          * @param { Aray }
          */
-        update (updatedCodes) {
-            this.codes  = [...updatedCodes];
+        update (updatedNodes) {
+            this.nodes  = [...updatedNodes];
         },
 
         /**
-         * clear all the currently selected codes
+         * clear all the currently selected nodes
          */
         empty () {
-            this.codes.forEach((node) => this.remove(node));
+            this.nodes.forEach((node) => this.remove(node));
         },
 
         /**
-         * set the active node, which would prompt the cs-active-selected-code-modal to open
+         * set the active node, which would prompt the cs-active-selected-node-modal to open
          * and if it's set to null we can listen for it to be set again
          * We also load the ancestors of the node to display the breadcrumbs in the modal
          *
          * @param { Object }
          */
-        async setActiveCode (code) {
-            if (code === null) { //we only need to grab the nodes breadcrumbs if there's actually a node
-                this.activeCode = code;
+        async setActiveNode (node) {
+            if (node === null) { //we only need to grab the nodes breadcrumbs if there's actually a node
+                this.activeNode = node;
                 return;
             }
             try {
                 this.isLoading = true;
-                const response = await fetch(`${apiEndpoint}/${code.id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
+                const response = await fetch(`${apiEndpoint}/${node.id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
                 if (response.ok) {
-                    const codeWithParents = await response.json();
-                    code.breadcrumbs = getBreadcrumbs(codeWithParents, []);
+                    const nodeWithParents = await response.json();
+                    node.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
                 } else {
                     console.warn(response);
                     this.hasLoadError = true;
@@ -151,21 +151,21 @@ export const useSelectedCodesStore = defineStore(`csSelectedCodes`, {
             } finally {
                 this.isLoading = false;
             }
-            this.activeCode = code;
+            this.activeNode = node;
         },
 
         /**
-         * A code can have .children and .parent properties which aren't always needed
+         * A node can have .children and .parent properties which aren't always needed
          * and will bloat the selected objects. As such we remove these properties
          * to slim down the object.
          *
          * @param { Object }
          */
-         trimCode (code) {
-            const copiedCode = { ...code };
-            delete copiedCode.children;
-            delete copiedCode.parent;
-            return copiedCode;
+         trimNode (node) {
+            const copiedNode = { ...node };
+            delete copiedNode.children;
+            delete copiedNode.parent;
+            return copiedNode;
         },
 
     },

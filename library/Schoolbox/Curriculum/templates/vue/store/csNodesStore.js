@@ -1,18 +1,18 @@
 /**
- * Stores all the curriculum codes and load in subsequent children
+ * Stores all the curriculum nodes and load in subsequent children
  */
 
 import { defineStore } from 'pinia';
 import { useStore, apiEndpoint } from './curriculumSelectorStore';
-import { useModalActiveCodesStore } from './csModalActiveNodesStore';
+import { useModalActiveNodesStore } from './csModalActiveNodesStore';
 
 export const UNSET_ID = 0;
 
 
-export const useCodesStore = defineStore(`csCodes`, {
+export const useNodesStore = defineStore(`csNodes`, {
 
     state: () => ({
-        codes: [], //all the codes currenty loaded
+        nodes: [], //all the nodes currenty loaded
         isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place
@@ -26,7 +26,7 @@ export const useCodesStore = defineStore(`csCodes`, {
          * @return { Boolean }
          */
         hasNoCurriculum () {
-            return this.codes.children && this.codes.children.length === 0 ? true : false;
+            return this.nodes.children && this.nodes.children.length === 0 ? true : false;
         },
 
         /**
@@ -36,7 +36,7 @@ export const useCodesStore = defineStore(`csCodes`, {
          * @return { Boolean }
          */
         hasSingleCurriculum () {
-            return this.codes.children && this.codes.children.length === 1 ? true : false;
+            return this.nodes.children && this.nodes.children.length === 1 ? true : false;
         },
 
     },
@@ -102,8 +102,8 @@ export const useCodesStore = defineStore(`csCodes`, {
         async setTopLevel (nodes) {
             this.updateNodes(nodes);
             if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
-                const singleCurriculumId = this.codes.children[0].id;
-                await useModalActiveCodesStore().setNextSelected(singleCurriculumId); //load in its children for initial display
+                const singleCurriculumId = this.nodes.children[0].id;
+                await useModalActiveNodesStore().setNextSelected(singleCurriculumId); //load in its children for initial display
             }
         },
 
@@ -119,7 +119,7 @@ export const useCodesStore = defineStore(`csCodes`, {
                 if (response.ok) {
                     const newNode = await response.json();
                     const newNodeChildrenEnabled = newNode.children.filter((node) => (node.enabled)); //only show those nodes with children enabled, this can be handled with enabled=1 on just topLevelOnly
-                    const oldNode = findById(this.codes.children, id);
+                    const oldNode = findById(this.nodes.children, id);
                     oldNode.children = newNodeChildrenEnabled; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
                     console.warn(response);
@@ -139,7 +139,7 @@ export const useCodesStore = defineStore(`csCodes`, {
          * @param { Object }
          */
         updateNodes (nodes) { //we add them to .children so the top level structure is consistent with the levels below
-            this.codes = {
+            this.nodes = {
                 id: UNSET_ID,
                 name: 'Curricula',
                 children: nodes,

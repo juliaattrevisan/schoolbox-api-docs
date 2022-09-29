@@ -8,7 +8,7 @@ import { ref, watch } from 'vue';
 import { useModalStore } from '../store/csModalStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 import CsModalHeader from './cs-modal-header.vue';
-import CsModalCodes from './cs-modal-codes.vue';
+import CsModalNodes from './cs-modal-nodes.vue';
 import CsModalFooter from './cs-modal-footer.vue';
 
 
@@ -40,7 +40,7 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <cs-modal-header />
-        <cs-modal-codes />
+        <cs-modal-nodes />
         <cs-modal-footer />
     </reveal-modal>
 </template>

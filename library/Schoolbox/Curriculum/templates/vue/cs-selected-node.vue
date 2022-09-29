@@ -1,20 +1,20 @@
 <script setup>
 
 /**
- * A selected Curriculum code, it can be deleted and
+ * A selected Curriculum node, it can be deleted and
  * further details revealed via a modal
  */
 
 import { computed } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
-import { useSelectedCodesStore } from './store/csSelectedNodesStore';
+import { useSelectedNodesStore } from './store/csSelectedNodesStore';
 
 
 const props = defineProps({
     /**
-     * the selected curriculum code
+     * the selected curriculum node
      */
-    code: {
+    node: {
         type: Object,
         required: true,
         default: () => {
@@ -22,53 +22,52 @@ const props = defineProps({
                 id: 0,
                 code: '',
                 name: '',
-                breadcrumb: '',
             }
         }
     },
 });
 
 const store = useStore();
-const selectedCodesStore = useSelectedCodesStore();
+const selectedNodesStore = useSelectedNodesStore();
 
 /**
  * Prevent rapid fire while loading the selected node
  *
  * @returns { boolean }
  */
-const isDisabled = computed(() => selectedCodesStore.isLoading);
+const isDisabled = computed(() => selectedNodesStore.isLoading);
 
 /**
- * To open a modal that shows further info on the selected code
+ * To open a modal that shows further info on the selected node
  */
 function onTitleSelected () {
-    selectedCodesStore.setActiveCode(props.code);
+    selectedNodesStore.setActiveNode(props.node);
 }
 
 /**
  * To remove from the selected list
  */
 function onRemoveSelected () {
-    selectedCodesStore.remove(props.code);
+    selectedNodesStore.remove(props.node);
 }
 
 </script>
 
 <template>
-   <div class="selected-code">
+   <div class="selected-node">
         <button
             class="title-button"
-            :title="`View ${props.code.name}`"
+            :title="`View ${props.node.name}`"
             :disabled="isDisabled"
             @click.prevent="onTitleSelected"
             @keyup.enter="onTitleSelected"
             data-test-title-button>
-            {{ props.code.code }}
+            {{ props.node.code }}
         </button>
         <button
             v-if="!store.isReadOnly"
             class="remove-button icon-close"
-            :title="`Remove ${props.code.name}`"
+            :title="`Remove ${props.node.name}`"
             @click.prevent="onRemoveSelected"
             @keyup.enter="onRemoveSelected"
             data-test-remove-button>
@@ -78,7 +77,7 @@ function onRemoveSelected () {
 
 <style lang="scss" scoped>
 
-.selected-code {
+.selected-node {
     background: var(--body-background);
     color: #000;
     display: flex;

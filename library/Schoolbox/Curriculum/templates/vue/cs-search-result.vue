@@ -7,11 +7,11 @@
 import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
 import { useSearchStore } from './store/csSearchStore';
-import { useSelectedCodesStore } from './store/csSelectedNodesStore';
+import { useSelectedNodesStore } from './store/csSelectedNodesStore';
 
 
 const searchStore = useSearchStore();
-const selectedCodesStore = useSelectedCodesStore();
+const selectedNodesStore = useSelectedNodesStore();
 
 
 const props = defineProps({
@@ -23,7 +23,6 @@ const props = defineProps({
                 id: 0,
                 code: '',
                 name: '',
-                breadcrumb: '',
             }
         }
     },
@@ -50,19 +49,6 @@ const title = computed(() => {
 const highlightTitleSearch = computed(() => highlightSearchInElement(title.value));
 
 /**
- * To highlight any search selections in the breadcrumbs
- *
- * @returns { HTML }
- */
-const highlightBreadcrumbSearch = computed(() => {
-    if (props.result.breadcrumb) {
-        return highlightSearchInElement(props.result.breadcrumb);
-    } else {
-        return '';
-    }
-});
-
-/**
  * To highlight where the search string matches within the settings result
  * (?![^mark>]*mark>) is used to check we are not inside an element node
  *
@@ -86,16 +72,16 @@ function highlightSearchInElement (toHighlight) {
  *
  * @returns { Boolean }
  */
-const isCodeSelected = computed(() => {
-    return selectedCodesStore.codes.some((code) => props.result.id === code.id);
+const isNodeSelected = computed(() => {
+    return selectedNodesStore.nodes.some((node) => props.result.id === node.id);
 });
 
 /**
  * To determine the display of the checkbox based on whether
- * the code is currently selected
+ * the node is currently selected
  */
 function onSelected () {
-    isCodeSelected.value ? selectedCodesStore.remove(props.result) : selectedCodesStore.add(props.result);
+    isNodeSelected.value ? selectedNodesStore.remove(props.result) : selectedNodesStore.add(props.result);
 }
 
 </script>
@@ -111,13 +97,12 @@ function onSelected () {
             <input
                 :id="`checkbox-${result.id}`"
                 type="checkbox"
-                :checked="isCodeSelected"
+                :checked="isNodeSelected"
             />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
         <div>
             <span v-html="highlightTitleSearch"></span>
-            <aside v-html="highlightBreadcrumbSearch"></aside>
         </div>
     </button>
 </template>

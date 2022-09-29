@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useModalSelectedCodesStore } from './csModalSelectedNodesStore';
+import { useModalSelectedNodesStore } from './csModalSelectedNodesStore';
 
 
 export const useModalStore = defineStore(`csModal`, {
@@ -19,26 +19,26 @@ export const useModalStore = defineStore(`csModal`, {
          * in the new modal session
          */
         open () {
-            useModalSelectedCodesStore().refresh(); //ensure current selections are reflected in the new modal session
+            useModalSelectedNodesStore().refresh(); //ensure current selections are reflected in the new modal session
             this.isOpen = true;
         },
 
         /**
-         * to close the modal, clearing any selected codes in this modal session
+         * to close the modal, clearing any selected nodes in this modal session
          */
         cancel () {
-            useModalSelectedCodesStore().empty();
+            useModalSelectedNodesStore().empty();
             this.isOpen = false;
         },
 
         /**
-         * close the modal, also updating the selected codes to reflect the changes
+         * close the modal, also updating the selected nodes to reflect the changes
          * made in this modal session and then clear for another possible modal session
          */
         select () {
-            useModalSelectedCodesStore().update();
+            useModalSelectedNodesStore().update();
             this.isOpen = false;
-            useModalSelectedCodesStore().empty();
+            useModalSelectedNodesStore().empty();
         },
 
     },

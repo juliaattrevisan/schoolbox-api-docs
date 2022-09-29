@@ -1,22 +1,22 @@
 <script setup>
 
 /**
- * To select Curriculum Codes to assign to something like a Due Work
+ * To select Curriculum Nodes to assign to something like a Due Work
  */
 
 import { ref, onMounted, nextTick } from 'vue';
 import { ResizeObserver } from 'vue3-resize';
 import 'vue3-resize/dist/vue3-resize.css';
 import { useStore } from './store/curriculumSelectorStore';
-import { useSelectedCodesStore } from './store/csSelectedNodesStore';
+import { useSelectedNodesStore } from './store/csSelectedNodesStore';
 import { useSearchStore } from './store/csSearchStore';
 import { useModalStore } from './store/csModalStore';
-import { useModalActiveCodesStore } from './store/csModalActiveNodesStore';
+import { useModalActiveNodesStore } from './store/csModalActiveNodesStore';
 import CsSearchInput from './cs-search-input.vue';
-import CsSelectedCodes from './cs-selected-codes.vue';
+import CsSelectedNodes from './cs-selected-nodes.vue';
 import CsSearchResults from './cs-search-results.vue';
 import CsModal from './modal/cs-modal.vue';
-import CsActiveSelectedCodeModal from './cs-active-selected-code-modal.vue';
+import CsActiveSelectedNodeModal from './cs-active-selected-node-modal.vue';
 
 
 const props = defineProps({
@@ -29,15 +29,15 @@ const props = defineProps({
         default: '',
     },
     /**
-     * the codes already previously selected
+     * the nodes already previously selected
      */
-    selectedCodes: {
+    selectedNodes: {
         type: Array,
         required: false,
         default: [],
     },
     /**
-     * can only view the currently selected codes, not edit them
+     * can only view the currently selected nodes, not edit them
      */
     isReadOnly: {
         type: Boolean,
@@ -84,8 +84,8 @@ onMounted(() => {
     if (!store.isReadOnly && props.dataEndpoint !== '') { //only load when we need to
         store.load(props.dataEndpoint);
     }
-    if (props.selectedCodes?.length > 0) { //add in any codes that have been selected previously
-        useSelectedCodesStore().add(props.selectedCodes);
+    if (props.selectedNodes?.length > 0) { //add in any nodes that have been selected previously
+        useSelectedNodesStore().add(props.selectedNodes);
     }
     checkContainerWidth();
 });
@@ -96,10 +96,10 @@ onMounted(() => {
  */
 function checkForStorybook () {
     if (typeof STORYBOOK_ENV !== 'undefined') {
-        useSelectedCodesStore().$reset();
+        useSelectedNodesStore().$reset();
         useSearchStore().$reset();
         useModalStore().$reset();
-        useModalActiveCodesStore().$reset();
+        useModalActiveNodesStore().$reset();
         useStore().$reset();
     }
 }
@@ -123,13 +123,13 @@ function onContainerResize () {
 
 <template>
    <div ref="curriculumSelectorEl">
-        <cs-selected-codes />
+        <cs-selected-nodes />
         <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
         <cs-search-results />
         <resize-observer @notify="onContainerResize" />
     </div>
     <cs-modal />
-    <cs-active-selected-code-modal />
+    <cs-active-selected-node-modal />
 </template>
 
 <style lang="scss" scoped>

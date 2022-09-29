@@ -1,9 +1,9 @@
 /**
- * Manages the currently visible nodes in mc-modal-codes
+ * Manages the currently visible nodes in mc-modal-nodes
  */
 
 import { defineStore } from 'pinia';
-import { useCodesStore, findById } from './csNodesStore';
+import { useNodesStore, findById } from './csNodesStore';
 import { useModalSearchStore } from './csModalSearchStore';
 
 export const DIRECTION = {
@@ -11,7 +11,7 @@ export const DIRECTION = {
     BACKWARDS: 'backwards',
 }
 
-export const useModalActiveCodesStore = defineStore(`csModelActive`, {
+export const useModalActiveNodesStore = defineStore(`csModelActive`, {
 
     state: () => ({
         idList: [], //ids of the selected nodes
@@ -37,12 +37,12 @@ export const useModalActiveCodesStore = defineStore(`csModelActive`, {
          */
         breadcrumbs () {
             let breadcrumbs = [];
-            const codesStore = useCodesStore();
-            if (!codesStore.hasSingleCurriculum) { //we only need this breadcrumb if there's more than one Curriculum, otherwise we jump straight to the single node with no option of returning back
-                breadcrumbs.push( { id: codesStore.codes.id, name: codesStore.codes.name, depth: 0 } );
+            const nodesStore = useNodesStore();
+            if (!nodesStore.hasSingleCurriculum) { //we only need this breadcrumb if there's more than one Curriculum, otherwise we jump straight to the single node with no option of returning back
+                breadcrumbs.push( { id: nodesStore.nodes.id, name: nodesStore.nodes.name, depth: 0 } );
             }
             this.idList.forEach((id, index) => { //add in a breadcrumb for each selected node
-                const nodeAtDepth = findById(codesStore.codes.children, id);
+                const nodeAtDepth = findById(nodesStore.nodes.children, id);
                 breadcrumbs.push( { id: id, name: nodeAtDepth.name, depth: index+1 } );
             });
             //we return an empty array if there's no selections yet, otherwise we pull out the latest as it represents the node we are currently on (not one we need to move back to)
@@ -55,11 +55,11 @@ export const useModalActiveCodesStore = defineStore(`csModelActive`, {
          * @returns { Object }
          */
         current () {
-            const codesStore = useCodesStore();
+            const nodesStore = useNodesStore();
             if (this.idList.length > 0) { //grab the current latest selection
-                return findById(codesStore.codes.children, this.idList[this.currentDepth-1]);
+                return findById(nodesStore.nodes.children, this.idList[this.currentDepth-1]);
             } else { //otherwise return the root level structure when there's more than one root level node
-                return codesStore.codes;
+                return nodesStore.nodes;
             }
         },
 
@@ -69,7 +69,7 @@ export const useModalActiveCodesStore = defineStore(`csModelActive`, {
          *
          * @returns { Array }
          */
-        codes () {
+        nodes () {
             const searchStore = useModalSearchStore();
             if (searchStore.hasNoResults) {
                 return [this.current];
@@ -136,8 +136,8 @@ export const useModalActiveCodesStore = defineStore(`csModelActive`, {
          * @param { number }
          */
         async setNextSelected (id) {
-            const codesStore = useCodesStore();
-            await codesStore.loadChildren(id);
+            const nodesStore = useNodesStore();
+            await nodesStore.loadChildren(id);
             this.setSelected(this.currentDepth+1, id);
         },
 

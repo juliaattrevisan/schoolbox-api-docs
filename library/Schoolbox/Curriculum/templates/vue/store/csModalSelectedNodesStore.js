@@ -1,35 +1,35 @@
 /**
- * Manages the currently selected codes relevant to the curent modal session
+ * Manages the currently selected nodes relevant to the curent modal session
  */
 
 import { defineStore } from 'pinia';
-import { useSelectedCodesStore } from './csSelectedNodesStore';
+import { useSelectedNodesStore } from './csSelectedNodesStore';
 
 
-export const useModalSelectedCodesStore = defineStore(`csModalSelectedCodes`, {
+export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, {
 
     state: () => ({
-        codes: [], //the currently selected codes in the current modal session, with any previously selected also considered
+        nodes: [], //the currently selected nodes in the current modal session, with any previously selected also considered
     }),
 
     getters: {
 
         /**
-         * Do we have any selected codes?
+         * Do we have any selected nodes?
          *
          * @return { Boolean }
          */
-        hasNoCodes () {
-            return this.codes.length === 0;
+        hasNoNodes () {
+            return this.nodes.length === 0;
         },
 
         /**
-         * just return an array of ids, used to compare if a code is selected or not
+         * just return an array of ids, used to compare if a node is selected or not
          *
          * @return { array }
          */
-        codesIds () {
-            return this.codes.map((node) => node.id);
+        nodesIds () {
+            return this.nodes.map((node) => node.id);
         },
 
     },
@@ -37,39 +37,39 @@ export const useModalSelectedCodesStore = defineStore(`csModalSelectedCodes`, {
     actions: {
 
         /**
-         * populate with the currently selected codes
+         * populate with the currently selected nodes
          */
         refresh () {
-            this.codes = useSelectedCodesStore().codes; //ensure current selections are reflected in the new modal session
+            this.nodes = useSelectedNodesStore().nodes; //ensure current selections are reflected in the new modal session
         },
 
         /**
-         * add a code
+         * add a node
          *
          * @param { Object }
          */
-        add (codeToAdd) {
-            this.codes  = [...this.codes, codeToAdd];
+        add (nodeToAdd) {
+            this.nodes  = [...this.nodes, nodeToAdd];
         },
 
         /**
-         * remove a code
+         * remove a node
          *
          * @param { Object }
          */
-        remove (codeToRemove) {
-            this.codes = this.codes.filter((code) => code.id !== codeToRemove.id);
+        remove (nodeToRemove) {
+            this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id);
         },
 
         /**
-         * to check if a code is selected
+         * to check if a node is selected
          *
          * @param { Object }
          *
          * @returns { boolean }
          */
-         isSelected (code) {
-            return this.codesIds.includes(code.id);
+        isSelected (node) {
+            return this.nodesIds.includes(node.id);
         },
 
         /**
@@ -83,17 +83,17 @@ export const useModalSelectedCodesStore = defineStore(`csModalSelectedCodes`, {
         },
 
         /**
-         * clear all the currently selected codes
+         * clear all the currently selected nodes
          */
         empty () {
-            this.codes.forEach((node) => this.remove(node));
+            this.nodes.forEach((node) => this.remove(node));
         },
 
         /**
          * update the currently selected with the latest modal session
          */
         update () {
-            useSelectedCodesStore().update(this.codes);
+            useSelectedNodesStore().update(this.nodes);
         },
 
     },

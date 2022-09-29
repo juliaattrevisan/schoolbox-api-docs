@@ -6,11 +6,11 @@
 
 import { computed, watch } from 'vue';
 import debounce from 'lodash/debounce';
-import { useModalActiveCodesStore } from '../store/csModalActiveNodesStore';
+import { useModalActiveNodesStore } from '../store/csModalActiveNodesStore';
 import { useModalSearchStore } from '../store/csModalSearchStore';
 
 
-const modalActiveCodesStore = useModalActiveCodesStore();
+const modalActiveNodesStore = useModalActiveNodesStore();
 const modalSearchStore = useModalSearchStore();
 
 /**
@@ -18,7 +18,7 @@ const modalSearchStore = useModalSearchStore();
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => !modalActiveCodesStore.isActive);
+const isDisabled = computed(() => !modalActiveNodesStore.isActive);
 
 /**
  * Only enable search once a first node is selected
@@ -29,7 +29,7 @@ const placeholder = computed(() => {
     if (isDisabled.value) {
         return 'Select a Curriculum Code to enable search...'
     } else {
-        return `Search ${modalActiveCodesStore.current.name} for codes or keywords...`;
+        return `Search ${modalActiveNodesStore.current.name} for codes or keywords...`;
     }
 });
 
