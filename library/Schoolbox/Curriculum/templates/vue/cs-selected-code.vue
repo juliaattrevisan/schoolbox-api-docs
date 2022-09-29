@@ -85,9 +85,11 @@ function onRemoveSelected () {
     font-size: 0.8125rem;
     gap: 0.5rem;
     min-height: auto;
+    overflow: hidden;
     padding: 5px 10px;
     text-align: left;
     transition: all 0.3s;
+    white-space: nowrap;
 }
 
 .title-button {
@@ -95,6 +97,7 @@ function onRemoveSelected () {
     margin: 0;
     min-height: 0;
     padding: 0;
+    text-overflow: ellipsis;
 }
 
 .remove-button {

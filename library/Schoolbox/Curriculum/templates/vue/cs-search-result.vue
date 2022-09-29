@@ -103,6 +103,7 @@ function onSelected () {
 <template>
     <button
         class="search-result"
+        :title="title"
         @click.prevent="onSelected"
         @keyup.enter="onSelected"
     >
