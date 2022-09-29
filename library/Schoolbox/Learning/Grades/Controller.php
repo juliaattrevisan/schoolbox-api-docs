@@ -173,7 +173,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
-            'year'             => ($termIsWholeYear ? $term->getStart()->getYear(): null),
+            'year'             => ($termIsWholeYear ? $term->getStart()->getYear() : null),
             'terms'            => $this->termMapper->findAllWithExtraordinary($viewee),
             'folders'          => $folders,
             'assessmentTasks'  => $assessmentTasks,
