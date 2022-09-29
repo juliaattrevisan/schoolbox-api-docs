@@ -46,6 +46,18 @@ export const useSearchStore = defineStore(`csSearch`, {
         },
 
         /**
+         * the search string broken into words, to search for each word
+         *
+         * @returns { Array } the search string broken into single words
+         */
+        queryWordList () {
+            const queryTrimmed = this.query.trim(); //remove any front or back white space
+            const re = /\s*(?:,|$)\s*/ //adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
+            const commaSeparated = queryTrimmed.split(re) ?? []; //split the string into a comma separated list
+            return commaSeparated.filter(word => word.length > 0); //and ensure each contains a character
+        },
+
+        /**
          * To show that no nodes match the current search
          *
          * @return { Boolean }
@@ -104,10 +116,10 @@ export const useSearchStore = defineStore(`csSearch`, {
          */
         removeAllResults () {
             const selectedNodesStore = useSelectedNodesStore();
-            const matchedselectedNodes = this.results.filter((matchedselectedNode) => { //check if the node is in the list already
-                return selectedNodesStore.nodes.some((selectedNode) => selectedNode.id === matchedselectedNode.id); //add in those that match
+            const matchedSelectedNodes = this.results.filter((matchedSelectedNode) => { //check if the node is in the list already
+                return selectedNodesStore.nodes.some((selectedNode) => selectedNode.id === matchedSelectedNode.id); //add in those that match
             });
-            selectedNodesStore.remove(matchedselectedNodes);
+            selectedNodesStore.remove(matchedSelectedNodes);
         },
 
     },

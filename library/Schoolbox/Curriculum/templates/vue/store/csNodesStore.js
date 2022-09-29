@@ -47,7 +47,7 @@ export const useNodesStore = defineStore(`csNodes`, {
          * check if the top level is loaded in the session storage already
          * so we don't reload
          */
-         initTopLevel () {
+        initTopLevel () {
             /**
              * @TODO - Hold off on this for now, I'll need to think a bit more on what to store in the session storage
              * before I enable this.

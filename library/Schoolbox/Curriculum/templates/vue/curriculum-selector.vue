@@ -7,16 +7,16 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ResizeObserver } from 'vue3-resize';
 import 'vue3-resize/dist/vue3-resize.css';
-import { useStore } from './store/curriculumSelectorStore';
-import { useSelectedNodesStore } from './store/csSelectedNodesStore';
-import { useSearchStore } from './store/csSearchStore';
-import { useModalStore } from './store/csModalStore';
-import { useModalActiveNodesStore } from './store/csModalActiveNodesStore';
-import CsSearchInput from './cs-search-input.vue';
-import CsSelectedNodes from './cs-selected-nodes.vue';
-import CsSearchResults from './cs-search-results.vue';
-import CsModal from './modal/cs-modal.vue';
-import CsActiveSelectedNodeModal from './cs-active-selected-node-modal.vue';
+// import { useStore } from './store/curriculumSelectorStore';
+// import { useSelectedNodesStore } from './store/csSelectedNodesStore';
+// import { useSearchStore } from './store/csSearchStore';
+// import { useModalStore } from './store/csModalStore';
+// import { useModalActiveNodesStore } from './store/csModalActiveNodesStore';
+// import CsSearchInput from './cs-search-input.vue';
+// import CsSelectedNodes from './cs-selected-nodes.vue';
+// import CsSearchResults from './cs-search-results.vue';
+// import CsModal from './modal/cs-modal.vue';
+// import CsActiveSelectedNodeModal from './cs-active-selected-node-modal.vue';
 
 
 const props = defineProps({
@@ -55,7 +55,7 @@ const props = defineProps({
     /**
      * an 'original' selection, saved by the user
      */
-     selectedOriginal: {
+    selectedOriginal: {
         type: Array,
         required: false,
         default: [],
@@ -63,31 +63,32 @@ const props = defineProps({
     /**
      * the default selection relevant to the current user role
      */
-     selectedDefault: {
+    selectedDefault: {
         type: Array,
         required: false,
         default: [],
     },
 });
 
-const store = useStore();
-const curriculumSelectorEl = ref(null);
+// const store = useStore();
+// const curriculumSelectorEl = ref(null);
 
 
 /**
  * Start loading the curriculum data
  */
 onMounted(() => {
-    checkForStorybook();
-    store.isReadOnly = props.isReadOnly;
-    store.formValueName = props.formValueName;
-    if (!store.isReadOnly && props.dataEndpoint !== '') { //only load when we need to
-        store.load(props.dataEndpoint);
-    }
-    if (props.selectedNodes?.length > 0) { //add in any nodes that have been selected previously
-        useSelectedNodesStore().add(props.selectedNodes);
-    }
-    checkContainerWidth();
+    console.warn('mounted eh');
+    // checkForStorybook();
+    // store.isReadOnly = props.isReadOnly;
+    // store.formValueName = props.formValueName;
+    // if (!store.isReadOnly && props.dataEndpoint !== '') { //only load when we need to
+    //     store.load(props.dataEndpoint);
+    // }
+    // if (props.selectedNodes?.length > 0) { //add in any nodes that have been selected previously
+    //     useSelectedNodesStore().add(props.selectedNodes);
+    // }
+    // checkContainerWidth();
 });
 
 /**
@@ -123,13 +124,13 @@ function onContainerResize () {
 
 <template>
    <div ref="curriculumSelectorEl">
-        <cs-selected-nodes />
-        <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
-        <cs-search-results />
-        <resize-observer @notify="onContainerResize" />
+        <!-- <cs-selected-nodes /> -->
+        <!-- <cs-search-input :curriculum-selector-el="curriculumSelectorEl" /> -->
+        <!-- <cs-search-results /> -->
+        <!-- <resize-observer @notify="onContainerResize" /> -->
     </div>
-    <cs-modal />
-    <cs-active-selected-node-modal />
+    <!-- <cs-modal /> -->
+    <!-- <cs-active-selected-node-modal /> -->
 </template>
 
 <style lang="scss" scoped>
