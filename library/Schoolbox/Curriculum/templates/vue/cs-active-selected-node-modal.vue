@@ -5,7 +5,7 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useSelectedCodesStore } from './store/csSelectedCodesStore';
+import { useSelectedCodesStore } from './store/csSelectedNodesStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 

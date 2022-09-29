@@ -6,8 +6,8 @@
 
 import { computed } from 'vue';
 import { generateUUID } from '@js/util/jsUtils';
-import { UNSET_ID } from '../store/csCodesStore';
-import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
+import { UNSET_ID } from '../store/csNodesStore';
+import { useModalSelectedCodesStore } from '../store/csModalSelectedNodesStore';
 
 
 const modalSelectedCodesStore = useModalSelectedCodesStore();

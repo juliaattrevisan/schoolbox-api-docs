@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import CsSelectedCode from '../cs-selected-code';
 import { createTestingPinia } from '@pinia/testing';
 import { useStore } from '../store/curriculumSelectorStore';
-import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
+import { useSelectedCodesStore } from '../store/csSelectedNodesStore';
 
 let wrapper; //so we don't need to pass it into every test
 

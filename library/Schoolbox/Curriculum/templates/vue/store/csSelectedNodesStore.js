@@ -3,8 +3,8 @@
  */
 
 import { defineStore } from 'pinia';
-import { apiEndpoint } from '../store/curriculumSelectorStore';
-import { getBreadcrumbs } from '../store/csCodesStore';
+import { apiEndpoint } from './curriculumSelectorStore';
+import { getBreadcrumbs } from './csNodesStore';
 
 
 export const useSelectedCodesStore = defineStore(`csSelectedCodes`, {

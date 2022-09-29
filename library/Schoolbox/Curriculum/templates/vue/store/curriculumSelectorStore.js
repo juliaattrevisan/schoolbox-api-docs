@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useCodesStore } from './csCodesStore';
+import { useCodesStore } from './csNodesStore';
 
 
 export let apiEndpoint = '';

@@ -6,8 +6,8 @@
 
 import { computed } from 'vue';
 import { useModalStore } from '../store/csModalStore';
-import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
-import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
+import { useSelectedCodesStore } from '../store/csSelectedNodesStore';
+import { useModalSelectedCodesStore } from '../store/csModalSelectedNodesStore';
 
 
 const modalStore = useModalStore();
@@ -22,15 +22,15 @@ function onCancelled () {
 }
 
 /**
- * The selection has been confirmed, so close the modal 
- * and insert into the current codes  
+ * The selection has been confirmed, so close the modal
+ * and insert into the current codes
  */
 function onSelected () {
     modalStore.select();
 }
 
 /**
- * If there's currently no selected codes, we are Selecting codes, 
+ * If there's currently no selected codes, we are Selecting codes,
  * otherwise we are Updating
  *
  * @returns { String }

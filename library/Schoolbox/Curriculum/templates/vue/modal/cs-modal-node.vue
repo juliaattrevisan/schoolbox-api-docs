@@ -7,7 +7,7 @@
 
 import { ref, computed, onMounted } from 'vue';
 import { gsap } from 'gsap/all';
-import { useModalActiveCodesStore, DIRECTION } from '../store/csModalActiveCodesStore';
+import { useModalActiveCodesStore, DIRECTION } from '../store/csModalActiveNodesStore';
 import { useModalSearchStore } from '../store/csModalSearchStore';
 import CsModalCodeCheckbox from './cs-modal-code-checkbox.vue';
 import CsModalCodeName from './cs-modal-code-name.vue';

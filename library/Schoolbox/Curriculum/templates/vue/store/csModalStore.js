@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useModalSelectedCodesStore } from './csModalSelectedCodesStore';
+import { useModalSelectedCodesStore } from './csModalSelectedNodesStore';
 
 
 export const useModalStore = defineStore(`csModal`, {

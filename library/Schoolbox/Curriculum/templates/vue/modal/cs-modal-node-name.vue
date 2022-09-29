@@ -7,8 +7,8 @@
 
 import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
-import { useCodesStore } from '../store/csCodesStore';
-import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
+import { useCodesStore } from '../store/csNodesStore';
+import { useModalActiveCodesStore } from '../store/csModalActiveNodesStore';
 import { useModalSearchStore } from '../store/csModalSearchStore';
 
 

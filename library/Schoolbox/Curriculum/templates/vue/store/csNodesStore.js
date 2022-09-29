@@ -4,7 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { useStore, apiEndpoint } from './curriculumSelectorStore';
-import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
+import { useModalActiveCodesStore } from './csModalActiveNodesStore';
 
 export const UNSET_ID = 0;
 

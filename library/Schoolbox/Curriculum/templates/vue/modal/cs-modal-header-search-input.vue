@@ -6,7 +6,7 @@
 
 import { computed, watch } from 'vue';
 import debounce from 'lodash/debounce';
-import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
+import { useModalActiveCodesStore } from '../store/csModalActiveNodesStore';
 import { useModalSearchStore } from '../store/csModalSearchStore';
 
 

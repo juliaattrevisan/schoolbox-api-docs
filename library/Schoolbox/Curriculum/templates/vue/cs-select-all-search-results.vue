@@ -7,7 +7,7 @@
 
 import { computed } from 'vue';
 import { useSearchStore } from './store/csSearchStore';
-import { useSelectedCodesStore } from './store/csSelectedCodesStore';
+import { useSelectedCodesStore } from './store/csSelectedNodesStore';
 
 
 const searchStore = useSearchStore();

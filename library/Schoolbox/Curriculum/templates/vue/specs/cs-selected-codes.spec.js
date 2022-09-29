@@ -2,7 +2,7 @@ import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import CsSelectedCodes from '../cs-selected-codes';
 import { createTestingPinia } from '@pinia/testing';
-import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
+import { useSelectedCodesStore } from '../store/csSelectedNodesStore';
 
 
 let wrapper; //so we don't need to pass it into every test
@@ -23,9 +23,9 @@ test('should not display when there is no codes', () => {
 
 test('should display when there is codes', async () => {
     const selectedCodesStore = useSelectedCodesStore();
-    selectedCodesStore.add([ 
-        { id: 1, code: 'C1', name: 'Code 1' }, 
-        { id: 2, code: 'C2', name: 'Code 2' }, 
+    selectedCodesStore.add([
+        { id: 1, code: 'C1', name: 'Code 1' },
+        { id: 2, code: 'C2', name: 'Code 2' },
     ]);
     expect(selectedCodesStore.hasCodes).toBe(true); //should have codes now
     await nextTick(); //need to ensure the DOM has updated first prior to checking
@@ -34,9 +34,9 @@ test('should display when there is codes', async () => {
 
 test('should not display when had codes but has been emptied', async () => {
     const selectedCodesStore = useSelectedCodesStore();
-    selectedCodesStore.add([ 
-        { id: 1, code: 'C1', name: 'Code 1' }, 
-        { id: 2, code: 'C2', name: 'Code 2' }, 
+    selectedCodesStore.add([
+        { id: 1, code: 'C1', name: 'Code 1' },
+        { id: 2, code: 'C2', name: 'Code 2' },
     ]);
     expect(selectedCodesStore.hasCodes).toBe(true); //should have codes now
     selectedCodesStore.empty();

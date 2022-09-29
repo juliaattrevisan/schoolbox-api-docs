@@ -6,8 +6,8 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
-import { useCodesStore } from '../store/csCodesStore';
+import { useModalActiveCodesStore } from '../store/csModalActiveNodesStore';
+import { useCodesStore } from '../store/csNodesStore';
 import { useModalSearchStore } from '../store/csModalSearchStore';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
 import CsModalCode from './cs-modal-code.vue'

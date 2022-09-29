@@ -7,7 +7,7 @@
 
 import { computed } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
-import { useSelectedCodesStore } from './store/csSelectedCodesStore';
+import { useSelectedCodesStore } from './store/csSelectedNodesStore';
 
 
 const props = defineProps({

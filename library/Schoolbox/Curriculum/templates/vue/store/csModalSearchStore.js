@@ -4,8 +4,8 @@
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from './curriculumSelectorStore';
-import { useSelectedCodesStore } from './csSelectedCodesStore';
-import { useModalActiveCodesStore } from './csModalActiveCodesStore';
+import { useSelectedCodesStore } from './csSelectedNodesStore';
+import { useModalActiveCodesStore } from './csModalActiveNodesStore';
 
 
 const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
