@@ -100,6 +100,29 @@ class Controller extends Base
     }
 
     /**
+     * @param User $viewee
+     * @param int  $year
+     * @throws MapperException
+     * @api   GET /learning/grades-year/{userId}/year/{year}
+     * @level 165
+     */
+    public function getGradesYear(User $viewee, int $year): void
+    {
+        $from = (new Alaress_Date_Format())->setYear($year)->startOfYear();
+        $to = (new Alaress_Date_Format())->setYear($year)->endOfYear();
+        // find a term from the from date to get actual term code
+        $term = $this->termMapper->findForDate($from);
+
+        // fake its period to match the year
+        $term->setTitle($year)
+             ->setStart($from)
+             ->setDisplayFinish($to)
+             ->setActualFinish($to);
+
+        $this->getCustomGrades($viewee, $term, true);
+    }
+
+    /**
      * Display the grade summary page. With a list of classes/groups that have student interactions
      * for the specified Viewee and Term
      *
@@ -248,29 +271,6 @@ class Controller extends Base
                 'yearUrl'            => $yearUrl,
             ])->setTab('grade')->setTitle("Grades for {$subject->getTitle()}")
         );
-    }
-
-    /**
-     * @param User $viewee
-     * @param int  $year
-     * @throws MapperException
-     * @api   GET /learning/grades-year/{userId}/year/{year}
-     * @level 165
-     */
-    public function getGradesYear(User $viewee, int $year): void
-    {
-        $from = (new Alaress_Date_Format())->setYear($year)->startOfYear();
-        $to = (new Alaress_Date_Format())->setYear($year)->endOfYear();
-        // find a term from the from date to get actual term code
-        $term = $this->termMapper->findForDate($from);
-
-        // fake its period to match the year
-        $term->setTitle($year)
-            ->setStart($from)
-            ->setDisplayFinish($to)
-            ->setActualFinish($to);
-
-        $this->getCustomGrades($viewee, $term, true);
     }
 
     /**
