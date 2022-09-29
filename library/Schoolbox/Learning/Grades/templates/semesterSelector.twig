@@ -11,41 +11,54 @@ Usage: include 'sub/semesterSelector.twig
 
 <script type="text/javascript">
     $(function() {
-
-        var $semesterSelector = $('#context-selector-semester');
-        var $options = $semesterSelector.find('option');
+        let $semesterSelector = $('#context-selector-semester');
 
         {# Wire up context selector #}
-
         $semesterSelector.change(function () {
             window.location.href = $semesterSelector.find(':selected').data('href');
         });
 
-        {# Wire up next/previous term buttons #}
+        if ($semesterSelector.children().length <= 1) {
+            {# Disable next/previous term buttons #}
+            $('[data-semester-switch]').addClass('disabled');
+        } else {
+            {# Wire up next/previous term buttons #}
+            $("[data-semester-switch]").click(function (e) {
+                e.preventDefault();
 
-        $("[data-semester-switch]").click(function (e) {
-            e.preventDefault();
+                let $options = $semesterSelector.children();
+                let index    = $semesterSelector.prop('selectedIndex');
+                let newIndex = index + (('next' === $(this).data('semester-switch')) ? -1 : +1);
 
-            var index = $semesterSelector.prop('selectedIndex');
-            var newIndex = 'next' === $(this).data('semester-switch') ? index - 1 : index + 1;
+                if (newIndex >= 1 && newIndex < $options.length) {
+                    let term = $options.eq(newIndex);
+                    window.location.href = term.data('href');
+                }
 
-            if (newIndex >= 1 && newIndex < $options.length){
-                var term = $options.eq(newIndex);
-                window.location.href = term.data('href');
-            }
-        });
+                disableNavsIfNecessary();
+            });
+
+            disableNavsIfNecessary();
+        }
     });
+
+    function disableNavsIfNecessary() {
+        let $selector   = $('#context-selector-semester');
+        let $prevButton = $('[data-semester-switch=previous]').removeClass('disabled');
+        let $nextButton = $('[data-semester-switch=next]').removeClass('disabled');
+        let $options    = $selector.children();
+
+        if ($selector.val() == $($options[$options.length - 1]).val()) {
+            $prevButton.addClass('disabled');
+        }
+
+        if ($selector.val() == $($options[1]).val()) { // 1 not 0 because of instruction option.
+            $nextButton.addClass('disabled');
+        }
+    }
 </script>
 
-<nav>
-    {% if year is not empty %}
-        <a data-semester-switch="previous" href="#"></a>
-    {% else %}
-        {% if terms and terms|length %}
-            <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
-        {% endif %}
-    {% endif %}
-</nav>
+<nav><a data-semester-switch="previous" href="#"></a></nav>
 <div class="semester">
     <select id="context-selector-semester" title="Select {{ locale.term.indefiniteArticle ~ ' ' ~ locale.term }}{% if year is not empty %}/Year{% endif %}">
         <option disabled {% if currentTerm is empty %}selected{% endif %} label="Select {{ locale.term.indefiniteArticle ~ ' ' ~ locale.term }}{% if year is not empty %}/year{% endif %}">Select {{ locale.term.indefiniteArticle ~ ' ' ~ locale.term }}{% if year is not empty %}/year{% endif %}</option>
@@ -77,12 +90,4 @@ Usage: include 'sub/semesterSelector.twig
         {% endif %}
     </select>
 </div>
-<nav>
-    {% if year is not empty %}
-        <a data-semester-switch="next" href="#"></a>
-    {% else %}
-        {% if terms and terms|length %}
-            <a data-semester-switch="next" href="#" {% if currentTerm.code == (terms|first).code %}disabled{% endif %}></a>
-        {% endif %}
-    {% endif %}
-</nav>
+<nav><a data-semester-switch="next" href="#"></a></nav>
