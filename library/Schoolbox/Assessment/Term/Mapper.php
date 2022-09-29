@@ -369,6 +369,8 @@ class Mapper extends BaseMapper
             return !$model->getExtraordinary();
         })->first();
 
+        // Note: If no term was found we create a fake one here.  This fake term will not exist in the database, so its ID will be null.
+        // Functions that accept this fake term as a parameter cannot assume it has a non-null ID.
         return $term ?? $this->createModel();
     }
 

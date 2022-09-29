@@ -110,14 +110,14 @@ class Controller extends Base
     {
         $from = (new Alaress_Date_Format())->setYear($year)->startOfYear();
         $to = (new Alaress_Date_Format())->setYear($year)->endOfYear();
-        // find a term from the from date to get actual term code
-        $term = $this->termMapper->findForDate($from);
 
-        // fake its period to match the year
-        $term->setTitle($year)
-             ->setStart($from)
-             ->setDisplayFinish($to)
-             ->setActualFinish($to);
+        // Create new term for the full year summary.  Note this term will not exist in the database, so its ID will be null.
+        // Functions that accept this fake term as a parameter cannot assume it has a non-null ID.
+        $term = $this->termMapper->createModel()
+            ->setTitle($from->getYear() . ' Full Year')
+            ->setCode($from->getYear() . '-full-year')
+            ->setStart($from)
+            ->setActualFinish($to);
 
         $this->getCustomGrades($viewee, $term, true);
     }
