@@ -143,7 +143,7 @@ class Controller extends Base
     /**
      * @param User       $viewee
      * @param Term\Model $term
-     * @param            $termIsWholeYear
+     * @param Boolean    $termIsWholeYear
      * @return void
      */
     private function getCustomGrades(User $viewee, Term\Model $term, $termIsWholeYear = false): void
