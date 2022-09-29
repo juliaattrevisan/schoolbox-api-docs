@@ -238,28 +238,28 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ))
-//            ->add(new TimetableCalendar\Prepare(
-//                $this->log,
-//                $this->perform,
-//                $this->eventMapper,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper,
-//                $this->periodMapper,
-//                $this->overridesMapper,
-//                self::SOURCE_NAME
-//            ))
-//            ->add(new TimetableCalendar\Classes(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $this->eventMapper,
-//                $this->overridesMapper,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $from,
-//                $to
-//            ))
+            ->add(new TimetableCalendar\Prepare(
+                $this->log,
+                $this->perform,
+                $this->eventMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper,
+                $this->periodMapper,
+                $this->overridesMapper,
+                self::SOURCE_NAME
+            ))
+            ->add(new TimetableCalendar\Classes(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->eventMapper,
+                $this->overridesMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $from,
+                $to
+            ))
             ->add(new ApiCertification(
                 $this->log,
                 $api
