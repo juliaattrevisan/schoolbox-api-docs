@@ -9,8 +9,8 @@ readonly ARG_HELP_LONG="help"
 readonly ARG_AWS_BUCKET="bucket"
 readonly ARG_AWS_ACCESS_KEY_ID="access-key"
 readonly ARG_AWS_SECRET_ACCESS_KEY="secret-key"
-readonly VAGRANT_YAML_KEY_AWS_ACCESS_KEY="aws_iam_key"      # Name of var in vagrant.yaml file
-readonly VAGRANT_YAML_KEY_AWS_SECRET_KEY="aws_iam_secret"   # Name of var in vagrant.yaml file
+readonly VAGRANT_YAML_KEY_AWS_ACCESS_KEY="aws_personal_iam_key"      # Name of var in vagrant.yaml file
+readonly VAGRANT_YAML_KEY_AWS_SECRET_KEY="aws_personal_iam_secret"   # Name of var in vagrant.yaml file
 
 # Global vars
 declare site_root
