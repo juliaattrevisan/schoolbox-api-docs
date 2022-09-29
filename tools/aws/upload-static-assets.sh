@@ -146,7 +146,7 @@ function read_var_from_vagrant_yaml() {
   fi
   VAR=$(grep -E "^\s*$1" "$file" | xargs)
   IFS=":" read -ra VAR <<< "$VAR"
-  echo "${VAR[1]}"
+  echo "${VAR[1]}" | xargs
 }
 
 function load_access_and_secret_keys(){
