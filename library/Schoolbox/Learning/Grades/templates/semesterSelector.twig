@@ -67,7 +67,12 @@ Usage: include 'sub/semesterSelector.twig
             </option>
         {% endfor %}
         {% if not selected %}
-            {# This is to cover the case where there are no terms in the schoolbox.terms database table matching the requested year. #}
+            {#
+             # An extra option is added here to cover the case where there are no terms in the schoolbox.terms database table
+             # matching the requested year.  No results will be shown in this case.  We add the extra option to avoid the
+             # situation where the user requests a year and then a different year or term is selected when the page loads.
+             # Specify in the URL a year in the far future to see the extra option.
+             #}
             <option selected>{{ year }} Grades Summary</option>
         {% endif %}
     </select>

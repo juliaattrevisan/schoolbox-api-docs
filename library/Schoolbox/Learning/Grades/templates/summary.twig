@@ -66,7 +66,7 @@
             {% for folder in folders %}
                 <ul class="activity-list group">
                     <li class="subject-group">
-                        {% if year is empty %}
+                        {% if term.id is not null %}
                             {# The supplied term matches a row in the schoolbox.term database table, so we can link to the getGradesForSubject() page for this term/subject. #}
                             <a href="{{ routeLookup('learningGrades.getGradesForSubject', {viewee: student, userId: student.id, term: term, termCode: term.code, subject: folder, subjectId: folder.id}) }}"
                                class="flex-grade link-row" title="View {{ locale.grades.properPlural }}">
@@ -76,7 +76,7 @@
                                 } only %}
                             </a>
                         {% else %}
-                            {# The supplied term is a fake full-year term that does not match a row in the schoolbox.term database table.  So we cannot link to the getGradesForSubject() page for this term/subject. #}
+                            {# The supplied term is a fake term that does not match a row in the schoolbox.term database table.  So we cannot link to the getGradesForSubject() page for this term/subject. #}
                             <h4 class="flex-grade">
                                 {% include '@learningGrades/fragments/subject.twig' with {
                                     folder:              folder,
