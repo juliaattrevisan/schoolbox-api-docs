@@ -118,60 +118,46 @@ class Controller extends Base
     }
 
     /**
-     *
-     * @param User                      $viewee
-     * @param Term\Model                $term
-     * @param Alaress_Date_Format|null $from
-     * @param Alaress_Date_Format|null $to
+     * @param User       $viewee
+     * @param Term\Model $term
+     * @param            $termIsWholeYear
      * @return void
-     * @throws MapperException
      */
-    private function getCustomGrades(
-        User $viewee,
-        Term\Model $term,
-        ?Alaress_Date_Format $from = null,
-        ?Alaress_Date_Format $to = null,
-        $termIsWholeYear = false
-    ): void {
-        $from = $from ?: $term->getStart();
-        $to = $to ?: $term->getActualFinish();
-
+    private function getCustomGrades(User $viewee, Term\Model $term, $termIsWholeYear = false): void)
+    {
         $markSchemeFactory = new Factory($this->getConfigLoader());
-
-        $gradeHelper = new Helper(
+        $gradeHelper       = new Helper(
             $this->folderMapper,
             $this->assessmentMapperProxy,
             $this->access,
             $markSchemeFactory
         );
 
-        [$folders, $markbooks, $assessments] = $gradeHelper->generateGrades($this->getUser(), $viewee, $term, $from, $to);
-
-        $assessmentTasks = new Collection();
+        [$folders, $markbooks, $assessments] = $gradeHelper->generateGrades($this->getUser(), $viewee, $term);
 
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
-        if ($filteredWorkTypes->count() > 0) {
-            $assessmentTasks = $gradeHelper->filterAssessments($this->getUser(), $viewee, $assessments, $filteredWorkTypes);
-        }
+        $assessmentTasks   = (
+            ($filteredWorkTypes->count() > 0)?
+            $gradeHelper->filterAssessments($this->getUser(), $viewee, $assessments, $filteredWorkTypes):
+            new Collection()
+        );
 
         /* A list of Terms to choose from
          *
          * If we're in an extraordinary Term right now, provide that as an option
          * in addition to the ordinary Terms
          */
-        $terms = $this->termMapper->findAllWithExtraordinary($viewee);
-        $yearUrl = $this->getYearUrl($viewee->getId());
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
-            'year'             => ($termIsWholeYear ? $from->getYear() : null),
-            'terms'            => $terms,
+            'year'             => ($termIsWholeYear ? $term->getStart()->getYear(): null),
+            'terms'            => $this->termMapper->findAllWithExtraordinary($viewee),
             'folders'          => $folders,
             'assessmentTasks'  => $assessmentTasks,
             'markbooks'        => $markbooks,
             'mailHandle'       => $this->getSession()->get('mailhandle'),
             'currentUser'      => $this->getUser(),
-            'yearUrl'          => $yearUrl,
+            'yearUrl'          => $this->getYearUrl($viewee->getId())
         ])->setTab('grade'));
     }
 
@@ -284,7 +270,7 @@ class Controller extends Base
             ->setDisplayFinish($to)
             ->setActualFinish($to);
 
-        $this->getCustomGrades($viewee, $term, $from, $to, true);
+        $this->getCustomGrades($viewee, $term, true);
     }
 
     /**
