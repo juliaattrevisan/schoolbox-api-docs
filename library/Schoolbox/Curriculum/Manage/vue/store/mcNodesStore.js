@@ -9,7 +9,6 @@ import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesSto
 
 
 export const UNSET_ID = 0;
-const SB_CURRICULUM_TOP_LEVEL = 'SB_CURRICULUM_TOP_LEVEL'; //to id to store the top level session storage with
 
 
 export const useNodesStore = defineStore('mcNodes', {
@@ -18,7 +17,6 @@ export const useNodesStore = defineStore('mcNodes', {
         nodes: {}, //all the nodes currently loaded
         isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
-        isProcessing: false, //to notify that an action is taking place
     }),
 
     getters: {
@@ -47,36 +45,9 @@ export const useNodesStore = defineStore('mcNodes', {
     actions: {
 
         /**
-         * check if the top level is loaded in the session storage already
-         * so we don't reload
-         */
-        initTopLevel () {
-            /**
-             * @TODO - Hold off on this for now, I'll need to think a bit more on what to store in the session storage
-             * before I enable this.
-             */
-            // if (sessionStorage.getItem(SB_CURRICULUM_TOP_LEVEL)) {
-            //     this.getTopLevel();
-            // } else {
-            //     this.loadTopLevel();
-            // }
-            this.loadTopLevel();
-        },
-
-        /**
-         * get the top level from session storage
-         */
-        async getTopLevel () {
-            const topLevelNodes = JSON.parse(sessionStorage.getItem(SB_CURRICULUM_TOP_LEVEL)); //convert the saved string var back to JSON
-            await this.setTopLevel(topLevelNodes);
-            const store = useStore();
-            store.isLoading = false;
-        },
-
-        /**
          * load in the top level nodes from the api
          */
-        async loadTopLevel () {
+        async load () {
             const store = useStore();
             try {
                 const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&descendants=1`, {
@@ -86,39 +57,75 @@ export const useNodesStore = defineStore('mcNodes', {
                 });
                 if (response.ok) {
                     const topLevelNodes = await response.json();
-                    sessionStorage.setItem(SB_CURRICULUM_TOP_LEVEL, JSON.stringify(topLevelNodes)); //session storage vars need to be saved as strings only
                     await this.setTopLevel(topLevelNodes);
-                } else if (response.status === 401) {
-                    store.hasPermissionDeniedError = true; //show a permission denied error
                 } else {
                     store.hasLoadError = true; //show the load error display state
                 }
             } catch (error) {
-                store.hasLoadError = true; //show the load error display state
-                throw new Error(error.message);
+                console.warn(error);
             } finally {
-                store.isLoading = false; //otherwise show the tree
+                store.isLoading = false;
             }
         },
 
         /**
-         * set the top level nodes, passed through either from loading or
-         * the already stored session storage
+         * set the top level nodes, passed through from loading
          *
          * @param { object }
          */
         async setTopLevel (nodes) {
             this.updateNodes(nodes);
-            const viewNodesStore = useViewNodesStore();
-            if (viewNodesStore.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
-                const singleCurriculumId = this.nodes.children[0].id;
-                await this.loadChildren(singleCurriculumId); //load in its children for initial display
-                viewNodesStore.setSelected(1, singleCurriculumId); //then select the node
+            const store = useStore();
+            if (store.hasId) {
+                await this.loadId(store.id);
+            } else if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
+                await this.loadSingleCurriculum();
             }
         },
 
         /**
-         * Load in another level of children of the target node
+         * load the single curriculum for display straight away
+         */
+        async loadSingleCurriculum () {
+            const singleCurriculumId = this.nodes.children[0].id;
+            await useViewNodesStore().setNextSelected(singleCurriculumId);
+        },
+
+        /**
+         * load the node, retrieving all its parents so we can traverse directly to it
+         *
+         * @param { number }
+         */
+        async loadId (id) {
+            try {
+                this.isLoading = true;
+                const response = await fetch(`${apiEndpoint}/${id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
+                if (response.ok) {
+                    const nodeWithParents = await response.json();
+                    const breadcrumbs = getBreadcrumbs(nodeWithParents, []);
+                    breadcrumbs.push( { id: id, name: nodeWithParents.name } ); //add in the actual node as the last
+                    for (let i = 0; i < breadcrumbs.length; i++) { //recursively load in each parent and traverse down
+                        await useViewNodesStore().setNextSelected(breadcrumbs[i].id);
+                    }
+                } else {
+                    this.hasId = false; //as the id couldn't be found
+                    if (this.hasSingleCurriculum) { //we should still jump straight to the only node available if there's only one
+                        await this.loadSingleCurriculum();
+                    }
+                    if (response.status === 404) { //and we assume the id can't be found, displaying an error
+                        throw new Error(`No node id matching ${id} has been found`);
+                    }
+                }
+            } catch (error) {
+                this.hasLoadError = true;
+                throw new Error(error.message, error.options);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        /**
+         * Load in another level of children of the target node id
          *
          * @param { number }
          */
@@ -134,9 +141,9 @@ export const useNodesStore = defineStore('mcNodes', {
                 if (response.ok) {
                     const newNode = responseJson;
                     newNode.children.forEach((node) => useSelectedNodesStore().addIsSelected(node));
-                    const oldNode = findById(this.nodes.children, id);
+                    const oldNode = findById(this.nodes.children, id); //grab the old node to update
                     useSelectedNodesStore().addIsSelected(oldNode);
-                    oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property that was previously null
+                    oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property
                 } else {
                     throw new Error(responseJson.title, { ...responseJson } );
                 }
@@ -179,10 +186,10 @@ export const useNodesStore = defineStore('mcNodes', {
          * @param { object }
          */
         nodeUpdated (node) {
-            if (node.parent) {
+            if (node.parent) { //sort via the parent node
                 const parentNode = findById(this.nodes.children, node.parent.id);
                 sortByName(parentNode.children);
-            } else {
+            } else { //otherwise sort on the children
                 sortByName(this.nodes.children);
             }
         },
@@ -193,7 +200,7 @@ export const useNodesStore = defineStore('mcNodes', {
          * @param { object }
          */
         deleteNode (node) {
-            useViewNodesStore().checkDeletedNode(node); //check we aren't on the deleted node currently
+            useViewNodesStore().checkDeletedNode(node); //check we aren't on the deleted node currently, if so we could move traverse backwards
             const nodeRemoved = removeId(this.nodes.children, node.id);
             this.updateNodes(nodeRemoved);
         },

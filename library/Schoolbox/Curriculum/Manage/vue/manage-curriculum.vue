@@ -7,8 +7,7 @@
 
 import { ref, onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
-import { useViewNodesStore } from './viewNodes/store/mcViewNodesStore';
-import { useActiveNodeStore } from './activeNode/store/mcActiveNodeStore';
+import { useNodesStore } from './store/mcNodesStore';
 import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';
 import McSelectedNodes from './selectedNodes/mc-selected-nodes.vue';
@@ -16,6 +15,10 @@ import McEnableNodes from './selectedNodes/mc-enable-nodes.vue';
 import McDeleteNodes from './selectedNodes/mc-delete-nodes.vue';
 import McActiveSelectedNodeModal from './selectedNodes/mc-active-selected-node-modal.vue';
 import Toast from '@schoolboxVue/components/toast.vue';
+
+
+const store = useStore();
+const toastEl = ref(null);
 
 
 const props = defineProps({
@@ -37,31 +40,29 @@ const props = defineProps({
     },
 });
 
-const toastEl = ref(null);
-
 /**
  * Start loading the curriculum data
  */
 onMounted(() => {
-    checkForStorybook();
-    const store = useStore();
-    store.isReadOnly = props.isReadOnly;
-    store.toastEl = toastEl;
-    if (props.dataEndpoint !== '') { //only load when we need to
-        store.load(props.dataEndpoint);
+    store.init(props, toastEl);
+    if (store.hasId) {
+        initErrorListener();
     }
 });
 
 /**
- * When switching between stories, we need to reset the data models
- * as they persist between the stories otherwise
+ * Display an error if we cant find the node id that we jump to straight on page load
  */
-function checkForStorybook () {
-    if (typeof STORYBOOK_ENV !== 'undefined') {
-        useStore().$reset();
-        useViewNodesStore().$reset();
-        useActiveNodeStore().$reset();
-    }
+function initErrorListener () {
+    useNodesStore().$onAction(({ name, onError }) => {
+        if (name === 'loadId') {
+            onError((error) => {
+                console.warn(error.message);
+                store.toastEl.activate();
+                store.toastEl.timeout(error.message, false, 5000);
+            });
+        }
+    });
 }
 
 </script>
