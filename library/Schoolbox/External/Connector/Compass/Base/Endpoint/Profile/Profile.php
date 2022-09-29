@@ -271,7 +271,6 @@ class Profile implements IStrategy
         ]);
 
         foreach ($students['d'] as $student) {
-            print_r($student);die();
             $externalId = $this->helper->findExternalId($student['importIdentifiers']);
             $academicHouse = $this->findHouse($student['organisationMilestones']);
             $boardingHouseName = '';
@@ -346,6 +345,19 @@ class Profile implements IStrategy
                     'Skipping %s %s (no external identifier)',
                     $firstname,
                     $lastname
+                ));
+
+                continue;
+            }
+
+            /* If they're not in this baseRole, skip them
+             */
+            if (!$this->isInBaseRole(self::BASEROLE_STUDENT, $student['organisationMilestones'])) {
+                $this->log->warning(sprintf(
+                    'Skipping %s %s (%s) - they are not in the student baseRole',
+                    $firstname,
+                    $lastname,
+                    $externalId
                 ));
 
                 continue;
@@ -742,38 +754,16 @@ class Profile implements IStrategy
 
 
     /**
-     * Decide if this person's organisationMilestones indicates that they're a student
+     * Decide if this person's organisationMilestones indicates that they're a student, parent or staff
+     * in accordance with the consts
      *
+     * @param int   $roleIdentifier
      * @param array $organisationMilestones
      * @return bool
      */
-    private function isStudentBaseRole(array $organisationMilestones): bool
+    private function isInBaseRole(int $roleIdentifier, array $organisationMilestones): bool
     {
-        return self::BASEROLE_STUDENT === (int)$this->findOrganisationMilestoneField($organisationMilestones, 'baseRole');
-    }
-
-
-    /**
-     * Decide if this person's organisationMilestones indicates that they're a staff
-     *
-     * @param array $organisationMilestones
-     * @return bool
-     */
-    private function isStaffBaseRole(array $organisationMilestones): bool
-    {
-        return self::BASEROLE_STAFF === (int)$this->findOrganisationMilestoneField($organisationMilestones, 'baseRole');
-    }
-
-
-    /**
-     * Decide if this person's organisationMilestones indicates that they're a parent
-     *
-     * @param array $organisationMilestones
-     * @return bool
-     */
-    private function isParentBaseRole(array $organisationMilestones): bool
-    {
-        return self::BASEROLE_PARENT === (int)$this->findOrganisationMilestoneField($organisationMilestones, 'baseRole');
+        return $roleIdentifier === (int)$this->findOrganisationMilestoneField($organisationMilestones, 'baseRole');
     }
 
 
@@ -790,7 +780,7 @@ class Profile implements IStrategy
             if ($this->helper->matchesHost($organisationMilestone['organisationName'])) {
                 if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
                     if ('' !== trim((string)$organisationMilestone[$field])) {
-                        return $organisationMilestone[$field];
+                        return (string)$organisationMilestone[$field];
                     }
                 }
             }
@@ -844,6 +834,19 @@ class Profile implements IStrategy
                 $this->log->warning(sprintf(
                     'Skipping parent %s (no external identifier)',
                     $relationship['compassPersonToId']
+                ));
+
+                continue;
+            }
+
+            /* If they're not in this baseRole, skip them
+             */
+            if (!$this->isInBaseRole(self::BASEROLE_PARENT, $parent['organisationMilestones'])) {
+                $this->log->warning(sprintf(
+                    'Skipping %s %s (%s) - they are not in the parent baseRole',
+                    $parent['firstName'],
+                    $parent['lastName'],
+                    $externalId
                 ));
 
                 continue;
@@ -1008,8 +1011,8 @@ class Profile implements IStrategy
         foreach ($staffs['d'] as $staff) {
             $externalId = $this->helper->findExternalId($staff['importIdentifiers']);
             $campusName = $this->findCampusName($staff['organisationMilestones']);
-            $firstname = (string)$staff['firstName'];
-            $firstnamePreferred = (string)$staff['preferredFirstName'];
+            $firstname = trim((string)$staff['firstName']);
+            $firstnamePreferred = trim((string)$staff['preferredFirstName']);
 
             /* Prioritise preferred names over official names
              */
@@ -1017,6 +1020,19 @@ class Profile implements IStrategy
                 $staff['preferredLastName'],
                 $staff['lastName']
             ]);
+
+            /* If they're not in this baseRole, skip them
+             */
+            if (!$this->isInBaseRole(self::BASEROLE_STAFF, $staff['organisationMilestones'])) {
+                $this->log->warning(sprintf(
+                    'Skipping %s %s (%s) - they are not in the staff baseRole',
+                    $firstname,
+                    $lastname,
+                    $externalId
+                ));
+
+                continue;
+            }
 
             /* Haven't encountered data this specific
              */
