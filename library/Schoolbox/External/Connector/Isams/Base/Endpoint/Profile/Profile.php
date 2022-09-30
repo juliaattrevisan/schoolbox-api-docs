@@ -261,6 +261,7 @@ class Profile implements IStrategy
 
             $form = trim((string)$student->Form);
             $lastname = trim((string)$student->Surname);
+            $personId = trim((string)$student->xpath('@Id')[0]);
             $studentId = trim((string)$student->xpath('@Id')[0]);
             $username = trim((string)$student->UserName);
             $yearLevel = trim((string)$student->NCYear);
@@ -418,7 +419,7 @@ class Profile implements IStrategy
 
             /* Import photos from sis
              */
-            $this->importPortrait($studentBaseProfile, $studentId);
+            $this->importPortrait($studentBaseProfile, $personId);
 
             /* Then save it
              */
@@ -987,7 +988,7 @@ class Profile implements IStrategy
             $firstnamePreferred = trim((string)$staff->PreferredName);
 
             $lastname = trim((string)$staff->Surname);
-            $staffId = trim((string)$staff->xpath('@Id')[0]);
+            $personId = trim((string)$staff->xpath('@PersonId')[0]);
 
             /* A shortcut for convenience in logging
              * (Sometimes people don't have all the parts of their name; odd but ok)
@@ -1085,7 +1086,7 @@ class Profile implements IStrategy
 
             /* Import photos from sis
              */
-            $this->importPortrait($staffBaseProfile, $staffId);
+            $this->importPortrait($staffBaseProfile, $personId);
 
             /* Then save it
              */
