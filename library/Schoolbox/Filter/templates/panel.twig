@@ -514,7 +514,7 @@ Usage:
             $submitButton.attr('disabled', false);
             $clearAllBtn.attr('disabled', false);
             $resetToDefaultsBtn.attr('disabled', false);
-            $optionInputs.filter(':not([data-disabled])').attr('disabled', false);
+            $optionInputs.filter(':not([data-disabled],[data-modal-search-input])').attr('disabled', false);
         }
 
         /**
