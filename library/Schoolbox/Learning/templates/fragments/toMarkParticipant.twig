@@ -24,7 +24,7 @@
             {% include 'include/portrait.twig' with {user: participant.user, description: 'View Submission'} only %}
             <p>
                 {{ participant.user.fullName }}
-                <span class="pipe meta" title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</span>
+                <span class="pipe meta" title="{{ response.submittedAt.local }}">Submitted {{ response.submittedAt.relativeTime }}</span>
             </p>
         </div>
     </div>
@@ -42,7 +42,7 @@
                 {% include 'include/portrait.twig' with {user: participant.user, description: 'View Submission'} only %}
                 <p>
                     {{ participant.user.fullName }}
-                    <span class="pipe meta" title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</span>
+                    <span class="pipe meta" title="{{ response.submittedAt.local }}">Submitted {{ response.submittedAt.relativeTime }}</span>
                 </p>
             </div>
         </div>
