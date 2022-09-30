@@ -67,6 +67,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var PhotoDownloader
+     */
+    private PhotoDownloader $photoDownloader;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private UserProfile\Mapper $baseProfileMapper;
@@ -102,6 +108,7 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param array                           $api
+     * @param PhotoDownloader                 $photoDownloader
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -112,6 +119,7 @@ class Profile implements IStrategy
         LoggerInterface $log,
         bool $perform,
         array $api,
+        PhotoDownloader $photoDownloader,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -121,7 +129,7 @@ class Profile implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
-
+        $this->photoDownloader = $photoDownloader;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
@@ -150,9 +158,16 @@ class Profile implements IStrategy
             $this->relationshipMapper->truncate();
         }
 
-        /* Import students' profile data
+        /* Download a zip containing everyone's profile pictures, and extract them
+         * It uses isams internal ids, not external ids
+         *
+         * Import students' profile data
          * Import their specific parents' profile data
          */
+        $this->log->info('Downloading student profile photos (this might take a while)');
+
+        $this->photoDownloader->downloadStudentPhotos();
+
         $this->log->info('Processing students and their parents.');
 
         $this->importStudents();
@@ -375,6 +390,9 @@ class Profile implements IStrategy
                 $studentBaseProfile->getFirstnamePreferred(),
                 $externalId
             ));
+
+            /* TODO Import photos from sis
+             */
 
             /* Then save it
              */

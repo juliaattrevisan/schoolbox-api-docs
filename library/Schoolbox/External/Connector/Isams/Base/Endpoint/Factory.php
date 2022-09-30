@@ -17,6 +17,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
@@ -57,6 +58,12 @@ class Factory
      * @var string
      */
     private string $key;
+
+
+    /**
+     * @var string
+     */
+    private string $zipDir;
 
 
     /**
@@ -138,8 +145,9 @@ class Factory
      * @param bool                            $perform
      * @param string                          $host
      * @param string                          $key
+     * @param string                          $zipDir
      * @param string|null                     $file
-     * @param UserProfile\Mapper              $baseProfileMapper
+     * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
@@ -156,6 +164,7 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        string $zipDir,
         ?string $file,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
@@ -175,6 +184,7 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->zipDir = $zipDir;
         $this->file = $file;
 
         /* Profile pieces
@@ -227,6 +237,10 @@ class Factory
          */
         $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
 
+        /* This lets you shank down zip files containing everyone's profile ictures
+         */
+        $photoDownloader = new Profile\PhotoDownloader($this->host, $this->key, $this->zipDir);
+
         /* Purge previously-imported profile relationships and classes
          */
         return (new GenericCollection(IStrategy::class))
@@ -243,6 +257,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $photoDownloader,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
