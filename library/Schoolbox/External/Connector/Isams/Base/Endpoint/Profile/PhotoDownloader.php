@@ -85,7 +85,6 @@ class PhotoDownloader
     public function downloadStudentPhotos(): void
     {
         $this->download('photos.ashx', $this->key);
-
     }
 
 
