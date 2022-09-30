@@ -154,4 +154,26 @@ class PhotoDownloader
             $zipArchive->close();
         }
     }
+
+
+    /**
+     * Get a photo's contents after decide if $personId has a picture
+     * that came out of the zip archive. Returns null if the file
+     * doesn't exist
+     *
+     * All isams pictures seem to be pngs in a zip (god knows why)
+     *
+     * @param int $personId
+     * @return string|null
+     */
+    public function getPhoto(int $personId): ?string
+    {
+        $path = "{$this->zipDir}/{$personId}.png";
+
+        if (file_exists($path)) {
+            return file_get_contents($path);
+        }
+
+        return null;
+    }
 }

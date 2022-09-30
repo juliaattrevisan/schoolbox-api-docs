@@ -19,6 +19,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
@@ -391,7 +392,7 @@ class Profile implements IStrategy
                 $externalId
             ));
 
-            /* TODO Import photos from sis
+            /* Import photos from sis
              */
 
             /* Then save it
@@ -399,6 +400,84 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->studentProfileMapper->save($studentProfile);
             }
+        }
+    }
+
+
+    /**
+     * Import a profile picture for the given $baseProfile
+     *
+     * Importing a profile picture requires you to enable photo_from_sis config var
+     * ("Load Photos From SIS" needs to be on)
+     *
+     * This populates the portrait_hash in $baseProfile
+     *
+     * @param Model $baseProfile
+     * @param int   $studentId
+     * @return void
+     */
+    private function importPortrait(UserProfile\Model $baseProfile, int $studentId): void
+    {
+        /* Check if config setting allows photos from sis
+         * If it's enabled, continue importing pics
+         */
+        if (!$this->includePhoto) {
+            return;
+        }
+
+        /* Start validating the contents of $fileInfo to ensure we have what we need
+         *
+         * file_info node might not exist; if it doesn't, skip it
+         */
+        $photoContents = $this->photoDownloader->getPhoto($studentId);
+
+        if (null === $photoContents) {
+            $this->log->debug(sprintf(
+                'Profile picture: no data found for %s %s (%s)',
+                $baseProfile->getFirstname(),
+                $baseProfile->getLastname(),
+                $baseProfile->getExternalId()
+            ));
+
+            return;
+        }
+
+        /* Start the part where we save the image
+         */
+        $this->log->debug(sprintf(
+            'Importing profile picture for %s %s (%s)',
+            $baseProfile->getFirstname(),
+            $baseProfile->getLastname(),
+            $baseProfile->getExternalId()
+        ));
+
+        /* Only try to persist images if perform mode is activated
+         */
+        if (!$this->perform) {
+            return;
+        }
+
+        /* Otherwise, all the parts are here and valid; continue with the persistence
+         * to storage and assignation to the $baseProfile by reference
+         *
+         * Not using $fileInfo['file_name'] and $fileInfo['mime_type'] for now
+         */
+        try {
+            $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . '.jpg', $photoContents);
+
+            /* You get a picture if any of the following occur:
+             *     - you don't have a portrait yet; you can get one added
+             *     - your existing picture is different to the one we just got; update it
+             */
+            if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
+                $baseProfile->setPortrait($portrait);
+            }
+        } catch (\Exception $e) {
+            // noop, but warn the cli that something unusual has transpired
+            $this->log->warning(sprintf(
+                'Profile picture: exception thrown. %s',
+                $e->getMessage()
+            ));
         }
     }
 
