@@ -501,6 +501,15 @@ class Profile implements IStrategy
              *     - your existing picture is different to the one we just got; update it
              */
             if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
+                $this->log->debug(sprintf(
+                    'Profile picture: %s %s (%s) has profile hash %s',
+                    $baseProfile->getFirstname(),
+                    $baseProfile->getLastname(),
+                    $baseProfile->getExternalId(),
+                    $portrait->getHash()
+                ));
+
+
                 $baseProfile->setPortrait($portrait);
             }
         } catch (\Exception $e) {
