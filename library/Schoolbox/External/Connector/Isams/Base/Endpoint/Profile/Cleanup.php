@@ -13,6 +13,8 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
+
 
 /**
  * Class Cleanup
@@ -68,15 +70,22 @@ class Cleanup implements IStrategy
 
 
     /**
+     * @var PhotoDownloader
+     */
+    private PhotoDownloader $photoDownloader;
+
+
+    /**
      * Cleanup constructor.
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
-     * @param UserProfile\Mapper              $baseProfileMapper
+     * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param PhotoDownloader                 $photoDownloader
      */
     public function __construct(
         LoggerInterface $log,
@@ -85,7 +94,8 @@ class Cleanup implements IStrategy
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper
+        UserProfile\Relationship\Mapper $relationshipMapper,
+        PhotoDownloader $photoDownloader
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -95,6 +105,7 @@ class Cleanup implements IStrategy
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+        $this->photoDownloader = $photoDownloader;
     }
 
 
@@ -125,6 +136,10 @@ class Cleanup implements IStrategy
             ))->remove();
 
             $this->log->info("Removed {$orphans} orphaned profiles.");
+
+            $this->photoDownloader->cleanup();
+
+            $this->log->info("Removed residual files from isams cache dir.");
         }
     }
 }

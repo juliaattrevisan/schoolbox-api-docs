@@ -206,4 +206,14 @@ class PhotoDownloader
 
         return null;
     }
+
+
+    /**
+     * Removes all the photo-related files from the isams cache dir
+     *
+     * @return void
+     */
+    public function cleanup(): void
+    {
+    }
 }

@@ -293,7 +293,8 @@ class Factory
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
-                $this->relationshipMapper
+                $this->relationshipMapper,
+                $photoDownloader
             ))
             ->add(new Timetable\Prepare(
                 $this->log,
