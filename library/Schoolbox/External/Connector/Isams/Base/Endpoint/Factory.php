@@ -21,6 +21,7 @@ use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -67,6 +68,12 @@ class Factory
 
 
     /**
+     * @var bool
+     */
+    private bool $includePhoto;
+
+
+    /**
      * @var string|null
      */
     private ?string $file;
@@ -100,6 +107,12 @@ class Factory
      * @var UserProfile\Relationship\Mapper
      */
     private UserProfile\Relationship\Mapper $relationshipMapper;
+
+
+    /**
+     * @var StorageMapper
+     */
+    private StorageMapper $storageMapper;
 
 
     /**
@@ -146,12 +159,14 @@ class Factory
      * @param string                          $host
      * @param string                          $key
      * @param string                          $zipDir
+     * @param bool                            $includePhoto
      * @param string|null                     $file
      * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param StorageMapper                   $storageMapper
      * @param UserMapper                      $userMapper
      * @param TimetableCycleMapper            $timetableCycleMapper
      * @param TimetablePeriodMapper           $timetablePeriodMapper
@@ -165,6 +180,7 @@ class Factory
         string $host,
         string $key,
         string $zipDir,
+        bool $includePhoto,
         ?string $file,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
@@ -172,6 +188,7 @@ class Factory
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
+        StorageMapper $storageMapper,
         /* Timetable pieces */
         UserMapper $userMapper,
         TimetableCycleMapper $timetableCycleMapper,
@@ -185,6 +202,7 @@ class Factory
         $this->host = $host;
         $this->key = $key;
         $this->zipDir = $zipDir;
+        $this->includePhoto = $includePhoto;
         $this->file = $file;
 
         /* Profile pieces
@@ -194,6 +212,7 @@ class Factory
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+        $this->storageMapper = $storageMapper;
 
         /* Timetable pieces
          */
@@ -209,6 +228,7 @@ class Factory
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
+     * @throws \DomainException
      */
     public function produce(): GenericCollection
     {
@@ -257,12 +277,14 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $this->includePhoto,
                 $photoDownloader,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
-                $this->relationshipMapper
+                $this->relationshipMapper,
+                $this->storageMapper
             ))
             ->add(new Profile\Cleanup(
                 $this->log,

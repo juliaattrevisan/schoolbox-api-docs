@@ -131,6 +131,7 @@ class Factory implements IFactory
                     $this->host,
                     $this->key,
                     Loader::getInstance()->get('zip_dir'),
+                    Loader::getInstance()->get('photo_sis_import'),
                     $file,
                     /* Profile pieces
                      */
@@ -139,6 +140,7 @@ class Factory implements IFactory
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
                     UserProfile\Relationship\Mapper::getInstance(),
+                    StorageMapper::getInstance(),
                     /* Timetable pieces
                      */
                     UserMapper::getInstance(),

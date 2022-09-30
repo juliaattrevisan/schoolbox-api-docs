@@ -22,6 +22,7 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use UnexpectedValueException;
 use Laminas\Uri\Exception\InvalidUriPartException;
 
@@ -68,6 +69,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var bool
+     */
+    private bool $includePhoto;
+
+
+    /**
      * @var PhotoDownloader
      */
     private PhotoDownloader $photoDownloader;
@@ -104,38 +111,50 @@ class Profile implements IStrategy
 
 
     /**
+     * @var StorageMapper
+     */
+    private StorageMapper $storageMapper;
+
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param array                           $api
+     * @param bool                            $includePhoto
      * @param PhotoDownloader                 $photoDownloader
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param StorageMapper                   $storageMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         array $api,
+        bool $includePhoto,
         PhotoDownloader $photoDownloader,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper
+        UserProfile\Relationship\Mapper $relationshipMapper,
+        StorageMapper $storageMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->includePhoto = $includePhoto;
         $this->photoDownloader = $photoDownloader;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+        $this->storageMapper = $storageMapper;
     }
 
 
