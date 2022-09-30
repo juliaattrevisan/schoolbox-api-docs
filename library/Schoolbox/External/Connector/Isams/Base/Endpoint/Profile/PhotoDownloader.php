@@ -215,5 +215,14 @@ class PhotoDownloader
      */
     public function cleanup(): void
     {
+        $dirhandle = opendir($this->cacheDir);
+
+        while ($file = readdir($dirhandle)) {
+            if ($file !== '.' && $file !== '..') {
+                $source = "{$this->cacheDir}/{$file}";
+
+                unlink($source);
+            }
+        }
     }
 }
