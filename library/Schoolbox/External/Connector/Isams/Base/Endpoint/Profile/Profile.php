@@ -414,6 +414,12 @@ class Profile implements IStrategy
             /* Then save it
              */
             if ($this->perform) {
+                $this->baseProfileMapper->save($studentBaseProfile);
+            }
+
+            /* Then save it
+             */
+            if ($this->perform) {
                 $this->studentProfileMapper->save($studentProfile);
             }
         }
