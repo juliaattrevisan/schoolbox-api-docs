@@ -163,10 +163,10 @@ class PhotoDownloader
      *
      * All isams pictures seem to be pngs in a zip (god knows why)
      *
-     * @param int $personId
+     * @param string $personId
      * @return string|null
      */
-    public function getPhoto(int $personId): ?string
+    public function getPhoto(string $personId): ?string
     {
         $path = "{$this->zipDir}/{$personId}.png";
 

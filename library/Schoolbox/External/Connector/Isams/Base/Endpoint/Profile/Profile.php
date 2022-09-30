@@ -413,6 +413,7 @@ class Profile implements IStrategy
 
             /* Import photos from sis
              */
+            $this->importPortrait($studentBaseProfile, $studentId);
 
             /* Then save it
              */
@@ -431,11 +432,11 @@ class Profile implements IStrategy
      *
      * This populates the portrait_hash in $baseProfile
      *
-     * @param Model $baseProfile
-     * @param int   $studentId
+     * @param Model  $baseProfile
+     * @param string $studentId
      * @return void
      */
-    private function importPortrait(UserProfile\Model $baseProfile, int $studentId): void
+    private function importPortrait(UserProfile\Model $baseProfile, string $studentId): void
     {
         /* Check if config setting allows photos from sis
          * If it's enabled, continue importing pics
