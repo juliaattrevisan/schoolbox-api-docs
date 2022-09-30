@@ -172,12 +172,6 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
-        /* Purge old relations before re-inserting them
-         */
-        if ($this->perform) {
-            $this->relationshipMapper->truncate();
-        }
-
         /* Download a zip containing everyone's profile pictures, and extract them
          * It uses isams internal ids, not external ids
          */
