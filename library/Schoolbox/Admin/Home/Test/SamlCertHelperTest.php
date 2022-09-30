@@ -90,9 +90,9 @@ class SamlCertHelperTest extends Framework\TestCase
     private const VALID_METADATA_URL = "http://test.schoolbox.cloud";
     private const INVALID_IDP_CERT = "this is an invalid cert";
 
-    private function getMetadataEmptyMock()
+    private function getDefaultCache(): \Alaress_Saml_Cache
     {
-        return null;
+        return new \Alaress_Saml_Cache();
     }
 
     private function getMetadataUnparsableMock(): \Alaress_Saml_Cache
@@ -149,7 +149,7 @@ class SamlCertHelperTest extends Framework\TestCase
          *  IDP Certificate      - Empty
          *  Metadata URL         - Empty
          */
-        $samlCertHelper = new SamlCertHelper($this->getMetadataEmptyMock());
+        $samlCertHelper = new SamlCertHelper($this->getDefaultCache());
 
         $widget = $samlCertHelper->buildWidget("", "");
 
@@ -217,7 +217,7 @@ class SamlCertHelperTest extends Framework\TestCase
          *  IDP Certificate      - Unparsable
          *  Metadata URL         - Empty
          */
-        $samlCertHelper = new SamlCertHelper($this->getMetadataEmptyMock());
+        $samlCertHelper = new SamlCertHelper($this->getDefaultCache());
 
         $widget = $samlCertHelper->buildWidget(self::INVALID_IDP_CERT, "");
         self::assertEquals(SamlCertHelper::LIGHT_ALERT, $widget->getLight());
@@ -293,7 +293,7 @@ class SamlCertHelperTest extends Framework\TestCase
          */
         $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
-        $samlCertHelper = new SamlCertHelper($this->getMetadataEmptyMock());
+        $samlCertHelper = new SamlCertHelper($this->getDefaultCache());
 
         $widget = $samlCertHelper->buildWidget(self::CERT_2027_04_26, "", $now);
         self::assertEquals($light, $widget->getLight());
