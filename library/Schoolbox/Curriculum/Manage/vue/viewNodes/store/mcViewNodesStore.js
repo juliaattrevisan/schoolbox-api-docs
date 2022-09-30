@@ -4,7 +4,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore, findById } from '../../store/mcNodesStore';
+import { useNodesStore, findById } from '../../../js/nodeUtils';
 
 export const DIRECTION = {
     FORWARDS: 'forwards',

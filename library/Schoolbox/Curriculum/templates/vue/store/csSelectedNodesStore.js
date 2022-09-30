@@ -4,7 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from './curriculumSelectorStore';
-import { getBreadcrumbs } from './csNodesStore';
+import { getBreadcrumbs } from '../../../Manage/js/nodeUtils';
 
 
 export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {

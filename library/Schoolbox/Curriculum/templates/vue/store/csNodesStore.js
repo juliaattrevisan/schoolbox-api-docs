@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
+import { findById } from '../../../Manage/js/nodeUtils';
 import { useStore, apiEndpoint } from './curriculumSelectorStore';
 import { useModalActiveNodesStore } from './csModalActiveNodesStore';
 
@@ -122,38 +123,3 @@ export const useNodesStore = defineStore(`csNodes`, {
     },
 
 });
-
-/**
- * To just return the node containing the specified id
- *
- * @param { array }
- * @param { number }
- */
-export function findById (array, id) {
-    for (const item of array) {
-        if (item.id === id) {
-            return item;
-        }
-        if (item.children?.length) {
-            const innerResult = findById(item.children, id);
-            if (innerResult) {
-                return innerResult;
-            }
-        }
-    }
-}
-
-/**
- * Recursively loop through the parents adding in a breadcrumb for each
- *
- * @param { object }
- * @param { array }
- */
-export function getBreadcrumbs (node, currentBreadcrumbs) {
-    if (node.hasOwnProperty('parent') && node.parent !== null) { //if there's a parent to use as a breadcrumb
-        let breadcrumbs = [ { id: node.parent.id, name: node.parent.name }, ...currentBreadcrumbs ]; //add it in to the front of the list
-        return breadcrumbs = getBreadcrumbs(node.parent, breadcrumbs); //and then check the next node up the list
-    } else { //otherwise we must be at the top of the breadcrumb list
-        return currentBreadcrumbs; //so we can return now
-    }
-}
