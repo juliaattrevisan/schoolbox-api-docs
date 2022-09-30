@@ -444,10 +444,10 @@ class Profile implements IStrategy
      * This populates the portrait_hash in $baseProfile
      *
      * @param Model  $baseProfile
-     * @param string $studentId
+     * @param string $personId
      * @return void
      */
-    private function importPortrait(UserProfile\Model $baseProfile, string $studentId): void
+    private function importPortrait(UserProfile\Model $baseProfile, string $personId): void
     {
         /* Check if config setting allows photos from sis
          * If it's enabled, continue importing pics
@@ -460,7 +460,7 @@ class Profile implements IStrategy
          *
          * file_info node might not exist; if it doesn't, skip it
          */
-        $photoContents = $this->photoDownloader->getPhoto($studentId);
+        $photoContents = $this->photoDownloader->getPhoto($personId);
 
         if (null === $photoContents) {
             $this->log->debug(sprintf(
@@ -508,7 +508,6 @@ class Profile implements IStrategy
                     $baseProfile->getExternalId(),
                     $portrait->getHash()
                 ));
-
 
                 $baseProfile->setPortrait($portrait);
             }
