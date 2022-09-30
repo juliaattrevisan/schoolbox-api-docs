@@ -295,34 +295,35 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ))
-            ->add(new Timetable\Prepare(
-                $this->log,
-                $this->perform,
-                $this->timetablePeriodMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
-            ->add(new Timetable\Identifier(
-                $this->log,
-                $this->perform,
-                $api
-            ))
-            ->add(new Timetable\Definition(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->timetableCycleMapper,
-                $this->timetablePeriodMapper
-            ))
-            ->add(new Timetable\Classes(
-                $this->log,
-                $this->perform,
-                $api,
-                $lookup,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ));
+//            ->add(new Timetable\Prepare(
+//                $this->log,
+//                $this->perform,
+//                $this->timetablePeriodMapper,
+//                $this->classEntryMapper,
+//                $this->classInvolvementMapper,
+//                $this->classPeriodMapper
+//            ))
+//            ->add(new Timetable\Identifier(
+//                $this->log,
+//                $this->perform,
+//                $api
+//            ))
+//            ->add(new Timetable\Definition(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $this->timetableCycleMapper,
+//                $this->timetablePeriodMapper
+//            ))
+//            ->add(new Timetable\Classes(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $lookup,
+//                $this->classEntryMapper,
+//                $this->classInvolvementMapper,
+//                $this->classPeriodMapper
+//            ))
+            ;
     }
 }
