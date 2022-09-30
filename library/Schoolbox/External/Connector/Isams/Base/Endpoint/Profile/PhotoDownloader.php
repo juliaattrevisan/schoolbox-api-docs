@@ -34,6 +34,14 @@ class PhotoDownloader
 
 
     /**
+     * A subfolder of $zipDir gets created forcibly
+     *
+     * @var string
+     */
+    public const ISAMS_CACHE_DIR = 'isams';
+
+
+    /**
      * The host of the iSAMS server
      *
      * @var string
@@ -56,6 +64,12 @@ class PhotoDownloader
 
 
     /**
+     * @var string
+     */
+    private string $cacheDir;
+
+
+    /**
      * Constructor.
      *
      * @param string $host
@@ -72,6 +86,8 @@ class PhotoDownloader
         $credentials = (new DSN())->decode($dsn);
 
         $this->key = $credentials['modules'][DSN::MODULE_BATCHXML]['key'];
+
+        $this->cacheDir = $zipDir . '/' . self::ISAMS_CACHE_DIR;
     }
 
 
@@ -81,6 +97,7 @@ class PhotoDownloader
      * @return void
      * @throws InvalidUriException
      * @throws InvalidUriPartException
+     * @throws \RuntimeException
      */
     public function downloadStudentPhotos(): void
     {
@@ -94,6 +111,7 @@ class PhotoDownloader
      * @return void
      * @throws InvalidUriException
      * @throws InvalidUriPartException
+     * @throws \RuntimeException
      */
     public function downloadStaffPhotos(): void
     {
@@ -109,10 +127,23 @@ class PhotoDownloader
      * @return void
      * @throws InvalidUriException
      * @throws InvalidUriPartException
+     * @throws \RuntimeException
      */
     private function download(string $path, string $key): void
     {
-        $filename = tempnam($this->zipDir, self::DOWNLOAD_PREFIX);
+        /* Forcibly create isams subdir
+         */
+        if (!is_dir($this->cacheDir)) {
+            if (!mkdir($concurrentDirectory = $this->cacheDir) && !is_dir($concurrentDirectory)) {
+                $message = sprintf('Directory "%s" was not created', $concurrentDirectory);
+
+                throw new \RuntimeException($message);
+            }
+        }
+
+        /* Shove in the files we download
+         */
+        $filename = tempnam($this->cacheDir, self::DOWNLOAD_PREFIX);
         $filepointer = fopen($filename, 'wb+');
 
         $url = (new Uri())
@@ -149,7 +180,7 @@ class PhotoDownloader
         $result = $zipArchive->open($filename);
 
         if (true === $result) {
-            $zipArchive->extractTo($this->zipDir);
+            $zipArchive->extractTo($this->cacheDir);
             $zipArchive->close();
         }
     }
