@@ -188,11 +188,20 @@ class Profile implements IStrategy
 
         $this->importStudents();
 
-//        /* Import staff profile data
-//         */
-//        $this->log->info('Processing staff.');
-//
-//        $this->importStaff();
+        /* Download a zip containing everyone's profile pictures, and extract them
+         * It uses isams internal ids, not external ids
+         */
+        if ($this->includePhoto) {
+            $this->log->info('Downloading staff profile photos (this might take a while)');
+
+            $this->photoDownloader->downloadStaffPhotos();
+        }
+
+        /* Import staff profile data
+         */
+        $this->log->info('Processing staff.');
+
+        $this->importStaff();
 
         /* Remove any orphaned profiles
          */

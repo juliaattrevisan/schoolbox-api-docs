@@ -257,7 +257,7 @@ class Factory
          */
         $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
 
-        /* This lets you shank down zip files containing everyone's profile ictures
+        /* This lets you shank down zip files containing everyone's profile pictures
          */
         $photoDownloader = new Profile\PhotoDownloader($this->host, $this->key, $this->zipDir);
 
@@ -295,35 +295,35 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ))
-//            ->add(new Timetable\Prepare(
-//                $this->log,
-//                $this->perform,
-//                $this->timetablePeriodMapper,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper
-//            ))
-//            ->add(new Timetable\Identifier(
-//                $this->log,
-//                $this->perform,
-//                $api
-//            ))
-//            ->add(new Timetable\Definition(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $this->timetableCycleMapper,
-//                $this->timetablePeriodMapper
-//            ))
-//            ->add(new Timetable\Classes(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $lookup,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper
-//            ))
+            ->add(new Timetable\Prepare(
+                $this->log,
+                $this->perform,
+                $this->timetablePeriodMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
+            ))
+            ->add(new Timetable\Identifier(
+                $this->log,
+                $this->perform,
+                $api
+            ))
+            ->add(new Timetable\Definition(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->timetableCycleMapper,
+                $this->timetablePeriodMapper
+            ))
+            ->add(new Timetable\Classes(
+                $this->log,
+                $this->perform,
+                $api,
+                $lookup,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
+            ))
             ;
     }
 }
