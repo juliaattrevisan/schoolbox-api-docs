@@ -969,6 +969,7 @@ class Profile implements IStrategy
             $firstnamePreferred = trim((string)$staff->PreferredName);
 
             $lastname = trim((string)$staff->Surname);
+            $staffId = trim((string)$staff->xpath('@Id')[0]);
 
             /* A shortcut for convenience in logging
              * (Sometimes people don't have all the parts of their name; odd but ok)
@@ -1063,6 +1064,16 @@ class Profile implements IStrategy
                 $firstnamePreferred,
                 $externalId
             ));
+
+            /* Import photos from sis
+             */
+            $this->importPortrait($staffBaseProfile, $staffId);
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($staffBaseProfile);
+            }
 
             /* Then save it
              */
