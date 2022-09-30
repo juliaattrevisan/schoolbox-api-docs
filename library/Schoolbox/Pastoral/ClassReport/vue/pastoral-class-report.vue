@@ -215,15 +215,15 @@ export default {
                                                 <img :src="record.createdBy._links.avatar"
                                                      :alt="`Profile photo of ${record.createdBy.fullName}`"
                                                      :title="`Created by ${ record.createdBy.fullName }`"
-                                                     class="portrait"/>
-                                                <span>{{ record.heading }}</span>
+                                                     class="portrait" />
+                                                {{ record.heading }}
                                             </a>
                                             <div class="time-container">
                                                 <template v-if="record.createdAt !== record.updatedAt">
                                                     <span :title="`Updated on ${formatDateTime(record.updatedAt)}`">⭐</span>
                                                 </template>
                                                 <time :datetime="formatDateTime(record.createdAt)" :title="formatDateTime(record.createdAt)">
-                                                    {{ formatDate(record.createdAt) }}
+                                                {{ formatDate(record.createdAt) }}
                                                 </time>
                                             </div>
                                         </div>
@@ -335,6 +335,7 @@ input[type=radio]:not(.plain) + label.input-toggle {
                         transform: scale(0.85);
                         float: none;
                         margin: 0;
+
                     }
                 }
 
@@ -353,23 +354,13 @@ input[type=radio]:not(.plain) + label.input-toggle {
                     .tiny {
                         display: grid;
                         grid-template-columns: 6fr 2fr;
-                        padding: 0;
 
                         a {
-                            display: grid;
-                            grid-template-columns: 2rem 1fr;
-                            padding-bottom: 0.25rem;
+                            line-height: 1.5rem;
 
                             img {
                                 border-radius: 50%;
-                                margin: 0;
-                                padding: 0;
-                                width: 100%;
-                            }
-
-                            span {
-                                line-height: 1.5rem;
-                                padding-left: 0.25rem;
+                                margin-right: 0.75rem;
                             }
                         }
 
