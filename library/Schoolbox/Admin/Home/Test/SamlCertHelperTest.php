@@ -90,11 +90,19 @@ class SamlCertHelperTest extends Framework\TestCase
     private const VALID_METADATA_URL = "http://test.schoolbox.cloud";
     private const INVALID_IDP_CERT = "this is an invalid cert";
 
+    /**
+     * Used for test cases where the metadata URL is empty, so we do not need to mock specific behaviour
+     * @return \Alaress_Saml_Cache (mocked)
+     */
     private function getDefaultCache(): \Alaress_Saml_Cache
     {
         return new \Alaress_Saml_Cache();
     }
 
+    /**
+     * Mocks the cache's behaviour when a metadata URL is accessible, but we failed to parse its contents
+     * @return \Alaress_Saml_Cache (mocked)
+     */
     private function getMetadataUnparsableMock(): \Alaress_Saml_Cache
     {
         $return = $this->createMock(\Alaress_Saml_Cache::class);
@@ -111,6 +119,10 @@ class SamlCertHelperTest extends Framework\TestCase
         return $samlCache;
     }
 
+    /**
+     * Mocks the cache's behaviour when a metadata URL is offline
+     * @return \Alaress_Saml_Cache (mocked)
+     */
     private function getMetadataOfflineMock(): \Alaress_Saml_Cache
     {
         $return = $this->createMock(\Alaress_Saml_Cache::class);
@@ -127,6 +139,10 @@ class SamlCertHelperTest extends Framework\TestCase
         return $samlCache;
     }
 
+    /**
+     * Mocks the cache's behaviour when a valid cert can be returned
+     * @return \Alaress_Saml_Cache (mocked)
+     */
     private function getMetadataOkMock(): \Alaress_Saml_Cache
     {
         $return = $this->createMock(\Alaress_Saml_Cache::class);
@@ -145,7 +161,7 @@ class SamlCertHelperTest extends Framework\TestCase
 
     public function testIdpCertEmptyMetadataUrlEmpty(): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Empty
          *  Metadata URL         - Empty
          */
@@ -159,7 +175,7 @@ class SamlCertHelperTest extends Framework\TestCase
 
     public function testIdpCertEmptyMetadataUrlOffline(): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Empty
          *  Metadata URL         - Offline
          */
@@ -172,7 +188,7 @@ class SamlCertHelperTest extends Framework\TestCase
 
     public function testIdpCertEmptyMetadataUrlUnparsable(): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Empty
          *  Metadata URL         - Unparsable
          */
@@ -188,7 +204,7 @@ class SamlCertHelperTest extends Framework\TestCase
      */
     public function testIdpCertEmptyMetadataUrlOk(string $nowOverride, string $light, string $message): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Empty
          *  Metadata URL         - Ok
          */
@@ -213,7 +229,7 @@ class SamlCertHelperTest extends Framework\TestCase
 
     public function testIdpCertUnparsableMetadataUrlEmpty(): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Unparsable
          *  Metadata URL         - Empty
          */
@@ -227,7 +243,7 @@ class SamlCertHelperTest extends Framework\TestCase
 
     public function testIdpCertUnparsableMetadataUrlOffline(): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Unparsable
          *  Metadata URL         - Offline
          */
@@ -241,7 +257,7 @@ class SamlCertHelperTest extends Framework\TestCase
 
     public function testIdpCertUnparsableMetadataUrlUnparsable(): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Unparsable
          *  Metadata URL         - Unparsable
          */
@@ -258,7 +274,7 @@ class SamlCertHelperTest extends Framework\TestCase
      */
     public function testIdpCertUnparsableMetadataUrlOk(string $nowOverride, string $light, string $message): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Unparsable
          *  Metadata URL         - Ok
          */
@@ -287,7 +303,7 @@ class SamlCertHelperTest extends Framework\TestCase
      */
     public function testIdpCertOkMetadataUrlEmpty(string $nowOverride, string $light, string $message): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Ok
          *  Metadata URL         - Empty
          */
@@ -316,7 +332,7 @@ class SamlCertHelperTest extends Framework\TestCase
      */
     public function testIdpCertOkMetadataUrlOffline(string $nowOverride, string $light, string $message): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Ok
          *  Metadata URL         - Offline
          */
@@ -344,7 +360,7 @@ class SamlCertHelperTest extends Framework\TestCase
      */
     public function testIdpCertOkMetadataUrlUnparsable(string $nowOverride, string $light, string $message): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Ok
          *  Metadata URL         - Unparsable
          */
@@ -372,7 +388,7 @@ class SamlCertHelperTest extends Framework\TestCase
      */
     public function testIdpCertOkMetadataUrlOk(string $nowOverride, string $idpCert, string $light, string $message): void
     {
-        /** Testing:
+        /* Testing:
          *  IDP Certificate      - Ok
          *  Metadata URL         - Ok
          */

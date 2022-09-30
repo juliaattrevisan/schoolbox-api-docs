@@ -55,9 +55,9 @@ class SamlCertHelper
         string $idpMetadataUrl,
         Alaress_Date_Format $nowOverride = null,
     ): SamlWidget {
-        /**
+        /*
          * Time value used in testing to simulate and reproduce different test cases.
-         * We use this to replicate how the widget responds depending on how close a cert is to expiry
+         * We use this to replicate how the widget responds depending on how close a cert is to expiry.
          */
         $now = $nowOverride ?? Alaress_Date_Format::now();
 
