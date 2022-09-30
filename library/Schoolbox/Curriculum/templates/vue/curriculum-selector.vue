@@ -8,10 +8,6 @@ import { ref, onMounted, nextTick } from 'vue';
 import { ResizeObserver } from 'vue3-resize';
 import 'vue3-resize/dist/vue3-resize.css';
 import { useStore } from './store/curriculumSelectorStore';
-import { useSelectedNodesStore } from './store/csSelectedNodesStore';
-import { useSearchStore } from './store/csSearchStore';
-import { useModalStore } from './store/csModalStore';
-import { useModalActiveNodesStore } from './store/csModalActiveNodesStore';
 import CsSearchInput from './cs-search-input.vue';
 import CsSelectedNodes from './cs-selected-nodes.vue';
 import CsSearchResults from './cs-search-results.vue';
@@ -78,31 +74,9 @@ const curriculumSelectorEl = ref(null);
  * Start loading the curriculum data
  */
 onMounted(() => {
-    checkForStorybook();
-    store.isReadOnly = props.isReadOnly;
-    store.formValueName = props.formValueName;
-    if (!store.isReadOnly && props.dataEndpoint !== '') { //only load when we need to
-        store.load(props.dataEndpoint);
-    }
-    if (props.selectedNodes?.length > 0) { //add in any nodes that have been selected previously
-        useSelectedNodesStore().add(props.selectedNodes);
-    }
+    store.init(props);
     checkContainerWidth();
 });
-
-/**
- * When switching between stories, we need to reset the data models
- * as they persist between the stories otherwise
- */
-function checkForStorybook () {
-    if (typeof STORYBOOK_ENV !== 'undefined') {
-        useSelectedNodesStore().$reset();
-        useSearchStore().$reset();
-        useModalStore().$reset();
-        useModalActiveNodesStore().$reset();
-        useStore().$reset();
-    }
-}
 
 /**
  * so can respond to dimenion changes if required

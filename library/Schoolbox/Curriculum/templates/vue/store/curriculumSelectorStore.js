@@ -4,6 +4,10 @@
 
 import { defineStore } from 'pinia';
 import { useNodesStore } from './csNodesStore';
+import { useSelectedNodesStore } from './csSelectedNodesStore';
+import { useSearchStore } from './csSearchStore';
+import { useModalStore } from './csModalStore';
+import { useModalActiveNodesStore } from './csModalActiveNodesStore';
 
 
 export let apiEndpoint = '';
@@ -46,13 +50,35 @@ export const useStore = defineStore(`curriculumSelector`, {
     actions: {
 
         /**
-         * load the top level curricula
+         * set up the passed properties and start loading the node data
          *
-         * @param { String }
+         * @param { object }
          */
-        load (endpoint) {
-            apiEndpoint = endpoint;
-            useNodesStore().initTopLevel();
+        init (props) {
+            this.checkForStorybook();
+            this.isReadOnly = props.isReadOnly;
+            this.formValueName = props.formValueName;
+            if (!this.isReadOnly && props.dataEndpoint !== '') { //only load when we need to
+                apiEndpoint = props.dataEndpoint;
+                useNodesStore().load();
+            }
+            if (props.selectedNodes?.length > 0) { //add in any nodes that have been selected previously
+                useSelectedNodesStore().add(props.selectedNodes);
+            }
+        },
+
+        /**
+         * When switching between stories, we need to reset the data models
+         * as they persist between the stories otherwise
+         */
+        checkForStorybook () {
+            if (typeof STORYBOOK_ENV !== 'undefined') {
+                useSelectedNodesStore().$reset();
+                useSearchStore().$reset();
+                useModalStore().$reset();
+                useModalActiveNodesStore().$reset();
+                this.$reset();
+            }
         },
 
         /**
