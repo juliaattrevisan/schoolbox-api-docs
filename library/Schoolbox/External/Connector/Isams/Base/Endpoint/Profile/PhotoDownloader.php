@@ -198,7 +198,7 @@ class PhotoDownloader
      */
     public function getPhoto(string $personId): ?string
     {
-        $path = "{$this->zipDir}/{$personId}.png";
+        $path = "{$this->cacheDir}/{$personId}.png";
 
         if (file_exists($path)) {
             return file_get_contents($path);
