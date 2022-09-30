@@ -4,7 +4,8 @@
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
-import { useNodesStore, findById, getBreadcrumbs } from '../../../js/nodeUtils';
+import { useNodesStore } from '../../store/mcNodesStore';
+import { findById, getBreadcrumbs } from '../../../js/nodeUtils';
 import { useEnableNodesStore } from './mcEnableNodesStore';
 
 

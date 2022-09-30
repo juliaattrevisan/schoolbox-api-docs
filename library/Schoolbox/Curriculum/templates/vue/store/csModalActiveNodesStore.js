@@ -3,7 +3,8 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore, findById } from '../../../Manage/js/nodeUtils';
+import { useNodesStore } from '../store/csNodesStore';
+import { findById } from '../../../Manage/js/nodeUtils';
 import { useModalSearchStore } from './csModalSearchStore';
 
 export const DIRECTION = {
