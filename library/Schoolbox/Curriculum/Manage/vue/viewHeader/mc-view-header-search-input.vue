@@ -1,23 +1,23 @@
 <script setup>
 
 /**
- * To search the currently active curriculum node
+ * The modal header, containing the title, select nodes and search input
  */
 
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
+import debounce from 'lodash/debounce';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
-import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
+import { useSearchStore } from '../store/mcSearchStore';
 
 
 const viewNodesStore = useViewNodesStore();
-const activeNodeStore = useActiveNodeStore();
+const searchStore = useSearchStore();
 
 /**
  * Only enable search once a first node is selected
  *
  * @returns { Boolean }
  */
-// const isDisabled = computed(() => !viewNodesStore.isActive || activeNodeStore.isActive);
 const isDisabled = computed(() => !viewNodesStore.isActive);
 
 /**
@@ -26,23 +26,40 @@ const isDisabled = computed(() => !viewNodesStore.isActive);
  * @returns { String }
  */
 const placeholder = computed(() => {
-    if (viewNodesStore.isActive) {
-        return `Search ${viewNodesStore.current.name} for codes or keywords...`;
+    if (isDisabled.value) {
+        return 'Select a Curriculum to enable search...'
     } else {
-        return 'Select a Curriculum Code to enable search...'  ;
+        return `Search ${viewNodesStore.current.name} for codes or keywords...`;
     }
 });
+
+/**
+ * start searching once the search is active, watching the query string for input
+ */
+watch(() => searchStore.query, () => {
+    if (searchStore.isActive) {
+        debounceSearch();
+    }
+});
+
+/**
+ * debounce to avoid constant polling while the user is typing
+ */
+const debounceSearch = debounce(() => {
+    searchStore.search();
+}, 350);
 
 </script>
 
 <template>
-   <input
-        v-model="viewNodesStore.query"
+    <input
+        v-model="searchStore.query"
         ref="queryInputEl"
         type="text"
         class="search-input"
         :disabled="isDisabled"
         :placeholder="placeholder"
+        data-modal-search-input
         @input="$event.target.composing = false"
     />
 </template>
