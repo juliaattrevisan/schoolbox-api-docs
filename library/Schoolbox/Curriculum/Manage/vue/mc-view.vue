@@ -4,11 +4,9 @@
  * To view and filter the curriculum codes
  */
 
-import { computed } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useNodesStore } from './store/mcNodesStore';
 import { useAddCurriculumStore } from './store/mcAddCurriculumStore';
-import { useViewNodesStore } from './viewNodes/store/mcViewNodesStore';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
 import McViewHeader from './viewHeader/mc-view-header.vue';
 import McViewNodes from './viewNodes/mc-view-nodes.vue';
@@ -17,7 +15,6 @@ import McViewNodes from './viewNodes/mc-view-nodes.vue';
 const store = useStore();
 const nodesStore = useNodesStore();
 const addCurriculumStore = useAddCurriculumStore();
-const viewNodesStore = useViewNodesStore();
 
 /**
  * Reload the page to try loading again
@@ -31,20 +28,6 @@ function onRefreshSelected () {
  */
 function onCreateNewSelected () {
     addCurriculumStore.prompt();
-}
-
-/**
- * To further clarify where the current search term hasn't found any code matches
- *
- * @returns { String }
- */
-const currentSelectedNodeTitle = computed(() => viewNodesStore.current.name);
-
-/**
- * Clear the current search query
- */
-function onClearSearchSelected () {
-    viewNodesStore.clearSearch();
 }
 
 </script>
@@ -95,7 +78,7 @@ function onClearSearchSelected () {
     }
 }
 
-.view-nodes {
+.row {
     margin-bottom: 180px; /* provide a minimum space to allow the bottom-drawer.vue */
 }
 
