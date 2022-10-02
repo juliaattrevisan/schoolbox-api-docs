@@ -186,9 +186,9 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
             if (node.isSelected === undefined) {
                 const nodesStore = useNodesStore();
                 const parentNode = findById(nodesStore.nodes.children, node.parent?.id);
-                if (parentNode) {
+                if (parentNode) { //we check the parent node and base the selection on that
                     node.isSelected = parentNode.isSelected;
-                } else {
+                } else { //otherwise it's assumed they're not selected
                     node.isSelected = false;
                 }
             }

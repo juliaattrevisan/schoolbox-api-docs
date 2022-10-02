@@ -168,7 +168,7 @@ export const useNodesStore = defineStore('mcNodes', {
                 children: nodes,
                 enabled: true,
             }
-            nodes.forEach((node) => useSelectedNodesStore().addIsSelected(node));
+            nodes.forEach((node) => useSelectedNodesStore().addIsSelected(node)); //ensure isSelected is kept up to date
         },
 
         /**

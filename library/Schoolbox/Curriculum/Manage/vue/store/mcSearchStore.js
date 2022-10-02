@@ -85,8 +85,8 @@ export const useSearchStore = defineStore(`mcSearch`, {
                     },
                 });
                 this.results = await response.json();
-                const selectedNodesStore = useSelectedNodesStore();
-                this.results.forEach((node) => node.isSelected = selectedNodesStore.isSelected(node)); //ensure checked results are reflected
+                // const selectedNodesStore = useSelectedNodesStore();
+                // this.results.forEach((node) => node.isSelected = selectedNodesStore.isSelected(node)); //ensure selected results are reflected in the search results
             } catch (error) {
                 console.warn(error);
             } finally {
