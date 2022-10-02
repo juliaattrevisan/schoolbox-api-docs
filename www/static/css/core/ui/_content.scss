@@ -1,7 +1,7 @@
 /*
-    Shared Schoolbox styles for 'content', 
+    Shared Schoolbox styles for 'content',
     which is a bit of a catch all for styles that are shared across multiple pages
-    but are just not specific enough to go into a sepearate sass file or into a 
+    but are just not specific enough to go into a sepearate sass file or into a
     more relevant sass file
 */
 
@@ -39,6 +39,21 @@
         margin-bottom: 0;
     }
 }
+
+    .empty-state-flex-centered {
+        @extend .empty-state;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        p {
+            max-width: 50%;
+        }
+        button {
+            background: none;
+            font-size: 0.875rem;
+        }
+    }
 
 // a general error display notifying something couldn't be processed
 .error-state section {
@@ -383,7 +398,7 @@ nav {
     animation: sb-loader 1.2s infinite ease-in-out;
 }
 
-// spin in 3d vertically then horizontally 
+// spin in 3d vertically then horizontally
 @keyframes sb-loader {
     0% {
         transform: perspective(7.5rem) rotateX(0deg) rotateY(0deg);
@@ -518,7 +533,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
         margin: 0 0 0.75rem 0;
         @media #{$small-only} {
             margin: 0 0 0.5rem 0.5rem;
-            dt, 
+            dt,
             dd {
                 padding: 0 0.25rem 0 0;
             }

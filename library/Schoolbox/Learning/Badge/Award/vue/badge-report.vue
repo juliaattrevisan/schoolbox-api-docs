@@ -31,7 +31,7 @@ export default {
         AwardDetailModal,
         BottomDrawer
     },
-    
+
     props: {
         subjectTitle: {
             type: String,
@@ -54,7 +54,7 @@ export default {
             required: true,
         }
     },
-    
+
     data () {
         return {
             studentsData: [], //hold all student data
@@ -69,16 +69,16 @@ export default {
 
         /**
          * No badges to show if there's no students, so show a 'no students' display
-         * 
+         *
          * @returns { Boolean }
          */
         hasStudents () {
-            return this.studentsData.length > 0; 
+            return this.studentsData.length > 0;
         },
 
         /**
          * To determine whether to show the bottom-drawer to award badges to students
-         * 
+         *
          * @returns { Boolean }
          */
         hasSelectedStudents () {
@@ -87,7 +87,7 @@ export default {
 
         /**
          * To display how many students are selected
-         * 
+         *
          * @returns { Boolean }
          */
         selectedStudentsCount () {
@@ -96,7 +96,7 @@ export default {
 
         /**
          * To show an 'indeterminate' state on the header checkbox, currently a dash in the box
-         * 
+         *
          * @returns { Boolean }
          */
         hasSomeStudentsSelected () {
@@ -105,7 +105,7 @@ export default {
 
         /**
          * Activate the select all when all are checked individually
-         * 
+         *
          * @returns { Boolean }
          */
         areAllStudentsSelected () {
@@ -139,23 +139,23 @@ export default {
 
         /**
          * To be able to award badges to multiple students
-         * 
-         * @params { Number } 
-         * @params { Boolean } 
+         *
+         * @params { Number }
+         * @params { Boolean }
          */
         onSelectAllSelected (isChecked) {
             if (isChecked) {
                 this.selectedStudents = this.studentsData.map((student) => student.id); //add in all student ids
             } else {
-                this.selectedStudents = []; //clear all 
+                this.selectedStudents = []; //clear all
             }
         },
 
         /**
          * To be able to award badges to multiple students
-         * 
-         * @params { Number } 
-         * @params { Boolean } 
+         *
+         * @params { Number }
+         * @params { Boolean }
          */
         onStudentSelected (studentID, isChecked) {
             if (isChecked) {
@@ -167,8 +167,8 @@ export default {
 
         /**
          * Open the selected award detail modal
-         * 
-         * @params { Object } 
+         *
+         * @params { Object }
          */
         onBadgeSelected (badge) {
             this.$refs.awardDetailModal.open(badge);
@@ -178,9 +178,9 @@ export default {
          * To update a badge that was previously a goal that is now an achievement
          * There are two scenarios, one is that the badge is already an achievement, in which case
          * the count on the badge will be incremented.
-         * Otherwise the goal is just turned into an achievement by going full colour. 
-         * 
-         * @params { Object } 
+         * Otherwise the goal is just turned into an achievement by going full colour.
+         *
+         * @params { Object }
          */
         onAchievementAwarded (awardedBadge) {
             const student = this.studentsData.find((student) => student.id === awardedBadge.recipient.id);
@@ -188,7 +188,7 @@ export default {
             const badgeToUpdate = studentBadges.find((badge) => badge.badge.id === awardedBadge.badge.id);
             const hasBadgeMatch = studentBadges.find((badge) => badge.badge.id === badgeToUpdate.badge.id && badge.id !== badgeToUpdate.id);
             if (hasBadgeMatch) { //if the badge has already been achieved, increment the count and pull the badge goal out of the list
-                hasBadgeMatch.count++; 
+                hasBadgeMatch.count++;
                 student.badges = studentBadges.filter((badge) => badge.id !== badgeToUpdate.id);
             } else {
                 badgeToUpdate.isGoal = false; //this will trigger the badge to update within badge-report-student.vue
@@ -223,24 +223,24 @@ export default {
     <div class="small-12 island badge-report">
 
         <section class="content">
-            
+
             <div v-if="isDataLoaded && hasStudents">
-                <badge-report-header 
+                <badge-report-header
                     :has-some-students-selected="hasSomeStudentsSelected"
                     :are-all-students-selected="areAllStudentsSelected"
                     @on-select-all-selected="onSelectAllSelected"
                 />
                 <ul class="action-list">
-                    <badge-report-student 
-                        v-for="student in studentsData" 
-                        :key="student.id" 
+                    <badge-report-student
+                        v-for="student in studentsData"
+                        :key="student.id"
                         :student="student"
                         :selected-students="selectedStudents"
                         @on-student-selected="onStudentSelected"
                         @on-badge-selected="onBadgeSelected"
                     />
                 </ul>
-                <award-detail-modal 
+                <award-detail-modal
                     ref="awardDetailModal"
                     @on-achievement-awarded="onAchievementAwarded"
                     :cdn-prefix="this.cdnPrefix"
@@ -248,7 +248,7 @@ export default {
                 />
             </div>
 
-            <div v-else-if="isDataLoaded && !hasStudents" class="empty-state">
+            <div v-else-if="isDataLoaded && !hasStudents" class="empty-state margin-none ">
                 <i class="icon-staff-students"></i>
                 <p>There are currently no users within this group.</p>
             </div>
@@ -306,10 +306,6 @@ export default {
 	a {
 		margin: 0 1px;
 	}
-}
-
-.empty-state {
-    margin: 0; //remove the white space at the bottom when there's no rows
 }
 
 </style>

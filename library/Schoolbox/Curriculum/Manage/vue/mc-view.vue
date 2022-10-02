@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * To view and filter the curriculum codes
+ * To view and filter the curriculum nodes
  */
 
 import { useStore } from './store/manageCurriculumStore';
@@ -41,7 +41,7 @@ function onCreateNewSelected () {
                     Sorry, we are currently unable to load the Curriculum data. Please <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected">refresh the page</a> to try again and contact your support if the problem persists.
                 </div>
             </section>
-            <div v-else-if="nodesStore.hasNoCurriculum" class="empty-state">
+            <div v-else-if="nodesStore.hasNoCurriculum" class="empty-state-flex-centered">
                 <i class="icon-curriculum"></i>
                 <p>There's currently no Curriculum loaded to display.</p>
                 <template v-if="store.hasLoadedOk && !store.isReadOnly">
@@ -62,21 +62,6 @@ function onCreateNewSelected () {
 </template>
 
 <style lang="scss" scoped>
-
-.empty-state {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 200px;
-    p {
-        max-width: 50%;
-    }
-    button {
-        background: none;
-        font-size: 0.875rem;
-    }
-}
 
 .row {
     margin-bottom: 180px; /* provide a minimum space to allow the bottom-drawer.vue */

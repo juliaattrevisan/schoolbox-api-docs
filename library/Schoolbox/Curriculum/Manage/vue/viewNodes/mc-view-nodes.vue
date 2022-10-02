@@ -48,7 +48,7 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
     <div v-if="searchStore.isProcessing">
         <loading-table />
     </div>
-    <div v-else-if="searchStore.hasNoResults" class="empty-state">
+    <div v-else-if="searchStore.hasNoResults" class="empty-state-flex-centered">
         <i class="icon-curriculum"></i>
         <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
         <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
@@ -64,17 +64,6 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
 </template>
 
 <style lang="scss" scoped>
-
-.empty-state {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    button {
-        background: none;
-        font-size: 0.875rem;
-    }
-}
 
 ul {
     list-style: none;
