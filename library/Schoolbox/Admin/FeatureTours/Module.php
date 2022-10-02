@@ -11,7 +11,6 @@ use Twig\Error\LoaderError;
 
 class Module extends BaseModule
 {
-
     protected $basename = "featureTours";
 
 
