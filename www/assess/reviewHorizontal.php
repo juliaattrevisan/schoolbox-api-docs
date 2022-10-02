@@ -115,6 +115,7 @@ if (!isset($this->arg[1])) {
         ],
     ]);
 }
+
 /* Update the reviewed_at for all the latest attempts for a particular assess :D
  * How do you like them apples
  */
@@ -135,6 +136,7 @@ else if ($this->arg[1] == 'finalise') {
 
     $this->localRedir("/learning/assessments/{$assess['assessment_id']}/status");
 }
+
 /* Reviewing attempts for a question
  */
 else {
