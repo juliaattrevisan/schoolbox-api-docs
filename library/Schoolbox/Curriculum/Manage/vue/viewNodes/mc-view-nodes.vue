@@ -5,15 +5,32 @@
  * From here curriclum codes can be selected for further travesal or editing
  */
 
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useViewNodesStore } from './store/mcViewNodesStore';
+import { useSearchStore } from '../store/mcSearchStore';
+import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
 import McViewNode from './mc-view-node.vue'
 
 
 const viewNodesStore = useViewNodesStore();
+const searchStore = useSearchStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
 const nodesContainerEl = ref(null); //to scroll back to top on any selection change
 
+
+/**
+ * To further clarify where the current search term hasn't found any node matches
+ *
+ * @returns { String }
+ */
+const currentSelectedNodeTitle = computed(() => viewNodesStore.current.name);
+
+/**
+ * Clear the current search query
+ */
+function onClearSearchSelected () {
+    searchStore.clear();
+}
 
 /**
  * to scroll back to top on any selection change, otherwise the
@@ -28,9 +45,17 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
 </script>
 
 <template>
-    <ul ref="nodesContainerEl">
+    <div v-if="searchStore.isProcessing">
+        <loading-table />
+    </div>
+    <div v-else-if="searchStore.hasNoResults" class="empty-state">
+        <i class="icon-curriculum"></i>
+        <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
+        <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
+    </div>
+    <ul v-else ref="nodesContainerEl">
         <mc-view-node
-            v-for="node in viewNodesStore.nodesWithSearch"
+            v-for="node in viewNodesStore.nodes"
             :key="node.id"
             :node="node"
             :depth="depth"
@@ -39,6 +64,17 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
 </template>
 
 <style lang="scss" scoped>
+
+.empty-state {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    button {
+        background: none;
+        font-size: 0.875rem;
+    }
+}
 
 ul {
     list-style: none;

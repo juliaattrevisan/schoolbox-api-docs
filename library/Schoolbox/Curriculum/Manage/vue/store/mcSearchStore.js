@@ -11,7 +11,7 @@ import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
 
 
-export const useModalSearchStore = defineStore(`csModalSearch`, {
+export const useSearchStore = defineStore(`mcSearch`, {
 
     state: () => ({
         isProcessing: false, //to notify that an action is taking place,

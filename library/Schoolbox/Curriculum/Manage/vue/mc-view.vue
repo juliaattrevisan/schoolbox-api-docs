@@ -66,11 +66,6 @@ function onClearSearchSelected () {
                     <a href="/curriculum/import" title="Import Curriculum">Import Curriculum</a>
                 </template>
             </div>
-            <div v-else-if="viewNodesStore.hasNoSearchResults" class="empty-state">
-                <i class="icon-curriculum"></i>
-                <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
-                <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
-            </div>
             <section v-else>
                 <fieldset class="content">
                     <div class="small-12 columns">

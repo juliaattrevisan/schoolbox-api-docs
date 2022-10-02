@@ -27,7 +27,7 @@ const isDisabled = computed(() => !viewNodesStore.isActive);
  */
 const placeholder = computed(() => {
     if (isDisabled.value) {
-        return 'Select a Curriculum to enable search...'
+        return 'Select a Curricula to enable search...'
     } else {
         return `Search ${viewNodesStore.current.name} for codes or keywords...`;
     }

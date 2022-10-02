@@ -5,6 +5,7 @@
 
 import { defineStore } from 'pinia';
 import { useNodesStore } from '../../store/mcNodesStore';
+import { useSearchStore } from '../../store/mcSearchStore';
 import { findById } from '../../../js/nodeUtils';
 
 export const DIRECTION = {
@@ -51,15 +52,6 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
         },
 
         /**
-         * the codes found relevant to the search input
-         *
-         * @returns { Array }
-         */
-        nodesWithSearch () {
-            return [this.current];
-        },
-
-        /**
          * the current node selection
          *
          * @returns { Object }
@@ -71,7 +63,22 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
             } else { //otherwise return the root level structure when there's more than one root level node
                 return nodesStore.nodes;
             }
-        }
+        },
+
+        /**
+         * the current nodes to display, which are either just the current selection
+         * or when the search is active the results found within the current selection
+         *
+         * @returns { Array }
+         */
+        nodes () {
+            const searchStore = useSearchStore();
+            if (searchStore.isActive) {
+                return searchStore.results;
+            } else {
+                return [this.current];
+            }
+        },
 
     },
 
