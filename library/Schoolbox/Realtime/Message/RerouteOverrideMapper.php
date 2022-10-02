@@ -194,8 +194,8 @@ class RerouteOverrideMapper extends Mapper
 
         // routes contain results for user 0 (muted in group level) and user $userId (if provided)
         foreach ($routes as $route) {
-            preg_match($routeKeyRegex, $route->getRouteKey(), $matches);
-            $folderId = is_array($matches) ? (int)$matches[1] : null;
+            preg_match($routeKeyRegex, $route->getRouteKey(), $matches, PREG_UNMATCHED_AS_NULL);
+            $folderId = !empty($matches) ? (int)$matches[1] : null;
             if (!$folderId) {
                 continue;
             }
