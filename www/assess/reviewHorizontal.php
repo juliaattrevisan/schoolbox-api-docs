@@ -100,7 +100,7 @@ if (!isset($this->arg[1])) {
         ],
         [
             'text'  => $folder->getName(),
-            'href'  => "/learning/markbook/{$folder->getId()}/term/{$term->getCode()}/",
+            'href'  => "/homepage{$folder->getId()}",
             'class' => ''
         ],
         [
