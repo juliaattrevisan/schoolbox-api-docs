@@ -9,6 +9,7 @@ import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
 import { useNodesStore } from '../store/mcNodesStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
+import { useSearchStore } from '../store/mcSearchStore';
 
 
 const props = defineProps({
@@ -51,6 +52,7 @@ const props = defineProps({
 
 const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
+const searchStore = useSearchStore();
 
 /**
  * To disable selection on certain sitatuions
@@ -93,7 +95,7 @@ const isButton = computed(() => {
         return false;
     } else if (props.node.children?.length === 0) { //there's no children to display, so no point going further
         return false;
-    } else if (viewNodesStore.isSearchActive) { //cant do any navigation while search is active
+    } else if (searchStore.isSearchActive) { //cant do any navigation while search is active
         return false;
     } else {
         return true;
@@ -105,12 +107,12 @@ const isButton = computed(() => {
  *
  * @returns { string }
  */
- const fontWeight = computed(() => isParentNode.value && !viewNodesStore.isSearchActive ? 'bold' : 'normal');
+const fontWeight = computed(() => isParentNode.value && !searchStore.isActive ? 'bold' : 'normal');
 
 /**
  * traverse to the next nodel level
  */
- function onNameSelected () {
+function onNameSelected () {
     viewNodesStore.setNextSelected(props.node.id);
 }
 
@@ -120,23 +122,10 @@ const isButton = computed(() => {
  * @returns { HTML }
  */
 const highlightTitleSearch = computed(() => {
-    if (viewNodesStore.isSearchActive) {
+    if (searchStore.isActive) {
         return highlightSearchInElement(props.title);
     } else {
         return props.title;
-    }
-});
-
-/**
- * To highlight any search selections in the breadcrumbs
- *
- * @returns { HTML }
- */
-const highlightBreadcrumbSearch = computed(() => {
-    if (viewNodesStore.isSearchActive && props.node.breadcrumb) {
-        return highlightSearchInElement(props.node.breadcrumb);
-    } else {
-        return '';
     }
 });
 
@@ -150,7 +139,7 @@ const highlightBreadcrumbSearch = computed(() => {
  */
 function highlightSearchInElement (toHighlight) {
     let highlighted = toHighlight;
-    viewNodesStore.queryWordList.forEach((wordInSearch) => {
+    searchStore.queryWordList.forEach((wordInSearch) => {
         highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
             return `<mark>${match}</mark>`;
         });
@@ -176,7 +165,6 @@ function highlightSearchInElement (toHighlight) {
         class="name"
     >
         <span v-html="highlightTitleSearch"></span>
-        <aside v-if="viewNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
     </div>
 
 </template>
