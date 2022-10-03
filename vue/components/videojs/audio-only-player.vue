@@ -50,7 +50,7 @@ export default {
 
     methods: {
 
-        /** 
+        /**
          * if the file contains a hash, we should ensure the video isn't transcoding prior to displaying
          *
          * @returns { Boolean }
@@ -64,7 +64,7 @@ export default {
             }
         },
 
-        /** 
+        /**
          * ensure the video has finished processing prior to displaying
          *
          */
@@ -78,7 +78,7 @@ export default {
             }
         },
 
-        /** 
+        /**
          * check whether SB has encoded the video yet
          *
          * @returns { Boolean }
@@ -112,19 +112,19 @@ export default {
             });
         },
 
-        /** 
+        /**
          * videojs is ready, dispatch event in case anyone listening and pass in the audio src
          *
          */
         onVideojsReady () {
             this.player.src({
-                src: this.options.audioPlayerSrc, 
+                src: this.options.audioPlayerSrc,
                 type: this.options.audioPlayerType
             });
             this.$emit('on-dimensions-ready', this.$refs.audioContainer.offsetWidth, this.$refs.audioContainer.offsetHeight);
         },
 
-        /** 
+        /**
          * ensure big play button is disabled on play
          *
          */
@@ -133,9 +133,9 @@ export default {
             audioContainer.querySelector('.vjs-big-play-button').classList.add('vjs-hidden');
         },
 
-        /** 
+        /**
          * the waveform has been put into the video component,
-         * which is put at the top of the container, so need to re-apply some 
+         * which is put at the top of the container, so need to re-apply some
          * divs to still behave the same as a standard video
          *
          */
@@ -146,7 +146,7 @@ export default {
             this.updateControlBar(audioContainer);
         },
 
-        /** 
+        /**
          * Put a toggle play/pause over the top of the waveform
          *
          */
@@ -166,10 +166,10 @@ export default {
                     this.player.pause();
                 }
             });
-            audioContainer.appendChild(playToggle);  
+            audioContainer.appendChild(playToggle);
         },
 
-        /** 
+        /**
          * Move the big play button above the waveform and ensure behaves as expected
          *
          */
@@ -182,13 +182,13 @@ export default {
             audioContainer.appendChild(bigPlayButton);
         },
 
-        /** 
+        /**
          * Put the control above the waveform
          *
          */
         updateControlBar (audioContainer) {
             const controlBar = audioContainer.querySelector('.vjs-control-bar');
-            audioContainer.appendChild(controlBar);   
+            audioContainer.appendChild(controlBar);
         }
 
     }
@@ -198,7 +198,7 @@ export default {
 
 <template>
     <div ref="audioContainer">
-        <img v-if="isVideoEncoding" class="processing-img" src="/static/images/core/video-processing.gif">
+        <img v-if="isVideoEncoding" class="processing-img" src="`${cdnPrefix}images/core/video-processing.gif`">
         <video v-else ref="audioPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>

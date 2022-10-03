@@ -51,7 +51,7 @@ export default {
 
     methods: {
 
-        /** 
+        /**
          * if the file contains a hash, we should ensure the video isn't transcoding prior to displaying
          *
          * @returns { Boolean }
@@ -65,7 +65,7 @@ export default {
             }
         },
 
-        /** 
+        /**
          * ensure the video has finished processing prior to displaying
          *
          */
@@ -79,7 +79,7 @@ export default {
             }
         },
 
-        /** 
+        /**
          * check whether SB has encoded the video yet
          *
          * @returns { Boolean }
@@ -101,34 +101,34 @@ export default {
             }
         },
 
-        /** 
+        /**
          * set up videojs
          *
          */
         initVideojs () {
-            
+
             this.$nextTick(() => {
-                
+
                 this.videoHeight = this.$refs.videoPlayer.offsetHeight;
-                
+
                 this.player = videojs(this.$refs.videoPlayer, this.options, this.onVideoPlayerReady);
                 this.player.on('error', this.onVideoError);
-                gsap.from(this.$refs.videoPlayer, 0.5, { opacity: 0, scale: 1.025 } ); 
+                gsap.from(this.$refs.videoPlayer, 0.5, { opacity: 0, scale: 1.025 } );
 
             });
-           
+
         },
 
-        /** 
-         * there's no fully cross-browser accurate load detection, 
-         * and as all we need is height detection, just use an interval 
+        /**
+         * there's no fully cross-browser accurate load detection,
+         * and as all we need is height detection, just use an interval
          *
          */
         onVideoPlayerReady () {
             this.checkInterval = setInterval(this.checkVideoHeight, 500);
         },
 
-        /** 
+        /**
          * there's no fully cross-browser accurate load detection, and as all we need is height detection,
          * just use an interval. This mainly relates to safari ios, which doesn't load a input captured video.
          *
@@ -142,7 +142,7 @@ export default {
             }
         },
 
-        /** 
+        /**
          * unable to load for whatever reason
          *
          */
@@ -157,7 +157,7 @@ export default {
 
 <template>
     <div ref="container">
-        <img v-if="isVideoEncoding" class="processing-img" src="/static/images/core/video-processing.gif">
+        <img v-if="isVideoEncoding" class="processing-img" src="`${cdnPrefix}images/core/video-processing.gif`">
         <video v-else ref="videoPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>
