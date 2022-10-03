@@ -21,12 +21,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 class Prepare implements IStrategy
 {
     /**
-     * An arbitrarily-chosen string to denote where these events came from
-     */
-    public const EVENT_IMPORT_IDENTIFIER = 'suds_compass';
-
-
-    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -124,9 +118,9 @@ class Prepare implements IStrategy
              */
             $query = "
                 UPDATE {$this->eventMapper->getTable()}
-                SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
-                WHERE {$this->eventMapper->getTable()}.classification = :classification
-                AND {$this->eventMapper->getTable()}.`source` = :source  
+                SET updated_at = '0000-00-00 00:00:00'
+                WHERE classification = :classification
+                AND source = :source
             ";
 
             $statement = $this->eventMapper->getDatabase()->prepare($query);
