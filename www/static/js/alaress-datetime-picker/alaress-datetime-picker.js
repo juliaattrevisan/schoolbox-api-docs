@@ -240,8 +240,9 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         } else {
             $datebtn.addClass("no-text");
         }
-
-        element.data("dateButton", $datebtn);
+        element
+            .data("dateButton", $datebtn)
+            .after($datebtn);
     }
 
     var $datepickerButton = $(this).siblings("[data-adtp-btn]");
