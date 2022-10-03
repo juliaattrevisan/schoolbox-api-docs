@@ -91,7 +91,7 @@ if (!isset($this->arg[1])) {
 
     /* Render out breadcrumbs
      */
-    $trail   = new Breadcrumbs();
+    $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text'  => 'Learning',
@@ -100,7 +100,7 @@ if (!isset($this->arg[1])) {
         ],
         [
             'text'  => $folder->getTitle(),
-            'href'  => "/homepage{$folder->getId()}",
+            'href'  => "/homepage/{$folder->getId()}",
             'class' => ''
         ],
         [
