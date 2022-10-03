@@ -361,7 +361,7 @@ class DataSource
                 $student = $userMapper->hydrate($row, 's');
                 $record->setStudent($student);
 
-                /** @var Severity $severity */
+                /** @var PastoralSeverity $severity */
                 $severity = $severityMapper->hydrate($row, 'sev');
                 $record->setSeverity($severity);
 
