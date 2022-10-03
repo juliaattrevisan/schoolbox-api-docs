@@ -80,7 +80,11 @@ if ($enabled) {
     // aaaand put 0 at the start
     ksort($dayTests);
 
-    foreach (\Schoolbox\RoleMapper::getInstance()->findAll() as $role) {
+    $roleMapper = \Schoolbox\RoleMapper::getInstance();
+    $pb = $roleMapper->getPredicateBuilder()->notEquals('group_type', \Schoolbox\Role::GUEST);
+    $roles = $roleMapper->findByPredicates($pb);
+
+    foreach ($roles as $role) {
 
         /** @var \Schoolbox\Role $role */
 
