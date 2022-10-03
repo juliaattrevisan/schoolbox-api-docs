@@ -147,10 +147,10 @@ class MapTest extends TestCase
             [],
         ];
 
-        yield 'backslashes do not escape' => [
+        yield 'backslashes escape' => [
             ['test\\*' => '1'],
             ['test*'],
-            [],
+            ['1'],
         ];
 
         // The patterns which Jez wants to match on:
