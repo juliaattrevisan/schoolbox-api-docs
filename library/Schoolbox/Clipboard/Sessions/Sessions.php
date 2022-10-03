@@ -14,6 +14,8 @@ use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\Hierarchy\Registry;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
+use Schoolbox\Fixtures\Venue\Model;
+use Schoolbox\Mapper\Exception;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -357,7 +359,7 @@ class Sessions implements IStrategy
 
                     /* Set up a Matchup instance for this team; they aren't vsing anyone
                      */
-                    $venue = $this->findVenue($session['locationData']['name'] ?? null);
+                    $venue = $this->findVenue($session['locationData'] ?? []);
 
                     $matchupName = trim($session['title']);
 
@@ -537,21 +539,26 @@ class Sessions implements IStrategy
      * If a venue name was not specified, generate a placeholder
      * (venues are optional in clipboard)
      *
-     * @param string|null $venueName
-     * @return \Schoolbox\Fixtures\Venue\Model|null
+     * @param array|null $locationData
+     * @return Model|null
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws Exception
      * @throws \UnexpectedValueException
      */
-    private function findVenue(?string $venueName): ?\Schoolbox\Fixtures\Venue\Model
+    private function findVenue(?array $locationData): ?\Schoolbox\Fixtures\Venue\Model
     {
+        /* Name or address not set?
+         * Can't work with this; just leave
+         */
+        if (!isset($locationData['name'], $locationData['address'])) {
+            return null;
+        }
+
         /* If venue name wasn't specified, find a placeholder
          * generating one if it doesn't already exist
          */
-        if ('' === trim((string)$venueName)) {
-            return null;
-        }
+        $venueName = trim((string)$locationData['name']);
+        $venueAddress = trim((string)$locationData['address']);
 
         /* Set up a Venue instance for this Matchup,
          * reusing an existing one if possible
@@ -561,10 +568,17 @@ class Sessions implements IStrategy
         } catch (\Schoolbox\Mapper\Exception $e) {
             $venue = $this->venueMapper->createModel()
                 ->setName($venueName);
+        }
 
-            if ($this->perform) {
-                $this->venueMapper->save($venue);
-            }
+        /* Update existing address to whatever it now is,
+         * in case a) you've already imported previously and didn't have an address back then
+         * or b) you had a venue called something generic like "The Usual Place" which has
+         * a different address contextually
+         */
+        $venue->setAddress($venueAddress);
+
+        if ($this->perform) {
+            $this->venueMapper->save($venue);
         }
 
         return $venue;
