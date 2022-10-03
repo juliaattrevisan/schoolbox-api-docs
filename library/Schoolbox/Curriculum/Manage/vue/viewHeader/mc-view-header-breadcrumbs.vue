@@ -13,7 +13,7 @@
         /**
          * to disable certain events when editing is taking place
          */
-        isUpdatingOrAdding: {
+        isDisabled: {
             type: Boolean,
             required: true,
         },
@@ -29,7 +29,7 @@
                 v-for="breadcrumb in viewNodesStore.breadcrumbs"
                 :key="breadcrumb.id"
                 :breadcrumb="breadcrumb"
-                :is-updating-or-adding="props.isUpdatingOrAdding"
+                :is-disabled="props.isDisabled"
             />
         </TransitionGroup>
     </template>

@@ -19,7 +19,7 @@ const props = defineProps({
     /**
      * to disable certain events when editing is taking place
      */
-    isUpdatingOrAdding: {
+    isDisabled: {
         type: Boolean,
         required: true,
     },
@@ -38,7 +38,7 @@ function onSelected () {
 
 <template>
     <li>
-        <span v-if="props.isUpdatingOrAdding">
+        <span v-if="props.isDisabled">
             {{ props.breadcrumb.name }}
         </span>
         <a v-else

@@ -14,7 +14,7 @@ const props = defineProps({
     /**
      * to disable certain events when editing is taking place
      */
-    isUpdatingOrAdding: {
+     isDisabled: {
         type: Boolean,
         required: true,
     },
@@ -28,7 +28,7 @@ const searchStore = useSearchStore();
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => !viewNodesStore.isActive || props.isUpdatingOrAdding);
+const isDisabled = computed(() => !viewNodesStore.isActive || props.isDisabled);
 
 /**
  * Only enable search once a first node is selected
