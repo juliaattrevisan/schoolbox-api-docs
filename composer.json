@@ -111,7 +111,8 @@
         "enqueue/enqueue": "^0.10.15",
         "enqueue/redis": "^0.10.9",
         "imangazaliev/didom": "^2.0",
-        "egulias/email-validator": "^3.2"
+        "egulias/email-validator": "^3.2",
+        "phlak/splat": "^4.0"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
