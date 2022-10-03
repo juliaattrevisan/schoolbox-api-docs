@@ -114,12 +114,11 @@ if (!isset($this->arg[1])) {
             'class' => 'active'
         ],
     ]);
-}
+} elseif ($this->arg[1] == 'finalise') {
+    /* Update the reviewed_at for all the latest attempts for a particular assess :D
+     * How do you like them apples
+     */
 
-/* Update the reviewed_at for all the latest attempts for a particular assess :D
- * How do you like them apples
- */
-else if ($this->arg[1] == 'finalise') {
     // Retrieve all attempts
     $attemptMapper = QuizAttemptMapper::getInstance();
     $attempts = $attemptHandler->retrieveLatestReviewableAttemptIds($assess['assess_id'], true);
@@ -135,11 +134,10 @@ else if ($this->arg[1] == 'finalise') {
     }
 
     $this->localRedir("/learning/assessments/{$assess['assessment_id']}/status");
-}
+} else {
+    /* Reviewing attempts for a question
+     */
 
-/* Reviewing attempts for a question
- */
-else {
     if (!is_numeric($this->arg[1])) {
         error(119);
     }
