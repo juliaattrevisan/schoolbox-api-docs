@@ -547,7 +547,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         preg_match_all($pattern, $currentAnswer['answer'], $matches);
 
         $page->setVar(array(
-            'ANSWER' => Scrub::html($currentAnswer['answer']),
+            'CORRECT_ANSWER' => Scrub::html($currentAnswer['answer']),
         ));
 
         $page->parse('answerTop_block', 'answerTop', true);
