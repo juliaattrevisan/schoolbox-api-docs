@@ -211,7 +211,7 @@ class Model implements ISoftDeletable
     public function setFileName(?string $filename): self
     {
         //if blank or empty use default value
-        if ('' === trim($filename)) {
+        if ('' === trim((string)$filename)) {
             $filename = "{external_id}/Semester Report - {firstname} {lastname}.pdf";
         }
 
