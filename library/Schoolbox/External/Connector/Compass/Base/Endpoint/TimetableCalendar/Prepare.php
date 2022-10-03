@@ -147,18 +147,20 @@ class Prepare implements IStrategy
 
             $this->log->debug('Purged timetable event overrides');
 
+            /* Stage existing timetable events for later deletion if they were
+             * never touched during the import
+             */
             $query = "
                 UPDATE {$this->eventMapper->getTable()}
-                INNER JOIN {$this->overridesMapper->getTable()} seuo ON seuo.event_id = {$this->eventMapper->getTable()}.id
-                SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
-                WHERE {$this->eventMapper->getTable()}.classification = :classification
-                AND {$this->eventMapper->getTable()}.`source` = :source  
+                SET updated_at = '0000-00-00 00:00:00'
+                WHERE classification = :classification
+                AND source = :source
             ";
 
             $statement = $this->eventMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => $this->source,
+                'source' => $this->source
             ]);
 
             /* Truncate other data entirely
