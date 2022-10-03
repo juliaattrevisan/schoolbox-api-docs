@@ -271,10 +271,6 @@ class Profile implements IStrategy
         ]);
 
         foreach ($students['d'] as $student) {
-            if (!(new Watchlist())->isOnWatchlist($student['lastName'], ['DU BRUYN'])) {
-                continue;
-            }
-
             $externalId = $this->helper->findExternalId($student['importIdentifiers']);
             $academicHouse = $this->findHouse($student['organisationMilestones']);
             $boardingHouseName = '';
@@ -357,7 +353,6 @@ class Profile implements IStrategy
             /* If they're not in this baseRole, skip them
              */
             if (!$this->isInBaseRole(self::BASEROLE_STUDENT, $student['organisationMilestones'])) {
-                print_r($student['organisationMilestones']);
                 $this->log->debug(sprintf(
                     'Skipping %s %s (%s) - they do not have an active student baseRole',
                     $firstname,
