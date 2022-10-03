@@ -48,12 +48,12 @@
                         <label for="name" class="required">Name</label>
                         <input type="text" name="name" id="name" value="{{ venue.name }}" required/>
 
-                        <label>
-                            Location
-                            <span data-tooltip class="hint has-tip tip-top" title="Select the venue by clicking its location on the map, scrolling and zooming as required.">?</span>
-                        </label>
-
                         {% if venue.address or (venue.latitude and venue.longitude) %}
+                            <label>
+                                Location
+                                <span data-tooltip class="hint has-tip tip-top" title="Select the venue by clicking its location on the map, scrolling and zooming as required.">?</span>
+                            </label>
+
                             {% import '@sportsfixturesMatch/macro/map.twig' as matchMap %}
 
                             {% if googleApiKey %}
@@ -61,15 +61,11 @@
                             {% endif %}
                         {% endif %}
 
-                        <input type="hidden" name="latitude" value="{{ venue.latitude }}" />
-                        <input type="hidden" name="longitude" value="{{ venue.longitude }}" />
-
                         <label>
-                            Closest Street Address
-                            <span data-tooltip class="hint has-tip tip-top" title="This will automatically update when you click a point on the map, but you can override it if you need to.">?</span>
+                            Street Address
+                            <span data-tooltip class="hint has-tip tip-top" title="Enter the street address of your venue.">?</span>
                             <input type="text" name="address" value="{{ venue.address }}" maxlength="255"/>
                         </label>
-
                     </div>
                 </fieldset>
             </section>
