@@ -19,6 +19,7 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Audience\ColorHelper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -311,15 +312,20 @@ class Controller extends Base
     {
         $records = $this->pastoralDataSource->findByTag($this->getUser(), $tag);
 
+        $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
+        $severityColors = $showSeverity ? $this->getSeverityColors() : [];
+
         // And spit this thing out
 
         $this->getResponse()->content->set(
             [
-                'template' => '@pastoralReportBuilder/report_tags.twig',
+                'template' => '@pastoralReportBuilder/report_results.twig',
                 'data'     => [
-                    'tag'          => $tag,
-                    'results'      => $records,
-                    'showSeverity' => $this->getConfigLoader()->get('pastoral_severity'),
+                    'title'          => "Records By Tag - {$tag->getName()}",
+                    'export'         => false,
+                    'results'        => $records,
+                    'showSeverity'   => $showSeverity,
+                    'severityColors' => $severityColors,
                 ],
                 'title'    => 'Pastoral Tag Report',
             ]
@@ -354,15 +360,21 @@ class Controller extends Base
         $auditRecord->setSearchResult(implode(',', $searchResults));
         $pastoralAuditMapper->save($auditRecord);
 
+        $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
+        $severityColors = $showSeverity ? $this->getSeverityColors() : [];
+
         // And spit this thing out
 
         $this->getResponse()->content->set(
             [
                 'template' => '@pastoralReportBuilder/report_results.twig',
                 'data'     => [
-                    'results'      => $records,
-                    'report'       => $report,
-                    'showSeverity' => $this->getConfigLoader()->get('pastoral_severity'),
+                    'title'          => $report->getName(),
+                    'export'         => true,
+                    'results'        => $records,
+                    'report'         => $report,
+                    'showSeverity'   => $showSeverity,
+                    'severityColors' => $severityColors,
                 ],
                 'title'    => $report->getName(),
             ]
@@ -704,5 +716,28 @@ class Controller extends Base
     private function getCsv(?array $var): ?string
     {
         return is_array($var) ? implode(',', $var) : null;
+    }
+
+    /**
+     * Returns array of severities with colour in format of
+     * severity id => ['back' => background colour, 'fore' => foreground colour]
+     * @return array
+     */
+    private function getSeverityColors(): array
+    {
+        $severityColors = [];
+        $severities     = $this->pastoralSeverityMapper->findAll()->indexBy('id');
+        $transformer    = new ColorHelper();
+        $colorFactory   = $transformer->getColorFactory();
+        foreach ($severities as $severityId => $severity) {
+            if (!$severity->getColor()) {
+                continue;
+            }
+            $severityColors[$severityId] = [
+                'back' => $severity->getColor(),
+                'fore' => $transformer->calculateForeground($colorFactory->build($severity->getColor()))->getAsRgba(),
+            ];
+        }
+        return $severityColors;
     }
 }

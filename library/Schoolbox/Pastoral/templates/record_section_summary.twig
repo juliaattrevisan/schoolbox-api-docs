@@ -33,7 +33,13 @@
 
                     {% if record.severity and config.pastoral_severity %}
                         <dt class="small-4 medium-3 columns">{{ locale.severity.proper }}:</dt>
-                        <dd class="small-8 medium-9 columns">{{ record.severity.name }}</dd>
+                        <dd class="small-8 medium-9 columns">
+                            {% if severityColor %}
+                                <span class="label" style="background-color:{{ record.severity.color }};color:{{ severityColor }}">{{ record.severity.name }}</span>
+                            {% else %}
+                                {{ record.severity.name }}
+                            {% endif %}
+                        </dd>
                     {% endif %}
 
                     <dt class="small-4 medium-3 columns">Type:</dt>

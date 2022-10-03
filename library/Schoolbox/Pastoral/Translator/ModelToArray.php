@@ -91,6 +91,7 @@ class ModelToArray
                     'id'       => $model->getSeverity()->getId(),
                     'name'     => $model->getSeverity()->getName(),
                     'sequence' => $model->getSeverity()->getSequence(),
+                    'color'    => $model->getSeverity()->getColor(),
                 ]
                 : null,
             'points'                 => $model->getPoints(),

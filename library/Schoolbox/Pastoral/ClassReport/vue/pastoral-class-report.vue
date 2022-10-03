@@ -204,7 +204,7 @@ export default {
                                 </div>
 
                                 <div class="text-container">
-                                    <h4><a :href="studentData.student._links.profile" title="View profile" class="name">
+                                    <h4><a :href="`/pastoral/student/${ studentData.student.id }`" title="View all pastoral records" class="name">
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
                                     </a></h4>
                                     <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
@@ -216,7 +216,9 @@ export default {
                                                      :alt="`Profile photo of ${record.createdBy.fullName}`"
                                                      :title="`Created by ${ record.createdBy.fullName }`"
                                                      class="portrait"/>
-                                                <span>{{ record.heading }}</span>
+                                                <span>{{ record.heading }}
+                                                    <span v-if="record.severity?.color" class="circle" :style="'background-color:'+record.severity?.color" :title="record.severity?.name"></span>
+                                                </span>
                                             </a>
                                             <div class="time-container">
                                                 <template v-if="record.createdAt !== record.updatedAt">

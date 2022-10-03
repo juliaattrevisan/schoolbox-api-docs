@@ -291,38 +291,6 @@ class DataSource
                 $parentChildMap[$record->getParent()->getId()] = $record->getId();
             }
         }
-
-        // TODO: SA-9641
-        // Hiding linked records from student pastoral page for now to prevent performance issue.
-        if (null === $linkedStudentId) {
-            return $studentRecords;
-        }
-
-        // get linked records to the student records found
-        $linkedRecords = $this->findRawRecords($viewer, null, $typeId, $subtypeId, null, null, null, $studentRecords->keys());
-
-        /** @var Model $linkedRecord */
-        foreach ($linkedRecords as $linkedRecord) {
-            // attach current linked record to a proper student record
-            if ($linkedRecord->getParent() && $studentRecords->keyExists($linkedRecord->getParent()->getId())) {
-                // parent of the current linked record is a student record
-                $targetRecord = $studentRecords->offsetGet($linkedRecord->getParent()->getId());
-                $targetRecord->setRelatedRecords($targetRecord->getRelatedRecords()->add($linkedRecord));
-                $linkedRecord->setParent($targetRecord);
-            } elseif ($linkedRecord->getParent() && array_key_exists($linkedRecord->getParent()->getId(), $parentChildMap)) {
-                // parent of the current linked parent is a parent of a student record
-                $siblingRecordId = $parentChildMap[$linkedRecord->getParent()->getId()];
-                $targetRecord    = $studentRecords->offsetGet($siblingRecordId);
-                $targetRecord->setRelatedRecords($targetRecord->getRelatedRecords()->add($linkedRecord));
-            } elseif (array_key_exists($linkedRecord->getId(), $parentChildMap)) {
-                // the current linked record is the parent of a student record
-                $siblingRecordId = $parentChildMap[$linkedRecord->getId()];
-                $targetRecord    = $studentRecords->offsetGet($siblingRecordId);
-                $targetRecord->setRelatedRecords($targetRecord->getRelatedRecords()->add($linkedRecord));
-                $targetRecord->setParent($linkedRecord);
-            }
-        }
-
         return $studentRecords;
     }
 
@@ -355,11 +323,13 @@ class DataSource
                 {$this->mapper->getColumnString('p')},
                 {$this->mapper->getJoinColumnString('owner', 'o')},
                 {$this->mapper->getJoinColumnString('student', 's')},
-                {$this->mapper->getJoinColumnString('modifiedBy', 'm')}
+                {$this->mapper->getJoinColumnString('modifiedBy', 'm')},
+                {$this->mapper->getJoinColumnString('severity', 'sev')}
             FROM       {$this->mapper->getTable()} p
             INNER JOIN {$this->mapper->getJoinSql('student', 'p', 's')}
             INNER JOIN {$this->mapper->getJoinSql('owner', 'p', 'o', true)}
             LEFT JOIN  {$this->mapper->getJoinSql('modifiedBy', 'p', 'm', true)}
+            LEFT JOIN  {$this->mapper->getJoinSql('severity', 'p', 'sev', true)}
             WHERE s.deleted_at IS NULL
                 AND {$where}
             GROUP BY p.id
@@ -375,6 +345,8 @@ class DataSource
 
         // hydrate
         $userMapper = $this->mapper->getJoinMapper('owner');
+        $severityMapper = $this->mapper->getJoinMapper('severity');
+
         $records    = Model::createCollection();
         foreach ($rows as $row) {
             try {
@@ -388,6 +360,11 @@ class DataSource
                 /** @var User $student */
                 $student = $userMapper->hydrate($row, 's');
                 $record->setStudent($student);
+
+                /** @var Severity $severity */
+                $severity = $severityMapper->hydrate($row, 'sev');
+                $record->setSeverity($severity);
+
             } catch (MapperException $e) {
                 // noop
                 continue;
