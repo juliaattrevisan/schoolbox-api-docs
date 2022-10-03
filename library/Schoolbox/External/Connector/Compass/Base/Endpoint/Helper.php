@@ -14,7 +14,6 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
  */
 class Helper
 {
-
     /**
      * @var IApi
      */

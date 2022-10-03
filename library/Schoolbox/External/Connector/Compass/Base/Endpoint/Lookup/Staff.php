@@ -13,7 +13,6 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Profile\Profile;
 
-
 /**
  * Some Compass Timetable events don't have enrolments, such as yard duties and other
  * non-academic classes; these have attendees instead, and they're referenced by
