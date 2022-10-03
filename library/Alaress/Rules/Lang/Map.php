@@ -7,6 +7,8 @@
 
 namespace Alaress\Rules\Lang;
 
+use PHLAK\Splat\Glob;
+
 /**
  * A language construct for mapping SIS output (possibly modified with tokens)
  * to one or more final values.
@@ -84,10 +86,7 @@ class Map implements Construct
         $output = [];
         foreach ($inputValue as $input) {
             foreach ($this->map as $mapKey => $mapVal) {
-                // TODO figure out what FNM_PERIOD and FNM_PATHNAME do
-                // TODO consider whether to just split `$mapKey` on space/comma
-                //      and then compare
-                if ($mapKey === $input || fnmatch($mapKey, $input, FNM_CASEFOLD | FNM_NOESCAPE)) {
+                if ($mapKey === $input || Glob::match($mapKey, $input)) {
                     if (is_array($mapVal)) {
                         $output = array_merge($output, $this->flattenArray($mapVal));
                     } else {

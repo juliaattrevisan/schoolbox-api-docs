@@ -238,42 +238,42 @@ class MapTest extends TestCase
 
         // Extended matches not supported by fnmatch
         yield 'comma-separated list: single pattern, match at start of input' => [
-            ['?(zero|*,zero|zero,*|*,zero,*)' => '1'],
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
             ['zero,match,one'],
             ['1'],
         ];
         yield 'comma-separated list: single pattern, match in middle of input' => [
-            ['?(zero|*,zero|zero,*|*,zero,*)' => '1'],
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
             ['match,zero,one'],
             ['1'],
         ];
         yield 'comma-separated list: single pattern, match at end of input' => [
-            ['?(zero|*,zero|zero,*|*,zero,*)' => '1'],
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
             ['match,one,zero'],
             ['1'],
         ];
         yield 'comma-separated list: single pattern, match equals input' => [
-            ['?(zero|*,zero|zero,*|*,zero,*)' => '1'],
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
             ['zero'],
             ['1'],
         ];
         yield 'comma-separated list: single pattern, partial match at start of input' => [
-            ['?(zero|*,zero|zero,*|*,zero,*)' => '1'],
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
             ['zeroo,match,one'],
             [],
         ];
         yield 'comma-separated list: single pattern, partial match in middle of input' => [
-            ['?(zero|*,zero|zero,*|*,zero,*)' => '1'],
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
             ['match,zeroo,one'],
             [],
         ];
         yield 'comma-separated list: single pattern, partial match at end of input' => [
-            ['?(zero|*,zero|zero,*|*,zero,*)' => '1'],
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
             ['match,one,zeroo'],
             [],
         ];
         yield 'comma-separated list: single pattern, partial match equals input' => [
-            ['?(zero|*,zero|zero,*|*,zero,*)' => '1'],
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
             ['zeroo'],
             [],
         ];
