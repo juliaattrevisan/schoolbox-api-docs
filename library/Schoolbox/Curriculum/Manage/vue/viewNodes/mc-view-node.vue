@@ -16,6 +16,7 @@ import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 import { useAddCurriculumStore } from '../store/mcAddCurriculumStore';
 import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
 import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
+import { useSearchStore } from '../store/mcSearchStore';
 import McViewNodeCheckbox from './mc-view-node-checkbox.vue';
 import McViewNodeName from './mc-view-node-name.vue';
 import McViewNodeActions from './mc-view-node-actions.vue';
@@ -53,6 +54,7 @@ const activeNodeStore = useActiveNodeStore();
 const addCurriculumStore = useAddCurriculumStore();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
+const searchStore = useSearchStore();
 const viewNodeEl = ref(null); //to animate the node
 const isNew = ref(false); //to highlight if the node has just been added
 const justUpdated = ref(false); //to highlight if the node has just been updated
@@ -131,7 +133,13 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
  *
  * @returns { String }
  */
- const borderBottomColour = computed(() => props.depth === 0 ? `var(--body-foreground-h1)` : `var(--body-background)`);
+const borderBottomColour = computed(() => {
+    if (searchStore.isActive || props.depth !== 0) {
+        return `var(--body-background)`;
+    } else if (props.depth === 0) {
+        return `var(--body-foreground-h1)`;
+    }
+});
 
 /**
  * If this is the active node being updated

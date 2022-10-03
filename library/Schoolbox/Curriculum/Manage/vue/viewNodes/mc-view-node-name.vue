@@ -89,13 +89,13 @@ const isDisabled = computed(() => {
  * @returns { Boolean }
  */
 const isButton = computed(() => {
-    if (isParentNode.value) { //is the parent node, which we don't
+    if (searchStore.isActive) { //when search is active, we can jump to the selected node
+        return true;
+    } else if (isParentNode.value) { //is the parent node, which we can't select
         return false;
     } else if (props.node.children === null) { //the children haven't been loaded
         return false;
     } else if (props.node.children?.length === 0) { //there's no children to display, so no point going further
-        return false;
-    } else if (searchStore.isSearchActive) { //cant do any navigation while search is active
         return false;
     } else {
         return true;
@@ -158,7 +158,7 @@ function highlightSearchInElement (toHighlight) {
         @click.prevent="onNameSelected"
         @keyup.enter="onNameSelected"
     >
-        {{ props.title }}
+        <span v-html="highlightTitleSearch"></span>
     </button>
     <div
         v-else
@@ -186,11 +186,6 @@ function highlightSearchInElement (toHighlight) {
     font-size: 1rem;
     font-weight: v-bind(fontWeight);
     width: 100%;
-}
-
-aside {
-    font-size: 0.725rem;
-    font-style: italic;
 }
 
 </style>
