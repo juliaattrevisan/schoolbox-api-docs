@@ -55,6 +55,7 @@ class Model implements ISoftDeletable
     private ?\Schoolbox\Resource\Storage\Model $logo = null;
     private ?string $options = null;
     private ?\Schoolbox\User $updatedBy = null;
+    private ?string $fileName = null;
 
 
     /**
@@ -187,6 +188,39 @@ class Model implements ISoftDeletable
     public function setUpdatedBy(?User $updatedBy): self
     {
         $this->updatedBy = $updatedBy;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFileName(): ?string
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * Dynamic filename structure to allow the user to specify the format for the reports.
+     * if attempting to save a blank fileName, it will use a sane default of
+     * `{external_id}/Semester Report - {firstname} {lastname}.pdf`
+     * This will also append .pdf if it is missing from the input
+     *
+     * @param null|string $filename
+     * @return $this
+     */
+    public function setFileName(?string $filename): self
+    {
+        //if blank or empty use default value
+        if ('' === trim($filename)) {
+            $filename = "{external_id}/Semester Report - {firstname} {lastname}.pdf";
+        }
+
+        //if missing .pdf then append that now
+        if (!str_ends_with($filename, '.pdf')) {
+            $filename .= '.pdf';
+        }
+
+        $this->fileName = $filename;
         return $this;
     }
 }
