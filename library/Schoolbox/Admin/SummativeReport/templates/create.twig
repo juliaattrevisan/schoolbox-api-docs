@@ -276,6 +276,18 @@
                                 {% endfor %}
                             </select>
                         </div>
+
+                        <div class="small-12 columns">
+                            <label for="report-filename">Filename</label>
+                            <p class="meta">
+                                You may use the following tokens that will be substituted with the
+                                students details on creation:
+                                [externalId], [firstname], [surname], [year].
+                                <br>
+                                .pdf will be appended automatically. Default is `[externalID]/Semester Report - [firstname] [surname]`
+                            </p>
+                            <input type="text" id="report-filename" name="filename" maxlength="255" value="{{ report.filename ?? '[externalID]/Semester Report - [firstname] [surname]' }}" />
+                        </div>
                     </fieldset>
 
                     <fieldset class="content">

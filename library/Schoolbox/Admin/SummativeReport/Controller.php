@@ -347,7 +347,8 @@ class Controller extends ConfigController
         $report->setTitle($postData['title'])
             ->setIntroduction($postData['introduction'])
             ->setOptions($options)
-            ->setUpdatedBy($this->getUser());
+            ->setUpdatedBy($this->getUser())
+            ->setFileName(trim((string)$postData['fileName']));
 
         /* If any Logo was provided, remember it
          * Otherwise clear it

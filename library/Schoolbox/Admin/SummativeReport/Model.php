@@ -202,8 +202,7 @@ class Model implements ISoftDeletable
     /**
      * Dynamic filename structure to allow the user to specify the format for the reports.
      * if attempting to save a blank fileName, it will use a sane default of
-     * `{external_id}/Semester Report - {firstname} {lastname}.pdf`
-     * This will also append .pdf if it is missing from the input
+     * `[externalID]/Semester Report - [firstname] [surname]`
      *
      * @param null|string $filename
      * @return $this
@@ -212,12 +211,12 @@ class Model implements ISoftDeletable
     {
         //if blank or empty use default value
         if ('' === trim((string)$filename)) {
-            $filename = "{external_id}/Semester Report - {firstname} {lastname}.pdf";
+            $filename = "[externalID]/Semester Report - [firstname] [surname]";
         }
 
-        //if missing .pdf then append that now
-        if (!str_ends_with($filename, '.pdf')) {
-            $filename .= '.pdf';
+        //if the name contains .pdf then remove that now, it will be appended when it is sent out
+        if (str_ends_with($filename, '.pdf')) {
+            $filename = substr($filename, 0, -4);
         }
 
         $this->fileName = $filename;
