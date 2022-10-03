@@ -8,8 +8,7 @@
 import { computed } from 'vue';
 import { UNSET_ID } from '../store/mcNodesStore';
 import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
-
-const selectedNodesStore = useSelectedNodesStore();
+import { useSearchStore } from '../store/mcSearchStore';
 
 
 const props = defineProps({
@@ -36,12 +35,22 @@ const props = defineProps({
     },
 });
 
+const selectedNodesStore = useSelectedNodesStore();
+const searchStore = useSearchStore();
+
 /**
  * Dont add a checklist on the very first level node
+ * or when the search is active
  *
  * @returns { Boolean }
  */
-const isIdSet = computed(() => props.node.id !== UNSET_ID);
+const isVisible = computed(() => {
+    if (props.node.id !== UNSET_ID && !searchStore.isActive) {
+        return true;
+    } else {
+        return false;
+    }
+});
 
 /**
  * if the node is a child of one that's selected but is not in
@@ -74,7 +83,7 @@ function onChange (isChecked) {
 </script>
 
 <template>
-    <div v-if="isIdSet" class="checklist">
+    <div v-if="isVisible" class="checklist">
         <input
             :id="`checkbox-${props.node.id}`"
             type="checkbox"

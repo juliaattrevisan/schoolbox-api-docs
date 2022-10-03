@@ -4,9 +4,9 @@
  * To edit an existing node or add a new subsection to a node
  */
 
-import { useNodesStore } from '../store/mcNodesStore';
 import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
 import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
+import { useSearchStore } from '../store/mcSearchStore';
 
 
 const props = defineProps({
@@ -56,6 +56,7 @@ const props = defineProps({
 
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
+const searchStore = useSearchStore();
 
 
 /**
@@ -76,6 +77,7 @@ function onUpdateToggleSelected () {
 
 <template>
     <button
+        v-if="!searchStore.isActive"
         :class="`button-action-option ${ props.isUpdating ? 'icon-close' : 'icon-modify' }`"
         :title="`Update ${props.title}`"
         :disabled="props.isAdding"
@@ -85,6 +87,7 @@ function onUpdateToggleSelected () {
         Update {{ props.title }}
     </button>
     <button
+        v-if="!searchStore.isActive"
         :class="`button-action-option ${ props.isAdding ? 'icon-close' : 'icon-add' }`"
         :title="`Add subsection to ${props.title}`"
         :disabled="props.isUpdating"

@@ -5,7 +5,6 @@
  * move backwards through the tree
  */
 
-import { computed } from 'vue';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 
 
