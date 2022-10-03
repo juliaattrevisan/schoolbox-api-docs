@@ -5,23 +5,20 @@
  * move backwards through the tree
  */
 
-import { computed } from 'vue';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
-import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
-import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
 
+
+const props = defineProps({
+    /**
+     * to disable certain events when editing is taking place
+     */
+    isUpdatingOrAdding: {
+        type: Boolean,
+        required: true,
+    },
+});
 
 const viewNodesStore = useViewNodesStore();
-const updateNodeStore = useUpdateNodeStore();
-const addSubsectionStore = useAddSubsectionStore();
-
-
-/**
- * Can't select the breadcrumbs while updating or adding a node
- *
- * @returns { Boolean }
- */
-const isUpdatingOrAdding = computed(() => updateNodeStore.isOpen || addSubsectionStore.isOpen);
 
 /**
  * to display the just selected node
@@ -41,7 +38,7 @@ function onSelected (depth, id) {
             <a
                 :href="`/curricululm/${breadcrumb.id}`"
                 :title="`View ${breadcrumb.name}`"
-                :disabled="isUpdatingOrAdding"
+                :disabled="props.isUpdatingOrAdding"
                 @click.prevent="onSelected(breadcrumb.depth, breadcrumb.id)"
                 @keyup.enter="onSelected(breadcrumb.depth, breadcrumb.id)"
             >

@@ -10,6 +10,16 @@ import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useSearchStore } from '../store/mcSearchStore';
 
 
+const props = defineProps({
+    /**
+     * to disable certain events when editing is taking place
+     */
+    isUpdatingOrAdding: {
+        type: Boolean,
+        required: true,
+    },
+});
+
 const viewNodesStore = useViewNodesStore();
 const searchStore = useSearchStore();
 
@@ -18,7 +28,7 @@ const searchStore = useSearchStore();
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => !viewNodesStore.isActive);
+const isDisabled = computed(() => !viewNodesStore.isActive || props.isUpdatingOrAdding);
 
 /**
  * Only enable search once a first node is selected
@@ -26,7 +36,7 @@ const isDisabled = computed(() => !viewNodesStore.isActive);
  * @returns { String }
  */
 const placeholder = computed(() => {
-    if (isDisabled.value) {
+    if (!viewNodesStore.isActive) {
         return 'Select a Curricula to enable search...'
     } else {
         return `Search ${viewNodesStore.current.name} for codes or keywords...`;
