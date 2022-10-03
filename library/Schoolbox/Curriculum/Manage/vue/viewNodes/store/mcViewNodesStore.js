@@ -154,6 +154,17 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
             this.setSelected(this.currentDepth+1, id);
         },
 
+        /**
+         *
+         *
+         * @param { number }
+         */
+        async toId (id) {
+            this.reset();
+            useNodesStore().loadId(id);
+            // this.setSelected(this.currentDepth+1, id);
+        },
+
     },
 
 });

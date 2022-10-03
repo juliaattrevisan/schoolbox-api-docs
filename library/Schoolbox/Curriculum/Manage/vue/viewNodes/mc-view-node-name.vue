@@ -110,10 +110,14 @@ const isButton = computed(() => {
 const fontWeight = computed(() => isParentNode.value && !searchStore.isActive ? 'bold' : 'normal');
 
 /**
- * traverse to the next nodel level
+ * reset the structure to that node or traverse to the next node level
  */
 function onNameSelected () {
-    viewNodesStore.setNextSelected(props.node.id);
+    if (searchStore.isActive) { //reset the structure and move to the selected searched node
+        viewNodesStore.toId(props.node.id);
+    } else { //traverse to the next node level
+        viewNodesStore.setNextSelected(props.node.id);
+    }
 }
 
 /**
