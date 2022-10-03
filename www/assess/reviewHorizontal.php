@@ -99,7 +99,7 @@ if (!isset($this->arg[1])) {
             'class' => ''
         ],
         [
-            'text'  => $folder->getName(),
+            'text'  => $folder->getTitle(),
             'href'  => "/homepage{$folder->getId()}",
             'class' => ''
         ],
