@@ -310,3 +310,15 @@ button.submit {
         border-color: $content-ui-foreground;
     }
 }
+
+.circle {
+    border-radius: 2rem;
+    transform: rotate(360deg);
+    width: 0.75rem;
+    height: 0.75rem;
+    min-width: 0.75rem;
+    min-height: 0.75rem;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 0.4rem;
+}

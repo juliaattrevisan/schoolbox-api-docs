@@ -204,7 +204,7 @@ export default {
                                 </div>
 
                                 <div class="text-container">
-                                    <h4><a :href="studentData.student._links.profile" title="View profile" class="name">
+                                    <h4><a :href="`/pastoral/student/${ studentData.student.id }`" title="View all pastoral records" class="name">
                                     {{ studentData.student.lastName }}, {{ studentData.student.firstName }}
                                     </a></h4>
                                     <p v-if="studentData.student.role" class="meta">{{ studentData.student.role }}</p>
@@ -216,8 +216,9 @@ export default {
                                                      :alt="`Profile photo of ${record.createdBy.fullName}`"
                                                      :title="`Created by ${ record.createdBy.fullName }`"
                                                      class="portrait"/>
-                                                <span>{{ record.heading }}</span>
-                                                <span v-if="record.severity?.color" class="circle" :style="'background-color:'+record.severity?.color" :title="record.severity?.name"></span>
+                                                <span>{{ record.heading }}
+                                                    <span v-if="record.severity?.color" class="circle" :style="'background-color:'+record.severity?.color" :title="record.severity?.name"></span>
+                                                </span>
                                             </a>
                                             <div class="time-container">
                                                 <template v-if="record.createdAt !== record.updatedAt">
@@ -384,18 +385,6 @@ input[type=radio]:not(.plain) + label.input-toggle {
                             padding-right: 1rem;
                             text-align: right;
                         }
-                    }
-
-                    .circle {
-                        border-radius: 2rem;
-                        transform: rotate(360deg);
-                        width: 0.75rem;
-                        height: 0.75rem;
-                        min-width: 0.75rem;
-                        min-height: 0.75rem;
-                        display: inline-block;
-                        vertical-align: middle;
-                        margin-left: 0.4rem;
                     }
                 }
 

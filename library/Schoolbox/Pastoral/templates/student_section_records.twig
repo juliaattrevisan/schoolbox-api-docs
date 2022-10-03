@@ -34,29 +34,15 @@
                                     {% set recordId = record.id %}
 
                                     <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': studentId, 'recordId': recordId}) }}">
-                                        <h3>{{ record.heading }}</h3>
+                                        <h3>{{ record.heading }}
+                                            {% if config.pastoral_severity == true and record.severity.color %}
+                                                <span class="circle" style="background-color:{{ record.severity.color }}" title="{{ record.severity.name }}"></span>
+                                            {% endif %}
+                                        </h3>
                                     </a>
                                     <p class="meta">
-
-                                    {% if linkedStudent %}
-
-                                        {% for linkedRecord in record.relatedRecords %}
-
-
-                                            {% if linkedRecord.parent.id is empty %}
-                                                Original Record:
-                                                {% set headingCurrent = linkedRecord.heading %}
-                                            {% else %}
-                                                Related Record:
-                                                {% set headingCurrent = record.heading %}
-                                            {% endif %}
-
-                                            <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': linkedRecord.student.id, 'recordId': linkedRecord.id}) }}"> {{ linkedRecord.student.fullName }} - {{ headingCurrent }}</a><br>
-                                        {% endfor %}
-
-                                    {% endif %}
-
-                                    {# Display name of poster #}
+                                        {{ record.type.name }} {% if record.subtype.name is defined %}({{ record.subtype.name }}){% endif %} |
+                                        {# Display name of poster #}
                                         Created by
                                         {% if record.owner.deletedAt.isNull %}
                                             <a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a>

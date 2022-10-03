@@ -1,13 +1,14 @@
 {# Macros for linking to user profile and displaying user profile picture #}
 
 {% macro imageSquare64(user) -%}
-    {#
-        TODO: Someone else can brutalise this
-
-        Have hardcoded the image size, and defaulted it to the placeholder image so things
-        don't appear to 'pop' in so obviously
-    #}
     <img src="/portrait.php?id={{ user.id }}&size=square64"
+         style="background-color:#c6c6c6;"
+         alt="{{ user.fullName }}"
+         title="{{ user.fullName }}">
+{%- endmacro %}
+
+{% macro imageSquare32(user) -%}
+    <img src="/portrait.php?id={{ user.id }}&size=square32"
          style="background-color:#c6c6c6;"
          alt="{{ user.fullName }}"
          title="{{ user.fullName }}">
