@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
+use External\IConnector;
 use PhpXmlRpc\Value;
 use Psr\Log\LoggerInterface;
 
@@ -22,13 +23,6 @@ use Psr\Log\LoggerInterface;
  */
 class Authenticator
 {
-    /**
-     * Arbitrary const that denotes we're on the schoolbox connector
-     * TODO This might be found elsewhere, can't remember where
-     */
-    private const SCHOOLBOX_CONNECTOR = 'schoolbox';
-
-
     /**
      * Default logging message when attempting to use liss with a non-schoolbox connector
      */
@@ -129,7 +123,7 @@ class Authenticator
         /* Must be using external database and schoolbox connector
          */
         $externalEnable = (bool)$this->externalEnable;
-        $externalType = self::SCHOOLBOX_CONNECTOR === $this->externalType;
+        $externalType = IConnector::EXTERNAL_TYPE_SCHOOLBOX === $this->externalType;
 
         if (!($externalEnable && $externalType)) {
             $this->log->info(self::WRONG_CONNECTOR_MESSAGE);
