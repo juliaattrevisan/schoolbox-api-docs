@@ -138,9 +138,9 @@ class Module extends BaseModule
         $getHomepageIdCallback = function ($params) {
             if (($params['layout'] ?? false) && $params['layout']->getFolder()) {
                 return $params['layout']->getFolder()->getId();
-            } else if ($params['component'] && $params['component']->getIdentifier()) {
+            } else if (($params['component'] ?? false) && $params['component']->getIdentifier()) {
                 return $params['component']->getIdentifier();
-            } else if ($params['homepage'] && $params['homepage']->getId()) {
+            } else if (($params['homepage'] ?? false) && $params['homepage']->getId()) {
                 return $params['homepage']->getId();
             }
             // No homepage could be determined: deny authorization
