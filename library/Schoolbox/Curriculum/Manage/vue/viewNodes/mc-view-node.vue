@@ -188,7 +188,7 @@ const showChildren = computed(() => props.node.children && props.node.children.l
  *
  * @returns { Boolean }
  */
- const hasCode = computed(() => props.node.code && props.node.code !== '');
+const hasCode = computed(() => props.node.code && props.node.code !== '');
 
 /**
  * Add in the code if it's available otherwise just show the title
@@ -199,11 +199,11 @@ const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.
 
 /**
  * Whether the buttons should be displayed, shouldn't be if the user is read only
- * or are are at the root level node
+ * or we are at the root level node, or if the search is active
  *
  * @returns { Boolean }
  */
-const showActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID);
+const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
 
 /**
  * Slide down the node to be updated / added
@@ -237,7 +237,7 @@ async function onLeave (el, done) {
             :data-just-updated="justUpdated"
         >
             <mc-view-node-checkbox
-                v-if="showActions"
+                v-if="hasActions"
                 :node="props.node"
                 :isUpdatingOrAdding="isUpdatingOrAdding"
             />
@@ -248,7 +248,7 @@ async function onLeave (el, done) {
                 :isUpdatingOrAdding="isUpdatingOrAdding"
             />
             <mc-view-node-actions
-                v-if="showActions"
+                v-if="hasActions"
                 :node="props.node"
                 :title="title"
                 :isUpdating="isUpdating"
