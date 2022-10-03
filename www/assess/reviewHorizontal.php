@@ -18,6 +18,9 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Mapper;
@@ -89,31 +92,12 @@ if (!isset($this->arg[1])) {
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
+    $assessment  = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
+
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs();
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
-        [
-            'text'  => 'Learning',
-            'href'  => '/learning/classes',
-            'class' => ''
-        ],
-        [
-            'text'  => $folder->getTitle(),
-            'href'  => "/homepage/{$folder->getId()}",
-            'class' => ''
-        ],
-        [
-            'text'  => $assess['title'],
-            'href'  => "/learning/assessments/{$assess['assessment_id']}/status",
-            'class' => ''
-        ],
-        [
-            'text'  => 'Horizontal Marking',
-            'href'  => "#",
-            'class' => 'active'
-        ],
-    ]);
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', getBreadcrumbsArray($folder, $assessment, $assess['title']));
 } elseif ($this->arg[1] == 'finalise') {
     /* Update the reviewed_at for all the latest attempts for a particular assess :D
      * How do you like them apples
@@ -370,4 +354,77 @@ if (!isset($this->arg[1])) {
             'class' => 'active'
         ]
     ]);
+}
+
+/**
+ * @param $folder
+ * @param $assessment
+ * @param $assessTitle
+ * @return array
+ */
+function getBreadcrumbsArray($folder, $assessment, $assessTitle)
+{
+    $breadcrumbs = [
+        [
+            'text'  => 'Learning',
+            'href'  => '/learning/classes',
+            'class' => ''
+        ],
+        [
+            'text'  => $folder->getTitle(),
+            'href'  => "/homepage/{$folder->getId()}",
+            'class' => ''
+        ]
+    ];
+
+    // Maybe add another breadcrumb here, depending on the type of the object to which the quiz belongs.
+    $context = $assessment->getContext();
+    if ($context instanceof Project) {
+        // Quiz belongs to subject->unit->project (eg. '9ENGA'->'Romeo and Juliet'->'Project'), so add breadcrumbs for unit and project.
+        $project        = $context;
+        $unit           = $project->getContext();
+        $unitSpecFolder = $unit->getSpecification()->getFolder();
+        $breadcrumbs[]  = [
+            'text'  => $unitSpecFolder->getTitle(),
+            'href'  => "/homepage/{$unitSpecFolder->getId()}",
+            'class' => ''
+        ];
+        $breadcrumbs[] = [
+            'text'  => $project->getTitle(),
+            'href'  => "/learning/assessments/{$project->getId()}",
+            'class' => ''
+        ];
+    } elseif ($context instanceof UnitImplementation) {
+        // Quiz belongs to subject->unit (eg. '9ENGA'->'Romeo and Juliet'), so add breadcrumb for unit.
+        $unit           = $context;
+        $unitSpecFolder = $unit->getSpecification()->getFolder();
+        $breadcrumbs[] = [
+            'text'  => $unitSpecFolder->getTitle(),
+            'href'  => "/homepage/{$unitSpecFolder->getId()}",
+            'class' => ''
+        ];
+    } elseif ($context instanceof UnitSpecification) {
+        // Quiz belongs to subject->unit specification (eg. spec for '9ENGA'->'Romeo and Juliet'), so add breadcrumb for unit.
+        $unitSpecFolder = $context->getFolder();
+        $breadcrumbs[] = [
+            'text'  => $unitSpecFolder->getTitle(),
+            'href'  => "/homepage/{$unitSpecFolder->getId()}",
+            'class' => ''
+        ];
+    } else {
+        // Quiz belongs directly to subject (eg. 9ENGA), so no extra breadcrumb needed.
+    }
+
+    $breadcrumbs[] = [
+        'text'  => $assessTitle,
+        'href'  => "/learning/assessments/{$assessment->getId()}/status",
+        'class' => ''
+    ];
+    $breadcrumbs[] = [
+        'text'  => 'Horizontal Marking',
+        'href'  => "#",
+        'class' => 'active'
+    ];
+
+    return $breadcrumbs;
 }
