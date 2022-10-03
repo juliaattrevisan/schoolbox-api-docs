@@ -100,7 +100,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         }
         try {
             $instance = $this->componentInstanceMapper->findById($model->getInstanceId());
-            if (!$instance->getDefinition()->getNamespace()) {
+            if (!$instance->getDefinition()->getNamespace() || $instance->getModule() !== Component_Definition::MODULE_HOMEPAGE) {
                 return;
             }
         } catch (\Schoolbox\Mapper\Exception $e) {
