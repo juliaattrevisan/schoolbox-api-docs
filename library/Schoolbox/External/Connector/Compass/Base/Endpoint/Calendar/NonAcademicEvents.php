@@ -508,7 +508,7 @@ class NonAcademicEvents implements IStrategy
             ->setType($type)
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_EVENT)
             ->setGuid($guid)
-            ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
+            ->setSource(\Schoolbox\External\Connector\Compass\Base\Endpoint\Factory::SOURCE_NAME);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */

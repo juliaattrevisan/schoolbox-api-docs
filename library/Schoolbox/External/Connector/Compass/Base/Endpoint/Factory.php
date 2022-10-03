@@ -260,6 +260,11 @@ class Factory
                 $from,
                 $to
             ))
+            ->add(new TimetableCalendar\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->eventMapper
+            ))
             ->add(new ApiCertification(
                 $this->log,
                 $api
