@@ -169,7 +169,8 @@ class Controller extends Base
         );
 
         $users        = $this->userMapper->findByColumnList(['id' => array_keys($newAccesses)]);
-        $userAccesses = $this->userAccessMapper->findForFolderUser($folder, $users);
+        $originalAccesses = $this->userAccessMapper->findForFolderUser($folder, $users);
+        $userAccesses = $originalAccesses->deepClone();
 
         $translator = new ArrayToModel\UserAccess($this->getConfigLoader()->get(ConfigMapper::NAME_GROUP_STAFF_ONLY));
         try {
@@ -182,7 +183,9 @@ class Controller extends Base
         }
 
         try {
-            $this->userAccessMapper->save($userAccesses);
+            // update changed accesses only, to avoid sending out notifications
+            $accessesToSave = $userAccesses->diff($originalAccesses);
+            $this->userAccessMapper->save($accessesToSave);
         } catch (MapperException $e) {
             $this->sendJsonError('Failed to update member: ' . $e->getMessage(), 400);
             return;
