@@ -111,19 +111,19 @@
 
                                         <div>
                                             <label for="firstname" class="required">First Name</label>
-                                            <input id="firstname" type="text" name="firstname" value="{{ user.firstName }}"/>
+                                            <input id="firstname" type="text" name="firstname" maxlength="255" value="{{ user.firstName }}"/>
                                         </div>
                                         <div>
                                             <label for="preferred_name">Preferred Name</label>
-                                            <input id="preferred_name" type="text" name="preferred_name" value="{{ user.preferredName }}" placeholder="{{ user.firstName }}"/>
+                                            <input id="preferred_name" type="text" name="preferred_name" maxlength="255" value="{{ user.preferredName }}" placeholder="{{ user.firstName }}"/>
                                         </div>
                                         <div>
                                             <label for="lastname">Surname</label>
-                                            <input id="lastname" type="text" name="lastname" value="{{ user.lastName }}"/>
+                                            <input id="lastname" type="text" name="lastname" maxlength="255" value="{{ user.lastName }}"/>
                                         </div>
                                         <div>
                                             <label for="position_title">Position Title</label>
-                                            <input id="position_title" type="text" name="position_title" value="{{ user.positionTitle }}"/>
+                                            <input id="position_title" type="text" name="position_title" maxlength="255" value="{{ user.positionTitle }}"/>
                                         </div>
 
                                         {% if user %}
@@ -136,7 +136,7 @@
 
                                         <div>
                                             <label for="database">{{ externalDatabase }} ID</label>
-                                            <input id="database" type="text" name="database_id" value="{{ user.externalId }}"/>
+                                            <input id="database" type="text" name="database_id" maxlength="64" value="{{ user.externalId }}"/>
                                         </div>
                                     </div>
 
