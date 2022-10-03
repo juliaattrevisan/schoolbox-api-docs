@@ -271,9 +271,9 @@ class Profile implements IStrategy
         ]);
 
         foreach ($students['d'] as $student) {
-            if (!(new Watchlist())->isOnWatchlist($student['lastName'], ['DU BRUYN'])) {
-                continue;
-            }
+//            if (!(new Watchlist())->isOnWatchlist($student['lastName'], ['DU BRUYN'])) {
+//                continue;
+//            }
 
             $externalId = $this->helper->findExternalId($student['importIdentifiers'], self::BASEROLE_STUDENT);
             $academicHouse = $this->findHouse($student['organisationMilestones']);
