@@ -364,7 +364,6 @@ class DataSource
                 /** @var PastoralSeverity $severity */
                 $severity = $severityMapper->hydrate($row, 'sev');
                 $record->setSeverity($severity);
-
             } catch (MapperException $e) {
                 // noop
                 continue;
