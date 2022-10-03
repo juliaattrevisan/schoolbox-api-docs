@@ -7,7 +7,14 @@
             $(this).confirmDialog({
                 text: 'Are you sure you want to install this package?',
                 confirmEvent: function() {
+                    /** check if the package has already been installed, or is being installed? */
+                    if (true === $(event.target).prop('checked')) {
+                        return;
+                    }
                     var config = {text: 'Installing package...'};
+
+                    /** mark the package as installed. if it fails we will undo this */
+                    $(event.target).prop('checked', true).prop('disabled', true);
                     $toast.toastActivate(config);
 
                     $.ajax({
@@ -28,6 +35,8 @@
                     .fail(function(response) {
                         var temp = $.parseJSON(response.responseText);
 
+                        /** package failed, allow this package to be re-installed */
+                        $(event.target).prop('checked', false).prop('disabled', false);
                         $toast.toastTimeout({
                             text: temp.message,
                             css: 'alert'
