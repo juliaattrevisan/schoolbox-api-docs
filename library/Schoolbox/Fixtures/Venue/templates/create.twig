@@ -48,24 +48,95 @@
                         <label for="name" class="required">Name</label>
                         <input type="text" name="name" id="name" value="{{ venue.name }}" required/>
 
-                        {% if venue.address or (venue.latitude and venue.longitude) %}
-                            <label>
-                                Location
-                                <span data-tooltip class="hint has-tip tip-top" title="Select the venue by clicking its location on the map, scrolling and zooming as required.">?</span>
-                            </label>
+                        <label>
+                            Location
+                            <span data-tooltip class="hint has-tip tip-top" title="Select the venue by clicking its location on the map, scrolling and zooming as required.">?</span>
+                        </label>
+                        <div id="map" style="height:50vh;"></div>
+                        <script>
+                            var marker;
 
-                            {% import '@sportsfixturesMatch/macro/map.twig' as matchMap %}
+                            function initMap() {
+                                {% set gLat  = venue.latitude ?: location.lat %}
+                                {% set gLon  = venue.longitude ?: location.lon %}
+                                {% set gZoom = zoom ?? (venue.latitude ? 16 : 13) %}
 
-                            {% if googleApiKey %}
-                                <iframe src="{{ matchMap.generate(venue, googleApiKey) }}" frameborder="0" width='100%' height='450' allowfullscreen="true"></iframe>
-                            {% endif %}
-                        {% endif %}
+                                var map = new google.maps.Map(document.getElementById('map'), {
+                                    zoom: {{ gZoom }},
+                                    center: { lat: {{ gLat }}, lng: {{ gLon }} },
+                                    streetViewControl: false
+                                });
+                                var geocoder = new google.maps.Geocoder;
+
+                                {% if venue.latitude %}
+                                let marker = new google.maps.Marker({
+                                    position: { lat: {{ venue.latitude }}, lng: {{ venue.longitude }} },
+                                    map: map
+                                });
+                                {% elseif venue.address %}
+                                /* Try to geocode the address
+                                 */
+                                geocoder.geocode({'address': '{{ venue.address }}'}, function(results, status) {
+                                    if (status === 'OK') {
+                                        let marker = new google.maps.Marker({
+                                            position: results[0].geometry.location,
+                                            map: map
+                                        });
+
+                                        map.panTo(results[0].geometry.location);
+                                        map.setZoom(18);
+                                    }
+                                });
+                                {% endif %}
+
+                                map.addListener('click', function(e) {
+                                    placeMarkerAndPanTo(e.latLng, map);
+                                    geocodeLatLng(geocoder, map);
+                                });
+                            }
+
+                            function placeMarkerAndPanTo(latLng, map) {
+                                // remove any previous marker
+                                if (marker) {
+                                    marker.setMap(null);
+                                }
+
+                                marker = new google.maps.Marker({
+                                    position: latLng,
+                                    map: map
+                                });
+
+                                map.panTo(latLng);
+
+                                $('[name=latitude]').val(latLng.lat());
+                                $('[name=longitude]').val(latLng.lng());
+                            }
+
+                            function geocodeLatLng(geocoder, map) {
+                                var latlng = {lat: parseFloat($('[name=latitude]').val()), lng: parseFloat($('[name=longitude]').val())};
+                                geocoder.geocode({'location': latlng}, function(results, status) {
+                                    if (status === google.maps.GeocoderStatus.OK) {
+                                        if (results[0]) {
+                                            $('[name=address]').val(results[0].formatted_address);
+                                        }
+                                    }
+                                });
+                            }
+
+                        </script>
+                        <script async defer
+                                src="https://maps.googleapis.com/maps/api/js?key={{ googleApiKey }}&callback=initMap">
+                        </script>
+
+                        <input type="hidden" name="latitude" value="{{ venue.latitude }}" />
+                        <input type="hidden" name="longitude" value="{{ venue.longitude }}" />
 
                         <label>
-                            Street Address
-                            <span data-tooltip class="hint has-tip tip-top" title="Enter the street address of your venue.">?</span>
+                            Closest Street Address
+                            <span data-tooltip class="hint has-tip tip-top" title="This will automatically update when you click a point on the map, but you can override it if you need to.">?</span>
                             <input type="text" name="address" value="{{ venue.address }}" maxlength="255"/>
                         </label>
+
                     </div>
                 </fieldset>
             </section>
