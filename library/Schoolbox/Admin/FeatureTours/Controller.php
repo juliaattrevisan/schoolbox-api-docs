@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Admin\FeatureTours;
 
+use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\Config;
@@ -15,14 +16,18 @@ class Controller extends Base
      */
     private $tourMapper;
 
+    private Rebuilder $rebuilder;
+
     /**
      * Controller constructor.
      *
      * @param Tour\Mapper $tourMapper
+     * @param Rebuilder $rebuilder
      */
-    public function __construct(Tour\Mapper $tourMapper)
+    public function __construct(Tour\Mapper $tourMapper, Rebuilder $rebuilder)
     {
         $this->tourMapper = $tourMapper;
+        $this->rebuilder = $rebuilder;
     }
 
     /**
@@ -73,6 +78,9 @@ class Controller extends Base
         }
 
         $this->tourMapper->updateActiveTours($uuids);
+
+        //rebuild the module cache
+        $this->rebuilder->rebuild($this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
 
         // Redirect back to the same page
         $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('featureTours.render'));

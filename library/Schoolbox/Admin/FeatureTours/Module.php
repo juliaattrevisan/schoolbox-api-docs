@@ -11,7 +11,6 @@ use Twig\Error\LoaderError;
 
 class Module extends BaseModule
 {
-
     protected $basename = "featureTours";
 
 
@@ -39,6 +38,9 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->getMapperFactory()->get(TourMapper::class));
+        return new Controller(
+            $this->getMapperFactory()->get(TourMapper::class),
+            $this->injector->get('moduleCache.rebuilder')
+        );
     }
 }
