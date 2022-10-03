@@ -42,6 +42,10 @@ class Installer
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, null, "Package class not found");
             }
 
+            //set the package as installed, to stop multiple calls...
+            $package->setInstalled(true);
+            $this->packageMapper->save($package);
+
             $db = $this->packageMapper->getDatabase();
             $db->beginTransaction();
             try {
@@ -49,15 +53,16 @@ class Installer
             } catch (\Throwable $e) {
                 $db->rollBack();
 
+                //mark the package as not installed to allow the user to attempt installing again.
+                $package->setInstalled(false);
+                $this->packageMapper->save($package);
+
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, $e, sprintf(
                     'Unable to install package, rolling back - %s',
                     $e->getMessage()
                 ));
             }
             $db->commit();
-
-            $package->setInstalled(true);
-            $this->packageMapper->save($package);
         } else {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, null, "Package is already installed.");
         }
