@@ -1,8 +1,7 @@
 <script setup>
 
 /**
- * A curriculum node to select to traverse further down the tree,
- * or to CRUD via the actions
+ * To be able to enable/disable or delete a node
  */
 
 import { computed } from 'vue';
@@ -36,13 +35,12 @@ const props = defineProps({
 const selectedNodesStore = useSelectedNodesStore();
 
 /**
- * if the node is a child of one that's selected but is not in
- * the selected list it should be disabled
+ * if the node is a child of one that's selected it should be disabled
  *
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    return props.node.isSelected && !selectedNodesStore.nodesIds.includes(props.node.id);
+    return selectedNodesStore.childNodesIds.includes(props.node.id);
 });
 
 /**
@@ -51,7 +49,7 @@ const isDisabled = computed(() => {
  * @returns { Boolean }
  */
 const isChecked = computed(() => {
-    return props.node.isSelected;
+    return selectedNodesStore.nodesIds.includes(props.node.id) || selectedNodesStore.childNodesIds.includes(props.node.id);
 });
 
 /**
