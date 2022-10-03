@@ -357,8 +357,9 @@ class Profile implements IStrategy
             /* If they're not in this baseRole, skip them
              */
             if (!$this->isInBaseRole(self::BASEROLE_STUDENT, $student['organisationMilestones'])) {
+                print_r($student['organisationMilestones']);
                 $this->log->debug(sprintf(
-                    'Skipping %s %s (%s) - they are not in the student baseRole',
+                    'Skipping %s %s (%s) - they do not have an active student baseRole',
                     $firstname,
                     $lastname,
                     $externalId
@@ -767,7 +768,7 @@ class Profile implements IStrategy
      */
     private function isInBaseRole(int $roleIdentifier, array $organisationMilestones): bool
     {
-        return $roleIdentifier === (int)$this->findOrganisationMilestoneField($organisationMilestones, 'baseRole');
+        return $this->hasOrganisationMilestoneFieldTuple($organisationMilestones, 'baseRole', (string)$roleIdentifier);
     }
 
 
@@ -791,6 +792,31 @@ class Profile implements IStrategy
         }
 
         return null;
+    }
+
+
+    /**
+     * Find a particular field inside the set of $organisationMilestones tuples
+     * where it has a particular $value
+     *
+     * @param array  $organisationMilestones
+     * @param string $field
+     * @param string $value
+     * @return bool
+     */
+    private function hasOrganisationMilestoneFieldTuple(array $organisationMilestones, string $field, string $value): bool
+    {
+        foreach ($organisationMilestones as $organisationMilestone) {
+            if ($this->helper->matchesHost($organisationMilestone['organisationName'])) {
+                if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
+                    if ($value === (string)$organisationMilestone[$field]) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
 
@@ -828,9 +854,6 @@ class Profile implements IStrategy
              */
             $parent = $families[$relationship['compassPersonToId']];
 
-            print_r($parent);
-            print_r($relationship);
-
             /* Start piling in the deets
              */
             $externalId = $this->helper->findExternalId($parent['importIdentifiers']);
@@ -850,7 +873,7 @@ class Profile implements IStrategy
              */
             if (!$this->isInBaseRole(self::BASEROLE_PARENT, $parent['organisationMilestones'])) {
                 $this->log->debug(sprintf(
-                    'Skipping %s %s (%s) - they are not in the parent baseRole',
+                    'Skipping %s %s (%s) - they do not have an active parent baseRole',
                     $parent['firstName'],
                     $parent['lastName'],
                     $externalId
@@ -1032,7 +1055,7 @@ class Profile implements IStrategy
              */
             if (!$this->isInBaseRole(self::BASEROLE_STAFF, $staff['organisationMilestones'])) {
                 $this->log->debug(sprintf(
-                    'Skipping %s %s (%s) - they are not in the staff baseRole',
+                    'Skipping %s %s (%s) - they do not have an active staff baseRole',
                     $firstname,
                     $lastname,
                     $externalId
