@@ -50,38 +50,35 @@ class Factory
 
         // Add capabilities
         foreach ($postData as $tempCapabilityId => $postedCapability) {
-            $postCurricCap = $postedCapability['curriculumCode'] ?? '';
-
-            if (substr_count($postCurricCap[0], ',')) {
-                $postCurricCap = explode(',', $postCurricCap[0]);
-            }
-            $curriculumNodes = ($postCurricCap ?? '')
-                ? $this->nodeMapper->findByColumn('id', $postCurricCap)
-                : $this->nodeMapper->createCollection();
-
             $capability = (new Capability())
                 ->setId(filter_var($postedCapability['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE))
-                ->setName($postedCapability['name'] ?? '')
-                ->setCurriculumNodes($curriculumNodes);
+                ->setName($postedCapability['name'] ?? '');
+
+            if (isset($postedCapability['curriculumCode'])) {
+                if (!empty($postedCapability['curriculumCode'][0] ?? '')) {
+                    $curriculumNodes = $this->nodeMapper->findByColumn('id', explode(',', $postedCapability['curriculumCode'][0]));
+                } else {
+                    $curriculumNodes = $this->nodeMapper->createCollection();
+                }
+                $capability->setCurriculumNodes($curriculumNodes);
+            }
 
             // Add indicators
             foreach ($postedCapability['items'] ?? [] as $tempIndicatorId => $postedIndicator) {
-                $postCurricIndi = $postedIndicator['curriculumCode'] ?? '';
-
-                if (substr_count($postCurricIndi[0], ',')) {
-                    $postCurricIndi = explode(',', $postCurricIndi[0]);
-                }
-                $indicatorCurriculumNodes = ($postCurricIndi ?? '')
-                    ? $this->nodeMapper->findByColumn('id', $postCurricIndi)
-                    : $this->nodeMapper->createCollection();
-
                 $indicator = (new Indicator())
                     ->setId(filter_var($postedIndicator['id'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE))
-                    ->setName($postedIndicator['name'] ?? '')
-                    ->setCurriculumNodes($indicatorCurriculumNodes);
+                    ->setName($postedIndicator['name'] ?? '');
+
+                if (isset($postedIndicator['curriculumCode'])) {
+                    if (!empty($postedIndicator['curriculumCode'][0] ?? '')) {
+                        $curriculumNodes = $this->nodeMapper->findByColumn('id', explode(',', $postedIndicator['curriculumCode'][0]));
+                    } else {
+                        $curriculumNodes = $this->nodeMapper->createCollection();
+                    }
+                    $indicator->setCurriculumNodes($curriculumNodes);
+                }
                 $capability->getIndicators()[$tempIndicatorId] = $indicator;
             }
-
 
             $rowSet->getCapabilities()[$tempCapabilityId] = $capability;
         }

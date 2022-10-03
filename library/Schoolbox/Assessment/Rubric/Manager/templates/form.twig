@@ -84,9 +84,13 @@ $(function() {
 
                     idInput.attr('name', 'crits['+groupId+'][id]');
 
+                    {% if config.curriculum_tagging_enabled %}
                     container.find('div.list-item').first().append("<div data-cs-container> <curriculum-selector :is-read-only=false :selected-codes=[] data-endpoint='{{ routeLookup('curriculumApi.searchNode') }}' form-value-name='crits["+groupId+"][curriculumCode][]' /> </div>");
+                    {% endif %}
                 }
+                {% if config.curriculum_tagging_enabled %}
                 $('body').append("<script src=\"{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}\"> <\/script>");
+                {% endif %}
             }
         }
     };
