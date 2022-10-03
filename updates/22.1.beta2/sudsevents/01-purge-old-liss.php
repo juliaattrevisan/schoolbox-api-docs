@@ -88,7 +88,7 @@ SUDS Timetable and is no longer required here where it pollutes the event space.
 
 This always runs in perform mode as part of the v22 update
 
-Usage: php 01-purge-old-liss.php --perform
+Usage: php 01-purge-old-liss.php
 
 
 HELP;
@@ -246,20 +246,6 @@ HELP;
             'Purged existing events/relations that used event_source prefix: %s',
             self::EVENT_IMPORT_IDENTIFIER
         ));
-    }
-
-
-    /**
-     * FIXME Decide whether this script must be run as root
-     *  By default, this returns false (see CliTool\App) but if you're using methods that require
-     *  access to special folders (such as when you're creating files) you need to run this as root.
-     *  Otherwise it'll fail with a generic error that might mislead you
-     *
-     * @return bool|null
-     */
-    public function runAsRoot(): ?bool
-    {
-        return parent::runAsRoot();
     }
 };
 
