@@ -348,54 +348,16 @@ switch ($_POST['module']) {
         ];
         break;
     case 'service_saml_cert':
-        $databaseSamlCert = $config->get('saml_idp_certificate');
-        $samlCertMetadataUrl = $config->get('saml_idp_metadata_url');
+        $samlCertHelper = new SamlCertHelper();
 
-        $daysBeforeExpiry = null;
-
-        //if database cert field contains a value, get the days before expiry
-        if ($databaseSamlCert) {
-            $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($databaseSamlCert);
-        }
-
-        if (($daysBeforeExpiry === null) && $samlCertMetadataUrl) {
-            $metadataSamlCerts = SamlCertHelper::getSamlCertsFromMetadataUrl($samlCertMetadataUrl);
-            $bestSamlCert = SamlCertHelper::getCertWithLongestDatedExpiryFromX509CertMulti($metadataSamlCerts);
-            $daysBeforeExpiry = SamlCertHelper::getDaysBeforeExpiry($bestSamlCert);
-        }
-
-        if ($daysBeforeExpiry === null) {
-            //code will only reach here if both saml configs exist but are invalid
-            $output[] = array('SAML_LIGHT'  => 'alert',
-                              'SAML_MESSAGE' => 'Invalid SAML config',
-            );
-        } else {
-            $absDaysBeforeExpiry = abs($daysBeforeExpiry);
-            //get plural/singular form of 'day'
-            if ($absDaysBeforeExpiry === 1) {
-                $dayOrDays = "day";
-            } else {
-                $dayOrDays = "days";
-            }
-
-            if ($daysBeforeExpiry < 0) {
-                $output[] = array('SAML_LIGHT'  => 'alert',
-                                  'SAML_MESSAGE' => 'Expired'
-                );
-            } elseif ($daysBeforeExpiry < 7) {
-                $output[] = array('SAML_LIGHT'  => 'alert',
-                                  'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays
-                );
-            } elseif ($daysBeforeExpiry < 30) {
-                $output[] = array('SAML_LIGHT'  => 'warning',
-                                  'SAML_MESSAGE' => 'Expires in ' . $absDaysBeforeExpiry . ' ' . $dayOrDays
-                );
-            } else {
-                $output[] = array('SAML_LIGHT'  => 'success',
-                                  'SAML_MESSAGE' => 'Valid'
-                );
-            }
-        }
+        $samlWidget = $samlCertHelper->buildWidget(
+            $config->get('saml_idp_certificate') ?? "",
+            $config->get('saml_idp_metadata_url') ?? ""
+        );
+        $output[] = [
+            'SAML_LIGHT'   => $samlWidget->getLight(),
+            'SAML_MESSAGE' => $samlWidget->getMessage(),
+        ];
         break;
     default:
         break;

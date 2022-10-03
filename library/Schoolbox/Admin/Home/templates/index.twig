@@ -91,7 +91,7 @@
                 $('[data-light="www"]').html(data[0].WWW_STATUS).removeClass('neutral').addClass(data[0].WWW_LIGHT);
             });
 
-            {% if saml_enabled %}
+            {% if show_saml_widget %}
             // Replace the default saml status with 'Testing...'
             $('[data-light="saml_cert"]').html('Testing...');
             // Load service statuses via ajax
@@ -513,10 +513,10 @@
                                         <span class="full-width neutral label" data-light="ntp">Testing...</span>
                                     </div>
                                 </li>
-                                {% if saml_enabled %}
+                                {% if show_saml_widget %}
                                 <li>
                                     <div class="small-5 columns content">
-                                        SAML Certificate
+                                        SAML IdP Certificate
                                     </div>
                                     <div class="small-7 columns content">
                                         <span class="full-width neutral label" data-light="saml_cert">testing...</span>
