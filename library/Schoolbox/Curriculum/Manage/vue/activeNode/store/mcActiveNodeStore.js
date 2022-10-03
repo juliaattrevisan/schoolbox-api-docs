@@ -78,7 +78,7 @@ export const useActiveNodeStore = defineStore('mcActiveNode', {
          */
         async addSubsection (newNode) {
             if (this.node.children === null) { //if the children aren't loaded, load them in - which will also return the newly added node
-                await useNodesStore().loadChildren(this.node.id);
+                await useNodesStore().loadNextChildren(this.node.id);
             } else { //otherwise we need to push the newNode in as the children are already loaded
                 this.node.children.push(newNode);
                 sortByName(this.node.children); //and sort again with the new node added

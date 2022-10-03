@@ -14,7 +14,7 @@ const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search b
 export const useSearchStore = defineStore(`mcSearch`, {
 
     state: () => ({
-        isProcessing: false, //to notify that an action is taking place,
+        isLoading: false, //to notify that an action is taking place,
         query: '', //current search term to filter the active nodes
         isResultsCapped: false, //to show a 'refine your search' note
         resultsNotShownCount: 0, //a total of the results not visible in the list
@@ -64,7 +64,7 @@ export const useSearchStore = defineStore(`mcSearch`, {
          * @return { Boolean }
          */
         hasNoResults () {
-            return this.isActive && this.filteredResults.length === 0 && !this.isProcessing;
+            return this.isActive && this.filteredResults.length === 0 && !this.isLoading;
         },
 
     },
@@ -75,7 +75,7 @@ export const useSearchStore = defineStore(`mcSearch`, {
          * search for nodes that match
          */
         async search () {
-            this.isProcessing = true;
+            this.isLoading = true;
             try {
                 const viewNodesStore = useViewNodesStore();
                 const response = await fetch(`${apiEndpoint}?parentId=${viewNodesStore.current.id}&query=${this.query}`, {
@@ -90,7 +90,7 @@ export const useSearchStore = defineStore(`mcSearch`, {
             } catch (error) {
                 console.warn(error);
             } finally {
-                this.isProcessing = false;
+                this.isLoading = false;
             }
         },
 

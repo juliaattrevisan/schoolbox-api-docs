@@ -150,19 +150,18 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
          */
         async setNextSelected (id) {
             const nodesStore = useNodesStore();
-            await nodesStore.loadChildren(id);
+            await nodesStore.loadNextChildren(id);
             this.setSelected(this.currentDepth+1, id);
         },
 
         /**
-         *
+         * To traverse to a specified id, regardless of where it is
+         * in the current tree structure
          *
          * @param { number }
          */
         async toId (id) {
-            this.reset();
             useNodesStore().loadId(id);
-            // this.setSelected(this.currentDepth+1, id);
         },
 
     },

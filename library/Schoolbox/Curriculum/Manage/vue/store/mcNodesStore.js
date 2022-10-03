@@ -103,11 +103,7 @@ export const useNodesStore = defineStore('mcNodes', {
                 const response = await fetch(`${apiEndpoint}/${id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
                 if (response.ok) {
                     const nodeWithParents = await response.json();
-                    const breadcrumbs = getBreadcrumbs(nodeWithParents, []);
-                    breadcrumbs.push( { id: id, name: nodeWithParents.name } ); //add in the actual node as the last
-                    for (let i = 0; i < breadcrumbs.length; i++) { //recursively load in each parent and traverse down
-                        await useViewNodesStore().setNextSelected(breadcrumbs[i].id);
-                    }
+                    await this.loadAllChildren(nodeWithParents);
                 } else {
                     this.hasId = false; //as the id couldn't be found
                     if (this.hasSingleCurriculum) { //we should still jump straight to the only node available if there's only one
@@ -126,11 +122,35 @@ export const useNodesStore = defineStore('mcNodes', {
         },
 
         /**
+         * load in all the children required to reach the depth of the node,
+         * avoiding loading those nodes that are already loaded
+         *
+         * @TODO - this setup currently assumes we are already in the node tree of the passed through node
+         * it currently doesnt handle an entirely new node tree
+         *
+         * @param { object }
+         */
+        async loadAllChildren (node) {
+            const breadcrumbs = getBreadcrumbs(node, []);
+            breadcrumbs.push( { id: node.id, name: node.name } ); //add in the actual node as the last
+            const viewNodesStore = useViewNodesStore();
+            const activeBreadcrumbs = [ ...viewNodesStore.breadcrumbs, { id: viewNodesStore.current.id } ];
+            const onlyInactiveBreadcrumbs = breadcrumbs.filter((newBreadcrumb) => { //to only load the nodes that aren't already active
+                return !activeBreadcrumbs.some((activeBreadcrumb) => {
+                    return newBreadcrumb.id === activeBreadcrumb.id; // return the ones with equal id
+               });
+            });
+            for (let i = 0; i < onlyInactiveBreadcrumbs.length; i++) { //recursively load in each node and traverse down
+                await useViewNodesStore().setNextSelected(onlyInactiveBreadcrumbs[i].id);
+            }
+        },
+
+        /**
          * Load in another level of children of the target node id
          *
          * @param { number }
          */
-        async loadChildren (id) {
+        async loadNextChildren (id) {
             try {
                 this.isLoading = true;
                 const response = await fetch(`${apiEndpoint}/${id}?descendants=2`, {

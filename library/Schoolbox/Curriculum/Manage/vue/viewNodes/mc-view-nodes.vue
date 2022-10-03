@@ -6,17 +6,18 @@
  */
 
 import { ref, computed, watch } from 'vue';
+import { useNodesStore } from '../store/mcNodesStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useSearchStore } from '../store/mcSearchStore';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
 import McViewNode from './mc-view-node.vue'
 
 
+const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
 const searchStore = useSearchStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
 const nodesContainerEl = ref(null); //to scroll back to top on any selection change
-
 
 /**
  * To further clarify where the current search term hasn't found any node matches
@@ -45,7 +46,7 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
 </script>
 
 <template>
-    <div v-if="searchStore.isProcessing">
+    <div v-if="searchStore.isProcessing || nodesStore.isLoading">
         <loading-table />
     </div>
     <div v-else-if="searchStore.hasNoResults" class="empty-state-flex-centered">
