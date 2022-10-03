@@ -192,7 +192,7 @@ class Classes implements IStrategy
         $skipCount = [
             'noClassCode' => 0,
             'noType' => 0,
-            'invalidType' => 0,
+            'excludedType' => 0,
             'total' => 0,
         ];
 
@@ -253,7 +253,7 @@ class Classes implements IStrategy
 
                 /* Update counts
                  */
-                $skipCount['invalidType']++;
+                $skipCount['excludedType']++;
                 $skipCount['total']++;
 
                 /* Skip processing this event entirely
@@ -298,7 +298,7 @@ class Classes implements IStrategy
         $this->log->info("Total Skipped: {$skipCount['total']}/{$total}");
         $this->log->info("Skipped (no class code): {$skipCount['noClassCode']}/{$skipCount['total']}");
         $this->log->info("Skipped (no type): {$skipCount['noType']}/{$skipCount['total']}");
-        $this->log->info("Skipped (invalid type): {$skipCount['invalidType']}/{$skipCount['total']}");
+        $this->log->info("Skipped (excluded type): {$skipCount['excludedType']}/{$skipCount['total']}");
         $this->log->info('');
     }
 
