@@ -271,6 +271,10 @@ class Profile implements IStrategy
         ]);
 
         foreach ($students['d'] as $student) {
+            if (!(new Watchlist())->isOnWatchlist($student['lastName'], ['DU BRUYN'])) {
+                continue;
+            }
+
             $externalId = $this->helper->findExternalId($student['importIdentifiers']);
             $academicHouse = $this->findHouse($student['organisationMilestones']);
             $boardingHouseName = '';
@@ -823,6 +827,9 @@ class Profile implements IStrategy
             /* Otherwise grab them out and process them as usual
              */
             $parent = $families[$relationship['compassPersonToId']];
+
+            print_r($parent);
+            print_r($relationship);
 
             /* Start piling in the deets
              */
