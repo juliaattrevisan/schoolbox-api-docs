@@ -348,7 +348,7 @@ class Controller extends ConfigController
             ->setIntroduction($postData['introduction'])
             ->setOptions($options)
             ->setUpdatedBy($this->getUser())
-            ->setFileName(trim((string)$postData['fileName']));
+            ->setFileName(trim((string)$postData['filename']));
 
         /* If any Logo was provided, remember it
          * Otherwise clear it
