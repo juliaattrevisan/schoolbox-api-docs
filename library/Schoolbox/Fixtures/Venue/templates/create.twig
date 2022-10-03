@@ -52,67 +52,14 @@
                             Location
                             <span data-tooltip class="hint has-tip tip-top" title="Select the venue by clicking its location on the map, scrolling and zooming as required.">?</span>
                         </label>
-                        <div id="map" style="height:50vh;"></div>
-                        <script>
-                            var marker;
 
-                            function initMap() {
-                                {% set gLat  = venue.latitude ?: location.lat %}
-                                {% set gLon  = venue.longitude ?: location.lon %}
-                                {% set gZoom = zoom ?? (venue.latitude ? 16 : 13) %}
+                        {% if venue.address or (venue.latitude and venue.longitude) %}
+                            {% import '@sportsfixturesMatch/macro/map.twig' as matchMap %}
 
-                                var map = new google.maps.Map(document.getElementById('map'), {
-                                    zoom: {{ gZoom }},
-                                    center: { lat: {{ gLat }}, lng: {{ gLon }} },
-                                    streetViewControl: false
-                                });
-                                var geocoder = new google.maps.Geocoder;
-
-                                {% if venue.latitude %}
-                                marker = new google.maps.Marker({
-                                    position: { lat: {{ venue.latitude }}, lng: {{ venue.longitude }} },
-                                    map: map
-                                });
-                                {% endif %}
-
-                                map.addListener('click', function(e) {
-                                    placeMarkerAndPanTo(e.latLng, map);
-                                    geocodeLatLng(geocoder, map);
-                                });
-                            }
-
-                            function placeMarkerAndPanTo(latLng, map) {
-                                // remove any previous marker
-                                if (marker) {
-                                    marker.setMap(null);
-                                }
-
-                                marker = new google.maps.Marker({
-                                    position: latLng,
-                                    map: map
-                                });
-
-                                map.panTo(latLng);
-
-                                $('[name=latitude]').val(latLng.lat());
-                                $('[name=longitude]').val(latLng.lng());
-                            }
-
-                            function geocodeLatLng(geocoder, map) {
-                                var latlng = {lat: parseFloat($('[name=latitude]').val()), lng: parseFloat($('[name=longitude]').val())};
-                                geocoder.geocode({'location': latlng}, function(results, status) {
-                                    if (status === google.maps.GeocoderStatus.OK) {
-                                        if (results[0]) {
-                                            $('[name=address]').val(results[0].formatted_address);
-                                        }
-                                    }
-                                });
-                            }
-
-                        </script>
-                        <script async defer
-                                src="https://maps.googleapis.com/maps/api/js?key={{ googleApiKey }}&callback=initMap">
-                        </script>
+                            {% if googleApiKey %}
+                                <iframe src="{{ matchMap.generate(venue, googleApiKey) }}" frameborder="0" width='100%' height='450' allowfullscreen="true"></iframe>
+                            {% endif %}
+                        {% endif %}
 
                         <input type="hidden" name="latitude" value="{{ venue.latitude }}" />
                         <input type="hidden" name="longitude" value="{{ venue.longitude }}" />
