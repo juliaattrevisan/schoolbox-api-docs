@@ -46,7 +46,7 @@ export default {
 
         /**
          * Add the extra properties required for the /fileForm.php endpoint
-         * 
+         *
          * @param { Object }
          * @param { FormData }
          */
@@ -61,7 +61,7 @@ export default {
 
         /**
          * Update the display to notify of success and animate it out
-         * 
+         *
          * @param { Object }
          */
         displayFileUploadSuccess (file) {
@@ -71,17 +71,17 @@ export default {
             previewElement.querySelector('span.dz-upload').classList.add('complete');
             previewElement.querySelector('[data-dz-status]').textContent = 'Success';
             previewElement.style.overflow = 'hidden';
-            gsap.to(previewElement, { 
-                height: 0, 
-                delay: 1, 
+            gsap.to(previewElement, {
+                height: 0,
+                delay: 1,
                 duration: 0.5,
                 onComplete: () => previewElement.remove()
             } );
         },
 
         /**
-         * Can't upload the file, so notify the reason and show the close button 
-         * 
+         * Can't upload the file, so notify the reason and show the close button
+         *
          * @param { Object }
          * @param { Object }
          */
@@ -107,7 +107,7 @@ export default {
                     <button class="close-button hide" aria-label="Close alert" type="button" data-close="">
                         <span aria-hidden="true">×</span>
                     </button>
-                    <img data-dz-thumbnail="" class="mime" src="/static/images/foundation/preloader.gif" alt="file loading spinner">
+                    <img data-dz-thumbnail="" class="mime" :src="`${cdnPrefix}/images/foundation/preloader.gif`" alt="file loading spinner">
                     <p data-dz-name=""></p>
                     <p class="meta" data-dz-status="">Uploading...</p>
                     <div class="progress dz-progress">
