@@ -115,7 +115,7 @@ elseif ($count['all'] == 0) {
 // escape any quotes in the keyword string, or the javascript will explode.
 
 $this->setVar(array(
-    'KEYWORD' => json_encode($keyword),
+    'KEYWORD' => json_encode(urlencode($keyword)),
     'ENCODED_KEYWORD' => htmlentities($keyword),
 ));
 
