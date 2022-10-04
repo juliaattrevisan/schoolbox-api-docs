@@ -426,11 +426,14 @@ set upsConfig = {
                                 <td>Matches a range of characters. Remember to specify the characters in ascending order (A to Z, not Z to A).</td>
                                 <td>b[a-c]d finds bad, bbd, and bcd.</td>
                             </tr>
+                            {# AFAICT this has never been supported #}
+                            {#
                             <tr>
                                 <td>#</td>
                                 <td>Matches any single numeric character.</td>
                                 <td>1#3 finds 103, 113, and 123.</td>
                             </tr>
+                            #}
                             </tbody>
                         </table>
                     </div>
