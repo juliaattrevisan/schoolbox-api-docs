@@ -7,7 +7,7 @@
 import { computed, watch } from 'vue';
 import debounce from 'lodash/debounce';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
-import { useSearchStore } from '../store/mcSearchStore';
+import { useSearchStore, DEBOUNCE_AMOUNT } from '../store/mcSearchStore';
 
 
 const props = defineProps({
@@ -48,6 +48,7 @@ const placeholder = computed(() => {
  */
 watch(() => searchStore.query, () => {
     if (searchStore.isActive) {
+        searchStore.enableSearch();
         debounceSearch();
     }
 });
@@ -57,7 +58,7 @@ watch(() => searchStore.query, () => {
  */
 const debounceSearch = debounce(() => {
     searchStore.search();
-}, 350);
+}, DEBOUNCE_AMOUNT);
 
 </script>
 

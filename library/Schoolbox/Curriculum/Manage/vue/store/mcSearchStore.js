@@ -4,11 +4,11 @@
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from './manageCurriculumStore';
-import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 
 
-const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
+const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search becomes active
+export const DEBOUNCE_AMOUNT = 350; //the amount in ms to hold off on searching, to allow the user to keep typing
 
 
 export const useSearchStore = defineStore(`mcSearch`, {
@@ -72,10 +72,17 @@ export const useSearchStore = defineStore(`mcSearch`, {
     actions: {
 
         /**
+         * when the search isActive, we should display the loading prompt straight away,
+         * but the debounce holds on calling search() until we assume the user has stopped typing
+         */
+        enableSearch () {
+            this.isLoading = true;
+        },
+
+        /**
          * search for nodes that match
          */
         async search () {
-            this.isLoading = true;
             try {
                 const viewNodesStore = useViewNodesStore();
                 const response = await fetch(`${apiEndpoint}?parentId=${viewNodesStore.current.id}&query=${this.query}`, {
@@ -85,8 +92,6 @@ export const useSearchStore = defineStore(`mcSearch`, {
                     },
                 });
                 this.results = await response.json();
-                // const selectedNodesStore = useSelectedNodesStore();
-                // this.results.forEach((node) => node.isSelected = selectedNodesStore.isSelected(node)); //ensure selected results are reflected in the search results
             } catch (error) {
                 console.warn(error);
             } finally {
@@ -100,6 +105,7 @@ export const useSearchStore = defineStore(`mcSearch`, {
         clear () {
             this.query = '';
             this.results = [];
+            this.isLoading = false;
         },
 
     },

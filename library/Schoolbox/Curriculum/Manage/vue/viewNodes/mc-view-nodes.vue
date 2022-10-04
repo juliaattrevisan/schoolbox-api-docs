@@ -46,7 +46,7 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
 </script>
 
 <template>
-    <div v-if="searchStore.isProcessing || nodesStore.isLoading">
+    <div v-if="nodesStore.isLoading || searchStore.isLoading">
         <loading-table />
     </div>
     <div v-else-if="searchStore.hasNoResults" class="empty-state-flex-centered">
