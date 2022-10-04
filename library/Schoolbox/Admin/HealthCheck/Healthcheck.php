@@ -9,6 +9,7 @@
 namespace Schoolbox\Admin\HealthCheck;
 
 use Alaress\Database\Connector\IConnector;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database;
@@ -46,7 +47,7 @@ class Healthcheck
      * @param Database\Factory $databaseFactory
      * @param IConfigLoader    $configMapper
      * @param LoggerInterface  $logger
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @throws \Alaress\Database\Exception
      */
     public function __construct(
@@ -60,7 +61,7 @@ class Healthcheck
 
         // Ensure we can connect to external database
         if (!$databaseExternal || ($databaseExternal instanceof \Alaress\Database\Connector\NullConnector)) {
-            throw new InvalidArgumentException('Unable to connect to external database');
+            throw new \InvalidArgumentException('Unable to connect to external database');
         }
 
         $this->connector    = $databaseExternal;
@@ -76,7 +77,7 @@ class Healthcheck
      *                       - db driver does not support transactions,
      *                       - we attempt to begin a transaction when already in a transaction
      *                       - we attempt to rollback a transaction when not in a transaction
-     * @throws LogicException If configured external database type is not recognised
+     * @throws \LogicException If configured external database type is not recognised
      */
     public function run(): void
     {
@@ -136,7 +137,7 @@ class Healthcheck
      * Execute external database tests
      *
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
-     * @throws LogicException If configured external database type is not recognised
+     * @throws \LogicException If configured external database type is not recognised
      */
     private function externalTest(): void
     {
@@ -176,7 +177,7 @@ class Healthcheck
                 $this->isamsTest();
                 break;
             default:
-                throw new LogicException("Unrecognised external type: {$this->externalType}");
+                throw new \LogicException("Unrecognised external type: {$this->externalType}");
         }
     }
 
