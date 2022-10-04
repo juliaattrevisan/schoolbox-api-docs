@@ -145,8 +145,8 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
         add (nodeToAdd) {
             this.nodes = this.noChildrenOfNode(nodeToAdd);
             this.nodes = [...this.nodes, nodeToAdd];
-            this.childNodes = this.updateChildNodes();
-            this.updateIsSelected(nodeToAdd, true, nodeToAdd.id);
+            this.childNodes = this.removeChildNodes();
+            this.updateChildNodes(nodeToAdd, true, nodeToAdd.id);
         },
 
         /**
@@ -170,11 +170,11 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
         },
 
         /**
-         * remove any existing child nodes that don't have a .selectedParentId that is in id contained in nodes
+         * remove any existing child nodes that don't have a .selectedParentId that is an id contained in nodes
          *
          * @returns { array }
          */
-        updateChildNodes () {
+        removeChildNodes () {
             return this.childNodes.filter((selectedChildNode) => {
                 return this.nodesIds.includes(selectedChildNode.selectedParentId);
             });
@@ -186,7 +186,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
          * @param { Object }
          */
         remove (nodeToRemove) {
-            this.updateIsSelected(nodeToRemove, false, nodeToRemove.id);
+            this.updateChildNodes(nodeToRemove, false, nodeToRemove.id);
             this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id);
         },
 
@@ -198,11 +198,14 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
          *
          * @param { object }
          */
-        addIsSelected (node) {
+        checkIfSelected (node) {
             const parentNode = findById(useNodesStore().nodes.children, node.parent?.id);
             //no parent node, so it would be a root level node, already in the selected list, or already in the children of selected list
             if (parentNode === undefined || this.nodesIds.includes(node.id) || this.childNodesIds.includes(node.id)) {
                 return;
+            } else if (this.nodesIds.includes(parentNode.id)) {
+                node.selectedParentId = parentNode.id; //add the base level selectedParentId
+                this.childNodes  = [...this.childNodes, node]; //and then add the node
             } else if (this.childNodesIds.includes(parentNode.id)) { //if the parent is in the children of selected list, this node can also go in the list
                 const selectedParentNode = this.childNodes.find((node) => node.id === parentNode.id); //find the selected parent in the list
                 node.selectedParentId = selectedParentNode.selectedParentId; //add the base level selectedParentId
@@ -211,13 +214,15 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
         },
 
         /**
-         * recursively loop through and update all children to the parents selected state
+         * recursively loop through and update the childNodes array
+         * adding any loaded children when the parent node is selected
+         * or removing any loaded children from the node just removed
          *
          * @param { object }
          * @param { boolean }
          * @param { number }
          */
-        updateIsSelected (node, isSelected, selectedParentId) {
+        updateChildNodes (node, isSelected, selectedParentId) {
             if (isSelected) {
                 if (!this.nodesIds.includes(node.id) && !this.childNodesIds.includes(node.id)) { //don't include the parent node and nodes already in the child list
                     node.selectedParentId = selectedParentId;
@@ -227,7 +232,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
                 this.childNodes = this.childNodes.filter((selectedCode) => selectedCode.selectedParentId !== selectedParentId);
             }
             node.children?.forEach((innerNode) => {
-                this.updateIsSelected(innerNode, isSelected, selectedParentId);
+                this.updateChildNodes(innerNode, isSelected, selectedParentId);
             });
         },
 

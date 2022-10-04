@@ -161,9 +161,9 @@ export const useNodesStore = defineStore('mcNodes', {
                 const responseJson = await response.json();
                 if (response.ok) {
                     const newNode = responseJson;
-                    newNode.children.forEach((node) => useSelectedNodesStore().addIsSelected(node));
+                    newNode.children.forEach((node) => useSelectedNodesStore().checkIfSelected(node));
                     const oldNode = findById(this.nodes.children, id); //grab the old node to update
-                    useSelectedNodesStore().addIsSelected(oldNode);
+                    useSelectedNodesStore().checkIfSelected(oldNode);
                     oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property
                 } else {
                     throw new Error(responseJson.title, { ...responseJson } );
@@ -188,7 +188,7 @@ export const useNodesStore = defineStore('mcNodes', {
                 children: nodes,
                 enabled: true,
             }
-            nodes.forEach((node) => useSelectedNodesStore().addIsSelected(node)); //ensure isSelected is kept up to date
+            nodes.forEach((node) => useSelectedNodesStore().checkIfSelected(node)); //ensure isSelected is kept up to date
         },
 
         /**

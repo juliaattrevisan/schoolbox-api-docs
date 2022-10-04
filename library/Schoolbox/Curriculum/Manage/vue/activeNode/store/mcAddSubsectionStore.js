@@ -5,6 +5,7 @@
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
+import { useSelectedNodesStore } from '../../selectedNodes/store/mcSelectedNodesStore';
 
 
 const UNSET_ID = -1;
@@ -38,9 +39,8 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
          */
         async add () {
             const activeNodeStore = useActiveNodeStore();
-            this.isProcessing = true;
             try {
-                this.isProcessing = false;
+                this.isProcessing = true;
                 const response = await fetch(`${apiEndpoint}/${activeNodeStore.node.id}`, {
                     method: 'POST',
                     headers: {
@@ -52,8 +52,8 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
                 if (response.ok) {
                     const newNode = responseJson;
                     this.id = newNode.id;
+                    useSelectedNodesStore().checkIfSelected(newNode); //the parent node could be selected, so this node will need to be selected as well
                     await activeNodeStore.addSubsection(newNode);
-                    this.isProcessing = false;
                     this.cancel();
                     return { id: newNode.id, message: `${this.subsection.name} successfully added` };
                 } else {
@@ -61,6 +61,8 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
                 }
             } catch (error) {
                 throw new Error(error.message, error.options);
+            } finally {
+                this.isProcessing = false;
             }
         },
 
