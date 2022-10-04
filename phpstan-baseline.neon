@@ -2066,11 +2066,6 @@ parameters:
 			path: library/External/Isams/Timetable.php
 
 		-
-			message: "#^Call to an undefined method Alaress\\\\Database\\\\Predicate\\\\IBuilder\\:\\:in\\(\\)\\.$#"
-			count: 1
-			path: library/External/Isams/User.php
-
-		-
 			message: "#^Property External_Liss_Authenticator\\:\\:\\$schoolCode is never read, only written\\.$#"
 			count: 1
 			path: library/External/Liss/Authenticator.php
