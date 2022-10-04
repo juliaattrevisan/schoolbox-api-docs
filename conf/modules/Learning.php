@@ -111,6 +111,6 @@ class Learning extends ModuleLoader
          * display the Student's Courses
          * dupe of the student my classes page, but for courses
          */
-        $this->loadModule($di, StudentCourseModule::class, "/{$namespace}/student/courses");
+        $this->loadModule($di, StudentCourseModule::class, "/{$namespace}/courses/student");
     }
 }
