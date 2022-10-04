@@ -167,7 +167,7 @@ class Url
                             '[firstname]'     => \Scrub::filename($student->getFirstname() ?: 'unknown'),
                             '[surname]'       => \Scrub::filename($student->getLastname() ?: 'unknown'),
                             '[externalID]'  => \Scrub::filename($student->getExternalId() ?: 'unknown'),
-                            '[yearLevel]'  => \Scrub::filename($student->getYear()->getName() ?: 'unknown'),
+                            '[yearLevel]'  => \Scrub::filename($student->getYear()?->getName() ?: 'unknown'),
 
                         ]
                     );
@@ -182,8 +182,9 @@ class Url
                         mb_substr($file, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') //trim the filename to the max length 250 characters
                     );
 
+                    $copy = 0;
                     //if the filename has already been used, then increment by 1
-                    while (in_array($filename, $filenames)) {
+                    while (in_array($filename, $filenames) && $copy !== 100) {
                         //check if there is already a (\d) value at the end of the filename
                         if (preg_match_all("(\(\d+\))", $filename, $matches)) {
                             //grab that (\d) value...
@@ -193,7 +194,7 @@ class Url
                             $copy = (int)$values[0] + 1;
 
                             //use that as the new append file count
-                            $filename = strtr($filename, $matches[0][0], sprintf("(%s)", $copy));
+                            $filename = str_replace($matches[0][0], sprintf("(%d)", $copy), $filename);
                         } else {
                             //fist instance of a dupe file, so add (1)
                             $filename .= '(1)';
@@ -201,6 +202,16 @@ class Url
                     }
                     //log the filename
                     $filenames[] = $filename;
+
+                    //if count became 100, then log it as an error
+                    if (100 === $copy) {
+                        $warnings[] = sprintf(
+                            'Unable to generate report for student id %d (%s). Too similar to existing filename',
+                            $student->getId(),
+                            $student->getExternalId()
+                        );
+                        continue;
+                    }
 
                     /* Assemble paths/hierarchy in the zip
                      *
