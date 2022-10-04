@@ -563,7 +563,8 @@ class Controller extends Base
     {
         $get = $this->getRequest()->query;
 
-        $return_type = $get['return_type'];
+        //null coalesce as if this does not match any 'valid' response, it will throw an exception
+        $return_type = $get['return_type'] ?? null;
 
         // Ultimately all return types will be treated in the same way by our LTI component
         // and it will just redirect to the target URL. The only real difference at this point
