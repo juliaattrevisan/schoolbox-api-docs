@@ -60,6 +60,7 @@ class Controller extends Base
     {
         $homepageList   = $this->folderMapper->createCollection();
         $homepageUrls = [];
+        $courseListIds = [];
 
         // Iterate all subjects from the SIS and try to find folders with that class code
         foreach ($user->getSubjectCollection() as $subject) {
@@ -70,12 +71,14 @@ class Controller extends Base
             $homepageList = $homepageList->mergeUnique(new GenericCollection(Folder\Model::class, [$folder]), 'id');
         }
 
-        //get courses imported onto pages
-        $pb = $this->database
-            ->buildPredicateBuilder('')
-            ->in('f.id', $homepageList->getPropertyValues('id'));
-        $whereClause = implode(' AND ', $pb->getWhere());
-        $query = "
+        //if the student is enrolled in classes, then search for courses...
+        if ($homepageList->count()) {
+            //get courses imported onto pages
+            $pb          = $this->database
+                ->buildPredicateBuilder('')
+                ->in('f.id', $homepageList->getPropertyValues('id'));
+            $whereClause = implode(' AND ', $pb->getWhere());
+            $query       = "
             SELECT f.id AS 'f.id', cs.id AS 'cs.id', cs.folder_id as 'cs.fd.id', csf.name as 'cs.title'
             FROM folder f
             JOIN course_implementation ci ON ci.folder_id = f.id
@@ -87,12 +90,13 @@ class Controller extends Base
             WHERE {$whereClause}
             GROUP BY f.id, ci.course_specification_id;
             ";
-        $statement = $this->database->executeQuery($query, $pb->getParams());
-        $courseListIds = [];
+            $statement   = $this->database->executeQuery($query, $pb->getParams());
 
-        while ($row = $statement->fetch()) {
-            $courseListIds[] = $row['cs.fd.id'];
+            while ($row = $statement->fetch()) {
+                $courseListIds[] = $row['cs.fd.id'];
+            }
         }
+
         //build the folder objects for the course list
         $courseList = $this->folderMapper->findByColumnList(['id' => $courseListIds])->indexBy('id');
 
