@@ -11,6 +11,7 @@ namespace Schoolbox\Sync\Grammar\Condition\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Normalise\User\Base;
+use Schoolbox\External\Normalise\User\Common\Email;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\Sync\Grammar\Condition\ExternalUserValueIn;
 
@@ -45,28 +46,58 @@ class ExternalUserValueInTest extends TestCase
      */
     public function getTestAssertInData(): iterable
     {
+        $staffUser = (new Staff())
+            ->setGivenName('Jack')
+            ->addEmail((new Email())->setAddress('jack@example.com'))
+            ->addEmail((new Email())->setAddress('john@example.com'))
+        ;
         yield 'match on single user name' => [
             'givenName',
             'Jack',
-            (new Staff())->setGivenName('Jack'),
+            $staffUser,
             true,
         ];
         yield 'match on multiple user names' => [
             'givenName',
             ['Jack', 'John'],
-            (new Staff())->setGivenName('Jack'),
+            $staffUser,
             true,
         ];
         yield 'no match on single user name' => [
             'givenName',
-            'Jack',
-            (new Staff())->setGivenName('Jill'),
+            'Jill',
+            $staffUser,
             false,
         ];
         yield 'no match on multiple user names' => [
             'givenName',
-            ['Jack', 'John'],
-            (new Staff())->setGivenName('Jill'),
+            ['Jill', 'John'],
+            $staffUser,
+            false,
+        ];
+
+        yield 'match on single email address' => [
+            'email.address',
+            'jack@example.com',
+            $staffUser,
+            true,
+        ];
+        yield 'match on multiple email addresses' => [
+            'email.address',
+            ['john@example.com', 'jill@example.com',],
+            $staffUser,
+            true,
+        ];
+        yield 'no match on single email address' => [
+            'email.address',
+            'jill@example.com',
+            $staffUser,
+            false,
+        ];
+        yield 'no match on multiple email addresses' => [
+            'email.address',
+            ['james@example.com', 'jill@example.com',],
+            $staffUser,
             false,
         ];
     }
