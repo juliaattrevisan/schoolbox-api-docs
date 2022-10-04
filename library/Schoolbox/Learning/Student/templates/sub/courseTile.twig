@@ -1,0 +1,28 @@
+{# Usage:
+    {% include 'sub/courseTile.twig' with {
+        'course':      Folder
+    } only %}
+#}
+
+{% set tileContent %}
+    <div class="card-class-image"
+         style="background-color:{{ course.colour }}; border-bottom: 10px solid {{ course.colour }};{% if course.coverImage %} background-image: url('/storage/image.php?hash={{ course.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
+{% endset %}
+
+<div class="v-card small-12">
+    {% if homepageUrl %}
+        <a href="{{ homepageUrl }}">{{ tileContent }}</a>
+    {% else %}
+        {{ tileContent }}
+    {% endif %}
+    <div class="card-content classes actions-small-1">
+        <div class="list-item">
+            {% if homepageUrl %}
+                <h3><a href="{{ homepageUrl }}" title="{{ course.title }}">{{ course.name }}</a></h3>
+            {% else %}
+                <h3>{{ course.name }}</h3>
+            {% endif %}
+        </div>
+    </div>
+</div>
+

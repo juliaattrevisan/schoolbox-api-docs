@@ -8,12 +8,13 @@
 
 namespace Alaress\Database\Predicate;
 
+use UnderflowException;
+
 /**
  * Interface for predicate builder implementations.
  */
 interface IBuilder
 {
-
     /**
      * Returns a predicate builder with the same quoter and table as this builder,
      * suitable for building sub-predicates.
@@ -240,4 +241,13 @@ interface IBuilder
      * @return string
      */
     public function getWhereUnion(): string;
+
+    /**
+     * @param string|ISqlFunc $columnName
+     * @param iterable        $columnValues
+     * @return $this
+     * @throws InvalidColumnException If unable to parse column name
+     * @throws UnderflowException If an empty traversable is provided
+     */
+    public function in($columnName, iterable $columnValues): self;
 }

@@ -32,6 +32,7 @@ use Schoolbox\Learning\Moment\Feed\Module as FeedModule;
 use Schoolbox\Learning\Moment\StudentToolkit\Module as StudentToolkitModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Turnitin\Module as TurnitinModule;
+use Schoolbox\Learning\Student\Module as StudentCourseModule;
 use Schoolbox\Learning\Upcoming;
 
 class Learning extends ModuleLoader
@@ -105,5 +106,11 @@ class Learning extends ModuleLoader
          *  and based on plan availability settings?
          */
         $this->loadModule($di, TurnitinModule::class, "/{$namespace}/turnitin");
+
+        /**
+         * display the Student's Courses
+         * dupe of the student my classes page, but for courses
+         */
+        $this->loadModule($di, StudentCourseModule::class, "/{$namespace}/courses/student");
     }
 }
