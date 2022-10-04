@@ -16,7 +16,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -106,7 +105,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|UserMapper
+     * @return UserMapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
     protected function getUserMapper()
