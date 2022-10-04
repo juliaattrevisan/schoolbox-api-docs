@@ -18,12 +18,10 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
  */
 interface IApi
 {
-
     /**
      * Retrieves a XML document representing the result from the API call.
      *
-     * @param string $filter An XML document representing a filter
      * @return string|null
      */
-    public function retrieveDocument(string $filter = ''): ?string;
+    public function retrieveDocument(): ?string;
 }

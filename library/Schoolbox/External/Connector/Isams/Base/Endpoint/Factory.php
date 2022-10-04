@@ -13,12 +13,15 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
@@ -32,7 +35,6 @@ use UnexpectedValueException;
  */
 class Factory
 {
-
     /**
      * @var LoggerInterface
      */
@@ -57,6 +59,18 @@ class Factory
      * @var string
      */
     private string $key;
+
+
+    /**
+     * @var string
+     */
+    private string $zipDir;
+
+
+    /**
+     * @var bool
+     */
+    private bool $includePhoto;
 
 
     /**
@@ -93,6 +107,12 @@ class Factory
      * @var UserProfile\Relationship\Mapper
      */
     private UserProfile\Relationship\Mapper $relationshipMapper;
+
+
+    /**
+     * @var StorageMapper
+     */
+    private StorageMapper $storageMapper;
 
 
     /**
@@ -138,12 +158,15 @@ class Factory
      * @param bool                            $perform
      * @param string                          $host
      * @param string                          $key
+     * @param string                          $zipDir
+     * @param bool                            $includePhoto
      * @param string|null                     $file
-     * @param UserProfile\Mapper              $baseProfileMapper
+     * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param StorageMapper                   $storageMapper
      * @param UserMapper                      $userMapper
      * @param TimetableCycleMapper            $timetableCycleMapper
      * @param TimetablePeriodMapper           $timetablePeriodMapper
@@ -156,6 +179,8 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        string $zipDir,
+        bool $includePhoto,
         ?string $file,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
@@ -163,6 +188,7 @@ class Factory
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
+        StorageMapper $storageMapper,
         /* Timetable pieces */
         UserMapper $userMapper,
         TimetableCycleMapper $timetableCycleMapper,
@@ -175,6 +201,8 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->zipDir = $zipDir;
+        $this->includePhoto = $includePhoto;
         $this->file = $file;
 
         /* Profile pieces
@@ -184,6 +212,7 @@ class Factory
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+        $this->storageMapper = $storageMapper;
 
         /* Timetable pieces
          */
@@ -199,25 +228,38 @@ class Factory
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
+     * @throws \DomainException
      */
     public function produce(): GenericCollection
     {
         if ($this->file) {
             $this->log->info("Loading from locally-cached xml file: {$this->file}");
-            $api = new MockFileApi($this->file);
+
+            /* Forge an equivalent that reads from a local file where possible
+             * Staff and Students photos does nothing, intentionally, atm.
+             * Only the xml files can/should be stored and read locally afaict
+             */
+            $api = [
+                DSN::MODULE_BATCHXML => new Batchxml(new MockFileApi($this->file)),
+            ];
         } else {
             $this->log->info('Accessing api endpoint');
-            $api = new Api($this->host, $this->key);
-        }
 
-        /* Connect and shank data
-         */
-        $batchxml = new Batchxml($api);
+            /* Connect and shank data for all the modules we know about
+             */
+            $api = [
+                DSN::MODULE_BATCHXML => new Batchxml(new Api($this->host, $this->key, DSN::MODULE_BATCHXML)),
+            ];
+        }
 
         /* Cache a list of known users and periods
          * Every student timetable processing uses info stored there
          */
         $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
+
+        /* This lets you shank down zip files containing everyone's profile pictures
+         */
+        $photoDownloader = new Profile\PhotoDownloader($this->host, $this->key, $this->zipDir);
 
         /* Purge previously-imported profile relationships and classes
          */
@@ -234,12 +276,15 @@ class Factory
             ->add(new Profile\Profile(
                 $this->log,
                 $this->perform,
-                $batchxml,
+                $api,
+                $this->includePhoto,
+                $photoDownloader,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
-                $this->relationshipMapper
+                $this->relationshipMapper,
+                $this->storageMapper
             ))
             ->add(new Profile\Cleanup(
                 $this->log,
@@ -248,7 +293,8 @@ class Factory
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
-                $this->relationshipMapper
+                $this->relationshipMapper,
+                $photoDownloader
             ))
             ->add(new Timetable\Prepare(
                 $this->log,
@@ -261,23 +307,24 @@ class Factory
             ->add(new Timetable\Identifier(
                 $this->log,
                 $this->perform,
-                $batchxml
+                $api
             ))
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,
-                $batchxml,
+                $api,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
             ->add(new Timetable\Classes(
                 $this->log,
                 $this->perform,
-                $batchxml,
+                $api,
                 $lookup,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
-            ));
+            ))
+            ;
     }
 }

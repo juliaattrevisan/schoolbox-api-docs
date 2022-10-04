@@ -20,7 +20,6 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
  */
 class MockFragmentApi implements IApi
 {
-
     /**
      * A chunk of xml from which to read
      *
@@ -43,10 +42,9 @@ class MockFragmentApi implements IApi
     /**
      * Retrieves a XML document representing the result from the API call.
      *
-     * @param string $filter An XML document representing a filter
      * @return string|null
      */
-    public function retrieveDocument(string $filter = ''): ?string
+    public function retrieveDocument(): ?string
     {
         return $this->fragment;
     }

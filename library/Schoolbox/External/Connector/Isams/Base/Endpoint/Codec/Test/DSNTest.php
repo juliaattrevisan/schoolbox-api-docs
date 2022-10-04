@@ -23,7 +23,6 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
  */
 class DSNTest extends TestCase
 {
-
     /**
      * Data provider for testValidDSNDecode
      *
@@ -32,10 +31,67 @@ class DSNTest extends TestCase
     public function providerValidDSNDecode(): array
     {
         return [
+            /* Batch XML only
+             */
             'Valid DSN 1' => [
-                '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
                 [
-                    'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                    'modules' => [
+                        'batchxml' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
+                    ]
+                ]
+            ],
+
+            /* Batch XML and Staff Photos
+             */
+            'Valid DSN 2' => [
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777',
+                [
+                    'modules' => [
+                        'batchxml' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
+                        'staffphoto' => [
+                            'key' => 'zka7ght5-pp91-k28dy-zm28g-e1janv9777',
+                        ],
+                    ]
+                ]
+            ],
+
+            /* Batch XML and Student Photos
+             */
+            'Valid DSN 3' => [
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a',
+                [
+                    'modules' => [
+                        'batchxml' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
+                        'studentphoto' => [
+                            'key' => 'aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
+                        ]
+                    ]
+                ]
+            ],
+
+            /* Batch XML, Staff Photos, Student Photos
+             */
+            'Valid DSN 4' => [
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a',
+                [
+                    'modules' => [
+                        'batchxml' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
+                        'staffphoto' => [
+                            'key' => 'zka7ght5-pp91-k28dy-zm28g-e1janv9777',
+                        ],
+                        'studentphoto' => [
+                            'key' => 'aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
+                        ]
+                    ]
                 ]
             ],
         ];
@@ -50,7 +106,7 @@ class DSNTest extends TestCase
      * @param array  $expected
      * @throws DomainException
      */
-    public function testValidDSNDecode(string $dsn, $expected): void
+    public function testValidDSNDecode(string $dsn, array $expected): void
     {
         $codec = new DSN();
 
@@ -67,8 +123,8 @@ class DSNTest extends TestCase
     {
         return [
             'Valid DSN Re-encode 1' => [
-                '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
-                '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h'
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a',
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
             ],
         ];
     }
@@ -127,7 +183,7 @@ class DSNTest extends TestCase
      * @param array  $expected
      * @throws DomainException
      */
-    public function testInvalidDSNDecode(string $dsn, $expected): void
+    public function testInvalidDSNDecode(string $dsn, array $expected): void
     {
         $this->expectException(DomainException::class);
 

@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 /**
@@ -24,7 +24,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  */
 class Identifier implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */
@@ -40,25 +39,25 @@ class Identifier implements IStrategy
 
 
     /**
-     * @var Batchxml
+     * @var array
      */
-    private Batchxml $batchxml;
+    private array $api;
 
 
     /**
      * TimetableClass constructor.
-     * @param LoggerInterface        $log
-     * @param bool                   $perform
-     * @param Batchxml               $batchxml
+     * @param LoggerInterface $log
+     * @param bool            $perform
+     * @param array           $api
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Batchxml $batchxml
+        array $api
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->batchxml = $batchxml;
+        $this->api = $api;
     }
 
     /**
@@ -68,7 +67,7 @@ class Identifier implements IStrategy
     {
         /* Get a list of all the timetables to process
          */
-        $timetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
+        $timetables = $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
         /* If there aren't any timetables, log it and exit
          */

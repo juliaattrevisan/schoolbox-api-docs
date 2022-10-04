@@ -21,9 +21,47 @@ use Schoolbox\External\Importer\Endpoint\IDSN;
  */
 class DSN implements IDSN
 {
+    /**
+     * These correspond to the modules we found by configuring the DSN
+     * (Each module is an array key in the decoded DSN)
+     */
+    public const MODULE_BATCHXML = 'batchxml';
+
 
     /**
-     * Decode a dsn string
+     * Each module const has a corresponding path which isn't conveniently known,
+     * so I just append them when decoding and ignore them when encoding DSNs
+     */
+    public const PATHS = [
+        self::MODULE_BATCHXML => 'xml.ashx',
+    ];
+
+
+    /**
+     * DSN format
+     *
+     * iSAMS Module (e.g. Batch XML, Staff Photos, Student Photos)
+     * followed by a colon
+     * followed by key-value pairs
+     * separated by comma
+     */
+    private const DSN_FORMAT = '/([^:]+):key=([^;]*)/';
+
+
+    /**
+     * This character separates module-related tuples from each other
+     */
+    private const MODULE_SEPARATOR = ',';
+
+
+    /**
+     * This character separates module configuration tuples from each other
+     */
+    private const MODULE_TUPLE_SEPARATOR = ';';
+
+
+    /**
+     * Decode a DSN string
      *
      * @param string $dsn
      * @return array
@@ -35,20 +73,49 @@ class DSN implements IDSN
             throw new DomainException('iSAMS API DSN: could not decode; missing some credentials.');
         }
 
-        return [
-            'key' => $dsn
+        $dsnParts = explode(self::MODULE_SEPARATOR, $dsn);
+
+        $struct = [
+            'modules' => []
         ];
+
+        /* Break apart module config
+         */
+        foreach ($dsnParts as $dsnPart) {
+            $matches = [];
+            preg_match(self::DSN_FORMAT, $dsnPart, $matches);
+
+            $struct['modules'][$matches[1]] = [
+                'key' => $matches[2]
+            ];
+        }
+
+        return $struct;
     }
 
 
     /**
-     * Encode a dsn string
+     * Encode a DSN string
      *
      * @param array $parts
      * @return string
      */
     public function encode(array $parts): string
     {
-        return $parts['key'];
+        $struct = [];
+
+        foreach ($parts['modules'] as $module => $pairs) {
+            $module = "{$module}:";
+
+            $tuples = [];
+
+            foreach ($pairs as $key => $value) {
+                $tuples[] = "{$key}={$value}";
+            }
+
+            $struct[] = $module . implode(self::MODULE_TUPLE_SEPARATOR, $tuples);
+        }
+
+        return implode(self::MODULE_SEPARATOR, $struct);
     }
 }
