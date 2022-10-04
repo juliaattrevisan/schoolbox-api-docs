@@ -35,6 +35,7 @@ use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\SortUsersByName;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Timetable_ColourManager;
@@ -359,7 +360,7 @@ class Controller extends BaseController
                         'synergy_id' => $teacherCodes,
                         'group_id'   => $teacherRoles,
                     ]
-                )->sortByCallback($this->userMapper->getSortCallback());
+                )->sortByCallback((new SortUsersByName())->getCallable());
             } else {
                 $subject['teachers'] = [];
             }
@@ -405,7 +406,7 @@ class Controller extends BaseController
                 UserAccess::SERVICE_HOMEPAGE,
                 UserAccess::ACCESS_FULL,
                 $groupFolder->getId(),
-            )->sortByCallback($this->userMapper->getSortCallback());
+            )->sortByCallback((new SortUsersByName())->getCallable());
 
             $groups[] = $group;
         }

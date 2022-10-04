@@ -1125,19 +1125,4 @@ class UserMapper extends Mapper
 
         return true;
     }
-
-    /**
-     * Returns callback to sort users
-     * @return \Closure
-     */
-    public function getSortCallback(): \Closure
-    {
-        return static function (User $a, User $b) {
-            $cmp = strnatcasecmp((string)$a->getLastname(), (string)$b->getLastname());
-            if ($cmp !== 0) {
-                return $cmp;
-            }
-            return strnatcasecmp((string)$a->getFirstname(), (string)$b->getFirstname());
-        };
-    }
 }
