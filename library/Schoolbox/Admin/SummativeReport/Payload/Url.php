@@ -168,7 +168,8 @@ class Url
                             '[surname]'       => \Scrub::filename($student->getLastname() ?: 'unknown'),
                             '[externalID]'  => \Scrub::filename($student->getExternalId() ?: 'unknown'),
                             '[yearLevel]'  => \Scrub::filename($student->getYear()?->getName() ?: 'unknown'),
-
+                            '[preferredname]' => \Scrub::filename($student->getPreferredName() ?: 'unknown'),
+                            '[title]'         => \Scrub::filename($student->getTitle() ?: 'unknown'),
                         ]
                     );
                     //grab the filename excluding the folder paths
