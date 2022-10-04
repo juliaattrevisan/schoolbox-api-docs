@@ -283,8 +283,8 @@ class Profile implements IStrategy
             if (null === $externalId) {
                 $this->log->warning(sprintf(
                     'Skipping %s %s (no external identifier)',
-                    (string)$student['firstName'],
-                    (string)$student['lastName']
+                    trim((string)$student['firstName']),
+                    trim((string)$student['lastName'])
                 ));
 
                 continue;
@@ -848,8 +848,8 @@ class Profile implements IStrategy
             } else {
                 $this->log->debug(sprintf(
                     'Parent %s %s (externalId %s) is not contactable; disregarding email and phone fields.',
-                    $parent['firstName'],
-                    $parent['lastName'],
+                    trim((string)$parent['firstName']),
+                    trim((string)$parent['lastName']),
                     $externalId
                 ));
             }
@@ -984,8 +984,8 @@ class Profile implements IStrategy
             if (null === $externalId) {
                 $this->log->warning(sprintf(
                     'Skipping %s %s (no external identifier)',
-                    (string)$staff['firstName'],
-                    (string)$staff['lastName']
+                    trim((string)$staff['firstName']),
+                    trim((string)$staff['lastName'])
                 ));
 
                 continue;
