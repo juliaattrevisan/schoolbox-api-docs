@@ -22,7 +22,6 @@ class ExternalUserValueInTest extends TestCase
      *
      * @param string           $field
      * @param array|string|int $validValues
-     * @param bool             $negate
      * @param Base             $externalUser
      * @param bool             $expected
      * @return void
@@ -30,13 +29,12 @@ class ExternalUserValueInTest extends TestCase
     public function testAssertIn(
         string $field,
         array|string|int $validValues,
-        bool $negate,
         Base $externalUser,
         bool $expected,
     ): void {
         // negate is meaningless in this class:
         // currently, negation is tested in `\Alaress\Rules\Rule::apply`
-        $condition = new ExternalUserValueIn($field, $validValues, $negate);
+        $condition = new ExternalUserValueIn($field, $validValues);
         $this->assertSame($expected, $condition->assertIn($externalUser));
     }
 
@@ -50,58 +48,26 @@ class ExternalUserValueInTest extends TestCase
         yield 'match on single user name' => [
             'givenName',
             'Jack',
-            false,
             (new Staff())->setGivenName('Jack'),
             true,
-        ];
-        yield 'match on single user name: negated' => [
-            'givenName',
-            'Jack',
-            true,
-            (new Staff())->setGivenName('Jack'),
-            false,
         ];
         yield 'match on multiple user names' => [
             'givenName',
             ['Jack', 'John'],
-            false,
             (new Staff())->setGivenName('Jack'),
             true,
-        ];
-        yield 'match on multiple user names: negated' => [
-            'givenName',
-            ['Jack', 'John'],
-            true,
-            (new Staff())->setGivenName('Jack'),
-            false,
         ];
         yield 'no match on single user name' => [
             'givenName',
             'Jack',
-            false,
             (new Staff())->setGivenName('Jill'),
             false,
-        ];
-        yield 'no match on single user name: negated' => [
-            'givenName',
-            'Jack',
-            true,
-            (new Staff())->setGivenName('Jill'),
-            true,
         ];
         yield 'no match on multiple user names' => [
             'givenName',
             ['Jack', 'John'],
-            false,
             (new Staff())->setGivenName('Jill'),
             false,
-        ];
-        yield 'no match on multiple user names: negated' => [
-            'givenName',
-            ['Jack', 'John'],
-            true,
-            (new Staff())->setGivenName('Jill'),
-            true,
         ];
     }
 }
