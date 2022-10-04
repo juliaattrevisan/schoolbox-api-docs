@@ -11,6 +11,7 @@ namespace Schoolbox\Sync\Grammar\Condition;
 
 use Alaress\ObjectReader;
 use Alaress\Rules\Condition;
+use PHLAK\Splat\Pattern;
 use Schoolbox\Collection;
 
 class ExternalUserValueIn extends Condition\In
@@ -79,8 +80,16 @@ class ExternalUserValueIn extends Condition\In
     private function matchesValidValue($value): bool
     {
         foreach ($this->validValues as $validValue) {
-            if ($value === $validValue || fnmatch($validValue, $value, FNM_CASEFOLD | FNM_NOESCAPE)) {
+            // Exact match: return early
+            if ($value === $validValue) {
                 return true;
+            } else {
+                // Match vs pattern case-insensitively
+                $pattern = new Pattern($validValue);
+                $regexp  = $pattern->toRegex() . 'i';
+                if (preg_match($regexp, $value)) {
+                    return true;
+                }
             }
         }
         return false;

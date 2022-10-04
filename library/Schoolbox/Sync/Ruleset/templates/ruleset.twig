@@ -427,10 +427,35 @@ set upsConfig = {
                                 <td>b[a-c]d finds bad, bbd, and bcd.</td>
                             </tr>
                             <tr>
+                                <td>{ }</td>
+                                <td>Matches one or more patterns (separated by commas).</td>
+                                <td>b{an,e?}d finds band, bend, and bead, but not bald.</td>
+                            </tr>
+                            <tr>
+                                <td>\</td>
+                                <td>Escapes any character which has a meaning within a pattern.</td>
+                                <td>b\? finds b? only.</td>
+                            </tr>
+                            <tr>
+                                <td>(? )</td>
+                                <td>Matches the pattern within the brackets, but does not itself match any characters.</td>
+                                <td>foo(?bar)* matches foobar, but does not match any other string beginning with foo.
+                                    <br />(Note that the * is required, otherwise it will match nothing.)</td>
+                            </tr>
+                            <tr>
+                                <td>(! )</td>
+                                <td>Matches the inverse of the pattern within the brackets, but does not itself match any characters.</td>
+                                <td>foo(!bar)* matches any string beginning with foo other than foobar.
+                                    <br />(Note that the * is required, otherwise it will match nothing.)</td>
+                            </tr>
+                            {# AFAICT this has never been supported #}
+                            {#
+                            <tr>
                                 <td>#</td>
                                 <td>Matches any single numeric character.</td>
                                 <td>1#3 finds 103, 113, and 123.</td>
                             </tr>
+                            #}
                             </tbody>
                         </table>
                     </div>

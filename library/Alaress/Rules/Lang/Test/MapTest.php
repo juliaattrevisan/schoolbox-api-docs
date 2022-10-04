@@ -122,6 +122,24 @@ class MapTest extends TestCase
             ['1'],
         ];
 
+        yield 'Wildcard matches zero characters (leading)' => [
+            ['*match' => '1'],
+            ['match'],
+            ['1'],
+        ];
+
+        yield 'Wildcard matches zero characters (trailing)' => [
+            ['match*' => '1'],
+            ['match'],
+            ['1'],
+        ];
+
+        yield 'Wildcard matches zero characters (leading and trailing)' => [
+            ['*match*' => '1'],
+            ['match'],
+            ['1'],
+        ];
+
         yield 'Character class' => [
             ['match[12]' => '1', 'match[34]' => '2'],
             ['match1'],
@@ -147,10 +165,192 @@ class MapTest extends TestCase
             [],
         ];
 
-        yield 'backslashes do not escape' => [
+        yield 'backslashes escape' => [
             ['test\\*' => '1'],
             ['test*'],
+            ['1'],
+        ];
+
+        // The patterns which Jez wants to match on:
+        // he wants to match a single value in a comma-separated list
+        yield 'comma-separated list: multiple patterns, match at start of input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['zero,match,one'],
+            ['1'],
+        ];
+        yield 'comma-separated list: multiple patterns, match in middle of input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['match,zero,one'],
+            ['1'],
+        ];
+        yield 'comma-separated list: multiple patterns, match at end of input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['match,one,zero'],
+            ['1'],
+        ];
+        yield 'comma-separated list: multiple patterns, match equals input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['zero'],
+            ['1'],
+        ];
+        yield 'comma-separated list: multiple patterns, partial match at start of input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['zeroo,match,one'],
             [],
+        ];
+        yield 'comma-separated list: multiple patterns, partial match in middle of input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['match,zeroo,one'],
+            [],
+        ];
+        yield 'comma-separated list: multiple patterns, partial match at end of input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['match,one,zeroo'],
+            [],
+        ];
+        yield 'comma-separated list: multiple patterns, partial match equals input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['zeroo'],
+            [],
+        ];
+
+        // Extended matches not supported by fnmatch
+        yield 'comma-separated list: single pattern, match at start of input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['zero,match,one'],
+            ['1'],
+        ];
+        yield 'comma-separated list: single pattern, match in middle of input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['match,zero,one'],
+            ['1'],
+        ];
+        yield 'comma-separated list: single pattern, match at end of input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['match,one,zero'],
+            ['1'],
+        ];
+        yield 'comma-separated list: single pattern, match equals input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['zero'],
+            ['1'],
+        ];
+        yield 'comma-separated list: single pattern, partial match at start of input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['zeroo,match,one'],
+            [],
+        ];
+        yield 'comma-separated list: single pattern, partial match in middle of input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['match,zeroo,one'],
+            [],
+        ];
+        yield 'comma-separated list: single pattern, partial match at end of input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['match,one,zeroo'],
+            [],
+        ];
+        yield 'comma-separated list: single pattern, partial match equals input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['zeroo'],
+            [],
+        ];
+
+        // The (=foo) and (!foo) patterns are lookaheads:
+        // I haven't found a use for them, but I can't ignore them
+        yield 'positive lookahead: match' => [
+            ['zero(=[0-9])*' => '1'],
+            ['zero0'],
+            ['1'],
+        ];
+        yield 'positive lookahead: no match' => [
+            ['zero(=[a-z])*' => '1'],
+            ['zero0'],
+            [],
+        ];
+        yield 'negative lookahead: match' => [
+            ['zero(![a-z])*' => '1'],
+            ['zero0'],
+            ['1'],
+        ];
+        yield 'negative lookahead: no match' => [
+            ['zero(![0-9])*' => '1'],
+            ['zero0'],
+            [],
+        ];
+    }
+
+    /**
+     * @dataProvider getTestApplyInvalidPatternData
+     * @covers \Alaress\Rules\Lang\Map::apply
+     *
+     * @param array $map
+     * @param array $inputValue
+     * @param array $expected
+     * @return void
+     */
+    public function testApplyInvalidPattern(array $map, array $inputValue, array $expected): void
+    {
+        $this->expectWarning();
+        $this->assertSame($expected, (new Map('', $map))->apply($inputValue));
+    }
+
+    /**
+     * Data provider for `testApplyInvalidPattern`.
+     *
+     * @return iterable
+     */
+    public function getTestApplyInvalidPatternData(): iterable
+    {
+        yield 'invalid pattern' => [
+            ['{zero' => '1'],
+            ['zero'],
+            [],
+        ];
+        yield 'valid and invalid patterns: valid patterns still match' => [
+            ['{zero' => '1', 'zero' => '2', 'zero0' => '3'],
+            ['zero'],
+            ['1'],
         ];
     }
 }
