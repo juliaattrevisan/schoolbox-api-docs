@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Lookup;
 
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\Profile\Profile;
 
 /**
  * Some Compass Timetable events don't have enrolments, such as yard duties and other
@@ -62,7 +63,7 @@ class Staff
 
         foreach ($staffs['d'] as $staff) {
             $stack[$staff['compassPersonId']] = [
-                'externalId' => $this->helper->findExternalId($staff['importIdentifiers']),
+                'externalId' => $this->helper->findExternalId($staff['importIdentifiers'], Profile::BASEROLE_STAFF),
                 'firstname' => $staff['firstName'],
                 'lastname' => $staff['lastName'],
             ];

@@ -14,7 +14,6 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
  */
 class Helper
 {
-
     /**
      * @var IApi
      */
@@ -72,10 +71,11 @@ class Helper
      *
      * The IApi conveniently knows this, though
      *
-     * @param array  $importIdentifiers
+     * @param array $importIdentifiers
+     * @param int   $baseRole
      * @return string|null
      */
-    public function findExternalId(array $importIdentifiers): ?string
+    public function findExternalId(array $importIdentifiers, int $baseRole): ?string
     {
         /* Example usage:
          *
@@ -86,7 +86,12 @@ class Helper
          */
         foreach ($importIdentifiers as $importIdentifier) {
             if ($this->matchesHost($importIdentifier['school'])) {
-                return $importIdentifier['importIdentifier'];
+                /* This also has to match the baseRole field, which is roughly
+                 * synonymous with our idea of a roleType
+                 */
+                if ($baseRole === (int)$importIdentifier['baseRole']) {
+                    return $importIdentifier['importIdentifier'];
+                }
             }
         }
 
