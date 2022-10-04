@@ -624,6 +624,7 @@ class Healthcheck
         // Pastoral upload
         if ($this->configMapper->get('external_pastoral_upload')) {
             $prefix = $mediaDb ? ($mediaDb . '.') : '';
+<<<<<<< Updated upstream
             $this->insertTest(
                 [
                     $prefix . $mediaSchema . '.tDocuments',
@@ -631,6 +632,15 @@ class Healthcheck
                     $prefix . $mediaSchema . '.tDocumentReferences',
                 ]
             );
+=======
+            $tables = [
+                $prefix . $mediaSchema . '.tDocuments',
+                $prefix . $mediaSchema . '.DocumentReferences',
+                $prefix . $mediaSchema . '.tDocumentReferences',
+            ];
+            $this->insertTest($tables);
+            $this->selectTest($tables);
+>>>>>>> Stashed changes
         }
 
 
