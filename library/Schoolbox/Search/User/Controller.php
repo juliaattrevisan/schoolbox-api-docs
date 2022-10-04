@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\User;
 
 use Alaress\Color\ColorFactory;
-use Alaress\Mail\Mailer;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress_Date_Format;
 use Custom;
@@ -360,7 +359,7 @@ class Controller extends BaseController
                         'synergy_id' => $teacherCodes,
                         'group_id'   => $teacherRoles,
                     ]
-                );
+                )->sortByCallback($this->userMapper->getSortCallback());
             } else {
                 $subject['teachers'] = [];
             }
@@ -406,7 +405,7 @@ class Controller extends BaseController
                 UserAccess::SERVICE_HOMEPAGE,
                 UserAccess::ACCESS_FULL,
                 $groupFolder->getId(),
-            )->sortNaturally('lastname');
+            )->sortByCallback($this->userMapper->getSortCallback());
 
             $groups[] = $group;
         }
