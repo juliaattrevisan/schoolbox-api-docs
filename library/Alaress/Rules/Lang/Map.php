@@ -7,7 +7,7 @@
 
 namespace Alaress\Rules\Lang;
 
-use PHLAK\Splat\Glob;
+use PHLAK\Splat\Pattern;
 
 /**
  * A language construct for mapping SIS output (possibly modified with tokens)
@@ -96,7 +96,17 @@ class Map implements Construct
         $output = [];
         foreach ($inputValue as $input) {
             foreach ($this->map as $mapKey => $mapVal) {
-                if ($mapKey === $input || Glob::match(strtolower($mapKey), strtolower($input))) {
+                // Does the pattern in $mapKey match the actual pattern?
+                if ($mapKey === $input) {
+                    $isMatch = true;
+                } else {
+                    // Case-insensitive match vs. pattern
+                    $pattern = new Pattern($mapKey);
+                    $regexp  = $pattern->toRegex() . 'i';
+                    $isMatch = preg_match($regexp, $input);
+                }
+
+                if ($isMatch) {
                     if (is_array($mapVal)) {
                         $output = array_merge($output, $this->flattenArray($mapVal));
                     } else {

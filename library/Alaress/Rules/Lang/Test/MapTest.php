@@ -296,4 +296,38 @@ class MapTest extends TestCase
             [],
         ];
     }
+
+    /**
+     * @dataProvider getTestApplyInvalidPatternData
+     * @covers \Alaress\Rules\Lang\Map::apply
+     *
+     * @param array $map
+     * @param array $inputValue
+     * @param array $expected
+     * @return void
+     */
+    public function testApplyInvalidPattern(array $map, array $inputValue, array $expected): void
+    {
+        $this->expectWarning();
+        $this->assertSame($expected, (new Map('', $map))->apply($inputValue));
+    }
+
+    /**
+     * Data provider for `testApplyInvalidPattern`.
+     *
+     * @return iterable
+     */
+    public function getTestApplyInvalidPatternData(): iterable
+    {
+        yield 'invalid pattern' => [
+            ['{zero' => '1'],
+            ['zero'],
+            [],
+        ];
+        yield 'valid and invalid patterns: valid patterns still match' => [
+            ['{zero' => '1', 'zero' => '2', 'zero0' => '3'],
+            ['zero'],
+            ['1'],
+        ];
+    }
 }
