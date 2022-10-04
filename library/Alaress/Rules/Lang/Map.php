@@ -25,9 +25,19 @@ class Map implements Construct
      *
      * key:   the value which will be compared to each `$inputValue` passed to
      *        `apply()`.
-     *        This pattern may contain wildcards: "*" matches any character
-     *        sequence, "?" matches any single character.
-     *        (@see https://www.php.net/fnmatch)
+     *        This pattern may contain wildcards
+     *        (@see https://github.com/PHLAK/Splat):
+     *        * "*" matches any character sequence
+     *        * "?" matches any single character
+     *        * "[abc]" matches any character in the set
+     *        * "[a-c]" matches any character in the range
+     *        * "[^abc]" matches any character not in the set
+     *        * "[^a-c]" matches any character not in the range
+     *        * "{foo,bar,baz}" matches if any of the comma-separated
+     *          sub-patterns also match
+     *        * "(=foo)" matches if the string also contains the pattern
+     *        * "(!foo)" matches if the string doesn't contain the pattern
+     *        * "\" escapes any wildcard character
      * value: the value(s) which will be set in the object. This may be a
      *        multidimensional array: it will be converted into a flat array.
      *
@@ -86,7 +96,7 @@ class Map implements Construct
         $output = [];
         foreach ($inputValue as $input) {
             foreach ($this->map as $mapKey => $mapVal) {
-                if ($mapKey === $input || Glob::match($mapKey, $input)) {
+                if ($mapKey === $input || Glob::match(strtolower($mapKey), strtolower($input))) {
                     if (is_array($mapVal)) {
                         $output = array_merge($output, $this->flattenArray($mapVal));
                     } else {
