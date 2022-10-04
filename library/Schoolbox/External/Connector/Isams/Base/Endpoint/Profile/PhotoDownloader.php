@@ -50,14 +50,6 @@ class PhotoDownloader
 
 
     /**
-     * Zip files download here, as per config
-     *
-     * @var string
-     */
-    private string $zipDir;
-
-
-    /**
      * @var string
      */
     private string $key;
@@ -79,7 +71,6 @@ class PhotoDownloader
      */
     public function __construct(string $host, string $dsn, string $zipDir) {
         $this->host = $host;
-        $this->zipDir = $zipDir;
 
         /* Store this locally just once
          */
