@@ -55,7 +55,7 @@ export default {
         },
 
         /**
-         *
+         * So we can use the same qrCodeSize within css
          *
          * @returns { string }
          */
@@ -135,7 +135,7 @@ export default {
             </div>
         </div>
         <div class="student__details">
-            <a :href="`/search/user/${student.id}`" title="View profile">{{ student.fullname }}</a>
+            <a :href="`/search/user/${student.id}`" :title="`View ${student.fullname}`">{{ student.fullname }}</a>
             <h4>{{ folderNameWithCode }}</h4>
             <h5 v-if="hasQrCode">Expires {{ studentExpiry }}</h5>
             <h5 v-else>&nbsp;</h5>
@@ -173,6 +173,7 @@ export default {
     }
 
     .student__details {
+        overflow: hidden;
         padding: 1rem 0;
         text-align: center;
         h4 {
