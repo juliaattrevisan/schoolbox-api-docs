@@ -276,6 +276,20 @@ class Profile implements IStrategy
 //            }
 
             $externalId = $this->helper->findExternalId($student['importIdentifiers'], self::BASEROLE_STUDENT);
+
+            /* If the externalId was empty, skip them
+             * (externalId might also be empty because this person isn't in the correct baseRole)
+             */
+            if (null === $externalId) {
+                $this->log->warning(sprintf(
+                    'Skipping %s %s (no external identifier)',
+                    (string)$student['firstName'],
+                    (string)$student['lastName']
+                ));
+
+                continue;
+            }
+
             $academicHouse = $this->findHouse($student['organisationMilestones']);
             $boardingHouseName = '';
             $boardingStatus = $this->findBoardingStatus($student['studentDetails']);
@@ -341,18 +355,6 @@ class Profile implements IStrategy
              */
             $enrolment = $this->findDate($enrolmentDate);
             $leaving = $this->findDate($leavingDate);
-
-            /* If the externalId was empty, skip them
-             */
-            if (null === $externalId) {
-                $this->log->warning(sprintf(
-                    'Skipping %s %s (no external identifier)',
-                    $firstname,
-                    $lastname
-                ));
-
-                continue;
-            }
 
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
@@ -806,6 +808,7 @@ class Profile implements IStrategy
             $externalId = $this->helper->findExternalId($parent['importIdentifiers'], self::BASEROLE_PARENT);
 
             /* If the externalId was empty, skip them
+             * (externalId might also be empty because this person isn't in the correct baseRole)
              */
             if (null === $externalId) {
                 $this->log->warning(sprintf(
@@ -974,6 +977,20 @@ class Profile implements IStrategy
 
         foreach ($staffs['d'] as $staff) {
             $externalId = $this->helper->findExternalId($staff['importIdentifiers'], self::BASEROLE_STAFF);
+
+            /* If the externalId was empty, skip them
+             * (externalId might also be empty because this person isn't in the correct baseRole)
+             */
+            if (null === $externalId) {
+                $this->log->warning(sprintf(
+                    'Skipping %s %s (no external identifier)',
+                    (string)$staff['firstName'],
+                    (string)$staff['lastName']
+                ));
+
+                continue;
+            }
+
             $campusName = $this->findCampusName($staff['organisationMilestones']);
             $firstname = trim((string)$staff['firstName']);
             $firstnamePreferred = trim((string)$staff['preferredFirstName']);
