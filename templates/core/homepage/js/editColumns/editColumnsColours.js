@@ -117,14 +117,7 @@ function updateColour (colourId, colourAsRGB) {
  * the columns have the same colour.
  */
 function displayDefaultColourPickerColours () {
-    const colourPickers = getAllColourPickers();
-    colourPickers.forEach((colourPicker) => {
-        const allCheckboxes = getAllColumnCheckboxes(); //use to retrieve the relevant colours
-        const colourList = allCheckboxes.map((checkbox) => COLOURS.pickers[`${checkbox.id}_${colourPicker.id}`]); //for example top_head_font, left_head_font and right_head_font
-        const areAllColoursTheSame = colourList.every((value, index, array) => value === array[0]); //are all colour values within the array the same as the first value in the array
-        const initialColour = areAllColoursTheSame ? colourList[0] : null; //if all the colours aren't the same, set to null
-        $(colourPicker).spectrum('set', initialColour);
-    });
+    updateColourPickerColours(getAllColumnCheckboxes());
 }
 
 /**
@@ -134,10 +127,22 @@ function displayDefaultColourPickerColours () {
  * the selected columns have the same colour.
  */
 function displaySelectedColourPickerColours () {
+    updateColourPickerColours(getSelectedColumnCheckboxes());
+}
+
+/**
+ * Display the current colour picker colours based on which column checkboxes are passed through,
+ * if there's different colour values for the top & left columns for example,
+ * no colour will be set. So the colour will only be set if all
+ * columns checkboxes have the same colour.
+ *
+ * @param { array }
+ */
+function updateColourPickerColours (columnCheckboxes) {
     const colourPickers = getAllColourPickers();
     colourPickers.forEach((colourPicker) => {
-        const selectedCheckboxes = getSelectedColumnCheckboxes(); //use to retrieve the relevant colours
-        const colourList = selectedCheckboxes.map((checkbox) => COLOURS.pickers[`${checkbox.id}_${colourPicker.id}`]); //for example top_head_font, left_head_font and right_head_font
+        const checkboxes = columnCheckboxes; //use to retrieve the relevant colours
+        const colourList = checkboxes.map((checkbox) => COLOURS.pickers[`${checkbox.id}_${colourPicker.id}`]); //for example top_head_font, left_head_font and right_head_font
         const areAllColoursTheSame = colourList.every((value, index, array) => value === array[0]); //are all colour values within the array the same as the first value in the array
         const initialColour = areAllColoursTheSame ? colourList[0] : null; //if all the colours aren't the same, set to null
         $(colourPicker).spectrum('set', initialColour);
