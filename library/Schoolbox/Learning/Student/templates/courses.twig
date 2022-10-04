@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="small-12 large-12 columns">
+        <h1>My Courses</h1>
+    </div>
+</div>
+
+<div class="row">
+    {% if courseList is empty %}
+        <div class="small-12 island">
+            <div class = "empty-state">
+                <i class="icon-class-list"></i>
+                <p>You are not participating in any courses.</p>
+                <p>If you expect to have courses please contact your system administrator.</p>
+            </div>
+        </div>
+    {% else %}
+        {% for course in courseList %}
+            <div class="small-12 medium-6 large-4 xlarge-3 island">
+                <section>
+                    {% include '@learningStudentCourses/sub/courseTile.twig' with {
+                        'course':     course,
+                        'homepageUrl': homepageUrls[course.id],
+                    } only %}
+                </section>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
