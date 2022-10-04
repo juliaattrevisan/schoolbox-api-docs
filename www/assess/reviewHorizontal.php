@@ -207,7 +207,7 @@ if (!isset($this->arg[1])) {
         $j = 0;
 
         $assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
-        $actionValidator = new ActionValidator(\Alaress_Date_Format::now(), Access::getInstance());
+        $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
 
         foreach ($allAttempts as $currentAttempt) {
             try {
