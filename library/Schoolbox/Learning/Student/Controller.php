@@ -123,6 +123,7 @@ class Controller extends Base
 
         //render the things
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningStudentCourses/courses.twig', [
+            'user'          => $user,
             'courseList'    => $courseList,
             'homepageUrls' => $homepageUrls,
             ])->setTab('classes'));
