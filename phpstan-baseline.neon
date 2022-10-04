@@ -6581,16 +6581,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Ancestry.php
 
 		-
-			message: "#^Call to an undefined method Alaress\\\\Database\\\\Predicate\\\\IBuilder\\:\\:in\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/ClassListFactory.php
-
-		-
-			message: "#^Call to an undefined method Alaress\\\\Database\\\\Predicate\\\\IBuilder\\:\\:in\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Student/Controller.php
-
-		-
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method Schoolbox\\\\Resource\\\\Folder\\\\Code\\\\Mapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Code/Mapper.php
