@@ -77,6 +77,18 @@ class ExternalUserValueInTest extends TestCase
             $staffUser,
             false,
         ];
+        yield 'match on single valid name (case-insensitive)' => [
+            'givenName',
+            'jACk',
+            $staffUser,
+            true,
+        ];
+        yield 'match on multiple valid names (case-insensitive)' => [
+            'givenName',
+            ['jACk', 'JohN'],
+            $staffUser,
+            true,
+        ];
 
         // Simple match (or not) on email addresses
         // (a user may have more than one)
@@ -141,6 +153,12 @@ class ExternalUserValueInTest extends TestCase
             ['j*', '*n'],
             $staffUser,
             true,
+        ];
+        yield 'no match on escaped name pattern' => [
+            'givenName',
+            'j\\*',
+            $staffUser,
+            false,
         ];
 
         // Pattern matching: various types of pattern
@@ -256,6 +274,20 @@ class ExternalUserValueInTest extends TestCase
         yield 'no match range negation' => [
             'givenName',
             '[^a-k]ack',
+            $staffUser,
+            false,
+        ];
+
+        // Multiple patterns in valid value
+        yield 'match on single valid name pattern with multiple sub-patterns' => [
+            'givenName',
+            '{jack,john}',
+            $staffUser,
+            true,
+        ];
+        yield 'no match on single valid name pattern with multiple sub-patterns' => [
+            'givenName',
+            '{john,jill}',
             $staffUser,
             false,
         ];
