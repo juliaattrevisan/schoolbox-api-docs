@@ -15,7 +15,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
 
-
 /**
  * Class Cleanup
  *
@@ -25,8 +24,6 @@ use Schoolbox\External\Profile\Mapper;
  */
 class Cleanup implements IStrategy
 {
-
-
     /**
      * @var LoggerInterface
      */

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2022, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
@@ -12,7 +14,6 @@ use Laminas\Uri\Exception\InvalidUriPartException;
 use Laminas\Uri\Uri;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use ZipArchive;
-
 
 /**
  * Class PhotoDownloader
@@ -69,7 +70,8 @@ class PhotoDownloader
      * @param string $zipDir
      * @throws \DomainException
      */
-    public function __construct(string $host, string $dsn, string $zipDir) {
+    public function __construct(string $host, string $dsn, string $zipDir)
+    {
         $this->host = $host;
 
         /* Store this locally just once
