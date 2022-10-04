@@ -94,10 +94,10 @@ if (!is_numeric($keyword) && (strlen($keyword) == 0)) {
     $this->setVar(array(
         'has_options_block' => ''
     ));
-} /* Also parse the no_result block if no results were found
- * when using the default 'all' selection
- */
-elseif ($count['all'] == 0) {
+} elseif ($count['all'] == 0) {
+    /* Also parse the no_result block if no results were found
+    * when using the default 'all' selection
+    */
     $enabled = AJAX_DISABLED;
 
     $this->setVar(array(
