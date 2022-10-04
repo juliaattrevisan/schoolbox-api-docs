@@ -69,9 +69,23 @@
                                 var geocoder = new google.maps.Geocoder;
 
                                 {% if venue.latitude %}
-                                marker = new google.maps.Marker({
+                                    marker = new google.maps.Marker({
                                     position: { lat: {{ venue.latitude }}, lng: {{ venue.longitude }} },
                                     map: map
+                                });
+                                {% elseif venue.address %}
+                                /* Try to geocode the address
+                                 */
+                                geocoder.geocode({'address': '{{ venue.address }}'}, function(results, status) {
+                                    if (status === 'OK') {
+                                        let marker = new google.maps.Marker({
+                                            position: results[0].geometry.location,
+                                            map: map
+                                        });
+
+                                        map.panTo(results[0].geometry.location);
+                                        map.setZoom(18);
+                                    }
                                 });
                                 {% endif %}
 
