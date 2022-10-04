@@ -69,7 +69,7 @@
                                 var geocoder = new google.maps.Geocoder;
 
                                 {% if venue.latitude %}
-                                let marker = new google.maps.Marker({
+                                    marker = new google.maps.Marker({
                                     position: { lat: {{ venue.latitude }}, lng: {{ venue.longitude }} },
                                     map: map
                                 });
