@@ -16,12 +16,13 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
+use Timetable_ColourMapper;
 
 class Module extends BaseModule
 {
@@ -71,7 +72,7 @@ class Module extends BaseModule
     {
         try {
             $user = $this->getUserMapper()->findWithSubjects($params['userId']);
-        } catch (MapperException $e) {
+        } catch (MapperException) {
             throw new NotFound();
         }
 
@@ -88,7 +89,9 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(FolderMapper::class),
-            $this->injector->get('databaseInternal')
+            $this->injector->get('databaseInternal'),
+            $this->getMapperFactory()->get(Timetable_ColourMapper::class),
+            $this->getMapperFactory()->get(Access::class)
         );
     }
 

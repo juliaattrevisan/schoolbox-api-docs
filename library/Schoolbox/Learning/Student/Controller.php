@@ -13,8 +13,6 @@ namespace Schoolbox\Learning\Student;
 use Alaress\Color\ColorFactory;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Term\Mapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
@@ -22,7 +20,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
+use Timetable_ColourMapper;
 
 class Controller extends Base
 {
@@ -30,16 +28,23 @@ class Controller extends Base
 
     private IConnector $database;
 
+    private Timetable_ColourMapper $timetableColourMapper;
+
+    private Access $access;
+
     /**
      * Controller constructor.
      *
-     * @param FolderMapper $folderMapper
-     * @param IConnector   $database
+     * @param FolderMapper           $folderMapper
+     * @param IConnector             $database
+     * @param Timetable_ColourMapper $timetableColourMapper
      */
-    public function __construct(FolderMapper $folderMapper, IConnector $database)
+    public function __construct(FolderMapper $folderMapper, IConnector $database, Timetable_ColourMapper $timetableColourMapper, Access $access)
     {
         $this->folderMapper = $folderMapper;
         $this->database = $database;
+        $this->timetableColourMapper = $timetableColourMapper;
+        $this->access = $access;
     }
 
 
@@ -54,6 +59,7 @@ class Controller extends Base
     public function getCourses(User $user)
     {
         $homepageList   = $this->folderMapper->createCollection();
+        $homepageUrls = [];
 
         // Iterate all subjects from the SIS and try to find folders with that class code
         foreach ($user->getSubjectCollection() as $subject) {
@@ -83,7 +89,7 @@ class Controller extends Base
             ";
         $statement = $this->database->executeQuery($query, $pb->getParams());
         $courseListIds = [];
-        /** @noinspection PhpAssignmentInConditionInspection */
+
         while ($row = $statement->fetch()) {
             $courseListIds[] = $row['cs.fd.id'];
         }
@@ -91,15 +97,12 @@ class Controller extends Base
         $courseList = $this->folderMapper->findByColumnList(['id' => $courseListIds])->indexBy('id');
 
         //make colours for courses
-        $folderColours = new Folder\FolderColour(\Timetable_ColourMapper::getInstance(), new ColorFactory());
+        $folderColours = new Folder\FolderColour($this->timetableColourMapper, new ColorFactory());
         $folderColours->applyFolderColours($courseList);
-
-        $homepageUrls = [];
-        $access       = Access::getInstance();
 
         // Only set those homepage URLs that the viewing user has access permission for
         foreach ($courseList as $folder) {
-            if ($access->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ) {
+            if ($this->access->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ) {
                 $homepageUrls[$folder->getId()] = "/homepage/{$folder->getId()}";
             } else {
                 $homepageUrls[$folder->getId()] = false;
