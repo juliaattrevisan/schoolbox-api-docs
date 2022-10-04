@@ -19,6 +19,7 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Quiz\ActionValidator;
@@ -97,8 +98,8 @@ if (!isset($this->arg[1])) {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs();
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', getBreadcrumbsArray($folder, $assessment, $assess['title']));
-} elseif ($this->arg[1] == 'finalise') {
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', getBreadcrumbsArray($folder, $assessment, $assess['assess_id'], $assess['title']));
+} elseif ($this->arg[1] === 'finalise') {
     /* Update the reviewed_at for all the latest attempts for a particular assess :D
      * How do you like them apples
      */
@@ -324,45 +325,30 @@ if (!isset($this->arg[1])) {
 
     /* Render out breadcrumbs
      */
-    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
-    $term    = TermMapper::getInstance()->findForDate($dueDate);
-    $trail   = new Breadcrumbs();
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', [
-        [
-            'text'  => 'Learning',
-            'href'  => '/learning/classes',
-            'class' => ''
-        ],
-        [
-            'text'  => $folder->getName(),
-            'href'  => "/learning/markbook/{$folder->getId()}/term/{$term->getCode()}/",
-            'class' => ''
-        ],
-        [
-            'text'  => $assess['title'],
-            'href'  => "/learning/assessments/{$assess['assessment_id']}/status",
-            'class' => ''
-        ],
-        [
-            'text'  => 'Horizontal Marking',
-            'href'  => "/assess/reviewHorizontal/{$assess['assess_id']}",
-            'class' => ''
-        ],
-        [
-            'text'  => Scrub::text($section['title']),
-            'href'  => "#",
-            'class' => 'active'
-        ]
-    ]);
+    $dueDate    = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+    $term       = TermMapper::getInstance()->findForDate($dueDate);
+    $assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
+    $trail      = new Breadcrumbs();
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', getBreadcrumbsArray($folder, $assessment, $assess['assess_id'], $assess['title'], $section['title']));
 }
 
 /**
- * @param $folder
- * @param $assessment
- * @param $assessTitle
+ * @param Folder\Model $subjectFolder
+ * @param Quiz\Model   $assessment
+ * @param int          $assessId
+ * @param String       $assessTitle
+ * @param String|null  $sectionTitle
  * @return array
+ *
+ * Return an array of breadcrumbs suitable for use in the Breadcrumbs::renderIntoSitePage() function.
  */
-function getBreadcrumbsArray($folder, $assessment, $assessTitle)
+function getBreadcrumbsArray(
+    Folder\Model $subjectFolder,
+    Quiz\Model $assessment,
+    int $assessId,
+    String $assessTitle,
+    ?String $sectionTitle = null
+): array
 {
     $breadcrumbs = [
         [
@@ -371,13 +357,13 @@ function getBreadcrumbsArray($folder, $assessment, $assessTitle)
             'class' => ''
         ],
         [
-            'text'  => $folder->getTitle(),
-            'href'  => "/homepage/{$folder->getId()}",
+            'text'  => $subjectFolder->getTitle(),
+            'href'  => "/homepage/{$subjectFolder->getId()}",
             'class' => ''
         ]
     ];
 
-    // Maybe add another breadcrumb here, depending on the type of the object to which the quiz belongs.
+    // Maybe add more breadcrumbs here, depending on the type of the object to which the quiz belongs.
     $context = $assessment->getContext();
     if ($context instanceof Project) {
         // Quiz belongs to subject->unit->project (eg. '9ENGA'->'Romeo and Juliet'->'Project'), so add breadcrumbs for unit and project.
@@ -411,20 +397,33 @@ function getBreadcrumbsArray($folder, $assessment, $assessTitle)
             'href'  => "/homepage/{$unitSpecFolder->getId()}",
             'class' => ''
         ];
-    } else {
-        // Quiz belongs directly to subject (eg. 9ENGA), so no extra breadcrumb needed.
     }
+    // If none of the above cases apply, quiz belongs directly to subject (eg. 9ENGA), so no extra breadcrumbs needed.
 
     $breadcrumbs[] = [
         'text'  => $assessTitle,
         'href'  => "/learning/assessments/{$assessment->getId()}/status",
         'class' => ''
     ];
-    $breadcrumbs[] = [
-        'text'  => 'Horizontal Marking',
-        'href'  => "#",
-        'class' => 'active'
-    ];
+
+    if ($sectionTitle === null) {
+        $breadcrumbs[] = [
+            'text'  => 'Horizontal Marking',
+            'href'  => '#',
+            'class' => 'active'
+        ];
+    } else {
+        $breadcrumbs[] = [
+            'text'  => 'Horizontal Marking',
+            'href'  => "/assess/reviewHorizontal/$assessId",
+            'class' => 'active'
+        ];
+        $breadcrumbs[] = [
+            'text'  => Scrub::text($sectionTitle),
+            'href'  => "#",
+            'class' => 'active'
+        ];
+    }
 
     return $breadcrumbs;
 }
