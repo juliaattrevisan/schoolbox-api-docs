@@ -295,6 +295,29 @@ class MapTest extends TestCase
             ['zeroo'],
             [],
         ];
+
+        // The (=foo) and (!foo) patterns are lookaheads:
+        // I haven't found a use for them, but I can't ignore them
+        yield 'positive lookahead: match' => [
+            ['zero(=[0-9])*' => '1'],
+            ['zero0'],
+            ['1'],
+        ];
+        yield 'positive lookahead: no match' => [
+            ['zero(=[a-z])*' => '1'],
+            ['zero0'],
+            [],
+        ];
+        yield 'negative lookahead: match' => [
+            ['zero(![a-z])*' => '1'],
+            ['zero0'],
+            ['1'],
+        ];
+        yield 'negative lookahead: no match' => [
+            ['zero(![0-9])*' => '1'],
+            ['zero0'],
+            [],
+        ];
     }
 
     /**

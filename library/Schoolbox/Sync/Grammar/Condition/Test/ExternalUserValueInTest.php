@@ -291,5 +291,33 @@ class ExternalUserValueInTest extends TestCase
             $staffUser,
             false,
         ];
+
+
+        // The (=foo) and (!foo) patterns are lookaheads:
+        // I haven't found a use for them, but I can't ignore them
+        yield 'match on positive lookahead' => [
+            'givenName',
+            'j(=ack)*',
+            $staffUser,
+            true,
+        ];
+        yield 'no match on positive lookahead' => [
+            'givenName',
+            'j(=ohn)*',
+            $staffUser,
+            false,
+        ];
+        yield 'match on negative lookahead' => [
+            'givenName',
+            'j(!ohn)*',
+            $staffUser,
+            true,
+        ];
+        yield 'no match on negative lookahead' => [
+            'givenName',
+            'j(!ack)*',
+            $staffUser,
+            false,
+        ];
     }
 }
