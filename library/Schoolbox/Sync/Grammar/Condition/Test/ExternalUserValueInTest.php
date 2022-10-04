@@ -235,5 +235,29 @@ class ExternalUserValueInTest extends TestCase
             $staffUser,
             false,
         ];
+        yield 'match set negation' => [
+            'givenName',
+            '[^bl]ack',
+            $staffUser,
+            true,
+        ];
+        yield 'no match set negation' => [
+            'givenName',
+            '[^bj]ack',
+            $staffUser,
+            false,
+        ];
+        yield 'match range negation' => [
+            'givenName',
+            '[^l-z]ack',
+            $staffUser,
+            true,
+        ];
+        yield 'no match range negation' => [
+            'givenName',
+            '[^a-k]ack',
+            $staffUser,
+            false,
+        ];
     }
 }
