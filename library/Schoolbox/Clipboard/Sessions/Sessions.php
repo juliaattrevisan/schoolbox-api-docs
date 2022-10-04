@@ -554,28 +554,38 @@ class Sessions implements IStrategy
             return null;
         }
 
-        /* If venue name wasn't specified, find a placeholder
-         * generating one if it doesn't already exist
+        /* Mine the clipboard data for venue info
+         * Beware: sometimes fields won't be provided to you, despite the documentation
+         *
+         * Latitude and Longitude fields might not even be here
+         * Sometimes it is, sometimes it isn't
          */
-        $venueName = trim((string)$locationData['name']);
-        $venueAddress = trim((string)$locationData['address']);
+        $venueData = [
+            'name' => trim((string)$locationData['name']),
+            'address' => trim((string)$locationData['address']),
+            'latitude' => trim((string)($locationData['latitude'] ?? null)),
+            'longitude' => trim((string)($locationData['longitude'] ?? null))
+        ];
 
         /* Set up a Venue instance for this Matchup,
          * reusing an existing one if possible
          */
         try {
-            $venue = $this->venueMapper->findOneByColumn('name', $venueName);
+            $venue = $this->venueMapper->findOneByColumn('name', $venueData['name']);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $venue = $this->venueMapper->createModel()
-                ->setName($venueName);
+                ->setName($venueData['name']);
         }
 
-        /* Update existing address to whatever it now is,
-         * in case a) you've already imported previously and didn't have an address back then
-         * or b) you had a venue called something generic like "The Usual Place" which has
-         * a different address contextually
+        /* Update existing address to whatever it now is, in case:
+         *
+         * a) you've already imported previously and didn't have an address back then, or...
+         * b) you had a venue called something generic like "The Usual Place" which has
+         *    a different address contextually and just changes throughout the year
          */
-        $venue->setAddress($venueAddress);
+        $venue->setAddress($venueData['address'])
+            ->setLatitude($venueData['latitude'])
+            ->setLongitude($venueData['longitude']);
 
         if ($this->perform) {
             $this->venueMapper->save($venue);
