@@ -346,10 +346,9 @@ function getBreadcrumbsArray(
     Folder\Model $subjectFolder,
     Quiz\Model $assessment,
     int $assessId,
-    String $assessTitle,
-    ?String $sectionTitle = null
-): array
-{
+    string $assessTitle,
+    ?string $sectionTitle = null
+): array {
     $breadcrumbs = [
         [
             'text'  => 'Learning',
