@@ -174,7 +174,7 @@ class Controller extends Base
      * @return void
      * @throws MapperException
      */
-    private function getCustomGrades(User $viewee, Term\Model $term, ?Alaress_Date_Format $from = null, ?Alaress_Date_Format $to = null, $year = null): void
+    private function getCustomGrades(User $viewee, Term\Model $term, ?Alaress_Date_Format $from = null, ?Alaress_Date_Format $to = null): void
     {
         $from = $from ?: $term->getStart();
         $to = $to ?: $term->getActualFinish();
@@ -734,7 +734,7 @@ class Controller extends Base
      */
     private function findByFiltersWithParticipants(array $filters, User $viewee, bool $loadOtherParticipantInteractions): GenericCollection
     {
-        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+        $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters);
         // Fetch assessments & participants
         $user        = $loadOtherParticipantInteractions ? null : $viewee;
 
