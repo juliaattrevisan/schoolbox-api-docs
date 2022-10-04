@@ -426,6 +426,16 @@ set upsConfig = {
                                 <td>Matches a range of characters. Remember to specify the characters in ascending order (A to Z, not Z to A).</td>
                                 <td>b[a-c]d finds bad, bbd, and bcd.</td>
                             </tr>
+                            <tr>
+                                <td>{ }</td>
+                                <td>Matches one or more patterns (separated by commas).</td>
+                                <td>b{an,e?}d finds band, bend, and bead, but not bald.</td>
+                            </tr>
+                            <tr>
+                                <td>\</td>
+                                <td>Escapes any character which has a meaning within a pattern.</td>
+                                <td>b\? finds b? only.</td>
+                            </tr>
                             {# AFAICT this has never been supported #}
                             {#
                             <tr>
