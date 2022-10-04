@@ -58,7 +58,7 @@ class Controller extends Base
      */
     public function getCourses(User $user)
     {
-        $homepageList   = $this->folderMapper->createCollection();
+        $classList   = $this->folderMapper->createCollection();
         $homepageUrls = [];
         $courseListIds = [];
 
@@ -68,18 +68,21 @@ class Controller extends Base
             if (!$folder) {
                 continue;
             }
-            $homepageList = $homepageList->mergeUnique(new GenericCollection(Folder\Model::class, [$folder]), 'id');
+            $classList = $classList->mergeUnique(new GenericCollection(Folder\Model::class, [$folder]), 'id');
         }
 
-        //if the student is enrolled in classes, then search for courses...
-        if ($homepageList->count()) {
+        /**
+         * if the student is enrolled in classes, then search for courses...
+         * original query \Schoolbox\Resource\Folder\ClassListFactory::findFoldersWithDueImportedAssessments
+         */
+        if ($classList->count()) {
             //get courses imported onto pages
             $pb          = $this->database
                 ->buildPredicateBuilder('')
-                ->in('f.id', $homepageList->getPropertyValues('id'));
+                ->in('f.id', $classList->getPropertyValues('id'));
             $whereClause = implode(' AND ', $pb->getWhere());
             $query       = "
-            SELECT f.id AS 'f.id', cs.id AS 'cs.id', cs.folder_id as 'cs.fd.id', csf.name as 'cs.title'
+            SELECT cs.folder_id as 'cs.fd.id'
             FROM folder f
             JOIN course_implementation ci ON ci.folder_id = f.id
             JOIN course_specification cs ON ci.course_specification_id = cs.id
