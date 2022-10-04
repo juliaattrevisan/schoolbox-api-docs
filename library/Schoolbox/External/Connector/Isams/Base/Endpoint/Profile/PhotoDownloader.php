@@ -17,7 +17,7 @@ use ZipArchive;
 /**
  * Class PhotoDownloader
  *
- * Downlaods a zip file containing profile pictures, from isams
+ * Downloads a zip file containing profile pictures, from isams
  * For some reason the Guzzle implementation results in isams
  * stopping you:
  *
