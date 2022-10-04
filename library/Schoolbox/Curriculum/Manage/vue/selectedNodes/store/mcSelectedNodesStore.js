@@ -285,7 +285,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
         },
 
         /**
-         * Update the .enabled status on eac node and all its children
+         * Update the .enabled status on each node and all its children
          *
          * @param { object }
          */

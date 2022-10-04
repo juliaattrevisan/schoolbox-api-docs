@@ -46,7 +46,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: getFormData(this.subsection),
+                    body: getFormData(this.subsection, activeNodeStore.node),
                 });
                 const responseJson = await response.json();
                 if (response.ok) {
@@ -89,11 +89,9 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
 /**
  * Pass empty fields to be added
  *
- * @param { Object }
- *
  * @returns { Object }
  */
- function getSubsection (node) {
+ function getSubsection () {
     return {
         name: '',
         code: '',
@@ -102,14 +100,18 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
 }
 
 /**
- * Pass through the group id
+ * Pass through the subsection and whether the node is enabled
+ *
+ * @param { object }
+ * @param { object }
  *
  * @returns { FormData }
  */
- function getFormData (node) {
+ function getFormData (subsection, node) {
     return JSON.stringify({
-        name: node.name,
-        code: node.code,
-        description: node.description,
+        name: subsection.name,
+        code: subsection.code,
+        description: subsection.description,
+        enabled: node.enabled,
     });
 }
