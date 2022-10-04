@@ -60,19 +60,36 @@ const debounceSearch = debounce(() => {
     searchStore.search();
 }, DEBOUNCE_AMOUNT);
 
+/**
+ * Clear the current search query
+ */
+function onClearSearchSelected () {
+    searchStore.clear();
+}
+
 </script>
 
 <template>
-    <input
-        v-model="searchStore.query"
-        ref="queryInputEl"
-        type="text"
-        class="search-input"
-        :disabled="isDisabled"
-        :placeholder="placeholder"
-        data-modal-search-input
-        @input="$event.target.composing = false"
-    />
+    <div class="input-group">
+        <input
+            v-model="searchStore.query"
+            ref="queryInputEl"
+            type="text"
+            :disabled="isDisabled"
+            :placeholder="placeholder"
+            data-modal-search-input
+            @input="$event.target.composing = false"
+        />
+        <button
+            v-if="searchStore.query !== ''"
+            title="Clear the current search"
+            class="button icon-close"
+            @click.prevent="onClearSearchSelected"
+            @keyup.enter="onClearSearchSelected"
+        >
+        Clear
+        </button>
+    </div>
 </template>
 
 <style scoped>
