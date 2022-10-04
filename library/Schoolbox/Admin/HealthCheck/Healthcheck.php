@@ -6,11 +6,13 @@
  * @link        https://schoolbox.com.au/
  */
 
+namespace Schoolbox\Admin\HealthCheck;
+
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Database;
+use Schoolbox\IConfigLoader;
 
 /**
  * Performs a health check on external database permissions
@@ -31,7 +33,7 @@ class Healthcheck
     /** @var IConnector[] $secondaryConnectors Array of secondary database connectors */
     private $secondaryConnectors = [];
 
-    /** @var IConfigLoader  */
+    /** @var IConfigLoader */
     private $configMapper;
 
     /** @var LoggerInterface */
@@ -53,7 +55,7 @@ class Healthcheck
         IConfigLoader $configMapper,
         LoggerInterface $logger
     ) {
-        $this->logger = $logger;
+        $this->logger     = $logger;
         $databaseExternal = $databaseExternal ?? $databaseFactory->getExternalDatabase($configMapper, true);
 
         // Ensure we can connect to external database
@@ -221,7 +223,7 @@ class Healthcheck
 
             $log = str_pad(str_pad($method, 15) . $objectName, 50);
 
-            $sql = str_replace(':object', $objectParam, $query);
+            $sql       = str_replace(':object', $objectParam, $query);
             $statement = $this->connector->prepareQuery($sql);
 
             if ($wrapInTransaction) {
@@ -364,8 +366,8 @@ class Healthcheck
      */
     public function customUPSTest(): array
     {
-        $tables = array();
-        $staff = trim($this->configMapper->get('external_custom_ups_staff'));
+        $tables = [];
+        $staff  = trim($this->configMapper->get('external_custom_ups_staff'));
         if (strlen($staff) > 0) {
             $tables[] = $staff;
         }
@@ -400,7 +402,7 @@ class Healthcheck
             'SCHOOLBOX_STAFF',
             'SCHOOLBOX_TIMETABLE',
             'SCHOOLBOX_TIMETABLE_DAYS',
-            'SCHOOLBOX_TIMETABLE_DEFINITION'
+            'SCHOOLBOX_TIMETABLE_DEFINITION',
         ];
 
         $this->selectTest($db2inst1Tables, null, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
@@ -428,7 +430,7 @@ class Healthcheck
             'THTQ',
             'TT',
             'TTTG',
-            'UM'
+            'UM',
         ];
 
         $tables = array_merge($tables, $this->customUPSTest());
@@ -473,7 +475,7 @@ class Healthcheck
             'studnswbos',
             'studqcaa',
             'studscsa',
-            'studvsn'
+            'studvsn',
         ];
 
         $tables = array_merge($tables, $this->customUPSTest());
@@ -498,7 +500,7 @@ class Healthcheck
             'SYSFILE',
             'IDENTITY',
             'TTABLE',
-            'WORKAREA'
+            'WORKAREA',
         ];
 
         $tables = array_merge($tables, $this->customUPSTest());
@@ -570,7 +572,7 @@ class Healthcheck
             'IndividualPlans',
             'StudentYears',
             'vStudentsAll',
-            'luStudentStatus'
+            'luStudentStatus',
         ];
 
         // Pastoral Care Tables (Only If Module Enabled)
@@ -677,7 +679,7 @@ class Healthcheck
 
         $this->executeTest($procedures);
 
-        $functions = [ 'dbo.fnTimeStr' ];
+        $functions = ['dbo.fnTimeStr'];
 
         $this->executeTest($functions);
     }

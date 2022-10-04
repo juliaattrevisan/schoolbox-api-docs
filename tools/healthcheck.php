@@ -8,6 +8,7 @@
  */
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Admin\HealthCheck\Healthcheck;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 
