@@ -122,6 +122,24 @@ class MapTest extends TestCase
             ['1'],
         ];
 
+        yield 'Wildcard matches zero characters (leading)' => [
+            ['*match' => '1'],
+            ['match'],
+            ['1'],
+        ];
+
+        yield 'Wildcard matches zero characters (trailing)' => [
+            ['match*' => '1'],
+            ['match'],
+            ['1'],
+        ];
+
+        yield 'Wildcard matches zero characters (leading and trailing)' => [
+            ['*match*' => '1'],
+            ['match'],
+            ['1'],
+        ];
+
         yield 'Character class' => [
             ['match[12]' => '1', 'match[34]' => '2'],
             ['match1'],
