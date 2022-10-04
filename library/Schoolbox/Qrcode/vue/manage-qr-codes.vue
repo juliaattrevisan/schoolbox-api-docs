@@ -341,14 +341,16 @@ export default {
     .options-list__option {
         flex: 1 1 0; //keep both sides equal
         @media (max-width: 760px) { //move to two columns instead of four
-            flex: 1 0 35%; 
+            flex: 1 0 35%;
         }
         @media (max-width: 380px) { //and then to one column
-            flex: 1 0 100%; 
+            flex: 1 0 100%;
         }
     }
 
 .students {
+    display: flex;
+    gap: 0.5rem;
     padding: 1rem 0;
 }
 

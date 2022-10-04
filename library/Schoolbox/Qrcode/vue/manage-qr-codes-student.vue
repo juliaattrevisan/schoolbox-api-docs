@@ -39,6 +39,7 @@ export default {
             hasQrCode: false, //to determine whether to show the qr code
             qrCodeValue: '', //the qr code is updated on every new generation request, so needs to be stored
             studentExpiry: '', //the expiry is updated on every new generation request, so needs to be stored
+            qrCodeSize: 170, //the size of the QR code
         }
     },
 
@@ -51,6 +52,15 @@ export default {
          */
         isInSelectedStudents () {
             return this.selectedStudents.some((student) => student.id === this.student.id);
+        },
+
+        /**
+         * So we can use the same qrCodeSize within css
+         *
+         * @returns { string }
+         */
+        qrCodeSizeWithPx () {
+            return `${this.qrCodeSize}px`;
         },
 
     },
@@ -121,11 +131,11 @@ export default {
         <div class="student__code" ref="container">
             <div class="student_code-option empty-state" ref="emptyState"></div>
             <div class="student_code-option qr-code-container" ref="qrCodeContainer">
-                <qrcode-vue :value="qrCodeValue" :size="170" level="M" class="qr-code" />
+                <qrcode-vue :value="qrCodeValue" :size="qrCodeSize" level="M" class="qr-code" />
             </div>
         </div>
         <div class="student__details">
-            <a :href="`/search/user/${student.id}`" title="View profile">{{ student.fullname }}</a>
+            <a :href="`/search/user/${student.id}`" :title="`View ${student.fullname}`">{{ student.fullname }}</a>
             <h4>{{ folderNameWithCode }}</h4>
             <h5 v-if="hasQrCode">Expires {{ studentExpiry }}</h5>
             <h5 v-else>&nbsp;</h5>
@@ -135,22 +145,20 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
 .student {
     border: 1px solid var(--form-border-color);
-    display: inline-block;
-    margin: 0 0.5rem 1rem 0.5rem;
     padding: 1rem;
     transition: background-color 0.3s; //shows that the student can be selected to toggle selection status
+    width: calc(v-bind(qrCodeSizeWithPx) + 2rem); //the width of the qr code plus 1rem padding left and right
     &:hover {
         background-color: var(--form-bg-hover-color);
     }
 }
 
     .student__code {
+        height: v-bind(qrCodeSizeWithPx); //should be the same as the qr code size
         position: relative;
-        height: 170px; //should be the same as the qr code size
-        width: 170px;
+        width: v-bind(qrCodeSizeWithPx);
     }
 
     .student_code-option {
@@ -165,6 +173,7 @@ export default {
     }
 
     .student__details {
+        overflow: hidden;
         padding: 1rem 0;
         text-align: center;
         h4 {
@@ -197,7 +206,7 @@ export default {
     .student__details {
         padding-bottom: 0;
         a, h4, h5 {
-            color: black; //enusre any custom print styles are ignored
+            color: black; //ensure any custom print styles are ignored
         }
         a { //remove default link styles
             font-size: 14px;
