@@ -98,7 +98,7 @@ if (!isset($this->arg[1])) {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs();
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', getBreadcrumbsArray($folder, $assessment, $assess['assess_id'], $assess['title']));
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', getBreadcrumbsArray($assessment, $assess['assess_id'], $assess['title']));
 } elseif ($this->arg[1] === 'finalise') {
     /* Update the reviewed_at for all the latest attempts for a particular assess :D
      * How do you like them apples
@@ -329,7 +329,7 @@ if (!isset($this->arg[1])) {
     $term       = TermMapper::getInstance()->findForDate($dueDate);
     $assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
     $trail      = new Breadcrumbs();
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', getBreadcrumbsArray($folder, $assessment, $assess['assess_id'], $assess['title'], $section['title']));
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', getBreadcrumbsArray($assessment, $assess['assess_id'], $assess['title'], $section['title']));
 }
 
 /**
@@ -343,7 +343,6 @@ if (!isset($this->arg[1])) {
  * Return an array of breadcrumbs suitable for use in the Breadcrumbs::renderIntoSitePage() function.
  */
 function getBreadcrumbsArray(
-    Folder\Model $subjectFolder,
     Quiz\Model $assessment,
     int $assessId,
     string $assessTitle,
@@ -355,21 +354,36 @@ function getBreadcrumbsArray(
             'href'  => '/learning/classes',
             'class' => ''
         ],
-        [
-            'text'  => $subjectFolder->getTitle(),
-            'href'  => "/homepage/{$subjectFolder->getId()}",
-            'class' => ''
-        ]
     ];
 
     // Maybe add more breadcrumbs here, depending on the type of the object to which the quiz belongs.
     $context = $assessment->getContext();
     if ($context instanceof Project) {
-        // Quiz belongs to subject->unit->project (eg. '9ENGA'->'Romeo and Juliet'->'Project'), so add breadcrumbs for unit and project.
+        // Quiz belongs to subject->unit->project (eg. '9ENGA'->'Romeo and Juliet'->'Project'), so add breadcrumbs for subject, unit, and project.
         $project        = $context;
-        $unit           = $project->getContext();
-        $unitSpecFolder = $unit->getSpecification()->getFolder();
-        $breadcrumbs[]  = [
+        $projectContext = $project->getContext();
+
+        if ($projectContext instanceof UnitImplementation) {
+            $unitSpec       = $projectContext->getSpecification(); // TESTED - Works with assess_id 130.
+            $unitSpecFolder = $unitSpec->getFolder();
+            $subjectFolder  = $projectContext->getFolder(); // TESTED - Works with assess_id 130.
+            $breadcrumbs[]  = [
+                'text'  => $subjectFolder->getTitle(),
+                'href'  => "/homepage/{$subjectFolder->getId()}",
+                'class' => ''
+            ];
+        } elseif ($projectContext instanceof UnitSpecification) {
+            // NOTE: UnitSpecifications are not attached to subjects.
+            //       Think of them as templates of units that become implementations only when they are attached to subjects.
+            $unitSpec       = $projectContext;
+            $unitSpecFolder = $unitSpec->getFolder();
+        } else {
+            throw ErrorMapper::getInstance()->generateException(
+                0, null, "Unknown type '" . get_class($projectContext) . "' for project context."
+            );
+        }
+
+        $breadcrumbs[] = [
             'text'  => $unitSpecFolder->getTitle(),
             'href'  => "/homepage/{$unitSpecFolder->getId()}",
             'class' => ''
@@ -380,25 +394,42 @@ function getBreadcrumbsArray(
             'class' => ''
         ];
     } elseif ($context instanceof UnitImplementation) {
-        // Quiz belongs to subject->unit (eg. '9ENGA'->'Romeo and Juliet'), so add breadcrumb for unit.
+        // Quiz belongs to subject->unit (eg. '9ENGA'->'Romeo and Juliet'), so add breadcrumbs for subject and unit.
         $unit           = $context;
+        $subjectFolder  = $unit->getFolder(); // TESTED - Works with assess_id 111.
         $unitSpecFolder = $unit->getSpecification()->getFolder();
+        $breadcrumbs[]  = [
+            'text'  => $subjectFolder->getTitle(),
+            'href'  => "/homepage/{$subjectFolder->getId()}",
+            'class' => ''
+        ];
         $breadcrumbs[] = [
             'text'  => $unitSpecFolder->getTitle(),
             'href'  => "/homepage/{$unitSpecFolder->getId()}",
             'class' => ''
         ];
     } elseif ($context instanceof UnitSpecification) {
-        // Quiz belongs to subject->unit specification (eg. spec for '9ENGA'->'Romeo and Juliet'), so add breadcrumb for unit.
-        $unitSpecFolder = $context->getFolder();
-        $breadcrumbs[] = [
+        // Quiz belongs to subject->unit specification (eg. spec for '9ENGA'->'Romeo and Juliet'), so add breadcrumbs for subject and unit.
+        // NOTE: UnitSpecifications are not attached to subjects.
+        //       Think of them as templates of units that become implementations only when they are attached to subjects.
+        $unitSpec       = $context;
+        $unitSpecFolder = $unitSpec->getFolder();
+        $breadcrumbs[]  = [
             'text'  => $unitSpecFolder->getTitle(),
             'href'  => "/homepage/{$unitSpecFolder->getId()}",
             'class' => ''
         ];
+    } else {
+        // Quiz belongs directly to subject (eg. 9ENGA), so add breadcrumb for subject only.
+        $subjectFolder = $context; // TESTED - Works with assess_id 128.
+        $breadcrumbs[]  = [
+            'text'  => $subjectFolder->getTitle(),
+            'href'  => "/homepage/{$subjectFolder->getId()}",
+            'class' => ''
+        ];
     }
-    // If none of the above cases apply, quiz belongs directly to subject (eg. 9ENGA), so no extra breadcrumbs needed.
 
+    // This is the breadcrumb for the assessment itself.
     $breadcrumbs[] = [
         'text'  => $assessTitle,
         'href'  => "/learning/assessments/{$assessment->getId()}/status",
