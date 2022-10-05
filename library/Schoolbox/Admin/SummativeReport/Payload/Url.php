@@ -174,29 +174,35 @@ class Url
                         ]
                     );
                     //grab the filename excluding the folder paths
-                    $filenameBits = mb_split('/', $filename);
-                    $file = end($filenameBits);
+                    $filenameBits = pathinfo($filename);
+                    $file = $filenameBits['filename'];
 
-                    //trim the filename to the max length and add that back to the filepath
-                    $filename = strtr(
-                        $filename,
-                        $file,
-                        mb_substr($file, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') //trim the filename to the max length 250 characters
-                    );
+                    //if there is no basename, then the file can become the filename
+                    if ('.' === $filenameBits['dirname']) {
+                        //trim the filename to the max length 250 characters
+                        $filename = mb_substr($file, 0, self::FILENAME_MAX_LENGTH, 'UTF-8');
+                    } else {
+                        //trim the filename to the max length and add that back to the filepath
+                        $filename = sprintf(
+                            "%s/%s",
+                            $filenameBits['dirname'],
+                            mb_substr($file, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') //trim the filename to the max length 250 characters
+                        );
+                    }
 
                     $copy = 0;
                     //if the filename has already been used, then increment by 1
                     while (in_array($filename, $filenames) && $copy !== 100) {
                         //check if there is already a (\d) value at the end of the filename
-                        if (preg_match_all("(\(\d+\))", $filename, $matches)) {
+                        if (preg_match("(\(\d+\)$)", $filename, $matches)) {
                             //grab that (\d) value...
-                            preg_match('(\d+)', $matches[0][0], $values);
+                            preg_match('(\d+)', $matches[0], $values);
 
                             //read the int of that match, and increment by 1
                             $copy = (int)$values[0] + 1;
 
                             //use that as the new append file count
-                            $filename = str_replace($matches[0][0], sprintf("(%d)", $copy), $filename);
+                            $filename = str_replace($matches[0], sprintf("(%d)", $copy), $filename);
                         } else {
                             //fist instance of a dupe file, so add (1)
                             $filename .= '(1)';
