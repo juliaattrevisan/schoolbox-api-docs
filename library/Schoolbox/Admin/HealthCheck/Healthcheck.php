@@ -606,37 +606,37 @@ class Healthcheck
             $mediaSchema = 'dbo';
         }
 
-        // Pastoral upload tests.
-        if ($this->configMapper->get('external_pastoral_upload')) {
-            $prefix = $mediaDb ? ($mediaDb . '.') : '';
-            $this->insertTest(
-                [
-                    $prefix . $mediaSchema . '.tDocuments',
-                    $prefix . $mediaSchema . '.DocumentReferences',
-                    $prefix . $mediaSchema . '.tDocumentReferences',
-                ]
-            );
-            $this->selectTest(
-                [
-                    'tDocuments',
-                    'DocumentReferences',
-                    'tDocumentReferences',
-                ],
-                $mediaDb,
-                $mediaSchema
-            );
-        }
+        if (
+            // Combine these two to avoid repeating tests.
+            $this->configMapper->get('external_pastoral_upload') ||
+            $this->configMapper->get('external_document_report_enabled')
+        ) {
+            $tablesForInsertTest = [];
+            $tablesForSelectTest = [];
+            $prefix              = $mediaDb ? ($mediaDb . '.') : '';
 
-        // External document reports.
-        if ($this->configMapper->get('external_document_report_enabled')) {
+            // Pastoral upload tests.
+            if ($this->configMapper->get('external_pastoral_upload')) {
+                $tablesForInsertTest[] = $prefix . $mediaSchema . '.tDocuments';
+                $tablesForInsertTest[] = $prefix . $mediaSchema . '.DocumentReferences';
+                $tablesForInsertTest[] = $prefix . $mediaSchema . '.tDocumentReferences';
+                $tablesForSelectTest[] = 'tDocuments';
+                $tablesForSelectTest[] = 'DocumentReferences';
+                $tablesForSelectTest[] = 'tDocumentReferences';
+            }
+
+            // External document reports.
+            if ($this->configMapper->get('external_document_report_enabled')) {
+                $tablesForSelectTest[] = 'StudentReportsArchiveLink';
+                $tablesForSelectTest[] = 'StudentReportsArchive';
+                $tablesForSelectTest[] = 'tDocuments';
+                $tablesForSelectTest[] = 'DocumentReferences';
+                $tablesForSelectTest[] = 'pvDocumentReferences';
+            }
+
+            $this->insertTest(array_unique($tablesForInsertTest));
             $this->selectTest(
-                [
-                    'StudentReportsArchiveLink',
-                    'StudentReportsArchive',
-                    'tDocuments',
-                    'DocumentReferences',
-                    'pvDocumentReferences',
-                ],
+                array_unique($tablesForSelectTest),
                 $mediaDb,
                 $mediaSchema
             );
