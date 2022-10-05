@@ -710,9 +710,11 @@ class Manager
             $this->logger->debug($this->prefixLog("Checking mutex required: '$hash'"));
             if ($this->localStorageDir !== null) {
                 // If using local storage
-                $path        = FilesystemProxy::getPathFromHash($hash);
-                $cmd         = self::IDENTIFY_BIN . " -format '%n\\n' {$this->localStorageDir}/$path | head -n 1";
-                $countLayers = (int)exec($cmd, $output, $exitCode);
+                $path = FilesystemProxy::getPathFromHash($hash);
+                $cmd  = self::IDENTIFY_BIN . " " . escapeshellarg("{$this->localStorageDir}/$path");
+                exec($cmd, $output, $exitCode);
+                // identify outputs one line per layer
+                $countLayers = count($output);
                 if ($exitCode) {
                     $this->logger->error("Unable to determine image layer count, assuming multiple layers");
                     $this->requiresMutexCache[$hash] = true;
