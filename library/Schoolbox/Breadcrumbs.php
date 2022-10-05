@@ -10,6 +10,10 @@
 namespace Schoolbox;
 
 use SitePage;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Quiz;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
 class Breadcrumbs
 {
@@ -88,5 +92,130 @@ class Breadcrumbs
                 'class' => '',
             ],
         ];
+    }
+
+    /**
+     * @param Quiz\Model  $assessment
+     * @param int         $assessId
+     * @param String      $assessTitle
+     * @param String|null $sectionTitle
+     * @return array
+     *
+     * Return an array of breadcrumbs suitable for use in self::renderIntoSitePage().
+     */
+    public static function getAssessmentCrumbs(
+        Quiz\Model $assessment,
+        int $assessId,
+        string $assessTitle,
+        ?string $sectionTitle = null
+    ): array {
+        $breadcrumbs = [
+            [
+                'text'  => 'Learning',
+                'href'  => '/learning/classes',
+                'class' => ''
+            ],
+        ];
+
+        // Maybe add more breadcrumbs here, depending on the type of the object to which the quiz belongs.
+        $context = $assessment->getContext();
+        if ($context instanceof Project) {
+            // Quiz belongs to subject->unit->project (eg. '9ENGA'->'Romeo and Juliet'->'Project'), so add breadcrumbs for subject, unit, and project.
+            $project        = $context;
+            $projectContext = $project->getContext();
+
+            if ($projectContext instanceof UnitImplementation) {
+                $unitSpec       = $projectContext->getSpecification(); // TESTED - Works with assess_id 130.
+                $unitSpecFolder = $unitSpec->getFolder();
+                $subjectFolder  = $projectContext->getFolder(); // TESTED - Works with assess_id 130.
+                $breadcrumbs[]  = [
+                    'text'  => $subjectFolder->getTitle(),
+                    'href'  => "/homepage/{$subjectFolder->getId()}",
+                    'class' => ''
+                ];
+            } elseif ($projectContext instanceof UnitSpecification) {
+                // NOTE: UnitSpecifications are not attached to subjects.
+                //       Think of them as templates of units that become implementations only when they are attached to subjects.
+                $unitSpec       = $projectContext;
+                $unitSpecFolder = $unitSpec->getFolder();
+            } else {
+                throw ErrorMapper::getInstance()->generateException(
+                    0, null, "Unknown type '" . get_class($projectContext) . "' for project context."
+                );
+            }
+
+            $breadcrumbs[] = [
+                'text'  => $unitSpecFolder->getTitle(),
+                'href'  => "/homepage/{$unitSpecFolder->getId()}",
+                'class' => ''
+            ];
+            $breadcrumbs[] = [
+                'text'  => $project->getTitle(),
+                'href'  => "/learning/assessments/{$project->getId()}",
+                'class' => ''
+            ];
+        } elseif ($context instanceof UnitImplementation) {
+            // Quiz belongs to subject->unit (eg. '9ENGA'->'Romeo and Juliet'), so add breadcrumbs for subject and unit.
+            $unit           = $context;
+            $subjectFolder  = $unit->getFolder(); // TESTED - Works with assess_id 111.
+            $unitSpecFolder = $unit->getSpecification()->getFolder();
+            $breadcrumbs[]  = [
+                'text'  => $subjectFolder->getTitle(),
+                'href'  => "/homepage/{$subjectFolder->getId()}",
+                'class' => ''
+            ];
+            $breadcrumbs[] = [
+                'text'  => $unitSpecFolder->getTitle(),
+                'href'  => "/homepage/{$unitSpecFolder->getId()}",
+                'class' => ''
+            ];
+        } elseif ($context instanceof UnitSpecification) {
+            // Quiz belongs to subject->unit specification (eg. spec for '9ENGA'->'Romeo and Juliet'), so add breadcrumb for unit only.
+            // NOTE: UnitSpecifications are not attached to subjects.
+            //       Think of them as templates of units that become implementations only when they are attached to subjects.
+            $unitSpec       = $context;
+            $unitSpecFolder = $unitSpec->getFolder();
+            $breadcrumbs[]  = [
+                'text'  => $unitSpecFolder->getTitle(),
+                'href'  => "/homepage/{$unitSpecFolder->getId()}",
+                'class' => ''
+            ];
+        } else {
+            // Quiz belongs directly to subject (eg. 9ENGA), so add breadcrumb for subject only.
+            $subjectFolder = $context; // TESTED - Works with assess_id 128.
+            $breadcrumbs[]  = [
+                'text'  => $subjectFolder->getTitle(),
+                'href'  => "/homepage/{$subjectFolder->getId()}",
+                'class' => ''
+            ];
+        }
+
+        // This is the breadcrumb for the assessment itself.
+        $breadcrumbs[] = [
+            'text'  => $assessTitle,
+            'href'  => "/learning/assessments/{$assessment->getId()}/status",
+            'class' => ''
+        ];
+
+        if ($sectionTitle === null) {
+            $breadcrumbs[] = [
+                'text'  => 'Horizontal Marking',
+                'href'  => '#',
+                'class' => 'active'
+            ];
+        } else {
+            $breadcrumbs[] = [
+                'text'  => 'Horizontal Marking',
+                'href'  => "/assess/reviewHorizontal/$assessId",
+                'class' => 'active'
+            ];
+            $breadcrumbs[] = [
+                'text'  => Scrub::text($sectionTitle),
+                'href'  => "#",
+                'class' => 'active'
+            ];
+        }
+
+        return $breadcrumbs;
     }
 }
