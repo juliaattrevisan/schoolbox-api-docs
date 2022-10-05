@@ -219,12 +219,14 @@ class Controller extends ConfigController
             ->setMimeFilter('image/*')
             ->setFilesystemContext('images');
 
+        $report = $this->reportMapper->createModel();
+        $report->setFileName(Model::DEFAULT_FILENAME);
         $this->getResponse()->content->set([
             'template' => '@adminSummativeReport/create.twig',
             'data' => [
                 'pageCurrent' => $this->router->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminSummativeReport.getList')),
-                'report' => null,
+                'report' => $report,
                 'options' => Model::DEFAULT_OPTIONS,
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext()

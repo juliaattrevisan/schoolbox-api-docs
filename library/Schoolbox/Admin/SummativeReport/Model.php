@@ -50,6 +50,11 @@ class Model implements ISoftDeletable
         ]
     ];
 
+    /**
+     * default filename, to be kept in a common place.
+     */
+    public const DEFAULT_FILENAME = "[externalID]/Semester Report - [firstname] [surname]";
+
     private ?string $title = null;
     private ?string $introduction = null;
     private ?\Schoolbox\Resource\Storage\Model $logo = null;
@@ -202,7 +207,6 @@ class Model implements ISoftDeletable
     /**
      * Dynamic filename structure to allow the user to specify the format for the reports.
      * if attempting to save a blank fileName, it will use a sane default of
-     * `[externalID]/Semester Report - [firstname] [surname]`
      *
      * @param null|string $filename
      * @return $this
@@ -211,7 +215,7 @@ class Model implements ISoftDeletable
     {
         //if blank or empty use default value
         if ('' === trim((string)$filename)) {
-            $filename = "[externalID]/Semester Report - [firstname] [surname]";
+            $filename = self::DEFAULT_FILENAME;
         }
 
         //if the name contains .pdf then remove that now, it will be appended when it is sent out
