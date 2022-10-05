@@ -69,7 +69,6 @@ class Healthcheck
         $this->externalType = $configMapper->get('external_type');
     }
 
-
     /**
      * This method is designed to provide information about the permissions of the External database
      *
@@ -118,7 +117,6 @@ class Healthcheck
         }
     }
 
-
     /**
      * Return the results
      *
@@ -131,7 +129,6 @@ class Healthcheck
             'externalType' => $this->externalType,
         ];
     }
-
 
     /**
      * Execute external database tests
@@ -180,7 +177,6 @@ class Healthcheck
                 throw new \LogicException("Unrecognised external type: {$this->externalType}");
         }
     }
-
 
     /**
      * Test a query against each database object in the supplied array
@@ -243,7 +239,6 @@ class Healthcheck
         }
     }
 
-
     /**
      * Attempts to being a transaction if one is not in progress
      *
@@ -256,7 +251,6 @@ class Healthcheck
             $connector->beginTransaction();
         }
     }
-
 
     /**
      * Attempts to rollback a transaction if one is in progress
@@ -359,7 +353,6 @@ class Healthcheck
         }
     }
 
-
     /**
      * Returns the names of any database views configured for use by the UPS system
      *
@@ -384,8 +377,7 @@ class Healthcheck
         return $tables;
     }
 
-    // Connector specific test functions
-
+    // Connector specific test functions.
 
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
@@ -437,7 +429,6 @@ class Healthcheck
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
     }
-
 
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
@@ -506,14 +497,8 @@ class Healthcheck
 
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
-
-        $procedures = [
-            'spSelTimeTable',
-        ];
-
-        $this->executeTest($procedures);
+        $this->executeTest(['spSelTimeTable']); // Test stored procedures.
     }
-
 
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
@@ -522,12 +507,29 @@ class Healthcheck
     {
         $tables = [
             'Addresses',
+            'AttendanceMaster',
             'CalendarEvents',
             'Community',
             'CommunityAlerts',
             'Config',
             'Constituencies',
             'FileSemesters',
+            'IndividualPlans',
+            'Relationships',
+            'StaffAssessmentMarkBook',
+            'StaffSchedule',
+            'StaffScheduleStudentClasses',
+            'StudentAssessmentMarkBook',
+            'StudentClasses',
+            'StudentContactsPortal',
+            'StudentYears',
+            'SubjectClassStaff',
+            'SubjectClasses',
+            'Timetable',
+            'TimetableDefinition',
+            'TimetableSubstitutes',
+            'luAbsenceReason',
+            'luAbsenceType',
             'luBoarder',
             'luBuilding',
             'luCountry',
@@ -537,49 +539,30 @@ class Healthcheck
             'luFileType',
             'luForm',
             'luHouse',
-            'luRoom',
+            'luLocation',
             'luReportResultType',
+            'luRoom',
+            'luStudentStatus',
+            'luTeam',
+            'luTimetableGroup',
             'luTutor',
             'luYearLevel',
-            'Relationships',
-            'StudentContactsPortal',
-            'StudentClasses',
-            'SubjectClasses',
-            'SubjectClassStaff',
-            'Timetable',
-            'TimetableDefinition',
-            'TimetableSubstitutes',
-            'luTimetableGroup',
-            'luLocation',
-            'luTeam',
-            'StaffSchedule',
-            'StaffScheduleStudentClasses',
+            'tAttendances',
             'vCommunityAddresses',
             'vPhotos',
             'vStaff',
             'vStaffJobPositions',
+            'vStudentClasses',
             'vStudentContactAllAddress',
             'vStudents',
-            'vSubjectClassesStaff',
-            'vStudentClasses',
-            'StaffAssessmentMarkBook',
-            'StudentAssessmentMarkBook',
-            'luAbsenceReason',
-            'luAbsenceType',
-            'TimetableSubstitutes',
-            'wkAttendances',
-            'AttendanceMaster',
-            'tAttendances',
-            'IndividualPlans',
-            'StudentYears',
             'vStudentsAll',
-            'luStudentStatus',
+            'vSubjectClassesStaff',
+            'wkAttendances',
         ];
 
-        // Pastoral Care Tables (Only If Module Enabled)
-
+        // Pastoral care tables (only if module enabled).
         if ($this->configMapper->get(ConfigMapper::NAME_PASTORAL_ENABLED)) {
-            $allPastoralTables      = [
+            $allPastoralTables = [
                 'PastoralCareComments',
                 'PastoralCareContacts',
                 'PastoralCareActions',
@@ -602,11 +585,11 @@ class Healthcheck
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
 
-        // Attendance Update Tests
+        // Attendance update Tests.
         $this->updateTest(['wkAttendances']);
         $this->updateTest(['AttendanceMaster']);
 
-        // Markbook Tests
+        // Markbook tests.
         if ($this->configMapper->get('external_markbook')) {
             $markbookTables = ['StaffAssessmentMarkBook', 'StudentAssessmentMarkBook'];
             $this->updateTest($markbookTables);
@@ -623,7 +606,7 @@ class Healthcheck
             $mediaSchema = 'dbo';
         }
 
-        // Pastoral upload
+        // Pastoral upload tests.
         if ($this->configMapper->get('external_pastoral_upload')) {
             $prefix = $mediaDb ? ($mediaDb . '.') : '';
             $this->insertTest(
@@ -644,9 +627,7 @@ class Healthcheck
             );
         }
 
-
-        // External Document Reports
-
+        // External document reports.
         if ($this->configMapper->get('external_document_report_enabled')) {
             $this->selectTest(
                 [
@@ -661,7 +642,7 @@ class Healthcheck
             );
         }
 
-        // Community Portal Password Update
+        // Community portal password update.
         if ($this->configMapper->get('synergetic_password_reset')) {
             $this->updateTest(['CommunityLogins']);
 
@@ -670,8 +651,6 @@ class Healthcheck
                 $this->insertTest(['CommunityLoginsPage']);
             }
         }
-
-        // Stored Procedures
 
         $procedures = [
             'spgTimetableDay',
@@ -685,11 +664,9 @@ class Healthcheck
             'spuExcursionDetails',
             'spiCommunityEventsCurrent',
         ];
-
         $this->executeTest($procedures);
 
         $functions = ['dbo.fnTimeStr'];
-
         $this->executeTest($functions);
     }
 
@@ -719,7 +696,6 @@ class Healthcheck
         $this->executeTest($procedures);
     }
 
-
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
      */
@@ -735,7 +711,6 @@ class Healthcheck
 
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
-
 
         $fcTables = [
             "TimetableSubject",
@@ -765,7 +740,6 @@ class Healthcheck
             'SELECT TOP 1 * FROM fc.TimetableBlockInstance tbi CROSS APPLY :object(tbi.TimetablePeriodID, tbi.Consecutive) tpe'
         );
     }
-
 
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
@@ -818,18 +792,19 @@ class Healthcheck
         $this->selectTest($tables);
     }
 
-
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
      */
     private function isamsTest(): void
     {
-        $list[] = 'V_Class';
-        $list[] = 'V_Parent';
-        $list[] = 'V_Staff';
-        $list[] = 'V_Student';
-        $list[] = 'V_TimetableSchedule';
-        $list[] = 'V_TimetableStructure';
+        $list = [
+            'V_Class',
+            'V_Parent',
+            'V_Staff',
+            'V_Student',
+            'V_TimetableSchedule',
+            'V_TimetableStructure',
+        ];
 
         $list = array_merge($list, $this->customUPSTest());
         $this->selectTest($list);
