@@ -110,7 +110,7 @@ class Processor
     {
         // ensure file format is actually a string (it may have been a mimetype object)
         $mimetype   = $this->mimetype ?? $this->pathFilesystem->mimeType($this->path);
-        $fileFormat = new TransformFormat($mimetype);
+        $fileFormat = TransformFormat::createFromMime($mimetype);
 
         // Is this a SVG? just stream it if so, don't even attempt to transform
         if ('svg' === $fileFormat->getFormat()) {
