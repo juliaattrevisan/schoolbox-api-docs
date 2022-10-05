@@ -74,7 +74,13 @@ class User extends SimpleStrategy
         return "
             SELECT
                 user.id,
-                TRIM(CONCAT(COALESCE(firstname, ''), ' ', COALESCE(lastname, ''), ' (', `groups`.name, ')')) AS name,
+                TRIM(CONCAT(
+                    COALESCE(firstname, ''), 
+                    ' ', 
+                    COALESCE(lastname, ''), 
+                    IF (synergy_id != '', CONCAT(' (', synergy_id, ')'), ''), 
+                    ' (', `groups`.name, ')')
+                ) AS name,
                 '{$entityType}' AS entity_type,
                 `groups`.group_type as entity_meta
             FROM `user`
@@ -98,10 +104,18 @@ class User extends SimpleStrategy
             ->in('id', $entityValues);
 
         $sql = "
-            SELECT '{$entityType}' entity_type, id entity_value, CONCAT(firstname, ' ', lastname) name
+            SELECT '{$entityType}' entity_type, user.id entity_value, CONCAT(
+                firstname, 
+                ' ', 
+                lastname,
+                IF (synergy_id != '', CONCAT(' (', synergy_id, ')'), ''),
+                CONCAT(' (', `groups`.name, ')')
+            ) name
             FROM user
+            INNER JOIN `groups` ON user.group_id = `groups`.id
             WHERE {$pb->getWhereIntersect()}
         ";
+
         return new TranslateSql($sql, $pb->getParams());
     }
 
