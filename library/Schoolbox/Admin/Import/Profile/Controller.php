@@ -143,7 +143,7 @@ class Controller extends Base
             ->setModalTitle('Select CSV Files')
             ->setAttachmentsLabel('')
             ->setAttachPrompt($prompt)
-            ->setMimeFilter('*/*')
+            ->setMimeFilter('.csv')
             ->setReadOnly(false)
             ->setMulti(false)
             ->useImportExpiryDate()

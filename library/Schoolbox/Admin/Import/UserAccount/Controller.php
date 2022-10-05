@@ -183,6 +183,7 @@ class Controller extends Base
             ->setAttachmentsLabel('Upload CSV')
             ->setAttachPrompt('upload CSV')
             ->setReadOnly($readonly)
+            ->setMimeFilter('.csv')
             ->setMulti(false)
             ->useImportExpiryDate();
 
