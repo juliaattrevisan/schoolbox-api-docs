@@ -46,13 +46,17 @@ class Controller extends Component_Homepage_ControllerAbstract
             }
         }
 
+        /* See if we can find the textbox specified in the component config
+         * A textbox that's deleted is treated the same as if it never existed;
+         * we have to decide how to allow users to interact/manage this
+         */
         $textboxMapper = TextboxMapper::getInstance();
         try {
             $this->textbox = $textboxMapper->findById($this->getConfig('textbox'));
         } catch (\Schoolbox\Mapper\Exception $e) {
-            // didn't find it or it's been deleted
-            // display this component only if current user has WRITE+ permission to this folder
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContextPermission() < UserAccess::ACCESS_WRITE) {
+            // show empty state, only if the user can create a new text box in this folder
+            // when alt-sourced and text box is not selected, just hide it until existing text box is selected
+            if (!$this->hasContextWriteAccess()) {
                 return false;
             }
             $this->textbox = $textboxMapper
@@ -86,7 +90,13 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        if (!$this->isSourceRenderable()) {
+        // If alt source is not renderable
+        // or alt source is set without any text box selected, and does not have write permission to alt sourced folder
+        // show the Unable to display empty state
+        if (
+            !$this->isSourceRenderable()
+            || ($this->isUsingAltSource() && !$this->textbox->getId() && !$this->hasWriteAccess())
+        ) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
