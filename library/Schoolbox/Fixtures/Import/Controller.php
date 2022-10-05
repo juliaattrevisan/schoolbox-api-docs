@@ -286,7 +286,7 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setAttachPrompt('Upload CSV')
             ->setReadOnly(false)
-            ->setMimeFilter('.csv')
+            ->setMimeFilter('.csv,text/csv')
             ->setMulti(true)
             ->attachFiles($attachments ?? []);
 

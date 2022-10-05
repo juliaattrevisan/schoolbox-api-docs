@@ -158,7 +158,7 @@ class Controller extends Base
             ->setModalTitle('Select CSV')
             ->setAttachmentsLabel('')
             ->setAttachPrompt('Upload CSV')
-            ->setMimeFilter('.csv')
+            ->setMimeFilter('.csv,text/csv')
             ->setReadOnly(false)
             ->setMulti(false);
 
