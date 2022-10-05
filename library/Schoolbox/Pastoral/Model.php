@@ -36,7 +36,7 @@ class Model implements ISoftDeletable, IModel
     /** @var Alaress_Date_Format $updatedAtDisplay The date this record, or any of its accessible comments were last updated */
     private $updatedAtDisplay;
 
-    /** @var User $modifiedByDisplay The person that last modified the record, or any of its accessible comments */
+    /** @var User|null $modifiedByDisplay The person that last modified the record, or any of its accessible comments */
     private $modifiedByDisplay;
 
     /** @var null|int Identifier of corresponding SIS record. NULL if none. */
@@ -553,7 +553,7 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return User
+     * @return User|null
      */
     public function getModifiedByDisplay()
     {
