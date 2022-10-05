@@ -28,41 +28,17 @@ use Schoolbox\User;
 class Factory
 {
     /**
-     * @var Router
-     */
-    private $router;
-
-
-    /**
-     * @var Authorizer
-     */
-    private $authorizer;
-
-
-    /**
-     * @var Access
-     */
-    private $access;
-
-
-    /**
-     * Constructor
-     *
-     * @param Router $router Used to generate route URLs
-     */
-    /**
      * Constructor
      *
      * @param Router     $router     Used to generate route URLs
-     * @param Authorizer $authorizer Used to verify that route URLs are
-     *                               accessible
+     * @param Authorizer $authorizer Used to verify that route URLs are accessible
      * @param Access     $access     Used to verify homepage access permissions
      */
-    public function __construct(Router $router, Authorizer $authorizer, Access $access)
-    {
-        $this->router     = $router;
-        $this->authorizer = $authorizer;
-        $this->access     = $access;
+    public function __construct(
+        private Router $router,
+        private Authorizer $authorizer,
+        private Access $access
+    ) {
     }
 
     /**
