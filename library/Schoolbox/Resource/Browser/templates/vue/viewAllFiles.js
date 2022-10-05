@@ -7,5 +7,6 @@ const app = createApp({
         ViewAllFiles
     }
 });
+app.config.globalProperties.cdnPrefix = window.cdnPrefix;
 app.use(ClientTable)
 app.mount('#view-all-files-container');
