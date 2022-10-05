@@ -29,7 +29,6 @@ use Schoolbox\Pastoral\Attachment\Model as PastoralAttachment;
  */
 class AccessLevelCensorTest extends TestCase
 {
-
     /** @var Pastoral\AccessLevelCensor */
     private $accessLevelCensor;
 
