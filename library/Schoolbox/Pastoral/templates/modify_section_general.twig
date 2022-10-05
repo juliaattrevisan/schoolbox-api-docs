@@ -8,11 +8,14 @@
     </fieldset>
     <fieldset class="content">
         <div class="small-12 medium-6 columns">
-            <label for="typeId">Type</label>
-                <select name="typeId" id="typeId">
+            <label for="typeId" class="required">Type</label>
+                <select name="typeId" id="typeId" required>
                     {# Is this record's type deleted? #}
                     {% if record.type.deleted ?? false %}
                         <option selected value="{{ record.type.id }}">{{ record.type.name }} (deleted)</option>
+                    {% endif %}
+                    {% if record.type.id is not defined %}
+                        <option disabled selected>Please select a type</option>
                     {% endif %}
                     {% for type in types %}
                         <option {% if type.id == record.type.id ?? '' %}selected{% endif %}
