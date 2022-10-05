@@ -6,7 +6,6 @@
  # bool kamiEnabled Schoolbox-configured var that determines whether kami export is available
  #}
 {% if response and response.allFiles.count %}
-    {% if kamiEnabled %}
         <script src="{{ CDN_PREFIX }}/js/submissions/jquery.kami-export.js?v={{ config.site_version }}"></script>
         <script>
             $(function() {
@@ -16,14 +15,13 @@
                 });
             });
         </script>
-    {% endif %}
 
     <div class="row">
         <div class="small-12 island">
             <h2 class="subheader">Files</h2>
             <ul class="inline-grader-filelist grid small-block-grid-1 medium-block-grid-2">
                 {% for currentFile in response.allFiles %}
-                    {% if currentFile.kami and kamiEnabled %}
+                    {% if currentFile.kami %}
                     {% set selected = '' %}
                     {% if (selectedFileHash is defined and currentFile.hash == selectedFileHash) or (loop.index0 == 0 and not selectedFileHash) %}
                         {% set selected = 'selected' %}
