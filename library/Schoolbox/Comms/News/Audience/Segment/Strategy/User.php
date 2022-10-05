@@ -156,18 +156,18 @@ class User extends SimpleStrategy
             $this->formatter = (new Factory())->buildFromNothing();
         }
         $nameParts     = explode('::', $name);
-        $nameArray     =
-            [
-                'title'          => $nameParts[0],
-                'firstname'      => $nameParts[1],
-                'preferred_name' => $nameParts[2],
-                'lastname'       => $nameParts[3],
-            ];
+        $nameArray     = [
+            'title'          => $nameParts[0],
+            'firstname'      => $nameParts[1],
+            'preferred_name' => $nameParts[2],
+            'lastname'       => $nameParts[3],
+            'externalId'     => '' !== $nameParts[4] ? "({$nameParts[4]})" : '',
+            'role'           => '' !== $nameParts[5] ? "({$nameParts[5]})" : ''
+        ];
+
         $formattedName = $this->formatter->formatArray($nameArray);
-        if (isset($nameParts[4])) {
-            $formattedName .= " ({$nameParts[4]})";
-        }
-        return $formattedName;
+
+        return trim("{$formattedName} {$nameArray['externalId']} {$nameArray['role']}");
     }
 
 
