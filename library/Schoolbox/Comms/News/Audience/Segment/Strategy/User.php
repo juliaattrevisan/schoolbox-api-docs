@@ -15,9 +15,14 @@ use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
+use Schoolbox\User\Formatter\Factory;
+use Schoolbox\User\Formatter\Formatter;
 
 class User extends SimpleStrategy
 {
+    private Formatter | null $formatter = null;
+
+
     /**
      * @return string
      */
@@ -75,11 +80,17 @@ class User extends SimpleStrategy
             SELECT
                 user.id,
                 TRIM(CONCAT(
-                    COALESCE(firstname, ''), 
-                    ' ', 
-                    COALESCE(lastname, ''), 
-                    IF (synergy_id != '', CONCAT(' (', synergy_id, ')'), ''), 
-                    ' (', `groups`.name, ')')
+                    COALESCE(title, ''),
+                    '::',
+                    COALESCE(firstname, ''),
+                    '::', 
+                    COALESCE(preferred_name, ''),
+                    '::', 
+                    COALESCE(lastname, ''),
+                    '::', 
+                    COALESCE(synergy_id, ''),
+                    '::',
+                    `groups`.name
                 ) AS name,
                 '{$entityType}' AS entity_type,
                 `groups`.group_type as entity_meta
@@ -104,13 +115,20 @@ class User extends SimpleStrategy
             ->in('id', $entityValues);
 
         $sql = "
-            SELECT '{$entityType}' entity_type, user.id entity_value, CONCAT(
-                firstname, 
-                ' ', 
-                lastname,
-                IF (synergy_id != '', CONCAT(' (', synergy_id, ')'), ''),
-                CONCAT(' (', `groups`.name, ')')
-            ) name
+            SELECT '{$entityType}' entity_type, user.id entity_value, 
+                TRIM(CONCAT(
+                    COALESCE(title, ''),
+                    '::',
+                    COALESCE(firstname, ''),
+                    '::', 
+                    COALESCE(preferred_name, ''),
+                    '::', 
+                    COALESCE(lastname, ''),
+                    '::', 
+                    COALESCE(synergy_id, ''),
+                    '::',
+                    `groups`.name
+                )) name
             FROM user
             INNER JOIN `groups` ON user.group_id = `groups`.id
             WHERE {$pb->getWhereIntersect()}
@@ -118,6 +136,40 @@ class User extends SimpleStrategy
 
         return new TranslateSql($sql, $pb->getParams());
     }
+
+
+    /**
+     * A postprocessing method for every strategy that helps you format
+     * the entity $name after you get it from db, allowing you one last
+     * opportunity to do something to it with php that might otherwise
+     * have been annoying in sql alone
+     *
+     * @param string|null $name
+     * @return string|null
+     */
+    public function formatName(?string $name): ?string
+    {
+        if (!$name) {
+            return $name;
+        }
+        if (!$this->formatter) {
+            $this->formatter = (new Factory())->buildFromNothing();
+        }
+        $nameParts     = explode('::', $name);
+        $nameArray     =
+            [
+                'title'          => $nameParts[0],
+                'firstname'      => $nameParts[1],
+                'preferred_name' => $nameParts[2],
+                'lastname'       => $nameParts[3],
+            ];
+        $formattedName = $this->formatter->formatArray($nameArray);
+        if (isset($nameParts[4])) {
+            $formattedName .= " ({$nameParts[4]})";
+        }
+        return $formattedName;
+    }
+
 
     /**
      * @inheritdoc

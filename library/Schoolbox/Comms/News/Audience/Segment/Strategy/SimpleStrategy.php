@@ -242,4 +242,13 @@ abstract class SimpleStrategy implements ISimpleStrategy
         }
         return $entityValues;
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function formatName(?string $name): ?string
+    {
+        return $name;
+    }
 }

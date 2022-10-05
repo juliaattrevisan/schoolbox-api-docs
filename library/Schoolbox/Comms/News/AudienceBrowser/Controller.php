@@ -91,7 +91,7 @@ class Controller extends Base
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $entityType   = $row['entity_type'];
             $value        = $row['id'];
-            $name         = $row['name'];
+            $name         = $simpleStrategies[$entityType]->formatName($row['name']);
             $meta         = $row['entity_meta'];
             $encodedValue = $codec->encodeValue($value);
 
@@ -171,7 +171,7 @@ class Controller extends Base
             $stmt = $this->db->executeQuery($sql);
             /** @noinspection PhpAssignmentInConditionInspection */
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $valueLabels[$codec->encodeValue($row['id'])] = $row['name'];
+                $valueLabels[$codec->encodeValue($row['id'])] = $strategy->formatName($row['name']);
             }
         }
         return $valueLabels;

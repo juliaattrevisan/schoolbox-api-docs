@@ -135,4 +135,11 @@ interface ISimpleStrategy extends IStrategy
      * @return bool|null
      */
     public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool;
+
+    /**
+     * Formats name
+     * @param string|null $name
+     * @return string|null
+     */
+    public function formatName(?string $name): ?string;
 }
