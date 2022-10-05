@@ -715,7 +715,10 @@ class Manager
                 exec($cmd, $output, $exitCode);
                 // identify outputs one line per layer
                 $countLayers = count($output);
-                if ($exitCode) {
+
+                // For reasons I don't yet know, $exitCode is always -1 even
+                // when the identify process runs successfully.
+                if ($exitCode > 0) {
                     $this->logger->error("Unable to determine image layer count, assuming multiple layers");
                     $this->requiresMutexCache[$hash] = true;
                 } else {
