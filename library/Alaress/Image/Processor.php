@@ -347,10 +347,35 @@ class Processor
                         throw new OverflowException("File height ($height) > limit ($heightLimit) - aborting");
                     }
                     break;
+                case 'disk':
+                    Imagick::setResourceLimit(
+                        Imagick::RESOURCETYPE_DISK,
+                        Alaress_Byte_Format::stringToBytes($value, false),
+                    );
+                    break;
+                case 'memory':
+                    Imagick::setResourceLimit(
+                        Imagick::RESOURCETYPE_MEMORY,
+                        Alaress_Byte_Format::stringToBytes($value, false),
+                    );
+                    break;
+                case 'map':
+                    Imagick::setResourceLimit(
+                        Imagick::RESOURCETYPE_MAP,
+                        Alaress_Byte_Format::stringToBytes($value, false),
+                    );
+                    break;
+                case 'area':
+                    // Area might be able to be supplied as a pixel count:
+                    // strip the trailing P if it's there
+                    Imagick::setResourceLimit(
+                        Imagick::RESOURCETYPE_AREA,
+                        Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false),
+                    );
+                    break;
             }
         }
 
-        Imagick::setResourceLimit(Imagick::RESOURCETYPE_DISK, 1_000_000_000);
         Imagick::setResourceLimit(Imagick::RESOURCETYPE_TIME, $this->imageMagickTimeout);
         $imagine  = (new Imagine())->setMetadataReader(new ExifMetadataReader());
         $image    = null;
