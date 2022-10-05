@@ -65,7 +65,7 @@ class Controller extends Component_Homepage_ControllerAbstract
              * From these places, find the minimum access level and that's your
              * getContentPermission() value. It might be READ even if you're a WRITE accessor
              *
-             * If it's not found
+             * If the textbox is not found for whatever reason
              *     and you're equated as a WRITE accessor in this homepage
              *     and you have permissions to alter its contents in the remote location,
              *        then make a placeholder component so you can get access to its ui etc.
