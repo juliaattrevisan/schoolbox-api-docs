@@ -12,7 +12,7 @@
 
             <ul class="information-list">
                 {% if node.children %}
-                    {% for subnode in node.children %}
+                    {% for subnode in node.children | filter (subnode => subnode.enabled) %}
                         {# _self should work here even in twig 2.x #}
                         {{ _self.outputCurriculumNode(subnode) }}
                     {% endfor %}
