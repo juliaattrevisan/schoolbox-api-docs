@@ -166,8 +166,8 @@ class Url
                         [
                             '[firstname]'     => \Scrub::filename($student->getFirstname() ?: 'unknown'),
                             '[surname]'       => \Scrub::filename($student->getLastname() ?: 'unknown'),
-                            '[externalID]'  => \Scrub::filename($student->getExternalId() ?: 'unknown'),
-                            '[yearLevel]'  => \Scrub::filename($student->getYear()?->getName() ?: 'unknown'),
+                            '[externalId]'  => \Scrub::filename($student->getExternalId() ?: 'unknown'),
+                            '[year]'  => \Scrub::filename($student->getYear()?->getName() ?: 'unknown'),
                             //yes getGivenName returns the firstname if the preferred name is not set. but it says it can also return null... I don't trust this. so null coalesce
                             '[preferredname]' => \Scrub::filename($student->getGivenName() ?: 'unknown'),
                             '[title]'         => \Scrub::filename($student->getTitle() ?: 'unknown'),
