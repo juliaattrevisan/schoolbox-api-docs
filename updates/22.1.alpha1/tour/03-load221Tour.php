@@ -20,11 +20,19 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         if($this->getConfig()->get('pastoral_enabled')) {
-            return passthru('php ' . __DIR__ .  '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour-pastoral.yaml', $returnVar);
+            passthru('php ' . __DIR__ .  '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour-pastoral.yaml', $returnVar);
         }
         else {
-            return passthru('php ' . __DIR__ .  '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour.yaml', $returnVar);
+            passthru('php ' . __DIR__ .  '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour.yaml', $returnVar);
         }
     }
-}
+
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
+};
+
+(new Schoolbox\Application\CliTool\Kernel($app))->runApp();
+
 
