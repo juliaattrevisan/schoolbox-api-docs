@@ -9,5 +9,22 @@
 
 declare(strict_types=1);
 
-passthru('php ' . __DIR__ .  '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour.yaml', $returnVar);
-exit($returnVar);
+use Schoolbox\Application\CliTool;
+
+require_once __DIR__ . '/../../../conf/core/require.php';
+
+/**
+ * Set colours to pastoral severity
+ */
+$app = new class extends CliTool\App {
+    public function run(): void
+    {
+        if($this->getConfig()->get('pastoral_enabled')) {
+            return passthru('php ' . __DIR__ .  '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour-pastoral.yaml', $returnVar);
+        }
+        else {
+            return passthru('php ' . __DIR__ .  '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour.yaml', $returnVar);
+        }
+    }
+}
+
