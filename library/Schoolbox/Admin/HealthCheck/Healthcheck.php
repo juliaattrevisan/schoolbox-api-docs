@@ -623,17 +623,25 @@ class Healthcheck
             $mediaSchema = 'dbo';
         }
 
-
         // Pastoral upload
         if ($this->configMapper->get('external_pastoral_upload')) {
             $prefix = $mediaDb ? ($mediaDb . '.') : '';
-            $tables = [
-                $prefix . $mediaSchema . '.tDocuments',
-                $prefix . $mediaSchema . '.DocumentReferences',
-                $prefix . $mediaSchema . '.tDocumentReferences',
-            ];
-            $this->insertTest($tables);
-            $this->selectTest($tables);
+            $this->insertTest(
+                [
+                    $prefix . $mediaSchema . '.tDocuments',
+                    $prefix . $mediaSchema . '.DocumentReferences',
+                    $prefix . $mediaSchema . '.tDocumentReferences',
+                ]
+            );
+            $this->selectTest(
+                [
+                    'tDocuments',
+                    'DocumentReferences',
+                    'tDocumentReferences',
+                ],
+                $mediaDb,
+                $mediaSchema
+            );
         }
 
 
