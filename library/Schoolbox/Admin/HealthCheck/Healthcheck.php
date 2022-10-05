@@ -6,11 +6,14 @@
  * @link        https://schoolbox.com.au/
  */
 
+namespace Schoolbox\Admin\HealthCheck;
+
 use Alaress\Database\Connector\IConnector;
+use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Database;
+use Schoolbox\IConfigLoader;
 
 /**
  * Performs a health check on external database permissions
@@ -31,7 +34,7 @@ class Healthcheck
     /** @var IConnector[] $secondaryConnectors Array of secondary database connectors */
     private $secondaryConnectors = [];
 
-    /** @var IConfigLoader  */
+    /** @var IConfigLoader */
     private $configMapper;
 
     /** @var LoggerInterface */
@@ -44,7 +47,7 @@ class Healthcheck
      * @param Database\Factory $databaseFactory
      * @param IConfigLoader    $configMapper
      * @param LoggerInterface  $logger
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      * @throws \Alaress\Database\Exception
      */
     public function __construct(
@@ -53,19 +56,18 @@ class Healthcheck
         IConfigLoader $configMapper,
         LoggerInterface $logger
     ) {
-        $this->logger = $logger;
+        $this->logger     = $logger;
         $databaseExternal = $databaseExternal ?? $databaseFactory->getExternalDatabase($configMapper, true);
 
         // Ensure we can connect to external database
         if (!$databaseExternal || ($databaseExternal instanceof \Alaress\Database\Connector\NullConnector)) {
-            throw new InvalidArgumentException('Unable to connect to external database');
+            throw new \InvalidArgumentException('Unable to connect to external database');
         }
 
         $this->connector    = $databaseExternal;
         $this->configMapper = $configMapper;
         $this->externalType = $configMapper->get('external_type');
     }
-
 
     /**
      * This method is designed to provide information about the permissions of the External database
@@ -74,7 +76,7 @@ class Healthcheck
      *                       - db driver does not support transactions,
      *                       - we attempt to begin a transaction when already in a transaction
      *                       - we attempt to rollback a transaction when not in a transaction
-     * @throws LogicException If configured external database type is not recognised
+     * @throws \LogicException If configured external database type is not recognised
      */
     public function run(): void
     {
@@ -115,7 +117,6 @@ class Healthcheck
         }
     }
 
-
     /**
      * Return the results
      *
@@ -129,12 +130,11 @@ class Healthcheck
         ];
     }
 
-
     /**
      * Execute external database tests
      *
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
-     * @throws LogicException If configured external database type is not recognised
+     * @throws \LogicException If configured external database type is not recognised
      */
     private function externalTest(): void
     {
@@ -174,10 +174,9 @@ class Healthcheck
                 $this->isamsTest();
                 break;
             default:
-                throw new LogicException("Unrecognised external type: {$this->externalType}");
+                throw new \LogicException("Unrecognised external type: {$this->externalType}");
         }
     }
-
 
     /**
      * Test a query against each database object in the supplied array
@@ -221,7 +220,7 @@ class Healthcheck
 
             $log = str_pad(str_pad($method, 15) . $objectName, 50);
 
-            $sql = str_replace(':object', $objectParam, $query);
+            $sql       = str_replace(':object', $objectParam, $query);
             $statement = $this->connector->prepareQuery($sql);
 
             if ($wrapInTransaction) {
@@ -240,7 +239,6 @@ class Healthcheck
         }
     }
 
-
     /**
      * Attempts to being a transaction if one is not in progress
      *
@@ -253,7 +251,6 @@ class Healthcheck
             $connector->beginTransaction();
         }
     }
-
 
     /**
      * Attempts to rollback a transaction if one is in progress
@@ -356,7 +353,6 @@ class Healthcheck
         }
     }
 
-
     /**
      * Returns the names of any database views configured for use by the UPS system
      *
@@ -364,8 +360,8 @@ class Healthcheck
      */
     public function customUPSTest(): array
     {
-        $tables = array();
-        $staff = trim($this->configMapper->get('external_custom_ups_staff'));
+        $tables = [];
+        $staff  = trim($this->configMapper->get('external_custom_ups_staff'));
         if (strlen($staff) > 0) {
             $tables[] = $staff;
         }
@@ -381,8 +377,7 @@ class Healthcheck
         return $tables;
     }
 
-    // Connector specific test functions
-
+    // Connector specific test functions.
 
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
@@ -400,7 +395,7 @@ class Healthcheck
             'SCHOOLBOX_STAFF',
             'SCHOOLBOX_TIMETABLE',
             'SCHOOLBOX_TIMETABLE_DAYS',
-            'SCHOOLBOX_TIMETABLE_DEFINITION'
+            'SCHOOLBOX_TIMETABLE_DEFINITION',
         ];
 
         $this->selectTest($db2inst1Tables, null, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
@@ -428,13 +423,12 @@ class Healthcheck
             'THTQ',
             'TT',
             'TTTG',
-            'UM'
+            'UM',
         ];
 
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
     }
-
 
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
@@ -473,7 +467,7 @@ class Healthcheck
             'studnswbos',
             'studqcaa',
             'studscsa',
-            'studvsn'
+            'studvsn',
         ];
 
         $tables = array_merge($tables, $this->customUPSTest());
@@ -498,19 +492,13 @@ class Healthcheck
             'SYSFILE',
             'IDENTITY',
             'TTABLE',
-            'WORKAREA'
+            'WORKAREA',
         ];
 
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
-
-        $procedures = [
-            'spSelTimeTable',
-        ];
-
-        $this->executeTest($procedures);
+        $this->executeTest(['spSelTimeTable']); // Test stored procedures.
     }
-
 
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
@@ -519,12 +507,29 @@ class Healthcheck
     {
         $tables = [
             'Addresses',
+            'AttendanceMaster',
             'CalendarEvents',
             'Community',
             'CommunityAlerts',
             'Config',
             'Constituencies',
             'FileSemesters',
+            'IndividualPlans',
+            'Relationships',
+            'StaffAssessmentMarkBook',
+            'StaffSchedule',
+            'StaffScheduleStudentClasses',
+            'StudentAssessmentMarkBook',
+            'StudentClasses',
+            'StudentContactsPortal',
+            'StudentYears',
+            'SubjectClassStaff',
+            'SubjectClasses',
+            'Timetable',
+            'TimetableDefinition',
+            'TimetableSubstitutes',
+            'luAbsenceReason',
+            'luAbsenceType',
             'luBoarder',
             'luBuilding',
             'luCountry',
@@ -534,49 +539,30 @@ class Healthcheck
             'luFileType',
             'luForm',
             'luHouse',
-            'luRoom',
+            'luLocation',
             'luReportResultType',
+            'luRoom',
+            'luStudentStatus',
+            'luTeam',
+            'luTimetableGroup',
             'luTutor',
             'luYearLevel',
-            'Relationships',
-            'StudentContactsPortal',
-            'StudentClasses',
-            'SubjectClasses',
-            'SubjectClassStaff',
-            'Timetable',
-            'TimetableDefinition',
-            'TimetableSubstitutes',
-            'luTimetableGroup',
-            'luLocation',
-            'luTeam',
-            'StaffSchedule',
-            'StaffScheduleStudentClasses',
+            'tAttendances',
             'vCommunityAddresses',
             'vPhotos',
             'vStaff',
             'vStaffJobPositions',
+            'vStudentClasses',
             'vStudentContactAllAddress',
             'vStudents',
-            'vSubjectClassesStaff',
-            'vStudentClasses',
-            'StaffAssessmentMarkBook',
-            'StudentAssessmentMarkBook',
-            'luAbsenceReason',
-            'luAbsenceType',
-            'TimetableSubstitutes',
-            'wkAttendances',
-            'AttendanceMaster',
-            'tAttendances',
-            'IndividualPlans',
-            'StudentYears',
             'vStudentsAll',
-            'luStudentStatus'
+            'vSubjectClassesStaff',
+            'wkAttendances',
         ];
 
-        // Pastoral Care Tables (Only If Module Enabled)
-
+        // Pastoral care tables (only if module enabled).
         if ($this->configMapper->get(ConfigMapper::NAME_PASTORAL_ENABLED)) {
-            $allPastoralTables      = [
+            $allPastoralTables = [
                 'PastoralCareComments',
                 'PastoralCareContacts',
                 'PastoralCareActions',
@@ -599,11 +585,11 @@ class Healthcheck
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
 
-        // Attendance Update Tests
+        // Attendance update Tests.
         $this->updateTest(['wkAttendances']);
         $this->updateTest(['AttendanceMaster']);
 
-        // Markbook Tests
+        // Markbook tests.
         if ($this->configMapper->get('external_markbook')) {
             $markbookTables = ['StaffAssessmentMarkBook', 'StudentAssessmentMarkBook'];
             $this->updateTest($markbookTables);
@@ -620,37 +606,43 @@ class Healthcheck
             $mediaSchema = 'dbo';
         }
 
+        if (
+            // Combine these two to avoid repeating tests.
+            $this->configMapper->get('external_pastoral_upload') ||
+            $this->configMapper->get('external_document_report_enabled')
+        ) {
+            $tablesForInsertTest = [];
+            $tablesForSelectTest = [];
+            $prefix              = $mediaDb ? ($mediaDb . '.') : '';
 
-        // Pastoral upload
-        if ($this->configMapper->get('external_pastoral_upload')) {
-            $prefix = $mediaDb ? ($mediaDb . '.') : '';
-            $this->insertTest(
-                [
-                    $prefix . $mediaSchema . '.tDocuments',
-                    $prefix . $mediaSchema . '.DocumentReferences',
-                    $prefix . $mediaSchema . '.tDocumentReferences',
-                ]
-            );
-        }
+            // Pastoral upload tests.
+            if ($this->configMapper->get('external_pastoral_upload')) {
+                $tablesForInsertTest[] = $prefix . $mediaSchema . '.tDocuments';
+                $tablesForInsertTest[] = $prefix . $mediaSchema . '.DocumentReferences';
+                $tablesForInsertTest[] = $prefix . $mediaSchema . '.tDocumentReferences';
+                $tablesForSelectTest[] = 'tDocuments';
+                $tablesForSelectTest[] = 'DocumentReferences';
+                $tablesForSelectTest[] = 'tDocumentReferences';
+            }
 
+            // External document reports.
+            if ($this->configMapper->get('external_document_report_enabled')) {
+                $tablesForSelectTest[] = 'StudentReportsArchiveLink';
+                $tablesForSelectTest[] = 'StudentReportsArchive';
+                $tablesForSelectTest[] = 'tDocuments';
+                $tablesForSelectTest[] = 'DocumentReferences';
+                $tablesForSelectTest[] = 'pvDocumentReferences';
+            }
 
-        // External Document Reports
-
-        if ($this->configMapper->get('external_document_report_enabled')) {
+            $this->insertTest(array_unique($tablesForInsertTest));
             $this->selectTest(
-                [
-                    'StudentReportsArchiveLink',
-                    'StudentReportsArchive',
-                    'tDocuments',
-                    'DocumentReferences',
-                    'pvDocumentReferences',
-                ],
+                array_unique($tablesForSelectTest),
                 $mediaDb,
                 $mediaSchema
             );
         }
 
-        // Community Portal Password Update
+        // Community portal password update.
         if ($this->configMapper->get('synergetic_password_reset')) {
             $this->updateTest(['CommunityLogins']);
 
@@ -659,8 +651,6 @@ class Healthcheck
                 $this->insertTest(['CommunityLoginsPage']);
             }
         }
-
-        // Stored Procedures
 
         $procedures = [
             'spgTimetableDay',
@@ -674,11 +664,9 @@ class Healthcheck
             'spuExcursionDetails',
             'spiCommunityEventsCurrent',
         ];
-
         $this->executeTest($procedures);
 
-        $functions = [ 'dbo.fnTimeStr' ];
-
+        $functions = ['dbo.fnTimeStr'];
         $this->executeTest($functions);
     }
 
@@ -708,7 +696,6 @@ class Healthcheck
         $this->executeTest($procedures);
     }
 
-
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
      */
@@ -724,7 +711,6 @@ class Healthcheck
 
         $tables = array_merge($tables, $this->customUPSTest());
         $this->selectTest($tables);
-
 
         $fcTables = [
             "TimetableSubject",
@@ -754,7 +740,6 @@ class Healthcheck
             'SELECT TOP 1 * FROM fc.TimetableBlockInstance tbi CROSS APPLY :object(tbi.TimetablePeriodID, tbi.Consecutive) tpe'
         );
     }
-
 
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
@@ -807,18 +792,19 @@ class Healthcheck
         $this->selectTest($tables);
     }
 
-
     /**
      * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
      */
     private function isamsTest(): void
     {
-        $list[] = 'V_Class';
-        $list[] = 'V_Parent';
-        $list[] = 'V_Staff';
-        $list[] = 'V_Student';
-        $list[] = 'V_TimetableSchedule';
-        $list[] = 'V_TimetableStructure';
+        $list = [
+            'V_Class',
+            'V_Parent',
+            'V_Staff',
+            'V_Student',
+            'V_TimetableSchedule',
+            'V_TimetableStructure',
+        ];
 
         $list = array_merge($list, $this->customUPSTest());
         $this->selectTest($list);
