@@ -91,7 +91,7 @@ class User extends SimpleStrategy
                     COALESCE(synergy_id, ''),
                     '::',
                     `groups`.name
-                ) AS name,
+                )) AS name,
                 '{$entityType}' AS entity_type,
                 `groups`.group_type as entity_meta
             FROM `user`
