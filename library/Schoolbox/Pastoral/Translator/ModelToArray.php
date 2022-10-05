@@ -132,7 +132,7 @@ class ModelToArray
             // Ownership, last modifying user and time
             'createdBy'              => call_user_func($this->userTranslator, $model->getOwner()),
             'createdAt'              => $model->getCreatedAt()->toRfc3339String(),
-            'updatedBy'              => call_user_func($this->userTranslator, $model->getModifiedByDisplay()),
+            'updatedBy'              => call_user_func($this->userTranslator, $model->getModifiedBy()),
             'updatedAt'              => $model->getUpdatedAtDisplay()->toRfc3339String(),
 
             // Links

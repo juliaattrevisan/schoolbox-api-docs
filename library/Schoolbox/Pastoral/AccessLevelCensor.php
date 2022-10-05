@@ -142,7 +142,7 @@ class AccessLevelCensor
                 if ($filteredComment->getUpdatedAt()->gt($filteredRecord->getUpdatedAtDisplay())) {
                     // Found a newer comment, update the record with the date/time, and author of the comment
                     $filteredRecord->setUpdatedAtDisplay($filteredComment->getUpdatedAt());
-                    $filteredRecord->setModifiedByDisplay($filteredComment->getOwner());
+                    $filteredRecord->setModifiedBy($filteredComment->getOwner());
                 }
             }
         }

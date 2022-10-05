@@ -22,7 +22,7 @@
                                 <a href="{{ recordLink }}"><h3>{{ record.student.fullName }}: {{ record.heading }}</h3></a>
                                 <p class="meta">
                                     {{ record.type.name }} {% if record.subtype.name is defined %}({{ record.subtype.name }}){% endif %} |
-                                    Last updated by <a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a>
+                                    Last updated by <a href="{{ profile.link(record.modifiedBy) }}">{{ record.modifiedBy.fullName }}</a>
                                     <span title="{{ record.updatedAtDisplay.short }}">{{ record.updatedAtDisplay.relativeDay }}</span>
                                 </p>
                             </div>

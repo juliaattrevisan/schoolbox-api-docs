@@ -36,9 +36,6 @@ class Model implements ISoftDeletable, IModel
     /** @var Alaress_Date_Format $updatedAtDisplay The date this record, or any of its accessible comments were last updated */
     private $updatedAtDisplay;
 
-    /** @var User $modifiedByDisplay The person that last modified the record, or any of its accessible comments */
-    private $modifiedByDisplay;
-
     /** @var null|int Identifier of corresponding SIS record. NULL if none. */
     private $externalId;
 
@@ -84,13 +81,10 @@ class Model implements ISoftDeletable, IModel
 
     /**
      * The user who created the record.
-     *
-     * @var User
      */
-    private $owner;
+    private User $owner;
 
-    /** @var null|User Null if imported from SIS */
-    private $modifiedBy;
+    private User $modifiedBy;
 
     /** @var GenericCollection<Access\Model>|null */
     private $access;
@@ -541,37 +535,11 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param User|null $modifiedByDisplay
+     * @param User $modifiedBy
      *
-     * @return self
+     * @return static
      */
-    public function setModifiedByDisplay(?User $modifiedByDisplay = null)
-    {
-        $this->modifiedByDisplay = $modifiedByDisplay;
-
-        return $this;
-    }
-
-    /**
-     * @return User
-     */
-    public function getModifiedByDisplay()
-    {
-        // If this has not been set fall back to the last record modifier
-
-        if ($this->modifiedByDisplay === null) {
-            return $this->modifiedBy;
-        }
-
-        return $this->modifiedByDisplay;
-    }
-
-    /**
-     * @param null|User $modifiedBy
-     *
-     * @return self
-     */
-    public function setModifiedBy(?User $modifiedBy = null)
+    public function setModifiedBy(User $modifiedBy): self
     {
         $this->modifiedBy = $modifiedBy;
 
@@ -579,9 +547,9 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return null|User
+     * @return User
      */
-    public function getModifiedBy()
+    public function getModifiedBy(): User
     {
         return $this->modifiedBy;
     }

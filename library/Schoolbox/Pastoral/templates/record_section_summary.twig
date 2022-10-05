@@ -21,7 +21,7 @@
 
                 {% if record.createdAt.long != record.updatedAtDisplay.long %}
                     <dt class="small-4 medium-3 columns">Last Updated By:</dt>
-                    <dd class="small-8 medium-9 columns"><a href="{{ profile.link(record.modifiedByDisplay) }}">{{ record.modifiedByDisplay.fullName }}</a></dd>
+                    <dd class="small-8 medium-9 columns"><a href="{{ profile.link(record.modifiedBy) }}">{{ record.modifiedBy.fullName }}</a></dd>
                 {% endif %}
 
                 {% if record.createdAt.long != record.updatedAtDisplay.long %}
