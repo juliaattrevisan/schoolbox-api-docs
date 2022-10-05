@@ -118,7 +118,7 @@ foreach ($typeList as $type) {
             ->setModalTitle('Select CSV/ICS')
             ->setAttachmentsLabel('')
             ->setAttachPrompt('Upload CSV/ICS')
-            ->setMimeFilter('text/csv,text/calendar')
+            ->setMimeFilter('.csv,.ics')
             ->setReadOnly(false)
             ->setMulti(false)
             ->useImportExpiryDate();
