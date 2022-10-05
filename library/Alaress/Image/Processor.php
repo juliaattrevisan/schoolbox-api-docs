@@ -327,6 +327,10 @@ class Processor
         }
         $width = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
+
+        // Test the image format again
+
+        var_dump($imagick->getImageFormat(), Imagick::queryFormats());
         set_error_handler($oldErrorHandler);
         error_reporting($oldErrorLevel);
 
