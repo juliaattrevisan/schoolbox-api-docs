@@ -54,30 +54,9 @@ class Controller extends Component_Homepage_ControllerAbstract
         try {
             $this->textbox = $textboxMapper->findById($this->getConfig('textbox'));
         } catch (\Schoolbox\Mapper\Exception $e) {
-            /* Find the minimum access level among all these places.
-             *     The current homepage
-             *         this will be at least READ, except when you're a WRITE accessor
-             *         looking at Student View in which case this will be READ.
-             *         That's because you're looking at this from a READ user's perspective
-             *     The remote location if you're alt-sourcing from there
-             *         If you aren't alt-sourcing, this will be READ
-             *
-             * From these places, find the minimum access level and that's your
-             * getContentPermission() value. It might be READ even if you're a WRITE accessor
-             *
-             * If the textbox is not found for whatever reason
-             *     and you're equated as a WRITE accessor in this homepage
-             *     and you have permissions to alter its contents in the remote location,
-             *        then make a placeholder component so you can get access to its ui etc.
-             *
-             * Otherwise, you can't do anything about it because you have READ- access
-             * to the remote location, or you only have READ access to this homepage
-             * (We just decided arbitrarily that READ accessors who have WRITE access in the
-             * remote location don't get a chance to manage its contents)
-             *
-             * Hide this whole component entirely.
-             */
-            if (!($this->hasWriteAccess() || $this->hasContextWriteAccess())) {
+            // show empty state, only if the user can create a new text box in this folder
+            // when alt-sourced and text box is not selected, just hide it until existing text box is selected
+            if (!$this->hasContextWriteAccess()) {
                 return false;
             }
             $this->textbox = $textboxMapper
