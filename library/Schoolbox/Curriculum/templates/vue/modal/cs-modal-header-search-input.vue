@@ -1,7 +1,7 @@
 <script setup>
 
 /**
- * The modal header, containing the title, select nodes and search input
+ * To search the currently selected curriculum node
  */
 
 import { computed, watch } from 'vue';
@@ -27,7 +27,7 @@ const isDisabled = computed(() => !modalActiveNodesStore.isActive);
  */
 const placeholder = computed(() => {
     if (isDisabled.value) {
-        return 'Select a Curriculum Code to enable search...'
+        return 'Expand a Curricula to enable search...'
     } else {
         return `Search ${modalActiveNodesStore.current.name} for codes or keywords...`;
     }
