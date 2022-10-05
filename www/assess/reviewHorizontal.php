@@ -409,7 +409,7 @@ function getBreadcrumbsArray(
             'class' => ''
         ];
     } elseif ($context instanceof UnitSpecification) {
-        // Quiz belongs to subject->unit specification (eg. spec for '9ENGA'->'Romeo and Juliet'), so add breadcrumbs for subject and unit.
+        // Quiz belongs to subject->unit specification (eg. spec for '9ENGA'->'Romeo and Juliet'), so add breadcrumb for unit only.
         // NOTE: UnitSpecifications are not attached to subjects.
         //       Think of them as templates of units that become implementations only when they are attached to subjects.
         $unitSpec       = $context;
