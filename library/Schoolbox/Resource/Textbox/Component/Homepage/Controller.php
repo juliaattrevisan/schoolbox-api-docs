@@ -52,7 +52,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         } catch (\Schoolbox\Mapper\Exception $e) {
             // didn't find it or it's been deleted
             // display this component only if current user has WRITE+ permission to this folder
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContextPermission() < UserAccess::ACCESS_WRITE) {
+            if (($this->getContentPermission() < UserAccess::ACCESS_WRITE) && ($this->getContextPermission() < UserAccess::ACCESS_WRITE)) {
                 return false;
             }
             $this->textbox = $textboxMapper
