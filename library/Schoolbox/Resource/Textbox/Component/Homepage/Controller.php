@@ -50,9 +50,12 @@ class Controller extends Component_Homepage_ControllerAbstract
         try {
             $this->textbox = $textboxMapper->findById($this->getConfig('textbox'));
         } catch (\Schoolbox\Mapper\Exception $e) {
-            // didn't find it or it's been deleted
-            // display this component only if current user has WRITE+ permission to this folder
-            if (($this->getContentPermission() < UserAccess::ACCESS_WRITE) && ($this->getContextPermission() < UserAccess::ACCESS_WRITE)) {
+            /* If it's not found, and either:
+             * * you're a WRITE accessor in this homepage
+             * * you have WRITE permissions to alter its contents in the remote location
+             * then make a placeholder component so you can get access to its ui etc.
+             */
+            if (!($this->hasWriteAccess() || $this->hasContextWriteAccess())) {
                 return false;
             }
             $this->textbox = $textboxMapper
@@ -86,7 +89,13 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        if (!$this->isSourceRenderable()) {
+        // If alt source is not renderable
+        // or alt source is set without any text box selected, and does not have write permission to alt sourced folder
+        // show the Unable to display empty state
+        if (
+            !$this->isSourceRenderable()
+            || ($this->isUsingAltSource() && !$this->textbox->getId() && !$this->hasWriteAccess())
+        ) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
