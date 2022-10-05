@@ -8,6 +8,8 @@
 
 namespace Alaress\Image;
 
+use UnexpectedValueException;
+
 /**
  * This class determines what formats we convert images into for the web
  * It can also tell you what mime type should be sent with specific formats
@@ -16,7 +18,10 @@ namespace Alaress\Image;
  */
 class TransformFormat
 {
-    private array $formatMap = [
+    /**
+     * Mapping of MIME types to image formats.
+     */
+    private const FORMAT_MAP = [
         'image/heif'    => 'jpg',
         'image/heic'    => 'jpg',
         'image/tiff'    => 'jpg',
@@ -30,7 +35,10 @@ class TransformFormat
         'image/svg+xml' => 'svg',
     ];
 
-    private array $mimeMap = [
+    /**
+     * Mapping of image formats to MIME types.
+     */
+    private const MIME_MAP = [
         'jpg'  => 'image/jpeg',
         'gif'  => 'image/gif',
         'png'  => 'image/png',
@@ -47,7 +55,43 @@ class TransformFormat
      */
     public function __construct(string $mime)
     {
-        $this->format = $this->formatMap[$mime];
+        $this->format = self::FORMAT_MAP[$mime];
+    }
+
+    /**
+     * Create an instance of this object from a given MIME type.
+     *
+     * @param string $mime A MIME type ("jpg", "gif", etc.)
+     * @return self
+     * @throws UnexpectedValueException if `$mime` is not recognised
+     */
+    public static function createFromMime(string $mime): self
+    {
+        $mime = strtolower($mime);
+        if (in_array($mime, self::FORMAT_MAP)) {
+            return new self($mime);
+        }
+        throw new UnexpectedValueException(
+            sprintf('MIME type "%s" is not associated with any image format', $mime)
+        );
+    }
+
+    /**
+     * Create an instance of this object from a given image format.
+     *
+     * @param string $format An image format ("jpg", "gif", etc.)
+     * @return self
+     * @throws UnexpectedValueException if `$format` is not recognised
+     */
+    public static function createFromFormat(string $format): self
+    {
+        $format = strtolower($format);
+        if (in_array($format, self::MIME_MAP)) {
+            return new self(self::MIME_MAP[$format]);
+        }
+        throw new UnexpectedValueException(
+            sprintf('Format "%s" is not associated with any image MIME type', $format)
+        );
     }
 
     /**
@@ -67,7 +111,7 @@ class TransformFormat
      */
     public function getMime(): string
     {
-        return $this->mimeMap[$this->format];
+        return self::MIME_MAP[$this->format];
     }
 
     /**
