@@ -24,6 +24,16 @@ class Component_Config_CurriculumCode extends Component_Config_Abstract
 
         $context = $component->getContext();
         if ($context instanceof Schoolbox\Resource\Folder\Model) {
+            $page->setVar(
+                [
+                    'COMPONENT_CONFIG_CURRICULUMCODE_NAME'     => 'All',
+                    'COMPONENT_CONFIG_CURRICULUMCODE_VALUE'    => '',
+                    'COMPONENT_CONFIG_CURRICULUMCODE_SELECTED' => empty($configValue)
+                        ? ' selected'
+                        : '',
+                ]
+            );
+            $page->parse('curriculumCodes_block', 'curriculumCodes', true);
             foreach ($context->getCurriculumNodes() as $node) {
                 // Value is code instead of ID, because we may eventually
                 // implement free entry

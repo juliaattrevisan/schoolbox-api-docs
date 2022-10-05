@@ -25,13 +25,17 @@
 {% import _self as macros %}
 
 
-{% if node %}
-
+{% if nodes %}
+    {% for node in nodes %}
     <div class="content">
         <ul class="information-list">
             {{ macros.outputCurriculumNode(node) }}
         </ul>
     </div>
+        {% if not loop.last %}
+            <hr>
+        {% endif %}
+    {% endfor %}
 {% else %}
 
     <div class="empty-state">

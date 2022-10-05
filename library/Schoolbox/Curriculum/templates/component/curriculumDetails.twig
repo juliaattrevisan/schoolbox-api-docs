@@ -1,6 +1,6 @@
-{% if node %}
-
+{% if nodes %}
     <div class="content">
+  {% for node in nodes %}
         <h3>
             {% if node.code %}
                 {% if isRouteAuthorized('curriculum.browse') %}
@@ -15,8 +15,11 @@
         {% if node.description %}
             <article>{{ node.description|purify }}</article>
         {% endif %}
+      {% if not loop.last %}
+          <hr>
+      {% endif %}
+  {% endfor %}
     </div>
-
 {% else %}
 
     <div class="empty-state">

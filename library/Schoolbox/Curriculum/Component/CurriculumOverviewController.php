@@ -15,6 +15,7 @@ namespace Schoolbox\Curriculum\Component;
 
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 
@@ -22,17 +23,13 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
 {
     /**
      * The curriculum to display.
-     *
-     * @var Node\Model
      */
-    protected $curriculumNode = null;
+    protected ?GenericCollection $curriculumNodes = null;
 
     /**
      * Is curriculum tagging turned on
-     *
-     * @var bool
      */
-    protected $curriculumTagging = null;
+    protected bool $curriculumTagging = false;
 
     /**
      * Loads the component's configuration.
@@ -56,29 +53,38 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         /** @var Folder\Model $context */
         $context = $this->getContext();
         if ($context->getCurriculumNodes()->count()) {
-            // No curriculum item selected? just use the first.
-            $this->curriculumNode = $context->getCurriculumNodes()->first();
+            $nodeMapper            = Node\Mapper::getInstance();
+            $this->curriculumNodes = $nodeMapper->createCollection();
+
             foreach ($context->getCurriculumNodes() as $node) {
-                if ($node->getCode() == $this->getConfig('curriculumCode')) {
-                    $this->curriculumNode = $node;
-                    break;
+                if (!$node->getEnabled()) {
+                    continue;
+                }
+                if (empty($this->getConfig('curriculumCode')) || ($node->getCode() == $this->getConfig('curriculumCode'))) {
+                    $nodeMapper->loadDescendants($node);
+                    $this->curriculumNodes->add($node);
+                }
+            }
+
+            // make sure that the node or node's ancestors do not already in the list
+            // to avoid same hierarchy appears twice in the component
+            $selectedNodeIds = $this->curriculumNodes->getPropertyValues('id');
+            foreach ($this->curriculumNodes as $offset => $node) {
+                $nodeMapper->loadAncestors($node);
+                $ancestorIds = $this->getAllAncestorIds($node);
+                $diff        = array_diff($ancestorIds, $selectedNodeIds);
+                if (count($diff) !== count($ancestorIds)) {
+                    $this->curriculumNodes->offsetUnset($offset);
                 }
             }
         } elseif ($this->getContentPermission() <= UserAccess::ACCESS_READ) {
             return false;
         }
-
-        // Load child nodes of the node model.
-        if ($this->curriculumNode instanceof Node\Model) {
-            Node\Mapper::getInstance()->loadDescendants($this->curriculumNode);
-        }
         return true;
     }
 
     /**
-     * @param String $templateHandle
-     *
-     * @return bool
+     * @inheritDoc
      */
     public function renderTemplate($templateHandle)
     {
@@ -87,9 +93,24 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             '@curriculum/component/curriculumOverview.twig',
             [
                 'context'           => $this->getContext(),
-                'node'              => $this->curriculumNode,
+                'nodes'             => $this->curriculumNodes,
                 'curriculumTagging' => $this->curriculumTagging,
             ]
         );
+    }
+
+    /**
+     * Find all ancestor ids to remove duplicates
+     * @param Node\Model $node
+     * @return array
+     */
+    private function getAllAncestorIds(Node\Model $node): array
+    {
+        $parentIds = [];
+        if ($node->getParent() instanceof Node\Model) {
+            $parentIds   = $this->getAllAncestorIds($node->getParent());
+            $parentIds[] = $node->getParent()->getId();
+        }
+        return $parentIds;
     }
 }
