@@ -32,6 +32,9 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
                 return;
             }
             $instance = $this->getInstanceFromConfig($model);
+            if (!$instance->isHomepage()) {
+                return;
+            }
             if ($previous) {
                 $diff = $this->diff($model, $previous);
                 // if src value is not changed, do nothing.
@@ -51,7 +54,11 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
             if (!$this->definitionIsSource($model)) {
                 return;
             }
-            $this->handleDelete($this->getInstanceFromConfig($model), (int)$model->getValue());
+            $instance = $this->getInstanceFromConfig($model);
+            if (!$instance->isHomepage()) {
+                return;
+            }
+            $this->handleDelete($instance, (int)$model->getValue());
         });
     }
 
