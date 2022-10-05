@@ -350,6 +350,7 @@ class Processor
             }
         }
 
+        Imagick::setResourceLimit(Imagick::RESOURCETYPE_DISK, 1_000_000_000);
         Imagick::setResourceLimit(Imagick::RESOURCETYPE_TIME, $this->imageMagickTimeout);
         $imagine  = (new Imagine())->setMetadataReader(new ExifMetadataReader());
         $image    = null;
