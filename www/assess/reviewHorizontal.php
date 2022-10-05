@@ -98,7 +98,7 @@ if (!isset($this->arg[1])) {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs();
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', getBreadcrumbsArray($assessment, $assess['assess_id'], $assess['title']));
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', getAssessmentCrumbs($assessment, $assess['assess_id'], $assess['title']));
 } elseif ($this->arg[1] === 'finalise') {
     /* Update the reviewed_at for all the latest attempts for a particular assess :D
      * How do you like them apples
@@ -329,11 +329,10 @@ if (!isset($this->arg[1])) {
     $term       = TermMapper::getInstance()->findForDate($dueDate);
     $assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
     $trail      = new Breadcrumbs();
-    $trail->renderIntoSitePage($this, 'BREADCRUMB', getBreadcrumbsArray($assessment, $assess['assess_id'], $assess['title'], $section['title']));
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', getAssessmentCrumbs($assessment, $assess['assess_id'], $assess['title'], $section['title']));
 }
 
 /**
- * @param Folder\Model $subjectFolder
  * @param Quiz\Model   $assessment
  * @param int          $assessId
  * @param String       $assessTitle
@@ -342,7 +341,7 @@ if (!isset($this->arg[1])) {
  *
  * Return an array of breadcrumbs suitable for use in the Breadcrumbs::renderIntoSitePage() function.
  */
-function getBreadcrumbsArray(
+function getAssessmentCrumbs(
     Quiz\Model $assessment,
     int $assessId,
     string $assessTitle,
