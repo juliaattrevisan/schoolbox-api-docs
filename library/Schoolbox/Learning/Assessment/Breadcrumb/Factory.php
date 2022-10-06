@@ -107,7 +107,7 @@ class Factory
         } elseif ($assessmentContext instanceof UnitImplementation) {
             // Assessment belongs to subject->unit (eg. '9ENGA'->'Romeo and Juliet'), so add crumbs for subject and unit.
             $unit           = $assessmentContext;
-            $subjectFolder  = $unit->getFolder(); // TESTED - Works with assess_id 111.
+            $subjectFolder  = $unit->getFolder();
             $unitSpecFolder = $unit->getSpecification()->getFolder();
             $trail->add([$subjectFolder->getTitle(), "/homepage/{$subjectFolder->getId()}"]); // Add breadcrumb for subject.
             $trail->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]); // Add breadcrumb for unit.
