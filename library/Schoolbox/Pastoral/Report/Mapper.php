@@ -21,6 +21,7 @@ use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -180,6 +181,25 @@ class Mapper extends BaseMapper
     {
         $dashboardJoin = $dashboardOnly ? 'JOIN' : 'LEFT JOIN';
 
+        // if current user is moderator, get all shared reports
+        // regardless of whether the pastoral group is deleted or pastoral group member doesn't exist
+        if ($user->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL) !== null) {
+            $userQuery = "
+                    `access`.`user_id` IS NOT NULL
+                    OR
+                    `access`.`group_id` IS NOT NULL";
+        } else {
+            $userQuery = "
+                    (`access`.`user_id` = :userId)
+                    OR
+                    (`access`.`group_id` IN
+                      (SELECT `group_id` FROM `pastoral_group` JOIN `pastoral_group_member` ON `pastoral_group`.`id` = `pastoral_group_member`.`group_id`
+                        AND `pastoral_group_member`.`user_id` = :userId
+                        AND `pastoral_group_member`.`deleted_at` IS NULL
+                        AND `pastoral_group`.`deleted_at` IS NULL)
+                    ) ";
+        }
+
         $sql = "
             SELECT {$this->getColumnString('report')},
                    `dashboard`.`id` as dashboard_id,
@@ -193,14 +213,7 @@ class Mapper extends BaseMapper
               AND (
                     `report`.`owner_id` = :userId
                     OR
-                    (`access`.`user_id` = :userId)
-                    OR
-                    (`access`.`group_id` IN
-                      (SELECT `group_id` FROM `pastoral_group` JOIN `pastoral_group_member` ON `pastoral_group`.`id` = `pastoral_group_member`.`group_id`
-                        AND `pastoral_group_member`.`user_id` = :userId
-                        AND `pastoral_group_member`.`deleted_at` IS NULL
-                        AND `pastoral_group`.`deleted_at` IS NULL)
-                    )
+                    {$userQuery}
                   )
         ";
 
@@ -423,6 +436,6 @@ class Mapper extends BaseMapper
             }
             $collection->offsetSet($row['report.id'], $model);
         }
-        return $collection;
+        return $collection->sortNaturally('name');
     }
 }

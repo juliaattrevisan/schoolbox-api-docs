@@ -34,7 +34,7 @@
                title="Show report on dashboard">
             <span class="icon-star alert"></span>
         </label>
-        {% if report.canEdit(USER) %}
+        {% if canEdit %}
             <a class="icon-modify no-text"
                href="{{ routeLookup('pastoralReportBuilder.getReportUpdate', {reportId: report.id, report: report}) }}"
                title="Modify Report"></a>

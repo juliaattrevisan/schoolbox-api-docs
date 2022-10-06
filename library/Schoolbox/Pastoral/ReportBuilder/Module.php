@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Alaress\Authorizer\Failure\Unauthorized;
@@ -44,26 +46,42 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $permissionStaff        =
+        $pastoralModerator = new Rule\All(
+            new Rule\HasRole(Role::STAFF),
+            new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
+        );
+
+        $permissionStaff =
             new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
+                    $pastoralModerator,
                     new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF),
-                    new Rule\All(
-                        new Rule\HasRole(Role::STAFF),
-                        new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
-                    )
                 )
             );
+
         $permissionModifyReport =
             new Rule\All(
-                $permissionStaff,
-                $this->getPermRule(ReportAccess::WRITE)
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    $pastoralModerator,
+                    new Rule\All (
+                        new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF),
+                        $this->getPermRule(ReportAccess::WRITE)
+                    ),
+                )
             );
-        $permissionReadReport   =
+
+        $permissionReadReport =
             new Rule\All(
-                $permissionStaff,
-                $this->getPermRule(ReportAccess::READ)
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    $pastoralModerator,
+                    new Rule\All (
+                        new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF),
+                        $this->getPermRule(ReportAccess::READ)
+                    ),
+                )
             );
 
         $this->registerRoutesArray(

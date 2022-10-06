@@ -38,55 +38,39 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% set found = 0 %}
-
-        {% if reportsMine | length or reportsGroup | length %}
-            {% for report in reportsMine %}
-                {% if loop.first %}
-                    {% set found = 1 %}
-                    <section>
-                    <ul id="studentsList" class="information-list">
-                {% endif %}
-                {% include '@pastoralReportBuilder/report_row.twig' with {report: report} %}
-            {% endfor %}
-
-            {% if found == 1 %}
+        {% if reportsMine | length %}
+            <section>
+                <ul id="studentsList" class="information-list">
+                    {% for report in reportsMine %}
+                        {% include '@pastoralReportBuilder/report_row.twig' with {report: report, canEdit: true} %}
+                    {% endfor %}
                 </ul>
-                </section>
-                {% include '@pastoralReportBuilder/report_empty.twig' with {hidden: 1} %}
-
-            {% else %}
-                {% include '@pastoralReportBuilder/report_empty.twig' %}
-            {% endif %}
-
-            {% set found = 0 %}
-
-            {% for report in reportsGroup %}
-                {% set firstGroup = true %}
-
-                {% if loop.first %}
-
-                    {% set found = 1 %}
-                    <h2 class="subheader">Shared Reports<span data-tooltip
-                                                              title="These reports have been shared with you"
-                                                              class="hint has-tip tip-top">?</span></h2>
-
-                    <section>
-                    <ul id="studentsList" class="information-list">
-
-                {% endif %}
-                {% include '@pastoralReportBuilder/report_row.twig' with {report: report} %}
-            {% endfor %}
-
-            {% if found == 1 %}
+            </section>
+        {% endif %}
+        {% include '@pastoralReportBuilder/report_empty.twig' with {hidden: (reportsMine | length)} %}
+        {% if reportsGroup | length %}
+            <h2 class="subheader">Shared Reports<span data-tooltip
+                                                      title="These reports have been shared with you"
+                                                      class="hint has-tip tip-top">?</span></h2>
+            <section>
+                <ul id="studentsList" class="information-list">
+                    {% for report in reportsGroup %}
+                        {% include '@pastoralReportBuilder/report_row.twig' with {report: report, canEdit: isModerator or report.canEdit(USER)} %}
+                    {% endfor %}
                 </ul>
-                </section>
-            {% endif %}
-
-        {% else %}
-
-            {% include '@pastoralReportBuilder/report_empty.twig' %}
-
+            </section>
+        {% endif %}
+        {% if reportsOther | length %}
+            <h2 class="subheader">Other Shared Reports<span data-tooltip
+                                                      title="These reports have been shared with others"
+                                                      class="hint has-tip tip-top">?</span></h2>
+            <section>
+                <ul id="studentsList" class="information-list">
+                    {% for report in reportsOther %}
+                        {% include '@pastoralReportBuilder/report_row.twig' with {report: report, canEdit: isModerator or report.canEdit(USER)} %}
+                    {% endfor %}
+                </ul>
+            </section>
         {% endif %}
     </div>
 </div>
