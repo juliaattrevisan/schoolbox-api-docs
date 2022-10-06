@@ -43,7 +43,6 @@ use UnexpectedValueException;
  */
 class Controller extends Base
 {
-
     /**
      * @var Error\Mapper
      */
@@ -300,6 +299,12 @@ class Controller extends Base
     public function getModify(Event $event): void
     {
 
+        /*
+         * if the publish date is null, then set to the event start date
+         */
+        if ($event->getPublishDateTime()->isNull()) {
+            $event->setPublishDateTime(Alaress_Date_Format::now());
+        }
         /* Preselected campuses
          * Note: this collection could be one of three data types
          */
