@@ -4,7 +4,7 @@
  * Factory
  *
  * Create a trail of crumbs based on available information regarding an existing
- * IAssessable $asseessment, or derived from a contextId/contextType tuple
+ * IAssessable $assessment, or derived from a contextId/contextType tuple
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -137,14 +137,15 @@ class Factory
     /**
      * Produce breadcrumb trail for a new IAssessable $assessment
      *
-     * These won't have enough information to determine a meaningful trail of crumbs
+     * These won't have enough information to determine a meaningful trail of crumbs,
      * so we give it the contextId/contextType, and decide from there
      *
      * @param AssessmentContext $context
-     * @param IAssessable|null $assessment
+     * @param IAssessable|null  $assessment
      * @return Collection
+     * @throws RouteNotFound
      */
-    public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null)
+    public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null): Collection
     {
         $trail = new Collection();
         $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
