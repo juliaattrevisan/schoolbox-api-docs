@@ -46,17 +46,10 @@ class TransformFormat
         'svg'  => 'image/svg+xml',
     ];
 
-
-    private string $format;
-
     /**
-     * Provided with a source mime, will convert to a destination format
-     * @param string $mime
+     * The image format associated with this transform format.
      */
-    public function __construct(string $mime)
-    {
-        $this->format = self::FORMAT_MAP[$mime];
-    }
+    private string $format;
 
     /**
      * Create an instance of this object from a given MIME type.
@@ -69,7 +62,7 @@ class TransformFormat
     {
         $mime = strtolower($mime);
         if (in_array($mime, self::FORMAT_MAP)) {
-            return new self($mime);
+            return (new self())->setFormat(self::FORMAT_MAP[$mime]);
         }
         throw new UnexpectedValueException(
             sprintf('MIME type "%s" is not associated with any image format', $mime)
@@ -87,7 +80,7 @@ class TransformFormat
     {
         $format = strtolower($format);
         if (in_array($format, self::MIME_MAP)) {
-            return new self(self::MIME_MAP[$format]);
+            return (new self())->setFormat($format);
         }
         throw new UnexpectedValueException(
             sprintf('Format "%s" is not associated with any image MIME type', $format)
