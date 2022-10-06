@@ -16,6 +16,7 @@ namespace Schoolbox\Learning\Assessment\Breadcrumb;
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
+use http\Exception\UnexpectedValueException;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -66,26 +67,19 @@ class Factory
 
         if ($assessmentContext instanceof Project) {
             // Assessment belongs to project.
-            $project        = $assessmentContext;
-            $projectContext = $project->getContext();
+            $project = $assessmentContext;
 
-            if ($projectContext instanceof UnitImplementation) {
-                // Assessment belongs to subject->unit->project (eg. '9ENGA'->'Romeo and Juliet'->'Project'), so add crumb for subject.
-                $unitSpec       = $projectContext->getSpecification();
-                $unitSpecFolder = $unitSpec->getFolder();
-                $subjectFolder  = $projectContext->getFolder();
-                $trail->add([$subjectFolder->getTitle(), "/homepage/{$subjectFolder->getId()}"]);
-            } elseif ($projectContext instanceof UnitSpecification) {
-                // Assessment belongs to unit->project specification, so cannot add crumb for subject.
-                // NOTE: UnitSpecifications are not attached to subjects.
-                //       Think of them as templates of units that become implementations only when they are attached to subjects.
-                $unitSpec       = $projectContext;
-                $unitSpecFolder = $unitSpec->getFolder();
-            } else {
-                throw new \UnexpectedValueException("Unknown type '" . get_class($projectContext) . "' for project context.");
+            if (!($project instanceof UnitImplementation || $project instanceof UnitSpecification)) {
+                throw new UnexpectedValueException(
+                    'Variable $project is expected to be an instance of either UnitImplementation or UnitSpecification.'
+                );
             }
 
-            $trail->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]); // Add crumb for unit.
+            // Forget about the trail we have started so far, and instead create a new $trail recursively.
+            // After the assignment below $trail will be either:
+            //  * 'Learning->$unit' (if $project is instanceof UnitSpecification), or
+            //  * 'Learning->$subject->$unit' (if $project is instanceof UnitImplementation)
+            $trail = $this->produceFromAssessment($project, $user);
 
             $routeParams = [
                 'assessment'   => $project,
@@ -93,7 +87,7 @@ class Factory
                 'studentId'    => $user->getId()
             ];
 
-            $trail->add( // Add crumb for project.
+            $trail->add( // Finish the trail by adding a crumb for project.
                 [
                     $project->getTitle(),
                     (
