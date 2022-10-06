@@ -88,8 +88,6 @@ class Controller extends Base
             JOIN course_specification cs ON (ci.course_specification_id = cs.id and cs.deleted_at is null)
             JOIN folder csf ON csf.id = cs.folder_id
             JOIN course_unit_implementation cui ON (ci.id = cui.course_implementation_id and cui.deleted_at is null)
-            JOIN assessment_course_unit_implementation acui ON acui.course_unit_implementation_id = cui.id
-            JOIN assessment a ON acui.assessment_id = a.id
             WHERE {$whereClause}
             GROUP BY f.id, ci.course_specification_id;
             ";
