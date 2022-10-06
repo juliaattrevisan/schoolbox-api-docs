@@ -228,7 +228,14 @@ export default {
                     change: () => { // Bind the content of CKEditor into the comment model on change
                         this.$emit('value-changed', CKEDITOR.instances[this.inputName].getData()); //notifying of any changes for a parent to maintain state
                     },
-                    instanceReady: () => { //can display the loaded CKEditor now
+                    instanceReady: (event) => { //can display the loaded CKEditor now
+                        const ckeditor = event.editor.container.$;
+                        /**
+                         * removing the Equation editor button via the 'removeButtons' in the config settings is currently preventing the drag and drop from working
+                         * so we manually remove the button once the ckeditor instance is loaded
+                         */
+                        const eqnEditorButton = ckeditor.querySelector('.cke_button__eqneditor');
+                        eqnEditorButton.style.display = 'none';
                         this.isCKEditorLoading = false;
                         this.isCKEditorLoaded = true;
                     }

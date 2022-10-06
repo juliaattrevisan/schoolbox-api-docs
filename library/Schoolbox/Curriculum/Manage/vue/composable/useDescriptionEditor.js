@@ -76,6 +76,9 @@ export function useDescriptionEditor ($initialValue, $ckeditorInstance) {
         videoAudioButton.style.display = 'none';
         const imageButton = ckeditor.querySelector('.cke_button__schoolboxresourceimage');
         imageButton.style.display = 'none';
+        const eqnEditorButton = ckeditor.querySelector('.cke_button__eqneditor');
+        eqnEditorButton.style.display = 'none';
+
     }
 
     return initialValue;
