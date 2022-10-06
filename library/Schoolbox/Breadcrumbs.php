@@ -134,9 +134,9 @@ class Breadcrumbs
             $projectContext = $project->getContext();
 
             if ($projectContext instanceof UnitImplementation) {
-                $unitSpec       = $projectContext->getSpecification(); // TESTED - Works with assess_id 130.
+                $unitSpec       = $projectContext->getSpecification();
                 $unitSpecFolder = $unitSpec->getFolder();
-                $subjectFolder  = $projectContext->getFolder(); // TESTED - Works with assess_id 130.
+                $subjectFolder  = $projectContext->getFolder();
                 $breadcrumbs[]  = [
                     'text'  => $subjectFolder->getTitle(),
                     'href'  => "/homepage/{$subjectFolder->getId()}",
@@ -166,7 +166,7 @@ class Breadcrumbs
         } elseif ($context instanceof UnitImplementation) {
             // Quiz belongs to subject->unit (eg. '9ENGA'->'Romeo and Juliet'), so add breadcrumbs for subject and unit.
             $unit           = $context;
-            $subjectFolder  = $unit->getFolder(); // TESTED - Works with assess_id 111.
+            $subjectFolder  = $unit->getFolder();
             $unitSpecFolder = $unit->getSpecification()->getFolder();
             $breadcrumbs[]  = [
                 'text'  => $subjectFolder->getTitle(),
@@ -191,7 +191,7 @@ class Breadcrumbs
             ];
         } else {
             // Quiz belongs directly to subject (eg. 9ENGA), so add breadcrumb for subject only.
-            $subjectFolder = $context; // TESTED - Works with assess_id 128.
+            $subjectFolder = $context;
             $breadcrumbs[]  = [
                 'text'  => $subjectFolder->getTitle(),
                 'href'  => "/homepage/{$subjectFolder->getId()}",
