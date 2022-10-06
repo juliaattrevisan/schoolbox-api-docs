@@ -60,7 +60,7 @@ $event
     ->setLocation($_POST['location'] ?? '')
     ->setAttendance(\count($guests) ? Event\Attendance\Model::LEVEL_INVITE_ONLY : Event\Attendance\Model::LEVEL_NO_ATTENDANCE)
     ->setDetail($_POST['detail'] ?? '')
-    ->setPublishDateTime(null)
+    ->setPublishDateTime(Alaress_Date_Format::now())
     ->setCompleted(isset($_POST['completed']) ? $_POST['completed'] : false);
 
 /* Give all-day events a time, so that update.php can calculate the minuteDelta appropriately
