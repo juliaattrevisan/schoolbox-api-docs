@@ -45,7 +45,7 @@ function onCreateNewSelected () {
                 <i class="icon-curriculum"></i>
                 <p>There's currently no Curriculum loaded to display.</p>
                 <template v-if="store.hasLoadedOk && !store.isReadOnly">
-                    <button @click.prevent="onCreateNewSelected" @keyup.enter="onCreateNewSelected" title="Create a new Curriculum">Create a new Curriculum</button>
+                    <a href="#create-curriculum" @click.prevent="onCreateNewSelected" @keyup.enter="onCreateNewSelected" title="Create a new Curriculum">Create a new Curriculum</a>
                     <a href="/curriculum/import" title="Import Curriculum">Import Curriculum</a>
                 </template>
             </div>
