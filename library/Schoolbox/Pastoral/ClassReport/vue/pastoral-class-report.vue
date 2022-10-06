@@ -121,6 +121,16 @@ export default {
         },
 
         /**
+         * Format relative time
+         *
+         * @param {String} date
+         * @returns {String}
+         */
+        formatRelative(date) {
+            return dayjs.duration(dayjs(date).diff()).humanize(true);
+        },
+
+        /**
          * Load more records for the student at this index.
          *
          * @param {Integer} studentIndex
@@ -222,11 +232,15 @@ export default {
                                             </a>
                                             <div class="time-container">
                                                 <template v-if="record.createdAt !== record.updatedAt">
-                                                    <span :title="`Updated on ${formatDateTime(record.updatedAt)}`">⭐</span>
+                                                    <span :title="'Created on ' + formatDateTime(record.createdAt) + ', last modified ' + formatDateTime(record.updatedAt)">
+                                                        Last modified <time>{{ formatRelative(record.updatedAt) }}</time>
+                                                    </span>
                                                 </template>
-                                                <time :datetime="formatDateTime(record.createdAt)" :title="formatDateTime(record.createdAt)">
-                                                    {{ formatDate(record.createdAt) }}
-                                                </time>
+                                                <template v-else>
+                                                    <span :title="'Created on ' + formatDateTime(record.createdAt)">
+                                                        Created <time>{{ formatRelative(record.createdAt) }}</time>
+                                                    </span>
+                                                </template>
                                             </div>
                                         </div>
                                     </div>
