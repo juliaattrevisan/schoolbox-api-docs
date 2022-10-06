@@ -43,7 +43,6 @@ use UnexpectedValueException;
  */
 class Controller extends Base
 {
-
     /**
      * @var Error\Mapper
      */
