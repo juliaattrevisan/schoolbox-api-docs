@@ -18,7 +18,9 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
@@ -356,6 +358,18 @@ class Profile implements IStrategy
             $enrolment = $this->findDate($enrolmentDate);
             $leaving = $this->findDate($leavingDate);
 
+            /* If the externalId was empty, skip them
+             */
+            if (null === $externalId) {
+                $this->log->warning(sprintf(
+                    'Skipping %s %s (no external identifier)',
+                    $firstname,
+                    $lastname
+                ));
+
+                continue;
+            }
+
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
              *
@@ -480,7 +494,7 @@ class Profile implements IStrategy
 
             /* Add their parents' profile data
              */
-            $this->importParentsOfStudent($student['relationships'], $studentBaseProfile, $families);
+            $this->importParentsOfStudent($student['compassPersonId'], $student['relationships'], $studentBaseProfile, $families);
         }
     }
 
@@ -772,15 +786,16 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param array             $relationships
-     * @param UserProfile\Model $studentBaseProfile
-     * @param array             $families
+     * @param string $studentCompassId
+     * @param array  $relationships
+     * @param Model  $studentBaseProfile
+     * @param array  $families
      * @throws Exception
-     * @throws Mapper\DefinitionException
+     * @throws DefinitionException
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function importParentsOfStudent(array $relationships, UserProfile\Model $studentBaseProfile, array $families): void
+    private function importParentsOfStudent(string $studentCompassId, array $relationships, UserProfile\Model $studentBaseProfile, array $families): void
     {
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
@@ -797,6 +812,8 @@ class Profile implements IStrategy
                     $studentBaseProfile->getLastname(),
                     $studentBaseProfile->getExternalId()
                 ));
+
+                continue;
             }
 
             /* Otherwise grab them out and process them as usual
@@ -814,6 +831,38 @@ class Profile implements IStrategy
                 $this->log->warning(sprintf(
                     'Skipping parent %s (no external identifier)',
                     $relationship['compassPersonToId']
+                ));
+
+                continue;
+            }
+
+            /* If their canSeePersonInPortal relationship is truthy,
+             * this parent can see the student and should be created in schoolbox
+             * Otherwise they should be skipped
+             *
+             * To do it, we need to find out if $parent has a relationship to $studentCompassId
+             * where canSeePersonInPortal is truthy
+             */
+            $canAddParent = false;
+
+            /* This is so dopey, it's tempting to turn $parent['relationships'] into a
+             * hash lookup based on student's compass identifier in Families, just to
+             * avoid this
+             */
+            foreach ($parent['relationships'] as $parentRelationship) {
+                if ($parentRelationship['compassPersonToId'] === $studentCompassId && $parentRelationship['canSeePersonInPortal']) {
+                    $canAddParent = true;
+                }
+            }
+
+            if (!$canAddParent) {
+                $this->log->debug(sprintf(
+                    'Skipping parent %s %s (externalId %s) because they cannot see %s %s',
+                    $parent['firstName'],
+                    $parent['lastName'],
+                    $externalId,
+                    $studentBaseProfile->getFirstname(),
+                    $studentBaseProfile->getLastname()
                 ));
 
                 continue;
@@ -854,8 +903,8 @@ class Profile implements IStrategy
                 ));
             }
 
-            $firstname = (string)$parent['firstName'];
-            $firstnamePreferred = (string)$parent['preferredFirstName'];
+            $firstname = trim((string)$parent['firstName']);
+            $firstnamePreferred = trim((string)$parent['preferredFirstName']);
 
             /* Prioritise preferred names over official names
              */
