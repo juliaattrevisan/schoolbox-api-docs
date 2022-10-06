@@ -283,6 +283,7 @@ class Processor
      * @param int $maxAttempts
      * @return ImageInterface
      * @throws OverflowException If file contents are too big
+     * @throws UnexpectedValueException if the file's mimetype isn't a recognised image type
      * @throws ImagineException\RuntimeException If cannot read file into an image
      * @throws UnableToReadFile If original storage file not found on disk
      * @throws CorruptImageException If unable to parse width/height dimensions from image contents
@@ -327,6 +328,15 @@ class Processor
         }
         $width = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
+
+        // Now we have a pointer to the actual file, and not just its mimetype:
+        // test its actual image format, and error if it's invalid.
+        try {
+            new TransformFormat($imagick->getImageMimeType());
+        } catch (UnexpectedValueException $e) {
+            throw new CorruptImageException($e->getMessage(), $e->getCode(), $e);
+        }
+
         set_error_handler($oldErrorHandler);
         error_reporting($oldErrorLevel);
 
@@ -346,6 +356,32 @@ class Processor
                     if ($height > $heightLimit) {
                         throw new OverflowException("File height ($height) > limit ($heightLimit) - aborting");
                     }
+                    break;
+                case 'disk':
+                    Imagick::setResourceLimit(
+                        Imagick::RESOURCETYPE_DISK,
+                        Alaress_Byte_Format::stringToBytes($value, false),
+                    );
+                    break;
+                case 'memory':
+                    Imagick::setResourceLimit(
+                        Imagick::RESOURCETYPE_MEMORY,
+                        Alaress_Byte_Format::stringToBytes($value, false),
+                    );
+                    break;
+                case 'map':
+                    Imagick::setResourceLimit(
+                        Imagick::RESOURCETYPE_MAP,
+                        Alaress_Byte_Format::stringToBytes($value, false),
+                    );
+                    break;
+                case 'area':
+                    // Area might be able to be supplied as a pixel count:
+                    // strip the trailing P if it's there
+                    Imagick::setResourceLimit(
+                        Imagick::RESOURCETYPE_AREA,
+                        Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false),
+                    );
                     break;
             }
         }

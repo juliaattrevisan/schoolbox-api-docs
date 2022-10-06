@@ -8,6 +8,8 @@
 
 namespace Alaress\Image;
 
+use UnexpectedValueException;
+
 /**
  * This class determines what formats we convert images into for the web
  * It can also tell you what mime type should be sent with specific formats
@@ -16,7 +18,10 @@ namespace Alaress\Image;
  */
 class TransformFormat
 {
-    private array $formatMap = [
+    /**
+     * Mapping of MIME types to image formats.
+     */
+    private const FORMAT_MAP = [
         'image/heif'    => 'jpg',
         'image/heic'    => 'jpg',
         'image/tiff'    => 'jpg',
@@ -30,7 +35,10 @@ class TransformFormat
         'image/svg+xml' => 'svg',
     ];
 
-    private array $mimeMap = [
+    /**
+     * Mapping of image formats to MIME types.
+     */
+    private const MIME_MAP = [
         'jpg'  => 'image/jpeg',
         'gif'  => 'image/gif',
         'png'  => 'image/png',
@@ -38,16 +46,29 @@ class TransformFormat
         'svg'  => 'image/svg+xml',
     ];
 
-
+    /**
+     * The image format associated with this transform format.
+     */
     private string $format;
 
     /**
-     * Provided with a source mime, will convert to a destination format
-     * @param string $mime
+     * Constructor
+     *
+     * @param string $mime A MIME type ("image/jpeg", "image/gif", etc.):
+     *                     will be converted to a destination format
+     * @throws UnexpectedValueException if `$mime` is not a recognised MIME type
+     *                                  for transformations
      */
     public function __construct(string $mime)
     {
-        $this->format = $this->formatMap[$mime];
+        $mime = strtolower($mime);
+        if (array_key_exists($mime, self::FORMAT_MAP)) {
+            $this->format = self::FORMAT_MAP[$mime];
+        } else {
+            throw new UnexpectedValueException(
+                sprintf('MIME type "%s" is not associated with any image format', $mime)
+            );
+        }
     }
 
     /**
@@ -67,7 +88,7 @@ class TransformFormat
      */
     public function getMime(): string
     {
-        return $this->mimeMap[$this->format];
+        return self::MIME_MAP[$this->format];
     }
 
     /**
