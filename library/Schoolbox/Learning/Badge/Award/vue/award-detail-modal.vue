@@ -254,6 +254,13 @@ export default {
             this.allowReasonEdit = true;
             this.reason = '';
         },
+
+        /**
+         * Redirect back to where we started and not the students profile.
+         */
+        returnToHere( value ) {
+            return value + '?returnUrl=' + btoa(window.location.pathname);
+        },
     }
 }
 </script>
@@ -322,7 +329,7 @@ export default {
 
                 <!-- If you have the ability to change the Reason, provide dynamic input -->
                 <template v-if="award._links.awardUpdate">
-                    <form :action="award._links.awardUpdate" method="post">
+                    <form :action="returnToHere(award._links.awardUpdate)" method="post">
                         <dynamic-input
                             v-if="hasSelectedModify"
                             preset-unique-id="reason"

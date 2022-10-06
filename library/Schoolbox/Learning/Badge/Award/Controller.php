@@ -664,15 +664,18 @@ class Controller extends Base
 
         $this->mapper->save($award);
 
-        /* Redirect back to a guy's feed, I guess
-         * That's the only place where you can spawn the edit button which
-         * gets you to the award edit form
-         *
-         * TODO Maybe a return url is more ideal
+        /* Protect the user from themselves.
+         * If there is no redirect link, then just redirect back to the students profile (this shouldn't happen...)
+         * else redirect to back to where you came from
+         * this redirect is created in the vue form component.
          */
-        $this->response->redirect->to($this->router->generate('searchUser.getProfile', [
+        $redirectUrl = $this->router->generate('searchUser.getProfile', [
             'userId' => $award->getRecipient()->getId()
-        ]));
+        ]);
+        if (isset($_GET[Redirect::RETURN_URL])) {
+            $redirectUrl = Redirect::decode($_GET[Redirect::RETURN_URL]);
+        }
+        $this->response->redirect->to($redirectUrl);
     }
 
 
