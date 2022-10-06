@@ -129,11 +129,12 @@ class Breadcrumbs
         // Maybe add more breadcrumbs here, depending on the type of the object to which the quiz belongs.
         $context = $assessment->getContext();
         if ($context instanceof Project) {
-            // Quiz belongs to subject->unit->project (eg. '9ENGA'->'Romeo and Juliet'->'Project'), so add breadcrumbs for subject, unit, and project.
+            // Quiz belongs to project.
             $project        = $context;
             $projectContext = $project->getContext();
 
             if ($projectContext instanceof UnitImplementation) {
+                // Quiz belongs to subject->unit->project (eg. '9ENGA'->'Romeo and Juliet'->'Project'), so add breadcrumbs for subject.
                 $unitSpec       = $projectContext->getSpecification();
                 $unitSpecFolder = $unitSpec->getFolder();
                 $subjectFolder  = $projectContext->getFolder();
@@ -143,6 +144,7 @@ class Breadcrumbs
                     'class' => ''
                 ];
             } elseif ($projectContext instanceof UnitSpecification) {
+                // Quiz belongs to unit specification, so cannot add breadcrumb for subject.
                 // NOTE: UnitSpecifications are not attached to subjects.
                 //       Think of them as templates of units that become implementations only when they are attached to subjects.
                 $unitSpec       = $projectContext;
@@ -153,6 +155,7 @@ class Breadcrumbs
                 );
             }
 
+            // Add breadcrumbs for unit and project.
             $breadcrumbs[] = [
                 'text'  => $unitSpecFolder->getTitle(),
                 'href'  => "/homepage/{$unitSpecFolder->getId()}",
@@ -179,7 +182,7 @@ class Breadcrumbs
                 'class' => ''
             ];
         } elseif ($context instanceof UnitSpecification) {
-            // Quiz belongs to subject->unit specification (eg. spec for '9ENGA'->'Romeo and Juliet'), so add breadcrumb for unit only.
+            // Quiz belongs to unit specification, so add breadcrumb for unit only (not subject).
             // NOTE: UnitSpecifications are not attached to subjects.
             //       Think of them as templates of units that become implementations only when they are attached to subjects.
             $unitSpec       = $context;
