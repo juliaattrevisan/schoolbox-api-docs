@@ -109,7 +109,9 @@ class Factory
 
                 $lastCrumbTitle = $project->getTitle();
                 $lastCrumbPath  = (
-                ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user)) ?
+                    // In some circumstances the user will not be authorised to view the 'status' page.
+                    // In that case, show the 'summary' page instead.
+                    ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user)) ?
                     $this->router->generate('learningAssessment.getStatus', $routeParams) :
                     $this->router->generate('learningAssessment.getSummary', $routeParams)
                 );
