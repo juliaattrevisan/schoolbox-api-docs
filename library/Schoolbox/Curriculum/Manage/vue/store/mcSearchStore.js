@@ -85,7 +85,7 @@ export const useSearchStore = defineStore(`mcSearch`, {
         async search () {
             try {
                 const viewNodesStore = useViewNodesStore();
-                const response = await fetch(`${apiEndpoint}?parentId=${viewNodesStore.current.id}&query=${this.query}`, {
+                const response = await fetch(`${apiEndpoint}?parentId=${viewNodesStore.current.id}&query=${this.query}&limit=50`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
