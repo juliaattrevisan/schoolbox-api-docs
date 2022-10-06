@@ -114,6 +114,7 @@ export default {
          */
         checkForDropdowns () {
             this.$nextTick(() => {
+                Foundation.global.namespace = '';
                 $(document).foundation('dropdown', 'reflow');
             });
         },

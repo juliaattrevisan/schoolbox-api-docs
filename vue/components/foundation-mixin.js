@@ -23,6 +23,7 @@ export default {
      * see https://get.foundation/sites/docs-v5/javascript.html#adding-new-content-after-page-load
      */
     updated() {
+        Foundation.global.namespace = '';
         this.$nextTick(() => {
             this.jQuery(document)
                 .foundation('dropdown', 'reflow')
