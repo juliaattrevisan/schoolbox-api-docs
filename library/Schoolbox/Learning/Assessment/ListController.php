@@ -446,7 +446,7 @@ class ListController extends Web\Controller\Base
         }
         $assessment->setWeight($weight);
         $this->getAssessmentMapper()->save($assessment, $this->getUser());
-        $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Loaded successfully']));
+        $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Successfully updated weighting']));
     }
 
     /**
