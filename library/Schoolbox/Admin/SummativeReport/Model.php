@@ -205,16 +205,28 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * Dynamic filename structure to allow the user to specify the format for the reports.
-     * if attempting to save a blank fileName, it will use a sane default of
-     *
+     * Set the custom filename structure to allow the user to specify the format for the reports.
      * @param null|string $filename
      * @return $this
      */
     public function setFileName(?string $filename): self
     {
+        $this->fileName = $filename;
+        return $this;
+    }
+
+    /**
+     * Cleans filename structure:
+     * if empty it will use the default `self::DEFAULT_FILENAME`
+     * also trim .pdf from the end of the file
+     *
+     * @param string $filename
+     * @return string
+     */
+    public function sanitiseFilename(string $filename): string
+    {
         //if blank or empty use default value
-        if ('' === trim((string)$filename)) {
+        if ('' === trim($filename)) {
             $filename = self::DEFAULT_FILENAME;
         }
 
@@ -222,8 +234,6 @@ class Model implements ISoftDeletable
         if (str_ends_with($filename, '.pdf')) {
             $filename = substr($filename, 0, -4);
         }
-
-        $this->fileName = $filename;
-        return $this;
+        return $filename;
     }
 }
