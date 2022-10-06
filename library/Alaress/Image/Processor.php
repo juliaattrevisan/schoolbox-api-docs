@@ -283,6 +283,7 @@ class Processor
      * @param int $maxAttempts
      * @return ImageInterface
      * @throws OverflowException If file contents are too big
+     * @throws UnexpectedValueException if the file's mimetype isn't a recognised image type
      * @throws ImagineException\RuntimeException If cannot read file into an image
      * @throws UnableToReadFile If original storage file not found on disk
      * @throws CorruptImageException If unable to parse width/height dimensions from image contents
@@ -328,9 +329,9 @@ class Processor
         $width = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
 
-        // Test the image format again
+        // Test the image format again (will raise an exception if not valid)
+        TransformFormat::createFromFormat($imagick->getImageFormat());
 
-        var_dump($imagick->getImageFormat(), Imagick::queryFormats());
         set_error_handler($oldErrorHandler);
         error_reporting($oldErrorLevel);
 
