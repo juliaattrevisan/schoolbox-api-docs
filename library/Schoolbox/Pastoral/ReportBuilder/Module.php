@@ -65,7 +65,7 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     $pastoralModerator,
-                    new Rule\All (
+                    new Rule\All(
                         new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF),
                         $this->getPermRule(ReportAccess::WRITE)
                     ),
@@ -77,7 +77,7 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     $pastoralModerator,
-                    new Rule\All (
+                    new Rule\All(
                         new Rule\HasRolePermission(Role::PERMISSION_ACCESS_PASTORAL, Role::STAFF),
                         $this->getPermRule(ReportAccess::READ)
                     ),
