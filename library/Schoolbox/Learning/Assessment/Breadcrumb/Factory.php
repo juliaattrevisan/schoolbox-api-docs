@@ -14,13 +14,16 @@
 namespace Schoolbox\Learning\Assessment\Breadcrumb;
 
 use Alaress\Authorizer\Authorizer;
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
@@ -48,45 +51,85 @@ class Factory
      * determine a meaningful trail of crumbs
      *
      * @param IAssessable $assessment
-     * @param User $user
+     * @param User        $user
      * @return Collection
+     * @throws RouteNotFound
+     * @throws Exception
+     * @throws \Exception
+     * @see library/Schoolbox/Breadcrumbs::getAssessmentCrumbs() - similar to this function but for www-style pages.
      */
-    public function produceFromAssessment(IAssessable $assessment, User $user)
+    public function produceFromAssessment(IAssessable $assessment, User $user): Collection
     {
         $trail = new Collection();
         $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
 
-        $context = $assessment->getContext();
-        $path = '';
+        $assessmentContext = $assessment->getContext();
 
-        if ($context instanceof Project) {
-            $routeName   = 'learningAssessment.getStatus';
+        if ($assessmentContext instanceof Project) {
+            // Assessment belongs to project.
+            $project        = $assessmentContext;
+            $projectContext = $project->getContext();
+
+            if ($projectContext instanceof UnitImplementation) {
+                // Assessment belongs to subject->unit->project (eg. '9ENGA'->'Romeo and Juliet'->'Project'), so add crumb for subject.
+                $unitSpec       = $projectContext->getSpecification();
+                $unitSpecFolder = $unitSpec->getFolder();
+                $subjectFolder  = $projectContext->getFolder();
+                $trail->add([$subjectFolder->getTitle(), "/homepage/{$subjectFolder->getId()}"]);
+            } elseif ($projectContext instanceof UnitSpecification) {
+                // Assessment belongs to unit->project specification, so cannot add crumb for subject.
+                // NOTE: UnitSpecifications are not attached to subjects.
+                //       Think of them as templates of units that become implementations only when they are attached to subjects.
+                $unitSpec       = $projectContext;
+                $unitSpecFolder = $unitSpec->getFolder();
+            } else {
+                throw ErrorMapper::getInstance()->generateException(
+                    0, null, "Unknown type '" . get_class($projectContext) . "' for project context."
+                );
+            }
+
+            $trail->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]); // Add crumb for unit.
+
             $routeParams = [
-                'assessment'   => $context,
-                'assessmentId' => $context->getId(),
-                'studentId' => $user->getId()
+                'assessment'   => $project,
+                'assessmentId' => $project->getId(),
+                'studentId'    => $user->getId()
             ];
 
-            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $user)) {
-                $path = $this->router->generate($routeName, $routeParams);
-            } else {
-                $path = $this->router->generate('learningAssessment.getSummary', $routeParams);
-            }
+            $trail->add( // Add crumb for project.
+                [
+                    $assessmentContext->getTitle(),
+                    (
+                        // Link to the project status page if the user has access, otherwise to the summary page.
+                        ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user))?
+                        $this->router->generate('learningAssessment.getStatus', $routeParams):
+                        $this->router->generate('learningAssessment.getSummary', $routeParams)
+                    )
+                ]
+            );
+        } elseif ($assessmentContext instanceof UnitImplementation) {
+            // Assessment belongs to subject->unit (eg. '9ENGA'->'Romeo and Juliet'), so add crumbs for subject and unit.
+            $unit           = $assessmentContext;
+            $subjectFolder  = $unit->getFolder(); // TESTED - Works with assess_id 111.
+            $unitSpecFolder = $unit->getSpecification()->getFolder();
+            $trail->add([$subjectFolder->getTitle(), "/homepage/{$subjectFolder->getId()}"]); // Add breadcrumb for subject.
+            $trail->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]); // Add breadcrumb for unit.
+        } elseif ($assessmentContext instanceof UnitSpecification) {
+            // Assessment belongs to unit specification, so add breadcrumb for unit only (not subject).
+            // NOTE: UnitSpecifications are not attached to subjects.
+            //       Think of them as templates of units that become implementations only when they are attached to subjects.
+            $unitSpec       = $assessmentContext;
+            $unitSpecFolder = $unitSpec->getFolder();
+            $trail->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]); // Add crumb for unit.
+        } else {
+            $subject       = $assessmentContext;
+            $subjectFolder = $subject->getFolder();
 
-            $trail = $this->produceFromAssessment($context, $user);
-        } elseif ($context instanceof UnitSpecification) {
-            $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]) . '#' . $context->getId();
-        } elseif ($context instanceof UnitImplementation) {
-            if ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
-                $path = "/homepage/{$context->getFolder()->getId()}";
+            if ($this->access->getFolderAccess($user, $subjectFolder->getId())) {
+                // Assessment belongs directly to subject (eg. '9ENGA').
+                $trail->add([$subject->getTitle(), "/homepage/{$subjectFolder->getId()}"]); // Add crumb for subject.
             }
-
-            $trail->add([$context->getFolder()->getTitle(), $path]);
-        } elseif ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
-            $path = "/homepage/{$context->getFolder()->getId()}";
         }
-
-        $trail->add([$context->getTitle(), $path]);
 
         return $trail;
     }
