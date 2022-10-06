@@ -300,6 +300,12 @@ class Controller extends Base
     public function getModify(Event $event): void
     {
 
+        /*
+         * if the publish date is null, then set to the event start date
+         */
+        if ($event->getPublishDateTime()->isNull()) {
+            $event->setPublishDateTime($event->getStartDateTime());
+        }
         /* Preselected campuses
          * Note: this collection could be one of three data types
          */
