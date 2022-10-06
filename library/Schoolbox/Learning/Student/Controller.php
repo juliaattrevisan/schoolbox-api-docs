@@ -84,12 +84,10 @@ class Controller extends Base
             $query       = "
             SELECT cs.folder_id as 'cs.fd.id'
             FROM folder f
-            JOIN course_implementation ci ON ci.folder_id = f.id
-            JOIN course_specification cs ON ci.course_specification_id = cs.id
+            JOIN course_implementation ci ON (ci.folder_id = f.id and ci.deleted_at is null)
+            JOIN course_specification cs ON (ci.course_specification_id = cs.id and cs.deleted_at is null)
             JOIN folder csf ON csf.id = cs.folder_id
-            JOIN course_unit_implementation cui ON ci.id = cui.course_implementation_id
-            JOIN assessment_course_unit_implementation acui ON acui.course_unit_implementation_id = cui.id
-            JOIN assessment a ON acui.assessment_id = a.id
+            JOIN course_unit_implementation cui ON (ci.id = cui.course_implementation_id and cui.deleted_at is null)
             WHERE {$whereClause}
             GROUP BY f.id, ci.course_specification_id;
             ";
