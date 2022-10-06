@@ -61,7 +61,7 @@ class TransformFormat
     public static function createFromMime(string $mime): self
     {
         $mime = strtolower($mime);
-        if (in_array($mime, self::FORMAT_MAP)) {
+        if (array_key_exists($mime, self::FORMAT_MAP)) {
             return (new self())->setFormat(self::FORMAT_MAP[$mime]);
         }
         throw new UnexpectedValueException(
@@ -79,7 +79,7 @@ class TransformFormat
     public static function createFromFormat(string $format): self
     {
         $format = strtolower($format);
-        if (in_array($format, self::MIME_MAP)) {
+        if (array_key_exists($format, self::MIME_MAP)) {
             return (new self())->setFormat($format);
         }
         throw new UnexpectedValueException(
