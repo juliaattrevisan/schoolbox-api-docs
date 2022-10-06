@@ -25,9 +25,12 @@ class Breadcrumbs
     const TPL = 'breadcrumbTpl';
 
     /**
+     * TODO: This function could be made static.
+     *
      * @param SitePage $page
      * @param string   $handle
      * @param array    $data
+     * @return void
      */
     public function renderIntoSitePage(SitePage $page, string $handle, array $data): void
     {
@@ -56,6 +59,7 @@ class Breadcrumbs
 
     /**
      * I don't have a better place for this to live, sorry -_-;
+     * TODO: This function could be made static.
      *
      * @param FolderModel $folder
      * @param string      $returnUrl
