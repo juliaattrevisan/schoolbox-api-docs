@@ -303,7 +303,7 @@ class Controller extends Base
          * if the publish date is null, then set to the event start date
          */
         if ($event->getPublishDateTime()->isNull()) {
-            $event->setPublishDateTime($event->getStartDateTime());
+            $event->setPublishDateTime(Alaress_Date_Format::now());
         }
         /* Preselected campuses
          * Note: this collection could be one of three data types
