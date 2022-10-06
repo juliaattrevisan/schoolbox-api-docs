@@ -211,7 +211,8 @@ class Breadcrumbs
             'href'  => (
                 // In some circumstances the user will not be authorised to view the 'status' page.  In that case, show the 'summary' page instead.
                 $authorizer->isPathAuthorizedForUser(
-                    'learningAssessment.getStatus', [
+                    'learningAssessment.getStatus',
+                    [
                         'assessment'   => $quiz,
                         'assessmentId' => $quiz->getId(),
                         'studentId'    => $_SESSION['user']->getId(),
