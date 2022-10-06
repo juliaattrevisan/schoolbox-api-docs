@@ -9,6 +9,7 @@
 
 namespace Schoolbox;
 
+use Alaress\Authorizer\Authorizer;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz;
@@ -103,7 +104,7 @@ class Breadcrumbs
     }
 
     /**
-     * @param Quiz\Model  $assessment
+     * @param Quiz\Model  $quiz
      * @param int         $assessId
      * @param String      $assessTitle
      * @param String|null $sectionTitle
@@ -112,8 +113,8 @@ class Breadcrumbs
      * Return an array of breadcrumbs suitable for use in self::renderIntoSitePage().
      * @throws \Exception
      */
-    public static function getAssessmentCrumbs(
-        Quiz\Model $assessment,
+    public static function getQuizCrumbs(
+        Quiz\Model $quiz,
         int $assessId,
         string $assessTitle,
         ?string $sectionTitle = null
@@ -127,10 +128,10 @@ class Breadcrumbs
         ];
 
         // Maybe add more breadcrumbs here, depending on the type of the object to which the quiz belongs.
-        $context = $assessment->getContext();
-        if ($context instanceof Project) {
+        $quizContext = $quiz->getContext();
+        if ($quizContext instanceof Project) {
             // Quiz belongs to project.
-            $project        = $context;
+            $project        = $quizContext;
             $projectContext = $project->getContext();
 
             if ($projectContext instanceof UnitImplementation) {
@@ -166,9 +167,9 @@ class Breadcrumbs
                 'href'  => "/learning/assessments/{$project->getId()}",
                 'class' => ''
             ];
-        } elseif ($context instanceof UnitImplementation) {
+        } elseif ($quizContext instanceof UnitImplementation) {
             // Quiz belongs to subject->unit (eg. '9ENGA'->'Romeo and Juliet'), so add breadcrumbs for subject and unit.
-            $unit           = $context;
+            $unit           = $quizContext;
             $subjectFolder  = $unit->getFolder();
             $unitSpecFolder = $unit->getSpecification()->getFolder();
             $breadcrumbs[]  = [
@@ -181,11 +182,11 @@ class Breadcrumbs
                 'href'  => "/homepage/{$unitSpecFolder->getId()}",
                 'class' => ''
             ];
-        } elseif ($context instanceof UnitSpecification) {
+        } elseif ($quizContext instanceof UnitSpecification) {
             // Quiz belongs to unit specification, so add breadcrumb for unit only (not subject).
             // NOTE: UnitSpecifications are not attached to subjects.
             //       Think of them as templates of units that become implementations only when they are attached to subjects.
-            $unitSpec       = $context;
+            $unitSpec       = $quizContext;
             $unitSpecFolder = $unitSpec->getFolder();
             $breadcrumbs[]  = [
                 'text'  => $unitSpecFolder->getTitle(),
@@ -194,7 +195,7 @@ class Breadcrumbs
             ];
         } else {
             // Quiz belongs directly to subject (eg. 9ENGA), so add breadcrumb for subject only.
-            $subjectFolder = $context;
+            $subjectFolder = $quizContext;
             $breadcrumbs[]  = [
                 'text'  => $subjectFolder->getTitle(),
                 'href'  => "/homepage/{$subjectFolder->getId()}",
@@ -202,10 +203,12 @@ class Breadcrumbs
             ];
         }
 
-        // This is the breadcrumb for the assessment itself.
+        // This is the breadcrumb for the quiz itself.
         $breadcrumbs[] = [
+            // TODO: The user may not have access to the 'status' page.
+            //       If the user does not have access, the link should be to the 'summary' page instead (same URL without the 'status' suffix).
             'text'  => $assessTitle,
-            'href'  => "/learning/assessments/{$assessment->getId()}/status",
+            'href'  => "/learning/assessments/{$quiz->getId()}/status",
             'class' => ''
         ];
 

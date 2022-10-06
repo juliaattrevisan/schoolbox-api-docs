@@ -97,7 +97,7 @@ if (!isset($this->arg[1])) {
     $trail->renderIntoSitePage(
         $this,
         'BREADCRUMB',
-        Breadcrumbs::getAssessmentCrumbs($assessment, $assess['assess_id'], $assess['title'])
+        Breadcrumbs::getQuizCrumbs($assessment, $assess['assess_id'], $assess['title'])
     );
 } elseif ($this->arg[1] === 'finalise') {
     /* Update the reviewed_at for all the latest attempts for a particular assess :D
@@ -332,6 +332,6 @@ if (!isset($this->arg[1])) {
     $trail->renderIntoSitePage(
         $this,
         'BREADCRUMB',
-        Breadcrumbs::getAssessmentCrumbs($assessment, $assess['assess_id'], $assess['title'], $section['title'])
+        Breadcrumbs::getQuizCrumbs($assessment, $assess['assess_id'], $assess['title'], $section['title'])
     );
 }
