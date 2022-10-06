@@ -40,6 +40,7 @@ class TransformFormat
      */
     private const MIME_MAP = [
         'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
         'gif'  => 'image/gif',
         'png'  => 'image/png',
         'webp' => 'image/webp',
