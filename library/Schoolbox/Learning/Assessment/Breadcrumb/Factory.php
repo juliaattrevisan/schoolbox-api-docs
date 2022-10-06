@@ -17,7 +17,6 @@ use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Schoolbox\Collection;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
@@ -83,9 +82,7 @@ class Factory
                 $unitSpec       = $projectContext;
                 $unitSpecFolder = $unitSpec->getFolder();
             } else {
-                throw ErrorMapper::getInstance()->generateException(
-                    0, null, "Unknown type '" . get_class($projectContext) . "' for project context."
-                );
+                throw new \UnexpectedValueException("Unknown type '" . get_class($projectContext) . "' for project context.");
             }
 
             $trail->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]); // Add crumb for unit.
@@ -101,8 +98,8 @@ class Factory
                     $assessmentContext->getTitle(),
                     (
                         // Link to the project status page if the user has access, otherwise to the summary page.
-                        ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user))?
-                        $this->router->generate('learningAssessment.getStatus', $routeParams):
+                        ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user)) ?
+                        $this->router->generate('learningAssessment.getStatus', $routeParams) :
                         $this->router->generate('learningAssessment.getSummary', $routeParams)
                     )
                 ]

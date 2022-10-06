@@ -10,7 +10,6 @@
 namespace Schoolbox;
 
 use Alaress\Authorizer\Authorizer;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Model;
@@ -155,9 +154,7 @@ class Breadcrumbs
                 $unitSpec       = $projectContext;
                 $unitSpecFolder = $unitSpec->getFolder();
             } else {
-                throw ErrorMapper::getInstance()->generateException(
-                    0, null, "Unknown type '" . get_class($projectContext) . "' for project context."
-                );
+                throw new \UnexpectedValueException("Unknown type '" . get_class($projectContext) . "' for project context.");
             }
 
             // Add breadcrumbs for unit and project.
@@ -220,8 +217,8 @@ class Breadcrumbs
                         'studentId'    => $_SESSION['user']->getId(),
                     ],
                     $_SESSION['user']
-                )?
-                "/learning/assessments/{$quiz->getId()}/status":
+                ) ?
+                "/learning/assessments/{$quiz->getId()}/status" :
                 "/learning/assessments/{$quiz->getId()}"
             )
         ];
