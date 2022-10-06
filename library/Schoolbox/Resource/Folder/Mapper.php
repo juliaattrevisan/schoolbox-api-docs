@@ -2206,11 +2206,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         if ($term->getExtraordinary()) {
             if ($term->getId() === null) {
                 // This may arise because fake terms (terms not stored in the database) may have been used by calling functions.
-                throw ErrorMapper::getInstance()->generateException(
-                    ErrorMapper::ERROR_INFORMATION_MISSING,
-                    null,
-                    "Parameter \$term is expected to have a non-null ID."
-                );
+                throw new \UnexpectedValueException("Parameter \$term is expected to have a non-null ID.");
             }
 
             $termJoin          = '
