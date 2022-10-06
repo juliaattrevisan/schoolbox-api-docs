@@ -5,7 +5,13 @@
  # IResponse response
  # bool kamiEnabled Schoolbox-configured var that determines whether kami export is available
  #}
-{% if response and response.allFiles.count %}
+{#
+ # if response.allFiles exits,
+ # check if those files have a kami file id,
+ # check how many of those exist,
+ # if it is more than 1 then show the file list
+#}
+{% if response.allFiles | filter(file => file.kami.id is defined) | length > 1 %}
         <script src="{{ CDN_PREFIX }}/js/submissions/jquery.kami-export.js?v={{ config.site_version }}"></script>
         <script>
             $(function() {
