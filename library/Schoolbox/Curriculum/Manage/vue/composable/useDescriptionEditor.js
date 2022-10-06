@@ -10,7 +10,7 @@ import { ref, onMounted } from 'vue';
 import { isScriptAdded, injectScript } from '@js/util/domUtils';
 
 
-export function useCKEditor ($initialValue, $ckeditorInstance) {
+export function useDescriptionEditor ($initialValue, $ckeditorInstance) {
 
     const initialValue = ref($initialValue);
     const ckeditorInstance = $ckeditorInstance;
@@ -57,7 +57,10 @@ export function useCKEditor ($initialValue, $ckeditorInstance) {
                         event.editor.setData(initialValue.value); //set the initial data
                         removeMediaEmbedButtons(event.editor.container.$);
                     }
-                }
+                },
+                drop: (event) => { //prevent drag and drop from functioning (haven't been able to disable it prior in any other config setting)
+                    event.stop();
+                },
             },
             targetElements: $(`#${ckeditorInstance}`),
         }
