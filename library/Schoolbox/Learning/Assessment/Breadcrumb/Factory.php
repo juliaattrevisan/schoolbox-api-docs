@@ -95,7 +95,7 @@ class Factory
 
             $trail->add( // Add crumb for project.
                 [
-                    $assessmentContext->getTitle(),
+                    $project->getTitle(),
                     (
                         // Link to the project status page if the user has access, otherwise to the summary page.
                         ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user)) ?
@@ -106,9 +106,9 @@ class Factory
             );
         } elseif ($assessmentContext instanceof UnitImplementation) {
             // Assessment belongs to subject->unit (eg. '9ENGA'->'Romeo and Juliet'), so add crumbs for subject and unit.
-            $unit           = $assessmentContext;
-            $subjectFolder  = $unit->getFolder();
-            $unitSpecFolder = $unit->getSpecification()->getFolder();
+            $unitImpl       = $assessmentContext;
+            $subjectFolder  = $unitImpl->getFolder();
+            $unitSpecFolder = $unitImpl->getSpecification()->getFolder();
             $trail->add([$subjectFolder->getTitle(), "/homepage/{$subjectFolder->getId()}"]); // Add breadcrumb for subject.
             $trail->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]); // Add breadcrumb for unit.
         } elseif ($assessmentContext instanceof UnitSpecification) {
