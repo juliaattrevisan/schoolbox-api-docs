@@ -358,18 +358,6 @@ class Profile implements IStrategy
             $enrolment = $this->findDate($enrolmentDate);
             $leaving = $this->findDate($leavingDate);
 
-            /* If the externalId was empty, skip them
-             */
-            if (null === $externalId) {
-                $this->log->warning(sprintf(
-                    'Skipping %s %s (no external identifier)',
-                    $firstname,
-                    $lastname
-                ));
-
-                continue;
-            }
-
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
              *
