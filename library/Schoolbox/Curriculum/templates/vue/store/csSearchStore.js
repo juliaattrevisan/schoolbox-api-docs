@@ -7,7 +7,7 @@ import { apiEndpoint } from './curriculumSelectorStore';
 import { useSelectedNodesStore } from './csSelectedNodesStore';
 
 
-const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
+const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search becomes active
 
 
 export const useSearchStore = defineStore(`csSearch`, {
