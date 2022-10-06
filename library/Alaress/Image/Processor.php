@@ -329,8 +329,13 @@ class Processor
         $width = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
 
-        // Test the image format again (will raise an exception if not valid)
-        TransformFormat::createFromFormat($imagick->getImageFormat());
+        // Now we have a pointer to the actual file, and not just its mimetype:
+        // test its actual image format, and error if it's invalid.
+        try {
+            TransformFormat::createFromFormat($imagick->getImageFormat());
+        } catch (UnexpectedValueException $e) {
+            throw new CorruptImageException($e->getMessage(), $e->getCode(), $e);
+        }
 
         set_error_handler($oldErrorHandler);
         error_reporting($oldErrorLevel);
