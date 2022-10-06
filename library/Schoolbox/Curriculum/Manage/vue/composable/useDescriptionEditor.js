@@ -3,7 +3,7 @@
  * This setup uses https://vuejs.org/guide/reusability/composables.html, a Vue 3 alternative to mixins
  *
  * We currently use this for the description in add curriculum, add subsection and update an existing node
- * It's linked to Curriculum for now as we are specifically removing embed media buttons which is currently specific just to these description fields
+ * It's linked specifically to description as we are removing embed media buttons which is currently specific just to these description fields
  */
 
 import { ref, onMounted } from 'vue';
