@@ -332,7 +332,7 @@ class Processor
         // Now we have a pointer to the actual file, and not just its mimetype:
         // test its actual image format, and error if it's invalid.
         try {
-            TransformFormat::createFromFormat($imagick->getImageFormat());
+            TransformFormat::createFromMime($imagick->getImageMimeType());
         } catch (UnexpectedValueException $e) {
             throw new CorruptImageException($e->getMessage(), $e->getCode(), $e);
         }
