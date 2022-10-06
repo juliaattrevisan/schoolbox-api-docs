@@ -22,7 +22,7 @@ use SitePage;
 
 class Breadcrumbs
 {
-    const TPL = 'breadcrumbTpl';
+    public const TPL = 'breadcrumbTpl';
 
     /**
      * TODO: This function could be made static.
@@ -144,7 +144,7 @@ class Breadcrumbs
                     'class' => ''
                 ];
             } elseif ($projectContext instanceof UnitSpecification) {
-                // Quiz belongs to unit specification, so cannot add breadcrumb for subject.
+                // Quiz belongs to unit->project specification, so cannot add breadcrumb for subject.
                 // NOTE: UnitSpecifications are not attached to subjects.
                 //       Think of them as templates of units that become implementations only when they are attached to subjects.
                 $unitSpec       = $projectContext;
