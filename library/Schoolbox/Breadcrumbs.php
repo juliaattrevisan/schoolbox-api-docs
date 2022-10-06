@@ -13,6 +13,7 @@ use Alaress\Authorizer\Authorizer;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz;
+use Schoolbox\Learning\Assessment\Quiz\Model;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception;
@@ -104,16 +105,19 @@ class Breadcrumbs
     }
 
     /**
-     * @param Quiz\Model  $quiz
+     * @param Authorizer  $authorizer
+     * @param Model       $quiz
      * @param int         $assessId
      * @param String      $assessTitle
      * @param String|null $sectionTitle
      * @return array
+     * @see library/Schoolbox/Learning/Assessment/Breadcrumb/Factory::produceFromAssessment() - similar to this function but for aura-paradigm pages.
      *
      * Return an array of breadcrumbs suitable for use in self::renderIntoSitePage().
      * @throws \Exception
      */
     public static function getQuizCrumbs(
+        Authorizer $authorizer,
         Quiz\Model $quiz,
         int $assessId,
         string $assessTitle,
@@ -205,11 +209,21 @@ class Breadcrumbs
 
         // This is the breadcrumb for the quiz itself.
         $breadcrumbs[] = [
-            // TODO: The user may not have access to the 'status' page.
-            //       If the user does not have access, the link should be to the 'summary' page instead (same URL without the 'status' suffix).
             'text'  => $assessTitle,
-            'href'  => "/learning/assessments/{$quiz->getId()}/status",
-            'class' => ''
+            'class' => '',
+            'href'  => (
+                // In some circumstances the user will not be authorised to view the 'status' page.  In that case, show the 'summary' page instead.
+                $authorizer->isPathAuthorizedForUser(
+                    'learningAssessment.getStatus', [
+                        'assessment'   => $quiz,
+                        'assessmentId' => $quiz->getId(),
+                        'studentId'    => $_SESSION['user']->getId(),
+                    ],
+                    $_SESSION['user']
+                )?
+                "/learning/assessments/{$quiz->getId()}/status":
+                "/learning/assessments/{$quiz->getId()}"
+            )
         ];
 
         if ($sectionTitle === null) {
