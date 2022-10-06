@@ -40,7 +40,6 @@ class TransformFormat
      */
     private const MIME_MAP = [
         'jpg'  => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
         'gif'  => 'image/gif',
         'png'  => 'image/png',
         'webp' => 'image/webp',
@@ -53,39 +52,23 @@ class TransformFormat
     private string $format;
 
     /**
-     * Create an instance of this object from a given MIME type.
+     * Constructor
      *
-     * @param string $mime A MIME type ("jpg", "gif", etc.)
-     * @return self
-     * @throws UnexpectedValueException if `$mime` is not recognised
+     * @param string $mime A MIME type ("image/jpeg", "image/gif", etc.):
+     *                     will be converted to a destination format
+     * @throws UnexpectedValueException if `$mime` is not a recognised MIME type
+     *                                  for transformations
      */
-    public static function createFromMime(string $mime): self
+    public function __construct(string $mime)
     {
         $mime = strtolower($mime);
         if (array_key_exists($mime, self::FORMAT_MAP)) {
-            return (new self())->setFormat(self::FORMAT_MAP[$mime]);
+            $this->format = self::FORMAT_MAP[$mime];
+        } else {
+            throw new UnexpectedValueException(
+                sprintf('MIME type "%s" is not associated with any image format', $mime)
+            );
         }
-        throw new UnexpectedValueException(
-            sprintf('MIME type "%s" is not associated with any image format', $mime)
-        );
-    }
-
-    /**
-     * Create an instance of this object from a given image format.
-     *
-     * @param string $format An image format ("jpg", "gif", etc.)
-     * @return self
-     * @throws UnexpectedValueException if `$format` is not recognised
-     */
-    public static function createFromFormat(string $format): self
-    {
-        $format = strtolower($format);
-        if (array_key_exists($format, self::MIME_MAP)) {
-            return (new self())->setFormat($format);
-        }
-        throw new UnexpectedValueException(
-            sprintf('Format "%s" is not associated with any image MIME type', $format)
-        );
     }
 
     /**

@@ -110,7 +110,7 @@ class Processor
     {
         // ensure file format is actually a string (it may have been a mimetype object)
         $mimetype   = $this->mimetype ?? $this->pathFilesystem->mimeType($this->path);
-        $fileFormat = TransformFormat::createFromMime($mimetype);
+        $fileFormat = new TransformFormat($mimetype);
 
         // Is this a SVG? just stream it if so, don't even attempt to transform
         if ('svg' === $fileFormat->getFormat()) {
@@ -332,7 +332,7 @@ class Processor
         // Now we have a pointer to the actual file, and not just its mimetype:
         // test its actual image format, and error if it's invalid.
         try {
-            TransformFormat::createFromMime($imagick->getImageMimeType());
+            new TransformFormat($imagick->getImageMimeType());
         } catch (UnexpectedValueException $e) {
             throw new CorruptImageException($e->getMessage(), $e->getCode(), $e);
         }
