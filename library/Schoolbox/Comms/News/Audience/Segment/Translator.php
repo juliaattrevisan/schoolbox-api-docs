@@ -170,7 +170,10 @@ class Translator
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             // We don't attempt to translate 'NULL' entity values here, that's not a DB responsibility.
             // Instead leave that to the view-layer.
-            $this->cache[$row['entity_type']][$row['entity_value']] = $row['name'];
+            /** @var ISimpleStrategy $strategyInUse */
+            $strategyInUse = $strategiesInUse[$row['entity_type']];
+            $this->cache[$row['entity_type']][$row['entity_value']]
+                           = $strategyInUse->formatName($row['name']);
         }
 
         return $this;
