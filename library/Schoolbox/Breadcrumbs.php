@@ -158,8 +158,7 @@ class Breadcrumbs
                 'href'  => "/homepage/{$unitSpecFolder->getId()}",
                 'class' => ''
             ];
-        }
-        elseif ($quizContext instanceof Project) {
+        } elseif ($quizContext instanceof Project) {
             // Quiz belongs to project.
             $project        = $quizContext;
             $projectContext = $project->getContext();

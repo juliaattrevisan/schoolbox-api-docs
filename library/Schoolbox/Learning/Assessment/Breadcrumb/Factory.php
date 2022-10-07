@@ -85,8 +85,7 @@ class Factory
 
             $lastCrumbTitle = $unitSpecFolder->getTitle();
             $lastCrumbPath  = "/homepage/{$unitSpecFolder->getId()}";
-        }
-        elseif ($assessmentContext instanceof Project) {
+        } elseif ($assessmentContext instanceof Project) {
             // Assessment belongs to $subject->$unit->project or $unit->$project.
             // Generate trail like one of:
             //  * 'Learning->$subject->$unit->$project' (eg. 'Learning'->'9ENGA'->'Romeo and Juliet'->'Project title').
