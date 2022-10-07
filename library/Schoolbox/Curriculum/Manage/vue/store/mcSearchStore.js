@@ -16,8 +16,6 @@ export const useSearchStore = defineStore(`mcSearch`, {
     state: () => ({
         isLoading: false, //to notify that an action is taking place,
         query: '', //current search term to filter the active nodes
-        isResultsCapped: false, //to show a 'refine your search' note
-        resultsNotShownCount: 0, //a total of the results not visible in the list
         results: [], //nodes returned in the current search results
         showOnlyEnabled: false, //whether disabled nodes should appear in search results
     }),

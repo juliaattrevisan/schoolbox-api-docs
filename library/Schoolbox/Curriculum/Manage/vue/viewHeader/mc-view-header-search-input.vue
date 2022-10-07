@@ -70,26 +70,39 @@ function onClearSearchSelected () {
 </script>
 
 <template>
-    <div class="input-group">
-        <input
-            v-model="searchStore.query"
-            ref="queryInputEl"
-            type="text"
-            :disabled="isDisabled"
-            :placeholder="placeholder"
-            data-modal-search-input
-            @input="$event.target.composing = false"
-        />
-        <button
-            v-if="searchStore.query !== ''"
-            title="Clear the current search"
-            class="button icon-close"
-            @click.prevent="onClearSearchSelected"
-            @keyup.enter="onClearSearchSelected"
-        >
-        Clear
-        </button>
-    </div>
+    <!-- <div class="small-8 columns"> -->
+        <label for="search">Search</label>
+        <div class="input-group">
+            <input
+                v-model="searchStore.query"
+                ref="queryInputEl"
+                type="text"
+                :disabled="isDisabled"
+                :placeholder="placeholder"
+                data-modal-search-input
+                @input="$event.target.composing = false"
+            />
+            <button
+                v-if="searchStore.query !== ''"
+                title="Clear the current search"
+                class="button icon-close"
+                @click.prevent="onClearSearchSelected"
+                @keyup.enter="onClearSearchSelected"
+            >
+            Clear
+            </button>
+        </div>
+    <!-- </div> -->
+    <!-- <div class="small-4 columns"> -->
+        <label class="inline-block">Hide disabled nodes</label>
+        <div class="switch">
+            <input id="show-only-enabled" type="checkbox" v-model="searchStore.showOnlyEnabled" />
+            <label for="show-only-enabled">
+                <span>On</span>
+                <span>Off</span>
+            </label>
+        </div>
+    <!-- </div> -->
 </template>
 
 <style scoped>
