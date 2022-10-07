@@ -111,7 +111,7 @@ export default {
             try {
                 await fetch(award._links.goalAward, {
                     method: 'POST',
-                    body: JSON.stringify({ users: [award.recipient] })
+                    body: JSON.stringify({ users: [award.recipient], reason: award.reason})
                 });
                 this.toastSuccess('Achievement awarded');
                 /* Temporarily replaced implementation of self.updateAwards()
