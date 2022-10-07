@@ -132,7 +132,34 @@ class Breadcrumbs
 
         // Maybe add more breadcrumbs here, depending on the type of the object to which the quiz belongs.
         $quizContext = $quiz->getContext();
-        if ($quizContext instanceof Project) {
+        if ($quizContext instanceof UnitImplementation) {
+            // Quiz belongs to subject->unit (eg. '9ENGA'->'Romeo and Juliet'), so add breadcrumbs for subject and unit.
+            $unit           = $quizContext;
+            $subjectFolder  = $unit->getFolder();
+            $unitSpecFolder = $unit->getSpecification()->getFolder();
+            $breadcrumbs[]  = [
+                'text'  => $subjectFolder->getTitle(),
+                'href'  => "/homepage/{$subjectFolder->getId()}",
+                'class' => ''
+            ];
+            $breadcrumbs[] = [
+                'text'  => $unitSpecFolder->getTitle(),
+                'href'  => "/homepage/{$unitSpecFolder->getId()}",
+                'class' => ''
+            ];
+        } elseif ($quizContext instanceof UnitSpecification) {
+            // Quiz belongs to unit specification, so add breadcrumb for unit only (not subject).
+            // NOTE: UnitSpecifications are not attached to subjects.
+            //       Think of them as templates of units that become implementations only when they are attached to subjects.
+            $unitSpec       = $quizContext;
+            $unitSpecFolder = $unitSpec->getFolder();
+            $breadcrumbs[]  = [
+                'text'  => $unitSpecFolder->getTitle(),
+                'href'  => "/homepage/{$unitSpecFolder->getId()}",
+                'class' => ''
+            ];
+        }
+        elseif ($quizContext instanceof Project) {
             // Quiz belongs to project.
             $project        = $quizContext;
             $projectContext = $project->getContext();
@@ -166,32 +193,6 @@ class Breadcrumbs
             $breadcrumbs[] = [
                 'text'  => $project->getTitle(),
                 'href'  => "/learning/assessments/{$project->getId()}",
-                'class' => ''
-            ];
-        } elseif ($quizContext instanceof UnitImplementation) {
-            // Quiz belongs to subject->unit (eg. '9ENGA'->'Romeo and Juliet'), so add breadcrumbs for subject and unit.
-            $unit           = $quizContext;
-            $subjectFolder  = $unit->getFolder();
-            $unitSpecFolder = $unit->getSpecification()->getFolder();
-            $breadcrumbs[]  = [
-                'text'  => $subjectFolder->getTitle(),
-                'href'  => "/homepage/{$subjectFolder->getId()}",
-                'class' => ''
-            ];
-            $breadcrumbs[] = [
-                'text'  => $unitSpecFolder->getTitle(),
-                'href'  => "/homepage/{$unitSpecFolder->getId()}",
-                'class' => ''
-            ];
-        } elseif ($quizContext instanceof UnitSpecification) {
-            // Quiz belongs to unit specification, so add breadcrumb for unit only (not subject).
-            // NOTE: UnitSpecifications are not attached to subjects.
-            //       Think of them as templates of units that become implementations only when they are attached to subjects.
-            $unitSpec       = $quizContext;
-            $unitSpecFolder = $unitSpec->getFolder();
-            $breadcrumbs[]  = [
-                'text'  => $unitSpecFolder->getTitle(),
-                'href'  => "/homepage/{$unitSpecFolder->getId()}",
                 'class' => ''
             ];
         } else {

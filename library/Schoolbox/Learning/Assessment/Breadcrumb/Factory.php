@@ -16,13 +16,13 @@ namespace Schoolbox\Learning\Assessment\Breadcrumb;
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
+use Exception;
 use Schoolbox\Collection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
@@ -55,7 +55,6 @@ class Factory
      * @return Collection
      * @throws RouteNotFound
      * @throws Exception
-     * @throws \Exception
      * @see library/Schoolbox/Breadcrumbs::getAssessmentCrumbs() - similar to this function but for www-style pages.
      */
     public function produceFromAssessment(IAssessable $assessment, User $user): Collection
@@ -129,7 +128,7 @@ class Factory
                 $lastCrumbTitle = $subject->getTitle();
                 $lastCrumbPath  = "/homepage/{$subjectFolder->getId()}";
             } else {
-                // The user does not have access to the subject folder, so generate an empty trail.
+                // The user does not have access to the subject folder, so no last crumb.
                 $lastCrumbTitle = null;
                 $lastCrumbPath  = null;
             }
