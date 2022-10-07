@@ -706,7 +706,17 @@ class Controller extends BaseController
         // Add new node if not already on folder
         foreach ($nodeIds as $nodeId) {
             if (!in_array($nodeId, $folder->getCurriculumNodes()->keys(), false)) {
-                $folder->getCurriculumNodes()[$nodeId] = $this->curriculumNodeMapper->findById($nodeId);
+                try {
+                    $curriculumNode = $this->curriculumNodeMapper->findById($nodeId);
+                    //check if the node is actually disabled... if so don't add it to the folder.
+                    if ($curriculumNode->getEnabled()) {
+                        $folder->getCurriculumNodes()[$nodeId] = $curriculumNode;
+                    }
+                } catch (MapperException\Deleted) {
+                    //noop
+                    /* Someone deleted the curriculum node we were trying to use, so just skip past this...
+                     */
+                }
             }
         }
     }
