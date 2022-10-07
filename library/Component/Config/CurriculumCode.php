@@ -21,9 +21,15 @@ class Component_Config_CurriculumCode extends Component_Config_Abstract
         // has an internal block for the select element
         $page->setBlock($keyblock, 'curriculumCodes', 'curriculumCodes_block');
         $page->setVar('curriculumCodes_block', '');
+        $page->setBlock($keyblock, 'curriculumCodesDisabled', 'curriculumCodesDisabled_block');
+        $page->setVar('curriculumCodesDisabled_block', '');
 
         $context = $component->getContext();
+        $nodeSelected = false;
         if ($context instanceof Schoolbox\Resource\Folder\Model) {
+            if (empty($configValue)) {
+                $nodeSelected = true;
+            }
             $page->setVar(
                 [
                     'COMPONENT_CONFIG_CURRICULUMCODE_NAME'     => 'All',
@@ -35,6 +41,12 @@ class Component_Config_CurriculumCode extends Component_Config_Abstract
             );
             $page->parse('curriculumCodes_block', 'curriculumCodes', true);
             foreach ($context->getCurriculumNodes() as $node) {
+                if (!$node->getEnabled()) {
+                    continue;
+                }
+                if ($node->getCode() === (string)$configValue) {
+                    $nodeSelected = true;
+                }
                 // Value is code instead of ID, because we may eventually
                 // implement free entry
                 $page->setVar([
@@ -45,6 +57,10 @@ class Component_Config_CurriculumCode extends Component_Config_Abstract
                         : '',
                 ]);
                 $page->parse('curriculumCodes_block', 'curriculumCodes', true);
+            }
+            // if config value did not match any of the above, show empty line
+            if (!$nodeSelected) {
+                $page->parse('curriculumCodesDisabled_block', 'curriculumCodesDisabled', true);
             }
         }
     }
