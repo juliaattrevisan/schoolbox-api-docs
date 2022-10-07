@@ -1,4 +1,4 @@
-/** 
+/**
  * Control the component settings panel and ensure it gets updated via ajax
  *
  */
@@ -19,7 +19,7 @@ const QUERY_STRING_ATTRIBUTE = 'data-query-string'; //to store the current setti
 
 
 /**
- * Initiate the setings toggle and form for each component and when a 
+ * Initiate the setings toggle and form for each component and when a
  * new component is added or udpated
  */
 export function initUpdateComponentsSettings () {
@@ -30,28 +30,30 @@ export function initUpdateComponentsSettings () {
 
 /**
  * Set up the settings buttons and what happens on form submission
- * 
- * @param { Element } 
+ *
+ * @param { Element }
  */
 function init (component) {
     initToggleButtons(component);
     initForm(component);
-}   
+}
 
 /**
  * To show/hide the settings panel with the toggle button.
  * There's also sometimes a settings toggle button in the empty component state as well,
  * so check for that
- * 
- * @param { Element } 
+ *
+ * @param { Element }
  */
 function initToggleButtons (component) {
-    const toggleButton = component.querySelector(BUTTON_SELECTOR);
-    toggleButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        const buttonRotation = isOpen(component) ? 0 : 90; 
-        gsap.to(toggleButton, { rotation: buttonRotation, transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
-        isOpen(component) ? close(component) : open(component);
+    const toggleButtons = component.querySelectorAll(BUTTON_SELECTOR);
+    toggleButtons.forEach((toggleButton) => {
+        toggleButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            const buttonRotation = isOpen(component) ? 0 : 90;
+            gsap.to(toggleButton, { rotation: buttonRotation, transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+            isOpen(component) ? close(component) : open(component);
+        });
     });
     const emptyStateToggleButton = component.querySelector(`${BUTTON_SELECTOR}.empty-edit`);
     if (emptyStateToggleButton) {
@@ -64,9 +66,9 @@ function initToggleButtons (component) {
 
 /**
  * Determine the state of the settings panel
- * 
- * @param { Element } 
- * 
+ *
+ * @param { Element }
+ *
  * @returns { Boolean }
  */
 export function isOpen (component) {
@@ -76,8 +78,8 @@ export function isOpen (component) {
 
 /**
  * Open the settings panel
- * 
- * @param { Element } 
+ *
+ * @param { Element }
  */
 function open (component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
@@ -89,10 +91,10 @@ function open (component) {
 
 /**
  * To be able to compare the form query string on form submit, as we don't want to submit if nothing has changed
- * 
- * @param { Element } 
- * 
- * @returns { String }  
+ *
+ * @param { Element }
+ *
+ * @returns { String }
  */
 function getQueryString (component) {
     const panelForm = component.querySelector(PANEL_SELECTOR).querySelector('form');
@@ -102,8 +104,8 @@ function getQueryString (component) {
 
 /**
  * Close the settings panel
- * 
- * @param { Element } 
+ *
+ * @param { Element }
  */
 async function close (component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
@@ -114,8 +116,8 @@ async function close (component) {
 
 /**
  * Ensure updates to the settings panel are updated via AJAX
- * 
- * @param { Element } 
+ *
+ * @param { Element }
  */
 function initForm (component) {
     const panelForm = component.querySelector(PANEL_SELECTOR).querySelector('form');
@@ -128,9 +130,9 @@ function initForm (component) {
 
 /**
  * Save the settings to the DB
- * 
- * @param { Element } 
- * @param { HTMLFormElement } 
+ *
+ * @param { Element }
+ * @param { HTMLFormElement }
  */
 async function saveComponentSettings (component, form) {
     const submitFormButton = form.querySelector('input[type="submit"]');
@@ -139,7 +141,7 @@ async function saveComponentSettings (component, form) {
         submitFormButton.disabled = true;
         submitFormButton.value = 'Updating...';
         const response = await fetch(UPDATE_URL + '?' + getSaveComponentSettingsParams(form));
-        const responseData = await response.text(); 
+        const responseData = await response.text();
         await updateComponent(component, responseData);
     } catch (error) {
         console.warn(error);
@@ -152,10 +154,10 @@ async function saveComponentSettings (component, form) {
 
 /**
  * To pass through the required FormData to update the component in the DB
- * 
- * @param { Element } 
- * 
- * @returns { Object }  
+ *
+ * @param { Element }
+ *
+ * @returns { Object }
  */
 function getSaveComponentSettingsParams (form) {
     const formData = Object.fromEntries(new FormData(form));
@@ -166,9 +168,9 @@ function getSaveComponentSettingsParams (form) {
 
 /**
  * Now we have the returned response from the settings save, replace the old component with the new component
- * 
- * @param { Element } 
- * @param { String } 
+ *
+ * @param { Element }
+ * @param { String }
  */
 async function updateComponent (component, responseData) {
     const updatedComponent = getUpdatedComponent(component, responseData);
@@ -176,20 +178,20 @@ async function updateComponent (component, responseData) {
     component.replaceWith(newComponent); //switch over to the newly updated component
     gsap.to(newComponent, { //fade in the updated component
         duration: ANIMATE_SPEED,
-        opacity: 1, 
+        opacity: 1,
         startAt: { opacity: 0 },
     } );
     document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_UPDATED, { detail: { component: newComponent } } ) );
 }
 
 /**
- * To get the updated component as an Element once returned as it's 
+ * To get the updated component as an Element once returned as it's
  * currently in the form of a String
- * 
- * @param { Element } 
- * @param { String } 
- * 
- * @returns { Element }  
+ *
+ * @param { Element }
+ * @param { String }
+ *
+ * @returns { Element }
  */
 function getUpdatedComponent (component, documentString) {
     const parser = new DOMParser();
