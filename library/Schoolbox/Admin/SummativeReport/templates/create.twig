@@ -248,7 +248,7 @@
                         <div class="small-12 columns">
                             <label for="report-title" class="required">Title</label>
                             {# This maxlength corresponds to the schema field length #}
-                            <input type="text" id="report-title" name="title" maxlength="100" value="{{ report.title ?? '' }}" />
+                            <input type="text" id="report-title" name="title" maxlength="100" value="{{ report.title }}" />
                         </div>
 
                         <div class="small-12 columns">
@@ -258,7 +258,7 @@
 
                         <div class="small-12 columns">
                             <label for="report-introduction">Introductory Message</label>
-                            <textarea id="report-introduction" name="introduction">{{ report.introduction ?? '' }}</textarea>
+                            <textarea id="report-introduction" name="introduction">{{ report.introduction }}</textarea>
                         </div>
 
                         <div class="small-12 columns">
@@ -275,6 +275,19 @@
                                     <option value="{{ key }}" {{ selected }}>{{ value }}</option>
                                 {% endfor %}
                             </select>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label for="report-filename">Filename</label>
+                            <p class="meta">
+                                Filenames should be unique for each student. [externalId] is suggested to be part of the filename.
+                                You may use the following tokens that will be substituted with the
+                                students details on creation:
+                                [externalId], [title], [firstname], [surname], [preferredname], [year].
+                                <br>
+                                .pdf will be appended automatically.
+                            </p>
+                            <input type="text" id="report-filename" name="filename" maxlength="255" value="{{ report.filename }}" />
                         </div>
                     </fieldset>
 

@@ -72,14 +72,13 @@ class Url
     {
         $optionsPayload = $report->decode();
 
-        /* Decide what this report's filename should be
-         * It's based on the sanitised name of the report
-         */
-        $filename = \Scrub::filename(trim((string)$report->getTitle()));
-
         /* Base url for report generation
          */
         $urlBase = $this->baseUrl;
+
+        /* create a tokeniser instance to assist with the custom filenames
+         */
+        $tokenReplacer = new \Schoolbox\TokenReplacer\Simple();
 
         /* Generate a list of student identifiers:
          * demographic students + additional students
@@ -124,6 +123,7 @@ class Url
          */
         $reportConfigs = [];
         $warnings = [];
+        $filenames = [];
 
         foreach ($reportStudents as $student) {
             if (isset($optionsPayload['viewAs']) && $optionsPayload['viewAs'] === Role::PARENT) {
@@ -157,17 +157,69 @@ class Url
                     /* Pacify any weird or wonky data in people's names and external ids
                      * to prevent hacking the filesystem somehow
                      */
-                    $externalId = \Scrub::filename($student->getExternalId() ?: 'unknown');
-                    $fullName   = \Scrub::filename($student->getFullName());
 
-                    /* Concat the names
-                     * Report names were mandatory in the create/update screen
+                    /**
+                     * create the custom filename for this report
                      */
-                    $reportFilename = mb_substr(sprintf(
-                        '%s - %s',
-                        $filename,
-                        $fullName
-                    ), 0, self::FILENAME_MAX_LENGTH, 'UTF-8');
+                    $filename = $tokenReplacer->replace(
+                        $report->getFileName(),
+                        [
+                            '[firstname]'     => \Scrub::filename($student->getFirstname() ?: 'unknown'),
+                            '[surname]'       => \Scrub::filename($student->getLastname() ?: 'unknown'),
+                            '[externalId]'  => \Scrub::filename($student->getExternalId() ?: 'unknown'),
+                            '[year]'  => \Scrub::filename($student->getYear()?->getName() ?: 'unknown'),
+                            //yes getGivenName returns the firstname if the preferred name is not set. but it says it can also return null... I don't trust this. so null coalesce
+                            '[preferredname]' => \Scrub::filename($student->getGivenName() ?: 'unknown'),
+                            '[title]'         => \Scrub::filename($student->getTitle() ?: 'unknown'),
+                        ]
+                    );
+                    //grab the filename excluding the folder paths
+                    $filenameBits = pathinfo($filename);
+                    $file = $filenameBits['filename'];
+
+                    //if there is no basename, then the file can become the filename
+                    if ('.' === $filenameBits['dirname']) {
+                        //trim the filename to the max length 250 characters
+                        $filename = mb_substr($file, 0, self::FILENAME_MAX_LENGTH, 'UTF-8');
+                    } else {
+                        //trim the filename to the max length and add that back to the filepath
+                        $filename = sprintf(
+                            "%s/%s",
+                            $filenameBits['dirname'],
+                            mb_substr($file, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') //trim the filename to the max length 250 characters
+                        );
+                    }
+
+                    $copy = 0;
+                    //if the filename has already been used, then increment by 1
+                    while (in_array($filename, $filenames) && $copy !== 100) {
+                        //check if there is already a (\d) value at the end of the filename
+                        if (preg_match("(\(\d+\)$)", $filename, $matches)) {
+                            //grab that (\d) value...
+                            preg_match('(\d+)', $matches[0], $values);
+
+                            //read the int of that match, and increment by 1
+                            $copy = (int)$values[0] + 1;
+
+                            //use that as the new append file count
+                            $filename = str_replace($matches[0], sprintf("(%d)", $copy), $filename);
+                        } else {
+                            //fist instance of a dupe file, so add (1)
+                            $filename .= '(1)';
+                        }
+                    }
+                    //log the filename
+                    $filenames[] = $filename;
+
+                    //if count became 100, then log it as an error
+                    if (100 === $copy) {
+                        $warnings[] = sprintf(
+                            'Unable to generate report for student id %d (%s). Too similar to existing filename',
+                            $student->getId(),
+                            $student->getExternalId()
+                        );
+                        continue;
+                    }
 
                     /* Assemble paths/hierarchy in the zip
                      *
@@ -176,11 +228,7 @@ class Url
                      * who owns which file
                      */
                     $reportConfig = [
-                        'filename' => sprintf(
-                            "%s/%s.pdf",
-                            $externalId,
-                            $reportFilename,
-                        ),
+                        'filename' => sprintf("%s.pdf", $filename),
                         'url' => $urlBase->setPath($reportPath)->toString(),
                     ];
 
