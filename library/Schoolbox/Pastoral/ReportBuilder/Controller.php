@@ -25,6 +25,7 @@ use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Model as PastoralRecord;
 use Schoolbox\Pastoral\Report\Access\Mapper as ReportAccessMapper;
+use Schoolbox\Pastoral\Report\Access\Model as ReportAccess;
 use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
@@ -111,16 +112,20 @@ class Controller extends Base
     public function getIndex(): void
     {
         $reportsAll = $this->pastoralReportMapper->findForUser($this->getUser(), dashboardOnly: false);
+        $isModerator = $this->getUser()->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL) !== null;
 
         $reportsMine  = [];
         $reportsGroup = [];
+        $reportsOther = [];
 
         /** @var PastoralReport $reportCurrent */
         foreach ($reportsAll as $reportCurrent) {
             if ($reportCurrent->getOwner()->getId() === $this->getUser()->getId()) {
                 $reportsMine[] = $reportCurrent;
-            } else {
+            } elseif (in_array($this->getUser()->getId(), $reportCurrent->getUserIds(ReportAccess::READ))) {
                 $reportsGroup[] = $reportCurrent;
+            } elseif ($isModerator) {
+                $reportsOther[] = $reportCurrent;
             }
         }
 
@@ -132,6 +137,8 @@ class Controller extends Base
                 'data'     => [
                     'reportsMine'  => $reportsMine,
                     'reportsGroup' => $reportsGroup,
+                    'reportsOther' => $reportsOther,
+                    'isModerator'  => $isModerator,
                 ],
                 'title'    => 'Pastoral Reports',
             ]
