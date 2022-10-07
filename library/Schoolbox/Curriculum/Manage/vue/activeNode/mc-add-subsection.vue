@@ -104,7 +104,7 @@ const isAddDisabled = computed(() => {
     <div class="node-container">
         <section>
             <fieldset class="content">
-                <legend>Add subsection to {{ activeNodeStore.title }}</legend>
+                <legend>Add subsection</legend>
                 <div class="small-12 columns">
                     <label for="name" class="required">Name</label>
                     <input type="text" id="name" v-model="addSubsectionStore.subsection.name" maxlength="2048" required>

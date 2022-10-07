@@ -105,7 +105,7 @@ const isUpdateDisabled = computed(() => {
     <div class="node-container">
         <section>
             <fieldset class="content">
-                <legend>Update {{ activeNodeStore.title }}</legend>
+                <legend>Update</legend>
                 <div class="small-12 columns">
                     <label for="name" class="required">Name</label>
                     <input type="text" id="name" v-model="updateNodeStore.activeNodeCopy.name" maxlength="2048" required>
