@@ -317,7 +317,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/kamiView.twig', [
             'kami'     => $kami,
             'session'  => $session,
-            'response' => $response,
+            'response' => $response
         ]));
     }
 
