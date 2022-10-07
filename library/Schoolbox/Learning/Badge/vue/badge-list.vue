@@ -246,6 +246,10 @@ export default {
         generateResetFilterUrl () {
             let emptyQueryString = {};
             Object.keys(this.selectedFilters).forEach(k => emptyQueryString[k] = '');
+            const url = new URL(window.location.href);
+            if (url.searchParams.get('returnUrl') !== null) {
+                emptyQueryString['returnUrl'] = url.searchParams.get('returnUrl');
+            }
             return "?" + new URLSearchParams(emptyQueryString).toString();
         },
 
