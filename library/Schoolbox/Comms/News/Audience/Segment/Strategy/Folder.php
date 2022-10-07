@@ -287,7 +287,11 @@ class Folder extends SimpleStrategy
             return false;
         }
         // The user must still have READ perm to the page
-        return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_READ;
+        try {
+            return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_READ;
+        } catch (Mapper\Exception $e) {
+            return false;
+        }
     }
 
 
