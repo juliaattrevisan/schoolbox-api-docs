@@ -46,22 +46,24 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
 </script>
 
 <template>
-    <div v-if="nodesStore.isLoading || searchStore.isLoading">
-        <loading-table />
+    <div class="small-12 columns">
+        <div v-if="nodesStore.isLoading || searchStore.isLoading">
+            <loading-table />
+        </div>
+        <div v-else-if="searchStore.hasNoResults" class="empty-state-flex-centered">
+            <i class="icon-curriculum"></i>
+            <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
+            <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
+        </div>
+        <ul v-else ref="nodesContainerEl">
+            <mc-view-node
+                v-for="node in viewNodesStore.nodes"
+                :key="node.id"
+                :node="node"
+                :depth="depth"
+            />
+        </ul>
     </div>
-    <div v-else-if="searchStore.hasNoResults" class="empty-state-flex-centered">
-        <i class="icon-curriculum"></i>
-        <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
-        <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
-    </div>
-    <ul v-else ref="nodesContainerEl">
-        <mc-view-node
-            v-for="node in viewNodesStore.nodes"
-            :key="node.id"
-            :node="node"
-            :depth="depth"
-        />
-    </ul>
 </template>
 
 <style lang="scss" scoped>

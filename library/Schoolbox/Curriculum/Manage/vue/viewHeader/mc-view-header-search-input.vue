@@ -70,7 +70,7 @@ function onClearSearchSelected () {
 </script>
 
 <template>
-    <!-- <div class="small-8 columns"> -->
+    <div class="small-8 columns">
         <label for="search">Search</label>
         <div class="input-group">
             <input
@@ -92,8 +92,8 @@ function onClearSearchSelected () {
             Clear
             </button>
         </div>
-    <!-- </div> -->
-    <!-- <div class="small-4 columns"> -->
+    </div>
+    <div class="small-4 columns">
         <label class="inline-block">Hide disabled nodes</label>
         <div class="switch">
             <input id="show-only-enabled" type="checkbox" v-model="viewNodesStore.showOnlyEnabled" />
@@ -102,7 +102,7 @@ function onClearSearchSelected () {
                 <span>Off</span>
             </label>
         </div>
-    <!-- </div> -->
+    </div>
 </template>
 
 <style scoped>

@@ -51,10 +51,8 @@ function onCreateNewSelected () {
             </div>
             <section v-else>
                 <fieldset class="content">
-                    <div class="small-12 columns">
-                        <mc-view-header />
-                        <mc-view-nodes />
-                    </div>
+                    <mc-view-header />
+                    <mc-view-nodes />
                 </fieldset>
             </section>
         </div>
