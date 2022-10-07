@@ -4,7 +4,7 @@
  * Review assessment. The marks for each submitted question can be modified here
  * but the actual answers cannot be changed, only seen. Structurally, this is
  * similar to the normal undertaking of the test, only that answers for the
- * specified attempt are shown and you can only change the value of marks.
+ * specified attempt are shown, and you can only change the value of marks.
  *
  * You can add extra marks beyond the specified maximum for bonus answers, and
  * half marks are acceptable.
