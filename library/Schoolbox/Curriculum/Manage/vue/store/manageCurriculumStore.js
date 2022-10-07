@@ -19,6 +19,7 @@ export const useStore = defineStore('manageCurriculum', {
         isReadOnly: true, //can only view the currently selected codes, not edit them
         hasId: false, //whether we should traverse directly to a node id on page load
         id: 0, //the id of the node to traverse directly to
+        showOnlyEnabled: false, //whether disabled nodes should appear
         toastEl: null, //so we don't need to pass it all around as a prop
     }),
 

@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { apiEndpoint } from './manageCurriculumStore';
+import { useStore, apiEndpoint } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 
 
@@ -17,7 +17,6 @@ export const useSearchStore = defineStore(`mcSearch`, {
         isLoading: false, //to notify that an action is taking place,
         query: '', //current search term to filter the active nodes
         results: [], //nodes returned in the current search results
-        showOnlyEnabled: false, //whether disabled nodes should appear in search results
     }),
 
     getters: {
@@ -72,7 +71,7 @@ export const useSearchStore = defineStore(`mcSearch`, {
          * @return { string }
          */
         enabled () {
-            return this.showOnlyEnabled ? '&enabled=1' : '';
+            return useStore().showOnlyEnabled ? '&enabled=1' : '';
         },
 
     },
