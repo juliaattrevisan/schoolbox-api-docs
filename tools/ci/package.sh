@@ -6,7 +6,7 @@ readonly FULL_PATH=${FILE_PATH%/*}
 readonly INST_DIR=$(readlink -f "$FULL_PATH"/../../)
 readonly ARG_BRANCH="--branch"
 readonly ARG_GITHUB_TOKEN="--github-token"
-readonly APTLY_SCRIPT="$INITIAL_DIR/aptly.sh"                  # We'll download the aptly helper script from GitHub to this file
+readonly APTLY_SCRIPT="$INITIAL_DIR/aptly.sh" # We'll download the aptly helper script from GitHub to this file
 readonly ARTIFACT_DIR="$INITIAL_DIR/package-artifacts"
 
 #global variables
@@ -80,8 +80,8 @@ function determine_version() {
 function download_aptly_publish_script() {
   echo -e "\n\n**** Downloading aptly helper script from GitHub..." >&2
 
-  local owner="alaress";
-  local repo="puppet-alaress";
+  local owner="alaress"
+  local repo="puppet-alaress"
   local path="environments/production/modules/schoolbox/files/repo/aptly.sh"
   local branch="stable"
   local github_endpoint="https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}"
@@ -92,7 +92,7 @@ function download_aptly_publish_script() {
   fi
 
   if ! head -n1 "$APTLY_SCRIPT" | grep -q "/bin/bash"; then
-    cat "$APTLY_SCRIPT";
+    cat "$APTLY_SCRIPT"
     echo "Unable to download aptly helper script. Exiting." >&2
   fi
 
@@ -145,7 +145,7 @@ function build_changelog() {
 
   * Release of the $majversion series
 
- -- Schoolbox (Schoolbox Signing Key) <support@schoolbox.com.au>  $curdate" > debian/changelog
+ -- Schoolbox (Schoolbox Signing Key) <support@schoolbox.com.au>  $curdate" >debian/changelog
 }
 
 function package() {
@@ -179,11 +179,16 @@ function package() {
 }
 
 # Upload DEB package to aptly
-function upload_to_aptly(){
+function upload_to_aptly() {
   distros="bionic jammy"
+  if [[ $branch == "master" ]]; then
+    repo="schoolbox-stable"
+  else
+    repo="schoolbox-unstable"
+  fi
   for distro in $distros; do
     echo "Uploading DEB to aptly for $distro..." >&2
-    $APTLY_SCRIPT --package "$(realpath "$ARTIFACT_DIR"/*deb)" --local-repo "schoolbox-stable-$distro"
+    $APTLY_SCRIPT --package "$(realpath "$ARTIFACT_DIR"/*deb)" --local-repo "$repo-$distro"
 
     echo "Upload complete to $distro. Package: schoolbox=$version" >&2
   done
