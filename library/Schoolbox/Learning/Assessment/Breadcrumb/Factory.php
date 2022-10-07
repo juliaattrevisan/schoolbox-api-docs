@@ -115,7 +115,8 @@ class Factory
                 );
             } else {
                 throw new UnexpectedValueException(
-                    'The context of $project is expected to be an instance of either UnitImplementation or UnitSpecification.'
+                    'Variable $projectContext is expected to be an instance of either UnitImplementation or UnitSpecification.' .
+                    "Found variable of class '" . get_class($projectContext) . "'."
                 );
             }
         } else {
