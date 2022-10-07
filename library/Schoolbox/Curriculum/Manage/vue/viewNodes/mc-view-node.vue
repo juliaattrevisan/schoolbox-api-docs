@@ -142,6 +142,19 @@ const borderBottomColour = computed(() => {
 });
 
 /**
+ * Consider whether we are currently only showing enabled nodes
+ *
+ * @returns { Boolean }
+ */
+const showNode = computed(() => {
+    if (viewNodesStore.showOnlyEnabled && !props.node.enabled) {
+        return false;
+    } else {
+        return true;
+    }
+});
+
+/**
  * If this is the active node being updated
  *
  * @returns { Boolean }
@@ -228,7 +241,7 @@ async function onLeave (el, done) {
 </script>
 
 <template>
-    <li ref="viewNodeEl">
+    <li v-if="showNode" ref="viewNodeEl">
         <div
             class="buttons-container"
             :data-enabled="props.node.enabled"
@@ -262,7 +275,7 @@ async function onLeave (el, done) {
         <Transition @enter="onEnter" @leave="onLeave" >
             <mc-update-node v-if="isUpdating" :depth="props.depth" />
         </Transition>
-        <ul v-if="showChildren ">
+        <ul v-if="showChildren">
             <mc-view-node
                 v-for="node in props.node.children"
                 :key="node.id"
