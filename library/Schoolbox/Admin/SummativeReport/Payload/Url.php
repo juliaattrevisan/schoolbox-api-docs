@@ -164,12 +164,12 @@ class Url
                     $filename = $tokenReplacer->replace(
                         $report->getFileName(),
                         [
-                            '[firstName]'     => \Scrub::filename($student->getFirstname() ?: 'unknown'),
-                            '[lastName]'       => \Scrub::filename($student->getLastname() ?: 'unknown'),
+                            '[firstname]'     => \Scrub::filename($student->getFirstname() ?: 'unknown'),
+                            '[lastname]'       => \Scrub::filename($student->getLastname() ?: 'unknown'),
                             '[externalId]'  => \Scrub::filename($student->getExternalId() ?: 'unknown'),
                             '[year]'  => \Scrub::filename($student->getYear()?->getName() ?: 'unknown'),
                             //yes getGivenName returns the firstname if the preferred name is not set. but it says it can also return null... I don't trust this. so null coalesce
-                            '[preferredName]' => \Scrub::filename($student->getGivenName() ?: 'unknown'),
+                            '[preferredname]' => \Scrub::filename($student->getGivenName() ?: 'unknown'),
                             '[title]'         => \Scrub::filename($student->getTitle() ?: 'unknown'),
                         ]
                     );
