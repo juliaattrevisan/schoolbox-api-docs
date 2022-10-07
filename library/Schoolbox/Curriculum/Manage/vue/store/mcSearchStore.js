@@ -19,6 +19,7 @@ export const useSearchStore = defineStore(`mcSearch`, {
         isResultsCapped: false, //to show a 'refine your search' note
         resultsNotShownCount: 0, //a total of the results not visible in the list
         results: [], //nodes returned in the current search results
+        showOnlyEnabled: false, //whether disabled nodes should appear in search results
     }),
 
     getters: {
@@ -67,6 +68,15 @@ export const useSearchStore = defineStore(`mcSearch`, {
             return this.isActive && this.filteredResults.length === 0 && !this.isLoading;
         },
 
+        /**
+         * to pass through as a url parameter when searching
+         *
+         * @return { string }
+         */
+        enabled () {
+            return this.showOnlyEnabled ? '&enabled=1' : '';
+        },
+
     },
 
     actions: {
@@ -85,7 +95,7 @@ export const useSearchStore = defineStore(`mcSearch`, {
         async search () {
             try {
                 const viewNodesStore = useViewNodesStore();
-                const response = await fetch(`${apiEndpoint}?parentId=${viewNodesStore.current.id}&query=${this.query}&limit=50`, {
+                const response = await fetch(`${apiEndpoint}?parentId=${viewNodesStore.current.id}&query=${this.query}&limit=50${this.enabled}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
