@@ -4,23 +4,23 @@
            <div data-cs-container>
                 <curriculum-selector
                     :is-read-only="false"
-                    :selected-codes="[]"
+                    :selected-nodes="[]"
                     data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
                 />
             </div>
             <script src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>
         </section>
     </div>
-    <div class="small-12 medium-6 island">
+    {# <div class="small-12 medium-6 island">
         <section class="content">
             <div data-cs-container>
                 <curriculum-selector
                     :is-read-only="false"
-                    :selected-codes="[]"
+                    :selected-nodes="[]"
                     data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
                 />
             </div>
             <script src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>
         </section>
-    </div>
+    </div> #}
 </div>

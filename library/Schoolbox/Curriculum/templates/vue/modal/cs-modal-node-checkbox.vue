@@ -1,23 +1,23 @@
 <script setup>
 
 /**
- * to select a code within the current modal session
+ * to select a node within the current modal session
  */
 
 import { computed } from 'vue';
 import { generateUUID } from '@js/util/jsUtils';
-import { UNSET_ID } from '../store/csCodesStore';
-import { useModalSelectedCodesStore } from '../store/csModalSelectedCodesStore';
+import { UNSET_ID } from '../store/csNodesStore';
+import { useModalSelectedNodesStore } from '../store/csModalSelectedNodesStore';
 
 
-const modalSelectedCodesStore = useModalSelectedCodesStore();
+const modalSelectedNodesStore = useModalSelectedNodesStore();
 const extraId = generateUUID(); //to ensure the input/label id is unique
 
 const props = defineProps({
     /**
      * the assigned node to display
      */
-    code: {
+    node: {
         type: Object,
         required: true,
         default() {
@@ -35,17 +35,17 @@ const props = defineProps({
  *
  * @returns { Boolean }
  */
-const isIdSet = computed(() => props.code.id !== UNSET_ID);
+const isIdSet = computed(() => props.node.id !== UNSET_ID);
 
 /**
  * If there's a code available, which means it can be selected
  *
  * @returns { Boolean }
  */
-const hasCode = computed(() => props.code.code && props.code.code !== '');
+const hasCode = computed(() => props.node.code && props.node.code !== '');
 
 /**
- * Only show the checkbox if the node has an ide and a code
+ * Only show the checkbox if the node has an id and a code
  *
  * @returns { Boolean }
  */
@@ -56,7 +56,7 @@ const isVisible = computed(() => isIdSet.value && hasCode.value);
  *
  * @returns { Boolean }
  */
-const isChecked = computed(() => modalSelectedCodesStore.isSelected(props.code));
+const isChecked = computed(() => modalSelectedNodesStore.isSelected(props.node));
 
 /**
  * add or remove based on the current status
@@ -64,7 +64,7 @@ const isChecked = computed(() => modalSelectedCodesStore.isSelected(props.code))
  * @param { boolean }
  */
 function onChange (isChecked) {
-    modalSelectedCodesStore.switch(props.code, isChecked);
+    modalSelectedNodesStore.switch(props.node, isChecked);
 }
 
 </script>
@@ -72,13 +72,13 @@ function onChange (isChecked) {
 <template>
     <div v-if="isVisible" class="checklist">
         <input
-            :id="`checkbox-${props.code.id}__${extraId}`"
+            :id="`checkbox-${props.node.id}__${extraId}`"
             type="checkbox"
-            :value="props.code.id"
+            :value="props.node.id"
             :checked="isChecked"
             @change="onChange($event.target.checked)"
         />
-        <label :for="`checkbox-${props.code.id}__${extraId}`"></label>
+        <label :for="`checkbox-${props.node.id}__${extraId}`"></label>
     </div>
 </template>
 

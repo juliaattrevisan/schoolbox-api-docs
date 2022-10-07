@@ -7,11 +7,11 @@
 
 import { computed } from 'vue';
 import { useSearchStore } from './store/csSearchStore';
-import { useSelectedCodesStore } from './store/csSelectedCodesStore';
+import { useSelectedNodesStore } from './store/csSelectedNodesStore';
 
 
 const searchStore = useSearchStore();
-const selectedCodesStore = useSelectedCodesStore();
+const selectedNodesStore = useSelectedNodesStore();
 
 /**
  * To determine the behaviour of the 'Select all' button, whether to
@@ -20,11 +20,11 @@ const selectedCodesStore = useSelectedCodesStore();
  * @returns { Boolean }
  */
 const isAllResultsSelected = computed(() => {
-    if (selectedCodesStore.codes.length > 0) {
-        const alreadySelectedCodes = searchStore.results.filter((resultItem) => {
-            return selectedCodesStore.codes.some((code) => resultItem.id === code.id);
+    if (selectedNodesStore.nodes.length > 0) {
+        const alreadySelectedNodes = searchStore.results.filter((resultItem) => {
+            return selectedNodesStore.nodes.some((node) => resultItem.id === node.id);
         });
-        return alreadySelectedCodes.length === searchStore.results.length ? true : false;
+        return alreadySelectedNodes.length === searchStore.results.length ? true : false;
     } else {
         return false;
     }
@@ -37,11 +37,11 @@ const isAllResultsSelected = computed(() => {
  * @returns { Boolean }
  */
 const isSomeResultsSelected = computed(() => {
-    if (selectedCodesStore.codes.length > 0) {
-        const alreadySelectedCodes = searchStore.results.filter((resultItem) => {
-            return selectedCodesStore.codes.some((code) => resultItem.id === code.id);
+    if (selectedNodesStore.nodes.length > 0) {
+        const alreadySelectedNodes = searchStore.results.filter((resultItem) => {
+            return selectedNodesStore.nodes.some((node) => resultItem.id === node.id);
         });
-        return alreadySelectedCodes.length >= 1 && alreadySelectedCodes.length !== searchStore.results.length ? true : false;
+        return alreadySelectedNodes.length >= 1 && alreadySelectedNodes.length !== searchStore.results.length ? true : false;
     } else {
         return false;
     }

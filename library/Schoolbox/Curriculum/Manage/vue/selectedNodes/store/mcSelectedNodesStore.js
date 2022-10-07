@@ -4,7 +4,8 @@
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
-import { useNodesStore, findById, getBreadcrumbs } from '../../store/mcNodesStore';
+import { useNodesStore } from '../../store/mcNodesStore';
+import { findById, getBreadcrumbs } from '../../../js/nodeUtils';
 import { useEnableNodesStore } from './mcEnableNodesStore';
 
 
@@ -12,6 +13,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
 
     state: () => ({
         nodes: [], //the currently selected nodes
+        childNodes: [], //any children of currently selected nodes
         activeNode: null, //to show extra info on a selected code in a modal
         hasDisabledChildNodes: false,
         isLoading: false, //to display loading note
@@ -75,6 +77,15 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
         },
 
         /**
+         * just return an array of ids, used to compare if a node is selected or not
+         *
+         * @return { array }
+         */
+        childNodesIds () {
+            return this.childNodes.map((node) => node.id);
+        },
+
+        /**
          * check if all nodes are enabled so we can just show the disable button
          *
          * @return { boolean }
@@ -129,26 +140,25 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
         /**
          * add a node
          *
-         * @param { Object or Array } either a single node, or mulitple can be added
+         * @param { Object  }
          */
         add (nodeToAdd) {
-            if (Array.isArray(nodeToAdd)) {
-                this.nodes  = [...this.nodes, ...nodeToAdd];
-            } else {
-                this.updateIsSelected(nodeToAdd, true);
-                this.nodes = this.removeChildNodes(nodeToAdd);
-                this.nodes  = [...this.nodes, nodeToAdd];
-            }
+            this.nodes = this.noChildrenOfNode(nodeToAdd);
+            this.nodes = [...this.nodes, nodeToAdd];
+            this.childNodes = this.removeChildNodes();
+            this.updateChildNodes(nodeToAdd, true, nodeToAdd.id);
         },
 
         /**
-         * we need to check if a new parent has been selected of any existing children
+         * we need to check if a new parent has been selected of any existing children,
          * if it has the children should be removed as the parent now takes precedence
          *
          * @param { Object }
+         *
+         * @returns { array }
          */
-        removeChildNodes (nodeToAdd) {
-            const withoutChildrenOfNewSelection = this.nodes.filter((selectedNode) => {
+        noChildrenOfNode (nodeToAdd) {
+            const noChildrenOfNode = this.nodes.filter((selectedNode) => {
                 if (nodeToAdd.children) { //only if the children have loaded
                     const node = findById(nodeToAdd.children, selectedNode.id);
                     return node !== undefined ? false : true; //only keep those nodes that aren't a child of the new node
@@ -156,7 +166,18 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
                     return true;
                 }
             });
-            return withoutChildrenOfNewSelection;
+            return noChildrenOfNode;
+        },
+
+        /**
+         * remove any existing child nodes that don't have a .selectedParentId that is an id contained in nodes
+         *
+         * @returns { array }
+         */
+        removeChildNodes () {
+            return this.childNodes.filter((selectedChildNode) => {
+                return this.nodesIds.includes(selectedChildNode.selectedParentId);
+            });
         },
 
         /**
@@ -165,45 +186,53 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
          * @param { Object }
          */
         remove (nodeToRemove) {
-            if (Array.isArray(nodeToRemove)) {
-                nodeToRemove.forEach((node) => {
-                    this.nodes = this.nodes.filter((selectedCode) => selectedCode.id !== node.id);
-                });
-            } else {
-                this.updateIsSelected(nodeToRemove, false);
-                this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id);
-            }
+            this.updateChildNodes(nodeToRemove, false, nodeToRemove.id);
+            this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id);
         },
 
         /**
          * to track whether a node is selected (with mc-view-node-checkbox)
-         * we add an additional property to each node
+         * for each newly loaded node, we need to check whether its parent has been selected
+         * to do this we check if the parent of the loaded node is already in the child nodes list
+         * if it is we also need to add in this node
          *
          * @param { object }
          */
-        addIsSelected (node) {
-            if (node.isSelected === undefined) {
-                const nodesStore = useNodesStore();
-                const parentNode = findById(nodesStore.nodes.children, node.parent?.id);
-                if (parentNode) {
-                    node.isSelected = parentNode.isSelected;
-                } else {
-                    node.isSelected = false;
-                }
+        checkIfSelected (node) {
+            const parentNode = findById(useNodesStore().nodes.children, node.parent?.id);
+            //no parent node, so it would be a root level node, already in the selected list, or already in the children of selected list
+            if (parentNode === undefined || this.nodesIds.includes(node.id) || this.childNodesIds.includes(node.id)) {
+                return;
+            } else if (this.nodesIds.includes(parentNode.id)) {
+                node.selectedParentId = parentNode.id; //add the base level selectedParentId
+                this.childNodes  = [...this.childNodes, node]; //and then add the node
+            } else if (this.childNodesIds.includes(parentNode.id)) { //if the parent is in the children of selected list, this node can also go in the list
+                const selectedParentNode = this.childNodes.find((node) => node.id === parentNode.id); //find the selected parent in the list
+                node.selectedParentId = selectedParentNode.selectedParentId; //add the base level selectedParentId
+                this.childNodes  = [...this.childNodes, node]; //and then add the node
             }
         },
 
         /**
-         * Loop through and update all children to the parents
-         * updated isSelected state
+         * recursively loop through and update the childNodes array
+         * adding any loaded children when the parent node is selected
+         * or removing any loaded children from the node just removed
          *
-         * @param { array }
+         * @param { object }
          * @param { boolean }
+         * @param { number }
          */
-        updateIsSelected (node, isSelected) {
-            node.isSelected = isSelected;
+        updateChildNodes (node, isSelected, selectedParentId) {
+            if (isSelected) {
+                if (!this.nodesIds.includes(node.id) && !this.childNodesIds.includes(node.id)) { //don't include the parent node and nodes already in the child list
+                    node.selectedParentId = selectedParentId;
+                    this.childNodes = [...this.childNodes, node];
+                }
+            } else { //use the .selectedParentId property to determine which child nodes to remove from the list
+                this.childNodes = this.childNodes.filter((selectedCode) => selectedCode.selectedParentId !== selectedParentId);
+            }
             node.children?.forEach((innerNode) => {
-                this.updateIsSelected(innerNode, isSelected);
+                this.updateChildNodes(innerNode, isSelected, selectedParentId);
             });
         },
 
@@ -256,7 +285,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
         },
 
         /**
-         * Update the .enabled status on eac node and all its children
+         * Update the .enabled status on each node and all its children
          *
          * @param { object }
          */

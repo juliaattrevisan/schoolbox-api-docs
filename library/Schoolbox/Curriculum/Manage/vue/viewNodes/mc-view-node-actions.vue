@@ -4,7 +4,6 @@
  * To edit an existing node or add a new subsection to a node
  */
 
-import { useNodesStore } from '../store/mcNodesStore';
 import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
 import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
 
@@ -56,7 +55,6 @@ const props = defineProps({
 
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
-
 
 /**
  * to open up or close the update modal

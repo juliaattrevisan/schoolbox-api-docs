@@ -16,6 +16,7 @@ import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 import { useAddCurriculumStore } from '../store/mcAddCurriculumStore';
 import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
 import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
+import { useSearchStore } from '../store/mcSearchStore';
 import McViewNodeCheckbox from './mc-view-node-checkbox.vue';
 import McViewNodeName from './mc-view-node-name.vue';
 import McViewNodeActions from './mc-view-node-actions.vue';
@@ -53,6 +54,7 @@ const activeNodeStore = useActiveNodeStore();
 const addCurriculumStore = useAddCurriculumStore();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
+const searchStore = useSearchStore();
 const viewNodeEl = ref(null); //to animate the node
 const isNew = ref(false); //to highlight if the node has just been added
 const justUpdated = ref(false); //to highlight if the node has just been updated
@@ -131,7 +133,13 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
  *
  * @returns { String }
  */
- const borderBottomColour = computed(() => props.depth === 0 ? `var(--body-foreground-h1)` : `var(--body-background)`);
+const borderBottomColour = computed(() => {
+    if (searchStore.isActive || props.depth !== 0) {
+        return `var(--body-background)`;
+    } else if (props.depth === 0) {
+        return `var(--body-foreground-h1)`;
+    }
+});
 
 /**
  * If this is the active node being updated
@@ -180,7 +188,7 @@ const showChildren = computed(() => props.node.children && props.node.children.l
  *
  * @returns { Boolean }
  */
- const hasCode = computed(() => props.node.code && props.node.code !== '');
+const hasCode = computed(() => props.node.code && props.node.code !== '');
 
 /**
  * Add in the code if it's available otherwise just show the title
@@ -191,11 +199,11 @@ const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.
 
 /**
  * Whether the buttons should be displayed, shouldn't be if the user is read only
- * or are are at the root level node
+ * or we are at the root level node, or if the search is active
  *
  * @returns { Boolean }
  */
-const showActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID);
+const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
 
 /**
  * Slide down the node to be updated / added
@@ -229,7 +237,7 @@ async function onLeave (el, done) {
             :data-just-updated="justUpdated"
         >
             <mc-view-node-checkbox
-                v-if="showActions"
+                v-if="hasActions"
                 :node="props.node"
                 :isUpdatingOrAdding="isUpdatingOrAdding"
             />
@@ -240,7 +248,7 @@ async function onLeave (el, done) {
                 :isUpdatingOrAdding="isUpdatingOrAdding"
             />
             <mc-view-node-actions
-                v-if="showActions"
+                v-if="hasActions"
                 :node="props.node"
                 :title="title"
                 :isUpdating="isUpdating"

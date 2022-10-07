@@ -5,10 +5,10 @@
  * move backwards through the tree
  */
 
-import { useModalActiveCodesStore } from '../store/csModalActiveCodesStore';
+import { useModalActiveNodesStore } from '../store/csModalActiveNodesStore';
 
 
-const modalActiveCodesStore = useModalActiveCodesStore();
+const modalActiveNodesStore = useModalActiveNodesStore();
 
 /**
  * to display the just selected node
@@ -17,14 +17,14 @@ const modalActiveCodesStore = useModalActiveCodesStore();
  * @param { number }
  */
 function onSelected (depth, id) {
-    modalActiveCodesStore.setSelected(depth, parseInt(id));
+    modalActiveNodesStore.setSelected(depth, parseInt(id));
 }
 
 </script>
 
 <template>
     <TransitionGroup name="list" class="breadcrumb" tag="ul">
-        <li v-for="(breadcrumb) in modalActiveCodesStore.breadcrumbs" :key="breadcrumb.id">
+        <li v-for="(breadcrumb) in modalActiveNodesStore.breadcrumbs" :key="breadcrumb.id">
             <a
                 :href="`/curricululm/${breadcrumb.id}`"
                 :title="`View ${breadcrumb.name}`"

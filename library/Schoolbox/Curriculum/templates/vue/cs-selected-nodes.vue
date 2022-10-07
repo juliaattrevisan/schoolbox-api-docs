@@ -6,12 +6,12 @@
 
 import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import { useStore } from './store/curriculumSelectorStore';
-import { useSelectedCodesStore } from './store/csSelectedCodesStore';
-import CsSelectedCode from './cs-selected-code.vue';
+import { useSelectedNodesStore } from './store/csSelectedNodesStore';
+import CsSelectedNode from './cs-selected-node.vue';
 
 
 const store = useStore();
-const selectedCodesStore = useSelectedCodesStore();
+const selectedNodesStore = useSelectedNodesStore();
 const selectEl = ref(null);
 
 
@@ -22,7 +22,7 @@ onMounted(() => {
     document.addEventListener('SEARCH_SELECT__UPDATE_SELECTION', (event) => {
         if (selectEl.value.getAttribute('id') === event.detail.elementId) { //just in case there are multiple on the page
             const newSelection = JSON.parse(event.detail.selection);
-            selectedCodesStore.update(newSelection);
+            selectedNodesStore.update(newSelection);
         }
     });
 });
@@ -34,16 +34,16 @@ onMounted(() => {
  * @returns { String }
  */
 const ids = computed(() => {
-    return selectedCodesStore.codesIds.join(',');
+    return selectedNodesStore.nodesIds.join(',');
 });
 
 /**
- * To manually dispatch a <select> change event when there's been a change in the selected codes
+ * To manually dispatch a <select> change event when there's been a change in the selected nodes
  * As this is being handled by Vue rather than user input, the change event won't fire otherwise
  * except when the <select> is first displayed in the DOM.
  * We listen for this in library/Schoolbox/Filter/templates/panel.twig
  */
-watch(() => selectedCodesStore.codesIds, () => {
+watch(() => selectedNodesStore.nodesIds, () => {
     nextTick(() => { //nextTick to ensure the dom has updated so we can access with the latest changes
         const event = new Event('change');
         selectEl.value.dispatchEvent(event);
@@ -53,15 +53,15 @@ watch(() => selectedCodesStore.codesIds, () => {
 </script>
 
 <template>
-    <div v-if="selectedCodesStore.hasCodes" class="selected-codes-container" data-test-container>
-        <cs-selected-code
-            v-for="code in selectedCodesStore.codes"
-            :key="code.id"
-            :code="code"
-            data-test-code
+    <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-container>
+        <cs-selected-node
+            v-for="node in selectedNodesStore.nodes"
+            :key="node.id"
+            :node="node"
+            data-test-node
         />
     </div>
-    <div v-else-if="selectedCodesStore.hasNoCodes && store.isReadOnly" class="selected-codes-container" data-test-container>
+    <div v-else-if="selectedNodesStore.hasNoNodes && store.isReadOnly" class="selected-nodes-container" data-test-container>
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
     <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />
@@ -76,13 +76,13 @@ watch(() => selectedCodesStore.codesIds, () => {
         data-search-select
     >
         <option
-            v-for="code in selectedCodesStore.codes"
-            :key="code.id"
-            :value="code.id"
+            v-for="node in selectedNodesStore.nodes"
+            :key="node.id"
+            :value="node.id"
             :selected.attr="`selected`"
-            :data-selected-object="JSON.stringify(selectedCodesStore.trimCode(code))"
+            :data-selected-object="JSON.stringify(selectedNodesStore.trimNode(node))"
         >
-            {{ code.code }}
+            {{ node.code }}
         </option>
     </select>
 
@@ -90,7 +90,7 @@ watch(() => selectedCodesStore.codesIds, () => {
 
 <style lang="scss" scoped>
 
-.selected-codes-container {
+.selected-nodes-container {
     border: 1px solid var(--form-border-color);
     display: flex;
     flex-wrap: wrap;

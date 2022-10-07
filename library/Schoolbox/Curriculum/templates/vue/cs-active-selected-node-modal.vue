@@ -5,18 +5,18 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { useSelectedCodesStore } from './store/csSelectedCodesStore';
+import { useSelectedNodesStore } from './store/csSelectedNodesStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const selectedCodesStore = useSelectedCodesStore();
+const selectedNodesStore = useSelectedNodesStore();
 const modalEl = ref(null);
 
 /**
  * to open the modal when requested
  */
-watch(() => selectedCodesStore.hasActiveCode, (hasActiveCode) => {
-    if (hasActiveCode) {
+watch(() => selectedNodesStore.hasActiveNode, (hasActiveNode) => {
+    if (hasActiveNode) {
         modalEl.value.open()
     }
 });
@@ -27,10 +27,10 @@ watch(() => selectedCodesStore.hasActiveCode, (hasActiveCode) => {
  * @returns { String }
  */
 const title = computed(() => {
-    if (selectedCodesStore.activeCode?.code && selectedCodesStore.activeCode.code !== '') {
-        return `[${selectedCodesStore.activeCode.code}] ${selectedCodesStore.activeCode.name}`;
+    if (selectedNodesStore.activeNode?.code && selectedNodesStore.activeNode.code !== '') {
+        return `[${selectedNodesStore.activeNode.code}] ${selectedNodesStore.activeNode.name}`;
     } else {
-        return selectedCodesStore.activeCode?.name;
+        return selectedNodesStore.activeNode?.name;
     }
 });
 
@@ -40,8 +40,8 @@ const title = computed(() => {
  * @returns { String }
  */
 const breadcrumbs = computed(() => {
-    if (selectedCodesStore.activeCode?.breadcrumbs.length > 0) {
-        const justNames = selectedCodesStore.activeCode.breadcrumbs.map((breadcrumb) => breadcrumb.name);
+    if (selectedNodesStore.activeNode?.breadcrumbs.length > 0) {
+        const justNames = selectedNodesStore.activeNode.breadcrumbs.map((breadcrumb) => breadcrumb.name);
         return justNames.join(' > ');
     } else {
         return '';
@@ -49,10 +49,10 @@ const breadcrumbs = computed(() => {
 });
 
 /**
- * close the modal, setting the activeCode to null so we can allow another selection
+ * close the modal, setting the activeNode to null so we can allow another selection
  */
 function onModalClosed () {
-    selectedCodesStore.setActiveCode(null);
+    selectedNodesStore.setActiveNode(null);
 }
 
 </script>
@@ -60,12 +60,13 @@ function onModalClosed () {
 <template>
     <reveal-modal
         ref="modalEl"
+        size="large"
         @closed="onModalClosed"
     >
-        <template v-if="selectedCodesStore.hasActiveCode">
+        <template v-if="selectedNodesStore.hasActiveNode">
             <h2>{{ title }}</h2>
             <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
-            <div v-html="selectedCodesStore.activeCode.description"></div>
+            <div v-html="selectedNodesStore.activeNode.description"></div>
         </template>
     </reveal-modal>
 </template>

@@ -9,6 +9,7 @@ import { computed } from 'vue';
 import { escapeRegExp } from '@js/util/jsUtils';
 import { useNodesStore } from '../store/mcNodesStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
+import { useSearchStore } from '../store/mcSearchStore';
 
 
 const props = defineProps({
@@ -51,6 +52,7 @@ const props = defineProps({
 
 const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
+const searchStore = useSearchStore();
 
 /**
  * To disable selection on certain sitatuions
@@ -87,13 +89,13 @@ const isDisabled = computed(() => {
  * @returns { Boolean }
  */
 const isButton = computed(() => {
-    if (isParentNode.value) { //is the parent node, which we don't
+    if (searchStore.isActive) { //when search is active, we can jump to the selected node
+        return true;
+    } else if (isParentNode.value) { //is the parent node, which we can't select
         return false;
     } else if (props.node.children === null) { //the children haven't been loaded
         return false;
     } else if (props.node.children?.length === 0) { //there's no children to display, so no point going further
-        return false;
-    } else if (viewNodesStore.isSearchActive) { //cant do any navigation while search is active
         return false;
     } else {
         return true;
@@ -105,13 +107,17 @@ const isButton = computed(() => {
  *
  * @returns { string }
  */
- const fontWeight = computed(() => isParentNode.value && !viewNodesStore.isSearchActive ? 'bold' : 'normal');
+const fontWeight = computed(() => isParentNode.value && !searchStore.isActive ? 'bold' : 'normal');
 
 /**
- * traverse to the next nodel level
+ * reset the structure to that node or traverse to the next node level
  */
- function onNameSelected () {
-    viewNodesStore.setNextSelected(props.node.id);
+function onNameSelected () {
+    if (searchStore.isActive) { //reset the structure and move to the selected searched node
+        viewNodesStore.toId(props.node.id);
+    } else { //traverse to the next node level
+        viewNodesStore.setNextSelected(props.node.id);
+    }
 }
 
 /**
@@ -120,23 +126,10 @@ const isButton = computed(() => {
  * @returns { HTML }
  */
 const highlightTitleSearch = computed(() => {
-    if (viewNodesStore.isSearchActive) {
+    if (searchStore.isActive) {
         return highlightSearchInElement(props.title);
     } else {
         return props.title;
-    }
-});
-
-/**
- * To highlight any search selections in the breadcrumbs
- *
- * @returns { HTML }
- */
-const highlightBreadcrumbSearch = computed(() => {
-    if (viewNodesStore.isSearchActive && props.node.breadcrumb) {
-        return highlightSearchInElement(props.node.breadcrumb);
-    } else {
-        return '';
     }
 });
 
@@ -150,7 +143,7 @@ const highlightBreadcrumbSearch = computed(() => {
  */
 function highlightSearchInElement (toHighlight) {
     let highlighted = toHighlight;
-    viewNodesStore.queryWordList.forEach((wordInSearch) => {
+    searchStore.queryWordList.forEach((wordInSearch) => {
         highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
             return `<mark>${match}</mark>`;
         });
@@ -169,14 +162,13 @@ function highlightSearchInElement (toHighlight) {
         @click.prevent="onNameSelected"
         @keyup.enter="onNameSelected"
     >
-        {{ props.title }}
+        <span v-html="highlightTitleSearch"></span>
     </button>
     <div
         v-else
         class="name"
     >
         <span v-html="highlightTitleSearch"></span>
-        <aside v-if="viewNodesStore.isSearchActive" v-html="highlightBreadcrumbSearch"></aside>
     </div>
 
 </template>
@@ -198,11 +190,6 @@ function highlightSearchInElement (toHighlight) {
     font-size: 1rem;
     font-weight: v-bind(fontWeight);
     width: 100%;
-}
-
-aside {
-    font-size: 0.725rem;
-    font-style: italic;
 }
 
 </style>

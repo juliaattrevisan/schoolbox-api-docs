@@ -1,15 +1,11 @@
 <script setup>
 
 /**
- * A curriculum node to select to traverse further down the tree,
- * or to CRUD via the actions
+ * To be able to enable/disable or delete a node
  */
 
 import { computed } from 'vue';
-import { UNSET_ID } from '../store/mcNodesStore';
 import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
-
-const selectedNodesStore = useSelectedNodesStore();
 
 
 const props = defineProps({
@@ -36,21 +32,15 @@ const props = defineProps({
     },
 });
 
-/**
- * Dont add a checklist on the very first level node
- *
- * @returns { Boolean }
- */
-const isIdSet = computed(() => props.node.id !== UNSET_ID);
+const selectedNodesStore = useSelectedNodesStore();
 
 /**
- * if the node is a child of one that's selected but is not in
- * the selected list it should be disabled
+ * if the node is a child of one that's selected it should be disabled
  *
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    return props.node.isSelected && !selectedNodesStore.nodesIds.includes(props.node.id);
+    return selectedNodesStore.childNodesIds.includes(props.node.id);
 });
 
 /**
@@ -59,7 +49,7 @@ const isDisabled = computed(() => {
  * @returns { Boolean }
  */
 const isChecked = computed(() => {
-    return props.node.isSelected;
+    return selectedNodesStore.nodesIds.includes(props.node.id) || selectedNodesStore.childNodesIds.includes(props.node.id);
 });
 
 /**
@@ -74,7 +64,7 @@ function onChange (isChecked) {
 </script>
 
 <template>
-    <div v-if="isIdSet" class="checklist">
+    <div class="checklist">
         <input
             :id="`checkbox-${props.node.id}`"
             type="checkbox"

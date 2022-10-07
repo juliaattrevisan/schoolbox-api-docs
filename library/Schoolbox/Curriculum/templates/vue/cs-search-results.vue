@@ -47,7 +47,6 @@ watch(() => searchStore.filteredResults, () => {
             <ul>
                 <li v-if="searchStore.isProcessing" class="search-status">Searching for results....</li>
                 <li v-else-if="searchStore.hasNoResults" class="search-status">No results found for your current search.</li>
-                <li v-else-if="searchStore.isResultsCapped" class="search-status">{{ searchStore.resultsNotShownCount }} search results not shown, try refining your search further.</li>
                 <li v-if="showSelectAll">
                     <cs-select-all-search-results />
                 </li>

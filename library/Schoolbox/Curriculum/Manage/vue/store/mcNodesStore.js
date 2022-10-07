@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
+import { findById, sortByName, removeId, getBreadcrumbs } from '../../js/nodeUtils';
 import { useStore, apiEndpoint } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
@@ -102,11 +103,7 @@ export const useNodesStore = defineStore('mcNodes', {
                 const response = await fetch(`${apiEndpoint}/${id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
                 if (response.ok) {
                     const nodeWithParents = await response.json();
-                    const breadcrumbs = getBreadcrumbs(nodeWithParents, []);
-                    breadcrumbs.push( { id: id, name: nodeWithParents.name } ); //add in the actual node as the last
-                    for (let i = 0; i < breadcrumbs.length; i++) { //recursively load in each parent and traverse down
-                        await useViewNodesStore().setNextSelected(breadcrumbs[i].id);
-                    }
+                    await this.loadAllChildren(nodeWithParents);
                 } else {
                     this.hasId = false; //as the id couldn't be found
                     if (this.hasSingleCurriculum) { //we should still jump straight to the only node available if there's only one
@@ -125,11 +122,35 @@ export const useNodesStore = defineStore('mcNodes', {
         },
 
         /**
+         * load in all the children required to reach the depth of the node,
+         * avoiding loading those nodes that are already loaded
+         *
+         * @TODO - this setup currently assumes we are already in the node tree of the passed through node
+         * it currently doesnt handle an entirely new node tree
+         *
+         * @param { object }
+         */
+        async loadAllChildren (node) {
+            const breadcrumbs = getBreadcrumbs(node, []);
+            breadcrumbs.push( { id: node.id, name: node.name } ); //add in the actual node as the last
+            const viewNodesStore = useViewNodesStore();
+            const activeBreadcrumbs = [ ...viewNodesStore.breadcrumbs, { id: viewNodesStore.current.id } ];
+            const onlyInactiveBreadcrumbs = breadcrumbs.filter((newBreadcrumb) => { //to only load the nodes that aren't already active
+                return !activeBreadcrumbs.some((activeBreadcrumb) => {
+                    return newBreadcrumb.id === activeBreadcrumb.id; // return the ones with equal id
+               });
+            });
+            for (let i = 0; i < onlyInactiveBreadcrumbs.length; i++) { //recursively load in each node and traverse down
+                await useViewNodesStore().setNextSelected(onlyInactiveBreadcrumbs[i].id);
+            }
+        },
+
+        /**
          * Load in another level of children of the target node id
          *
          * @param { number }
          */
-        async loadChildren (id) {
+        async loadNextChildren (id) {
             try {
                 this.isLoading = true;
                 const response = await fetch(`${apiEndpoint}/${id}?descendants=2`, {
@@ -140,9 +161,9 @@ export const useNodesStore = defineStore('mcNodes', {
                 const responseJson = await response.json();
                 if (response.ok) {
                     const newNode = responseJson;
-                    newNode.children.forEach((node) => useSelectedNodesStore().addIsSelected(node));
+                    newNode.children.forEach((node) => useSelectedNodesStore().checkIfSelected(node));
                     const oldNode = findById(this.nodes.children, id); //grab the old node to update
-                    useSelectedNodesStore().addIsSelected(oldNode);
+                    useSelectedNodesStore().checkIfSelected(oldNode);
                     oldNode.children = newNode.children; //we just grab the loaded children and overwrite the old property
                 } else {
                     throw new Error(responseJson.title, { ...responseJson } );
@@ -167,7 +188,7 @@ export const useNodesStore = defineStore('mcNodes', {
                 children: nodes,
                 enabled: true,
             }
-            nodes.forEach((node) => useSelectedNodesStore().addIsSelected(node));
+            nodes.forEach((node) => useSelectedNodesStore().checkIfSelected(node)); //ensure isSelected is kept up to date
         },
 
         /**
@@ -208,77 +229,3 @@ export const useNodesStore = defineStore('mcNodes', {
     },
 
 });
-
-/**
- * To just return the node containing the specified id
- * We recursively loop through the object until we find the
- * matched object or undefined if not found
- *
- * @param { array }
- * @param { number }
- */
-export function findById (array, id) {
-    for (const item of array) {
-        if (item.id === id) {
-            return item;
-        }
-        if (item.children?.length) {
-            const innerResult = findById(item.children, id);
-            if (innerResult) {
-                return innerResult;
-            }
-        }
-    }
-}
-
-/**
- * Sort the passed through curriculum nodes by their .name property
- *
- * @param { array }
- */
-export function sortByName (array, id) {
-    array.sort((a, b) => {
-        return a.name.localeCompare(b.name, undefined, {
-            numeric: true,
-            sensitivity: 'base'
-        });
-    });
-}
-
-/**
- * To return an array with any objects containing the specified id removed
- * we move through the object, looping recursively through .children and remove
- * any with the id that's being removed
- *
- * @param { array }
- * @param { number }
- *
- * @returns { object }
- */
-function removeId (data, id) {
-    if (data !== null) { // .children wont always be available if the node hasn't been loaded yet
-        return data.reduce((previousValue, currentValue) => {
-            if (currentValue.id !== id) {
-                previousValue.push( { ...currentValue, children: removeId(currentValue.children, id) } );
-            }
-            return previousValue;
-        }, []);
-    } else {
-        return data;
-    }
-}
-
-/**
- * Recursively loop through the parents adding in a breadcrumb for each
- *
- * @param { object }
- * @param { array }
- */
-export function getBreadcrumbs (node, currentBreadcrumbs) {
-    if (node.hasOwnProperty('parent') && node.parent !== null) { //if there's a parent to use as a breadcrumb
-        let breadcrumbs = [ { id: node.parent.id, name: node.parent.name }, ...currentBreadcrumbs ]; //add it in to the front of the list
-        return breadcrumbs = getBreadcrumbs(node.parent, breadcrumbs); //and then check the next node up the list
-    } else { //otherwise we must be at the top of the breadcrumb list
-        return currentBreadcrumbs; //so we can return now
-    }
-}

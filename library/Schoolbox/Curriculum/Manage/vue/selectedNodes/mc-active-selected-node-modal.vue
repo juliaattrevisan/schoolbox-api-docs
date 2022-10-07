@@ -60,6 +60,7 @@ function onModalClosed () {
 <template>
     <reveal-modal
         ref="modalEl"
+        size="large"
         @closed="onModalClosed"
     >
         <template v-if="selectedNodesStore.hasActiveNode">

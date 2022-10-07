@@ -1,23 +1,22 @@
 import { nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
-import CsSelectedCode from '../cs-selected-code';
+import CsSelectedNode from '../cs-selected-node';
 import { createTestingPinia } from '@pinia/testing';
 import { useStore } from '../store/curriculumSelectorStore';
-import { useSelectedCodesStore } from '../store/csSelectedCodesStore';
+import { useSelectedNodesStore } from '../store/csSelectedNodesStore';
 
 let wrapper; //so we don't need to pass it into every test
 
 beforeEach(() => {
-    wrapper = mount(CsSelectedCode, {
+    wrapper = mount(CsSelectedNode, {
         global: {
             plugins: [createTestingPinia({ stubActions: false })], //By default, all actions are mocked and therefore not executed. This allows you to unit test your store and components separately.
         },
         props: {
-            code: {
+            node: {
                 id: 1,
                 code: 'C1',
                 name: 'Code 1',
-                breadcrumb: '',
             }
         },
     });
@@ -35,8 +34,8 @@ test('remove button should be visible when not read only', async () => {
 });
 
 test('selecting title should add active code', async () => {
-    const selectedCodesStore = useSelectedCodesStore();
-    expect(selectedCodesStore.hasActiveCode).toBe(false);
+    const selectedNodesStore = useSelectedNodesStore();
+    expect(selectedNodesStore.hasActiveNode).toBe(false);
     await wrapper.find('[data-test-title-button]').trigger('click');
-    expect(selectedCodesStore.hasActiveCode).toBe(true);
+    expect(selectedNodesStore.hasActiveNode).toBe(true);
 });

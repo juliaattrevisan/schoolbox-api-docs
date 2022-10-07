@@ -4,7 +4,9 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore, findById } from '../../store/mcNodesStore';
+import { useNodesStore } from '../../store/mcNodesStore';
+import { useSearchStore } from '../../store/mcSearchStore';
+import { findById } from '../../../js/nodeUtils';
 
 export const DIRECTION = {
     FORWARDS: 'forwards',
@@ -50,15 +52,6 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
         },
 
         /**
-         * the codes found relevant to the search input
-         *
-         * @returns { Array }
-         */
-        nodesWithSearch () {
-            return [this.current];
-        },
-
-        /**
          * the current node selection
          *
          * @returns { Object }
@@ -70,7 +63,22 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
             } else { //otherwise return the root level structure when there's more than one root level node
                 return nodesStore.nodes;
             }
-        }
+        },
+
+        /**
+         * the current nodes to display, which are either just the current selection
+         * or when the search is active the results found within the current selection
+         *
+         * @returns { Array }
+         */
+        nodes () {
+            const searchStore = useSearchStore();
+            if (searchStore.isActive) {
+                return searchStore.results;
+            } else {
+                return [this.current];
+            }
+        },
 
     },
 
@@ -84,6 +92,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
          * @param { number }
          */
         setSelected (depth, id) {
+            useSearchStore().clear(); //clear the search results when traversing
             if (depth === 0) { //pulling back to no node selection at all, the root level
                 this.reset();
             } else if (depth > this.currentDepth) { //progressing to the next depth
@@ -141,8 +150,18 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
          */
         async setNextSelected (id) {
             const nodesStore = useNodesStore();
-            await nodesStore.loadChildren(id);
+            await nodesStore.loadNextChildren(id);
             this.setSelected(this.currentDepth+1, id);
+        },
+
+        /**
+         * To traverse to a specified id, regardless of where it is
+         * in the current tree structure
+         *
+         * @param { number }
+         */
+        async toId (id) {
+            useNodesStore().loadId(id);
         },
 
     },

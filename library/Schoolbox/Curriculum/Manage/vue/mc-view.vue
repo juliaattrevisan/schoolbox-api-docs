@@ -1,14 +1,12 @@
 <script setup>
 
 /**
- * To view and filter the curriculum codes
+ * To view and filter the curriculum nodes
  */
 
-import { computed } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useNodesStore } from './store/mcNodesStore';
 import { useAddCurriculumStore } from './store/mcAddCurriculumStore';
-import { useViewNodesStore } from './viewNodes/store/mcViewNodesStore';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
 import McViewHeader from './viewHeader/mc-view-header.vue';
 import McViewNodes from './viewNodes/mc-view-nodes.vue';
@@ -17,7 +15,6 @@ import McViewNodes from './viewNodes/mc-view-nodes.vue';
 const store = useStore();
 const nodesStore = useNodesStore();
 const addCurriculumStore = useAddCurriculumStore();
-const viewNodesStore = useViewNodesStore();
 
 /**
  * Reload the page to try loading again
@@ -33,20 +30,6 @@ function onCreateNewSelected () {
     addCurriculumStore.prompt();
 }
 
-/**
- * To further clarify where the current search term hasn't found any code matches
- *
- * @returns { String }
- */
-const currentSelectedNodeTitle = computed(() => viewNodesStore.current.name);
-
-/**
- * Clear the current search query
- */
-function onClearSearchSelected () {
-    viewNodesStore.clearSearch();
-}
-
 </script>
 
 <template>
@@ -58,18 +41,13 @@ function onClearSearchSelected () {
                     Sorry, we are currently unable to load the Curriculum data. Please <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected">refresh the page</a> to try again and contact your support if the problem persists.
                 </div>
             </section>
-            <div v-else-if="nodesStore.hasNoCurriculum" class="empty-state">
+            <div v-else-if="nodesStore.hasNoCurriculum" class="empty-state-flex-centered">
                 <i class="icon-curriculum"></i>
                 <p>There's currently no Curriculum loaded to display.</p>
                 <template v-if="store.hasLoadedOk && !store.isReadOnly">
-                    <button @click.prevent="onCreateNewSelected" @keyup.enter="onCreateNewSelected" title="Create a new Curriculum">Create a new Curriculum</button>
+                    <a href="#create-curriculum" @click.prevent="onCreateNewSelected" @keyup.enter="onCreateNewSelected" title="Create a new Curriculum">Create a new Curriculum</a>
                     <a href="/curriculum/import" title="Import Curriculum">Import Curriculum</a>
                 </template>
-            </div>
-            <div v-else-if="viewNodesStore.hasNoSearchResults" class="empty-state">
-                <i class="icon-curriculum"></i>
-                <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
-                <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
             </div>
             <section v-else>
                 <fieldset class="content">
@@ -85,22 +63,7 @@ function onClearSearchSelected () {
 
 <style lang="scss" scoped>
 
-.empty-state {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 200px;
-    p {
-        max-width: 50%;
-    }
-    button {
-        background: none;
-        font-size: 0.875rem;
-    }
-}
-
-.view-nodes {
+.row {
     margin-bottom: 180px; /* provide a minimum space to allow the bottom-drawer.vue */
 }
 
