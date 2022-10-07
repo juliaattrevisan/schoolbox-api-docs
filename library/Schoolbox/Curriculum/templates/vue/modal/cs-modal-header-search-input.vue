@@ -27,9 +27,9 @@ const isDisabled = computed(() => !modalActiveNodesStore.isActive);
  */
 const placeholder = computed(() => {
     if (isDisabled.value) {
-        return 'Expand a Curricula to enable search...'
+        return 'Expand a curriculum to enable search...'
     } else {
-        return `Search ${modalActiveNodesStore.current.name} for codes or keywords...`;
+        return `Search for codes or keywords...`;
     }
 });
 

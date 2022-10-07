@@ -37,9 +37,9 @@ const isDisabled = computed(() => !viewNodesStore.isActive || props.isDisabled);
  */
 const placeholder = computed(() => {
     if (!viewNodesStore.isActive) {
-        return 'Expand a Curricula to enable search...'
+        return 'Expand a curriculum to enable search...'
     } else {
-        return `Search ${viewNodesStore.current.name} for codes or keywords...`;
+        return `Search for codes or keywords...`;
     }
 });
 
