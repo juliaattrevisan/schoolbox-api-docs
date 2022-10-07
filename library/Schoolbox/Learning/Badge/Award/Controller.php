@@ -669,12 +669,10 @@ class Controller extends Base
          * else redirect to back to where you came from
          * this redirect is created in the vue form component.
          */
-        $redirectUrl = $this->router->generate('searchUser.getProfile', [
+        $studentProfile = $this->router->generate('searchUser.getProfile', [
             'userId' => $award->getRecipient()->getId()
         ]);
-        if (isset($_GET[Redirect::RETURN_URL])) {
-            $redirectUrl = Redirect::decode($_GET[Redirect::RETURN_URL]);
-        }
+        $redirectUrl = Redirect::decode($this->request->query->get(Redirect::RETURN_URL, $studentProfile));
         $this->response->redirect->to($redirectUrl);
     }
 
