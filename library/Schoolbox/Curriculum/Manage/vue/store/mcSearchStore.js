@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useStore, apiEndpoint } from './manageCurriculumStore';
+import { apiEndpoint } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 
 
@@ -71,7 +71,7 @@ export const useSearchStore = defineStore(`mcSearch`, {
          * @return { string }
          */
         enabled () {
-            return useStore().showOnlyEnabled ? '&enabled=1' : '';
+            return useViewNodesStore().showOnlyEnabled ? '&enabled=1' : '';
         },
 
     },

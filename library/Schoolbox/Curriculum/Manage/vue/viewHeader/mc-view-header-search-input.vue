@@ -6,7 +6,6 @@
 
 import { computed, watch } from 'vue';
 import debounce from 'lodash/debounce';
-import { useStore } from '../store/manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useSearchStore, DEBOUNCE_AMOUNT } from '../store/mcSearchStore';
 
@@ -21,7 +20,6 @@ const props = defineProps({
     },
 });
 
-const store = useStore();
 const viewNodesStore = useViewNodesStore();
 const searchStore = useSearchStore();
 
@@ -98,7 +96,7 @@ function onClearSearchSelected () {
     <!-- <div class="small-4 columns"> -->
         <label class="inline-block">Hide disabled nodes</label>
         <div class="switch">
-            <input id="show-only-enabled" type="checkbox" v-model="store.showOnlyEnabled" />
+            <input id="show-only-enabled" type="checkbox" v-model="viewNodesStore.showOnlyEnabled" />
             <label for="show-only-enabled">
                 <span>On</span>
                 <span>Off</span>

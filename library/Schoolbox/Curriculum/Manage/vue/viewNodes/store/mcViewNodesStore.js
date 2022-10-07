@@ -18,7 +18,8 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
     state: () => ({
         idList: [], //ids of the selected nodes
         currentDepth: 0, //track how far down the tree we are
-        currentDirection: DIRECTION.FORWARDS //which direction we are currently travelling in the tree
+        currentDirection: DIRECTION.FORWARDS, //which direction we are currently travelling in the tree
+        showOnlyEnabled: false, //whether only enabled nodes should appear
     }),
 
     getters: {
