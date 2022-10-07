@@ -55,15 +55,13 @@ class Helper
 
     /**
      * Generates data for grades
-     * @param User                $viewer
-     * @param User                $viewee
-     * @param Term                $term
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param User $viewer
+     * @param User $viewee
+     * @param Term $term
      * @return array
      * @throws MapperException
      */
-    public function generateGrades(User $viewer, User $viewee, Term $term, Alaress_Date_Format $from, Alaress_Date_Format $to)
+    public function generateGrades(User $viewer, User $viewee, Term $term)
     {
         // Add folders with response or feedback
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
@@ -82,7 +80,7 @@ class Helper
 
         // Get all assessments for this user in the specified term, grouped by folder
         $assessmentsPerFolder = $this->assessmentMapperProxy
-            ->findAllByStudentBetweenDates($viewee, false, $from, $to, [], $displayFolderIds)
+            ->findAllByStudentBetweenDates($viewee, false, $term->getStart(), $term->getActualFinish(), [], $displayFolderIds)
             ->filter(function (IAssessable $a) use ($viewee) {
                 return $a->isPublished($viewee) && $a->isParticipant($viewee);
             })

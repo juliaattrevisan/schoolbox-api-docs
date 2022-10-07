@@ -86,7 +86,6 @@ use function strnatcasecmp;
  */
 class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 {
-
     /**
      * Interface with external user database.
      *
@@ -2205,6 +2204,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $termParam         = [];
         $withYearLevelOnly = false;
         if ($term->getExtraordinary()) {
+            if ($term->getId() === null) {
+                // This may arise because fake terms (terms not stored in the database) may have been used by calling functions.
+                throw new \UnexpectedValueException("Parameter \$term is expected to have a non-null ID.");
+            }
+
             $termJoin          = '
             INNER JOIN term_year_level tyl ON fyl.year_level_id = tyl.year_level_id
             INNER JOIN term t ON tyl.term_id = t.id

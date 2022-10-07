@@ -759,12 +759,11 @@ class Controller extends ConfigController
             $this->userMapper
         ))->calculateDateRange($optionsPayload['terms']);
 
-        $from = new \Alaress_Date_Format($range['startDate'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
-        $to   = new \Alaress_Date_Format($range['endDate'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
-
         /* Manufacture a placeholder instance
          */
-        $term = $this->termMapper->createModel()->setStart($from)->setActualFinish($to);
+        $term = $this->termMapper->createModel()
+            ->setStart(new \Alaress_Date_Format($range['startDate'], \Alaress_Date_Format::DATABASE_DATE_FORMAT))
+            ->setActualFinish(new \Alaress_Date_Format($range['endDate'], \Alaress_Date_Format::DATABASE_DATE_FORMAT));
 
         /* View As
          * Default to the current admin
@@ -807,7 +806,7 @@ class Controller extends ConfigController
             new Factory($this->getConfigLoader())
         );
 
-        [ $folders, $markbooks, $assessments ] = $gradeHelper->generateGrades($viewer, $student, $term, $from, $to);
+        [ $folders, $markbooks, $assessments ] = $gradeHelper->generateGrades($viewer, $student, $term);
 
         /* Find the assessments that fulfil $summaryWorkTypes requirements
          */

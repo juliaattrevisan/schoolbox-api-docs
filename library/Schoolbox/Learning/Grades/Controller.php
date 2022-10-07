@@ -50,44 +50,6 @@ use function func_get_args;
 class Controller extends Base
 {
     /**
-     * @var Term\Mapper
-     */
-    private $termMapper;
-
-    /**
-     * @var Folder\Mapper
-     */
-    private $folderMapper;
-
-    /**
-     * @var AssessmentMapperProxy
-     */
-    private $assessmentMapperProxy;
-
-    /**
-     * @var RubricDataSource
-     */
-    private $rubricMapper;
-
-    /**
-     * @var Access
-     */
-    private $access;
-
-    /** @var FilterSelection\Mapper */
-    private $selectionMapper;
-
-
-    /** @var AssessmentFilters\IdFinder */
-    private $assessmentIdFinder;
-
-    /**
-     * @var Filter\IFactoryFactory
-     */
-    private $filterFactoryFactory;
-
-
-    /**
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param Folder\Mapper              $folderMapper
      * @param Term\Mapper                $termMapper
@@ -98,25 +60,16 @@ class Controller extends Base
      * @param Filter\IFactoryFactory     $filterFactoryFactory
      */
     public function __construct(
-        AssessmentMapperProxy $assessmentMapperProxy,
-        Folder\Mapper $folderMapper,
-        Term\Mapper $termMapper,
-        RubricDataSource $rubricMapper,
-        FilterSelection\Mapper $filterSelectionMapper,
-        Access $access,
-        AssessmentFilters\IdFinder $assessmentIdFinder,
-        Filter\IFactoryFactory $filterFactoryFactory
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private Folder\Mapper $folderMapper,
+        private Term\Mapper $termMapper,
+        private RubricDataSource $rubricMapper,
+        private FilterSelection\Mapper $filterSelectionMapper,
+        private Access $access,
+        private AssessmentFilters\IdFinder $assessmentIdFinder,
+        private Filter\IFactoryFactory $filterFactoryFactory
     ) {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->termMapper            = $termMapper;
-        $this->folderMapper          = $folderMapper;
-        $this->rubricMapper          = $rubricMapper;
-        $this->access                = $access;
-        $this->filterFactoryFactory  = $filterFactoryFactory;
-        $this->selectionMapper       = $filterSelectionMapper;
-        $this->assessmentIdFinder    = $assessmentIdFinder;
     }
-
 
     /**
      * Redirect user to their own grades page for the current term
@@ -146,6 +99,28 @@ class Controller extends Base
         );
     }
 
+    /**
+     * @param User $viewee
+     * @param int  $year
+     * @throws MapperException
+     * @api   GET /learning/grades-year/{userId}/year/{year}
+     * @level 165
+     */
+    public function getGradesYear(User $viewee, int $year): void
+    {
+        $from = (new Alaress_Date_Format())->setYear($year)->startOfYear();
+        $to = (new Alaress_Date_Format())->setYear($year)->endOfYear();
+
+        // Create new term for the full year summary.  Note this term will not exist in the database, so its ID will be null.
+        // Functions that accept this fake term as a parameter cannot assume it has a non-null ID.
+        $term = $this->termMapper->createModel()
+            ->setTitle($from->getYear() . ' Full Year')
+            ->setCode($from->getYear() . '-full-year')
+            ->setStart($from)
+            ->setActualFinish($to);
+
+        $this->getCustomGrades($viewee, $term, true);
+    }
 
     /**
      * Display the grade summary page. With a list of classes/groups that have student interactions
@@ -166,58 +141,48 @@ class Controller extends Base
     }
 
     /**
-     *
-     * @param User                      $viewee
-     * @param Term\Model                $term
-     * @param Alaress_Date_Format|null $from
-     * @param Alaress_Date_Format|null $to
+     * @param User       $viewee
+     * @param Term\Model $term
+     * @param Boolean    $termIsWholeYear
      * @return void
-     * @throws MapperException
      */
-    private function getCustomGrades(User $viewee, Term\Model $term, ?Alaress_Date_Format $from = null, ?Alaress_Date_Format $to = null): void
+    private function getCustomGrades(User $viewee, Term\Model $term, bool $termIsWholeYear = false): void
     {
-        $from = $from ?: $term->getStart();
-        $to = $to ?: $term->getActualFinish();
-
         $markSchemeFactory = new Factory($this->getConfigLoader());
-
-        $gradeHelper = new Helper(
+        $gradeHelper       = new Helper(
             $this->folderMapper,
             $this->assessmentMapperProxy,
             $this->access,
             $markSchemeFactory
         );
 
-        [$folders, $markbooks, $assessments] = $gradeHelper->generateGrades($this->getUser(), $viewee, $term, $from, $to);
-
-        $assessmentTasks = new Collection();
+        [$folders, $markbooks, $assessments] = $gradeHelper->generateGrades($this->getUser(), $viewee, $term);
 
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
-        if ($filteredWorkTypes->count() > 0) {
-            $assessmentTasks = $gradeHelper->filterAssessments($this->getUser(), $viewee, $assessments, $filteredWorkTypes);
-        }
+        $assessmentTasks   = (
+            ($filteredWorkTypes->count() > 0) ?
+            $gradeHelper->filterAssessments($this->getUser(), $viewee, $assessments, $filteredWorkTypes) :
+            new Collection()
+        );
 
         /* A list of Terms to choose from
          *
          * If we're in an extraordinary Term right now, provide that as an option
          * in addition to the ordinary Terms
          */
-        $terms = $this->termMapper->findAllWithExtraordinary($viewee);
-        $yearUrl = $this->getYearUrl($viewee->getId());
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
-            'year'             => null,
-            'terms'            => $terms,
+            'year'             => ($termIsWholeYear ? $term->getStart()->getYear() : null),
+            'terms'            => $this->termMapper->findAllWithExtraordinary($viewee),
             'folders'          => $folders,
             'assessmentTasks'  => $assessmentTasks,
             'markbooks'        => $markbooks,
             'mailHandle'       => $this->getSession()->get('mailhandle'),
             'currentUser'      => $this->getUser(),
-            'yearUrl'          => $yearUrl,
+            'yearUrl'          => $this->getYearUrl($viewee->getId())
         ])->setTab('grade'));
     }
-
 
     /**
      * Generate the page with filter panel where we will insert a filtered grades report
@@ -309,28 +274,6 @@ class Controller extends Base
     }
 
     /**
-     * @param User $viewee
-     * @param int  $year
-     * @throws MapperException
-     * @api   GET /learning/grades-year/{userId}/year/{year}
-     * @level 165
-     */
-    public function getGradesYear(User $viewee, int $year): void
-    {
-        $from = (new Alaress_Date_Format())->setYear($year)->startOfYear();
-        $to = (new Alaress_Date_Format())->setYear($year)->endOfYear();
-        // find a term from the from date to get actual term code
-        $term = $this->termMapper->findForDate($from);
-        // fake its period to match the year
-        $term->setTitle($year)
-            ->setStart($from)
-            ->setDisplayFinish($to)
-            ->setActualFinish($to);
-
-        $this->getCustomGrades($viewee, $term, $from, $to);
-    }
-
-    /**
      * @param User         $viewee
      * @param Term\Model   $term
      * @param Folder\Model $subject
@@ -355,7 +298,7 @@ class Controller extends Base
         $userSelections  = $codec->convertRequestToSelections($this->getUser(), $page, $request);
 
         // TODO don't save selections for non user-configurable page filters
-        $this->selectionMapper->updateSelections($this->getUser(), $page, $userSelections);
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $userSelections);
 
         $filters = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $this->getUser(), $page);
 
@@ -513,7 +456,6 @@ class Controller extends Base
             }
         }
 
-
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
             'content' => $this->buildUnthemedHtmlOutput('@learningGrades/gradesInner.twig', [
@@ -573,7 +515,6 @@ class Controller extends Base
         $propertyValues = array_unique($folder->getYearLevels()->getPropertyValues($propertyName));
         return count($propertyValues) > 1 ? true : (bool)$propertyValues[0];
     }
-
 
     /**
      * Builds an array of data used by twig to render the assessment box-and-whiskers graph
@@ -679,7 +620,6 @@ class Controller extends Base
         ];
     }
 
-
     /**
      * @param GenericCollection|IAssessable[] $assessments
      * @param User                            $student
@@ -720,7 +660,6 @@ class Controller extends Base
         return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student, $includeComparison);
     }
 
-
     /**
      * @param array $filters
      * @param User  $viewee
@@ -749,7 +688,6 @@ class Controller extends Base
             });
         return $assessments;
     }
-
 
     /**
      * @param int $vieweeId
