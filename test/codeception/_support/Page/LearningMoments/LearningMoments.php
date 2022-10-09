@@ -21,7 +21,7 @@ class LearningMoments
     public const DELETE_A_PHOTO = 'a.button.icon-delete.delete-button';
     public const CONFIRM_BUTTON = 'Confirm';
     public const SUBMIT_BUTTON = '#evidence-submit';
-    public const ADD_COMMENT_BUTTON = 'button.btn-show-ckeditor';
+    public const ADD_COMMENT_BUTTON = 'button.show-ckeditor-button';
     public const COMMENT_SUBMIT_BUTTON = 'button[class=button\ submit]';
     public const DROPDOWN_MENU = 'a.icon-overflow';
     public const COMMENT_DELETE_BUTTON = 'a[title="Delete comment"]';
