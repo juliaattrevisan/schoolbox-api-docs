@@ -1,5 +1,5 @@
-/** 
- * To remove a component 
+/**
+ * To remove a component
  *
  */
 
@@ -25,35 +25,37 @@ export function initRemoveComponents () {
 
 /**
  * To show/hide the confirm/cancel remove component panel
- * 
- * @param { Element } 
+ *
+ * @param { Element }
  */
 function init (component) {
     initToggleButon(component);
     initCancelButton(component);
     initConfirmButton(component);
-}   
+}
 
 /**
  * The show/hide button
- * 
- * @param { Element } 
- * @param { Element } 
+ *
+ * @param { Element }
+ * @param { Element }
  */
 function initToggleButon (component) {
-    const toggleButton = component.querySelector(BUTTON_SELECTOR);
-    toggleButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        gsap.to(toggleButton, { rotation: isOpen(component) ? 0 : 180, transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
-        isOpen(component) ? close(component) : open(component);
+    const toggleButtons = component.querySelectorAll(BUTTON_SELECTOR);
+    toggleButtons.forEach((toggleButton) => {
+        toggleButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            gsap.to(toggleButton, { rotation: isOpen(component) ? 0 : 180, transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+            isOpen(component) ? close(component) : open(component);
+        });
     });
 }
 
 /**
  * Determine the state of the remove panel
- * 
- * @param { Element } 
- * 
+ *
+ * @param { Element }
+ *
  * @returns { Boolean }
  */
 export function isOpen (component) {
@@ -63,8 +65,8 @@ export function isOpen (component) {
 
 /**
  * Open the settings panel
- * 
- * @param { Element } 
+ *
+ * @param { Element }
  */
 function open (component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
@@ -75,8 +77,8 @@ function open (component) {
 
 /**
  * Close the settings panel
- * 
- * @param { Element } 
+ *
+ * @param { Element }
  */
 async function close (component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
@@ -87,8 +89,8 @@ async function close (component) {
 
 /**
  * Cancel the component deletion
- * 
- * @param { Element } 
+ *
+ * @param { Element }
  */
 function initCancelButton (component) {
     const cancelDeleteButton = component.querySelector('[data-remove="0"]');
@@ -96,14 +98,14 @@ function initCancelButton (component) {
         event.preventDefault();
         if (isOpen(component)) {
             close(component);
-        } 
+        }
     });
 }
 
 /**
  * Confirm the component deletion
- * 
- * @param { Element } 
+ *
+ * @param { Element }
  */
 function initConfirmButton (component) {
     const confirmDeleteButton = component.querySelector('[data-remove="1"]');
@@ -112,12 +114,12 @@ function initConfirmButton (component) {
         removeComponent(component, confirmDeleteButton);
     });
 }
- 
+
 /**
  * Save the removed component to the DB
- * 
- * @param { Element } 
- * @param { Element } 
+ *
+ * @param { Element }
+ * @param { Element }
  */
 async function removeComponent (component, confirmDeleteButton) {
     try {
@@ -135,21 +137,21 @@ async function removeComponent (component, confirmDeleteButton) {
         slideUp(component);
     } finally {
         component.remove();
-        document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_REMOVED, { 
+        document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_REMOVED, {
             detail: {
-                component: component 
+                component: component
             }
-        })); 
+        }));
         document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
     }
 }
 
 /**
  * To pass through the required FormData to remove the component in the DB
- * 
- * @param { Element } 
- * 
- * @returns { FormData }  
+ *
+ * @param { Element }
+ *
+ * @returns { FormData }
  */
 function getFormData (component) {
     const formData = new FormData();
@@ -162,12 +164,12 @@ function getFormData (component) {
 /**
  * The component has been removed elsewhere, so notify the user
  * and suggest a page refresh for the latest data
- * 
- * @param { Element } 
+ *
+ * @param { Element }
  */
 export function updateRemovedComponent (component) {
 
-    component.querySelector('[data-component-handle]').remove(); //remove the drag trigger 
+    component.querySelector('[data-component-handle]').remove(); //remove the drag trigger
     component.querySelector('[data-component-titlebar-container] > nav').remove(); //as well as the edit controls to prevent any further interactions on this component
 
     const errorElement = document.createElement('div');
