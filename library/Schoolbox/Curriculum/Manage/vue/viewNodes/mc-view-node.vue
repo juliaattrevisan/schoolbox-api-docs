@@ -59,12 +59,24 @@ const viewNodeEl = ref(null); //to animate the node
 const isNew = ref(false); //to highlight if the node has just been added
 const justUpdated = ref(false); //to highlight if the node has just been updated
 
+/**
+ * Consider whether we are currently only showing enabled nodes
+ *
+ * @returns { Boolean }
+ */
+const showNode = computed(() => {
+    if (viewNodesStore.showOnlyEnabled && !props.node.enabled) {
+        return false;
+    } else {
+        return true;
+    }
+});
 
 /**
  * to animate on the node
  */
 onMounted(() => {
-    if (props.depth === 0) { //we only need to animate the first node, as the rest are contained within
+    if (showNode.value && props.depth === 0) { //we only need to animate the first node, as the rest are contained within
         animateOn();
     }
     if (props.node.id === addSubsectionStore.id) {
@@ -89,7 +101,6 @@ useUpdateNodeStore().$onAction(({ name, after }) => {
         });
     }
 });
-
 
 /**
  * animate to help show which direction we are currently moving through the tree
@@ -138,19 +149,6 @@ const borderBottomColour = computed(() => {
         return `var(--body-background)`;
     } else if (props.depth === 0) {
         return `var(--body-foreground-h1)`;
-    }
-});
-
-/**
- * Consider whether we are currently only showing enabled nodes
- *
- * @returns { Boolean }
- */
-const showNode = computed(() => {
-    if (viewNodesStore.showOnlyEnabled && !props.node.enabled) {
-        return false;
-    } else {
-        return true;
     }
 });
 
