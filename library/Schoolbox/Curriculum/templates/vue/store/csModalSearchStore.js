@@ -14,10 +14,8 @@ const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search b
 export const useModalSearchStore = defineStore(`csModalSearch`, {
 
     state: () => ({
-        isProcessing: false, //to notify that an action is taking place,
+        isLoading: false, //to notify that an action is taking place,
         query: '', //current search term to filter the active nodes
-        isResultsCapped: false, //to show a 'refine your search' note
-        resultsNotShownCount: 0, //a total of the results not visible in the list
         results: [], //nodes returned in the current search results
     }),
 
@@ -64,7 +62,7 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
          * @return { Boolean }
          */
         hasNoResults () {
-            return this.isActive && this.filteredResults.length === 0 && !this.isProcessing;
+            return this.isActive && this.filteredResults.length === 0 && !this.isLoading;
         },
 
     },
@@ -72,10 +70,18 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
     actions: {
 
         /**
+         * when the search isActive, we should display the loading prompt straight away,
+         * but the debounce holds on calling search() until we assume the user has stopped typing
+         */
+        enableSearch () {
+            this.isLoading = true;
+        },
+
+        /**
          * search for nodes that match
          */
         async search () {
-            this.isProcessing = true;
+            this.isLoading = true;
             try {
                 const modalActiveNodesStore = useModalActiveNodesStore();
                 const response = await fetch(`${apiEndpoint}?parentId=${modalActiveNodesStore.current.id}&query=${this.query}&enabled=1&limit=50`, {
@@ -90,7 +96,7 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
             } catch (error) {
                 console.warn(error);
             } finally {
-                this.isProcessing = false;
+                this.isLoading = false;
             }
         },
 
@@ -100,28 +106,6 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
         clear () {
             this.query = '';
             this.results = [];
-        },
-
-        /**
-         * add all found results to the selection
-         */
-        addAllResults () {
-            const selectedNodesStore = useSelectedNodesStore();
-            const newSelectedNodes = this.results.filter((newSelectedNode) => { //check if the node isn't in the list already
-                return !selectedNodesStore.nodes.some((selectedNode) => selectedNode.id === newSelectedNode.id); //don't add in those that match
-            });
-            selectedNodesStore.add(newSelectedNodes);
-        },
-
-        /**
-         * remove all found results from the selection
-         */
-        removeAllResults () {
-            const selectedNodesStore = useSelectedNodesStore();
-            const matchedSelectedNodes = this.results.filter((matchedSelectedNode) => { //check if the node is in the list already
-                return selectedNodesStore.nodes.some((selectedNode) => selectedNode.id === matchedSelectedNode.id); //add in those that match
-            });
-            selectedNodesStore.remove(matchedSelectedNodes);
         },
 
     },

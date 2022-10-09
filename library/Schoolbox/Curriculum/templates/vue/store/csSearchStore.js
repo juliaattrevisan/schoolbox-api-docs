@@ -8,15 +8,14 @@ import { useSelectedNodesStore } from './csSelectedNodesStore';
 
 
 const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search becomes active
+export const DEBOUNCE_AMOUNT = 350; //the amount in ms to hold off on searching, to allow the user to keep typing
 
 
 export const useSearchStore = defineStore(`csSearch`, {
 
     state: () => ({
-        isProcessing: false, //to notify that an action is taking place,
+        isLoading: false, //to notify that an action is taking place,
         query: '', //current search term to filter the active nodes
-        isResultsCapped: false, //to show a 'refine your search' note
-        resultsNotShownCount: 0, //a total of the results not visible in the list
         results: [], //nodes returned in the current search results
     }),
 
@@ -63,7 +62,7 @@ export const useSearchStore = defineStore(`csSearch`, {
          * @return { Boolean }
          */
         hasNoResults () {
-            return this.isActive && this.filteredResults.length === 0 && !this.isProcessing;
+            return this.isActive && this.filteredResults.length === 0 && !this.isLoading;
         },
 
     },
@@ -71,10 +70,17 @@ export const useSearchStore = defineStore(`csSearch`, {
     actions: {
 
         /**
+         * when the search isActive, we should display the loading prompt straight away,
+         * but the debounce holds on calling search() until we assume the user has stopped typing
+         */
+        enableSearch () {
+            this.isLoading = true;
+        },
+
+        /**
          * search for nodes that match
          */
-         async search () {
-            this.isProcessing = true;
+        async search () {
             try {
                 const response = await fetch(`${apiEndpoint}?query=${this.query}&enabled=1&limit=50`, {
                     method: 'GET',
@@ -88,7 +94,7 @@ export const useSearchStore = defineStore(`csSearch`, {
             } catch (error) {
                 console.warn(error);
             } finally {
-                this.isProcessing = false;
+                this.isLoading = false;
             }
         },
 
@@ -98,6 +104,7 @@ export const useSearchStore = defineStore(`csSearch`, {
         clear () {
             this.query = '';
             this.results = [];
+            this.isLoading = false;
         },
 
         /**

@@ -7,7 +7,7 @@
 import { computed, watch } from 'vue';
 import debounce from 'lodash/debounce';
 import { useModalActiveNodesStore } from '../store/csModalActiveNodesStore';
-import { useModalSearchStore } from '../store/csModalSearchStore';
+import { useModalSearchStore, DEBOUNCE_AMOUNT } from '../store/csModalSearchStore';
 
 
 const modalActiveNodesStore = useModalActiveNodesStore();
@@ -38,6 +38,7 @@ const placeholder = computed(() => {
  */
  watch(() => modalSearchStore.query, () => {
     if (modalSearchStore.isActive) {
+        modalSearchStore.enableSearch();
         debounceSearch();
     }
 });
@@ -47,24 +48,37 @@ const placeholder = computed(() => {
  */
 const debounceSearch = debounce(() => {
     modalSearchStore.search();
-}, 350);
+}, DEBOUNCE_AMOUNT);
+
+/**
+ * Clear the current search query
+ */
+ function onClearSearchSelected () {
+    modalSearchStore.clear();
+}
 
 </script>
 
 <template>
-   <input
-        v-model="modalSearchStore.query"
-        ref="queryInputEl"
-        type="text"
-        class="search-input"
-        :disabled="isDisabled"
-        :placeholder="placeholder"
-        data-modal-search-input
-        @input="$event.target.composing = false"
-    />
+    <div class="input-group">
+        <input
+            v-model="modalSearchStore.query"
+            ref="queryInputEl"
+            type="text"
+            class="search-input"
+            :disabled="isDisabled"
+            :placeholder="placeholder"
+            data-modal-search-input
+            @input="$event.target.composing = false"
+        />
+        <button
+            v-if="modalSearchStore.query !== ''"
+            title="Clear the current search"
+            class="button icon-close"
+            @click.prevent="onClearSearchSelected"
+            @keyup.enter="onClearSearchSelected"
+        >
+        Clear
+        </button>
+    </div>
 </template>
-
-<style scoped>
-
-
-</style>

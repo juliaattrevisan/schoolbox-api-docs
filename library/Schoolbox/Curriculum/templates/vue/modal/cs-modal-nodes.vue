@@ -52,7 +52,7 @@ watch(() => modalActiveNodesStore.nodes, () => {
         <i class="icon-curriculum"></i>
         <p>There's currently no Curriculum loaded to display.</p>
     </div>
-    <div v-else-if="modalSearchStore.isProcessing">
+    <div v-else-if="nodesStore.isLoading || modalSearchStore.isLoading">
         <loading-table />
     </div>
     <div v-else-if="modalSearchStore.hasNoResults" class="empty-state-flex-centered">
