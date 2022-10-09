@@ -1,12 +1,14 @@
 <?php
 
+namespace acceptance;
+
+use AcceptanceTester;
 use Codeception\Exception\TestRuntimeException;
 use Codeception\Util\Locator;
 use Page\Datepicker as DatepickerPage;
 
 class DatepickerCest
 {
-
     public function _before(AcceptanceTester $i)
     {
         $i->loginAsAdmin();
@@ -22,17 +24,19 @@ class DatepickerCest
      * @param AcceptanceTester $i
      * @throws TestRuntimeException if something goes wrong
      */
-    public function addEvent(AcceptanceTester $i)
+    public function addEvent(AcceptanceTester $i): void
     {
         $datepickerPage = new DatepickerPage($i);
-        $i->amOnPage('/calendar/full');
+        $i->amOnPage('/calendar/week');
         $i->wait(3);
         $i->clickWithLeftButton('td.fc-day');
         $i->waitForElementVisible('div#createEventPanel', 5);
         $i->fillField('div#createEventPanel input[name=title]', 'Date Picker Test');
         $i->click('input[type=submit][value=Create\ Event]');
+        sleep(2);
         $i->canSee('Date Picker Test');
-        $i->amOnPage('/calendar/full');
+        $i->amOnPage('/calendar/week');
+        $i->click('button.fc-customPrev-button.fc-button.fc-button-primary');
         sleep(2);
         $element = Locator::contains('a.fc-daygrid-event', 'Date Picker Test');
         $i->clickWithLeftButton($element);
