@@ -4,12 +4,11 @@ use Codeception\Util\Locator;
 
 class CalendarInitialCest
 {
-
     public function createPersonalEvent(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
         $i->login("alaress", "alaress");
-        $i->amOnPage('/calendar/full');
+        $i->amOnPage('/calendar/week');
         sleep(5);
         $i->clickWithLeftButton('td.fc-day');
         $i->waitForElementVisible('div#createEventPanel', 5);
@@ -23,12 +22,16 @@ class CalendarInitialCest
     {
         $i->amOnPage('/login/');
         $i->login("alaress", "alaress");
-        $i->amOnPage('/calendar/full');
-        sleep(5);
+        $i->amOnPage('/calendar/week');
+        $i->click('button.fc-customPrev-button.fc-button.fc-button-primary');
+        sleep(2);
         $i->canSee('My Test Event');
         $i->impersonate('Eden Reed');
-        $i->amOnPage('/calendar/full');
-        sleep(5);
+        $i->amOnPage('/calendar/week');
+        sleep(2);
+        $i->cantSee('My Test Event');
+        $i->click('button.fc-customPrev-button.fc-button.fc-button-primary');
+        sleep(2);
         $i->cantSee('My Test Event');
     }
 
@@ -36,8 +39,9 @@ class CalendarInitialCest
     {
         $i->amOnPage('/login/');
         $i->login("alaress", "alaress");
-        $i->amOnPage('/calendar/full');
-        sleep(5);
+        $i->amOnPage('/calendar/week');
+        $i->click('button.fc-customPrev-button.fc-button.fc-button-primary');
+        sleep(2);
         $element = Locator::contains('a.fc-daygrid-event', 'My Test Event');
         $i->clickWithLeftButton($element);
         $element = Locator::contains('a.button', 'Delete');
