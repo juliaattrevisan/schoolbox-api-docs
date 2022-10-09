@@ -25,7 +25,7 @@
 {% import _self as macros %}
 
 
-{% if nodes %}
+{% if nodes | length > 0 %}
     {% for node in nodes %}
     <div class="content">
         <ul class="information-list">
