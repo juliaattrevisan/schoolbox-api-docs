@@ -1,10 +1,13 @@
 <?php
 
+namespace Calendar;
+
+use AcceptanceTester;
 use Codeception\Util\Locator;
 
 class CalendarInitialCest
 {
-    public function createPersonalEvent(AcceptanceTester $i)
+    public function createPersonalEvent(AcceptanceTester $i): void
     {
         $i->amOnPage('/login/');
         $i->login("alaress", "alaress");
@@ -18,7 +21,7 @@ class CalendarInitialCest
         $i->canSee('My Test Event');
     }
 
-    public function viewDifferentForDifferentUsers(AcceptanceTester $i)
+    public function viewDifferentForDifferentUsers(AcceptanceTester $i): void
     {
         $i->amOnPage('/login/');
         $i->login("alaress", "alaress");
@@ -35,7 +38,7 @@ class CalendarInitialCest
         $i->cantSee('My Test Event');
     }
 
-    public function deletePersonalEvent(AcceptanceTester $i)
+    public function deletePersonalEvent(AcceptanceTester $i): void
     {
         $i->amOnPage('/login/');
         $i->login("alaress", "alaress");
