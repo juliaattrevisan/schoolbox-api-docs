@@ -4,7 +4,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore } from '../../store/mcNodesStore';
+import { UNSET_ID, useNodesStore } from '../../store/mcNodesStore';
 import { useSearchStore } from '../../store/mcSearchStore';
 import { findById } from '../../../js/nodeUtils';
 
@@ -92,7 +92,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
          * @param { number }
          * @param { number }
          */
-        setSelected (depth, id) {
+        setSelected (depth, id=UNSET_ID) {
             useSearchStore().clear(); //clear the search results when traversing
             if (depth === 0) { //pulling back to no node selection at all, the root level
                 this.reset();
@@ -102,6 +102,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
                 this.toPrevious(depth)
             }
             this.currentDepth = depth;
+            this.updateHash();
         },
 
         /**
@@ -110,7 +111,6 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
         reset () {
             this.currentDirection = DIRECTION.BACKWARDS;
             this.idList = [];
-            this.currentDepth = 0;
         },
 
         /**
@@ -163,6 +163,17 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
          */
         async toId (id) {
             useNodesStore().loadId(id);
+        },
+
+        /**
+         *
+         */
+        updateHash () {
+            if (this.current.id === UNSET_ID) {
+                history.replaceState(undefined, undefined, '#');
+            } else {
+                history.replaceState(undefined, undefined, `#${this.current.id}`);
+            }
         },
 
     },

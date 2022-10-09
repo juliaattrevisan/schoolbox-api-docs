@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore } from './mcNodesStore';
+import { useNodesStore, UNSET_ID } from './mcNodesStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
@@ -63,7 +63,7 @@ export const useStore = defineStore('manageCurriculum', {
             const hashCount = (documentURL.match(/#/g) || []).length; //the number of # found in the url
             const id = Number(documentURL.substring(documentURL.indexOf('#')+1, documentURL.length));
             const isIdNumber = Number.isInteger(id);
-            if (hashCount === 1 && isIdNumber) { //we check if there's an #, and the string proceeding it is a number
+            if (hashCount === 1 && isIdNumber && id !== UNSET_ID) { //we check if there's an #, and the string proceeding it is a number
                 this.hasId = true;
                 this.id = id;
             }
