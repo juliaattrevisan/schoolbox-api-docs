@@ -46,14 +46,12 @@ function init (component) {
  * @param { Element }
  */
 function initToggleButtons (component) {
-    const toggleButtons = component.querySelectorAll(BUTTON_SELECTOR);
-    toggleButtons.forEach((toggleButton) => {
-        toggleButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            const buttonRotation = isOpen(component) ? 0 : 90;
-            gsap.to(toggleButton, { rotation: buttonRotation, transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
-            isOpen(component) ? close(component) : open(component);
-        });
+    const toggleButton = component.querySelector(BUTTON_SELECTOR);
+    toggleButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        const buttonRotation = isOpen(component) ? 0 : 90;
+        gsap.to(toggleButton, {rotation: buttonRotation, transformOrigin: '20px 20px', duration: ANIMATE_SPEED});
+        isOpen(component) ? close(component) : open(component);
     });
     const emptyStateToggleButton = component.querySelector(`${BUTTON_SELECTOR}.empty-edit`);
     if (emptyStateToggleButton) {
