@@ -6,7 +6,7 @@
 
 import { computed } from 'vue';
 import { generateUUID } from '@js/util/jsUtils';
-import { UNSET_ID } from '../../../Manage/js/nodeUtils';
+import { UNSET_ID } from '../../../js/nodeUtils';
 import { useModalSelectedNodesStore } from '../store/csModalSelectedNodesStore';
 
 

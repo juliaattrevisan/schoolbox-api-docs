@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { UNSET_ID, findById, sortByName, removeId, getBreadcrumbs } from '../../js/nodeUtils';
+import { UNSET_ID, findById, sortByName, removeId, getBreadcrumbs } from '../../../js/nodeUtils';
 import { useStore, apiEndpoint } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';

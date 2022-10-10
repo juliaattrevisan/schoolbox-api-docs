@@ -6,7 +6,7 @@
 import { defineStore } from 'pinia';
 import { useNodesStore } from '../../store/mcNodesStore';
 import { useSearchStore } from '../../store/mcSearchStore';
-import { UNSET_ID, findById } from '../../../js/nodeUtils';
+import { UNSET_ID, findById } from '../../../../js/nodeUtils';
 
 export const DIRECTION = {
     FORWARDS: 'forwards',

@@ -4,7 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { useNodesStore } from '../../store/mcNodesStore';
-import { sortByName } from '../../../js/nodeUtils';
+import { sortByName } from '../../../../js/nodeUtils';
 import { useViewNodesStore } from '../../viewNodes/store/mcViewNodesStore';
 
 
