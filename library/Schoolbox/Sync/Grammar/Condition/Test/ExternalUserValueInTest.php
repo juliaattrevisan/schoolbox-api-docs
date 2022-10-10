@@ -292,7 +292,6 @@ class ExternalUserValueInTest extends TestCase
             false,
         ];
 
-
         // The (=foo) and (!foo) patterns are lookaheads:
         // I haven't found a use for them, but I can't ignore them
         yield 'match on positive lookahead' => [
@@ -318,6 +317,25 @@ class ExternalUserValueInTest extends TestCase
             'j(!ack)*',
             $staffUser,
             false,
+        ];
+
+        // Invalid patterns:
+        // I'd like to raise a warning, but I cannot without having different
+        // behavior when running UPS on the command line and dry run: the CLI
+        // uses the daemon kernel, which throws errors on warning trigger.
+        // (Of course this class shouldn't have any dependency on which kernel
+        //  creates it: undoing said dependency is another problem though.)
+        yield 'invalid pattern' => [
+            'givenName',
+            '{jack',
+            $staffUser,
+            false,
+        ];
+        yield 'valid and invalid patterns: valid patterns still match' => [
+            'givenName',
+            ['{jack', 'jack'],
+            $staffUser,
+            true,
         ];
     }
 }
