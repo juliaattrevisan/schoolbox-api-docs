@@ -522,7 +522,7 @@ class Controller extends Base
 
         $showSeverity = $this->getConfigLoader()->get('pastoral_severity');
         $severityForegroundColor = null;
-        if ($showSeverity && $record->getSeverity() && $record->getSeverity()->getColor()) {
+        if ($showSeverity && $record->getSeverity()?->getColor()) {
             $transformer             = new ColorHelper();
             $severityColor           = $transformer->getColorFactory()->build($record->getSeverity()->getColor());
             $severityForegroundColor = $transformer->calculateForeground($severityColor)->getAsRgba();
