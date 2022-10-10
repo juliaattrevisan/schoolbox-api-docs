@@ -68,7 +68,7 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
         }
 
         // if no nodes left after removing disabled node, do not render for read only user
-        if (!$this->curriculumNodes->count() && ($this->getContentPermission() <= UserAccess::ACCESS_READ)) {
+        if ((!$this->curriculumNodes || !$this->curriculumNodes->count()) && ($this->getContentPermission() <= UserAccess::ACCESS_READ)) {
             return false;
         }
 
