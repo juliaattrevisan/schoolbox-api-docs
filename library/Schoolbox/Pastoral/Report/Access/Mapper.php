@@ -74,12 +74,13 @@ class Mapper extends \Schoolbox\Mapper
             $user   = $this->hydrateJoin($row, 'user', 'u');
             if ($user instanceof User) {
                 $access->setUser($user);
+                $collection->add($access);
             }
             $group = $this->hydrateJoin($row, 'group', 'g');
             if ($group instanceof \Schoolbox\Pastoral\Group\Model && $pastoralGroups->offsetExists($group->getId())) {
                 $access->setGroup($pastoralGroups->offsetGet($access->getGroup()->getId()));
+                $collection->add($access);
             }
-            $collection->add($access);
         }
         return $collection;
     }
