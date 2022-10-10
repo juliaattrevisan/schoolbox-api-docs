@@ -85,16 +85,21 @@ $(function() {
                                     <script>
                                         $(function() {
                                             $('#modifyLinkButton-{MYLINK_ID}').schoolboxLink({
+                                                allowedFiles: false,
+                                                allowedFilesystems: 'folder',
                                                 restoreModal: '#modify-link-{MYLINK_ID}',
                                                 onSelect: function(url, name, mime, dialog) {
                                                     $('#url-{MYLINK_ID}').val(url);
+                                                },
+                                                onAfterClose: function () {
+                                                    $('#file-picker').remove();
                                                 }
                                             });
                                         });
                                     </script>
                                     <label for="url-{MYLINK_ID}" class="required">Link</label>
                                     <div class="input-group">
-                                        <input id="url-{MYLINK_ID}" name="url" type="text" class="required" value="{MYLINK_URL}" />
+                                        <input id="url-{MYLINK_ID}" name="url" type="text" maxlength="2048" class="required" value="{MYLINK_URL}" />
                                         <a id="modifyLinkButton-{MYLINK_ID}" class="button icon-link">Browse</a>
                                     </div>
                                 </div>
@@ -122,16 +127,21 @@ $(function() {
                         <script>
                             $(function() {
                                 $('#addLinkButton').schoolboxLink({
+                                    allowedFiles: false,
+                                    allowedFilesystems: 'folder',
                                     restoreModal: '#add-link',
                                     onSelect: function(url, name, mime, dialog) {
                                         $('#url-new').val(url);
+                                    },
+                                    onAfterClose: function () {
+                                        $('#file-picker').remove();
                                     }
                                 });
                             });
                         </script>
                         <label for="url-new" class="required">Link</label>
                         <div class="input-group">
-                            <input id="url-new" name="url" type="text" class="required" />
+                            <input id="url-new" name="url" type="text" maxlength="2048" class="required" />
                             <a id="addLinkButton" class="button icon-link">Browse</a>
                         </div>
                     </div>
