@@ -63,6 +63,10 @@ class Factory
         $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
 
         $assessmentContext = $assessment->getContext();
+        $lastCrumb         = [
+            'title' => '',
+            'path'  => ''
+        ];
 
         if ($assessmentContext instanceof UnitImplementation) {
             // Assessment belongs to subject->unit.
@@ -73,8 +77,8 @@ class Factory
 
             $unitSpecFolder = $unitImpl->getSpecification()->getFolder();
 
-            $lastCrumbTitle = $unitSpecFolder->getTitle();
-            $lastCrumbPath  = "/homepage/{$unitSpecFolder->getId()}";
+            $lastCrumb['title'] = $unitSpecFolder->getTitle();
+            $lastCrumb['path']  = "/homepage/{$unitSpecFolder->getId()}";
         } elseif ($assessmentContext instanceof UnitSpecification) {
             // Assessment belongs to unit specification.
             // Generate trail like 'Learning->$unit' (eg. 'Learning'->'Romeo and Juliet').
@@ -83,8 +87,8 @@ class Factory
             $unitSpec       = $assessmentContext;
             $unitSpecFolder = $unitSpec->getFolder();
 
-            $lastCrumbTitle = $unitSpecFolder->getTitle();
-            $lastCrumbPath  = "/homepage/{$unitSpecFolder->getId()}";
+            $lastCrumb['title'] = $unitSpecFolder->getTitle();
+            $lastCrumb['path']  = "/homepage/{$unitSpecFolder->getId()}";
         } elseif ($assessmentContext instanceof Project) {
             // Assessment belongs to $subject->$unit->project or $unit->$project.
             // Generate trail like one of:
@@ -105,8 +109,8 @@ class Factory
                     'studentId'    => $user->getId()
                 ];
 
-                $lastCrumbTitle = $project->getTitle();
-                $lastCrumbPath  = (
+                $lastCrumb['title'] = $project->getTitle();
+                $lastCrumb['path']  = (
                     // In some circumstances the user will not be authorised to view the 'status' page.
                     // In that case, show the 'summary' page instead.
                     ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user)) ?
@@ -125,17 +129,18 @@ class Factory
             $subjectFolder = $subject->getFolder();
 
             if ($this->access->getFolderAccess($user, $subjectFolder->getId())) {
-                $lastCrumbTitle = $subject->getTitle();
-                $lastCrumbPath  = "/homepage/{$subjectFolder->getId()}";
+                $lastCrumb['title'] = $subject->getTitle();
+                $lastCrumb['path']  = "/homepage/{$subjectFolder->getId()}";
             } else {
                 // The user does not have access to the subject folder, so no last crumb.
-                $lastCrumbTitle = null;
-                $lastCrumbPath  = null;
+                $lastCrumb['title'] = '';
+                $lastCrumb['path']  = '';
             }
         }
 
-        if ($lastCrumbPath !== null) {
-            $trail->add([$lastCrumbTitle, $lastCrumbPath]); // Add the last crumb to the trail.
+        // Final check to make sure we have meaningful data before adding the last crumb.
+        if ('' !== trim($lastCrumb['title']) && '' !== trim($lastCrumb['path'])) {
+            $trail->add([$lastCrumb['title'], $lastCrumb['path']]); // Add the last crumb to the trail.
         }
 
         return $trail;
