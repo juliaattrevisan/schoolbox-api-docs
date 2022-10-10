@@ -244,18 +244,21 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
 
     $tabNumber = 0;
     if ($total = $definitionCollection->count()) {
-        $i        = 0;
         $previous = new Component_Definition();
         $folderId = ($folder instanceof Schoolbox\Resource\Folder\Model) ? $folder->getId() : null;
 
         foreach ($definitionCollection as $component) {
             /** @var Component_Definition $component */
-            ++$i;
-
             if (!$component->renderInPalette($component->getModule(), $folderId)) {
                 continue;
             }
 
+            /* Some components can only spawn once
+             * Others can spawn multiple times
+             *
+             * Apply different css classes to show that limitation where appropriate
+             * at the time of loading
+             */
             $class = '';
             if ($component->getMultiple() === false) {
                 $class = 'one-only ';
@@ -264,7 +267,16 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
                 }
             }
 
-            $class = trim($class);
+            /* If this is not our first iteration
+             * and this component's category is different than what saw previously,
+             * then parse the tab we were populating and start the next one
+             */
+            if ($previous->getComponentCategory() && $component->getComponentCategory() !== $previous->getComponentCategory()) {
+                $this->parse('homepage_component_page_block', 'homepage_component_page', true);
+                $this->setVar('homepage_component_block');
+
+                $tabNumber++;
+            }
 
             $this->setVar([
                 'HOMEPAGE_COMPONENT_ID'             => Scrub::text($component->getId()),
@@ -272,10 +284,16 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
                 'HOMEPAGE_COMPONENT_COUNT'          => $component->getInstanceCount(),
                 'HOMEPAGE_COMPONENT_DESCRIPTION'    => Scrub::text($component->getDescription()),
                 'HOMEPAGE_COMPONENT_CLASS'          => $component->getCssClass(),
-                'HOMEPAGE_COMPONENT_MULTIPLE_STATE' => $class,
-                'HOMEPAGE_COMPONENT_CATEGORY_ID'    => $previous->getComponentCategory(),
+                'HOMEPAGE_COMPONENT_MULTIPLE_STATE' => trim($class),
+                'HOMEPAGE_COMPONENT_CATEGORY_ID'    => $component->getComponentCategory(),
                 'HOMEPAGE_COMPONENT_CATEGORY_CLASS' => $tabNumber === 0 ? 'active' : '',
             ]);
+
+            $this->parse('homepage_component_block', 'homepage_component', true);
+
+            /* Remember what we just processed
+             */
+            $previous = $component;
 
             /* Initialise category counts if they don't already exist
              */
@@ -283,26 +301,14 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
                 $tabList[$component->getComponentCategory()]['count'] = 0;
             }
 
-            $this->parse('homepage_component_block', 'homepage_component', true);
-
-            if ($i > 1 && $component->getComponentCategory() !== $previous->getComponentCategory()) {
-                $this->parse('homepage_component_page_block', 'homepage_component_page', true);
-                $this->setVar('homepage_component_block');
-                $tabNumber++;
-            }
-
-            // Last rotation.
-            if ($total === $i) {
-                $this->setVar('HOMEPAGE_COMPONENT_CATEGORY_ID', $component->getComponentCategory());
-                $this->parse('homepage_component_page_block', 'homepage_component_page', true);
-            }
-
-            $previous = $component;
-
             // This was set to $component->componentCategoryName - a non-existent value.
             $tabList[$component->getComponentCategory()]['name'] = $component->getComponentCategoryName();
             $tabList[$component->getComponentCategory()]['count']++;
         }
+
+        /* Final page set is always parsed
+         */
+        $this->parse('homepage_component_page_block', 'homepage_component_page', true);
     } else {
         $this->setVar([
             'homepage_component_block'      => '',
