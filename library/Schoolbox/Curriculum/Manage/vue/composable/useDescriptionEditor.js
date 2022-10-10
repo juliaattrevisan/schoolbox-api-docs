@@ -3,14 +3,14 @@
  * This setup uses https://vuejs.org/guide/reusability/composables.html, a Vue 3 alternative to mixins
  *
  * We currently use this for the description in add curriculum, add subsection and update an existing node
- * It's linked to Curriculum for now as we are specifically removing embed media buttons which is currently specific just to these description fields
+ * It's linked specifically to description as we are removing embed media buttons which is currently specific just to these description fields
  */
 
 import { ref, onMounted } from 'vue';
 import { isScriptAdded, injectScript } from '@js/util/domUtils';
 
 
-export function useCKEditor ($initialValue, $ckeditorInstance) {
+export function useDescriptionEditor ($initialValue, $ckeditorInstance) {
 
     const initialValue = ref($initialValue);
     const ckeditorInstance = $ckeditorInstance;
@@ -57,7 +57,10 @@ export function useCKEditor ($initialValue, $ckeditorInstance) {
                         event.editor.setData(initialValue.value); //set the initial data
                         removeMediaEmbedButtons(event.editor.container.$);
                     }
-                }
+                },
+                drop: (event) => { //prevent drag and drop from functioning (haven't been able to disable it prior in any other config setting)
+                    event.stop();
+                },
             },
             targetElements: $(`#${ckeditorInstance}`),
         }
@@ -73,6 +76,9 @@ export function useCKEditor ($initialValue, $ckeditorInstance) {
         videoAudioButton.style.display = 'none';
         const imageButton = ckeditor.querySelector('.cke_button__schoolboxresourceimage');
         imageButton.style.display = 'none';
+        const eqnEditorButton = ckeditor.querySelector('.cke_button__eqneditor');
+        eqnEditorButton.style.display = 'none';
+
     }
 
     return initialValue;

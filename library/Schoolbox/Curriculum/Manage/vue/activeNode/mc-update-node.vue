@@ -8,7 +8,7 @@ import { computed, watch } from 'vue';
 import { useStore } from '../store/manageCurriculumStore';
 import { useActiveNodeStore } from './store/mcActiveNodeStore';
 import { useUpdateNodeStore } from './store/mcUpdateNodeStore';
-import { useCKEditor } from '../composable/useCKEditor';
+import { useDescriptionEditor } from '../composable/useDescriptionEditor';
 
 
 const props = defineProps({
@@ -43,7 +43,7 @@ const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}`
 /**
  * Use a customised ckeditor for the description field
  */
-const descriptionField = useCKEditor(updateNodeStore.activeNodeCopy.description, ckeditorInstance.value);
+const descriptionField = useDescriptionEditor(updateNodeStore.activeNodeCopy.description, ckeditorInstance.value);
 
 /**
  * And watch for changes on this field so we can update the description in the store

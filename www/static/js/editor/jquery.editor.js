@@ -166,7 +166,7 @@
     $.alaressEditorConfigForComments = function (overrideConfig = {}) {
         const config = {
             removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,autolink,autoembed,schoolboxiframe',
-            removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+            removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
             toolbarGroups: [
                 { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
                 { name: 'paragraph', groups: ['list', 'blocks', 'bidi', 'wordcount'] },
@@ -201,7 +201,7 @@
      $.alaressEditorConfigBasic = function (overrideConfig = {}) {
         const config = {
             removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed,schoolboxiframe',
-            removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+            removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
             toolbarGroups: [
                 { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
                 { name: 'paragraph', groups: ['list', 'blocks', 'bidi'] },
