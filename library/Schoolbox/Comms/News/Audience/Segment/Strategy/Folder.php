@@ -335,7 +335,10 @@ class Folder extends SimpleStrategy
     {
         $userIds = $users->getPropertyValues('id');
 
-        // Get groups where learner or instructor (but not admin) TODO that's not what this code is doing??
+        /* Find all the folders where $userIds have the HOMEPAGE service permission and aren't
+         * explicitly denied access to said folders. findIdsByColumn() removes soft-deleted items
+         * from the result set
+         */
         $pb              = $this->getUserAccessMapper()->getPredicateBuilder()
                                 ->in('uid', $userIds)
                                 ->equals('service', UserAccess::SERVICE_HOMEPAGE)
