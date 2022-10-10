@@ -8,6 +8,7 @@
 import { ref, onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useNodesStore } from './store/mcNodesStore';
+import { useSelectedNodesStore } from './selectedNodes/store/mcSelectedNodesStore';
 import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';
 import McSelectedNodes from './selectedNodes/mc-selected-nodes.vue';
@@ -18,6 +19,7 @@ import Toast from '@schoolboxVue/components/toast.vue';
 
 
 const store = useStore();
+const selectedNodesStore = useSelectedNodesStore();
 const toastEl = ref(null);
 
 
@@ -65,6 +67,14 @@ function initErrorListener () {
     });
 }
 
+/**
+ * set the active node as null
+ */
+function onModalClosed () {
+    selectedNodesStore.setActiveNode( { id: 0 } );
+}
+
+
 </script>
 
 <template>
@@ -73,7 +83,10 @@ function initErrorListener () {
     <mc-selected-nodes />
     <mc-enable-nodes />
     <mc-delete-nodes />
-    <mc-active-selected-node-modal />
+    <mc-active-selected-node-modal
+        :node="selectedNodesStore.activeNode"
+        @closed="onModalClosed"
+    />
     <toast ref="toastEl"></toast>
 </template>
 

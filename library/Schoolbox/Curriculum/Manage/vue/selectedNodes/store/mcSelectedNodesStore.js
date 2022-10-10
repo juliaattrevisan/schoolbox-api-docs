@@ -4,7 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
-import { useNodesStore } from '../../store/mcNodesStore';
+import { useNodesStore, UNSET_ID } from '../../store/mcNodesStore';
 import { findById, getBreadcrumbs } from '../../../js/nodeUtils';
 import { useEnableNodesStore } from './mcEnableNodesStore';
 
@@ -14,7 +14,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
     state: () => ({
         nodes: [], //the currently selected nodes
         childNodes: [], //any children of currently selected nodes
-        activeNode: null, //to show extra info on a selected code in a modal
+        activeNode: { id: UNSET_ID }, //to show extra info on a selected code in a modal
         hasDisabledChildNodes: false,
         isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
@@ -130,7 +130,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
          * @return { Boolean }
          */
         hasActiveNode () {
-            return this.activeNode !== null ? true : false;
+            return this.activeNode.id !== UNSET_ID ? true : false;
         },
 
     },
@@ -261,7 +261,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
          * @param { Object }
          */
         async setActiveNode (node) {
-            if (node === null) { //we only need to grab the nodes breadcrumbs if there's actually a node
+            if (node.id === 0) { //we only need to grab the nodes breadcrumbs if there's actually a node
                 this.activeNode = node;
                 return;
             }

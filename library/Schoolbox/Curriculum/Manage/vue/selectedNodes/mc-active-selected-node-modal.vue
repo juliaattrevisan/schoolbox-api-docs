@@ -1,25 +1,49 @@
 <script setup>
 
 /**
- * to show further info in a modal on a code that's been selected
+ * displays further info in a modal on a curriculm node that's been selected
  */
 
 import { ref, computed, watch } from 'vue';
-import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const selectedNodesStore = useSelectedNodesStore();
+const emit = defineEmits(['closed']);
 const modalEl = ref(null);
+
+const props = defineProps({
+    /**
+     * the selected curriculum node
+     */
+    node: {
+        type: Object,
+        required: true,
+        default: () => {
+            return {
+                id: 0,
+                code: '',
+                name: '',
+                breadcrumb: '',
+            }
+        }
+    },
+});
 
 /**
  * to open the modal when requested
  */
-watch(() => selectedNodesStore.hasActiveNode, (hasActiveNode) => {
-    if (hasActiveNode) {
+watch(() => props.node, (newNode) => {
+    if (newNode.id !== 0) {
         modalEl.value.open()
     }
 });
+
+/**
+ * If the node is one that can be displayed
+ *
+ * @returns { boolean }
+ */
+const isValidNode = computed(() => props.node.id !== 0 ? true : false);
 
 /**
  * Add in the code if it's available otherwise just show the title
@@ -27,10 +51,10 @@ watch(() => selectedNodesStore.hasActiveNode, (hasActiveNode) => {
  * @returns { String }
  */
 const title = computed(() => {
-    if (selectedNodesStore.activeNode?.code && selectedNodesStore.activeNode.code !== '') {
-        return `[${selectedNodesStore.activeNode.code}] ${selectedNodesStore.activeNode.name}`;
+    if (props.node?.code && props.node.code !== '') {
+        return `[${props.node.code}] ${props.node.name}`;
     } else {
-        return selectedNodesStore.activeNode?.name;
+        return props.node?.name;
     }
 });
 
@@ -40,8 +64,8 @@ const title = computed(() => {
  * @returns { String }
  */
 const breadcrumbs = computed(() => {
-    if (selectedNodesStore.activeNode?.breadcrumbs.length > 0) {
-        const justNames = selectedNodesStore.activeNode.breadcrumbs.map((breadcrumb) => breadcrumb.name);
+    if (props.node?.breadcrumbs.length > 0) {
+        const justNames = props.node.breadcrumbs.map((breadcrumb) => breadcrumb.name);
         return justNames.join(' > ');
     } else {
         return '';
@@ -52,7 +76,8 @@ const breadcrumbs = computed(() => {
  * close the modal, setting the activeNode to null so we can allow another selection
  */
 function onModalClosed () {
-    selectedNodesStore.setActiveNode(null);
+    emit('closed');
+
 }
 
 </script>
@@ -63,14 +88,10 @@ function onModalClosed () {
         size="large"
         @closed="onModalClosed"
     >
-        <template v-if="selectedNodesStore.hasActiveNode">
+        <template v-if="isValidNode">
             <h2>{{ title }}</h2>
             <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
-            <div v-html="selectedNodesStore.activeNode.description"></div>
+            <div v-html="props.node.description"></div>
         </template>
     </reveal-modal>
 </template>
-
-<style scoped>
-
-</style>
