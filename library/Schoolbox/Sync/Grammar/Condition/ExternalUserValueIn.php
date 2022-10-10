@@ -87,7 +87,13 @@ class ExternalUserValueIn extends Condition\In
                 // Match vs pattern case-insensitively
                 $pattern = new Pattern($validValue);
                 $regexp  = $pattern->toRegex() . 'i';
-                if (preg_match($regexp, $value)) {
+
+                // Is this an invalid pattern? Skip this pattern if so
+                $isMatch = @preg_match($regexp, $value);
+                if (preg_last_error() !== PREG_NO_ERROR) {
+                    continue;
+                }
+                if ($isMatch) {
                     return true;
                 }
             }
