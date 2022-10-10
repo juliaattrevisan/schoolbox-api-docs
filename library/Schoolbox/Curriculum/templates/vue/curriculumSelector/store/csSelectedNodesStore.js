@@ -124,8 +124,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
         },
 
         /**
-         * set the active node, which would prompt the cs-active-selected-node-modal to open
-         * and if it's set to null we can listen for it to be set again
+         * set the active node, which would prompt the selected-node-modal to open
          * We also load the ancestors of the node to display the breadcrumbs in the modal
          *
          * @param { Object }
