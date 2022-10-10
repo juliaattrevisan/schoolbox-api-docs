@@ -10,8 +10,8 @@
     margin-top: 0.625rem;
 }
 
-$anchor-text-decoration: none; 
-$anchor-text-decoration-hover: none; 
+$anchor-text-decoration: none;
+$anchor-text-decoration-hover: none;
 $anchor-font-color: $content-ui-foreground;
 $anchor-font-color-hover: $content-ui-foreground;
 a {
@@ -19,8 +19,8 @@ a {
     line-height: inherit;
     text-decoration: $anchor-text-decoration;
     transition: all 0.15s linear;
-    &:hover { 
-        cursor: $cursor-pointer-value; 
+    &:hover {
+        cursor: $cursor-pointer-value;
     }
     &:hover,
     &:focus {
@@ -29,8 +29,8 @@ a {
             text-decoration: $anchor-text-decoration-hover;
         }
     }
-    img { 
-        border: none; 
+    img {
+        border: none;
     }
 }
 
@@ -41,7 +41,7 @@ p, h1, h2, h3, h4, h5, h6 {
 $paragraph-font-family: inherit;
 $paragraph-font-size: rem-calc(($base-font-size - 3));
 $paragraph-line-height: 1.6;
-$paragraph-margin-bottom: rem-calc(($base-font-size - 4)); 
+$paragraph-margin-bottom: rem-calc(($base-font-size - 4));
 p {
     font-family: $paragraph-font-family;
     font-size: $paragraph-font-size;
@@ -49,7 +49,7 @@ p {
     line-height: $paragraph-line-height;
     margin-bottom: $paragraph-margin-bottom;
     text-rendering: auto;
-    &.lead { 
+    &.lead {
         font-size: $paragraph-font-size + rem-calc(3.5);
         line-height: 1.6;
     }
@@ -93,46 +93,46 @@ h1, h2, h3, h4, h5, h6 {
 
 $h1-font-size: rem-calc(($base-font-size + 12));
 $h1-font-reduction: rem-calc(8);
-h1 { 
+h1 {
     color: $body-foreground-h1;
     font-size: $h1-font-size - $h1-font-reduction;
     @media #{$medium-up} {
-        font-size: $h1-font-size; 
+        font-size: $h1-font-size;
     }
 }
 
 $h2-font-size: rem-calc(($base-font-size + 2));
-h2 { 
+h2 {
     font-size: $h2-font-size;
 }
 
 $h3-font-size: rem-calc(($base-font-size + 1));
-h3 { 
+h3 {
     font-size: $h3-font-size;
 }
 
 $h4-font-size: rem-calc(($base-font-size));
-h4 { 
+h4 {
     font-size: $h4-font-size;
 }
 
 $h5-font-size: rem-calc(($base-font-size - 1));
-h5 { 
+h5 {
     font-size: $h5-font-size;
 }
 
 $h6-font-size: rem-calc(($base-font-size - 2));
-h6 { 
+h6 {
     font-size: $h6-font-size;
 }
 
-.subheader { 
-    @include subheader; 
+.subheader {
+    @include subheader;
     text-transform: uppercase;
 }
 
 $hr-margin: rem-calc(16);
-$hr-border-width: 1px; 
+$hr-border-width: 1px;
 hr {
     border: solid $gainsboro;
     border-width: $hr-border-width 0 0;
@@ -141,7 +141,7 @@ hr {
     margin: $hr-margin 0 ($hr-margin - rem-calc($hr-border-width));
 }
 
-//Helpful Typography Defaults 
+//Helpful Typography Defaults
 em,
 i {
     font-style: italic;
@@ -204,17 +204,17 @@ ul {
     &.square,
     &.circle,
     &.disc {
-        li ul { 
-            list-style: inherit; 
+        li ul {
+            list-style: inherit;
         }
     }
-    &.square { 
+    &.square {
         list-style-type: square; margin-#{$default-float}: $list-side-margin;
     }
-    &.circle { 
+    &.circle {
         list-style-type: circle; margin-#{$default-float}: $list-side-margin;
     }
-    &.disc { 
+    &.disc {
         list-style-type: disc; margin-#{$default-float}: $list-side-margin;
     }
 }
@@ -244,18 +244,18 @@ ol {
     }
 }
 
-//Definition Lists 
+//Definition Lists
 dl {
     dt {
         font-weight: $font-weight-bold;
         margin-bottom: 0.3rem;
     }
-    dd { 
-        margin-bottom: rem-calc(12); 
+    dd {
+        margin-bottom: rem-calc(12);
     }
 }
 
-//Abbreviations 
+//Abbreviations
 abbr,
 acronym {
     color: $body-font-color;
@@ -312,7 +312,7 @@ blockquote p {
     line-height: $paragraph-line-height;
 }
 
-//Microformats 
+//Microformats
 .vcard {
     border: 1px solid $gainsboro;
     display: inline-block;
@@ -329,8 +329,8 @@ blockquote p {
 }
 
 .vevent {
-    .summary { 
-        font-weight: $font-weight-bold; 
+    .summary {
+        font-weight: $font-weight-bold;
     }
     abbr {
         border: none;
@@ -366,6 +366,11 @@ blockquote p {
     margin: 0 0 0 0.375rem;
 }
 
+// For meta containers that need to be on the same line
+.meta.inline-container {
+    display: inline-block;
+}
+
 // Deleted or struck out content
 .strike,
 .del {
@@ -386,24 +391,24 @@ blockquote p {
 }
 
 .noselect {
-    -webkit-user-select: none; //Safari 
-    user-select: none; //Non-prefixed version, currently (Jan 17) supported by Chrome and Opera 
+    -webkit-user-select: none; //Safari
+    user-select: none; //Non-prefixed version, currently (Jan 17) supported by Chrome and Opera
 }
 
-.text-left { 
-    text-align: left !important; 
+.text-left {
+    text-align: left !important;
 }
 
-.text-right { 
-    text-align: right !important; 
+.text-right {
+    text-align: right !important;
 }
 
-.text-center { 
-    text-align: center !important; 
+.text-center {
+    text-align: center !important;
 }
 
-.text-justify { 
-    text-align: justify !important; 
+.text-justify {
+    text-align: justify !important;
 }
 
 /*
@@ -420,22 +425,22 @@ blockquote p {
     }
 
     a,
-    a:visited { 
+    a:visited {
         text-decoration: underline;
     }
-    a[href]:after { 
-        content: " (" attr(href) ")"; 
+    a[href]:after {
+        content: " (" attr(href) ")";
     }
 
-    abbr[title]:after { 
-        content: " (" attr(title) ")"; 
+    abbr[title]:after {
+        content: " (" attr(title) ")";
     }
 
     // Don't show links for images, or javascript/internal links
     .ir a:after,
     a[href^="javascript:"]:after,
-    a[href^="#"]:after { 
-        content: ""; 
+    a[href^="#"]:after {
+        content: "";
     }
 
     pre,
@@ -444,21 +449,21 @@ blockquote p {
         page-break-inside: avoid;
     }
 
-    thead { 
-        display: table-header-group; //h5bp.com/t  
+    thead {
+        display: table-header-group; //h5bp.com/t
     }
 
     tr,
-    img { 
-        page-break-inside: avoid; 
+    img {
+        page-break-inside: avoid;
     }
 
-    img { 
-        max-width: 100% !important; 
+    img {
+        max-width: 100% !important;
     }
 
-    @page { 
-        margin: 0.34in; 
+    @page {
+        margin: 0.34in;
     }
 
     p,
@@ -469,12 +474,12 @@ blockquote p {
     }
 
     h2,
-    h3 { 
-        page-break-after: avoid; 
+    h3 {
+        page-break-after: avoid;
     }
 
     //Remove display of links to places, when printing
-        
+
     a[href*="/"]:after,
     a[href*="/"]:visited:after {
         content: normal;

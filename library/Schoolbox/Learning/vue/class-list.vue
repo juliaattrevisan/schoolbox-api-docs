@@ -609,14 +609,14 @@ export default {
                             <span class="meta">({{ student.synergy_id }})</span>
                             <span class="show-for-print"><br>{{ student.email }}</span><br>
 
-                            <p class="meta meta-inline">
+                            <p class="meta inline-container">
                                 <pastoral-count-badge v-for="(studentBadge) in studentPastoralCounts[student.id]"
                                                       :key="studentBadge.id"
                                                       v-bind="studentBadge"
                                 ></pastoral-count-badge>
                             </p>
 
-                            <p class="meta meta-inline">
+                            <p class="meta inline-container">
                                 <slot name="student-meta" v-bind:student="student">
                                     <span v-if="showMedicalAlerts && Number(student.EnglishSecondFlag) === 1"
                                           class="icon-eng-second-lang highlight"
@@ -711,8 +711,3 @@ export default {
 
     </div>
 </template>
-<style lang="scss" scoped>
-    .meta-inline {
-        display: inline-block;
-    }
-</style>
