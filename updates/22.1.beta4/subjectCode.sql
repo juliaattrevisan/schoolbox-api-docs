@@ -3,5 +3,5 @@
 update course_specification SET subject_code='' where subject_code is NULL;
 
 alter table course_specification
-    modify subject_code varchar(20) default '' not null;
+    modify subject_code varchar(20) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' default '' not null;
 
