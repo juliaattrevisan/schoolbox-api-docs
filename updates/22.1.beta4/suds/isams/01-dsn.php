@@ -106,6 +106,14 @@ HELP;
          */
         $apiKey = trim((string)$this->getConfig()->get('schooldata_import_endpoint_key'));
 
+        /* No api key? No trabajo
+         */
+        if ('' === $apiKey) {
+            return;
+        }
+
+        /* api key exists so let's see if we can reformat it
+         */
         try {
             $decoded = $codec->decode($apiKey);
         } catch (\DomainException | \ErrorException $e) {
