@@ -340,6 +340,9 @@ module.exports = {
                 loader: 'vue-loader', //to handle .vue files
                 options: {
                     appendTsSuffixTo: [/\.vue$/],
+                    compilerOptions: {
+                        whitespace: 'preserve',
+                    }
                 }
             },
             {
@@ -414,5 +417,5 @@ module.exports = {
         }),
         new VueLoaderPlugin(), //to handle .vue files
         new RemoveEmptyScriptsPlugin(),
-    ]
+    ],
 };
