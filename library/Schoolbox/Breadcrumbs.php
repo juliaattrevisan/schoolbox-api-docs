@@ -107,7 +107,6 @@ class Breadcrumbs
      * @param Authorizer  $authorizer
      * @param Model       $quiz
      * @param int         $assessId
-     * @param String      $assessTitle
      * @param String|null $sectionTitle
      * @return array
      * @see library/Schoolbox/Learning/Assessment/Breadcrumb/Factory::produceFromAssessment() - similar to this function but for aura-paradigm pages.
@@ -119,7 +118,6 @@ class Breadcrumbs
         Authorizer $authorizer,
         Quiz\Model $quiz,
         int $assessId,
-        string $assessTitle,
         ?string $sectionTitle = null
     ): array {
         $breadcrumbs = [
@@ -206,7 +204,7 @@ class Breadcrumbs
 
         // This is the breadcrumb for the quiz itself.
         $breadcrumbs[] = [
-            'text'  => $assessTitle,
+            'text'  => $quiz->getTitle(),
             'class' => '',
             'href'  => (
                 // In some circumstances the user will not be authorised to view the 'status' page.  In that case, show the 'summary' page instead.

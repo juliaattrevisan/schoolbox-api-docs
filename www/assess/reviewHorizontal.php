@@ -100,8 +100,7 @@ if (!isset($this->arg[1])) {
         Breadcrumbs::getQuizCrumbs(
             $this->getDi()->get('authorizer'),
             $assessment,
-            $assess['assess_id'],
-            $assess['title']
+            $assess['assess_id']
         )
     );
 } elseif ($this->arg[1] === 'finalise') {
@@ -341,7 +340,6 @@ if (!isset($this->arg[1])) {
             $this->getDi()->get('authorizer'),
             $assessment,
             $assess['assess_id'],
-            $assess['title'],
             $section['title']
         )
     );
