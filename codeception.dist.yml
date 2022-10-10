@@ -16,6 +16,7 @@ suites:
                             binary: "/usr/lib/chromium-browser/chromium-browser"
                         acceptInsecureCerts: true
                 - \Helper\Acceptance
+                - \Helper\SchoolboxCli
                 - Asserts
                 - Db:
                     dsn: "mysql:host=localhost;dbname=schoolbox"

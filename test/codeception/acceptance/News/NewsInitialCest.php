@@ -131,10 +131,10 @@ class NewsInitialCest
         $i->waitForElementVisible($element, 5);
         $i->click($element);
         //$i->waitForElementVisible(['css'=>'div#cke_comment'], 5);
-        $i->waitForElementVisible(['css' => 'button.btn-show-ckeditor'], 5);
-        $i->click(['css' => 'button.btn-show-ckeditor']);
+        $i->waitForElementVisible(['css' => 'button.show-ckeditor-button'], 5);
+        $i->click(['css' => 'button.show-ckeditor-button']);
         $i->waitForElementVisible(['css' => 'div#cke_comment-0'], 5);
-        $i->executeJS('CKEDITOR.instances[\'comment-0\'].setData("indeed this is intresting news");');
+        $i->executeJS('CKEDITOR.instances[\'comment-0\'].setData("indeed this is interesting news");');
         sleep(2);
         $i->click(['css' => 'button[class=button\ submit]']);
         sleep(3);
@@ -171,7 +171,7 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
-        $i->waitForElementVisible(['css' => 'button.btn-show-ckeditor'], 1);
+        $i->waitForElementVisible(['css' => 'button.show-ckeditor-button'], 1);
         $i->click(['css' => 'label[for=allow-comments]']);
     }
 
