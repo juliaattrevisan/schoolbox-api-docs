@@ -906,7 +906,7 @@ class Controller extends Base
                         'caption'   => 'Severity Colour',
                         'colour'    => true,
                         'width'     => 1,
-                        'default'   => '',
+                        'default'   => null,
                     ],
                 ]
             ];
