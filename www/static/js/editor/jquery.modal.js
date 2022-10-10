@@ -303,7 +303,13 @@
             $(document)
                 //.foundation('reveal', 'reflow')
                 .on('closed.fndtn.reveal', '[data-reveal]', function () {
-                    if (singletonModal && (null === config.restoreModal || undefined === config.restoreModal)) {
+                    //if singletonModal is set, and there is no restoreModal OR if the event is triggered from the singletonModal
+                    //detatch the singletonModal, and set it to null
+                    if (
+                        singletonModal &&
+                        (null === config.restoreModal || undefined === config.restoreModal) ||
+                        ( singletonModal && singletonModal[0].id === this.id)
+                    ) {
                         singletonModal.detach();
                         singletonModal = null;
                     }
