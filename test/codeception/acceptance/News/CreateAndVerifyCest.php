@@ -20,6 +20,7 @@ use Page\Group\ManageGroup;
 use Page\News\Form;
 use Page\News\Index;
 use Page\News\Item;
+use Schoolbox\User;
 
 class CreateAndVerifyCest
 {
@@ -241,10 +242,21 @@ class CreateAndVerifyCest
         $formPage->seeRoles(['9A English (9ENGA) (Inc. parents of students)','(Inc. parents of students)']);
 
         $i->amGoingTo('Fill in form values by typing an audience: Jana Reed, Tim Reed and Jenni Reed');
+        // Grab user to generate fullname for removing audience
+        $janaReed = $i->grabUser('jreed');
+        $timReed = $i->grabUser('treed');
+        $jenniReed = $i->grabUser('jennireed01');
+
         $itemPage->modifyArticle();
         $formPage->removeAudience(['9A English (9ENGA)','Primary']);
-        $formPage->fillUsers(['Jenni','Jana','Tim','Demo 1','Primary']);
-        $formPage->seeRoles(['Jana Reed (Middle Student)','Tim Reed (Senior Student)','Jenni Reed (Parent)','Demo Class Page 1 (DEMO1)','Primary']);
+        $formPage->fillUsers([
+                                 $janaReed->getFirstname(),
+                                 $jenniReed->getFirstname(),
+                                 $timReed->getFirstname() . ' ' . $timReed->getLastname(), // tim is too short...
+                                 'Demo 1',
+                                 'Primary',
+                             ]);
+        $formPage->seeRoles([$janaReed->getFullName(), $jenniReed->getFullName(), $timReed->getFullName(),'Demo Class Page 1 (DEMO1)','Primary']);
         $i->amGoingTo('check the draft article presents the proper audience: Primary and Demo class 1');
         $i->amOnPage('/news/me?status=Drafted');
         $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Composite Audience Article Testing');
@@ -253,7 +265,15 @@ class CreateAndVerifyCest
 
         $i->amGoingTo('Fill in form values by selecting audience via bricks and composite: year level + house and Teams Raiders');
         $itemPage->modifyArticle();
-        $formPage->removeAudience(['Jana Reed','Tim Reed','Jenni Reed','Primary','Demo Class Page 1 (DEMO1)']);
+
+        $formPage->removeAudience([
+            $this->getAudienceText($janaReed),
+            $this->getAudienceText($timReed),
+            $this->getAudienceText($jenniReed),
+            'Primary',
+            'Demo Class Page 1 (DEMO1)']
+        );
+
         $formPage->selectAudienceOption('Year Levels', 'Year 9', ['audience-select-parents']);
         $formPage->createCompositeAudience('House', 'Team', ['primary-IjEi','secondary-IjIi']);
         $formPage->seeRoles(['1 Team & 1 House','Year 9','Composite Audience (view details)','Year Level','Inc. parents of students']);
@@ -277,7 +297,6 @@ class CreateAndVerifyCest
      */
     public function newsAudienceViaClassPageTest(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage): void
     {
-
         $this->createFolder($i);
         $i->amGoingTo("Navigate to the class page");
         $i->click('News Folder Test');
@@ -306,7 +325,7 @@ class CreateAndVerifyCest
         $formPage->selectAudienceOption('Roles', 'Teacher', []);
         $formPage->fillUsers(['Eden Reed']);
         $i->amGoingTo("Check the audience is properly presented: News Folders, Eden Reed and Teacher");
-        $formPage->seeRoles(['News Folder Test','Teacher','Eden Reed (Junior Student)']);
+        $formPage->seeRoles(['News Folder Test','Teacher','Eden Reed']);
         $i->amGoingTo('check the draft article presents the proper audience: News Folders and Teacher');
         $i->amOnPage('/news/me?status=Drafted');
         $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Audience Article via Class Page Testing');
@@ -350,9 +369,17 @@ class CreateAndVerifyCest
         $createFolder->clickCreateGroupToggle();
         $createFolder->clickCreateFolderButton();
         $manageGroup->waitManageGroupTitleToBePresented();
-        $i->click('#content a.icon-more');
-        $i->click('#updateGroupSettings');
         $manageGroup->setAccessPermission('type-3');
         $manageGroup->clickUpdateButton();
+    }
+
+    /**
+     * @param User $user
+     * @return string
+     */
+    private function getAudienceText(User $user): string
+    {
+        $externalId = $user->getExternalId() ? ' (' . $user->getExternalId() . ')' : '';
+        return $user->getFullName() . $externalId . ' (' . $user->getRole()->getName() . ')';
     }
 }
