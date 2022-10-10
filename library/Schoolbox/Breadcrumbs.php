@@ -20,6 +20,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Scrub;
 use SitePage;
+use UnexpectedValueException;
 
 class Breadcrumbs
 {
@@ -106,20 +107,13 @@ class Breadcrumbs
     /**
      * @param Authorizer  $authorizer
      * @param Model       $quiz
-     * @param int         $assessId
-     * @param String|null $sectionTitle
      * @return array
      * @see library/Schoolbox/Learning/Assessment/Breadcrumb/Factory::produceFromAssessment() - similar to this function but for aura-paradigm pages.
      *
      * Return an array of breadcrumbs suitable for use in self::renderIntoSitePage().
-     * @throws \Exception
+     * @throws UnexpectedValueException
      */
-    public static function getQuizCrumbs(
-        Authorizer $authorizer,
-        Quiz\Model $quiz,
-        int $assessId,
-        ?string $sectionTitle = null
-    ): array {
+    public static function getQuizCrumbs(Authorizer $authorizer, Quiz\Model $quiz): array {
         $breadcrumbs = [
             [
                 'text'  => 'Learning',
@@ -178,7 +172,7 @@ class Breadcrumbs
                 $unitSpec       = $projectContext;
                 $unitSpecFolder = $unitSpec->getFolder();
             } else {
-                throw new \UnexpectedValueException("Unknown type '" . get_class($projectContext) . "' for project context.");
+                throw new UnexpectedValueException("Unknown type '" . get_class($projectContext) . "' for project context.");
             }
 
             // Add breadcrumbs for unit and project.
@@ -221,25 +215,6 @@ class Breadcrumbs
                 "/learning/assessments/{$quiz->getId()}"
             )
         ];
-
-        if ($sectionTitle === null) {
-            $breadcrumbs[] = [
-                'text'  => 'Horizontal Marking',
-                'href'  => '#',
-                'class' => 'active'
-            ];
-        } else {
-            $breadcrumbs[] = [
-                'text'  => 'Horizontal Marking',
-                'href'  => "/assess/reviewHorizontal/$assessId",
-                'class' => 'active'
-            ];
-            $breadcrumbs[] = [
-                'text'  => Scrub::text($sectionTitle),
-                'href'  => "#",
-                'class' => 'active'
-            ];
-        }
 
         return $breadcrumbs;
     }

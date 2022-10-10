@@ -89,20 +89,18 @@ if (!isset($this->arg[1])) {
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
-    $assessment  = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
+    $assessment    = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
+    $breadcrumbs   = Breadcrumbs::getQuizCrumbs($this->getDi()->get('authorizer'), $assessment);
+    $breadcrumbs[] = [
+        'text'  => 'Horizontal Marking',
+        'href'  => '#',
+        'class' => 'active'
+    ];
 
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs();
-    $trail->renderIntoSitePage(
-        $this,
-        'BREADCRUMB',
-        Breadcrumbs::getQuizCrumbs(
-            $this->getDi()->get('authorizer'),
-            $assessment,
-            $assess['assess_id']
-        )
-    );
+    $trail->renderIntoSitePage($this,'BREADCRUMB', $breadcrumbs);
 } elseif ($this->arg[1] === 'finalise') {
     /* Update the reviewed_at for all the latest attempts for a particular assess :D
      * How do you like them apples
@@ -327,20 +325,23 @@ if (!isset($this->arg[1])) {
         $this->setVar('next_question_block', '');
     }
 
+    $dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+    $term          = TermMapper::getInstance()->findForDate($dueDate);
+    $assessment    = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
+    $breadcrumbs   = Breadcrumbs::getQuizCrumbs($this->getDi()->get('authorizer'), $assessment);
+    $breadcrumbs[] = [
+        'text'  => 'Horizontal Marking',
+        'href'  => "/assess/reviewHorizontal/{$assess['assess_id']}",
+        'class' => 'active'
+    ];
+    $breadcrumbs[] = [
+        'text'  => Scrub::text($section['title']),
+        'href'  => "#",
+        'class' => 'active'
+    ];
+
     /* Render out breadcrumbs
      */
-    $dueDate    = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
-    $term       = TermMapper::getInstance()->findForDate($dueDate);
-    $assessment = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
-    $trail      = new Breadcrumbs();
-    $trail->renderIntoSitePage(
-        $this,
-        'BREADCRUMB',
-        Breadcrumbs::getQuizCrumbs(
-            $this->getDi()->get('authorizer'),
-            $assessment,
-            $assess['assess_id'],
-            $section['title']
-        )
-    );
+    $trail = new Breadcrumbs();
+    $trail->renderIntoSitePage($this,'BREADCRUMB', $breadcrumbs);
 }
