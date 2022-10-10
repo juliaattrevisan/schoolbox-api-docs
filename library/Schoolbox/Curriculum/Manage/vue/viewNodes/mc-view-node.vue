@@ -10,7 +10,7 @@ import { gsap } from 'gsap/all';
 import { timeout } from '@js/util/jsUtils';
 import { slideDown, slideUp } from '@js/util/animateUtils';
 import { useStore } from '../store/manageCurriculumStore';
-import { UNSET_ID } from '../store/mcNodesStore';
+import { UNSET_ID } from '../../js/nodeUtils';
 import { useViewNodesStore, DIRECTION } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 import { useAddCurriculumStore } from '../store/mcAddCurriculumStore';

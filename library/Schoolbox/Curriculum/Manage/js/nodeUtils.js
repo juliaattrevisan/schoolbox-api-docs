@@ -3,6 +3,13 @@
  */
 
 /**
+ * To indicate that a node should be invalid and unset
+ * used as the base 'node' to show all Curricula in the curriculum display list
+ * and also to know when to toggle when a node is active
+ */
+export const UNSET_ID = 0;
+
+/**
  * To just return the node containing the specified id
  * We recursively loop through the object until we find the
  * matched object or undefined if not found

@@ -3,7 +3,8 @@
  */
 
 import { defineStore } from 'pinia';
-import { useNodesStore, UNSET_ID } from './mcNodesStore';
+import { UNSET_ID } from '../../js/nodeUtils';
+import { useNodesStore } from './mcNodesStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 
@@ -18,7 +19,7 @@ export const useStore = defineStore('manageCurriculum', {
         isProcessing: false, //to notify that an action is taking place, like updating a member access
         isReadOnly: true, //can only view the currently selected codes, not edit them
         hasId: false, //whether we should traverse directly to a node id on page load
-        id: 0, //the id of the node to traverse directly to
+        id: UNSET_ID, //the id of the node to traverse directly to
         toastEl: null, //so we don't need to pass it all around as a prop
     }),
 

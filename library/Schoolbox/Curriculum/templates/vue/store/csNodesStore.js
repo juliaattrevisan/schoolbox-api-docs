@@ -3,11 +3,9 @@
  */
 
 import { defineStore } from 'pinia';
-import { findById } from '../../../Manage/js/nodeUtils';
+import { UNSET_ID, findById } from '../../../Manage/js/nodeUtils';
 import { useStore, apiEndpoint } from './curriculumSelectorStore';
 import { useModalActiveNodesStore } from './csModalActiveNodesStore';
-
-export const UNSET_ID = 0;
 
 
 export const useNodesStore = defineStore(`csNodes`, {

@@ -4,9 +4,9 @@
  */
 
 import { defineStore } from 'pinia';
-import { UNSET_ID, useNodesStore } from '../../store/mcNodesStore';
+import { useNodesStore } from '../../store/mcNodesStore';
 import { useSearchStore } from '../../store/mcSearchStore';
-import { findById } from '../../../js/nodeUtils';
+import { UNSET_ID, findById } from '../../../js/nodeUtils';
 
 export const DIRECTION = {
     FORWARDS: 'forwards',
@@ -166,7 +166,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', {
         },
 
         /**
-         *
+         * So if the page is refreshed the current node view is maintained
          */
         updateHash () {
             if (this.current.id === UNSET_ID) {
