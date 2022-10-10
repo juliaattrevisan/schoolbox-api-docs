@@ -13,6 +13,7 @@ import StackedRevealModal from '@schoolboxVue/components/stacked-reveal-modal.vu
 const selectedNodesStore = useSelectedNodesStore();
 const modalEl = ref(null);
 const isModalActive = ref(false);
+const activeModalIndex = ref(1);
 
 /**
  * to open the modal when requested
@@ -65,6 +66,7 @@ function onModalClosed () {
         ref="modalEl"
         size="large"
         :is-active="isModalActive"
+        :active-index="activeModalIndex"
         @closed="onModalClosed"
     >
         <template v-slot:reveal-1 v-if="selectedNodesStore.hasActiveNode">

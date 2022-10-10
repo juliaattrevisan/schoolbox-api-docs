@@ -3,14 +3,12 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { generateUUID } from '@js/util/jsUtils';
 
-// Valid sizes from https://get.foundation/sites/docs-v5/bundle/reveal.html
-const VALID_SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge', 'full'];
+
+
 
 const props = defineProps({
     /**
-     * The size of the modal to display.
-     *
-     * This is added as a class to the modal.
+     * Whether the modal is active, used to trigger the first open
      */
     isActive: {
         type: Boolean,
@@ -18,18 +16,27 @@ const props = defineProps({
         default: false,
     },
     /**
+     * The index of the current stacked modal
+     */
+    activeIndex: {
+        type: Number,
+        default: 1,
+    },
+    /**
      * The size of the modal to display.
-     *
      * This is added as a class to the modal.
      */
     size: {
         type: String,
         default: 'small',
-        // validator: (value) => VALID_SIZES.indexOf(value) !== -1
+        validator: (value) => {
+            // Valid sizes from https://get.foundation/sites/docs-v5/bundle/reveal.html
+            const validSizes = ['tiny', 'small', 'medium', 'large', 'xlarge', 'full'];
+            return validSizes.includes(value);
+        }
     },
     /**
      * Is the modal closed when the background is clicked?
-     *
      * This corresponds to the modal's `close_on_background_click`
      * setting.
      *
@@ -65,6 +72,15 @@ onMounted(() => {
     if (isActive) {
         open();
     }
+});
+
+/**
+ * to open the modal when requested
+ */
+watch(() => props.activeIndex, (activeIndex) => {
+    // if (isActive) {
+    //     open();
+    // }
 });
 
 /**
