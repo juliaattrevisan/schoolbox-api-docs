@@ -336,11 +336,13 @@ class Folder extends SimpleStrategy
         $userIds = $users->getPropertyValues('id');
 
         // Get groups where learner or instructor (but not admin) TODO that's not what this code is doing??
-        $pb             = $this->getUserAccessMapper()->getPredicateBuilder()
-                               ->in('uid', $userIds)
-                               ->equals('service', UserAccess::SERVICE_HOMEPAGE)
-                               ->notEquals('type', UserAccess::ACCESS_DENY);
-        $groupFolderIds = $this->getUserAccessMapper()->findScalarByPredicates('sid', $pb);
+        $pb              = $this->getUserAccessMapper()->getPredicateBuilder()
+                                ->in('uid', $userIds)
+                                ->equals('service', UserAccess::SERVICE_HOMEPAGE)
+                                ->notEquals('type', UserAccess::ACCESS_DENY);
+        $accessFolderIds = $this->getUserAccessMapper()->findScalarByPredicates('sid', $pb);
+        // filter out deleted folders
+        $groupFolderIds = $this->folderMapper->findIdsByColumn('id', $accessFolderIds);
 
         // Get subjects
         $subjectLists = [];
