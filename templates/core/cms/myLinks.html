@@ -90,6 +90,9 @@ $(function() {
                                                 restoreModal: '#modify-link-{MYLINK_ID}',
                                                 onSelect: function(url, name, mime, dialog) {
                                                     $('#url-{MYLINK_ID}').val(url);
+                                                },
+                                                onAfterClose: function () {
+                                                    $('#file-picker').remove();
                                                 }
                                             });
                                         });
@@ -129,6 +132,9 @@ $(function() {
                                     restoreModal: '#add-link',
                                     onSelect: function(url, name, mime, dialog) {
                                         $('#url-new').val(url);
+                                    },
+                                    onAfterClose: function () {
+                                        $('#file-picker').remove();
                                     }
                                 });
                             });
