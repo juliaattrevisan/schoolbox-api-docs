@@ -39,7 +39,7 @@ class Model extends AbstractCourse
      */
     private $courseImplementations;
 
-    private null|string $subjectCode;
+    private null|string $subjectCode = null;
 
 
     /**
