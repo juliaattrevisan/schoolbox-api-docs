@@ -26,20 +26,6 @@ require_once __DIR__ . '/../../../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
     /**
-     * Make sure to add your locking script to the Lock Inspector tool
-     * const LOCK_NAMES in Inspector.php
-     */
-    public const MY_TOOL_LOCK_NAME = 'isams_dsn_migration';
-
-
-    /**
-     * Decide how long this should be based on your usage
-     * You might have to adjust it, but it should cover the cost of an iteration
-     */
-    private const LOCK_TTL = 60;
-
-
-    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
