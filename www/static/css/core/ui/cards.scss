@@ -460,7 +460,7 @@
       }
     }
     h3 {
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
   }
   // Content area for Classes/Groups
@@ -542,6 +542,8 @@
       width: 4rem;
     }
   }
+
+  box-shadow: 0 2px 3px 0 rgb(0 0 0 / 10%);
 }
 
 // Dashboard specific for v-cards
