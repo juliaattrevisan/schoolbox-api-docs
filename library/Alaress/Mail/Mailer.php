@@ -123,7 +123,7 @@ class Mailer
      */
     public function setTo(Address | User | null $to)
     {
-        if ($to instanceof User) {
+        if ($to instanceof User && $to->getEmail()) {
             $this->email->addTo(new Address($to->getEmail(), $to->formatName()));
         } elseif ($to instanceof Address) {
             $this->email->addTo($to);
