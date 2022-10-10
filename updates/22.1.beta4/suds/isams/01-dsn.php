@@ -96,8 +96,6 @@ HELP;
             return;
         }
 
-        $codec = new \Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN();
-
         /* This will just be their api key, not the dsn format
          * If we cannot decode it, save it in a format that *can* decode
          *
@@ -114,6 +112,8 @@ HELP;
 
         /* api key exists so let's see if we can reformat it
          */
+        $codec = new \Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN();
+
         try {
             $decoded = $codec->decode($apiKey);
         } catch (\DomainException | \ErrorException $e) {
