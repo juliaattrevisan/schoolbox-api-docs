@@ -531,7 +531,7 @@ class Classes implements IStrategy
          * The endpoints getStudentTimetable/getTeacherTimetable have the potential to
          * return multiple elements, only some of which are appropriate to $now
          */
-        if ((new ValidActiveTtid($timetableCalendar))->isActive()) {
+        if (!(new ValidActiveTtid($timetableCalendar))->isActive()) {
             $this->log->debug(sprintf(
                 'timetableCalendar %s is not relevant to today; skipping',
                 $timetable['TT_ID']
