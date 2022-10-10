@@ -12,13 +12,14 @@ import StackedRevealModal from '@schoolboxVue/components/stacked-reveal-modal.vu
 
 const selectedNodesStore = useSelectedNodesStore();
 const modalEl = ref(null);
+const isModalActive = ref(false);
 
 /**
  * to open the modal when requested
  */
 watch(() => selectedNodesStore.hasActiveNode, (hasActiveNode) => {
     if (hasActiveNode) {
-        modalEl.value.open()
+        isModalActive.value = true;
     }
 });
 
@@ -53,6 +54,7 @@ const breadcrumbs = computed(() => {
  * close the modal, setting the activeNode to null so we can allow another selection
  */
 function onModalClosed () {
+    isModalActive.value = false;
     selectedNodesStore.setActiveNode(null);
 }
 
@@ -62,6 +64,7 @@ function onModalClosed () {
     <stacked-reveal-modal
         ref="modalEl"
         size="large"
+        :is-active="isModalActive"
         @closed="onModalClosed"
     >
         <template v-slot:reveal-1 v-if="selectedNodesStore.hasActiveNode">
