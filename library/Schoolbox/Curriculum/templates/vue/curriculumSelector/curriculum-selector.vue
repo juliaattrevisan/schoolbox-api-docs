@@ -8,11 +8,12 @@ import { ref, onMounted, nextTick } from 'vue';
 import { ResizeObserver } from 'vue3-resize';
 import 'vue3-resize/dist/vue3-resize.css';
 import { useStore } from './store/curriculumSelectorStore';
+import { useSelectedNodesStore } from './store/csSelectedNodesStore';
 import CsSearchInput from './cs-search-input.vue';
 import CsSelectedNodes from './cs-selected-nodes.vue';
 import CsSearchResults from './cs-search-results.vue';
 import CsModal from './modal/cs-modal.vue';
-import CsActiveSelectedNodeModal from './cs-active-selected-node-modal.vue';
+import SelectedNodeModal from '../selected-node-modal.vue';
 
 
 const props = defineProps({
@@ -67,8 +68,8 @@ const props = defineProps({
 });
 
 const store = useStore();
+const selectedNodesStore = useSelectedNodesStore();
 const curriculumSelectorEl = ref(null);
-
 
 /**
  * Start loading the curriculum data
@@ -103,7 +104,9 @@ function onContainerResize () {
         <resize-observer @notify="onContainerResize" />
     </div>
     <cs-modal />
-    <cs-active-selected-node-modal />
+    <selected-node-modal
+        :node="selectedNodesStore.activeNode"
+    />
 </template>
 
 <style lang="scss" scoped>

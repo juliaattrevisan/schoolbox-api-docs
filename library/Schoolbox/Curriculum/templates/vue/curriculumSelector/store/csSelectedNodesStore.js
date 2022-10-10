@@ -4,14 +4,14 @@
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from './curriculumSelectorStore';
-import { getBreadcrumbs } from '../../../js/nodeUtils';
+import { UNSET_ID, getBreadcrumbs } from '../../../js/nodeUtils';
 
 
 export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
 
     state: () => ({
         nodes: [], //the currently selected nodes
-        activeNode: null, //to show extra info on a selected node in a modal
+        activeNode: { id: UNSET_ID }, //to show extra info on a selected node in a modal
         isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
     }),
@@ -42,7 +42,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          * @return { Boolean }
          */
         hasActiveNode () {
-            return this.activeNode !== null ? true : false;
+            return this.activeNode.id !== UNSET_ID ? true : false;
         },
 
         /**
@@ -131,7 +131,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          * @param { Object }
          */
         async setActiveNode (node) {
-            if (node === null) { //we only need to grab the nodes breadcrumbs if there's actually a node
+            if (node.id === UNSET_ID) { //we only need to grab the nodes breadcrumbs if there's actually a node
                 this.activeNode = node;
                 return;
             }

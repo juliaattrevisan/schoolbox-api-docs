@@ -18,11 +18,6 @@ import SelectedNodeModal from '../selected-node-modal.vue';
 import Toast from '@schoolboxVue/components/toast.vue';
 
 
-const store = useStore();
-const selectedNodesStore = useSelectedNodesStore();
-const toastEl = ref(null);
-
-
 const props = defineProps({
     /**
      * the endpoint to retrieve all the group data from
@@ -41,6 +36,10 @@ const props = defineProps({
         default: true,
     },
 });
+
+const store = useStore();
+const selectedNodesStore = useSelectedNodesStore();
+const toastEl = ref(null);
 
 /**
  * Start loading the curriculum data
@@ -67,14 +66,6 @@ function initErrorListener () {
     });
 }
 
-/**
- * set the active node as null
- */
-function onModalClosed () {
-    selectedNodesStore.setActiveNode( { id: 0 } );
-}
-
-
 </script>
 
 <template>
@@ -85,7 +76,6 @@ function onModalClosed () {
     <mc-delete-nodes />
     <selected-node-modal
         :node="selectedNodesStore.activeNode"
-        @closed="onModalClosed"
     />
     <toast ref="toastEl"></toast>
 </template>

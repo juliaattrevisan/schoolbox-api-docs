@@ -8,9 +8,6 @@ import { ref, computed, watch } from 'vue';
 import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
-const emit = defineEmits(['closed']);
-const modalEl = ref(null);
-
 const props = defineProps({
     /**
      * the selected curriculum node
@@ -28,6 +25,9 @@ const props = defineProps({
         }
     },
 });
+
+const emit = defineEmits(['closed']);
+const modalEl = ref(null);
 
 /**
  * to open the modal when requested
@@ -77,7 +77,6 @@ const breadcrumbs = computed(() => {
  */
 function onModalClosed () {
     emit('closed');
-
 }
 
 </script>

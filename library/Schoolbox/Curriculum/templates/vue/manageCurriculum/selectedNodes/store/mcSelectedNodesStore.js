@@ -261,7 +261,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
          * @param { Object }
          */
         async setActiveNode (node) {
-            if (node.id === 0) { //we only need to grab the nodes breadcrumbs if there's actually a node
+            if (node.id === UNSET_ID) { //we only need to grab the nodes breadcrumbs if there's actually a node
                 this.activeNode = node;
                 return;
             }
