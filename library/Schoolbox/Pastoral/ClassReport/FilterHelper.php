@@ -108,9 +108,6 @@ class FilterHelper
         $hardcodedFilters = [
             Filter\Filters\Pastoral\Student\Definition::class => array_combine($studentIds, $studentIds),
         ];
-        $hardcodedFilters = [
-            Filter\Filters\Pastoral\Student\Definition::class => []
-        ];
 
         // Find pastoral records
         $idFinder = Filter\Filters\Pastoral\IdFinder::getInstance(
