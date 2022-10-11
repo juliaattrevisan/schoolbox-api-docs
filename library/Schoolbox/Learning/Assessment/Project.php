@@ -711,11 +711,15 @@ class Project extends AbstractAssessment implements AssessmentContext
         return $this->getBaseContext()->getTitle() . ' > ' . $this->getTitle();
     }
 
-    public function getBreadcrumbs()
+    /**
+     * Generate trail like one of:
+     *  * $subject->$unit->$project (eg. '9ENGA'->'Romeo and Juliet'->'Project title').
+     *  * $unit->$project           (eg. 'Romeo and Juliet'->'Project title').
+     *
+     * @return Collection
+     */
+    public function getBreadcrumbs(): Collection
     {
-        // Generate trail like one of:
-        //  * 'Learning->$subject->$unit->$project' (eg. 'Learning'->'9ENGA'->'Romeo and Juliet'->'Project title').
-        //  * 'Learning->$unit->$project'           (eg. 'Learning'->'Romeo and Juliet'->'Project title').
         $projectContext = $this->getContext();
 
         if (!($projectContext instanceof UnitImplementation || $projectContext instanceof UnitSpecification)) {
@@ -726,20 +730,20 @@ class Project extends AbstractAssessment implements AssessmentContext
         }
 
         $routeParams = [
-            'assessment'   => $project,
-            'assessmentId' => $project->getId(),
-            'studentId'    => $user->getId()
+            'assessment'   => $this,
+            'assessmentId' => $this->getId(),
+            'studentId'    => $_SESSION['user']->getId()
         ];
 
         $di          = $this->getDi();
         $breadcrumbs = $projectContext->getBreadcrumbs();
         $breadcrumbs->add(
             [
-                $project->getTitle(),
+                $this->getTitle(),
                 (
                     // In some circumstances the user will not be authorised to view the 'status' page.
                     // In that case, show the 'summary' page instead.
-                    ($di->get('authorizer')->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user)) ?
+                    ($di->get('authorizer')->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $_SESSION['user'])) ?
                     $di->get('router')->generate('learningAssessment.getStatus', $routeParams) :
                     $di->get('router')->generate('learningAssessment.getSummary', $routeParams)
                 )
