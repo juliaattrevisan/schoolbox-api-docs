@@ -100,7 +100,7 @@ if (!isset($this->arg[1])) {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs();
-    $trail->renderIntoSitePage($this,'BREADCRUMB', $breadcrumbs);
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', $breadcrumbs);
 } elseif ($this->arg[1] === 'finalise') {
     /* Update the reviewed_at for all the latest attempts for a particular assess :D
      * How do you like them apples
@@ -343,5 +343,5 @@ if (!isset($this->arg[1])) {
     /* Render out breadcrumbs
      */
     $trail = new Breadcrumbs();
-    $trail->renderIntoSitePage($this,'BREADCRUMB', $breadcrumbs);
+    $trail->renderIntoSitePage($this, 'BREADCRUMB', $breadcrumbs);
 }

@@ -113,7 +113,8 @@ class Breadcrumbs
      * Return an array of breadcrumbs suitable for use in self::renderIntoSitePage().
      * @throws UnexpectedValueException
      */
-    public static function getQuizCrumbs(Authorizer $authorizer, Quiz\Model $quiz): array {
+    public static function getQuizCrumbs(Authorizer $authorizer, Quiz\Model $quiz): array
+    {
         $breadcrumbs = [
             [
                 'text'  => 'Learning',
