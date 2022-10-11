@@ -14,9 +14,11 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Aura\Router\Exception\RouteNotFound as RouteNotFoundAlias;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -89,8 +91,7 @@ if (!isset($this->arg[1])) {
 
     $this->parse('allQuestions_block', 'assessContentsFragment', true);
 
-    $assessment    = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
-    $breadcrumbs   = Breadcrumbs::getQuizCrumbs($this->getDi()->get('authorizer'), $assessment);
+    $breadcrumbs   = getBreadcrumbsForQuiz($this->getDi(), $assess['assess_id']);
     $breadcrumbs[] = [
         'text'  => 'Horizontal Marking',
         'href'  => '#',
@@ -325,14 +326,14 @@ if (!isset($this->arg[1])) {
         $this->setVar('next_question_block', '');
     }
 
-    $dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
-    $term          = TermMapper::getInstance()->findForDate($dueDate);
-    $assessment    = $this->getDi()->get('assessmentDataSource')->findByQuizId($assess['assess_id'], null);
-    $breadcrumbs   = Breadcrumbs::getQuizCrumbs($this->getDi()->get('authorizer'), $assessment);
+    $dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+    $term    = TermMapper::getInstance()->findForDate($dueDate);
+
+    $breadcrumbs   = getBreadcrumbsForQuiz($this->getDi(), $assess['assess_id']);
     $breadcrumbs[] = [
         'text'  => 'Horizontal Marking',
         'href'  => "/assess/reviewHorizontal/{$assess['assess_id']}",
-        'class' => 'active'
+        'class' => ''
     ];
     $breadcrumbs[] = [
         'text'  => Scrub::text($section['title']),
@@ -344,4 +345,29 @@ if (!isset($this->arg[1])) {
      */
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', $breadcrumbs);
+}
+
+/**
+ * @param $di
+ * @param $assessId
+ * @return array
+ * @throws RouteNotFoundAlias
+ */
+function getBreadcrumbsForQuiz($di, $assessId): array
+{
+    $assessment        = $di->get('assessmentDataSource')->findByQuizId($assessId, null);
+    $breadcrumbFactory = new BreadcrumbFactory($di->get('router'), $di->get('authorizer'), Access::getInstance());
+    $breadcrumbs       = $breadcrumbFactory->produceFromAssessment($assessment, $_SESSION['user']);
+    $breadcrumbsArray  = [];
+
+    // Convert $breadcrumb collection to format expected by Breadcrumbs->renderIntoSitePage().
+    foreach ($breadcrumbs as $crumb) {
+        $breadcrumbsArray[] = [
+            'text'  => $crumb[0],
+            'href'  => $crumb[1],
+            'class' => ''
+        ];
+    }
+
+    return $breadcrumbsArray;
 }
