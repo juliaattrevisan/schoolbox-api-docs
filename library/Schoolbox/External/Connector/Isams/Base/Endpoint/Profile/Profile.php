@@ -202,20 +202,6 @@ class Profile implements IStrategy
         $this->log->info('Processing staff.');
 
         $this->importStaff();
-
-        /* Remove any orphaned profiles
-         */
-        if ($this->perform) {
-            $orphans = (new OrphanRemover(
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))->remove();
-
-            $this->log->info("Removed {$orphans} orphaned profiles.");
-        }
     }
 
 
