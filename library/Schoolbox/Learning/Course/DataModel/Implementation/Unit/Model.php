@@ -265,7 +265,6 @@ class Model extends AbstractUnit
      */
     public function getBreadcrumbs(): Collection
     {
-echo "In ImplementationUnitModel->getBreadcrumbs().<br/>\n";
         $breadcrumbs = new Collection();
 
         $subjectFolder = $this->getFolder();
