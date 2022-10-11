@@ -65,6 +65,7 @@ class Manager
 
     // List of transformations that we will generate for each image
     private const CUSTOM_TRANSFORMS  = [
+        [64, 64],
         [100, 100],
         [2048, 2048],
     ];
