@@ -8,6 +8,7 @@ import Toast from "@schoolboxVue/components/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 import BadgeImage from "../../../Badge/vue/badge-image";
 import CodesList from '@schoolboxCurriculum/vue/codes-list';
+import NodeDetails from '@schoolboxCurriculum/vue/node-details';
 import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import userProfileConstants from '../../../vue/user-profile/constants';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
@@ -23,6 +24,7 @@ export default {
         CommentThread,
         BadgeImage,
         CodesList,
+        NodeDetails,
     },
     mixins: [
         foundationMixin,
@@ -43,6 +45,7 @@ export default {
             },
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
+            selectedNodeDetails: { id: 0 }, //the selected curriculum code to display further details for
         }
     },
     computed: {
@@ -245,12 +248,13 @@ export default {
         },
 
         /**
-         * to open up the description modal
+         * to open up the node details modal
          *
          * @pararm { object }
          */
         onCodeSelected (node) {
-            console.warn(node.code);
+            this.selectedNodeDetails = node;
+            this.$refs.nodeDetailsModal.open();
         },
 
     },
@@ -327,17 +331,17 @@ export default {
 
                                 <!-- Display curriculum codes and tags -->
                                 <div class="tags">
-                                  <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
+                                    <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
                                       Tags:
-                                      <codes-list
+                                        <codes-list
                                             :nodes="evidence.object.curriculumNodes"
                                             @selected="onCodeSelected"
                                         />
-                                      <template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
-                                      <template v-for="(tag, index) in evidence.object.tags" :key="`${index}-${tag.name}`">
-                                          <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
-                                      </template>
-                                  </p>
+                                       <template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
+                                        <template v-for="(tag, index) in evidence.object.tags" :key="`${index}-${tag.name}`">
+                                            <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
+                                        </template>
+                                    </p>
                                 </div>
                             </div>
 
@@ -467,6 +471,12 @@ export default {
                 </button>
             </div>
         </div>
+
+        <reveal-modal ref="nodeDetailsModal">
+            <node-details
+                :node="selectedNodeDetails"
+            />
+        </reveal-modal>
 
         <!-- TODO create a Vue equivalent of $.confirmDialog -->
         <reveal-modal ref="deleteModal">

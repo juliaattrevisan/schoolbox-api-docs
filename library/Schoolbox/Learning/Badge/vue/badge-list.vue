@@ -82,7 +82,7 @@ export default {
             showSkeletonLoader: true,
             selectedFilters: null,
             isDetailModalOpen: false, //whether the modal to display the badge details is open
-            selectedDetailNode: { id: 0 }, //the selected curriculum code to display further details for
+            selectedNodeDetails: { id: 0 }, //the selected curriculum code to display further details for
             detailModalIndex: 1, //to move to show the selected curriculum code details
         }
     },
@@ -113,7 +113,7 @@ export default {
          * @pararm { object }
          */
         onCodeSelected (node) {
-            this.selectedDetailNode = node;
+            this.selectedNodeDetails = node;
             this.detailModalIndex++;
         },
 
@@ -415,7 +415,7 @@ export default {
             </template>
             <template v-slot:sequence-2>
                 <node-details
-                    :node="selectedDetailNode"
+                    :node="selectedNodeDetails"
                 />
             </template>
         </sequential-reveal-modal>
