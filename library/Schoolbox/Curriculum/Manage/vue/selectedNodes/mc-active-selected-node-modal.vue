@@ -7,7 +7,7 @@
 import { ref, computed, watch } from 'vue';
 import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
 // import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
-import StackedRevealModal from '@schoolboxVue/components/stacked-reveal-modal.vue';
+import SequentialRevealModal from '@schoolboxVue/components/sequential-reveal-modal.vue';
 
 
 const selectedNodesStore = useSelectedNodesStore();
@@ -70,7 +70,7 @@ function onShowNext () {
 </script>
 
 <template>
-    <stacked-reveal-modal
+    <sequential-reveal-modal
         ref="modalEl"
         size="large"
         :is-active="isModalActive"
@@ -86,7 +86,7 @@ function onShowNext () {
         <template v-slot:reveal-2 v-if="selectedNodesStore.hasActiveNode">
             <h2>Second reveal</h2>
         </template>
-    </stacked-reveal-modal>
+    </sequential-reveal-modal>
 </template>
 
 <style scoped>
