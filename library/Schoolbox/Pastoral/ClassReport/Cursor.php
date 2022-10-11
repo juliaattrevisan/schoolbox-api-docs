@@ -129,7 +129,14 @@ class Cursor implements ICursor
             ],
         );
 
-        $results = $results->sortByCallback($this->buildSortCallback());
+        $results = $results->map(static function (Model $record) {
+            // as mapper hydrates deleted severity (so that it can be modified on record modify page)
+            // unsetting them for list
+            if ($record->getSeverity() && $record->getSeverity()->isDeleted()) {
+                $record->setSeverity(null);
+            }
+            return $record;
+        })->sortByCallback($this->buildSortCallback());
         if (count($results) === 0) {
             return $results;
         }

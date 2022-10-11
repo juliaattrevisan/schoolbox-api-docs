@@ -31,7 +31,7 @@
 
                 {% if user.role.isStaff %}
 
-                    {% if record.severity and config.pastoral_severity %}
+                    {% if record.severity and not record.severity.deleted and config.pastoral_severity %}
                         <dt class="small-4 medium-3 columns">{{ locale.severity.proper }}:</dt>
                         <dd class="small-8 medium-9 columns">
                             {% if severityColor %}

@@ -329,7 +329,7 @@ class DataSource
             INNER JOIN {$this->mapper->getJoinSql('student', 'p', 's')}
             INNER JOIN {$this->mapper->getJoinSql('owner', 'p', 'o', true)}
             LEFT JOIN  {$this->mapper->getJoinSql('modifiedBy', 'p', 'm', true)}
-            LEFT JOIN  {$this->mapper->getJoinSql('severity', 'p', 'sev', true)}
+            LEFT JOIN  {$this->mapper->getJoinSql('severity', 'p', 'sev')}
             WHERE s.deleted_at IS NULL
                 AND {$where}
             GROUP BY p.id
