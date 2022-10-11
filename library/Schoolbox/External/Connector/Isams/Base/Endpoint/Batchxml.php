@@ -70,10 +70,6 @@ class Batchxml
      */
     public function fetchXml(string $path): array
     {
-        /* Init error message in case we actually needed it
-         */
-        $errorMessage = '';
-
         /* If you need to see the raw xml data from your chosen endpoint
          * you can drop a printxml() here, which does some minor formatting to
          * make it vaguely bearable to read
@@ -114,7 +110,7 @@ class Batchxml
                  *
                  *     Entity: line 1: parser error : Document labelled UTF-16 but has UTF-8 content
                  *
-                 * isams is telling us the wrong encoding. Forcibly rewrite utf-16 into utf-8 which
+                 * iSAMs is telling us the wrong encoding. Forcibly rewrite utf-16 into utf-8 which
                  * is what it really is, when an error message occurs (e.g. invalid api key)
                  */
                 try {
