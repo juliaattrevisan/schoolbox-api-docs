@@ -67,8 +67,8 @@ const props = defineProps({
 const emit = defineEmits(['closed']);
 const uuid = generateUUID();
 const elementId = ref(`reveal-modal-${uuid}`);
-const currentIndex = ref(props.selectedIndex);
-const isNextSelected = ref(false);
+const sequenceIndex = ref(props.selectedIndex); //to help track the current sequence index
+const isNextSelected = ref(false); //to determine whether we need to move to the next in sequence
 let $modal;
 
 /**
@@ -76,7 +76,7 @@ let $modal;
  */
  watch(() => props.isActive, (isActive) => {
     if (isActive) {
-        currentIndex.value = 1;
+        sequenceIndex.value = 1;
         open();
         addCloseListener();
     }
@@ -87,9 +87,9 @@ let $modal;
  * so close the current so we can move to the next
  */
 watch(() => props.selectedIndex, (selectedIndex) => {
-    if (currentIndex.value != selectedIndex) {
+    if (sequenceIndex.value != selectedIndex) {
         isNextSelected.value = true;
-        currentIndex.value++;
+        sequenceIndex.value++;
         close();
     }
 });
@@ -98,7 +98,7 @@ watch(() => props.selectedIndex, (selectedIndex) => {
  * open the current modal in sequence
  */
 function open () {
-    $modal = $(`#${currentIndex.value}-${elementId.value}`);
+    $modal = $(`#${sequenceIndex.value}-${elementId.value}`);
     $modal.foundation(
         'reveal',
         'open',
@@ -116,10 +116,10 @@ function addCloseListener () {
         if (!event.target.id.includes(elementId.value)) { //can be multiple modals open at once
             return;
         }
-        if (currentIndex.value > 1) { //the 1st is closed and the 2nd is active, so we open up the 2nd
+        if (sequenceIndex.value > 1) { //the 1st is closed and the 2nd is active, so we open up the 2nd
             open();
-            currentIndex.value--; //so we can close the 2nd next
-        } else if (isNextSelected.value && currentIndex.value == 1) { //the 2nd has been selected and is closed, so we open up the 1st
+            sequenceIndex.value--; //so we can close target the 1st once the 2nd is closed
+        } else if (isNextSelected.value && sequenceIndex.value == 1) { //the 2nd has been selected and is closed, so we open up the 1st
             open();
             isNextSelected.value = false; //so we can close the 1st
         } else { //the 1st is closed, and we aren't opening the 2nd so the modal is closed
