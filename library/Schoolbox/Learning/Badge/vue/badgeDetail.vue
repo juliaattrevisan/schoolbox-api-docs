@@ -1,11 +1,13 @@
 <script>
 import BadgeImage from './badge-image';
+import CodesList from '@schoolboxCurriculum/vue/codes-list';
 
 import {translateDaysToExpiryLabel} from './expiry-helper';
 
 export default {
     components: {
-        BadgeImage
+        BadgeImage,
+        CodesList
     },
     props: {
         /**
@@ -54,9 +56,10 @@ export default {
 
             <p class="meta">
                 Curriculum Codes:
-                <template v-for="(curriculumNode, index) in curriculumNodesWithCode">
+                <codes-list :nodes="curriculumNodesWithCode" />
+                <!-- <template v-for="(curriculumNode, index) in curriculumNodesWithCode">
                     <span :title="curriculumNode.name">{{ curriculumNode.code }}</span><template v-if="(index + 1) < curriculumNodesWithCode.length">, </template>
-                </template>
+                </template> -->
             </p>
         </div>
     </div>
