@@ -67,19 +67,29 @@ class Mapper extends \Schoolbox\Mapper
     {
         $collection          = $this->createCollection();
         $pastoralGroupMapper = \Schoolbox\Pastoral\Group\Mapper::getInstance();
-        $pastoralGroups      = $pastoralGroupMapper->findAll()->indexBy('id');
+        // Get all groups populated with members
+        $pastoralGroups = $pastoralGroupMapper->findAll()->indexBy('id');
         foreach ($statement as $row) {
             /** @var Model $access */
-            $access = $this->hydrate($row);
-            $user   = $this->hydrateJoin($row, 'user', 'u');
+            $access      = $this->hydrate($row);
+            $accessValid = false;
+            // set user
+            $user = $this->hydrateJoin($row, 'user', 'u');
             if ($user instanceof User) {
                 $access->setUser($user);
+                $accessValid = true;
             }
+            // set group
             $group = $this->hydrateJoin($row, 'group', 'g');
             if ($group instanceof \Schoolbox\Pastoral\Group\Model && $pastoralGroups->offsetExists($group->getId())) {
                 $access->setGroup($pastoralGroups->offsetGet($access->getGroup()->getId()));
+                $accessValid = true;
             }
-            $collection->add($access);
+            // Role is not supported for Report Access
+            // Do not add to collection, if both User and Group are null
+            if ($accessValid) {
+                $collection->add($access);
+            }
         }
         return $collection;
     }
