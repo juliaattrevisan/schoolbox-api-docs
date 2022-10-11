@@ -38,7 +38,16 @@ export default {
             return translateDaysToExpiryLabel(this.badge?.goalExpiry);
         },
     },
-    methods: {},
+    methods: {
+        /**
+         * to open up the description modal
+         *
+         * @pararm { object }
+         */
+        onCodeSelected (code) {
+            console.warn(code.name);
+        },
+    },
 }
 </script>
 
@@ -53,13 +62,12 @@ export default {
         <article v-html="badge.body"></article>
         <div v-if="badge.curriculumNodes.length">
             <hr />
-
             <p class="meta">
                 Curriculum Codes:
-                <codes-list :nodes="curriculumNodesWithCode" />
-                <!-- <template v-for="(curriculumNode, index) in curriculumNodesWithCode">
-                    <span :title="curriculumNode.name">{{ curriculumNode.code }}</span><template v-if="(index + 1) < curriculumNodesWithCode.length">, </template>
-                </template> -->
+                <codes-list
+                    :nodes="curriculumNodesWithCode"
+                    @selected="onCodeSelected"
+                />
             </p>
         </div>
     </div>

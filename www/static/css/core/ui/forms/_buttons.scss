@@ -379,6 +379,7 @@ $button-disabled-cursor: $cursor-default-value !default;
 .meta-button {
     background: none;
     margin: 0;
+    min-height: auto;
     padding: 0;
     &:hover, &:focus {
         background: none;
