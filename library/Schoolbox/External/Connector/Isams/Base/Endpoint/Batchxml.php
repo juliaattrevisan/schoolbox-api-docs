@@ -81,7 +81,7 @@ class Batchxml
          * $this->printXml(true);
          */
         if (!$this->nodes) {
-            $xml = $this->api->retrieveDocument();
+            $xml = trim($this->api->retrieveDocument());
 
             /* Test if $xml is actually xml, or some other random jank
              *
@@ -134,7 +134,7 @@ class Batchxml
 
                 /* Announce whatever error message we might have found
                  */
-                throw new RuntimeException($errorMessage);
+                throw new RuntimeException(trim($errorMessage));
             }
         }
 
