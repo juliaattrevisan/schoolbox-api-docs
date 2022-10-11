@@ -20,13 +20,6 @@ const depth = ref(0); //to increment each time we go down the node tree to visua
 const nodesContainerEl = ref(null); //to scroll back to top on any selection change
 
 /**
- * To further clarify where the current search term hasn't found any node matches
- *
- * @returns { String }
- */
-const currentSelectedNodeTitle = computed(() => viewNodesStore.current.name);
-
-/**
  * Clear the current search query
  */
 function onClearSearchSelected () {
@@ -52,7 +45,7 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
         </div>
         <div v-else-if="searchStore.hasNoResults" class="empty-state-flex-centered">
             <i class="icon-curriculum"></i>
-            <p>No Curriculum in: {{ currentSelectedNodeTitle }} match your current search.</p>
+            <p>No Curriculum match your current search.</p>
             <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
         </div>
         <ul v-else ref="nodesContainerEl">
