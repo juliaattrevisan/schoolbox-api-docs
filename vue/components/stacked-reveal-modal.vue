@@ -16,9 +16,9 @@ const props = defineProps({
         default: false,
     },
     /**
-     * The index of the current stacked modal
+     * The newly requested stack index
      */
-    activeIndex: {
+    selectedIndex: {
         type: Number,
         default: 1,
     },
@@ -57,12 +57,15 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['closed']);
-const elementId = ref(`reveal-modal-${generateUUID()}`);
+const uuid = generateUUID();
+const elementId = ref(`reveal-modal-${uuid}`);
+const currentIndex = ref(props.selectedIndex);
+const isNextSelected = ref(false);
+// const $modal = ref(`${props.selectedIndex}-${elementId.value}`);
 let modal;
 
 onMounted(() => {
-    // How do I find the dialog in the DOM? ID probably needs to be unique
-    modal = $(`#1-${elementId.value}`);
+    modal = $(`#${props.selectedIndex}-${elementId.value}`);
 });
 
 /**
@@ -70,21 +73,25 @@ onMounted(() => {
  */
  watch(() => props.isActive, (isActive) => {
     if (isActive) {
+        currentIndex.value = 1;
         open();
+        addCloseListener();
     }
 });
 
 /**
- * to open the modal when requested
+ * the next has been selected, so close the current so we can move to the next
  */
-watch(() => props.activeIndex, (activeIndex) => {
-    // if (isActive) {
-    //     open();
-    // }
+watch(() => props.selectedIndex, (selectedIndex) => {
+    if (currentIndex.value != selectedIndex) {
+        isNextSelected.value = true;
+        currentIndex.value++;
+        close();
+    }
 });
 
 /**
- * Open this modal.
+ * open this modal
  */
 function open () {
     modal.foundation(
@@ -92,8 +99,25 @@ function open () {
         'open',
         { close_on_background_click: props.closeOnBackgroundClick }
     );
+}
+
+/**
+ *
+ */
+function addCloseListener () {
     $(document).on('closed.fndtn.reveal', '[data-reveal]', (event) => { //to respond to the modal closing when requried
-        if (event.target.id.includes(elementId.value)) { //can be multiple modals open at once
+        if (!event.target.id.includes(elementId.value)) { //can be multiple modals open at once
+            return;
+        }
+        if (currentIndex.value == 1 && isNextSelected.value) { //the 2nd is closed, so we open up the first
+            isNextSelected.value = false;
+            modal = $(`#${currentIndex.value}-${elementId.value}`);
+            open();
+        } else if (currentIndex.value > 1) { //the 1st is closed, so we open up the 2nd
+            currentIndex.value--;
+            modal = $(`#${props.selectedIndex}-${elementId.value}`);
+            open();
+        } else { //the 1st is closed, and we aren't opening the 2nd
             emit('closed');
             $(document).off('closed.fndtn.reveal');
         }
@@ -112,7 +136,7 @@ function onCloseSelected (event) {
 }
 
 /**
- * Close this modal.
+ * Close this modal
  */
 function close () {
     modal.foundation('reveal', 'close');
@@ -129,7 +153,7 @@ function close () {
     <div :id="`2-${elementId}`" :class="`reveal-modal ${props.size}`" data-reveal :data-reveal-reopen="`1-${elementId}`" aria-hidden="true" role="dialog">
         <!-- @slot Reveal modal content goes into this slot -->
         <slot name="reveal-2">Stacked Reveal 2</slot>
-        <a class="close-reveal-modal" aria-label="Close" @click.prevent="onCloseSelected">&#215;</a>
+        <a class="close-reveal-modal" aria-label="Close" @click.prevent="onCloseSelected">&#8592;</a>
     </div>
 </template>
 

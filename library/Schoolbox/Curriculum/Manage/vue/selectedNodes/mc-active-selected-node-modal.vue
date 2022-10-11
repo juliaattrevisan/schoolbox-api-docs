@@ -56,7 +56,15 @@ const breadcrumbs = computed(() => {
  */
 function onModalClosed () {
     isModalActive.value = false;
+    activeModalIndex.value = 1;
     selectedNodesStore.setActiveNode(null);
+}
+
+/**
+ *
+ */
+function onShowNext () {
+    activeModalIndex.value++;
 }
 
 </script>
@@ -66,13 +74,13 @@ function onModalClosed () {
         ref="modalEl"
         size="large"
         :is-active="isModalActive"
-        :active-index="activeModalIndex"
+        :selected-index="activeModalIndex"
         @closed="onModalClosed"
     >
         <template v-slot:reveal-1 v-if="selectedNodesStore.hasActiveNode">
             <h2>{{ title }}</h2>
             <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
-            <a class="button submit" data-reveal-id="2-reveal-modal">Show me Reveal #2</a>
+            <a class="button submit" @click="onShowNext">Show me Reveal #2</a>
             <div v-html="selectedNodesStore.activeNode.description"></div>
         </template>
         <template v-slot:reveal-2 v-if="selectedNodesStore.hasActiveNode">
