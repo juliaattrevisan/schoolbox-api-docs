@@ -18,7 +18,7 @@ const props = defineProps({
     /**
      * Whether the modal is active, used to trigger the first open
      */
-    isActive: {
+    isOpen: {
         type: Boolean,
         required: true,
         default: false,
@@ -74,8 +74,8 @@ let $modal;
 /**
  * to open the first modal in the sequence
  */
- watch(() => props.isActive, (isActive) => {
-    if (isActive) {
+ watch(() => props.isOpen, (isOpen) => {
+    if (isOpen) {
         sequenceIndex.value = 1;
         open();
         addCloseListener();
@@ -152,12 +152,12 @@ function close () {
 <template>
     <div :id="`1-${elementId}`" :class="`reveal-modal ${props.size}`" data-reveal aria-hidden="true" role="dialog">
         <!-- @slot Reveal modal content goes into this slot -->
-        <slot name="reveal-1">Sequential Reveal 1</slot>
+        <slot name="sequence-1">Sequential Reveal 1</slot>
         <a class="close-reveal-modal" aria-label="Close" @click.prevent="onCloseSelected">&#215;</a>
     </div>
     <div :id="`2-${elementId}`" :class="`reveal-modal ${props.size}`" data-reveal :data-reveal-reopen="`1-${elementId}`" aria-hidden="true" role="dialog">
         <!-- @slot Reveal modal content goes into this slot -->
-        <slot name="reveal-2">Sequential Reveal 2</slot>
+        <slot name="sequence-2">Sequential Reveal 2</slot>
         <a class="close-reveal-modal" aria-label="Close" @click.prevent="onCloseSelected">&#8592;</a>
     </div>
 </template>

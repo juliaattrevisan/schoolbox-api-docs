@@ -2,6 +2,7 @@
 
 import Toast from '@schoolboxVue/components/toast';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
+import SequentialRevealModal from '@schoolboxVue/components/sequential-reveal-modal';
 import BadgeAward from '../Award/vue/badgeAward';
 import BadgeDetail from './badgeDetail';
 import BadgeAchievementWithdrawModal from '../Award/vue/badge-achievement-withdraw-modal';
@@ -31,6 +32,7 @@ export default {
         BadgeGoalWithdrawModal,
         BadgeImage,
         RevealModal,
+        SequentialRevealModal,
         Toast
     },
 
@@ -77,6 +79,7 @@ export default {
             isModalOpen: false,
             showSkeletonLoader: true,
             selectedFilters: null,
+            isDetailModalOpen: false, //whether the modal to display the badge details is open
         }
     },
 
@@ -97,7 +100,16 @@ export default {
          */
         openDetailModal(badge) {
             this.currentBadge = badge;
-            this.$refs.detailModal.open();
+            // this.$refs.detailModal.open();
+            this.isDetailModalOpen = true;
+        },
+
+        /**
+         * the detail modal is closed, so we should set the boolean to
+         * false so we can open it again
+         */
+        onDetailModalClosed () {
+            this.isDetailModalOpen = false;
         },
 
         /**
@@ -375,9 +387,18 @@ export default {
             </template>
         </div>
 
-        <reveal-modal size="medium" ref="detailModal">
-            <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>
-        </reveal-modal>
+        <sequential-reveal-modal
+            size="medium"
+            :isOpen="isDetailModalOpen"
+            @closed="onDetailModalClosed"
+        >
+            <template v-slot:sequence-1>
+                <badge-detail
+                    v-if="currentBadge"
+                    :badge="currentBadge"
+                />
+            </template>
+        </sequential-reveal-modal>
 
         <reveal-modal size="medium" ref="awardAsAchievementModal" :closeOnBackgroundClick="false" @closed="onModalClosed">
             <badge-award
