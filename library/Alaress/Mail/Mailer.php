@@ -30,6 +30,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Crypto\DkimOptions;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\TextPart;
@@ -123,7 +124,10 @@ class Mailer
      */
     public function setTo(Address | User | null $to)
     {
-        if ($to instanceof User && $to->getEmail()) {
+        if ($to instanceof User) {
+            if (!$to->getEmail()) {
+                throw new RfcComplianceException("User {$to->getId()} doesn't have email address");
+            }
             $this->email->addTo(new Address($to->getEmail(), $to->formatName()));
         } elseif ($to instanceof Address) {
             $this->email->addTo($to);
