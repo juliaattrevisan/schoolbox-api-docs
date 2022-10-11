@@ -18,7 +18,7 @@
 
 <template>
     <template v-for="(node, index) in props.nodes">
-        <span :title="node.name">{{ node.code }}</span><template v-if="(index + 1) < props.nodes.length">, </template>
+        <button class="meta-button" title="View details">{{ node.code }}</button><template v-if="(index + 1) < props.nodes.length">, </template>
     </template>
 </template>
 
