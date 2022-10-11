@@ -4,7 +4,6 @@ namespace Folder;
 
 use AcceptanceTester;
 use Exception;
-use Codeception\Util\Locator;
 use Page\Group\ManageGroup;
 use Page\Folder\CreateFolder;
 
@@ -65,9 +64,8 @@ class GroupPermissionCest
         $createFolder->clickCreateFolderButton();
 
         $manageGroup->waitManageGroupTitleToBePresented();
-        $manageGroup->clickTab('settings');
         $manageGroup->setAccessPermission('type-3');
-        $manageGroup->clickSubmitButton();
+        $manageGroup->clickUpdateButton();;
 
         //getting logged in as a junior student to check the group is presented to them
         $i->impersonate($studentJunior);
@@ -122,9 +120,8 @@ class GroupPermissionCest
         $createFolder->clickCreateFolderButton();
 
         $manageGroup->waitManageGroupTitleToBePresented();
-        $manageGroup->clickTab('settings');
         $manageGroup->setAccessPermission('type-2');
-        $manageGroup->clickSubmitButton();
+        $manageGroup->clickUpdateButton();;
 
         //getting logged in as a junior student to check the group is presented to them
         $i->impersonate($studentJunior);
@@ -179,9 +176,8 @@ class GroupPermissionCest
         $createFolder->clickCreateFolderButton();
 
         $manageGroup->waitManageGroupTitleToBePresented();
-        $manageGroup->clickTab('settings');
         $manageGroup->setAccessPermission('type-1');
-        $manageGroup->clickSubmitButton();
+        $manageGroup->clickUpdateButton();;
 
         //getting logged in as a junior student to check the group is NOT presented to them
         $i->impersonate($studentJunior);
