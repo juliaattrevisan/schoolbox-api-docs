@@ -62,14 +62,12 @@ class Factory
         $breadcrumbs       = new Collection();
         $breadcrumbs->add(['Learning', $this->router->generate('learning.getClasses')]);
 
-        if (
-            $assessmentContext instanceof UnitImplementation ||
-            $assessmentContext instanceof UnitSpecification ||
-            $assessmentContext instanceof Project
-        ) {
-            $crumbs = $assessmentContext->getBreadcrumbs();
-
-            foreach ($crumbs as $crumb) {
+        if ($assessmentContext instanceof UnitImplementation || $assessmentContext instanceof UnitSpecification) {
+            foreach ($assessmentContext->getBreadcrumbs() as $crumb) {
+                $breadcrumbs->add($crumb);
+            }
+        } elseif ($assessmentContext instanceof Project) {
+            foreach ($assessmentContext->getBreadcrumbs($this->router, $this->authorizer) as $crumb) {
                 $breadcrumbs->add($crumb);
             }
         } else {

@@ -17,15 +17,18 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Authorizer\Authorizer;
+use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Router;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\User;
-use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 use UnexpectedValueException;
 
 class Project extends AbstractAssessment implements AssessmentContext
@@ -716,9 +719,12 @@ class Project extends AbstractAssessment implements AssessmentContext
      *  * $subject->$unit->$project (eg. '9ENGA'->'Romeo and Juliet'->'Project title').
      *  * $unit->$project           (eg. 'Romeo and Juliet'->'Project title').
      *
+     * @param Router     $router
+     * @param Authorizer $authorizer
      * @return Collection
+     * @throws RouteNotFound
      */
-    public function getBreadcrumbs(): Collection
+    public function getBreadcrumbs(Router $router, Authorizer $authorizer): Collection
     {
         $projectContext = $this->getContext();
 
@@ -735,7 +741,6 @@ class Project extends AbstractAssessment implements AssessmentContext
             'studentId'    => $_SESSION['user']->getId()
         ];
 
-        $di          = $this->getDi();
         $breadcrumbs = $projectContext->getBreadcrumbs();
         $breadcrumbs->add(
             [
@@ -743,9 +748,9 @@ class Project extends AbstractAssessment implements AssessmentContext
                 (
                     // In some circumstances the user will not be authorised to view the 'status' page.
                     // In that case, show the 'summary' page instead.
-                    ($di->get('authorizer')->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $_SESSION['user'])) ?
-                    $di->get('router')->generate('learningAssessment.getStatus', $routeParams) :
-                    $di->get('router')->generate('learningAssessment.getSummary', $routeParams)
+                    ($authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $_SESSION['user'])) ?
+                    $router->generate('learningAssessment.getStatus', $routeParams) :
+                    $router->generate('learningAssessment.getSummary', $routeParams)
                 )
             ]
         );
