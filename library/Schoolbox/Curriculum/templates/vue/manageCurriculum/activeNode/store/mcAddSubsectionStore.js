@@ -55,7 +55,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
                     useSelectedNodesStore().checkIfSelected(newNode); //the parent node could be selected, so this node will need to be selected as well
                     await activeNodeStore.addSubsection(newNode);
                     this.cancel();
-                    return { id: newNode.id, message: `${this.subsection.name} successfully added` };
+                    return { id: newNode.id, message: 'Subsection successfully added' };
                 } else {
                     throw new Error(responseJson.title, { ...responseJson } );
                 }

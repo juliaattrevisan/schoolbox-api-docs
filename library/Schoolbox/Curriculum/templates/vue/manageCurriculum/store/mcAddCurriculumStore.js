@@ -53,7 +53,7 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', {
                     useViewNodesStore().setSelected(0);
                     this.isProcessing = false;
                     this.cancel();
-                    return { id: newCurriculum.id, message: `${this.curriculum.name} successfully added` };
+                    return { id: newCurriculum.id, message: 'Curriculum successfully added' };
                 } else {
                     throw new Error(responseJson.title, { ...responseJson } );
                 }
