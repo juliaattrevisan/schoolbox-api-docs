@@ -39,7 +39,7 @@ class Model extends AbstractCourse
      */
     private $courseImplementations;
 
-    private null|string $subjectCode;
+    private string $subjectCode = '';
 
 
     /**
@@ -110,17 +110,17 @@ class Model extends AbstractCourse
     }
 
     /**
-     * @param string|null $subjectCode
+     * @param string $subjectCode
      * @return $this
      */
-    public function setSubjectCode(?string $subjectCode)
+    public function setSubjectCode(string $subjectCode)
     {
         $this->subjectCode = $subjectCode;
         return $this;
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getSubjectCode()
     {
