@@ -27,6 +27,11 @@ use SimpleXMLElement;
  */
 class Batchxml
 {
+    /**
+     * A surety for maximum length of error messages.
+     */
+    private const MAX_ERROR_MESSAGE_LENGTH = 255;
+
 
     /**
      * @var IApi
@@ -121,9 +126,10 @@ class Batchxml
 
                     $errorMessage = trim((string)$errorNodes->xpath('/Message')[0]->Description);
                 } catch (\Exception $e) {
-                    /* Some non-xml returned from isams: use it as-is
+                    /* Some non-xml returned from isams: use it as-is but
+                     * if it's longer than 255, truncate it for the log
                      */
-                    $errorMessage = $e->getMessage();
+                    $errorMessage = mb_substr($e->getMessage(), 0, self::MAX_ERROR_MESSAGE_LENGTH, 'utf-8');
                 }
 
                 /* Announce whatever error message we might have found
