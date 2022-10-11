@@ -76,8 +76,8 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
          */
         getSuccessMessage () {
             const selectedNodesStore = useSelectedNodesStore();
-            const nodeSingleOrPlural = `node${selectedNodesStore.count > 1  ? 's' : ''}`;
-            return `${selectedNodesStore.count} ${nodeSingleOrPlural} successfully deleted`;
+            const nodeSingleOrPlural = `Node${selectedNodesStore.count > 1  ? 's' : ''}`;
+            return `${nodeSingleOrPlural} successfully deleted`;
         },
 
         /**

@@ -83,9 +83,9 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', {
          */
         getSuccessMessage () {
             const selectedNodesStore = useSelectedNodesStore();
-            const nodeSingleOrPlural = `node${selectedNodesStore.count > 1  ? 's' : ''}`;
+            const nodeSingleOrPlural = `Node${selectedNodesStore.count > 1  ? 's' : ''}`;
             const enabledOrDisabled = `${ selectedNodesStore.nodes[0].enabled ? 'disabled' : 'enabled'}`
-            return `${selectedNodesStore.count} ${nodeSingleOrPlural} successfully ${enabledOrDisabled}`;
+            return `${nodeSingleOrPlural} successfully ${enabledOrDisabled}`;
         },
 
         /**
