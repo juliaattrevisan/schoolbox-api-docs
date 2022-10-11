@@ -59,69 +59,19 @@ class Factory
      */
     public function produceFromAssessment(IAssessable $assessment, User $user): Collection
     {
-        $trail = new Collection();
-        $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
-
         $assessmentContext = $assessment->getContext();
-        $lastCrumb         = [
-            'title' => '',
-            'path'  => ''
-        ];
+        $breadcrumbs       = new Collection();
+        $breadcrumbs->add(['Learning', $this->router->generate('learning.getClasses')]);
 
-        if ($assessmentContext instanceof UnitImplementation) {
-            // Assessment belongs to subject->unit.
-            // Generate trail like 'Learning->$subject->$unit' (eg. 'Learning'->'9ENGA'->'Romeo and Juliet').
-            $unitImpl      = $assessmentContext;
-            $subjectFolder = $unitImpl->getFolder();
-            $trail->add([$subjectFolder->getTitle(), "/homepage/{$subjectFolder->getId()}"]); // Add breadcrumb for subject.
+        if (
+            $assessmentContext instanceof UnitImplementation ||
+            $assessmentContext instanceof UnitSpecification ||
+            $assessmentContext instanceof Project
+        ) {
+            $crumbs = $assessmentContext->getBreadcrumbs();
 
-            $unitSpecFolder = $unitImpl->getSpecification()->getFolder();
-
-            $lastCrumb['title'] = $unitSpecFolder->getTitle();
-            $lastCrumb['path']  = "/homepage/{$unitSpecFolder->getId()}";
-        } elseif ($assessmentContext instanceof UnitSpecification) {
-            // Assessment belongs to unit specification.
-            // Generate trail like 'Learning->$unit' (eg. 'Learning'->'Romeo and Juliet').
-            // NOTE: UnitSpecifications are not attached to subjects.
-            //       Think of them as templates of units that become implementations only when they are attached to subjects.
-            $unitSpec       = $assessmentContext;
-            $unitSpecFolder = $unitSpec->getFolder();
-
-            $lastCrumb['title'] = $unitSpecFolder->getTitle();
-            $lastCrumb['path']  = "/homepage/{$unitSpecFolder->getId()}";
-        } elseif ($assessmentContext instanceof Project) {
-            // Assessment belongs to $subject->$unit->project or $unit->$project.
-            // Generate trail like one of:
-            //  * 'Learning->$subject->$unit->$project' (eg. 'Learning'->'9ENGA'->'Romeo and Juliet'->'Project title').
-            //  * 'Learning->$unit->$project'           (eg. 'Learning'->'Romeo and Juliet'->'Project title').
-            $project        = $assessmentContext;
-            $projectContext = $project->getContext();
-
-            if ($projectContext instanceof UnitImplementation || $projectContext instanceof UnitSpecification) {
-                // We have already handled the case of UnitImplementation and UnitSpecification above, so forget about
-                // the trail we have started so far, and instead create a new $trail recursively.  Then we can add the
-                // project as the last crumb.
-                $trail = $this->produceFromAssessment($project, $user);
-
-                $routeParams = [
-                    'assessment'   => $project,
-                    'assessmentId' => $project->getId(),
-                    'studentId'    => $user->getId()
-                ];
-
-                $lastCrumb['title'] = $project->getTitle();
-                $lastCrumb['path']  = (
-                    // In some circumstances the user will not be authorised to view the 'status' page.
-                    // In that case, show the 'summary' page instead.
-                    ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user)) ?
-                    $this->router->generate('learningAssessment.getStatus', $routeParams) :
-                    $this->router->generate('learningAssessment.getSummary', $routeParams)
-                );
-            } else {
-                throw new UnexpectedValueException(
-                    'Variable $projectContext is expected to be an instance of either UnitImplementation or UnitSpecification.' .
-                    "Found variable of class '" . get_class($projectContext) . "'."
-                );
+            foreach ($crumbs as $crumb) {
+                $breadcrumbs->add($crumb);
             }
         } else {
             // Assessment belongs directly to subject (eg. '9ENGA').
@@ -129,21 +79,11 @@ class Factory
             $subjectFolder = $subject->getFolder();
 
             if ($this->access->getFolderAccess($user, $subjectFolder->getId())) {
-                $lastCrumb['title'] = $subject->getTitle();
-                $lastCrumb['path']  = "/homepage/{$subjectFolder->getId()}";
-            } else {
-                // The user does not have access to the subject folder, so no last crumb.
-                $lastCrumb['title'] = '';
-                $lastCrumb['path']  = '';
+                $breadcrumbs->add([$subject->getTitle(), "/homepage/{$subjectFolder->getId()}"]);
             }
         }
 
-        // Final check to make sure we have meaningful data before adding the last crumb.
-        if ('' !== trim($lastCrumb['title']) && '' !== trim($lastCrumb['path'])) {
-            $trail->add([$lastCrumb['title'], $lastCrumb['path']]); // Add the last crumb to the trail.
-        }
-
-        return $trail;
+        return $breadcrumbs;
     }
 
     /**

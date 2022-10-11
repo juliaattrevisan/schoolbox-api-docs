@@ -21,10 +21,12 @@ use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Resource\Folder\Model as Folder;
+use UnexpectedValueException;
 
 class Project extends AbstractAssessment implements AssessmentContext
 {
@@ -633,7 +635,7 @@ class Project extends AbstractAssessment implements AssessmentContext
      * Project-specific method to get all users who are participating in this project and its sub-assessments
      *
      * @return User[]|GenericCollection Indexed by user.id
-     * @throws \UnexpectedValueException If unable to merge collections
+     * @throws UnexpectedValueException If unable to merge collections
      */
     public function getParticipantUsers(): GenericCollection
     {
@@ -698,7 +700,7 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function getLocationId(): string
     {
-            return 'project-' . $this->getId();
+        return 'project-' . $this->getId();
     }
 
     /**
@@ -707,5 +709,43 @@ class Project extends AbstractAssessment implements AssessmentContext
     public function getLocationTitle(): string
     {
         return $this->getBaseContext()->getTitle() . ' > ' . $this->getTitle();
+    }
+
+    public function getBreadcrumbs()
+    {
+        // Generate trail like one of:
+        //  * 'Learning->$subject->$unit->$project' (eg. 'Learning'->'9ENGA'->'Romeo and Juliet'->'Project title').
+        //  * 'Learning->$unit->$project'           (eg. 'Learning'->'Romeo and Juliet'->'Project title').
+        $projectContext = $this->getContext();
+
+        if (!($projectContext instanceof UnitImplementation || $projectContext instanceof UnitSpecification)) {
+            throw new UnexpectedValueException(
+                'Variable $projectContext is expected to be an instance of either UnitImplementation or UnitSpecification.' .
+                "Found variable of class '" . get_class($projectContext) . "'."
+            );
+        }
+
+        $routeParams = [
+            'assessment'   => $project,
+            'assessmentId' => $project->getId(),
+            'studentId'    => $user->getId()
+        ];
+
+        $di          = $this->getDi();
+        $breadcrumbs = $projectContext->getBreadcrumbs();
+        $breadcrumbs->add(
+            [
+                $project->getTitle(),
+                (
+                    // In some circumstances the user will not be authorised to view the 'status' page.
+                    // In that case, show the 'summary' page instead.
+                    ($di->get('authorizer')->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user)) ?
+                    $di->get('router')->generate('learningAssessment.getStatus', $routeParams) :
+                    $di->get('router')->generate('learningAssessment.getSummary', $routeParams)
+                )
+            ]
+        );
+
+        return $breadcrumbs;
     }
 }
