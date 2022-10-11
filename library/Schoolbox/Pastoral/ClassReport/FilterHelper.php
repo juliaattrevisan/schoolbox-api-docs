@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\ClassReport;
 
+use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -96,7 +97,15 @@ class FilterHelper
         );
 
         // Hardcoded filter: ensures only records for `$students` get returned
-        $studentIds       = $students->getPropertyValues('id');
+        $studentIds = $students->getPropertyValues('id');
+
+        if (0 === count($studentIds)) {
+            // If there are no students in the class, then there are no pastoral records
+            // pertaining to the students in the class, and so no records should be returned.
+            // If we pass an empty filter to $idFilter->findIdsByFilters(), an unfiltered list (ie. all records) will be returned.
+            return [];
+        }
+
         $hardcodedFilters = [
             Filter\Filters\Pastoral\Student\Definition::class => array_combine($studentIds, $studentIds),
         ];
