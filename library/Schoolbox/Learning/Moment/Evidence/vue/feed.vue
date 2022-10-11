@@ -336,8 +336,7 @@ export default {
                                         <codes-list
                                             :nodes="evidence.object.curriculumNodes"
                                             @selected="onCodeSelected"
-                                        />
-                                       <template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
+                                        /><template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
                                         <template v-for="(tag, index) in evidence.object.tags" :key="`${index}-${tag.name}`">
                                             <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
                                         </template>
@@ -488,7 +487,11 @@ export default {
             </ul>
         </reveal-modal>
 
-        <award-detail-modal ref="awardDetailModal" :cdn-prefix="this.cdnPrefix" :site-version="this.siteVersion"></award-detail-modal>
+        <award-detail-modal
+            ref="awardDetailModal"
+            :cdn-prefix="this.cdnPrefix"
+            :site-version="this.siteVersion"
+        />
 
         <toast ref="toast"></toast>
     </div>

@@ -37,7 +37,6 @@ function onCodeSelected (node) {
             @keyup.enter="onCodeSelected(node)"
         >
             {{ node.code }}
-        </button>
-        <template v-if="(index + 1) < props.nodes.length">, </template>
+        </button><template v-if="(index + 1) < props.nodes.length">, </template>
     </template>
 </template>

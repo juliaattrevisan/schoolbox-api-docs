@@ -41,7 +41,7 @@ export default {
     },
     methods: {
         /**
-         * to open up the description modal
+         * to open up the details modal
          *
          * @pararm { object }
          */

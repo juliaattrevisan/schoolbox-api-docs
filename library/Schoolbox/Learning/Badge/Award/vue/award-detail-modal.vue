@@ -10,6 +10,7 @@ import { animateBadgeImage } from '../js/animateBadgeImage'
 import { ResizeObserver } from 'vue3-resize';
 import 'vue3-resize/dist/vue3-resize.css';
 import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
+import CodesList from '@schoolboxCurriculum/vue/codes-list';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 /**
@@ -59,7 +60,8 @@ export default {
         RelativeTime,
         RevealModal,
         ResizeObserver, //to track any size changes to the parent container
-        DynamicInput
+        DynamicInput,
+        CodesList,
     },
 
     /**
@@ -247,6 +249,15 @@ export default {
         },
 
         /**
+         * to open up the details modal
+         *
+         * @pararm { object }
+         */
+        onCodeSelected (node) {
+            // this.$emit('code-selected', node);
+        },
+
+        /**
          * The modal is now completely closed
          */
         onModalClosed () {
@@ -353,9 +364,10 @@ export default {
                     <hr />
                     <p class="meta">
                         Curriculum Codes:
-                        <template v-for="(curriculumNode, index) in award.badge.curriculumNodes">
-                            {{ curriculumNode.code }}<span v-if="index != award.badge.curriculumNodes.length-1">, </span>
-                        </template>
+                        <codes-list
+                            :nodes="award.badge.curriculumNodes"
+                            @selected="onCodeSelected"
+                        />
                     </p>
                 </template>
 
