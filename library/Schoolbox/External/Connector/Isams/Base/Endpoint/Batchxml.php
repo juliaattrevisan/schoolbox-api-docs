@@ -90,7 +90,7 @@ class Batchxml
                  */
                 $this->nodes = new SimpleXMLElement($xml);
             } catch (\Exception $e) {
-                /* iSAMs can throw you either a plain-jane text string:
+                /* iSAMS can throw you either a plain-jane text string:
                  * "iSAMS blocked the request as it came from an unknown source."
                  *
                  * ...or this beauty:
@@ -110,7 +110,7 @@ class Batchxml
                  *
                  *     Entity: line 1: parser error : Document labelled UTF-16 but has UTF-8 content
                  *
-                 * iSAMs is telling us the wrong encoding. Forcibly rewrite utf-16 into utf-8 which
+                 * iSAMS is telling us the wrong encoding. Forcibly rewrite utf-16 into utf-8 which
                  * is what it really is, when an error message occurs (e.g. invalid api key)
                  */
                 try {
