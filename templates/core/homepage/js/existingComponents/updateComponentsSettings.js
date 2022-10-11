@@ -53,13 +53,13 @@ function initToggleButtons (component) {
         gsap.to(toggleButton, {rotation: buttonRotation, transformOrigin: '20px 20px', duration: ANIMATE_SPEED});
         isOpen(component) ? close(component) : open(component);
     });
-    const emptyStateToggleButton = component.querySelector(`${BUTTON_SELECTOR}.empty-edit`);
-    if (emptyStateToggleButton) {
+    const emptyStateToggleButtons = component.querySelectorAll(`${BUTTON_SELECTOR}.empty-edit`);
+    emptyStateToggleButtons.forEach((emptyStateToggleButton) => {
         emptyStateToggleButton.addEventListener('click', (event) => {
             event.preventDefault();
             isOpen(component) ? close(component) : open(component);
         });
-    }
+    });
 }
 
 /**
