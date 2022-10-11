@@ -131,6 +131,15 @@ HELP;
             $this->getLogger()->debug('iSAMS is using the old credentials format; upgrading it to modern DSN');
         }
     }
+
+
+    /**
+     * @return bool|null
+     */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
 };
 
 /* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
