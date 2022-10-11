@@ -74,7 +74,7 @@ let $modal;
 /**
  * to open the first modal in the sequence
  */
- watch(() => props.isOpen, (isOpen) => {
+watch(() => props.isOpen, (isOpen) => {
     if (isOpen) {
         sequenceIndex.value = 1;
         open();

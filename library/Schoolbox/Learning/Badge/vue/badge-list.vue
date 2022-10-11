@@ -5,6 +5,7 @@ import RevealModal from '@schoolboxVue/components/reveal-modal';
 import SequentialRevealModal from '@schoolboxVue/components/sequential-reveal-modal';
 import BadgeAward from '../Award/vue/badgeAward';
 import BadgeDetail from './badgeDetail';
+import NodeDetails from '@schoolboxCurriculum/vue/node-details';
 import BadgeAchievementWithdrawModal from '../Award/vue/badge-achievement-withdraw-modal';
 import BadgeGoalWithdrawModal from '../Award/vue/badge-goal-withdraw-modal';
 import BadgeImage from './badge-image';
@@ -28,6 +29,7 @@ export default {
         RelativeTime,
         BadgeAward,
         BadgeDetail,
+        NodeDetails,
         BadgeAchievementWithdrawModal,
         BadgeGoalWithdrawModal,
         BadgeImage,
@@ -80,6 +82,7 @@ export default {
             showSkeletonLoader: true,
             selectedFilters: null,
             isDetailModalOpen: false, //whether the modal to display the badge details is open
+            selectedDetailNode: { id: 0 }, //the selected curriculum code to display further details for
             detailModalIndex: 1, //to move to show the selected curriculum code details
         }
     },
@@ -110,7 +113,7 @@ export default {
          * @pararm { object }
          */
         onCodeSelected (node) {
-            console.warn(node.code);
+            this.selectedDetailNode = node;
             this.detailModalIndex++;
         },
 
@@ -411,7 +414,9 @@ export default {
                 />
             </template>
             <template v-slot:sequence-2>
-                <h2>Second reveal</h2>
+                <node-details
+                    :node="selectedDetailNode"
+                />
             </template>
         </sequential-reveal-modal>
 

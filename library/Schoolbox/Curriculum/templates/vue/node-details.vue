@@ -4,7 +4,7 @@
  * To view all details including breadcrumbs and description on a curriculum node
  */
 
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch } from 'vue';
 import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
 // import { getBreadcrumbs } from '@schoolboxCurriclum/js/nodeUtils';
 
@@ -19,20 +19,26 @@ const props = defineProps({
     },
 });
 
+const isActive = ref(false);
 const node = ref(null);
 const isLoading = ref(true);
 const hasLoadError = ref(false);
 
 /**
- *
+ * when there's a new node, we should load all the details to display
  */
-onMounted (() => {
-    node.value = node.value;
-    load();
+watch(() => props.node, (newNode) => {
+    if (newNode.id === 0) {
+        isActive.value = false;
+    } else {
+        node.value = newNode;
+        load();
+        isActive.value = true;
+    }
 });
 
 /**
- *
+ * load al the node details, retrieving the breadcrumbs by loading all the parents
  */
 async function load () {
     try {
@@ -55,7 +61,7 @@ async function load () {
 }
 
 /**
- * @NOTE - temporarily while wait for merge in anothe PR
+ * @NOTE - temporary while wait for merge in another PR
  * Recursively loop through the parents adding in a breadcrumb for each
  *
  * @param { object }
@@ -100,7 +106,7 @@ const breadcrumbs = computed(() => {
 </script>
 
 <template>
-   <div>
+   <div v-if="isActive">
         <h2>{{ title }}</h2>
         <loading-table v-if="isLoading" />
         <template v-else>
