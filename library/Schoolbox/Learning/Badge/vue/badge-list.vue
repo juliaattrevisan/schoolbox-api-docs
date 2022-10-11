@@ -80,6 +80,7 @@ export default {
             showSkeletonLoader: true,
             selectedFilters: null,
             isDetailModalOpen: false, //whether the modal to display the badge details is open
+            detailModalIndex: 1, //to move to show the selected curriculum code details
         }
     },
 
@@ -100,8 +101,17 @@ export default {
          */
         openDetailModal(badge) {
             this.currentBadge = badge;
-            // this.$refs.detailModal.open();
             this.isDetailModalOpen = true;
+        },
+
+        /**
+         * a code has been selected in the detail modal
+         *
+         * @pararm { object }
+         */
+        onCodeSelected (node) {
+            console.warn(node.code);
+            this.detailModalIndex++;
         },
 
         /**
@@ -390,13 +400,18 @@ export default {
         <sequential-reveal-modal
             size="medium"
             :isOpen="isDetailModalOpen"
+            :selected-index="detailModalIndex"
             @closed="onDetailModalClosed"
         >
             <template v-slot:sequence-1>
                 <badge-detail
                     v-if="currentBadge"
                     :badge="currentBadge"
+                    @code-selected="onCodeSelected"
                 />
+            </template>
+            <template v-slot:sequence-2>
+                <h2>Second reveal</h2>
             </template>
         </sequential-reveal-modal>
 

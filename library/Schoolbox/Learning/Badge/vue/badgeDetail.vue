@@ -18,6 +18,7 @@ export default {
             default: null,
         },
     },
+    emits: ['code-selected'], //dispatch to notify of curriculum code selection
     computed: {
         badgeTagNames() {
             if (this.badge?.tags?.length) {
@@ -44,8 +45,8 @@ export default {
          *
          * @pararm { object }
          */
-        onCodeSelected (code) {
-            console.warn(code.name);
+        onCodeSelected (node) {
+            this.$emit('code-selected', node);
         },
     },
 }
