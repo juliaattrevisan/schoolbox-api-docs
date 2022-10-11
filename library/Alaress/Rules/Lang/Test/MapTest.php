@@ -318,30 +318,13 @@ class MapTest extends TestCase
             ['zero0'],
             [],
         ];
-    }
 
-    /**
-     * @dataProvider getTestApplyInvalidPatternData
-     * @covers \Alaress\Rules\Lang\Map::apply
-     *
-     * @param array $map
-     * @param array $inputValue
-     * @param array $expected
-     * @return void
-     */
-    public function testApplyInvalidPattern(array $map, array $inputValue, array $expected): void
-    {
-        $this->expectWarning();
-        $this->assertSame($expected, (new Map('', $map))->apply($inputValue));
-    }
-
-    /**
-     * Data provider for `testApplyInvalidPattern`.
-     *
-     * @return iterable
-     */
-    public function getTestApplyInvalidPatternData(): iterable
-    {
+        // Invalid patterns:
+        // I'd like to raise a warning, but I cannot without having different
+        // behavior when running UPS on the command line and dry run: the CLI
+        // uses the daemon kernel, which throws errors on warning trigger.
+        // (Of course this class shouldn't have any dependency on which kernel
+        //  creates it: undoing said dependency is another problem though.)
         yield 'invalid pattern' => [
             ['{zero' => '1'],
             ['zero'],
@@ -350,7 +333,7 @@ class MapTest extends TestCase
         yield 'valid and invalid patterns: valid patterns still match' => [
             ['{zero' => '1', 'zero' => '2', 'zero0' => '3'],
             ['zero'],
-            ['1'],
+            ['2'],
         ];
     }
 }

@@ -103,7 +103,12 @@ class Map implements Construct
                     // Case-insensitive match vs. pattern
                     $pattern = new Pattern($mapKey);
                     $regexp  = $pattern->toRegex() . 'i';
-                    $isMatch = preg_match($regexp, $input);
+
+                    // Is this an invalid pattern? Skip this map key if so
+                    $isMatch = @preg_match($regexp, $input);
+                    if (preg_last_error() !== PREG_NO_ERROR) {
+                        continue;
+                    }
                 }
 
                 if ($isMatch) {
