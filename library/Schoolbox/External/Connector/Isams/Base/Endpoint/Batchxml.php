@@ -114,7 +114,7 @@ class Batchxml
                  *
                  *     Entity: line 1: parser error : Document labelled UTF-16 but has UTF-8 content
                  *
-                 * isams is telling is the wrong encoding. Forcibly rewrite utf-16 into utf-8 which
+                 * isams is telling us the wrong encoding. Forcibly rewrite utf-16 into utf-8 which
                  * is what it really is, when an error message occurs (e.g. invalid api key)
                  */
                 try {
