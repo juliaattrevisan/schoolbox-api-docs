@@ -54,7 +54,6 @@ class Factory
      * @return Collection
      * @throws RouteNotFound
      * @throws Exception
-     * @see library/Schoolbox/Breadcrumbs::getAssessmentCrumbs() - similar to this function but for www-style pages.
      */
     public function produceFromAssessment(IAssessable $assessment, User $user): Collection
     {
