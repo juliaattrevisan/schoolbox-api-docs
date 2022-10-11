@@ -355,8 +355,9 @@ if (!isset($this->arg[1])) {
  */
 function getBreadcrumbsForQuiz($di, $assessId): array
 {
+    $authorizer        = $di->get('authorizer');
     $assessment        = $di->get('assessmentDataSource')->findByQuizId($assessId, null);
-    $breadcrumbFactory = new BreadcrumbFactory($di->get('router'), $di->get('authorizer'), Access::getInstance());
+    $breadcrumbFactory = new BreadcrumbFactory($di->get('router'), $authorizer, Access::getInstance());
     $breadcrumbs       = $breadcrumbFactory->produceFromAssessment($assessment, $_SESSION['user']);
     $breadcrumbsArray  = [];
 
@@ -368,6 +369,26 @@ function getBreadcrumbsForQuiz($di, $assessId): array
             'class' => ''
         ];
     }
+
+    // This is the breadcrumb for the quiz itself.
+    $breadcrumbsArray[] = [
+        'text'  => $assessment->getTitle(),
+        'class' => '',
+        'href'  => (
+            // In some circumstances the user will not be authorised to view the 'status' page.  In that case, show the 'summary' page instead.
+            $authorizer->isPathAuthorizedForUser(
+                'learningAssessment.getStatus',
+                [
+                    'assessment'   => $assessment,
+                    'assessmentId' => $assessment->getId(),
+                    'studentId'    => $_SESSION['user']->getId(),
+                ],
+                $_SESSION['user']
+            ) ?
+            "/learning/assessments/{$assessment->getId()}/status" :
+            "/learning/assessments/{$assessment->getId()}"
+        )
+    ];
 
     return $breadcrumbsArray;
 }
