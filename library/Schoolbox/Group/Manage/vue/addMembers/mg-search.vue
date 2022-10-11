@@ -110,6 +110,7 @@ const debounceSearch = debounce(() => {
 <template>
    <div ref="searchEl">
        <input
+            id="search-text"
             type="text"
             v-model="searchStore.query"
             :placeholder="inputPlaceholder"

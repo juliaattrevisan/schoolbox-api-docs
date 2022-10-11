@@ -20,7 +20,8 @@ class DueWorkInitialCest
         $i->login('alaress', 'alaress');
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resource/folder/0/create");
         $i->selectOption("template", "Blank");
-        $i->fillField(['name' => 'name'], 'Test Class Homepage');
+        $folderName = 'Test Class Homepage ' . time();
+        $i->fillField(['name' => 'name'], $folderName);
         $i->click(['css' => 'label[class=radio-label][for=groupWrite1]']);
         $i->click(['css' => 'label[class=radio-label][for=groupWrite2]']);
         $i->click(['css' => 'label[class=radio-label][for=groupRead3]']);
@@ -30,8 +31,8 @@ class DueWorkInitialCest
 
         // Navigate to the new folder, store its location for later tests
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
-        $i->canSee("Test Class Homepage");
-        $i->click("Test Class Homepage");
+        $i->canSee($folderName);
+        $i->click($folderName);
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
         $this->home_page_url = $i->getCurrentUrl();
@@ -39,17 +40,17 @@ class DueWorkInitialCest
         $i->click('a#all-actions.icon-more');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
         $i->waitForText("Manage Group", 5);
+        $i->clickWithLeftButton('#search-text');
+        $i->fillField('input#search-text', $student);
+        $i->checkOption('button.search-result input');
         $i->click('Add Members');
-        $i->clickWithLeftButton('div.selectize-input.items.not-full');
-        $i->pressKey('div.selectize-input.items.not-full input', $student);
         sleep(1);
-        $i->pressKey('div.selectize-input.items.not-full input', WebDriverKeys::ENTER);
-        $i->clickWithLeftButton('div.selectize-input.items.not-full');
-        $i->pressKey('div.selectize-input.items.not-full input', $teacher);
+        $i->clickWithLeftButton('#search-text');
+        $i->fillField('input#search-text', $teacher);
+        $i->checkOption('button.search-result input');
+        $i->click('Add Members');
         sleep(1);
-        $i->pressKey('div.selectize-input.items.not-full input', WebDriverKeys::ENTER);
-        $i->click('input[type=submit][value=Add\ Users]');
-        $i->click('label.input-toggle[for=accessLevel-22-3]');
+        $i->selectOption('tr.VueTables__row:first-child select', 'admin');
         sleep(5);
         $i->amOnUrl($this->home_page_url);
         $i->click(['css' => 'label[for=component-lock-toggle]']);
