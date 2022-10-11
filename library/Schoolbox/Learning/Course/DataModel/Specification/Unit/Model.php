@@ -150,7 +150,7 @@ class Model extends AbstractUnit
      */
     public function getBreadcrumbs(): Collection
     {
-        $breadcrumbs    = new Collection;
+        $breadcrumbs    = new Collection();
         $unitSpecFolder = $this->getFolder();
 
         $breadcrumbs->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]);
