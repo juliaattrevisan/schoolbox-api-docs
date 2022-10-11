@@ -35,7 +35,7 @@
 
                                     <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': studentId, 'recordId': recordId}) }}">
                                         <h3>{{ record.heading }}
-                                            {% if config.pastoral_severity == true and record.severity and record.severity.color %}
+                                            {% if config.pastoral_severity == true and record.severity.color %}
                                                 <span class="circle" style="background-color:{{ record.severity.color }}" title="{{ record.severity.name }}"></span>
                                             {% endif %}
                                         </h3>

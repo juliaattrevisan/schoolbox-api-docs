@@ -733,7 +733,7 @@ class Controller extends Base
     private function getSeverityColors(): array
     {
         $severityColors = [];
-        $severities     = $this->pastoralSeverityMapper->findAll()->indexBy('id');
+        $severities     = $this->pastoralSeverityMapper->findAll(['deleted' => true])->indexBy('id');
         $transformer    = new ColorHelper();
         $colorFactory   = $transformer->getColorFactory();
         foreach ($severities as $severityId => $severity) {
