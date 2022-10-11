@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\ClassReport;
 
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -108,6 +107,9 @@ class FilterHelper
 
         $hardcodedFilters = [
             Filter\Filters\Pastoral\Student\Definition::class => array_combine($studentIds, $studentIds),
+        ];
+        $hardcodedFilters = [
+            Filter\Filters\Pastoral\Student\Definition::class => []
         ];
 
         // Find pastoral records
