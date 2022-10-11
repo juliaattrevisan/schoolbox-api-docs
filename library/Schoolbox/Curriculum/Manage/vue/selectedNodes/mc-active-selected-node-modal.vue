@@ -6,21 +6,18 @@
 
 import { ref, computed, watch } from 'vue';
 import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
-// import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
-import SequentialRevealModal from '@schoolboxVue/components/sequential-reveal-modal.vue';
+import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
 
 
 const selectedNodesStore = useSelectedNodesStore();
 const modalEl = ref(null);
-const isModalActive = ref(false);
-const activeModalIndex = ref(1);
 
 /**
  * to open the modal when requested
  */
 watch(() => selectedNodesStore.hasActiveNode, (hasActiveNode) => {
     if (hasActiveNode) {
-        isModalActive.value = true;
+        modalEl.value.open()
     }
 });
 
@@ -55,38 +52,23 @@ const breadcrumbs = computed(() => {
  * close the modal, setting the activeNode to null so we can allow another selection
  */
 function onModalClosed () {
-    isModalActive.value = false;
-    activeModalIndex.value = 1;
     selectedNodesStore.setActiveNode(null);
-}
-
-/**
- *
- */
-function onShowNext () {
-    activeModalIndex.value++;
 }
 
 </script>
 
 <template>
-    <sequential-reveal-modal
+    <reveal-modal
         ref="modalEl"
         size="large"
-        :is-active="isModalActive"
-        :selected-index="activeModalIndex"
         @closed="onModalClosed"
     >
-        <template v-slot:reveal-1 v-if="selectedNodesStore.hasActiveNode">
+        <template v-if="selectedNodesStore.hasActiveNode">
             <h2>{{ title }}</h2>
             <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
-            <a class="button submit" @click="onShowNext">Show me Reveal #2</a>
             <div v-html="selectedNodesStore.activeNode.description"></div>
         </template>
-        <template v-slot:reveal-2 v-if="selectedNodesStore.hasActiveNode">
-            <h2>Second reveal</h2>
-        </template>
-    </sequential-reveal-modal>
+    </reveal-modal>
 </template>
 
 <style scoped>
