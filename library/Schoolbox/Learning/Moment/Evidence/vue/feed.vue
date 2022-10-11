@@ -7,6 +7,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 import BadgeImage from "../../../Badge/vue/badge-image";
+import CodesList from '@schoolboxCurriculum/vue/codes-list';
 import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import userProfileConstants from '../../../vue/user-profile/constants';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
@@ -21,6 +22,7 @@ export default {
         Storage,
         CommentThread,
         BadgeImage,
+        CodesList,
     },
     mixins: [
         foundationMixin,
@@ -242,6 +244,15 @@ export default {
             return dayjs(date).format(format);
         },
 
+        /**
+         * to open up the description modal
+         *
+         * @pararm { object }
+         */
+        onCodeSelected (node) {
+            console.warn(node.code);
+        },
+
     },
 
 }
@@ -318,10 +329,10 @@ export default {
                                 <div class="tags">
                                   <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
                                       Tags:
-                                      <template v-for="(curriculumNode, index) in evidence.object.curriculumNodes" :key="`${index}-${curriculumNode.code}`">
-                                          <template v-if="index !== 0">, </template>
-                                          <span :title="curriculumNode.name">{{ curriculumNode.code }}</span>
-                                      </template>
+                                      <codes-list
+                                            :nodes="evidence.object.curriculumNodes"
+                                            @selected="onCodeSelected"
+                                        />
                                       <template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
                                       <template v-for="(tag, index) in evidence.object.tags" :key="`${index}-${tag.name}`">
                                           <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
