@@ -131,7 +131,6 @@ export default {
          */
         open (award) {
             this.award = award;
-            // this.$refs.modal.open();
             this.isModalOpen = true;
             this.modelCheckInterval = setInterval(this.onModalCheck, 50); //be checking if the modal is on screen yet
         },
@@ -219,8 +218,6 @@ export default {
                 .catch(() => {
                     this.toastError('Failed to award achievement')
                 })
-
-            // this.$refs.modal.close();
             this.isModalOpen = false;
         },
 

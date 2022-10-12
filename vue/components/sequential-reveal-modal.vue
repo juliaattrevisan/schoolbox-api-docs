@@ -79,6 +79,8 @@ watch(() => props.isOpen, (isOpen) => {
         sequenceIndex.value = 1;
         open();
         addCloseListener();
+    } else if (!isOpen) { //this can also be toggled when emit('closed') is dispatched, however if the modal is already closed nothing will happen
+        close();
     }
 });
 
