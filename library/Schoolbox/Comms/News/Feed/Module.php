@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Authorizer;
 use Schoolbox\Mapper;
@@ -105,7 +106,7 @@ class Module extends BaseModule
         try {
             return ['user' => $this->getUserMapper()->findOneByColumn('key', $params['key'])];
         } catch (MapperException $e) {
-            throw new Unauthorized("No user found for key: '{$params['key']}'", $e->getCode(), $e);
+            throw new NotFound("No user found for key: '{$params['key']}'", $e->getCode(), $e);
         }
     }
 
@@ -127,7 +128,7 @@ class Module extends BaseModule
         try {
             return ['folder' => $this->getFolderMapper()->findOneByColumn('id', $params['folderId'])];
         } catch (MapperException $e) {
-            throw new Unauthorized("No folder found for id: '{$params['folderId']}'", $e->getCode(), $e);
+            throw new NotFound("No folder found for id: '{$params['folderId']}'", $e->getCode(), $e);
         }
     }
 
