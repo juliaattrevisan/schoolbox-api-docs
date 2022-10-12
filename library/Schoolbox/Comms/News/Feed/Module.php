@@ -58,6 +58,10 @@ class Module extends BaseModule
         // Must be SU, or have News service READ+ perm, or READ+ access to folder
         $canReadFolderNews = new Rule\LazyCallback(static function () {
             return new Rule\Callback(static function (array $params): bool {
+                if (!array_key_exists('user', $params)) {
+                    throw new InvalidArgumentException("Expected array key 'user' does not exist.");
+                }
+
                 /** @var User $user */
                 $user = $params['user'];
 
