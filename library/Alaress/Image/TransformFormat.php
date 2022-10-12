@@ -77,7 +77,11 @@ class TransformFormat
     {
         // Check if the mime type passed in matches one of the allowed formats.
         // Remove the unregistered tree designation if it's there, too.
-        $mime = str_replace(self::UNREGISTERED_TREE_SEARCH, self::UNREGISTERED_TREE_REPLACE, strtolower($mime));
+        $mime = str_replace(
+            self::UNREGISTERED_TREE_SEARCH,
+            self::UNREGISTERED_TREE_REPLACE,
+            trim(strtolower($mime)),
+        );
         if (array_key_exists($mime, self::FORMAT_MAP)) {
             $this->format = self::FORMAT_MAP[$mime];
         } else {

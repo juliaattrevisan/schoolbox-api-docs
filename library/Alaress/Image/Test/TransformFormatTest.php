@@ -11,6 +11,7 @@ namespace Alaress\Image\Test;
 
 use Alaress\Image\TransformFormat;
 use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
 /**
  * @covers \Alaress\Image\TransformFormat
@@ -90,6 +91,20 @@ class TransformFormatTest extends TestCase
             'image/svg+xml',
             'svg',
             'image/svg+xml',
+        ];
+
+        // Case-insensitive test
+        yield 'iMagE/jPeg' => [
+            'iMagE/jPeg',
+            'jpg',
+            'image/jpeg',
+        ];
+
+        // Trim test
+        yield 'image/jpeg with leading/trailing space' => [
+            ' image/jpeg ',
+            'jpg',
+            'image/jpeg',
         ];
 
         // Supported mimetypes with proper unregistered tree (x.) prefix
@@ -195,5 +210,39 @@ class TransformFormatTest extends TestCase
             'svg',
             'image/svg+xml',
         ];
+    }
+    /**
+     * @dataProvider getTestConstructInvalidMimetypeData
+     * @covers \Alaress\Image\TransformFormat::__construct
+     *
+     * @param string $mime
+     * @return void
+     */
+    public function testConstructInvalidMimetype(string $mime): void
+    {
+        $this->expectException(UnexpectedValueException::class);
+        new TransformFormat($mime);
+    }
+
+    /**
+     * Data provider for `testConstructInvalidMimetype`
+     *
+     * @return iterable
+     */
+    public function getTestConstructInvalidMimetypeData(): iterable
+    {
+        // PSD files are unsupported
+        yield 'application/x-photoshop' => ['application/x-photoshop'];
+        yield 'application/photoshop' => ['application/photoshop'];
+        yield 'application/psd' => ['application/psd'];
+        yield 'image/psd' => ['image/psd'];
+        yield 'image/vnd.adobe.photoshop' => ['image/vnd.adobe.photoshop'];
+
+        // Unsupported other types
+        yield 'text/plain' => ['text/plain'];
+        yield 'application/octet-stream' => ['application/octet-stream'];
+
+        // Totally invalid mimetypes
+        yield 'invalid' => ['invalid'];
     }
 }
