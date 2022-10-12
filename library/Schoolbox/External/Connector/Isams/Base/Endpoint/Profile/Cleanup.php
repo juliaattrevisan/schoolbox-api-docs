@@ -37,6 +37,12 @@ class Cleanup implements IStrategy
 
 
     /**
+     * @var bool
+     */
+    private bool $includePhoto;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private UserProfile\Mapper $baseProfileMapper;
@@ -77,6 +83,7 @@ class Cleanup implements IStrategy
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
+     * @param bool                            $includePhoto
      * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -87,6 +94,7 @@ class Cleanup implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        bool $includePhoto,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -96,7 +104,7 @@ class Cleanup implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
-
+        $this->includePhoto = $includePhoto;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
@@ -111,7 +119,6 @@ class Cleanup implements IStrategy
      */
     public function import(): void
     {
-
         /* Only remove profiles if we're performing
          */
         if ($this->perform) {
@@ -134,9 +141,14 @@ class Cleanup implements IStrategy
 
             $this->log->info("Removed {$orphans} orphaned profiles.");
 
-            $this->photoDownloader->cleanup();
+            /* Only try to clean up photos if we actually tried to import them
+             * Otherwise leave this place untouched
+             */
+            if ($this->includePhoto) {
+                $this->photoDownloader->cleanup();
 
-            $this->log->info("Removed residual files from isams cache dir.");
+                $this->log->info("Removed residual photos and zip files from isams cache dir.");
+            }
         }
     }
 }

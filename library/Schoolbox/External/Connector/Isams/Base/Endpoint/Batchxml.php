@@ -27,6 +27,11 @@ use SimpleXMLElement;
  */
 class Batchxml
 {
+    /**
+     * A surety for maximum length of error messages.
+     */
+    private const MAX_ERROR_MESSAGE_LENGTH = 255;
+
 
     /**
      * @var IApi
@@ -72,18 +77,63 @@ class Batchxml
          * $this->printXml(true);
          */
         if (!$this->nodes) {
-            $xml = $this->api->retrieveDocument();
+            $xml = trim($this->api->retrieveDocument());
 
-            if (strpos($xml, '<') !== 0) {
-                throw new RuntimeException($xml);
-            }
-
+            /* Test if $xml is actually xml, or some other random jank
+             *
+             * Specifically catch root level exception since SimpleXmlElement throws
+             * them. It also circumstantially captures all other Exception subclasses
+             */
             try {
+                /* If this succeeds, $xml is the actual isams batch xml contents
+                 * and we're good to go
+                 */
                 $this->nodes = new SimpleXMLElement($xml);
             } catch (\Exception $e) {
-                /* iSAMS returned some sort of error message, not xml
+                /* iSAMS can throw you either a plain-jane text string:
+                 * "iSAMS blocked the request as it came from an unknown source."
+                 *
+                 * ...or this beauty:
+                 *
+                    <?xml version="1.0" encoding="utf-16"?>
+                    <Message>
+                      <MessageId>MissingParameter</MessageId>
+                      <MessageName>MissingParameter</MessageName>
+                      <Title>Missing Field: apiKey</Title>
+                      <Description>A required field "apiKey" was not supplied or was in an incorrect format.</Description>
+                    </Message>
+
+                 * Which means we have to try to load *that* as xml next.
+                 *
+                 * Severe Warning:
+                 * SimpleXml will tell you "String could not be parsed as XML" because of this:
+                 *
+                 *     Entity: line 1: parser error : Document labelled UTF-16 but has UTF-8 content
+                 *
+                 * iSAMS is telling us the wrong encoding. Forcibly rewrite utf-16 into utf-8 which
+                 * is what it really is, when an error message occurs (e.g. invalid api key)
                  */
-                throw new RuntimeException("{$e->getMessage()}\n\n{$xml}");
+                try {
+                    $errorXml = str_replace('utf-16', 'utf-8', $xml);
+
+                    /* Shank out the Description
+                     */
+                    $errorNodes = new SimpleXMLElement($errorXml);
+
+                    $errorMessage = (string)$errorNodes->xpath('/Message')[0]->Description;
+                } catch (\Exception $e) {
+                    /* Some non-xml returned from isams: use it as-is
+                     */
+                    $errorMessage = $e->getMessage();
+                }
+
+                /* If it's longer than 255, truncate it for the log
+                 */
+                $errorMessage = mb_substr(trim($errorMessage), 0, self::MAX_ERROR_MESSAGE_LENGTH, 'utf-8');
+
+                /* Announce whatever error message we might have found
+                 */
+                throw new RuntimeException($errorMessage);
             }
         }
 

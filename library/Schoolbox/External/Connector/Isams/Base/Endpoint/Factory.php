@@ -289,6 +289,7 @@ class Factory
             ->add(new Profile\Cleanup(
                 $this->log,
                 $this->perform,
+                $this->includePhoto,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
