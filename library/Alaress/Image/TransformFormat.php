@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Image;
 
 use UnexpectedValueException;
