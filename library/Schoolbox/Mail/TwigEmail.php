@@ -26,26 +26,11 @@ use Alaress\Html\ToText as Html2Text;
  */
 class TwigEmail extends Mailer
 {
-    /**
-     * @var array
-     */
     protected array $coreContext = [];
-
-    /**
-     * @var CssToInlineStyles
-     */
     protected CssToInlineStyles $cssInliner;
-
-    /** @var Environment|null */
     protected ?Environment $twig = null;
-
-    /** @var array */
     protected array $context = [];
-
-    /** @var string */
     protected string $templateFilename;
-
-    /** @var string */
     protected string $rendercache = '';
 
     /**
@@ -165,7 +150,7 @@ class TwigEmail extends Mailer
      *
      * @param string $subject
      */
-    public function setSubject(string $subject)
+    public function setSubject(string $subject): void
     {
         parent::setSubject($subject);
         $this->setCoreContext(['config' => ['subject' => $subject]]);
