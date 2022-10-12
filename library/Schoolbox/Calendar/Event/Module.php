@@ -63,6 +63,10 @@ class Module extends BaseModule
                 new Any(
                     new IsSuperuser(),
                     new Callback(function (array $params) {
+                        if (!array_key_exists('event', $params)) {
+                            throw new InvalidArgumentException("Expected array key 'event' does not exist.");
+                        }
+
                         /** @var Event $event */
                         $event = $params['event'];
 
