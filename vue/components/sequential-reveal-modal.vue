@@ -24,9 +24,9 @@ const props = defineProps({
         default: false,
     },
     /**
-     * The newly requested sequential index
+     * The requested sequence index
      */
-    selectedIndex: {
+    sequenceIndex: {
         type: Number,
         default: 1,
     },
@@ -67,7 +67,7 @@ const props = defineProps({
 const emit = defineEmits(['closed']);
 const uuid = generateUUID();
 const elementId = ref(`reveal-modal-${uuid}`);
-const sequenceIndex = ref(props.selectedIndex); //to help track the current sequence index
+const sequenceIndex = ref(props.sequenceIndex); //to help track the current sequence index independant of the prop
 const isNextSelected = ref(false); //to determine whether we need to move to the next in sequence
 let $modal;
 
@@ -88,8 +88,8 @@ watch(() => props.isOpen, (isOpen) => {
  * the next in the sequence has been selected,
  * so close the current so we can move to the next
  */
-watch(() => props.selectedIndex, (selectedIndex) => {
-    if (sequenceIndex.value != selectedIndex) {
+watch(() => props.sequenceIndex, (newSequenceIndex) => {
+    if (sequenceIndex.value != newSequenceIndex) {
         isNextSelected.value = true;
         sequenceIndex.value++;
         close();

@@ -277,11 +277,10 @@ export default {
 }
 </script>
 <template>
-    <!-- <reveal-modal ref="modal" size="medium" @closed="onModalClosed"> -->
     <sequential-reveal-modal
         size="medium"
         :isOpen="isModalOpen"
-        :selected-index="modalIndex"
+        :sequence-index="modalIndex"
         @closed="onModalClosed"
     >
         <template v-slot:sequence-1>

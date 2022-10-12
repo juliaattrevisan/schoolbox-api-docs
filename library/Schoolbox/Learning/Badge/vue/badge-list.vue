@@ -403,7 +403,7 @@ export default {
         <sequential-reveal-modal
             size="medium"
             :isOpen="isDetailModalOpen"
-            :selected-index="detailModalIndex"
+            :sequence-index="detailModalIndex"
             @closed="onDetailModalClosed"
         >
             <template v-slot:sequence-1>
