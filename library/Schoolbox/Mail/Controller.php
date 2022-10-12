@@ -249,8 +249,8 @@ class Controller extends Base
                 if (!$toEmail->isValid()) {
                     $this->sendError('Your email address is not valid.');
                 }
-                $mail->setTo(new Address($toUser->getEmail()));
-            } catch (MapperException $e) {
+                $mail->setTo(new Address($toUser->getEmail(), $toUser->formatName()));
+            } catch (MapperException | RfcComplianceException | LogicException $e) {
                 $this->sendError('Your email address is not valid.');
             }
         } else {
@@ -266,7 +266,11 @@ class Controller extends Base
         //check if its got no to address but has either cc or bcc
         //put the users email in the to field
         if (!stristr($to, '@') && ($bcc || $cc)) {
-            $mail->setTo(new Address($this->getUser()->getEmail(), $to));
+            try {
+                $mail->setTo(new Address($this->getUser()->getEmail(), $to));
+            } catch (RfcComplianceException | LogicException $e) {
+                $this->sendError('Your email address is not valid.');
+            }
         }
 
         //create email header

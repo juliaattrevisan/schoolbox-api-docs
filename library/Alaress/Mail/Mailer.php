@@ -42,26 +42,18 @@ class Mailer
 
     /**
      * Instance of mail transporter.
-     *
-     * @var TransportInterface
      */
-    protected static $transport;
+    protected static TransportInterface $transport;
 
-    /** @var Email */
     protected Email $email;
 
     /**
      * List of headers that are added to the email that is sent.
-     *
-     * @var array
      */
     protected array $headers;
 
-    /** @var LoggerInterface */
     protected LoggerInterface $log;
-
     protected IConfigLoader $config;
-
     protected Mapper $dkimMapper;
 
     /**
@@ -71,7 +63,6 @@ class Mailer
 
     /**
      * System default from address
-     * @var Address
      */
     private Address $systemFrom;
 
@@ -82,6 +73,7 @@ class Mailer
      * @param Address|User|null $to
      * @param IConfigLoader             $config
      * @param Mapper                    $dkimMapper
+     * @throws RfcComplianceException
      */
     public function __construct(string $subject, Address | User | null $to, IConfigLoader $config, Mapper $dkimMapper)
     {
@@ -106,13 +98,11 @@ class Mailer
 
 
     /**
-     * @param LoggerInterface $logger
-     * @return static
+     * Provide a log interface to send mail sending errors to
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): self
     {
         $this->log = $logger;
-
         return $this;
     }
 
@@ -120,9 +110,10 @@ class Mailer
     /**
      * Set To
      * @param Address | User | null $to
+     * @throws RfcComplianceException
      * @return void
      */
-    public function setTo(Address | User | null $to)
+    public function setTo(Address | User | null $to): void
     {
         if ($to instanceof User) {
             if (!$to->getEmail()) {
@@ -137,9 +128,8 @@ class Mailer
     /**
      * Set CC
      * @param Address $cc
-     * @return void
      */
-    public function setCc(Address $cc)
+    public function setCc(Address $cc): void
     {
         $this->email->addCc($cc);
     }
@@ -147,9 +137,8 @@ class Mailer
     /**
      * Set BCC
      * @param Address $bcc
-     * @return void
      */
-    public function setBcc(Address $bcc)
+    public function setBcc(Address $bcc): void
     {
         $this->email->addBcc($bcc);
     }
@@ -157,9 +146,8 @@ class Mailer
     /**
      * Set subject
      * @param string $subject
-     * @return void
      */
-    public function setSubject(string $subject)
+    public function setSubject(string $subject): void
     {
         $this->email->subject($subject);
     }
@@ -176,9 +164,8 @@ class Mailer
     /**
      * Set text
      * @param string $text
-     * @return void
      */
-    public function setText(string $text)
+    public function setText(string $text): void
     {
         $this->email->text($text);
     }
@@ -186,9 +173,8 @@ class Mailer
     /**
      * Set html
      * @param string $html
-     * @return void
      */
-    public function setHtml(string $html)
+    public function setHtml(string $html): void
     {
         $this->email->html($html);
     }
@@ -197,7 +183,7 @@ class Mailer
      * Set from
      * @param Address $address
      */
-    public function setFrom(Address $address)
+    public function setFrom(Address $address): void
     {
         $this->email->from($address);
         $this->email->returnPath($address);
@@ -207,7 +193,7 @@ class Mailer
      * Set the reply-to header
      * @param Address $address
      */
-    public function addReplyTo(Address $address)
+    public function addReplyTo(Address $address): void
     {
         $this->email->addReplyTo($address);
     }
@@ -215,9 +201,8 @@ class Mailer
     /**
      * Set date
      * @param \DateTimeInterface $date
-     * @return void
      */
-    public function setDate(\DateTimeInterface $date)
+    public function setDate(\DateTimeInterface $date): void
     {
         $this->email->date($date);
     }
@@ -228,9 +213,8 @@ class Mailer
      * @param string      $type
      * @param string|null $filename
      * @param bool        $isFile
-     * @return void
      */
-    public function addFile($file, $type = 'text/plain', $filename = '', $isFile = true)
+    public function addFile($file, $type = 'text/plain', $filename = '', $isFile = true): void
     {
         // add attachment to email
         if ($isFile) {
@@ -246,25 +230,21 @@ class Mailer
      * @param string|null $type
      * @return Email
      */
-    public function addImage($file, $type = 'application/octet')
+    public function addImage($file, $type = 'application/octet'): Email
     {
         //add inline image to email
         // Returns a string so its source can be used later
         return $this->email->embed($file, null, $type);
     }
 
-    /**
-     * @return string
-     */
-    protected function composeHTML()
+
+    protected function composeHTML(): string
     {
         return (string)$this->email->getHtmlBody();
     }
 
-    /**
-     * @return string
-     */
-    protected function composePlain()
+
+    protected function composePlain(): string
     {
         return (string)$this->email->getTextBody();
     }
@@ -272,7 +252,7 @@ class Mailer
     /**
      * Encodes email in base64 rather than quoted printable.
      */
-    public function encodeBase64()
+    public function encodeBase64(): void
     {
         $this->encodeBase64 = true;
     }
@@ -281,7 +261,7 @@ class Mailer
      * Encode with base64, if specified
      * @return void
      */
-    private function encode()
+    private function encode(): void
     {
         if (!$this->encodeBase64) {
             return;
@@ -310,7 +290,7 @@ class Mailer
      * @return bool
      * @throws TransportExceptionInterface
      */
-    public function send()
+    public function send(): bool
     {
         // construct body and set headers
         $this->email->text($this->composePlain());
@@ -336,7 +316,7 @@ class Mailer
      * This is intended for use in time-sensitive requests, where it should not
      * be possible to infer from the request time whether an email was sent.
      */
-    public function sendToBlackhole()
+    public function sendToBlackhole(): void
     {
         // This has to be sent somewhere
         $this->email->to(new Address('devnull@blackhole'));
@@ -362,7 +342,7 @@ class Mailer
      * @return bool
      * @throws TransportExceptionInterface if not send after `$retries` attempts
      */
-    private function trySend($retries = 0, $reinitialise = false)
+    private function trySend($retries = 0, $reinitialise = false): bool
     {
         // create transport and send email
         try {
