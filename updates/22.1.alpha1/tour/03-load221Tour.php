@@ -19,8 +19,12 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        if($this->getConfig()->get('pastoral_enabled')) {
-            passthru('php ' . __DIR__ .  '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour-pastoral.yaml', $returnVar);
+
+        if(strtolower($this->getConfig()->get('site_plan')) === 'elite') {
+            passthru('php ' . __DIR__ .  '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour-elite.yaml', $returnVar);
+        }
+        if(strtolower($this->getConfig()->get('site_plan')) === 'pro') {
+            passthru('php ' . __DIR__ .  '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour-pro.yaml', $returnVar);
         }
         else {
             passthru('php ' . __DIR__ .  '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour.yaml', $returnVar);
