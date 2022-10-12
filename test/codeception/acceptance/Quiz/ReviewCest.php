@@ -25,9 +25,7 @@ use Page\Quiz\SectionForm;
 use Page\Quiz\AssessmentPage;
 
 use Page\Quiz\AttemptForm;
-use Page\Quiz\QuestionForm;
 use Page\Common;
-use Codeception\Util\Locator;
 use Exception;
 
 /**
@@ -43,6 +41,15 @@ class ReviewCest
      */
     public function _before(AcceptanceTester $i)
     {
+        // Removing Quiz component on class 83, so that we can re-add it in the test script
+        $componentInstanceMapper = \Component_InstanceMapper::getInstance();
+        $componentInstanceList   = $componentInstanceMapper->findByContext('homepage', 83);
+        foreach ($componentInstanceList as $componentInstance) {
+            if ($componentInstance->getDefinition()->getClass() === \Schoolbox\Learning\Assessment\Quiz\Component\Homepage\Controller::class) {
+                $componentInstanceMapper->delete($componentInstance);
+            }
+        }
+
         $i->logout();
         $i->loginAsAdmin();
     }
