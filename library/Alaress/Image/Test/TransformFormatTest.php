@@ -91,5 +91,109 @@ class TransformFormatTest extends TestCase
             'svg',
             'image/svg+xml',
         ];
+
+        // Supported mimetypes with proper unregistered tree (x.) prefix
+        yield 'image/x.heif (transforms to jpg)' => [
+            'image/x.heif',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x.heic (transforms to jpg)' => [
+            'image/x.heic',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x.tiff (transforms to jpg)' => [
+            'image/x.tiff',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x.jpeg' => [
+            'image/x.jpeg',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x.bmp (transforms to jpg)' => [
+            'image/x.bmp',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x.pjpeg (transforms to jpg)' => [
+            'image/x.pjpeg',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x.gif' => [
+            'image/x.gif',
+            'gif',
+            'image/gif',
+        ];
+        yield 'image/x.png' => [
+            'image/x.png',
+            'png',
+            'image/png',
+        ];
+        yield 'image/x.webp' => [
+            'image/x.webp',
+            'webp',
+            'image/webp',
+        ];
+        yield 'image/x.svg+xml' => [
+            'image/x.svg+xml',
+            'svg',
+            'image/svg+xml',
+        ];
+
+        // Supported mimetypes with improper unregistered tree (x-) prefix
+        yield 'image/x-heif (transforms to jpg)' => [
+            'image/x-heif',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x-heic (transforms to jpg)' => [
+            'image/x-heic',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x-tiff (transforms to jpg)' => [
+            'image/x-tiff',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x-jpeg' => [
+            'image/x-jpeg',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x-bmp (transforms to jpg)' => [
+            'image/x-bmp',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x-pjpeg (transforms to jpg)' => [
+            'image/x-pjpeg',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x-gif' => [
+            'image/x-gif',
+            'gif',
+            'image/gif',
+        ];
+        yield 'image/x-png' => [
+            'image/x-png',
+            'png',
+            'image/png',
+        ];
+        yield 'image/x-webp' => [
+            'image/x-webp',
+            'webp',
+            'image/webp',
+        ];
+        yield 'image/x-svg+xml' => [
+            'image/x-svg+xml',
+            'svg',
+            'image/svg+xml',
+        ];
     }
 }
