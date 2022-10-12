@@ -166,8 +166,6 @@ function package() {
   echo "[] Copy deb files to package-artifacts"
   cp -vf ../*.deb "$ARTIFACT_DIR"
 
-  cd "$INST_DIR"
-
   echo "Creating package tarball"
   cd "$INITIAL_DIR"
   if ! tar czf package.tar.gz "$ARTIFACT_DIR"; then
