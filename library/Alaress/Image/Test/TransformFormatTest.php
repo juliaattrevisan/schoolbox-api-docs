@@ -67,6 +67,16 @@ class TransformFormatTest extends TestCase
             'jpg',
             'image/jpeg',
         ];
+        yield 'image/bmp2 (transforms to jpg)' => [
+            'image/bmp2',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/bmp3 (transforms to jpg)' => [
+            'image/bmp3',
+            'jpg',
+            'image/jpeg',
+        ];
         yield 'image/pjpeg (transforms to jpg)' => [
             'image/pjpeg',
             'jpg',
@@ -133,6 +143,16 @@ class TransformFormatTest extends TestCase
             'jpg',
             'image/jpeg',
         ];
+        yield 'image/x.bmp2 (transforms to jpg)' => [
+            'image/x.bmp2',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x.bmp3 (transforms to jpg)' => [
+            'image/x.bmp3',
+            'jpg',
+            'image/jpeg',
+        ];
         yield 'image/x.pjpeg (transforms to jpg)' => [
             'image/x.pjpeg',
             'jpg',
@@ -182,6 +202,16 @@ class TransformFormatTest extends TestCase
         ];
         yield 'image/x-bmp (transforms to jpg)' => [
             'image/x-bmp',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x-bmp2 (transforms to jpg)' => [
+            'image/x-bmp2',
+            'jpg',
+            'image/jpeg',
+        ];
+        yield 'image/x-bmp3 (transforms to jpg)' => [
+            'image/x-bmp3',
             'jpg',
             'image/jpeg',
         ];
