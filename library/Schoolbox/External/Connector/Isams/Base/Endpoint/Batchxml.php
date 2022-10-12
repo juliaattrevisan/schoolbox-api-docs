@@ -120,17 +120,20 @@ class Batchxml
                      */
                     $errorNodes = new SimpleXMLElement($errorXml);
 
-                    $errorMessage = trim((string)$errorNodes->xpath('/Message')[0]->Description);
+                    $errorMessage = (string)$errorNodes->xpath('/Message')[0]->Description;
                 } catch (\Exception $e) {
-                    /* Some non-xml returned from isams: use it as-is but
-                     * if it's longer than 255, truncate it for the log
+                    /* Some non-xml returned from isams: use it as-is
                      */
-                    $errorMessage = mb_substr($e->getMessage(), 0, self::MAX_ERROR_MESSAGE_LENGTH, 'utf-8');
+                    $errorMessage = $e->getMessage();
                 }
+
+                /* If it's longer than 255, truncate it for the log
+                 */
+                $errorMessage = mb_substr(trim($errorMessage), 0, self::MAX_ERROR_MESSAGE_LENGTH, 'utf-8');
 
                 /* Announce whatever error message we might have found
                  */
-                throw new RuntimeException(trim($errorMessage));
+                throw new RuntimeException($errorMessage);
             }
         }
 
