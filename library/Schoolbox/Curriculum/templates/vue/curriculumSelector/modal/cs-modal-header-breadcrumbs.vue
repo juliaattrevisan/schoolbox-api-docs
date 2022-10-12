@@ -5,10 +5,12 @@
  * move backwards through the tree
  */
 
+import { shortenLength } from '@js/util/stringUtils';
 import { useModalActiveNodesStore } from '../store/csModalActiveNodesStore';
 
 
 const modalActiveNodesStore = useModalActiveNodesStore();
+const maxNameLength = 100;
 
 /**
  * to display the just selected node
@@ -31,7 +33,7 @@ function onSelected (depth, id) {
                 @click.prevent="onSelected(breadcrumb.depth, breadcrumb.id)"
                 @keyup.enter="onSelected(breadcrumb.depth, breadcrumb.id)"
             >
-                {{ breadcrumb.name }}
+                {{ shortenLength(breadcrumb.name, maxNameLength) }}
             </a>
         </li>
     </TransitionGroup>

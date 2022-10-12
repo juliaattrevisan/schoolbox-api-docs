@@ -5,6 +5,7 @@
  * move backwards through the tree
  */
 
+import { shortenLength } from '@js/util/stringUtils';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 
 
@@ -26,6 +27,7 @@ const props = defineProps({
 });
 
 const viewNodesStore = useViewNodesStore();
+const maxNameLength = 100;
 
 /**
  * to display the just selected node
@@ -39,7 +41,7 @@ function onSelected () {
 <template>
     <li>
         <span v-if="props.isDisabled">
-            {{ props.breadcrumb.name }}
+            {{ shortenLength(props.breadcrumb.name, maxNameLength) }}
         </span>
         <a v-else
             :href="`/curricululm/${props.breadcrumb.id}`"
@@ -47,7 +49,7 @@ function onSelected () {
             @click.prevent="onSelected()"
             @keyup.enter="onSelected()"
         >
-            {{ props.breadcrumb.name }}
+            {{ shortenLength(props.breadcrumb.name, maxNameLength) }}
         </a>
     </li>
 </template>
