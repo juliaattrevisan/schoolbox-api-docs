@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Image;
 
 use UnexpectedValueException;
@@ -19,6 +21,19 @@ use UnexpectedValueException;
 class TransformFormat
 {
     /**
+     * Possible prefixes for a mimetype with an unregistered tree component in
+     * its subtype.
+     *
+     * @see https://en.wikipedia.org/wiki/Media_type#Unregistered_tree
+     */
+    private const UNREGISTERED_TREE_SEARCH  = ['/x-', '/x.'];
+
+    /**
+     * Replacements for the unregistered tree component: it is simply stripped.
+     */
+    private const UNREGISTERED_TREE_REPLACE = '/';
+
+    /**
      * Mapping of MIME types to image formats.
      */
     private const FORMAT_MAP = [
@@ -30,7 +45,6 @@ class TransformFormat
         'image/pjpeg'   => 'jpg',
         'image/gif'     => 'gif',
         'image/png'     => 'png',
-        'image/x-png'   => 'png',
         'image/webp'    => 'webp',
         'image/svg+xml' => 'svg',
     ];
@@ -61,7 +75,13 @@ class TransformFormat
      */
     public function __construct(string $mime)
     {
-        $mime = strtolower($mime);
+        // Check if the mime type passed in matches one of the allowed formats.
+        // Remove the unregistered tree designation if it's there, too.
+        $mime = str_replace(
+            self::UNREGISTERED_TREE_SEARCH,
+            self::UNREGISTERED_TREE_REPLACE,
+            trim(strtolower($mime)),
+        );
         if (array_key_exists($mime, self::FORMAT_MAP)) {
             $this->format = self::FORMAT_MAP[$mime];
         } else {

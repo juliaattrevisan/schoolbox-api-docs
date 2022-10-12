@@ -65,6 +65,7 @@ class Manager
 
     // List of transformations that we will generate for each image
     private const CUSTOM_TRANSFORMS  = [
+        [64, 64],
         [100, 100],
         [2048, 2048],
     ];
@@ -392,8 +393,6 @@ class Manager
                 ON afe.fileTypeID = aft.fileTypeID
                 AND aft.mime LIKE 'image%'
                 AND aft.mime NOT LIKE 'image%svg%'
-                AND aft.mime NOT LIKE 'image%webp%'
-                AND aft.mime NOT LIKE 'image%heic%'
             WHERE s.uploaded_on >= (NOW() - INTERVAL {$this->timeInterval} MINUTE)
             ORDER BY s.uploaded_on
             LIMIT 0, {$this->imageCountLimit}";
