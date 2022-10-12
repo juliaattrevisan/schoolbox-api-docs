@@ -211,6 +211,7 @@ class TransformFormatTest extends TestCase
             'image/svg+xml',
         ];
     }
+
     /**
      * @dataProvider getTestConstructInvalidMimetypeData
      * @covers \Alaress\Image\TransformFormat::__construct
