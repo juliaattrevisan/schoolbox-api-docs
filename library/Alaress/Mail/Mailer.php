@@ -404,7 +404,7 @@ class Mailer
      */
     public static function getConfiguredTransport($conf, $reinitialise = false)
     {
-        if (!(self::$transport instanceof TransportInterface) || $reinitialise) {
+        if (!(isset(self::$transport)) || $reinitialise) {
             if ($conf->get('mail_smtp_host') && $conf->get('mail_smtp_port')) {
                 self::$transport = new EsmtpTransport(
                     $conf->get('mail_smtp_host'),
