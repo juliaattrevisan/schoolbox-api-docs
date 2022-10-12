@@ -33,14 +33,6 @@ class ManageGroup
     }
 
     /**
-     * click one of the Tabs: current members (members), waiting list (waitingList), add members (addMembers), settings (settings)
-     */
-    public function clickTab($tabName): void
-    {
-        $this->tester->click('a[href="#' . $tabName . '"]');
-    }
-
-    /**
      * set access permission
      * free: type-3
      * moderated: type-2
