@@ -27,10 +27,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $hasApiReadAccess = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\HasRole(Role::STAFF),
-        );
+        $hasApiReadAccess  = new Rule\IsLoggedIn();
         $hasApiWriteAccess = new Rule\All(
             $hasApiReadAccess,
             new Rule\Any(
