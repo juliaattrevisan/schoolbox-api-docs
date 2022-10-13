@@ -208,6 +208,11 @@ HELP;
                 $this->getLogger()->info("Merge Forums based on [MERGE \d+]");
                 $mergeId = $matches[1];
 
+                //don't merge into its self... this is wrong
+                if ($forum->getId() === (int)$mergeId) {
+                    $this->getLogger()->warning("Forum '{$title}' attempting to merge into self... stop");
+                    continue;
+                }
                 $this->getLogger()->notice("Found Forum '{$title}' to merge into: Forum ID: {$mergeId}");
 
                 //check if the merge ID has been exists. /else return a warning, and do nothing.
