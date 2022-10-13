@@ -102,6 +102,10 @@ class Module extends BaseModule
             $folderWriteAccess,
             new Rule\Callback(
                 static function (array $params = []) {
+                    if (!array_key_exists('folder', $params)) {
+                        throw new InvalidArgumentException("Expected array key 'folder' does not exist.");
+                    }
+
                     /** @var Model $folder */
                     $folder = $params['folder'];
                     if ($folder->getId() === Model::ROOT_ID) {
