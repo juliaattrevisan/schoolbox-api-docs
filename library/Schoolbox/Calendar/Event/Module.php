@@ -63,6 +63,10 @@ class Module extends BaseModule
                 new Any(
                     new IsSuperuser(),
                     new Callback(function (array $params) {
+                        if (!array_key_exists('event', $params)) {
+                            throw new InvalidArgumentException("Expected array key 'event' does not exist.");
+                        }
+
                         /** @var Event $event */
                         $event = $params['event'];
 
@@ -134,7 +138,6 @@ class Module extends BaseModule
             );
         });
 
-
         /* Permissions for creating an event
          */
         $createPerms = new LazyCallback(function () {
@@ -142,7 +145,6 @@ class Module extends BaseModule
                 new IsLoggedIn()
             );
         });
-
 
         /* Permissions for modifying an event
          */
@@ -176,7 +178,6 @@ class Module extends BaseModule
         $this->register('POST', '/create', 'postCreate', $createPerms);
         $this->register('POST', '/{eventId:\d+}/delete', 'postDelete', $modifyPerms, $preloadEvent);
     }
-
 
     /**
      * @inheritdoc
