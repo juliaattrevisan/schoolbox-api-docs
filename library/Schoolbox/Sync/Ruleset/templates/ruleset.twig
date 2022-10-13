@@ -416,10 +416,12 @@ set upsConfig = {
                                 <td>b[ae]ll finds ball and bell, but not bill.</td>
                             </tr>
                             <tr>
-                                <td>[^ ]</td>
+                                <td>[^ ]<br />
+                                    [! ]
+                                </td>
                                 <td>Excludes characters inside the brackets.</td>
-                                <td> b[^ae]ll finds bill and bull, but not ball or bell.<br />
-                                    Like “[^a]*” finds all items that do not begin with the letter a.</td>
+                                <td>b[^ae]ll or b[!ae]ll finds bill and bull, but not ball or bell.<br />
+                                    Like “[^a]*” or “[!a]*” find all items that do not begin with the letter a.</td>
                             </tr>
                             <tr>
                                 <td>-</td>
