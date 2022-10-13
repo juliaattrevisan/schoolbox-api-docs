@@ -46,7 +46,7 @@ function onNodeLinkSelected (event) {
 </script>
 
 <template>
-   <reveal-modal ref="modalEl">
+    <reveal-modal ref="modalEl">
         <node-details
             :node="selectedNode"
         />

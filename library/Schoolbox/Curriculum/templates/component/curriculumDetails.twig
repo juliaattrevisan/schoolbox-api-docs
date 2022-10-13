@@ -3,11 +3,7 @@
   {% for node in nodes %}
         <h3>
             {% if node.code %}
-                {% if isRouteAuthorized('curriculum.browse') %}
-                    [<a title="View in curriculum browser" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
-                {% else %}
-                    [{{ node.code }}]
-                {% endif %}
+                [<a title="View curriculum node details" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
             {% endif %}
             {{ node.name }}
         </h3>
