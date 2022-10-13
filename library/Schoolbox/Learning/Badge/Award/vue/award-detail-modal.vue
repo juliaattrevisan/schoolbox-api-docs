@@ -11,6 +11,7 @@ import { ResizeObserver } from 'vue3-resize';
 import 'vue3-resize/dist/vue3-resize.css';
 import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
 import CodesList from '@schoolboxCurriculum/vue/codes-list';
+import NodeDetails from '@schoolboxCurriculum/vue/node-details';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 /**
@@ -62,6 +63,7 @@ export default {
         ResizeObserver, //to track any size changes to the parent container
         DynamicInput,
         CodesList,
+        NodeDetails,
     },
 
     /**
@@ -88,8 +90,8 @@ export default {
              * This toggles to false when you spawn the ckeditor
              */
             allowReasonEdit: true,
-
             reason: '', //the reason the badge(s) are being awarded
+            selectedNodeDetails: { id: 0 }, //the selected curriculum code to display further details for
         }
     },
 
@@ -254,7 +256,9 @@ export default {
          * @pararm { object }
          */
         onCodeSelected (node) {
-            // this.$emit('code-selected', node);
+            this.selectedNodeDetails = node;
+            this.modalIndex++;
+            this.hasSelectedModify = false; //so the ckeditor can be re-instantiated when we return from the 2nd modal
         },
 
         /**
@@ -387,6 +391,11 @@ export default {
                     </div>
                 </div>
             </template>
+        </template>
+        <template v-slot:sequence-2>
+            <node-details
+                :node="selectedNodeDetails"
+            />
         </template>
     </sequential-reveal-modal>
 </template>
