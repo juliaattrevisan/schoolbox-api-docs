@@ -38,14 +38,10 @@ function onCodeSelected (node) {
 </script>
 
 <template>
-   <ul class="meta">
-        <li class="icon-curriculum">
-            <codes-list
-                :nodes="props.nodes"
-                @selected="onCodeSelected"
-            />
-        </li>
-    </ul>
+    <codes-list
+        :nodes="props.nodes"
+        @selected="onCodeSelected"
+    />
     <reveal-modal ref="modalEl">
         <node-details
             :node="selectedNode"

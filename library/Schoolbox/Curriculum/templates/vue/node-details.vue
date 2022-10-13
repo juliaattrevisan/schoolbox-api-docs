@@ -108,7 +108,7 @@ const breadcrumbs = computed(() => {
 <template>
    <div v-if="isActive">
         <h2>{{ title }}</h2>
-        <loading-table v-if="isLoading" />
+        <div class="loader" v-if="isLoading" />
         <template v-else>
             <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
             <div v-html="node.description"></div>

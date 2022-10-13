@@ -1,18 +1,8 @@
-{# {% if config.curriculum_tagging_enabled and (assessment.curriculumNodes | length) > 0 %}
-    <ul class="meta">
-        <li class="icon-curriculum">
-            {%- for node in assessment.curriculumNodes | filter(node => node.enabled) %}
-                {% if not loop.first %}, {% endif %}
-                <span title="{{ node.name }}">{{ node.code }}
-            {%- endfor %}
-        </li>
-    </ul>
-{% endif %} #}
 {% if config.curriculum_tagging_enabled and (assessment.curriculumNodes | length) > 0 %}
-<div id="assessment-codes-container">
+<li id="assessment-codes-container" class="icon-curriculum">
     <assessment-codes
         :nodes="{{ assessment.curriculumNodes|json_encode }}"
     />
-</div>
+</li>
 <script src="{{ CDN_PREFIX }}/js/bundle/assessmentCodes.js?v={{ config.site_version }}"></script>
 {% endif %}
