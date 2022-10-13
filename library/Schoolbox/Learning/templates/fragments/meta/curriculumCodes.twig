@@ -9,10 +9,10 @@
     </ul>
 {% endif %} #}
 {% if config.curriculum_tagging_enabled and (assessment.curriculumNodes | length) > 0 %}
-<div id="list-codes-container">
-    <list-codes-container
-        :nodes="{% assessment.curriculumNodes | filter(node => node.enabled) %}"
+<div id="assessment-codes-container">
+    <assessment-codes
+        :nodes="{{ assessment.curriculumNodes|json_encode }}"
     />
 </div>
-<script src="{{ CDN_PREFIX }}/js/bundle/listCodesContainer.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/assessmentCodes.js?v={{ config.site_version }}"></script>
 {% endif %}

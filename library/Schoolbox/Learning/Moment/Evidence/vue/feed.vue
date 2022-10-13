@@ -45,7 +45,7 @@ export default {
             },
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
-            selectedNodeDetails: { id: 0 }, //the selected curriculum code to display further details for
+            selectedNode: { id: 0 }, //the selected curriculum code to display further details for
         }
     },
     computed: {
@@ -253,7 +253,7 @@ export default {
          * @pararm { object }
          */
         onCodeSelected (node) {
-            this.selectedNodeDetails = node;
+            this.selectedNode = node;
             this.$refs.nodeDetailsModal.open();
         },
 
@@ -473,7 +473,7 @@ export default {
 
         <reveal-modal ref="nodeDetailsModal">
             <node-details
-                :node="selectedNodeDetails"
+                :node="selectedNode"
             />
         </reveal-modal>
 

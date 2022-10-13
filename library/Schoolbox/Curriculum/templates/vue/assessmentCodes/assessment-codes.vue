@@ -8,19 +8,22 @@
 
 import { ref } from 'vue';
 import CodesList from '@schoolboxCurriculum/vue/codes-list';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import NodeDetails from '@schoolboxCurriculum/vue/node-details';
 
 
 const props = defineProps({
     /**
-     * the node to load and display
+     * the nodes to load and display
      */
     nodes: {
-        type: Object,
+        type: Array,
         required: true,
     },
 });
 
 const selectedNode = ref({ id: 0 });
+const modalEl = ref(null);
 
 /**
  * to open up the details modal
@@ -29,7 +32,7 @@ const selectedNode = ref({ id: 0 });
  */
 function onCodeSelected (node) {
     selectedNode.value = node;
-    // this.$refs.nodeDetailsModal.open();
+    modalEl.value.open();
 }
 
 </script>
@@ -43,6 +46,11 @@ function onCodeSelected (node) {
             />
         </li>
     </ul>
+    <reveal-modal ref="modalEl">
+        <node-details
+            :node="selectedNode"
+        />
+    </reveal-modal>
 </template>
 
 <style scoped>
