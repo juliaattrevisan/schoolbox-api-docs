@@ -86,6 +86,11 @@ abstract class Module extends BaseModule
             $authorizer,
             '.*',
             new Auth\Rule\Callback(function (array $params) {
+                if (!array_key_exists('comment', $params)) {
+                    // Authorizer callbacks may be called after a preload function has failed.
+                    // @see library/Schoolbox/Application/WebRequest/Kernel.php function outputAuraContent().
+                    throw new InvalidArgumentException("Expected array key 'comment' does not exist.");
+                }
                 $comment = $params['comment'];
                 if (
                     $comment instanceof Model
