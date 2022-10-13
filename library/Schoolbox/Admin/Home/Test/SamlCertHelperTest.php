@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Home\Test;
 
 use Alaress_Date_Format;
+use DateTimeZone;
 use PHPUnit\Framework;
 use Schoolbox\Admin\Home\SamlCertHelper;
 
@@ -210,7 +211,7 @@ class SamlCertHelperTest extends Framework\TestCase
          */
         $samlCertHelper = new SamlCertHelper($this->getMetadataOkMock());
 
-        $now = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $now    = $this->buildNowOverride($nowOverride);
 
         $widget = $samlCertHelper->buildWidget("", self::VALID_METADATA_URL, $now);
         self::assertEquals($light, $widget->getLight());
@@ -278,7 +279,7 @@ class SamlCertHelperTest extends Framework\TestCase
          *  IDP Certificate      - Unparsable
          *  Metadata URL         - Ok
          */
-        $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $now    = $this->buildNowOverride($nowOverride);
 
         $samlCertHelper = new SamlCertHelper($this->getMetadataOkMock());
 
@@ -307,7 +308,7 @@ class SamlCertHelperTest extends Framework\TestCase
          *  IDP Certificate      - Ok
          *  Metadata URL         - Empty
          */
-        $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $now    = $this->buildNowOverride($nowOverride);
 
         $samlCertHelper = new SamlCertHelper($this->getDefaultCache());
 
@@ -338,7 +339,7 @@ class SamlCertHelperTest extends Framework\TestCase
          */
         $samlCertHelper = new SamlCertHelper($this->getMetadataOfflineMock());
 
-        $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $now    = $this->buildNowOverride($nowOverride);
 
         $widget = $samlCertHelper->buildWidget(self::CERT_2027_04_26, self::VALID_METADATA_URL, $now);
         self::assertEquals($light, $widget->getLight());
@@ -366,7 +367,7 @@ class SamlCertHelperTest extends Framework\TestCase
          */
         $samlCertHelper = new SamlCertHelper($this->getMetadataUnparsableMock());
 
-        $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $now    = $this->buildNowOverride($nowOverride);
 
         $widget = $samlCertHelper->buildWidget(self::CERT_2027_04_26, self::VALID_METADATA_URL, $now);
         self::assertEquals($light, $widget->getLight());
@@ -394,7 +395,7 @@ class SamlCertHelperTest extends Framework\TestCase
          */
         $samlCertHelper = new SamlCertHelper($this->getMetadataOkMock());
 
-        $now    = new Alaress_Date_Format($nowOverride, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $now    = $this->buildNowOverride($nowOverride);
 
         $widget = $samlCertHelper->buildWidget($idpCert, self::VALID_METADATA_URL, $now);
         self::assertEquals($light, $widget->getLight());
@@ -413,5 +414,22 @@ class SamlCertHelperTest extends Framework\TestCase
             ["2027-04-27", self::CERT_2022_09_08, SamlCertHelper::LIGHT_ALERT, 'Expired'],
             ["2027-04-27", self::CERT_2027_04_26, SamlCertHelper::LIGHT_ALERT, 'Expired'],
         ];
+    }
+
+    /**
+     * Given a now override date string in YYYY-MM-DD format, creates a date
+     * object for the end of that day in the UTC timezone.
+     *
+     * @param string $nowOverride a YYYY-MM-DD string
+     * @return Alaress_Date_Format
+     */
+    private function buildNowOverride(string $nowOverride): Alaress_Date_Format
+    {
+        $now = new Alaress_Date_Format(
+            $nowOverride,
+            Alaress_Date_Format::DATABASE_DATE_FORMAT,
+            new DateTimeZone('UTC'),
+        );
+        return $now->endOfDay();
     }
 }
