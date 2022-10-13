@@ -277,6 +277,30 @@ class ExternalUserValueInTest extends TestCase
             $staffUser,
             false,
         ];
+        yield 'match set negation (! format)' => [
+            'givenName',
+            '[!bl]ack',
+            $staffUser,
+            true,
+        ];
+        yield 'no match set negation (! format)' => [
+            'givenName',
+            '[!bj]ack',
+            $staffUser,
+            false,
+        ];
+        yield 'match range negation (! format)' => [
+            'givenName',
+            '[!l-z]ack',
+            $staffUser,
+            true,
+        ];
+        yield 'no match range negation (! format)' => [
+            'givenName',
+            '[!a-k]ack',
+            $staffUser,
+            false,
+        ];
 
         // Multiple patterns in valid value
         yield 'match on single valid name pattern with multiple sub-patterns' => [

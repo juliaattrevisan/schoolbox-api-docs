@@ -152,6 +152,30 @@ class MapTest extends TestCase
             ['1'],
         ];
 
+        yield 'Character class negation' => [
+            ['match[^12]' => '1', 'match[^34]' => '2'],
+            ['match1'],
+            ['2'],
+        ];
+
+        yield 'Character class negation: exact match' => [
+            ['match[^12]' => '1', 'match[^34]' => '2'],
+            ['match[^12]'],
+            ['1'],
+        ];
+
+        yield 'Character class negation, ! format' => [
+            ['match[!12]' => '1', 'match[!34]' => '2'],
+            ['match1'],
+            ['2'],
+        ];
+
+        yield 'Character class negation: exact match, ! format' => [
+            ['match[!12]' => '1', 'match[!34]' => '2'],
+            ['match[!12]'],
+            ['1'],
+        ];
+
         // Vagaries of fnmatch
         yield 'leading period in input does not match' => [
             ['test' => '1'],
