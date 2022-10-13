@@ -252,6 +252,9 @@ class Controller extends Base
         // encode then decode
         $requestBody = json_decode(json_encode($this->request->content->get()), true);
 
+        //unless there are mapper errors (and those will change it to 500 as required
+        //set the return code to 201 (Created)
+        $this->response->status->setCode(201);
 
         // Save the evidence
         $evidenceCollection = $this->mapper->createCollection();
