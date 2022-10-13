@@ -334,7 +334,7 @@ export default {
                             <nav>
                                 <!-- Provide the button to make the change -->
                                 <!-- Nonzero-length reason gets a button -->
-                                <button v-if="award._links.awardUpdate" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
+                                <button v-if="award._links.awardUpdate && !hasSelectedModify" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
                             </nav>
                         </div>
                     </template>
