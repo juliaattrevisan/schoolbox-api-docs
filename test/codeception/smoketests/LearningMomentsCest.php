@@ -176,6 +176,6 @@ class LearningMomentsCest
         $i->sendRequest($learningMomentPayloadDelete);
 
         #THEN
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(204);
     }
 }
