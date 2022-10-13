@@ -96,6 +96,9 @@ class Mailer
         if ($this->useReplyTo && $decorator->count() === 1) {
             $effectors = $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getReplyToIds());
             foreach ($effectors as $effector) {
+                if (!$effector->getEmail()) {
+                    continue;
+                }
                 try {
                     $email->addReplyTo(new Address($effector->getEmail(), $effector->formatName()));
                 } catch (RfcComplianceException | LogicException $e) {

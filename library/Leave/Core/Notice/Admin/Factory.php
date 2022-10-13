@@ -8,6 +8,10 @@
  * @link       https://schoolbox.com.au/
  * @copiedfrom Steve Chan <steve.chan@alaress.com.au>
  */
+
+use Symfony\Component\Mime\Exception\RfcComplianceException;
+use Symfony\Component\Mime\Exception\LogicException;
+
 class Leave_Core_Notice_Admin_Factory extends Leave_Notice_Abstract_Factory
 {
     /**
@@ -32,7 +36,7 @@ class Leave_Core_Notice_Admin_Factory extends Leave_Notice_Abstract_Factory
         if ($notice) {
             try {
                 $notice->setup();
-            } catch (TypeError $e) {
+            } catch (TypeError | RfcComplianceException | LogicException $e) {
                 return null;
             }
         }
