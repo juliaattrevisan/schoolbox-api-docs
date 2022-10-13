@@ -14,9 +14,9 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
+use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Thread;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -77,6 +77,7 @@ abstract class Module extends BaseModule
      * preloader is the same as the context of the requested object.
      *
      * @param Authorizer $authorizer
+     * @throws InvalidArgumentException
      */
     public function initRoutePermissions(Authorizer $authorizer): void
     {
@@ -126,15 +127,6 @@ abstract class Module extends BaseModule
     public function preloadComment(array $params): array
     {
         return ['comment' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id'])];
-    }
-
-    /**
-     * @return ErrorMapper
-     * @throws \InvalidArgumentException If mapper class not found
-     */
-    private function getErrorMapper(): ErrorMapper
-    {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 
 
