@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Failure\Unauthorized;
 use InvalidArgumentException;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Authorizer;
 use Schoolbox\Mapper;
@@ -32,7 +33,6 @@ use Schoolbox\UserMapper;
  */
 class Module extends BaseModule
 {
-
     /**
      * @inheritdoc
      */
@@ -58,6 +58,10 @@ class Module extends BaseModule
         // Must be SU, or have News service READ+ perm, or READ+ access to folder
         $canReadFolderNews = new Rule\LazyCallback(static function () {
             return new Rule\Callback(static function (array $params): bool {
+                if (!array_key_exists('user', $params)) {
+                    throw new InvalidArgumentException("Expected array key 'user' does not exist.");
+                }
+
                 /** @var User $user */
                 $user = $params['user'];
 
@@ -90,8 +94,7 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws InvalidArgumentException
-     * @throws Unauthorized
+     * @throws NotFound
      */
     private function preloadUser(array $params): array
     {
@@ -102,7 +105,7 @@ class Module extends BaseModule
         try {
             return ['user' => $this->getUserMapper()->findOneByColumn('key', $params['key'])];
         } catch (MapperException $e) {
-            throw new Unauthorized("No user found for key: '{$params['key']}'", $e->getCode(), $e);
+            throw new NotFound("No user found for key: '{$params['key']}'", $e->getCode(), $e);
         }
     }
 
@@ -112,8 +115,7 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws InvalidArgumentException
-     * @throws Unauthorized
+     * @throws NotFound
      */
     private function preloadFolder(array $params): array
     {
@@ -124,7 +126,7 @@ class Module extends BaseModule
         try {
             return ['folder' => $this->getFolderMapper()->findOneByColumn('id', $params['folderId'])];
         } catch (MapperException $e) {
-            throw new Unauthorized("No folder found for id: '{$params['folderId']}'", $e->getCode(), $e);
+            throw new NotFound("No folder found for id: '{$params['folderId']}'", $e->getCode(), $e);
         }
     }
 
