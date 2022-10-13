@@ -1067,6 +1067,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             if ($this->isExternalIdValid($pastoral->getExternalId())) {
                 // These must be done in order due to FK constraints in Synergetic database
 
+                // Delete actions
+                $this->connector->executeQuery(
+                    "DELETE FROM PastoralCareActions WHERE PastoralCareSeq = :externalId",
+                    ['externalId' => $pastoral->getExternalId()]
+                );
+
                 // Delete contacts
                 $this->connector->executeQuery(
                     "DELETE FROM PastoralCareContacts WHERE PastoralCareSeq = :externalId",
