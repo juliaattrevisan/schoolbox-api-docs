@@ -364,6 +364,8 @@ class Controller extends Base
      */
     public function deleteEvidence(Model $evidence): void
     {
+        //unless there are mapper errors, set the return status code to 204 (No Content)
+        $this->response->status->setCode(204);
         $this->mapper->delete($evidence);
     }
 
