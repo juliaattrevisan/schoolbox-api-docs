@@ -176,6 +176,30 @@ class MapTest extends TestCase
             ['1'],
         ];
 
+        yield '[! escaped' => [
+            ['match\\[!1]' => '1'],
+            ['match\\[!1]'],
+            ['1'],
+        ];
+
+        yield '[! escaped, no match' => [
+            ['match\\[!1]' => '1'],
+            ['match\\2'],
+            [],
+        ];
+
+        yield '[! double-escaped' => [
+            ['match\\\\[!1]' => '1'],
+            ['match\\2'],
+            ['1'],
+        ];
+
+        yield '[! double-escaped, no match' => [
+            ['match\\\\[!1]' => '1'],
+            ['match\\1'],
+            [],
+        ];
+
         // Vagaries of fnmatch
         yield 'leading period in input does not match' => [
             ['test' => '1'],
