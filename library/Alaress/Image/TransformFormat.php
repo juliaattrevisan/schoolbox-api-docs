@@ -42,6 +42,8 @@ class TransformFormat
         'image/tiff'    => 'jpg',
         'image/jpeg'    => 'jpg',
         'image/bmp'     => 'jpg',
+        'image/bmp2'    => 'jpg',
+        'image/bmp3'    => 'jpg',
         'image/pjpeg'   => 'jpg',
         'image/gif'     => 'gif',
         'image/png'     => 'png',
