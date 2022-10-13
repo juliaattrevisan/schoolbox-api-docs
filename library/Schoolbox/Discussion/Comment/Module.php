@@ -12,14 +12,12 @@ namespace Schoolbox\Discussion\Comment;
 use Alaress\Authorizer as Auth;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
+use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Thread;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception;
 
 /**
  * Module for discussion comment requests.
@@ -79,6 +77,7 @@ abstract class Module extends BaseModule
      * preloader is the same as the context of the requested object.
      *
      * @param Authorizer $authorizer
+     * @throws InvalidArgumentException
      */
     public function initRoutePermissions(Authorizer $authorizer): void
     {
@@ -88,6 +87,11 @@ abstract class Module extends BaseModule
             $authorizer,
             '.*',
             new Auth\Rule\Callback(function (array $params) {
+                if (!array_key_exists('comment', $params)) {
+                    // Authorizer callbacks may be called after a preload function has failed.
+                    // @see library/Schoolbox/Application/WebRequest/Kernel.php function outputAuraContent().
+                    throw new InvalidArgumentException("Expected array key 'comment' does not exist.");
+                }
                 $comment = $params['comment'];
                 if (
                     $comment instanceof Model
@@ -118,27 +122,11 @@ abstract class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws MapperException         if the comment never existed
-     * @throws MapperException\Deleted if the comment has been deleted
+     * @throws MapperException if comment not found
      */
     public function preloadComment(array $params): array
     {
-        try {
-            return [
-                'comment' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
-            ];
-        } catch (Exception $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
-    }
-
-    /**
-     * @return ErrorMapper
-     * @throws \InvalidArgumentException If mapper class not found
-     */
-    private function getErrorMapper(): ErrorMapper
-    {
-        return $this->getMapperFactory()->get(ErrorMapper::class);
+        return ['comment' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id'])];
     }
 
 
