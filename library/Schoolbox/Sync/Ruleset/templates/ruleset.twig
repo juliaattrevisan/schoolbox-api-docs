@@ -423,8 +423,10 @@ set upsConfig = {
                             </tr>
                             <tr>
                                 <td>-</td>
-                                <td>Matches a range of characters. Remember to specify the characters in ascending order (A to Z, not Z to A).</td>
-                                <td>b[a-c]d finds bad, bbd, and bcd.</td>
+                                <td>Matches a range of characters within [ ]. Remember to specify the characters in ascending order (A to Z, not Z to A).</td>
+                                <td>b[a-c]d finds bad, bbd, and bcd, but not bdd.<br />
+                                    b[^a-c]d finds bdd, but not bad, bbd, and bcd.
+                                </td>
                             </tr>
                             <tr>
                                 <td>{ }</td>
