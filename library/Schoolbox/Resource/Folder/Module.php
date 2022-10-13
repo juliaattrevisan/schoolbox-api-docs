@@ -35,7 +35,6 @@ class Module extends BaseModule
     /** @var string */
     protected $basename = 'folder';
 
-
     /**
      * @inheritDoc
      * @throws InvalidArgumentException
@@ -146,7 +145,6 @@ class Module extends BaseModule
         $this->register('POST', '/folder/{id:\d+}/reset', 'postFolderReset', $writeAccessAndNotRoot, $preloadFolder);
     }
 
-
     /**
      * @return Mapper
      * @throws InvalidArgumentException
@@ -155,7 +153,6 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(Mapper::class);
     }
-
 
     /**
      * {@inheritdoc}
