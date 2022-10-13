@@ -9,7 +9,6 @@ use Payload;
 
 class LearningMomentsCest
 {
-
     /**
      * Push a login payload to Schoolbox each test to ensure session is active and logged in.
      *
