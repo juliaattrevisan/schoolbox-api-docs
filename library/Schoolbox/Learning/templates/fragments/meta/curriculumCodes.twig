@@ -1,4 +1,4 @@
-{% if config.curriculum_tagging_enabled and (assessment.curriculumNodes | length) > 0 %}
+{# {% if config.curriculum_tagging_enabled and (assessment.curriculumNodes | length) > 0 %}
     <ul class="meta">
         <li class="icon-curriculum">
             {%- for node in assessment.curriculumNodes | filter(node => node.enabled) %}
@@ -7,4 +7,12 @@
             {%- endfor %}
         </li>
     </ul>
+{% endif %} #}
+{% if config.curriculum_tagging_enabled and (assessment.curriculumNodes | length) > 0 %}
+<div id="list-codes-container">
+    <list-codes-container
+        :nodes="{% assessment.curriculumNodes | filter(node => node.enabled) %}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/listCodesContainer.js?v={{ config.site_version }}"></script>
 {% endif %}

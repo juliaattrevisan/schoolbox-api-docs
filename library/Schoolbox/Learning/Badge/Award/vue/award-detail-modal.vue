@@ -91,7 +91,7 @@ export default {
              */
             allowReasonEdit: true,
             reason: '', //the reason the badge(s) are being awarded
-            selectedNodeDetails: { id: 0 }, //the selected curriculum code to display further details for
+            selectedNode: { id: 0 }, //the selected curriculum code to display further details for
         }
     },
 
@@ -256,7 +256,7 @@ export default {
          * @pararm { object }
          */
         onCodeSelected (node) {
-            this.selectedNodeDetails = node;
+            this.selectedNode = node;
             this.modalIndex++;
             this.hasSelectedModify = false; //so the ckeditor can be re-instantiated when we return from the 2nd modal
         },
@@ -394,7 +394,7 @@ export default {
         </template>
         <template v-slot:sequence-2>
             <node-details
-                :node="selectedNodeDetails"
+                :node="selectedNode"
             />
         </template>
     </sequential-reveal-modal>
