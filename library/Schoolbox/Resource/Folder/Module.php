@@ -122,6 +122,10 @@ class Module extends BaseModule
                 new Rule\IsSuperuser(),
                 new Rule\Callback(
                     function (array $params = []) {
+                        if (!array_key_exists('folder', $params)) {
+                            throw new InvalidArgumentException("Expected array key 'folder' does not exist.");
+                        }
+
                         /** @var Model $folder */
                         $folder = $params['folder'];
                         if ($this->getMapper()->countByColumn('parent', $folder->getId()) > 0) {
