@@ -195,6 +195,12 @@ class MapTest extends TestCase
             ['1'],
         ];
 
+        yield 'backslashes escape: not a match' => [
+            ['test\\*' => '1'],
+            ['test?'],
+            [],
+        ];
+
         // The patterns which Jez wants to match on:
         // he wants to match a single value in a comma-separated list
         yield 'comma-separated list: multiple patterns, match at start of input' => [
