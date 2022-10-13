@@ -11,7 +11,7 @@ namespace Schoolbox\Sync\Grammar\Condition;
 
 use Alaress\ObjectReader;
 use Alaress\Rules\Condition;
-use PHLAK\Splat\Pattern;
+use Alaress\Rules\Matcher\Matcher;
 use Schoolbox\Collection;
 
 class ExternalUserValueIn extends Condition\In
@@ -84,15 +84,7 @@ class ExternalUserValueIn extends Condition\In
             if ($value === $validValue) {
                 return true;
             } else {
-                // Match vs pattern case-insensitively
-                $pattern = new Pattern($validValue);
-                $regexp  = $pattern->toRegex() . 'i';
-
-                // Is this an invalid pattern? Skip this pattern if so
-                $isMatch = @preg_match($regexp, $value);
-                if (preg_last_error() !== PREG_NO_ERROR) {
-                    continue;
-                }
+                $isMatch = (new Matcher($validValue))->match($value);
                 if ($isMatch) {
                     return true;
                 }

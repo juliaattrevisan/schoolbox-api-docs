@@ -7,7 +7,7 @@
 
 namespace Alaress\Rules\Lang;
 
-use PHLAK\Splat\Pattern;
+use Alaress\Rules\Matcher\Matcher;
 
 /**
  * A language construct for mapping SIS output (possibly modified with tokens)
@@ -25,19 +25,7 @@ class Map implements Construct
      *
      * key:   the value which will be compared to each `$inputValue` passed to
      *        `apply()`.
-     *        This pattern may contain wildcards
-     *        (@see https://github.com/PHLAK/Splat):
-     *        * "*" matches any character sequence
-     *        * "?" matches any single character
-     *        * "[abc]" matches any character in the set
-     *        * "[a-c]" matches any character in the range
-     *        * "[^abc]" matches any character not in the set
-     *        * "[^a-c]" matches any character not in the range
-     *        * "{foo,bar,baz}" matches if any of the comma-separated
-     *          sub-patterns also match
-     *        * "(=foo)" matches if the string also contains the pattern
-     *        * "(!foo)" matches if the string doesn't contain the pattern
-     *        * "\" escapes any wildcard character
+     *        This pattern may contain wildcards (@see Matcher for format)
      * value: the value(s) which will be set in the object. This may be a
      *        multidimensional array: it will be converted into a flat array.
      *
@@ -100,15 +88,7 @@ class Map implements Construct
                 if ($mapKey === $input) {
                     $isMatch = true;
                 } else {
-                    // Case-insensitive match vs. pattern
-                    $pattern = new Pattern($mapKey);
-                    $regexp  = $pattern->toRegex() . 'i';
-
-                    // Is this an invalid pattern? Skip this map key if so
-                    $isMatch = @preg_match($regexp, $input);
-                    if (preg_last_error() !== PREG_NO_ERROR) {
-                        continue;
-                    }
+                    $isMatch = (new Matcher($mapKey))->match($input);
                 }
 
                 if ($isMatch) {
