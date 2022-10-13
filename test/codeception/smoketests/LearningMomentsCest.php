@@ -42,7 +42,7 @@ class LearningMomentsCest
         $i->sendRequest($learningMomentPayload);
 
         #THEN
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
     }
 
     /** Create a learning moment by uploading a file and submitting it
@@ -73,7 +73,7 @@ class LearningMomentsCest
         $i->sendRequest($learningMomentPayload);
 
         #THEN
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
     }
     /** Update a text learning moment submitting it
      * check if response code is 200
@@ -91,7 +91,7 @@ class LearningMomentsCest
         $learningMomentPayload = new Payload\LearningMoment\Create($student_jreed->getId(), $type, $body, $file);
         $i->amGoingTo('Send request to create a learning moment');
         $i->sendRequest($learningMomentPayload);
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
 
         $evidence = $i->grabLearningMomentByBody($body);
 
@@ -129,7 +129,7 @@ class LearningMomentsCest
         $learningMomentPayload = new Payload\LearningMoment\Create($student_ereed->getId(), $type, $body, $file);
         $i->amGoingTo('Send request to create a learning moment');
         $i->sendRequest($learningMomentPayload);
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
         $evidence = $i->grabLearningMomentByBody($body);
 
         #WHEN
@@ -167,7 +167,7 @@ class LearningMomentsCest
         $learningMomentPayload = new Payload\LearningMoment\Create($student_jreed->getId(), $type, $body, $file);
         $i->amGoingTo('Send request to create a learning moment');
         $i->sendRequest($learningMomentPayload);
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
 
         $evidence = $i->grabLearningMomentByBody($body);
 
