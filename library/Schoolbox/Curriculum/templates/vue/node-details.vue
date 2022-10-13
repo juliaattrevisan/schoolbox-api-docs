@@ -47,7 +47,7 @@ async function load () {
         if (response.ok) {
             const nodeWithParents = await response.json();
             node.value.name = nodeWithParents.name;
-            node.value.code = nodeWithParents.came;
+            node.value.code = nodeWithParents.code;
             node.value.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
             node.value.description = nodeWithParents.description;
         } else {
