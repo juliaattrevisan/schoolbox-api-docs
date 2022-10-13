@@ -35,7 +35,6 @@ class Module extends BaseModule
     /** @var string */
     protected $basename = 'folder';
 
-
     /**
      * @inheritDoc
      * @throws InvalidArgumentException
@@ -102,6 +101,10 @@ class Module extends BaseModule
             $folderWriteAccess,
             new Rule\Callback(
                 static function (array $params = []) {
+                    if (!array_key_exists('folder', $params)) {
+                        throw new InvalidArgumentException("Expected array key 'folder' does not exist.");
+                    }
+
                     /** @var Model $folder */
                     $folder = $params['folder'];
                     if ($folder->getId() === Model::ROOT_ID) {
@@ -118,6 +121,10 @@ class Module extends BaseModule
                 new Rule\IsSuperuser(),
                 new Rule\Callback(
                     function (array $params = []) {
+                        if (!array_key_exists('folder', $params)) {
+                            throw new InvalidArgumentException("Expected array key 'folder' does not exist.");
+                        }
+
                         /** @var Model $folder */
                         $folder = $params['folder'];
                         if ($this->getMapper()->countByColumn('parent', $folder->getId()) > 0) {
@@ -138,7 +145,6 @@ class Module extends BaseModule
         $this->register('POST', '/folder/{id:\d+}/reset', 'postFolderReset', $writeAccessAndNotRoot, $preloadFolder);
     }
 
-
     /**
      * @return Mapper
      * @throws InvalidArgumentException
@@ -147,7 +153,6 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(Mapper::class);
     }
-
 
     /**
      * {@inheritdoc}
