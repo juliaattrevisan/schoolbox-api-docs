@@ -94,8 +94,7 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws InvalidArgumentException
-     * @throws Unauthorized
+     * @throws NotFound
      */
     private function preloadUser(array $params): array
     {
@@ -116,8 +115,7 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws InvalidArgumentException
-     * @throws Unauthorized
+     * @throws NotFound
      */
     private function preloadFolder(array $params): array
     {
