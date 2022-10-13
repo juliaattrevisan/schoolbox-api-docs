@@ -3,7 +3,7 @@
         <div class="twelve-column">
             {% if node.code %}
                 {% if isRouteAuthorized('curriculum.browse') %}
-                    [<a title="View in curriculum browser" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
+                    [<a title="View in curriculum browser" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}" data-display-node="{{ node.id }}">{{ node.code }}</a>]
                 {% else %}
                     [{{ node.code }}]
                 {% endif %}

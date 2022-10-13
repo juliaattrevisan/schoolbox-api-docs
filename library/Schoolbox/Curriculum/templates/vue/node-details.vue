@@ -46,6 +46,8 @@ async function load () {
         const response = await fetch(`/api/curriculum/${node.value.id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
         if (response.ok) {
             const nodeWithParents = await response.json();
+            node.value.name = nodeWithParents.name;
+            node.value.code = nodeWithParents.came;
             node.value.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
             node.value.description = nodeWithParents.description;
         } else {
@@ -107,9 +109,9 @@ const breadcrumbs = computed(() => {
 
 <template>
    <div v-if="isActive">
-        <h2>{{ title }}</h2>
         <div class="loader" v-if="isLoading" />
         <template v-else>
+            <h2>{{ title }}</h2>
             <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
             <div v-html="node.description"></div>
         </template>

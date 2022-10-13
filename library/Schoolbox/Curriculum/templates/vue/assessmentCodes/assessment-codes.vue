@@ -48,7 +48,3 @@ function onCodeSelected (node) {
         />
     </reveal-modal>
 </template>
-
-<style scoped>
-
-</style>
