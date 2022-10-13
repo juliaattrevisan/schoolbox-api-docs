@@ -12,14 +12,12 @@ namespace Schoolbox\Discussion\Comment;
 use Alaress\Authorizer as Auth;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception;
 
 /**
  * Module for discussion comment requests.
@@ -118,18 +116,11 @@ abstract class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws MapperException         if the comment never existed
-     * @throws MapperException\Deleted if the comment has been deleted
+     * @throws MapperException if comment not found
      */
     public function preloadComment(array $params): array
     {
-        try {
-            return [
-                'comment' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
-            ];
-        } catch (Exception $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
+        return ['comment' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id'])];
     }
 
     /**
