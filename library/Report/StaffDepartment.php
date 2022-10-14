@@ -11,7 +11,6 @@ use Schoolbox\UserMapper;
  */
 class Report_StaffDepartment extends Report_Abstract
 {
-
     /**
      * Constructor
      *
@@ -164,7 +163,7 @@ class Report_StaffDepartment extends Report_Abstract
                     'STAFF_STAFFID'    => Scrub::text($currentStaff['StaffID'] ?? ''),
                     'STAFF_EXTERNALID' => $userId,
                     'STAFF_STAFFCODE'  => Scrub::text($currentStaff['SchoolStaffCode'] ?? ''),
-                    'STAFF_TITLE'      => Scrub::text($currentStaff['StaffTitle']) ?? '',
+                    'STAFF_TITLE'      => Scrub::text($currentStaff['StaffTitle'] ?? ''),
                     'STAFF_FIRSTNAME'  => Scrub::text($currentStaff['StaffPreferredName'] ?? ''),
                     'STAFF_SURNAME'    => Scrub::text($currentStaff['StaffSurname'] ?? ''),
                     'STAFF_ROLE'       => Scrub::text(implode(', ', $currentStaff['JobPositionDescription'] ?? '')),
