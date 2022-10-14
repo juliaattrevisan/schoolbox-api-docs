@@ -1,6 +1,20 @@
 <div class="row">
     <div class="small-12 large-12 columns">
-        <h1>{% if USER.id == user.id %}My{% else %}{{ user.fullname }}{% endif %} Courses</h1>
+        <h1>
+            {#
+                If the user you are viewing is not you, display the student's name.
+                format the name with correct grammar:
+                if their name ends with s append '
+                if their name does NOT end with s append 's
+            #}
+            {% if USER.id == user.id %}
+                My
+            {% else %}
+                {{ user.fullname }}'
+                {% if user.fullname |last != 's' %}s{% endif %}
+            {% endif %}
+            Courses
+        </h1>
     </div>
 </div>
 
