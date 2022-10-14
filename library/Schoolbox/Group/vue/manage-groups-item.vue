@@ -348,18 +348,20 @@ export default {
                         <div class="card-class-image" :style="getImageStyles()"></div>
                     </a>
                     <transition name="slide">
-                        <div class="group-actions" v-if="isEnrolled || isPrivate" :style="[ { pointerEvents: isProcessing ? 'none' : 'auto' } ]">
+                        <div class="group-actions" v-if="isEnrolled || isPrivate">
                             <button
-                                :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']"
                                 title="Toggle Favourites"
+                                :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']"
+                                :disabled="isProcessing"
                                 @click="toggleFavourites"
                             >
                                 Toggle Favourites
                             </button>
                             <button
                                 v-if="!group.isForceFollow && !group.isMsgDisabled"
-                                :class="['group-action', isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow']"
                                 title="Toggle Notifications"
+                                :class="['group-action', isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow']"
+                                :disabled="isProcessing"
                                 @click="toggleNotifications"
                             >
                                 Toggle Notifications
@@ -432,6 +434,10 @@ export default {
     }
     &:hover {
         opacity: 0.8;
+    }
+    &:disabled {
+        color: white;
+        opacity: 1;
     }
 }
 
