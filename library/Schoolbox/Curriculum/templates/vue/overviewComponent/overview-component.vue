@@ -38,7 +38,8 @@ function findNodeLinks () {
  */
 function onNodeLinkSelected (event) {
     event.preventDefault();
-    const selectedNodeId = parseInt(event.currentTarget.dataset.displayNode);
+    const href = event.currentTarget.href;
+    const selectedNodeId = parseInt(href.substring(href.indexOf('#')+1, href.length));
     selectedNode.value = { id: selectedNodeId };
     modalEl.value.open();
 }

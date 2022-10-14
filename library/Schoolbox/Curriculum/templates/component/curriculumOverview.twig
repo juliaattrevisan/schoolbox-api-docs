@@ -2,7 +2,7 @@
     <li class="row">
         <div class="twelve-column">
             {% if node.code %}
-                [<a title="View curriculum node details" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}" data-display-node="{{ node.id }}">{{ node.code }}</a>]
+                [<a title="View curriculum node details" href="#{{ node.id }}" data-display-node>{{ node.code }}</a>]
             {% endif %}
             {{ node.name }}
 
