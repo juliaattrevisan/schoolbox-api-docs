@@ -228,7 +228,8 @@ export default {
          */
         async toggleFavourites (event) {
             this.isProcessing = true;
-            gsap.from(event.currentTarget, { scale: 0.2, duration: 0.3 } ); //to help indicate selection
+            gsap.set(event.currentTarget, { scale: 0.2 } );
+            gsap.to(event.currentTarget, { scale: 1, duration: 0.3 } ); //to help indicate selection
             if (this.isFavourite) {
                 await this.removeFromFavourites();
             } else {
@@ -284,7 +285,8 @@ export default {
          */
         async toggleNotifications (event) {
             this.isProcessing = true;
-            gsap.from(event.currentTarget, { scale: 0.2, duration: 0.3 } ); //to help indicate selection
+            gsap.set(event.currentTarget, { scale: 0.2 } );
+            gsap.to(event.currentTarget, { scale: 1.0, duration: 0.3 } ); //to help indicate selection
             if (this.isNotificationsOn) {
                 await this.removeFromNotifications();
             } else {
@@ -347,12 +349,27 @@ export default {
                     </a>
                     <transition name="slide">
                         <div class="group-actions" v-if="isEnrolled || isPrivate" :style="[ { pointerEvents: isProcessing ? 'none' : 'auto' } ]">
-                            <button :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']" title="Toggle Favourites" @click="toggleFavourites">Toggle Favourites</button>
-                            <button v-if="!group.isForceFollow && !group.isMsgDisabled"
-                                    :class="['group-action', isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow']"
-                                    title="Toggle Notifications" @click="toggleNotifications">Toggle Notifications</button>
-                            <button v-if="group.isForceFollow || group.isMsgDisabled"
-                                    :class="['group-action disabled', group.isForceFollow ? 'icon-notifications' : 'icon-notifications-hollow']"></button>
+                            <button
+                                :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']"
+                                title="Toggle Favourites"
+                                @click="toggleFavourites"
+                            >
+                                Toggle Favourites
+                            </button>
+                            <button
+                                v-if="!group.isForceFollow && !group.isMsgDisabled"
+                                :class="['group-action', isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow']"
+                                title="Toggle Notifications"
+                                @click="toggleNotifications"
+                            >
+                                Toggle Notifications
+                            </button>
+                            <button
+                                v-if="group.isForceFollow || group.isMsgDisabled"
+                                title="Disabled force follow button"
+                                :class="['group-action disabled', group.isForceFollow ? 'icon-notifications' : 'icon-notifications-hollow']"
+                            >
+                            </button>
                         </div>
                     </transition>
                 </div>
@@ -402,11 +419,11 @@ export default {
     position: absolute;
     right: 10px;
     top: 10px;
+    z-index: 1;
 }
 .group-action {
     background: none;
     font-size: 0;
-    transition: all 0.2s;
     &:before {
         color: white;
         font-size: 1.5rem;
