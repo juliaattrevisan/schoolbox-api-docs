@@ -204,7 +204,7 @@ class Cursor implements ICursor
         if (!($a->getSeverity() && $b->getSeverity())) {
             return 0;
         }
-        return $b->getSeverity()->getId() <=> $a->getSeverity()->getId();
+        return $b->getSeverity()->getSequence() <=> $a->getSeverity()->getSequence();
     }
 
     /**
