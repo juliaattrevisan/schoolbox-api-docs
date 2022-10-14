@@ -51,6 +51,8 @@ export default {
         siteVersion: String
     },
 
+    emits: ['on-achievement-awarded'],
+
     /**
      * Components.
      * Any other vue components you also want to use here; they must already be imported
