@@ -15,6 +15,11 @@
         </div>
     {% else %}
         {% for course in courseList %}
+            {#
+             # dont show courses if the user has no pers
+             # if homepageUrls[course.id] is false, dont show
+            #}
+        {% if false != homepageUrls[course.id] %}
             <div class="small-12 medium-6 large-4 xlarge-3 island">
                 <section>
                     {% include '@learningStudentCourses/sub/courseTile.twig' with {
@@ -23,6 +28,7 @@
                     } only %}
                 </section>
             </div>
+            {% endif %}
         {% endfor %}
     {% endif %}
 </div>
