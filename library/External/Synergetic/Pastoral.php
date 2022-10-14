@@ -838,7 +838,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         ";
         $params = [
             'PastoralCareTypeCode'     => $pastoral->getType()->getExternalCode(),
-            'PastoralCareCategoryCode' => $pastoral->getSubType()->getExternalCode(),
+            'PastoralCareCategoryCode' => $pastoral->getSubType()?->getExternalCode(),
             'PastoralCareSeq'          => $pastoral->getExternalId(),
         ];
         $params = array_merge($params, $actionCodeBindings['bindings']);
