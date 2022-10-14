@@ -369,7 +369,8 @@ export default {
                             <button
                                 v-if="group.isForceFollow || group.isMsgDisabled"
                                 title="Disabled force follow button"
-                                :class="['group-action disabled', group.isForceFollow ? 'icon-notifications' : 'icon-notifications-hollow']"
+                                :class="['group-action', group.isForceFollow ? 'icon-notifications' : 'icon-notifications-hollow']"
+                                :disabled="true"
                             >
                             </button>
                         </div>
@@ -449,10 +450,6 @@ export default {
         color: white;
         opacity: 1;
     }
-}
-
-.disabled {
-    pointer-events: none;
 }
 
 .private, .membership-pending  {
