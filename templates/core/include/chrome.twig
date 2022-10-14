@@ -81,7 +81,6 @@
 
         {% if config.site_usage_tracking %}
         {% autoescape 'js' %}
-
         <!-- Google Tag Manager -->
         <script>
             window.dataLayer = window.dataLayer || [];
@@ -99,7 +98,6 @@
                 'impersonated': {{ user.impersonated ? 1 : 0 }},
                 {% endif %}
             });
-
         </script>
         <script>
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -110,7 +108,6 @@
         </script>
         <!-- End Google Tag Manager -->
         {% endautoescape %}
-
         {% endif %}
         {{ scripts.header | raw }}
     {% endblock mainHeader %}

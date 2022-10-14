@@ -37,30 +37,25 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/browser/browser-redirect.js?v={{ config.site_version }}"></script>
 {% if config.site_usage_tracking %}
-    <!-- Global Site Tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-97642429-1"></script>
-
     {% autoescape 'js' %}
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments)}
-        gtag('js', new Date());
-
-        // Set tracking ID and map custom dimensions
-        gtag('config', 'UA-97642429-1', {
-            'custom_map': {
-                'dimension1': 'site_school_code',
-                'dimension2': 'site_type',
-                'dimension6': 'site_version'
-            }
-        });
-
-        // Send custom dimension events
-        gtag('event', 'site_school_code_dimension', {'site_school_code': '{{ config. site_school_code }}'});
-        gtag('event', 'site_type_dimension', {'site_type': '{{ config.site_type }}'});
-        gtag('event', 'site_version_dimension', {'site_version': '{{ config.site_version }}'});
-
-    </script>
+        <!-- Google Tag Manager -->
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            dataLayer.push({
+                'event': 'page_view',
+                'site_school_code': '{{ config. site_school_code }}',
+                'site_type': '{{ config.site_type }}',
+                'site_version': '{{ config.site_version }}',
+            });
+        </script>
+        <script>
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-N8R6VLV');
+        </script>
+        <!-- End Google Tag Manager -->
     {% endautoescape %}
 
 {% endif %}
