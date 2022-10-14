@@ -121,14 +121,16 @@ class Cursor implements ICursor
     {
         // TODO limit the results returned in query, instead of post-query:
         //      need to update findByColumnList to do so
-        $results = $this->dataSource->findByColumnList(
+        $results = $this->dataSource->findRecords(
             $this->currentUser,
-            [
-                'id'         => $this->pastoralIds,
-                'student_id' => $this->student->getId(),
-            ],
+            $this->student->getId(),
+            null,
+            null,
+            0,
+            0,
+            null,
         );
-
+        $results = $results->filter(fn (Model $model) => in_array($model->getId(), $this->pastoralIds));
         $results = $results->sortByCallback($this->buildSortCallback());
         if (count($results) === 0) {
             return $results;
