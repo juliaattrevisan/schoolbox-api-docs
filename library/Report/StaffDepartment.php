@@ -152,8 +152,6 @@ class Report_StaffDepartment extends Report_Abstract
                     $previousDepartment = $currentStaff['StaffDepartment'];
                 }
 
-                $extensionText = Scrub::text($currentStaff['StaffExtension']) === '' ? '' : '(x' . Scrub::text($currentStaff['StaffExtension']) . ')';
-
                 // Find the match schoolbox user so we can link to their profile page
 
                 try {
@@ -163,20 +161,22 @@ class Report_StaffDepartment extends Report_Abstract
                 }
 
                 $this->getPage()->setVar([
-                    'STAFF_STAFFID'    => Scrub::text($currentStaff['StaffID']),
+                    'STAFF_STAFFID'    => Scrub::text($currentStaff['StaffID'] ?? ''),
                     'STAFF_EXTERNALID' => $userId,
-                    'STAFF_STAFFCODE'  => Scrub::text($currentStaff['SchoolStaffCode']),
-                    'STAFF_TITLE'      => Scrub::text($currentStaff['StaffTitle']),
-                    'STAFF_FIRSTNAME'  => Scrub::text($currentStaff['StaffPreferredName']),
-                    'STAFF_SURNAME'    => Scrub::text($currentStaff['StaffSurname']),
-                    'STAFF_ROLE'       => Scrub::text(implode(', ', $currentStaff['JobPositionDescription'])),
-                    'STAFF_DEPARTMENT' => $currentStaff['StaffDepartment'],
-                    'STAFF_CAMPUS'     => Scrub::text($currentStaff['StaffCampusDescription']),
-                    'STAFF_EXTENSION'  => $extensionText,
-                    'STAFF_MOBILE'     => Scrub::text($currentStaff['StaffDefaultMobilePhone']),
-                    'STAFF_VOICEMAIL'  => Scrub::text($currentStaff['StaffVoiceMail']),
-                    'STAFF_PHONE'      => Scrub::text($currentStaff['StaffOccupPhone']),
-                    'STAFF_EMAIL'      => Scrub::text($currentStaff['StaffOccupEmail']),
+                    'STAFF_STAFFCODE'  => Scrub::text($currentStaff['SchoolStaffCode'] ?? ''),
+                    'STAFF_TITLE'      => Scrub::text($currentStaff['StaffTitle']) ?? '',
+                    'STAFF_FIRSTNAME'  => Scrub::text($currentStaff['StaffPreferredName'] ?? ''),
+                    'STAFF_SURNAME'    => Scrub::text($currentStaff['StaffSurname'] ?? ''),
+                    'STAFF_ROLE'       => Scrub::text(implode(', ', $currentStaff['JobPositionDescription'] ?? '')),
+                    'STAFF_DEPARTMENT' => Scrub::text($currentStaff['StaffDepartment'] ?? ''),
+                    'STAFF_CAMPUS'     => Scrub::text($currentStaff['StaffCampusDescription'] ?? ''),
+                    'STAFF_EXTENSION'  => (
+                        (Scrub::text($currentStaff['StaffExtension'] ?? '') === '') ? '' : '(x' . Scrub::text($currentStaff['StaffExtension']) . ')'
+                    ),
+                    'STAFF_MOBILE'     => Scrub::text($currentStaff['StaffDefaultMobilePhone'] ?? ''),
+                    'STAFF_VOICEMAIL'  => Scrub::text($currentStaff['StaffVoiceMail'] ?? ''),
+                    'STAFF_PHONE'      => Scrub::text($currentStaff['StaffOccupPhone'] ?? ''),
+                    'STAFF_EMAIL'      => Scrub::text($currentStaff['StaffOccupEmail'] ?? ''),
                 ]);
 
                 if ($userId !== -1) {
