@@ -330,9 +330,9 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     : date($this->config->get('date_time'), strtotime($lesson['endTime']));
 
             if (
-                isset($periodList[$period]) && !isset($periodList[$period]['class'][$lesson['ClassCode']])
+                isset($periodList[$period]) && !isset($periodList[$period]['class'][$lesson['classCode']])
             ) {
-                $periodList[$period]['class'][$lesson['ClassCode']] = array_merge(
+                $periodList[$period]['class'][$lesson['classCode']] = array_merge(
                     $periodList[$period],
                     [
                         'description' => $lesson['subjectName'],
