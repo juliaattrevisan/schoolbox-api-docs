@@ -6,8 +6,6 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace External\Denbigh;
-
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus as Campus;
