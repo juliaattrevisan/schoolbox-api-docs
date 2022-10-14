@@ -98,8 +98,8 @@ function onClearSearchSelected () {
         <div class="long switch">
             <input id="show-only-enabled" type="checkbox" v-model="viewNodesStore.showDisabled" />
             <label for="show-only-enabled">
-                <span>Show</span>
-                <span>Hide</span>
+                <span>Shown</span>
+                <span>Hidden</span>
             </label>
         </div>
     </div>
