@@ -71,7 +71,7 @@ export const useSearchStore = defineStore(`mcSearch`, {
          * @return { string }
          */
         enabled () {
-            return useViewNodesStore().showOnlyEnabled ? '&enabled=1' : '';
+            return useViewNodesStore().showDisabled ? '' : '&enabled=1';
         },
 
     },

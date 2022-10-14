@@ -65,7 +65,7 @@ const justUpdated = ref(false); //to highlight if the node has just been updated
  * @returns { Boolean }
  */
 const showNode = computed(() => {
-    if (viewNodesStore.showOnlyEnabled && !props.node.enabled) {
+    if (!viewNodesStore.showDisabled && !props.node.enabled) {
         return false;
     } else {
         return true;

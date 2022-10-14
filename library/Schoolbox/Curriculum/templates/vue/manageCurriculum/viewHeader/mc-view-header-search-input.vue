@@ -94,12 +94,12 @@ function onClearSearchSelected () {
         </div>
     </div>
     <div class="medium-4 small-12 columns">
-        <label class="inline-block">Hide disabled nodes</label>
-        <div class="switch">
-            <input id="show-only-enabled" type="checkbox" v-model="viewNodesStore.showOnlyEnabled" />
+        <label class="inline-block">Show disabled nodes</label>
+        <div class="long switch">
+            <input id="show-only-enabled" type="checkbox" v-model="viewNodesStore.showDisabled" />
             <label for="show-only-enabled">
-                <span>On</span>
-                <span>Off</span>
+                <span>Show</span>
+                <span>Hide</span>
             </label>
         </div>
     </div>
