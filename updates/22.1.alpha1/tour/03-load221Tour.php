@@ -21,8 +21,7 @@ $app = new class extends CliTool\App {
     {
         if (strtolower($this->getConfig()->get('site_plan')) === 'elite') {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour-elite.yaml', $returnVar);
-        }
-        else if (strtolower($this->getConfig()->get('site_plan')) === 'pro') {
+        } elseif (strtolower($this->getConfig()->get('site_plan')) === 'pro') {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour-pro.yaml', $returnVar);
         } else {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/221tour.yaml', $returnVar);
