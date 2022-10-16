@@ -239,49 +239,51 @@ async function onLeave (el, done) {
 </script>
 
 <template>
-    <li v-if="showNode" ref="viewNodeEl">
-        <div
-            class="buttons-container"
-            :data-enabled="props.node.enabled"
-            :data-is-inactive="`${ isUpdatingAnother || isAddingAnother ? true : false }`"
-            :data-is-new="isNew"
-            :data-just-updated="justUpdated"
-        >
-            <mc-view-node-checkbox
-                v-if="hasActions"
-                :node="props.node"
-                :isUpdatingOrAdding="isUpdatingOrAdding"
-            />
-            <mc-view-node-name
-                :node="props.node"
-                :depth="props.depth"
-                :title="title"
-                :isUpdatingOrAdding="isUpdatingOrAdding"
-            />
-            <mc-view-node-actions
-                v-if="hasActions"
-                :node="props.node"
-                :title="title"
-                :isUpdating="isUpdating"
-                :isAdding="isAdding"
-                :isUpdatingOrAdding="isUpdatingOrAdding"
-            />
-        </div>
-        <Transition @enter="onEnter" @leave="onLeave">
-            <mc-add-subsection v-if="isAdding" :depth="props.depth" />
-        </Transition>
-        <Transition @enter="onEnter" @leave="onLeave" >
-            <mc-update-node v-if="isUpdating" :depth="props.depth" />
-        </Transition>
-        <ul v-if="showChildren">
-            <mc-view-node
-                v-for="node in props.node.children"
-                :key="node.id"
-                :node="node"
-                :depth="props.depth+1"
-            />
-        </ul>
-   </li>
+    <Transition @enter="onEnter" @leave="onLeave">
+        <li v-if="showNode" ref="viewNodeEl">
+            <div
+                class="buttons-container"
+                :data-enabled="props.node.enabled"
+                :data-is-inactive="`${ isUpdatingAnother || isAddingAnother ? true : false }`"
+                :data-is-new="isNew"
+                :data-just-updated="justUpdated"
+            >
+                <mc-view-node-checkbox
+                    v-if="hasActions"
+                    :node="props.node"
+                    :isUpdatingOrAdding="isUpdatingOrAdding"
+                />
+                <mc-view-node-name
+                    :node="props.node"
+                    :depth="props.depth"
+                    :title="title"
+                    :isUpdatingOrAdding="isUpdatingOrAdding"
+                />
+                <mc-view-node-actions
+                    v-if="hasActions"
+                    :node="props.node"
+                    :title="title"
+                    :isUpdating="isUpdating"
+                    :isAdding="isAdding"
+                    :isUpdatingOrAdding="isUpdatingOrAdding"
+                />
+            </div>
+            <Transition @enter="onEnter" @leave="onLeave">
+                <mc-add-subsection v-if="isAdding" :depth="props.depth" />
+            </Transition>
+            <Transition @enter="onEnter" @leave="onLeave" >
+                <mc-update-node v-if="isUpdating" :depth="props.depth" />
+            </Transition>
+            <ul v-if="showChildren">
+                <mc-view-node
+                    v-for="node in props.node.children"
+                    :key="node.id"
+                    :node="node"
+                    :depth="props.depth+1"
+                />
+            </ul>
+        </li>
+    </Transition>
 </template>
 
 <style lang="scss" scoped>
