@@ -10,7 +10,6 @@ import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search becomes active
 export const DEBOUNCE_AMOUNT = 350; //the amount in ms to hold off on searching, to allow the user to keep typing
 
-
 export const useSearchStore = defineStore(`mcSearch`, {
 
     state: () => ({

@@ -45,14 +45,16 @@ watch(() => searchStore.filteredResults, () => {
     <div class="search-results-container" ref="searchResultsContainerEl">
         <div class="search-results" ref="searchResultsEl">
             <ul>
-                <li v-if="searchStore.isProcessing" class="search-status">Searching for results....</li>
+                <li v-if="searchStore.isLoading" class="search-status">Searching for results....</li>
                 <li v-else-if="searchStore.hasNoResults" class="search-status">No results found for your current search.</li>
-                <li v-if="showSelectAll">
-                    <cs-select-all-search-results />
-                </li>
-                <li v-for="result in searchStore.filteredResults" :key="result.id">
-                    <cs-search-result :result="result"/>
-                </li>
+                <template v-else>
+                    <li v-if="showSelectAll">
+                        <cs-select-all-search-results />
+                    </li>
+                    <li v-for="result in searchStore.filteredResults" :key="result.id">
+                        <cs-search-result :result="result"/>
+                    </li>
+                </template>
             </ul>
         </div><!-- .search-results -->
     </div><!-- .search-results-container -->

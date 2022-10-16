@@ -8,7 +8,7 @@ import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import debounce from 'lodash/debounce';
 import { useStore } from './store/curriculumSelectorStore';
 import { useModalStore } from './store/csModalStore';
-import { useSearchStore } from './store/csSearchStore';
+import { useSearchStore, DEBOUNCE_AMOUNT } from './store/csSearchStore';
 
 
 const store = useStore();
@@ -115,6 +115,7 @@ function onMouseClick (event) {
  */
  watch(() => searchStore.query, () => {
     if (searchStore.isActive) {
+        searchStore.enableSearch();
         debounceSearch();
     }
 });
@@ -124,7 +125,7 @@ function onMouseClick (event) {
  */
 const debounceSearch = debounce(() => {
     searchStore.search();
-}, 350);
+}, DEBOUNCE_AMOUNT);
 
 /**
  * to open the modal
