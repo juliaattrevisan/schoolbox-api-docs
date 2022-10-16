@@ -417,52 +417,53 @@ export default {
     position: relative;
 }
 .group-actions { //to put them in the top right corner
-    background: rgba(0, 102, 176, 0.85);
-    display: inline-block;
+    background: var(--navigation-background);
     position: absolute;
-    right: 10px;
-    top: 10px;
-    z-index: 1;
+    right: 0.5rem;
+    top: 0.5rem;
+}
+
+@mixin disabled-button { //both .group-action and .membership share the same disabled styling
+    &:disabled {
+        color: white;
+        opacity: 1;
+    }
 }
 .group-action {
+    @include disabled-button;
     background: none;
     font-size: 0;
-    &:before {
+    &:before { //tweak the icon display
         color: white;
         font-size: 1.5rem;
-        margin: 0;
         padding: 0;
     }
     &:hover {
         opacity: 0.8;
     }
-    &:disabled {
-        color: white;
-        opacity: 1;
-    }
 }
 
 .membership-button {
-    display: inline-block;
+    @include disabled-button;
     margin: 0;
+}
+
+.expand {
     padding: 1rem; //add extra padding
-    &:disabled {
-        color: white;
-        opacity: 1;
-    }
 }
 
 .private, .membership-pending  {
     background: #DDDDDD;
     color: #999999;
-    padding: 1rem; //add extra padding
     text-align: center;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
     transition: opacity 0.2s;
 }
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
     opacity: 0;
 }
 
@@ -470,7 +471,8 @@ export default {
 .slide-leave-active {
     transition: transform 0.3s ease-out;
 }
-.slide-enter-active, .slide-leave-to {
+.slide-enter-active,
+.slide-leave-to {
     transform: translateX(100%);
 }
 .slide-enter-to {
