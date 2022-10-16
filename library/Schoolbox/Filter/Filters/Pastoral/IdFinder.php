@@ -86,7 +86,7 @@ class IdFinder extends AbstractIdFinder
 
         // Severity selection
         $severitySelection = $completeFilters[Severity\Definition::class] ?? null;
-        if (isset($severitySelection)) {
+        if (isset($severitySelection) && count($severitySelection) > 0) {
             $pb = $pb->in('p.severity_id', $severitySelection);
         }
 
