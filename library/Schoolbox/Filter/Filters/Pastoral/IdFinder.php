@@ -112,7 +112,7 @@ class IdFinder extends AbstractIdFinder
 
         // Student selection (hardcoded filter)
         $studentSelection = $completeFilters[Student\Definition::class] ?? null;
-        if (isset($studentSelection)) {
+        if (isset($studentSelection) && count($studentSelection) > 0) {
             $pb = $pb->in('p.student_id', $studentSelection);
         }
 
