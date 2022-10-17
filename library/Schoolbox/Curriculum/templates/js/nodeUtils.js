@@ -10,7 +10,8 @@
 export const UNSET_ID = 0;
 
 /**
- * return an empty node, usually used to indicate a disabled state
+ * return an empty node, usually used to indicate there's currently
+ * nothing to display
  *
  * @returns { object }
  */
