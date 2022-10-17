@@ -13,14 +13,27 @@ use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Term;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -30,9 +43,41 @@ use UnexpectedValueException;
  */
 class Controller extends Assessment\Controller
 {
+    public function __construct(
+        UserMapper $userMapper,
+        ErrorMapper $errorMapper,
+        DataModel\MapperProxy $assessmentMapper,
+        WorkTypeMapper $workTypeMapper,
+        Access $access,
+        Transactor $transactor,
+        BreadcrumbFactory $bakery,
+        Term\Mapper $termMapper,
+        Participant\DataSource $participantDataSource,
+        CourseSpecificationMapper $courseSpecificationMapper,
+        UnitSpecificationMapper $unitSpecificationMapper,
+        Replicator $replicator,
+        LatestViewMapper $latestViewMapper,
+        private StateMapper $stateMapper,
+    ) {
+        parent::__construct(
+            $userMapper,
+            $errorMapper,
+            $assessmentMapper,
+            $workTypeMapper,
+            $access,
+            $transactor,
+            $bakery,
+            $termMapper,
+            $participantDataSource,
+            $courseSpecificationMapper,
+            $unitSpecificationMapper,
+            $replicator,
+            $latestViewMapper,
+        );
+    }
 
     /**
-     * @param Assessment\Project|IAssessable $assessment
+     * @param Project|IAssessable $assessment
      * @return array
      * @throws UnexpectedValueException
      */
@@ -48,12 +93,13 @@ class Controller extends Assessment\Controller
         }
 
         return [
-            'types'             => new Assessment\AssessmentType(),
-            'selectedSummator'  => $selectedSummator,
-            'acceptingResponses' => false,
-            'allSummators'      => $summatorMapping,
-            'allMarkTypes'      => $this->getAllMarkTypes($assessment),
-            'allGradeSchemes'   => $this->getAllGradeSchemes(),
+            'types'                   => new Assessment\AssessmentType(),
+            'selectedSummator'        => $selectedSummator,
+            'acceptingResponses'      => false,
+            'allSummators'            => $summatorMapping,
+            'allMarkTypes'            => $this->getAllMarkTypes($assessment),
+            'allGradeSchemes'         => $this->getAllGradeSchemes(),
+            'allNullSubmissionStates' => $this->stateMapper->findByColumn('normalise_as', null),
         ];
     }
 
