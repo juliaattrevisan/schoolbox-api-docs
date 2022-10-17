@@ -5,6 +5,8 @@
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useSelectedNodesStore } from './mcSelectedNodesStore';
+import { useUpdateNodeStore } from '../../activeNode/store/mcUpdateNodeStore';
+import { useAddSubsectionStore } from '../../activeNode/store/mcAddSubsectionStore';
 
 
 export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
@@ -36,16 +38,18 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
                 const deleteResponses = nodeDeletions.map((response) => response.ok);
                 const isAllResponsesOk = deleteResponses.every((response) => response === true);
                 if (isAllResponsesOk) {
-                    const successMessage = this.getSuccessMessage();
                     useSelectedNodesStore().deleteNodes();
-                    this.isProcessing = false;
+                    useUpdateNodeStore().cancel(); //the active node may have been deleted
+                    useAddSubsectionStore().cancel(); //the active node may have been deleted
                     this.cancel();
-                    return successMessage;
+                    return this.getSuccessMessage();
                 } else {
                     throw new Error();
                 }
             } catch (error) {
                 console.warn(error);
+            } finally {
+                this.isProcessing = false;
             }
         },
 
