@@ -102,8 +102,8 @@ class Mapper extends BaseMapper
 
             /* Hard-delete the events themselves
              */
-            $deleteEvents = EventMapper::getInstance()->findByColumn('id', $eventIds, ['deleted' => true]);
-            EventMapper::getInstance()->hardDelete($deleteEvents);
+            $query = "DELETE FROM event WHERE id IN (" . implode(',', $eventIds) . ")";
+            $this->database->query($query);
         }
     }
 }
