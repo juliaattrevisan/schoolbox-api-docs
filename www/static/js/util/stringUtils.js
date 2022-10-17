@@ -14,3 +14,14 @@
 export function shortenLength (string, maxLength) {
     return string.length < maxLength ? string : `${string.substring(0, maxLength)}...`;
 }
+
+/**
+ * capitalize the first letter of a string
+ *
+ * @param { string }
+ *
+ * @returns { string }
+ */
+export function capitalizeFirstLetter (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}

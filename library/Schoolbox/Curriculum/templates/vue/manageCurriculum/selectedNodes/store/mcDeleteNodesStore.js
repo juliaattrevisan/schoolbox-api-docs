@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
+import { capitalizeFirstLetter } from '@js/util/stringUtils';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useSelectedNodesStore } from './mcSelectedNodesStore';
 import { useUpdateNodeStore } from '../../activeNode/store/mcUpdateNodeStore';
@@ -80,8 +81,7 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
          * @returns { string }
          */
         getSuccessMessage () {
-            const selectedNodesStore = useSelectedNodesStore();
-            const nodeSingleOrPlural = `Node${selectedNodesStore.count > 1  ? 's' : ''}`;
+            const nodeSingleOrPlural = capitalizeFirstLetter(useSelectedNodesStore().singleOrPlural);
             return `${nodeSingleOrPlural} successfully deleted`;
         },
 
