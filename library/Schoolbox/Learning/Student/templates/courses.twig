@@ -10,8 +10,7 @@
             {% if USER.id == user.id %}
                 My
             {% else %}
-                {{ user.fullname }}'
-                {% if user.fullname |last != 's' %}s{% endif %}
+                {{ user.fullname }}'{% if user.fullname |last != 's' %}s{% endif %}
             {% endif %}
             Courses
         </h1>
