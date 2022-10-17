@@ -275,8 +275,6 @@ async function onLeave (el, done) {
 
 <style lang="scss" scoped>
 
-@import '@css/core/base/colors';
-
 .buttons-container {
     align-items: center;
     border-bottom: 1px solid v-bind(borderBottomColour);
@@ -310,7 +308,7 @@ async function onLeave (el, done) {
 }
 
 @keyframes isNewAnimation {
-    0% { background-color: $success-color; }
+    0% { background-color: #4fa74f; } //is $success-color from _colors.scss
     100% { background-color: white; }
 }
 
