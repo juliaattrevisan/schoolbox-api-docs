@@ -5,13 +5,16 @@
  * button to easily add/remove all search results
  */
 
-import { computed  } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
+import { gsap } from 'gsap/all';
 import { useSearchStore  } from '../store/mgSearchStore';
 import MgSelectAllSearchResults from './mg-select-all-search-results.vue';
 import MgAddMembersSearchResult from './mg-search-result.vue';
 
 
 const searchStore = useSearchStore();
+const searchResultsContainerEl = ref(null);
+const searchResultsEl = ref(null);
 
 /**
  * show select all option for adding / removing codes only if there's
@@ -23,11 +26,24 @@ const showSelectAll = computed(() => {
     return searchStore.filteredResults.length > 1;
 });
 
+/**
+ * to slide up and down the search results
+ */
+ watch(() => searchStore.filteredResults, () => {
+    nextTick(() => {
+        const targetHeight = searchResultsEl.value.offsetHeight;
+        gsap.to(searchResultsContainerEl.value, {
+            duration: 0.3,
+            height: targetHeight,
+        });
+    });
+});
+
 </script>
 
 <template>
-    <div v-if="searchStore.isSearchActive" class="search-results-container">
-        <div class="search-results">
+    <div v-if="searchStore.isSearchActive" class="search-results-container" ref="searchResultsContainerEl">
+        <div class="search-results" ref="searchResultsEl">
             <ul>
                 <li v-if="searchStore.isLoading" class="search-status">Searching for results....</li>
                 <li v-else-if="searchStore.hasNoResults" class="search-status">No results found for your current search.</li>
@@ -47,12 +63,14 @@ const showSelectAll = computed(() => {
 <style lang="scss" scoped>
 
 .search-results-container {
-    position: relative; //to give the .search-result position: absolute context
+    height: 0; //will animate the results within with the watch() above
+    overflow: hidden;
+    position: relative;
 }
 
 .search-results {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    max-height: 500px;
+    max-height: 400px;
     overflow: auto;
     position: absolute;
     top: 0;

@@ -113,7 +113,7 @@ export const useSearchStore = defineStore('mgSearch', {
          */
         async search () {
             const store = useStore();
-            store.isLoading = true;
+            store.isProcessing = true;
             try {
                 const response = await fetch(`${this.searchEndpoint}${this.query}`, {
                     method: 'GET',
@@ -126,7 +126,7 @@ export const useSearchStore = defineStore('mgSearch', {
                 console.warn(error);
             } finally {
                 this.isLoading = false;
-                store.isLoading = false;
+                store.isProcessing = false;
             }
         },
 
