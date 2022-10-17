@@ -67,7 +67,9 @@ class Decorator implements DecoratorInterface
         $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
         $assessment->setMarkScheme($markScheme);
 
-        $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
+        $assessment->setSummator(
+            (new SummatorFactory($this->getSummator(), $this->getRequireAllActivities()))->produce(),
+        );
         $assessment->setRequireAllActivities($this->requireAllActivities);
     }
 

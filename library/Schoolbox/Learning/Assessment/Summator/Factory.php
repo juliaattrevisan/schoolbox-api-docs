@@ -20,21 +20,17 @@ class Factory
     const MAXIMUM = 'max';
     const MINIMUM = 'min';
 
-
-    /**
-     * @var string
-     */
-    protected $summator;
-
-
     /**
      * Factory constructor.
      *
      * @param string $summator
+     * @param bool   $requireAllActivities Must a student attempt all activities? If so, they will receive zero for and
+     *                                     assessment they've not attempted.
      */
-    public function __construct(string $summator)
-    {
-        $this->summator = $summator;
+    public function __construct(
+        private string $summator,
+        private bool $requireAllActivities,
+    ) {
     }
 
 

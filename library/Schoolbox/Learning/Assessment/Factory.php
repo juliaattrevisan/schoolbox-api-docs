@@ -305,7 +305,9 @@ class Factory
         $assessment = AssessmentType::stringToObject($this->getAssessmentType(), $this->context);
 
         if ($assessment instanceof Project) {
-            $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
+            $assessment->setSummator(
+                (new SummatorFactory($this->getSummator(), $this->getRequireAllActivities()))->produce(),
+            );
         }
 
         // Attach context
