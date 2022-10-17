@@ -411,7 +411,7 @@ class Profile implements IStrategy
 
             /* Import profile pictures
              */
-            $this->importPortrait($studentBaseProfile, $student['studentDetails']);
+            $this->importPortrait($studentBaseProfile, self::BASEROLE_STUDENT, $student);
 
             /* Then save it
              */
@@ -1131,7 +1131,7 @@ class Profile implements IStrategy
 
             /* Import profile pictures
              */
-            $this->importPortrait($staffBaseProfile, $staff['staffDetails']);
+            $this->importPortrait($staffBaseProfile, self::BASEROLE_STAFF, $staff);
 
             /* Then save it
              */
@@ -1176,10 +1176,11 @@ class Profile implements IStrategy
      * This populates the portrait_hash in $baseProfile
      *
      * @param Model $baseProfile
+     * @param int   $type
      * @param array $details
      * @return void
      */
-    private function importPortrait(UserProfile\Model $baseProfile, array $details): void
+    private function importPortrait(UserProfile\Model $baseProfile, int $type, array $details): void
     {
         /* Check if config setting allows photos from sis
          * If it's enabled, continue importing pics
@@ -1188,27 +1189,11 @@ class Profile implements IStrategy
             return;
         }
 
-        /* Check if this random node exists if $details was for a student
-         * For that particular usage, it must be set to true
-         *
-         * Staff always get their mugshots and their $details doesn't have a
-         * publishPhotoToInternal field in this area, but they do have one
-         * in their parent data struct (??!)
-         *
-         * There's field duplication and their docs contradict each setting.
-         * Trust this $details one to be canonical.
-         *
-         * Disgusting.
-         */
-        if (isset($details['publishPhotoToInternal']) && !$details['publishPhotoToInternal']) {
-            return;
-        }
-
         /* Start validating the contents of $details to ensure we have what we need
          *
          * getPersonPhotoUrl node might not exist; if it doesn't, skip it
          */
-        $url = trim((string)($details['getPersonPhotoUrl'] ?? ''));
+        $url = $this->findPortraitUrl($type, $details);
 
         /* Node not present/poorly formed
          */
@@ -1273,5 +1258,62 @@ class Profile implements IStrategy
                 $e->getMessage()
             ));
         }
+    }
+
+
+    /**
+     * From an arbitrary $details array, find Organisation*Details nodes
+     * for the given role type and mine out a url accordingly (they're
+     * in different places depending on your roletype...)
+     *
+     * Always returns a string. Empty string means one isn't found or
+     * wasn't specified which equates to the same outcome: useless
+     *
+     * @param int   $type
+     * @param array $person
+     * @return string
+     */
+    private function findPortraitUrl(int $type, array $person): string
+    {
+        /* publishPhotoToInternal isn't found inside studentDetails (disgusting!)
+         * despite what their api docs suggested.
+         *
+         * Check whether it's false; if it's false, we don't import their pictures
+         *
+         * There's field duplication and their docs contradict each setting.
+         * Trust this $person one to be canonical.
+         *
+         * Disgusting.
+         */
+        if (!isset($person['publishPhotoToInternal']) || !$person['publishPhotoToInternal']) {
+            return '';
+        }
+
+        /* Find the first Organisation*Details node among all the $details
+         * nodes that compass might provide.
+         */
+        if ($type === self::BASEROLE_STUDENT) {
+            $node = 'studentDetails';
+            $nodeIdentifier = 'OrganisationStudentDetails:';
+        } elseif ($type === self::BASEROLE_STAFF) {
+            $node = 'staffDetails';
+            $nodeIdentifier = 'OrganisationStaffDetails:';
+        } else {
+            /* Other roletypes don't get pictures
+             */
+            return '';
+        }
+
+        /* Dodgy dig into the darkness
+         */
+        foreach ($person[$node] as $detail) {
+            if (str_contains($detail['__type'], $nodeIdentifier)) {
+                if ($this->isActiveDetailsField($detail)) {
+                    return trim((string)$detail['getPersonPhotoUrl']);
+                }
+            }
+        }
+
+        return '';
     }
 }
