@@ -431,7 +431,7 @@ class TimetableUsers
          */
         $eventIds = [];
 
-        /* Find the usual guys for the sis_events occuring between the two timestamps
+        /* Find the usual guys for the sis_events occurring between the two timestamps
          */
         $query = "
             SELECT DISTINCT se.id AS eventId, se.code, scu.*
