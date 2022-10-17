@@ -546,7 +546,6 @@ export default {
 
 <style lang="scss">
 
-@import 'www/static/css/core/base/_colors.scss';
 @import '@schoolboxVue/components/vueTables2/vueTables2';
 
 .VueTables table {
@@ -643,7 +642,7 @@ export default {
 }
 
 @keyframes fadeOutBackgroundColour {
-    0% { background-color: $success-color; }
+    0% { background-color: #4fa74f; } //is $success-color from _colors.scss
     100% { background-color: white; }
 }
 

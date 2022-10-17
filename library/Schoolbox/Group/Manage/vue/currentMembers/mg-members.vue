@@ -261,7 +261,6 @@ function updateSelectedMembers () {
 <style lang="scss">
 
 @import '@schoolboxVue/components/vueTables2/vueTables2';
-@import '@css/core/base/colors';
 
 .VueTables {
     margin-bottom: 150px; //to allow space for the bottom-drawer so it can't cut off the bottom of the table
@@ -291,7 +290,7 @@ function updateSelectedMembers () {
 }
 
 @keyframes isNewAnimation {
-    0% { background-color: $success-color; }
+    0% { background-color: #4fa74f; } //is $success-color from _colors.scss
     100% { background-color: white; }
 }
 
