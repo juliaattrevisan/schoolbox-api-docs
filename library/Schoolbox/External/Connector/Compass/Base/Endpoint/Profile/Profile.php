@@ -22,6 +22,7 @@ use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use UnexpectedValueException;
 
 /**
@@ -98,6 +99,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var bool
+     */
+    private bool $includePhoto;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private UserProfile\Mapper $baseProfileMapper;
@@ -125,6 +132,12 @@ class Profile implements IStrategy
      * @var UserProfile\Relationship\Mapper
      */
     private UserProfile\Relationship\Mapper $relationshipMapper;
+
+
+    /**
+     * @var StorageMapper
+     */
+    private StorageMapper $storageMapper;
 
 
     /**
@@ -161,31 +174,37 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param IApi                            $api
+     * @param bool                            $includePhoto
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param StorageMapper                   $storageMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         IApi $api,
+        bool $includePhoto,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper
+        UserProfile\Relationship\Mapper $relationshipMapper,
+        StorageMapper $storageMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->includePhoto = $includePhoto;
 
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+        $this->storageMapper = $storageMapper;
 
         /* Helper class
          */
@@ -389,6 +408,10 @@ class Profile implements IStrategy
                 ->setFirstname($firstname)
                 ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
+
+            /* Import profile pictures
+             */
+            $this->importPortrait($studentBaseProfile, $student['studentDetails']);
 
             /* Then save it
              */
@@ -1106,6 +1129,10 @@ class Profile implements IStrategy
                 ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
+            /* Import profile pictures
+             */
+            $this->importPortrait($staffBaseProfile, $staff['staffDetails']);
+
             /* Then save it
              */
             if ($this->perform) {
@@ -1136,6 +1163,115 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->staffProfileMapper->save($staffProfile);
             }
+        }
+    }
+
+
+    /**
+     * Import a profile picture for the given $baseProfile
+     *
+     * Importing a profile picture requires you to enable photo_from_sis config var
+     * ("Load Photos From SIS" needs to be on)
+     *
+     * This populates the portrait_hash in $baseProfile
+     *
+     * @param Model $baseProfile
+     * @param array $details
+     * @return void
+     */
+    private function importPortrait(UserProfile\Model $baseProfile, array $details): void
+    {
+        /* Check if config setting allows photos from sis
+         * If it's enabled, continue importing pics
+         */
+        if (!$this->includePhoto) {
+            return;
+        }
+
+        /* Check if this random node exists if $details was for a student
+         * For that particular usage, it must be set to true
+         *
+         * Staff always get their mugshots and their $details doesn't have a
+         * publishPhotoToInternal field in this area, but they do have one
+         * in their parent data struct (??!)
+         *
+         * There's field duplication and their docs contradict each setting.
+         * Trust this $details one to be canonical.
+         *
+         * Disgusting.
+         */
+        if (isset($details['publishPhotoToInternal']) && !$details['publishPhotoToInternal']) {
+            return;
+        }
+
+        /* Start validating the contents of $details to ensure we have what we need
+         *
+         * getPersonPhotoUrl node might not exist; if it doesn't, skip it
+         */
+        $url = trim((string)($details['getPersonPhotoUrl'] ?? ''));
+
+        /* Node not present/poorly formed
+         */
+        if ('' === $url) {
+            $this->log->debug(sprintf(
+                'Profile picture: no data found for %s %s (%s)',
+                $baseProfile->getFirstname(),
+                $baseProfile->getLastname(),
+                $baseProfile->getExternalId()
+            ));
+
+            return;
+        }
+
+        /* Fetch data from the url specified
+         */
+        $image = file_get_contents($url);
+
+        if (!$image) {
+            $this->log->debug(sprintf(
+                'Profile picture: could not decode image data for %s %s (%s)',
+                $baseProfile->getFirstname(),
+                $baseProfile->getLastname(),
+                $baseProfile->getExternalId()
+            ));
+
+            return;
+        }
+
+        /* Start the part where we save the image
+         */
+        $this->log->debug(sprintf(
+            'Importing profile picture for %s %s (%s)',
+            $baseProfile->getFirstname(),
+            $baseProfile->getLastname(),
+            $baseProfile->getExternalId()
+        ));
+
+        /* Only try to persist images if perform mode is activated
+         */
+        if (!$this->perform) {
+            return;
+        }
+
+        /* Otherwise, all the parts are here and valid; continue with the persistence
+         * to storage and assignation to the $baseProfile by reference
+         */
+        try {
+            $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . '.jpg', $image);
+
+            /* You get a picture if any of the following occur:
+             *     - you don't have a portrait yet; you can get one added
+             *     - your existing picture is different to the one we just got; update it
+             */
+            if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
+                $baseProfile->setPortrait($portrait);
+            }
+        } catch (\Exception $e) {
+            // noop, but warn the cli that something unusual has transpired
+            $this->log->warning(sprintf(
+                'Profile picture: exception thrown. %s',
+                $e->getMessage()
+            ));
         }
     }
 }
