@@ -12,6 +12,7 @@ import NodeDetails from '@schoolboxCurriculum/vue/node-details';
 import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import userProfileConstants from '../../../vue/user-profile/constants';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 
 
 export default {
@@ -45,7 +46,7 @@ export default {
             },
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
-            selectedNode: { id: 0 }, //the selected curriculum code to display further details for
+            selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
         }
     },
     computed: {

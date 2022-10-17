@@ -5,7 +5,7 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import { getBreadcrumbs } from '@schoolboxCurriculum/js/nodeUtils';
+import { getBreadcrumbs, UNSET_ID } from '@schoolboxCurriculum/js/nodeUtils';
 
 
 const props = defineProps({
@@ -27,7 +27,7 @@ const hasLoadError = ref(false);
  * when there's a new node, we should load all the details to display
  */
 watch(() => props.node, (newNode) => {
-    if (newNode.id === 0) {
+    if (newNode.id === UNSET_ID) {
         isActive.value = false;
     } else {
         node.value = newNode;

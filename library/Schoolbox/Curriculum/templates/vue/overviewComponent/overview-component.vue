@@ -11,13 +11,14 @@
 import { ref, onMounted } from 'vue';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
 import NodeDetails from '@schoolboxCurriculum/vue/node-details';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 
 
 onMounted(() => {
     findNodeLinks();
 });
 
-const selectedNode = ref({ id: 0 });
+const selectedNode = ref(getEmptyNode());
 const modalEl = ref(null);
 
 /**

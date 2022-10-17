@@ -12,6 +12,8 @@ import BadgeImage from './badge-image';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import mixinFilter from '@schoolboxVue/mixins/filter';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
+
 
 export default {
     /**
@@ -82,7 +84,7 @@ export default {
             showSkeletonLoader: true,
             selectedFilters: null,
             isDetailModalOpen: false, //whether the modal to display the badge details is open
-            selectedNodeDetails: { id: 0 }, //the selected curriculum code to display further details for
+            selectedNodeDetails: getEmptyNode(), //the selected curriculum code to display further details for
             detailModalIndex: 1, //to move to show the selected curriculum code details
         }
     },

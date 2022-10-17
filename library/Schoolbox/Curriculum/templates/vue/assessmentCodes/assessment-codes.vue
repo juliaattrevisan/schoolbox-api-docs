@@ -10,6 +10,7 @@ import { ref } from 'vue';
 import CodesList from '@schoolboxCurriculum/vue/codes-list';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
 import NodeDetails from '@schoolboxCurriculum/vue/node-details';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 
 
 const props = defineProps({
@@ -22,7 +23,7 @@ const props = defineProps({
     },
 });
 
-const selectedNode = ref({ id: 0 });
+const selectedNode = ref(getEmptyNode());
 const modalEl = ref(null);
 
 /**

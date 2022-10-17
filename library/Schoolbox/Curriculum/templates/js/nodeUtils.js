@@ -10,6 +10,17 @@
 export const UNSET_ID = 0;
 
 /**
+ * return an empty node, usually used to indicate a disabled state
+ *
+ * @returns { object }
+ */
+export function getEmptyNode () {
+    return {
+        id: UNSET_ID,
+    }
+}
+
+/**
  * To just return the node containing the specified id
  * We recursively loop through the object until we find the
  * matched object or undefined if not found

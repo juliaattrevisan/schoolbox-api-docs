@@ -13,6 +13,7 @@ import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
 import CodesList from '@schoolboxCurriculum/vue/codes-list';
 import NodeDetails from '@schoolboxCurriculum/vue/node-details';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 
 /**
  * Award detail modal.
@@ -93,7 +94,7 @@ export default {
              */
             allowReasonEdit: true,
             reason: '', //the reason the badge(s) are being awarded
-            selectedNode: { id: 0 }, //the selected curriculum code to display further details for
+            selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
         }
     },
 
