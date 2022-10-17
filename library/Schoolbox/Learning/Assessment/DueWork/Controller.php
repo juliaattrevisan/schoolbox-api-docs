@@ -122,6 +122,7 @@ class Controller extends Assessment\Controller
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      * @param LatestViewMapper                  $latestViewMapper
      * @param FilesystemProxy                   $filesystemProxy
+     * @param StateMapper                       $stateMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -149,6 +150,7 @@ class Controller extends Assessment\Controller
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         LatestViewMapper $latestViewMapper,
         private FilesystemProxy $filesystemProxy,
+        private StateMapper $stateMapper,
     ) {
         parent::__construct(
             $userMapper,
@@ -220,7 +222,7 @@ class Controller extends Assessment\Controller
         // Only display download link if there are actually files to download
 
         $twigData = [
-            'errors'            => StateMapper::getInstance()->listDisplayValues(),
+            'errors'            => $this->stateMapper->listDisplayValues(),
             'type'              => Assessment\AssessmentType::objectToString($assessment),
             'markSchemeName'    => $this->deriveSchemeName($assessment->getMarkScheme()),
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(

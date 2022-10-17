@@ -448,6 +448,7 @@ class Module extends BaseModule
                     $folderMapper,
                     $viewLatestMapper,
                     $this->injector->get('filesystem.storageProxy'),
+                    $stateMapper,
                 );
 
             case Assessment\Project\Controller::class:
