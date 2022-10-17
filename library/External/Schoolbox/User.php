@@ -265,7 +265,6 @@ class External_Schoolbox_User implements External_UserInterface
                 \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                 \Schoolbox\External\Event\Mapper::getInstance(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-                \Schoolbox\UserMapper::getInstance(),
                 \Schoolbox\External\Profile\Staff\Mapper::getInstance()
             ))->findClassCodesForUser($user, $pastThreshold, $futureThreshold);
 

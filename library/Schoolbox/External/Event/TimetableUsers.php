@@ -15,7 +15,6 @@ use Schoolbox\External\Event\Overrides\Applicator;
 use Schoolbox\External\Event\Overrides\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 /**
  * For a given event, find the final calculated list of users
@@ -90,7 +89,6 @@ class TimetableUsers
      * @param ClassInvolvementMapper                   $classInvolvementMapper
      * @param \Schoolbox\External\Event\Mapper         $eventMapper
      * @param Mapper                                   $overrideMapper
-     * @param UserMapper                               $userMapper
      * @param \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
      */
     public function __construct(
@@ -98,7 +96,6 @@ class TimetableUsers
         \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
-        \Schoolbox\UserMapper $userMapper,
         \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
     ) {
         $this->classEntryMapper = $classEntryMapper;

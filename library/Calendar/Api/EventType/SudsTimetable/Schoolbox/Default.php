@@ -147,7 +147,6 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $this->classInvolvementMapper,
             $this->eventMapper,
             $this->overrideMapper,
-            $this->userMapper,
             $this->staffProfileMapper
         ))->findForUser(
             $this->getUser(),
