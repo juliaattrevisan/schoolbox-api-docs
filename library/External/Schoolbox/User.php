@@ -240,13 +240,16 @@ class External_Schoolbox_User implements External_UserInterface
          * for involvements. You might have been the teacher of a class
          * at some point in the past, but no longer
          *
-         * $pastThreshold and $futureThreshold are both defaulted to 1 week
-         * just because I said so. This gives you a span of 2 weeks where
-         * your involvements are examined. We don't know your involvements
-         * outside of this interval.
+         * $pastThreshold and $futureThreshold are both defaulted to Just Today
+         * This means anyone who is *not* the usual teacher will lose their
+         * access to homepages etc. via the My Subjects in the side menu at the
+         * end of the day (midnight). This rule applies universally.
+         *
+         * We chose not to accommodate covering teachers having more access than
+         * this; if a school wants that, add them to the homepage manually.
          */
-        $pastThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
-        $futureThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_FUTURE_THRESHOLD)->endOfDay()->getUnixTimeStamp();
+        $pastThreshold = \Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
+        $futureThreshold = \Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp();
         $overridesTeachers = [];
         $config = \Schoolbox\Config\Loader::getInstance();
 
