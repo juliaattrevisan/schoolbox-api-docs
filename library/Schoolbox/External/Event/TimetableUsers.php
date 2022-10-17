@@ -12,9 +12,8 @@ namespace Schoolbox\External\Event;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Event\Overrides\Applicator;
+use Schoolbox\External\Event\Overrides\Mapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -71,12 +70,6 @@ class TimetableUsers
 
 
     /**
-     * @var \Schoolbox\UserMapper
-     */
-    private \Schoolbox\UserMapper $userMapper;
-
-
-    /**
      * @var \Schoolbox\External\Profile\Staff\Mapper
      */
     private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
@@ -91,12 +84,14 @@ class TimetableUsers
 
 
     /**
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param \Schoolbox\External\Event\Mapper           $eventMapper
-     * @param \Schoolbox\External\Event\Overrides\Mapper $overrideMapper
-     * @param UserMapper                                 $userMapper
-     * @param \Schoolbox\External\Profile\Staff\Mapper   $staffProfileMapper
+     * Constructor.
+     *
+     * @param ClassEntryMapper                         $classEntryMapper
+     * @param ClassInvolvementMapper                   $classInvolvementMapper
+     * @param \Schoolbox\External\Event\Mapper         $eventMapper
+     * @param Mapper                                   $overrideMapper
+     * @param UserMapper                               $userMapper
+     * @param \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
      */
     public function __construct(
         \Schoolbox\External\ClassEntryMapper $classEntryMapper,
@@ -110,7 +105,6 @@ class TimetableUsers
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->eventMapper = $eventMapper;
         $this->overrideMapper = $overrideMapper;
-        $this->userMapper = $userMapper;
         $this->staffProfileMapper = $staffProfileMapper;
     }
 
@@ -458,6 +452,10 @@ class TimetableUsers
                 $stack[$row['eventId']] = [
                     'code' => $row['code'],
                     'usuals' => [],
+                    /* A list of overrides index by event id since each event
+                     * has its own list of overrides
+                     */
+                    'overrides' => [],
                     /* A list of people who survived all the mutations
                      * and transformations in this algorithm
                      */
@@ -513,10 +511,7 @@ class TimetableUsers
         /* Perform mutations
          */
         foreach ($stack as $eventId => &$data) {
-            $data['manifest'] = (new Applicator($this->staffProfileMapper))->apply(
-                $data['usuals'] ?? [],
-                $data['overrides'] ?? [],
-            );
+            $data['manifest'] = (new Applicator($this->staffProfileMapper))->apply($data['usuals'], $data['overrides']);
 
             /* Only care about events the current user is in today
              */
