@@ -8,7 +8,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { gsap } from 'gsap/all';
 import { timeout } from '@js/util/jsUtils';
-import { slideDown, slideUp } from '@js/util/animateUtils';
+import { slideDownOnEnter, slideUpOnLeave } from '@schoolboxVue/transitions/transitions';
 import { useStore } from '../store/manageCurriculumStore';
 import { UNSET_ID } from '../../../js/nodeUtils';
 import { useViewNodesStore, DIRECTION } from './store/mcViewNodesStore';
@@ -61,6 +61,7 @@ const justUpdated = ref(false); //to highlight if the node has just been updated
 
 /**
  * Consider whether we are currently only showing enabled nodes
+ * and hide the node if we are are and the node is not enabled
  *
  * @returns { Boolean }
  */
@@ -73,16 +74,17 @@ const showNode = computed(() => {
 });
 
 /**
- * to animate on the node
+ * to animate on the node, checking also if this node is
+ * a new subsection or entirely new curriculum and animating
  */
 onMounted(() => {
     if (showNode.value && props.depth === 0) { //we only need to animate the first node, as the rest are contained within
         animateOn();
     }
-    if (props.node.id === addSubsectionStore.id) {
+    if (props.node.id === addSubsectionStore.id) { //higlight the newly added node
         displayAnimation(isNew);
         addSubsectionStore.unsetId();
-    } else if (props.node.id === addCurriculumStore.id) {
+    } else if (props.node.id === addCurriculumStore.id) { //highlight the new curriculum that's just been added
         displayAnimation(isNew);
         addCurriculumStore.unsetId();
     }
@@ -95,7 +97,7 @@ onMounted(() => {
 useUpdateNodeStore().$onAction(({ name, after }) => {
     if (name === 'update') {
         after((result) => {
-            if (props.node.id === result.id) {
+            if (props.node.id === result.id) { //highlight the just updated node
                 displayAnimation(justUpdated);
             }
         });
@@ -216,30 +218,10 @@ const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.
  */
 const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
 
-/**
- * Slide down the node to be updated / added
- *
- * @param { DOMElement }
- */
-async function onEnter (el, done) {
-    await slideDown(el);
-    done()
-}
-
-/**
- * Slide up on close or when the node is updated  / added
- *
- * @param { DOMElement }
- */
-async function onLeave (el, done) {
-    await slideUp(el);
-    done()
-}
-
 </script>
 
 <template>
-    <Transition @enter="onEnter" @leave="onLeave">
+    <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
         <li v-if="showNode" ref="viewNodeEl">
             <div
                 class="buttons-container"
@@ -268,10 +250,10 @@ async function onLeave (el, done) {
                     :isUpdatingOrAdding="isUpdatingOrAdding"
                 />
             </div>
-            <Transition @enter="onEnter" @leave="onLeave">
+            <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                 <mc-add-subsection v-if="isAdding" :depth="props.depth" />
             </Transition>
-            <Transition @enter="onEnter" @leave="onLeave" >
+            <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave" >
                 <mc-update-node v-if="isUpdating" :depth="props.depth" />
             </Transition>
             <ul v-if="showChildren">
