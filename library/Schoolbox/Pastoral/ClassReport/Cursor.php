@@ -148,9 +148,9 @@ class Cursor implements ICursor
     {
         return match ($this->sortOption) {
             self::SORT_OPTION_SEVERITY => [
-                'sev.sequence' => Mapper::SORT_ORDER_DESC,
-                'created_at'   => Mapper::SORT_ORDER_DESC,
-                'id'           => Mapper::SORT_ORDER_DESC,
+                'sv.sequence' => Mapper::SORT_ORDER_DESC,
+                'created_at'  => Mapper::SORT_ORDER_DESC,
+                'id'          => Mapper::SORT_ORDER_DESC,
             ],
             self::SORT_OPTION_UPDATED => [
                 'updated_at' => Mapper::SORT_ORDER_DESC,
@@ -199,15 +199,15 @@ class Cursor implements ICursor
             // severity: severity.sequence DESC, then created DESC, then id DESC
             $pb = $pb->any(
                 $this->dataSource->getPredicateBuilder()
-                    ->lessThan('sev.sequence', $cursor['severity'])
+                    ->lessThan('sv.sequence', $cursor['severity'])
                     ->all(
                         $this->dataSource->getPredicateBuilder()
-                            ->equals('sev.sequence', $cursor['severity'])
+                            ->equals('sv.sequence', $cursor['severity'])
                             ->lessThan('created_at', $created)
                     )
                     ->all(
                         $this->dataSource->getPredicateBuilder()
-                            ->equals('sev.sequence', $cursor['severity'])
+                            ->equals('sv.sequence', $cursor['severity'])
                             ->equals('created_at', $created)
                             ->lessThan('id', $cursor['id'])
                     )
