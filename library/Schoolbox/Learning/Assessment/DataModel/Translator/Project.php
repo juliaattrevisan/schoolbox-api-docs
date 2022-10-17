@@ -115,6 +115,7 @@ class Project implements IAssessmentTypeTranslator
         } elseif ($domainObject->getSummator() instanceof Maximum) {
             $dataModel->setSummator(ProjectModel::SUMMATOR_MAXIMUM);
         }
+        $dataModel->setRequireAllActivities($domainObject->getRequireAllActivities());
 
         // Translate mark scheme
         // TODO move this to the mark scheme translator
@@ -143,6 +144,7 @@ class Project implements IAssessmentTypeTranslator
         /** @var ProjectModel $dataModel */
         /** @var ProjectObject $domainObject */
         $domainObject->setSummator($this->getSummator($dataModel));
+        $domainObject->setRequireAllActivities($dataModel->getRequireAllActivities());
         null === $dataModel->getOwner() || $domainObject->setCreator($dataModel->getOwner());
 
 
