@@ -42,7 +42,7 @@ const showSelectAll = computed(() => {
 </script>
 
 <template>
-    <div v-if="searchStore.isSearchActive" class="search-results-container" ref="searchResultsContainerEl">
+    <div class="search-results-container" ref="searchResultsContainerEl">
         <div class="search-results" ref="searchResultsEl">
             <ul>
                 <li v-if="searchStore.isLoading" class="search-status">Searching for results....</li>
