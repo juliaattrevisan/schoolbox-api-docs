@@ -148,18 +148,18 @@ class Cursor implements ICursor
     {
         return match ($this->sortOption) {
             self::SORT_OPTION_SEVERITY => [
-                'sv.sequence' => Mapper::SORT_ORDER_DESC,
-                'created_at'  => Mapper::SORT_ORDER_DESC,
-                'id'          => Mapper::SORT_ORDER_DESC,
+                'sev.sequence' => Mapper::SORT_ORDER_DESC,
+                'p.created_at' => Mapper::SORT_ORDER_DESC,
+                'p.id'         => Mapper::SORT_ORDER_DESC,
             ],
             self::SORT_OPTION_UPDATED => [
-                'updated_at' => Mapper::SORT_ORDER_DESC,
-                'created_at' => Mapper::SORT_ORDER_DESC,
-                'id'         => Mapper::SORT_ORDER_DESC,
+                'p.updated_at' => Mapper::SORT_ORDER_DESC,
+                'p.created_at' => Mapper::SORT_ORDER_DESC,
+                'p.id'         => Mapper::SORT_ORDER_DESC,
             ],
             default => [
-                'created_at' => Mapper::SORT_ORDER_DESC,
-                'id'         => Mapper::SORT_ORDER_DESC,
+                'p.created_at' => Mapper::SORT_ORDER_DESC,
+                'p.id'         => Mapper::SORT_ORDER_DESC,
             ],
         };
     }
@@ -173,8 +173,8 @@ class Cursor implements ICursor
     private function buildPredicateBuilder(?string $encodedCursor): Builder
     {
         $pb = $this->dataSource->getPredicateBuilder()
-            ->equals('student_id', $this->student->getId())
-            ->in('id', $this->pastoralIds);
+            ->equals('p.student_id', $this->student->getId())
+            ->in('p.id', $this->pastoralIds);
         if (!isset($encodedCursor)) {
             return $pb;
         }
@@ -199,45 +199,45 @@ class Cursor implements ICursor
             // severity: severity.sequence DESC, then created DESC, then id DESC
             $pb = $pb->any(
                 $this->dataSource->getPredicateBuilder()
-                    ->lessThan('sv.sequence', $cursor['severity'])
+                    ->lessThan('sev.sequence', $cursor['severity'])
                     ->all(
                         $this->dataSource->getPredicateBuilder()
-                            ->equals('sv.sequence', $cursor['severity'])
-                            ->lessThan('created_at', $created)
+                            ->equals('sev.sequence', $cursor['severity'])
+                            ->lessThan('p.created_at', $created)
                     )
                     ->all(
                         $this->dataSource->getPredicateBuilder()
-                            ->equals('sv.sequence', $cursor['severity'])
-                            ->equals('created_at', $created)
-                            ->lessThan('id', $cursor['id'])
+                            ->equals('sev.sequence', $cursor['severity'])
+                            ->equals('p.created_at', $created)
+                            ->lessThan('p.id', $cursor['id'])
                     )
             );
         } elseif ($this->sortOption === self::SORT_OPTION_UPDATED) {
             // updated: updated DESC, then created DESC, then id DESC
             $pb = $pb->any(
                 $this->dataSource->getPredicateBuilder()
-                    ->lessThan('updated_at', $updated)
+                    ->lessThan('p.updated_at', $updated)
                     ->all(
                         $this->dataSource->getPredicateBuilder()
-                            ->equals('updated_at', $updated)
-                            ->lessThan('created_at', $created)
+                            ->equals('p.updated_at', $updated)
+                            ->lessThan('p.created_at', $created)
                     )
                     ->all(
                         $this->dataSource->getPredicateBuilder()
-                            ->equals('updated_at', $cursor['severity'])
-                            ->equals('created_at', $created)
-                            ->lessThan('id', $cursor['id'])
+                            ->equals('p.updated_at', $cursor['severity'])
+                            ->equals('p.created_at', $created)
+                            ->lessThan('p.id', $cursor['id'])
                     )
             );
         } else {
             // created: created DESC, then id DESC
             $pb = $pb->any(
                 $this->dataSource->getPredicateBuilder()
-                    ->lessThan('created_at', $created)
+                    ->lessThan('p.created_at', $created)
                     ->all(
                         $this->dataSource->getPredicateBuilder()
-                             ->equals('created_at', $created)
-                             ->lessThan('id', $cursor['id'])
+                             ->equals('p.created_at', $created)
+                             ->lessThan('p.id', $cursor['id'])
                     )
             );
         }
