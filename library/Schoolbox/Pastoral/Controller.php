@@ -880,7 +880,7 @@ class Controller extends Base
 
                 $access = $this->pastoralAccessMapper->createModel();
                 $access->setAccess($accessLevel);
-                $access->setCommentsAllowed((bool)$post["roleComment{$roleId}"] ?? false);
+                $access->setCommentsAllowed((bool)($post["roleComment{$roleId}"] ?? false));
 
                 // Is this a role or a role type?
                 if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
@@ -914,7 +914,7 @@ class Controller extends Base
                     $access = $this->pastoralAccessMapper->createModel();
                     $access->setAccess($accessLevel);
                     $access->setGroup($group);
-                    $access->setCommentsAllowed((bool)$post["groupComment{$groupId}"] ?? false);
+                    $access->setCommentsAllowed((bool)($post["groupComment{$groupId}"] ?? false));
                     $accesses->add($access);
                 } catch (MapperException $e) {
                     // Noop
@@ -935,7 +935,7 @@ class Controller extends Base
                     $user   = $this->userMapper->findById($userId);
                     $access = $this->pastoralAccessMapper->createModel();
                     $access->setAccess($accessLevel);
-                    $access->setCommentsAllowed((bool)$post["userComment{$userId}"] ?? false);
+                    $access->setCommentsAllowed((bool)($post["userComment{$userId}"] ?? false));
                     $access->setUser($user);
                     $accesses->add($access);
                 } catch (MapperException $e) {
