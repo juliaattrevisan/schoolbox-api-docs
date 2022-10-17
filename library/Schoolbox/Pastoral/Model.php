@@ -287,8 +287,7 @@ class Model implements ISoftDeletable, IModel
     public function getParentCommentsAllowed(): bool
     {
         /** @var \Schoolbox\Pastoral\Access\Model $access */
-        foreach ($this->getAccess() as $access)
-        {
+        foreach ($this->getAccess() as $access) {
             if (
                 $access->getRoleType() === Role::PARENT
                 && $access->getAccess() >= \Schoolbox\Pastoral\Access\Mapper::ACCESS_PUBLIC
@@ -306,8 +305,7 @@ class Model implements ISoftDeletable, IModel
     public function getStudentCommentsAllowed(): bool
     {
         /** @var \Schoolbox\Pastoral\Access\Model $access */
-        foreach ($this->getAccess() as $access)
-        {
+        foreach ($this->getAccess() as $access) {
             if (
                 $access->getRoleType() === Role::STUDENT
                 && $access->getAccess() >= \Schoolbox\Pastoral\Access\Mapper::ACCESS_PUBLIC
