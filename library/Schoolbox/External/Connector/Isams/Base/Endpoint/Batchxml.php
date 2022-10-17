@@ -88,7 +88,15 @@ class Batchxml
                 /* If this succeeds, $xml is the actual isams batch xml contents
                  * and we're good to go
                  */
-                $this->nodes = new SimpleXMLElement($xml);
+                $this->nodes = @(new SimpleXMLElement($xml));
+
+                /* Note about Suppression
+                 *
+                 * I *know* it looks weird having a suppression on a constructor,
+                 * but $xml from isams can be malformed as per the following commentary
+                 * about Severe Warning. The suppression prevents warnings being shown
+                 * on the Specification screen when you misconfigure the api key
+                 */
             } catch (\Exception $e) {
                 /* iSAMS can throw you either a plain-jane text string:
                  * "iSAMS blocked the request as it came from an unknown source."
