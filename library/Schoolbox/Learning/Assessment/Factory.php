@@ -177,6 +177,7 @@ class Factory
         /* Projects need this to instantiate
          */
         $this->setSummator($post['summator'] ?? '');
+        $this->setRequireAllActivities((bool)($post['requireAllActivities'] ?? false));
 
         /* Due Work needs this to instantiate correctly
          */
@@ -341,7 +342,8 @@ class Factory
             $decorator = new ProjectDecorator(
                 $this->getMarkType(),
                 $this->getGradingScheme(),
-                $this->getSummator()
+                $this->getSummator(),
+                $this->getRequireAllActivities(),
             );
         } elseif ($assessment instanceof DueWork) {
             /** @var DueWork $originalDueWork */
