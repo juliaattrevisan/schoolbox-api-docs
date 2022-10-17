@@ -373,7 +373,16 @@ class TimetableUsers
          */
         foreach ($lookup as $classCode => &$data) {
             foreach ($data['overrides'] as $eventId => $overrides) {
-                $data['manifest'][$eventId] = (new Applicator($this->staffProfileMapper))->apply($data['usuals'], $overrides);
+                $manifest = (new Applicator($this->staffProfileMapper))->apply($data['usuals'], $overrides);
+
+                /* When we use this to calculate My Subjects in the side menu
+                 * it's actually a union of the usual guys and the survivors
+                 * of the mutations. This does not affect timetables, just
+                 * folder access and shortcuts.
+                 */
+                $superposition = array_merge($manifest, $data['usuals']);
+
+                $data['manifest'][$eventId] = $superposition;
 
                 /* If you were involved in this class at any point within the
                  * time interval specified, I suppose you can pile its class code
