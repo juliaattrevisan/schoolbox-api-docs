@@ -10,7 +10,7 @@ import FromTypes from '../addMembers/mgAddMembersFromTypes';
 
 
 const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search becomes active
-export const DEBOUNCE_AMOUNT = 350;
+export const DEBOUNCE_AMOUNT = 350; //to allow time for further user key presses before search begins
 
 export const useSearchStore = defineStore('mgSearch', {
 
