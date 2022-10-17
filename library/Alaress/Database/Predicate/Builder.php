@@ -208,6 +208,21 @@ class Builder implements IBuilder
 
 
     /**
+     * Add a raw WHERE condition to this predicate builder.
+     *
+     * @param string $where  A raw WHERE condition, e.g. `column IS TRUE`.
+     * @param array  $params Any params for placeholders in `$where`.
+     * @return $this
+     */
+    public function rawWhere(string $where, array $params): self
+    {
+        $this->where[] = $where;
+        $this->params = array_merge($this->params, $params);
+        return $this;
+    }
+
+
+    /**
      * @param string|ISqlFunc                      $columnName
      * @param string|int|float|Alaress_Date_Format $columnValue
      * @param string                               $operator
