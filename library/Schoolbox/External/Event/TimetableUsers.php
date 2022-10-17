@@ -411,6 +411,9 @@ class TimetableUsers
      */
     public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
+        $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
+        $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
+
         /* Micromanage a stack of minimal event data with overrides
          */
         $stack = [];
@@ -435,8 +438,8 @@ class TimetableUsers
         $statement = $this->eventMapper->getDatabase()->prepare($query);
         $statement->execute([
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'from' => \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(),
-            'to' => \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase(),
+            'from' => $startDatetime,
+            'to' => $finishDatetime,
         ]);
 
         /* Pile it into the $stack in preparation for the mutations
@@ -474,8 +477,8 @@ class TimetableUsers
         $statement = $this->eventMapper->getDatabase()->prepare($query);
         $statement->execute([
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'from' => \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(),
-            'to' => \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase(),
+            'from' => $startDatetime,
+            'to' => $finishDatetime,
         ]);
 
         /* Remember: overrides are generally optional so they might not even
@@ -503,7 +506,7 @@ class TimetableUsers
         foreach ($stack as $eventId => &$data) {
             $data['manifest'] = (new Applicator($this->staffProfileMapper))->apply(
                 $data['usuals'] ?? [],
-                    $data['overrides'] ?? [],
+                $data['overrides'] ?? [],
             );
 
             /* Only care about events the current user is in today
