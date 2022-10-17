@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Queue\Composite;
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
 use Monolog\Logger;
 use Predis\ClientInterface;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -41,20 +42,38 @@ class Controller extends Base
     public function apiUserNotify(User $user): void
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
-        $bob  = new NotificationInstanceBuilder();
-        $bob->setTitle($data['message'] ?? '')
-            ->setAllowSelfSend(true)
-            ->setSeverity(Logger::INFO)
-            ->setNamespace(NSMapper::NS_MESSAGE)
-            ->setHref($data['href'] ?? '#')
-            ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
-            ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $user->getId()))
-            ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
+        //check for required fields
+        if ('' === ($data['message'] ?? '')) {
+            $problem = (new ApiProblem("'message' is not set"))
+                ->setStatus(500)
+                ->asArray();
+            $this->getResponse()->status->setCode(500);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return; //exit early the message field is not set...
+        }
+        try {
+            $bob  = new NotificationInstanceBuilder();
+            $bob->setTitle($data['message'] ?? '')
+                ->setAllowSelfSend(true)
+                ->setSeverity(Logger::INFO)
+                ->setNamespace(NSMapper::NS_MESSAGE)
+                ->setHref($data['href'] ?? '#')
+                ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
+                ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $user->getId()))
+                ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
 
-        $composite = new Composite(
-            new Listed($this->redisStorage, INSTANCE_ID, $user->getId()),
-            new Unread($this->redisStorage, INSTANCE_ID, $user->getId())
-        );
-        $composite->push($bob->build());
+            $composite = new Composite(
+                new Listed($this->redisStorage, INSTANCE_ID, $user->getId()),
+                new Unread($this->redisStorage, INSTANCE_ID, $user->getId())
+            );
+            $composite->push($bob->build());
+        } catch (\Exception $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(500)
+                ->asArray();
+            $this->getResponse()->status->setCode(500);
+            $this->getResponse()->content->set($this->buildJsonOutput($problem));
+            return;
+        }
     }
 }
