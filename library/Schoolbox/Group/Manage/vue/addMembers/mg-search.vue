@@ -7,7 +7,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import debounce from 'lodash/debounce';
 import { useAddMembersStore } from '../store/mgAddMembersStore';
-import { useSearchStore } from '../store/mgSearchStore';
+import { useSearchStore, DEBOUNCE_AMOUNT } from '../store/mgSearchStore';
 import FromTypes from './mgAddMembersFromTypes';
 import MgSearchResults from './mg-search-results.vue';
 
@@ -94,6 +94,7 @@ function onMouseClick (event) {
  */
 watch(() => searchStore.query, () => {
     if (searchStore.isSearchActive) {
+        searchStore.enableSearch();
         debounceSearch();
     }
 });
@@ -103,7 +104,7 @@ watch(() => searchStore.query, () => {
  */
 const debounceSearch = debounce(() => {
     searchStore.search();
-}, 350);
+}, DEBOUNCE_AMOUNT);
 
 </script>
 

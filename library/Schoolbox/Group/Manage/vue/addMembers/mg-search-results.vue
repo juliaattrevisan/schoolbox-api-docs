@@ -29,15 +29,16 @@ const showSelectAll = computed(() => {
     <div v-if="searchStore.isSearchActive" class="search-results-container">
         <div class="search-results">
             <ul>
-                <li v-if="searchStore.isProcessing" class="search-status">Searching for results....</li>
+                <li v-if="searchStore.isLoading" class="search-status">Searching for results....</li>
                 <li v-else-if="searchStore.hasNoResults" class="search-status">No results found for your current search.</li>
-                <li v-else-if="searchStore.isResultsCapped" class="search-status">{{ searchStore.resultsNotShownCount }} search results not shown, try refining your search further.</li>
-                <li v-if="showSelectAll">
-                    <mg-select-all-search-results />
-                </li>
-                <li v-for="result in searchStore.filteredResults" :key="result.id">
-                    <mg-add-members-search-result :result="result"/>
-                </li>
+                <template v-else>
+                    <li v-if="showSelectAll">
+                        <mg-select-all-search-results />
+                    </li>
+                    <li v-for="result in searchStore.filteredResults" :key="result.id">
+                        <mg-add-members-search-result :result="result"/>
+                    </li>
+                </template>
             </ul>
         </div><!-- .search-results -->
     </div><!-- .search-results-container -->
