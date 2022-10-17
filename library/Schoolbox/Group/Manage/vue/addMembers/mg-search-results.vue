@@ -5,13 +5,16 @@
  * button to easily add/remove all search results
  */
 
-import { computed  } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
+import { gsap } from 'gsap/all';
 import { useSearchStore  } from '../store/mgSearchStore';
 import MgSelectAllSearchResults from './mg-select-all-search-results.vue';
 import MgAddMembersSearchResult from './mg-search-result.vue';
 
 
 const searchStore = useSearchStore();
+const searchResultsContainerEl = ref(null);
+const searchResultsEl = ref(null);
 
 /**
  * show select all option for adding / removing codes only if there's
@@ -23,21 +26,48 @@ const showSelectAll = computed(() => {
     return searchStore.filteredResults.length > 1;
 });
 
+/**
+ * so can slide down to show searching
+ */
+watch(() => searchStore.isLoading, () => {
+    nextTick(() => animate());
+});
+
+/**
+ * to slide up and down based on the amount of results
+ */
+watch(() => searchStore.filteredResults, () => {
+    nextTick(() => animate());
+});
+
+/**
+ * to slide up and down the search results
+ */
+function animate () {
+    //the height will be 2 as there's a 2px border, and we add +1 to allow the border to be shown
+    const targetHeight = searchResultsEl.value.offsetHeight === 2 ? 0 : searchResultsEl.value.offsetHeight + 1;
+    gsap.to(searchResultsContainerEl.value, {
+        duration: 0.3,
+        height: targetHeight,
+    });
+}
+
 </script>
 
 <template>
-    <div v-if="searchStore.isSearchActive" class="search-results-container">
-        <div class="search-results">
+    <div class="search-results-container" ref="searchResultsContainerEl">
+        <div class="search-results" ref="searchResultsEl">
             <ul>
-                <li v-if="searchStore.isProcessing" class="search-status">Searching for results....</li>
+                <li v-if="searchStore.isLoading" class="search-status">Searching for results....</li>
                 <li v-else-if="searchStore.hasNoResults" class="search-status">No results found for your current search.</li>
-                <li v-else-if="searchStore.isResultsCapped" class="search-status">{{ searchStore.resultsNotShownCount }} search results not shown, try refining your search further.</li>
-                <li v-if="showSelectAll">
-                    <mg-select-all-search-results />
-                </li>
-                <li v-for="result in searchStore.filteredResults" :key="result.id">
-                    <mg-add-members-search-result :result="result"/>
-                </li>
+                <template v-else>
+                    <li v-if="showSelectAll">
+                        <mg-select-all-search-results />
+                    </li>
+                    <li v-for="result in searchStore.filteredResults" :key="result.id">
+                        <mg-add-members-search-result :result="result"/>
+                    </li>
+                </template>
             </ul>
         </div><!-- .search-results -->
     </div><!-- .search-results-container -->
@@ -46,30 +76,24 @@ const showSelectAll = computed(() => {
 <style lang="scss" scoped>
 
 .search-results-container {
-    position: relative; //to give the .search-result position: absolute context
+    height: 0; //will animate the results within with the watch() above
+    overflow: hidden;
+    position: relative;
 }
 
 .search-results {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    max-height: 500px;
+    max-height: 400px;
     overflow: auto;
-    position: absolute;
-    top: 0;
     width: 100%;
-    z-index: 10;
     ul {
+        border: 1px solid var(--navigation-hover);
         list-style: none;
         margin: 0;
         li {
             border-bottom: 1px solid var(--body-background);
-            border-left: 1px solid var(--navigation-hover);
-            border-right: 1px solid var(--navigation-hover);
             transform: none !important;
-            &:first-child {
-                border-top: 1px solid var(--navigation-hover);
-            }
             &:last-child {
-                border-bottom: 1px solid var(--navigation-hover);
+                border-bottom: none;
             }
         }
     }

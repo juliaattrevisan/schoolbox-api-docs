@@ -9,16 +9,14 @@ import { useAddMembersStore } from './mgAddMembersStore';
 import FromTypes from '../addMembers/mgAddMembersFromTypes';
 
 
-const MIN_QUERY_LENGTH = 3; //the amount of characters typed before the search becomes active
-const CAPPED_RESULTS_LENGTH = 50; //the maximum amount of results to show
+const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search becomes active
+export const DEBOUNCE_AMOUNT = 350; //to allow time for further user key presses before search begins
 
 export const useSearchStore = defineStore('mgSearch', {
 
     state: () => ({
-        isProcessing: false, //to notify that an action is taking place, like updating a member access
+        isLoading: false, //to notify that an action is taking place, like updating a member access
         query: '', //current search query
-        isResultsCapped: false, //to show a 'refine your search' note
-        resultsNotShownCount: 0, //a total of the results not visible in the list
         results: [], //members/groups/roles returned in the current search results
         selectedResults: [], //members to add on Add Members selectedResults
     }),
@@ -76,7 +74,7 @@ export const useSearchStore = defineStore('mgSearch', {
          * @return { Boolean }
          */
         hasNoResults () {
-            return this.isSearchActive && this.filteredResults.length === 0 && !this.isProcessing;
+            return this.isSearchActive && this.filteredResults.length === 0 && !this.isLoading;
         },
 
         /**
@@ -94,7 +92,7 @@ export const useSearchStore = defineStore('mgSearch', {
          * @returns { Boolean }
          */
         canAddMembers () {
-            return this.hasSelectedResults && !this.isProcessing;
+            return this.hasSelectedResults && !this.isLoading;
         },
 
     },
@@ -102,12 +100,18 @@ export const useSearchStore = defineStore('mgSearch', {
     actions: {
 
         /**
+         * search has started
+         */
+        enableSearch () {
+            this.isLoading = true;
+        },
+
+        /**
          * search for members
          *
          * @returns { Array }
          */
         async search () {
-            this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
             try {
@@ -121,7 +125,7 @@ export const useSearchStore = defineStore('mgSearch', {
             } catch (error) {
                 console.warn(error);
             } finally {
-                this.isProcessing = false;
+                this.isLoading = false;
                 store.isProcessing = false;
             }
         },
