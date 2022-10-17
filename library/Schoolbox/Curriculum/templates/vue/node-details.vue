@@ -5,8 +5,7 @@
  */
 
 import { ref, computed, watch } from 'vue';
-import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
-// import { getBreadcrumbs } from '@schoolboxCurriclum/js/nodeUtils';
+import { getBreadcrumbs } from '@schoolboxCurriculum/js/nodeUtils';
 
 
 const props = defineProps({
@@ -59,22 +58,6 @@ async function load () {
         hasLoadError.value = true;
     } finally {
         isLoading.value = false;
-    }
-}
-
-/**
- * @NOTE - temporary while wait for merge in another PR
- * Recursively loop through the parents adding in a breadcrumb for each
- *
- * @param { object }
- * @param { array }
- */
-function getBreadcrumbs (node, currentBreadcrumbs) {
-    if (node.hasOwnProperty('parent') && node.parent !== null) { //if there's a parent to use as a breadcrumb
-        let breadcrumbs = [ { id: node.parent.id, name: node.parent.name }, ...currentBreadcrumbs ]; //add it in to the front of the list
-        return breadcrumbs = getBreadcrumbs(node.parent, breadcrumbs); //and then check the next node up the list
-    } else { //otherwise we must be at the top of the breadcrumb list
-        return currentBreadcrumbs; //so we can return now
     }
 }
 
