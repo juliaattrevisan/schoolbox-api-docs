@@ -18,7 +18,8 @@
 </div>
 
 <div class="row">
-    {% if courseList is empty %}
+    {# homepageUrls contain the permission check value, so check if there are any pages the user can actually view... #}
+    {% if homepageUrls | filter(url => url != false) is empty %}
         <div class="small-12 island">
             <div class = "empty-state">
                 <i class="icon-course"></i>
