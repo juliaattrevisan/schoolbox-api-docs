@@ -228,7 +228,8 @@ export default {
          */
         async toggleFavourites (event) {
             this.isProcessing = true;
-            gsap.from(event.currentTarget, { scale: 0.2, duration: 0.3 } ); //to help indicate selection
+            gsap.set(event.currentTarget, { scale: 0.2 } );
+            gsap.to(event.currentTarget, { scale: 1, duration: 0.3 } ); //to help indicate selection
             if (this.isFavourite) {
                 await this.removeFromFavourites();
             } else {
@@ -284,7 +285,8 @@ export default {
          */
         async toggleNotifications (event) {
             this.isProcessing = true;
-            gsap.from(event.currentTarget, { scale: 0.2, duration: 0.3 } ); //to help indicate selection
+            gsap.set(event.currentTarget, { scale: 0.2 } );
+            gsap.to(event.currentTarget, { scale: 1.0, duration: 0.3 } ); //to help indicate selection
             if (this.isNotificationsOn) {
                 await this.removeFromNotifications();
             } else {
@@ -346,13 +348,31 @@ export default {
                         <div class="card-class-image" :style="getImageStyles()"></div>
                     </a>
                     <transition name="slide">
-                        <div class="group-actions" v-if="isEnrolled || isPrivate" :style="[ { pointerEvents: isProcessing ? 'none' : 'auto' } ]">
-                            <button :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']" title="Toggle Favourites" @click="toggleFavourites">Toggle Favourites</button>
-                            <button v-if="!group.isForceFollow && !group.isMsgDisabled"
-                                    :class="['group-action', isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow']"
-                                    title="Toggle Notifications" @click="toggleNotifications">Toggle Notifications</button>
-                            <button v-if="group.isForceFollow || group.isMsgDisabled"
-                                    :class="['group-action disabled', group.isForceFollow ? 'icon-notifications' : 'icon-notifications-hollow']"></button>
+                        <div class="group-actions" v-if="isEnrolled || isPrivate">
+                            <button
+                                title="Toggle Favourites"
+                                :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']"
+                                :disabled="isProcessing"
+                                @click="toggleFavourites"
+                            >
+                                Toggle Favourites
+                            </button>
+                            <button
+                                v-if="!group.isForceFollow && !group.isMsgDisabled"
+                                title="Toggle Notifications"
+                                :class="['group-action', isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow']"
+                                :disabled="isProcessing"
+                                @click="toggleNotifications"
+                            >
+                                Toggle Notifications
+                            </button>
+                            <button
+                                v-if="group.isForceFollow || group.isMsgDisabled"
+                                title="Disabled force follow button"
+                                :class="['group-action', group.isForceFollow ? 'icon-notifications' : 'icon-notifications-hollow']"
+                                :disabled="true"
+                            >
+                            </button>
                         </div>
                     </transition>
                 </div>
@@ -380,10 +400,10 @@ export default {
                 <transition name="fade" mode="out-in">
                     <div v-if="isAdmin" class="expand private" key="admin">Group Admin</div>
                     <div v-else-if="isPrivate" class="expand private" key="private">Private</div>
-                    <button v-else-if="isEnrolled" class="button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave" :disabled="isProcessing">Leave</button>
-                    <button v-else-if="isMembershipPending" class="button expand icon-logout alert" title="Cancel membership request"  key="membershipPending" @click="leave" :disabled="isProcessing">Cancel membership request</button>
-                    <button v-else-if="isRequestToJoin" class="button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join" :disabled="isProcessing">Request to join</button>
-                    <button v-else class="button expand icon-add submit" :title="`Join ${group.name}`" key="join" @click="join" :disabled="isProcessing">Join</button>
+                    <button v-else-if="isEnrolled" class="membership-button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave" :disabled="isProcessing">Leave</button>
+                    <button v-else-if="isMembershipPending" class="membership-button expand icon-logout alert" title="Cancel membership request"  key="membershipPending" @click="leave" :disabled="isProcessing">Cancel membership request</button>
+                    <button v-else-if="isRequestToJoin" class="membership-button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join" :disabled="isProcessing">Request to join</button>
+                    <button v-else class="membership-button expand icon-add submit" :title="`Join ${group.name}`" key="join" @click="join" :disabled="isProcessing">Join</button>
                 </transition>
             </div>
         </section>
@@ -397,20 +417,25 @@ export default {
     position: relative;
 }
 .group-actions { //to put them in the top right corner
-    background: rgba(0, 102, 176, 0.85);
-    display: inline-block;
+    background: var(--navigation-background);
     position: absolute;
-    right: 10px;
-    top: 10px;
+    right: 0.5rem;
+    top: 0.5rem;
+}
+
+@mixin disabled-button { //both .group-action and .membership share the same disabled styling
+    &:disabled {
+        color: white;
+        opacity: 1;
+    }
 }
 .group-action {
+    @include disabled-button;
     background: none;
     font-size: 0;
-    transition: all 0.2s;
-    &:before {
+    &:before { //tweak the icon display
         color: white;
         font-size: 1.5rem;
-        margin: 0;
         padding: 0;
     }
     &:hover {
@@ -418,31 +443,27 @@ export default {
     }
 }
 
-.button {
-    display: inline-block;
+.membership-button {
+    @include disabled-button;
     margin: 0;
-    padding: 1rem; //add extra padding
-    &:disabled {
-        color: white;
-        opacity: 1;
-    }
 }
 
-.disabled {
-    pointer-events: none;
+.expand {
+    padding: 1rem; //add extra padding
 }
 
 .private, .membership-pending  {
     background: #DDDDDD;
     color: #999999;
-    padding: 1rem; //add extra padding
     text-align: center;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
     transition: opacity 0.2s;
 }
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
     opacity: 0;
 }
 
@@ -450,7 +471,8 @@ export default {
 .slide-leave-active {
     transition: transform 0.3s ease-out;
 }
-.slide-enter-active, .slide-leave-to {
+.slide-enter-active,
+.slide-leave-to {
     transform: translateX(100%);
 }
 .slide-enter-to {
