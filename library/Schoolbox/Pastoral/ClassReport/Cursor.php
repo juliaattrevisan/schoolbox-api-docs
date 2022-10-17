@@ -124,139 +124,16 @@ class Cursor implements ICursor
         if (empty($this->pastoralIds)) {
             return $this->dataSource->createCollection();
         }
-        $pb      = $this->buildPredicateBuilder($encodedCursor);
-        $results = $this->dataSource->findRecordsByPredicates(
-            $this->currentUser,
-            $pb,
-            [
-                'order' => $this->buildOrderPart(),
-                'limit' => $this->limit,
-            ],
-        );
-        return $results->reindex();
-
-//        // TODO limit the results returned in query, instead of post-query:
-//        //      need to update findByColumnList to do so
-//        $results = $this->dataSource->findRecords(
-//            $this->currentUser,
-//            $this->student->getId(),
-//            null,
-//            null,
-//            0,
-//            0,
-//            null,
-//        );
-//        $results = $results->filter(fn (Model $model) => in_array($model->getId(), $this->pastoralIds));
-//        $results = $results->sortByCallback($this->buildSortCallback());
-        if (count($results) === 0) {
-            return $results;
-        }
-
-        // Simplified filtering:
-        // Find the ID in the encoded cursor, and return every record after that
-        // in already-sorted `$results`.
-        // The alternative is to be aware of every ordering option in each sort
-        // option, and filter conditionally on that.
-        // e.g. the severity filter would need to exclude any result with:
-        // * a severity higher than the cursor
-        // * a severity equal to the cursor, and a created higher than the
-        //   cursor
-        // * a severity and created equal to the cursor, and an ID higher than
-        //   the cursor
-        $offset = 0;
-        if (isset($encodedCursor)) {
-            $decodedCursor = $this->codec->decode($encodedCursor);
-            $id            = $decodedCursor['id'] ?? null;
-            if ($id) {
-                $resultIds    = $results->getPropertyValues('id');
-                $cursorOffset = array_search($id, $resultIds, true);
-                // Not found: return an empty result
-                if ($cursorOffset === false) {
-                    return $results->emptyClone();
-                } else {
-                    $offset = $cursorOffset + 1;
-                }
-            }
-        }
-
-        return $results->slice($offset, $this->limit);
-    }
-
-    /**
-     * Build a sort callback for this type of record.
-     *
-     * Ordering of results:
-     * * severity: severity.sequence DESC, then created DESC, then id DESC
-     * * created:  created DESC, then id DESC
-     * * updated:  updated DESC, then created DESC, then id DESC
-     *
-     * @return Closure
-     */
-    private function buildSortCallback(): Closure
-    {
-        $callback = match ($this->sortOption) {
-            self::SORT_OPTION_SEVERITY => function (Model $a, Model $b) {
-                return $this->sortSeverity($a, $b) ?: $this->sortCreated($a, $b) ?: $this->sortId($a, $b);
-            },
-            self::SORT_OPTION_UPDATED => function (Model $a, Model $b) {
-                return $this->sortUpdated($a, $b) ?: $this->sortCreated($a, $b) ?: $this->sortId($a, $b);
-            },
-            default => function (Model $a, Model $b) {
-                return $this->sortCreated($a, $b) ?: $this->sortId($a, $b);
-            },
-        };
-        return Closure::fromCallable($callback);
-    }
-
-    /**
-     * Sort pastoral records by severity (descending).
-     *
-     * @param Model $a
-     * @param Model $b
-     * @return int
-     */
-    private function sortSeverity(Model $a, Model $b): int
-    {
-        if (!($a->getSeverity() && $b->getSeverity())) {
-            return 0;
-        }
-        return $b->getSeverity()->getSequence() <=> $a->getSeverity()->getSequence();
-    }
-
-    /**
-     * Sort pastoral records by created (descending)
-     *
-     * @param Model $a
-     * @param Model $b
-     * @return int
-     */
-    private function sortCreated(Model $a, Model $b): int
-    {
-        return $b->getCreatedAt()->getUnixTimeStamp() <=> $a->getCreatedAt()->getUnixTimeStamp();
-    }
-
-    /**
-     * Sort pastoral records by updated (descending)
-     *
-     * @param Model $a
-     * @param Model $b
-     * @return int
-     */
-    private function sortUpdated(Model $a, Model $b): int
-    {
-        return $b->getUpdatedAtDisplay()->getUnixTimeStamp() <=> $a->getUpdatedAtDisplay()->getUnixTimeStamp();
-    }
-
-    /**
-     * Sort pastoral records by ID (descending)
-     *
-     * @param Model $a
-     * @param Model $b
-     * @return int
-     */
-    private function sortId(Model $a, Model $b): int
-    {
-        return $b->getId() <=> $a->getId();
+        return $this->dataSource
+            ->findRecordsByPredicates(
+                $this->currentUser,
+                $this->buildPredicateBuilder($encodedCursor),
+                [
+                    'order' => $this->buildOrderPart(),
+                    'limit' => $this->limit,
+                ],
+            )
+            ->reindex();
     }
 
     /**
