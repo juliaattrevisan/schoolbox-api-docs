@@ -176,7 +176,6 @@ class Factory
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
         StorageMapper $storageMapper,
-
         /* Timetable pieces */
         \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
