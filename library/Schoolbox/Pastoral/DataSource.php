@@ -76,6 +76,29 @@ class DataSource
 
 
     /**
+     * Wrapper for `Mapper::createCollection`.
+     *
+     * @param array $contents
+     * @return GenericCollection<Model>
+     */
+    public function createCollection(array $contents = []): GenericCollection
+    {
+        return $this->mapper->createCollection($contents);
+    }
+
+
+    /**
+     * Wrapper for `Mapper::getPredicateBuilder`.
+     *
+     * @return Builder
+     */
+    public function getPredicateBuilder(): Builder
+    {
+        return $this->mapper->getPredicateBuilder();
+    }
+
+
+    /**
      * User-sensitive wrapper for `Mapper::findById`.
      *
      * @param User $currentUser
