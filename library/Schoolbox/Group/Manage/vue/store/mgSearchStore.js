@@ -56,7 +56,9 @@ export const useSearchStore = defineStore('mgSearch', {
          */
         filteredResults () {
             const addMembersStore = useAddMembersStore();
-            if (addMembersStore.fromType === FromTypes.NAME || addMembersStore.fromType === FromTypes.LIST) {
+            if (!this.isSearchActive) {
+                return [];
+            } else if (addMembersStore.fromType === FromTypes.NAME || addMembersStore.fromType === FromTypes.LIST) {
                 const membersStore = useMembersStore();
                 const memberIdList = membersStore.members.map((member) => member.id); //create an array of just the existing member ids
                 return this.results.filter((result) => !memberIdList.includes(result.id)); //to only keep those search results that aren't already in the group
