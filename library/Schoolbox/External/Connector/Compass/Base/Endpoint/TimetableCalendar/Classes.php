@@ -738,7 +738,18 @@ class Classes implements IStrategy
             /* Otherwise there's always at least one guy
              * and we know who it is - carry onwards
              */
-            $teacher = $staffLookup[$teacherCompassIds];
+            $coveringTeacher = $staffLookup[$teacherCompassIds];
+
+            /* This is the regular guy regularly teaching this class
+             * even though they might not be teaching this particular
+             * instance we need to remember they *usually do*
+             */
+            $managingTeacherId = (new FirstMeaningfulValue())->find([
+                $activityInstance['managingCompassPersonId'],
+                $activity['managerCompassPersonId']
+            ]);
+
+            $managingTeacher = $staffLookup[$managingTeacherId];
 
             /* FIXME Multiple teachers might exist here
              *  It might be possible that $teacherCompassIds is a comma-separated string
@@ -752,14 +763,22 @@ class Classes implements IStrategy
              */
 
             $this->log->debug(sprintf(
+                'Creating new regular teaching enrolment record for Activity %s Instance on %s for %s (compassId %s)',
+                $activityName,
+                $activityInstance['start'],
+                $managingTeacher['externalId'],
+                $managingTeacherId
+            ));
+
+            $this->log->debug(sprintf(
                 'Creating new Override record for Activity %s Instance on %s for %s (compassId %s)',
                 $activityName,
                 $activityInstance['start'],
-                $teacher['externalId'],
+                $coveringTeacher['externalId'],
                 $teacherCompassIds
             ));
 
-            $this->saveStaffInvolvement($event, $teacher);
+            $this->saveStaffInvolvement($event, $classEntry, $managingTeacher, $coveringTeacher);
         }
 
         /* Save sis_class_user involvements
@@ -772,7 +791,7 @@ class Classes implements IStrategy
             ));
         } else {
             foreach ($enrolments['students'] as $externalId) {
-                $this->saveStudentInvolvement($event, $classEntry, $externalId);
+                $this->saveRegularInvolvement($event, $classEntry, $externalId);
             }
         }
     }
@@ -782,29 +801,31 @@ class Classes implements IStrategy
      * Save staff involvement as an override, which allows each class
      * to have different teachers depending on their associated sis_event
      *
-     * @param array                           $teacher
-     * @param \Schoolbox\External\Event\Model $event
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @param array      $managingTeacher
+     * @param array      $coveringTeacher
      * @return void
+     * @throws Exception
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
     private function saveStaffInvolvement(
         \Schoolbox\External\Event\Model $event,
-        array $teacher
+        ClassEntry $classEntry,
+        array $managingTeacher,
+        array $coveringTeacher
     ): void {
+        /* Shove in a regular involvement for the guy who usually teaches this
+         */
+        $this->saveRegularInvolvement($event, $classEntry, $managingTeacher['externalId']);
+
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
          */
-        $override = $this->overridesMapper->createModel()
-            ->setEventId($event->getId())
-            ->setExternalId($teacher['externalId'])
-            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
-            ->setSequence(1);
-
         $this->log->debug(sprintf(
             'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
-            $teacher['externalId'],
+            $coveringTeacher['externalId'],
             $event->getTitle(),
             $event->getDay(),
             $event->getPeriod(),
@@ -812,8 +833,25 @@ class Classes implements IStrategy
             $event->getFinishAt()->getDatabase()
         ));
 
+        /* For specific teaching, execute CLEAR_STAFF to disregard the usual guy
+         * and add the guy teaching this particular instance (even though they
+         * might end up being the same person sometimes)
+         */
+        $clearOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId(null)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
+            ->setSequence(1);
+
+        $involvementOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId($coveringTeacher['externalId'])
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
+            ->setSequence(2);
+
         if ($this->perform) {
-            $this->overridesMapper->save($override);
+            $this->overridesMapper->save($clearOverride);
+            $this->overridesMapper->save($involvementOverride);
         }
     }
 
@@ -830,7 +868,7 @@ class Classes implements IStrategy
      * @throws Exception
      * @throws \UnexpectedValueException
      */
-    private function saveStudentInvolvement(
+    private function saveRegularInvolvement(
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry,
         string $externalId
