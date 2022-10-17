@@ -226,7 +226,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                         $context['new data'][$property] = $value;
                     } else {
                         if (is_array($value)) {
-                            $value = implode(',', $value);
+                            $value = implode(', ', $value);
                         }
                         // ensure lack of whitespace
                         $value = trim($value);
