@@ -45,9 +45,9 @@ class Controller extends Base
         //check for required fields
         if ('' === ($data['message'] ?? '')) {
             $problem = (new ApiProblem("'message' is not set"))
-                ->setStatus(500)
+                ->setStatus(400)
                 ->asArray();
-            $this->getResponse()->status->setCode(500);
+            $this->getResponse()->status->setCode(400);
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
             return; //exit early the message field is not set...
         }
