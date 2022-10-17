@@ -131,22 +131,6 @@ class DataSource
 
 
     /**
-     * User-sensitive wrapper for `Mapper::findByColumnList`.
-     *
-     * @param User  $currentUser
-     * @param array $columnList
-     * @return GenericCollection<Model>
-     */
-    public function findByColumnList(User $currentUser, array $columnList): GenericCollection
-    {
-        return $this->accessLevelCensor->filterRecordsForUser(
-            $this->mapper->findByColumnList($columnList),
-            $currentUser,
-        );
-    }
-
-
-    /**
      * User-sensitive wrapper for `Mapper::countByColumnList`.
      *
      * @param User  $viewer
