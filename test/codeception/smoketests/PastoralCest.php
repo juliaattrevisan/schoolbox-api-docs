@@ -594,7 +594,6 @@ class PastoralCest
         $createPastoral = new Payload\Pastoral\Create($student->getId());
         $createPastoral->setHeading($heading);
         $createPastoral->setUserAccess($parent->getId(), Pastoral\Access\Mapper::ACCESS_PRIVATE);
-        $createPastoral->setParentCommentsAllowed();
         $i->amGoingTo('Send request create pastoral record for student #' . $student->getId());
         $i->sendRequest($createPastoral);
 

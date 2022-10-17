@@ -12,9 +12,13 @@
                 {% if userAccess.roleType %}
                     {% set roleId = 'role-type-' ~ userAccess.roleType %}
                     {% set roleName = userAccess.roleType | capitalize %}
+                    {% set disabled = '' %}
+                    {% set checkedComment = userAccess.commentsAllowed ? 'checked="checked"' : '' %}
                 {% elseif userAccess.role %}
                     {% set roleId = userAccess.role.id %}
                     {% set roleName = userAccess.role.name %}
+                    {% set disabled = 'disabled' %}
+                    {% set checkedComment = userAccess.role.type == 'staff' ? 'checked="checked"' : '' %}
                 {% endif %}
 
                 {% if roleId %}
@@ -32,10 +36,10 @@
                     {% endif %}
 
                     <tr data-role-id="{{ roleId }}">
-                        <td class="small-2">
+                        <td class="small-1">
                             Role
                         </td>
-                        <td class="small-3">
+                        <td class="small-2">
                             {{ roleName }}
                         </td>
                         <td class="small-2">
@@ -53,6 +57,13 @@
                                    value="2" {{ checkedPrivate }}>
                             <label class="radio-label" for="rolePrivate{{ roleId }}"></label>
                         </td>
+                        {% if not managePage %}
+                        <td class="small-2 checklist">
+                            <input type="checkbox" name="roleComment{{ roleId }}" id="roleComment{{ roleId }}"
+                                   value="1" {{ checkedComment }} {{ disabled }}>
+                            <label class="checkbox-label" for="roleComment{{ roleId }}"></label>
+                        </td>
+                        {% endif %}
                         <td class="text-right small-1">
                             <a href="#" data-delete-visibility="role" class="icon-delete"></a>
                         </td>

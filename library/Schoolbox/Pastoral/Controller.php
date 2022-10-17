@@ -880,6 +880,7 @@ class Controller extends Base
 
                 $access = $this->pastoralAccessMapper->createModel();
                 $access->setAccess($accessLevel);
+                $access->setCommentsAllowed((bool)$post["roleComment{$roleId}"] ?? false);
 
                 // Is this a role or a role type?
                 if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
@@ -902,17 +903,18 @@ class Controller extends Base
         // Save pastoral group permissions, de-duplicating as we go
         if (is_array($post["group"] ?? null)) {
             $foundGroups = [];
-            foreach ($post["group"] as $group_id => $accessLevel) {
-                if (in_array($group_id, $foundGroups)) {
+            foreach ($post["group"] as $groupId => $accessLevel) {
+                if (in_array($groupId, $foundGroups)) {
                     // should not happen
                     continue;
                 }
-                $foundGroups[] = $group_id;
+                $foundGroups[] = $groupId;
                 try {
-                    $group  = $this->pastoralGroupMapper->findById($group_id);
+                    $group  = $this->pastoralGroupMapper->findById($groupId);
                     $access = $this->pastoralAccessMapper->createModel();
                     $access->setAccess($accessLevel);
                     $access->setGroup($group);
+                    $access->setCommentsAllowed((bool)$post["groupComment{$groupId}"] ?? false);
                     $accesses->add($access);
                 } catch (MapperException $e) {
                     // Noop
@@ -923,16 +925,17 @@ class Controller extends Base
         // Save individual user permissions, de-duplicating as we go
         if (is_array($post["user"] ?? null)) {
             $foundUsers = [];
-            foreach ($post["user"] as $user_id => $accessLevel) {
-                if (in_array($user_id, $foundUsers)) {
+            foreach ($post["user"] as $userId => $accessLevel) {
+                if (in_array($userId, $foundUsers)) {
                     // should not happen
                     continue;
                 }
-                $foundUsers[] = $user_id;
+                $foundUsers[] = $userId;
                 try {
-                    $user   = $this->userMapper->findById($user_id);
+                    $user   = $this->userMapper->findById($userId);
                     $access = $this->pastoralAccessMapper->createModel();
                     $access->setAccess($accessLevel);
+                    $access->setCommentsAllowed((bool)$post["userComment{$userId}"] ?? false);
                     $access->setUser($user);
                     $accesses->add($access);
                 } catch (MapperException $e) {
@@ -1179,9 +1182,6 @@ class Controller extends Base
                 (new TokenReplacer\Student(new TokenReplacer\Simple()))
                     ->replace(trim($post->get('body_private')), $student)
             );
-
-            $record->setParentCommentsAllowed((bool)$post->get('parent_comments_allowed'));
-            $record->setStudentCommentsAllowed((bool)$post->get('student_comments_allowed'));
 
             // Only set owner if this is a new record
             if (!$record->getId()) {

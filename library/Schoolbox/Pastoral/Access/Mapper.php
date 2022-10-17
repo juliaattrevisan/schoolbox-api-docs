@@ -61,6 +61,7 @@ class Mapper extends BaseMapper
             [Role::GUEST, Role::STUDENT, Role::PARENT, Role::STAFF, null],
         );
         $this->joins('group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
+        $this->uses('comments_allowed', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }

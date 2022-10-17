@@ -23,10 +23,10 @@
                 {% endif %}
 
                 <tr data-group-id="{{ userAccess.group.id }}">
-                    <td class="small-2">
+                    <td class="small-1">
                         {{ locale.pastoral.proper }} Group
                     </td>
-                    <td class="small-{{ reportPage ? 5 : 3 }}">
+                    <td class="small-{{ reportPage ? 4 : 2 }}">
                         {{ userAccess.group.name }}
                     </td>
                     {% if not reportPage %}
@@ -46,6 +46,13 @@
                                value="2" {{ checkedPrivate }}>
                         <label class="radio-label" for="groupPrivate{{ userAccess.group.id }}"></label>
                     </td>
+                    {% if not reportPage and not managePage %}
+                    <td class="small-2 checklist">
+                        <input type="checkbox" name="groupComment{{ userAccess.group.id }}" id="groupComment{{ userAccess.group.id }}"
+                               value="1" checked="checked" disabled="disabled">
+                        <label class="checkbox-label" for="groupComment{{ userAccess.group.id }}"></label>
+                    </td>
+                    {% endif %}
                     <td class="text-right small-1">
                         <a href="#" data-delete-visibility="group" class="icon-delete"></a>
                     </td>

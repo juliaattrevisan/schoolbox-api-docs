@@ -103,8 +103,6 @@ class ModelToArray
                     ];
                 }
             ),
-            'studentCommentsAllowed' => $model->getStudentCommentsAllowed(),
-            'parentCommentsAllowed'  => $model->getParentCommentsAllowed(),
 
             // Text and comments
             'bodyPrivate'            => $this->scrubAdapter->purify($model->getBodyPrivate()),

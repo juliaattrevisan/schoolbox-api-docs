@@ -51,6 +51,11 @@ class Model implements ISoftDeletable
     /** @var int $access */
     protected $access;
 
+    /**
+     * Whether the user/role is allowed to comment
+     * Staff with access can always comment regardless of this flag
+     */
+    private bool $commentsAllowed = false;
 
     /**
      * Return the access level granted to the user via this access record
@@ -290,5 +295,23 @@ class Model implements ISoftDeletable
     public function getAccess(): ?int
     {
         return $this->access;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCommentsAllowed(): bool
+    {
+        return $this->commentsAllowed;
+    }
+
+    /**
+     * @param bool $commentsAllowed
+     * @return static
+     */
+    public function setCommentsAllowed(bool $commentsAllowed): self
+    {
+        $this->commentsAllowed = $commentsAllowed;
+        return $this;
     }
 }
