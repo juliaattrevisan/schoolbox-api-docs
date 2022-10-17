@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { UNSET_ID, findById } from '../../../js/nodeUtils';
+import { UNSET_ID, findById } from '@schoolboxCurriculum/js/nodeUtils';
 import { useStore, apiEndpoint } from './curriculumSelectorStore';
 import { useModalActiveNodesStore } from './csModalActiveNodesStore';
 

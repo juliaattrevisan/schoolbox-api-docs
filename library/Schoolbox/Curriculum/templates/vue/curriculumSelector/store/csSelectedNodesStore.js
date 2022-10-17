@@ -4,7 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from './curriculumSelectorStore';
-import { UNSET_ID, getBreadcrumbs } from '../../../js/nodeUtils';
+import { UNSET_ID, getBreadcrumbs } from '@schoolboxCurriculum/js/nodeUtils';
 
 
 export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {

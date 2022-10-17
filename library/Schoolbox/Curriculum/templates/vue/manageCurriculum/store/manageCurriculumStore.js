@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { UNSET_ID } from '../../../js/nodeUtils';
+import { UNSET_ID } from '@schoolboxCurriculum/js/nodeUtils';
 import { useNodesStore } from './mcNodesStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';

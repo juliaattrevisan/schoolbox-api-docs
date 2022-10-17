@@ -6,7 +6,7 @@
 
 import { computed } from 'vue';
 import { generateUUID } from '@js/util/jsUtils';
-import { UNSET_ID } from '../../../js/nodeUtils';
+import { UNSET_ID } from '@schoolboxCurriculum/js/nodeUtils';
 import { useModalSelectedNodesStore } from '../store/csModalSelectedNodesStore';
 
 
