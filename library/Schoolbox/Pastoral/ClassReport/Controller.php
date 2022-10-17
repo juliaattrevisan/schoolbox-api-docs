@@ -25,21 +25,21 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Pastoral\DataSource              $pastoralDataSource Used for fetching pastoral records, and applying
-     *                                                             filtering appropriate to the current user.
-     * @param UserAccessMapper                 $userAccessMapper   Used for finding the set of students in a folder.
-     * @param UserTranslator                   $userTranslator     Used for converting a user model into an array, for
-     *                                                             JSON output.
-     * @param Pastoral\Translator\ModelToArray $pastoralTranslator Used for converting a pastoral model into an array,
-     *                                                             for JSON output.
-     * @param FilterHelper                     $filterHelper       Used for: building a filter panel, fetching a set of
-     *                                                             pastoral IDs which match the filter panel.
+     * @param Pastoral\DataSource     $pastoralDataSource Used for fetching pastoral records, and applying filtering
+     *                                                    appropriate to the current user.
+     * @param UserAccessMapper        $userAccessMapper   Used for finding the set of students in a folder.
+     * @param UserTranslator          $userTranslator     Used for converting a user model into an array, for JSON
+     *                                                    output.
+     * @param Translator\ModelToArray $pastoralTranslator Used for converting a pastoral model into an array, for JSON
+     *                                                    output.
+     * @param FilterHelper            $filterHelper       Used for: building a filter panel, fetching a set of pastoral
+     *                                                    IDs which match the filter panel.
      */
     public function __construct(
         private Pastoral\DataSource $pastoralDataSource,
         private UserAccessMapper $userAccessMapper,
         private UserTranslator $userTranslator,
-        private Pastoral\Translator\ModelToArray $pastoralTranslator,
+        private Translator\ModelToArray $pastoralTranslator,
         private FilterHelper $filterHelper,
     ) {
     }
