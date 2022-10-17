@@ -50,6 +50,13 @@
         p {
             max-width: 50%;
         }
+        button {
+            background: none;
+            font-size: 0.875rem;
+            &:hover {
+                background: none;
+            }
+        }
     }
 
 // a general error display notifying something couldn't be processed
