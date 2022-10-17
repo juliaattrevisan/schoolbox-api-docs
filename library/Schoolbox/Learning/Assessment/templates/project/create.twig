@@ -57,14 +57,38 @@
 
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 
-<label for="summatorSelect">Mark Summation Method</label>
-<div class="input-group">
-    <select id="summatorSelect" name="summator">
-        {% for index, title in allSummators.map %}
-            <option value="{{ index }}" {% if index == selectedSummator %}selected{% endif %}>{{ title }}</option>
-        {% endfor %}
-    </select>
-    <a href="#" class="adtp-btn" data-reveal-id="reveal-summators-description">Describe Methods...</a>
+<div class="row">
+    <div class="small-12 medium-6 columns">
+        <label for="summatorSelect">Mark Summation Method</label>
+        <div class="input-group">
+            <select id="summatorSelect" name="summator">
+                {% for index, title in allSummators.map %}
+                    <option value="{{ index }}" {% if index == selectedSummator %}selected{% endif %}>{{ title }}</option>
+                {% endfor %}
+            </select>
+            <a href="#" class="adtp-btn" data-reveal-id="reveal-summators-description">Describe Methods...</a>
+        </div>
+    </div>
+    <div class="small-12 medium-6 columns">
+        <label for="requireAllActivities">
+            Require all Activities
+            <span class="hint has-tip tip-top" title="If ON, the project will count unmarked activities as having a score of zero. This is useful where a participant must complete all activities within the project." data-tooltip>?</span>
+        </label>
+        <div class="switch">
+            <input id="requireAllActivities"
+                   name="requireAllActivities"
+                   type="checkbox"
+                    {{ (assessment.requireAllActivities ?? false) ? 'checked' : '' }}
+                    {% if courseManaged.isReadonly %}
+                        disabled
+                    {% endif %}
+            >
+            <label for="requireAllActivities">
+                <span>On</span>
+                <span>Off</span>
+            </label>
+        </div>
+    </div>
 </div>
 
 <div class="reveal-modal" data-reveal id="reveal-summators-description">
@@ -100,7 +124,10 @@
         This option changes how an unmarked activity for a participant contributes toward their total mark calculation:
     </p>
     <ul>
-        <li><strong>On</strong>: unmarked activities count as having a mark of zero</li>
+        <li>
+            <strong>On</strong>: unmarked activities count as having a mark of zero;
+            this is useful where a participant must complete all activities within the project
+        </li>
         <li><strong>Off</strong>: unmarked activities are ignored, and do not contribute to the total mark at all</li>
     </ul>
     <h3>Ignoring Activities</h3>
@@ -112,7 +139,10 @@
     <ul>
         <li>the participant is explicitly excluded from the activity</li>
         <li>the participant has been given a null grade</li>
-        <li>the participant has not been marked for the activity, <strong>unless</strong>the "Require all Activities" option is on</li>
+        <li>
+            the participant has not been marked for the activity,
+            <strong>unless</strong> the "Require all Activities" option is on
+        </li>
     </ul>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
