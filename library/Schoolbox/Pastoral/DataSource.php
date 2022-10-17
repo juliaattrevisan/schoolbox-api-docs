@@ -296,9 +296,31 @@ class DataSource
 
 
     /**
+     * Find pastoral records which match the given predicate builder, and are
+     * viewable by `$viewer`.
+     *
+     * @param User    $viewer
+     * @param Builder $pb
+     * @param array   $options
+     * @return GenericCollection
+     */
+    public function findRecordsByPredicates(
+        User $viewer,
+        Builder $pb,
+        array $options = [],
+    ): GenericCollection {
+        $permissionClause = $this->getPermissionClause($viewer, null, null, null, 'pastoral');
+        return $this->mapper->findByPredicates(
+            $pb->rawWhere($permissionClause['where'], $permissionClause['params']),
+            $options,
+        );
+    }
+
+
+    /**
      * Gets records with least hydration. This will not populate any linked records to the returning records.
      * @param User       $viewer          Who is viewing this student's records
-     * @param int        $studentId       Id of a student being viewed
+     * @param int|null   $studentId       Id of a student being viewed
      * @param int|null   $typeId          Filter the records with a pastoral type, if not null
      * @param int|null   $subtypeId
      * @param int|null   $offset
