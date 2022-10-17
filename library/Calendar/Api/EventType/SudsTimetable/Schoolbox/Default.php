@@ -44,12 +44,6 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
 
 
     /**
-     * @var \Schoolbox\UserMapper
-     */
-    private \Schoolbox\UserMapper $userMapper;
-
-
-    /**
      * @var Timetable_ColourMapper
      */
     private \Timetable_ColourMapper $timetableColourMapper;
@@ -80,7 +74,6 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overrideMapper,
-        \Schoolbox\UserMapper $userMapper,
         \Timetable_ColourMapper $timetableColourMapper,
         \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper
     ) {
@@ -92,7 +85,6 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->eventMapper = $eventMapper;
         $this->overrideMapper = $overrideMapper;
-        $this->userMapper = $userMapper;
         $this->timetableColourMapper = $timetableColourMapper;
         $this->staffProfileMapper = $staffProfileMapper;
     }
@@ -106,13 +98,6 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
      * @param array|null $allowedEventTypes
      * @return \Calendar\Event\Collection
      * @throws PDOException
-     * @throws UnderflowException
-     * @throws UnexpectedValueException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\Mapper\Exception\NotFound
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
     {
