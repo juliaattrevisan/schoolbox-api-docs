@@ -27,17 +27,30 @@ const showSelectAll = computed(() => {
 });
 
 /**
+ * so can slide down to show searching
+ */
+watch(() => searchStore.isLoading, () => {
+    nextTick(() => animate());
+});
+
+/**
+ * to slide up and down based on the amount of results
+ */
+watch(() => searchStore.filteredResults, () => {
+    nextTick(() => animate());
+});
+
+/**
  * to slide up and down the search results
  */
- watch(() => searchStore.filteredResults, () => {
-    nextTick(() => {
-        const targetHeight = searchResultsEl.value.offsetHeight;
-        gsap.to(searchResultsContainerEl.value, {
-            duration: 0.3,
-            height: targetHeight,
-        });
+function animate () {
+    //the height will be 2 as there's a 2px border, and we add +1 to allow the border to be shown
+    const targetHeight = searchResultsEl.value.offsetHeight === 2 ? 0 : searchResultsEl.value.offsetHeight + 1;
+    gsap.to(searchResultsContainerEl.value, {
+        duration: 0.3,
+        height: targetHeight,
     });
-});
+}
 
 </script>
 
@@ -69,26 +82,18 @@ const showSelectAll = computed(() => {
 }
 
 .search-results {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     max-height: 400px;
     overflow: auto;
-    position: absolute;
-    top: 0;
     width: 100%;
-    z-index: 10;
     ul {
+        border: 1px solid var(--navigation-hover);
         list-style: none;
         margin: 0;
         li {
             border-bottom: 1px solid var(--body-background);
-            border-left: 1px solid var(--navigation-hover);
-            border-right: 1px solid var(--navigation-hover);
             transform: none !important;
-            &:first-child {
-                border-top: 1px solid var(--navigation-hover);
-            }
             &:last-child {
-                border-bottom: 1px solid var(--navigation-hover);
+                border-bottom: none;
             }
         }
     }
