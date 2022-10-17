@@ -100,23 +100,23 @@
     <dl>
         <dt>{{ allSummators.map.weighted }}</dt>
         <dd>
-            The participant&rsquo;s total mark is equal to the average mark they have received for each activity within
-            the project, weighted by that activity&rsquo;s weight.
+            The participant&rsquo;s total mark is equal to the <strong>average</strong> mark they have received for each
+            activity within the project, <strong>weighted</strong> by that activity&rsquo;s weight.
         </dd>
         <dt>{{ allSummators.map.avg }}</dt>
         <dd>
-            The participant&rsquo;s total mark is equal to the average mark they have received for each activity within
-            the project; the activity&rsquo;s weight is ignored.
+            The participant&rsquo;s total mark is equal to the <strong>average</strong> mark they have received for each
+            activity within the project; the activity&rsquo;s <strong>weight is ignored</strong>.
         </dd>
         <dt>{{ allSummators.map.max }}</dt>
         <dd>
-            The participant&rsquo;s total mark is equal to the highest mark they have received for any activity within
-            the project.
+            The participant&rsquo;s total mark is equal to the <strong>highest</strong> mark they have received for any
+            activity within the project.
         </dd>
         <dt>{{ allSummators.map.min }}</dt>
         <dd>
-            The participant&rsquo;s total mark is equal to the lowest mark they have received for any activity within
-            the project.
+            The participant&rsquo;s total mark is equal to the <strong>lowest</strong> mark they have received for any
+            activity within the project.
         </dd>
     </dl>
     <h3>Require All Activities</h3>
@@ -137,20 +137,22 @@
     </p>
     <p>An activity will be ignored if:</p>
     <ul>
-        <li>the participant is explicitly excluded</li>
+        {% if custom_assessment_participation %}
+            <li>the participant is <strong>excluded</strong> from the activity</li>
+        {% endif %}
         {% if allNullSubmissionStates is not empty %}
-        <li>
-            the participant has been given a null grade
-            (
-            {%- for state in allNullSubmissionStates %}
-                {{- state.displayAs -}}
-                {%- if not loop.last %}, {% endif -%}
-            {% endfor -%}
-            )
-        </li>
+            <li>
+                the participant has been <strong>marked with a null grade</strong>
+                (
+                {%- for state in allNullSubmissionStates %}
+                    {{- state.displayAs -}}
+                    {%- if not loop.last %}, {% endif -%}
+                {% endfor -%}
+                ) for the activity
+            </li>
         {% endif %}
         <li>
-            the participant has not been marked,
+            the participant has <strong>not been marked</strong> at all,
             <strong>unless</strong> the &ldquo;Require All Activities&rdquo; option is on
         </li>
     </ul>
