@@ -88,7 +88,7 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
-        <p>Are you sure you wish to delete the {{ selectedNodesStore.countWithName }} selected and all of {{ selectedNodesStore.count > 1 ? 'their' : 'its' }} children?</p>
+        <p>Are you sure you wish to delete the selected {{ selectedNodesStore.singleOrPlural }} and all of {{ selectedNodesStore.count > 1 ? 'their' : 'its' }} children?</p>
         <ul class="flex-list">
             <li>
                 <button @click.prevent="onDeleteSelected" class="button icon-approve submit" :disabled="deleteNodesStore.isProcessing">{{ deleteButtonText }}</button>
