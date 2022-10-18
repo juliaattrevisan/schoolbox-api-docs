@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Config;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
