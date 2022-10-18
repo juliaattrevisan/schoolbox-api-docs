@@ -5,7 +5,6 @@
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
-import { useSelectedNodesStore } from '../../selectedNodes/store/mcSelectedNodesStore';
 
 
 export const useUpdateNodeStore = defineStore('mcUpdateNode', {
