@@ -118,12 +118,34 @@ class CycleUnroller
                 /* For each of the Days and Periods, assign their corresponding startdatetime and
                  * finishdatetime values
                  */
+                foreach ($day->Periods->Period as $period) {
+                    $periodId = (string)$period->xpath('@Id')[0];
+
+                    $startDatetime = sprintf(
+                        '%s %s:00',
+                        $date,
+                        $period->StartTime
+                    );
+
+                    $finishDatetime = sprintf(
+                        '%s %s:00',
+                        $date,
+                        $period->EndTime
+                    );
+
+                    /* Assemble into stack
+                     */
+                    $stack[$weekIndex]['days'][$dayIndex]['periods'][$periodId] = [
+                        'id' => $periodId,
+                        'name' => (string)$period->Name,
+                        'startAt' => $startDatetime,
+                        'finishAt' => $finishDatetime
+                    ];
+                }
             }
         }
 
-        new \Alaress_Probe($week, $stack);
-
-
+        new \Alaress_Probe($stack);
 
         return $stack;
     }
