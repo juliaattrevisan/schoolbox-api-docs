@@ -65,18 +65,11 @@ class Hydrator
                     'isamsId' => (string)$schedule->xpath('@Id')[0],
                     'periodId' => $periodId,
                     'subject' => $subject,
-                    'staff' => $this->findScheduleTeacher((string)$schedule->Teacher),
+                    'substituteStaff' => $this->findScheduleStaff((string)$schedule->Teacher),
                     'roomId' => (string)$schedule->RoomId,
                     'setId' => (string)$schedule->SetId,
                     'set' => (string)$schedule->Set,
                 ];
-
-                $t = $this->findScheduleTeacher((string)$schedule->Teacher);
-                $s = $subject['staff'][0] ?? ['staffId' => ''];
-
-                if ($t['staffId'] !== $s['staffId']) {
-                    new \Alaress_Probe($t, $s);
-                }
             }
         }
 
@@ -86,11 +79,29 @@ class Hydrator
 
     /**
      * Find a teacher's details via their isams UserCode
+     * I *think* this is for Substitute Teachers, given that the school had
+     * this person for a Schedule:
+     *
+     * Array
+        (
+            [externalId] => 50638
+            [staffId] => 508
+            [userCode] => cvr119765041396889606
+            [title] => Miss
+            [firstname] => Secondary
+            [firstnamePreferred] => Secondary
+            [lastname] => Cover 1
+        )
+     *
+     * The Subject's Teacher is sometimes empty, so I guess this means it's
+     * always covered by a subby. Or, they're not specified. Or, it's actually
+     * the other way around. I've seen Secondary Cover in both the regular
+     * subject staff and this schedule staff.
      *
      * @param string $userCode
      * @return string[]
      */
-    public function findScheduleTeacher(string $userCode): array
+    public function findScheduleStaff(string $userCode): array
     {
         $node = $this->nodes->xpath("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$userCode}']]")[0] ?? null;
 
@@ -126,7 +137,7 @@ class Hydrator
      * @param string $id
      * @return array
      */
-    public function findStaff(string $id): array
+    public function findSubjectStaff(string $id): array
     {
         $node = $this->nodes->xpath("/iSAMS/HRManager/CurrentStaff/StaffMember[@Id='{$id}']")[0] ?? null;
 
@@ -181,7 +192,7 @@ class Hydrator
                 'subjectId' => '',
                 'code' => '',
                 'name' => '(unknown subject)',
-                'staff' => []
+                'regularStaff' => []
             ];
         }
 
@@ -194,14 +205,14 @@ class Hydrator
         /* lol the Teacher @Id attribute is the Set Id, not the teacher's...
          */
         foreach ($teachers as $teacher) {
-            $staff[] = $this->findStaff((string)$teacher->xpath('@StaffId')[0]);
+            $staff[] = $this->findSubjectStaff((string)$teacher->xpath('@StaffId')[0]);
         }
 
         return [
             'subjectId' => (string)$node->SubjectId,
             'code' => $setCode,
             'name' => trim((string)$node[0]->Name),
-            'staff' => $staff
+            'regularStaff' => $staff
         ];
     }
 }
