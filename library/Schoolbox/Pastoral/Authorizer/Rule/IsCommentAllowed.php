@@ -56,7 +56,9 @@ class IsCommentAllowed implements IAuthorizationRule
             return true;
         }
         if ($user->getRole()->isStudent() || $user->getRole()->isParent()) {
-            return $this->getCommentsAllowed($record, $user);
+            if ($this->getCommentsAllowed($record, $user)) {
+                return true;
+            }
         }
         throw new Unauthorized();
     }

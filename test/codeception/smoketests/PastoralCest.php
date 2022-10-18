@@ -28,6 +28,7 @@ class PastoralCest
     {
         $i->loginAdmin();
         $i->stopFollowingRedirects();
+        $i->updateInDatabase('config', array('value' => '1'), array('name' => 'pastoral_student_access'));
     }
 
 
@@ -160,7 +161,9 @@ class PastoralCest
     {
         #GIVEN
         $student_jreed = $i->grabUser('jreed');
-        $pastoral_record = $this->createParentsCommentsToggledOnPastoralRecord($i, $student_jreed, 'Automated Test Pastoral Allow Parents to comment toggled on at ' . time());
+        $parent         = $i->grabUser('jennireed01');
+
+        $pastoral_record = $this->createUserCommentsToggledOnPastoralRecord($i, $student_jreed, $parent, 'Automated Test Pastoral Allow Parents to comment toggled on at ' . time());
 
         #WHEN impersonating Jenni Reed
         $i->impersonateUser(27);
@@ -176,6 +179,37 @@ class PastoralCest
         $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
         $pastoralCommentPayload->setPrivateComment('A very private comment from a parent');
         $i->amGoingTo("Send request add private comment to student #{$student_jreed->getId()} record # {$pastoral_record->getId()}");
+        $i->sendRequest($pastoralCommentPayload);
+
+        $i->seeResponseCodeIs(200);
+    }
+
+    /** Student is able to comment on a pastoral record for themselves using a curl request.
+     *
+     * @param IntegrationTester $i
+     */
+    public function studentCommentOnPastoralRecord(IntegrationTester $i): void
+    {
+        #GIVEN
+        $student_jreed = $i->grabUser('jreed');
+        $parent         = $i->grabUser('jennireed01');
+
+        $pastoral_record = $this->createUserCommentsToggledOnPastoralRecord($i, $student_jreed, $student_jreed, 'Automated Test Pastoral Allow Student to comment toggled on at ' . time());
+
+        #WHEN impersonating Jenni Reed
+        $i->impersonateUser($student_jreed->getId());
+
+        #THEN Jenni Reed(parent) is able to add comment to the pastoral record
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
+        $pastoralCommentPayload->setPublicComment('A very public comment from self');
+        $i->amGoingTo("Send request add comment to self #{$student_jreed->getId()} record # {$pastoral_record->getId()}");
+        $i->sendRequest($pastoralCommentPayload);
+
+        $i->seeResponseCodeIs(200);
+
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
+        $pastoralCommentPayload->setPrivateComment('A very private comment from self');
+        $i->amGoingTo("Send request add private comment to self #{$student_jreed->getId()} record # {$pastoral_record->getId()}");
         $i->sendRequest($pastoralCommentPayload);
 
         $i->seeResponseCodeIs(200);
@@ -201,13 +235,17 @@ class PastoralCest
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}");
 
-        $i->grabPastoralRecordByTitle($heading);
+        $record = $i->grabPastoralRecordByTitle($heading);
         $recordID = $i->grabFromDatabase('pastoral', 'id', ['heading' => $heading]);
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($record);
 
         #WHEN admin navigates to the pastoral record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
 
         #THEN admin can view that record
+        $i->seeResponseCodeIs(200);
+        $pastoralCommentPayload->setPublicComment('A comment from admin');
+        $i->sendRequest($pastoralCommentPayload);
         $i->seeResponseCodeIs(200);
 
         #WHEN impersonating Jenni Reed
@@ -216,6 +254,9 @@ class PastoralCest
         #THEN Jenni Reed cannot view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
         $i->seeResponseCodeIs(400);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a parent');
+        $i->sendRequest($pastoralCommentPayload);
+        $i->seeResponseCodeIs(400);
 
         #WHEN impersonating Alison Chan
         $i->impersonateUser(43);
@@ -223,12 +264,18 @@ class PastoralCest
         #THEN Alison Chan cannot view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
         $i->seeResponseCodeIs(400);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a denied staff');
+        $i->sendRequest($pastoralCommentPayload);
+        $i->seeResponseCodeIs(400);
 
         #WHEN impersonating Jack Coles
         $i->impersonateUser(22);
 
         #THEN Jack Coles can view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
+        $i->seeResponseCodeIs(200);
+        $pastoralCommentPayload->setPublicComment('A very public comment from moderator');
+        $i->sendRequest($pastoralCommentPayload);
         $i->seeResponseCodeIs(200);
     }
 
@@ -256,13 +303,17 @@ class PastoralCest
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}");
 
-        $i->grabPastoralRecordByTitle($heading);
+        $record = $i->grabPastoralRecordByTitle($heading);
         $recordID = $i->grabFromDatabase('pastoral', 'id', ['heading' => $heading]);
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($record);
 
         #WHEN admin navigates to the pastoral record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
 
         #THEN admin can view that record
+        $i->seeResponseCodeIs(200);
+        $pastoralCommentPayload->setPublicComment('A very public comment from admin');
+        $i->sendRequest($pastoralCommentPayload);
         $i->seeResponseCodeIs(200);
 
         #WHEN impersonating Jenni Reed
@@ -271,6 +322,9 @@ class PastoralCest
         #THEN Jenni Reed cannot view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
         $i->seeResponseCodeIs(400);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a parent');
+        $i->sendRequest($pastoralCommentPayload);
+        $i->seeResponseCodeIs(400);
 
         #WHEN impersonating Alison Chan
         $i->impersonateUser(43);
@@ -278,12 +332,18 @@ class PastoralCest
         #THEN Alison Chan can view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
         $i->seeResponseCodeIs(200);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a staff');
+        $i->sendRequest($pastoralCommentPayload);
+        $i->seeResponseCodeIs(200);
 
         #WHEN impersonating Jack Coles
         $i->impersonateUser(22);
 
         #THEN Jack Coles can view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
+        $i->seeResponseCodeIs(200);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a moderator');
+        $i->sendRequest($pastoralCommentPayload);
         $i->seeResponseCodeIs(200);
     }
 
@@ -306,6 +366,7 @@ class PastoralCest
         $teacherUser2         = $i->grabUser('achan');
         $createPastoral->setUserAccess($teacherUser->getId(), Pastoral\Access\Mapper::ACCESS_DENY);
         $createPastoral->setUserAccess($parentUser->getId(), Pastoral\Access\Mapper::ACCESS_PRIVATE);
+        // $createPastoral->setParentCommentsAllowed($parentUser->getId());
         $createPastoral->setUserAccess($teacherUser2->getId(), Pastoral\Access\Mapper::ACCESS_PUBLIC);
         $i->amGoingTo('Send request create pastoral record grant access by user for student #' . $student_jreed->getId());
         $i->sendRequest($createPastoral);
@@ -313,13 +374,17 @@ class PastoralCest
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}");
 
-        $i->grabPastoralRecordByTitle($heading);
+        $record = $i->grabPastoralRecordByTitle($heading);
         $recordID = $i->grabFromDatabase('pastoral', 'id', ['heading' => $heading]);
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($record);
 
         #WHEN admin navigates to the pastoral record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
 
         #THEN admin can view that record
+        $i->seeResponseCodeIs(200);
+        $pastoralCommentPayload->setPublicComment('A very public comment from admin');
+        $i->sendRequest($pastoralCommentPayload);
         $i->seeResponseCodeIs(200);
 
         #WHEN impersonating Jenni Reed
@@ -328,12 +393,18 @@ class PastoralCest
         #THEN Jenni Reed cannot view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
         $i->seeResponseCodeIs(200);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a parent');
+        $i->sendRequest($pastoralCommentPayload);
+        $i->seeResponseCodeIs(401);
 
         #WHEN impersonating Alison Chan
         $i->impersonateUser(43);
 
         #THEN Alison Chan can view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
+        $i->seeResponseCodeIs(200);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a staff');
+        $i->sendRequest($pastoralCommentPayload);
         $i->seeResponseCodeIs(200);
 
         #WHEN impersonating Jack Coles
@@ -342,12 +413,18 @@ class PastoralCest
         #THEN Jack Coles can view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
         $i->seeResponseCodeIs(200);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a moderator');
+        $i->sendRequest($pastoralCommentPayload);
+        $i->seeResponseCodeIs(200);
 
         #WHEN impersonating Staff 1
         $i->impersonateUser(65);
 
         #THEN Staff 1 cannot view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
+        $i->seeResponseCodeIs(400);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a denied staff');
+        $i->sendRequest($pastoralCommentPayload);
         $i->seeResponseCodeIs(400);
     }
 
@@ -375,8 +452,9 @@ class PastoralCest
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}");
 
-        $i->grabPastoralRecordByTitle($heading);
+        $record = $i->grabPastoralRecordByTitle($heading);
         $recordID = $i->grabFromDatabase('pastoral', 'id', ['heading' => $heading]);
+        $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($record);
 
         #WHEN admin navigates to the pastoral record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
@@ -387,12 +465,18 @@ class PastoralCest
         #THEN Jenni Reed cannot view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
         $i->seeResponseCodeIs(400);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a parent');
+        $i->sendRequest($pastoralCommentPayload);
+        $i->seeResponseCodeIs(400);
 
         #WHEN impersonating Alison Chan
         $i->impersonateUser(43);
 
         #THEN Alison Chan can view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
+        $i->seeResponseCodeIs(200);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a staff in a group');
+        $i->sendRequest($pastoralCommentPayload);
         $i->seeResponseCodeIs(200);
 
         #WHEN impersonating Jack Coles
@@ -401,12 +485,18 @@ class PastoralCest
         #THEN Jack Coles can view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
         $i->seeResponseCodeIs(200);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a moderator');
+        $i->sendRequest($pastoralCommentPayload);
+        $i->seeResponseCodeIs(200);
 
         #WHEN impersonating Staff 1
         $i->impersonateUser(65);
 
         #THEN Staff 1 cannot view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
+        $i->seeResponseCodeIs(400);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a denied staff');
+        $i->sendRequest($pastoralCommentPayload);
         $i->seeResponseCodeIs(400);
 
         #GIVEN Jack Coles set access to the group as denied
@@ -422,6 +512,9 @@ class PastoralCest
         #THEN Alison Chan can not view the record
         $i->sendGet('/pastoral/student/' . $student_jreed->getId() . '/record/' . $recordID);
         $i->seeResponseCodeIs(400);
+        $pastoralCommentPayload->setPublicComment('A very public comment from a denied staff');
+        $i->sendRequest($pastoralCommentPayload);
+        $i->seeResponseCodeIs(400);
     }
 
     /** Test add pastoral type
@@ -431,7 +524,6 @@ class PastoralCest
      */
     public function addPastoralType(IntegrationTester $i): void
     {
-
         #GIVEN new pastoral types are created
         $name = 'Automated Pastoral Type ' . time();
         $id = $i->grabNumRecords('lu_pastoral_type');
@@ -468,7 +560,6 @@ class PastoralCest
      */
     public function addPastoralSubType(IntegrationTester $i): void
     {
-
         #GIVEN some new pastoral type are created
         $pastoralType = 4;
         $subTypeName = 'Automated Pastoral Bullying Sub Type ' . time();
@@ -506,7 +597,6 @@ class PastoralCest
      */
     public function addPastoralActions(IntegrationTester $i): void
     {
-
         #GIVEN a news pastoral action is created
         $i->updateInDatabase('config', array('value' => '1'), array('name' => 'pastoral_action_enable'));
         $pastoralName = 'Automated Pastoral Action' . time();
@@ -587,14 +677,12 @@ class PastoralCest
      * @param string            $heading
      * @return Pastoral\Model
      */
-    private function createParentsCommentsToggledOnPastoralRecord(IntegrationTester $i, User $student, string $heading): Pastoral\Model
+    private function createUserCommentsToggledOnPastoralRecord(IntegrationTester $i, User $student, User $viewer, string $heading): Pastoral\Model
     {
-        $parent         = $i->grabUser('jennireed01');
-
         $createPastoral = new Payload\Pastoral\Create($student->getId());
         $createPastoral->setHeading($heading);
-        $createPastoral->setUserAccess($parent->getId(), Pastoral\Access\Mapper::ACCESS_PRIVATE);
-        $createPastoral->setParentCommentsAllowed($parent->getId());
+        $createPastoral->setUserAccess($viewer->getId(), Pastoral\Access\Mapper::ACCESS_PRIVATE);
+        $createPastoral->setUserCommentsAllowed($viewer->getId());
         $i->amGoingTo('Send request create pastoral record for student #' . $student->getId());
         $i->sendRequest($createPastoral);
 
