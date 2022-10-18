@@ -9,6 +9,8 @@ import { computed  } from 'vue';
 import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
 import { useDeleteNodesStore } from './store/mcDeleteNodesStore';
 import { useEnableNodesStore } from './store/mcEnableNodesStore';
+import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
+import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
 import McSelectedNode from './mc-selected-node.vue';
 
@@ -16,8 +18,8 @@ import McSelectedNode from './mc-selected-node.vue';
 const selectedNodesStore = useSelectedNodesStore(); //to keep track of selected nodes
 const deleteNodesStore = useDeleteNodesStore();
 const enableNodesStore = useEnableNodesStore();
-
-
+const updateNodeStore = useUpdateNodeStore(); //so the bottom-drawer is not visible while we are updating a node
+const addSubsectionStore = useAddSubsectionStore(); //so the bottom-drawer is not visible while we are adding a node
 
 /**
  * For proper count display, eg: 'No nodes / 1 Member' / '4 nodes'
@@ -52,7 +54,7 @@ function onDeleteNodesSelected () {
 
 <template>
     <div class="small-12 island">
-        <bottom-drawer :showDrawer="selectedNodesStore.hasNodes">
+        <bottom-drawer :showDrawer="selectedNodesStore.hasNodes && !updateNodeStore.isOpen && !addSubsectionStore.isOpen">
             <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container">
                 <mc-selected-node
                     v-for="node in selectedNodesStore.nodes"
