@@ -234,6 +234,7 @@ class Factory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
+                    Loader::getInstance()->get('photo_sis_import'),
                     /* Profile pieces
                      */
                     UserProfile\Mapper::getInstance(),
@@ -241,6 +242,7 @@ class Factory implements IFactory
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
                     UserProfile\Relationship\Mapper::getInstance(),
+                    StorageMapper::getInstance(),
                     /* Timetable pieces
                      */
                     \Schoolbox\External\Event\Mapper::getInstance(),

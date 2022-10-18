@@ -15,8 +15,10 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use UnexpectedValueException;
 
 /**
@@ -60,6 +62,12 @@ class Factory
      * @var string
      */
     private string $key;
+
+
+    /**
+     * @var bool
+     */
+    private bool $includePhoto;
 
 
     /**
@@ -129,17 +137,25 @@ class Factory
 
 
     /**
+     * @var StorageMapper
+     */
+    private StorageMapper $storageMapper;
+
+
+    /**
      * Factory constructor.
      *
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
      * @param string                                     $host
      * @param string                                     $key
-     * @param UserProfile\Mapper                         $baseProfileMapper
+     * @param bool                                       $includePhoto
+     * @param Mapper                                     $baseProfileMapper
      * @param UserProfile\Student\Mapper                 $studentProfileMapper
      * @param UserProfile\Parent\Mapper                  $parentProfileMapper
      * @param UserProfile\Staff\Mapper                   $staffProfileMapper
      * @param UserProfile\Relationship\Mapper            $relationshipMapper
+     * @param StorageMapper                              $storageMapper
      * @param \Schoolbox\External\Event\Mapper           $eventMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
@@ -152,12 +168,14 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        bool $includePhoto,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
+        StorageMapper $storageMapper,
         /* Timetable pieces */
         \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
@@ -170,6 +188,7 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->includePhoto = $includePhoto;
 
         /* Profile pieces
          */
@@ -178,6 +197,7 @@ class Factory
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+        $this->storageMapper = $storageMapper;
 
         /* Timetable pieces
          */
@@ -223,11 +243,13 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $this->includePhoto,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
-                $this->relationshipMapper
+                $this->relationshipMapper,
+                $this->storageMapper
             ))
             ->add(new Profile\Cleanup(
                 $this->log,
