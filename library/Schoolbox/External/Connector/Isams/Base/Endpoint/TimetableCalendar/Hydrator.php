@@ -49,9 +49,10 @@ class Hydrator
      */
     public function hydrate(): array
     {
+
         /* A list of (periodId, everything) tuples
          */
-        $schedules = $this->findSchedules();
+        $schedules = $this->findSchedules($this->findPeriodIds());
 
         /* Map them straight into the definition
          */
@@ -65,19 +66,43 @@ class Hydrator
             }
         }
 
-        unset($schedules);
+        unset($weekData, $days, $period, $schedules);
 
         return $this->timetableDefinition;
     }
 
 
     /**
-     * Find all the Published Schedules, which are schedules that exist inside
-     * a Published Timetable
+     * Find periodIds that we actually care about; anything not mentioned
+     * in the timetableDefinition has no relevance
      *
      * @return array
      */
-    private function findSchedules(): array
+    private function findPeriodIds(): array
+    {
+        $periodIds = [];
+
+        foreach ($this->timetableDefinition as $weekId => $weekData) {
+            foreach ($weekData['days'] as $day) {
+                foreach ($day['periods'] as $periodId => $periodData) {
+                    $periodIds[$periodId] = $periodId;
+                }
+            }
+        }
+
+        return $periodIds;
+    }
+
+
+    /**
+     * Find all the Published Schedules, which are schedules that exist inside
+     * a Published Timetable, but we only care about schedules that could populate
+     * the known $periodIds in this definition
+     *
+     * @param array $periodIds
+     * @return array
+     */
+    private function findSchedules(array $periodIds): array
     {
         $publishedTimetables = $this->nodes->xpath('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
@@ -88,6 +113,13 @@ class Hydrator
 
             foreach ($schedules as $schedule) {
                 $periodId = (string)$schedule->PeriodId;
+
+                /* This periodId isn't in the definition; skip it
+                 */
+                if (!isset($periodIds[$periodId])) {
+                    continue;
+                }
+
                 $classCode = (string)$schedule->Code;
                 $subject = $this->findSubject($classCode);
                 $scheduleId = (string)$schedule->xpath('@Id')[0];
