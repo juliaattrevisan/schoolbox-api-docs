@@ -187,13 +187,13 @@ class Project implements IAssessmentTypeTranslator
         $strategy = (new MarkDerivation\StrategyFactory())->build($requireAllActivities);
         switch ($summatorString) {
             case ProjectModel::SUMMATOR_AVERAGE:
-                return new Average();
+                return new Average($strategy);
             case ProjectModel::SUMMATOR_WEIGHTED_AVERAGE:
                 return new WeightedAverage($strategy);
             case ProjectModel::SUMMATOR_MINIMUM:
-                return new Minimum();
+                return new Minimum($strategy);
             case ProjectModel::SUMMATOR_MAXIMUM:
-                return new Maximum();
+                return new Maximum($strategy);
         }
         throw new UnexpectedValueException('$model->getSummator() is not a recognised summator type');
     }

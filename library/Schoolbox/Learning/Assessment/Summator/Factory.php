@@ -49,13 +49,13 @@ class Factory
                 return new WeightedAverage($strategy);
 
             case self::AVERAGE:
-                return new Average();
+                return new Average($strategy);
 
             case self::MAXIMUM:
-                return new Maximum();
+                return new Maximum($strategy);
 
             case self::MINIMUM:
-                return new Minimum();
+                return new Minimum($strategy);
         }
 
         throw new \InvalidArgumentException('Please choose a valid summation option');
