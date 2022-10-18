@@ -84,7 +84,9 @@ function onDeleteNodesSelected () {
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
+    max-height: 133px;
     min-height: 50px;
+    overflow: auto;
     padding: 0.5rem;
 }
 
