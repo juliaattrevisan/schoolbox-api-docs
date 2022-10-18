@@ -50,7 +50,7 @@
                     {% if not reportPage and not managePage %}
                     <td class="small-2 checklist">
                         <input type="checkbox" name="userComment{{ userAccess.user.id }}" id="userComment{{ userAccess.user.id }}"
-                               value="1" {{ userAccess.commentsAllowed ? 'checked' : '' }} {{ userAccess.user.role.isParent or userAccess.user.role.isStudent ? '' : 'disabled' }}>
+                               value="1" {{ userAccess.commentsAllowed ? 'checked' : '' }} {{ userAccess.user.role.isParent or userAccess.user.role.isStudent ? '' : 'readonly' }}>
                         <label class="checkbox-label" for="userComment{{ userAccess.user.id }}"></label>
                     </td>
                     {% endif %}
@@ -105,10 +105,14 @@
                         .replace(/{ID}/g, user.id)
                         .replace(/{ROLE}/g, user.role);
 
-
-
                     var permissionListUsers = $('#permission-users');
                     permissionListUsers.html(permissionListUsers.html() + html);
+
+                    if (user.roleType !== 'parent' && user.roleType !== 'student') {
+                        let commentCheckbox = $('#userComment' + user.id);
+                        commentCheckbox.attr('checked', 'checked');
+                        commentCheckbox.attr('readonly', 'readonly');
+                    }
 
                     //Check the correct box
                     var selector = 'input[name = "user['+user.id+']"][value ="'+permission+'"]';
