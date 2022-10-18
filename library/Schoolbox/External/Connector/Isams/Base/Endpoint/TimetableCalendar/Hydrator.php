@@ -65,7 +65,7 @@ class Hydrator
                 $stack[$periodId]['schedule'][$scheduleId] = [
                     'subject' => $subject,
                     'substituteStaff' => $this->findScheduleStaff((string)$schedule->Teacher),
-                    'roomId' => (string)$schedule->RoomId,
+                    'room' => $this->findRoom((string)$schedule->RoomId),
                     'setId' => (string)$schedule->SetId,
                     'set' => (string)$schedule->Set,
                 ];
@@ -73,6 +73,34 @@ class Hydrator
         }
 
         return $stack;
+    }
+
+
+    /**
+     * Find a room by its isams $roomId
+     *
+     * @param string $roomId
+     * @return string[]
+     */
+    private function findRoom(string $roomId): array
+    {
+        $room = $this->nodes->xpath("/iSAMS/EstateManager/Buildings/Building/Classrooms/Classroom[@Id='{$roomId}']")[0] ?? null;
+
+        /* 494 room not found.
+         */
+        if (null === $room) {
+            return [
+                'roomId' => $roomId,
+                'name' => '',
+                'code' => ''
+            ];
+        }
+
+        return [
+            'roomId' => $roomId,
+            'name' => (string)$room->Name,
+            'code' => (string)$room->Code,
+        ];
     }
 
 
@@ -100,7 +128,7 @@ class Hydrator
      * @param string $userCode
      * @return string[]
      */
-    public function findScheduleStaff(string $userCode): array
+    private function findScheduleStaff(string $userCode): array
     {
         $node = $this->nodes->xpath("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$userCode}']]")[0] ?? null;
 
@@ -136,7 +164,7 @@ class Hydrator
      * @param string $id
      * @return array
      */
-    public function findSubjectStaff(string $id): array
+    private function findSubjectStaff(string $id): array
     {
         $node = $this->nodes->xpath("/iSAMS/HRManager/CurrentStaff/StaffMember[@Id='{$id}']")[0] ?? null;
 
