@@ -23,6 +23,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -859,19 +860,20 @@ class Controller extends Base
 
     /**
      * @param RequestValues $post
-     * @return Collection
+     * @return GenericCollection
      * @throws MapperException
      */
-    private function prepareAccesses(RequestValues $post): Collection
+    private function prepareAccesses(RequestValues $post): GenericCollection
     {
         // Save system role permissions, de-duplicating as we go
         $accesses = $this->pastoralAccessMapper->createCollection();
 
-        if (is_array($post["role"] ?? null)) {
+        if (is_array($post->get("role"))) {
             $foundRoles       = [];
             $allowedRoles     = $this->pastoralAccessMapper->determineAllowedRoles();
             $allowedRoleTypes = $this->pastoralAccessMapper->determineAllowedRoleTypes();
-            foreach ($post["role"] as $roleId => $accessLevel) {
+            foreach ($post->get("role") as $roleId => $accessLevel) {
+
                 if (in_array($roleId, $foundRoles)) {
                     // should not happen
                     continue;
@@ -880,7 +882,7 @@ class Controller extends Base
 
                 $access = $this->pastoralAccessMapper->createModel();
                 $access->setAccess($accessLevel);
-                $access->setCommentsAllowed((bool)($post["roleComment{$roleId}"] ?? false));
+                $access->setCommentsAllowed($post->getBool("roleComment{$roleId}", false));
 
                 // Is this a role or a role type?
                 if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
@@ -896,14 +898,17 @@ class Controller extends Base
                         continue;
                     }
                 }
+                if ($post->getInt("roleAccessId{$roleId}")) {
+                    $access->setId($post->getInt("roleAccessId{$roleId}"));
+                }
                 $accesses->add($access);
             }
         }
 
         // Save pastoral group permissions, de-duplicating as we go
-        if (is_array($post["group"] ?? null)) {
+        if (is_array($post->get("group"))) {
             $foundGroups = [];
-            foreach ($post["group"] as $groupId => $accessLevel) {
+            foreach ($post->get("group") as $groupId => $accessLevel) {
                 if (in_array($groupId, $foundGroups)) {
                     // should not happen
                     continue;
@@ -914,7 +919,10 @@ class Controller extends Base
                     $access = $this->pastoralAccessMapper->createModel();
                     $access->setAccess($accessLevel);
                     $access->setGroup($group);
-                    $access->setCommentsAllowed((bool)($post["groupComment{$groupId}"] ?? false));
+                    $access->setCommentsAllowed($post->getBool("groupComment{$groupId}", false));
+                    if ($post->getInt("groupAccessId{$groupId}")) {
+                        $access->setId($post->getInt("groupAccessId{$groupId}"));
+                    }
                     $accesses->add($access);
                 } catch (MapperException $e) {
                     // Noop
@@ -923,9 +931,9 @@ class Controller extends Base
         }
 
         // Save individual user permissions, de-duplicating as we go
-        if (is_array($post["user"] ?? null)) {
+        if (is_array($post->get("user"))) {
             $foundUsers = [];
-            foreach ($post["user"] as $userId => $accessLevel) {
+            foreach ($post->get("user") as $userId => $accessLevel) {
                 if (in_array($userId, $foundUsers)) {
                     // should not happen
                     continue;
@@ -935,8 +943,11 @@ class Controller extends Base
                     $user   = $this->userMapper->findById($userId);
                     $access = $this->pastoralAccessMapper->createModel();
                     $access->setAccess($accessLevel);
-                    $access->setCommentsAllowed((bool)($post["userComment{$userId}"] ?? false));
+                    $access->setCommentsAllowed($post->getBool("userComment{$userId}", false));
                     $access->setUser($user);
+                    if ($post->getInt("userAccessId{$userId}")) {
+                        $access->setId($post->getInt("userAccessId{$userId}"));
+                    }
                     $accesses->add($access);
                 } catch (MapperException $e) {
                     // Noop
@@ -1202,14 +1213,27 @@ class Controller extends Base
             $record->setTags($tags);
 
             // Save permissions/visibility
-            $this->pastoralAccessMapper->deleteByColumn('pastoral_id', $record->getId());
+            $existingAccesses = $record->getAccess()->indexBy('id');
+            $keptAccessIds    = [];
             $record->setAccess($this->pastoralAccessMapper->createCollection());
+            /** @var Access\Model $access */
             foreach ($accesses as $access) {
+                if ($access->getId()) {
+                    $keptAccessIds[] = $access->getId();
+                }
                 $recordAccess = clone $access;
                 $recordAccess->setPastoral($record);
                 $this->pastoralAccessMapper->save($recordAccess);
                 $record->getAccess()->add($recordAccess);
             }
+            // Delete accesses no longer exists
+            $removingAccesses = $existingAccesses->filter(
+                static function ($access) use ($keptAccessIds) {
+                    /** @var Access\Model $access */
+                    return !in_array($access->getId(), $keptAccessIds);
+                }
+            );
+            $this->pastoralAccessMapper->delete($removingAccesses);
 
             // Save actions, record actions are compared against luAction id rather than recordAction id.
             if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {

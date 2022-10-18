@@ -282,42 +282,6 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return bool
-     */
-    public function getParentCommentsAllowed(): bool
-    {
-        /** @var \Schoolbox\Pastoral\Access\Model $access */
-        foreach ($this->getAccess() as $access) {
-            if (
-                $access->getRoleType() === Role::PARENT
-                && $access->getAccess() >= \Schoolbox\Pastoral\Access\Mapper::ACCESS_PUBLIC
-                && $access->getCommentsAllowed()
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getStudentCommentsAllowed(): bool
-    {
-        /** @var \Schoolbox\Pastoral\Access\Model $access */
-        foreach ($this->getAccess() as $access) {
-            if (
-                $access->getRoleType() === Role::STUDENT
-                && $access->getAccess() >= \Schoolbox\Pastoral\Access\Mapper::ACCESS_PUBLIC
-                && $access->getCommentsAllowed()
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * @param Collection|Comment\Model[] $comments
      *
      * @return self

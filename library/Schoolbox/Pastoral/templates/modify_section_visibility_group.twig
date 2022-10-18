@@ -28,6 +28,7 @@
                     </td>
                     <td class="small-{{ reportPage ? 4 : 2 }}">
                         {{ userAccess.group.name }}
+                        <input type="hidden" name="groupAccessId{{ userAccess.group.id }}" id="groupAccessId{{ userAccess.group.id }}" value="{{ userAccess.id }}" >
                     </td>
                     {% if not reportPage %}
                     <td class="small-2">
@@ -49,7 +50,7 @@
                     {% if not reportPage and not managePage %}
                     <td class="small-2 checklist">
                         <input type="checkbox" name="groupComment{{ userAccess.group.id }}" id="groupComment{{ userAccess.group.id }}"
-                               value="1" checked="checked" disabled="disabled">
+                               value="1" checked="checked" readonly="readonly">
                         <label class="checkbox-label" for="groupComment{{ userAccess.group.id }}"></label>
                     </td>
                     {% endif %}
@@ -179,6 +180,10 @@
 
                     var permissionListGroups = $('#permission-groups');
                     permissionListGroups.html(permissionListGroups.html() + html);
+
+                    let commentCheckbox = $('#groupComment' + groupId);
+                    commentCheckbox.attr("checked", "checked");
+                    commentCheckbox.attr("readonly", "readonly");
 
                     applyLock(['groups'], locked);
                     //Check the correct box
