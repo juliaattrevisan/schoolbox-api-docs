@@ -49,7 +49,7 @@ if (!$_SESSION['id']) {
     $expiryAt = null;
 
     if (isset($_GET['expiryDate'])) {
-        $expiryAt = new Alaress_Date_Format($_GET['expiryDate'], \DateTime::RFC3339);
+        $expiryAt = new Alaress_Date_Format($_GET['expiryDate'], [DATE_RFC3339, DATE_RFC3339_EXTENDED]);
         $expiryAt->setTimezone($kernel->get('config')->get('date_timezone'));
     }
 
