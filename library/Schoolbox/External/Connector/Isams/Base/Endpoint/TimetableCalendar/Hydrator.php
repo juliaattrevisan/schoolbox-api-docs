@@ -60,10 +60,9 @@ class Hydrator
                 $periodId = (string)$schedule->PeriodId;
                 $classCode = (string)$schedule->Code;
                 $subject = $this->findSubject($classCode);
+                $scheduleId = (string)$schedule->xpath('@Id')[0];
 
-                $stack[$periodId][] = [
-                    'isamsId' => (string)$schedule->xpath('@Id')[0],
-                    'periodId' => $periodId,
+                $stack[$periodId]['schedule'][$scheduleId] = [
                     'subject' => $subject,
                     'substituteStaff' => $this->findScheduleStaff((string)$schedule->Teacher),
                     'roomId' => (string)$schedule->RoomId,
