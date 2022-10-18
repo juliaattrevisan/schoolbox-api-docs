@@ -11,9 +11,13 @@ namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
+use Alaress\Database\Predicate\Builder;
+use Alaress_Date_Format;
 use Closure;
+use DateTimeInterface;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
+use Schoolbox\Mapper;
 use Schoolbox\Pastoral\DataSource;
 use Schoolbox\Pastoral\Model;
 use Schoolbox\User;
@@ -77,12 +81,10 @@ class Cursor implements ICursor
         $lastRecord  = $collection->last();
 
         if ($lastRecord instanceof Model) {
-            // Simplified cursor, based only on ID: see "Simplified filtering"
-            // in `retrieveResults` for discussion
             $nextCursor = $this->codec->encode([
-//                'severity' => $lastRecord->getSeverity()->getSequence(),
-//                'created'  => $lastRecord->getCreatedAt()->getUnixTimeStamp(),
-//                'updated'  => $lastRecord->getUpdatedAt()->getUnixTimeStamp(),
+                'severity' => $lastRecord->getSeverity()->getSequence(),
+                'created'  => $lastRecord->getCreatedAt()->toRfc3339String(),
+                'updated'  => $lastRecord->getUpdatedAt()->toRfc3339String(),
                 'id'       => $lastRecord->getId(),
             ]);
         }
@@ -119,127 +121,127 @@ class Cursor implements ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        // TODO limit the results returned in query, instead of post-query:
-        //      need to update findByColumnList to do so
-        $results = $this->dataSource->findRecords(
-            $this->currentUser,
-            $this->student->getId(),
-            null,
-            null,
-            0,
-            0,
-            null,
-        );
-        $results = $results->filter(fn (Model $model) => in_array($model->getId(), $this->pastoralIds));
-        $results = $results->sortByCallback($this->buildSortCallback());
-        if (count($results) === 0) {
-            return $results;
+        if (empty($this->pastoralIds)) {
+            return $this->dataSource->createCollection();
         }
-
-        // Simplified filtering:
-        // Find the ID in the encoded cursor, and return every record after that
-        // in already-sorted `$results`.
-        // The alternative is to be aware of every ordering option in each sort
-        // option, and filter conditionally on that.
-        // e.g. the severity filter would need to exclude any result with:
-        // * a severity higher than the cursor
-        // * a severity equal to the cursor, and a created higher than the
-        //   cursor
-        // * a severity and created equal to the cursor, and an ID higher than
-        //   the cursor
-        $offset = 0;
-        if (isset($encodedCursor)) {
-            $decodedCursor = $this->codec->decode($encodedCursor);
-            $id            = $decodedCursor['id'] ?? null;
-            if ($id) {
-                $resultIds    = $results->getPropertyValues('id');
-                $cursorOffset = array_search($id, $resultIds, true);
-                // Not found: return an empty result
-                if ($cursorOffset === false) {
-                    return $results->emptyClone();
-                } else {
-                    $offset = $cursorOffset + 1;
-                }
-            }
-        }
-
-        return $results->slice($offset, $this->limit);
+        return $this->dataSource
+            ->findRecordsByPredicates(
+                $this->currentUser,
+                $this->buildPredicateBuilder($encodedCursor),
+                [
+                    'order' => $this->buildOrderPart(),
+                    'limit' => $this->limit,
+                ],
+            )
+            ->reindex();
     }
 
     /**
-     * Build a sort callback for this type of record.
-     *
-     * Ordering of results:
+     * Build the order part for this cursor, depending on `$this->sortOption`.
      * * severity: severity.sequence DESC, then created DESC, then id DESC
      * * created:  created DESC, then id DESC
      * * updated:  updated DESC, then created DESC, then id DESC
      *
-     * @return Closure
+     * @return array
      */
-    private function buildSortCallback(): Closure
+    private function buildOrderPart(): array
     {
-        $callback = match ($this->sortOption) {
-            self::SORT_OPTION_SEVERITY => function (Model $a, Model $b) {
-                return $this->sortSeverity($a, $b) ?: $this->sortCreated($a, $b) ?: $this->sortId($a, $b);
-            },
-            self::SORT_OPTION_UPDATED => function (Model $a, Model $b) {
-                return $this->sortUpdated($a, $b) ?: $this->sortCreated($a, $b) ?: $this->sortId($a, $b);
-            },
-            default => function (Model $a, Model $b) {
-                return $this->sortCreated($a, $b) ?: $this->sortId($a, $b);
-            },
+        return match ($this->sortOption) {
+            self::SORT_OPTION_SEVERITY => [
+                'sev.sequence' => Mapper::SORT_ORDER_DESC,
+                'p.created_at' => Mapper::SORT_ORDER_DESC,
+                'p.id'         => Mapper::SORT_ORDER_DESC,
+            ],
+            self::SORT_OPTION_UPDATED => [
+                'p.updated_at' => Mapper::SORT_ORDER_DESC,
+                'p.created_at' => Mapper::SORT_ORDER_DESC,
+                'p.id'         => Mapper::SORT_ORDER_DESC,
+            ],
+            default => [
+                'p.created_at' => Mapper::SORT_ORDER_DESC,
+                'p.id'         => Mapper::SORT_ORDER_DESC,
+            ],
         };
-        return Closure::fromCallable($callback);
     }
 
     /**
-     * Sort pastoral records by severity (descending).
+     * Build the predicate builder for this cursor.
      *
-     * @param Model $a
-     * @param Model $b
-     * @return int
+     * @param string|null $encodedCursor
+     * @return Builder
      */
-    private function sortSeverity(Model $a, Model $b): int
+    private function buildPredicateBuilder(?string $encodedCursor): Builder
     {
-        if (!($a->getSeverity() && $b->getSeverity())) {
-            return 0;
+        $pb = $this->dataSource->getPredicateBuilder()
+            ->equals('p.student_id', $this->student->getId())
+            ->in('p.id', $this->pastoralIds);
+        if (!isset($encodedCursor)) {
+            return $pb;
         }
-        return $b->getSeverity()->getSequence() <=> $a->getSeverity()->getSequence();
-    }
 
-    /**
-     * Sort pastoral records by created (descending)
-     *
-     * @param Model $a
-     * @param Model $b
-     * @return int
-     */
-    private function sortCreated(Model $a, Model $b): int
-    {
-        return $b->getCreatedAt()->getUnixTimeStamp() <=> $a->getCreatedAt()->getUnixTimeStamp();
-    }
+        $cursor = $this->codec->decode($encodedCursor);
+        if (!isset($cursor['severity'], $cursor['created'], $cursor['updated'], $cursor['id'])) {
+            return $pb;
+        }
+        $created = (new Alaress_Date_Format($cursor['created'], DateTimeInterface::RFC3339))->getDatabase();
+        $updated = (new Alaress_Date_Format($cursor['updated'], DateTimeInterface::RFC3339))->getDatabase();
 
-    /**
-     * Sort pastoral records by updated (descending)
-     *
-     * @param Model $a
-     * @param Model $b
-     * @return int
-     */
-    private function sortUpdated(Model $a, Model $b): int
-    {
-        return $b->getUpdatedAtDisplay()->getUnixTimeStamp() <=> $a->getUpdatedAtDisplay()->getUnixTimeStamp();
-    }
+        // The difficulty of creating an ORDER BY statement which fetches all
+        // records after a multi-part cursor is that each part contributes to
+        // the query:
+        // For example: if `$this->sortOption === self::SORT_OPTION_SEVERITY`
+        // and the encoded cursor is "severity=3, created_at=2020-12-12, id=50"
+        // then the query builder must include results which match any of:
+        // * severity > 3
+        // * severity = 3 AND created_at < 2020-12-12
+        // * severity = 3 AND created_at = 2020-12-12 AND id < 50
+        if ($this->sortOption === self::SORT_OPTION_SEVERITY) {
+            // severity: severity.sequence DESC, then created DESC, then id DESC
+            $pb = $pb->any(
+                $this->dataSource->getPredicateBuilder()
+                    ->lessThan('sev.sequence', $cursor['severity'])
+                    ->all(
+                        $this->dataSource->getPredicateBuilder()
+                            ->equals('sev.sequence', $cursor['severity'])
+                            ->lessThan('p.created_at', $created)
+                    )
+                    ->all(
+                        $this->dataSource->getPredicateBuilder()
+                            ->equals('sev.sequence', $cursor['severity'])
+                            ->equals('p.created_at', $created)
+                            ->lessThan('p.id', $cursor['id'])
+                    )
+            );
+        } elseif ($this->sortOption === self::SORT_OPTION_UPDATED) {
+            // updated: updated DESC, then created DESC, then id DESC
+            $pb = $pb->any(
+                $this->dataSource->getPredicateBuilder()
+                    ->lessThan('p.updated_at', $updated)
+                    ->all(
+                        $this->dataSource->getPredicateBuilder()
+                            ->equals('p.updated_at', $updated)
+                            ->lessThan('p.created_at', $created)
+                    )
+                    ->all(
+                        $this->dataSource->getPredicateBuilder()
+                            ->equals('p.updated_at', $cursor['severity'])
+                            ->equals('p.created_at', $created)
+                            ->lessThan('p.id', $cursor['id'])
+                    )
+            );
+        } else {
+            // created: created DESC, then id DESC
+            $pb = $pb->any(
+                $this->dataSource->getPredicateBuilder()
+                    ->lessThan('p.created_at', $created)
+                    ->all(
+                        $this->dataSource->getPredicateBuilder()
+                             ->equals('p.created_at', $created)
+                             ->lessThan('p.id', $cursor['id'])
+                    )
+            );
+        }
 
-    /**
-     * Sort pastoral records by ID (descending)
-     *
-     * @param Model $a
-     * @param Model $b
-     * @return int
-     */
-    private function sortId(Model $a, Model $b): int
-    {
-        return $b->getId() <=> $a->getId();
+        return $pb;
     }
 }

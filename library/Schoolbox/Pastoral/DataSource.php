@@ -76,6 +76,29 @@ class DataSource
 
 
     /**
+     * Wrapper for `Mapper::createCollection`.
+     *
+     * @param array $contents
+     * @return GenericCollection<Model>
+     */
+    public function createCollection(array $contents = []): GenericCollection
+    {
+        return $this->mapper->createCollection($contents);
+    }
+
+
+    /**
+     * Wrapper for `Mapper::getPredicateBuilder`.
+     *
+     * @return Builder
+     */
+    public function getPredicateBuilder(): Builder
+    {
+        return $this->mapper->getPredicateBuilder();
+    }
+
+
+    /**
      * User-sensitive wrapper for `Mapper::findById`.
      *
      * @param User $currentUser
@@ -104,22 +127,6 @@ class DataSource
         }
 
         return $model;
-    }
-
-
-    /**
-     * User-sensitive wrapper for `Mapper::findByColumnList`.
-     *
-     * @param User  $currentUser
-     * @param array $columnList
-     * @return GenericCollection<Model>
-     */
-    public function findByColumnList(User $currentUser, array $columnList): GenericCollection
-    {
-        return $this->accessLevelCensor->filterRecordsForUser(
-            $this->mapper->findByColumnList($columnList),
-            $currentUser,
-        );
     }
 
 
@@ -296,29 +303,70 @@ class DataSource
 
 
     /**
+     * Find pastoral records which match the given predicate builder, and are
+     * viewable by `$viewer`.
+     *
+     * @param User    $viewer
+     * @param Builder $pb
+     * @param array   $options
+     * @return GenericCollection<Model>
+     */
+    public function findRecordsByPredicates(
+        User $viewer,
+        Builder $pb,
+        array $options = [],
+    ): GenericCollection {
+        $permissionClause = $this->getPermissionClause($viewer, null, null);
+        return $this->findRawRecordsByPredicates(
+            $pb->rawWhere($permissionClause['where'], $permissionClause['params']),
+            $options['order'] ?? [],
+            $options['offset'] ?? null,
+            $options['limit'] ?? null,
+        );
+    }
+
+
+    /**
      * Gets records with least hydration. This will not populate any linked records to the returning records.
      * @param User       $viewer          Who is viewing this student's records
-     * @param int        $studentId       Id of a student being viewed
+     * @param int|null   $studentId       Id of a student being viewed
      * @param int|null   $typeId          Filter the records with a pastoral type, if not null
      * @param int|null   $subtypeId
      * @param int|null   $offset
      * @param int|null   $limit
      * @param int|null   $linkedStudentId Find records linked to this student only, if provided
      * @param array|null $linkedRecordIds Find records linked to these records only, if provided
-     * @return GenericCollection
+     * @return GenericCollection<Model>
      */
     private function findRawRecords(User $viewer, ?int $studentId, ?int $typeId, ?int $subtypeId, ?int $offset, ?int $limit, ?int $linkedStudentId, ?array $linkedRecordIds): GenericCollection
     {
         $permissionClause = $this->getPermissionClause($viewer, $studentId, $typeId, $subtypeId);
-        $where            = $permissionClause['where'];
-        $params           = $permissionClause['params'];
+        $pb = $this->getPredicateBuilder()->rawWhere($permissionClause['where'], $permissionClause['params']);
         if (null !== $linkedRecordIds || null != $linkedStudentId) {
             $linkedClause = $this->getLinkedClause($viewer, $linkedStudentId, $linkedRecordIds);
-            $where        .= " AND {$linkedClause['where']}";
-            $params       = array_merge($params, $linkedClause['params']);
+            $pb = $pb->rawWhere($linkedClause['where'], $linkedClause['params']);
         }
+        return $this->findRawRecordsByPredicates($pb, [], $offset, $limit);
+    }
 
-        $sql = "
+
+    /**
+     * Fetches records from a predicate with minimal hydration.
+     *
+     * @param Builder  $pb
+     * @param array    $order
+     * @param int|null $offset
+     * @param int|null $limit
+     * @return GenericCollection<Model>
+     */
+    private function findRawRecordsByPredicates(
+        Builder $pb,
+        array $order,
+        ?int $offset,
+        ?int $limit,
+    ): GenericCollection {
+        $where = $pb->getWhereIntersect();
+        $sql   = "
             SELECT
                 {$this->mapper->getColumnString('p')},
                 {$this->mapper->getJoinColumnString('owner', 'o')},
@@ -333,14 +381,27 @@ class DataSource
             WHERE s.deleted_at IS NULL
                 AND {$where}
             GROUP BY p.id
-            ORDER BY p.updated_at DESC
         ";
+
+        $orderParts = [];
+        if (count($order) > 0) {
+            foreach ($order as $column => $direction) {
+                $orderParts[] = "$column $direction";
+            }
+        } else {
+            $direction = \Schoolbox\Mapper::SORT_ORDER_DESC;
+            $orderParts = [
+                "p.updated_at $direction",
+                "p.id $direction",
+            ];
+        }
+        $sql .= ' ORDER BY ' . implode(', ', $orderParts);
 
         if ($limit) {
             $sql .= " LIMIT {$limit}" . (empty($offset) ? '' : " OFFSET {$offset}");
         }
 
-        $stmt = $this->mapper->getDatabase()->query($sql, $params);
+        $stmt = $this->mapper->getDatabase()->query($sql, $pb->getParams());
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // hydrate
@@ -373,6 +434,7 @@ class DataSource
         }
         return $records;
     }
+
 
     /**
      * Gets "where" string to find linked records
