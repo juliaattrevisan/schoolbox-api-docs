@@ -75,6 +75,18 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
         },
 
         /**
+         * the active node may have just been deleted, in which case we
+         * should close the prompt if it's open
+         */
+        nodesDeleted () {
+            const deletedNodeIds = useSelectedNodesStore().nodesIds;
+            const activeNodeStore = useActiveNodeStore();
+            if (this.isOpen && deletedNodeIds.includes(activeNodeStore.node?.id)) {
+                this.cancel();
+            }
+        },
+
+        /**
          * to unset the id, called when the toast has already been displayed once
          */
         unsetId () {

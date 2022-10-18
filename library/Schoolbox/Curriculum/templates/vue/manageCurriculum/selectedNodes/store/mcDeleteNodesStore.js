@@ -40,9 +40,9 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', {
                 const isAllResponsesOk = deleteResponses.every((response) => response === true);
                 if (isAllResponsesOk) {
                     const successMessage = this.getSuccessMessage();
+                    useUpdateNodeStore().nodesDeleted(); //the active node may have been deleted
+                    useAddSubsectionStore().nodesDeleted(); //the active node may have been deleted
                     useSelectedNodesStore().deleteNodes();
-                    useUpdateNodeStore().cancel(); //the active node may have been deleted
-                    useAddSubsectionStore().cancel(); //the active node may have been deleted
                     this.cancel();
                     return successMessage;
                 } else {

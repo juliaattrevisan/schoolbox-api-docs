@@ -5,6 +5,7 @@
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
+import { useSelectedNodesStore } from '../../selectedNodes/store/mcSelectedNodesStore';
 
 
 export const useUpdateNodeStore = defineStore('mcUpdateNode', {
@@ -66,6 +67,18 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', {
         cancel () {
             useActiveNodeStore().unset();
             this.isOpen = false;
+        },
+
+        /**
+         * the active node may have just been deleted, in which case we
+         * should close the prompt if it's open
+         */
+        nodesDeleted () {
+            const deletedNodeIds = useSelectedNodesStore().nodesIds;
+            const activeNodeStore = useActiveNodeStore();
+            if (this.isOpen && deletedNodeIds.includes(activeNodeStore.node?.id)) {
+                this.cancel();
+            }
         },
 
     },
