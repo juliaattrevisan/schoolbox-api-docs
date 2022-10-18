@@ -10,10 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 
 /**
- * Takes an unrolled Cycle and populates it with the classes,
- * humans, etc. which results in something far more manageable
+ * Finds all the schedules that are relevant to the given $timetableDefinition
+ * by collecting all the PeriodIds contained therein
  */
-class Hydrator
+class ScheduleCompiler
 {
     /**
      * @var \SimpleXMLElement
@@ -43,36 +43,59 @@ class Hydrator
 
 
     /**
-     * Manufacture a hydrated definition
+     * Find all the Published Schedules, which are schedules that exist inside
+     * a Published Timetable, but we only care about schedules that could populate
+     * the known $periodIds in this definition
      *
      * @return array
      */
-    public function hydrate(): array
+    public function findSchedules(): array
     {
-        /* A list of (periodId, everything) tuples
-         */
-        $schedules = $this->findSchedules($this->findPeriodIds());
+        $periodIds = $this->findPeriodIds();
 
-        /* Map them straight into the definition
-         */
-        foreach ($this->timetableDefinition as $weekIndex => &$weekData) {
-            foreach ($weekData['days'] as &$days) {
-                foreach ($days['periods'] as &$period) {
-                    if (isset($schedules[$period['isamsId']])) {
-                        $period['classes'] = $schedules[$period['isamsId']];
-                    }
+        $publishedTimetables = $this->nodes->xpath('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
+
+        $stack = [];
+
+        foreach ($publishedTimetables as $publishedTimetable) {
+            $schedules = $publishedTimetable->xpath('Schedules/Schedule');
+
+            foreach ($schedules as $schedule) {
+                $periodId = (string)$schedule->PeriodId;
+
+                /* This periodId isn't in the definition; skip it
+                 */
+                if (!isset($periodIds[$periodId])) {
+                    continue;
                 }
+
+                $classCode = (string)$schedule->Code;
+                $scheduleId = (string)$schedule->xpath('@Id')[0];
+
+                /* Obtain this separately as you iterate rather than precompile
+                 * everything up-front
+                 *
+                 * $this->findSubject($classCode);
+                 */
+                $subject = null;
+
+                $stack[$periodId]['schedule'][$scheduleId] = [
+                    'code' => $classCode,
+                    'subject' => $subject,
+                    'substituteStaff' => $this->findScheduleStaff((string)$schedule->Teacher),
+                    'room' => $this->findRoom((string)$schedule->RoomId),
+                    'setId' => (string)$schedule->SetId,
+                    'set' => (string)$schedule->Set,
+                ];
             }
         }
 
-        unset($weekData, $days, $period, $schedules);
-
-        return $this->timetableDefinition;
+        return $stack;
     }
 
 
     /**
-     * Find a subject's name from its $setCode (that's its subject code equivalent)
+     * Find a subject's name and humans from its $setCode (that's its subject code equivalent)
      *
      * @param string $setCode
      * @return array
@@ -142,57 +165,6 @@ class Hydrator
         }
 
         return $periodIds;
-    }
-
-
-    /**
-     * Find all the Published Schedules, which are schedules that exist inside
-     * a Published Timetable, but we only care about schedules that could populate
-     * the known $periodIds in this definition
-     *
-     * @param array $periodIds
-     * @return array
-     */
-    private function findSchedules(array $periodIds): array
-    {
-        $publishedTimetables = $this->nodes->xpath('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
-
-        $stack = [];
-
-        foreach ($publishedTimetables as $publishedTimetable) {
-            $schedules = $publishedTimetable->xpath('Schedules/Schedule');
-
-            foreach ($schedules as $schedule) {
-                $periodId = (string)$schedule->PeriodId;
-
-                /* This periodId isn't in the definition; skip it
-                 */
-                if (!isset($periodIds[$periodId])) {
-                    continue;
-                }
-
-                $classCode = (string)$schedule->Code;
-                $scheduleId = (string)$schedule->xpath('@Id')[0];
-
-                /* Obtain this separately as you iterate rather than precompile
-                 * everything up-front
-                 *
-                 * $this->findSubject($classCode);
-                 */
-                $subject = null;
-
-                $stack[$periodId]['schedule'][$scheduleId] = [
-                    'code' => $classCode,
-                    'subject' => $subject,
-                    'substituteStaff' => $this->findScheduleStaff((string)$schedule->Teacher),
-                    'room' => $this->findRoom((string)$schedule->RoomId),
-                    'setId' => (string)$schedule->SetId,
-                    'set' => (string)$schedule->Set,
-                ];
-            }
-        }
-
-        return $stack;
     }
 
 
