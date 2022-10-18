@@ -229,7 +229,7 @@ class ProjectTest extends TestCase
         // should return true, as there's no assessment
         $project->setSummator(new SummatorAverage());
         $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
-        $project->setSummator(new SummatorWeightedAverage());
+        $project->setSummator(new SummatorWeightedAverage(false));
         $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
 
         // adding a task, should still return true, as task doesn't involve at all
@@ -238,21 +238,21 @@ class ProjectTest extends TestCase
 
         $project->setSummator(new SummatorAverage());
         $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
-        $project->setSummator(new SummatorWeightedAverage());
+        $project->setSummator(new SummatorWeightedAverage(false));
         $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
 
         // adding a non-weighted quiz, should return false for Average and return true for WeightedAverage
         $project->getAssessables()->add($quiz);
         $project->setSummator(new SummatorAverage());
         $this->assertFalse($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
-        $project->setSummator(new SummatorWeightedAverage());
+        $project->setSummator(new SummatorWeightedAverage(false));
         $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
 
         // now mark the quiz and they should now be true
         $this->addFeedbackToQuiz($quiz, $this->hodes);
         $project->setSummator(new SummatorAverage());
         $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
-        $project->setSummator(new SummatorWeightedAverage());
+        $project->setSummator(new SummatorWeightedAverage(false));
         $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
 
         // adding a weighted due work, should return false for both Average and WeightedAverage
@@ -260,14 +260,14 @@ class ProjectTest extends TestCase
         $project->getAssessables()->add($dueWork);
         $project->setSummator(new SummatorAverage());
         $this->assertFalse($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
-        $project->setSummator(new SummatorWeightedAverage());
+        $project->setSummator(new SummatorWeightedAverage(false));
         $this->assertFalse($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
 
         // now mark the quiz and they should now be true
         $this->addFeedbackToDueWork($dueWork, $this->hodes);
         $project->setSummator(new SummatorAverage());
         $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
-        $project->setSummator(new SummatorWeightedAverage());
+        $project->setSummator(new SummatorWeightedAverage(false));
         $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
     }
 

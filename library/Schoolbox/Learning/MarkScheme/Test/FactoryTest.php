@@ -311,7 +311,7 @@ class FactoryTest extends TestCase
             new Average(),
             new Maximum(),
             new Minimum(),
-            new WeightedAverage(),
+            new WeightedAverage(false),
         ];
     }
 

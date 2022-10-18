@@ -72,7 +72,7 @@ class ProjectTest extends TestCase
      */
     public function testTranslateToDataModel()
     {
-        $project = (new Project(new WeightedAverage()))
+        $project = (new Project(new WeightedAverage(false)))
             // Generic fields
             ->setContext((new Folder())->setId(1))
             ->setId(16)
@@ -110,6 +110,7 @@ class ProjectTest extends TestCase
         // Test project-specific fields
         $this->assertInstanceOf(ProjectModel::class, $projectModel);
         $this->assertEquals(ProjectModel::SUMMATOR_WEIGHTED_AVERAGE, $projectModel->getSummator());
+        $this->assertFalse($projectModel->getRequireAllActivities());
 
         // Test sub-assessables
         $this->assertCount(3, $projectModel->getAssessments());
@@ -181,7 +182,7 @@ class ProjectTest extends TestCase
         $user    = (new User())->setId(3);
         return [
             [
-                (new Project(new WeightedAverage()))
+                (new Project(new WeightedAverage(false)))
                     ->setContext($context)
                     ->setCreator($user)
                     ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
@@ -240,7 +241,7 @@ class ProjectTest extends TestCase
         $user    = (new User())->setId(3);
         return [
             [
-                (new Project(new WeightedAverage()))
+                (new Project(new WeightedAverage(false)))
                     ->setContext($context)
                     ->setCreator($user)
                     ->setMarkScheme(new None())
@@ -249,7 +250,7 @@ class ProjectTest extends TestCase
                 null,
             ],
             [
-                (new Project(new WeightedAverage()))
+                (new Project(new WeightedAverage(false)))
                     ->setContext($context)
                     ->setCreator($user)
                     ->setMarkScheme(new Percentage())
@@ -258,7 +259,7 @@ class ProjectTest extends TestCase
                 null,
             ],
             [
-                (new Project(new WeightedAverage()))
+                (new Project(new WeightedAverage(false)))
                     ->setContext($context)
                     ->setCreator($user)
                     ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
@@ -654,7 +655,7 @@ class ProjectTest extends TestCase
     public function testTranslateSpecificationAssessmentToDataModel()
     {
         $unitSpec = (new UnitSpecification())->setId(2);
-        $project  = (new Project(new WeightedAverage()))
+        $project  = (new Project(new WeightedAverage(false)))
             // Generic fields
             ->setContext((new UnitImplementation())->setId(1))
             ->setId(104)
@@ -668,7 +669,7 @@ class ProjectTest extends TestCase
             ->setWeight(13)
             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
             ->setSpecificationAssessment(
-                (new Project(new WeightedAverage()))
+                (new Project(new WeightedAverage(false)))
                     ->setContext($unitSpec)
                     ->setId(4)
                     ->setCreator($this->teacher1)
