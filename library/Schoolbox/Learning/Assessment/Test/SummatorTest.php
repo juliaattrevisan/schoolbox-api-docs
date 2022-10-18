@@ -791,6 +791,45 @@ class SummatorTest extends TestCase
         $this->assertEqualsWithDelta(38.461538462, $value, $this->delta);
         $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
         $this->assertEqualsWithDelta(38.461538462, $value, $this->delta);
+
+        // If the feedback exists, but its norm mark is null:
+        $dueWorkFeedback->setNormalisedMark(null);
+
+        // With the activities not required summator: his mark is null
+        $project->setSummator($allActivitiesNotRequiredSummator);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+
+        // With the activities required summator: his mark is 0
+        // (whilst due work is null, the others have no feedback thus are 0)
+        $project->setSummator($allActivitiesRequiredSummator);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+
+        // If feedback has null value and student is excluded from other
+        // assessments:
+        $dueWorkFeedback->setNormalisedMark(null);
+        $quiz->getParticipant($this->sberryhill)->setExcludedAt(\Alaress_Date_Format::now());
+        $task->getParticipant($this->sberryhill)->setExcludedAt(\Alaress_Date_Format::now());
+
+        // With either summator: his mark is null
+        $project->setSummator($allActivitiesNotRequiredSummator);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $project->setSummator($allActivitiesRequiredSummator);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+
+        // If feedback doesn't have a null value:
+        $dueWorkFeedback->setNormalisedMark(100);
+        $project->setSummator($allActivitiesNotRequiredSummator);
+
+        // With either summator: his mark is 100
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertEquals(100, $value, $this->delta);
+        $project->setSummator($allActivitiesRequiredSummator);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertEquals(100, $value, $this->delta);
     }
 
 
