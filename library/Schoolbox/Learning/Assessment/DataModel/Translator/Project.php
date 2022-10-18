@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\ISummator;
+use Schoolbox\Learning\Assessment\Summator\MarkDerivation;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
@@ -183,11 +184,12 @@ class Project implements IAssessmentTypeTranslator
         if (null === $summatorString) {
             return null;
         }
+        $strategy = (new MarkDerivation\StrategyFactory())->build($requireAllActivities);
         switch ($summatorString) {
             case ProjectModel::SUMMATOR_AVERAGE:
                 return new Average();
             case ProjectModel::SUMMATOR_WEIGHTED_AVERAGE:
-                return new WeightedAverage($requireAllActivities);
+                return new WeightedAverage($strategy);
             case ProjectModel::SUMMATOR_MINIMUM:
                 return new Minimum();
             case ProjectModel::SUMMATOR_MAXIMUM:

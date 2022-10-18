@@ -705,7 +705,7 @@ class AssessableTest extends TestCase
      */
     public function testProjectWeightedAverageNoneGetNorm(Project $project, User $student, $expected)
     {
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
@@ -723,7 +723,7 @@ class AssessableTest extends TestCase
      */
     public function testProjectWeightedAverageNoneGetNormPublishedOnly(Project $project, User $student, $expected)
     {
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
@@ -741,7 +741,7 @@ class AssessableTest extends TestCase
      */
     public function testProjectWeightedAverageLetterGradeGetNorm(Project $project, User $student, $expected)
     {
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
@@ -759,7 +759,7 @@ class AssessableTest extends TestCase
      */
     public function testProjectWeightedAverageLetterGradeGetNormPublishedOnly(Project $project, User $student, $expected)
     {
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
 
@@ -777,7 +777,7 @@ class AssessableTest extends TestCase
      */
     public function testProjectWeightedAveragePercentGetNorm(Project $project, User $student, $expected)
     {
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
@@ -795,7 +795,7 @@ class AssessableTest extends TestCase
      */
     public function testProjectWeightedAveragePercentGetNormPublishedOnly(Project $project, User $student, $expected)
     {
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
@@ -1077,7 +1077,7 @@ class AssessableTest extends TestCase
      */
     public function testProjectWeightedAverageNoneGetHR(Project $project, User $student, $expected)
     {
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
@@ -1095,7 +1095,7 @@ class AssessableTest extends TestCase
      */
     public function testProjectWeightedAverageNoneGetHRPublishedOnly(Project $project, User $student, $expected)
     {
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
@@ -1804,7 +1804,7 @@ class AssessableTest extends TestCase
     public function providerProjectWeightedAverageGetNorm(): array
     {
         $project = $this->getDummyProject();
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         if (self::FAVOR_FLOATING) {
             return [
                 [$project, $this->getDummyStudent(1), null],
@@ -1838,7 +1838,7 @@ class AssessableTest extends TestCase
     public function providerProjectWeightedAverageGetNormPublishedOnly(): array
     {
         $project = $this->getDummyProject();
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), 50.0],
@@ -2208,7 +2208,7 @@ class AssessableTest extends TestCase
     public function providerProjectWeightedAverageLetterGradeGetHR(): array
     {
         $project = $this->getDummyProject();
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         if (self::FAVOR_FLOATING) {
@@ -2244,7 +2244,7 @@ class AssessableTest extends TestCase
     public function providerProjectWeightedAverageLetterGradeGetHRPublishedOnly(): array
     {
         $project = $this->getDummyProject();
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
         return [
@@ -2267,7 +2267,7 @@ class AssessableTest extends TestCase
     public function providerProjectWeightedAveragePercentGetHR(): array
     {
         $project = $this->getDummyProject();
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         if (self::FAVOR_FLOATING) {
@@ -2303,7 +2303,7 @@ class AssessableTest extends TestCase
     public function providerProjectWeightedAveragePercentGetHRPublishedOnly(): array
     {
         $project = $this->getDummyProject();
-        $project->setSummator(new WeightedAverage(false));
+        $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         return [

@@ -43,9 +43,10 @@ class Factory
      */
     public function produce(): ISummator
     {
+        $strategy = (new MarkDerivation\StrategyFactory())->build($this->requireAllActivities);
         switch ($this->summator) {
             case self::WEIGHTED_AVERAGE:
-                return new WeightedAverage($this->requireAllActivities);
+                return new WeightedAverage($strategy);
 
             case self::AVERAGE:
                 return new Average();

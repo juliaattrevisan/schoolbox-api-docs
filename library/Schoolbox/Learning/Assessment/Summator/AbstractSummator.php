@@ -21,6 +21,23 @@ use Schoolbox\User;
 abstract class AbstractSummator implements ISummator
 {
     /**
+     * Strategy for deriving the normalised mark for a participant.
+     *
+     * Defaults to `MarkDerivation\Standard`.
+     */
+    private MarkDerivation\IStrategy $markDerivationStrategy;
+
+    /**
+     * Constructor
+     *
+     * @param MarkDerivation\IStrategy|null $strategy
+     */
+    public function __construct(MarkDerivation\IStrategy $strategy = null)
+    {
+        $this->markDerivationStrategy = $strategy ?? new MarkDerivation\Standard();
+    }
+
+    /**
      * @inheritDoc
      */
     public function summateList($values, ?array $weights = null)
@@ -72,7 +89,7 @@ abstract class AbstractSummator implements ISummator
      */
     protected function deriveNormalisedMark(Participant $participant, bool $publishedOnly): ?float
     {
-        return $participant->getNormalisedMark($publishedOnly);
+        return $this->markDerivationStrategy->deriveNormalisedMark($participant, $publishedOnly);
     }
 
     /**

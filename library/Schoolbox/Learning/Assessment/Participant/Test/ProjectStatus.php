@@ -319,7 +319,7 @@ class ProjectStatus extends TestCase
         foreach (DemoData::getProject(new Maximum())->getAllParticipants() as $participant) {
             $data[] = [$participant];
         }
-        foreach (DemoData::getProject(new WeightedAverage(false))->getAllParticipants() as $participant) {
+        foreach (DemoData::getProject(new WeightedAverage())->getAllParticipants() as $participant) {
             $data[] = [$participant];
         }
         foreach (DemoData::getProject(new Average())->getAllParticipants() as $participant) {

@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Summator\MarkDerivation\StrategyFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Summator\ISummator;
@@ -299,7 +300,7 @@ class SummatorTest extends TestCase
      */
     public function testWeightedAverage1()
     {
-        $project = $this->spawnProject(new SummatorWeightedAverage(false));
+        $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
@@ -336,7 +337,7 @@ class SummatorTest extends TestCase
      */
     public function testWeightedAverage2()
     {
-        $project = $this->spawnProject(new SummatorWeightedAverage(false));
+        $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
@@ -397,7 +398,7 @@ class SummatorTest extends TestCase
          * Task (null marks)
          * Quiz (12 marks)
          */
-        $project = $this->spawnProject(new SummatorWeightedAverage(false));
+        $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnTask())
             ->add($this->spawnDueWork())
@@ -440,7 +441,7 @@ class SummatorTest extends TestCase
          * Due Work (100 marks)
          * Quiz (12 marks)
          */
-        $project = $this->spawnProject(new SummatorWeightedAverage(false));
+        $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -482,7 +483,7 @@ class SummatorTest extends TestCase
          * Due Work (100 marks)
          * Quiz (12 marks)
          */
-        $project = $this->spawnProject(new SummatorWeightedAverage(false));
+        $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
@@ -516,7 +517,7 @@ class SummatorTest extends TestCase
      */
     public function testWeightedAverage10()
     {
-        $project = $this->spawnProject(new SummatorWeightedAverage(false));
+        $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables($this->massProduce());
 
        /* Due Work 1: Weight 20, NormalisedMark: P,18 UP,18
@@ -556,7 +557,7 @@ class SummatorTest extends TestCase
      */
     public function testWeightedAverage11()
     {
-        $project = $this->spawnProject(new SummatorWeightedAverage(false));
+        $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables($this->massProduce());
 
         /* Reset all the weights to zero
@@ -590,7 +591,7 @@ class SummatorTest extends TestCase
      */
     public function testWeightedAverage12()
     {
-        $project = $this->spawnProject(new SummatorWeightedAverage(false));
+        $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables($this->massProduce());
 
         /* Reset all but one of the weights
@@ -632,7 +633,7 @@ class SummatorTest extends TestCase
      */
     public function testWeightedAverage13()
     {
-        $project = $this->spawnProject(new SummatorWeightedAverage(false));
+        $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables($this->massProduce());
 
         /* Reset all but one of the weights
@@ -669,7 +670,7 @@ class SummatorTest extends TestCase
      */
     public function testWeightedAverage14()
     {
-        $project = $this->spawnProject(new SummatorWeightedAverage(false));
+        $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables($this->massProduce());
 
         /* Reset all but one of the weights
@@ -714,8 +715,10 @@ class SummatorTest extends TestCase
          * Task (0 marks)
          * Quiz (8 marks)
          */
-        $allActivitiesRequiredSummator = new SummatorWeightedAverage(true);
-        $allActivitiesNotRequiredSummator = new SummatorWeightedAverage(false);
+        $allActivitiesRequiredSummator = new SummatorWeightedAverage(
+            (new StrategyFactory())->build(true)
+        );
+        $allActivitiesNotRequiredSummator = new SummatorWeightedAverage();
         $project    = $this->spawnProject($allActivitiesNotRequiredSummator);
         $task       = $this->spawnTask()->setWeight(0);
         $dueWork    = $this->spawnDueWork()->setWeight(5);
