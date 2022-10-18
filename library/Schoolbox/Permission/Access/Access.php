@@ -445,8 +445,8 @@ class Access
         }
 
         // Find the NNIAN ancestors for the folder
+        $folder = $this->folderMapper->findCheaplyById($folderId);
         try {
-            $folder = $this->folderMapper->findCheaplyById($folderId);
             $nnianAncestors = $this->folderNnian->getNnianAncestors($folder);
         } catch (Mapper\Exception $e) {
             return UserAccess::ACCESS_DENY;
