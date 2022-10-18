@@ -77,17 +77,27 @@ class CycleUnroller
          * TimetableAllocation WeekId corresponds to a Structure node <Week Id="...">
          * which contains Days and Periods
          */
+        foreach ($timetableAllocations as $timetableAllocation) {
+            $weekId = (string)$timetableAllocation->TimetableWeekId;
 
+            $stack[(string)$timetableAllocation->Week] = [
+                'weekId' => $weekId,
+                'days' => []
+            ];
 
-        /* For each of the valid WeekId nodes that we found, calculate the datetime
-         * that would correspond to each of the Periods in each of the Days contained
-         * inside this WeekId node.
-         *
-         * There's an Ordinal field, which is essentially a sequencing int
-         * We can use that to calculate an offset from the start of the week which we
-         * can for now presume to be Monday. Localisation will mean that in some regions
-         * it won't be Monday, but some other day, and we'll have to accommodate that.
-         */
+            /* For each of the valid WeekId nodes that we found, calculate the datetime
+             * that would correspond to each of the Periods in each of the Days contained
+             * inside this WeekId node.
+             *
+             * There's an Ordinal field, which is essentially a sequencing int
+             * We can use that to calculate an offset from the start of the week which we
+             * can for now presume to be Monday. Localisation will mean that in some regions
+             * it won't be Monday, but some other day, and we'll have to accommodate that.
+             */
+        }
+
+        new \Alaress_Probe($timetableAllocations, $stack);
+
 
         /* For each of the Days and Periods, assign their corresponding startdatetime and
          * finishdatetime values
