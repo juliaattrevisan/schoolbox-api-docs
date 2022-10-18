@@ -101,7 +101,7 @@ function onClearSearchSelected () {
                 id="show-only-enabled"
                 type="checkbox"
                 v-model="viewNodesStore.showDisabled"
-                :disabled="isDisabled"
+                :disabled="props.isDisabled"
             />
             <label for="show-only-enabled">
                 <span>Shown</span>
