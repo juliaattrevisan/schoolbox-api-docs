@@ -702,6 +702,99 @@ class SummatorTest extends TestCase
 
 
     /**
+     * Test the difference between whether all activities are required and not.
+     *
+     * @return void
+     */
+    public function testWeightedAverage15()
+    {
+        /* There are three assessables here:
+         *
+         * Due Work (5 marks)
+         * Task (0 marks)
+         * Quiz (8 marks)
+         */
+        $allActivitiesRequiredSummator = new SummatorWeightedAverage(true);
+        $allActivitiesNotRequiredSummator = new SummatorWeightedAverage(false);
+        $project    = $this->spawnProject($allActivitiesNotRequiredSummator);
+        $task       = $this->spawnTask()->setWeight(0);
+        $dueWork    = $this->spawnDueWork()->setWeight(5);
+        $quiz       = $this->spawnQuiz()->setWeight(8);
+        $activities = new GenericCollection(IAssessable::class);
+        $activities[$task->getId()] = $task;
+        $activities[$dueWork->getId()] = $dueWork;
+        $activities[$quiz->getId()] = $quiz;
+        $project->setAssessables($activities);
+
+        // sberryhill hasn't been given feedback at all
+        // With the activities not required summator, his mark is null
+        $project->setSummator($allActivitiesNotRequiredSummator);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+
+        // With the activities required summator, his mark is 0
+        $project->setSummator($allActivitiesRequiredSummator);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(0.0, $value);
+
+        // Give him as-yet-unpublished due work feedback (100%)
+        $dueWorkFeedback = (new DueWorkFeedback())
+            ->setId(123456)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(100)
+            ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(new \Alaress_Date_NullDate())
+            ->setCreatedAt(\Alaress_Date_Format::now())
+            ->setUpdatedAt(\Alaress_Date_Format::now());
+        $project->getAssessables()[$dueWork->getId()]
+            ->getParticipant($this->sberryhill)
+            ->getAllFeedbacks()[$dueWorkFeedback->getId()] = $dueWorkFeedback;
+
+        // With the activities not required summator:
+        // * published only: his mark is null
+        // * unpublished: his mark is 100 (as only one has a mark)
+        $project->setSummator($allActivitiesNotRequiredSummator);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertEqualsWithDelta(100, $value, $this->delta);
+
+        // With the activities required summator:
+        // * published only: his mark is 0
+        // * unpublished: his mark is (5 * 100 / (5+8) + 8 * 0 / (5/8)) = 38.461538462
+        $project->setSummator($allActivitiesRequiredSummator);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertEqualsWithDelta(38.461538462, $value, $this->delta);
+
+        // Publish the due work feedback
+        $dueWorkFeedback->setPublishedAt(\Alaress_Date_Format::now());
+
+        // With the activities not required summator:
+        // his mark is 100 (as only one has a mark)
+        $project->setSummator($allActivitiesNotRequiredSummator);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertEqualsWithDelta(100, $value, $this->delta);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertEqualsWithDelta(100, $value, $this->delta);
+
+        // With the activities required summator:
+        // his mark is (5 * 100 / (5+8) + 8 * 0 / (5/8)) = 38.461538462
+        $project->setSummator($allActivitiesRequiredSummator);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertEqualsWithDelta(38.461538462, $value, $this->delta);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertEqualsWithDelta(38.461538462, $value, $this->delta);
+    }
+
+
+    /**
      * Test the maximum
      * when there is no feedback
      *
