@@ -178,7 +178,8 @@ class CycleUnroller
                 'isamsId' => $periodId,
                 'name' => (string)$period->Name,
                 'startAt' => $startDatetime,
-                'finishAt' => $finishDatetime
+                'finishAt' => $finishDatetime,
+                'classes' => []
             ];
         }
 

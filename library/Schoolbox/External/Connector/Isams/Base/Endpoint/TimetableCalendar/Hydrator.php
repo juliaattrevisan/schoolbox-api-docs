@@ -49,10 +49,40 @@ class Hydrator
      */
     public function hydrate(): array
     {
+        /* A list of (periodId, everything) tuples
+         */
+        $schedules = $this->findSchedules();
+
+        /* Map them straight into the definition
+         */
+        foreach ($this->timetableDefinition as $weekIndex => &$weekData) {
+            foreach ($weekData['days'] as &$days) {
+                foreach ($days['periods'] as &$period) {
+                    if (isset($schedules[$period['isamsId']])) {
+                        $period['classes'][] = $schedules[$period['isamsId']];
+                    }
+                }
+            }
+        }
+
+        unset($schedules);
+
+        return $this->timetableDefinition;
+    }
+
+
+    /**
+     * Find all the Published Schedules, which are schedules that exist inside
+     * a Published Timetable
+     *
+     * @return array
+     */
+    private function findSchedules(): array
+    {
         $publishedTimetables = $this->nodes->xpath('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
         $stack = [];
-        
+
         foreach ($publishedTimetables as $publishedTimetable) {
             $schedules = $publishedTimetable->xpath('Schedules/Schedule');
 
