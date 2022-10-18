@@ -68,6 +68,7 @@ class Hydrator
                     'room' => $this->findRoom((string)$schedule->RoomId),
                     'setId' => (string)$schedule->SetId,
                     'set' => (string)$schedule->Set,
+                    'students' => $this->findStudents($classCode)
                 ];
             }
         }
@@ -191,6 +192,59 @@ class Hydrator
             'firstnamePreferred' => (string)$node->PreferredName,
             'lastname' => (string)$node->Surname,
         ];
+    }
+
+
+    /**
+     * Find the students who were in subject $setCode
+     *
+     * @param string $setCode
+     * @return array
+     */
+    private function findStudents(string $setCode): array
+    {
+        $node = $this->nodes->xpath("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
+
+        /* Unknown subject: can't find it via its setCode
+         */
+        if (empty($node)) {
+            return [];
+        }
+
+        /* Otherwise continue digging
+         */
+        $students = [];
+
+        $setId = trim((string)$node[0]->xpath('@Id')[0]->Id);
+
+        /* Select all the SetList nodes where any of its SetId subnodes contains the value $setId exactly
+         */
+        $setListNodes = $this->nodes->xpath("/iSAMS/TeachingManager/SetLists/SetList[SetId[text()='{$setId}']]");
+
+        foreach ($setListNodes as $current) {
+            $studentId = trim((string)$current->xpath('@PupilId')[0]);
+
+            $student = $this->nodes->xpath("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+
+            /* Unknown student; can't find it via its studentId
+             */
+            if (empty($student)) {
+                continue;
+            }
+
+            $students[] = [
+                'externalId' => trim((string)$student->SchoolId),
+                'studentId' => trim((string)$student->xpath('@Id')[0]),
+                'userCode' => trim((string)$student->UserCode),
+                'username' => trim((string)$student->SchoolCode),
+                'title' => trim((string)$student->Title),
+                'firstname' => trim((string)$student->Forename),
+                'firstnamePreferred' => trim((string)$student->Preferredname),
+                'lastname' => trim((string)$student->Surname),
+            ];
+        }
+
+        return $students;
     }
 
 
