@@ -113,6 +113,42 @@ class Hydrator
 
 
     /**
+     * Find a staff member's info via internal isams @Id
+     *
+     * @param string $id
+     * @return array
+     */
+    public function findStaff(string $id): array
+    {
+        $node = $this->nodes->xpath("/iSAMS/HRManager/CurrentStaff/StaffMember[@Id='{$id}']")[0] ?? null;
+
+        /* Couldn't find this teacher
+         */
+        if (null === $node) {
+            return [
+                'externalId' => '',
+                'staffId' => $id,
+                'userCode' => '',
+                'title' => '',
+                'firstname' => '',
+                'firstnamePreferred' => '',
+                'lastname' => '',
+            ];
+        }
+
+        return [
+            'externalId' => (string)$node->xpath('@PersonId')[0],
+            'staffId' => $id,
+            'userCode' => (string)$node->UserCode,
+            'title' => (string)$node->Title,
+            'firstname' => (string)$node->Forename,
+            'firstnamePreferred' => (string)$node->PreferredName,
+            'lastname' => (string)$node->Surname,
+        ];
+    }
+
+
+    /**
      * Find a subject's name from its $setCode (that's its subject code equivalent)
      *
      * @param string $setCode
@@ -150,9 +186,7 @@ class Hydrator
         /* lol the Teacher @Id attribute is the Set Id, not the teacher's...
          */
         foreach ($teachers as $teacher) {
-            $staff[] = [
-                'staffId' => (string)$teacher->xpath('@StaffId')[0]
-            ];
+            $staff[] = $this->findStaff((string)$teacher->xpath('@StaffId')[0]);
         }
 
         return [
