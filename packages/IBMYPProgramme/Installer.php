@@ -17,7 +17,6 @@ use Schoolbox\User;
  */
 class Installer implements IPackageInstall
 {
-
     /**
      * CSV file from which to load
      */

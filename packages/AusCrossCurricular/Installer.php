@@ -12,7 +12,6 @@ use Schoolbox\User;
  */
 class Installer implements IPackageInstall
 {
-
     private const SOURCE_FILE = 'curriculum.csv';
 
     public function install(User $user): void
