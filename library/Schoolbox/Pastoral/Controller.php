@@ -873,7 +873,6 @@ class Controller extends Base
             $allowedRoles     = $this->pastoralAccessMapper->determineAllowedRoles();
             $allowedRoleTypes = $this->pastoralAccessMapper->determineAllowedRoleTypes();
             foreach ($post->get("role") as $roleId => $accessLevel) {
-
                 if (in_array($roleId, $foundRoles)) {
                     // should not happen
                     continue;
