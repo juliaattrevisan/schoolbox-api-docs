@@ -84,7 +84,7 @@ class CycleUnroller
 
             $stack[$weekIndex] = [
                 'week' => [
-                    'id' => $weekId,
+                    'isamsId' => $weekId,
                     'index' => $weekIndex,
                     'name' => (string)$week->Name
                 ],
@@ -103,15 +103,17 @@ class CycleUnroller
 
             for ($dayIndex = 0; $dayIndex < $numDays; $dayIndex++) {
                 $day = $days[$dayIndex];
+                $dayId = (string)$day->xpath('@Id')[0];
 
                 $date = (new \DateTime())->setISODate($year, $weekIndex, $dayIndex+1)->format('Y-m-d');
 
                 /* Assemble into stack
                  */
                 $stack[$weekIndex]['days'][$dayIndex] = [
-                    'date' => $date,
+                    'isamsId' => $dayId,
                     'name' => (string)$day->Name,
                     'dayNumber' => (string)$day->Day,
+                    'date' => $date,
                     'periods' => []
                 ];
 
@@ -136,7 +138,7 @@ class CycleUnroller
                     /* Assemble into stack
                      */
                     $stack[$weekIndex]['days'][$dayIndex]['periods'][$periodId] = [
-                        'id' => $periodId,
+                        'isamsId' => $periodId,
                         'name' => (string)$period->Name,
                         'startAt' => $startDatetime,
                         'finishAt' => $finishDatetime
