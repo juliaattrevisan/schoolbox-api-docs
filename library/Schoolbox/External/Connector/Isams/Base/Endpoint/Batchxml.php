@@ -126,7 +126,7 @@ class Batchxml
 
                     /* Shank out the Description
                      */
-                    $errorNodes = new SimpleXMLElement($errorXml);
+                    $errorNodes = @(new SimpleXMLElement($errorXml));
 
                     $errorMessage = (string)$errorNodes->xpath('/Message')[0]->Description;
                 } catch (\Exception $e) {
