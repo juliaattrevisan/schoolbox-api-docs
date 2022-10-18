@@ -218,6 +218,7 @@ class Access
         return $this->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_WRITE;
     }
 
+
     /**
      * Is the specified user a learner of the specified folder ?
      *
@@ -310,9 +311,13 @@ class Access
         }
 
         // Homepage service is a special case due to inheritance, otherwise just check `userAccess` table
-        $accessLevel = $service === UserAccess::SERVICE_HOMEPAGE
-            ? $this->getFolderAccess($user, $serviceIdentifier, $cache)
-            : $this->getUserAccessLevel($user, $service, $serviceIdentifier, $cache);
+        try {
+            $accessLevel = $service === UserAccess::SERVICE_HOMEPAGE
+                ? $this->getFolderAccess($user, $serviceIdentifier, $cache)
+                : $this->getUserAccessLevel($user, $service, $serviceIdentifier, $cache);
+        } catch (MapperException\Deleted) {
+            $accessLevel = UserAccess::ACCESS_DENY;
+        }
 
         $this->cachedUserServicePermissions[$user->getId()][$service][$serviceIdentifier] = $accessLevel;
         return $accessLevel;
@@ -412,7 +417,6 @@ class Access
      */
     public function getFolderAccess(User $user, int $folderId, $cache = true): int
     {
-
         /* $user can be an empty object stub
          * In that case, no primary identifier is ACCESS_DENY
          * We don't know who you are
