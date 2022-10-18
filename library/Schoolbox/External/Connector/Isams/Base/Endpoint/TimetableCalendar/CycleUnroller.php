@@ -47,7 +47,7 @@ class CycleUnroller
     {
         /* The current year. We won't care about other calendar years.
          */
-        $year = date('Y');
+        $year = (int)date('Y');
 
         $stack = [];
 
@@ -78,30 +78,52 @@ class CycleUnroller
          * which contains Days and Periods
          */
         foreach ($timetableAllocations as $timetableAllocation) {
-            $weekId = (string)$timetableAllocation->TimetableWeekId;
+            $weekId = (int)$timetableAllocation->TimetableWeekId;
+            $week = $nodes->xpath("/iSAMS/TimetableManager/Structure/Week[@Id='{$weekId}']")[0];
+            $weekIndex = (int)$timetableAllocation->Week;
 
-            $stack[(string)$timetableAllocation->Week] = [
-                'weekId' => $weekId,
+            $stack[$weekIndex] = [
+                'week' => [
+                    'id' => $weekId,
+                    'index' => $weekIndex,
+                    'name' => (string)$week->Name
+                ],
                 'days' => []
             ];
 
             /* For each of the valid WeekId nodes that we found, calculate the datetime
              * that would correspond to each of the Periods in each of the Days contained
              * inside this WeekId node.
-             *
-             * There's an Ordinal field, which is essentially a sequencing int
-             * We can use that to calculate an offset from the start of the week which we
-             * can for now presume to be Monday. Localisation will mean that in some regions
-             * it won't be Monday, but some other day, and we'll have to accommodate that.
              */
+            $days = $week->xpath('Days/Day');
+
+            /* Arbitrarily count offsets
+             */
+            $numDays = count($days);
+
+            for ($dayIndex = 0; $dayIndex < $numDays; $dayIndex++) {
+                $day = $days[$dayIndex];
+
+                $date = (new \DateTime())->setISODate($year, $weekIndex, $dayIndex+1)->format('Y-m-d');
+
+                /* Assemble into stack
+                 */
+                $stack[$weekIndex]['days'][$dayIndex] = [
+                    'date' => $date,
+                    'name' => (string)$day->Name,
+                    'dayNumber' => (string)$day->Day,
+                    'periods' => []
+                ];
+
+                /* For each of the Days and Periods, assign their corresponding startdatetime and
+                 * finishdatetime values
+                 */
+            }
         }
 
-        new \Alaress_Probe($timetableAllocations, $stack);
+        new \Alaress_Probe($week, $stack);
 
 
-        /* For each of the Days and Periods, assign their corresponding startdatetime and
-         * finishdatetime values
-         */
 
         return $stack;
     }
