@@ -49,7 +49,6 @@ class Hydrator
      */
     public function hydrate(): array
     {
-
         /* A list of (periodId, everything) tuples
          */
         $schedules = $this->findSchedules($this->findPeriodIds());
@@ -60,7 +59,7 @@ class Hydrator
             foreach ($weekData['days'] as &$days) {
                 foreach ($days['periods'] as &$period) {
                     if (isset($schedules[$period['isamsId']])) {
-                        $period['classes'][] = $schedules[$period['isamsId']];
+                        $period['classes'] = $schedules[$period['isamsId']];
                     }
                 }
             }
@@ -69,6 +68,58 @@ class Hydrator
         unset($weekData, $days, $period, $schedules);
 
         return $this->timetableDefinition;
+    }
+
+
+    /**
+     * Find a subject's name from its $setCode (that's its subject code equivalent)
+     *
+     * @param string $setCode
+     * @return array
+     */
+    public function findSubject(string $setCode): array
+    {
+        $node = $this->nodes->xpath("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]")[0];
+
+        /* TODO There is a <Teachers> node here, but there's always been
+         *  exactly one <Teacher> node contained inside. If multiple teachers
+         *  is possible, this is where you'd find them
+         *
+         * TODO It might be possible this is used for Substitute Teachers
+         *  and that Schedule->Teacher is the Regular Guy
+         */
+
+        /* Unknown subject: can't find it via its setCode
+         */
+        if (empty($node)) {
+            return [
+                'subjectId' => '',
+                'code' => '',
+                'name' => '(unknown subject)',
+                'regularStaff' => [],
+                'students' => [],
+            ];
+        }
+
+        /* Collect whatever these nodes mean; not sure yet
+         */
+        $staff = [];
+
+        $teachers = $node->xpath('Teachers/Teacher');
+
+        /* lol the Teacher @Id attribute is the Set Id, not the teacher's...
+         */
+        foreach ($teachers as $teacher) {
+            $staff[] = $this->findSubjectStaff((string)$teacher->xpath('@StaffId')[0]);
+        }
+
+        return [
+            'subjectId' => (string)$node->SubjectId,
+            'code' => $setCode,
+            'name' => trim((string)$node[0]->Name),
+            'regularStaff' => $staff,
+            'students' => $this->findSubjectStudents($setCode)
+        ];
     }
 
 
@@ -121,16 +172,22 @@ class Hydrator
                 }
 
                 $classCode = (string)$schedule->Code;
-                $subject = $this->findSubject($classCode);
                 $scheduleId = (string)$schedule->xpath('@Id')[0];
 
+                /* Obtain this separately as you iterate rather than precompile
+                 * everything up-front
+                 *
+                 * $this->findSubject($classCode);
+                 */
+                $subject = null;
+
                 $stack[$periodId]['schedule'][$scheduleId] = [
+                    'code' => $classCode,
                     'subject' => $subject,
                     'substituteStaff' => $this->findScheduleStaff((string)$schedule->Teacher),
                     'room' => $this->findRoom((string)$schedule->RoomId),
                     'setId' => (string)$schedule->SetId,
                     'set' => (string)$schedule->Set,
-                    'students' => $this->findStudents($classCode)
                 ];
             }
         }
@@ -263,7 +320,7 @@ class Hydrator
      * @param string $setCode
      * @return array
      */
-    private function findStudents(string $setCode): array
+    private function findSubjectStudents(string $setCode): array
     {
         $node = $this->nodes->xpath("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
 
@@ -307,55 +364,5 @@ class Hydrator
         }
 
         return $students;
-    }
-
-
-    /**
-     * Find a subject's name from its $setCode (that's its subject code equivalent)
-     *
-     * @param string $setCode
-     * @return array
-     */
-    private function findSubject(string $setCode): array
-    {
-        $node = $this->nodes->xpath("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]")[0];
-
-        /* TODO There is a <Teachers> node here, but there's always been
-         *  exactly one <Teacher> node contained inside. If multiple teachers
-         *  is possible, this is where you'd find them
-         *
-         * TODO It might be possible this is used for Substitute Teachers
-         *  and that Schedule->Teacher is the Regular Guy
-         */
-
-        /* Unknown subject: can't find it via its setCode
-         */
-        if (empty($node)) {
-            return [
-                'subjectId' => '',
-                'code' => '',
-                'name' => '(unknown subject)',
-                'regularStaff' => []
-            ];
-        }
-
-        /* Collect whatever these nodes mean; not sure yet
-         */
-        $staff = [];
-
-        $teachers = $node->xpath('Teachers/Teacher');
-
-        /* lol the Teacher @Id attribute is the Set Id, not the teacher's...
-         */
-        foreach ($teachers as $teacher) {
-            $staff[] = $this->findSubjectStaff((string)$teacher->xpath('@StaffId')[0]);
-        }
-
-        return [
-            'subjectId' => (string)$node->SubjectId,
-            'code' => $setCode,
-            'name' => trim((string)$node[0]->Name),
-            'regularStaff' => $staff
-        ];
     }
 }
