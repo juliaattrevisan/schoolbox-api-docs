@@ -96,7 +96,9 @@ watch(() => selectedNodesStore.nodesIds, () => {
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: -1px; //to butt up against the search input
+    max-height: 133px;
     min-height: 50px;
+    overflow: auto;
     padding: 0.5rem;
 }
 
