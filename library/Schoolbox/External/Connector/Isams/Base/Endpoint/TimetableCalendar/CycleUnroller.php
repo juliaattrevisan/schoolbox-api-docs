@@ -88,67 +88,96 @@ class CycleUnroller
                     'index' => $weekIndex,
                     'name' => (string)$week->Name
                 ],
-                'days' => []
+                'days' => $this->findDays($week, $weekIndex, $year)
             ];
-
-            /* For each of the valid WeekId nodes that we found, calculate the datetime
-             * that would correspond to each of the Periods in each of the Days contained
-             * inside this WeekId node.
-             */
-            $days = $week->xpath('Days/Day');
-
-            /* Arbitrarily count offsets
-             */
-            $numDays = count($days);
-
-            for ($dayIndex = 0; $dayIndex < $numDays; $dayIndex++) {
-                $day = $days[$dayIndex];
-                $dayId = (string)$day->xpath('@Id')[0];
-
-                $date = (new \DateTime())->setISODate($year, $weekIndex, $dayIndex+1)->format('Y-m-d');
-
-                /* Assemble into stack
-                 */
-                $stack[$weekIndex]['days'][$dayIndex] = [
-                    'isamsId' => $dayId,
-                    'name' => (string)$day->Name,
-                    'dayNumber' => (string)$day->Day,
-                    'date' => $date,
-                    'periods' => []
-                ];
-
-                /* For each of the Days and Periods, assign their corresponding startdatetime and
-                 * finishdatetime values
-                 */
-                foreach ($day->Periods->Period as $period) {
-                    $periodId = (string)$period->xpath('@Id')[0];
-
-                    $startDatetime = sprintf(
-                        '%s %s:00',
-                        $date,
-                        $period->StartTime
-                    );
-
-                    $finishDatetime = sprintf(
-                        '%s %s:00',
-                        $date,
-                        $period->EndTime
-                    );
-
-                    /* Assemble into stack
-                     */
-                    $stack[$weekIndex]['days'][$dayIndex]['periods'][$periodId] = [
-                        'isamsId' => $periodId,
-                        'name' => (string)$period->Name,
-                        'startAt' => $startDatetime,
-                        'finishAt' => $finishDatetime
-                    ];
-                }
-            }
         }
 
-        new \Alaress_Probe($stack);
-
         return $stack;
+    }
+
+
+    /**
+     * Find the Days' data corresponding to $week
+     *
+     * @param SimpleXMLElement $week
+     * @param int              $weekIndex
+     * @param int              $year
+     * @return array
+     */
+    private function findDays(SimpleXMLElement $week, int $weekIndex, int $year): array
+    {
+        $dayStruct = [];
+
+        /* For each of the valid WeekId nodes that we found, calculate the datetime
+         * that would correspond to each of the Periods in each of the Days contained
+         * inside this WeekId node.
+         */
+        $days = $week->xpath('Days/Day');
+
+        /* Arbitrarily count offsets
+         */
+        $numDays = count($days);
+
+        for ($dayIndex = 0; $dayIndex < $numDays; $dayIndex++) {
+            $day = $days[$dayIndex];
+            $dayId = (string)$day->xpath('@Id')[0];
+
+            $date = (new \DateTime())->setISODate($year, $weekIndex, $dayIndex + 1)->format('Y-m-d');
+
+            /* Assemble into stack
+             */
+            $dayStruct[$dayIndex] = [
+                'isamsId' => $dayId,
+                'name' => (string)$day->Name,
+                'dayNumber' => (string)$day->Day,
+                'date' => $date,
+                'periods' => $this->findPeriods($day, $date)
+            ];
+        }
+
+        return $dayStruct;
+    }
+
+
+    /**
+     * Find the Periods' data corresponding to $day
+     *
+     * @param SimpleXMLElement $day
+     * @param string           $date
+     * @return array
+     */
+    private function findPeriods(SimpleXMLElement $day, string $date): array
+    {
+        $periodStruct = [];
+
+        /* For each of the Days and Periods, assign their corresponding startdatetime and
+         * finishdatetime values
+         */
+        foreach ($day->Periods->Period as $period) {
+            $periodId = (string)$period->xpath('@Id')[0];
+
+            $startDatetime = sprintf(
+                '%s %s:00',
+                $date,
+                $period->StartTime
+            );
+
+            $finishDatetime = sprintf(
+                '%s %s:00',
+                $date,
+                $period->EndTime
+            );
+
+            /* Assemble into stack
+             */
+            $periodStruct[$periodId] = [
+                'isamsId' => $periodId,
+                'name' => (string)$period->Name,
+                'startAt' => $startDatetime,
+                'finishAt' => $finishDatetime
+            ];
+        }
+
+        return $periodStruct;
     }
 }
