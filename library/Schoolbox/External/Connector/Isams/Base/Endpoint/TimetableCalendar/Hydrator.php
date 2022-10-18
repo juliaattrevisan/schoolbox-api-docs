@@ -60,7 +60,7 @@ class Hydrator
                 $periodId = (string)$schedule->PeriodId;
                 $classCode = (string)$schedule->Code;
                 $subject = $this->findSubject($classCode);
-                
+
                 $stack[$periodId][] = [
                     'isamsId' => (string)$schedule->xpath('@Id')[0],
                     'periodId' => $periodId,
@@ -70,6 +70,13 @@ class Hydrator
                     'setId' => (string)$schedule->SetId,
                     'set' => (string)$schedule->Set,
                 ];
+
+                $t = $this->findScheduleTeacher((string)$schedule->Teacher);
+                $s = $subject['staff'][0] ?? ['staffId' => ''];
+
+                if ($t['staffId'] !== $s['staffId']) {
+                    new \Alaress_Probe($t, $s);
+                }
             }
         }
 
@@ -92,6 +99,7 @@ class Hydrator
         if (null === $node) {
             return [
                 'externalId' => '',
+                'staffId' => '',
                 'userCode' => $userCode,
                 'title' => '',
                 'firstname' => '',
