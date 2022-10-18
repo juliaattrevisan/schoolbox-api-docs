@@ -71,7 +71,7 @@ class BaseTest extends TestCase
                 ->setType(Model::MOMENT_TYPE_UPLOAD)
                 ->setDiscussionThread((new DiscussionThread())->setId(14))
                 ->setCurriculumNodes(
-                    (new GenericCollection(new CurriculumNode()))->add((new CurriculumNode())->setId(500)->setName('Test Curriculum')->setCode('TEST500'))
+                    (new GenericCollection(new CurriculumNode()))->add((new CurriculumNode())->setId(500)->setName('Test Curriculum')->setCode(trim('TEST500 ')))
                 )
                 ->setTags((new GenericCollection(new EvidenceTag()))->add((new EvidenceTag())->setId(1)->setName('Class Work'))),
             [

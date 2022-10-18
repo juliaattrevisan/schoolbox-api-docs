@@ -163,7 +163,7 @@ class Installer implements IPackageInstall
                     ->setParent($parent['curriculum_node_parent_id'] ? $this->parentLookup[$parent['curriculum_node_parent_id']] : null)
                     ->setName($parent['name'])
                     ->setDescription($parent['description'])
-                    ->setCode($parent['code'])
+                    ->setCode(trim($parent['code']))
                     ->setOrder($parent['order']);
 
                 $this->curriculumNodeMapper->save($node);
@@ -217,7 +217,7 @@ class Installer implements IPackageInstall
             ->setParent($parentId ? $this->parentLookup[$row['curriculum_node_parent_id']] : null)
             ->setName($row['name'])
             ->setDescription($row['description'])
-            ->setCode($row['code'])
+            ->setCode(trim($row['code']))
             ->setOrder($row['order']);
 
         $this->curriculumNodeMapper->save($node);

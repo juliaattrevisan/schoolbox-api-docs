@@ -208,7 +208,7 @@ class Controller extends Base
         // Perform necessary validations, if any.
         $item
             ->setName($post['name'])
-            ->setCode($post['code'])
+            ->setCode(trim($post['code']))
             ->setReference($post['reference'])
             ->setDescription($post['description']);
 
@@ -264,7 +264,7 @@ class Controller extends Base
             $item->setName($post['name']);
         }
         if (isset($post['code'])) {
-            $item->setCode($post['code']);
+            $item->setCode(trim($post['code']));
         }
         if (isset($post['reference'])) {
             $item->setReference($post['reference']);

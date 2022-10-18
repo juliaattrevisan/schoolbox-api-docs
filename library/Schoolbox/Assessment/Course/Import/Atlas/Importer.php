@@ -643,7 +643,7 @@ class Importer
             // Consider soft-deletion the same as hard deletion
             $node = $this->nodeMapper->createModel()
                 ->setName($name)
-                ->setCode($code)
+                ->setCode(trim($code))
                 ->setDescription($description ?? '')
                 ->setReference($reference)
                 ->setParent($parent);
