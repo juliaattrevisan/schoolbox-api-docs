@@ -199,7 +199,7 @@ class Folder extends SimpleStrategy
 
         try {
             return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE;
-        } catch (MapperException\Deleted | MapperException\NotFound) {
+        } catch (MapperException\Deleted) {
             return false;
         }
     }

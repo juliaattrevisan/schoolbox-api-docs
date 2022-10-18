@@ -1310,7 +1310,7 @@ class Controller extends Base
                     $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
                     Access::getInstance()->getFolderAccess($user, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ
                 );
-            } catch (MapperException\Deleted | MapperException\NotFound) {
+            } catch (MapperException\Deleted) {
                 return false;
             }
         }
