@@ -78,8 +78,14 @@ class CycleUnroller
         foreach ($timetableAllocations as $timetableAllocation) {
             $weekId = (int)$timetableAllocation->TimetableWeekId;
             $week = $nodes->xpath("/iSAMS/TimetableManager/Structure/Week[@Id='{$weekId}']")[0];
+
+            /* The ISO Week number in this calendar year
+             */
             $weekIndex = (int)$timetableAllocation->Week;
 
+            /* Make a megastruct that is basically the "timetable definition"
+             * for each week, consisting of its days and periods
+             */
             $stack[$weekIndex] = [
                 'week' => [
                     'isamsId' => $weekId,
