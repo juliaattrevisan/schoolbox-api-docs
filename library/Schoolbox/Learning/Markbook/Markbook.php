@@ -223,7 +223,7 @@ class Markbook
 
         // Summate student's statistics as an average, weighted by each assessment's weight.
         // Render as whatever the default grade group is
-        $weightedSummator  = new WeightedAverage();
+        $weightedSummator  = new WeightedAverage(false);
 
         // Not all assessables are used in stats:
         // only ones for which feedback is visible, and are not project sub-assessments, are usable.

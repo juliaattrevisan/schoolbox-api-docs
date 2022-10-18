@@ -168,15 +168,18 @@ class Project implements IAssessmentTypeTranslator
      */
     private function getSummator(ProjectModel $project): ?ISummator
     {
-        $summatorString = $project->getSummator();
-        return self::getSummatorFromString($summatorString);
+        return self::getSummatorFromString($project->getSummator(), $project->getRequireAllActivities());
     }
 
     /**
      * @param string|null $summatorString
+     * @param bool        $requireAllActivities
      * @return ISummator|null
      */
-    public static function getSummatorFromString(?string $summatorString): ?Isummator
+    public static function getSummatorFromString(
+        ?string $summatorString,
+        bool $requireAllActivities,
+    ): ?Isummator
     {
         if (null === $summatorString) {
             return null;
@@ -185,7 +188,7 @@ class Project implements IAssessmentTypeTranslator
             case ProjectModel::SUMMATOR_AVERAGE:
                 return new Average();
             case ProjectModel::SUMMATOR_WEIGHTED_AVERAGE:
-                return new WeightedAverage();
+                return new WeightedAverage($requireAllActivities);
             case ProjectModel::SUMMATOR_MINIMUM:
                 return new Minimum();
             case ProjectModel::SUMMATOR_MAXIMUM:

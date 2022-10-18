@@ -529,6 +529,7 @@ class MapperProxy
             "SELECT
                   p.assessment_id AS assessment_id,
                   summator,
+                  require_all_activities,
                   pa.assessment_id AS sub_assessment_id
              FROM project p
                  LEFT JOIN project_assessment pa ON p.id = pa.project_id AND p.deleted_at IS NULL
@@ -544,7 +545,7 @@ class MapperProxy
         $summators = [];
         foreach ($projectQuery as $row) {
             $projects[$row['assessment_id']]  ??= [];
-            $summators[$row['assessment_id']] ??= $row['summator'];
+            $summators[$row['assessment_id']] ??= $row;
             if (!key_exists($row['sub_assessment_id'], $marks)) {
                 continue;
             }
@@ -566,7 +567,10 @@ class MapperProxy
         // Calculate project marks and append to $marks
         foreach ($projects as $assessmentId => $projectMarks) {
             $marks[$assessmentId] ??= [];
-            $summator             = Translator\Project::getSummatorFromString($summators[$assessmentId]);
+            $summator             = Translator\Project::getSummatorFromString(
+                $summators[$assessmentId]['summator'],
+                (bool)$summators[$assessmentId]['require_all_activities'],
+            );
             if (null === $summator) {
                 continue;
             }

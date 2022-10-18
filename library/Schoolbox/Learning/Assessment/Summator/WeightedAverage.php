@@ -27,6 +27,10 @@ class WeightedAverage extends AbstractSummator
      */
     protected $runningValues = [];
 
+    public function __construct(private bool $requireAllActivities)
+    {
+    }
+
     /**
      * Calculate the total weighting of all IAssessables
      *

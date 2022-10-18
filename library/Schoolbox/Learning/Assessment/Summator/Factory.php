@@ -44,7 +44,7 @@ class Factory
     {
         switch ($this->summator) {
             case self::WEIGHTED_AVERAGE:
-                return new WeightedAverage();
+                return new WeightedAverage($this->requireAllActivities);
 
             case self::AVERAGE:
                 return new Average();
