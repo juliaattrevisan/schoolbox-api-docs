@@ -58,11 +58,13 @@ class Hydrator
 
             foreach ($schedules as $schedule) {
                 $periodId = (string)$schedule->PeriodId;
+                $classCode = (string)$schedule->Code;
+                $subject = $this->findSubject($classCode);
                 
                 $stack[$periodId][] = [
                     'isamsId' => (string)$schedule->xpath('@Id')[0],
                     'periodId' => $periodId,
-                    'code' => (string)$schedule->Code,
+                    'subject' => $subject,
                     'staff' => $this->findScheduleTeacher((string)$schedule->Teacher),
                     'roomId' => (string)$schedule->RoomId,
                     'setId' => (string)$schedule->SetId,
@@ -100,6 +102,7 @@ class Hydrator
 
         return [
             'externalId' => (string)$node->xpath('@PersonId')[0],
+            'staffId' => (string)$node->xpath('@Id')[0],
             'userCode' => $userCode,
             'title' => (string)$node->Title,
             'firstname' => (string)$node->Forename,
@@ -134,6 +137,21 @@ class Hydrator
                 'subjectId' => '',
                 'code' => '',
                 'name' => '(unknown subject)',
+                'staff' => []
+            ];
+        }
+
+        /* Collect whatever these nodes mean; not sure yet
+         */
+        $staff = [];
+
+        $teachers = $node->xpath('Teachers/Teacher');
+
+        /* lol the Teacher @Id attribute is the Set Id, not the teacher's...
+         */
+        foreach ($teachers as $teacher) {
+            $staff[] = [
+                'staffId' => (string)$teacher->xpath('@StaffId')[0]
             ];
         }
 
@@ -141,6 +159,7 @@ class Hydrator
             'subjectId' => (string)$node->SubjectId,
             'code' => $setCode,
             'name' => trim((string)$node[0]->Name),
+            'staff' => $staff
         ];
     }
 }
