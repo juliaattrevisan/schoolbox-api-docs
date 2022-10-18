@@ -24,8 +24,9 @@ class Factory
      * Factory constructor.
      *
      * @param string $summator
-     * @param bool   $requireAllActivities Must a student attempt all activities? If so, they will receive zero for and
-     *                                     assessment they've not attempted.
+     * @param bool  $requireAllActivities Must a student attempt all activities?
+     *                                    If so, they will receive zero for any
+     *                                    assessment they've not attempted.
      */
     public function __construct(
         private string $summator,

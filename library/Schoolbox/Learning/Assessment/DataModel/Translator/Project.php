@@ -179,8 +179,7 @@ class Project implements IAssessmentTypeTranslator
     public static function getSummatorFromString(
         ?string $summatorString,
         bool $requireAllActivities,
-    ): ?Isummator
-    {
+    ): ?Isummator {
         if (null === $summatorString) {
             return null;
         }

@@ -19,6 +19,7 @@ namespace Schoolbox\Learning\Assessment\Summator;
 
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 
 class WeightedAverage extends AbstractSummator
 {
@@ -27,8 +28,35 @@ class WeightedAverage extends AbstractSummator
      */
     protected $runningValues = [];
 
+    /**
+     * Constructor
+     *
+     * @param bool $requireAllActivities Must a student attempt all activities?
+     *                                   If so, they will receive zero for any
+     *                                   assessment they've not attempted.
+     */
     public function __construct(private bool $requireAllActivities)
     {
+    }
+
+    /**
+     * If a student must attempt all activities, and they have not yet received
+     * feedback for the activity, their normalised mark is zero: otherwise, the
+     * standard calculation is used.
+     *
+     * @param Participant $participant
+     * @param bool        $publishedOnly
+     * @return float|null
+     */
+    public function deriveNormalisedMark(Participant $participant, bool $publishedOnly): ?float
+    {
+        if ($this->requireAllActivities) {
+            $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
+            if (!$latestFeedback) {
+                return 0;
+            }
+        }
+        return parent::deriveNormalisedMark($participant, $publishedOnly);
     }
 
     /**
