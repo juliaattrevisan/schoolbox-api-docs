@@ -63,7 +63,7 @@ class Hydrator
                     'isamsId' => (string)$schedule->xpath('@Id')[0],
                     'periodId' => $periodId,
                     'code' => (string)$schedule->Code,
-                    'staff' => $this->findTeacher((string)$schedule->Teacher),
+                    'staff' => $this->findScheduleTeacher((string)$schedule->Teacher),
                     'roomId' => (string)$schedule->RoomId,
                     'setId' => (string)$schedule->SetId,
                     'set' => (string)$schedule->Set,
@@ -81,7 +81,7 @@ class Hydrator
      * @param string $userCode
      * @return string[]
      */
-    public function findTeacher(string $userCode): array
+    public function findScheduleTeacher(string $userCode): array
     {
         $node = $this->nodes->xpath("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$userCode}']]")[0] ?? null;
 
@@ -118,6 +118,14 @@ class Hydrator
     private function findSubject(string $setCode): array
     {
         $node = $this->nodes->xpath("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]")[0];
+
+        /* TODO There is a <Teachers> node here, but there's always been
+         *  exactly one <Teacher> node contained inside. If multiple teachers
+         *  is possible, this is where you'd find them
+         *
+         * TODO It might be possible this is used for Substitute Teachers
+         *  and that Schedule->Teacher is the Regular Guy
+         */
 
         /* Unknown subject: can't find it via its setCode
          */
