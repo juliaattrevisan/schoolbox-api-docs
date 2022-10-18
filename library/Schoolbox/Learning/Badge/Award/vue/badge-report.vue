@@ -219,48 +219,42 @@ export default {
 </script>
 
 <template>
-
     <div class="small-12 island badge-report">
-
-        <section class="content">
-
-            <div v-if="isDataLoaded && hasStudents">
-                <badge-report-header
-                    :has-some-students-selected="hasSomeStudentsSelected"
-                    :are-all-students-selected="areAllStudentsSelected"
-                    @on-select-all-selected="onSelectAllSelected"
+        <div v-if="isDataLoaded && hasStudents">
+            <section class="content">
+            <badge-report-header
+                :has-some-students-selected="hasSomeStudentsSelected"
+                :are-all-students-selected="areAllStudentsSelected"
+                @on-select-all-selected="onSelectAllSelected"
+            />
+            <ul class="action-list">
+                <badge-report-student
+                    v-for="student in studentsData"
+                    :key="student.id"
+                    :student="student"
+                    :selected-students="selectedStudents"
+                    @on-student-selected="onStudentSelected"
+                    @on-badge-selected="onBadgeSelected"
                 />
-                <ul class="action-list">
-                    <badge-report-student
-                        v-for="student in studentsData"
-                        :key="student.id"
-                        :student="student"
-                        :selected-students="selectedStudents"
-                        @on-student-selected="onStudentSelected"
-                        @on-badge-selected="onBadgeSelected"
-                    />
-                </ul>
-                <award-detail-modal
-                    ref="awardDetailModal"
-                    @on-achievement-awarded="onAchievementAwarded"
-                    :cdn-prefix="this.cdnPrefix"
-                    :site-version="this.siteVersion"
-                />
-            </div>
+            </ul>
+            <award-detail-modal
+                ref="awardDetailModal"
+                @on-achievement-awarded="onAchievementAwarded"
+                :cdn-prefix="this.cdnPrefix"
+                :site-version="this.siteVersion"
+            />
+            </section>
+        </div>
+        <div v-else-if="isDataLoaded && !hasStudents" class="empty-state margin-none ">
+            <i class="icon-staff-students"></i>
+            <p>There are currently no users within this group.</p>
+        </div>
 
-            <div v-else-if="isDataLoaded && !hasStudents" class="empty-state margin-none ">
-                <i class="icon-staff-students"></i>
-                <p>There are currently no users within this group.</p>
-            </div>
+        <div v-else-if="hasDataLoadError" class="alert-box alert">
+            Sorry, we are currently unable to load the group data.
+        </div>
 
-            <div v-else-if="hasDataLoadError" class="alert-box alert">
-                Sorry, we are currently unable to load the group data.
-            </div>
-
-            <div v-else class="loader"></div>
-
-        </section>
-
+        <div v-else class="loader"></div>
         <bottom-drawer :showDrawer="hasSelectedStudents">
             <h3 class="selected-count"><em>{{ selectedStudentsCount }} selected</em></h3>
             <button @click.prevent="onClearStudentSelection" @keyup.enter="onClearStudentSelection" class="button-clear">Clear selection</button>
