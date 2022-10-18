@@ -138,6 +138,9 @@ class Vcal
             $source = preg_replace('/^(\x{EF}\x{BB}\x{BF})/', '', $source);
         }
 
+        //fix broken LastModified date field \t character
+        $source = str_replace('LAST-MODIFIED:	', 'LAST-MODIFIED:', $source);
+
         // Expand 1 year in both directions
         $timezone = new DateTimeZone('UTC');
         $document = Reader::read($source, Reader::OPTION_FORGIVING);
