@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 
-use DebugBar\DebugBarException;
 use SimpleXMLElement;
 
 /**
@@ -41,7 +40,6 @@ class CycleUnroller
      *
      * @param SimpleXMLElement $nodes
      * @return array
-     * @throws DebugBarException
      */
     public function unroll(SimpleXmlElement $nodes): array
     {
