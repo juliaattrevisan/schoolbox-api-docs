@@ -171,7 +171,6 @@ class External_Schoolbox_Class implements External_ClassInterface
                 \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                 \Schoolbox\External\Event\Mapper::getInstance(),
                 \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-                \Schoolbox\UserMapper::getInstance(),
                 \Schoolbox\External\Profile\Staff\Mapper::getInstance()
             ))->findTeachersForClassCode($classCode, $pastThreshold, $futureThreshold);
 
