@@ -283,11 +283,13 @@ WHERE
         if (array_key_exists('dueDate', $filter)) {
             if (array_key_exists('from', $filter['dueDate'])) {
                 $where             .= " AND due_date >= FROM_UNIXTIME(:dueFrom) ";
-                $params['dueFrom'] = \DateTime::createFromFormat(DATE_RFC3339, $filter['dueDate']['from'])->getTimestamp();
+                $fromDate = new \Alaress_Date_Format($filter['dueDate']['from'], [DATE_RFC3339, DATE_RFC3339_EXTENDED]);
+                $params['dueFrom'] = $fromDate->getUnixTimeStamp();
             }
             if (array_key_exists('to', $filter['dueDate'])) {
                 $where             .= " AND due_date <= FROM_UNIXTIME(:dueTo) ";
-                $params['dueTo'] = \DateTime::createFromFormat(DATE_RFC3339, $filter['dueDate']['to'])->getTimestamp();
+                $toDate = new \Alaress_Date_Format($filter['dueDate']['to'], [DATE_RFC3339, DATE_RFC3339_EXTENDED]);
+                $params['dueTo'] = $toDate->getUnixTimeStamp();
             }
         }
         if (array_key_exists('yearLevel', $filter)) {
