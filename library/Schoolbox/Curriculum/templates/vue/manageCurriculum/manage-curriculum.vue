@@ -9,6 +9,7 @@ import { ref, onMounted } from 'vue';
 import { useStore } from './store/manageCurriculumStore';
 import { useNodesStore } from './store/mcNodesStore';
 import { useSelectedNodesStore } from './selectedNodes/store/mcSelectedNodesStore';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 import McHeader from './mc-header.vue';
 import McView from './mc-view.vue';
 import McSelectedNodes from './selectedNodes/mc-selected-nodes.vue';
@@ -66,6 +67,13 @@ function initErrorListener () {
     });
 }
 
+/**
+ * close the modal, setting the activeNode to null so we can allow another selection
+ */
+function onSelectedNodeModalClosed () {
+    selectedNodesStore.setActiveNode(getEmptyNode());
+}
+
 </script>
 
 <template>
@@ -76,11 +84,7 @@ function initErrorListener () {
     <mc-delete-nodes />
     <selected-node-modal
         :node="selectedNodesStore.activeNode"
+        @closed="onSelectedNodeModalClosed"
     />
     <toast ref="toastEl"></toast>
 </template>
-
-<style lang="scss" scoped>
-
-
-</style>

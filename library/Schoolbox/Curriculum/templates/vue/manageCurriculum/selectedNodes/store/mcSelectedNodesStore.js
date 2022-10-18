@@ -9,7 +9,7 @@
 import { defineStore } from 'pinia';
 import { apiEndpoint } from '../../store/manageCurriculumStore';
 import { useNodesStore } from '../../store/mcNodesStore';
-import { UNSET_ID, findById, getBreadcrumbs } from '@schoolboxCurriculum/js/nodeUtils';
+import { UNSET_ID, findById, getBreadcrumbs, getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 import { useEnableNodesStore } from './mcEnableNodesStore';
 
 
@@ -18,7 +18,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
     state: () => ({
         nodes: [], //the currently selected nodes
         childNodes: [], //any children of currently selected nodes
-        activeNode: { id: UNSET_ID }, //to show extra info on a selected code in a modal
+        activeNode: getEmptyNode(), //to show extra info on a selected code in a modal
         hasDisabledChildNodes: false,
         isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
@@ -250,31 +250,10 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', {
 
         /**
          * set the active node, which would prompt the selected-node-modal to open
-         * We also load the ancestors of the node to display the breadcrumbs in the modal
          *
-         * @param { Object }
+         * @param { object }
          */
-        async setActiveNode (node) {
-            if (node.id === UNSET_ID) { //we only need to grab the nodes breadcrumbs if there's actually a node
-                this.activeNode = node;
-                return;
-            }
-            try {
-                this.isLoading = true;
-                const response = await fetch(`${apiEndpoint}/${node.id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
-                if (response.ok) {
-                    const nodeWithParents = await response.json();
-                    node.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
-                } else {
-                    console.warn(response);
-                    this.hasLoadError = true;
-                }
-            } catch (error) {
-                console.warn(error);
-                this.hasLoadError = true;
-            } finally {
-                this.isLoading = false;
-            }
+        setActiveNode (node) {
             this.activeNode = node;
         },
 

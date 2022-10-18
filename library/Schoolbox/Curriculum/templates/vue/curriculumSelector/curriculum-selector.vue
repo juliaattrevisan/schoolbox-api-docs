@@ -9,6 +9,7 @@ import { ResizeObserver } from 'vue3-resize';
 import 'vue3-resize/dist/vue3-resize.css';
 import { useStore } from './store/curriculumSelectorStore';
 import { useSelectedNodesStore } from './store/csSelectedNodesStore';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 import CsSearchInput from './cs-search-input.vue';
 import CsSelectedNodes from './cs-selected-nodes.vue';
 import CsSearchResults from './cs-search-results.vue';
@@ -94,6 +95,13 @@ function onContainerResize () {
     checkContainerWidth();
 }
 
+/**
+ * close the modal, setting the activeNode to null so we can allow another selection
+ */
+function onSelectedNodeModalClosed () {
+    selectedNodesStore.setActiveNode(getEmptyNode());
+}
+
 </script>
 
 <template>
@@ -106,9 +114,6 @@ function onContainerResize () {
     <cs-modal />
     <selected-node-modal
         :node="selectedNodesStore.activeNode"
+        @closed="onSelectedNodeModalClosed"
     />
 </template>
-
-<style lang="scss" scoped>
-
-</style>
