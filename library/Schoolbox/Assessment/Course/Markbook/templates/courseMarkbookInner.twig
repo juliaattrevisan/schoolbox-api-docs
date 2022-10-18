@@ -38,7 +38,7 @@
         {% else %}
         <div class="legend">
             <div class="indicators">
-                <p class="meta"><span class="indicator indicator-none"></span>No mark</p>
+                <p class="meta"><span class="indicator indicator-none"></span>Unmarked</p>
                 <p class="meta"><span class="indicator indicator-pending"></span>Unpublished draft</p>
                 <p class="meta"><span class="indicator indicator-resubmit"></span>Resubmit</p>
                 <p class="meta"><span class="indicator indicator-published"></span>Mark Published</p>
@@ -243,7 +243,9 @@
                                     {% if marks.draft is defined %}
                                         <a href="{{ participationRoute }}" data-draft-mark style="display: none" data-tooltip="right" class="has-tip tip-right meta" data-width="105" title="Draft Mark">{{ decorator.label(participant, false) }}</a>
                                     {% endif %}
-                                    <span class="indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
+                                    {% if participant.hasSubmittedResponse %}
+                                        <span class="indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
+                                    {% endif %}
                                 {% endif %}
                                 </td>
                             {% else %}
