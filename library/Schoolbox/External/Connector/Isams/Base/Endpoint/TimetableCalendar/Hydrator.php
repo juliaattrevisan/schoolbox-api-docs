@@ -42,27 +42,36 @@ class Hydrator
     }
 
 
-    public function hydrate(): void
+    /**
+     * Manufacture a hydrated definition
+     *
+     * @return array
+     */
+    public function hydrate(): array
     {
         $publishedTimetables = $this->nodes->xpath('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
+        $stack = [];
+        
         foreach ($publishedTimetables as $publishedTimetable) {
             $schedules = $publishedTimetable->xpath('Schedules/Schedule');
 
             foreach ($schedules as $schedule) {
-                $scheduleStruct = [
+                $periodId = (string)$schedule->PeriodId;
+                
+                $stack[$periodId][] = [
                     'isamsId' => (string)$schedule->xpath('@Id')[0],
-                    'periodId' => (string)$schedule->PeriodId,
+                    'periodId' => $periodId,
                     'code' => (string)$schedule->Code,
                     'staff' => $this->findTeacher((string)$schedule->Teacher),
                     'roomId' => (string)$schedule->RoomId,
                     'setId' => (string)$schedule->SetId,
-                    'set' => (string)$schedule->Set
+                    'set' => (string)$schedule->Set,
                 ];
-
-                new \Alaress_Probe($schedule, $scheduleStruct);
             }
         }
+
+        return $stack;
     }
 
 
@@ -74,14 +83,56 @@ class Hydrator
      */
     public function findTeacher(string $userCode): array
     {
-        $node = $this->nodes->xpath("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$userCode}']]")[0];
+        $node = $this->nodes->xpath("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$userCode}']]")[0] ?? null;
+
+        /* Couldn't find this teacher
+         */
+        if (null === $node) {
+            return [
+                'externalId' => '',
+                'userCode' => $userCode,
+                'title' => '',
+                'firstname' => '',
+                'firstnamePreferred' => '',
+                'lastname' => '',
+            ];
+        }
 
         return [
             'externalId' => (string)$node->xpath('@PersonId')[0],
+            'userCode' => $userCode,
             'title' => (string)$node->Title,
             'firstname' => (string)$node->Forename,
             'firstnamePreferred' => (string)$node->PreferredName,
             'lastname' => (string)$node->Surname,
+        ];
+    }
+
+
+    /**
+     * Find a subject's name from its $setCode (that's its subject code equivalent)
+     *
+     * @param string $setCode
+     * @return array
+     */
+    private function findSubject(string $setCode): array
+    {
+        $node = $this->nodes->xpath("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]")[0];
+
+        /* Unknown subject: can't find it via its setCode
+         */
+        if (empty($node)) {
+            return [
+                'subjectId' => '',
+                'code' => '',
+                'name' => '(unknown subject)',
+            ];
+        }
+
+        return [
+            'subjectId' => (string)$node->SubjectId,
+            'code' => $setCode,
+            'name' => trim((string)$node[0]->Name),
         ];
     }
 }
