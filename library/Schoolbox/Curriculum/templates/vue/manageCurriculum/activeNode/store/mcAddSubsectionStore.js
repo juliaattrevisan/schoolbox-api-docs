@@ -81,7 +81,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
         nodesDeleted () {
             const deletedNodeIds = useSelectedNodesStore().nodesIds;
             const activeNodeStore = useActiveNodeStore();
-            if (this.isOpen && deletedNodeIds.includes(activeNodeStore.node?.id)) {
+            if (deletedNodeIds.includes(activeNodeStore.node?.id) && this.isOpen) {
                 this.cancel();
             }
         },
