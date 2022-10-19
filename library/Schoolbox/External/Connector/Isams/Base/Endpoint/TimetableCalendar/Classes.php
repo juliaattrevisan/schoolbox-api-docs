@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 
-use DebugBar\DebugBarException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
@@ -17,7 +16,6 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
-
 
 /**
  * Convert isams cyclic grid into schedule format and shank in
@@ -88,6 +86,9 @@ class Classes implements IStrategy
 
     /**
      * @return void
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function import(): void
     {
@@ -180,12 +181,11 @@ class Classes implements IStrategy
             /* Save sis_class record
              */
             $classEntry = $this->createClassEntry($subject, $event);
-        }
 
-//
-//        /* Save the involvements
-//         */
-//        $this->createInvolvements($activity, $activityInstance, $enrolments, $staffLookup, $event, $classEntry);
+            /* Save the involvements
+             */
+            $this->createInvolvements($dayData, $periodData, $classData, $subject, $event, $classEntry);
+        }
     }
 
 
@@ -331,5 +331,180 @@ class Classes implements IStrategy
         }
 
         return $classEntry;
+    }
+
+
+    /**
+     * Save all the involvements for a given $class
+     *
+     * @param array      $dayData
+     * @param array      $periodData
+     * @param array      $classData
+     * @param array      $subject
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @return void
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function createInvolvements(
+        array $dayData,
+        array $periodData,
+        array $classData,
+        array $subject,
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry
+    ): void {
+        /* Save whoever's teaching this thing on this particular occasion
+         */
+        $staff = $classData['substituteStaff'];
+
+        $this->log->debug(sprintf(
+            'Creating new Override record for subject %s (%s) on %s %s at %s for %s',
+            $subject['name'],
+            $subject['code'],
+            $dayData['dayNumber'],
+            $periodData['name'],
+            $periodData['startAt'],
+            $staff['externalId'],
+        ));
+
+        $this->saveStaffInvolvement($event, $classEntry, $staff['externalId']);
+
+        /* Also save a staff member's regular enrolment
+         */
+        foreach ($subject['regularStaff'] as $regularStaff) {
+            $this->log->debug(sprintf(
+                'Creating new regular teaching enrolment record for subject %s (%s) on %s %s at %s for %s',
+                $subject['name'],
+                $subject['code'],
+                $dayData['dayNumber'],
+                $periodData['name'],
+                $periodData['startAt'],
+                $regularStaff['externalId'],
+            ));
+
+            $this->saveRegularInvolvement($event, $classEntry, $regularStaff['externalId']);
+        }
+
+//
+//        /* Save sis_class_user involvements
+//         * This is the student(s) and they're associated with all instances
+//         */
+//        if (!\count($enrolments['students'])) {
+//            $this->log->debug(sprintf(
+//                '%s: no students involved',
+//                $activityName
+//            ));
+//        } else {
+//            foreach ($enrolments['students'] as $externalId) {
+//                $this->saveStudentInvolvement($event, $classEntry, $externalId);
+//            }
+//        }
+    }
+
+
+    /**
+     * Save staff involvement as an override, which allows each class
+     * to have different teachers depending on their associated sis_event
+     *
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @param string     $externalId
+     * @return void
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function saveStaffInvolvement(
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry,
+        string $externalId
+    ): void {
+        /* We use the Overrides system to specify a particular person's involvement
+         * in a particular sis_event instance, rather than being associated with all
+         */
+        $this->log->debug(sprintf(
+            'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+            $externalId,
+            $event->getTitle(),
+            $event->getDay(),
+            $event->getPeriod(),
+            $event->getStartAt()->getDatabase(),
+            $event->getFinishAt()->getDatabase()
+        ));
+
+        /* For specific teaching, execute CLEAR_STAFF to disregard the usual guy
+         * and add the guy teaching this particular instance (even though they
+         * might end up being the same person sometimes)
+         */
+        $clearOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId(null)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
+            ->setSequence(1);
+
+        $involvementOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId($externalId)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
+            ->setSequence(2);
+
+        if ($this->perform) {
+            $this->overridesMapper->save($clearOverride);
+            $this->overridesMapper->save($involvementOverride);
+        }
+    }
+
+
+    /**
+     * Save an involvement for user $externalId, whose name is $name,
+     * for the sis_event $event
+     *
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @param string     $externalId
+     * @return void
+     * @throws \PDOException
+     * @throws Exception
+     * @throws \UnexpectedValueException
+     */
+    private function saveRegularInvolvement(
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry,
+        string $externalId
+    ): void {
+        if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
+            $this->log->debug(sprintf(
+                'Reusing previous class involvement for %s in timetable event %s - %s, %s, %s-%s',
+                $externalId,
+                $event->getTitle(),
+                $event->getDay(),
+                $event->getPeriod(),
+                $event->getStartAt()->getDatabase(),
+                $event->getFinishAt()->getDatabase()
+            ));
+        } else {
+            $classInvolvement = $this->classInvolvementMapper->createModel()
+                ->setClass($classEntry)
+                ->setExternalId($externalId);
+
+            if ($this->perform) {
+                $this->classInvolvementMapper->save($classInvolvement);
+            }
+
+            $this->classInvolvements[$classEntry->getId()][$externalId] = true;
+
+            $this->log->debug(sprintf(
+                'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+                $externalId,
+                $event->getTitle(),
+                $event->getDay(),
+                $event->getPeriod(),
+                $event->getStartAt()->getDatabase(),
+                $event->getFinishAt()->getDatabase()
+            ));
+        }
     }
 }
