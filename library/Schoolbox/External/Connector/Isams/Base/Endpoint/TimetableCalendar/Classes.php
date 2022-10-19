@@ -277,10 +277,10 @@ class Classes implements IStrategy
          */
         try {
             $event = $this->eventMapper->findOneByColumn('guid', $guid);
-            $logPrefix = 'Reusing';
+            $logPrefix = 'Reusing existing';
         } catch (\Schoolbox\Mapper\Exception $e) {
             $event = $this->eventMapper->createModel();
-            $logPrefix = 'Creating';
+            $logPrefix = 'Creating new';
         }
 
         $event
@@ -300,7 +300,7 @@ class Classes implements IStrategy
         /* Save it and remember what we saw in case we need to reuse this later
          */
         $this->log->debug(sprintf(
-            '%s new timetable event %s (%s) on day %s, period %s, %s-%s',
+            '%s timetable event %s (%s) on day %s, period %s, %s-%s',
             $logPrefix,
             $event->getTitle(),
             $event->getCode(),
