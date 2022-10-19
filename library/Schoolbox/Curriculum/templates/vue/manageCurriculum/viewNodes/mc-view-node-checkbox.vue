@@ -26,7 +26,7 @@ const props = defineProps({
     /**
      * to disable certain events when any editing is taking place
      */
-     isUpdatingOrAdding: {
+    isUpdatingOrAdding: {
         type: Boolean,
         required: true,
     },
@@ -40,7 +40,7 @@ const selectedNodesStore = useSelectedNodesStore();
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    return selectedNodesStore.childNodesIds.includes(props.node.id);
+    return selectedNodesStore.childNodesIds.includes(props.node.id) || props.isUpdatingOrAdding;
 });
 
 /**

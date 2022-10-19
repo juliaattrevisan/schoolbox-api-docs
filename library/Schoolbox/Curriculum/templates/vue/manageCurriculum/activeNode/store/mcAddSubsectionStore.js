@@ -70,8 +70,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', {
          * to hide the confirmation prompt
          */
         cancel () {
-            const activeNodeStore = useActiveNodeStore();
-            activeNodeStore.unset();
+            useActiveNodeStore().unset();
             this.isOpen = false;
         },
 

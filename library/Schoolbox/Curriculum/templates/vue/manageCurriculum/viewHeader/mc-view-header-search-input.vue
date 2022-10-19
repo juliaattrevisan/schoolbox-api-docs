@@ -86,6 +86,7 @@ function onClearSearchSelected () {
                 v-if="searchStore.query !== ''"
                 title="Clear the current search"
                 class="button icon-close"
+                :disabled="isDisabled"
                 @click.prevent="onClearSearchSelected"
                 @keyup.enter="onClearSearchSelected"
             >
@@ -96,7 +97,12 @@ function onClearSearchSelected () {
     <div class="medium-4 small-12 columns">
         <label class="inline-block">Show disabled nodes</label>
         <div class="long switch">
-            <input id="show-only-enabled" type="checkbox" v-model="viewNodesStore.showDisabled" />
+            <input
+                id="show-only-enabled"
+                type="checkbox"
+                v-model="viewNodesStore.showDisabled"
+                :disabled="props.isDisabled"
+            />
             <label for="show-only-enabled">
                 <span>Shown</span>
                 <span>Hidden</span>

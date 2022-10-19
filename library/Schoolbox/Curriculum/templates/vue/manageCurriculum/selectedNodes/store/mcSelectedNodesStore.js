@@ -1,5 +1,9 @@
 /**
- * Manage the currently selected curriculum nodes
+ * Manage the currently selected curriculum nodes.
+ * A selected node can be bulk enabled or deleted.
+ *
+ * Note the distinciton with an 'active' node, handled in mcActiveNodeStore
+ * which is used to update or add a subsection to a SINGLE node.
  */
 
 import { defineStore } from 'pinia';

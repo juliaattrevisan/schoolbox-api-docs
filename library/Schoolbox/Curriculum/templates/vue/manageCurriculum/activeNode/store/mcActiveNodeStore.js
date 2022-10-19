@@ -1,5 +1,10 @@
 /**
- * Manage the currently selected curriculum node
+ * Manage the currently active curriculum node.
+ * An 'active' node is toggled when we choose to
+ * update or add a subsection to an existing node.
+ *
+ * This is different to a 'selected' node handled with mcSelectedNodesStore,
+ * which is used to bulk enable or delete MULTIPLE nodes
  */
 
 import { defineStore } from 'pinia';
