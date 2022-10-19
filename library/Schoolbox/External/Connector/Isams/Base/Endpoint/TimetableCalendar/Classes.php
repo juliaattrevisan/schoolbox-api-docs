@@ -388,20 +388,12 @@ class Classes implements IStrategy
             $this->saveRegularInvolvement($event, $classEntry, $regularStaff['externalId']);
         }
 
-//
-//        /* Save sis_class_user involvements
-//         * This is the student(s) and they're associated with all instances
-//         */
-//        if (!\count($enrolments['students'])) {
-//            $this->log->debug(sprintf(
-//                '%s: no students involved',
-//                $activityName
-//            ));
-//        } else {
-//            foreach ($enrolments['students'] as $externalId) {
-//                $this->saveStudentInvolvement($event, $classEntry, $externalId);
-//            }
-//        }
+        /* Save sis_class_user involvements
+         * This is the student(s) and they're associated with all instances
+         */
+        foreach ($subject['students'] as $student) {
+            $this->saveRegularInvolvement($event, $classEntry, $student['externalId']);
+        }
     }
 
 
