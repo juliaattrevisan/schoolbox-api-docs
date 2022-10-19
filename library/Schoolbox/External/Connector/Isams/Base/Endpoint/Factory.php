@@ -260,39 +260,39 @@ class Factory
         /* Purge previously-imported profile relationships and classes
          */
         return (new GenericCollection(IStrategy::class))
-//            ->add(new Profile\Prepare(
-//                $this->log,
-//                $this->perform,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
-//            ->add(new Profile\Profile(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $this->includePhoto,
-//                $photoDownloader,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper,
-//                $this->storageMapper
-//            ))
-//            ->add(new Profile\Cleanup(
-//                $this->log,
-//                $this->perform,
-//                $this->includePhoto,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper,
-//                $photoDownloader
-//            ))
+            ->add(new Profile\Prepare(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
+            ->add(new Profile\Profile(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->includePhoto,
+                $photoDownloader,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper,
+                $this->storageMapper
+            ))
+            ->add(new Profile\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->includePhoto,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper,
+                $photoDownloader
+            ))
             ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,
@@ -317,36 +317,6 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->eventMapper
-            ))
-//            ->add(new Timetable\Prepare(
-//                $this->log,
-//                $this->perform,
-//                $this->timetablePeriodMapper,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper
-//            ))
-//            ->add(new Timetable\Identifier(
-//                $this->log,
-//                $this->perform,
-//                $api
-//            ))
-//            ->add(new Timetable\Definition(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $this->timetableCycleMapper,
-//                $this->timetablePeriodMapper
-//            ))
-//            ->add(new Timetable\Classes(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $lookup,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper
-//            ))
-            ;
+            ));
     }
 }
