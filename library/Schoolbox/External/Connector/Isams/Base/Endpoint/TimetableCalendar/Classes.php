@@ -24,6 +24,12 @@ use Schoolbox\Mapper\Exception;
 class Classes implements IStrategy
 {
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $log;
+
+
+    /**
      * The "perform" flag from the cli tool
      *
      * @var bool
