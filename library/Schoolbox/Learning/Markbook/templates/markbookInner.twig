@@ -244,7 +244,7 @@
                                        class="meta"
                                        title="{{ participant.authoritativeFeedback(false) ? participant.authoritativeFeedback(false).comment : '' }}">{{ decorator.label(participant, false) }}</a>
                                 {% endif %}
-                                {% if participant.hasSubmittedResponse %}
+                                {% if participant.hasSubmittedResponse or participant.resubmissionRequired or participant.hasPublishedFeedback %}
                                     <span class="indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
                                 {% endif %}
                                 {% if not participant.plan.isDynamic %}
