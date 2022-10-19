@@ -116,7 +116,7 @@ onMounted(() => {
     store.toastEl = toastEl;
     store.showSetting = (props.showSetting === '1');
     store.groupStaffOnly = props.groupStaffOnly;
-    store.emailEnabled = props.emailEnabled;
+    store.emailEnabled = props.emailEnabled && Endpoints.SEND_EMAIL;
     checkForStorybook();
     store.loadData();
 });
