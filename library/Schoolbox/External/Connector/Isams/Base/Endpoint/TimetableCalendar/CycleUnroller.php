@@ -26,7 +26,7 @@ class CycleUnroller
     /**
      * We care about stuff that happens this many weeks after today
      */
-    private const FUTURE_THRESHOLD = 2;
+    private const FUTURE_THRESHOLD = 4;
 
 
     /**
