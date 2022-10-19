@@ -370,7 +370,7 @@ class Classes implements IStrategy
             $staff['externalId'],
         ));
 
-        $this->saveStaffInvolvement($event, $classEntry, $staff['externalId']);
+        $this->saveStaffInvolvement($event, $staff['externalId']);
 
         /* Also save a staff member's regular enrolment
          */
@@ -402,7 +402,6 @@ class Classes implements IStrategy
      * to have different teachers depending on their associated sis_event
      *
      * @param Model      $event
-     * @param ClassEntry $classEntry
      * @param string     $externalId
      * @return void
      * @throws Exception
@@ -411,14 +410,13 @@ class Classes implements IStrategy
      */
     private function saveStaffInvolvement(
         \Schoolbox\External\Event\Model $event,
-        ClassEntry $classEntry,
         string $externalId
     ): void {
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
          */
         $this->log->debug(sprintf(
-            'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+            'Creating new override involvements for %s in timetable event %s - %s, %s, %s-%s',
             $externalId,
             $event->getTitle(),
             $event->getDay(),
@@ -469,7 +467,7 @@ class Classes implements IStrategy
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
             $this->log->debug(sprintf(
-                'Reusing previous class involvement for %s in timetable event %s - %s, %s, %s-%s',
+                'Reusing previous regular class involvement for %s in timetable event %s - %s, %s, %s-%s',
                 $externalId,
                 $event->getTitle(),
                 $event->getDay(),
@@ -489,7 +487,7 @@ class Classes implements IStrategy
             $this->classInvolvements[$classEntry->getId()][$externalId] = true;
 
             $this->log->debug(sprintf(
-                'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+                'Creating new regular class involvement for %s in timetable event %s - %s, %s, %s-%s',
                 $externalId,
                 $event->getTitle(),
                 $event->getDay(),
