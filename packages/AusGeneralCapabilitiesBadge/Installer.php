@@ -15,7 +15,6 @@ use Schoolbox\User;
  */
 class Installer implements IPackageInstall
 {
-
     /**
      * The hardcoded source file for this importer
      */

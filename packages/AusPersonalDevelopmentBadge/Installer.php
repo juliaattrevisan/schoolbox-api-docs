@@ -16,7 +16,6 @@ use Schoolbox\User;
  */
 class Installer implements IPackageInstall
 {
-
     private const SOURCE_FILE = 'badge.csv';
 
     public function install(User $user): void

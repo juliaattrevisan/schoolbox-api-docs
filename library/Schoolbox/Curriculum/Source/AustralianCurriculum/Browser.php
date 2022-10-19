@@ -273,7 +273,7 @@ class Browser extends Source\BrowserAbstract
 
         // Set the timetable code if there is one
         if (isset($json->asn_statementNotation->literal)) {
-            $node->setCode($json->asn_statementNotation->literal);
+            $node->setCode(trim($json->asn_statementNotation->literal));
         }
         if (isset($json->dcterms_modified->literal)) {
             try {

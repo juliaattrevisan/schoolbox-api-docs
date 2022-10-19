@@ -12,7 +12,6 @@ use Schoolbox\User;
  */
 class Installer implements IPackageInstall
 {
-
     private const SOURCE_FILE = 'curriculum.csv';
 
     /**
@@ -35,7 +34,7 @@ class Installer implements IPackageInstall
             $node->setParent($row['curriculum_node_parent_id'] ? $parentLookup[$row['curriculum_node_parent_id']] : null);
             $node->setName($row['name']);
             $node->setDescription($row['description']);
-            $node->setCode($row['code']);
+            $node->setCode(trim($row['code']));
             $node->setOrder($row['order']);
 
             $curriculumMapper->save($node);
