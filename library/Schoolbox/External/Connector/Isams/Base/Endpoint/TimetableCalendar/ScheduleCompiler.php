@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 
-
 /**
  * Finds all the schedules that are relevant to the given $timetableDefinition
  * by collecting all the PeriodIds contained therein

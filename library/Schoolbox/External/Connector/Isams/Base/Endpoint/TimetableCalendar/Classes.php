@@ -71,8 +71,7 @@ class Classes implements IStrategy
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-
+        ClassInvolvementMapper $classInvolvementMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -251,7 +250,6 @@ class Classes implements IStrategy
         try {
             $event = $this->eventMapper->findOneByColumn('guid', $guid);
             $logPrefix = 'Reusing';
-
         } catch (\Schoolbox\Mapper\Exception $e) {
             $event = $this->eventMapper->createModel();
             $logPrefix = 'Creating';
