@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use SimpleXMLElement;
 
 /**
@@ -36,12 +37,28 @@ class CycleUnroller
 
 
     /**
+     * @var array
+     */
+    private array $api;
+
+
+    /**
+     * Constructor.
+     *
+     * @param array $api
+     */
+    public function __construct(array $api)
+    {
+        $this->api = $api;
+    }
+
+
+    /**
      * Convert a cyclic grid of xml nodes into a schedule equivalent
      *
-     * @param SimpleXMLElement $nodes
      * @return array
      */
-    public function unroll(SimpleXmlElement $nodes): array
+    public function unroll(): array
     {
         /* The current year. We won't care about other calendar years.
          */
@@ -68,7 +85,7 @@ class CycleUnroller
         $pastThreshold = max($currentWeek - self::PAST_THRESHOLD, 1);
         $futureThreshold = min($currentWeek + self::FUTURE_THRESHOLD, self::WEEKS_IN_YEAR);
 
-        $timetableAllocations = $nodes->xpath("/iSAMS/TimetableManager/TimetableAllocations/TimetableAllocation[ISOYear = {$year} and Week >= {$pastThreshold} and Week <= {$futureThreshold}]");
+        $timetableAllocations = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TimetableManager/TimetableAllocations/TimetableAllocation[ISOYear = {$year} and Week >= {$pastThreshold} and Week <= {$futureThreshold}]");
 
         /* For each of those nodes, find the WeekId that corresponds to that
          * particular week so we can start populating its Days and Periods
@@ -77,7 +94,7 @@ class CycleUnroller
          */
         foreach ($timetableAllocations as $timetableAllocation) {
             $weekId = (int)$timetableAllocation->TimetableWeekId;
-            $week = $nodes->xpath("/iSAMS/TimetableManager/Structure/Week[@Id='{$weekId}']")[0];
+            $week = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TimetableManager/Structure/Week[@Id='{$weekId}']")[0];
 
             /* The ISO Week number in this calendar year
              */

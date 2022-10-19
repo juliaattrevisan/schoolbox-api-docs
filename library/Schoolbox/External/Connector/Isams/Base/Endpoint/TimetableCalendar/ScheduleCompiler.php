@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+
+
 /**
  * Finds all the schedules that are relevant to the given $timetableDefinition
  * by collecting all the PeriodIds contained therein
@@ -16,9 +19,9 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 class ScheduleCompiler
 {
     /**
-     * @var \SimpleXMLElement
+     * @var array
      */
-    private \SimpleXMLElement $nodes;
+    private array $api;
 
 
     /**
@@ -32,12 +35,12 @@ class ScheduleCompiler
     /**
      * Constructor.
      *
-     * @param \SimpleXMLElement $nodes
-     * @param array             $timetableDefinition
+     * @param array $api
+     * @param array $timetableDefinition
      */
-    public function __construct(\SimpleXMLElement $nodes, array $timetableDefinition)
+    public function __construct(array $api, array $timetableDefinition)
     {
-        $this->nodes = $nodes;
+        $this->api = $api;
         $this->timetableDefinition = $timetableDefinition;
     }
 
@@ -53,7 +56,7 @@ class ScheduleCompiler
     {
         $periodIds = $this->findPeriodIds();
 
-        $publishedTimetables = $this->nodes->xpath('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
+        $publishedTimetables = $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
         $stack = [];
 
@@ -102,7 +105,7 @@ class ScheduleCompiler
      */
     public function findSubject(string $setCode): array
     {
-        $node = $this->nodes->xpath("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]")[0];
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]")[0];
 
         /* TODO There is a <Teachers> node here, but there's always been
          *  exactly one <Teacher> node contained inside. If multiple teachers
@@ -176,7 +179,7 @@ class ScheduleCompiler
      */
     private function findRoom(string $roomId): array
     {
-        $room = $this->nodes->xpath("/iSAMS/EstateManager/Buildings/Building/Classrooms/Classroom[@Id='{$roomId}']")[0] ?? null;
+        $room = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/EstateManager/Buildings/Building/Classrooms/Classroom[@Id='{$roomId}']")[0] ?? null;
 
         /* 494 room not found.
          */
@@ -222,7 +225,7 @@ class ScheduleCompiler
      */
     private function findScheduleStaff(string $userCode): array
     {
-        $node = $this->nodes->xpath("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$userCode}']]")[0] ?? null;
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$userCode}']]")[0] ?? null;
 
         /* Couldn't find this teacher
          */
@@ -258,7 +261,7 @@ class ScheduleCompiler
      */
     private function findSubjectStaff(string $id): array
     {
-        $node = $this->nodes->xpath("/iSAMS/HRManager/CurrentStaff/StaffMember[@Id='{$id}']")[0] ?? null;
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[@Id='{$id}']")[0] ?? null;
 
         /* Couldn't find this teacher
          */
@@ -294,7 +297,7 @@ class ScheduleCompiler
      */
     private function findSubjectStudents(string $setCode): array
     {
-        $node = $this->nodes->xpath("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
 
         /* Unknown subject: can't find it via its setCode
          */
@@ -310,12 +313,12 @@ class ScheduleCompiler
 
         /* Select all the SetList nodes where any of its SetId subnodes contains the value $setId exactly
          */
-        $setListNodes = $this->nodes->xpath("/iSAMS/TeachingManager/SetLists/SetList[SetId[text()='{$setId}']]");
+        $setListNodes = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[SetId[text()='{$setId}']]");
 
         foreach ($setListNodes as $current) {
             $studentId = trim((string)$current->xpath('@PupilId')[0]);
 
-            $student = $this->nodes->xpath("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+            $student = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
 
             /* Unknown student; can't find it via its studentId
              */
