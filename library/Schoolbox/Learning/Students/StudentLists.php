@@ -174,6 +174,7 @@ class StudentLists
         $lastVisit = $this->logMapper->lastVisit($this->folder, $user)->first();
 
         $studentSisRecord['id']                     = $user->getId();
+        $studentSisRecord['preferred']              = $user->getPreferredName();
         $studentSisRecord['email']                  = $user->getEmail();
         $studentSisRecord['lastAccessTime']         = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
         $studentSisRecord['learningMomentsEnabled'] = $user->getLearningMomentsEnabled();

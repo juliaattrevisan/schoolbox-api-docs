@@ -559,13 +559,13 @@ export default {
             </section>
 
             <template v-if="showSkeletonLoader">
-                <div v-for="n in 3" class="list-item" :key="n">
-                    <div class="small-12 card skeleton">
-                        <div class="img"></div>
-                        <h3></h3>
-                        <p class="meta"></p>
-                    </div>
-                </div>
+                    <div class="small-12">
+                        <table class="skeleton">
+                            <tr v-for="n in 6" :key="n">
+                                <td></td>
+                            </tr>
+                        </table>
+                   </div>
             </template>
 
             <template v-if="!showSkeletonLoader">
@@ -594,16 +594,16 @@ export default {
                         </td>
                         <td>
                             <img :src="'/portrait.php?id=' + student.id + '&size=square64'"
-                                 :alt="student.lastname + ', ' + student.firstname">
+                                 :alt="student.lastname + ', ' + student.firstname" >
                         </td>
                         <td>
                             <template v-if="student.id">
                                 <a :href="'/search/user/' + student.id">
-                                    {{ student.lastname + ', ' + student.firstname }}
+                                    {{ student.lastname + ', ' + student.firstname }} {{ student.preferred && student.preferred != student.firstname ? "‘" + student.preferred + "’" : '' }}
                                 </a>
                             </template>
                             <template v-else>
-                                {{ student.lastname + ', ' + student.firstname }}
+                                {{ student.lastname + ', ' + student.firstname }} {{ student.preferred && student.preferred != student.firstname ? "‘" + student.preferred + "’" : '' }}
                             </template>
 
                             <span class="meta">({{ student.synergy_id }})</span>
