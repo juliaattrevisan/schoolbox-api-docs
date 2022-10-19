@@ -308,6 +308,10 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $this->eventMapper,
+                $this->overridesMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
             ))
             ->add(new TimetableCalendar\Cleanup(
                 $this->log,
