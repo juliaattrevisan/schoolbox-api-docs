@@ -539,6 +539,6 @@ class TimetableUsers
             }
         }
 
-        return $this->eventMapper->findByColumn('id', $eventIds);
+        return $this->eventMapper->findWithCheapStaff($eventIds);
     }
 }
