@@ -233,7 +233,13 @@ class Classes implements IStrategy
         /* Fill in these vars as usual
          */
         $classCode = trim((string)$classData['code']);
-        $day = trim((string)$dayData['dayNumber']);
+
+        /* This seems to always be an int, so prefix it wtih a hardcoded "Day"
+         */
+        $day = 'Day ' . trim((string)$dayData['dayNumber']);
+
+        /* No descriptions available.
+         */
         $detail = null;
 
         /* Arbitrarily concoct a superkey to represent this instance
