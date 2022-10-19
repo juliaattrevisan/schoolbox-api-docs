@@ -499,6 +499,28 @@ class TimetableUsers
          *   manifest instead, but I was overridden
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            /* Some events might contain only overrides so if the struct
+             * never existed before, reinit it here
+             *
+             * Sometimes a class consists purely of overrides
+             * e.g. no students, just a non-regular teacher
+             * In that case $data['usuals'] is not set
+             */
+            if (!isset($stack[$row['eventId']])) {
+                $stack[$row['eventId']] = [
+                    'code' => $row['code'],
+                    'usuals' => [],
+                    /* A list of overrides index by event id since each event
+                     * has its own list of overrides
+                     */
+                    'overrides' => [],
+                    /* A list of people who survived all the mutations
+                     * and transformations in this algorithm
+                     */
+                    'manifest' => [],
+                ];
+            }
+
             $stack[$row['eventId']]['overrides'][] = [
                 'external_id' => $row['external_id'],
                 'action' => $row['action']
@@ -508,11 +530,7 @@ class TimetableUsers
         /* Perform mutations
          */
         foreach ($stack as $eventId => &$data) {
-            /* Sometimes a class consists purely of overrides
-             * e.g. no students, just a non-regular teacher
-             * In that case $data['usuals'] is not set
-             */
-            $data['manifest'] = (new Applicator($this->staffProfileMapper))->apply($data['usuals'] ?? [], $data['overrides']);
+            $data['manifest'] = (new Applicator($this->staffProfileMapper))->apply($data['usuals'], $data['overrides']);
 
             /* Only care about events the current user is in today
              */
