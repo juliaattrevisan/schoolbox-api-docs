@@ -32,13 +32,13 @@
             } only %}
         </div>
 
-        <section id="{{ reportContentId }}">
+        <div id="{{ reportContentId }}">
             <pastoral-class-report
                 get-report-data-route="{{ routeLookupIfAuthorized('pastoralClassReportModule.getReportDataForAllStudents', {folderId: folder.id, folder: folder}) }}"
                 :severity-enabled="{{ config.pastoral_severity ? 'true' : 'false' }}"
             >
             </pastoral-class-report>
-        </section>
+        </div>
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/pastoralClassReport.js?v={{ config.site_version }}"></script>
     </div>
 </div>

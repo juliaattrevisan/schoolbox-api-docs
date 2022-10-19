@@ -164,15 +164,15 @@ export default {
 </script>
 
 <template>
-    <section class="content">
-        <div v-if="showSkeletonLoader" class="loader">
-        </div>
+    <div v-if="showSkeletonLoader" class="loader">
+    </div>
 
-        <div v-else-if="data.length === 0" class="empty-state">
-            <i class="icon-class-list"></i>
-            <p>This class contains no students.</p>
-        </div>
-        <div v-else>
+    <div v-else-if="data.length === 0" class="empty-state">
+        <i class="icon-class-list"></i>
+        <p>Sorry, the system is unable to find any student in this class.</p>
+    </div>
+    <div v-else>
+        <section class="content">
             <div class="row">
                 <!-- sort options -->
                 <div class="small-6 no-pad columns">
@@ -259,10 +259,9 @@ export default {
                     </li>
                 </template>
             </ul>
-        </div>
-
-        <toast ref="toast"></toast>
-    </section>
+        </section>
+    </div>
+    <toast ref="toast"></toast>
 
 </template>
 
