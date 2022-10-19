@@ -68,6 +68,22 @@ class Classes implements IStrategy
 
 
     /**
+     * A list of classEntries that we saw previously
+     *
+     * @var array
+     */
+    private array $classEntries = [];
+
+
+    /**
+     * A list of classInvolvements that we saw previously
+     *
+     * @var array
+     */
+    private array $classInvolvements = [];
+
+
+    /**
      * Constructor.
      */
     public function __construct(
