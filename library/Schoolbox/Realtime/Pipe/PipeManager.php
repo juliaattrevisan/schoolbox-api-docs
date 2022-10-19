@@ -170,7 +170,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $pipe->close();
         } catch (SessionException $e) {
             // user not found, not logged in: signal authentication required
-            $this->log->notice('Failed to fully register pipe: ' . $e->getMessage(), [ 'exception' => $e ]);
+            $this->log->info('Failed to fully register pipe: ' . $e->getMessage(), [ 'exception' => $e ]);
 
             $this->sendHeader($pipe, 401);
             $this->pipes->unregisterPipe($pipe->getSocketKey());
