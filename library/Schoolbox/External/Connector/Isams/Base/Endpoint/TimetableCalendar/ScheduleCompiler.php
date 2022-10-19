@@ -180,7 +180,7 @@ class ScheduleCompiler
     {
         $room = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/EstateManager/Buildings/Building/Classrooms/Classroom[@Id='{$roomId}']")[0] ?? null;
 
-        /* 494 room not found.
+        /* 404 room not found.
          */
         if (null === $room) {
             return [
