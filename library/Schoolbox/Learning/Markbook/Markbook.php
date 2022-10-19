@@ -236,15 +236,7 @@ class Markbook
             // Check whether latest feedback is draft
             $statsHasDraft = false;
             foreach ($this->assessments as $assessment) {
-                if (!$assessment instanceof DueWork) {
-                    continue;
-                }
-                $participant = $assessment->getParticipantIfExtant($student);
-                if (!$participant || $participant->isExcluded()) {
-                    continue;
-                }
-                $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
-                if ($latestFeedback && $latestFeedback->isDraft()) {
+                if ($this->isMostRecentFeedbackDraft($assessment, $student)) {
                     $this->hasDraft[$assessment->getId()][$student->getId()] = true;
                     if (in_array($assessment->getId(), $visibleAssessmentIds)) {
                         $statsHasDraft = true;
@@ -282,6 +274,41 @@ class Markbook
             new Average()
         );
         $this->weightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->normalisedMean);
+    }
+
+    /**
+     * Is the most recent feedback on `$assessment` a draft?
+     * * Due work:   is the most recent feedback for `$student` a draft?
+     * * Project:    is any activity's most recent feedback for `$student` is a
+     *               draft?
+     * * All others: no
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return bool
+     */
+    private function isMostRecentFeedbackDraft(IAssessable $assessment, User $student): bool
+    {
+        $participant = $assessment->getParticipantIfExtant($student);
+        if (!$participant || $participant->isExcluded()) {
+            return false;
+        }
+
+        // If a due work:
+        if ($assessment instanceof DueWork) {
+            $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
+            return $latestFeedback && $latestFeedback->isDraft();
+        }
+
+        // If a project: check if any of the activities have a draft
+        if ($assessment instanceof Project) {
+            foreach ($assessment->getAssessables() as $activity) {
+                if ($this->isMostRecentFeedbackDraft($activity, $student)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
