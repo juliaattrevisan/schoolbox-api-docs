@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 
 use DebugBar\DebugBarException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Event\Model;
@@ -175,11 +176,12 @@ class Classes implements IStrategy
             /* Save sis_event record
              */
             $event = $this->createEvent($guidPrefix, $dayData, $periodData, $classData, $subject);
+
+            /* Save sis_class record
+             */
+            $classEntry = $this->createClassEntry($subject, $event);
         }
 
-//        /* Save sis_class record
-//         */
-//        $classEntry = $this->createClassEntry($activity, $event);
 //
 //        /* Save the involvements
 //         */
@@ -287,5 +289,47 @@ class Classes implements IStrategy
         }
 
         return $event;
+    }
+
+
+    /**
+     * Create (or reuse) a ClassEntry corresponding to $event
+     *
+     * @param array $subject
+     * @param Model $event
+     * @return ClassEntry
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function createClassEntry(array $subject, \Schoolbox\External\Event\Model $event): ClassEntry
+    {
+        /* Name is the same as the Code, in compass
+         */
+        $name = trim((string)$subject['name']);
+
+        /* Constraints in the schema are case insensitive, unlike
+         * these array keys - class codes sometimes appear like
+         * "Speech Therapy" and "Speech therapy" so inserting them
+         * twice will cause it to pack a sad. The classEntries array
+         * treats these as unique whereas the db didn't
+         */
+        $existingKey = strtolower($event->getCode());
+
+        if (isset($this->classEntries[$existingKey])) {
+            $classEntry = $this->classEntries[$existingKey];
+        } else {
+            $classEntry = $this->classEntryMapper->createModel()
+                ->setName($name)
+                ->setCode($name);
+
+            if ($this->perform) {
+                $this->classEntryMapper->save($classEntry);
+            }
+
+            $this->classEntries[strtolower($event->getCode())] = $classEntry;
+        }
+
+        return $classEntry;
     }
 }
