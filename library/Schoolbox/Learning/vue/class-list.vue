@@ -599,11 +599,11 @@ export default {
                         <td>
                             <template v-if="student.id">
                                 <a :href="'/search/user/' + student.id">
-                                    {{ student.lastname + ', ' + student.firstname }} {{ student.preferred && student.preferred != student.firstname ? "'" + student.preferred + "'" : '' }}
+                                    {{ student.lastname + ', ' + student.firstname }} {{ student.preferred && student.preferred != student.firstname ? "‘" + student.preferred + "’" : '' }}
                                 </a>
                             </template>
                             <template v-else>
-                                {{ student.lastname + ', ' + student.firstname }} {{ student.preferred && student.preferred != student.firstname ? "'" + student.preferred + "'" : '' }}
+                                {{ student.lastname + ', ' + student.firstname }} {{ student.preferred && student.preferred != student.firstname ? "‘" + student.preferred + "’" : '' }}
                             </template>
 
                             <span class="meta">({{ student.synergy_id }})</span>
