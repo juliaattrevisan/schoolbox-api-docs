@@ -513,16 +513,7 @@
                                 <div>
                                     <div class="grip"></div>
                                     <div class="card small-12 wrap-down">
-                                        <p>
-                                            Record Type
-                                            <span class="meta">
-                                                (
-                                                {%- for type in types -%}
-                                                    {{ type.name }}{% if not loop.last %}, {% endif %}
-                                                {%- endfor -%}
-                                                )
-                                            </span>
-                                        </p>
+                                        <p>Type</p>
                                     </div>
                                 </div>
                             </li>
@@ -531,16 +522,7 @@
                                 <div>
                                     <div class="grip"></div>
                                     <div class="card small-12 wrap-down">
-                                        <p>
-                                            Record Subtype
-                                            <span class="meta">
-                                                (
-                                                {%- for subtype in subTypes -%}
-                                                    {{ subtype.name }}{% if not loop.last %}, {% endif %}
-                                                {%- endfor -%}
-                                                )
-                                            </span>
-                                        </p>
+                                        <p>Sub-Type</p>
                                     </div>
                                 </div>
                             </li>
