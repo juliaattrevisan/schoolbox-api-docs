@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 
+use DebugBar\DebugBarException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
@@ -69,36 +70,42 @@ class Classes implements IStrategy
         foreach ($timetableDefinition as $weekId => $weekData) {
             foreach ($weekData['days'] as $day) {
                 foreach ($day['periods'] as $periodId => $periodData) {
-                    $this->processClass($schedules[$periodId]);
+                    $this->processClass($scheduleCompiler, $schedules[$periodId]);
                 }
             }
         }
     }
 
 
-    private function processClass(array $classes)
+    /**
+     * Process all the classes that occur on period $periodId
+     *
+     * @param ScheduleCompiler $scheduleCompiler
+     * @param array            $classes
+     * @return void
+     */
+    private function processClass(ScheduleCompiler $scheduleCompiler, array $classes): void
     {
-//        $classes = $schedules[$periodId];
-//
-//
-//        /* This is all the subjects occurring on this particular period
-//         * in the timetable
-//         */
-//        $subjects = [];
-//
-//        foreach ($classes['schedule'] as $scheduleId => $classData) {
-//            $subjects[] = $scheduleCompiler->findSubject($classData['code']);
-//        }
-//
-//        /* Process detailed data procedurally, saving on a mega-preload
-//         * of the timetable struct in its most detailed format
-//         *
-//         * * create classEntry
-//         * * create regular staff involvement
-//         * * create overrides for subby teachers
-//         * * create regular student involvements
-//         * * shank it into suds town
-//         */
-//        new \Alaress_Probe($classes, $subjects);
+        /* This is all the subjects occurring on this particular period
+         * in the timetable
+         */
+        $subjects = [];
+
+        foreach ($classes['schedule'] as $scheduleId => $classData) {
+            $subjects[] = $scheduleCompiler->findSubject($classData['code']);
+        }
+
+        print_r($classes);
+        print_r($subjects);
+        die();
+        /* Process detailed data procedurally, saving on a mega-preload
+         * of the timetable struct in its most detailed format
+         *
+         * * create classEntry
+         * * create regular staff involvement
+         * * create overrides for subby teachers
+         * * create regular student involvements
+         * * shank it into suds town
+         */
     }
 }
