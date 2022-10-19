@@ -508,7 +508,11 @@ class TimetableUsers
         /* Perform mutations
          */
         foreach ($stack as $eventId => &$data) {
-            $data['manifest'] = (new Applicator($this->staffProfileMapper))->apply($data['usuals'], $data['overrides']);
+            /* Sometimes a class consists purely of overrides
+             * e.g. no students, just a non-regular teacher
+             * In that case $data['usuals'] is not set
+             */
+            $data['manifest'] = (new Applicator($this->staffProfileMapper))->apply($data['usuals'] ?? [], $data['overrides']);
 
             /* Only care about events the current user is in today
              */
