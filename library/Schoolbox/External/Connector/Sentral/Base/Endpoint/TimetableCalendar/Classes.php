@@ -262,7 +262,6 @@ class Classes implements IStrategy
         /* Consume everything inside this payload
          */
         foreach ($payload['data'] as $class) {
-
             $this->processClass($class, $data);
         }
     }

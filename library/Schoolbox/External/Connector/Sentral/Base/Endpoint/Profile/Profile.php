@@ -257,7 +257,10 @@ class Profile implements IStrategy
                     $student['relationships']['person']['data']['attributes']['givenNames']
                 ]);
 
-                $firstnamePreferred = trim((string)$student['relationships']['person']['data']['attributes']['preferredName']);
+                $firstnamePreferred = (new FirstMeaningfulValue())->find([
+                    $student['relationships']['person']['data']['attributes']['preferredName'],
+                    $firstname
+                ]);
 
                 $form = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['rollClass'];
                 $gender = (string)$student['relationships']['person']['data']['attributes']['gender'];
@@ -969,7 +972,10 @@ class Profile implements IStrategy
                 $parent['data']['attributes']['givenNames']
             ]);
 
-            $firstnamePreferred = trim((string)$parent['data']['attributes']['preferredName']);
+            $firstnamePreferred = (new FirstMeaningfulValue())->find([
+                $parent['data']['attributes']['preferredName'],
+                $firstname
+            ]);
 
             $lastname = (string)$parent['data']['attributes']['lastName'];
             $phoneHome = $numbers[self::HOME_TELEPHONE_NUMBER] ?? '';
@@ -1036,6 +1042,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it
@@ -1125,7 +1132,10 @@ class Profile implements IStrategy
                     $staff['relationships']['person']['data']['attributes']['givenNames']
                 ]);
 
-                $firstnamePreferred = trim((string)$staff['relationships']['person']['data']['attributes']['preferredName']);
+                $firstnamePreferred = (new FirstMeaningfulValue())->find([
+                    $staff['relationships']['person']['data']['attributes']['preferredName'],
+                    $firstname
+                ]);
 
                 $building = '';
                 $campusName = '';
@@ -1229,6 +1239,7 @@ class Profile implements IStrategy
                     ->setExternalId($externalId)
                     ->setTitle($title)
                     ->setFirstname($firstname)
+                    ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
 
                 /* Then save it
