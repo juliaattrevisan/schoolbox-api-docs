@@ -14,6 +14,8 @@ use Alaress\Async\AMQP\AMQPExchange;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Connection\Heartbeat\PCNTLHeartbeatSender;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
 
@@ -38,6 +40,16 @@ class Connector extends AMQPConnector
     const PRIMARY_EXCHANGE = 'sb.%s.tx';
     const PRIMARY_TYPE     = 'topic';
 
+    /**
+     * AMQP connection options.
+     *
+     * Currently, just set the heartbeat to 15s: however this could be made
+     * configurable if desired.
+     */
+    private const AMQP_CONNECTION_OPTIONS = [
+        'heartbeat' => 15
+    ];
+
     /** @var IConfigLoader */
     protected $conf;
 
@@ -60,13 +72,26 @@ class Connector extends AMQPConnector
     protected function connect()
     {
         if (!$this->conn instanceof AMQPStreamConnection) {
-            $this->conn = new AMQPStreamConnection(
-                $this->conf->get('amqp_host'),
-                $this->conf->get('amqp_port'),
-                $this->conf->get('amqp_user'),
-                $this->conf->get('amqp_pass'),
-                $this->conf->get('amqp_vhost')
+            $this->conn = AMQPStreamConnection::create_connection(
+                [
+                    [
+                        'host'     => $this->conf->get('amqp_host'),
+                        'port'     => $this->conf->get('amqp_port'),
+                        'user'     => $this->conf->get('amqp_user'),
+                        'password' => $this->conf->get('amqp_pass'),
+                        'vhost'    => $this->conf->get('amqp_vhost'),
+                    ],
+                ],
+                self::AMQP_CONNECTION_OPTIONS,
             );
+
+            try {
+                $heartbeat = new PCNTLHeartbeatSender($this->conn);
+            } catch (AMQPRuntimeException) {
+                // pcntl isn't enabled in web requests: noop
+                return;
+            }
+            $heartbeat->register();
         }
     }
 
