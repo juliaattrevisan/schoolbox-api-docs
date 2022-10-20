@@ -1304,10 +1304,15 @@ class Controller extends Base
     {
         // Base Case:
         if ($segment->isSimple()) {
-            return
-                $this->access->getAccessLevel($user, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
-                $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
-                Access::getInstance()->getFolderAccess($user, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ;
+            try {
+                return (
+                    $this->access->getAccessLevel($user, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
+                    $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
+                    Access::getInstance()->getFolderAccess($user, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ
+                );
+            } catch (MapperException\Deleted) {
+                return false;
+            }
         }
 
         // Recursive Case:

@@ -26,6 +26,7 @@ use Schoolbox\Resource\Folder\NNIAN;
 use Schoolbox\User;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use External_UserInterface;
@@ -195,7 +196,12 @@ class Folder extends SimpleStrategy
         if (null === $entityValue) {
             return false;
         }
-        return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE;
+
+        try {
+            return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE;
+        } catch (MapperException\Deleted) {
+            return false;
+        }
     }
 
 
