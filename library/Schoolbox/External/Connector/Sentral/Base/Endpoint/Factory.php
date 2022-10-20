@@ -269,6 +269,7 @@ class Factory
                 $api,
                 $registry,
                 $this->eventMapper,
+                $this->overridesMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $from,
