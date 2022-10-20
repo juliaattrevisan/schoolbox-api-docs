@@ -154,9 +154,10 @@
             picker.setVisible(true);
 
             if (config.containerID) { //if it exists, add it into the empty containerId element and ensure it sits at the top left
-                picker.$.style.left = '0px';
-                picker.$.style.top = '0px';
-                $(config.containerID).append(picker.$);
+                picker.De.style.left = '0px';
+                picker.De.style.top = '0px';
+                picker.De.style.width = '100%'; //ensure it sits within the boundaries of the parent modal
+                $(config.containerID).append(picker.De);
             }
 
             /* Shut google modal when we shut our modal
