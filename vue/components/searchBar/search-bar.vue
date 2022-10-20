@@ -74,7 +74,7 @@ export default {
 
         /**
          * Display the search results
-         * 
+         *
          * @param { Event }
          */
         onFocusOver (event) {
@@ -110,7 +110,7 @@ export default {
 
         /**
          * To a new browser page
-         * 
+         *
          * @param { String }
          */
         goToPath (path) {
@@ -118,7 +118,7 @@ export default {
         },
 
         /**
-         * Submit the current query, using underscore.js _debounce to accommodate for key presses 
+         * Submit the current query, using underscore.js _debounce to accommodate for key presses
          * so not sending on every key press
          */
         filterResults: debounce(function () {
@@ -136,7 +136,7 @@ export default {
 
         /**
          * To display the users portrait image
-         * 
+         *
          * @param { String }
          *
          * @returns { String }
@@ -169,7 +169,7 @@ export default {
                @focusout="isFocused=false"
                maxlength="2048"
         />
-        <ul class="results information-list" v-show="isFocused && isOpen">
+        <ul class="results information-list" v-show="isFocused && isOpen && keyword.length >= minKeywordLength">
             <li class="result-meta" v-if="results.length && results.length !== totalCount" @click.prevent>
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
