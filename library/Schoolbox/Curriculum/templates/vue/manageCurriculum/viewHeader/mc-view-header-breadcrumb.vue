@@ -27,7 +27,7 @@ const props = defineProps({
 });
 
 const viewNodesStore = useViewNodesStore();
-const maxNameLength = 100;
+const maxNameLength = 50;
 
 /**
  * to display the just selected node
