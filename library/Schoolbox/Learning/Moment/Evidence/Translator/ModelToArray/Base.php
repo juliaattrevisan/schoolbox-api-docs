@@ -98,8 +98,8 @@ class Base
             'storage'          => $model->getStorage()
                 ? call_user_func($this->storageTranslator, $model->getStorage())
                 : null,
-            'curriculumNodes' => $model->getCurriculumNodes()
-                ? $model->getCurriculumNodes()
+            'curriculumNodes' => $model->getViewableCurriculumNodes()
+                ? $model->getViewableCurriculumNodes()
                         ->map(
                             static function (Node\Model $node) {
                                 return [
