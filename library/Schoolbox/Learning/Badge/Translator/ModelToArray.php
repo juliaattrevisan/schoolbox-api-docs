@@ -111,7 +111,7 @@ class ModelToArray
         }
 
         try {
-            $curriculumNodes = $model->getCurriculumNodes();
+            $curriculumNodes = $model->getViewableCurriculumNodes();
         } catch (Error $e) {
             $curriculumNodes = null;
         }
