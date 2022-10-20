@@ -158,6 +158,16 @@
                 picker.De.style.top = '0px';
                 picker.De.style.width = '100%'; //ensure it sits within the boundaries of the parent modal
                 $(config.containerID).append(picker.De);
+                window.addEventListener('resize', () => resizeGooglePicker());
+            }
+
+            /**
+             * Google has its own resize listener, so we need to overwrite it to
+             * ensure the picker stays within the boundaries of the modal its
+             * been added to
+             */
+            function resizeGooglePicker () {
+                picker.De.style.width = '100%';
             }
 
             /* Shut google modal when we shut our modal
@@ -199,6 +209,7 @@
             });
             return views;
         }
+
 
         /**
          * Asynchronously execute this whenever you pick a file in the modal
