@@ -305,7 +305,7 @@ class Controller extends Base
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
             'isCreate'                 => false,
             'momentType'               => $momentType,
-            'curriculumCodes'          => $evidence->getCurriculumNodes()?->reindex(),
+            'curriculumCodes'          => $evidence->getViewableCurriculumNodes()?->reindex(),
         ];
         $zone       = $this->buildAttachzone($momentType);
         if ($evidence->getStorage()) {

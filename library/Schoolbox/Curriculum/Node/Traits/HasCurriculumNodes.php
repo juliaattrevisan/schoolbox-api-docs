@@ -43,4 +43,22 @@ trait HasCurriculumNodes
         $this->curriculumNodes = $curriculumNodes;
         return $this;
     }
+
+    /**
+     * Returns just the Curriculum nodes that do not have an empty code.
+     * usually these are parent objects, or titles
+     * @return Collection|Model[]
+     */
+    public function getViewableCurriculumNodes()
+    {
+        return $this->curriculumNodes->filter(
+            function ($node) {
+                if ($node->getCode() !== '') {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        );
+    }
 }
