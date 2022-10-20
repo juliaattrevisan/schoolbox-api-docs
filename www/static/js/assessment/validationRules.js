@@ -138,13 +138,18 @@ function attachValidationRules() {
         });
 
         $("[data-group-max-value]").each(function() {
-            $(this).rules("add", {
-                required: true,
-                number: true,
-                messages: {
-                    number: "Please enter a numeric value"
-                }
-            });
+            //don't check if the input is hidden
+            if(this.classList.contains('hide')) {
+                $(this).rules("remove", "required");
+            } else {
+                $(this).rules("add", {
+                    required: true,
+                    number: true,
+                    messages: {
+                        number: "Please enter a numeric value"
+                    }
+                });
+            }
         });
     }
 }
