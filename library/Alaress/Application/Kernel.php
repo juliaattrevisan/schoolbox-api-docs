@@ -474,9 +474,16 @@ abstract class Kernel
             )
         );
 
-        $di->set('amqp', $di->lazy(function () {
-            return new Connector([], []);
-        }));
+        $di->set(
+            'amqp',
+            $di->lazyNew(
+                Connector::class,
+                [
+                    'settings'          => [],
+                    'connectionOptions' => [],
+                ],
+            ),
+        );
 
         $di->set('instance', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */

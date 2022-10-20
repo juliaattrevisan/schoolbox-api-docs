@@ -133,9 +133,16 @@ class Kernel extends WebKernelAbstract
             )
         );
 
-        $di->set('amqp', $di->lazy(function () {
-            return Connector::getInstance();
-        }));
+        $di->set(
+            'amqp',
+            $di->lazyNew(
+                Connector::class,
+                [
+                    'settings'          => [],
+                    'connectionOptions' => [],
+                ],
+            ),
+        );
 
         $di->set('instance', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */

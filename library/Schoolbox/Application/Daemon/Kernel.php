@@ -379,13 +379,14 @@ EOL;
         // Override AMQP connection with one with a heartbeat
         $di->set(
             'amqp',
-            $di->lazy(
-                function () {
-                    return new Connector(
-                        [],
-                        [Connector::AMQP_CONNECTION_OPTION_HEARTBEAT => 15,],
-                    );
-                }
+            $di->lazyNew(
+                Connector::class,
+                [
+                    'settings'          => [],
+                    'connectionOptions' => [
+                        Connector::AMQP_CONNECTION_OPTION_HEARTBEAT => 15,
+                    ],
+                ],
             ),
         );
 
