@@ -483,7 +483,7 @@ class Classes implements IStrategy
          *
          * Save whoever's teaching this thing on this particular occasion
          */
-        if (Profile::TYPE_STAFF === $data['person']['type']) {
+        if (Profile::TYPE_STAFF === $person['type']) {
             $this->saveStaffInvolvement($event, $classEntry, $person['externalId']);
         }
     }
