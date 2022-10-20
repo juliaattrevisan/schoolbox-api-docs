@@ -74,7 +74,12 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
         } else {
             $this->setBlock('podcast', 'podcast_list', 'podcast_list_block');
             $this->setBlock('podcast', 'default_podcast', 'default_podcast_block');
-            $this->setVar('empty_state_block', '');
+            $this->setVar(
+                [
+                    'podcast_list_block'    => '',
+                    'empty_state_block'     => '',
+                ]
+            );
 
             // Podcasts from xml feed
             $j = 0;
