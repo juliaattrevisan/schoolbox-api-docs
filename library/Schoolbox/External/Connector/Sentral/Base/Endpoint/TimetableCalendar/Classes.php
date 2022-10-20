@@ -424,7 +424,7 @@ class Classes implements IStrategy
      */
     private function createClassEntry(array $class, \Schoolbox\External\Event\Model $event): ClassEntry
     {
-        $subjectName= trim((string)$class['attributes']['subject']);
+        $subjectName = trim((string)$class['attributes']['subject']);
         $classCode = trim((string)$class['attributes']['className']);
 
         /* Constraints in the schema are case insensitive, unlike
