@@ -855,6 +855,14 @@ interface IAssessable extends ISoftDeletable
     public function setCurriculumNodes(GenericCollection $curriculumNodes): self;
 
     /**
+     * Returns just the Curriculum nodes that do not have an empty code.
+     * usually these are parent objects, or titles
+     *
+     * @return Node\Model[]|GenericCollection
+     */
+    public function getViewableCurriculumNodes(): GenericCollection;
+
+    /**
      * Created date
      *
      * @return \Alaress_Date_Format

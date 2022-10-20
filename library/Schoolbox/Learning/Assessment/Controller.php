@@ -223,7 +223,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         /* Curriculum Codes prefilled from those associated with context folder
          */
-        $data['curriculumNodes'] = $context->getFolder()->getCurriculumNodes();
+        $data['curriculumNodes'] = $context->getFolder()->getViewableCurriculumNodes();
 
         /* Default Visibility comes from an LMS Policy setting in config
          */
@@ -283,8 +283,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['returnUrl'] = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
         /* Curriculum Codes prefilled from those associated with the assessment itself
+         hide nodes with no codes
          */
-        $data['curriculumNodes'] = $assessment->getCurriculumNodes();
+        $data['curriculumNodes'] = $assessment->getViewableCurriculumNodes()->reindex();
 
         $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
         $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');

@@ -21,12 +21,12 @@ trait HasCurriculumNodes
     /**
      * A collection of CurriculumNode instances
      *
-     * @var Collection|Model[]
+     * @var Collection|Model[]|null
      */
     protected $curriculumNodes;
 
     /**
-     * @return Collection|Model[]
+     * @return Collection|Model[]|null
      */
     public function getCurriculumNodes()
     {
@@ -42,5 +42,23 @@ trait HasCurriculumNodes
     {
         $this->curriculumNodes = $curriculumNodes;
         return $this;
+    }
+
+    /**
+     * Returns just the Curriculum nodes that do not have an empty code.
+     * usually these are parent objects, or titles
+     * @return Collection|Model[]|null
+     */
+    public function getViewableCurriculumNodes()
+    {
+        return $this->curriculumNodes?->filter(
+            function ($node) {
+                if ($node->getCode() !== '') {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        );
     }
 }

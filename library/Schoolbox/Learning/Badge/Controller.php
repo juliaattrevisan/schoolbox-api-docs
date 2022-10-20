@@ -373,7 +373,7 @@ class Controller extends Base
             }
         );
 
-        $curriculumCodes = $badge->getCurriculumNodes()?->reindex();
+        $curriculumCodes = $badge->getViewableCurriculumNodes()?->reindex();
         $this->response->content->set($this->buildHtmlOutput('@learningBadge/createUpdateForm.twig', [
             'badge' => $badge,
             'curriculumCodes' => $curriculumCodes,

@@ -1244,6 +1244,26 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * Returns just the Curriculum nodes that do not have an empty code.
+     * usually these are parent objects, or titles
+     *
+     * @return Node\Model[]|GenericCollection
+     */
+    public function getViewableCurriculumNodes(): GenericCollection
+    {
+        return $this->curriculumNodes->filter(
+            function ($node) {
+                if ($node->getCode() !== '') {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        );
+    }
+
+
+    /**
      * @return Plan[]|GenericCollection
      */
     public function getPlans(): GenericCollection

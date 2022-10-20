@@ -260,6 +260,24 @@ class Model implements ISoftDeletable, IThreadLocation
 
 
     /**
+     * Returns just the Curriculum nodes that do not have an empty code.
+     * usually these are parent objects, or titles
+     *
+     * @return GenericCollection|null
+     */
+    public function getViewableCurriculumNodes(): ?GenericCollection
+    {
+        return $this->curriculumNodes?->filter(
+            function ($node) {
+                if ($node->getCode() !== '') {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        );
+    }
+    /**
      * @return GenericCollection|null
      */
     public function getTags(): ?GenericCollection
