@@ -44,7 +44,7 @@ so if there are bullet points in the textbox they count as 3 characters, and wil
             {% endif %}
             {% set codeList = [] %}
             {% if criterion is not null %}
-                {% set codeList = criterion.curriculumNodes %}
+                {% set codeList = criterion.getViewableCurriculumNodes.reindex %}
             {% endif %}
             <div data-cs-container>
                 <curriculum-selector
