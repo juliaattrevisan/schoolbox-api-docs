@@ -48,7 +48,7 @@ export const useNodesStore = defineStore(`csNodes`, {
          async load () {
             const store = useStore();
             try {
-                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1&descendants=1`);
+                const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1&descendants=1&limit=50`);
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     await this.setTopLevel(topLevelNodes);
@@ -86,7 +86,7 @@ export const useNodesStore = defineStore(`csNodes`, {
         async loadChildren (id) {
             try {
                 this.isLoading = true;
-                const response = await fetch(`${apiEndpoint}/${id}?descendants=2`); //we go two levels deep so we can check for children on two levels
+                const response = await fetch(`${apiEndpoint}/${id}?descendants=2&limit=50`); //we go two levels deep so we can check for children on two levels
                 if (response.ok) {
                     const newNode = await response.json();
                     const newNodeChildrenEnabled = newNode.children.filter((node) => (node.enabled)); //only show those nodes with children enabled, this can be handled with enabled=1 on just topLevelOnly
