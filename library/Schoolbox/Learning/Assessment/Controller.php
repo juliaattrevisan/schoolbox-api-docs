@@ -285,7 +285,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* Curriculum Codes prefilled from those associated with the assessment itself
          hide nodes with no codes
          */
-        $data['curriculumNodes'] = $assessment->getViewableCurriculumNodes();
+        $data['curriculumNodes'] = $assessment->getViewableCurriculumNodes()->reindex();
 
         $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
         $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
