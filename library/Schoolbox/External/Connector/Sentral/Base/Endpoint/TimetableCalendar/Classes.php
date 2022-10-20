@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\TimetableCalendar;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Profile;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
@@ -296,7 +297,7 @@ class Classes implements IStrategy
                     ->setType(trim((string)$class['attributes']['classType']))
                     ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
                     ->setGuid(trim((string)$class['id']))
-                    ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
+                    ->setSource(Factory::SOURCE_NAME);
 
                 if ($this->perform) {
                     $this->eventMapper->save($event);
