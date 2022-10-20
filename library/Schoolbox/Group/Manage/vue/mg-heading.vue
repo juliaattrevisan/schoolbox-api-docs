@@ -70,17 +70,17 @@ function onDisbandSelected () {
         <div class="list-item small-12 columns">
             <h1>Manage Group</h1>
         </div>
-        <nav v-if="store.hasLoadedOk">
+        <nav v-if="store.hasLoadedOk && settingsStore.isAccessSaved">
             <a href="#expand" class="icon-more" data-dropdown="tab-control" title="Actions"></a>
         </nav>
         <ul id="tab-control" class="f-dropdown" data-dropdown-content>
             <li>
                 <a href="#update-group-settings" class="icon-settings" id="updateGroupSettings" @click.prevent="onUpdateSettingsSelected">Update Group Settings</a>
             </li>
-            <li v-if="store.emailEnabled && Endpoints.SEND_EMAIL != '' && membersStore.hasGroupMembers"><!-- NOTE: Endpoints.SEND_EMAIL will be blank if the route is not authorised for the user -->
+            <li v-if="store.emailEnabled && membersStore.hasGroupMembers">
                 <a href="#email-group-members" class="icon-email" id="emailAllGroup" @click.prevent="onEmailGroupSelected">Email Group Members</a>
             </li>
-            <li v-if="store.emailEnabled && Endpoints.SEND_EMAIL != '' && membersStore.hasGroupMembers"><!-- NOTE: Endpoints.SEND_EMAIL will be blank if the route is not authorised for the user -->
+            <li v-if="store.emailEnabled && membersStore.hasGroupMembers">
                 <a href="#email-group-parents" class="icon-staff" id="emailAllParents" title="Includes parents of students in the group, as well as parents directly in the group." @click.prevent="onEmailGroupParentsSelected">Email Group Parents</a>
             </li>
             <li>

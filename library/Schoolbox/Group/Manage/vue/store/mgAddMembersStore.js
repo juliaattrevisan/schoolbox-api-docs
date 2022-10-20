@@ -6,6 +6,7 @@ import { defineStore } from 'pinia';
 import { useStore } from './manageGroupStore';
 import { useMembersStore } from './mgMembersStore';
 import { useSearchStore } from './mgSearchStore';
+import { useSettingsStore } from './mgSettingsStore';
 import Endpoints from '../mgEndpoints';
 import FromTypes from '../addMembers/mgAddMembersFromTypes';
 
@@ -25,6 +26,8 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
         async add () {
             this.isProcessing = true;
             const store = useStore();
+            // refresh whole page after adding users, if current folder is not a group
+            const reload = !useSettingsStore().isAccessSaved;
             store.isProcessing = true;
             try {
                 const response = await fetch(Endpoints.ADD_MEMBERS, {
@@ -35,7 +38,9 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
                     body: getFormData(),
                 });
                 const responseJson = await response.json();
-                if (response.ok) {
+                if (response.ok && reload) {
+                    location.reload();
+                } else if (response.ok) {
                     const newMembers = responseJson.newMembers.map((newMember) => { //add in some additional properties
                         return {
                             ...newMember,

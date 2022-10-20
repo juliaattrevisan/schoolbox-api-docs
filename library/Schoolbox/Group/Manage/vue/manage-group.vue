@@ -116,7 +116,8 @@ onMounted(() => {
     store.toastEl = toastEl;
     store.showSetting = (props.showSetting === '1');
     store.groupStaffOnly = props.groupStaffOnly;
-    store.emailEnabled = props.emailEnabled;
+    // NOTE: Endpoints.SEND_EMAIL will be blank if the route is not authorised for the user
+    store.emailEnabled = props.emailEnabled && Endpoints.SEND_EMAIL;
     checkForStorybook();
     store.loadData();
 });
