@@ -27,6 +27,8 @@ export default {
          */
         async saveRows_onSaveSelected () {
             try {
+                $('button.sp-choose').click(); // First close any open colour selectors by auto-clicking 'choose'.
+
                 this.saveRows_isProcessing = true;
                 this.saveRows_saveStatus = 'Saving...';
                 this.$refs.toast.activate(this.saveRows_saveStatus);
