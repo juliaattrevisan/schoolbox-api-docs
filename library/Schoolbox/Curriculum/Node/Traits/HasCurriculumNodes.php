@@ -51,7 +51,7 @@ trait HasCurriculumNodes
      */
     public function getViewableCurriculumNodes()
     {
-        return $this->curriculumNodes->filter(
+        return $this->curriculumNodes?->filter(
             function ($node) {
                 if ($node->getCode() !== '') {
                     return true;
