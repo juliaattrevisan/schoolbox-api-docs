@@ -30,13 +30,6 @@ class CycleUnroller
 
 
     /**
-     * Number of weeks in a year
-     * Canonically, 52
-     */
-    private const WEEKS_IN_YEAR = 52;
-
-
-    /**
      * @var array
      */
     private array $api;
@@ -82,9 +75,17 @@ class CycleUnroller
          */
         $currentWeek = (int)\Alaress_Date_Format::now()->getUsingFormat('W');
 
-        $pastThreshold = max($currentWeek - self::PAST_THRESHOLD, 1);
-        $futureThreshold = min($currentWeek + self::FUTURE_THRESHOLD, self::WEEKS_IN_YEAR);
+        /* It turns out that sometimes you can have 53 weeks in a year
+         */
+        $weeksInYear = (new \DateTime("December 28th, {$year}"))->format('W');
 
+        /* Calculate bounds somewhat crudely
+         */
+        $pastThreshold = max($currentWeek - self::PAST_THRESHOLD, 1);
+        $futureThreshold = min($currentWeek + self::FUTURE_THRESHOLD, $weeksInYear);
+
+        /* Find all TimetableAllocations within these bounds
+         */
         $timetableAllocations = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TimetableManager/TimetableAllocations/TimetableAllocation[ISOYear = {$year} and Week >= {$pastThreshold} and Week <= {$futureThreshold}]");
 
         /* For each of those nodes, find the WeekId that corresponds to that
