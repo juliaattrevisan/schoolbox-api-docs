@@ -9,6 +9,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Async\Stomp\IAckResolver;
 use Alaress\Async\Stomp\IClient;
 use Alaress\Async\Stomp\IFrame;
@@ -88,7 +89,8 @@ $loop  = $kernel->getDependencyInjector()->values['react.loop'];
 /** @var IClient $stomp */
 $stomp = $kernel->getDependencyInjector()->get('stomp');
 
-$amqpConn = \Schoolbox\Notif\MQ\Connector::getInstance();
+/** @var AMQPConnector $amqpConn */
+$amqpConn = $kernel->getDependencyInjector()->get('amqp');
 $amqpConn->declareQueue(INSTANCE_ID . '.sb.reviewsched');
 $amqpConn->bindQueue(INSTANCE_ID . '.sb.reviewsched', 'deadmessage');
 $amqpConn->closeConnection();
@@ -276,7 +278,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
         /** @var Redis|ClientInterface $redis */
         $redis = $di->get('redis.storage');
 
-        $amqp  = Connector::getInstance();
+        $amqp  = $di->get('amqp');
 
         $splitter = new Splitter(new NotifierInflector(new Configurator($di)), new TriggerFactoryFactory(true));
 
