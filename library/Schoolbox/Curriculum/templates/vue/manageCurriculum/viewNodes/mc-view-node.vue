@@ -10,7 +10,7 @@ import { gsap } from 'gsap/all';
 import { timeout } from '@js/util/jsUtils';
 import { slideDownOnEnter, slideUpOnLeave } from '@schoolboxVue/transitions/transitions';
 import { useStore } from '../store/manageCurriculumStore';
-import { UNSET_ID } from '../../../js/nodeUtils';
+import { UNSET_ID } from '@schoolboxCurriculum/js/nodeUtils';
 import { useViewNodesStore, DIRECTION } from './store/mcViewNodesStore';
 import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
 import { useAddCurriculumStore } from '../store/mcAddCurriculumStore';

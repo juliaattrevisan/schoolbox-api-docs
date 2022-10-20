@@ -4,7 +4,7 @@
         <h3>
             {% if node.code %}
                 {% if isRouteAuthorized('curriculum.browse') %}
-                    [<a title="View in curriculum browser" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
+                    [<a title="View in Manage Curriculum" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
                 {% else %}
                     [{{ node.code }}]
                 {% endif %}

@@ -16,6 +16,7 @@
     {% if USER.role.isStaff %}
         <li class="icon-progress">Mark calculated as {{ assessment.summator.title }}</li>
     {% endif %}
+    {% include '@learning/fragments/meta/curriculumCodes.twig' %}
     {# joining student name with lastView data #}
     {% if student is defined and student.id != USER.id %}
         <li class="icon-staff-students" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}">

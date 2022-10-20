@@ -2,14 +2,18 @@
 
 import Toast from '@schoolboxVue/components/toast';
 import RevealModal from '@schoolboxVue/components/reveal-modal';
+import SequentialRevealModal from '@schoolboxVue/components/sequential-reveal-modal';
 import BadgeAward from '../Award/vue/badgeAward';
 import BadgeDetail from './badgeDetail';
+import NodeDetails from '@schoolboxCurriculum/vue/node-details';
 import BadgeAchievementWithdrawModal from '../Award/vue/badge-achievement-withdraw-modal';
 import BadgeGoalWithdrawModal from '../Award/vue/badge-goal-withdraw-modal';
 import BadgeImage from './badge-image';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import mixinFilter from '@schoolboxVue/mixins/filter';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
+
 
 export default {
     /**
@@ -27,10 +31,12 @@ export default {
         RelativeTime,
         BadgeAward,
         BadgeDetail,
+        NodeDetails,
         BadgeAchievementWithdrawModal,
         BadgeGoalWithdrawModal,
         BadgeImage,
         RevealModal,
+        SequentialRevealModal,
         Toast
     },
 
@@ -77,6 +83,9 @@ export default {
             isModalOpen: false,
             showSkeletonLoader: true,
             selectedFilters: null,
+            isDetailModalOpen: false, //whether the modal to display the badge details is open
+            selectedNodeDetails: getEmptyNode(), //the selected curriculum code to display further details for
+            detailModalIndex: 1, //to move to show the selected curriculum code details
         }
     },
 
@@ -97,7 +106,25 @@ export default {
          */
         openDetailModal(badge) {
             this.currentBadge = badge;
-            this.$refs.detailModal.open();
+            this.isDetailModalOpen = true;
+        },
+
+        /**
+         * a code has been selected in the detail modal
+         *
+         * @pararm { object }
+         */
+        onCodeSelected (node) {
+            this.selectedNodeDetails = node;
+            this.detailModalIndex++;
+        },
+
+        /**
+         * the detail modal is closed, so we should set the boolean to
+         * false so we can open it again
+         */
+        onDetailModalClosed () {
+            this.isDetailModalOpen = false;
         },
 
         /**
@@ -375,9 +402,25 @@ export default {
             </template>
         </div>
 
-        <reveal-modal size="medium" ref="detailModal">
-            <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>
-        </reveal-modal>
+        <sequential-reveal-modal
+            size="medium"
+            :isOpen="isDetailModalOpen"
+            :sequence-index="detailModalIndex"
+            @closed="onDetailModalClosed"
+        >
+            <template v-slot:sequence-1>
+                <badge-detail
+                    v-if="currentBadge"
+                    :badge="currentBadge"
+                    @code-selected="onCodeSelected"
+                />
+            </template>
+            <template v-slot:sequence-2>
+                <node-details
+                    :node="selectedNodeDetails"
+                />
+            </template>
+        </sequential-reveal-modal>
 
         <reveal-modal size="medium" ref="awardAsAchievementModal" :closeOnBackgroundClick="false" @closed="onModalClosed">
             <badge-award

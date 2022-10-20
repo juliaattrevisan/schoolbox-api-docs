@@ -4,7 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { useNodesStore } from '../store/csNodesStore';
-import { findById } from '../../../js/nodeUtils';
+import { findById } from '@schoolboxCurriculum/js/nodeUtils';
 import { useModalSearchStore } from './csModalSearchStore';
 
 export const DIRECTION = {

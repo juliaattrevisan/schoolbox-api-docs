@@ -7,9 +7,12 @@ import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 import BadgeImage from "../../../Badge/vue/badge-image";
+import CodesList from '@schoolboxCurriculum/vue/codes-list';
+import NodeDetails from '@schoolboxCurriculum/vue/node-details';
 import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import userProfileConstants from '../../../vue/user-profile/constants';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 
 
 export default {
@@ -21,6 +24,8 @@ export default {
         Storage,
         CommentThread,
         BadgeImage,
+        CodesList,
+        NodeDetails,
     },
     mixins: [
         foundationMixin,
@@ -41,6 +46,7 @@ export default {
             },
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
+            selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
         }
     },
     computed: {
@@ -242,6 +248,16 @@ export default {
             return dayjs(date).format(format);
         },
 
+        /**
+         * to open up the node details modal
+         *
+         * @pararm { object }
+         */
+        onCodeSelected (node) {
+            this.selectedNode = node;
+            this.$refs.nodeDetailsModal.open();
+        },
+
     },
 
 }
@@ -316,17 +332,16 @@ export default {
 
                                 <!-- Display curriculum codes and tags -->
                                 <div class="tags">
-                                  <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
+                                    <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
                                       Tags:
-                                      <template v-for="(curriculumNode, index) in evidence.object.curriculumNodes" :key="`${index}-${curriculumNode.code}`">
-                                          <template v-if="index !== 0">, </template>
-                                          <span :title="curriculumNode.name">{{ curriculumNode.code }}</span>
-                                      </template>
-                                      <template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
-                                      <template v-for="(tag, index) in evidence.object.tags" :key="`${index}-${tag.name}`">
-                                          <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
-                                      </template>
-                                  </p>
+                                        <codes-list
+                                            :nodes="evidence.object.curriculumNodes"
+                                            @selected="onCodeSelected"
+                                        /><template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
+                                        <template v-for="(tag, index) in evidence.object.tags" :key="`${index}-${tag.name}`">
+                                            <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
+                                        </template>
+                                    </p>
                                 </div>
                             </div>
 
@@ -457,6 +472,12 @@ export default {
             </div>
         </div>
 
+        <reveal-modal ref="nodeDetailsModal">
+            <node-details
+                :node="selectedNode"
+            />
+        </reveal-modal>
+
         <!-- TODO create a Vue equivalent of $.confirmDialog -->
         <reveal-modal ref="deleteModal">
             <h2>Please confirm</h2>
@@ -467,7 +488,11 @@ export default {
             </ul>
         </reveal-modal>
 
-        <award-detail-modal ref="awardDetailModal" :cdn-prefix="this.cdnPrefix" :site-version="this.siteVersion"></award-detail-modal>
+        <award-detail-modal
+            ref="awardDetailModal"
+            :cdn-prefix="this.cdnPrefix"
+            :site-version="this.siteVersion"
+        />
 
         <toast ref="toast"></toast>
     </div>

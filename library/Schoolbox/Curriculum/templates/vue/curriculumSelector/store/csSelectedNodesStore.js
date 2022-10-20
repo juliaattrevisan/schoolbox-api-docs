@@ -4,7 +4,7 @@
 
 import { defineStore } from 'pinia';
 import { apiEndpoint } from './curriculumSelectorStore';
-import { UNSET_ID, getBreadcrumbs } from '../../../js/nodeUtils';
+import { UNSET_ID, getBreadcrumbs } from '@schoolboxCurriculum/js/nodeUtils';
 
 
 export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
@@ -65,9 +65,9 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          */
         add (nodeToAdd) {
             if (Array.isArray(nodeToAdd)) {
-                this.nodes  = [...this.nodes, ...nodeToAdd];
+                this.nodes = [...this.nodes, ...nodeToAdd];
             } else {
-                this.nodes  = [...this.nodes, nodeToAdd];
+                this.nodes = [...this.nodes, nodeToAdd];
             }
         },
 
@@ -125,31 +125,10 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
 
         /**
          * set the active node, which would prompt the selected-node-modal to open
-         * We also load the ancestors of the node to display the breadcrumbs in the modal
          *
-         * @param { Object }
+         * @param { object }
          */
-        async setActiveNode (node) {
-            if (node.id === UNSET_ID) { //we only need to grab the nodes breadcrumbs if there's actually a node
-                this.activeNode = node;
-                return;
-            }
-            try {
-                this.isLoading = true;
-                const response = await fetch(`${apiEndpoint}/${node.id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
-                if (response.ok) {
-                    const nodeWithParents = await response.json();
-                    node.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
-                } else {
-                    console.warn(response);
-                    this.hasLoadError = true;
-                }
-            } catch (error) {
-                console.warn(error);
-                this.hasLoadError = true;
-            } finally {
-                this.isLoading = false;
-            }
+        setActiveNode (node) {
             this.activeNode = node;
         },
 
@@ -158,9 +137,9 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          * and will bloat the selected objects. As such we remove these properties
          * to slim down the object.
          *
-         * @param { Object }
+         * @param { object }
          */
-         trimNode (node) {
+        trimNode (node) {
             const copiedNode = { ...node };
             delete copiedNode.children;
             delete copiedNode.parent;

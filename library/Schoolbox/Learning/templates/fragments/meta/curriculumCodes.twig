@@ -1,0 +1,8 @@
+{% if config.curriculum_tagging_enabled and (assessment.curriculumNodes | length) > 0 %}
+<li id="assessment-codes-container" class="icon-curriculum">
+    <assessment-codes
+        :nodes="{{ assessment.curriculumNodes|json_encode }}"
+    />
+</li>
+<script src="{{ CDN_PREFIX }}/js/bundle/assessmentCodes.js?v={{ config.site_version }}"></script>
+{% endif %}

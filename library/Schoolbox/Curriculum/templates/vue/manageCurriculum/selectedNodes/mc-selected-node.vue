@@ -6,6 +6,7 @@
  */
 
 import { computed } from 'vue';
+import { shortenLength } from '@js/util/stringUtils';
 import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
 
 
@@ -45,7 +46,7 @@ const title = computed(() => {
     if (props.node.code && props.node.code !== '') {
         return `${props.node.code}`;
     } else {
-        return props.node.name;
+        return shortenLength(props.node.name, 50);
     }
 });
 

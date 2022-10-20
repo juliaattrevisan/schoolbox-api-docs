@@ -120,6 +120,16 @@ export default {
         }
     },
 
+    unmounted () {
+        /**
+         * check if a proxy existed, and if so display it again as per the saved display property
+         */
+        let proxy = document.querySelector('#' + this.proxy);
+        if (proxy) {
+            proxy.style.display = proxy.dataset.display;
+        }
+    },
+
     computed: {
 
         /**
@@ -163,12 +173,16 @@ export default {
         spawnEditor () {
             this.init(configTypes.BASIC);
 
-            /* If a proxy element exists, remove it
+            /* If a proxy element exists, hide it while the dynamic input is visible
              */
             let proxy = document.querySelector('#' + this.proxy);
 
             if (proxy) {
-                proxy.remove();
+                /**
+                 * we store the original display property so we can apply it again when this component is unmounted
+                 */
+                proxy.dataset.display = proxy.style.display;
+                proxy.style.display = 'none';
             }
 
             /* Once the ck spawns you can also hide the edit button

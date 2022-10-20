@@ -1,11 +1,13 @@
 <script>
 import BadgeImage from './badge-image';
+import CodesList from '@schoolboxCurriculum/vue/codes-list';
 
 import {translateDaysToExpiryLabel} from './expiry-helper';
 
 export default {
     components: {
-        BadgeImage
+        BadgeImage,
+        CodesList
     },
     props: {
         /**
@@ -16,6 +18,7 @@ export default {
             default: null,
         },
     },
+    emits: ['code-selected'], //dispatch to notify of curriculum code selection
     computed: {
         badgeTagNames() {
             if (this.badge?.tags?.length) {
@@ -36,7 +39,16 @@ export default {
             return translateDaysToExpiryLabel(this.badge?.goalExpiry);
         },
     },
-    methods: {},
+    methods: {
+        /**
+         * to open up the details modal
+         *
+         * @pararm { object }
+         */
+        onCodeSelected (node) {
+            this.$emit('code-selected', node);
+        },
+    },
 }
 </script>
 
@@ -51,12 +63,12 @@ export default {
         <article v-html="badge.body"></article>
         <div v-if="badge.curriculumNodes.length">
             <hr />
-
             <p class="meta">
                 Curriculum Codes:
-                <template v-for="(curriculumNode, index) in curriculumNodesWithCode">
-                    <span :title="curriculumNode.name">{{ curriculumNode.code }}</span><template v-if="(index + 1) < curriculumNodesWithCode.length">, </template>
-                </template>
+                <codes-list
+                    :nodes="curriculumNodesWithCode"
+                    @selected="onCodeSelected"
+                />
             </p>
         </div>
     </div>

@@ -2,11 +2,7 @@
     <li class="row">
         <div class="twelve-column">
             {% if node.code %}
-                {% if isRouteAuthorized('curriculum.browse') %}
-                    [<a title="View in curriculum browser" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
-                {% else %}
-                    [{{ node.code }}]
-                {% endif %}
+                [<a title="View curriculum node details" href="#{{ node.id }}" data-display-node>{{ node.code }}</a>]
             {% endif %}
             {{ node.name }}
 
@@ -54,3 +50,8 @@
     </div>
 
 {% endif %}
+
+<div data-overview-component>
+    <overview-component />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/overviewComponent.js?v={{ config.site_version }}"></script>
