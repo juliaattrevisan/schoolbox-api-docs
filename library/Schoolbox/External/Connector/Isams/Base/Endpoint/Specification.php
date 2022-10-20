@@ -276,7 +276,7 @@ class Specification implements ISpecification
 
         foreach ($timetables as $timetable) {
             $timetableMessage = sprintf(
-                'Found timetable %s: select %s for campus cycle_identifier',
+                'Found published timetable %s (%s)',
                 trim((string)$timetable->Name),
                 trim((string)$timetable->xpath('@Id')[0]->Id)
             );
