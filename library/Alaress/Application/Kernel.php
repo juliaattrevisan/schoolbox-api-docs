@@ -475,7 +475,7 @@ abstract class Kernel
         );
 
         $di->set('amqp', $di->lazy(function () {
-            return Connector::getInstance();
+            return new Connector([], []);
         }));
 
         $di->set('instance', $di->lazy(function () use ($di) {

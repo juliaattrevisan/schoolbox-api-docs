@@ -41,14 +41,10 @@ class Connector extends AMQPConnector
     const PRIMARY_TYPE     = 'topic';
 
     /**
-     * AMQP connection options.
-     *
-     * Currently, just set the heartbeat to 15s: however this could be made
-     * configurable if desired.
+     * AMQP connection options for heartbeat.
      */
-    private const AMQP_CONNECTION_OPTIONS = [
-        'heartbeat' => 15
-    ];
+    public const AMQP_CONNECTION_OPTION_HEARTBEAT = 'heartbeat';
+
 
     /** @var IConfigLoader */
     protected $conf;
@@ -57,11 +53,11 @@ class Connector extends AMQPConnector
     /**
      * @param array $settings
      */
-    public function __construct($settings = [])
+    public function __construct($settings = [], array $connectionOptions = [])
     {
         parent::__construct($settings);
         $this->conf = ConfigLoader::getInstance();
-        $this->connect();
+        $this->connect($connectionOptions);
     }
 
 
@@ -69,7 +65,7 @@ class Connector extends AMQPConnector
      * Establishes a new AMQP connection if it doesn't already exist.
      * @return void
      */
-    protected function connect()
+    protected function connect(array $connectionOptions)
     {
         if (!$this->conn instanceof AMQPStreamConnection) {
             $this->conn = AMQPStreamConnection::create_connection(
@@ -82,20 +78,22 @@ class Connector extends AMQPConnector
                         'vhost'    => $this->conf->get('amqp_vhost'),
                     ],
                 ],
-                self::AMQP_CONNECTION_OPTIONS,
+                $connectionOptions,
             );
 
-            try {
-                $heartbeat = new PCNTLHeartbeatSender($this->conn);
-            } catch (AMQPRuntimeException $e) {
-                // pcntl isn't enabled (so likely a web request): noop
-                trigger_error(
-                    sprintf('Unable to create heartbeat (%s)', $e->getMessage()),
-                    E_USER_NOTICE,
-                );
-                return;
+            if (isset($connectionOptions[self::AMQP_CONNECTION_OPTION_HEARTBEAT)) {
+                try {
+                    $heartbeat = new PCNTLHeartbeatSender($this->conn);
+                } catch (AMQPRuntimeException $e) {
+                    // pcntl isn't enabled (so likely a web request): noop
+                    trigger_error(
+                        sprintf('Unable to create heartbeat (%s)', $e->getMessage()),
+                        E_USER_NOTICE,
+                    );
+                    return;
+                }
+                $heartbeat->register();
             }
-            $heartbeat->register();
         }
     }
 

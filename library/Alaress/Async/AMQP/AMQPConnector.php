@@ -75,7 +75,7 @@ abstract class AMQPConnector implements AMQPInterface
     public function getConnection()
     {
         if (!$this->conn instanceof AMQPStreamConnection) {
-            $this->connect();
+            $this->connect([]);
         }
         return $this->conn;
     }
@@ -388,5 +388,5 @@ abstract class AMQPConnector implements AMQPInterface
      *
      * @return void
      */
-    abstract protected function connect();
+    abstract protected function connect(array $connectionOptions);
 }

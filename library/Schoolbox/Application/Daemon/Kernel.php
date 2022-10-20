@@ -24,6 +24,7 @@ use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Notif\MQ\Connector;
 use Stomp\Protocol\Protocol;
 use Stomp\Protocol\Version;
 use Stomp\Transport\Parser;
@@ -374,6 +375,19 @@ EOL;
     protected function installDependencies(Container $di): Container
     {
         parent::installDependencies($di);
+
+        // Override AMQP connection with one with a heartbeat
+        $di->set(
+            'amqp',
+            $di->lazy(
+                function () {
+                    return new Connector(
+                        [],
+                        [Connector::AMQP_CONNECTION_OPTION_HEARTBEAT => 15,],
+                    );
+                }
+            ),
+        );
 
         $di->set('stomp', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
