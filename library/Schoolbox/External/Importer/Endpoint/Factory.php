@@ -182,6 +182,7 @@ class Factory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
+                    $this->watchlist,
                     /* Profile pieces
                      */
                     UserProfile\Mapper::getInstance(),

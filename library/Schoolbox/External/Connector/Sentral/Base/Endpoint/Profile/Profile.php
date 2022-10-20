@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
@@ -131,11 +132,18 @@ class Profile implements IStrategy
 
 
     /**
+     * @var array
+     */
+    private array $watchlist;
+
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param IApi                            $api
+     * @param array                           $watchlist
      * @param Registry                        $registry
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
@@ -147,6 +155,7 @@ class Profile implements IStrategy
         LoggerInterface $log,
         bool $perform,
         IApi $api,
+        array $watchlist,
         Registry $registry,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
@@ -157,6 +166,7 @@ class Profile implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->watchlist = $watchlist;
         $this->registry = $registry;
 
         $this->baseProfileMapper = $baseProfileMapper;
@@ -226,6 +236,13 @@ class Profile implements IStrategy
 
             foreach ($payload['data'] as $student) {
                 $externalId = (string)$student['attributes']['studentCode'];
+
+                /* Only import data for externalIds in $watchlist, if provided
+                 */
+                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
+
                 $boardingHouseName = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['boardingHouse'];
                 $boardingStatus = (bool)$student['relationships']['primaryEnrolment']['data']['attributes']['isBoarding'];
                 $campusName = '';
@@ -1094,6 +1111,12 @@ class Profile implements IStrategy
 
             foreach ($payload['data'] as $staff) {
                 $externalId = (string)$staff['attributes']['staffCode'];
+
+                /* Only import data for externalIds in $watchlist, if provided
+                 */
+                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
 
                 /* Find the first meaningful value out of this set
                  */

@@ -77,6 +77,12 @@ class Factory
 
 
     /**
+     * @var array
+     */
+    private array $watchlist;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private UserProfile\Mapper $baseProfileMapper;
@@ -166,6 +172,7 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        array $watchlist,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
@@ -184,6 +191,7 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->watchlist = $watchlist;
 
         /* Profile pieces
          */
@@ -237,6 +245,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $this->watchlist,
                 $registry,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
