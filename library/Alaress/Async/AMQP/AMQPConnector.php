@@ -17,7 +17,6 @@ use RuntimeException;
 
 abstract class AMQPConnector implements AMQPInterface
 {
-
     // default connection vars
 
     /** @var bool */
@@ -44,7 +43,7 @@ abstract class AMQPConnector implements AMQPInterface
     protected $expiry     = 1209600000; // 1000 * 60 * 60 * 24 * 14 = 2 weeks in millis
 
     /**
-     * @var AMQPStreamConnection
+     * @var AMQPStreamConnection|null
      */
     protected $conn;
 

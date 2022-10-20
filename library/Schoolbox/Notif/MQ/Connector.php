@@ -11,7 +11,6 @@ namespace Schoolbox\Notif\MQ;
 
 use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Async\AMQP\AMQPExchange;
-use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Connection\Heartbeat\PCNTLHeartbeatSender;
@@ -20,21 +19,6 @@ use Schoolbox\IConfigLoader;
 
 class Connector extends AMQPConnector
 {
-    /** @var AMQPInterface */
-    protected static $instance;
-
-    /**
-     * @return Connector
-     */
-    public static function getInstance()
-    {
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
-
     const PRIMARY_EXCHANGE = 'sb.%s.tx';
     const PRIMARY_TYPE     = 'topic';
 
