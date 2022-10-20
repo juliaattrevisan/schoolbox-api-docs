@@ -15,13 +15,11 @@ use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Connection\Heartbeat\PCNTLHeartbeatSender;
-use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\IConfigLoader;
 
 class Connector extends AMQPConnector
 {
-
     /** @var AMQPInterface */
     protected static $instance;
 
@@ -81,17 +79,8 @@ class Connector extends AMQPConnector
                 $connectionOptions,
             );
 
-            if (isset($connectionOptions[self::AMQP_CONNECTION_OPTION_HEARTBEAT)) {
-                try {
-                    $heartbeat = new PCNTLHeartbeatSender($this->conn);
-                } catch (AMQPRuntimeException $e) {
-                    // pcntl isn't enabled (so likely a web request): noop
-                    trigger_error(
-                        sprintf('Unable to create heartbeat (%s)', $e->getMessage()),
-                        E_USER_NOTICE,
-                    );
-                    return;
-                }
+            if (isset($connectionOptions[self::AMQP_CONNECTION_OPTION_HEARTBEAT])) {
+                $heartbeat = new PCNTLHeartbeatSender($this->conn);
                 $heartbeat->register();
             }
         }
