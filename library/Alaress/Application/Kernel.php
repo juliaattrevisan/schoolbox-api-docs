@@ -131,7 +131,7 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Menu\Side\Mapper as SideMenuMapper;
 use Schoolbox\Menu\Side\Section\Mapper as SideMenuSectionMapper;
 use Schoolbox\Menu\Top\Mapper as TopMenuMapper;
-use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Notif\MQ\ConnectorFactory;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\StorefileLogger as NotifStorefileLogger;
 use Schoolbox\Pastoral\AccessLevelCensor;
@@ -476,12 +476,8 @@ abstract class Kernel
 
         $di->set(
             'amqp',
-            $di->lazyNew(
-                Connector::class,
-                [
-                    'settings'          => [],
-                    'connectionOptions' => [],
-                ],
+            $di->lazy(
+                fn () => (new ConnectorFactory($config))->build([], []),
             ),
         );
 

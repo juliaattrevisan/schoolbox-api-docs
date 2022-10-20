@@ -54,7 +54,7 @@ abstract class AMQPConnector implements AMQPInterface
     /**
      * @param array $settings
      */
-    public function __construct($settings = [])
+    public function __construct(array $settings = [])
     {
         foreach ($settings as $property => $value) {
             if (property_exists($this, $property)) {
@@ -381,11 +381,4 @@ abstract class AMQPConnector implements AMQPInterface
      * @return string
      */
     abstract protected function hashMessage($message, $channelId);
-
-    /**
-     * Sets $this->conn to an instance of AMQPConnection.
-     *
-     * @return void
-     */
-    abstract protected function connect(array $connectionOptions);
 }

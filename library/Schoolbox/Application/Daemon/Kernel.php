@@ -25,6 +25,7 @@ use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Notif\MQ\ConnectorFactory;
 use Stomp\Protocol\Protocol;
 use Stomp\Protocol\Version;
 use Stomp\Transport\Parser;
@@ -379,14 +380,15 @@ EOL;
         // Override AMQP connection with one with a heartbeat
         $di->set(
             'amqp',
-            $di->lazyNew(
-                Connector::class,
-                [
-                    'settings'          => [],
-                    'connectionOptions' => [
-                        Connector::AMQP_CONNECTION_OPTION_HEARTBEAT => 15,
-                    ],
-                ],
+            $di->lazy(
+                function () use ($di) {
+                    /** @var IConfigLoader $conf */
+                    $conf = $di->get('config');
+                    return (new ConnectorFactory($conf))->build(
+                        [],
+                        [Connector::AMQP_CONNECTION_OPTION_HEARTBEAT => 15,],
+                    );
+                }
             ),
         );
 

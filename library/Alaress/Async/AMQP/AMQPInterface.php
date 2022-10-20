@@ -14,15 +14,6 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 interface AMQPInterface
 {
-
-    /**
-     * Accept optional settings for construction
-     *
-     * @param array $settings
-     */
-    public function __construct($settings = array());
-
-
     /**
      * Declare an exchange
      *

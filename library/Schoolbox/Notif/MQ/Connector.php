@@ -14,8 +14,6 @@ use Alaress\Async\AMQP\AMQPExchange;
 use Alaress\Async\Notification\Instance\Instance;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Connection\Heartbeat\PCNTLHeartbeatSender;
-use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\IConfigLoader;
 
 class Connector extends AMQPConnector
 {
@@ -23,22 +21,26 @@ class Connector extends AMQPConnector
     const PRIMARY_TYPE     = 'topic';
 
     /**
-     * AMQP connection options for heartbeat.
+     * AMQP connection options
      */
+    public const AMQP_CONNECTION_OPTION_HOST      = 'host';
+    public const AMQP_CONNECTION_OPTION_PORT      = 'port';
+    public const AMQP_CONNECTION_OPTION_USER      = 'user';
+    public const AMQP_CONNECTION_OPTION_PASSWORD  = 'password';
+    public const AMQP_CONNECTION_OPTION_VHOST     = 'vhost';
     public const AMQP_CONNECTION_OPTION_HEARTBEAT = 'heartbeat';
 
-
-    /** @var IConfigLoader */
-    protected $conf;
-
-
     /**
+     * Constructor
+     *
      * @param array $settings
+     * @param array $connectionOptions
      */
-    public function __construct($settings = [], array $connectionOptions = [])
-    {
+    public function __construct(
+        array $settings = [],
+        array $connectionOptions = []
+    ) {
         parent::__construct($settings);
-        $this->conf = ConfigLoader::getInstance();
         $this->connect($connectionOptions);
     }
 
@@ -53,11 +55,11 @@ class Connector extends AMQPConnector
             $this->conn = AMQPStreamConnection::create_connection(
                 [
                     [
-                        'host'     => $this->conf->get('amqp_host'),
-                        'port'     => $this->conf->get('amqp_port'),
-                        'user'     => $this->conf->get('amqp_user'),
-                        'password' => $this->conf->get('amqp_pass'),
-                        'vhost'    => $this->conf->get('amqp_vhost'),
+                        self::AMQP_CONNECTION_OPTION_HOST     => $connectionOptions[self::AMQP_CONNECTION_OPTION_HOST],
+                        self::AMQP_CONNECTION_OPTION_PORT     => $connectionOptions[self::AMQP_CONNECTION_OPTION_PORT],
+                        self::AMQP_CONNECTION_OPTION_USER     => $connectionOptions[self::AMQP_CONNECTION_OPTION_USER],
+                        self::AMQP_CONNECTION_OPTION_PASSWORD => $connectionOptions[self::AMQP_CONNECTION_OPTION_PASSWORD],
+                        self::AMQP_CONNECTION_OPTION_VHOST    => $connectionOptions[self::AMQP_CONNECTION_OPTION_VHOST],
                     ],
                 ],
                 $connectionOptions,
