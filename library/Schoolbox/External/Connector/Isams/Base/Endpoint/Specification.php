@@ -202,6 +202,12 @@ class Specification implements ISpecification
                 '/iSAMS/TimetableManager/Structure/Week/Days/Day/Periods/Period',
                 '/iSAMS/TimetableManager/Structure/Week/Days/Day/Periods/Period[@Id]',
 
+                /* SUDS Timetable requires TimetableAllocations to figure out a calendar
+                 * date equivalent to the cyclic day/period tuple
+                 */
+                '/iSAMS/TimetableManager/TimetableAllocations',
+                '/iSAMS/TimetableManager/TimetableAllocations/TimetableAllocation',
+
                 /* There is at least one Set
                  * This is a container of Subject and Teacher and occurs somewhere in a Schedule
                  * This is closest to our concept of "a subject that is being taught"
