@@ -87,8 +87,12 @@ class Connector extends AMQPConnector
 
             try {
                 $heartbeat = new PCNTLHeartbeatSender($this->conn);
-            } catch (AMQPRuntimeException) {
-                // pcntl isn't enabled in web requests: noop
+            } catch (AMQPRuntimeException $e) {
+                // pcntl isn't enabled (so likely a web request): noop
+                trigger_error(
+                    sprintf('Unable to create heartbeat (%s)', $e->getMessage()),
+                    E_USER_NOTICE,
+                );
                 return;
             }
             $heartbeat->register();
