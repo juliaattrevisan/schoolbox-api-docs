@@ -69,7 +69,7 @@ export const useActiveNodeStore = defineStore('mcActiveNode', {
                 useNodesStore().nodeUpdated(this.node); //notify to prompt a sort
             }
             if (node.code !== this.node.code) {
-                this.node.code = node.code;
+                this.node.code = node.code.trim();
             }
             if (node.description !== this.node.description) {
                 this.node.description = node.description;
