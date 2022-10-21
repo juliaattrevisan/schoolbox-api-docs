@@ -330,9 +330,11 @@ class Classes implements IStrategy
      */
     private function createClassEntry(array $subject, \Schoolbox\External\Event\Model $event): ClassEntry
     {
-        /* Name is the same as the Code, in compass
+        /* The name is the same as the code in isams for some reason
+         * I presume the school knows what they mean
          */
-        $name = trim((string)$subject['name']);
+        $name = $event->getTitle();
+        $code = $event->getCode();
 
         /* Constraints in the schema are case insensitive, unlike
          * these array keys - class codes sometimes appear like
@@ -347,7 +349,7 @@ class Classes implements IStrategy
         } else {
             $classEntry = $this->classEntryMapper->createModel()
                 ->setName($name)
-                ->setCode($name);
+                ->setCode($code);
 
             if ($this->perform) {
                 $this->classEntryMapper->save($classEntry);
