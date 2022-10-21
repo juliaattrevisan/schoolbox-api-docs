@@ -24,7 +24,6 @@ use UnexpectedValueException;
 
 class CollectorFactory
 {
-
     /** @var IStorageWrapper */
     private $wrapper;
 
@@ -140,6 +139,11 @@ class CollectorFactory
                     }
                     break;
                 case NodeFactory::OFFICE:
+                    if (!array_key_exists('azureAccessToken', $_SESSION)) {
+                        // Office 365 isn't configured. we're ok with that.
+                        $this->loaders[$type] = false;
+                        break;
+                    }
                     try {
                         $locator              = new Locator(new Tenant($this->conf->get('office365_tenant')), $_SESSION['azureAccessToken']);
                         $this->loaders[$type] = new ExternalFileSystemHandler($locator, $this->storage, $locator, $this->wrapper);
