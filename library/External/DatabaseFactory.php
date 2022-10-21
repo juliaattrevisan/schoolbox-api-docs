@@ -227,7 +227,7 @@ class External_DatabaseFactory
      */
     private function getSchoolCode(IConfigLoader $config): string
     {
-        return $config->get('site_school_code');
+        return strtoupper($config->get('site_school_code'));
     }
 
 
@@ -410,6 +410,8 @@ class External_DatabaseFactory
                         return new External_Synergetic_Ths_User();
                     case 'SK':
                         return new External_Synergetic_Sk_User();
+                    case 'LUC':
+                        return new External_Synergetic_Luc_User();
                 }
                 return new External_Synergetic_User();
             case IConnector::EXTERNAL_TYPE_DOUBLEFIRST:
