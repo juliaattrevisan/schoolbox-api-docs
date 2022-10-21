@@ -142,7 +142,7 @@
         {% endif %}
         {% if allNullSubmissionStates is not empty %}
             <li>
-                the participant has been <strong>marked with a null grade</strong>
+                the participant has been <strong>marked with a status that has no value</strong>
                 (
                 {%- for state in allNullSubmissionStates %}
                     {{- state.displayAs -}}
