@@ -118,7 +118,7 @@ export default {
                     ascending: this.sortDir === 'asc',
                     column: this.sortBy === 'name' ? 'name' : 'dateModified.formatted',
                 },
-                perPage: 10,
+                perPage: 100,
                 perPageValues: [100, 200, 300],
                 resizableColumns: false,
                 rowClassCallback: (row) => { //to differentiate newly uploaded files so it's clear where they've been placed in the table
