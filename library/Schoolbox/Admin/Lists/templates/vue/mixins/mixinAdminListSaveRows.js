@@ -27,6 +27,10 @@ export default {
          */
         async saveRows_onSaveSelected () {
             try {
+                // First close any open colour selectors by auto-clicking 'choose'.  This ensures that the colour
+                // selectors will be in a state consistent with the database after the save action has been performed.
+                $('button.sp-choose').click();
+
                 this.saveRows_isProcessing = true;
                 this.saveRows_saveStatus = 'Saving...';
                 this.$refs.toast.activate(this.saveRows_saveStatus);
