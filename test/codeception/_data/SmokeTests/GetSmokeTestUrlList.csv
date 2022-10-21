@@ -45,7 +45,6 @@ Admin,Configure push providers,https://vagrant.dev.schoolbox.cloud/adminv2/messa
 Admin,System Settings 3rd Party Services,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services
 Admin,System Settings Debugging,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging
 Admin,System Settings Email,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Email
-Admin,System Settings Email DKIM,https://vagrant.dev.schoolbox.cloud/adminv2/email-dkim
 Admin,System Settings External DB,https://vagrant.dev.schoolbox.cloud/adminv2/setting/External%20DB
 Admin,System Settings LDAP,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LDAP
 Admin,System Settings Localisation,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Localisation

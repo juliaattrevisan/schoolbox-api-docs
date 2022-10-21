@@ -186,10 +186,6 @@ Admin,"System Settings Email",Superuser,https://vagrant.dev.schoolbox.cloud/admi
 Admin,"System Settings Email",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Email,401
 Admin,"System Settings Email",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Email,401
 Admin,"System Settings Email",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Email,401
-Admin,"System Settings Email DKIM",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/email-dkim,200
-Admin,"System Settings Email DKIM",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/email-dkim,401
-Admin,"System Settings Email DKIM",Student,https://vagrant.dev.schoolbox.cloud/adminv2/email-dkim,401
-Admin,"System Settings Email DKIM",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/email-dkim,401
 Admin,"System Settings External DB",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/External%20DB,200
 Admin,"System Settings External DB",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/External%20DB,401
 Admin,"System Settings External DB",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/External%20DB,401
