@@ -12,9 +12,13 @@
                 {% if userAccess.roleType %}
                     {% set roleId = 'role-type-' ~ userAccess.roleType %}
                     {% set roleName = userAccess.roleType | capitalize %}
+                    {% set readonly = '' %}
+                    {% set checkedComment = (not managePage and userAccess.commentsAllowed) ? 'checked="checked"' : '' %}
                 {% elseif userAccess.role %}
                     {% set roleId = userAccess.role.id %}
                     {% set roleName = userAccess.role.name %}
+                    {% set readonly = 'readonly' %}
+                    {% set checkedComment = (not managePage and userAccess.role.type == 'staff') ? 'checked="checked"' : '' %}
                 {% endif %}
 
                 {% if roleId %}
@@ -32,11 +36,12 @@
                     {% endif %}
 
                     <tr data-role-id="{{ roleId }}">
-                        <td class="small-2">
+                        <td class="small-1">
                             Role
                         </td>
-                        <td class="small-3">
+                        <td class="small-2">
                             {{ roleName }}
+                            <input type="hidden" name="roleAccessId{{ roleId }}" id="roleAccessId{{ roleId }}" value="{{ userAccess.id }}" >
                         </td>
                         <td class="small-2">
                             <input type="radio" name="role[{{ roleId }}]" id="roleDeny{{ roleId }}"
@@ -53,6 +58,13 @@
                                    value="2" {{ checkedPrivate }}>
                             <label class="radio-label" for="rolePrivate{{ roleId }}"></label>
                         </td>
+                        {% if not managePage %}
+                        <td class="small-2 checklist">
+                            <input type="checkbox" name="roleComment{{ roleId }}" id="roleComment{{ roleId }}"
+                                   value="1" {{ checkedComment }} {{ readonly }}>
+                            <label class="checkbox-label" for="roleComment{{ roleId }}"></label>
+                        </td>
+                        {% endif %}
                         <td class="text-right small-1">
                             <a href="#" data-delete-visibility="role" class="icon-delete"></a>
                         </td>
@@ -101,8 +113,7 @@
                     </li>
                 {% endfor %}
 
-                {# Students: a role type, rather than a role #}
-                {# TODO consider exposing parents as a role type instead #}
+                {# Students/Parents: a role type, rather than a role #}
                 {% for roleType in roleTypes %}
                     <li data-role-add="role-type-{{ roleType }}" data-role-name="{{ roleType | capitalize }}">
                         <a class="list-item link-row">
@@ -229,6 +240,13 @@
 
                     var permissionListRoles = $('#permission-roles');
                     permissionListRoles.html(permissionListRoles.html() + html);
+
+                    // enable comment checkbox only for student and parent role type
+                    if (roleId !== 'role-type-parent' && roleId !== 'role-type-student') {
+                        let commentCheckbox = $('#roleComment' + roleId);
+                        commentCheckbox.attr('checked', 'checked');
+                        commentCheckbox.attr('readonly', 'readonly');
+                    }
 
                     //Check the correct box
                     var selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';

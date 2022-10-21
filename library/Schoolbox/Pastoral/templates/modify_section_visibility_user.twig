@@ -29,8 +29,10 @@
                 {% endif %}
 
                 <tr data-user-id="{{ userAccess.user.id }}">
-                    <td class="small-2">User</td>
-                    <td class="small-{{ reportPage ? 5 : 3 }}">{{ userAccess.user.fullName }} ({{ userAccess.user.role.name }})</td>
+                    <td class="small-1">User</td>
+                    <td class="small-{{ reportPage ? 4 : 2 }}">{{ userAccess.user.fullName }} ({{ userAccess.user.role.name }})
+                        <input type="hidden" name="userAccessId{{ userAccess.user.id }}" id="userAccessId{{ userAccess.user.id }}" value="{{ userAccess.id }}" >
+                    </td>
                     {% if not reportPage %}
                     <td class="small-2">
                         <input type="radio" name="user[{{ userAccess.user.id }}]" id="userDeny{{ userAccess.user.id }}" value="0" {{ checkedDeny }}>
@@ -45,6 +47,13 @@
                         <input type="radio" name="user[{{ userAccess.user.id }}]" id="userPrivate{{ userAccess.user.id }}" value="2" {{ checkedPrivate }}>
                         <label class="radio-label" for="userPrivate{{ userAccess.user.id }}"></label>
                     </td>
+                    {% if not reportPage and not managePage %}
+                    <td class="small-2 checklist">
+                        <input type="checkbox" name="userComment{{ userAccess.user.id }}" id="userComment{{ userAccess.user.id }}"
+                               value="1" {{ userAccess.commentsAllowed ? 'checked' : '' }} {{ userAccess.user.role.isParent or userAccess.user.role.isStudent ? '' : 'readonly' }}>
+                        <label class="checkbox-label" for="userComment{{ userAccess.user.id }}"></label>
+                    </td>
+                    {% endif %}
                     <td class="text-right small-1">
                         <a href="#" data-delete-visibility="user" class="icon-delete"></a>
                     </td>
@@ -96,10 +105,14 @@
                         .replace(/{ID}/g, user.id)
                         .replace(/{ROLE}/g, user.role);
 
-
-
                     var permissionListUsers = $('#permission-users');
                     permissionListUsers.html(permissionListUsers.html() + html);
+
+                    if (user.roleType !== 'parent' && user.roleType !== 'student') {
+                        let commentCheckbox = $('#userComment' + user.id);
+                        commentCheckbox.attr('checked', 'checked');
+                        commentCheckbox.attr('readonly', 'readonly');
+                    }
 
                     //Check the correct box
                     var selector = 'input[name = "user['+user.id+']"][value ="'+permission+'"]';

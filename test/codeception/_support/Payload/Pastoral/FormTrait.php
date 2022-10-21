@@ -43,14 +43,14 @@ trait FormTrait
         $this->setFormParam('actions[]', $actions);
     }
 
-    public function setParentCommentsAllowed(): void
-    {
-        $this->setFormParam('parent comments allowed', '1');
-    }
-
     public function setUserAccess(int $userId, int $accessLevel): void
     {
         $this->setAccess('user', $userId, $accessLevel);
+    }
+
+    public function setUserCommentsAllowed(int $userId): void
+    {
+        $this->setFormParam("userComment$userId", '1');
     }
 
     public function setRoleAccess(int $roleId, int $accessLevel): void

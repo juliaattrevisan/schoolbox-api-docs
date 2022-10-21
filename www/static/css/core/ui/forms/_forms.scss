@@ -1393,6 +1393,7 @@ input[type="checkbox"][readonly]:not(.plain),
 input[type="radio"][readonly]:not(.plain)  {
     & + label {
         cursor: $cursor-default-value;
+        pointer-events: none;
         opacity: 0.5;
 
         &:after {

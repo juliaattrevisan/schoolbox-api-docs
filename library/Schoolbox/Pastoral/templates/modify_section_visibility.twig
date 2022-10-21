@@ -34,15 +34,18 @@
     <table class="no-margin" id="table-permission">
         <thead>
             <tr>
-                <th class="small-2">Type</th>
-                <th class="small-{{ reportPage ? 5 : 3 }}">Audience</th>
+                <th class="small-1">Type</th>
+                <th class="small-{{ reportPage ? 4 : 2 }}">Audience</th>
                 {% if reportPage %}
-                    <th class="small-2">Read</th>
-                    <th class="small-2">Modify</th>
+                    <th class="small-3">Read</th>
+                    <th class="small-3">Modify</th>
                 {% else %}
                     <th class="small-2">Deny</th>
                     <th class="small-2">General</th>
                     <th class="small-2">General + {{ locale.pastoralPrivate.proper }}</th>
+                    {% if not managePage %}
+                    <th class="small-2">Comments<span class='hint has-tip tip-top' title="If checked, these users will be able to read and post comments on this record" data-tooltip>?</span></th>
+                    {% endif %}
                 {% endif %}
                 <th class="text-right small-1">Delete</th>
             </tr>
@@ -200,14 +203,14 @@
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 {# Cloneable HTML For Permission #}
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-{% set colsize = reportPage ? 2 : 3 %}
+{% set colsize = reportPage ? 3 : 2 %}
 {% set accessTypes = reportPage ? ['user', 'group'] : ['user', 'group', 'role'] %}
 {% for accessType in accessTypes %}
     <table class="hide">
         <tbody data-{{ accessType }}-permission-clone>
         <tr data-{{ accessType }}-id="{ID}">
-            <td class="small-2">{TYPE_NAME}</td>
-            <td class="small-3">{NAME}</td>
+            <td class="small-1">{TYPE_NAME}</td>
+            <td class="small-{{ reportPage ? 4 : 2 }}">{NAME}</td>
             {% if not reportPage %}
             <td class="small-{{ colsize }}">
                 <input type="radio" name="{{ accessType }}[{ID}]" id="{{ accessType }}Deny{ID}" value="0">
@@ -222,6 +225,12 @@
                 <input type="radio" name="{{ accessType }}[{ID}]" id="{{ accessType }}Private{ID}" value="2">
                 <label class="radio-label" for="{{ accessType }}Private{ID}"></label>
             </td>
+            {% if not reportPage and not managePage %}
+            <td class="small-{{ colsize }} checklist">
+                <input type="checkbox" name="{{ accessType }}Comment{ID}" id="{{ accessType }}Comment{ID}" value="1">
+                <label class="checkbox-label" for="{{ accessType }}Comment{ID}"></label>
+            </td>
+            {% endif %}
             <td class="text-right small-1">
                 <a href="#" data-delete-visibility="{{ accessType }}" class="icon-delete"></a>
             </td>

@@ -87,33 +87,36 @@ class NotifierHelper
                 continue;
             }
 
+            // If recordType is "pastoral comment" and comment is disabled, add this to parent/student access enabled flag
+            $nonStaffCommentAllowed = $recordType !== 'pastoral comment' || $pastoralAccess->getCommentsAllowed();
+
             // Build the list of target users
             try {
                 if ($pastoralAccess->getRole() instanceof Role) {
                     $targetUsers += $this->buildTargetUsersForRole(
                         $pastoralAccess->getRole(),
                         $student,
-                        $parentAccessEnabled,
-                        $studentAccessEnabled,
+                        $parentAccessEnabled && $nonStaffCommentAllowed,
+                        $studentAccessEnabled && $nonStaffCommentAllowed,
                     );
                 } elseif ($pastoralAccess->getRoleType()) {
                     $targetUsers += $this->buildTargetUsersForRoleType(
                         $pastoralAccess->getRoleType(),
                         $student,
-                        $parentAccessEnabled,
-                        $studentAccessEnabled,
+                        $parentAccessEnabled && $nonStaffCommentAllowed,
+                        $studentAccessEnabled && $nonStaffCommentAllowed,
                     );
                 } elseif ($pastoralAccess->getGroup() instanceof PastoralGroup) {
                     $targetUsers += $this->buildTargetUsersForGroup(
                         $pastoralAccess->getGroup()->getId(),
-                        $parentAccessEnabled,
-                        $studentAccessEnabled,
+                        $parentAccessEnabled && $nonStaffCommentAllowed,
+                        $studentAccessEnabled && $nonStaffCommentAllowed,
                     );
                 } elseif ($pastoralAccess->getUser() instanceof User) {
                     $targetUsers += $this->buildTargetUsersForUser(
                         $pastoralAccess->getUser()->getId(),
-                        $parentAccessEnabled,
-                        $studentAccessEnabled,
+                        $parentAccessEnabled && $nonStaffCommentAllowed,
+                        $studentAccessEnabled && $nonStaffCommentAllowed,
                     );
                 }
             } catch (MapperException $e) {

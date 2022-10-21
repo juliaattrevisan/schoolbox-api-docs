@@ -13,10 +13,7 @@
             <a href="{{ profile.link(access.user) }}">
                 {{ profile.imageSquare64(access.user) }}
                 {{ accessLevelLabel | raw }}
-                {% if access.user.role.isParent and record.parentCommentsAllowed %}
-                    <span class="neutral label right">Comments</span>
-                {% endif %}
-                {% if access.user.role.isStudent and record.studentCommentsAllowed %}
+                {% if (access.user.role.isParent or access.user.role.isStudent) and access.commentsAllowed %}
                     <span class="neutral label right">Comments</span>
                 {% endif %}
                 <p>{{ access.user.fullName }}</p>

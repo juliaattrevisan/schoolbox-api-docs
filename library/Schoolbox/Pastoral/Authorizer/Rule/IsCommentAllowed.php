@@ -55,12 +55,40 @@ class IsCommentAllowed implements IAuthorizationRule
         if ($user->getRole()->isStaff()) {
             return true;
         }
-        if ($user->getRole()->isStudent() && $record->getStudentCommentsAllowed()) {
-            return true;
-        }
-        if ($user->getRole()->isParent() && $record->getParentCommentsAllowed()) {
-            return true;
+        if ($user->getRole()->isStudent() || $user->getRole()->isParent()) {
+            if ($this->getCommentsAllowed($record, $user)) {
+                return true;
+            }
         }
         throw new Unauthorized();
+    }
+
+    /**
+     * Check whether the user is allowed to comment on this pastoral
+     * This is applicable only to Parent and Student, as this does not check pastoral group membership
+     * @param Pastoral $record
+     * @param User     $user
+     * @return bool
+     */
+    private function getCommentsAllowed(Pastoral $record, User $user): bool
+    {
+        $commentsAllowed = false;
+        /** @var \Schoolbox\Pastoral\Access\Model $access */
+        foreach ($record->getAccess() as $access) {
+            if (
+                (!$access->getRoleType() || $access->getRoleType() !== $user->getRole()->getType())
+                && (!$access->getUser() || $access->getUser()->getId() !== $user->getId())
+            ) {
+                continue;
+            }
+            if ($access->getAccess() === \Schoolbox\Pastoral\Access\Mapper::ACCESS_DENY) {
+                return false;
+            }
+            if ($access->getCommentsAllowed()) {
+                // continue to check rest of the accesses, as there may still remain deny access for this user
+                $commentsAllowed = true;
+            }
+        }
+        return $commentsAllowed;
     }
 }

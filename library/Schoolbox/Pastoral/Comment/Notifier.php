@@ -146,8 +146,8 @@ class Notifier extends AbstractModuleNotifier
                 $accessRecords,
                 $model->getPrivate(),
                 $student,
-                $parentAccessEnabled && $pastoral->getParentCommentsAllowed(),
-                $studentAccessEnabled && $pastoral->getStudentCommentsAllowed(),
+                $parentAccessEnabled,
+                $studentAccessEnabled,
                 'pastoral comment',
                 $method,
             );
