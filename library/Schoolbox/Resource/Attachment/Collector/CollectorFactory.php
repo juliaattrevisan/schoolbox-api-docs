@@ -24,7 +24,6 @@ use UnexpectedValueException;
 
 class CollectorFactory
 {
-
     /** @var IStorageWrapper */
     private $wrapper;
 
