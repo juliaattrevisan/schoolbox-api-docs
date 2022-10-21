@@ -41,6 +41,15 @@ class Project extends AbstractAssessment implements AssessmentContext
     protected $summator;
 
     /**
+     * Does this project require that all activities be attempted by a
+     * participant?
+     *
+     * If so, activities which a participant hasn't attempted will be considered
+     * as having a zero mark.
+     */
+    private bool $requireAllActivities = false;
+
+    /**
      * Number of decimal places used in a Normalised Mark value
      *
      * @var int
@@ -596,6 +605,24 @@ class Project extends AbstractAssessment implements AssessmentContext
     public function setSummator(ISummator $summator = null)
     {
         $this->summator = $summator;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getRequireAllActivities(): bool
+    {
+        return $this->requireAllActivities;
+    }
+
+    /**
+     * @param bool $requireAllActivities
+     * @return $this
+     */
+    public function setRequireAllActivities(bool $requireAllActivities): self
+    {
+        $this->requireAllActivities = $requireAllActivities;
         return $this;
     }
 

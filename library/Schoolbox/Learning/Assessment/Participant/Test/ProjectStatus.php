@@ -32,11 +32,11 @@ use UnexpectedValueException;
 class ProjectStatus extends TestCase
 {
     /**
-     * @dataProvider provider_requiresResponse_optionalSubAssessments
+     * @dataProvider providerRequiresResponseOptionalSubAssessments
      * @param Participant $participant
      * @param bool        $isResponseRequired
      */
-    public function test_requiresResponse_optionalSubAssessments(Participant $participant, $isResponseRequired)
+    public function testRequiresResponseOptionalSubAssessments(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
         $actual = $participant->isResponseRequired();
@@ -46,11 +46,11 @@ class ProjectStatus extends TestCase
     }
 
     /**
-     * @dataProvider provider_requiresResponse_mandatorySubAssessments
+     * @dataProvider providerRequiresResponseMandatorySubAssessments
      * @param Participant $participant
      * @param bool        $isResponseRequired
      */
-    public function test_requiresResponse_mandatorySubAssessments(Participant $participant, $isResponseRequired)
+    public function testRequiresResponseMandatorySubAssessments(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
         $actual = $participant->isResponseRequired();
@@ -60,11 +60,11 @@ class ProjectStatus extends TestCase
     }
 
     /**
-     * @dataProvider provider_requiresFeedback
+     * @dataProvider providerRequiresFeedback
      * @param Participant $participant
      * @param bool        $isFeedbackRequired
      */
-    public function test_requiresFeedback(Participant $participant, $isFeedbackRequired)
+    public function testRequiresFeedback(Participant $participant, $isFeedbackRequired)
     {
         $actual = $participant->isFeedbackRequired();
 
@@ -73,11 +73,11 @@ class ProjectStatus extends TestCase
     }
 
     /**
-     * @dataProvider provider_reviewComplete_optionalSubAssessments
+     * @dataProvider providerReviewCompleteOptionalSubAssessments
      * @param Participant $participant
      * @param bool        $isReviewComplete
      */
-    public function test_reviewComplete_optionalSubAssessments(Participant $participant, $isReviewComplete)
+    public function testReviewCompleteOptionalSubAssessments(Participant $participant, $isReviewComplete)
     {
         $actual = $participant->isReviewComplete();
 
@@ -86,11 +86,11 @@ class ProjectStatus extends TestCase
     }
 
     /**
-     * @dataProvider provider_reviewComplete_mandatorySubAssessments
+     * @dataProvider providerReviewCompleteMandatorySubAssessments
      * @param Participant $participant
      * @param bool        $isReviewComplete
      */
-    public function test_reviewComplete_mandatorySubAssessments(Participant $participant, $isReviewComplete)
+    public function testReviewCompleteMandatorySubAssessments(Participant $participant, $isReviewComplete)
     {
         $actual = $participant->isReviewComplete();
 
@@ -99,11 +99,11 @@ class ProjectStatus extends TestCase
     }
 
     /**
-     * @dataProvider provider_participants
+     * @dataProvider providerParticipants
      * @param Participant $participant
      * @throws UnexpectedValueException If unable to merge collections
      */
-    public function test_mutual_exclusive_states_ifAllSame(Participant $participant)
+    public function testMutualExclusiveStatesIfAllSame(Participant $participant)
     {
         /** @var Project $project */
         $project = $participant->getAssessable();
@@ -145,7 +145,7 @@ class ProjectStatus extends TestCase
      * @throws InvalidArgumentException If an unrecognised $userChar is attempted
      * @throws UnexpectedValueException If unable to merge collections
      */
-    public function provider_requiresResponse_optionalSubAssessments(): array
+    public function providerRequiresResponseOptionalSubAssessments(): array
     {
         // Only 'Maximum' implies optionality
         $project = DemoData::getProject(new Maximum());
@@ -178,7 +178,7 @@ class ProjectStatus extends TestCase
      * @throws InvalidArgumentException If an unrecognised $userChar is attempted
      * @throws UnexpectedValueException If unable to merge collections
      */
-    public function provider_requiresResponse_mandatorySubAssessments(): array
+    public function providerRequiresResponseMandatorySubAssessments(): array
     {
         // 'Minimum', 'Average', 'WeightedAverage' all imply assessments are not expected to be optional
         $project = DemoData::getProject(new Minimum());
@@ -211,7 +211,7 @@ class ProjectStatus extends TestCase
      * @throws InvalidArgumentException If an unrecognised $userChar is attempted
      * @throws UnexpectedValueException If unable to merge collections
      */
-    public function provider_requiresFeedback(): array
+    public function providerRequiresFeedback(): array
     {
         // Only 'Maximum' implies optionality
         $project = DemoData::getProject();
@@ -244,7 +244,7 @@ class ProjectStatus extends TestCase
      * @throws InvalidArgumentException If an unrecognised $userChar is attempted
      * @throws UnexpectedValueException If unable to merge collections
      */
-    public function provider_reviewComplete_optionalSubAssessments(): array
+    public function providerReviewCompleteOptionalSubAssessments(): array
     {
         // Only 'Maximum' implies optionality
         $project = DemoData::getProject(new Maximum());
@@ -277,7 +277,7 @@ class ProjectStatus extends TestCase
      * @throws InvalidArgumentException If an unrecognised $userChar is attempted
      * @throws UnexpectedValueException If unable to merge collections
      */
-    public function provider_reviewComplete_mandatorySubAssessments(): array
+    public function providerReviewCompleteMandatorySubAssessments(): array
     {
         // 'Minimum', 'Average', 'WeightedAverage' all imply assessments are not expected to be optional
         $project = DemoData::getProject(new Minimum());
@@ -310,7 +310,7 @@ class ProjectStatus extends TestCase
      * @throws InvalidArgumentException If an unrecognised $userChar is attempted
      * @throws UnexpectedValueException If unable to merge collections
      */
-    public function provider_participants(): array
+    public function providerParticipants(): array
     {
         $data = [];
         foreach (DemoData::getProject(new Minimum())->getAllParticipants() as $participant) {

@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Summator\MarkDerivation\StrategyFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Summator\ISummator;
@@ -1903,6 +1904,415 @@ class SummatorTest extends TestCase
 
         $this->assertEquals(41, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
         $this->assertEquals(55, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
+    }
+
+
+    /**
+     * Test the difference between the all activities required and standard
+     * mark derivation strategies, for all summators.
+     *
+     * @return void
+     */
+    public function testAllActivitiesRequiredSummators(): void
+    {
+        // Build mark derivation strategies and summators
+        $strategyFactory                             = new StrategyFactory();
+        $standardStrategy                            = $strategyFactory->build(false);
+        $requireAllActivitiesStrategy                = $strategyFactory->build(true);
+        $summatorMinStandard                         = new SummatorMinimum($standardStrategy);
+        $summatorMinRequireAllActivities             = new SummatorMinimum($requireAllActivitiesStrategy);
+        $summatorMaxStandard                         = new SummatorMaximum($standardStrategy);
+        $summatorMaxRequireAllActivities             = new SummatorMaximum($requireAllActivitiesStrategy);
+        $summatorAverageStandard                     = new SummatorAverage($standardStrategy);
+        $summatorAverageRequireAllActivities         = new SummatorAverage($requireAllActivitiesStrategy);
+        $summatorWeightedAverageStandard             = new SummatorWeightedAverage($standardStrategy);
+        $summatorWeightedAverageRequireAllActivities = new SummatorWeightedAverage($requireAllActivitiesStrategy);
+
+        // Doesn't matter which summator I use here: it'll be replaced before
+        // each assertion
+        $project = $this->spawnProject($summatorWeightedAverageStandard);
+
+        // There are three assessments in the project:
+        // * Due Work (5 marks)
+        // * Task (0 marks)
+        // * Quiz (8 marks)
+        $task       = $this->spawnTask()->setWeight(0);
+        $dueWork    = $this->spawnDueWork()->setWeight(5);
+        $quiz       = $this->spawnQuiz()->setWeight(8);
+        $activities = new GenericCollection(IAssessable::class);
+        $activities[$task->getId()] = $task;
+        $activities[$dueWork->getId()] = $dueWork;
+        $activities[$quiz->getId()] = $quiz;
+        $project->setAssessables($activities);
+
+
+        // sberryhill hasn't been given feedback at all yet:
+        // With any standard summator, his mark is null
+        $project->setSummator($summatorMinStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorMaxStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorWeightedAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+
+        // With any all activities required summator, his mark is 0
+        $project->setSummator($summatorMinRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(0.0, $value);
+        $project->setSummator($summatorMaxRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(0.0, $value);
+        $project->setSummator($summatorAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(0.0, $value);
+        $project->setSummator($summatorWeightedAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(0.0, $value);
+
+
+        // Give him as-yet-unpublished due work feedback (100%)
+        $dueWorkFeedback = (new DueWorkFeedback())
+            ->setId(123456)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(100)
+            ->setReviewer($this->celia)
+            ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->setPublishedAt(new \Alaress_Date_NullDate())
+            ->setCreatedAt(\Alaress_Date_Format::now())
+            ->setUpdatedAt(\Alaress_Date_Format::now());
+        $project->getAssessables()[$dueWork->getId()]
+            ->getParticipant($this->sberryhill)
+            ->getAllFeedbacks()[$dueWorkFeedback->getId()] = $dueWorkFeedback;
+
+        // With any standard summator:
+        // * published only: his mark is null
+        // * unpublished: his mark is 100 (as only one has a mark)
+        $project->setSummator($summatorMinStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorMaxStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorWeightedAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+
+        // With activities required summators:
+        // * published only: his mark is 0
+        // * unpublished:
+        // ** min: 0
+        // ** max: 100
+        // ** avg: 33.4
+        // ** weighted: (100 * 5 / (5 + 8)) = 38.461538462
+        $project->setSummator($summatorMinRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(0.0, $value);
+        $project->setSummator($summatorMaxRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertEqualsWithDelta(33.333333333, $value, $this->delta);
+        $project->setSummator($summatorWeightedAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertEqualsWithDelta(38.461538462, $value, $this->delta);
+
+
+        // Publish the due work feedback
+        $dueWorkFeedback->setPublishedAt(\Alaress_Date_Format::now());
+
+        // With any standard summator:
+        // * his mark is 100 (as only one has a mark)
+        $project->setSummator($summatorMinStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorMaxStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorWeightedAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+
+        // With activities required summators:
+        // * min: 0
+        // * max: 100
+        // * avg: 33.4
+        // * weighted: (100 * 5 / (5 + 8)) = 38.461538462
+        $project->setSummator($summatorMinRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(0.0, $value);
+        $project->setSummator($summatorMaxRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertEqualsWithDelta(33.333333333, $value, $this->delta);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertEqualsWithDelta(33.333333333, $value, $this->delta);
+        $project->setSummator($summatorWeightedAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertEqualsWithDelta(38.461538462, $value, $this->delta);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertEqualsWithDelta(38.461538462, $value, $this->delta);
+
+
+        // If the feedback exists, but its norm mark is null:
+        $dueWorkFeedback->setNormalisedMark(null);
+
+        // With any standard summator: his mark is null
+        $project->setSummator($summatorMinStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorMaxStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorWeightedAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+
+        // With activities required summators: his mark is 0
+        // (whilst due work is null, the others have no feedback thus are 0)
+        $project->setSummator($summatorMinRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(0.0, $value);
+        $project->setSummator($summatorMaxRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(0.0, $value);
+        $project->setSummator($summatorAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(0.0, $value);
+        $project->setSummator($summatorWeightedAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(0.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(0.0, $value);
+
+
+        // If feedback has null value and student is excluded from other
+        // assessments:
+        $dueWorkFeedback->setNormalisedMark(null);
+        $quiz->getParticipant($this->sberryhill)->setExcludedAt(\Alaress_Date_Format::now());
+        $task->getParticipant($this->sberryhill)->setExcludedAt(\Alaress_Date_Format::now());
+
+        // With standard summators: his mark is null
+        $project->setSummator($summatorMinStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorMaxStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorWeightedAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+
+        // With activities required summators: his mark is still null
+        // (as he's been marked null for everything he's participating in)
+        $project->setSummator($summatorMinRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorMaxRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+        $project->setSummator($summatorWeightedAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+
+
+        // If feedback does not have null value and student is excluded from
+        // other assessments:
+        $dueWorkFeedback->setNormalisedMark(100);
+
+        // With standard summators: his mark is 100
+        $project->setSummator($summatorMinStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorMaxStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorWeightedAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+
+        // With activities required summators: his mark is still 100
+        // (as he's been marked for everything he's participating in)
+        $project->setSummator($summatorMinRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorMaxRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorWeightedAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+
+
+        // If due work has zero weight:
+        $dueWork->setWeight(0);
+
+        // With standard summators:
+        // his mark is 100, except for weighted average
+        // (which is null because there's no weight)
+        $project->setSummator($summatorMinStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorMaxStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorWeightedAverageStandard);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
+
+        // With activities required summators:
+        // his mark is 100, except for weighted average
+        // (which is null because there's no weight)
+        $project->setSummator($summatorMinRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorMaxRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertSame(100.0, $value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertSame(100.0, $value);
+        $project->setSummator($summatorWeightedAverageRequireAllActivities);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), true);
+        $this->assertNull($value);
+        $value = $project->getNormalisedMark($project->getParticipant($this->sberryhill), false);
+        $this->assertNull($value);
     }
 
 

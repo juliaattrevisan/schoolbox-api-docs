@@ -55,6 +55,7 @@ use Schoolbox\Learning\Authorizer\Rule\ValidAssessmentType;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
@@ -385,6 +386,7 @@ class Module extends BaseModule
         $folderMapper     = $this->getMapperFactory()->get(FolderMapper::class);
         $termMapper       = $this->getMapperFactory()->get(Term\Mapper::class);
         $viewLatestMapper = $this->getMapperFactory()->get(LatestViewMapper::class);
+        $stateMapper      = $this->getMapperFactory()->get(StateMapper::class);
 
         /** @var AssessmentMapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->injector->get('assessmentDataSource');
@@ -446,6 +448,7 @@ class Module extends BaseModule
                     $folderMapper,
                     $viewLatestMapper,
                     $this->injector->get('filesystem.storageProxy'),
+                    $stateMapper,
                 );
 
             case Assessment\Project\Controller::class:
@@ -463,6 +466,7 @@ class Module extends BaseModule
                     $unitSpecMapper,
                     $replicator,
                     $viewLatestMapper,
+                    $stateMapper,
                 );
 
             case Assessment\Quiz\Controller::class:

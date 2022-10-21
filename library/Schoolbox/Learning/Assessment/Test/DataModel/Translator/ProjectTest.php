@@ -110,6 +110,7 @@ class ProjectTest extends TestCase
         // Test project-specific fields
         $this->assertInstanceOf(ProjectModel::class, $projectModel);
         $this->assertEquals(ProjectModel::SUMMATOR_WEIGHTED_AVERAGE, $projectModel->getSummator());
+        $this->assertFalse($projectModel->getRequireAllActivities());
 
         // Test sub-assessables
         $this->assertCount(3, $projectModel->getAssessments());

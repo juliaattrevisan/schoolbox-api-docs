@@ -57,12 +57,107 @@
 
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 
-<label for="summatorSelect">Mark Summation Method</label>
-<select id="summatorSelect" name="summator">
-    {% for index, title in allSummators.map %}
-    <option value="{{ index }}" {% if index == selectedSummator %}selected{% endif %}>{{ title }}</option>
-    {% endfor %}
-</select>
+<div class="row">
+    <div class="small-12 medium-6 columns">
+        <label for="summatorSelect">Mark Summation Method</label>
+        <div class="input-group">
+            <select id="summatorSelect" name="summator">
+                {% for index, title in allSummators.map %}
+                    <option value="{{ index }}" {% if index == selectedSummator %}selected{% endif %}>{{ title }}</option>
+                {% endfor %}
+            </select>
+            <a href="#" class="adtp-btn" data-reveal-id="reveal-summators-description">Describe Methods...</a>
+        </div>
+    </div>
+    <div class="small-12 medium-6 columns">
+        <label for="requireAllActivities">
+            Require All Activities
+            <span class="hint has-tip tip-top" title="If ON, the project will count unmarked activities as having a score of zero. This is useful where a participant must complete all activities within the project." data-tooltip>?</span>
+        </label>
+        <div class="switch">
+            <input id="requireAllActivities"
+                   name="requireAllActivities"
+                   type="checkbox"
+                    {{ (assessment.requireAllActivities ?? false) ? 'checked' : '' }}
+                    {% if courseManaged.isReadonly %}
+                        disabled
+                    {% endif %}
+            >
+            <label for="requireAllActivities">
+                <span>On</span>
+                <span>Off</span>
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="reveal-modal" data-reveal id="reveal-summators-description">
+    <h2>Mark Summation</h2>
+    <p>
+        The project&rsquo;s mark summation method determines how a participant&rsquo;s total mark is calculated.
+    </p>
+    <h3>Methods</h3>
+    <dl>
+        <dt>{{ allSummators.map.weighted }}</dt>
+        <dd>
+            The participant&rsquo;s total mark is equal to the <strong>average</strong> mark they have received for each
+            activity within the project, <strong>weighted</strong> by that activity&rsquo;s weight.
+        </dd>
+        <dt>{{ allSummators.map.avg }}</dt>
+        <dd>
+            The participant&rsquo;s total mark is equal to the <strong>average</strong> mark they have received for each
+            activity within the project; the activity&rsquo;s <strong>weight is ignored</strong>.
+        </dd>
+        <dt>{{ allSummators.map.max }}</dt>
+        <dd>
+            The participant&rsquo;s total mark is equal to the <strong>highest</strong> mark they have received for any
+            activity within the project.
+        </dd>
+        <dt>{{ allSummators.map.min }}</dt>
+        <dd>
+            The participant&rsquo;s total mark is equal to the <strong>lowest</strong> mark they have received for any
+            activity within the project.
+        </dd>
+    </dl>
+    <h3>Require All Activities</h3>
+    <p>
+        This option changes how an unmarked activity for a participant contributes toward their total mark calculation:
+    </p>
+    <ul>
+        <li>
+            <strong>On</strong>: unmarked activities count as having a mark of zero;
+            this is useful where a participant must complete all activities within the project
+        </li>
+        <li><strong>Off</strong>: unmarked activities are ignored, and do not contribute to the total mark at all</li>
+    </ul>
+    <h3>Ignoring Activities</h3>
+    <p>
+        Activities may be ignored when calculating a participant&rsquo;s total mark; this effectively means that the
+        activity does not exist within the participant&rsquo;s attempt of the project.
+    </p>
+    <p>An activity will be ignored if:</p>
+    <ul>
+        {% if custom_assessment_participation %}
+            <li>the participant is <strong>excluded</strong> from the activity</li>
+        {% endif %}
+        {% if allNullSubmissionStates is not empty %}
+            <li>
+                the participant has been <strong>marked with a status that has no value</strong>
+                (
+                {%- for state in allNullSubmissionStates %}
+                    {{- state.displayAs -}}
+                    {%- if not loop.last %}, {% endif -%}
+                {% endfor -%}
+                ) for the activity
+            </li>
+        {% endif %}
+        <li>
+            the participant has <strong>not been marked</strong> at all,
+            <strong>unless</strong> the &ldquo;Require All Activities&rdquo; option is on
+        </li>
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
 
 {% include '@learningAssessment/fragments/markType.twig' with {
     context: '',

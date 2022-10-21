@@ -30,22 +30,23 @@ class Decorator implements DecoratorInterface
     protected $gradingScheme;
 
     /**
-     * @var string
-     */
-    protected $summator;
-
-    /**
      * Decorator constructor.
      *
      * @param int $markType
      * @param int $gradingScheme
      * @param string $summator
+     * @param bool $requireAllActivities
      */
-    public function __construct($markType, $gradingScheme, $summator)
-    {
+    public function __construct(
+        $markType,
+        $gradingScheme,
+        $summator,
+        bool $requireAllActivities,
+    ) {
         $this->setMarkType($markType);
         $this->setGradingScheme($gradingScheme);
         $this->setSummator($summator);
+        $this->requireAllActivities = $requireAllActivities;
     }
 
     /**
@@ -66,7 +67,10 @@ class Decorator implements DecoratorInterface
         $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
         $assessment->setMarkScheme($markScheme);
 
-        $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
+        $assessment->setSummator(
+            (new SummatorFactory($this->getSummator(), $this->getRequireAllActivities()))->produce(),
+        );
+        $assessment->setRequireAllActivities($this->requireAllActivities);
     }
 
     /**

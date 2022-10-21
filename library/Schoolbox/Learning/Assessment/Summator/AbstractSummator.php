@@ -14,11 +14,29 @@ namespace Schoolbox\Learning\Assessment\Summator;
 
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\User;
 
 abstract class AbstractSummator implements ISummator
 {
+    /**
+     * Strategy for deriving the normalised mark for a participant.
+     *
+     * Defaults to `MarkDerivation\Standard`.
+     */
+    private MarkDerivation\IStrategy $markDerivationStrategy;
+
+    /**
+     * Constructor
+     *
+     * @param MarkDerivation\IStrategy|null $strategy
+     */
+    public function __construct(MarkDerivation\IStrategy $strategy = null)
+    {
+        $this->markDerivationStrategy = $strategy ?? new MarkDerivation\Standard();
+    }
+
     /**
      * @inheritDoc
      */
@@ -52,7 +70,7 @@ abstract class AbstractSummator implements ISummator
         foreach ($allAssessables as $currentAssessable) {
             $participant = $currentAssessable->getParticipantIfExtant($user);
             if ($participant) {
-                $normMark = $participant->getNormalisedMark($publishedOnly);
+                $normMark = $this->deriveNormalisedMark($participant, $publishedOnly);
                 if (null !== $normMark) {
                     $this->aggregate($normMark, $currentAssessable->getWeight());
                 }
@@ -60,6 +78,18 @@ abstract class AbstractSummator implements ISummator
         }
 
         return $this->finalise();
+    }
+
+    /**
+     * Derive the normalised mark to use for this participant in an assessment.
+     *
+     * @param Participant $participant
+     * @param bool        $publishedOnly
+     * @return float|null
+     */
+    protected function deriveNormalisedMark(Participant $participant, bool $publishedOnly): ?float
+    {
+        return $this->markDerivationStrategy->deriveNormalisedMark($participant, $publishedOnly);
     }
 
     /**
@@ -77,8 +107,7 @@ abstract class AbstractSummator implements ISummator
     {
         $this->reset();
         foreach ($assessable->getAllParticipants() as $participant) {
-            $normMark = $participant->getNormalisedMark($publishedOnly);
-
+            $normMark = $this->deriveNormalisedMark($participant, $publishedOnly);
             if (null !== $normMark) {
                 // Weight doesn't matter within the context of a single assessment
                 $this->aggregate($normMark, $assessable->getWeight());

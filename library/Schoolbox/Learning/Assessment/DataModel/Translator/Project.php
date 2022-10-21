@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\ISummator;
+use Schoolbox\Learning\Assessment\Summator\MarkDerivation;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
@@ -115,6 +116,7 @@ class Project implements IAssessmentTypeTranslator
         } elseif ($domainObject->getSummator() instanceof Maximum) {
             $dataModel->setSummator(ProjectModel::SUMMATOR_MAXIMUM);
         }
+        $dataModel->setRequireAllActivities($domainObject->getRequireAllActivities());
 
         // Translate mark scheme
         // TODO move this to the mark scheme translator
@@ -143,6 +145,7 @@ class Project implements IAssessmentTypeTranslator
         /** @var ProjectModel $dataModel */
         /** @var ProjectObject $domainObject */
         $domainObject->setSummator($this->getSummator($dataModel));
+        $domainObject->setRequireAllActivities($dataModel->getRequireAllActivities());
         null === $dataModel->getOwner() || $domainObject->setCreator($dataModel->getOwner());
 
 
@@ -166,28 +169,31 @@ class Project implements IAssessmentTypeTranslator
      */
     private function getSummator(ProjectModel $project): ?ISummator
     {
-        $summatorString = $project->getSummator();
-        return self::getSummatorFromString($summatorString);
+        return self::getSummatorFromString($project->getSummator(), $project->getRequireAllActivities());
     }
 
     /**
      * @param string|null $summatorString
+     * @param bool        $requireAllActivities
      * @return ISummator|null
      */
-    public static function getSummatorFromString(?string $summatorString): ?Isummator
-    {
+    public static function getSummatorFromString(
+        ?string $summatorString,
+        bool $requireAllActivities,
+    ): ?Isummator {
         if (null === $summatorString) {
             return null;
         }
+        $strategy = (new MarkDerivation\StrategyFactory())->build($requireAllActivities);
         switch ($summatorString) {
             case ProjectModel::SUMMATOR_AVERAGE:
-                return new Average();
+                return new Average($strategy);
             case ProjectModel::SUMMATOR_WEIGHTED_AVERAGE:
-                return new WeightedAverage();
+                return new WeightedAverage($strategy);
             case ProjectModel::SUMMATOR_MINIMUM:
-                return new Minimum();
+                return new Minimum($strategy);
             case ProjectModel::SUMMATOR_MAXIMUM:
-                return new Maximum();
+                return new Maximum($strategy);
         }
         throw new UnexpectedValueException('$model->getSummator() is not a recognised summator type');
     }

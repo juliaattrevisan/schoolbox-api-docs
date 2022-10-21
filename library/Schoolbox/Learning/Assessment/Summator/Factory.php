@@ -20,21 +20,18 @@ class Factory
     const MAXIMUM = 'max';
     const MINIMUM = 'min';
 
-
-    /**
-     * @var string
-     */
-    protected $summator;
-
-
     /**
      * Factory constructor.
      *
      * @param string $summator
+     * @param bool  $requireAllActivities Must a student attempt all activities?
+     *                                    If so, they will receive zero for any
+     *                                    assessment they've not attempted.
      */
-    public function __construct(string $summator)
-    {
-        $this->summator = $summator;
+    public function __construct(
+        private string $summator,
+        private bool $requireAllActivities,
+    ) {
     }
 
 
@@ -46,18 +43,19 @@ class Factory
      */
     public function produce(): ISummator
     {
+        $strategy = (new MarkDerivation\StrategyFactory())->build($this->requireAllActivities);
         switch ($this->summator) {
             case self::WEIGHTED_AVERAGE:
-                return new WeightedAverage();
+                return new WeightedAverage($strategy);
 
             case self::AVERAGE:
-                return new Average();
+                return new Average($strategy);
 
             case self::MAXIMUM:
-                return new Maximum();
+                return new Maximum($strategy);
 
             case self::MINIMUM:
-                return new Minimum();
+                return new Minimum($strategy);
         }
 
         throw new \InvalidArgumentException('Please choose a valid summation option');
