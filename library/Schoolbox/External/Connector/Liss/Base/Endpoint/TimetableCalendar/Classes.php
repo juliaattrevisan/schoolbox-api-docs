@@ -463,11 +463,11 @@ class Classes implements IStrategy
         }
 
         foreach ($staffs as $externalId) {
-            $this->saveStaffInvolvement($event, (string)$externalId);
+            $this->saveStaffInvolvement($event, $classEntry, (string)$externalId);
         }
 
         foreach ($currentEvent['students'] as $externalId) {
-            $this->saveStudentInvolvement($event, $classEntry, (string)$externalId);
+            $this->saveRegularInvolvement($event, $classEntry, (string)$externalId);
         }
     }
 
@@ -475,26 +475,28 @@ class Classes implements IStrategy
     /**
      * Save staff involvements as Overrides
      *
-     * @param Model  $event
-     * @param string $externalId
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @param string     $externalId
      * @return void
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function saveStaffInvolvement(\Schoolbox\External\Event\Model $event, string $externalId): void
-    {
+    private function saveStaffInvolvement(
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry,
+        string $externalId
+    ): void {
+        /* Shove in a regular involvement for the guy who usually teaches this
+         */
+        $this->saveRegularInvolvement($event, $classEntry, $externalId);
+
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
          */
-        $override = $this->overridesMapper->createModel()
-            ->setEventId($event->getId())
-            ->setExternalId($externalId)
-            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
-            ->setSequence(1);
-
         $this->log->debug(sprintf(
-            'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+            'Creating new override involvements for %s in timetable event %s - %s, %s, %s-%s',
             $externalId,
             $event->getTitle(),
             $event->getDay(),
@@ -503,8 +505,25 @@ class Classes implements IStrategy
             $event->getFinishAt()->getDatabase()
         ));
 
+        /* For specific teaching, execute CLEAR_STAFF to disregard the usual guy
+         * and add the guy teaching this particular instance (even though they
+         * might end up being the same person sometimes)
+         */
+        $clearOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId(null)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
+            ->setSequence(1);
+
+        $involvementOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId($externalId)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
+            ->setSequence(2);
+
         if ($this->perform) {
-            $this->overridesMapper->save($override);
+            $this->overridesMapper->save($clearOverride);
+            $this->overridesMapper->save($involvementOverride);
         }
     }
 
@@ -521,7 +540,7 @@ class Classes implements IStrategy
      * @throws Exception
      * @throws \UnexpectedValueException
      */
-    private function saveStudentInvolvement(
+    private function saveRegularInvolvement(
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry,
         string $externalId
