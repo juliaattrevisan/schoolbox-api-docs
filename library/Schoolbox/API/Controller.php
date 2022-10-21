@@ -241,8 +241,8 @@ class Controller extends Base
                 return $this->authenticateViaJwt($postData['jwt']);
             }
             if ($allowQueryStringJwt) {
-                $queryStringJwt = $this->request->query->get('jwt');
-                if (isset($queryStringJwt)) {
+                $queryStringJwt = $this->request->query->get('jwt') ?? $this->request->query->get('id_token');
+                if ($queryStringJwt) {
                     return $this->authenticateViaJwt($queryStringJwt);
                 }
             }
