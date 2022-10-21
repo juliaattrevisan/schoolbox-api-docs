@@ -137,19 +137,14 @@ function attachValidationRules() {
             $(this).rules("add", { descriptorsAreMonotonic: true });
         });
 
-        $("[data-group-max-value]").each(function() {
-            //don't check if the input is hidden
-            if(this.classList.contains('hide')) {
-                $(this).rules("remove", "required");
-            } else {
-                $(this).rules("add", {
-                    required: true,
-                    number: true,
-                    messages: {
-                        number: "Please enter a numeric value"
-                    }
-                });
-            }
+        $("[data-group-max-value]:visible").each(function() {
+            $(this).rules("add", {
+                required: true,
+                number: true,
+                messages: {
+                    number: "Please enter a numeric value"
+                }
+            });
         });
     }
 }
