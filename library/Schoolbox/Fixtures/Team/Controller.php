@@ -291,6 +291,9 @@ class Controller extends AbstractController
         if ($this->getRequest()->isXhr()) {
             $this->getTeamTranslator()->collectPlayers($team);
 
+            // TODO: Sort $team->getPlayers() here somehow by 'sportsfixtures_team_user.sequence ASC'.
+            // $team->getPlayers()->sortByCallback(function ($a, $b) {return $a->});
+
             // Output a XHR data model + HTML output
             $dataModel = $this->getTeamTranslator()->translateTeam($team);
             $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/teamPlayerList.twig', $dataModel)->getAsString();
