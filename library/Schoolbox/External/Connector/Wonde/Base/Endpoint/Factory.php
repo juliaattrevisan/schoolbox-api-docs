@@ -285,6 +285,7 @@ class Factory
                 $this->perform,
                 $api,
                 $this->eventMapper,
+                $this->overridesMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $timezone,
