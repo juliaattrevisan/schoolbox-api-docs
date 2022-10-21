@@ -27,6 +27,12 @@ export default {
          */
         async saveRows_onSaveSelected () {
             try {
+                // First close any open colour selectors by auto-clicking 'choose'.  This ensures that the colour
+                // selectors will be in a state consistent with the database after the save action has been performed.
+                // Note that this is required even though the buttons may not be visible due to 'showButtons' having
+                // been set to false in the spectrum color-picker config.
+                $('button.sp-choose').click();
+
                 this.saveRows_isProcessing = true;
                 this.saveRows_saveStatus = 'Saving...';
                 this.$refs.toast.activate(this.saveRows_saveStatus);

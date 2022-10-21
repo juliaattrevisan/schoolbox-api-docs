@@ -42,11 +42,12 @@ export default {
         initColourPicker () {
             $(this.$el).spectrum({
                 allowEmpty: true,
-                showAlpha: false,
-                showInput: true,
-                preferredFormat: 'hex',
                 clickoutFiresChange: true,
+                preferredFormat: 'hex',
+                showAlpha: false,
+                showButtons: false,
                 showInitial: true,
+                showInput: true,
                 change: (color) => {
                     this.$emit('input', color ? color.toHexString() : null)
                 }
