@@ -29,6 +29,11 @@ use UnexpectedValueException;
  */
 class Factory
 {
+    /**
+     * Event source is an arbitrary string that helps identify the thing that imported
+     * them into the local event table so you can do a mass remove if needed
+     */
+    public const SOURCE_NAME = 'suds_wonde';
 
     /**
      * Get timetable classes occurring this far in the past
@@ -285,6 +290,11 @@ class Factory
                 $timezone,
                 $from,
                 $to
+            ))
+            ->add(new TimetableCalendar\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->eventMapper
             ))
             ->add(new ApiStatistics(
                 $this->log,
