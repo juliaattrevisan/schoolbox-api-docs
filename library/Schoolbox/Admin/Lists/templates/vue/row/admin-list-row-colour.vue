@@ -43,6 +43,7 @@ export default {
             $(this.$el).spectrum({
                 allowEmpty: true,
                 showAlpha: false,
+                showButtons: false,
                 showInput: true,
                 preferredFormat: 'hex',
                 clickoutFiresChange: true,
