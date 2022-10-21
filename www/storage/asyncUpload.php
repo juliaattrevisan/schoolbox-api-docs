@@ -134,8 +134,7 @@ function attemptStorage(array $fileData, PrefixGenerator $prefixGenerator, bool 
             'type' => $storage->getMimetype()->getMime(),
             'size' => $storage->getSize(),
             'name' => $fileData['name'],
-            'file' => $modelToArray($storage),
-            'inline'      => $storage->getMimetype()->getInline()
+            'file' => $modelToArray($storage)
         ]
     ];
 }
