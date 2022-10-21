@@ -118,7 +118,7 @@ export default {
                     ascending: this.sortDir === 'asc',
                     column: this.sortBy === 'name' ? 'name' : 'dateModified.formatted',
                 },
-                perPage: 100,
+                perPage: 10,
                 perPageValues: [100, 200, 300],
                 resizableColumns: false,
                 rowClassCallback: (row) => { //to differentiate newly uploaded files so it's clear where they've been placed in the table
@@ -389,7 +389,9 @@ export default {
         onFileSuccess (file) {
             this.checkFileFilterIsActive(file);
             this.addFileToTable(file);
-            this.$refs.table.resetQuery();
+            this.$nextTick(() => { //so we can use jQuery preview on newly added files
+                $('[data-plugin="preview"]').preview();
+            });
         },
 
         /**
