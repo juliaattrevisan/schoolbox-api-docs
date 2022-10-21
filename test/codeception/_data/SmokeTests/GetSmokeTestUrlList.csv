@@ -1,5 +1,7 @@
 Admin,Go admin dashboard,https://vagrant.dev.schoolbox.cloud/adminv2/home
 Admin,Go to user admin,https://vagrant.dev.schoolbox.cloud/adminv2/user
+Admin,Go to reports group,https://vagrant.dev.schoolbox.cloud/adminv2/reports/group/6
+Admin,Go to SSL Renewal,https://vagrant.dev.schoolbox.cloud/adminv2/home/ssl-renewal-help
 Admin,User Management Activity Report,https://vagrant.dev.schoolbox.cloud/adminv2/reports/activity/all
 Admin,User Management Login Log,https://vagrant.dev.schoolbox.cloud/adminv2/reports/login/all
 Admin,User Management Schoolbox Help All,https://vagrant.dev.schoolbox.cloud/adminv2/shaps
@@ -95,6 +97,7 @@ Admin,Filters Assessment Calendar,https://vagrant.dev.schoolbox.cloud/adminv2/fi
 Admin,Filters Badge List,https://vagrant.dev.schoolbox.cloud/adminv2/filters/badgeList
 Admin,Filters Badge Report,https://vagrant.dev.schoolbox.cloud/adminv2/filters/awardList
 Admin,Filters Class Markbook,https://vagrant.dev.schoolbox.cloud/adminv2/filters/classMarkbook
+Admin,Filters Class Pastoral,https://vagrant.dev.schoolbox.cloud/adminv2/filters/classPastoral
 Admin,Filters Course Markbook,https://vagrant.dev.schoolbox.cloud/adminv2/filters/courseMarkbook
 Admin,Filters Upcoming Due Work,https://vagrant.dev.schoolbox.cloud/adminv2/filters/dueWorkCal
 Admin,Filters Grades,https://vagrant.dev.schoolbox.cloud/adminv2/filters/grades
@@ -117,6 +120,11 @@ Admin,Import import pastoral,https://vagrant.dev.schoolbox.cloud/adminv2/import/
 Admin,Import timetable Structure,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableStructure
 Admin,Import timetable ,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable
 Admin,Import timetable enrolment,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment
+Boarder Leave,View Boarder Leave,https://vagrant.dev.schoolbox.cloud/modules/leave
+Boarder Leave,Create Request,https://vagrant.dev.schoolbox.cloud/modules/leave/create
+Boarder Leave,View Requests,https://vagrant.dev.schoolbox.cloud/modules/leave/house/1
+Boarder Leave,View Leave Report,https://vagrant.dev.schoolbox.cloud/modules/leave/report/house/1
+Boarder Leave,View Catering Report,https://vagrant.dev.schoolbox.cloud/modules/leave/report/catering
 Calendar,View calendar,https://vagrant.dev.schoolbox.cloud/calendar
 Calendar,Export calendar,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809
 Calendar,Create event,https://vagrant.dev.schoolbox.cloud/calendar/event/create?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1
@@ -129,15 +137,34 @@ CMS,Add tile,https://vagrant.dev.schoolbox.cloud/tile/add/25
 CMS,Post blog,https://vagrant.dev.schoolbox.cloud/blog/modify/new/83
 CMS,View blog archive,https://vagrant.dev.schoolbox.cloud/blog/archive/83
 CMS,Manage groups,https://vagrant.dev.schoolbox.cloud/group/join
+CMS,Manage all groups,https://vagrant.dev.schoolbox.cloud/groups#all-groups
+CMS,Manage favourite groups,https://vagrant.dev.schoolbox.cloud/groups#my-favourite-groups
+CMS,Manage groups I am in,https://vagrant.dev.schoolbox.cloud/groups#groups-im-in
+CMS,Manage groups I can join,https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join
+CMS,Manage groups pending membership,https://vagrant.dev.schoolbox.cloud/groups#groups-pending-membership
 CMS,Manage my links,https://vagrant.dev.schoolbox.cloud/cms/myLinks
 CMS,Manage my message settings,https://vagrant.dev.schoolbox.cloud/settings/messages
 CMS,View user profile,https://vagrant.dev.schoolbox.cloud/search/user/1
 CMS,View homepage statistics,https://vagrant.dev.schoolbox.cloud/homepage/153
 CMS,Get homepage RSS feed,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809/158
 CMS,Manage homepage group,https://vagrant.dev.schoolbox.cloud/group/modify/153
+Curriculum,Manage Curriculum,https://vagrant.dev.schoolbox.cloud/curriculum
+Evidence,Create Learning Moment Text,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=text
+Evidence,Create Learning Moment Photo,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=photo
+Evidence,Create Learning Moment Video,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=video
+Evidence,Create Learning Moment Audio,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=audio
+Evidence,Create Learning Moment Upload,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=upload
+Evidence,Badge List,https://vagrant.dev.schoolbox.cloud/learning/badge
+Evidence,Create Badge,https://vagrant.dev.schoolbox.cloud/learning/badge/create
+Evidence,View Badge Report,https://vagrant.dev.schoolbox.cloud/learning/badge/award/list/83
+EOTC,My EOTC events,https://vagrant.dev.schoolbox.cloud/modules/eotc/myReview
+EOTC,EOTC Event Report,https://vagrant.dev.schoolbox.cloud/modules/eotc/report/all?status%5B%5D=1&status%5B%5D=2&status%5B%5D=3&status%5B%5D=4&status%5B%5D=5&status%5B%5D=6
+EOTC,Manage EOTC Admins,https://vagrant.dev.schoolbox.cloud/modules/eotc/permission/modify
+EOTC,EOTC Configurations Settings,https://vagrant.dev.schoolbox.cloud/modules/eotc/config/modify
 LMS,Visit pending asses,https://vagrant.dev.schoolbox.cloud/learning/pending/
 LMS,Visit classes,https://vagrant.dev.schoolbox.cloud/learning/classes
 LMS,Visit Class List,https://vagrant.dev.schoolbox.cloud/learning/class/106
+LMS,Visit Student Courses List,https://vagrant.dev.schoolbox.cloud/learning/courses/student/25
 LMS,Visit class markbook,https://vagrant.dev.schoolbox.cloud/learning/markbook/class/106
 LMS,Visit rubric markbook,https://vagrant.dev.schoolbox.cloud/rubricMarkbook/106?5=&8=&10=&11=&12=&16=
 LMS,Visit class,https://vagrant.dev.schoolbox.cloud/homepage/code/9ENGA
@@ -156,6 +183,7 @@ LMS,View due work,https://vagrant.dev.schoolbox.cloud/learning/due
 LMS,View grades summary,https://vagrant.dev.schoolbox.cloud/learning/grades/25
 LMS,View grades for class,https://vagrant.dev.schoolbox.cloud/learning/grades/25/2019-1/83?1=&11=&12=
 LMS,View assessment with rubric and feedback history,https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D
+LMS,QR Code page,https://vagrant.dev.schoolbox.cloud/qrcode/83
 Resource Booking,View all resources,https://vagrant.dev.schoolbox.cloud/resource-booking/item
 Resource Booking,View resource booking category,https://vagrant.dev.schoolbox.cloud/resource-booking/category/5
 Resource Booking,View resource item,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5
@@ -172,6 +200,7 @@ Pastoral,Modify a group,https://vagrant.dev.schoolbox.cloud/pastoral/management/
 Pastoral,Manage visibility,https://vagrant.dev.schoolbox.cloud/pastoral/management/audience
 Pastoral,Create a record for student,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert
 Pastoral,View a record,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/2
+Pastoral,View class pastoral care report,https://vagrant.dev.schoolbox.cloud/pastoral/class/83?30=&31=&32=
 News,Get an RSS feed,https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=all
 News,Load news feed on news page,https://vagrant.dev.schoolbox.cloud/news/lists/feed
 News,View created by me,https://vagrant.dev.schoolbox.cloud/news/me
@@ -184,6 +213,7 @@ News,View saved news,https://vagrant.dev.schoolbox.cloud/news/saved
 News,View news archive,https://vagrant.dev.schoolbox.cloud/news/archive
 News,Read news,https://vagrant.dev.schoolbox.cloud/news
 News,Load news feed on news page,https://vagrant.dev.schoolbox.cloud/news/lists/feed
+Notifications,View all notifications,https://vagrant.dev.schoolbox.cloud/messages
 Fixtures,Go to fixtures,https://vagrant.dev.schoolbox.cloud/fixtures
 Fixtures,See all seasons,https://vagrant.dev.schoolbox.cloud/fixtures/seasons
 Fixtures,Change a seacon,https://vagrant.dev.schoolbox.cloud/fixtures/seasons/4/edit
