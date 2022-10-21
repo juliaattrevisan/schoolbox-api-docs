@@ -184,14 +184,14 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         $definition = $this->getTimetableDefinition(null, $campus, $now);
 
         foreach ($definition['number'] as $i => $number) {
-            $sequence = $definition[$i]['sequence'];
+            $sequence = $definition['sequence'][$i];
 
             if ($now) {
-                $start = strtotime($definition[$i]['start'], $now);
-                $end   = strtotime($definition[$i]['end'], $now);
+                $start = strtotime($definition['start'][$i], $now);
+                $end   = strtotime($definition['end'][$i], $now);
             } else {
-                $start = strtotime($definition[$i]['start']);
-                $end   = strtotime($definition[$i]['end']);
+                $start = strtotime($definition['start'][$i]);
+                $end   = strtotime($definition['end'][$i]);
             }
 
             if ($start < $now && $now <= $end) {
