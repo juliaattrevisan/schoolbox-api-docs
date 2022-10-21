@@ -9,7 +9,6 @@
  */
 class Report_Staff extends Report_Abstract
 {
-
     /**
      * Constructor
      *
