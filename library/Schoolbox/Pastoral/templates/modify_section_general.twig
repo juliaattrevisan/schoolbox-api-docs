@@ -53,7 +53,7 @@
             {% endif %}
         </div>
         <div class="small-12 medium-6 columns">
-            <label> Points <input type="number" inputmode="numeric" name="points" size="35" maxlength="10" value="{{ record.points }}"/> </label>
+            <label> Points <input type="number" inputmode="numeric" name="points" size="35" min="-1000000" max="1000000" value="{{ record.points }}"/> </label>
         </div>
         <div class="small-12 medium-6 columns">
             <label> Tags
