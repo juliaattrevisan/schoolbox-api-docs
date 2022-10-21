@@ -153,4 +153,9 @@ $sub-nav-item-divider-margin: rem-calc(12) !default;
       }
     }
   }
+  [class^='icon-'], [class*=' icon-'] {
+    &:before {
+      line-height: normal;
+    }
+  }
 }
