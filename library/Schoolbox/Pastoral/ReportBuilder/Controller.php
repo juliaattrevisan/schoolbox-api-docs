@@ -221,8 +221,8 @@ class Controller extends Base
         }
 
         $orders = [
-            'student',
             'date',
+            'student',
             'type',
             'subtype',
             'author',
