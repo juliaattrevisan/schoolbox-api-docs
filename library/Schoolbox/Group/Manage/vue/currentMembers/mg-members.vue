@@ -50,12 +50,11 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
     customSorting: {
         name: (ascending) => { //'waiting' members to always show on top and then sort by lastName
             return (a, b) => {
-                if (a.displayPriority < b.displayPriority) { //the displayPriority is set in manageGroupStore.js
+                if (a.displayPriority < b.displayPriority) { //the displayPriority is set in mgMembersStore.js
                     return 1;
                 } else if (a.displayPriority > b.displayPriority) {
                     return -1;
                 }
-
                 // Sort on last name, then given name
                 if (a.lastName !== b.lastName) {
                     if (ascending) {
