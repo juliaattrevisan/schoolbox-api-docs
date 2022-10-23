@@ -38,6 +38,7 @@ use Schoolbox\Learning\Turnitin;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 
 class Module extends BaseModule
 {
@@ -223,10 +224,14 @@ class Module extends BaseModule
      */
     private function preloadParticipant(array $params)
     {
-        try {
-            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
+            $assessment = $params['assessment'];
+        } else {
+            try {
+                $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+            }
         }
 
         $response = null;
@@ -250,11 +255,12 @@ class Module extends BaseModule
             if (!isset($student, $response)) {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
+        } elseif (isset($params['student']) && $params['student'] instanceof User) {
+            $student = $params['student'];
         } elseif ($params['studentId']) {
             /* Otherwise spawn a floating feedback instead
              */
             try {
-                $response = null;
                 $student  = \Schoolbox\UserMapper::getInstance()->findById($params['studentId']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
@@ -446,8 +452,7 @@ class Module extends BaseModule
         // fill response feedback, as it's not hydrated
         foreach ($participant->getAllFeedbacks() as $feedback) {
             // Feedback doesn't have response when given from status page
-            if (
-                ($feedback->getResponse() === null && $feedback->isPublished())
+            if (($feedback->getResponse() === null && $feedback->isPublished())
                 || ($feedback->getResponse() && ($feedback->getResponse()->getID() === $response->getId()))
             ) {
                 $response->getAllFeedback()->add($feedback);
