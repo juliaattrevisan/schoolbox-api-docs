@@ -42,13 +42,8 @@ abstract class AMQPConnector implements AMQPInterface
     /** @var int */
     protected $expiry     = 1209600000; // 1000 * 60 * 60 * 24 * 14 = 2 weeks in millis
 
-    /**
-     * @var AMQPStreamConnection|null
-     */
-    protected $conn;
-
     /** @var AMQPChannel[] */
-    protected $channels;
+    protected array $channels = [];
 
 
     /**
@@ -61,22 +56,6 @@ abstract class AMQPConnector implements AMQPInterface
                 $this->$property = $value;
             }
         }
-
-        // override any naughty settings
-        $this->conn = null;
-        $this->channels = [];
-    }
-
-
-    /**
-     * Closes the existing connection
-     * @return $this
-     */
-    public function closeConnection()
-    {
-        $this->conn->close();
-        $this->conn = null;
-        return $this;
     }
 
 
@@ -92,7 +71,7 @@ abstract class AMQPConnector implements AMQPInterface
         $idkey = $id ?: '_';
 
         if (!(isset($this->channels[$idkey]) && $this->channels[$idkey] instanceof AMQPChannel)) {
-            $this->channels[$idkey] = $this->conn->channel($id);
+            $this->channels[$idkey] = $this->getConnection()->channel($id);
 
             // automatically declares the primary exchange
             $this->channels[$idkey]->exchange_declare(
@@ -140,7 +119,7 @@ abstract class AMQPConnector implements AMQPInterface
     public function declareQueue($name, $channelId = null)
     {
         try {
-            list($queueName, $messageCount, $consumerCount) = $this->getChannel($channelId)->queue_declare(
+            [$queueName, $messageCount, $consumerCount] = $this->getChannel($channelId)->queue_declare(
                 $name,
                 $this->passive,
                 $this->durable,
@@ -369,4 +348,20 @@ abstract class AMQPConnector implements AMQPInterface
      * @return string
      */
     abstract protected function hashMessage($message, $channelId);
+
+
+    /**
+     * Connects to an instance of AMQPConnection, and returns that connection.
+     *
+     * @return AMQPStreamConnection
+     */
+    abstract protected function getConnection(): AMQPStreamConnection;
+
+
+    /**
+     * Closes the existing connection.
+     *
+     * @return $this
+     */
+    abstract public function closeConnection(): self;
 }

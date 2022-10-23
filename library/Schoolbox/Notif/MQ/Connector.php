@@ -31,6 +31,11 @@ class Connector extends AMQPConnector
     public const AMQP_CONNECTION_OPTION_HEARTBEAT = 'heartbeat';
 
     /**
+     * @var AMQPStreamConnection|null
+     */
+    private ?AMQPStreamConnection $conn = null;
+
+    /**
      * Constructor
      *
      * @param array $settings
@@ -38,38 +43,50 @@ class Connector extends AMQPConnector
      */
     public function __construct(
         array $settings = [],
-        array $connectionOptions = []
+        private array $connectionOptions = [],
     ) {
         parent::__construct($settings);
-        $this->connect($connectionOptions);
     }
 
 
     /**
-     * Establishes a new AMQP connection if it doesn't already exist.
-     * @return void
+     * @return AMQPStreamConnection
      */
-    protected function connect(array $connectionOptions)
+    protected function getConnection(): AMQPStreamConnection
     {
-        if (!$this->conn instanceof AMQPStreamConnection) {
+        if (!$this->conn) {
             $this->conn = AMQPStreamConnection::create_connection(
                 [
                     [
-                        self::AMQP_CONNECTION_OPTION_HOST     => $connectionOptions[self::AMQP_CONNECTION_OPTION_HOST],
-                        self::AMQP_CONNECTION_OPTION_PORT     => $connectionOptions[self::AMQP_CONNECTION_OPTION_PORT],
-                        self::AMQP_CONNECTION_OPTION_USER     => $connectionOptions[self::AMQP_CONNECTION_OPTION_USER],
-                        self::AMQP_CONNECTION_OPTION_PASSWORD => $connectionOptions[self::AMQP_CONNECTION_OPTION_PASSWORD],
-                        self::AMQP_CONNECTION_OPTION_VHOST    => $connectionOptions[self::AMQP_CONNECTION_OPTION_VHOST],
+                        self::AMQP_CONNECTION_OPTION_HOST     => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_HOST],
+                        self::AMQP_CONNECTION_OPTION_PORT     => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_PORT],
+                        self::AMQP_CONNECTION_OPTION_USER     => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_USER],
+                        self::AMQP_CONNECTION_OPTION_PASSWORD => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_PASSWORD],
+                        self::AMQP_CONNECTION_OPTION_VHOST    => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_VHOST],
                     ],
                 ],
-                $connectionOptions,
+                $this->connectionOptions,
             );
 
-            if (isset($connectionOptions[self::AMQP_CONNECTION_OPTION_HEARTBEAT])) {
+            if (isset($this->connectionOptions[self::AMQP_CONNECTION_OPTION_HEARTBEAT])) {
                 $heartbeat = new PCNTLHeartbeatSender($this->conn);
                 $heartbeat->register();
             }
         }
+        return $this->conn;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function closeConnection(): self
+    {
+        if ($this->conn) {
+            $this->conn->close();
+            $this->conn = null;
+        }
+        return $this;
     }
 
 
