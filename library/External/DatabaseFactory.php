@@ -363,14 +363,11 @@ class External_DatabaseFactory
      */
     private function buildEnabledUserConnector(string $externalType, string $siteSchoolCode, string $tassVersion): External_UserInterface
     {
-        $customClassName = sprintf("External_%s_%s_User", ucfirst(strtolower($externalType)), ucfirst(strtolower($siteSchoolCode)));
-        if (class_exists($customClassName)) {
-            return new $customClassName();
-        }
-
         switch ($externalType) {
             case IConnector::EXTERNAL_TYPE_MAZE:
-                return new External_Maze_User();
+                return $siteSchoolCode === 'LK'
+                    ? new External_Maze_Lk_User()
+                    : new External_Maze_User();
             case IConnector::EXTERNAL_TYPE_TASS:
                 switch ($tassVersion) {
                     case 'V52':
@@ -380,20 +377,40 @@ class External_DatabaseFactory
                 }
                 return new External_Tass_User();
             case IConnector::EXTERNAL_TYPE_ISAMS:
-                return new External_Isams_User();
+                return $siteSchoolCode === 'CISPL'
+                    ? new External_Isams_Cispl_User()
+                    : new External_Isams_User();
             case IConnector::EXTERNAL_TYPE_DENBIGH:
                 return new External_Denbigh_User();
             case IConnector::EXTERNAL_TYPE_EDUMATE:
                 return new External_Edumate_User();
             case IConnector::EXTERNAL_TYPE_PCSCHOOLS:
-                return new External_Pcschools_User();
+                return $siteSchoolCode === 'CC'
+                    ? new External_Pcschools_Cc_User()
+                    : new External_Pcschools_User();
             case IConnector::EXTERNAL_TYPE_SCHOOLBOX:
                 return new External_Schoolbox_User();
             case IConnector::EXTERNAL_TYPE_SCHOOLPRO:
                 return new External_Schoolpro_User();
             case IConnector::EXTERNAL_TYPE_SCHOOLEDGE:
-                return new External_Schooledge_User();
+                return $siteSchoolCode === 'CCB'
+                    ? new External_Schooledge_Ccb_User()
+                    : new External_Schooledge_User();
             case IConnector::EXTERNAL_TYPE_SYNERGETIC:
+                switch ($siteSchoolCode) {
+                    case 'AMITY':
+                        return new External_Synergetic_Amity_User();
+                    case 'MC':
+                        return new External_Synergetic_Mc_User();
+                    case 'SMCS':
+                        return new External_Synergetic_Smcs_User();
+                    case 'SRCL':
+                        return new External_Synergetic_Srcl_User();
+                    case 'THS':
+                        return new External_Synergetic_Ths_User();
+                    case 'SK':
+                        return new External_Synergetic_Sk_User();
+                }
                 return new External_Synergetic_User();
             case IConnector::EXTERNAL_TYPE_DOUBLEFIRST:
                 return new External_Doublefirst_User();
