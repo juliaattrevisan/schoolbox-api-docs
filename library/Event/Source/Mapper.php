@@ -102,6 +102,7 @@ class Mapper extends BaseMapper
 
             /* Hard-delete the events themselves
              */
+            $eventIds = array_map('intval', $eventIds);
             $query = "DELETE FROM event WHERE id IN (" . implode(',', $eventIds) . ")";
             $this->database->query($query);
         }
