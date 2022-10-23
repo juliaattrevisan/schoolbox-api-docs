@@ -12,17 +12,11 @@ namespace Alaress\Async\AMQP;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 
+/**
+ * Interface for connections to AMQP queues.
+ */
 interface AMQPInterface
 {
-
-    /**
-     * Accept optional settings for construction
-     *
-     * @param array $settings
-     */
-    public function __construct($settings = array());
-
-
     /**
      * Declare an exchange
      *

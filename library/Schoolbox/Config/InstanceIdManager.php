@@ -245,8 +245,8 @@ class InstanceIdManager extends CliTool\App
     private function renameMessageQueues(string $oldInstanceId, string $newInstanceId): void
     {
         $this->getLogger()->notice('Renaming message queues');
-        // https://stackoverflow.com/questions/57768315/how-to-rename-queue-in-rabbitmq
-        $amqpConn = MQ\Connector::getInstance();
+//        // https://stackoverflow.com/questions/57768315/how-to-rename-queue-in-rabbitmq
+//        $amqpConn = MQ\Connector::getInstance();
 
         $queues = [
             "%s.route",

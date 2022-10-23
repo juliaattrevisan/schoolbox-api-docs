@@ -262,7 +262,7 @@ switch ($_POST['module']) {
         $amqpOnline = "online";
         $amqpLight = 'success';
         try {
-            Schoolbox\Notif\MQ\Connector::getInstance();
+            $kernel->get('amqp');
         } catch (\Throwable $e) {
             $amqpOnline = "offline";
             $amqpLight = 'alert';

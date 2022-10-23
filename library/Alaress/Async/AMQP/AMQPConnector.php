@@ -10,86 +10,120 @@
 namespace Alaress\Async\AMQP;
 
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Exception\AMQPProtocolChannelException;
 use PhpAmqpLib\Message\AMQPMessage;
 use RuntimeException;
 
+/**
+ * Base definition for AMQP queues.
+ */
 abstract class AMQPConnector implements AMQPInterface
 {
-
-    // default connection vars
-
-    /** @var bool */
-    protected $passive    = false;
-    /** @var bool */
-    protected $durable    = true;       // exchanges and queues survive server restart
-    /** @var bool */
-    protected $autoDelete = false;      // exchanges and queues are not deleted when final client disconnects
-    /** @var bool */
-    protected $internal   = false;
-    /** @var bool */
-    protected $exclusive  = false;      // more than one connection allowed per queue
-
-    /** @var bool */
-    protected $noLocal    = false;
-    /** @var bool */
-    protected $noAck      = false;
-    /** @var bool */
-    protected $noWait     = false;
-
-    /** @var int */
-    protected $persist    = 2;          // save to disk
-    /** @var int */
-    protected $expiry     = 1209600000; // 1000 * 60 * 60 * 24 * 14 = 2 weeks in millis
+    /**
+     * Are exchange and queue connections passive?
+     *
+     * If true, the connection will create the exchange/queue if it doesn't
+     * exist: otherwise it'll raise an error.
+     *
+     * @see https://www.rabbitmq.com/amqp-0-9-1-reference.html#exchange.declare.passive
+     * @see https://www.rabbitmq.com/amqp-0-9-1-reference.html#queue.declare.passive
+     */
+    protected bool $passive = false;
 
     /**
-     * @var AMQPStreamConnection
+     * Do exchanges and queues survive server restart?
+     *
+     * @see https://www.rabbitmq.com/amqp-0-9-1-reference.html#exchange.declare.durable
+     * @see https://www.rabbitmq.com/amqp-0-9-1-reference.html#queue.declare.durable
      */
-    protected $conn;
+    protected bool $durable = true;
 
-    /** @var AMQPChannel[] */
-    protected $channels;
+    /**
+     * Are exchanges and queues deleted once final client disconnects?
+     *
+     * @see https://www.rabbitmq.com/amqp-0-9-1-reference.html#exchange.declare.auto-delete
+     * @see https://www.rabbitmq.com/amqp-0-9-1-reference.html#queue.declare.auto-delete
+     */
+    protected bool $autoDelete = false;
+
+    /**
+     * Are exchanges invisible to publishers
+     * (e.g. for use only by other exchanges)?
+     *
+     * @see https://www.rabbitmq.com/amqp-0-9-1-reference.html#exchange.declare.internal
+     */
+    protected bool $internal = false;
+
+    /**
+     * Are queues exclusive to this connection?
+     *
+     * @see https://www.rabbitmq.com/amqp-0-9-1-reference.html#queue.declare.exclusive
+     */
+    protected bool $exclusive = false;
 
 
     /**
-     * @param array $settings
+     * Unused in this implementation
+     *
+     * @see https://www.rabbitmq.com/amqp-0-9-1-reference.html#domain.no-local
      */
-    public function __construct($settings = [])
+    protected bool $noLocal = false;
+
+    /**
+     * Unused in this implementation
+     *
+     * @see https://www.rabbitmq.com/amqp-0-9-1-reference.html#domain.no-ack
+     */
+    protected bool $noAck = false;
+
+    /**
+     * Unused in this implementation
+     *
+     * @see https://www.rabbitmq.com/amqp-0-9-1-reference.html#domain.no-wait
+     */
+    protected bool $noWait = false;
+
+    /**
+     * The delivery mode for messages: Non-persistent (1) or persistent (2).
+     */
+    protected int $persist = 2;
+
+    /**
+     * Default expiration for messages, in milliseconds. (Defaults to 2 weeks)
+     */
+    protected int $expiry = 1209600000;
+
+    /**
+     * A list of channels
+     *
+     * @var AMQPChannel[]
+     */
+    protected array $channels = [];
+
+
+    /**
+     * Constructor
+     *
+     * @param array $settings Various connection-related settings:
+     *                        * passive
+     *                        * durable
+     *                        * autoDelete
+     *                        * internal
+     *                        * exclusive
+     *                        * noLocal
+     *                        * noAck
+     *                        * noWait
+     *                        * persist
+     *                        * expiry
+     */
+    public function __construct(array $settings = [])
     {
         foreach ($settings as $property => $value) {
             if (property_exists($this, $property)) {
                 $this->$property = $value;
             }
         }
-
-        // override any naughty settings
-        $this->conn = null;
-        $this->channels = [];
-    }
-
-
-    /**
-     * @return AMQPStreamConnection
-     */
-    public function getConnection()
-    {
-        if (!$this->conn instanceof AMQPStreamConnection) {
-            $this->connect();
-        }
-        return $this->conn;
-    }
-
-
-    /**
-     * Closes the existing connection
-     * @return $this
-     */
-    public function closeConnection()
-    {
-        $this->conn->close();
-        $this->conn = null;
-        return $this;
     }
 
 
@@ -153,7 +187,7 @@ abstract class AMQPConnector implements AMQPInterface
     public function declareQueue($name, $channelId = null)
     {
         try {
-            list($queueName, $messageCount, $consumerCount) = $this->getChannel($channelId)->queue_declare(
+            [$queueName, $messageCount, $consumerCount] = $this->getChannel($channelId)->queue_declare(
                 $name,
                 $this->passive,
                 $this->durable,
@@ -383,10 +417,19 @@ abstract class AMQPConnector implements AMQPInterface
      */
     abstract protected function hashMessage($message, $channelId);
 
+
     /**
-     * Sets $this->conn to an instance of AMQPConnection.
+     * Connects to an instance of AMQPConnection, and returns that connection.
      *
-     * @return void
+     * @return AbstractConnection
      */
-    abstract protected function connect();
+    abstract protected function getConnection(): AbstractConnection;
+
+
+    /**
+     * Closes the existing connection.
+     *
+     * @return $this
+     */
+    abstract public function closeConnection(): self;
 }

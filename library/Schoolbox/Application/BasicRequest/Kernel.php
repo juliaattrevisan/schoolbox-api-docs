@@ -32,7 +32,7 @@ use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStoneFactory;
-use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Notif\MQ\ConnectorFactory;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
@@ -133,9 +133,12 @@ class Kernel extends WebKernelAbstract
             )
         );
 
-        $di->set('amqp', $di->lazy(function () {
-            return Connector::getInstance();
-        }));
+        $di->set(
+            'amqp',
+            $di->lazy(
+                fn () => (new ConnectorFactory($config))->build([], []),
+            ),
+        );
 
         $di->set('instance', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */

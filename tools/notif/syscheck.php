@@ -9,6 +9,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Lumberjack\Logger;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -79,7 +80,8 @@ try {
 
     try {
         // test amqp is online
-        $amqp = \Schoolbox\Notif\MQ\Connector::getInstance();
+        /** @var AMQPConnector $amqp */
+        $amqp = $kernel->get('amqp');
         $amqp->publish('Testing AMQP Connection', 'daemon.test');
         $d->notice('RabbitMQ is online', array('char' => '+'));
     } catch (Exception $e) {

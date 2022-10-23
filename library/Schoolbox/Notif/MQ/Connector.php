@@ -11,63 +11,91 @@ namespace Schoolbox\Notif\MQ;
 
 use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Async\AMQP\AMQPExchange;
-use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
+use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\IConfigLoader;
+use PhpAmqpLib\Connection\Heartbeat\PCNTLHeartbeatSender;
 
+/**
+ * AMQP connection, specific to the needs of the schedule and route daemons.
+ */
 class Connector extends AMQPConnector
 {
-
-    /** @var AMQPInterface */
-    protected static $instance;
-
-    /**
-     * @return Connector
-     */
-    public static function getInstance()
-    {
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
-
     const PRIMARY_EXCHANGE = 'sb.%s.tx';
     const PRIMARY_TYPE     = 'topic';
 
-    /** @var IConfigLoader */
-    protected $conf;
-
+    /**
+     * AMQP connection options
+     */
+    public const AMQP_CONNECTION_OPTION_HOST      = 'host';
+    public const AMQP_CONNECTION_OPTION_PORT      = 'port';
+    public const AMQP_CONNECTION_OPTION_USER      = 'user';
+    public const AMQP_CONNECTION_OPTION_PASSWORD  = 'password';
+    public const AMQP_CONNECTION_OPTION_VHOST     = 'vhost';
+    public const AMQP_CONNECTION_OPTION_HEARTBEAT = 'heartbeat';
 
     /**
-     * @param array $settings
+     * @var AMQPStreamConnection|null
      */
-    public function __construct($settings = [])
-    {
+    private ?AMQPStreamConnection $conn = null;
+
+    /**
+     * Constructor
+     *
+     * @param array $settings
+     * @param array $connectionOptions
+     */
+    public function __construct(
+        array $settings = [],
+        private array $connectionOptions = [],
+    ) {
         parent::__construct($settings);
-        $this->conf = ConfigLoader::getInstance();
-        $this->connect();
     }
 
 
     /**
-     * Establishes a new AMQP connection if it doesn't already exist.
-     * @return void
+     * Creates an `AMQPStreamConnection` instance if not connected already.
+     *
+     * If the `AMQP_CONNECTION_OPTION_HEARTBEAT` option is set: register a
+     * heartbeat connection.
+     *
+     * @return AbstractConnection
      */
-    protected function connect()
+    protected function getConnection(): AbstractConnection
     {
-        if (!$this->conn instanceof AMQPStreamConnection) {
-            $this->conn = new AMQPStreamConnection(
-                $this->conf->get('amqp_host'),
-                $this->conf->get('amqp_port'),
-                $this->conf->get('amqp_user'),
-                $this->conf->get('amqp_pass'),
-                $this->conf->get('amqp_vhost')
+        if (!$this->conn) {
+            $this->conn = AMQPStreamConnection::create_connection(
+                [
+                    [
+                        self::AMQP_CONNECTION_OPTION_HOST     => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_HOST],
+                        self::AMQP_CONNECTION_OPTION_PORT     => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_PORT],
+                        self::AMQP_CONNECTION_OPTION_USER     => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_USER],
+                        self::AMQP_CONNECTION_OPTION_PASSWORD => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_PASSWORD],
+                        self::AMQP_CONNECTION_OPTION_VHOST    => $this->connectionOptions[self::AMQP_CONNECTION_OPTION_VHOST],
+                    ],
+                ],
+                $this->connectionOptions,
             );
+
+            if (isset($this->connectionOptions[self::AMQP_CONNECTION_OPTION_HEARTBEAT])) {
+                $heartbeat = new PCNTLHeartbeatSender($this->conn);
+                $heartbeat->register();
+            }
         }
+        return $this->conn;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function closeConnection(): self
+    {
+        if ($this->conn) {
+            $this->conn->close();
+            $this->conn = null;
+        }
+        return $this;
     }
 
 
