@@ -48,7 +48,7 @@ class External_Synergetic_User implements External_UserInterface
         // Make sure a valid external ID was passed
 
         if (!$this->isExternalIdValid($user->getExternalId())) {
-            return null;
+            return $user->getPortrait();
         }
 
         // Do a query to get the photos modification date in the SIS. We don't pull the actual photo at this time
