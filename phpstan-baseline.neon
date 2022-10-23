@@ -16,11 +16,6 @@ parameters:
 			path: library/Alaress/Application/Kernel.php
 
 		-
-			message: "#^Property Alaress\\\\Async\\\\AMQP\\\\AMQPConnector\\:\\:\\$conn \\(PhpAmqpLib\\\\Connection\\\\AMQPStreamConnection\\) does not accept null\\.$#"
-			count: 2
-			path: library/Alaress/Async/AMQP/AMQPConnector.php
-
-		-
 			message: "#^Return type \\(\\$this\\(Alaress\\\\Async\\\\AMQP\\\\AMQPConnector\\)\\) of method Alaress\\\\Async\\\\AMQP\\\\AMQPConnector\\:\\:bindQueue\\(\\) should be compatible with return type \\(PhpAmqpLib\\\\Channel\\\\AMQPChannel\\) of method Alaress\\\\Async\\\\AMQP\\\\AMQPInterface\\:\\:bindQueue\\(\\)$#"
 			count: 1
 			path: library/Alaress/Async/AMQP/AMQPConnector.php
