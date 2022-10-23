@@ -389,7 +389,9 @@ export default {
         onFileSuccess (file) {
             this.checkFileFilterIsActive(file);
             this.addFileToTable(file);
-            this.$refs.table.resetQuery();
+            this.$nextTick(() => { //so we can use jQuery preview on newly added files
+                $('[data-plugin="preview"]').preview();
+            });
         },
 
         /**
