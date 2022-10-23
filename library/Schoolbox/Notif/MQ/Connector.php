@@ -12,9 +12,13 @@ namespace Schoolbox\Notif\MQ;
 use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Async\AMQP\AMQPExchange;
 use Alaress\Async\Notification\Instance\Instance;
+use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Connection\Heartbeat\PCNTLHeartbeatSender;
 
+/**
+ * AMQP connection, specific to the needs of the schedule and route daemons.
+ */
 class Connector extends AMQPConnector
 {
     const PRIMARY_EXCHANGE = 'sb.%s.tx';
@@ -50,9 +54,14 @@ class Connector extends AMQPConnector
 
 
     /**
-     * @return AMQPStreamConnection
+     * Creates an `AMQPStreamConnection` instance if not connected already.
+     *
+     * If the `AMQP_CONNECTION_OPTION_HEARTBEAT` option is set: register a
+     * heartbeat connection.
+     *
+     * @return AbstractConnection
      */
-    protected function getConnection(): AMQPStreamConnection
+    protected function getConnection(): AbstractConnection
     {
         if (!$this->conn) {
             $this->conn = AMQPStreamConnection::create_connection(
