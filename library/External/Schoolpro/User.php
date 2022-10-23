@@ -408,7 +408,7 @@ class External_Schoolpro_User implements External_UserInterface
     public function getPortrait(User $user): ?Storage\Model
     {
         if (!is_numeric($user->getExternalId())) {
-            return null;
+            return $user->getPortrait();
         }
 
         $vars = [
