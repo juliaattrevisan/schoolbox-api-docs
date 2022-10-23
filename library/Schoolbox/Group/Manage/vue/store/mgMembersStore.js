@@ -173,7 +173,7 @@ export const useMembersStore = defineStore('mgMembers', {
          * will be replayed on any table display change (like sorting)
          * Also, we don't want newly added or just approved members to go into the usual sort (displayPriority: 0) until
          * the table display is changing, not when say a newly approved member has been changed from read to admin access
-         * This is so members don't suddenly 'dissapear' when they are approved as this can be a bit confusing
+         * This is so members don't suddenly 'dissapear' into the table when they are approved as this can be a bit confusing
          *
          * @param { Boolean }
          */
