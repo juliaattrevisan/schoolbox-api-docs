@@ -40,7 +40,7 @@ class Component_Config_CurriculumCode extends Component_Config_Abstract
                 ]
             );
             $page->parse('curriculumCodes_block', 'curriculumCodes', true);
-            foreach ($context->getCurriculumNodes() as $node) {
+            foreach ($context->getViewableCurriculumNodes() as $node) {
                 if (!$node->getEnabled()) {
                     continue;
                 }
