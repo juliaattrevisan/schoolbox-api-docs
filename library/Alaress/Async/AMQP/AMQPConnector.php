@@ -69,18 +69,6 @@ abstract class AMQPConnector implements AMQPInterface
 
 
     /**
-     * @return AMQPStreamConnection
-     */
-    public function getConnection()
-    {
-        if (!$this->conn instanceof AMQPStreamConnection) {
-            $this->connect([]);
-        }
-        return $this->conn;
-    }
-
-
-    /**
      * Closes the existing connection
      * @return $this
      */
@@ -104,7 +92,7 @@ abstract class AMQPConnector implements AMQPInterface
         $idkey = $id ?: '_';
 
         if (!(isset($this->channels[$idkey]) && $this->channels[$idkey] instanceof AMQPChannel)) {
-            $this->channels[$idkey] = $this->getConnection()->channel($id);
+            $this->channels[$idkey] = $this->conn->channel($id);
 
             // automatically declares the primary exchange
             $this->channels[$idkey]->exchange_declare(
