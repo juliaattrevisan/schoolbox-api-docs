@@ -4,6 +4,11 @@ import Storage        from '@schoolboxVue/components/storage';
 import RelativeTime   from '@schoolboxLearningMomentEvidence/relative-time';
 import CommentThread  from './comment-thread';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import CodesList      from '@schoolboxCurriculum/vue/codes-list';
+import RevealModal    from "@schoolboxVue/components/reveal-modal";
+import NodeDetails    from '@schoolboxCurriculum/vue/node-details';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
+
 
 export default {
     /**
@@ -43,6 +48,9 @@ export default {
         Storage,
         RelativeTime,
         CommentThread,
+        CodesList,
+        RevealModal,
+        NodeDetails,
     },
 
     /**
@@ -53,6 +61,7 @@ export default {
      */
     data() {
         return {
+            selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
         }
     },
 
@@ -112,33 +121,26 @@ export default {
          * Format each except last with a comma
          *
          * @param { Number }
-         * 
-         * @return { String }
-         */
-        curriculumCodeWithComma (index) {
-            if (index !== (this.evidence.curriculumNodes.length-1)) {
-                return `${this.evidence.curriculumNodes[index].code},`;
-            } else if (index === (this.evidence.curriculumNodes.length-1) && this.evidence.tags.length > 0) {
-                return `${this.evidence.curriculumNodes[index].code},`;
-            } else {
-                return this.evidence.curriculumNodes[index].code;
-            }
-        },
-
-        /**
-         * Format each except last with a comma
          *
-         * @param { Number }
-         * 
          * @return { String }
          */
         tagNameWithComma (index) {
             if (index !== this.evidence.tags.length-1) {
-                return `${this.evidence.tags[index].name},`;
+                return `${this.evidence.tags[index].name}, `;
             } else {
                 return this.evidence.tags[index].name;
             }
-        }
+        },
+
+        /**
+         * to open up the node details modal
+         *
+         * @pararm { object }
+         */
+        onCodeSelected (node) {
+            this.selectedNode = node;
+            this.$refs.nodeDetailsModal.open();
+        },
 
     }
 
@@ -189,7 +191,10 @@ export default {
                                     <br>
                                     <template v-if="evidence.curriculumNodes.length > 0 || evidence.tags.length > 0">
                                         Tags:
-                                        <span v-for="(curriculumNode, index) in evidence.curriculumNodes" :key="curriculumNode.name" :title="curriculumNode.name"> {{ curriculumCodeWithComma(index) }}</span>
+                                        <codes-list
+                                            :nodes="evidence.curriculumNodes"
+                                            @selected="onCodeSelected"
+                                        /><template v-if="evidence.curriculumNodes.length > 0 && evidence.tags.length > 0">, </template>
                                         <span v-for="(tag, index) in evidence.tags" :key="tag.name"> {{ tagNameWithComma(index) }}</span>
                                     </template>
                                 </p>
@@ -202,7 +207,7 @@ export default {
                         </div>
 
                         <!-- Discussion thread -->
-                        <comment-thread 
+                        <comment-thread
                             :thread="evidence.discussionThread"
                             :create-thread-endpoint="evidence._links.createThread"
                             :can-comment="canComment"
@@ -214,4 +219,9 @@ export default {
             </div>
         </div>
     </div>
+    <reveal-modal ref="nodeDetailsModal">
+        <node-details
+            :node="selectedNode"
+        />
+    </reveal-modal>
 </template>
