@@ -1,16 +1,16 @@
 /**
  * For a vue-table-2 to show the UI at the bottom right of the table
- * 
+ *
  * @TODO - we currently assume that there is only ever one vue-table on the page
  *         for now this is a safe assumption, but it could cause issues in the future
  *         if we ever put more than one vue-table on a page
- * 
+ *
  */
 
  import { nextTick } from 'vue';
 
  /**
-  * To adjust the UI display, 
+  * To adjust the UI display,
   * putting everything down the bottom right
   */
 export async function updateFooterUI () {
@@ -26,6 +26,7 @@ export async function updateFooterUI () {
 function pushUIIntoFooterSlot () {
     const perPageControls = document.querySelector('.VueTables__limit');
     const tableFooter = document.querySelector('[data-table-footer]');
+    // debugger;
     if (perPageControls && tableFooter) { //may not exist depending on how many results are currently available / filtered
         tableFooter.appendChild(perPageControls);
         const paginationCount = document.querySelector('.VuePagination__count');
@@ -41,7 +42,7 @@ function pushUIIntoFooterSlot () {
 function onlyShowNextPrevPagination () {
     document.querySelectorAll('.VuePagination__pagination-item').forEach( (item) => {
         if (item.className.includes('prev-page') && !item.className.includes('prev-chunk')) { // this is the previous button
-            item.style.display = 'block';  
+            item.style.display = 'block';
         } else if (item.className.includes('next-page') && !item.className.includes('next-chunk')) { //this is the next button
             item.style.display = 'block';
         } else { //and this is all others, which are hidden

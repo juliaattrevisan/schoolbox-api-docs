@@ -79,7 +79,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         ascending: true,
         column: 'name'
     },
-    perPage: 50,
+    perPage: 5,
     perPageValues: [50, 100, 200],
     resizableColumns: false,
     rowClassCallback: (row) => { //to differentiate new / updated rows
