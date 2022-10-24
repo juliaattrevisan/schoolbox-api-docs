@@ -11,6 +11,8 @@ import Endpoints from '../mgEndpoints';
 import FromTypes from '../addMembers/mgAddMembersFromTypes';
 
 
+let latestDisplayPriority = 2; //to increment on every new members add, so the most recently added are always displayed at top of the table
+
 export const useAddMembersStore = defineStore('mgAddMembers', {
 
     state: () => ({
@@ -26,9 +28,11 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
         async add () {
             this.isProcessing = true;
             const store = useStore();
+            store.isProcessing = true;
+            const membersStore = useMembersStore();
+            membersStore.refreshMembers(); //to set any previously isNew or justUpdated to false
             // refresh whole page after adding users, if current folder is not a group
             const reload = !useSettingsStore().isAccessSaved;
-            store.isProcessing = true;
             try {
                 const response = await fetch(Endpoints.ADD_MEMBERS, {
                     method: 'POST',
@@ -44,13 +48,13 @@ export const useAddMembersStore = defineStore('mgAddMembers', {
                     const newMembers = responseJson.newMembers.map((newMember) => { //add in some additional properties
                         return {
                             ...newMember,
-                            displayPriority: 2, //to show at the very top of the display table
+                            displayPriority: latestDisplayPriority, //to show at the very top of the display table, 1 is used for those on the waiting list, and all others below
                             isNew: true, //to highlight new members just added
                             justUpdated: false, //to highlight members that have just been changed
                         }
                     });
+                    latestDisplayPriority++; //increment so newest members are always on top
                     useSearchStore().clearSelectedResults(); //the members have been added so clear the selection
-                    const membersStore = useMembersStore();
                     membersStore.members = [...membersStore.members, ...newMembers]; //add in the new members to the table
                 } else {
                     throw new Error();
