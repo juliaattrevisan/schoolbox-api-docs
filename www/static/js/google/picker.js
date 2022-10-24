@@ -153,18 +153,17 @@
                 .build();
             picker.setVisible(true);
 
-            if (config.containerID) { //if it exists, add it into the empty containerId element and ensure it sits at the top left
+            if (config.containerID) { // If it exists, add it into the empty containerId element and ensure it sits at the top left
                 picker.De.style.left = '0px';
                 picker.De.style.top = '0px';
-                picker.De.style.width = '100%'; //ensure it sits within the boundaries of the parent modal
+                picker.De.style.width = '100%'; // Ensure it sits within the boundaries of the parent modal
                 $(config.containerID).append(picker.De);
                 window.addEventListener('resize', () => resizeGooglePicker());
             }
 
             /**
-             * Google has its own resize listener, so we need to overwrite it to
-             * ensure the picker stays within the boundaries of the modal its
-             * been added to
+             * Google has its own resize listener, so we need to overwrite it to ensure the picker stays within the
+             * boundaries of its parent modal.
              */
             function resizeGooglePicker () {
                 picker.De.style.width = '100%';
@@ -176,6 +175,7 @@
             $(document).on('close.fndtn.reveal', config.modalId, function () {
                 picker.setVisible(false);
                 if (config.containerID) { //empty on close
+                    window.removeEventListener('resize', () => resizeGooglePicker());
                     $(config.containerID).empty();
                 }
             });
