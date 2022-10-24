@@ -26,6 +26,7 @@ const membersStore = useMembersStore();
 const tableEl = ref(null);
 const tableColumns = ['name', 'firstName', 'givenName', 'preferredName', 'lastName', 'role', 'campus', 'yearLevel', 'house', 'accessType'];
 const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
+    alwaysShowPerPageSelect: true,
     columnsClasses: {
         accessType: 'access-td ', //to specify a width
     },
@@ -79,7 +80,7 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         ascending: true,
         column: 'name'
     },
-    perPage: 5,
+    perPage: 50,
     perPageValues: [50, 100, 200],
     resizableColumns: false,
     rowClassCallback: (row) => { //to differentiate new / updated rows
