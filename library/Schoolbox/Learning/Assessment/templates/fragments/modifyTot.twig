@@ -5,14 +5,14 @@
  # or modify the assessment details itself. It's since expanded to also become available for students when they
  # can showcase assessments to their eportfolio.
  #
+ # @param string        $gradeRoute             the route to the Grade/Feedback screen, for instructors
  # @param string        $viewRoute              the route to the Status screen, for instructors
  # @param string        $modifyRoute            the route to the Modify Assessment screen, for instructors
- # @param string|null   $similarityReportRoute  (optional) the route to the Similarity Report for this Due Work
  # @param bool          $canShowcase            a boolean for students' ability to Showcase to their eportfolio
  # @param bool          $isShowcased            whether this assessment is already showcased on a user's eportfolio
  # @param array         $externalRedirectUrl    A third party redirect url/application name tuple (url, name)
  #}
-{% if viewRoute or modifyRoute or (similarityReportRoute is defined and similarityReportRoute) or (canShowcase is defined and canShowcase) or (externalRedirectUrl is defined and externalRedirectUrl) %}
+{% if gradeRoute or viewRoute or modifyRoute or (canShowcase is defined and canShowcase) or (externalRedirectUrl is defined and externalRedirectUrl) %}
     <nav>
         {% if externalRedirectUrl is defined and externalRedirectUrl %}
             <a href="{{ externalRedirectUrl.url }}" class="icon-view alert" title="{{ externalRedirectUrl.name }}"></a>
@@ -20,6 +20,10 @@
         <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
     <ul data-dropdown-content id="header-options" class="f-dropdown">
+        {% if gradeRoute %}
+        <li><a class="icon-task" href="{{ gradeRoute }}">View and {{ locale.grades }} submission</a></li>
+        {% endif %}
+
         {% if viewRoute %}
             <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
         {% endif %}
@@ -65,15 +69,12 @@
                                 action: 'unpublish'
                             }
                         {% endif %}
-                    });
+                    %});
                 });
             </script>
         {% endif %}
         {% if modifyRoute %}
             <li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
-        {% endif %}
-        {% if similarityReportRoute is defined and similarityReportRoute %}
-            <li><a href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-due-work">Similarity Report</a></li>
         {% endif %}
     </ul>
 {% endif %}

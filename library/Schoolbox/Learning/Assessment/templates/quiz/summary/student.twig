@@ -18,6 +18,7 @@
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
     {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessment.id, assessment: assessment}) %}
     {% include '@learningAssessment/fragments/modifyTot.twig' with {
+        gradeRoute: false,
         viewRoute: viewRoute,
         modifyRoute: modifyRoute,
         canShowcase: false,
@@ -188,16 +189,6 @@
                 {% endfor %}
                 </tbody>
             </table>
-        </div>
-    </div>
-
-{% elseif not canAttempt %}
-    <div class="row">
-        <div class="small-12 columns">
-            <div class="empty-state">
-                <i class="icon-quiz"></i>
-                <p>There has not been any activity on this {{ locale.assessment }} yet.</p>
-            </div>
         </div>
     </div>
 {% endif %}

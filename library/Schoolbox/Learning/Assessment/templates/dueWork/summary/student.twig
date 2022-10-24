@@ -79,15 +79,15 @@
             lastViews: lastViews
         } only %}
     </div>
+    {% set gradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, assessment: assessment, student: student, studentId: student.id}) %}
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
-    {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
     {% include '@learningAssessment/fragments/modifyTot.twig' with {
+        gradeRoute: gradeRoute,
         viewRoute: viewRoute,
         modifyRoute: modifyRoute,
         canShowcase: canShowcase,
         isShowcased: isShowcased,
-        similarityReportRoute: similarityReportRoute,
         externalRedirectUrl: externalRedirectUrl
     } %}
 </div>
