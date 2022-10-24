@@ -6,7 +6,6 @@ import BadgeList from '../../vue/badge-list';
 import toastMixin from '@schoolboxVue/components/toast-mixin';
 import HorizontalScoller from '@schoolboxVue/components/scroll/horizontal-scoller';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
-import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 /**
@@ -31,7 +30,6 @@ export default {
         RevealModal,
         HorizontalScoller, //so badges are contained in one line when a lot are selected
         BottomDrawer, //to pop out when +1 badges is selected
-        DynamicInput,
     },
     props: {
         /**
@@ -226,13 +224,6 @@ export default {
             selectedBadges: [],
             badgeListChangeEvent: 'EVENT_CHANGE',
             hasContentChange: false, //to track badge addition changes
-            /**
-             * so dynamic-input.vue is only in the dom while the modal is active
-             * we do this to avoid issues around ckeditor instantiation coupled with modals
-             * where opening, closing, then re-opening a modal causes the ckeditor to break
-             */
-            isModalOpen: false,
-            reason: '', //the reason the badge(s) are being awarded
         }
     },
     computed: {
@@ -352,15 +343,6 @@ export default {
         },
 
         /**
-         * To keep track of the reason, that's being updated by dynamic-input.vue
-         *
-         * @param { string }
-         */
-        onReasonChanged (newValue) {
-            this.reason = newValue;
-        },
-
-        /**
          * close the modal
          */
         onCancelSelected () {
@@ -372,7 +354,6 @@ export default {
          */
         onModalClosed () {
             this.isModalOpen = false;
-            this.reason = '';
         },
 
         /**
@@ -389,7 +370,7 @@ export default {
 
                     /* Construct each payload for each badge uniquely
                      */
-                    const payload = this.awardToSelfOnly ? null : { users: this.users, reason: this.reason };
+                    const payload = this.awardToSelfOnly ? null : { users: this.users };
 
                     fetch(badge._links[this.postAwardRouteLookup], {
                         method: 'POST',
@@ -474,26 +455,6 @@ export default {
                     </div>
                 </li>
             </ul>
-
-            <template v-if="'achievement' === this.type">
-                <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
-
-                <dynamic-input
-                    v-if="isModalOpen"
-                    preset-unique-id="reason"
-                    inputName="reason"
-                    singular="reason"
-                    :value="reason"
-                    :allow-edit="true"
-                    :allow-submit="false"
-                    :spawn-immediately="true"
-                    :is-processing="true"
-                    :cdn-prefix="this.cdnPrefix"
-                    :site-version="this.siteVersion"
-                    @value-changed="onReasonChanged"
-                ></dynamic-input>
-            </template>
-
             <template v-if="!awardToSelfOnly">
                 <hr />
                 <p class="meta">{{ confirmModalUserListMeta }}</p>
@@ -508,11 +469,27 @@ export default {
                     </li>
                 </ul>
             </template>
-
-            <ul class="flex-list buttons">
-                <li><a @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button">Cancel</a></li>
-                <li><button ref="awardModalSubmit" @click.prevent="onSubmit" @keyup.enter="onSubmit" class="submit">Confirm</button></li>
-            </ul>
+            <div class="component-action">
+                <section>
+                    <a
+                        v-if="type === 'achievement'"
+                        title="Award with evidence"
+                        class="button"
+                        @click.prevent="onSubmit"
+                        @keyup.enter="onSubmit"
+                    >
+                        Award with Evidence
+                    </a>
+                    <button
+                        title="Award"
+                        ref="awardModalSubmit"
+                        @click.prevent="onSubmit"
+                        @keyup.enter="onSubmit"
+                    >
+                        Award
+                    </button>
+                </section>
+            </div>
         </reveal-modal>
     </div>
 </template>
