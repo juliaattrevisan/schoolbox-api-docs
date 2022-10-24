@@ -9,7 +9,6 @@
  */
 class Report_Staff extends Report_Abstract
 {
-
     /**
      * Constructor
      *
@@ -108,6 +107,7 @@ class Report_Staff extends Report_Abstract
             foreach ($allStaff as $currentStaff) {
                 $this->getPage()->setVar(
                     array(
+
                         'STAFF_STAFFID'    => Scrub::text($currentStaff['StaffID'] ?? ''),
                         'STAFF_STAFFCODE'  => Scrub::text($currentStaff['SchoolStaffCode'] ?? ''),
                         'STAFF_TITLE'      => Scrub::text($currentStaff['StaffTitle'] ?? ''),
@@ -123,6 +123,9 @@ class Report_Staff extends Report_Abstract
                         'STAFF_VOICEMAIL'  => Scrub::text($currentStaff['StaffVoiceMail'] ?? ''),
                         'STAFF_PHONE'      => Scrub::text($currentStaff['StaffOccupPhone'] ?? ''),
                         'STAFF_EMAIL'      => Scrub::text($currentStaff['StaffOccupEmail'] ?? ''),
+                        'STAFF_BUILDING'   => Scrub::text($currentStaff['StaffBuilding'] ?? ''),
+                        'STAFF_ROOM'       => Scrub::text($currentStaff['StaffRoom'] ?? ''),
+                        'STAFF_HOUSE'      => Scrub::text($currentStaff['StaffHouse'] ?? ''),
                     )
                 );
                 $this->getPage()->parse('staff_block', 'staff', true);
