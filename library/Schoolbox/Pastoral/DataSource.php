@@ -370,21 +370,18 @@ class DataSource
 
         $severityEnabled = $this->mapper->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED);
 
-        $severitySelect = $severityEnabled ? "{$this->mapper->getJoinColumnString('severity', 'sev')}, " : '';
-        $severityJoin = $severityEnabled ? "LEFT JOIN  {$this->mapper->getJoinSql('severity', 'p', 'sev', true)}" : '';
-
         $sql   = "
             SELECT
                 {$this->mapper->getColumnString('p')},
                 {$this->mapper->getJoinColumnString('owner', 'o')},
                 {$this->mapper->getJoinColumnString('student', 's')},
-                {$severitySelect}
-                {$this->mapper->getJoinColumnString('modifiedBy', 'm')}
+                {$this->mapper->getJoinColumnString('modifiedBy', 'm')},
+                {$this->mapper->getJoinColumnString('severity', 'sev')}
             FROM       {$this->mapper->getTable()} p
             INNER JOIN {$this->mapper->getJoinSql('student', 'p', 's')}
             INNER JOIN {$this->mapper->getJoinSql('owner', 'p', 'o', true)}
             LEFT JOIN  {$this->mapper->getJoinSql('modifiedBy', 'p', 'm', true)}
-            {$severityJoin}
+            LEFT JOIN  {$this->mapper->getJoinSql('severity', 'p', 'sev', true)}
             WHERE s.deleted_at IS NULL
                 AND {$where}
             GROUP BY p.id
