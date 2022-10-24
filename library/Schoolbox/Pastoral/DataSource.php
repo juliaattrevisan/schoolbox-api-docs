@@ -11,6 +11,7 @@ namespace Schoolbox\Pastoral;
 use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
@@ -366,18 +367,24 @@ class DataSource
         ?int $limit,
     ): GenericCollection {
         $where = $pb->getWhereIntersect();
+
+        $severityEnabled = $this->mapper->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED);
+
+        $severitySelect = $severityEnabled ? "{$this->mapper->getJoinColumnString('severity', 'sev')}, " : '';
+        $severityJoin = $severityEnabled ? "LEFT JOIN  {$this->mapper->getJoinSql('severity', 'p', 'sev', true)}" : '';
+
         $sql   = "
             SELECT
                 {$this->mapper->getColumnString('p')},
                 {$this->mapper->getJoinColumnString('owner', 'o')},
                 {$this->mapper->getJoinColumnString('student', 's')},
-                {$this->mapper->getJoinColumnString('modifiedBy', 'm')},
-                {$this->mapper->getJoinColumnString('severity', 'sev')}
+                {$severitySelect}
+                {$this->mapper->getJoinColumnString('modifiedBy', 'm')}
             FROM       {$this->mapper->getTable()} p
             INNER JOIN {$this->mapper->getJoinSql('student', 'p', 's')}
             INNER JOIN {$this->mapper->getJoinSql('owner', 'p', 'o', true)}
             LEFT JOIN  {$this->mapper->getJoinSql('modifiedBy', 'p', 'm', true)}
-            LEFT JOIN  {$this->mapper->getJoinSql('severity', 'p', 'sev', true)}
+            {$severityJoin}
             WHERE s.deleted_at IS NULL
                 AND {$where}
             GROUP BY p.id
@@ -422,9 +429,11 @@ class DataSource
                 $student = $userMapper->hydrate($row, 's');
                 $record->setStudent($student);
 
-                /** @var PastoralSeverity $severity */
-                $severity = $severityMapper->hydrate($row, 'sev');
-                $record->setSeverity($severity);
+                if ($severityEnabled) {
+                    /** @var PastoralSeverity $severity */
+                    $severity = $severityMapper->hydrate($row, 'sev');
+                    $record->setSeverity($severity);
+                }
             } catch (MapperException $e) {
                 // noop
                 continue;

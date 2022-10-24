@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -188,6 +189,7 @@ class Controller extends Base
             $this->getUser(),
             $student,
             $pastoralIds,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED),
             $sort,
             $count,
         );

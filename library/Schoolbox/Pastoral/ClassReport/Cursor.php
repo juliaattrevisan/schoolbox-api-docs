@@ -13,7 +13,6 @@ use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
 use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
-use Closure;
 use DateTimeInterface;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
@@ -48,6 +47,7 @@ class Cursor implements ICursor
      * @param User       $currentUser The user for whom results should be censored
      * @param User       $student     The student to fetch results for
      * @param array      $pastoralIds A list of IDs already determined to match a filter
+     * @param bool       $severityEnabled Whether severity is enabled
      * @param string     $sortOption  A field to order results by
      * @param int        $limit       The max number of results to fetch
      */
@@ -56,6 +56,7 @@ class Cursor implements ICursor
         private User $currentUser,
         private User $student,
         private array $pastoralIds,
+        private bool $severityEnabled,
         private string $sortOption = self::SORT_OPTION_CREATED,
         private int $limit = self::LIMIT_DEFAULT,
     ) {
@@ -82,7 +83,7 @@ class Cursor implements ICursor
 
         if ($lastRecord instanceof Model) {
             $nextCursor = $this->codec->encode([
-                'severity' => $lastRecord->getSeverity()->getSequence(),
+                'severity' => $this->severityEnabled ? $lastRecord->getSeverity()?->getSequence() : null,
                 'created'  => $lastRecord->getCreatedAt()->toRfc3339String(),
                 'updated'  => $lastRecord->getUpdatedAt()->toRfc3339String(),
                 'id'       => $lastRecord->getId(),
