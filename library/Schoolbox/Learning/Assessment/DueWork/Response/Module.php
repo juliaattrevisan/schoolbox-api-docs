@@ -452,7 +452,8 @@ class Module extends BaseModule
         // fill response feedback, as it's not hydrated
         foreach ($participant->getAllFeedbacks() as $feedback) {
             // Feedback doesn't have response when given from status page
-            if (($feedback->getResponse() === null && $feedback->isPublished())
+            if (
+                ($feedback->getResponse() === null && $feedback->isPublished())
                 || ($feedback->getResponse() && ($feedback->getResponse()->getID() === $response->getId()))
             ) {
                 $response->getAllFeedback()->add($feedback);
