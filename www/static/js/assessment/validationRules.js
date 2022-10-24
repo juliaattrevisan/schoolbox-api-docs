@@ -137,7 +137,7 @@ function attachValidationRules() {
             $(this).rules("add", { descriptorsAreMonotonic: true });
         });
 
-        $("[data-group-max-value]").each(function() {
+        $("[data-group-max-value]:visible").each(function() {
             $(this).rules("add", {
                 required: true,
                 number: true,
