@@ -137,15 +137,16 @@
             ;
             let views = config.views.length > 0 ? config.views : getDefaultViews();
 
-            // enable selected features
+            // Enable selected features.
             for (i = 0; i < features.length; ++i) {
                 builder.enableFeature(features[i]);
             }
 
-            // enabled selected views
+            // Enabled selected views.
             for (i = 0; i < views.length; ++i) {
                 builder.addView(views[i]);
             }
+
             let picker = builder
                 .setOAuthToken(authResult.access_token)
                 .setCallback(pickerCallback)
@@ -153,13 +154,18 @@
                 .build();
             picker.setVisible(true);
 
-            if (config.containerID) { // If it exists, add it into the empty containerId element and ensure it sits at the top left
+            if (config.containerID) { // If the container exists, move the picker into the empty container and ensure the picker sits at the top left.
                 picker.De.style.left = '0px';
                 picker.De.style.top = '0px';
-                picker.De.style.width = '100%'; // Ensure it sits within the boundaries of the parent modal
+                picker.De.style.width = '100%'; // Ensure it sits within the boundaries of the parent modal.
                 $(config.containerID).append(picker.De);
-                window.addEventListener('resize', () => resizeGooglePicker());
+                window.addEventListener('resize', resizeGooglePicker);
             }
+
+            /* Shut google picker modal when we shut our modal
+             * https://stackoverflow.com/questions/13745505/how-to-use-zurb-foundation-reveal-with-open-opened-close-closed-callback-func
+             */
+            $(document).on('close.fndtn.reveal', config.modalId, onClosePicker);
 
             /**
              * Google has its own resize listener, so we need to overwrite it to ensure the picker stays within the
@@ -169,16 +175,18 @@
                 picker.De.style.width = '100%';
             }
 
-            /* Shut google modal when we shut our modal
-             * https://stackoverflow.com/questions/13745505/how-to-use-zurb-foundation-reveal-with-open-opened-close-closed-callback-func
+            /**
+             * Clean up after the picker modal has been closed.
              */
-            $(document).on('close.fndtn.reveal', config.modalId, function () {
+            function onClosePicker() {
                 picker.setVisible(false);
-                if (config.containerID) { //empty on close
-                    window.removeEventListener('resize', () => resizeGooglePicker());
+                if (config.containerID) { // If the container exists, return it to the state it was in before the call to createPicker().
+                    window.removeEventListener('resize', resizeGooglePicker);
                     $(config.containerID).empty();
                 }
-            });
+
+                $(document).off('close.fndtn.reveal', config.modalId, onClosePicker);
+            }
         }
 
 
