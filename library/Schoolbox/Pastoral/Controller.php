@@ -1217,22 +1217,29 @@ class Controller extends Base
             $record->setAccess($this->pastoralAccessMapper->createCollection());
             /** @var Access\Model $access */
             foreach ($accesses as $access) {
-                if ($access->getId()) {
+                if ($previousRecord && $access->getId()) {
                     $keptAccessIds[] = $access->getId();
                 }
                 $recordAccess = clone $access;
+                // if this record is new, create new access
+                if (!$previousRecord) {
+                    $recordAccess->setId(0);
+                }
                 $recordAccess->setPastoral($record);
                 $this->pastoralAccessMapper->save($recordAccess);
                 $record->getAccess()->add($recordAccess);
             }
-            // Delete accesses no longer exists
-            $removingAccesses = $existingAccesses->filter(
-                static function ($access) use ($keptAccessIds) {
-                    /** @var Access\Model $access */
-                    return !in_array($access->getId(), $keptAccessIds);
-                }
-            );
-            $this->pastoralAccessMapper->delete($removingAccesses);
+
+            if ($previousRecord) {
+                // Delete accesses no longer exists
+                $removingAccesses = $existingAccesses->filter(
+                    static function ($access) use ($keptAccessIds) {
+                        /** @var Access\Model $access */
+                        return !in_array($access->getId(), $keptAccessIds);
+                    }
+                );
+                $this->pastoralAccessMapper->delete($removingAccesses);
+            }
 
             // Save actions, record actions are compared against luAction id rather than recordAction id.
             if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
