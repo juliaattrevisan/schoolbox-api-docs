@@ -6,7 +6,6 @@ import { gsap } from 'gsap/all';
 
 
 const googleFiles = document.getElementById('googleFiles');
-const clientId = googleFiles.dataset.clientId;
 const levels = googleFiles.dataset.levels;
 const saveRoute = googleFiles.dataset.saveRoute;
 const componentId = googleFiles.dataset.componentId;
