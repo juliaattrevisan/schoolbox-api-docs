@@ -27,13 +27,12 @@ export default {
          * Converts a goal to an achievement.
          *
          * @param {Object} award the award to convert to an achievement
-         * @param {String} reason
          * @return {Promise} An AJAX request created by `axios`
          */
-        convertToAchievement(award, reason) {
+        convertToAchievement(award) {
             return axios.request({
                 url: award._links.goalAward,
-                data: {users: [award.recipient], reason: reason, conversion: true},
+                data: {users: [award.recipient], conversion: true},
                 method: 'post',
                 responseType: 'json'
             });

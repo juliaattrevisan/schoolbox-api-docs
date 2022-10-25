@@ -80,7 +80,6 @@ export default {
             award: {},
             canvasWidth: 0,
             canvasHeight: 0,
-            // allowReasonEdit: true,
             selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
         }
     },
@@ -193,7 +192,7 @@ export default {
          */
         awardAchievement () {
             this.toastActivate('Awarding...');
-            this.convertToAchievement(this.award, this.award.reason)
+            this.convertToAchievement(this.award)
                 .then((response) => {
                     this.toastSuccess('Achievement awarded');
 
@@ -221,16 +220,12 @@ export default {
         onCodeSelected (node) {
             this.selectedNode = node;
             this.modalIndex++;
-            this.hasSelectedModify = false; //so the ckeditor can be re-instantiated when we return from the 2nd modal
         },
 
         /**
          * The modal is now completely closed
          */
         onModalClosed () {
-            this.hasSelectedModify = false;
-            this.allowReasonEdit = true;
-            this.reason = '';
             this.isModalOpen = false;
         },
 
@@ -283,54 +278,7 @@ export default {
                     <p class="meta" v-if="award.isGoal && award.award">
                         Goal has been achieved <relative-time :datetime="award.award.awardedAt" :key="`${award.id}-goalAwardedAt`"></relative-time>
                     </p>
-
                     <article v-if="award.badge.body" v-html="award.badge.body"></article>
-
-                    <!-- Only show the Reason section if there was something meaningful -->
-                    <!-- <template v-if="award.reason && award.reason.length">
-                        <div class="actions-small-1">
-                            <div class="list-item">
-                                <h4>Evidence</h4>
-
-                                <article v-html="award.reason" id="reason-proxy"></article>
-                            </div>
-                            <nav>
-                                <button v-if="award._links.awardUpdate && !hasSelectedModify" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
-                            </nav>
-                        </div>
-                    </template> -->
-
-                    <!-- If you can edit the reason... -->
-                    <!-- <template v-if="award._links.awardUpdate">
-                        <template v-if="!(award.reason && award.reason.length)">
-                            <div class="empty-state" v-if="award._links.awardUpdate">
-                                <p><a @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected">Provide evidence</a> to demonstrate how this was achieved.</p>
-                            </div>
-                        </template>
-                    </template> -->
-
-                    <!-- If you have the ability to change the Reason, provide dynamic input -->
-                    <!-- <template v-if="award._links.awardUpdate">
-                        <form :action="returnToHere(award._links.awardUpdate)" method="post">
-                            <dynamic-input
-                                v-if="hasSelectedModify"
-                                preset-unique-id="reason"
-                                inputName="reason"
-                                singular="reason"
-                                :proxy="'reason-proxy'"
-                                :value="award.reason"
-                                :allow-edit="true"
-                                :allow-submit="true"
-                                :spawn-immediately="true"
-                                :is-processing="true"
-                                :cdn-prefix="this.cdnPrefix"
-                                :site-version="this.siteVersion"
-                                @post="onSaveReasonSelected"
-                                @value-changed="onReasonChanged"
-                            ></dynamic-input>
-                        </form>
-                    </template> -->
-
                     <template v-if="award.badge.curriculumNodes.length">
                         <p class="meta">
                             Curriculum Codes:
@@ -340,7 +288,6 @@ export default {
                             />
                         </p>
                     </template>
-
                     <div class="component-action">
                         <section>
                             <template v-if="award._links.goalAward && award.isGoal && !award.award">
