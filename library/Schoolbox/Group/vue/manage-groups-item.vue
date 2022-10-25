@@ -348,8 +348,37 @@ export default {
                         <div class="card-class-image" :style="getImageStyles()"></div>
                     </a>
                     <transition name="slide">
-                        <div class="group-actions" v-if="isEnrolled || isPrivate">
+                        <div class="group-actions">
+                            <button v-if="isEnrolled && !(isPrivate || isAdmin)"
+                                    title="Leave Group"
+                                    class="group-action icon-logout"
+                                    @click="leave"
+                            >
+                                Leave
+                            </button>
+                            <button v-else-if="isMembershipPending && !(isPrivate || isAdmin)"
+                                    title="Cancel membership request"
+                                    class="group-action icon-logout"
+                                    @click="leave"
+                            >
+                                Cancel membership request
+                            </button>
+                            <button v-else-if="!isEnrolled && isRequestToJoin && !(isPrivate || isAdmin)"
+                                title="Request to join"
+                                class="group-action icon-add"
+                                @click="join"
+                                >
+                                Request to join
+                            </button>
+                            <button v-else-if="!(isPrivate || isAdmin)"
+                                    title="Join"
+                                    class="group-action icon-add"
+                                    @click="join"
+                            >
+                                Join
+                            </button>
                             <button
+                                v-if="isEnrolled || isPrivate"
                                 title="Toggle Favourites"
                                 :class="['group-action', isFavourite ? 'icon-favourite' : 'icon-favourite-hollow']"
                                 :disabled="isProcessing"
@@ -358,7 +387,7 @@ export default {
                                 Toggle Favourites
                             </button>
                             <button
-                                v-if="!group.isForceFollow && !group.isMsgDisabled"
+                                v-if="(!group.isForceFollow && !group.isMsgDisabled) && (isEnrolled || isPrivate)"
                                 title="Toggle Notifications"
                                 :class="['group-action', isNotificationsOn ? 'icon-notifications' : 'icon-notifications-hollow']"
                                 :disabled="isProcessing"
@@ -367,7 +396,7 @@ export default {
                                 Toggle Notifications
                             </button>
                             <button
-                                v-if="group.isForceFollow || group.isMsgDisabled"
+                                v-if="(group.isForceFollow || group.isMsgDisabled) && (isEnrolled || isPrivate)"
                                 title="Disabled force follow button"
                                 :class="['group-action', group.isForceFollow ? 'icon-notifications' : 'icon-notifications-hollow']"
                                 :disabled="true"
@@ -397,14 +426,6 @@ export default {
                         </ul>
                     </template>
                 </div>
-                <transition name="fade" mode="out-in">
-                    <div v-if="isAdmin" class="expand private" key="admin">Group Admin</div>
-                    <div v-else-if="isPrivate" class="expand private" key="private">Private</div>
-                    <button v-else-if="isEnrolled" class="membership-button expand icon-logout alert" :title="`Leave ${group.name}`" key="leave" @click="leave" :disabled="isProcessing">Leave</button>
-                    <button v-else-if="isMembershipPending" class="membership-button expand icon-logout alert" title="Cancel membership request"  key="membershipPending" @click="leave" :disabled="isProcessing">Cancel membership request</button>
-                    <button v-else-if="isRequestToJoin" class="membership-button expand icon-add submit" :title="`Request to join ${group.name}`" key="requestToJoin" @click="join" :disabled="isProcessing">Request to join</button>
-                    <button v-else class="membership-button expand icon-add submit" :title="`Join ${group.name}`" key="join" @click="join" :disabled="isProcessing">Join</button>
-                </transition>
             </div>
         </section>
     </div>
