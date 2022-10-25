@@ -343,6 +343,13 @@ export default {
 
                     <div class="component-action">
                         <section>
+                            <a
+                                title="Award with evidence"
+                                class="button"
+                                href="#award-with-evidence-page"
+                            >
+                                Award with Evidence
+                            </a>
                             <button
                                 v-if="award._links.goalAward && award.isGoal && !award.award"
                                 @click.prevent="awardAchievement"
