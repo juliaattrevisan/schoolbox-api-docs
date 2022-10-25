@@ -46,6 +46,7 @@ trait UpdateFormTrait
         $this->setFormParam('closeDate', $assessable->getCloseAt()->getDatePicker());
         if ($assessable instanceof Project) {
             $this->setFormParam('summator', $assessable->getSummator()::getTitle());
+            $this->setFormParam('requireAllActivities', $assessable->getRequireAllActivities());
         }
         $this->setFormParam('weight', $assessable->getWeight());
         if ($assessable instanceof DueWork\Model) {

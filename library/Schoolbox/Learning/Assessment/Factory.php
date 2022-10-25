@@ -308,6 +308,7 @@ class Factory
             $assessment->setSummator(
                 (new SummatorFactory($this->getSummator(), $this->getRequireAllActivities()))->produce(),
             );
+            $assessment->setRequireAllActivities($this->getRequireAllActivities());
         }
 
         // Attach context
