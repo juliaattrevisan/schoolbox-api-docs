@@ -1,9 +1,6 @@
 <?php
 
 /**
- * Controller for curriculum importing.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -18,27 +15,26 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Source;
 use Schoolbox\Mapper;
 
+/**
+ * Controller for curriculum importing.
+ */
 class Controller extends Base
 {
     /**
-     * @var Source\Mapper
+     * Constructor
+     *
+     * @param Node\Mapper          $nodeMapper
+     * @param Source\Mapper        $sourceMapper
+     * @param LearningArea\Mapper  $areaMapper
+     * @param LearningLevel\Mapper $levelMapper
      */
-    protected $sourceMapper;
-
-    /**
-     * @var LearningArea\Mapper
-     */
-    protected $areaMapper;
-
-    /**
-     * @var LearningLevel\Mapper
-     */
-    protected $levelMapper;
-
-    /**
-     * @var Node\Mapper
-     */
-    protected $nodeMapper;
+    public function __construct(
+        private Node\Mapper $nodeMapper,
+        private Source\Mapper $sourceMapper,
+        private LearningArea\Mapper $areaMapper,
+        private LearningLevel\Mapper $levelMapper,
+    ) {
+    }
 
     /**
      * Controller action for viewing the import page.
@@ -52,7 +48,7 @@ class Controller extends Base
                 'title'    => 'Curriculum Import',
                 'template' => '@curriculumImport/browse.twig',
                 'data'     => array(
-                    'sourceList' => $this->getSourceMapper()->findImportable(),
+                    'sourceList' => $this->sourceMapper->findImportable(),
                 ),
             )
         );
@@ -65,7 +61,7 @@ class Controller extends Base
     {
         // Refetch outcomes
         $post   = $this->getRequest()->post;
-        $source = $this->getSourceMapper()->findById($post['id']);
+        $source = $this->sourceMapper->findById($post['id']);
 
         // Stuff the source into a factory and use that to build list of levels
         $factory = new Source\BrowserFactory();
@@ -83,7 +79,7 @@ class Controller extends Base
             }
             if (!$area->getId()) {
                 try {
-                    $this->getAreaMapper()->findOneByColumnList(
+                    $this->areaMapper->findOneByColumnList(
                         [
                             'curriculum_source_id' => $area->getSource()->getId(),
                             'name'                 => $area->getName(),
@@ -110,8 +106,8 @@ class Controller extends Base
         }
 
         // Save new areas and levels
-        $this->getAreaMapper()->save($newAreas);
-        $this->getLevelMapper()->save($newLevels);
+        $this->areaMapper->save($newAreas);
+        $this->levelMapper->save($newLevels);
 
         // And save the outcomes
         // (Save a root node, and save everything as a child of that.)
@@ -120,9 +116,9 @@ class Controller extends Base
         if ($thisArea instanceof LearningArea\Model && $thisLevel instanceof LearningLevel\Model) {
             /** @var Node\Model $rootNode */
             try {
-                $rootNode = $this->getNodeMapper()->findOneByColumn('reference', $thisArea->getReference(), ["deleted" => false]);
+                $rootNode = $this->nodeMapper->findOneByColumn('reference', $thisArea->getReference(), ["deleted" => false]);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $rootNode = $this->getNodeMapper()->createModel();
+                $rootNode = $this->nodeMapper->createModel();
                 $rootNode
 //                    ->setLearningLevel($thisLevel)
 //                    ->setLearningArea($thisArea)
@@ -130,7 +126,7 @@ class Controller extends Base
                     ->setReference($thisArea->getReference());
             }
             $rootNode->setChildren($browser->getOutcomes($thisArea, $thisLevel));
-            $this->getNodeMapper()->saveTree($rootNode);
+            $this->nodeMapper->saveTree($rootNode);
             $outcomes = new Collection();
             $outcomes->add($rootNode);
             // All the handling code cares about is the root node's ID
@@ -154,7 +150,7 @@ class Controller extends Base
         $code = 200;
         $data = array();
         try {
-            $source = $this->getSourceMapper()->findById($this->getRequest()->query['id']);
+            $source = $this->sourceMapper->findById($this->getRequest()->query['id']);
             // Stuff this into a factory and use that to build a list of levels
             $factory = new Source\BrowserFactory();
             $browser = $factory->build($source);
@@ -184,7 +180,7 @@ class Controller extends Base
         $code = 200;
         $data = array();
         try {
-            $source = $this->getSourceMapper()->findById($this->getRequest()->query['id']);
+            $source = $this->sourceMapper->findById($this->getRequest()->query['id']);
 
             // Stuff this into a factory and use that to build a list of levels
             $factory = new Source\BrowserFactory();
@@ -195,13 +191,13 @@ class Controller extends Base
             $areaRef  = $this->getRequest()->query['area'];
             $levelRef = $this->getRequest()->query['level'];
             try {
-                $area = $this->getAreaMapper()->findOneByColumn('reference', $areaRef);
+                $area = $this->areaMapper->findOneByColumn('reference', $areaRef);
             } catch (Mapper\Exception $e) {
                 $area = new LearningArea\Model();
                 $area->setReference($areaRef);
             }
             try {
-                $level = $this->getLevelMapper()->findOneByColumn('reference', $levelRef);
+                $level = $this->levelMapper->findOneByColumn('reference', $levelRef);
             } catch (Mapper\Exception $e) {
                 $level = new LearningLevel\Model();
                 $level->setReference($levelRef);
@@ -220,77 +216,5 @@ class Controller extends Base
                 'data'   => $data,
             )
         );
-    }
-
-    /**
-     * @param  Source\Mapper $sourceMapper
-     * @return $this
-     */
-    public function setSourceMapper(Source\Mapper $sourceMapper)
-    {
-        $this->sourceMapper = $sourceMapper;
-        return $this;
-    }
-
-    /**
-     * @return Source\Mapper
-     */
-    public function getSourceMapper()
-    {
-        return $this->sourceMapper;
-    }
-
-    /**
-     * @return LearningArea\Mapper
-     */
-    public function getAreaMapper()
-    {
-        return $this->areaMapper;
-    }
-
-    /**
-     * @param  LearningArea\Mapper $areaMapper
-     * @return $this
-     */
-    public function setAreaMapper(LearningArea\Mapper $areaMapper)
-    {
-        $this->areaMapper = $areaMapper;
-        return $this;
-    }
-
-    /**
-     * @return LearningLevel\Mapper
-     */
-    public function getLevelMapper()
-    {
-        return $this->levelMapper;
-    }
-
-    /**
-     * @param  LearningLevel\Mapper $levelMapper
-     * @return $this
-     */
-    public function setLevelMapper(LearningLevel\Mapper $levelMapper)
-    {
-        $this->levelMapper = $levelMapper;
-        return $this;
-    }
-
-    /**
-     * @return Node\Mapper
-     */
-    public function getNodeMapper()
-    {
-        return $this->nodeMapper;
-    }
-
-    /**
-     * @param  Node\Mapper $nodeMapper
-     * @return $this
-     */
-    public function setNodeMapper(Node\Mapper $nodeMapper)
-    {
-        $this->nodeMapper = $nodeMapper;
-        return $this;
     }
 }
