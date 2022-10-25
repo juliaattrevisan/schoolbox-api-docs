@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 class ValidFinalisedSubmission
 {
-
     /**
      * @param IAssessable $assessment
      * @param User        $student
