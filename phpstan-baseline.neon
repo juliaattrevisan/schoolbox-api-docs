@@ -3246,16 +3246,6 @@ parameters:
 			path: library/Schoolbox/Config/Loader.php
 
 		-
-			message: "#^Variable \\$rootNode in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Import/Controller.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Curriculum/Node/Mapper.php
-
-		-
 			message: "#^Static property Schoolbox\\\\Database\\\\Factory\\:\\:\\$instance \\(Schoolbox\\\\Database\\\\Factory\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Database/Factory.php
