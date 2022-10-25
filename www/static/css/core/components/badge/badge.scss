@@ -123,15 +123,16 @@
     h2, .meta {
         text-align: center;
     }
-
     h2 {
         max-width: 100%;
         margin-bottom: .5rem;
     }
-
     article {
         max-width: 40rem;
         margin: 1rem auto 1rem auto;
+    }
+    .meta:last-of-type {
+        padding-bottom: 1rem;
     }
 }
 

@@ -343,20 +343,37 @@ export default {
 
                     <div class="component-action">
                         <section>
+                            <template v-if="award._links.goalAward && award.isGoal && !award.award">
+                                <a
+                                    title="Award with evidence"
+                                    class="button"
+                                    href="#award-with-evidence-page"
+                                >
+                                    Award with Evidence
+                                </a>
+                                <button
+                                    @click.prevent="awardAchievement"
+                                    @keyup.enter="awardAchievement"
+                                >
+                                    Award
+                                </button>
+                            </template>
                             <a
-                                title="Award with evidence"
+                                v-else-if="award.reason && award.reason.length"
+                                title="View evidence"
                                 class="button"
-                                href="#award-with-evidence-page"
+                                href="#view-evidence-page"
                             >
-                                Award with Evidence
+                                View Evidence
                             </a>
-                            <button
-                                v-if="award._links.goalAward && award.isGoal && !award.award"
-                                @click.prevent="awardAchievement"
-                                @keyup.enter="awardAchievement"
+                            <a
+                                v-else-if="award._links.awardUpdate"
+                                title="View evidence"
+                                class="button"
+                                href="#add-evidence-page"
                             >
-                                Award
-                            </button>
+                                Add Evidence
+                            </a>
                         </section>
                     </div>
                 </div>
