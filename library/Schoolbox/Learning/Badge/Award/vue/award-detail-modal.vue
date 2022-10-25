@@ -9,7 +9,6 @@ import axios from 'axios';
 import { animateBadgeImage } from '../js/animateBadgeImage'
 import { ResizeObserver } from 'vue3-resize';
 import 'vue3-resize/dist/vue3-resize.css';
-import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
 import CodesList from '@schoolboxCurriculum/vue/codes-list';
 import NodeDetails from '@schoolboxCurriculum/vue/node-details';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
@@ -64,7 +63,6 @@ export default {
         RelativeTime,
         SequentialRevealModal,
         ResizeObserver, //to track any size changes to the parent container
-        DynamicInput,
         CodesList,
         NodeDetails,
     },
@@ -82,18 +80,7 @@ export default {
             award: {},
             canvasWidth: 0,
             canvasHeight: 0,
-            /**
-             * so dynamic-input.vue is only in the dom while the modal is active
-             * we do this to avoid issues around ckeditor instantiation coupled with modals
-             * where opening, closing, then re-opening a modal causes the ckeditor to break
-             */
-            hasSelectedModify: false,
-            /* Decide if the edit button for the Reason is available
-             * (presuming you have access to the update route)
-             * This toggles to false when you spawn the ckeditor
-             */
-            allowReasonEdit: true,
-            reason: '', //the reason the badge(s) are being awarded
+            // allowReasonEdit: true,
             selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
         }
     },
@@ -227,33 +214,6 @@ export default {
         },
 
         /**
-         * to be able to udpate the reason using dynamic-input.vue
-         */
-        onEditReasonSelected () {
-            this.hasSelectedModify = true;
-            this.allowReasonEdit = false;
-        },
-
-        /**
-         * To keep track of the reason, that's being updated by dynamic-input.vue
-         *
-         * @param { string }
-         */
-        onReasonChanged (newValue) {
-            this.reason = newValue;
-        },
-
-        /**
-         * post the changed reason value to the backend
-         * and then close the modal
-         *
-         * @param { string }
-         */
-        onSaveReasonSelected (value) {
-            console.warn(value);
-        },
-
-        /**
          * to open up the details modal
          *
          * @pararm { object }
@@ -324,10 +284,10 @@ export default {
                         Goal has been achieved <relative-time :datetime="award.award.awardedAt" :key="`${award.id}-goalAwardedAt`"></relative-time>
                     </p>
 
-                    <article v-html="award.badge.body"></article>
+                    <article v-if="award.badge.body" v-html="award.badge.body"></article>
 
                     <!-- Only show the Reason section if there was something meaningful -->
-                    <template v-if="award.reason && award.reason.length">
+                    <!-- <template v-if="award.reason && award.reason.length">
                         <div class="actions-small-1">
                             <div class="list-item">
                                 <h4>Evidence</h4>
@@ -335,25 +295,22 @@ export default {
                                 <article v-html="award.reason" id="reason-proxy"></article>
                             </div>
                             <nav>
-                                <!-- Provide the button to make the change -->
-                                <!-- Nonzero-length reason gets a button -->
                                 <button v-if="award._links.awardUpdate && !hasSelectedModify" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
                             </nav>
                         </div>
-                    </template>
+                    </template> -->
 
                     <!-- If you can edit the reason... -->
-                    <template v-if="award._links.awardUpdate">
-                        <!-- If there's no value here, provide empty state -->
+                    <!-- <template v-if="award._links.awardUpdate">
                         <template v-if="!(award.reason && award.reason.length)">
                             <div class="empty-state" v-if="award._links.awardUpdate">
                                 <p><a @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected">Provide evidence</a> to demonstrate how this was achieved.</p>
                             </div>
                         </template>
-                    </template>
+                    </template> -->
 
                     <!-- If you have the ability to change the Reason, provide dynamic input -->
-                    <template v-if="award._links.awardUpdate">
+                    <!-- <template v-if="award._links.awardUpdate">
                         <form :action="returnToHere(award._links.awardUpdate)" method="post">
                             <dynamic-input
                                 v-if="hasSelectedModify"
@@ -372,10 +329,9 @@ export default {
                                 @value-changed="onReasonChanged"
                             ></dynamic-input>
                         </form>
-                    </template>
+                    </template> -->
 
                     <template v-if="award.badge.curriculumNodes.length">
-                        <hr />
                         <p class="meta">
                             Curriculum Codes:
                             <codes-list
@@ -387,9 +343,13 @@ export default {
 
                     <div class="component-action">
                         <section>
-                            <a v-if="award._links.goalAward && award.isGoal && !award.award"
-                            class="button"
-                            @click.prevent="awardAchievement" @keyup.enter="awardAchievement">Award Achievement</a>
+                            <button
+                                v-if="award._links.goalAward && award.isGoal && !award.award"
+                                @click.prevent="awardAchievement"
+                                @keyup.enter="awardAchievement"
+                            >
+                                Award
+                            </button>
                         </section>
                     </div>
                 </div>
