@@ -399,17 +399,9 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $nodeQuery = "
                 SELECT
                     {$otherMapper->getTable()}.{$otherMapper->getIdentifierColumn()},
-                    {$otherMapper->getJoinColumnString($otherJoin, 'cn')},
-                    {$otherMapper->getJoinColumnString("$otherJoin.level", 'cnl')},
-                    {$otherMapper->getJoinColumnString("$otherJoin.level.source", 'cnls')},
-                    {$otherMapper->getJoinColumnString("$otherJoin.area", 'cna')},
-                    {$otherMapper->getJoinColumnString("$otherJoin.area.source", 'cnas')}
+                    {$otherMapper->getJoinColumnString($otherJoin, 'cn')}
                 FROM {$otherMapper->getTable()}
                 INNER JOIN {$otherMapper->getJoinSql($otherJoin, '', 'cn')}
-                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.level", 'cn', 'cnl')}
-                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.level.source", 'cnl', 'cnls')}
-                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.area", 'cn', 'cna')}
-                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.area.source", 'cna', 'cnas')}
                 WHERE {$where}
             ";
 
@@ -418,7 +410,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $result = [];
         foreach ($statement as $row) {
             $id   = $row['id'];
-            $node = $this->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+            $node = $this->hydrate($row, 'cn');
             if (!isset($result[$id])) {
                 $result[$id] = $this->createCollection();
             }

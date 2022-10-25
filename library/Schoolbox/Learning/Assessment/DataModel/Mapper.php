@@ -926,17 +926,9 @@ class Mapper extends BaseMapper
         $query     = "
             SELECT
                 {$this->getTable()}.id,
-                {$this->getJoinColumnString('curriculum_node_for_assessment', 'cn')},
-                {$this->getJoinColumnString('curriculum_node_for_assessment.level', 'cnl')},
-                {$this->getJoinColumnString('curriculum_node_for_assessment.level.source', 'cnls')},
-                {$this->getJoinColumnString('curriculum_node_for_assessment.area', 'cna')},
-                {$this->getJoinColumnString('curriculum_node_for_assessment.area.source', 'cnas')}
+                {$this->getJoinColumnString('curriculum_node_for_assessment', 'cn')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('curriculum_node_for_assessment', '', 'cn')}
-            LEFT  JOIN {$this->getJoinSql('curriculum_node_for_assessment.level', 'cn', 'cnl')}
-            LEFT  JOIN {$this->getJoinSql('curriculum_node_for_assessment.level.source', 'cnl', 'cnls')}
-            LEFT  JOIN {$this->getJoinSql('curriculum_node_for_assessment.area', 'cn', 'cna')}
-            LEFT  JOIN {$this->getJoinSql('curriculum_node_for_assessment.area.source', 'cna', 'cnas')}
             WHERE {$where}
         ";
         $statement = $this->getDatabase()->prepare($query);
@@ -952,7 +944,7 @@ class Mapper extends BaseMapper
                 $curriculumNodes[$assessmentId] = $curriculumNodeMapper->createCollection();
             }
             $curriculumNodes[$assessmentId]->add(
-                $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls')
+                $curriculumNodeMapper->hydrate($row, 'cn')
             );
         }
 
