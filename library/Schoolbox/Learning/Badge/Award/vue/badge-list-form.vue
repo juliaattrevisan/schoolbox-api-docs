@@ -224,6 +224,7 @@ export default {
             selectedBadges: [],
             badgeListChangeEvent: 'EVENT_CHANGE',
             hasContentChange: false, //to track badge addition changes
+            isProcessing: false, //to disable buttons while form is processing
         }
     },
     computed: {
@@ -276,7 +277,10 @@ export default {
             } else {
                 return '';
             }
-        }
+        },
+        submitButtonText () { //change button text depending on whether an award or goal
+            return this.type === 'achievement' ? 'Award' : 'Set Goal';
+        },
     },
     watch: {
 
@@ -363,7 +367,7 @@ export default {
          */
         onSubmit() {
             this.toastActivate(this.toastActivateMessage);
-            this.$refs.awardModalSubmit.disabled = true;
+            this.isProcessing = true;
 
             Promise
                 .all(this.selectedBadges.map((badge) => {
@@ -389,7 +393,7 @@ export default {
                     this.toastError(this.toastFailureMessage);
                 })
                 .finally(() => {
-                    this.$refs.awardModalSubmit.disabled = false;
+                    this.isProcessing = false;
                 });
         },
 
@@ -475,18 +479,17 @@ export default {
                         v-if="type === 'achievement'"
                         title="Award with evidence"
                         class="button"
-                        @click.prevent="onSubmit"
-                        @keyup.enter="onSubmit"
+                        href="#award-with-evidence-page"
                     >
                         Award with Evidence
                     </a>
                     <button
                         title="Award"
-                        ref="awardModalSubmit"
+                        :isProcessing="isProcessing"
                         @click.prevent="onSubmit"
                         @keyup.enter="onSubmit"
                     >
-                        Award
+                        {{ submitButtonText }}
                     </button>
                 </section>
             </div>
@@ -514,8 +517,7 @@ export default {
 }
 
 .selected-container__badges {
-    flex: 1 1 auto; //fill up all the space that __count doesn't occupy
-    min-width: 50%; //and don't get too small when shrunk down
+    min-width: 50%; //don't get too small when shrunk down
 }
 
 .selected-badges__item {
