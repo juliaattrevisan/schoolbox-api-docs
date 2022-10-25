@@ -416,6 +416,10 @@
     padding-top: 50%;
     position: relative;
     print-color-adjust: exact;
+    transition: .2s ease;
+    &:hover {
+        opacity: 0.6;
+    }
     .related {
       bottom: 6px;
       display: flex;
@@ -436,6 +440,7 @@
         justify-content: center;
       }
     }
+
   }
   .card-feature-avatar {
     margin-right: 0;
