@@ -281,6 +281,14 @@ export default {
         submitButtonText () { //change button text depending on whether an award or goal
             return this.type === 'achievement' ? 'Award' : 'Set Goal';
         },
+        selectedUserIds () { //return a string of comma separated user ids
+            const userIdList = this.users.map((user) => user.id);
+            return userIdList.join(',');
+        },
+        selectedBadgeIds () { //return a string of comma separated badge ids
+            const badgeIdList = this.selectedBadges.map((badge) => badge.id);
+            return badgeIdList.join(',');
+        },
     },
     watch: {
 
@@ -479,12 +487,12 @@ export default {
                         v-if="type === 'achievement'"
                         title="Award with evidence"
                         class="button"
-                        href="#award-with-evidence-page"
+                        :href="`#user-ids=${selectedUserIds}&badge-ids=${selectedBadgeIds}`"
                     >
                         Award with Evidence
                     </a>
                     <button
-                        title="Award"
+                        :title="submitButtonText"
                         :isProcessing="isProcessing"
                         @click.prevent="onSubmit"
                         @keyup.enter="onSubmit"

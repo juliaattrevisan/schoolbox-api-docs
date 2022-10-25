@@ -315,9 +315,9 @@ export default {
                             </a>
                             <a
                                 v-else-if="award._links.awardUpdate"
-                                title="View evidence"
+                                title="Add evidence"
                                 class="button"
-                                href="#add-evidence-page"
+                                :href="`#user-id=${award.recipient.id}&badge-id=${award.id}`"
                             >
                                 Add Evidence
                             </a>

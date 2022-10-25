@@ -193,6 +193,16 @@ export default {
         expiryDate (fromDate) {
             return calculateExpiryDate(this.expiry, fromDate);
         },
+
+        /**
+         * return a string of comma separated user ids
+         *
+         * @returns {String}
+         */
+        selectedUserIds () {
+            const userIdList = this.selected.map((user) => user.id);
+            return userIdList.join(',');
+        },
     },
     methods: {
         /**
@@ -325,7 +335,7 @@ export default {
                     v-if="type === 'achievement'"
                     title="Award with evidence"
                     class="button"
-                    href="#award-with-evidence-page"
+                    :href="`#user-ids=${selectedUserIds}&badge-id=${badge.id}`"
                     :class="[isSubmitButtonDisabled ? 'disabled' : '']"
                 >
                     Award with Evidence
