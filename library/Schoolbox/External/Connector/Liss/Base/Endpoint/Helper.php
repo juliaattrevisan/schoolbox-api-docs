@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
 use PhpXmlRpc\Value;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar\Watchlist;
+
 
 /**
  * Class Helper
@@ -71,6 +73,7 @@ class Helper
      */
     private function reformatEvent(Value $currentEvent): array
     {
+
         $date = date('Y-m-d', strtotime($currentEvent->me['struct']['Date']->me['dateTime.iso8601']));
         $startDateTime = "{$date} {$currentEvent->me['struct']['StartTime']->me['string']}:00";
         $endDateTime = "{$date} {$currentEvent->me['struct']['EndTime']->me['string']}:00";
@@ -111,6 +114,18 @@ class Helper
             foreach ($currentEvent->me['struct']['Students']->me['array'] as $currentStudent) {
                 $restructured['students'][] = (string)$currentStudent->me['string'];
             }
+        }
+
+        /* Dump this to a log for later inspection
+         * Since this requires schools to push data to us, shanking it
+         * into a log allows us to inspect independently of the school
+         */
+        if ((new Watchlist())->isOnWatchlist($currentEvent['code'], [
+            '9DAN 1',
+            '10DAN 1'
+        ])) {
+            print_r($currentEvent);
+            print_r($restructured);
         }
 
         return $restructured;
