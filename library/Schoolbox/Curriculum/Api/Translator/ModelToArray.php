@@ -88,12 +88,12 @@ class ModelToArray
             'enabled'       => $node->getEnabled(),
             'parent'        => $parent,
             'children'      => $children,
-            'learningArea'  => $node->getLearningArea()
-                ? ['id' => $node->getLearningArea()->getId()]
-                : null,
-            'learningLevel' => $node->getLearningLevel()
-                ? ['id' => $node->getLearningLevel()->getId()]
-                : null,
+//            'learningArea'  => $node->getLearningArea()
+//                ? ['id' => $node->getLearningArea()->getId()]
+//                : null,
+//            'learningLevel' => $node->getLearningLevel()
+//                ? ['id' => $node->getLearningLevel()->getId()]
+//                : null,
             'order'         => $node->getOrder(),
             'createdAt'     => $node->getCreatedAt()->toRfc3339String(),
             'modifiedAt'    => $node->getModifiedAt()->toRfc3339String(),

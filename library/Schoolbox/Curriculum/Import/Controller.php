@@ -124,8 +124,8 @@ class Controller extends Base
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $rootNode = $this->getNodeMapper()->createModel();
                 $rootNode
-                    ->setLearningLevel($thisLevel)
-                    ->setLearningArea($thisArea)
+//                    ->setLearningLevel($thisLevel)
+//                    ->setLearningArea($thisArea)
                     ->setName($thisArea->getName())
                     ->setReference($thisArea->getReference());
             }

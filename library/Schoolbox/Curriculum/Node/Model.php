@@ -339,6 +339,8 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
+     * TODO remove this
+     *
      * (PHP 5 &gt;= 5.4.0)<br/>
      * Specify data which should be serialized to JSON
      *
@@ -355,8 +357,8 @@ class Model implements ISoftDeletable, JsonSerializable
             'description' => $this->getDescription(),
             'reference'   => $this->getReference(),
             'children'    => $this->getChildren(),
-            'area'        => $this->getLearningArea(),
-            'level'       => $this->getLearningLevel(),
+//            'area'        => $this->getLearningArea(),
+//            'level'       => $this->getLearningLevel(),
             'breadcrumb'  => $this->buildBreadcrumb(' > '),
         ];
     }

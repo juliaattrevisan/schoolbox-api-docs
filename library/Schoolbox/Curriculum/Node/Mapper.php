@@ -67,8 +67,8 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         /** @var Model $child */
         foreach ($model->getChildren() as $child) {
             $child
-                ->setLearningArea($model->getLearningArea())
-                ->setLearningLevel($model->getLearningLevel())
+//                ->setLearningArea($model->getLearningArea())
+//                ->setLearningLevel($model->getLearningLevel())
                 ->setParent($model)
                 ->setOrder($i++);
             $this->saveTree($child);
@@ -323,21 +323,21 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     ) {
         /** @var Model $curriculumNode */
         $curriculumNode = $this->hydrate($row, $alias);
-        if ($curriculumNode) {
-            $curriculumNode->setLearningArea($this->getJoinMapper('area')->hydrate($row, $areaAlias));
-            if ($curriculumNode->getLearningArea() instanceof LearningArea\Model) {
-                $curriculumNode->getLearningArea()->setSource(
-                    $this->getJoinMapper('area.source')->hydrate($row, $areaSourceAlias)
-                );
-            }
-
-            $curriculumNode->setLearningLevel($this->getJoinMapper('level')->hydrate($row, $levelAlias));
-            if ($curriculumNode->getLearningLevel() instanceof LearningLevel\Model) {
-                $curriculumNode->getLearningLevel()->setSource(
-                    $this->getJoinMapper('level.source')->hydrate($row, $levelSourceAlias)
-                );
-            }
-        }
+//        if ($curriculumNode) {
+//            $curriculumNode->setLearningArea($this->getJoinMapper('area')->hydrate($row, $areaAlias));
+//            if ($curriculumNode->getLearningArea() instanceof LearningArea\Model) {
+//                $curriculumNode->getLearningArea()->setSource(
+//                    $this->getJoinMapper('area.source')->hydrate($row, $areaSourceAlias)
+//                );
+//            }
+//
+//            $curriculumNode->setLearningLevel($this->getJoinMapper('level')->hydrate($row, $levelAlias));
+//            if ($curriculumNode->getLearningLevel() instanceof LearningLevel\Model) {
+//                $curriculumNode->getLearningLevel()->setSource(
+//                    $this->getJoinMapper('level.source')->hydrate($row, $levelSourceAlias)
+//                );
+//            }
+//        }
         return $curriculumNode;
     }
 
