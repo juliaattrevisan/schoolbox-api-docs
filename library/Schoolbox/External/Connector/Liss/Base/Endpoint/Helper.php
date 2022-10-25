@@ -20,6 +20,13 @@ use PhpXmlRpc\Value;
 class Helper
 {
     /**
+     * Some schools are creating class codes >64 chars long
+     * e.g. "Addams Family Lead Vocal Rehearsals 12/10/2022 1.00pm to 1.30pm @ Drama Studio/ RH21A - A Clarke - #2688"
+     */
+    private const MAX_CLASS_CODE_LENGTH = 64;
+
+
+    /**
      * Preprocess all this stuff
      * Make it easier to understand because their data structure is blasphemously terrible
      *
@@ -36,6 +43,21 @@ class Helper
         }
 
         return $allEvents;
+    }
+
+
+    /**
+     * Schools are creating data with >64 char class codes
+     * so that snaps our schema
+     *
+     * This method forcibly truncates anything beyond the maximum limit
+     *
+     * @param string $classCode
+     * @return string
+     */
+    private function generateClassCode(string $classCode): string
+    {
+        return mb_substr($classCode, 0, self::MAX_CLASS_CODE_LENGTH, 'utf-8');
     }
 
 
@@ -66,7 +88,7 @@ class Helper
 
             /* Detail
              */
-            'code' => trim((string)$currentEvent->me['struct']['ClassCode']->me['string']),
+            'code' => $this->generateClassCode(trim((string)$currentEvent->me['struct']['ClassCode']->me['string'])),
             'name' => trim((string)$currentEvent->me['struct']['ClassName']->me['string']),
             'rooms' => trim((string)$currentEvent->me['struct']['Rooms']->me['string']),
             'type' => trim((string)$currentEvent->me['struct']['Type']->me['string']),
