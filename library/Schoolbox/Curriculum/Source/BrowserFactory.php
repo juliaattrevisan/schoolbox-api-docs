@@ -7,8 +7,13 @@
 
 namespace Schoolbox\Curriculum\Source;
 
+use Alaress\Html\ToText as Html2Text;
 use InvalidArgumentException;
+use Schoolbox\Curriculum\LearningArea\Mapper as AreaMapper;
+use Schoolbox\Curriculum\LearningLevel\Mapper as LevelMapper;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Curriculum\Source\AustralianCurriculum\Browser;
+use Schoolbox\Curriculum\Source\AustralianCurriculum\SparqlClient;
 
 /**
  * Factory for creating browsers out of a curriculum source model.
@@ -19,6 +24,20 @@ use Schoolbox\Curriculum\Source\AustralianCurriculum\Browser;
 class BrowserFactory
 {
     /**
+     * Constructor
+     *
+     * @param NodeMapper  $nodeMapper
+     * @param AreaMapper  $areaMapper
+     * @param LevelMapper $levelMapper
+     */
+    public function __construct(
+        private NodeMapper $nodeMapper,
+        private AreaMapper $areaMapper,
+        private LevelMapper $levelMapper,
+    ) {
+    }
+
+    /**
      * @param Model $source
      *
      * @return BrowserInterface
@@ -27,7 +46,14 @@ class BrowserFactory
     {
         $browserClass = $source->getClass() . '\\Browser';
         return match ($browserClass) {
-            Browser::class => new Browser(),
+            Browser::class => new Browser(
+                $source,
+                $this->nodeMapper,
+                $this->areaMapper,
+                $this->levelMapper,
+                new SparqlClient(SparqlClient::API_URI),
+                new Html2Text(),
+            ),
             default        => throw new InvalidArgumentException("Class \"$browserClass\" does not exist"),
         };
     }

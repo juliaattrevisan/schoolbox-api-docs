@@ -74,6 +74,11 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Curriculum\Source\Mapper::class),
             $this->getMapperFactory()->get(Curriculum\LearningArea\Mapper::class),
             $this->getMapperFactory()->get(Curriculum\LearningLevel\Mapper::class),
+            new Curriculum\Source\BrowserFactory(
+                $this->getMapperFactory()->get(Curriculum\Node\Mapper::class),
+                $this->getMapperFactory()->get(Curriculum\LearningArea\Mapper::class),
+                $this->getMapperFactory()->get(Curriculum\LearningLevel\Mapper::class),
+            ),
         );
     }
 }

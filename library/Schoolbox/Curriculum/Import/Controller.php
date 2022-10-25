@@ -23,16 +23,18 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Node\Mapper          $nodeMapper
-     * @param Source\Mapper        $sourceMapper
-     * @param LearningArea\Mapper  $areaMapper
-     * @param LearningLevel\Mapper $levelMapper
+     * @param Node\Mapper           $nodeMapper
+     * @param Source\Mapper         $sourceMapper
+     * @param LearningArea\Mapper   $areaMapper
+     * @param LearningLevel\Mapper  $levelMapper
+     * @param Source\BrowserFactory $browserFactory
      */
     public function __construct(
         private Node\Mapper $nodeMapper,
         private Source\Mapper $sourceMapper,
         private LearningArea\Mapper $areaMapper,
         private LearningLevel\Mapper $levelMapper,
+        private Source\BrowserFactory $browserFactory,
     ) {
     }
 
@@ -43,7 +45,7 @@ class Controller extends Base
     {
         // A list of source objects
         // Only show ones with an import class, though.
-        $this->getResponse()->content->set(
+        $this->response->content->set(
             array(
                 'title'    => 'Curriculum Import',
                 'template' => '@curriculumImport/browse.twig',
@@ -60,12 +62,11 @@ class Controller extends Base
     public function create()
     {
         // Refetch outcomes
-        $post   = $this->getRequest()->post;
+        $post   = $this->request->post;
         $source = $this->sourceMapper->findById($post['id']);
 
         // Stuff the source into a factory and use that to build list of levels
-        $factory = new Source\BrowserFactory();
-        $browser = $factory->build($source);
+        $browser = $this->browserFactory->build($source);
 
         $thisArea  = null;
         $thisLevel = null;
@@ -114,7 +115,6 @@ class Controller extends Base
         $code = 200;
         $data = array();
         if ($thisArea instanceof LearningArea\Model && $thisLevel instanceof LearningLevel\Model) {
-            /** @var Node\Model $rootNode */
             try {
                 $rootNode = $this->nodeMapper->findOneByColumn('reference', $thisArea->getReference(), ["deleted" => false]);
             } catch (\Schoolbox\Mapper\Exception $e) {
@@ -137,8 +137,8 @@ class Controller extends Base
         }
 
         // JSON something back to me
-        $this->getResponse()->status->setCode($code);
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
+        $this->response->status->setCode($code);
+        $this->response->content->set($this->buildJsonOutput($data));
     }
 
     /**
@@ -150,10 +150,9 @@ class Controller extends Base
         $code = 200;
         $data = array();
         try {
-            $source = $this->sourceMapper->findById($this->getRequest()->query['id']);
+            $source = $this->sourceMapper->findById($this->request->query['id']);
             // Stuff this into a factory and use that to build a list of levels
-            $factory = new Source\BrowserFactory();
-            $browser = $factory->build($source);
+            $browser = $this->browserFactory->build($source);
             // Try to fetch levels and areas asynchronously
             $data['levels'] = $browser->getLearningLevels();
             $data['areas']  = $browser->getLearningAreas();
@@ -162,8 +161,8 @@ class Controller extends Base
         } catch (\InvalidArgumentException $e) {
             $code = 500;
         }
-        $this->getResponse()->status->setCode($code);
-        $this->getResponse()->content->set(
+        $this->response->status->setCode($code);
+        $this->response->content->set(
             array(
                 'format' => 'json',
                 'data'   => $data,
@@ -180,16 +179,15 @@ class Controller extends Base
         $code = 200;
         $data = array();
         try {
-            $source = $this->sourceMapper->findById($this->getRequest()->query['id']);
+            $source = $this->sourceMapper->findById($this->request->query['id']);
 
             // Stuff this into a factory and use that to build a list of levels
-            $factory = new Source\BrowserFactory();
-            $browser = $factory->build($source);
+            $browser = $this->browserFactory->build($source);
 
             // Try fetching an existing area and level.
             // Otherwise, create a virtual one.
-            $areaRef  = $this->getRequest()->query['area'];
-            $levelRef = $this->getRequest()->query['level'];
+            $areaRef  = $this->request->query['area'];
+            $levelRef = $this->request->query['level'];
             try {
                 $area = $this->areaMapper->findOneByColumn('reference', $areaRef);
             } catch (Mapper\Exception $e) {
@@ -209,8 +207,8 @@ class Controller extends Base
         } catch (\InvalidArgumentException $e) {
             $code = 500;
         }
-        $this->getResponse()->status->setCode($code);
-        $this->getResponse()->content->set(
+        $this->response->status->setCode($code);
+        $this->response->content->set(
             array(
                 'format' => 'json',
                 'data'   => $data,
