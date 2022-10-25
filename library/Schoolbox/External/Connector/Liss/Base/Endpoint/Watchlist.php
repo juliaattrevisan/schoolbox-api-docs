@@ -7,10 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
+namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
 /**
- * For a given activity name, dump some meaningful contents
+ * For a given string value, decide whether they were on a Watchlist
+ * of our own defining. This allows us to import particular subsets of
+ * data without having to import everything else too.
  */
 class Watchlist
 {
