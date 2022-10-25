@@ -503,7 +503,7 @@ export default {
                 <section>
                     <a
                         v-if="type === 'achievement'"
-                        title="Award with evidence 3"
+                        title="Award with evidence"
                         class="button"
                         :href="generateAwardWithEvidenceUrl()"
                     >

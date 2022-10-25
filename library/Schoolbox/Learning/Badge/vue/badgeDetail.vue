@@ -60,16 +60,13 @@ export default {
         <p class="meta" v-if="badge.goalExpiry">Goal expires: {{ goalExpiryLabel }} after setting</p>
         <p class="meta" v-if="badge.achievementExpiry">Achievement expires: {{ achievementExpiryLabel }} after awarding</p>
         <p class="meta" v-if="badgeTagNames.length > 0">Tags: {{ badgeTagNames }}</p>
-        <article v-html="badge.body"></article>
-        <div v-if="badge.curriculumNodes.length">
-            <hr />
-            <p class="meta">
-                Curriculum Codes:
-                <codes-list
-                    :nodes="curriculumNodesWithCode"
-                    @selected="onCodeSelected"
-                />
-            </p>
-        </div>
+        <article v-if="badge.body" v-html="badge.body"></article>
+        <p v-if="badge.curriculumNodes.length" class="meta">
+            Curriculum Codes:
+            <codes-list
+                :nodes="curriculumNodesWithCode"
+                @selected="onCodeSelected"
+            />
+        </p>
     </div>
 </template>
