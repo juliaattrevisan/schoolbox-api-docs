@@ -26,6 +26,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 class Factory
 {

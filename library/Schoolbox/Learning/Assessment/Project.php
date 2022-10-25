@@ -17,15 +17,11 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
-use Alaress\Authorizer\Authorizer;
-use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Router;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\Summator\ISummator;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;

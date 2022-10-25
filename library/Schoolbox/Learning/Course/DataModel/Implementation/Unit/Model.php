@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 
 use Alaress_Date_Format;
-use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\AbstractUnit;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
