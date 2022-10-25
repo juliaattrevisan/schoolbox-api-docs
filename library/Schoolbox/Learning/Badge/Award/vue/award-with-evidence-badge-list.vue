@@ -6,9 +6,7 @@
 
 import { ref } from 'vue';
 import BadgeImage from '../../vue/badge-image.vue';
-import SequentialRevealModal from '@schoolboxVue/components/sequential-reveal-modal';
-import NodeDetails from '@schoolboxCurriculum/vue/node-details';
-import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
+import BadgeModal from '../../vue/badge-modal.vue';
 
 
 const props = defineProps({
@@ -22,10 +20,8 @@ const props = defineProps({
     },
 });
 
-const currentBadge = ref()
+const currentBadge = ref(null);
 const isDetailModalOpen = ref(false);
-const selectedNodeDetails = ref(getEmptyNode());
-const detailModalIndex = ref(1);
 
 /**
  * Opens a modal window for viewing this badge's full details.
@@ -35,16 +31,6 @@ const detailModalIndex = ref(1);
 function openDetailModal (badge) {
     currentBadge.value = badge;
     isDetailModalOpen.vaue = true;
-}
-
-/**
- * a code has been selected in the detail modal
- *
- * @pararm { object }
- */
-function onCodeSelected (node) {
-    selectedNodeDetails.value = node;
-    detailModalIndex.value++;
 }
 
 /**
@@ -81,25 +67,11 @@ function onDetailModalClosed () {
             </section>
         </div> -->
     </div>
-    <sequential-reveal-modal
-        size="medium"
+    <badge-modal
         :isOpen="isDetailModalOpen"
-        :sequence-index="detailModalIndex"
+        :badge="currentBadge"
         @closed="onDetailModalClosed"
-    >
-        <template v-slot:sequence-1>
-            <badge-detail
-                v-if="currentBadge"
-                :badge="currentBadge"
-                @code-selected="onCodeSelected"
-            />
-        </template>
-        <template v-slot:sequence-2>
-            <node-details
-                :node="selectedNodeDetails"
-            />
-        </template>
-    </sequential-reveal-modal>
+    />
 </template>
 
 <style scoped>
