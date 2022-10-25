@@ -494,7 +494,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * Does this layout have tiles in a panoramic shape (aspect ratio 16:5)?
+     * Does this layout have tiles in a panoramic shape (aspect ratio 16:2)?
      *
      * @return bool
      */
@@ -504,7 +504,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * Is this a custom shape (none of portrait, square, landscape, panorama?)
+     * Is this a custom shape (none of portrait, square, landscape, panorama, banner?)
      *
      * @return bool
      */
