@@ -61,14 +61,53 @@ class Factory
         $breadcrumbs       = new Collection();
         $breadcrumbs->add(['Learning', $this->router->generate('learning.getClasses')]);
 
-        if ($assessmentContext instanceof UnitImplementation || $assessmentContext instanceof UnitSpecification) {
-            foreach ($assessmentContext->getBreadcrumbs() as $crumb) {
-                $breadcrumbs->add($crumb);
-            }
+        if ($assessmentContext instanceof UnitImplementation) {
+            // Generate trail like 'Learning'->$unitImp->$unitSpec (eg. 'Learning'->'9ENGA'->'Romeo and Juliet').
+            $unitImp        = $assessmentContext;
+            $unitImpFolder  = $unitImp->getFolder();
+            $unitSpecFolder = $unitImp->getSpecification()->getFolder();
+            $breadcrumbs->add([$unitImpFolder->getTitle(), "/homepage/{$unitImpFolder->getId()}"]);
+            $breadcrumbs->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]);
+        } elseif ($assessmentContext instanceof UnitSpecification) {
+            // Generate trail like 'Learning'->$unitSpec (eg. 'Learning'->'Romeo and Juliet').
+            $unitSpec       = $assessmentContext;
+            $unitSpecFolder = $unitSpec->getFolder();
+            $breadcrumbs->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]);
         } elseif ($assessmentContext instanceof Project) {
-            foreach ($assessmentContext->getBreadcrumbs($this->router, $this->authorizer) as $crumb) {
-                $breadcrumbs->add($crumb);
+            // Generate trail like one of:
+            //  * 'Learning->$unitImp->$unitSpec->$project (eg. 'Learning'->'9ENGA'->'Romeo and Juliet'->'Project title').
+            //  * 'Learning->$unitSpec->$project           (eg. 'Learning'->'Romeo and Juliet'->'Project title').
+            $project        = $assessmentContext;
+            $projectContext = $project->getContext();
+
+            if (!($projectContext instanceof UnitImplementation || $projectContext instanceof UnitSpecification)) {
+                throw new UnexpectedValueException(
+                    'Variable $projectContext is expected to be an instance of either UnitImplementation or UnitSpecification.' .
+                    "Found variable of class '" . get_class($projectContext) . "'."
+                );
             }
+
+            // We have already dealt with cases UnitSpecification and UnitImplementation above, so get breadcrumbs up to unitSpec level recursively.
+            $breadcrumbs = $this->produceFromAssessment($project, $user);
+
+            $routeParams = [
+                'assessment'   => $project,
+                'assessmentId' => $project->getId(),
+                'studentId'    => $_SESSION['user']->getId()
+            ];
+
+            $breadcrumbs->add(
+                [
+                    $project->getTitle(),
+                    (
+                        // In some circumstances the user will not be authorised to view the 'status' page.
+                        // In that case, show the 'summary' page instead.
+                        ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $_SESSION['user'])) ?
+                        $this->router->generate('learningAssessment.getStatus', $routeParams) :
+                        $this->router->generate('learningAssessment.getSummary', $routeParams)
+                    )
+                ]
+            );
         } else {
             // Assessment belongs directly to subject (eg. '9ENGA').
             $subject       = $assessmentContext;

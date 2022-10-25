@@ -142,19 +142,4 @@ class Model extends AbstractUnit
     {
         return false;
     }
-
-    /**
-     * Generate trail like $unit (eg. 'Romeo and Juliet').
-     *
-     * @return Collection
-     */
-    public function getBreadcrumbs(): Collection
-    {
-        $breadcrumbs    = new Collection();
-        $unitSpecFolder = $this->getFolder();
-
-        $breadcrumbs->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]);
-
-        return $breadcrumbs;
-    }
 }

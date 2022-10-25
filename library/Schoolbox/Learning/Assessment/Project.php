@@ -713,48 +713,4 @@ class Project extends AbstractAssessment implements AssessmentContext
     {
         return $this->getBaseContext()->getTitle() . ' > ' . $this->getTitle();
     }
-
-    /**
-     * Generate trail like one of:
-     *  * $subject->$unit->$project (eg. '9ENGA'->'Romeo and Juliet'->'Project title').
-     *  * $unit->$project           (eg. 'Romeo and Juliet'->'Project title').
-     *
-     * @param Router     $router
-     * @param Authorizer $authorizer
-     * @return Collection
-     * @throws RouteNotFound
-     */
-    public function getBreadcrumbs(Router $router, Authorizer $authorizer): Collection
-    {
-        $projectContext = $this->getContext();
-
-        if (!($projectContext instanceof UnitImplementation || $projectContext instanceof UnitSpecification)) {
-            throw new UnexpectedValueException(
-                'Variable $projectContext is expected to be an instance of either UnitImplementation or UnitSpecification.' .
-                "Found variable of class '" . get_class($projectContext) . "'."
-            );
-        }
-
-        $routeParams = [
-            'assessment'   => $this,
-            'assessmentId' => $this->getId(),
-            'studentId'    => $_SESSION['user']->getId()
-        ];
-
-        $breadcrumbs = $projectContext->getBreadcrumbs();
-        $breadcrumbs->add(
-            [
-                $this->getTitle(),
-                (
-                    // In some circumstances the user will not be authorised to view the 'status' page.
-                    // In that case, show the 'summary' page instead.
-                    ($authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $_SESSION['user'])) ?
-                    $router->generate('learningAssessment.getStatus', $routeParams) :
-                    $router->generate('learningAssessment.getSummary', $routeParams)
-                )
-            ]
-        );
-
-        return $breadcrumbs;
-    }
 }
