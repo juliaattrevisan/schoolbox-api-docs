@@ -45,7 +45,7 @@ class BrowserFactory
     public function build(Model $source): BrowserInterface
     {
         $browserClass = $source->getClass() . '\\Browser';
-        return match ($browserClass) {
+        return match (ltrim($browserClass, '\\')) {
             Browser::class => new Browser(
                 $source,
                 $this->nodeMapper,
