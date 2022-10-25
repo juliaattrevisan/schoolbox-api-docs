@@ -93,7 +93,7 @@ class Factory
             $routeParams = [
                 'assessment'   => $project,
                 'assessmentId' => $project->getId(),
-                'studentId'    => $_SESSION['user']->getId()
+                'studentId'    => $user->getId()
             ];
 
             $breadcrumbs->add(
@@ -102,7 +102,7 @@ class Factory
                     (
                         // In some circumstances the user will not be authorised to view the 'status' page.
                         // In that case, show the 'summary' page instead.
-                        ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $_SESSION['user'])) ?
+                        ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user)) ?
                         $this->router->generate('learningAssessment.getStatus', $routeParams) :
                         $this->router->generate('learningAssessment.getSummary', $routeParams)
                     )
