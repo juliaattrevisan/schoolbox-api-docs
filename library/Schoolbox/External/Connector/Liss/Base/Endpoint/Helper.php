@@ -73,7 +73,6 @@ class Helper
      */
     private function reformatEvent(Value $currentEvent): array
     {
-
         $date = date('Y-m-d', strtotime($currentEvent->me['struct']['Date']->me['dateTime.iso8601']));
         $startDateTime = "{$date} {$currentEvent->me['struct']['StartTime']->me['string']}:00";
         $endDateTime = "{$date} {$currentEvent->me['struct']['EndTime']->me['string']}:00";
