@@ -390,7 +390,7 @@ class Classes implements IStrategy
 
         /* Save it and remember what we saw in case we need to reuse this later
          */
-        $this->log->debug(sprintf(
+        $this->log->info(sprintf(
             'Creating new timetable event %s (%s) on day %s, period %s, %s-%s',
             $event->getTitle(),
             $event->getCode(),
@@ -527,7 +527,7 @@ class Classes implements IStrategy
 
             $this->classInvolvements[$classEntry->getId()][$externalId] = true;
 
-            $this->log->debug(sprintf(
+            $this->log->info(sprintf(
                 'Creating new regular class involvement for %s in timetable event %s - %s, %s, %s-%s',
                 $externalId,
                 $event->getTitle(),
@@ -564,7 +564,7 @@ class Classes implements IStrategy
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
          */
-        $this->log->debug(sprintf(
+        $this->log->info(sprintf(
             'Creating new Override record for subject %s (%s) on %s %s at %s for %s',
             $event->getTitle(),
             $event->getCode(),
