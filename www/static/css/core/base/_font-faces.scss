@@ -13,15 +13,15 @@
 }
 
 @font-face {
-    font-family: "LibreBarcode128";
+    font-family: "LibreBarcode39";
     src:
-        url('#{$cdn-prefix}/fonts/LibreBarcode128-Regular.ttf');
+        url('#{$cdn-prefix}/fonts/LibreBarcode39-Regular.ttf');
     font-weight: normal;
     font-style: normal;
 }
 
-.barcode-128 {
-    font-family: LibreBarcode128;
+.barcode-39 {
+    font-family: LibreBarcode39;
     width: 100%;
     font-size: 100px;
     line-height: 100px;
