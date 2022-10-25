@@ -119,7 +119,8 @@ class Helper
          */
         if ((new Watchlist())->isOnWatchlist($currentEvent['code'], [
             '9DAN 1',
-            '10DAN 1'
+            '10DAN 1',
+            'Duty Tcage'
         ])) {
             print_r($currentEvent);
             print_r($restructured);
