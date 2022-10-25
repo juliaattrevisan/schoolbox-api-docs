@@ -32,8 +32,8 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('curriculum_node_parent_id', self::class, 'id', null, null, 'parent', 'parent');
-        $this->joins('curriculum_learning_level_id', LearningLevel\Mapper::class, 'id', null, null, 'learningLevel', 'level');
-        $this->joins('curriculum_learning_area_id', LearningArea\Mapper::class, 'id', null, null, 'learningArea', 'area');
+//        $this->joins('curriculum_learning_level_id', LearningLevel\Mapper::class, 'id', null, null, 'learningLevel', 'level');
+//        $this->joins('curriculum_learning_area_id', LearningArea\Mapper::class, 'id', null, null, 'learningArea', 'area');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('code', self::TYPE_STRING);
         $this->uses('order', self::TYPE_INTEGER);

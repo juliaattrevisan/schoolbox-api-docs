@@ -43,11 +43,15 @@ class Model implements ISoftDeletable, JsonSerializable
 
     /**
      * The learning level this node is associated with, if any.
+     *
+     * @deprecated no longer required, and no longer mapped
      */
     protected ?LearningLevel\Model $learningLevel = null;
 
     /**
      * The learning area this node is associated with, if any.
+     *
+     * @deprecated no longer required, and no longer mapped
      */
     protected ?LearningArea\Model $learningArea = null;
 
@@ -186,37 +190,49 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
+     * @deprecated
+     *
      * @return LearningArea\Model|null
      */
     public function getLearningArea(): ?LearningArea\Model
     {
+        trigger_error(sprintf('Property %s::learningArea is deprecated', __CLASS__), E_USER_DEPRECATED);
         return $this->learningArea;
     }
 
     /**
+     * @deprecated
+     *
      * @param LearningArea\Model|null $learningArea
      * @return $this
      */
     public function setLearningArea(?LearningArea\Model $learningArea): self
     {
+        trigger_error(sprintf('Property %s::learningArea is deprecated', __CLASS__), E_USER_DEPRECATED);
         $this->learningArea = $learningArea;
         return $this;
     }
 
     /**
+     * @deprecated
+     *
      * @return LearningLevel\Model|null
      */
     public function getLearningLevel(): ?LearningLevel\Model
     {
+        trigger_error(sprintf('Property %s::learningLevel is deprecated', __CLASS__), E_USER_DEPRECATED);
         return $this->learningLevel;
     }
 
     /**
+     * @deprecated
+     *
      * @param LearningLevel\Model|null $learningLevel
      * @return $this
      */
     public function setLearningLevel(?LearningLevel\Model $learningLevel): self
     {
+        trigger_error(sprintf('Property %s::learningLevel is deprecated', __CLASS__), E_USER_DEPRECATED);
         $this->learningLevel = $learningLevel;
         return $this;
     }
