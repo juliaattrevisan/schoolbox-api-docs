@@ -494,6 +494,16 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
+     * Does this layout have tiles in a panoramic shape (aspect ratio 16:5)?
+     *
+     * @return bool
+     */
+    public function isBannerShape()
+    {
+        return $this->getAspectRatio() === '16:2';
+    }
+
+    /**
      * Is this a custom shape (none of portrait, square, landscape, panorama?)
      *
      * @return bool
@@ -505,6 +515,7 @@ class Model implements ISoftDeletable, \JsonSerializable
             || $this->isLandscapeShape()
             || $this->isSquareShape()
             || $this->isPanoramicShape()
+            || $this->isBannerShape()
         );
     }
 

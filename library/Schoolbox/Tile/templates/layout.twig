@@ -141,6 +141,10 @@
                     xInput.val(16);
                     yInput.val(5);
                     break;
+                case 'banner':
+                    xInput.val(16);
+                    yInput.val(2);
+                    break;
             }
             yInput.change();
         });
@@ -292,6 +296,8 @@
                                     {% if item.isSquareShape() %}selected{% endif %}>Square</option>
                             <option value="panorama"
                                     {% if item.isPanoramicShape() %}selected{% endif %}>Panorama (16:5)</option>
+                            <option value="banner"
+                                    {% if item.isBannerShape() %}selected{% endif %}>Banner (16:2)</option>
                             <option value="custom"
                                     {% if item.isCustomShape() %}selected{% endif %}>Custom Ratio</option>
                         </select>
