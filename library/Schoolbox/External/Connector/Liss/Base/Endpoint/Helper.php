@@ -118,7 +118,7 @@ class Helper
          * into a log allows us to inspect independently of the school
          */
         if ((new Watchlist())->isOnWatchlist(
-            $currentEvent['code'],
+            (string)$currentEvent['code'],
             [
                 '9DAN 1',
                 '10DAN 1',
