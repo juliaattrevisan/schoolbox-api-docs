@@ -1,0 +1,71 @@
+<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script>
+    $(function() {
+        $.fn.alaressEditor({
+            targetElements: $('#reason'),
+            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed,schoolboxiframe',
+            /* Why does EqnEditor stop my images loading?
+             */
+            removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
+            toolbarGroups: [
+                { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+                { name: 'paragraph', groups: ['list', 'blocks', 'bidi'] },
+                { name: 'insert', groups: ['insert'] },
+                { name: 'schoolbox', groups: ['schoolboxlink'] },
+            ],
+            resize_enabled: true,
+            toolbarCanCollapse: false
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Award Achievements</h1>
+        {% for targetUser in targetUsers %}
+        <ul class="meta">
+            <li class="icon-staff-students">{{ targetUser.fullname }}</a></li>
+        </ul>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            {% for badge in badges %}
+            {# One of these visual representations was chosen
+             # Visual representation was mandatory in Badge Create
+            #}
+            <div class="badge-img-container content">
+                {% if badge.icon %}
+                    <img src=" {{ CDN_PREFIX }}{{ badge.icon }}" class="badge-image" alt="{{ badge.name }}" title="{{ badge.name }}" />
+                {% elseif badge.image.hash %}
+                    <img src="/storage/image.php?hash={{ badge.image.hash }}" class="badge-image" alt="{{ badge.name }}" title="{{ badge.name }}" />
+                {% endif %}
+            </div>
+            <article>{{ badge.body|purify }}</article>
+            {% endfor %}
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardWithEvidence') ~ '?returnUrl=' ~ returnUrl%}
+
+        <form action="{{ postRoute }}" method="post">
+            <input type="hidden" name="targetUserIds" value="{{ targetUserIds }}">
+            <input type="hidden" name="badgeIds" value="{{ badgeIds }}">
+            <section>
+                <fieldset>
+                    <label>Reason</label>
+                    <textarea id="reason" name="reason"></textarea>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Save" />
+        </form>
+    </div>
+</div>

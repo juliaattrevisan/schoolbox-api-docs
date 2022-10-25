@@ -333,7 +333,7 @@ export default {
             <section>
                 <a
                     v-if="type === 'achievement'"
-                    title="Award with evidence"
+                    title="Award with evidence 1!!"
                     class="button"
                     :href="`#user-ids=${selectedUserIds}&badge-id=${badge.id}`"
                     :class="[isSubmitButtonDisabled ? 'disabled' : '']"

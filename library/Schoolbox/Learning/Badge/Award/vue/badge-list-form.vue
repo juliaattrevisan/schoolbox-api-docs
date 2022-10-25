@@ -404,6 +404,24 @@ export default {
                     this.isProcessing = false;
                 });
         },
+        /**
+         * Generate a URL which references this page with all filters cleared.
+         *
+         * @return {String}
+         */
+        generateAwardWithEvidenceUrl () {
+            let emptyQueryString = {};
+//            const userIds = this.users.map(user => user.id);
+            const badgeIds = this.selectedBadges.map(badge => badge.id);
+            let evidenceUrl = `/learning/badge/award/user/${this.selectedUserIds}/award`;
+//            emptyQueryString['badges'] = badgeIds.join(',');
+            emptyQueryString['badges'] = this.selectedBadgeIds;
+            const url = new URL(window.location.href);
+            if (url.searchParams.get('returnUrl') !== null) {
+                emptyQueryString['returnUrl'] = url.searchParams.get('returnUrl');
+            }
+            return evidenceUrl + "?" + new URLSearchParams(emptyQueryString).toString();
+        },
 
     },
 }
@@ -485,9 +503,9 @@ export default {
                 <section>
                     <a
                         v-if="type === 'achievement'"
-                        title="Award with evidence"
+                        title="Award with evidence 3"
                         class="button"
-                        :href="`#user-ids=${selectedUserIds}&badge-ids=${selectedBadgeIds}`"
+                        :href="generateAwardWithEvidenceUrl()"
                     >
                         Award with Evidence
                     </a>

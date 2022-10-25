@@ -1,0 +1,37 @@
+<div class="row">
+    <div class="small-12 columns">
+        <h1>View Evidence</h1>
+        <ul class="meta">
+            <li class="icon-staff-students">{{ targetUser.fullname }}</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <div class="badge-img-container content">
+                {% if badge.icon %}
+                    <img src=" {{ CDN_PREFIX }}{{ badge.icon }}" class="badge-image" alt="{{ badge.name }}"
+                         title="{{ badge.name }}"/>
+                {% elseif badge.image.hash %}
+                    <img src="/storage/image.php?hash={{ badge.image.hash }}" class="badge-image" alt="{{ badge.name }}"
+                         title="{{ badge.name }}"/>
+                {% endif %}
+            </div>
+            <article>{{ badge.body|purify }}</article>
+        </section>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <fieldset>
+                <label>Reason</label>
+                <div>{{ reason }}
+                </div>
+            </fieldset>
+        </section>
+    </div>
+</div>

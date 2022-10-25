@@ -292,9 +292,9 @@ export default {
                         <section>
                             <template v-if="award._links.goalAward && award.isGoal && !award.award">
                                 <a
-                                    title="Award with evidence"
+                                    title="Award with evidence 2"
                                     class="button"
-                                    href="#award-with-evidence-page"
+                                    href=""
                                 >
                                     Award with Evidence
                                 </a>
@@ -309,7 +309,7 @@ export default {
                                 v-else-if="award.reason && award.reason.length"
                                 title="View evidence"
                                 class="button"
-                                href="#view-evidence-page"
+                                :href="`/learning/badge/award/${award.id}/viewEvidence`"
                             >
                                 View Evidence
                             </a>

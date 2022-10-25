@@ -188,6 +188,29 @@ class Module extends BaseModule
 
         $this->register(
             self::METHOD_GET,
+            '/user/{userIds}/award',
+            'getAwardWithEvidenceForm',
+            $manageBadgesRule,
+            $preloadUsers
+        );
+
+        $this->register(
+            self::METHOD_POST,
+            '/user/awardWithEvidence',
+            'postAwardWithEvidence',
+            $manageBadgesRule
+        );
+
+        $this->register(
+            self::METHOD_GET,
+            '/{awardId}/viewEvidence',
+            'getAwardWithEvidence',
+            $viewAwardedBadges,
+            Closure::fromCallable([$this, 'preloadAward'])
+        );
+
+        $this->register(
+            self::METHOD_GET,
             '/user/goal',
             'redirectToSetAsGoalForm',
             $manageBadgesRule,

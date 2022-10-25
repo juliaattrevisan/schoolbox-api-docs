@@ -279,6 +279,71 @@ class Controller extends Base
 
 
     /**
+     * @param GenericCollection $users
+     * @return void
+     */
+    public function getAwardWithEvidenceForm(GenericCollection $users)
+    {
+        $badgeIds = array_unique(array_map('intval', explode(',', $this->request->query->get('badges') ?? '')));
+        $badges = $this->badgeMapper->findByColumn('id', $badgeIds);
+
+        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadgeAward/awardWithEvidenceForm.twig',
+                [
+                    'badges' => $badges,
+                    'badgeIds' => implode(',', $badges->getPropertyValues('id')),
+                    'targetUsers' => $users,
+                    'targetUserIds' => implode(',', $users->getPropertyValues('id')),
+//                    'returnUrl'      => Redirect::encode($returnUrl),
+                    'returnUrl' => $returnUrl,
+                ],
+                'Award Achievement' // TODO
+            )
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function postAwardWithEvidence()
+    {
+        $targetUserIds = array_map('intval', explode(',', $this->request->post->get('targetUserIds')));
+        $targetUsers = $this->userMapper->findByColumn('id', $targetUserIds);
+        $reason = trim($this->request->post->get('reason'));
+
+
+        $badgeIds = array_map('intval',explode(',', $this->request->post->get('badgeIds')));
+        try {
+            $badges = $this->badgeMapper->findByColumn('id', $badgeIds);
+            foreach ($badges as $badge) {
+                $collection = $this->createAwardsFromRequestBody($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, $targetUsers, $reason);
+            }
+        } catch (MapperException $e) {
+            // TODO handle error
+        }
+        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $this->response->redirect->afterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
+    }
+
+
+    public function getAwardWithEvidence(AwardModel $award)
+    {
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadgeAward/awardWithEvidence.twig',
+                [
+                    'badge' => $award->getBadge(),
+                    'targetUser' => $award->getRecipient()
+                ],
+                'View Evidence' // TODO
+            )
+        );
+    }
+
+    /**
      * Get a list of badges and their counts, awarded to $user
      *
      * @api GET /learning/badge/award/{userId}/awarded
@@ -362,9 +427,24 @@ class Controller extends Base
      */
     public function awardAsAchievement(Model $badge): void
     {
-        $this->createAwardsFromRequestBody(
+        $data       = json_decode($this->request->content->getRaw(), true);
+        $userIds    = array_column($data['users'], 'id');
+        // Users are in the data.
+        // For now: badges may only be awarded to or set as goals for students.
+        $users      = $this->userMapper->findByColumn('id', $userIds);
+        $reason     = trim((string)$data['reason']);
+
+        $collection = $this->createAwardsFromRequestBody(
             $badge,
-            AwardModel::AWARD_STATUS_ACHIEVEMENT
+            AwardModel::AWARD_STATUS_ACHIEVEMENT,
+            $users,
+            $reason
+        );
+
+        // Return what was just created
+        $translator = $this->buildBadgeAwardModelToArrayTranslator();
+        $this->response->content->set(
+            $this->buildJsonOutput($collection->map($translator))
         );
     }
 
@@ -380,9 +460,22 @@ class Controller extends Base
      */
     public function setAsGoal(Model $badge): void
     {
-        $this->createAwardsFromRequestBody(
+        $data       = json_decode($this->request->content->getRaw(), true);
+        $userIds    = array_column($data['users'], 'id');
+        $users = $this->userMapper->findByColumn('id', $userIds);
+        $reason     = trim((string)$data['reason']);
+
+        $collection = $this->createAwardsFromRequestBody(
             $badge,
-            AwardModel::AWARD_STATUS_GOAL
+            AwardModel::AWARD_STATUS_GOAL,
+            $users,
+            $reason
+        );
+
+        // Return what was just created
+        $translator = $this->buildBadgeAwardModelToArrayTranslator();
+        $this->response->content->set(
+            $this->buildJsonOutput($collection->map($translator))
         );
     }
 
@@ -402,16 +495,9 @@ class Controller extends Base
      * @throws MapperException if for some reason a query fails
      * @throws Exception       if attempting to award to a non-student
      */
-    private function createAwardsFromRequestBody(Model $badge, string $status): void
+    private function createAwardsFromRequestBody(Model $badge, string $status, GenericCollection $users, string $reason): GenericCollection
     {
-        // Users are in the data.
-        // For now: badges may only be awarded to or set as goals for students.
-        $data       = json_decode($this->request->content->getRaw(), true);
         $collection = $this->mapper->createCollection();
-        $userIds    = array_column($data['users'], 'id');
-        $users      = $this->userMapper->findByColumn('id', $userIds);
-        $reason     = trim((string)$data['reason']);
-
         // Are any of those users not students? Error out
         foreach ($users as $user) {
             if (!$user->getRole()->isStudent()) {
@@ -449,12 +535,7 @@ class Controller extends Base
             // For now: assume that the current award is being saved as-is
             $collection->add($award);
         }
-
-        // Return what was just created
-        $translator = $this->buildBadgeAwardModelToArrayTranslator();
-        $this->response->content->set(
-            $this->buildJsonOutput($collection->map($translator))
-        );
+        return $collection;
     }
 
 
