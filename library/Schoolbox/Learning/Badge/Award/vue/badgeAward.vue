@@ -9,7 +9,6 @@ import Toast from "@schoolboxVue/components/toast";
 import vSelect from "vue-select";
 import debounce from "lodash/debounce";
 import "vue-select/dist/vue-select.css";
-import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 
 // Render a custom template for the deselect icon.
@@ -52,7 +51,6 @@ export default {
         BadgeImage,
         Toast,
         vSelect,
-        DynamicInput
     },
     /**
      * Props.
