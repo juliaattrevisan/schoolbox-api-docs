@@ -13,7 +13,10 @@ use Schoolbox\Mapper as BaseMapper;
 /**
  * Mapper for learning levels.
  *
- * @deprecated 22.1: learning area and level are no longer set
+ * This will be deprecated eventually, as curriculum nodes no longer have a
+ * learning area or level: for now, it's kept so that
+ * `\Schoolbox\Curriculum\Source\BrowserInterface::getOutcomes` may be
+ * preserved as is.
  */
 class Mapper extends BaseMapper
 {
