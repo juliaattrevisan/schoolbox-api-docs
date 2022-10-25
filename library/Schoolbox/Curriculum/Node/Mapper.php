@@ -296,32 +296,6 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         ];
     }
 
-
-    /**
-     * Hydrates a curriculum node, with joins to area+source and level+source.
-     *
-     * @param array  $row
-     * @param string $alias
-     * @param string $areaAlias
-     * @param string $areaSourceAlias
-     * @param string $levelAlias
-     * @param string $levelSourceAlias
-     *
-     * @return Model
-     */
-    public function hydrateWithRelatedJoins(
-        $row,
-        $alias = null,
-        $areaAlias = 'cna',
-        $areaSourceAlias = 'cnas',
-        $levelAlias = 'cnl',
-        $levelSourceAlias = 'cnls'
-    ) {
-        /** @var Model $curriculumNode */
-        $curriculumNode = $this->hydrate($row, $alias);
-        return $curriculumNode;
-    }
-
     /**
      * Delete curriculum nodes associated with $assessment
      *
