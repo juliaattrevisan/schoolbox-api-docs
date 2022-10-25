@@ -8,8 +8,9 @@ $alert-close-font-size: rem-calc(($base-font-size + 14));
 
 a[disabled], a.disabled {
     // Make disabled links not clickable
-    pointer-events: none;
     cursor: default;
+    opacity: 0.5;
+    pointer-events: none;
 	&:hover {
 		text-decoration: none;
 	}

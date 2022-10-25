@@ -328,14 +328,14 @@ export default {
                     title="Award with evidence"
                     class="button"
                     href="#award-with-evidence-page"
-                    :disabled="isSubmitButtonDisabled"
+                    :class="[isSubmitButtonDisabled ? 'disabled' : '']"
                 >
                     Award with Evidence
                 </a>
                 <button
                     :disabled="isSubmitButtonDisabled"
-                    @click.prevent="awardAchievement"
-                    @keyup.enter="awardAchievement"
+                    @click.prevent="onSubmit"
+                    @keyup.enter="onSubmit"
                 >
                     <slot name="confirmButton">Award</slot>
                 </button>
