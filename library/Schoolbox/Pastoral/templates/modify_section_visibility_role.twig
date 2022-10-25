@@ -179,7 +179,7 @@
                         confirmEvent: function () {
                             // Remove from window.rolesAdded
                             var index = window.rolesAdded.indexOf(roleId);
-                            window.rolesAdded.splice(index);
+                            window.rolesAdded.splice(index, 1);
 
                             row.remove();
                             updateRolesModal();
