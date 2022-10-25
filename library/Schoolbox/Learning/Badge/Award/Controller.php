@@ -335,8 +335,9 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardWithEvidence.twig',
                 [
-                    'badge' => $award->getBadge(),
-                    'targetUser' => $award->getRecipient()
+                    'badge'      => $award->getBadge(),
+                    'targetUser' => $award->getRecipient(),
+                    'reason'     => $award->getReason(),
                 ],
                 'View Evidence' // TODO
             )
