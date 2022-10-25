@@ -117,11 +117,14 @@ class Helper
          * Since this requires schools to push data to us, shanking it
          * into a log allows us to inspect independently of the school
          */
-        if ((new Watchlist())->isOnWatchlist($currentEvent['code'], [
-            '9DAN 1',
-            '10DAN 1',
-            'Duty Tcage'
-        ])) {
+        if ((new Watchlist())->isOnWatchlist(
+            $currentEvent['code'],
+            [
+                '9DAN 1',
+                '10DAN 1',
+                'Duty Tcage'
+            ]
+        )) {
             print_r($currentEvent);
             print_r($restructured);
         }
