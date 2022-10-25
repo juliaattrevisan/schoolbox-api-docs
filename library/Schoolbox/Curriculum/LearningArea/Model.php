@@ -1,15 +1,6 @@
 <?php
 
 /**
- * Model for curriculum learning areas.
- *
- * A learning area is an area of study - common examples include:
- * * English
- * * Maths
- * * Science
- * I think you get the idea.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -21,6 +12,17 @@ use JsonSerializable;
 use Schoolbox\Curriculum\Source;
 use Schoolbox\ISoftDeletable;
 
+/**
+ * Model for curriculum learning areas.
+ *
+ * A learning area is an area of study - common examples include:
+ * * English
+ * * Maths
+ * * Science
+ * I think you get the idea.
+ *
+ * @deprecated 22.1: learning area and level are no longer set
+ */
 class Model implements ISoftDeletable, JsonSerializable
 {
     /**

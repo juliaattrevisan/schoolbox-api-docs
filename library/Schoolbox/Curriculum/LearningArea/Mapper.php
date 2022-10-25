@@ -1,9 +1,6 @@
 <?php
 
 /**
- * Mapper for learning areas.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -13,6 +10,11 @@ namespace Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 
+/**
+ * Mapper for learning areas.
+ *
+ * @deprecated 22.1: learning area and level are no longer set
+ */
 class Mapper extends BaseMapper
 {
     public function mapping()

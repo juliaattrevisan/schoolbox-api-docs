@@ -1,12 +1,6 @@
 <?php
 
 /**
- * Model for curriculum learning levels.
- *
- * A learning level is roughly equivalent to a student year, but may be on a
- * different scale (example: level 1 may map to year 1-3)
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -18,6 +12,14 @@ use JsonSerializable;
 use Schoolbox\Curriculum\Source;
 use Schoolbox\ISoftDeletable;
 
+/**
+ * Model for curriculum learning levels.
+ *
+ * A learning level is roughly equivalent to a student year, but may be on a
+ * different scale (example: level 1 may map to year 1-3)
+ *
+ * @deprecated 22.1: learning area and level are no longer set
+ */
 class Model implements ISoftDeletable, JsonSerializable
 {
     /**

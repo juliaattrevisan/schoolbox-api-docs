@@ -40,24 +40,24 @@ class ArrayToModel extends Base
             new Model(),
             'setId'
         );
-        $model = $this->setModel(
-            $array,
-            'learningArea',
-            'id',
-            $model,
-            'setLearningArea',
-            new Model(),
-            'setId'
-        );
-        $model = $this->setModel(
-            $array,
-            'learningLevel',
-            'id',
-            $model,
-            'setLearningLevel',
-            new Model(),
-            'setId'
-        );
+//        $model = $this->setModel(
+//            $array,
+//            'learningArea',
+//            'id',
+//            $model,
+//            'setLearningArea',
+//            new Model(),
+//            'setId'
+//        );
+//        $model = $this->setModel(
+//            $array,
+//            'learningLevel',
+//            'id',
+//            $model,
+//            'setLearningLevel',
+//            new Model(),
+//            'setId'
+//        );
         $model = $this->setScalar($array, 'order', $model, 'setOrder');
         $this->assertModelIsInstanceOf($model, Model::class);
         return $model;

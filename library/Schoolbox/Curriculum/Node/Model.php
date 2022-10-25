@@ -44,14 +44,14 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * The learning level this node is associated with, if any.
      *
-     * @deprecated no longer required, and no longer mapped
+     * @deprecated 22.1: learning area and level are no longer set
      */
     protected ?LearningLevel\Model $learningLevel = null;
 
     /**
      * The learning area this node is associated with, if any.
      *
-     * @deprecated no longer required, and no longer mapped
+     * @deprecated 22.1: learning area and level are no longer set
      */
     protected ?LearningArea\Model $learningArea = null;
 
