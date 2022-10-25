@@ -14,7 +14,7 @@ const props = defineProps({
      * the list of badges to display
      */
     badges: {
-        type: Object,
+        type: Array,
         required: true,
         default: [],
     },
