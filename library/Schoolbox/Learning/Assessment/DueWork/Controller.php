@@ -948,23 +948,12 @@ class Controller extends Assessment\Controller
 
         /* Determine whether a finalised submission could be initialised
          * Check that you don't exceed the specified rate limit
+         * Return error message if you attempted to resubmit too soon
          */
         if ($isFinal) {
             try {
                 (new ValidFinalisedSubmission())->isSatisfiedBy($assessment, $student, $this->getConfigLoader()->get('submission_window'));
             } catch (DomainException $e) {
-                // Report errors in this thing
-                if ($this->getDi()->has('sentry')) {
-                    try {
-                        /** @var HubInterface $sentry */
-                        $sentry = $this->getDi()->get('sentry');
-                        $sentry->captureException($e);
-                    } catch (ContainerExceptionInterface | NotFoundExceptionInterface $e) {
-                        // This should never happen, since we have already checked has('sentry') above.
-                        // Do nothing here, and just allow the exception generated below to be thrown.
-                    }
-                }
-
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_SUBMISSION_WINDOW_EXCEEDED);
             }
         }
