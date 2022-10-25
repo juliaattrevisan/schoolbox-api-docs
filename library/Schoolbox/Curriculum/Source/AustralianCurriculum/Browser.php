@@ -18,7 +18,6 @@ use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Source;
-use Schoolbox\Curriculum\Source\Model;
 use stdClass;
 use UnexpectedValueException;
 
@@ -34,7 +33,7 @@ class Browser implements Source\BrowserInterface
     /**
      * Constructor
      *
-     * @param Model                $source
+     * @param Source\Model         $source
      * @param Node\Mapper          $nodeMapper
      * @param LearningArea\Mapper  $areaMapper
      * @param LearningLevel\Mapper $levelMapper
@@ -42,7 +41,7 @@ class Browser implements Source\BrowserInterface
      * @param Html2Text            $htmlConverter
      */
     public function __construct(
-        private Model $source,
+        private Source\Model $source,
         private Node\Mapper $nodeMapper,
         private LearningArea\Mapper $areaMapper,
         private LearningLevel\Mapper $levelMapper,

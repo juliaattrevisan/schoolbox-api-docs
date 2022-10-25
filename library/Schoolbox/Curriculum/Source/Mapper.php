@@ -1,9 +1,6 @@
 <?php
 
 /**
- * Mapper for the curriculum source description.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -12,6 +9,11 @@ namespace Schoolbox\Curriculum\Source;
 
 use Schoolbox\Mapper as BaseMapper;
 
+/**
+ * Mapper for the curriculum source description.
+ *
+ * @method Model findById($identifierValue)
+ */
 class Mapper extends BaseMapper
 {
     public function mapping()

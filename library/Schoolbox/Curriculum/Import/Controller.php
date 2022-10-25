@@ -46,13 +46,13 @@ class Controller extends Base
         // A list of source objects
         // Only show ones with an import class, though.
         $this->response->content->set(
-            array(
+            [
                 'title'    => 'Curriculum Import',
                 'template' => '@curriculumImport/browse.twig',
-                'data'     => array(
+                'data'     => [
                     'sourceList' => $this->sourceMapper->findImportable(),
-                ),
-            )
+                ],
+            ]
         );
     }
 
@@ -113,15 +113,13 @@ class Controller extends Base
         // And save the outcomes
         // (Save a root node, and save everything as a child of that.)
         $code = 200;
-        $data = array();
+        $data = [];
         if ($thisArea instanceof LearningArea\Model && $thisLevel instanceof LearningLevel\Model) {
             try {
                 $rootNode = $this->nodeMapper->findOneByColumn('reference', $thisArea->getReference(), ["deleted" => false]);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $rootNode = $this->nodeMapper->createModel();
                 $rootNode
-//                    ->setLearningLevel($thisLevel)
-//                    ->setLearningArea($thisArea)
                     ->setName($thisArea->getName())
                     ->setReference($thisArea->getReference());
             }
@@ -132,7 +130,7 @@ class Controller extends Base
             // All the handling code cares about is the root node's ID
             $data['outcomes'][0] = ['id' => $rootNode->getId()];
         } else {
-            $code = 400;
+            $code            = 400;
             $data['message'] = 'Area or level not found';
         }
 
@@ -148,7 +146,7 @@ class Controller extends Base
     public function learningLevels()
     {
         $code = 200;
-        $data = array();
+        $data = [];
         try {
             $source = $this->sourceMapper->findById($this->request->query['id']);
             // Stuff this into a factory and use that to build a list of levels
@@ -163,10 +161,10 @@ class Controller extends Base
         }
         $this->response->status->setCode($code);
         $this->response->content->set(
-            array(
+            [
                 'format' => 'json',
                 'data'   => $data,
-            )
+            ]
         );
     }
 
@@ -177,7 +175,7 @@ class Controller extends Base
     public function outcomes()
     {
         $code = 200;
-        $data = array();
+        $data = [];
         try {
             $source = $this->sourceMapper->findById($this->request->query['id']);
 
@@ -209,10 +207,10 @@ class Controller extends Base
         }
         $this->response->status->setCode($code);
         $this->response->content->set(
-            array(
+            [
                 'format' => 'json',
                 'data'   => $data,
-            )
+            ]
         );
     }
 }
