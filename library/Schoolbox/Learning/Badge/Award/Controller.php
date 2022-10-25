@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use Exception;
 use PDOException;
+use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -32,6 +34,8 @@ use Schoolbox\SortUsersByName;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+use Schoolbox\Learning\Badge\Translator;
+use Schoolbox\Resource\Storage;
 
 use function count;
 use function in_array;
@@ -289,11 +293,13 @@ class Controller extends Base
 
         $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
 
+        $translator = $this->buildModelToArrayTranslator();
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardWithEvidenceForm.twig',
                 [
-                    'badges' => $badges,
+                    'badges' => $badges->map($translator),
                     'badgeIds' => implode(',', $badges->getPropertyValues('id')),
                     'targetUsers' => $users,
                     'targetUserIds' => implode(',', $users->getPropertyValues('id')),
@@ -864,5 +870,29 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput(['data' => $data]));
+    }
+
+    /**
+     * TODO for now copied from Badge Controller
+     * Builder for the model-to-array translator for badges.
+     *
+     * @return Composite
+     */
+    private function buildModelToArrayTranslator(): Composite
+    {
+        $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
+        return new Composite(
+            new Translator\ModelToArray(
+                new User\Translator\Author\ModelToArray(),
+                new Storage\Translator\ModelToArray($prefixGenerator),
+                new ScrubAdapter(),
+                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser(), $prefixGenerator)
+            ),
+            new Translator\ModelToArray\Links(
+                $this->router,
+                $this->authorizer,
+                $this->getUser()
+            )
+        );
     }
 }
