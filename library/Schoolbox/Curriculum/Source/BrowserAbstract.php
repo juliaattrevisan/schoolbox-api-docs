@@ -10,7 +10,6 @@
 
 namespace Schoolbox\Curriculum\Source;
 
-use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\Curriculum\Node;
@@ -60,14 +59,6 @@ abstract class BrowserAbstract implements BrowserInterface
     }
 
     /**
-     * @return Model
-     */
-    public function getSource()
-    {
-        return $this->source;
-    }
-
-    /**
      * @param  Model $source
      * @return $this
      */
@@ -75,14 +66,6 @@ abstract class BrowserAbstract implements BrowserInterface
     {
         $this->source = $source;
         return $this;
-    }
-
-    /**
-     * @return LearningArea\Mapper
-     */
-    public function getAreaMapper()
-    {
-        return $this->areaMapper;
     }
 
     /**
@@ -96,14 +79,6 @@ abstract class BrowserAbstract implements BrowserInterface
     }
 
     /**
-     * @return LearningLevel\Mapper
-     */
-    public function getLevelMapper()
-    {
-        return $this->levelMapper;
-    }
-
-    /**
      * @param  LearningLevel\Mapper $levelMapper
      * @return $this
      */
@@ -114,14 +89,6 @@ abstract class BrowserAbstract implements BrowserInterface
     }
 
     /**
-     * @return Node\Mapper
-     */
-    public function getNodeMapper()
-    {
-        return $this->nodeMapper;
-    }
-
-    /**
      * @param  Node\Mapper $nodeMapper
      * @return $this
      */
@@ -129,70 +96,5 @@ abstract class BrowserAbstract implements BrowserInterface
     {
         $this->nodeMapper = $nodeMapper;
         return $this;
-    }
-
-    /**
-     * Retrieves pre-saved learning levels for this browser's source.
-     *
-     * @return Collection|LearningLevel\Model[]
-     */
-    public function getSavedLearningLevels()
-    {
-        return $this->getLevelMapper()->findByColumn(
-            'curriculum_source_id',
-            $this->getSource()->getId(),
-            array(
-                'order' => array(
-                    'order' => 'asc',
-                    'name'  => 'asc',
-                ),
-            )
-        );
-    }
-
-    /**
-     * Retrieves pre-saved learning areas for this browser's source.
-     *
-     * @return Collection|LearningArea\Model[]
-     */
-    public function getSavedLearningAreas()
-    {
-        return $this->getAreaMapper()->findByColumn(
-            'curriculum_source_id',
-            $this->getSource()->getId(),
-            array(
-                'order' => array(
-                    'order' => 'asc',
-                    'name'  => 'asc',
-                ),
-            )
-        );
-    }
-
-    /**
-     * Retrieves pre-saved outcome node graph for the given area and level.
-     *
-     * @param LearningArea\Model  $area
-     * @param LearningLevel\Model $level
-     *
-     * @return Collection|Node\Model[]
-     */
-    public function getSavedOutcomes(LearningArea\Model $area, LearningLevel\Model $level)
-    {
-        return $this->getNodeMapper()->getCollectionAsTree(
-            $this->getNodeMapper()->findByColumnList(
-                array(
-                    'curriculum_learning_level_id' => $level->getId(),
-                    'curriculum_learning_area_id'  => $area->getId(),
-                ),
-                array(
-                    'order' => array(
-                        'curriculum_node_parent_id' => 'asc',
-                        'order'                     => 'asc',
-                        'name'                      => 'asc',
-                    ),
-                )
-            )
-        );
     }
 }
