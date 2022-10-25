@@ -444,7 +444,7 @@ export default {
                     <h2>Award &lsquo;<b>{{ slotProps.badge.name }}</b>&rsquo; as an Achievement</h2>
                 </template>
                 <template v-slot:confirmButton>
-                    Award Achievement
+                    Award
                 </template>
                 <template v-slot:expiryMessage="slotProps">
                     <p class="meta" v-if="slotProps.expiryDate">

@@ -167,7 +167,6 @@ export default {
             options: [],
             selected: [],
             isFormSubmitActive: false,
-            reason: '', //the reason the badge(s) are being awarded
         }
     },
     computed: {
@@ -236,7 +235,7 @@ export default {
             this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
 
-            axios.post(this.endpoint, {users: this.selected, reason: this.reason})
+            axios.post(this.endpoint, { users: this.selected })
                 .then(() => {
                     // Clear the select, so they don't show next time this opens
                     this.selected = [];
@@ -272,20 +271,10 @@ export default {
         },
 
         /**
-         * To keep track of the reason, that's being updated by dynamic-input.vue
-         *
-         * @param { string }
-         */
-        onReasonChanged (newValue) {
-            this.reason = newValue;
-        },
-
-        /**
          * The modal is now completely closed so reset
          */
         onModalClosed () {
             this.isModalOpen = false;
-            this.reason = '';
         },
     },
 }
@@ -303,28 +292,6 @@ export default {
                 <badge-image :badge="badge"></badge-image>
                 <h3>{{ badge.name }}</h3>
             </div>
-        </div>
-
-        <div>
-            <!-- Only achievements can do this -->
-            <template v-if="'achievement' === type">
-                <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
-
-                <dynamic-input
-                    v-if="this.isModalOpen"
-                    preset-unique-id="reason"
-                    inputName="reason"
-                    singular="''"
-                    :value="''"
-                    :allow-edit="true"
-                    :allow-submit="false"
-                    :spawn-immediately="true"
-                    :is-processing="true"
-                    :cdn-prefix="this.cdnPrefix"
-                    :site-version="this.siteVersion"
-                    @value-changed="onReasonChanged"
-                ></dynamic-input>
-            </template>
         </div>
 
         <!--
@@ -354,18 +321,26 @@ export default {
                 </span>
             </template>
         </v-select>
-        <ul class="flex-list buttons">
-            <li>
-                <button @click.prevent="onSubmit" class="submit" :disabled="isSubmitButtonDisabled">
-                    <!-- @slot The text for this badge award form's confirm button -->
-                    <slot name="confirmButton">
-                      Award Achievement
-                    </slot>
+        <div class="component-action">
+            <section>
+                <a
+                    v-if="type === 'achievement'"
+                    title="Award with evidence"
+                    class="button"
+                    href="#award-with-evidence-page"
+                    :disabled="isSubmitButtonDisabled"
+                >
+                    Award with Evidence
+                </a>
+                <button
+                    :disabled="isSubmitButtonDisabled"
+                    @click.prevent="awardAchievement"
+                    @keyup.enter="awardAchievement"
+                >
+                    <slot name="confirmButton">Award</slot>
                 </button>
-            </li>
-            <li><button @click.prevent="onCancel">Cancel</button></li>
-        </ul>
-
+            </section>
+        </div>
         <toast ref="toast"></toast>
     </div>
 </template>
