@@ -508,6 +508,10 @@ select.letter-grade-select {
     .rb td, .rb th {
         border: solid 1px #8c8c8c !important; //make happen, print needs this... I don't care...
     }
+    //force text size for rubric when printing
+    .rb * {
+        font-size: 10pt !important;
+    }
 }
 
 // This was added for the RubricResultSet index.twig template.
