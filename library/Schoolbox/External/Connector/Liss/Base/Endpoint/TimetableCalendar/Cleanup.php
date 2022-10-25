@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
@@ -41,36 +42,20 @@ class Cleanup implements IStrategy
 
 
     /**
-     * Event source is an arbitrary string that helps identify the thing that imported
-     * them into the local event table so you can do a mass remove if needed
-     *
-     * @var string
-     */
-    private string $source;
-
-
-    /**
      * Cleanup constructor.
      *
      * @param LoggerInterface $log
      * @param bool            $perform
      * @param Mapper          $eventMapper
-     * @param string          $source
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        string $source
+        \Schoolbox\External\Event\Mapper $eventMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->eventMapper = $eventMapper;
-
-        /* Event source is an arbitrary string that helps identify the thing that imported
-         * them into the local event table so you can do a mass remove if needed
-         */
-        $this->source = $source;
     }
 
 
@@ -93,7 +78,7 @@ class Cleanup implements IStrategy
 
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => $this->source
+                'source' => Factory::SOURCE_NAME
             ]);
 
             $this->log->info("Removed stale timetable events.");

@@ -39,12 +39,6 @@ use Schoolbox\Mapper\Exception;
 class Receiver
 {
     /**
-     * An arbitrarily-chosen string to denote where these events came from
-     */
-    public const SOURCE_NAME = 'suds_liss';
-
-
-    /**
      * A file in your vagrant: /var/log/schoolbox/vagrantx
      */
     private const LOG_FILE = 'liss.log';
@@ -268,7 +262,6 @@ class Receiver
         $composites = (new Factory())->produce(
             $this->log(),
             true,
-            self::SOURCE_NAME,
             $this->defaultType,
             $this->exclusions,
             $this->teacherIdentifier,

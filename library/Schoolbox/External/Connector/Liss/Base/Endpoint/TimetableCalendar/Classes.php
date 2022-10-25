@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
 use Schoolbox\External\Event\Mapper;
@@ -380,7 +381,7 @@ class Classes implements IStrategy
             ->setType($type)
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
-            ->setSource(Receiver::SOURCE_NAME);
+            ->setSource(Factory::SOURCE_NAME);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */

@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -75,15 +76,6 @@ class Prepare implements IStrategy
 
 
     /**
-     * Event source is an arbitrary string that helps identify the thing that imported
-     * them into the local event table so you can do a mass remove if needed
-     *
-     * @var string
-     */
-    private string $source;
-
-
-    /**
      * Prepare constructor.
      *
      * @param LoggerInterface                            $log
@@ -94,7 +86,6 @@ class Prepare implements IStrategy
      * @param ClassPeriodMapper                          $classPeriodMapper
      * @param TimetablePeriodMapper                      $periodMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
-     * @param string                                     $source
      */
     public function __construct(
         LoggerInterface $log,
@@ -104,8 +95,7 @@ class Prepare implements IStrategy
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper,
         TimetablePeriodMapper $periodMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
-        string $source
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -115,11 +105,6 @@ class Prepare implements IStrategy
         $this->classPeriodMapper = $classPeriodMapper;
         $this->periodMapper = $periodMapper;
         $this->overridesMapper = $overridesMapper;
-
-        /* Event source is an arbitrary string that helps identify the thing that imported
-         * them into the local event table so you can do a mass remove if needed
-         */
-        $this->source = $source;
     }
 
 
@@ -142,7 +127,7 @@ class Prepare implements IStrategy
             $statement = $this->overridesMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => $this->source
+                'source' => Factory::SOURCE_NAME
             ]);
 
             $this->log->debug('Purged timetable event overrides');
@@ -158,7 +143,7 @@ class Prepare implements IStrategy
             $statement = $this->eventMapper->getDatabase()->prepare($query);
             $statement->execute([
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'source' => $this->source,
+                'source' => Factory::SOURCE_NAME,
             ]);
 
             /* Truncate other data entirely
