@@ -9,7 +9,7 @@
     {# Student External ID as Barcode #}
     {% if user.externalId %}
         <dd class="small-12 medium-12 columns">
-            <span class="barcode-128">{{ user.externalId }}</span>
+            <span class="barcode-39">*{{ user.externalId }}*</span>
         </dd>
     {% endif %}
 {% endblock extraDetails %}
