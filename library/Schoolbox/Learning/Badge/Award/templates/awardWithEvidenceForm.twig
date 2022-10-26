@@ -1,7 +1,7 @@
 <script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 <script>
-    $(function() {
+    $(function () {
         $.fn.alaressEditor({
             targetElements: $('#reason'),
             removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed,schoolboxiframe',
@@ -9,50 +9,62 @@
              */
             removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
             toolbarGroups: [
-                { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
-                { name: 'paragraph', groups: ['list', 'blocks', 'bidi'] },
-                { name: 'insert', groups: ['insert'] },
-                { name: 'schoolbox', groups: ['schoolboxlink'] },
+                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
+                {name: 'insert', groups: ['insert']},
+                {name: 'schoolbox', groups: ['schoolboxlink']},
             ],
             resize_enabled: true,
             toolbarCanCollapse: false
         });
     });
 </script>
-
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    ['Badges', routeLookupIfAuthorized('learningBadge.getBadgeListPage') ],
+    ['Award Achievements']
+) }}
 <div class="row">
     <div class="small-12 columns">
         <h1>Award Achievements</h1>
-        {% for targetUser in targetUsers %}
-        <ul class="meta">
-            <li class="icon-staff-students">{{ targetUser.fullname }}</a></li>
-        </ul>
-        {% endfor %}
+        {% if targetUsers is not empty %}
+            <ul class="meta">
+                <li>
+                    {% include 'sub/userListMetadata.twig'
+                        with {
+                        users:   targetUsers,
+                        message: 'Awarding to',
+                    } only %}
+                </li>
+            </ul>
+        {% endif %}
     </div>
 </div>
 
 <div id="award-with-evidence-badge-list-container">
     <award-with-evidence-badge-list
-        :badges="{{ badges | json_encode }}"
+            :badges="{{ badges | json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/awardWithEvidenceBadgeList.js?v={{ config.site_version }}"></script>
 
 <div class="row">
     <div class="small-12 island">
-        {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardWithEvidence') ~ '?returnUrl=' ~ returnUrl%}
+        {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardWithEvidence') ~ '?returnUrl=' ~ returnUrl %}
 
         <form action="{{ postRoute }}" method="post">
             <input type="hidden" name="targetUserIds" value="{{ targetUserIds }}">
             <input type="hidden" name="badgeIds" value="{{ badgeIds }}">
             <section>
                 <fieldset>
-                    <label>Reason</label>
+                    <label for="reason">Evidence</label>
                     <textarea id="reason" name="reason"></textarea>
                 </fieldset>
             </section>
-
-            <input type="submit" value="Save" />
+            <ul class="flex-list buttons">
+                <li><a href="{{ cancelUrl }}" class="button">Back</a></li>
+                <li><input type="submit" value="Award"/></li>
+            </ul>
         </form>
     </div>
 </div>

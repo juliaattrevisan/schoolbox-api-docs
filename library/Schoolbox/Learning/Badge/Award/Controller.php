@@ -296,18 +296,21 @@ class Controller extends Base
             $this->sendError('No badge provided');
         }
 
-        $returnUrl  = $this->request->query->get(Redirect::RETURN_URL);
-        $translator = $this->buildBadgeModelToArrayTranslator();
+        $returnUrl       = $this->request->query->get(Redirect::RETURN_URL);
+        $cancelUrl       = Redirect::decode($returnUrl);
+        $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
+        $userTranslator  = new User\Translator\Author\ModelToArray();
 
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardWithEvidenceForm.twig',
                 [
-                    'badges'        => $badges->map($translator),
+                    'badges'        => $badges->map($badgeTranslator),
                     'badgeIds'      => implode(',', $badges->getPropertyValues('id')),
-                    'targetUsers'   => $users,
+                    'targetUsers'   => $users->map($userTranslator),
                     'targetUserIds' => implode(',', $users->getPropertyValues('id')),
                     'returnUrl'     => $returnUrl,
+                    'cancelUrl'     => $cancelUrl,
                 ],
                 'Award Achievement'
             )
