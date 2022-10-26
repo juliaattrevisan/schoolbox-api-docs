@@ -33,18 +33,14 @@ class Browser implements Source\BrowserInterface
     /**
      * Constructor
      *
-     * @param Source\Model         $source
-     * @param Node\Mapper          $nodeMapper
-     * @param LearningArea\Mapper  $areaMapper
-     * @param LearningLevel\Mapper $levelMapper
-     * @param Client               $client
-     * @param Html2Text            $htmlConverter
+     * @param Source\Model $source
+     * @param Node\Mapper  $nodeMapper
+     * @param Client       $client
+     * @param Html2Text    $htmlConverter
      */
     public function __construct(
         private Source\Model $source,
         private Node\Mapper $nodeMapper,
-        private LearningArea\Mapper $areaMapper,
-        private LearningLevel\Mapper $levelMapper,
         private Client $client,
         private Html2Text $htmlConverter,
     ) {
