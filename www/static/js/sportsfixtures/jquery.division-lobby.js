@@ -100,7 +100,7 @@
                     /* Reordering within the same sortable.
                      */
                     if (from.is(to)) {
-                        saveSequenceAndUpdateDisplay(from); // Update both 'from' and 'to' lists since they are the same.
+                        saveSequenceAndUpdatePlayersList(from); // Update both 'from' and 'to' lists since they are the same.
                     }
                     /* Drag from division to team.
                      */
@@ -119,8 +119,8 @@
                                     console.log('DB: adding ' + player.data('player') + ' to ' + to.data('addPlayersAction'));
                                 }
 
-                                updateDivisionLobby(response.divisionLobby); // Update 'from' list.
-                                saveSequenceAndUpdateDisplay(to);            // Update 'to' list.
+                                updateDivisionPlayersList(response.divisionLobby); // Update 'from' list.
+                                saveSequenceAndUpdatePlayersList(to);              // Update 'to' list.
                                 fromFeedback.toastTimeout({text: 'Removed from team', css: 'success'});
                                 toFeedback.toastTimeout({text: 'Added to team' , css: 'success'});
                             })
@@ -149,8 +149,8 @@
                                     console.log('DB: removing ' + player.data('player') + ' from ' + from.data('removePlayersAction'));
                                 }
 
-                                updateTeamMetadata($('[data-team='+fromId+']'), response); // Update 'from' list.
-                                saveSequenceAndUpdateDisplay(to);                          // Update 'to' list.
+                                updateTeamPlayersList($('[data-team='+fromId+']'), response); // Update 'from' list.
+                                saveSequenceAndUpdatePlayersList(to);                         // Update 'to' list.
                                 fromFeedback.toastTimeout({text: 'Removed from team', css: 'success'});
                             })
                             .fail(function() {
@@ -185,8 +185,8 @@
                                 console.log('DB: adding ' + player.data('player') + ' to ' + to.data('addPlayersAction'));
                             }
 
-                            updateTeamMetadata($('[data-team='+fromId+']'), fromTeamConfiguration); // Update 'from' list.
-                            saveSequenceAndUpdateDisplay(to);                                       // Update 'to' list.
+                            updateTeamPlayersList($('[data-team='+fromId+']'), fromTeamConfiguration); // Update 'from' list.
+                            saveSequenceAndUpdatePlayersList(to);                                      // Update 'to' list.
                             toFeedback.toastTimeout({text: 'Player moved to team', css: 'success'});
                         })
                         .fail(function() {
@@ -204,7 +204,7 @@
          * @param sortable
          * @returns {*}
          */
-        function saveSequenceAndUpdateDisplay(sortable) {
+        function saveSequenceAndUpdatePlayersList(sortable) {
             if (config.debugging) {
                 if (isDivisionList(sortable)) {
                     console.log('Saving new sequence for division ' + sortable.attr('data-division-player-list'));
@@ -225,9 +225,9 @@
                     }
 
                     if (isDivisionList(sortable)) {
-                        updateDivisionLobby(response.html);
+                        updateDivisionPlayersList(response.html);
                     } else {
-                        updateTeamMetadata(sortable.parents('[data-team]'), response);
+                        updateTeamPlayersList(sortable.parents('[data-team]'), response);
 
                         // If dragged onto a proxy element, remove the player drag helper after team list is respawned.
                         // This will happen when the first player is dropped into an empty team.
@@ -236,47 +236,6 @@
                         }
                     }
                 });
-        }
-
-        /**
-         * Replaces existing division lobby with new one
-         *
-         * This occurs every time a player moves into,
-         * between, or out of a team
-         *
-         * @param newDivisionLobby
-         */
-        function updateDivisionLobby(newDivisionLobby) {
-            let newHtml = $(newDivisionLobby).find('[data-division-player-list]').html();
-
-            if (config.debugging) {
-                let currDate = new Date();
-                newHtml += '<div>Division list updated at ' + currDate.toTimeString() + '</div>'
-            }
-
-            removeClickHandlersFromDivisionPlayerButtons(); // Remove click handlers from HTML elements about to be removed.
-            $('[data-division-player-list]').html(newHtml);
-            addClickHandlersToDivisionPlayerButtons(); // Attach click handlers to new HTML elements (note players may have been added or removed).
-
-            applyDivisionPlayerFilter();
-        }
-
-        /**
-         * Updates the Team's new player list
-         * Updates the Team's player count
-         */
-        function updateTeamMetadata(teamContainer, response) {
-            let newHtml = response.html;
-
-            if (config.debugging) {
-                let currDate = new Date();
-                newHtml += '<div>Team list updated at ' + currDate.toTimeString() + '</div>'
-            }
-
-            removeClickHandlersFromTeamPlayerButtons(); // Remove click handlers from HTML elements about to be removed.
-            teamContainer.find('[data-team-player-list]').html(newHtml);
-            teamContainer.find('[data-player-count]').text(teamContainer.find('[data-player]').length);
-            addClickHandlersToTeamPlayerButtons(); // Attach click handlers to new HTML elements (note players may have been added or removed).
         }
 
         /**
@@ -320,8 +279,8 @@
 
                 $.post(el.attr('href'), [{name: 'userId[]', value: el.data('addTeamPlayer')}], null, 'json')
                     .done(function(response) {
-                        updateTeamMetadata($('[data-team='+el.attr('data-affected-team')+']'), response);
-                        updateDivisionLobby(response.divisionLobby);
+                        updateTeamPlayersList($('[data-team='+el.attr('data-affected-team')+']'), response);
+                        updateDivisionPlayersList(response.divisionLobby);
                         feedback.toastTimeout({text: 'Added to team', css: 'success'});
                     })
                     .fail(function() {
@@ -410,8 +369,8 @@
 
                         $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removeTeamPlayer')}], null, 'json')
                             .done(function(response) {
-                                updateTeamMetadata($('[data-team='+el.attr('data-affected-team')+']'), response);
-                                updateDivisionLobby(response.divisionLobby);
+                                updateTeamPlayersList($('[data-team='+el.attr('data-affected-team')+']'), response);
+                                updateDivisionPlayersList(response.divisionLobby);
                                 feedback.toastTimeout({text: 'Removed from team', css: 'success'});
                             })
                             .fail(function() {
@@ -420,6 +379,47 @@
                     }
                 });
             });
+        }
+
+        /**
+         * Replaces existing division lobby with new one
+         *
+         * This occurs every time a player moves into,
+         * between, or out of a team
+         *
+         * @param newDivisionLobby
+         */
+        function updateDivisionPlayersList(newDivisionLobby) {
+            let newHtml = $(newDivisionLobby).find('[data-division-player-list]').html();
+
+            if (config.debugging) {
+                let currDate = new Date();
+                newHtml += '<div>Division list updated at ' + currDate.toTimeString() + '</div>'
+            }
+
+            removeClickHandlersFromDivisionPlayerButtons(); // Remove click handlers from HTML elements about to be removed.
+            $('[data-division-player-list]').html(newHtml);
+            addClickHandlersToDivisionPlayerButtons(); // Attach click handlers to new HTML elements (note players may have been added or removed).
+
+            applyDivisionPlayerFilter();
+        }
+
+        /**
+         * Updates the Team's new player list
+         * Updates the Team's player count
+         */
+        function updateTeamPlayersList(teamContainer, response) {
+            let newHtml = response.html;
+
+            if (config.debugging) {
+                let currDate = new Date();
+                newHtml += '<div>Team list updated at ' + currDate.toTimeString() + '</div>'
+            }
+
+            removeClickHandlersFromTeamPlayerButtons(); // Remove click handlers from HTML elements about to be removed.
+            teamContainer.find('[data-team-player-list]').html(newHtml);
+            teamContainer.find('[data-player-count]').text(teamContainer.find('[data-player]').length);
+            addClickHandlersToTeamPlayerButtons(); // Attach click handlers to new HTML elements (note players may have been added or removed).
         }
 
         /**
