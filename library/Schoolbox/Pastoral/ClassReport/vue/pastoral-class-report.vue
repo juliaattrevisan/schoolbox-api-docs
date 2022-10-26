@@ -221,7 +221,7 @@ export default {
 
                                     <div v-for="record in studentData.records.data" :key="'record-' + String(record.id)" class="pastoral-container">
                                         <div class="tiny card small-12">
-                                            <a :href="record._links.read" title="View record">
+                                            <a :href="record._links.read" title="View record" :class="{disabled: !record._links.read}">
                                                 <img :src="record.createdBy._links.avatar"
                                                      :alt="`Profile photo of ${record.createdBy.fullName}`"
                                                      :title="`Created by ${ record.createdBy.fullName }`"

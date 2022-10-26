@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\User;
@@ -412,7 +413,7 @@ class DataSource
         $userMapper = $this->mapper->getJoinMapper('owner');
         $severityMapper = $this->mapper->getJoinMapper('severity');
 
-        $records    = Model::createCollection();
+        $records = $this->mapper->createCollection();
         foreach ($rows as $row) {
             try {
                 $record = $this->mapper->hydrate($row, 'p');
@@ -435,9 +436,21 @@ class DataSource
                 // noop
                 continue;
             }
-            $record->setRelatedRecords(Model::createCollection());
+            $record->setRelatedRecords($this->mapper->createCollection());
             $records->offsetSet($record->getId(), $record);
         }
+
+        // Load record access
+        $recordIds        = $records->getPropertyValues('id');
+        $recordAccessById = $this->mapper->getJoinMapper('access')
+            ->findByColumn('pastoral_id', $recordIds)
+            ->groupByCallback(fn (PastoralAccess $v) => $v->getPastoral()->getId());
+        foreach ($records as $record) {
+            if (isset($recordAccessById[$record->getId()])) {
+                $record->setAccess($recordAccessById[$record->getId()]);
+            }
+        }
+
         return $records;
     }
 
