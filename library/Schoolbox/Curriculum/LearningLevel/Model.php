@@ -18,10 +18,9 @@ use Schoolbox\ISoftDeletable;
  * A learning level is roughly equivalent to a student year, but may be on a
  * different scale (example: level 1 may map to year 1-3)
  *
- * This will be deprecated eventually, as curriculum nodes no longer have a
- * learning area or level: for now, it's kept so that
- * `\Schoolbox\Curriculum\Source\BrowserInterface::getOutcomes` may be
- * preserved as is.
+ * Whilst the learning area/level mappers are deprecated, this model is not:
+ * it is still used by `\Schoolbox\Curriculum\Source\BrowserInterface` and its
+ * implementations.
  */
 class Model implements ISoftDeletable, JsonSerializable
 {

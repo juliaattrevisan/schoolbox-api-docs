@@ -7,16 +7,16 @@
 
 namespace Schoolbox\Curriculum\LearningArea;
 
-use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Mapper for learning areas.
  *
- * This will be deprecated eventually, as curriculum nodes no longer have a
- * learning area or level: for now, it's kept so that
- * `\Schoolbox\Curriculum\Source\BrowserInterface::getOutcomes` may be
- * preserved as is.
+ * @deprecated 22.1: curriculum nodes no longer store their learning area or
+ *             level, and these are no longer stored by
+ *             `\Schoolbox\Curriculum\Source\BrowserInterface` implementations.
+ *             (The corresponding models are _not_ deprecated, as they are still
+ *             returned and requested by implementations of that interface.)
  */
 class Mapper extends BaseMapper
 {
