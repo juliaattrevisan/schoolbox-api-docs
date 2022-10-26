@@ -953,7 +953,11 @@ class Profile implements IStrategy
                 ], Api::VERSION_2);
             } catch (RuntimeException $e) {
                 // Couldn't retrieve HR data: just pretend this was never called
-                $this->log->warning("Employee HR endpoint is misconfigured - employee positions and pictures will not be fetched.");
+                $this->log->warning(
+                    $this->includePhoto
+                        ? "Employee HR endpoint is misconfigured - employee positions and pictures will not be fetched."
+                        : "Employee HR endpoint is misconfigured - employee positions will not be fetched."
+                );
                 $this->log->warning($e->getMessage());
                 return $combinedSet;
             }
