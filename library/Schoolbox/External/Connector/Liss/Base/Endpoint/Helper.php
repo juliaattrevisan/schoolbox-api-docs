@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
 use PhpXmlRpc\Value;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Helper
@@ -24,6 +25,25 @@ class Helper
      * e.g. "Addams Family Lead Vocal Rehearsals 12/10/2022 1.00pm to 1.30pm @ Drama Studio/ RH21A - A Clarke - #2688"
      */
     private const MAX_CLASS_CODE_LENGTH = 64;
+
+
+    /**
+     * Logs the things that happened, in a text file
+     *
+     * @var LoggerInterface
+     */
+    private LoggerInterface $log;
+
+
+    /**
+     * Constructor.
+     *
+     * @param LoggerInterface $log
+     */
+    public function __construct(LoggerInterface $log)
+    {
+        $this->log = $log;
+    }
 
 
     /**
@@ -117,16 +137,11 @@ class Helper
          * Since this requires schools to push data to us, shanking it
          * into a log allows us to inspect independently of the school
          */
-        if ((new Watchlist())->isOnWatchlist(
-            (string)$currentEvent['code'],
-            [
-                '9DAN 1',
-                '10DAN 1',
-                'Duty Tcage'
-            ]
-        )) {
-            print_r($currentEvent);
-            print_r($restructured);
+        $watchlist = ['9DAN 1', '10DAN 1', 'Duty Tcage'];
+
+        if ((new Watchlist())->isOnWatchlist((string)$currentEvent['code'], $watchlist)) {
+            $this->log->debug(json_encode($currentEvent));
+            $this->log->debug(json_encode($restructured));
         }
 
         return $restructured;

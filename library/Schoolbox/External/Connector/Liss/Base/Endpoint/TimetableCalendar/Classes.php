@@ -184,7 +184,7 @@ class Classes implements IStrategy
     {
         /* Make all the data easier to manipulate by rearranging their guts
          */
-        $helper = new Helper();
+        $helper = new Helper($this->log);
         $allDailyData = $helper->reformatAllEvents($this->message->getParam(3)->me['array']);
 
         /* Keep track of all the problems we encountered
