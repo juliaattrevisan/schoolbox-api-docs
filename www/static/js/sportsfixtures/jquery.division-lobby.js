@@ -84,17 +84,18 @@
                 stop: function(event, ui) {
                     copyHelper && copyHelper.remove();
 
-                    let player = ui.item;                   // The player element that was dragged.
+                    let player = ui.item; // The player element that was dragged.
+
+                    // The sortables from which the player was dragged, and to which they were dropped.
+                    let from = $(event.target);
+
+                    // the sortable into which the player has been dropped (one of three possibilities).
+                    let to = player.closest('[data-team-player-list], [data-team-player-list-proxy], [data-division-player-list]');
+
                     let fromId;                             // Id of the 'to' HTML container element.
                     let toId;                               // Id of the 'from' HTML container element.
                     let fromFeedback = findIndicator(from); // Indicator for 'from' events.
                     let toFeedback = findIndicator(to);     // Indicator for 'to' events.
-
-                    // The sortable from which $player was dragged.
-                    let from = $(event.target);
-
-                    // The sortable into which the player has been dropped (one of three possibilities).
-                    let to = player.closest('[data-team-player-list], [data-team-player-list-proxy], [data-division-player-list]');
 
                     /* Reordering within the same sortable.
                      */
@@ -374,7 +375,6 @@
         function addClickHandlersToTeamPlayerButtons() {
             // Add click handler for 'Change player positions' button.
             $(document).on('click', '[data-player-positions-user]', function() {
-
                 // Set the form data with the team/user IDs
                 $('#playerPositionName').html($(this).attr('data-player-positions-team-name') + ' - ' + $(this).attr('data-player-positions-name'));
                 $('#playerPositionUserId').val($(this).attr('data-player-positions-user'));
