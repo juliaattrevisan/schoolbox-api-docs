@@ -8,7 +8,6 @@
 namespace Schoolbox\Pastoral\ClassReport;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccessMapper;
