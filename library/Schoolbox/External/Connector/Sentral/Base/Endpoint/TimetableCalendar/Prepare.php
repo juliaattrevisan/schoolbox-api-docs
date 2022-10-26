@@ -26,13 +26,6 @@ use Schoolbox\External\TimetablePeriodMapper;
  */
 class Prepare implements IStrategy
 {
-
-    /**
-     * An arbitrarily-chosen string to denote where these events came from
-     */
-    public const EVENT_IMPORT_IDENTIFIER = 'suds_sentral';
-
-
     /**
      * @var LoggerInterface
      */
@@ -73,7 +66,6 @@ class Prepare implements IStrategy
      * @var TimetablePeriodMapper
      */
     private TimetablePeriodMapper $periodMapper;
-
 
 
     /**
@@ -123,24 +115,39 @@ class Prepare implements IStrategy
         if ($this->perform) {
             /* Delete any overrides that existed
              */
-            $this->overridesMapper->truncate();
+            $query = "
+                DELETE seuo
+                FROM {$this->overridesMapper->getTable()} seuo
+                INNER JOIN {$this->eventMapper->getTable()} ON seuo.event_id = {$this->eventMapper->getTable()}.id
+                WHERE {$this->eventMapper->getTable()}.classification = :classification
+                AND {$this->eventMapper->getTable()}.`source` = :source
+            ";
+
+            $statement = $this->overridesMapper->getDatabase()->prepare($query);
+            $statement->execute([
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                'source' => \Schoolbox\External\Connector\Sentral\Base\Endpoint\Factory::SOURCE_NAME
+            ]);
+
             $this->log->debug('Purged timetable event overrides');
 
-            /* Delete existing timetable events
+            /* Stage existing timetable events for later deletion if they were
+             * never touched during the import
              */
-            $this->eventMapper->deleteByColumn('classification', \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE);
-            $this->log->debug(sprintf(
-                'Purged timetable events classified as %s',
-                \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE
-            ));
+            $query = "
+                UPDATE {$this->eventMapper->getTable()}
+                SET updated_at = '0000-00-00 00:00:00'
+                WHERE classification = :classification
+                AND source = :source
+            ";
+
+            $statement = $this->eventMapper->getDatabase()->prepare($query);
+            $statement->execute([
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                'source' => \Schoolbox\External\Connector\Sentral\Base\Endpoint\Factory::SOURCE_NAME
+            ]);
 
             /* Truncate other data entirely
-             *
-             * For some reason this truncate() doesn't always execute for all the tables
-             * This leaves stuff in a broken state which you have to manually clear
-             *
-             * It manifests as a FK issue where it tries to insert duplicate relations
-             * that were supposed to have been deleted prior
              */
             $this->classEntryMapper->truncate();
             $this->classInvolvementMapper->truncate();

@@ -30,6 +30,13 @@ use UnexpectedValueException;
 class Factory
 {
     /**
+     * Event source is an arbitrary string that helps identify the thing that imported
+     * them into the local event table so you can do a mass remove if needed
+     */
+    public const SOURCE_NAME = 'suds_sentral';
+
+
+    /**
      * Get timetable classes occurring this far in the past
      * Measured in weeks, defaults to -1 week
      */
@@ -67,6 +74,12 @@ class Factory
      * @var string
      */
     private string $key;
+
+
+    /**
+     * @var array
+     */
+    private array $watchlist;
 
 
     /**
@@ -159,6 +172,7 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        array $watchlist,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
@@ -177,6 +191,7 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->watchlist = $watchlist;
 
         /* Profile pieces
          */
@@ -230,6 +245,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $this->watchlist,
                 $registry,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
@@ -262,10 +278,16 @@ class Factory
                 $api,
                 $registry,
                 $this->eventMapper,
+                $this->overridesMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $from,
                 $to
+            ))
+            ->add(new TimetableCalendar\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->eventMapper
             ))
             ->add(new ApiStatistics(
                 $this->log,
