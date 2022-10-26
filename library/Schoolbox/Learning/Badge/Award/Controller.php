@@ -315,30 +315,38 @@ class Controller extends Base
     }
 
     /**
+     * Bulk award users with badges and reason
      * @return void
+     * @throws MapperException
+     * @throws \Alaress\Web\Controller\Exception
      */
-    public function postAwardWithEvidence()
+    public function postAwardWithEvidence():void
     {
-        $targetUserIds = array_map('intval', explode(',', $this->request->post->get('targetUserIds')));
+        $targetUserIds = $this->request->post->get('targetUserIds') ? array_map('intval', explode(',', $this->request->post->get('targetUserIds'))) : [];
         $targetUsers   = $this->userMapper->findByColumn('id', $targetUserIds);
-        $reason        = trim($this->request->post->get('reason'));
+        if (empty($targetUserIds) || !$targetUsers->count()) {
+            $this->sendError('No target user provided');
+        }
 
-
-        $badgeIds = array_map('intval', explode(',', $this->request->post->get('badgeIds')));
-        try {
-            $badges = $this->badgeMapper->findByColumn('id', $badgeIds);
-            foreach ($badges as $badge) {
-                $collection = $this->createAwardsFromRequestBody($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, $targetUsers, $reason);
-            }
-        } catch (MapperException $e) {
-            // TODO handle error
+        $reason   = trim($this->request->post->get('reason'));
+        $badgeIds = $this->request->post->get('badgeIds') ? array_map('intval', explode(',', $this->request->post->get('badgeIds'))) : [];
+        $badges   = $this->badgeMapper->findByColumn('id', $badgeIds);
+        if (empty($badgeIds) || !$badges->count()) {
+            $this->sendError('No badge provided');
+        }
+        foreach ($badges as $badge) {
+            $this->createAwardsFromRequestBody($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, $targetUsers, $reason);
         }
         $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
         $this->response->redirect->afterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
     }
 
-
-    public function getAwardWithEvidence(AwardModel $award)
+    /**
+     * Show award detail with evidence
+     * @param \Schoolbox\Learning\Badge\Award\Model $award
+     * @return void
+     */
+    public function getAwardWithEvidence(AwardModel $award): void
     {
         $this->response->content->set(
             $this->buildHtmlOutput(
@@ -348,7 +356,7 @@ class Controller extends Base
                     'targetUser' => $award->getRecipient(),
                     'reason'     => $award->getReason(),
                 ],
-                'View Evidence' // TODO
+                'View Evidence'
             )
         );
     }

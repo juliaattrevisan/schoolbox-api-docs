@@ -30,7 +30,7 @@ const isDetailModalOpen = ref(false);
  */
 function openDetailModal (badge) {
     currentBadge.value = badge;
-    isDetailModalOpen.vaue = true;
+    isDetailModalOpen.value = true;
 }
 
 /**
@@ -45,7 +45,7 @@ function onDetailModalClosed () {
 
 <template>
     <div class="row">
-        <!-- <div class="small-12 island">
+        <div class="small-12 island">
             <section class="content">
                 <div class="badge-grid v-card-list">
                     <div class="badge v-card" v-for="badge in badges" :key="badge.id">
@@ -65,7 +65,7 @@ function onDetailModalClosed () {
                     </div>
                 </div>
             </section>
-        </div> -->
+        </div>
     </div>
     <badge-modal
         :isOpen="isDetailModalOpen"
