@@ -25,15 +25,11 @@ class Controller extends Base
      *
      * @param Node\Mapper           $nodeMapper
      * @param Source\Mapper         $sourceMapper
-     * @param LearningArea\Mapper   $areaMapper
-     * @param LearningLevel\Mapper  $levelMapper
      * @param Source\BrowserFactory $browserFactory
      */
     public function __construct(
         private Node\Mapper $nodeMapper,
         private Source\Mapper $sourceMapper,
-        private LearningArea\Mapper $areaMapper,
-        private LearningLevel\Mapper $levelMapper,
         private Source\BrowserFactory $browserFactory,
     ) {
     }
@@ -71,44 +67,21 @@ class Controller extends Base
         $thisArea  = null;
         $thisLevel = null;
 
-        // Save areas, if they're new
-        $areas    = $browser->getLearningAreas();
-        $newAreas = new Collection();
-        foreach ($areas as $i => $area) {
+        // Find which area/level was selected
+        $areas = $browser->getLearningAreas();
+        foreach ($areas as $area) {
             if ($area->getReference() === $post['area']) {
                 $thisArea = $area;
-            }
-            if (!$area->getId()) {
-                try {
-                    $this->areaMapper->findOneByColumnList(
-                        [
-                            'curriculum_source_id' => $area->getSource()->getId(),
-                            'name'                 => $area->getName(),
-                        ]
-                    );
-                } catch (Mapper\Exception $e) {
-                    $area->setOrder($i);
-                    $newAreas->add($area);
-                }
+                break;
             }
         }
-
-        // Save levels, if they're new
-        $levels    = $browser->getLearningLevels();
-        $newLevels = new Collection();
-        foreach ($levels as $i => $level) {
+        $levels = $browser->getLearningLevels();
+        foreach ($levels as $level) {
             if ($level->getReference() === $post['level']) {
                 $thisLevel = $level;
-            }
-            if (!$level->getId()) {
-                $level->setOrder($i);
-                $newLevels->add($level);
+                break;
             }
         }
-
-        // Save new areas and levels
-        $this->areaMapper->save($newAreas);
-        $this->levelMapper->save($newLevels);
 
         // And save the outcomes
         // (Save a root node, and save everything as a child of that.)
@@ -182,22 +155,13 @@ class Controller extends Base
             // Stuff this into a factory and use that to build a list of levels
             $browser = $this->browserFactory->build($source);
 
-            // Try fetching an existing area and level.
-            // Otherwise, create a virtual one.
+            // Create level/area for searching for an outcome
             $areaRef  = $this->request->query['area'];
             $levelRef = $this->request->query['level'];
-            try {
-                $area = $this->areaMapper->findOneByColumn('reference', $areaRef);
-            } catch (Mapper\Exception $e) {
-                $area = new LearningArea\Model();
-                $area->setReference($areaRef);
-            }
-            try {
-                $level = $this->levelMapper->findOneByColumn('reference', $levelRef);
-            } catch (Mapper\Exception $e) {
-                $level = new LearningLevel\Model();
-                $level->setReference($levelRef);
-            }
+            $level    = new LearningLevel\Model();
+            $area     = new LearningArea\Model();
+            $level->setReference($levelRef);
+            $area->setReference($areaRef);
 
             $data['outcomes'] = $browser->getOutcomes($area, $level);
         } catch (Mapper\Exception $e) {
