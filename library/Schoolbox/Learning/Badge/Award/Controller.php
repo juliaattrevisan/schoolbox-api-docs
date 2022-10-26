@@ -34,7 +34,7 @@ use Schoolbox\SortUsersByName;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
-use Schoolbox\Learning\Badge\Translator;
+use Schoolbox\Learning\Badge\Translator as BadgeTranslator;
 use Schoolbox\Resource\Storage;
 
 use function count;
@@ -283,30 +283,33 @@ class Controller extends Base
 
 
     /**
+     * Display form to award multiple students with multiple badges
+     *
      * @param GenericCollection $users
      * @return void
      */
-    public function getAwardWithEvidenceForm(GenericCollection $users)
+    public function getAwardWithEvidenceForm(GenericCollection $users): void
     {
-        $badgeIds = array_unique(array_map('intval', explode(',', $this->request->query->get('badges') ?? '')));
-        $badges = $this->badgeMapper->findByColumn('id', $badgeIds);
+        $badgeIds = $this->request->query->get('badges') ? array_unique(array_map('intval', explode(',', $this->request->query->get('badges')))) : [];
+        $badges   = $this->badgeMapper->findByColumn('id', $badgeIds);
+        if (empty($badgeIds) || !$badges->count()) {
+            $this->sendError('No badge provided');
+        }
 
-        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
-
-        $translator = $this->buildModelToArrayTranslator();
+        $returnUrl  = $this->request->query->get(Redirect::RETURN_URL);
+        $translator = $this->buildBadgeModelToArrayTranslator();
 
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardWithEvidenceForm.twig',
                 [
-                    'badges' => $badges->map($translator),
-                    'badgeIds' => implode(',', $badges->getPropertyValues('id')),
-                    'targetUsers' => $users,
+                    'badges'        => $badges->map($translator),
+                    'badgeIds'      => implode(',', $badges->getPropertyValues('id')),
+                    'targetUsers'   => $users,
                     'targetUserIds' => implode(',', $users->getPropertyValues('id')),
-//                    'returnUrl'      => Redirect::encode($returnUrl),
-                    'returnUrl' => $returnUrl,
+                    'returnUrl'     => $returnUrl,
                 ],
-                'Award Achievement' // TODO
+                'Award Achievement'
             )
         );
     }
@@ -317,11 +320,11 @@ class Controller extends Base
     public function postAwardWithEvidence()
     {
         $targetUserIds = array_map('intval', explode(',', $this->request->post->get('targetUserIds')));
-        $targetUsers = $this->userMapper->findByColumn('id', $targetUserIds);
-        $reason = trim($this->request->post->get('reason'));
+        $targetUsers   = $this->userMapper->findByColumn('id', $targetUserIds);
+        $reason        = trim($this->request->post->get('reason'));
 
 
-        $badgeIds = array_map('intval',explode(',', $this->request->post->get('badgeIds')));
+        $badgeIds = array_map('intval', explode(',', $this->request->post->get('badgeIds')));
         try {
             $badges = $this->badgeMapper->findByColumn('id', $badgeIds);
             foreach ($badges as $badge) {
@@ -785,6 +788,29 @@ class Controller extends Base
 
 
     /**
+     * Builder for the model-to-array translator for badges.
+     *
+     * @return Composite
+     */
+    private function buildBadgeModelToArrayTranslator(): Composite
+    {
+        $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
+        return new Composite(
+            new BadgeTranslator\ModelToArray(
+                new User\Translator\Author\ModelToArray(),
+                new Storage\Translator\ModelToArray($prefixGenerator),
+                new ScrubAdapter(),
+                new BadgeTranslator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser(), $prefixGenerator)
+            ),
+            new BadgeTranslator\ModelToArray\Links(
+                $this->router,
+                $this->authorizer,
+                $this->getUser()
+            )
+        );
+    }
+
+    /**
      * List students with awarded badges
      *
      * @param Folder $folder
@@ -870,29 +896,5 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput(['data' => $data]));
-    }
-
-    /**
-     * TODO for now copied from Badge Controller
-     * Builder for the model-to-array translator for badges.
-     *
-     * @return Composite
-     */
-    private function buildModelToArrayTranslator(): Composite
-    {
-        $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
-        return new Composite(
-            new Translator\ModelToArray(
-                new User\Translator\Author\ModelToArray(),
-                new Storage\Translator\ModelToArray($prefixGenerator),
-                new ScrubAdapter(),
-                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser(), $prefixGenerator)
-            ),
-            new Translator\ModelToArray\Links(
-                $this->router,
-                $this->authorizer,
-                $this->getUser()
-            )
-        );
     }
 }
