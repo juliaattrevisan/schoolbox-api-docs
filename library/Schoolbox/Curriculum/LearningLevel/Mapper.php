@@ -22,7 +22,7 @@ class Mapper extends BaseMapper
 {
     public function mapping()
     {
-        $this->hasTable('curriculum_learning_level');
+        $this->hasTable('_curriculum_learning_level');
         $this->hasModel(Model::class);
         $this->hasMap(
             array(
