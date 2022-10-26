@@ -946,10 +946,17 @@ class Profile implements IStrategy
              *
              * Not sure that it actually happens in the wild though
              */
-            $details = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
-                'date' => date('d/m/Y'),
-                'includephoto' => $this->includePhoto,
-            ], Api::VERSION_2);
+            try {
+                $details = $this->api[Codec\DSN::MODULE_EMPLOYEE_HR]->retrieveDocument('getEmployeesDetails', [
+                    'date' => date('d/m/Y'),
+                    'includephoto' => $this->includePhoto,
+                ], Api::VERSION_2);
+            } catch (RuntimeException $e) {
+                // Couldn't retrieve HR data: just pretend this was never called
+                $this->log->warning("Employee HR endpoint is misconfigured - employee positions and pictures will not be fetched.");
+                $this->log->warning($e->getMessage());
+                return $combinedSet;
+            }
 
             $employeeLookup = [];
 
