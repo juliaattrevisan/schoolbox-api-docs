@@ -79,12 +79,7 @@ class Browser implements Source\BrowserInterface
                 continue;
             }
 
-            try {
-                $area = $this->areaMapper->findOneByColumn('reference', $row->doc->getUri(), ["deleted" => false]);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $area = new LearningArea\Model();
-            }
-
+            $area     = new LearningArea\Model();
             $modified = new Alaress_Date_Format($row->modified->getValue());
             $area
                 ->setSource($this->source)
@@ -118,14 +113,10 @@ class Browser implements Source\BrowserInterface
         }';
         $collection = new Collection();
         foreach ($this->client->query($sparql) as $row) {
-            try {
-                $level = $this->levelMapper->findOneByColumn('reference', $row->level->getUri(), ["deleted" => false]);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $level = new LearningLevel\Model();
-                $level
-                    ->setSource($this->source)
-                    ->setReference($row->level->getUri());
-            }
+            $level = new LearningLevel\Model();
+            $level
+                ->setSource($this->source)
+                ->setReference($row->level->getUri());
 
             $label    = null;
             $created  = null;
