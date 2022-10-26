@@ -320,7 +320,7 @@ class Controller extends Base
      * @throws MapperException
      * @throws \Alaress\Web\Controller\Exception
      */
-    public function postAwardWithEvidence():void
+    public function postAwardWithEvidence(): void
     {
         $targetUserIds = $this->request->post->get('targetUserIds') ? array_map('intval', explode(',', $this->request->post->get('targetUserIds'))) : [];
         $targetUsers   = $this->userMapper->findByColumn('id', $targetUserIds);
