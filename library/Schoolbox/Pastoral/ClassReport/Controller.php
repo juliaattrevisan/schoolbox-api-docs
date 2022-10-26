@@ -189,7 +189,6 @@ class Controller extends Base
             $this->getUser(),
             $student,
             $pastoralIds,
-            $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED),
             $sort,
             $count,
         );
