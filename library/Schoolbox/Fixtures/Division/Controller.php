@@ -8,12 +8,10 @@
 
 namespace Schoolbox\Fixtures\Division;
 
-use Alaress\Csv\Reader;
 use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Fixtures\Sport\Model as Sport;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
@@ -34,7 +32,6 @@ use Schoolbox\UserMapper;
 
 class Controller extends AbstractController
 {
-
     /**
      * @var SportMapper
      */
@@ -186,7 +183,6 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
 
-
         // Add players and teams into the division
         $division = $this->getDivisionCollector()->collectPlayers($division);
         $division = $this->getDivisionCollector()->collectTeams($division);
@@ -238,7 +234,6 @@ class Controller extends AbstractController
         }
     }
 
-
     /**
      * Add players to a Division
      *
@@ -286,7 +281,6 @@ class Controller extends AbstractController
 
         $this->renderPostAddPlayersResponse($division);
     }
-
 
     /**
      * Uploads players from a CSV into a Division
@@ -336,6 +330,7 @@ class Controller extends AbstractController
                 }
             }
         }
+
         $this->renderPostAddPlayersResponse($division);
     }
 
@@ -359,6 +354,7 @@ class Controller extends AbstractController
             )
         );
     }
+
     /**
      * Reorder players within a Division
      *
@@ -368,7 +364,8 @@ class Controller extends AbstractController
     {
         $userIds       = $this->getRequest()->post->get('userId');
         $divisionUsers = [];
-        $sequenceNo    = count($userIds);
+        $sequenceNo    = 1;
+
         foreach ($userIds as $userId) {
             try {
                 /** @var DivisionUser $divisionUser */
@@ -376,19 +373,15 @@ class Controller extends AbstractController
                     'user_id'     => $userId,
                     'division_id' => $division->getId(),
                 ]);
-                $divisionUsers[] = $divisionUser->setSequence($sequenceNo--);
+                $divisionUsers[] = $divisionUser->setSequence($sequenceNo++);
             } catch (MapperException $e) {
                 // User isn't in division. Ignore
                 continue;
             }
         }
+
         $this->divisionUserMapper->save($divisionUsers);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'sportsfixturesDivision.getLobby',
-                ['entityId' => $division->getId(),]
-            )
-        );
+        $this->renderPostAddPlayersResponse($division);
     }
 
     /**
@@ -398,7 +391,6 @@ class Controller extends AbstractController
      */
     public function postPlayerPositions($entityId)
     {
-
         $teamId = $this->request->post->get('team_id');
         try {
             // Load team
