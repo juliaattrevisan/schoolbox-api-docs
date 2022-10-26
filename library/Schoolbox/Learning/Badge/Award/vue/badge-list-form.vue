@@ -7,6 +7,7 @@ import toastMixin from '@schoolboxVue/components/toast-mixin';
 import HorizontalScoller from '@schoolboxVue/components/scroll/horizontal-scoller';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import { generateAwardWithEvidenceUrl } from '../js/awardBadgeUtils';
 
 /**
  * Form for awarding badges to users, by selecting them from a list of badges.
@@ -409,18 +410,8 @@ export default {
          *
          * @return {String}
          */
-        generateAwardWithEvidenceUrl () {
-            let emptyQueryString = {};
-//            const userIds = this.users.map(user => user.id);
-            const badgeIds = this.selectedBadges.map(badge => badge.id);
-            let evidenceUrl = `/learning/badge/award/user/${this.selectedUserIds}/award`;
-//            emptyQueryString['badges'] = badgeIds.join(',');
-            emptyQueryString['badges'] = this.selectedBadgeIds;
-            const url = new URL(window.location.href);
-            if (url.searchParams.get('returnUrl') !== null) {
-                emptyQueryString['returnUrl'] = url.searchParams.get('returnUrl');
-            }
-            return evidenceUrl + "?" + new URLSearchParams(emptyQueryString).toString();
+        getEvidenceUrl () {
+            return generateAwardWithEvidenceUrl(this.selectedUserIds, this.selectedBadgeIds);
         },
 
     },
@@ -505,7 +496,7 @@ export default {
                         v-if="type === 'achievement'"
                         title="Award with evidence"
                         class="button"
-                        :href="generateAwardWithEvidenceUrl()"
+                        :href="getEvidenceUrl()"
                     >
                         Award with Evidence
                     </a>

@@ -10,6 +10,7 @@ import vSelect from "vue-select";
 import debounce from "lodash/debounce";
 import "vue-select/dist/vue-select.css";
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import { generateAwardWithEvidenceUrl } from '../js/awardBadgeUtils';
 
 // Render a custom template for the deselect icon.
 // Partially documented on https://github.com/sagalbot/vue-select/issues/994
@@ -284,6 +285,16 @@ export default {
         onModalClosed () {
             this.isModalOpen = false;
         },
+
+        /**
+         * Generate a URL which references this page with all filters cleared.
+         *
+         * @return { string }
+         */
+        getEvidenceUrl () {
+            return generateAwardWithEvidenceUrl(this.selectedUserIds, this.badge.id);
+        },
+
     },
 }
 </script>
@@ -333,9 +344,9 @@ export default {
             <section>
                 <a
                     v-if="type === 'achievement'"
-                    title="Award with evidence 1!!"
+                    title="Award with evidence"
                     class="button"
-                    :href="`#user-ids=${selectedUserIds}&badge-id=${badge.id}`"
+                    :href="getEvidenceUrl()"
                     :class="[isSubmitButtonDisabled ? 'disabled' : '']"
                 >
                     Award with Evidence

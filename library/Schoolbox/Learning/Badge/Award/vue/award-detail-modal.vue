@@ -13,6 +13,8 @@ import CodesList from '@schoolboxCurriculum/vue/codes-list';
 import NodeDetails from '@schoolboxCurriculum/vue/node-details';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
+import { generateAwardWithEvidenceUrl } from '../js/awardBadgeUtils';
+
 
 /**
  * Award detail modal.
@@ -235,6 +237,18 @@ export default {
         returnToHere( value ) {
             return value + '?returnUrl=' + btoa(window.location.pathname);
         },
+
+        /**
+         * Generate a URL which references this page with all filters cleared.
+         *
+         * @param { string }
+         *
+         * @return { string }
+         */
+        getEvidenceUrl (badgeId) {
+            return generateAwardWithEvidenceUrl(this.award.recipient.id, badgeId);
+        },
+
     }
 }
 </script>
@@ -292,9 +306,9 @@ export default {
                         <section>
                             <template v-if="award._links.goalAward && award.isGoal && !award.award">
                                 <a
-                                    title="Award with evidence 2"
+                                    title="Award with evidence"
                                     class="button"
-                                    href=""
+                                    :href="getEvidenceUrl(award.badge.id)"
                                 >
                                     Award with Evidence
                                 </a>
@@ -317,7 +331,7 @@ export default {
                                 v-else-if="award._links.awardUpdate"
                                 title="Add evidence"
                                 class="button"
-                                :href="`#user-id=${award.recipient.id}&badge-id=${award.id}`"
+                                :href="getEvidenceUrl(award.badge.id)"
                             >
                                 Add Evidence
                             </a>
