@@ -11,6 +11,7 @@ namespace Schoolbox\Pastoral;
 use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
@@ -366,6 +367,9 @@ class DataSource
         ?int $limit,
     ): GenericCollection {
         $where = $pb->getWhereIntersect();
+
+        $severityEnabled = $this->mapper->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED);
+
         $sql   = "
             SELECT
                 {$this->mapper->getColumnString('p')},
@@ -422,9 +426,11 @@ class DataSource
                 $student = $userMapper->hydrate($row, 's');
                 $record->setStudent($student);
 
-                /** @var PastoralSeverity $severity */
-                $severity = $severityMapper->hydrate($row, 'sev');
-                $record->setSeverity($severity);
+                if ($severityEnabled) {
+                    /** @var PastoralSeverity $severity */
+                    $severity = $severityMapper->hydrate($row, 'sev');
+                    $record->setSeverity($severity);
+                }
             } catch (MapperException $e) {
                 // noop
                 continue;

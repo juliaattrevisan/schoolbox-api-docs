@@ -13,7 +13,6 @@ use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
 use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
-use Closure;
 use DateTimeInterface;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
@@ -82,7 +81,7 @@ class Cursor implements ICursor
 
         if ($lastRecord instanceof Model) {
             $nextCursor = $this->codec->encode([
-                'severity' => $lastRecord->getSeverity()->getSequence(),
+                'severity' => $lastRecord->getSeverity()?->getSequence(),
                 'created'  => $lastRecord->getCreatedAt()->toRfc3339String(),
                 'updated'  => $lastRecord->getUpdatedAt()->toRfc3339String(),
                 'id'       => $lastRecord->getId(),
@@ -180,7 +179,8 @@ class Cursor implements ICursor
         }
 
         $cursor = $this->codec->decode($encodedCursor);
-        if (!isset($cursor['severity'], $cursor['created'], $cursor['updated'], $cursor['id'])) {
+        $cursorSeverity = key_exists('severity', $cursor) ? (int)$cursor['severity'] : null;
+        if (!isset($cursorSeverity, $cursor['created'], $cursor['updated'], $cursor['id'])) {
             return $pb;
         }
         $created = (new Alaress_Date_Format($cursor['created'], DateTimeInterface::RFC3339))->getDatabase();
@@ -199,15 +199,15 @@ class Cursor implements ICursor
             // severity: severity.sequence DESC, then created DESC, then id DESC
             $pb = $pb->any(
                 $this->dataSource->getPredicateBuilder()
-                    ->lessThan('sev.sequence', $cursor['severity'])
+                    ->rawWhere('COALESCE(sev.sequence, 0) < :cursorSeverity_1', ['cursorSeverity_1' => $cursorSeverity])
                     ->all(
                         $this->dataSource->getPredicateBuilder()
-                            ->equals('sev.sequence', $cursor['severity'])
+                            ->rawWhere('COALESCE(sev.sequence, 0) = :cursorSeverity_2', ['cursorSeverity_2' => $cursorSeverity])
                             ->lessThan('p.created_at', $created)
                     )
                     ->all(
                         $this->dataSource->getPredicateBuilder()
-                            ->equals('sev.sequence', $cursor['severity'])
+                            ->rawWhere('COALESCE(sev.sequence, 0) = :cursorSeverity_3', ['cursorSeverity_3' => $cursorSeverity])
                             ->equals('p.created_at', $created)
                             ->lessThan('p.id', $cursor['id'])
                     )
@@ -224,7 +224,7 @@ class Cursor implements ICursor
                     )
                     ->all(
                         $this->dataSource->getPredicateBuilder()
-                            ->equals('p.updated_at', $cursor['severity'])
+                            ->equals('p.updated_at', $updated)
                             ->equals('p.created_at', $created)
                             ->lessThan('p.id', $cursor['id'])
                     )
