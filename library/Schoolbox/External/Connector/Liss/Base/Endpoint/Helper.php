@@ -137,9 +137,9 @@ class Helper
          * Since this requires schools to push data to us, shanking it
          * into a log allows us to inspect independently of the school
          */
-        $watchlist = ['9DAN 1', '10DAN 1', 'Duty Tcage'];
+        $watchlist = ['Duty CantInd'];
 
-        if ((new Watchlist())->isOnWatchlist((string)$currentEvent['code'], $watchlist)) {
+        if ((new Watchlist())->isOnWatchlist($restructured['code'], $watchlist)) {
             $this->log->debug(json_encode($currentEvent));
             $this->log->debug(json_encode($restructured));
         }
