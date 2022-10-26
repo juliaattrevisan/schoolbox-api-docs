@@ -1,5 +1,4 @@
 (function() {
-
     /**
      * Every sortable is connected to every other sortable
      * This enables you to drag:
@@ -14,19 +13,12 @@
 
         let config = init(options, $(this));
 
-        /* haha
-         */
         initSortables();
         initPlayerFilter();
         initCollapsables();
-        initAddPlayerToTeam();
-        initRemovePlayerFromTeam();
-        initRemovePlayerFromDivision();
         initAddPlayerToDivisionSelectize();
-        addClickHandlerToTeamPlayerButtons();
-
-        /* Apply default filter state
-         */
+        addClickHandlersToDivisionPlayerButtons();
+        addClickHandlersToTeamPlayerButtons();
         applyDivisionPlayerFilter();
 
         /* Glossary of data vars
@@ -92,24 +84,20 @@
                 stop: function(event, ui) {
                     copyHelper && copyHelper.remove();
 
-                    // The player element that was dragged.
-                    let player = ui.item;
-
-                    // Ids of the 'to' and 'from' HTML container elements respectively.
-                    let fromId;
-                    let toId;
+                    let player = ui.item;                   // The player element that was dragged.
+                    let fromId;                             // Id of the 'to' HTML container element.
+                    let toId;                               // Id of the 'from' HTML container element.
+                    let fromFeedback = findIndicator(from); // Indicator for 'from' events.
+                    let toFeedback = findIndicator(to);     // Indicator for 'to' events.
 
                     // The sortable from which $player was dragged.
                     let from = $(event.target);
 
-                    // The three possible destinations into which $player can drop.
+                    // The sortable into which the player has been dropped (one of three possibilities).
                     let to = player.closest('[data-team-player-list], [data-team-player-list-proxy], [data-division-player-list]');
 
-                    // Indicators.
-                    let fromFeedback = findIndicator(from);
-                    let toFeedback = findIndicator(to);
-
-                    // Reordering within the same sortable.
+                    /* Reordering within the same sortable.
+                     */
                     if (from.is(to)) {
                         saveSequenceAndUpdateDisplay(from); // Update both 'from' and 'to' lists since they are the same.
                     }
@@ -130,14 +118,8 @@
                                     console.log('DB: adding ' + player.data('player') + ' to ' + to.data('addPlayersAction'));
                                 }
 
-                                // If dragged onto a proxy element, remove the player drag helper after team list is respawned
-                                if (isTeamPlayerListProxy(to)) {
-                                    removeProxyHelperClone(to);
-                                }
-
                                 updateDivisionLobby(response.divisionLobby); // Update 'from' list.
                                 saveSequenceAndUpdateDisplay(to);            // Update 'to' list.
-
                                 fromFeedback.toastTimeout({text: 'Removed from team', css: 'success'});
                                 toFeedback.toastTimeout({text: 'Added to team' , css: 'success'});
                             })
@@ -168,7 +150,6 @@
 
                                 updateTeamMetadata($('[data-team='+fromId+']'), response); // Update 'from' list.
                                 saveSequenceAndUpdateDisplay(to);                          // Update 'to' list.
-
                                 fromFeedback.toastTimeout({text: 'Removed from team', css: 'success'});
                             })
                             .fail(function() {
@@ -203,14 +184,8 @@
                                 console.log('DB: adding ' + player.data('player') + ' to ' + to.data('addPlayersAction'));
                             }
 
-                            // If dragged onto a proxy element, remove the player drag helper after team list is respawned
-                            if (isTeamPlayerListProxy(to)) {
-                                removeProxyHelperClone(to);
-                            }
-
                             updateTeamMetadata($('[data-team='+fromId+']'), fromTeamConfiguration); // Update 'from' list.
                             saveSequenceAndUpdateDisplay(to);                                       // Update 'to' list.
-
                             toFeedback.toastTimeout({text: 'Player moved to team', css: 'success'});
                         })
                         .fail(function() {
@@ -220,149 +195,6 @@
                     }
                 }
             }).disableSelection();
-        }
-
-        /**
-         * Replaces existing division lobby with new one
-         *
-         * This occurs every time a player moves into,
-         * between, or out of a team
-         *
-         * @param newDivisionLobby
-         */
-        function updateDivisionLobby(newDivisionLobby) {
-            let newHtml = $(newDivisionLobby).find('[data-division-player-list]').html();
-
-            if (config.debugging) {
-                let currDate = new Date();
-                newHtml += '<div>Division list updated at ' + currDate.toTimeString() + '</div>'
-            }
-
-            $('[data-division-player-list]').html(newHtml);
-
-            applyDivisionPlayerFilter();
-        }
-
-        /**
-         * Updates the Team's new player list
-         * Updates the Team's player count
-         */
-        function updateTeamMetadata(teamContainer, response) {
-            removeClickHandlerFromTeamPlayerButtons(); // Remove click handlers from HTML elements about to be removed.
-
-            let newHtml = response.html;
-
-            if (config.debugging) {
-                let currDate = new Date();
-                newHtml += '<div>Team list updated at ' + currDate.toTimeString() + '</div>'
-            }
-
-            teamContainer.find('[data-team-player-list]').html(newHtml);
-            teamContainer.find('[data-player-count]').text(teamContainer.find('[data-player]').length);
-
-            addClickHandlerToTeamPlayerButtons(); // Attach click handlers to new HTML elements (note players may have been added or removed).
-        }
-
-        /**
-         * Every team is a collapsable
-         */
-        function initCollapsables() {
-            $('[data-collapser]').collapsable();
-        }
-
-        /**
-         * Selectize box for selecting one or more users
-         */
-        function initAddPlayerToDivisionSelectize() {
-            $('[data-role="userSelector"]')
-                .userSelectizeSelector({
-                    multiple: true,
-                    ajax: {
-                        data: {groupID: 0},
-                    }
-                });
-        }
-
-        /**
-         * Add a player to a team via tot
-         */
-        function initAddPlayerToTeam() {
-            $(config.element).on('click', '[data-add-team-player]', function(e) {
-                e.preventDefault();
-                let el       = $(this);
-                let feedback = findIndicator(el.parents('[data-division-player-list]'));
-                feedback.toastActivate({text: 'Adding to team...'});
-
-                $.post(el.attr('href'), [{name: 'userId[]', value: el.data('addTeamPlayer')}], null, 'json')
-                    .done(function(response) {
-                        updateTeamMetadata($('[data-team='+el.attr('data-affected-team')+']'), response);
-                        updateDivisionLobby(response.divisionLobby);
-                        feedback.toastTimeout({text: 'Added to team', css: 'success'});
-                    })
-                    .fail(function() {
-                        feedback.toastTimeout({text: 'Add failed', css: 'alert'});
-                    });
-            });
-        }
-
-        /**
-         * Remove a player from a team via tot
-         */
-        function initRemovePlayerFromTeam() {
-            $(config.element).on('click', '[data-remove-team-player]', function(e) {
-                e.preventDefault();
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you wish to remove this player from this team?',
-                    confirmEvent: function(el) {
-                        let feedback = findIndicator(el.parents('[data-team-player-list]'));
-                        feedback.toastActivate({text: 'Removing from team...'});
-
-                        $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removeTeamPlayer')}], null, 'json')
-                            .done(function(response) {
-                                updateTeamMetadata($('[data-team='+el.attr('data-affected-team')+']'), response);
-                                updateDivisionLobby(response.divisionLobby);
-                                feedback.toastTimeout({text: 'Removed from team', css: 'success'});
-                            })
-                            .fail(function() {
-                                feedback.toastTimeout({text: 'Remove failed', css: 'alert'});
-                            });
-                    }
-                });
-            });
-        }
-
-        /**
-         * Remove a player from division lobby via tot
-         * Also removes this player from all teams they are currently in
-         */
-        function initRemovePlayerFromDivision() {
-            $(config.element).on('click', '[data-remove-player]', function(e) {
-                e.preventDefault();
-
-                $(this).confirmDialog({
-                    text: 'Are you sure you wish to remove this player from this division, and all teams within this division?',
-                    confirmEvent: function(el) {
-                        let feedback = findIndicator(el.parents('[data-division-player-list]'));
-                        feedback.toastActivate({text: 'Removing from division...'});
-
-                        $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removePlayer')}], null, 'json')
-                            .done(function(response) {
-
-                                // Remove player from Division List and from all teams in which they existed
-                                let playerId = el.parents('[data-player]').attr('data-player');
-                                $('[data-division-player-list], [data-team-player-list]').find('[data-player='+playerId+']').remove();
-
-                                feedback.toastTimeout({text: 'Removed from division', css: 'success'});
-
-                                applyDivisionPlayerFilter();
-                            })
-                            .fail(function() {
-                                feedback.toastTimeout({text: 'Remove failed', css: 'alert'});
-                            });
-                    }
-                });
-            });
         }
 
         /**
@@ -395,15 +227,152 @@
                         updateDivisionLobby(response.html);
                     } else {
                         updateTeamMetadata(sortable.parents('[data-team]'), response);
+
+                        // If dragged onto a proxy element, remove the player drag helper after team list is respawned.
+                        // This will happen when the first player is dropped into an empty team.
+                        if (hasAttr(sortable, 'data-team-player-list-proxy')) {
+                            sortable.parents('[data-team]').find('[data-team-player-list-proxy]').children('[data-player]').remove();
+                        }
                     }
                 });
         }
 
         /**
-         * Add click handlers for when the player clicks the edit positions button.
-         * @see removeClickHandlerFromTeamPlayerButtons()
+         * Replaces existing division lobby with new one
+         *
+         * This occurs every time a player moves into,
+         * between, or out of a team
+         *
+         * @param newDivisionLobby
          */
-        function addClickHandlerToTeamPlayerButtons() {
+        function updateDivisionLobby(newDivisionLobby) {
+            let newHtml = $(newDivisionLobby).find('[data-division-player-list]').html();
+
+            if (config.debugging) {
+                let currDate = new Date();
+                newHtml += '<div>Division list updated at ' + currDate.toTimeString() + '</div>'
+            }
+
+            removeClickHandlersFromDivisionPlayerButtons(); // Remove click handlers from HTML elements about to be removed.
+            $('[data-division-player-list]').html(newHtml);
+            addClickHandlersToDivisionPlayerButtons(); // Attach click handlers to new HTML elements (note players may have been added or removed).
+
+            applyDivisionPlayerFilter();
+        }
+
+        /**
+         * Updates the Team's new player list
+         * Updates the Team's player count
+         */
+        function updateTeamMetadata(teamContainer, response) {
+            let newHtml = response.html;
+
+            if (config.debugging) {
+                let currDate = new Date();
+                newHtml += '<div>Team list updated at ' + currDate.toTimeString() + '</div>'
+            }
+
+            removeClickHandlersFromTeamPlayerButtons(); // Remove click handlers from HTML elements about to be removed.
+            teamContainer.find('[data-team-player-list]').html(newHtml);
+            teamContainer.find('[data-player-count]').text(teamContainer.find('[data-player]').length);
+            addClickHandlersToTeamPlayerButtons(); // Attach click handlers to new HTML elements (note players may have been added or removed).
+        }
+
+        /**
+         * Apply the Player Filter setting to all the folks
+         * in the division player list
+         */
+        function applyDivisionPlayerFilter() {
+            let divisionPlayerList = $('[data-division-player-list]');
+
+            switch (parseInt($('#player-filter').val())) {
+                // Hide everyone, show unassigned
+                case 1:
+                    divisionPlayerList.find('[data-player]').hide();
+                    divisionPlayerList.find('[data-assigned=0]').show();
+                    break;
+
+                // Hide everyone, show assigned
+                case 2:
+                    divisionPlayerList.find('[data-player]').hide();
+                    divisionPlayerList.find('[data-assigned=1]').show();
+                    break;
+
+                // Show everyone
+                case 0:
+                default:
+                    divisionPlayerList.find('[data-player]').show();
+                    break;
+            }
+        }
+
+        /**
+         * Add click handlers to the buttons on each division player (within the 3-dot menu).
+         */
+        function addClickHandlersToDivisionPlayerButtons() {
+            // Add click handler for 'Add player to team' button (inside 3-dot menu).
+            $(config.element).on('click', '[data-add-team-player]', function(e) {
+                e.preventDefault();
+                let el       = $(this);
+                let feedback = findIndicator(el.parents('[data-division-player-list]'));
+                feedback.toastActivate({text: 'Adding to team...'});
+
+                $.post(el.attr('href'), [{name: 'userId[]', value: el.data('addTeamPlayer')}], null, 'json')
+                    .done(function(response) {
+                        updateTeamMetadata($('[data-team='+el.attr('data-affected-team')+']'), response);
+                        updateDivisionLobby(response.divisionLobby);
+                        feedback.toastTimeout({text: 'Added to team', css: 'success'});
+                    })
+                    .fail(function() {
+                        feedback.toastTimeout({text: 'Add failed', css: 'alert'});
+                    });
+            });
+
+            // Add click handler for 'Remove player from division' button (inside 3-dot menu).
+            // This also removes player from all teams they are currently in.
+            $(config.element).on('click', '[data-remove-player]', function(e) {
+                e.preventDefault();
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you wish to remove this player from this division, and all teams within this division?',
+                    confirmEvent: function(el) {
+                        let feedback = findIndicator(el.parents('[data-division-player-list]'));
+                        feedback.toastActivate({text: 'Removing from division...'});
+
+                        $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removePlayer')}], null, 'json')
+                            .done(function(response) {
+
+                                // Remove player from Division List and from all teams in which they existed
+                                let playerId = el.parents('[data-player]').attr('data-player');
+                                $('[data-division-player-list], [data-team-player-list]').find('[data-player='+playerId+']').remove();
+
+                                feedback.toastTimeout({text: 'Removed from division', css: 'success'});
+
+                                applyDivisionPlayerFilter();
+                            })
+                            .fail(function() {
+                                feedback.toastTimeout({text: 'Remove failed', css: 'alert'});
+                            });
+                    }
+                });
+            });
+        }
+
+        /**
+         * Remove click handlers from the buttons on each division player (within the 3-dot menu).
+         * @see addClickHandlersToDivisionPlayerButtons()
+         */
+        function removeClickHandlersFromDivisionPlayerButtons() {
+            $(config.element).off('click', '[data-add-team-player]');
+            $(config.element).off('click', '[data-remove-player]');
+        }
+
+        /**
+         * Add click handlers to the buttons on each team player.
+         * @see removeClickHandlersFromTeamPlayerButtons()
+         */
+        function addClickHandlersToTeamPlayerButtons() {
+            // Add click handler for 'Change player positions' button.
             $(document).on('click', '[data-player-positions-user]', function() {
 
                 // Set the form data with the team/user IDs
@@ -428,14 +397,38 @@
                     }
                 });
             });
+
+            // Add click handler for 'Remove player from team' button.
+            $(config.element).on('click', '[data-remove-team-player]', function(e) {
+                e.preventDefault();
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you wish to remove this player from this team?',
+                    confirmEvent: function(el) {
+                        let feedback = findIndicator(el.parents('[data-team-player-list]'));
+                        feedback.toastActivate({text: 'Removing from team...'});
+
+                        $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removeTeamPlayer')}], null, 'json')
+                            .done(function(response) {
+                                updateTeamMetadata($('[data-team='+el.attr('data-affected-team')+']'), response);
+                                updateDivisionLobby(response.divisionLobby);
+                                feedback.toastTimeout({text: 'Removed from team', css: 'success'});
+                            })
+                            .fail(function() {
+                                feedback.toastTimeout({text: 'Remove failed', css: 'alert'});
+                            });
+                    }
+                });
+            });
         }
 
         /**
-         * Remove click handlers for when the player clicks the edit positions button.
-         * @see addClickHandlerToTeamPlayerButtons()
+         * Remove click handlers from the buttons on each team player.
+         * @see addClickHandlersToTeamPlayerButtons()
          */
-        function removeClickHandlerFromTeamPlayerButtons() {
+        function removeClickHandlersFromTeamPlayerButtons() {
             $(document).off('click', '[data-player-positions-user]');
+            $(config.element).off('click', '[data-remove-team-player]');
         }
 
         /**
@@ -448,45 +441,23 @@
         }
 
         /**
-         * Apply the Player Filter setting to all the folks
-         * in the division player list
+         * Every team is a collapsable
          */
-        function applyDivisionPlayerFilter() {
-            let divisionPlayerList = $('[data-division-player-list]');
-
-            switch (parseInt($('#player-filter').val())) {
-
-                /* Hide everyone, show Unassigned
-                 */
-                case 1:
-                    divisionPlayerList.find('[data-player]').hide();
-                    divisionPlayerList.find('[data-assigned=0]').show();
-                    break;
-
-                /* Hide everyone, show Assigned
-                 */
-                case 2:
-                    divisionPlayerList.find('[data-player]').hide();
-                    divisionPlayerList.find('[data-assigned=1]').show();
-                    break;
-
-                /* Show Everyone
-                 */
-                case 0:
-                default:
-                    divisionPlayerList.find('[data-player]').show();
-                    break;
-            }
+        function initCollapsables() {
+            $('[data-collapser]').collapsable();
         }
 
         /**
-         * If you dragged a player on the team title (player list proxy) it'll stay there
-         * in a weird place until you manually remove them
-         *
-         * @param to
+         * Selectize box for selecting one or more users
          */
-        function removeProxyHelperClone(to) {
-            to.parents('[data-team]').find('[data-team-player-list-proxy]').children('[data-player]').remove();
+        function initAddPlayerToDivisionSelectize() {
+            $('[data-role="userSelector"]')
+                .userSelectizeSelector({
+                    multiple: true,
+                    ajax: {
+                        data: {groupID: 0},
+                    }
+                });
         }
 
         /**
@@ -511,16 +482,6 @@
          */
         function isTeamPlayerList(element) {
             return (hasAttr(element, 'data-team-player-list') || hasAttr(element, 'data-team-player-list-proxy'));
-        }
-
-        /**
-         * $element is a team's player list proxy (alternate drag destination)
-         *
-         * @param element
-         * @returns {boolean}
-         */
-        function isTeamPlayerListProxy(element) {
-            return hasAttr(element, 'data-team-player-list-proxy');
         }
 
         /**
