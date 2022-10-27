@@ -331,7 +331,7 @@ export default {
                                 v-else-if="award._links.awardUpdate"
                                 title="Add evidence"
                                 class="button"
-                                :href="getEvidenceUrl(award.badge.id)"
+                                :href="`/learning/badge/award/${award.id}/update`"
                             >
                                 Add Evidence
                             </a>

@@ -51,7 +51,7 @@
             </div>
         </div>
         {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
-        <form action="{{ postRoute }}" method="post">
+        <form action="{{ postRoute ~ '?returnUrl=' ~ returnUrl }}" method="post">
             <section>
                 <fieldset>
                     <textarea id="reason" name="reason">{{ award.reason }}</textarea>

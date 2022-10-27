@@ -353,12 +353,16 @@ class Controller extends Base
     {
         $badges          = $this->badgeMapper->createCollection()->add($award->getBadge());
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
+        $returnUrl       = $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
+            'awardId' => $award->getId(),
+        ]);
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardWithEvidence.twig',
                 [
-                    'badges' => $badges->map($badgeTranslator),
-                    'award'  => $award,
+                    'badges'    => $badges->map($badgeTranslator),
+                    'award'     => $award,
+                    'returnUrl' => Redirect::encode($returnUrl),
                 ],
                 'View Evidence'
             )
@@ -740,12 +744,21 @@ class Controller extends Base
     {
         $badges          = $this->badgeMapper->createCollection()->add($award->getBadge());
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
+        $returnUrl       =
+            $this->request->query->get(Redirect::RETURN_URL) ??
+            Redirect::encode(
+                $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
+                    'awardId' => $award->getId(),
+                ])
+            );
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardUpdate.twig',
                 [
-                    'badges' => $badges->map($badgeTranslator),
-                    'award' => $award
+                    'badges'    => $badges->map($badgeTranslator),
+                    'award'     => $award,
+                    'returnUrl' => $returnUrl,
                 ],
                 'Edit award'
             )
@@ -776,7 +789,7 @@ class Controller extends Base
          * this redirect is created in the vue form component.
          */
         $redirectUrl = $this->router->generate('searchUser.getProfile', [
-            'userId' => $award->getRecipient()->getId()
+            'userId' => $award->getRecipient()->getId(),
         ]);
         if (null !== $this->request->query->get(Redirect::RETURN_URL)) {
             $redirectUrl = Redirect::decode($this->request->query->get(Redirect::RETURN_URL));
