@@ -760,6 +760,7 @@ class Controller extends Base
                     'badges'    => $badges->map($badgeTranslator),
                     'award'     => $award,
                     'returnUrl' => $returnUrl,
+                    'cancelUrl' => Redirect::decode($returnUrl),
                 ],
                 'Edit award'
             )

@@ -39,7 +39,10 @@
                     <textarea id="reason" name="reason">{{ award.reason }}</textarea>
                 </fieldset>
             </section>
-            <input type="submit" value="Save" />
+            <ul class="flex-list buttons">
+                <li><a href="{{ cancelUrl }}" class="button">Cancel</a></li>
+                <li><input type="submit" value="Save" /></li>
+            </ul>
         </form>
     </div>
 </div>
