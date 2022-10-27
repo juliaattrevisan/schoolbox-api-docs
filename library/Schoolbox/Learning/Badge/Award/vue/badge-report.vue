@@ -242,6 +242,7 @@ export default {
                 @on-achievement-awarded="onAchievementAwarded"
                 :cdn-prefix="this.cdnPrefix"
                 :site-version="this.siteVersion"
+                :return-url="this.encodedReturnUrl"
             />
             </section>
         </div>

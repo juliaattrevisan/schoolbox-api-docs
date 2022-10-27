@@ -50,7 +50,12 @@ export default {
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: {
-        siteVersion: String
+        siteVersion: String,
+        returnUrl: {
+            type: String,
+            default: null,
+            required: false
+        }
     },
 
     emits: ['on-achievement-awarded'],
@@ -249,6 +254,13 @@ export default {
             return generateAwardWithEvidenceUrl(this.award.recipient.id, badgeId);
         },
 
+        /**
+         * Generate returnUrl param
+         * @returns {string}
+         */
+        getReturnUrl() {
+            return (this.returnUrl !== null) ? `?returnUrl=${this.returnUrl}` : '';
+        }
     }
 }
 </script>
@@ -323,7 +335,7 @@ export default {
                                 v-else-if="award.reason && award.reason.length"
                                 title="View evidence"
                                 class="button"
-                                :href="`/learning/badge/award/${award.id}/viewEvidence`"
+                                :href="`/learning/badge/award/${award.id}/viewEvidence`+getReturnUrl()"
                             >
                                 View Evidence
                             </a>
@@ -331,7 +343,7 @@ export default {
                                 v-else-if="award._links.awardUpdate"
                                 title="Add evidence"
                                 class="button"
-                                :href="`/learning/badge/award/${award.id}/update`"
+                                :href="`/learning/badge/award/${award.id}/update`+getReturnUrl()"
                             >
                                 Add Evidence
                             </a>
