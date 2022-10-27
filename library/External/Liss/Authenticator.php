@@ -75,7 +75,6 @@ class External_Liss_Authenticator
     {
         $this->username   = $this->configLoader->get('external_liss_username');
         $this->password   = $this->configLoader->get('external_liss_password');
-        $this->schoolCode = $this->configLoader->get('external_liss_schoolcode');
     }
 
     /**

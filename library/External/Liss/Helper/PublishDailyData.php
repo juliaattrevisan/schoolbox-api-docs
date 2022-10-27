@@ -118,7 +118,7 @@ class PublishDailyData
      */
     public function generateSourceName()
     {
-        return self::EVENT_SOURCE_NAME . '_' . $this->configLoader->get('external_liss_schoolcode');
+        return self::EVENT_SOURCE_NAME;
     }
 
     /**
