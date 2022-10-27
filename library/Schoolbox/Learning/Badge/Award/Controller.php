@@ -357,6 +357,12 @@ class Controller extends Base
         $returnUrl       = $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
             'awardId' => $award->getId(),
         ]);
+        $cancelUrl       = $this->request->query->get(Redirect::RETURN_URL)
+            ? Redirect::decode($this->request->query->get(Redirect::RETURN_URL))
+            : $this->router->generate('searchUser.getProfile', [
+                'userId' => $award->getRecipient()->getId(),
+            ]);
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardWithEvidence.twig',
@@ -364,6 +370,7 @@ class Controller extends Base
                     'badges'    => $badges->map($badgeTranslator),
                     'award'     => $award,
                     'returnUrl' => Redirect::encode($returnUrl),
+                    'cancelUrl' => $cancelUrl,
                 ],
                 'View Evidence'
             )

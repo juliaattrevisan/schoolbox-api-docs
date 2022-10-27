@@ -1,13 +1,14 @@
 <script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+{% set title =  (badges | length > 1) ? 'Award Achievements' : 'Award Achievement' %}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     ['Badges', routeLookupIfAuthorized('learningBadge.getBadgeListPage') ],
-    ['Award Achievement']
+    [ title ]
 ) }}
 <div class="row">
     <div class="small-12 columns">
-        <h1>Award Achievement</h1>
+        <h1>{{ title }}</h1>
         {% if targetUsers is not empty %}
             <ul class="meta">
                 <li>
