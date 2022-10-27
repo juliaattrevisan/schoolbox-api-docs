@@ -1,3 +1,6 @@
+{% if players is empty %}
+    <li>&nbsp;</li><!-- Blank item to provide an area for dropping into an empty list. -->
+{% endif %}
 {% for teamPlayer in players %}
     <li data-player="{{ teamPlayer.id }}">
         <div class="actions-small-2">
