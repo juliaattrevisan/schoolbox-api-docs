@@ -18,7 +18,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
-use Schoolbox\External\Event\Overrides\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
 
