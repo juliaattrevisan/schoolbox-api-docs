@@ -2061,11 +2061,6 @@ parameters:
 			path: library/External/Isams/Timetable.php
 
 		-
-			message: "#^Property External_Liss_Authenticator\\:\\:\\$schoolCode is never read, only written\\.$#"
-			count: 1
-			path: library/External/Liss/Authenticator.php
-
-		-
 			message: "#^If condition is always false\\.$#"
 			count: 4
 			path: library/External/Liss/Server.php

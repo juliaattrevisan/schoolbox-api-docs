@@ -121,7 +121,7 @@ class Authenticator
             return false;
         }
 
-        /* Check the username/passwor/schoolcode tuple
+        /* Check the username/password tuple
          */
         $struct = $this->dataObject->me['struct'];
 
