@@ -137,12 +137,12 @@ class Helper
          * Since this requires schools to push data to us, shanking it
          * into a log allows us to inspect independently of the school
          */
-        $watchlist = ['Duty CantInd'];
-
-        if ((new Watchlist())->isOnWatchlist($restructured['code'], $watchlist)) {
-            $this->log->debug(json_encode($currentEvent));
-            $this->log->debug(json_encode($restructured));
-        }
+//        $watchlist = ['Duty CantInd'];
+//
+//        if ((new Watchlist())->isOnWatchlist($restructured['code'], $watchlist)) {
+//            $this->log->debug(json_encode($currentEvent));
+//            $this->log->debug(json_encode($restructured));
+//        }
 
         return $restructured;
     }
