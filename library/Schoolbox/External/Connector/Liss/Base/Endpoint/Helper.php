@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
 use PhpXmlRpc\Value;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Helper
@@ -19,6 +20,32 @@ use PhpXmlRpc\Value;
  */
 class Helper
 {
+    /**
+     * Some schools are creating class codes >64 chars long
+     * e.g. "Addams Family Lead Vocal Rehearsals 12/10/2022 1.00pm to 1.30pm @ Drama Studio/ RH21A - A Clarke - #2688"
+     */
+    private const MAX_CLASS_CODE_LENGTH = 64;
+
+
+    /**
+     * Logs the things that happened, in a text file
+     *
+     * @var LoggerInterface
+     */
+    private LoggerInterface $log;
+
+
+    /**
+     * Constructor.
+     *
+     * @param LoggerInterface $log
+     */
+    public function __construct(LoggerInterface $log)
+    {
+        $this->log = $log;
+    }
+
+
     /**
      * Preprocess all this stuff
      * Make it easier to understand because their data structure is blasphemously terrible
@@ -36,6 +63,21 @@ class Helper
         }
 
         return $allEvents;
+    }
+
+
+    /**
+     * Schools are creating data with >64 char class codes
+     * so that snaps our schema
+     *
+     * This method forcibly truncates anything beyond the maximum limit
+     *
+     * @param string $classCode
+     * @return string
+     */
+    private function generateClassCode(string $classCode): string
+    {
+        return mb_substr($classCode, 0, self::MAX_CLASS_CODE_LENGTH, 'utf-8');
     }
 
 
@@ -66,7 +108,7 @@ class Helper
 
             /* Detail
              */
-            'code' => trim((string)$currentEvent->me['struct']['ClassCode']->me['string']),
+            'code' => $this->generateClassCode(trim((string)$currentEvent->me['struct']['ClassCode']->me['string'])),
             'name' => trim((string)$currentEvent->me['struct']['ClassName']->me['string']),
             'rooms' => trim((string)$currentEvent->me['struct']['Rooms']->me['string']),
             'type' => trim((string)$currentEvent->me['struct']['Type']->me['string']),
@@ -90,6 +132,17 @@ class Helper
                 $restructured['students'][] = (string)$currentStudent->me['string'];
             }
         }
+
+        /* Dump this to a log for later inspection
+         * Since this requires schools to push data to us, shanking it
+         * into a log allows us to inspect independently of the school
+         */
+//        $watchlist = ['Duty CantInd'];
+//
+//        if ((new Watchlist())->isOnWatchlist($restructured['code'], $watchlist)) {
+//            $this->log->debug(json_encode($currentEvent));
+//            $this->log->debug(json_encode($restructured));
+//        }
 
         return $restructured;
     }

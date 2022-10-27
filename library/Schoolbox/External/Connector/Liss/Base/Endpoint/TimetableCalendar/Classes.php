@@ -14,8 +14,8 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\Liss\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\Helper;
-use Schoolbox\External\Connector\Liss\Base\Endpoint\Receiver;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -184,7 +184,7 @@ class Classes implements IStrategy
     {
         /* Make all the data easier to manipulate by rearranging their guts
          */
-        $helper = new Helper();
+        $helper = new Helper($this->log);
         $allDailyData = $helper->reformatAllEvents($this->message->getParam(3)->me['array']);
 
         /* Keep track of all the problems we encountered
@@ -380,7 +380,7 @@ class Classes implements IStrategy
             ->setType($type)
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
-            ->setSource(Receiver::SOURCE_NAME);
+            ->setSource(Factory::SOURCE_NAME);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */
@@ -462,10 +462,45 @@ class Classes implements IStrategy
             $staffs = $currentEvent['teacherCodes'];
         }
 
+        /* For specific teaching, execute CLEAR_STAFF to disregard the usual guy
+         * and add the guy teaching this particular instance (even though they
+         * might end up being the same person sometimes)
+         *
+         * If there's staff, clear them all and put them back in as they're discovered
+         */
+        if (\count($staffs)) {
+            $clearOverride = $this->overridesMapper->createModel()
+                ->setEventId($event->getId())
+                ->setExternalId(null)
+                ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
+                ->setSequence(1);
+
+            if ($this->perform) {
+                $this->overridesMapper->save($clearOverride);
+            }
+        }
+
+        /* We use the Overrides system to specify a particular person's involvement
+         * in a particular sis_event instance, rather than being associated with all
+         *
+         * This applies to all the teachers involved in a class
+         */
         foreach ($staffs as $externalId) {
+            $this->log->debug(sprintf(
+                'Creating new override involvements for %s in timetable event %s - %s, %s, %s-%s',
+                $externalId,
+                $event->getTitle(),
+                $event->getDay(),
+                $event->getPeriod(),
+                $event->getStartAt()->getDatabase(),
+                $event->getFinishAt()->getDatabase()
+            ));
+
             $this->saveStaffInvolvement($event, $classEntry, (string)$externalId);
         }
 
+        /* Students are always involved
+         */
         foreach ($currentEvent['students'] as $externalId) {
             $this->saveRegularInvolvement($event, $classEntry, (string)$externalId);
         }
@@ -492,29 +527,6 @@ class Classes implements IStrategy
          */
         $this->saveRegularInvolvement($event, $classEntry, $externalId);
 
-        /* We use the Overrides system to specify a particular person's involvement
-         * in a particular sis_event instance, rather than being associated with all
-         */
-        $this->log->debug(sprintf(
-            'Creating new override involvements for %s in timetable event %s - %s, %s, %s-%s',
-            $externalId,
-            $event->getTitle(),
-            $event->getDay(),
-            $event->getPeriod(),
-            $event->getStartAt()->getDatabase(),
-            $event->getFinishAt()->getDatabase()
-        ));
-
-        /* For specific teaching, execute CLEAR_STAFF to disregard the usual guy
-         * and add the guy teaching this particular instance (even though they
-         * might end up being the same person sometimes)
-         */
-        $clearOverride = $this->overridesMapper->createModel()
-            ->setEventId($event->getId())
-            ->setExternalId(null)
-            ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
-            ->setSequence(1);
-
         $involvementOverride = $this->overridesMapper->createModel()
             ->setEventId($event->getId())
             ->setExternalId($externalId)
@@ -522,7 +534,6 @@ class Classes implements IStrategy
             ->setSequence(2);
 
         if ($this->perform) {
-            $this->overridesMapper->save($clearOverride);
             $this->overridesMapper->save($involvementOverride);
         }
     }

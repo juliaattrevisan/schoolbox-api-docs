@@ -60,13 +60,6 @@ class Authenticator
      */
     private string $password;
 
-    /**
-     * School code
-     *
-     * @var string
-     */
-    private string $schoolCode;
-
 
     /**
      * Log location
@@ -91,7 +84,6 @@ class Authenticator
      * @param string          $externalType
      * @param string          $username
      * @param string          $password
-     * @param string          $schoolCode
      * @param LoggerInterface $log
      * @param Value           $dataObject
      */
@@ -100,7 +92,6 @@ class Authenticator
         string $externalType,
         string $username,
         string $password,
-        string $schoolCode,
         LoggerInterface $log,
         Value $dataObject
     ) {
@@ -108,7 +99,6 @@ class Authenticator
         $this->externalType = $externalType;
         $this->username = $username;
         $this->password = $password;
-        $this->schoolCode = $schoolCode;
         $this->dataObject = $dataObject;
         $this->log = $log;
     }
@@ -136,31 +126,27 @@ class Authenticator
         $struct = $this->dataObject->me['struct'];
 
         $username = (string)$struct['UserName']->me['string'];
-        $schoolCode = (string)$struct['School']->me['string'];
         $password = (string)$struct['Password']->me['string'];
 
         $isUsernameCorrect = $username === $this->username;
         $isPasswordCorrect = $password === $this->password;
-        $isSchoolCodeCorrect = $schoolCode === $this->schoolCode;
 
         /* external_enable must be truthy
          * external_type must be "schoolbox"
-         * (username, password, schoolCode) tuple must match what's transmitted
+         * (username, password) tuple must match what's transmitted
          */
-        if ($isUsernameCorrect && $isPasswordCorrect && $isSchoolCodeCorrect) {
+        if ($isUsernameCorrect && $isPasswordCorrect) {
             $this->log->info(sprintf(
-                'User %s at school %s has been authenticated',
+                'User %s has been authenticated',
                 $username,
-                $schoolCode
             ));
 
             return true;
         }
 
         $this->log->error(sprintf(
-            'User %s at school %s has failed to authenticate',
-            $username,
-            $schoolCode
+            'User %s has failed to authenticate',
+            $username
         ));
 
         return false;

@@ -28,9 +28,14 @@ use Schoolbox\GenericCollection;
 class Factory
 {
     /**
+     * An arbitrarily-chosen string to denote where these events came from
+     */
+    public const SOURCE_NAME = 'suds_liss';
+
+
+    /**
      * @param LoggerInterface $log
      * @param bool            $perform
-     * @param string          $source
      * @param string          $defaultType
      * @param array           $exclusions
      * @param string          $teacherIdentifier
@@ -41,7 +46,6 @@ class Factory
     public function produce(
         LoggerInterface $log,
         bool $perform,
-        string $source,
         string $defaultType,
         array $exclusions,
         string $teacherIdentifier,
@@ -56,8 +60,7 @@ class Factory
                 \Schoolbox\External\ClassInvolvementMapper::getInstance(),
                 \Schoolbox\External\ClassPeriodMapper::getInstance(),
                 \Schoolbox\External\TimetablePeriodMapper::getInstance(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-                $source
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()
             ))
             ->add(new Classes(
                 $log,
@@ -74,8 +77,7 @@ class Factory
             ->add(new Cleanup(
                 $log,
                 $perform,
-                new \Schoolbox\External\Event\Mapper(),
-                $source
+                new \Schoolbox\External\Event\Mapper()
             ));
     }
 }
