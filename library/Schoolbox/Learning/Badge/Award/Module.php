@@ -332,15 +332,19 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws \InvalidArgumentException
-     * @throws MapperException
      */
     private function preloadAward(array $params): array
     {
+        try {
+            $award = $this->getMapperFactory()
+                          ->get(Mapper::class)
+                          ->findById($params['awardId']);
+        } catch (MapperException $e) {
+            throw new \Schoolbox\Application\Exception\NotFound("No award found for id: {$params['awardId']}");
+        }
         return [
-            'award' => $this->getMapperFactory()
-                            ->get(Mapper::class)
-                            ->findById($params['awardId']),
+            'award' => $award,
+            'userId' => $award->getRecipient()->getId(),
         ];
     }
 

@@ -48,10 +48,10 @@
                     <h2 class="subheader">Evidence</h2>
                 </div>
             </div>
-            {% if modifyRoute or deleteRoute %}
+            {% if modifyRoute or postRoute %}
                 <nav>
                     {% if modifyRoute %}<a href="{{ modifyRoute }}" class="icon-modify" title="Modify"></a>{% endif %}
-                    <a class="icon-delete" title="Delete" data-delete-evidence></a>
+                    {% if postRoute %}<a class="icon-delete" title="Delete" data-delete-evidence></a>{% endif %}
                 </nav>
             {% endif %}
         </div>
