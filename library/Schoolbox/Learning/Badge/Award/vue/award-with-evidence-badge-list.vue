@@ -85,8 +85,8 @@ function onDetailModalClosed () {
 <template>
     <div class="row">
         <div class="small-12 island">
-            <section class="content">
-                <div v-if="isSingleBadge" class="small-12 card half-padding">
+            <section>
+                <div v-if="isSingleBadge" class="small-12 card">
                     <badge-detail
                         :badge="singleBadge"
                         parent-css="evidence-badge-container"
@@ -125,3 +125,11 @@ function onDetailModalClosed () {
         @closed="onDetailModalClosed"
     />
 </template>
+
+<style scoped>
+
+.badge-grid {
+    padding: 1rem;
+}
+
+</style>
