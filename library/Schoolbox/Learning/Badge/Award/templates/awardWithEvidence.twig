@@ -5,13 +5,31 @@
 ) }}
 {% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
 {% set modifyRoute = routeLookupIfAuthorized('learningBadgeAward.getAwardUpdate', {awardId: award.id}) %}
+{% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
+<script>
+    $(function () {
+        $('[data-delete-evidence]').click(function (e) {
+            e.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to remove evidence from this achievement?',
+                confirmEvent: function () {
+                    $.post('{{ postRoute }}', {
+                        reason: ''
+                    }).done(function () {
+                        window.location.reload();
+                    });
+                }
+            });
+        });
+    });
+</script>
 <div class="row">
     <div class="small-12 columns">
         <h1>Achievement Evidence</h1>
         <ul class="meta">
-            <li class="icon-folder">Category: {{ award.badge.category.name }}</li>
             <li class="icon-achievement">Awarded
-                <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time> by
+                <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
+                by
                 {% if awardedByRoute %}
                     <a href="{{ awardedByRoute }}">{{ award.awardedBy.fullname }}</a>
                 {% else %}
@@ -33,7 +51,7 @@
             {% if modifyRoute or deleteRoute %}
                 <nav>
                     {% if modifyRoute %}<a href="{{ modifyRoute }}" class="icon-modify" title="Modify"></a>{% endif %}
-                    <a href="" class="icon-delete" title="Delete"></a>
+                    <a class="icon-delete" title="Delete" data-delete-evidence></a>
                 </nav>
             {% endif %}
         </div>
