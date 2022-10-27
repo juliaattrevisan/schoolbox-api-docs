@@ -68,7 +68,8 @@ class Factory
             $unitImpFolder  = $unitImp->getFolder();
             $unitSpecFolder = $unitImp->getSpecification()->getFolder();
             $breadcrumbs->add($this->generateBreadcrumbForFolder($unitImpFolder, $user));
-            $breadcrumbs->add($this->generateBreadcrumbForFolder($unitSpecFolder, $user));
+            // Point back to the unit impl folder, rather than the spec
+            $breadcrumbs->add($this->generateBreadcrumbForFolder($unitImpFolder, $user, $unitSpecFolder->getTitle()));
         } elseif ($assessmentContext instanceof UnitSpecification) {
             // Generate trail like 'Learning'->$unitSpec (eg. 'Learning'->'Romeo and Juliet').
             $unitSpec       = $assessmentContext;
@@ -158,15 +159,16 @@ class Factory
      * * if user has permission to view the folder, it links to that folder:
      *   otherwise there is no link
      *
-     * @param Folder $folder
-     * @param User   $user
+     * @param Folder      $folder
+     * @param User        $user
+     * @param string|null $titleOverride
      * @return array
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function generateBreadcrumbForFolder(Folder $folder, User $user): array
+    private function generateBreadcrumbForFolder(Folder $folder, User $user, ?string $titleOverride = null): array
     {
         return [
-            $folder->getTitle(),
+            $titleOverride ?? $folder->getTitle(),
             $this->access->getFolderAccess($user, $folder->getId())
                 ? "/homepage/{$folder->getId()}"
                 : null,
