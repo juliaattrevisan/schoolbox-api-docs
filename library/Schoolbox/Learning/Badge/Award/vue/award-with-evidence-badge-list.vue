@@ -1,10 +1,13 @@
 <script setup>
 
 /**
- * This is a list of badges that will currently be awarded to the selected users coupled with evidence
+ * This diplays a single or list of badges linked to a number of users
+ * while evidence is being added or updated to a badge
+ *
  */
 
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import BadgeDetail from '../../vue/badgeDetail.vue';
 import BadgeImage from '../../vue/badge-image.vue';
 import BadgeModal from '../../vue/badge-modal.vue';
 
@@ -22,6 +25,25 @@ const props = defineProps({
 
 const currentBadge = ref(null);
 const isDetailModalOpen = ref(false);
+
+/**
+ * whether only a single badge is selected, in which case we can
+ * expand out the badge details out of the modal
+ *
+ * @returns { boolean }
+ */
+const isSingleBadge = computed(() => {
+    return Object.values(props.badges).length;
+});
+
+/**
+ * all the details of the single badge
+ *
+ * @returns { object }
+ */
+const singleBadge = computed(() => {
+    return Object.values(props.badges)[0];
+});
 
 /**
  * Opens a modal window for viewing this badge's full details.
@@ -47,7 +69,14 @@ function onDetailModalClosed () {
     <div class="row">
         <div class="small-12 island">
             <section class="content">
-                <div class="badge-grid v-card-list">
+                <div v-if="isSingleBadge" class="small-12 card padding-none">
+                    <badge-detail
+                        :badge="singleBadge"
+                        parent-css="evidence-badge-container"
+                        img-css="evidence-badge-img-container"
+                    />
+                </div>
+                <div v-else class="badge-grid v-card-list">
                     <div class="badge v-card" v-for="badge in badges" :key="badge.id">
                         <div class="card-feature-image">
                             <a @click.prevent="openDetailModal(badge)" :title="badge.name">
@@ -73,7 +102,3 @@ function onDetailModalClosed () {
         @closed="onDetailModalClosed"
     />
 </template>
-
-<style scoped>
-
-</style>

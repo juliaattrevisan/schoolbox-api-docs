@@ -17,6 +17,20 @@ export default {
             type: Object,
             default: null,
         },
+        /**
+         * Whether these details are being displayed in a modal
+         */
+        parentCss: {
+            type: String,
+            default: 'badge-modal',
+        },
+        /**
+         * To customise how the image displays
+         */
+        imgCss: {
+            type: String,
+            default: 'badge-img-container',
+        },
     },
     emits: ['code-selected'], //dispatch to notify of curriculum code selection
     computed: {
@@ -53,14 +67,13 @@ export default {
 </script>
 
 <template>
-    <div class="badge-modal">
-        <badge-image :badge="badge" class="badge-img-container"></badge-image>
+    <div :class="parentCss">
+        <badge-image :badge="badge" :class="imgCss"></badge-image>
         <h2>{{ badge.name }}</h2>
         <p class="meta" v-if="badge.category">Category: {{ badge.category.name }}</p>
         <p class="meta" v-if="badge.goalExpiry">Goal expires: {{ goalExpiryLabel }} after setting</p>
         <p class="meta" v-if="badge.achievementExpiry">Achievement expires: {{ achievementExpiryLabel }} after awarding</p>
         <p class="meta" v-if="badgeTagNames.length > 0">Tags: {{ badgeTagNames }}</p>
-        <article v-if="badge.body" v-html="badge.body"></article>
         <p v-if="badge.curriculumNodes.length" class="meta">
             Curriculum Codes:
             <codes-list
@@ -68,5 +81,6 @@ export default {
                 @selected="onCodeSelected"
             />
         </p>
+        <article v-if="badge.body" v-html="badge.body"></article>
     </div>
 </template>

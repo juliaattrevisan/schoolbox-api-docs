@@ -136,6 +136,12 @@
     }
 }
 
+.evidence-badge-container {
+    h2, p {
+        margin-bottom: 0.5rem;
+    }
+}
+
 .badge-img-container {
     background-color: $vapor;
     position: relative;
@@ -164,6 +170,16 @@
         padding: .35rem 0;
     }
 }
+
+    .evidence-badge-img-container { //to float the image to the left when display outside of a modal, curently in #award-with-evidence-badge-list
+        @extend .badge-img-container;
+        float: left;
+        margin-right: 0.5rem;
+        width: rem-calc(300);
+        @media #{$small-only} {
+            float: none;
+        }
+    }
 
 .badge-img-container__background,
 .badge-img-container__foreground {
