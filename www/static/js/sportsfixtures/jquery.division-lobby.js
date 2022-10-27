@@ -364,6 +364,15 @@
         }
 
         /**
+         * Remove click handlers from the buttons on each team player.
+         * @see addClickHandlersToTeamPlayerButtons()
+         */
+        function removeClickHandlersFromTeamPlayerButtons() {
+            $(document).off('click', '[data-player-positions-user]');
+            $(config.element).off('click', '[data-remove-team-player]');
+        }
+
+        /**
          * Replaces existing division lobby with new one
          *
          * This occurs every time a player moves into,
@@ -430,15 +439,6 @@
                     divisionPlayerList.find('[data-player]').show();
                     break;
             }
-        }
-
-        /**
-         * Remove click handlers from the buttons on each team player.
-         * @see addClickHandlersToTeamPlayerButtons()
-         */
-        function removeClickHandlersFromTeamPlayerButtons() {
-            $(document).off('click', '[data-player-positions-user]');
-            $(config.element).off('click', '[data-remove-team-player]');
         }
 
         /**
