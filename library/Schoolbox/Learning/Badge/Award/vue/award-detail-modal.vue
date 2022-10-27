@@ -292,7 +292,6 @@ export default {
                     <p class="meta" v-if="award.isGoal && award.award">
                         Goal has been achieved <relative-time :datetime="award.award.awardedAt" :key="`${award.id}-goalAwardedAt`"></relative-time>
                     </p>
-                    <article v-if="award.badge.body" v-html="award.badge.body"></article>
                     <template v-if="award.badge.curriculumNodes.length">
                         <p class="meta">
                             Curriculum Codes:
@@ -302,6 +301,7 @@ export default {
                             />
                         </p>
                     </template>
+                    <article v-if="award.badge.body" v-html="award.badge.body"></article>
                     <div class="component-action">
                         <section>
                             <template v-if="award._links.goalAward && award.isGoal && !award.award">
