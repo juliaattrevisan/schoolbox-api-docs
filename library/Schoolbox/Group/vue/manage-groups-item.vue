@@ -441,7 +441,6 @@ export default {
 @mixin disabled-button { //both .group-action and .membership share the same disabled styling
     &:disabled {
         color: white;
-        opacity: 1;
     }
 }
 .group-action {
