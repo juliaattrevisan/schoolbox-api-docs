@@ -10,6 +10,9 @@ import { ref, computed } from 'vue';
 import BadgeDetail from '../../vue/badgeDetail.vue';
 import BadgeImage from '../../vue/badge-image.vue';
 import BadgeModal from '../../vue/badge-modal.vue';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import NodeDetails from '@schoolboxCurriculum/vue/node-details';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 
 
 const props = defineProps({
@@ -23,8 +26,8 @@ const props = defineProps({
     },
 });
 
-const currentBadge = ref(null);
-const isDetailModalOpen = ref(false);
+const selectedNode = ref(getEmptyNode());
+const nodeModalEl = ref(null);
 
 /**
  * whether only a single badge is selected, in which case we can
@@ -46,13 +49,27 @@ const singleBadge = computed(() => {
 });
 
 /**
+ * to open up the curriculum node details modal
+ *
+ * @pararm { object }
+ */
+function onCodeSelected (node) {
+    selectedNode.value = node;
+    nodeModalEl.value.open();
+}
+
+
+const currentBadge = ref(null);
+const isBadgeModalOpen = ref(false);
+
+/**
  * Opens a modal window for viewing this badge's full details.
  *
  * @param {Object} badge
  */
-function openDetailModal (badge) {
+function openBadgeModal (badge) {
     currentBadge.value = badge;
-    isDetailModalOpen.value = true;
+    isBadgeModalOpen.value = true;
 }
 
 /**
@@ -60,7 +77,7 @@ function openDetailModal (badge) {
  * false so we can open it again
  */
 function onDetailModalClosed () {
-    isDetailModalOpen.value = false;
+    isBadgeModalOpen.value = false;
 }
 
 </script>
@@ -74,19 +91,20 @@ function onDetailModalClosed () {
                         :badge="singleBadge"
                         parent-css="evidence-badge-container"
                         img-css="evidence-badge-img-container"
+                        @code-selected="onCodeSelected"
                     />
                 </div>
                 <div v-else class="badge-grid v-card-list">
                     <div class="badge v-card" v-for="badge in badges" :key="badge.id">
                         <div class="card-feature-image">
-                            <a @click.prevent="openDetailModal(badge)" :title="badge.name">
+                            <a @click.prevent="openBadgeModal(badge)" :title="badge.name">
                                 <badge-image :badge="badge"></badge-image>
                             </a>
                         </div>
                         <div class=" actions-small-1 card-content">
                             <div class="list-item">
                                 <h3>
-                                    <a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a>
+                                    <a @click.prevent="openBadgeModal(badge)" :title="badge.name">{{ badge.name }}</a>
                                 </h3>
                             </div>
                             <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
@@ -96,8 +114,13 @@ function onDetailModalClosed () {
             </section>
         </div>
     </div>
+    <reveal-modal ref="nodeModalEl">
+        <node-details
+            :node="selectedNode"
+        />
+    </reveal-modal>
     <badge-modal
-        :isOpen="isDetailModalOpen"
+        :isOpen="isBadgeModalOpen"
         :badge="currentBadge"
         @closed="onDetailModalClosed"
     />
