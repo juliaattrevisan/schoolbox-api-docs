@@ -67,13 +67,13 @@ class Factory
             $unitImp        = $assessmentContext;
             $unitImpFolder  = $unitImp->getFolder();
             $unitSpecFolder = $unitImp->getSpecification()->getFolder();
-            $breadcrumbs->add([$unitImpFolder->getTitle(), "/homepage/{$unitImpFolder->getId()}"]);
-            $breadcrumbs->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]);
+            $breadcrumbs->add($this->generateBreadcrumbForFolder($unitImpFolder, $user));
+            $breadcrumbs->add($this->generateBreadcrumbForFolder($unitSpecFolder, $user));
         } elseif ($assessmentContext instanceof UnitSpecification) {
             // Generate trail like 'Learning'->$unitSpec (eg. 'Learning'->'Romeo and Juliet').
             $unitSpec       = $assessmentContext;
             $unitSpecFolder = $unitSpec->getFolder();
-            $breadcrumbs->add([$unitSpecFolder->getTitle(), "/homepage/{$unitSpecFolder->getId()}"]);
+            $breadcrumbs->add($this->generateBreadcrumbForFolder($unitSpecFolder, $user));
         } elseif ($assessmentContext instanceof Project) {
             // Generate trail like one of:
             //  * 'Learning->$unitImp->$unitSpec->$project (eg. 'Learning'->'9ENGA'->'Romeo and Juliet'->'Project title').
@@ -114,9 +114,7 @@ class Factory
             $subject       = $assessmentContext;
             $subjectFolder = $subject->getFolder();
 
-            if ($this->access->getFolderAccess($user, $subjectFolder->getId())) {
-                $breadcrumbs->add([$subject->getTitle(), "/homepage/{$subjectFolder->getId()}"]);
-            }
+            $breadcrumbs->add($this->generateBreadcrumbForFolder($subjectFolder, $user));
         }
 
         return $breadcrumbs;
@@ -152,5 +150,26 @@ class Factory
         $trail->add(["Create $assessmentType"]);
 
         return $trail;
+    }
+
+    /**
+     * Helper function for generating a breadcrumb for a folder.
+     * * breadcrumb has the folder's title
+     * * if user has permission to view the folder, it links to that folder:
+     *   otherwise there is no link
+     *
+     * @param Folder $folder
+     * @param User   $user
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function generateBreadcrumbForFolder(Folder $folder, User $user): array
+    {
+        return [
+            $folder->getTitle(),
+            $this->access->getFolderAccess($user, $folder->getId())
+                ? "/homepage/{$folder->getId()}"
+                : null,
+        ];
     }
 }
