@@ -373,9 +373,11 @@ class Family
     {
         /* Prioritise preferred names over official names
          */
-        $firstname = (new FirstMeaningfulValue())->find([
+        $firstname = $family[$node]['first_name'];
+
+        $firstnamePreferred = (new FirstMeaningfulValue())->find([
             $family[$node]['preferred_name'],
-            $family[$node]['first_name']
+            $firstname
         ]);
 
         /* If the Phones lookup contains data for this user code,
@@ -384,6 +386,7 @@ class Family
          */
         $person = $this->phones[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
+            'firstnamePreferred' => $firstnamePreferred,
             'surname' => $family[$node]['surname'],
             'mobile' => '',
             'home' => '',
@@ -437,9 +440,11 @@ class Family
     {
         /* Prioritise preferred names over official names
          */
-        $firstname = (new FirstMeaningfulValue())->find([
+        $firstname = $family[$node]['first_name'];
+
+        $firstnamePreferred = (new FirstMeaningfulValue())->find([
             $family[$node]['preferred_name'],
-            $family[$node]['first_name']
+            $firstname
         ]);
 
         /* If the Phones lookup contains data for this user code,
@@ -448,6 +453,7 @@ class Family
          */
         $person = $this->phones[$family['user_code']][$node] ?? [
             'firstname' => $firstname,
+            'firstnamePreferred' => $firstnamePreferred,
             'surname' => $family[$node]['surname'],
             'mobile' => '',
             'home' => '',

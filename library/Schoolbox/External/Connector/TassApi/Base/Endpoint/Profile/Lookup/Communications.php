@@ -187,10 +187,13 @@ class Communications
                 /* Split fam: non-prefixed fields are for a specific guy
                  */
                 if ($address['address_description'] === $this->motherAddressDescription) {
+                    $firstname = trim((string)$address['m_first_name']);
+
                     $stack[$address['parent_code']][Family::MOTHER_NODE] = [
-                        'firstname' => trim((new FirstMeaningfulValue())->find([
+                        'firstname' => $firstname,
+                        'firstnamePreferred' => trim((new FirstMeaningfulValue())->find([
                             $address['m_preferred_name'],
-                            $address['m_first_name']
+                            $firstname
                         ])),
                         'surname' => trim((string)$address['m_surname']),
                         'mobile' => $mobilePhone1 ?: $mobilePhone2,
@@ -201,10 +204,13 @@ class Communications
                         'validCommRule' => true
                     ];
                 } elseif ($address['address_description'] === $this->fatherAddressDescription) {
+                    $firstname = trim((string)$address['f_first_name']);
+
                     $stack[$address['parent_code']][Family::FATHER_NODE] = [
-                        'firstname' => trim((new FirstMeaningfulValue())->find([
+                        'firstname' => $firstname,
+                        'firstnamePreferred' => trim((new FirstMeaningfulValue())->find([
                             $address['f_preferred_name'],
-                            $address['f_first_name']
+                            $firstname
                         ])),
                         'surname' => trim((string)$address['f_surname']),
                         'mobile' => $mobilePhone1 ?: $mobilePhone2,
@@ -217,10 +223,13 @@ class Communications
                 } else {
                     /* Nukular family: fields are distributed among the guys in the fam
                      */
+                    $firstname = trim((string)$address['m_first_name']);
+
                     $stack[$address['parent_code']][Family::MOTHER_NODE] = [
-                        'firstname' => trim((new FirstMeaningfulValue())->find([
+                        'firstname' => $firstname,
+                        'firstnamePreferred' => trim((new FirstMeaningfulValue())->find([
                             $address['m_preferred_name'],
-                            $address['m_first_name']
+                            $firstname
                         ])),
                         'surname' => trim((string)$address['m_surname']),
                         'mobile' => $mobilePhone1,
@@ -231,10 +240,13 @@ class Communications
                         'validCommRule' => true
                     ];
 
+                    $firstname = trim((string)$address['f_first_name']);
+
                     $stack[$address['parent_code']][Family::FATHER_NODE] = [
-                        'firstname' => trim((new FirstMeaningfulValue())->find([
+                        'firstname' => $firstname,
+                        'firstnamePreferred' => trim((new FirstMeaningfulValue())->find([
                             $address['f_preferred_name'],
-                            $address['f_first_name']
+                            $firstname
                         ])),
                         'surname' => trim((string)$address['f_surname']),
                         'mobile' => $mobilePhone2,
