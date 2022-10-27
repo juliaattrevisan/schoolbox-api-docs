@@ -3,11 +3,11 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     ['Badges', routeLookupIfAuthorized('learningBadge.getBadgeListPage') ],
-    ['Award Achievements']
+    ['Award Achievement']
 ) }}
 <div class="row">
     <div class="small-12 columns">
-        <h1>Award Achievements</h1>
+        <h1>Award Achievement</h1>
         {% if targetUsers is not empty %}
             <ul class="meta">
                 <li>
