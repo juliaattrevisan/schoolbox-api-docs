@@ -57,7 +57,9 @@
         </div>
         {% if award.reason is empty %}
         <div class="empty-state">
-            There's no evidence added to this award.
+            <i class="icon-modify"></i>
+            <p>There's no evidence added to this award yet.</p>
+            {% if modifyRoute %}<p><a href="{{ modifyRoute ~ '?returnUrl=' ~ returnUrl }}" title="Add some evidence">Add evidence.</a></p>{% endif %}
         </div>
         {% else %}
         <section>
