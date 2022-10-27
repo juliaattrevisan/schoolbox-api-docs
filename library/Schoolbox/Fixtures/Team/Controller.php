@@ -208,7 +208,7 @@ class Controller extends AbstractController
 
         $teamUsers = [];
         foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
-            if (count($teamPlayerMapper->findByColumn('user_id', $user->getId())) > 0) {
+            if (count($teamPlayerMapper->findByColumnList(['team_id' => $team->getId(), 'user_id' => $user->getId()])) > 0) {
                 // The user already belongs to this team, so skip.
                 continue;
             }
