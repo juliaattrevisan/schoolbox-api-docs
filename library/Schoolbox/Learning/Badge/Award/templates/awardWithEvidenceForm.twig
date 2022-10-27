@@ -40,14 +40,7 @@
         {% endif %}
     </div>
 </div>
-
-<div id="award-with-evidence-badge-list-container">
-    <award-with-evidence-badge-list
-        :badges="{{ badges | json_encode }}"
-    />
-</div>
-<script src="{{ CDN_PREFIX }}/js/bundle/awardWithEvidenceBadgeList.js?v={{ config.site_version }}"></script>
-
+{% include '@learningBadgeAward/awardBadgeList.twig' %}
 <div class="row">
     <div class="small-12 island">
         <div class="actions-small-2 row">

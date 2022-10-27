@@ -351,11 +351,14 @@ class Controller extends Base
      */
     public function getAwardWithEvidence(AwardModel $award): void
     {
+        $badges          = $this->badgeMapper->createCollection()->add($award->getBadge());
+        $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardWithEvidence.twig',
                 [
-                    'award' => $award,
+                    'badges' => $badges->map($badgeTranslator),
+                    'award'  => $award,
                 ],
                 'View Evidence'
             )

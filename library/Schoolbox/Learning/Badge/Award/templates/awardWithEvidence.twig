@@ -17,24 +17,7 @@
         </p>
     </div>
 </div>
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <div class="badge-img-container content">
-                {% if award.badge.icon %}
-                    <img src=" {{ CDN_PREFIX }}{{ award.badge.icon }}" class="badge-image" alt="{{ award.badge.name }}"
-                         title="{{ award.badge.name }}"/>
-                {% elseif award.badge.image.hash %}
-                    <img src="/storage/image.php?hash={{ award.badge.image.hash }}" class="badge-image"
-                         alt="{{ award.badge.name }}"
-                         title="{{ award.badge.name }}"/>
-                {% endif %}
-            </div>
-            <article>{{ award.badge.body|purify }}</article>
-        </section>
-    </div>
-</div>
-
+{% include '@learningBadgeAward/awardBadgeList.twig' %}
 <div class="row">
     <div class="small-12 island">
         <div class="actions-small-2 row">
