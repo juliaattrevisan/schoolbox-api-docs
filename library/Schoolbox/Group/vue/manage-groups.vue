@@ -135,6 +135,7 @@ export default {
          */
         onGroupEditSuccess (text) {
             this.$refs.toast.timeout(text, true, 3000);
+            this.checkForDropdowns();
         },
 
         /**
