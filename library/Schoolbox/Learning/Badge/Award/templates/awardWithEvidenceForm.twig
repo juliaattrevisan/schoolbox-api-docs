@@ -1,0 +1,63 @@
+<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+{% set title =  (badges | length > 1) ? 'Award Achievements' : 'Award Achievement' %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    ['Badges', routeLookupIfAuthorized('learningBadge.getBadgeListPage') ],
+    [ title ]
+) }}
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ title }}</h1>
+        {% if targetUsers is not empty %}
+            <ul class="meta">
+                <li>
+                    {% include 'sub/userListMetadata.twig'
+                        with {
+                        users:   targetUsers,
+                        message: 'Awarding to',
+                    } only %}
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+</div>
+{% include '@learningBadgeAward/awardBadgeList.twig' %}
+<div class="row">
+    <div class="small-12 island">
+        <div class="actions-small-2 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Evidence</h2>
+                </div>
+            </div>
+        </div>
+        {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardWithEvidence') ~ '?returnUrl=' ~ returnUrl %}
+        <form action="{{ postRoute }}" method="post" id="evidence-form">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="targetUserIds" value="{{ targetUserIds }}">
+                        <input type="hidden" name="badgeIds" value="{{ badgeIds }}">
+                        <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
+                        <textarea id="reason" name="reason"></textarea>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <ul class="flex-list buttons">
+                        <li><a href="{{ cancelUrl }}" class="button">Cancel</a></li>
+                        <li><input type="submit" value="Award" /></li>
+                    </ul>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    $.fn.alaressEditor({
+        targetElements: $('#reason'),
+    });
+    $('#evidence-form').alaressValidate();
+</script>

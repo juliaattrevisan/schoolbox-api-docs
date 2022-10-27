@@ -9,8 +9,8 @@ import Toast from "@schoolboxVue/components/toast";
 import vSelect from "vue-select";
 import debounce from "lodash/debounce";
 import "vue-select/dist/vue-select.css";
-import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import { generateAwardWithEvidenceUrl } from '../js/awardBadgeUtils';
 
 // Render a custom template for the deselect icon.
 // Partially documented on https://github.com/sagalbot/vue-select/issues/994
@@ -52,7 +52,6 @@ export default {
         BadgeImage,
         Toast,
         vSelect,
-        DynamicInput
     },
     /**
      * Props.
@@ -167,7 +166,6 @@ export default {
             options: [],
             selected: [],
             isFormSubmitActive: false,
-            reason: '', //the reason the badge(s) are being awarded
         }
     },
     computed: {
@@ -195,6 +193,16 @@ export default {
          */
         expiryDate (fromDate) {
             return calculateExpiryDate(this.expiry, fromDate);
+        },
+
+        /**
+         * return a string of comma separated user ids
+         *
+         * @returns {String}
+         */
+        selectedUserIds () {
+            const userIdList = this.selected.map((user) => user.id);
+            return userIdList.join(',');
         },
     },
     methods: {
@@ -236,7 +244,7 @@ export default {
             this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
 
-            axios.post(this.endpoint, {users: this.selected, reason: this.reason})
+            axios.post(this.endpoint, { users: this.selected })
                 .then(() => {
                     // Clear the select, so they don't show next time this opens
                     this.selected = [];
@@ -272,21 +280,21 @@ export default {
         },
 
         /**
-         * To keep track of the reason, that's being updated by dynamic-input.vue
-         *
-         * @param { string }
-         */
-        onReasonChanged (newValue) {
-            this.reason = newValue;
-        },
-
-        /**
          * The modal is now completely closed so reset
          */
         onModalClosed () {
             this.isModalOpen = false;
-            this.reason = '';
         },
+
+        /**
+         * Generate a URL which references this page with all filters cleared.
+         *
+         * @return { string }
+         */
+        getEvidenceUrl () {
+            return generateAwardWithEvidenceUrl(this.selectedUserIds, this.badge.id);
+        },
+
     },
 }
 </script>
@@ -303,28 +311,6 @@ export default {
                 <badge-image :badge="badge"></badge-image>
                 <h3>{{ badge.name }}</h3>
             </div>
-        </div>
-
-        <div>
-            <!-- Only achievements can do this -->
-            <template v-if="'achievement' === type">
-                <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
-
-                <dynamic-input
-                    v-if="this.isModalOpen"
-                    preset-unique-id="reason"
-                    inputName="reason"
-                    singular="''"
-                    :value="''"
-                    :allow-edit="true"
-                    :allow-submit="false"
-                    :spawn-immediately="true"
-                    :is-processing="true"
-                    :cdn-prefix="this.cdnPrefix"
-                    :site-version="this.siteVersion"
-                    @value-changed="onReasonChanged"
-                ></dynamic-input>
-            </template>
         </div>
 
         <!--
@@ -354,18 +340,26 @@ export default {
                 </span>
             </template>
         </v-select>
-        <ul class="flex-list buttons">
-            <li>
-                <button @click.prevent="onSubmit" class="submit" :disabled="isSubmitButtonDisabled">
-                    <!-- @slot The text for this badge award form's confirm button -->
-                    <slot name="confirmButton">
-                      Award Achievement
-                    </slot>
+        <div class="component-action">
+            <section>
+                <a
+                    v-if="type === 'achievement'"
+                    title="Award with evidence"
+                    class="button"
+                    :href="getEvidenceUrl()"
+                    :class="[isSubmitButtonDisabled ? 'disabled' : '']"
+                >
+                    Award with Evidence
+                </a>
+                <button
+                    :disabled="isSubmitButtonDisabled"
+                    @click.prevent="onSubmit"
+                    @keyup.enter="onSubmit"
+                >
+                    <slot name="confirmButton">Award</slot>
                 </button>
-            </li>
-            <li><button @click.prevent="onCancel">Cancel</button></li>
-        </ul>
-
+            </section>
+        </div>
         <toast ref="toast"></toast>
     </div>
 </template>

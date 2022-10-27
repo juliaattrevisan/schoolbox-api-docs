@@ -1,0 +1,81 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ award.recipient.fullname, routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id}) ],
+    ['Achievement Evidence']
+) }}
+{% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
+{% set modifyRoute = routeLookupIfAuthorized('learningBadgeAward.getAwardUpdate', {awardId: award.id}) %}
+{% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
+<script>
+    $(function () {
+        $('[data-delete-evidence]').click(function (e) {
+            e.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete the evidence from this achievement?',
+                confirmEvent: function () {
+                    $.post('{{ postRoute }}', {
+                        reason: ''
+                    }).done(function () {
+                        window.location.reload();
+                    });
+                }
+            });
+        });
+    });
+</script>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Achievement Evidence</h1>
+        <ul class="meta">
+            <li class="icon-achievement">Awarded
+                <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
+                by
+                {% if awardedByRoute %}
+                    <a href="{{ awardedByRoute }}">{{ award.awardedBy.fullname }}</a>
+                {% else %}
+                    {{ award.awardedBy.fullname }}
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+</div>
+{% include '@learningBadgeAward/awardBadgeList.twig' %}
+<div class="row">
+    <div class="small-12 island">
+        <div class="actions-small-2 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Evidence</h2>
+                </div>
+            </div>
+            {% if modifyRoute or postRoute %}
+            <nav>
+                {% if modifyRoute %}<a href="{{ modifyRoute ~ '?returnUrl=' ~ returnUrl }}" class="icon-modify" title="Modify"></a>{% endif %}
+                {% if postRoute and award.reason is not empty %}<a class="icon-delete" title="Delete" data-delete-evidence></a>{% endif %}
+            </nav>
+            {% endif %}
+        </div>
+        {% if award.reason is empty %}
+        <div class="empty-state">
+            <i class="icon-modify"></i>
+            <p>There's no evidence added to this award yet.</p>
+            {% if modifyRoute %}<p><a href="{{ modifyRoute ~ '?returnUrl=' ~ returnUrl }}" title="Add some evidence">Add evidence.</a></p>{% endif %}
+        </div>
+        {% else %}
+        <section>
+            <fieldset class="content">
+                <div class="small-12 columns">
+                    {{ award.reason|purify }}
+                </div>
+            </fieldset>
+        </section>
+        {% endif %}
+        <div class="row">
+            <div class="small-12 columns">
+                <ul class="flex-list buttons">
+                    <li><a href="{{ cancelUrl }}" class="button">Return to previous page</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

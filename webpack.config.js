@@ -207,6 +207,7 @@ module.exports = {
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.js',
         badgeReport: './library/Schoolbox/Learning/Badge/Award/vue/badgeReport.js',
+        awardWithEvidenceBadgeList: './library/Schoolbox/Learning/Badge/Award/vue/awardWithEvidenceBadgeList.js',
         evidenceMediaRecording: './library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.js',
         checkShareWorkButtons: './library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js',
         similarityReport: './library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.js',

@@ -6,8 +6,8 @@ import BadgeList from '../../vue/badge-list';
 import toastMixin from '@schoolboxVue/components/toast-mixin';
 import HorizontalScoller from '@schoolboxVue/components/scroll/horizontal-scoller';
 import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
-import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import { generateAwardWithEvidenceUrl } from '../js/awardBadgeUtils';
 
 /**
  * Form for awarding badges to users, by selecting them from a list of badges.
@@ -31,7 +31,6 @@ export default {
         RevealModal,
         HorizontalScoller, //so badges are contained in one line when a lot are selected
         BottomDrawer, //to pop out when +1 badges is selected
-        DynamicInput,
     },
     props: {
         /**
@@ -226,13 +225,7 @@ export default {
             selectedBadges: [],
             badgeListChangeEvent: 'EVENT_CHANGE',
             hasContentChange: false, //to track badge addition changes
-            /**
-             * so dynamic-input.vue is only in the dom while the modal is active
-             * we do this to avoid issues around ckeditor instantiation coupled with modals
-             * where opening, closing, then re-opening a modal causes the ckeditor to break
-             */
-            isModalOpen: false,
-            reason: '', //the reason the badge(s) are being awarded
+            isProcessing: false, //to disable buttons while form is processing
         }
     },
     computed: {
@@ -285,7 +278,18 @@ export default {
             } else {
                 return '';
             }
-        }
+        },
+        submitButtonText () { //change button text depending on whether an award or goal
+            return this.type === 'achievement' ? 'Award' : 'Set Goal';
+        },
+        selectedUserIds () { //return a string of comma separated user ids
+            const userIdList = this.users.map((user) => user.id);
+            return userIdList.join(',');
+        },
+        selectedBadgeIds () { //return a string of comma separated badge ids
+            const badgeIdList = this.selectedBadges.map((badge) => badge.id);
+            return badgeIdList.join(',');
+        },
     },
     watch: {
 
@@ -352,15 +356,6 @@ export default {
         },
 
         /**
-         * To keep track of the reason, that's being updated by dynamic-input.vue
-         *
-         * @param { string }
-         */
-        onReasonChanged (newValue) {
-            this.reason = newValue;
-        },
-
-        /**
          * close the modal
          */
         onCancelSelected () {
@@ -372,7 +367,6 @@ export default {
          */
         onModalClosed () {
             this.isModalOpen = false;
-            this.reason = '';
         },
 
         /**
@@ -382,14 +376,14 @@ export default {
          */
         onSubmit() {
             this.toastActivate(this.toastActivateMessage);
-            this.$refs.awardModalSubmit.disabled = true;
+            this.isProcessing = true;
 
             Promise
                 .all(this.selectedBadges.map((badge) => {
 
                     /* Construct each payload for each badge uniquely
                      */
-                    const payload = this.awardToSelfOnly ? null : { users: this.users, reason: this.reason };
+                    const payload = this.awardToSelfOnly ? null : { users: this.users };
 
                     fetch(badge._links[this.postAwardRouteLookup], {
                         method: 'POST',
@@ -408,8 +402,16 @@ export default {
                     this.toastError(this.toastFailureMessage);
                 })
                 .finally(() => {
-                    this.$refs.awardModalSubmit.disabled = false;
+                    this.isProcessing = false;
                 });
+        },
+        /**
+         * Generate a URL which references this page with all filters cleared.
+         *
+         * @return {String}
+         */
+        getEvidenceUrl () {
+            return generateAwardWithEvidenceUrl(this.selectedUserIds, this.selectedBadgeIds);
         },
 
     },
@@ -474,26 +476,6 @@ export default {
                     </div>
                 </li>
             </ul>
-
-            <template v-if="'achievement' === this.type">
-                <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
-
-                <dynamic-input
-                    v-if="isModalOpen"
-                    preset-unique-id="reason"
-                    inputName="reason"
-                    singular="reason"
-                    :value="reason"
-                    :allow-edit="true"
-                    :allow-submit="false"
-                    :spawn-immediately="true"
-                    :is-processing="true"
-                    :cdn-prefix="this.cdnPrefix"
-                    :site-version="this.siteVersion"
-                    @value-changed="onReasonChanged"
-                ></dynamic-input>
-            </template>
-
             <template v-if="!awardToSelfOnly">
                 <hr />
                 <p class="meta">{{ confirmModalUserListMeta }}</p>
@@ -508,11 +490,26 @@ export default {
                     </li>
                 </ul>
             </template>
-
-            <ul class="flex-list buttons">
-                <li><a @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button">Cancel</a></li>
-                <li><button ref="awardModalSubmit" @click.prevent="onSubmit" @keyup.enter="onSubmit" class="submit">Confirm</button></li>
-            </ul>
+            <div class="component-action">
+                <section>
+                    <a
+                        v-if="type === 'achievement'"
+                        title="Award with evidence"
+                        class="button"
+                        :href="getEvidenceUrl()"
+                    >
+                        Award with Evidence
+                    </a>
+                    <button
+                        :title="submitButtonText"
+                        :isProcessing="isProcessing"
+                        @click.prevent="onSubmit"
+                        @keyup.enter="onSubmit"
+                    >
+                        {{ submitButtonText }}
+                    </button>
+                </section>
+            </div>
         </reveal-modal>
     </div>
 </template>
@@ -537,8 +534,7 @@ export default {
 }
 
 .selected-container__badges {
-    flex: 1 1 auto; //fill up all the space that __count doesn't occupy
-    min-width: 50%; //and don't get too small when shrunk down
+    min-width: 50%; //don't get too small when shrunk down
 }
 
 .selected-badges__item {

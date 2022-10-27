@@ -123,15 +123,23 @@
     h2, .meta {
         text-align: center;
     }
-
     h2 {
         max-width: 100%;
         margin-bottom: .5rem;
     }
-
     article {
         max-width: 40rem;
         margin: 1rem auto 1rem auto;
+    }
+    .meta:last-of-type {
+        padding-bottom: 1rem;
+    }
+}
+
+.evidence-badge-container {
+    padding: 0.5rem 0;
+    h2, p {
+        margin-bottom: 0.5rem;
     }
 }
 
@@ -163,6 +171,16 @@
         padding: .35rem 0;
     }
 }
+
+    .evidence-badge-img-container { //to float the image to the left when display outside of a modal, curently in #award-with-evidence-badge-list
+        @extend .badge-img-container;
+        float: left;
+        margin-right: 0.825rem;
+        width: rem-calc(300);
+        @media #{$small-only} {
+            float: none;
+        }
+    }
 
 .badge-img-container__background,
 .badge-img-container__foreground {

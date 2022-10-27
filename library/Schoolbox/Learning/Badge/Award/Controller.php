@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use Exception;
 use PDOException;
+use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -32,6 +34,8 @@ use Schoolbox\SortUsersByName;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+use Schoolbox\Learning\Badge\Translator as BadgeTranslator;
+use Schoolbox\Resource\Storage;
 
 use function count;
 use function in_array;
@@ -279,6 +283,101 @@ class Controller extends Base
 
 
     /**
+     * Display form to award multiple students with multiple badges
+     *
+     * @param GenericCollection $users
+     * @return void
+     */
+    public function getAwardWithEvidenceForm(GenericCollection $users): void
+    {
+        $badgeIds = $this->request->query->get('badges') ? array_unique(array_map('intval', explode(',', $this->request->query->get('badges')))) : [];
+        $badges   = $this->badgeMapper->findByColumn('id', $badgeIds);
+        if (empty($badgeIds) || !$badges->count()) {
+            $this->sendError('No badge provided');
+        }
+
+        $returnUrl = $this->request->query->get(Redirect::RETURN_URL) ??
+            Redirect::encode($this->router->generate('learningBadge.getBadgeListPage'));
+        $cancelUrl       = Redirect::decode($returnUrl);
+        $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
+        $userTranslator  = new User\Translator\Author\ModelToArray();
+
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadgeAward/awardWithEvidenceForm.twig',
+                [
+                    'badges'        => $badges->map($badgeTranslator),
+                    'badgeIds'      => implode(',', $badges->getPropertyValues('id')),
+                    'targetUsers'   => $users->map($userTranslator),
+                    'targetUserIds' => implode(',', $users->getPropertyValues('id')),
+                    'returnUrl'     => $returnUrl,
+                    'cancelUrl'     => $cancelUrl,
+                ],
+                'Award Achievement'
+            )
+        );
+    }
+
+    /**
+     * Bulk award users with badges and reason
+     * @return void
+     * @throws MapperException
+     * @throws \Alaress\Web\Controller\Exception
+     */
+    public function postAwardWithEvidence(): void
+    {
+        $targetUserIds = $this->request->post->get('targetUserIds') ? array_map('intval', explode(',', $this->request->post->get('targetUserIds'))) : [];
+        $targetUsers   = $this->userMapper->findByColumn('id', $targetUserIds);
+        if (empty($targetUserIds) || !$targetUsers->count()) {
+            $this->sendError('No target user provided');
+        }
+
+        $reason   = trim($this->request->post->get('reason'));
+        $badgeIds = $this->request->post->get('badgeIds') ? array_map('intval', explode(',', $this->request->post->get('badgeIds'))) : [];
+        $badges   = $this->badgeMapper->findByColumn('id', $badgeIds);
+        if (empty($badgeIds) || !$badges->count()) {
+            $this->sendError('No badge provided');
+        }
+        foreach ($badges as $badge) {
+            $this->createAwardsFromRequestBody($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, $targetUsers, $reason);
+        }
+        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $this->response->redirect->afterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
+    }
+
+    /**
+     * Show award detail with evidence
+     * @param \Schoolbox\Learning\Badge\Award\Model $award
+     * @return void
+     */
+    public function getAwardWithEvidence(AwardModel $award): void
+    {
+        $badges          = $this->badgeMapper->createCollection()->add($award->getBadge());
+        $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
+        $returnUrl       = $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
+            'awardId' => $award->getId(),
+        ]);
+        $cancelUrl       = $this->request->query->get(Redirect::RETURN_URL)
+            ? Redirect::decode($this->request->query->get(Redirect::RETURN_URL))
+            : $this->router->generate('searchUser.getProfile', [
+                'userId' => $award->getRecipient()->getId(),
+            ]);
+
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadgeAward/awardWithEvidence.twig',
+                [
+                    'badges'    => $badges->map($badgeTranslator),
+                    'award'     => $award,
+                    'returnUrl' => Redirect::encode($returnUrl),
+                    'cancelUrl' => $cancelUrl,
+                ],
+                'View Evidence'
+            )
+        );
+    }
+
+    /**
      * Get a list of badges and their counts, awarded to $user
      *
      * @api GET /learning/badge/award/{userId}/awarded
@@ -362,9 +461,24 @@ class Controller extends Base
      */
     public function awardAsAchievement(Model $badge): void
     {
-        $this->createAwardsFromRequestBody(
+        $data       = json_decode($this->request->content->getRaw(), true);
+        $userIds    = array_column($data['users'], 'id');
+        // Users are in the data.
+        // For now: badges may only be awarded to or set as goals for students.
+        $users      = $this->userMapper->findByColumn('id', $userIds);
+        $reason     = trim((string)$data['reason']);
+
+        $collection = $this->createAwardsFromRequestBody(
             $badge,
-            AwardModel::AWARD_STATUS_ACHIEVEMENT
+            AwardModel::AWARD_STATUS_ACHIEVEMENT,
+            $users,
+            $reason
+        );
+
+        // Return what was just created
+        $translator = $this->buildBadgeAwardModelToArrayTranslator();
+        $this->response->content->set(
+            $this->buildJsonOutput($collection->map($translator))
         );
     }
 
@@ -380,9 +494,22 @@ class Controller extends Base
      */
     public function setAsGoal(Model $badge): void
     {
-        $this->createAwardsFromRequestBody(
+        $data       = json_decode($this->request->content->getRaw(), true);
+        $userIds    = array_column($data['users'], 'id');
+        $users = $this->userMapper->findByColumn('id', $userIds);
+        $reason     = trim((string)$data['reason']);
+
+        $collection = $this->createAwardsFromRequestBody(
             $badge,
-            AwardModel::AWARD_STATUS_GOAL
+            AwardModel::AWARD_STATUS_GOAL,
+            $users,
+            $reason
+        );
+
+        // Return what was just created
+        $translator = $this->buildBadgeAwardModelToArrayTranslator();
+        $this->response->content->set(
+            $this->buildJsonOutput($collection->map($translator))
         );
     }
 
@@ -402,16 +529,9 @@ class Controller extends Base
      * @throws MapperException if for some reason a query fails
      * @throws Exception       if attempting to award to a non-student
      */
-    private function createAwardsFromRequestBody(Model $badge, string $status): void
+    private function createAwardsFromRequestBody(Model $badge, string $status, GenericCollection $users, string $reason): GenericCollection
     {
-        // Users are in the data.
-        // For now: badges may only be awarded to or set as goals for students.
-        $data       = json_decode($this->request->content->getRaw(), true);
         $collection = $this->mapper->createCollection();
-        $userIds    = array_column($data['users'], 'id');
-        $users      = $this->userMapper->findByColumn('id', $userIds);
-        $reason     = trim((string)$data['reason']);
-
         // Are any of those users not students? Error out
         foreach ($users as $user) {
             if (!$user->getRole()->isStudent()) {
@@ -449,12 +569,7 @@ class Controller extends Base
             // For now: assume that the current award is being saved as-is
             $collection->add($award);
         }
-
-        // Return what was just created
-        $translator = $this->buildBadgeAwardModelToArrayTranslator();
-        $this->response->content->set(
-            $this->buildJsonOutput($collection->map($translator))
-        );
+        return $collection;
     }
 
 
@@ -635,11 +750,24 @@ class Controller extends Base
      */
     public function getAwardUpdate(AwardModel $award): void
     {
+        $badges          = $this->badgeMapper->createCollection()->add($award->getBadge());
+        $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
+        $returnUrl       =
+            $this->request->query->get(Redirect::RETURN_URL) ??
+            Redirect::encode(
+                $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
+                    'awardId' => $award->getId(),
+                ])
+            );
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardUpdate.twig',
                 [
-                    'award' => $award
+                    'badges'    => $badges->map($badgeTranslator),
+                    'award'     => $award,
+                    'returnUrl' => $returnUrl,
+                    'cancelUrl' => Redirect::decode($returnUrl),
                 ],
                 'Edit award'
             )
@@ -670,7 +798,7 @@ class Controller extends Base
          * this redirect is created in the vue form component.
          */
         $redirectUrl = $this->router->generate('searchUser.getProfile', [
-            'userId' => $award->getRecipient()->getId()
+            'userId' => $award->getRecipient()->getId(),
         ]);
         if (null !== $this->request->query->get(Redirect::RETURN_URL)) {
             $redirectUrl = Redirect::decode($this->request->query->get(Redirect::RETURN_URL));
@@ -695,6 +823,29 @@ class Controller extends Base
         return $factory->build();
     }
 
+
+    /**
+     * Builder for the model-to-array translator for badges.
+     *
+     * @return Composite
+     */
+    private function buildBadgeModelToArrayTranslator(): Composite
+    {
+        $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
+        return new Composite(
+            new BadgeTranslator\ModelToArray(
+                new User\Translator\Author\ModelToArray(),
+                new Storage\Translator\ModelToArray($prefixGenerator),
+                new ScrubAdapter(),
+                new BadgeTranslator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser(), $prefixGenerator)
+            ),
+            new BadgeTranslator\ModelToArray\Links(
+                $this->router,
+                $this->authorizer,
+                $this->getUser()
+            )
+        );
+    }
 
     /**
      * List students with awarded badges

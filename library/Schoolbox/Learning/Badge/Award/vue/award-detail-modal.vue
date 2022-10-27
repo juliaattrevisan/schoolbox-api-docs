@@ -9,11 +9,12 @@ import axios from 'axios';
 import { animateBadgeImage } from '../js/animateBadgeImage'
 import { ResizeObserver } from 'vue3-resize';
 import 'vue3-resize/dist/vue3-resize.css';
-import DynamicInput from '@schoolboxVue/components/ckeditor/dynamic-input';
 import CodesList from '@schoolboxCurriculum/vue/codes-list';
 import NodeDetails from '@schoolboxCurriculum/vue/node-details';
 import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
 import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
+import { generateAwardWithEvidenceUrl } from '../js/awardBadgeUtils';
+
 
 /**
  * Award detail modal.
@@ -49,7 +50,12 @@ export default {
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: {
-        siteVersion: String
+        siteVersion: String,
+        returnUrl: {
+            type: String,
+            default: null,
+            required: false
+        }
     },
 
     emits: ['on-achievement-awarded'],
@@ -64,7 +70,6 @@ export default {
         RelativeTime,
         SequentialRevealModal,
         ResizeObserver, //to track any size changes to the parent container
-        DynamicInput,
         CodesList,
         NodeDetails,
     },
@@ -82,18 +87,6 @@ export default {
             award: {},
             canvasWidth: 0,
             canvasHeight: 0,
-            /**
-             * so dynamic-input.vue is only in the dom while the modal is active
-             * we do this to avoid issues around ckeditor instantiation coupled with modals
-             * where opening, closing, then re-opening a modal causes the ckeditor to break
-             */
-            hasSelectedModify: false,
-            /* Decide if the edit button for the Reason is available
-             * (presuming you have access to the update route)
-             * This toggles to false when you spawn the ckeditor
-             */
-            allowReasonEdit: true,
-            reason: '', //the reason the badge(s) are being awarded
             selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
         }
     },
@@ -206,7 +199,7 @@ export default {
          */
         awardAchievement () {
             this.toastActivate('Awarding...');
-            this.convertToAchievement(this.award, this.award.reason)
+            this.convertToAchievement(this.award)
                 .then((response) => {
                     this.toastSuccess('Achievement awarded');
 
@@ -227,33 +220,6 @@ export default {
         },
 
         /**
-         * to be able to udpate the reason using dynamic-input.vue
-         */
-        onEditReasonSelected () {
-            this.hasSelectedModify = true;
-            this.allowReasonEdit = false;
-        },
-
-        /**
-         * To keep track of the reason, that's being updated by dynamic-input.vue
-         *
-         * @param { string }
-         */
-        onReasonChanged (newValue) {
-            this.reason = newValue;
-        },
-
-        /**
-         * post the changed reason value to the backend
-         * and then close the modal
-         *
-         * @param { string }
-         */
-        onSaveReasonSelected (value) {
-            console.warn(value);
-        },
-
-        /**
          * to open up the details modal
          *
          * @pararm { object }
@@ -261,16 +227,12 @@ export default {
         onCodeSelected (node) {
             this.selectedNode = node;
             this.modalIndex++;
-            this.hasSelectedModify = false; //so the ckeditor can be re-instantiated when we return from the 2nd modal
         },
 
         /**
          * The modal is now completely closed
          */
         onModalClosed () {
-            this.hasSelectedModify = false;
-            this.allowReasonEdit = true;
-            this.reason = '';
             this.isModalOpen = false;
         },
 
@@ -280,6 +242,25 @@ export default {
         returnToHere( value ) {
             return value + '?returnUrl=' + btoa(window.location.pathname);
         },
+
+        /**
+         * Generate a URL which references this page with all filters cleared.
+         *
+         * @param { string }
+         *
+         * @return { string }
+         */
+        getEvidenceUrl (badgeId) {
+            return generateAwardWithEvidenceUrl(this.award.recipient.id, badgeId);
+        },
+
+        /**
+         * Generate returnUrl param
+         * @returns {string}
+         */
+        getReturnUrl() {
+            return (this.returnUrl !== null) ? `?returnUrl=${this.returnUrl}` : '';
+        }
     }
 }
 </script>
@@ -323,59 +304,7 @@ export default {
                     <p class="meta" v-if="award.isGoal && award.award">
                         Goal has been achieved <relative-time :datetime="award.award.awardedAt" :key="`${award.id}-goalAwardedAt`"></relative-time>
                     </p>
-
-                    <article v-html="award.badge.body"></article>
-
-                    <!-- Only show the Reason section if there was something meaningful -->
-                    <template v-if="award.reason && award.reason.length">
-                        <div class="actions-small-1">
-                            <div class="list-item">
-                                <h4>Evidence</h4>
-
-                                <article v-html="award.reason" id="reason-proxy"></article>
-                            </div>
-                            <nav>
-                                <!-- Provide the button to make the change -->
-                                <!-- Nonzero-length reason gets a button -->
-                                <button v-if="award._links.awardUpdate && !hasSelectedModify" class="icon-modify no-text modify-link" title="Update reason" @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected"></button>
-                            </nav>
-                        </div>
-                    </template>
-
-                    <!-- If you can edit the reason... -->
-                    <template v-if="award._links.awardUpdate">
-                        <!-- If there's no value here, provide empty state -->
-                        <template v-if="!(award.reason && award.reason.length)">
-                            <div class="empty-state" v-if="award._links.awardUpdate">
-                                <p><a @click.prevent="onEditReasonSelected" @keyup.enter="onEditReasonSelected">Provide evidence</a> to demonstrate how this was achieved.</p>
-                            </div>
-                        </template>
-                    </template>
-
-                    <!-- If you have the ability to change the Reason, provide dynamic input -->
-                    <template v-if="award._links.awardUpdate">
-                        <form :action="returnToHere(award._links.awardUpdate)" method="post">
-                            <dynamic-input
-                                v-if="hasSelectedModify"
-                                preset-unique-id="reason"
-                                inputName="reason"
-                                singular="reason"
-                                :proxy="'reason-proxy'"
-                                :value="award.reason"
-                                :allow-edit="true"
-                                :allow-submit="true"
-                                :spawn-immediately="true"
-                                :is-processing="true"
-                                :cdn-prefix="this.cdnPrefix"
-                                :site-version="this.siteVersion"
-                                @post="onSaveReasonSelected"
-                                @value-changed="onReasonChanged"
-                            ></dynamic-input>
-                        </form>
-                    </template>
-
                     <template v-if="award.badge.curriculumNodes.length">
-                        <hr />
                         <p class="meta">
                             Curriculum Codes:
                             <codes-list
@@ -384,12 +313,40 @@ export default {
                             />
                         </p>
                     </template>
-
+                    <article v-if="award.badge.body" v-html="award.badge.body"></article>
                     <div class="component-action">
                         <section>
-                            <a v-if="award._links.goalAward && award.isGoal && !award.award"
-                            class="button"
-                            @click.prevent="awardAchievement" @keyup.enter="awardAchievement">Award Achievement</a>
+                            <template v-if="award._links.goalAward && award.isGoal && !award.award">
+                                <a
+                                    title="Award with evidence"
+                                    class="button"
+                                    :href="getEvidenceUrl(award.badge.id)"
+                                >
+                                    Award with Evidence
+                                </a>
+                                <button
+                                    @click.prevent="awardAchievement"
+                                    @keyup.enter="awardAchievement"
+                                >
+                                    Award
+                                </button>
+                            </template>
+                            <a
+                                v-else-if="award.reason && award.reason.length"
+                                title="View evidence"
+                                class="button"
+                                :href="`/learning/badge/award/${award.id}/viewEvidence`+getReturnUrl()"
+                            >
+                                View Evidence
+                            </a>
+                            <a
+                                v-else-if="award._links.awardUpdate"
+                                title="Add evidence"
+                                class="button"
+                                :href="`/learning/badge/award/${award.id}/update`+getReturnUrl()"
+                            >
+                                Add Evidence
+                            </a>
                         </section>
                     </div>
                 </div>

@@ -6,7 +6,7 @@ export default {
      * The name of the component that we have here. This name will be used in the container
      * to spawn this component.
      */
-    name: "user-list",
+    name: "badge-image",
 
     /**
      * Mixins.
@@ -93,8 +93,8 @@ export default {
 <style lang="scss" scoped>
 
 .selected-badge-image { //shrink down the image, used by #badge-list-form
-    width: 30px;
     height: auto;
+    width: 30px;
 }
 
 </style>
