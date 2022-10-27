@@ -8,13 +8,17 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Achievement Evidence</h1>
-        <p class="meta">Achievement awarded by
-            {% if awardedByRoute %}
-                <a href="{{ awardedByRoute }}">{{ award.awardedBy.fullname }}</a>
-            {% else %}
-                {{ award.awardedBy.fullname }}
-            {% endif %}
-        </p>
+        <ul class="meta">
+            <li class="icon-folder">Category: {{ award.badge.category.name }}</li>
+            <li class="icon-achievement">Awarded
+                <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time> by
+                {% if awardedByRoute %}
+                    <a href="{{ awardedByRoute }}">{{ award.awardedBy.fullname }}</a>
+                {% else %}
+                    {{ award.awardedBy.fullname }}
+                {% endif %}
+            </li>
+        </ul>
     </div>
 </div>
 {% include '@learningBadgeAward/awardBadgeList.twig' %}
@@ -27,10 +31,10 @@
                 </div>
             </div>
             {% if modifyRoute or deleteRoute %}
-            <nav>
-                {% if modifyRoute %}<a href="{{ modifyRoute }}" class="icon-modify" title="Modify"></a>{% endif %}
-                <a href="" class="icon-delete" title="Delete"></a>
-            </nav>
+                <nav>
+                    {% if modifyRoute %}<a href="{{ modifyRoute }}" class="icon-modify" title="Modify"></a>{% endif %}
+                    <a href="" class="icon-delete" title="Delete"></a>
+                </nav>
             {% endif %}
         </div>
         <section>

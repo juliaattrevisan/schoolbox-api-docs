@@ -738,10 +738,13 @@ class Controller extends Base
      */
     public function getAwardUpdate(AwardModel $award): void
     {
+        $badges          = $this->badgeMapper->createCollection()->add($award->getBadge());
+        $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardUpdate.twig',
                 [
+                    'badges' => $badges->map($badgeTranslator),
                     'award' => $award
                 ],
                 'Edit award'

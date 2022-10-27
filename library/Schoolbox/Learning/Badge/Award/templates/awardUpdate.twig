@@ -19,55 +19,45 @@
         });
     });
 </script>
-
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ award.recipient.fullname, routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id}) ],
+    ['Achievement Evidence']
+) }}
+{% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
 <div class="row">
     <div class="small-12 columns">
-        <h1>{{ award.badge.name }}</h1>
-
+        <h1>Achievement Evidence</h1>
         <ul class="meta">
-            {% set recipientProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id}) %}
-            {% set awarderProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
-
-            <li class="icon-staff-students"><a href="{{ recipientProfileRoute }}">{{ award.recipient.fullname }}</a></li>
-            <li class="icon-view">Category: {{ award.badge.category.name }}</li>
-            <li class="icon-view">Awarded {{ award.awardedAt.relativeTime }} by
-                <a href="{{ awarderProfileRoute }}">{{ award.awardedBy.fullname }}</a>
+            <li class="icon-folder">Category: {{ award.badge.category.name }}</li>
+            <li class="icon-achievement">Awarded
+                <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time> by
+                {% if awardedByRoute %}
+                    <a href="{{ awardedByRoute }}">{{ award.awardedBy.fullname }}</a>
+                {% else %}
+                    {{ award.awardedBy.fullname }}
+                {% endif %}
             </li>
         </ul>
     </div>
 </div>
-
+{% include '@learningBadgeAward/awardBadgeList.twig' %}
 <div class="row">
     <div class="small-12 island">
-        <section class="content">
-            {# One of these visual representations was chosen
-             # Visual representation was mandatory in Badge Create
-             #}
-            <div class="badge-img-container content">
-                {% if award.badge.icon %}
-                    <img src=" {{ CDN_PREFIX }}{{ award.badge.icon }}" class="badge-image" alt="{{ award.badge.name }}" title="{{ award.badge.name }}" />
-                {% elseif award.badge.image.hash %}
-                    <img src="/storage/image.php?hash={{ award.badge.image.hash }}" class="badge-image" alt="{{ award.badge.name }}" title="{{ award.badge.name }}" />
-                {% endif %}
+        <div class="actions-small-2 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Evidence</h2>
+                </div>
             </div>
-
-            <article>{{ award.badge.body|purify }}</article>
-        </section>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
+        </div>
         {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
-
         <form action="{{ postRoute }}" method="post">
             <section>
                 <fieldset>
-                    <label>Reason</label>
                     <textarea id="reason" name="reason">{{ award.reason }}</textarea>
                 </fieldset>
             </section>
-
             <input type="submit" value="Save" />
         </form>
     </div>
