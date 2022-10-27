@@ -239,34 +239,6 @@
         }
 
         /**
-         * Apply the Player Filter setting to all the folks
-         * in the division player list
-         */
-        function applyDivisionPlayerFilter() {
-            let divisionPlayerList = $('[data-division-player-list]');
-
-            switch (parseInt($('#player-filter').val())) {
-                // Hide everyone, show unassigned
-                case 1:
-                    divisionPlayerList.find('[data-player]').hide();
-                    divisionPlayerList.find('[data-assigned=0]').show();
-                    break;
-
-                // Hide everyone, show assigned
-                case 2:
-                    divisionPlayerList.find('[data-player]').hide();
-                    divisionPlayerList.find('[data-assigned=1]').show();
-                    break;
-
-                // Show everyone
-                case 0:
-                default:
-                    divisionPlayerList.find('[data-player]').show();
-                    break;
-            }
-        }
-
-        /**
          * Add click handlers to the buttons on each division player (within the 3-dot menu).
          */
         function addClickHandlersToDivisionPlayerButtons() {
@@ -420,6 +392,34 @@
             teamContainer.find('[data-team-player-list]').html(newHtml);
             teamContainer.find('[data-player-count]').text(teamContainer.find('[data-player]').length);
             addClickHandlersToTeamPlayerButtons(); // Attach click handlers to new HTML elements (note players may have been added or removed).
+        }
+
+        /**
+         * Apply the Player Filter setting to all the folks
+         * in the division player list
+         */
+        function applyDivisionPlayerFilter() {
+            let divisionPlayerList = $('[data-division-player-list]');
+
+            switch (parseInt($('#player-filter').val())) {
+                // Hide everyone, show unassigned
+                case 1:
+                    divisionPlayerList.find('[data-player]').hide();
+                    divisionPlayerList.find('[data-assigned=0]').show();
+                    break;
+
+                // Hide everyone, show assigned
+                case 2:
+                    divisionPlayerList.find('[data-player]').hide();
+                    divisionPlayerList.find('[data-assigned=1]').show();
+                    break;
+
+                // Show everyone
+                case 0:
+                default:
+                    divisionPlayerList.find('[data-player]').show();
+                    break;
+            }
         }
 
         /**
