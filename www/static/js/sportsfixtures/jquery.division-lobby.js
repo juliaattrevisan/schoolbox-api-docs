@@ -138,8 +138,18 @@
                             console.log('remove a player from team ' + fromId);
                         }
 
-                        // Unique case: remove the clone from the division list
-                        $('[data-division-player-list]').find(player).remove();
+                        // The division players list always contains all players.  Therefore, when we drop a player into
+                        // the division players list, we now have two players in the list with the same ID.  The player
+                        // we just dropped is in the desired sequence, but this just dropped player has slightly different
+                        // HTML compared to the player native to the division players list.  So we must move the native
+                        // player into the position of the just-dropped player, and get rid of the just-dropped player.
+                        // We do this in three steps:
+                        //  1. Find HTML element of the pre-existing matching hidden player.
+                        //  2. Replace the just-dropped player element with the hidden player.
+                        //  3. Reveal the hidden player.
+                        let hiddenPlayer = $('[data-division-player-list]').find('[data-player=' + player.attr('data-player') + ']:hidden');
+                        player.replaceWith(hiddenPlayer);
+                        hiddenPlayer.show();
 
                         fromFeedback.toastActivate({text: 'Removing from team...'});
 
