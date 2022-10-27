@@ -36,7 +36,7 @@ const nodeModalEl = ref(null);
  * @returns { boolean }
  */
 const isSingleBadge = computed(() => {
-    return Object.values(props.badges).length;
+    return Object.values(props.badges).length == 1;
 });
 
 /**
