@@ -27,27 +27,27 @@
         <div class="actions-small-2 row">
             <div class="list-item">
                 <div class="small-12 columns">
-                    <h2 class="subheader"><label for="reason"></label>Evidence</h2>
+                    <h2 class="subheader">Evidence</h2>
                 </div>
             </div>
         </div>
         {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardWithEvidence') ~ '?returnUrl=' ~ returnUrl %}
         <form action="{{ postRoute }}" method="post">
-            <section class="content">
-                <input type="hidden" name="targetUserIds" value="{{ targetUserIds }}">
-                <input type="hidden" name="badgeIds" value="{{ badgeIds }}">
-                <section>
-                    <fieldset>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="targetUserIds" value="{{ targetUserIds }}">
+                        <input type="hidden" name="badgeIds" value="{{ badgeIds }}">
                         <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
                         <textarea id="reason" name="reason"></textarea>
-                    </fieldset>
-                </section>
+                    </div>
+                </fieldset>
             </section>
             <div class="row">
                 <div class="small-12 columns">
                     <ul class="flex-list buttons">
                         <li><a href="{{ cancelUrl }}" class="button">Cancel</a></li>
-                        <li><input type="submit" value="Award"/></li>
+                        <li><input type="submit" value="Save" /></li>
                     </ul>
                 </div>
             </div>

@@ -34,15 +34,21 @@
         {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
         <form action="{{ postRoute ~ '?returnUrl=' ~ returnUrl }}" method="post">
             <section>
-                <fieldset>
-                    <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
-                    <textarea id="reason" name="reason">{{ award.reason }}</textarea>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
+                        <textarea id="reason" name="reason">{{ award.reason }}</textarea>
+                    </div>
                 </fieldset>
             </section>
-            <ul class="flex-list buttons">
-                <li><a href="{{ cancelUrl }}" class="button">Cancel</a></li>
-                <li><input type="submit" value="Save" /></li>
-            </ul>
+            <div class="row">
+                <div class="small-12 columns">
+                    <ul class="flex-list buttons">
+                        <li><a href="{{ cancelUrl }}" class="button">Cancel</a></li>
+                        <li><input type="submit" value="Save" /></li>
+                    </ul>
+                </div>
+            </div>
         </form>
     </div>
 </div>

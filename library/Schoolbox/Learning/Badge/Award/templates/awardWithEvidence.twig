@@ -11,7 +11,7 @@
         $('[data-delete-evidence]').click(function (e) {
             e.preventDefault();
             $(this).confirmDialog({
-                text: 'Are you sure you want to remove evidence from this achievement?',
+                text: 'Are you sure you want to delete the evidence from this achievement?',
                 confirmEvent: function () {
                     $.post('{{ postRoute }}', {
                         reason: ''
@@ -49,23 +49,31 @@
                 </div>
             </div>
             {% if modifyRoute or postRoute %}
-                <nav>
-                    {% if modifyRoute %}<a href="{{ modifyRoute ~ '?returnUrl=' ~ returnUrl }}" class="icon-modify" title="Modify"></a>{% endif %}
-                    {% if postRoute and award.reason is not empty %}<a class="icon-delete" title="Delete" data-delete-evidence></a>{% endif %}
-                </nav>
+            <nav>
+                {% if modifyRoute %}<a href="{{ modifyRoute ~ '?returnUrl=' ~ returnUrl }}" class="icon-modify" title="Modify"></a>{% endif %}
+                {% if postRoute and award.reason is not empty %}<a class="icon-delete" title="Delete" data-delete-evidence></a>{% endif %}
+            </nav>
             {% endif %}
         </div>
         {% if award.reason is empty %}
-            <div class="empty-state">
-                There's no evidence added to this award.
-            </div>
+        <div class="empty-state">
+            There's no evidence added to this award.
+        </div>
         {% else %}
         <section>
-            <fieldset>
-                <div>{{ award.reason|purify }}
+            <fieldset class="content">
+                <div class="small-12 columns">
+                    {{ award.reason|purify }}
                 </div>
             </fieldset>
         </section>
         {% endif %}
+        <div class="row">
+            <div class="small-12 columns">
+                <ul class="flex-list buttons">
+                    <li><a href="#" class="button">Return to previous page</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
