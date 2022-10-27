@@ -474,5 +474,4 @@ class Family
 
         return $person;
     }
-
 }
