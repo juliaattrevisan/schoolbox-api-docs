@@ -749,7 +749,7 @@ class External_Liss_Server
     public function publishDailyData(Request $message): Response
     {
         $configLoader = $this->config;
-        $helper = new PublishDailyDataHelper($configLoader);
+        $helper = new PublishDailyDataHelper();
         $eventMapper = EventMapper::getInstance();
         $eventTypeMapper = EventTypeMapper::getInstance();
         $folderMapper = FolderMapper::getInstance();

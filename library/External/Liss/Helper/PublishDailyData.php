@@ -16,7 +16,6 @@ use Event\Source\Model as EventSource;
 use Event\Source\Mapper as EventSourceMapper;
 use PhpXmlRpc\Value;
 use Schoolbox\Calendar\Event;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 
 class PublishDailyData
@@ -26,19 +25,6 @@ class PublishDailyData
      */
     const EVENT_SOURCE_NAME = 'liss';
 
-    /**
-     * @var IConfigLoader
-     */
-    private $configLoader;
-
-    /**
-     * Helper constructor.
-     * @param IConfigLoader $configLoader
-     */
-    public function __construct(IConfigLoader $configLoader)
-    {
-        $this->configLoader = $configLoader;
-    }
 
     /**
      * Remove all events using this source
