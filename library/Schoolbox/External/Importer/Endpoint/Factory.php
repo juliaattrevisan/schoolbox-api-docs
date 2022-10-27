@@ -143,12 +143,12 @@ class Factory implements IFactory
                     StorageMapper::getInstance(),
                     /* Timetable pieces
                      */
-                    UserMapper::getInstance(),
-                    TimetableCycleMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper::getInstance(),
                     ClassEntryMapper::getInstance(),
                     ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance()
+                    ClassPeriodMapper::getInstance(),
+                    TimetablePeriodMapper::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()
                 ))->produce();
 
             /* We never reach out to kamar so we technically don't need the $file option

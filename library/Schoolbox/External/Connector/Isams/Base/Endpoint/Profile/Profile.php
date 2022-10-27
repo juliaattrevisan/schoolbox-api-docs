@@ -15,6 +15,7 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Common\Campus;
@@ -243,7 +244,10 @@ class Profile implements IStrategy
              *
              * Disgusting.
              */
-            $firstnamePreferred = trim((string)$student->Preferredname);
+            $firstnamePreferred = (new FirstMeaningfulValue())->find([
+                trim((string)$student->Preferredname),
+                $firstname
+            ]);
 
             $form = trim((string)$student->Form);
             $lastname = trim((string)$student->Surname);
@@ -971,7 +975,10 @@ class Profile implements IStrategy
              *
              * Disgusting.
              */
-            $firstnamePreferred = trim((string)$staff->PreferredName);
+            $firstnamePreferred = (new FirstMeaningfulValue())->find([
+                trim((string)$staff->PreferredName),
+                $firstname
+            ]);
 
             $lastname = trim((string)$staff->Surname);
             $personId = trim((string)$staff->xpath('@PersonId')[0]);

@@ -36,6 +36,13 @@ use UnexpectedValueException;
 class Factory
 {
     /**
+     * Event source is an arbitrary string that helps identify the thing that imported
+     * them into the local event table so you can do a mass remove if needed
+     */
+    public const SOURCE_NAME = 'suds_isams';
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -116,21 +123,9 @@ class Factory
 
 
     /**
-     * @var UserMapper
+     * @var \Schoolbox\External\Event\Mapper
      */
-    private UserMapper $userMapper;
-
-
-    /**
-     * @var TimetableCycleMapper
-     */
-    private TimetableCycleMapper $timetableCycleMapper;
-
-
-    /**
-     * @var TimetablePeriodMapper
-     */
-    private TimetablePeriodMapper $timetablePeriodMapper;
+    private \Schoolbox\External\Event\Mapper $eventMapper;
 
 
     /**
@@ -152,27 +147,39 @@ class Factory
 
 
     /**
+     * @var TimetablePeriodMapper
+     */
+    private TimetablePeriodMapper $periodMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Overrides\Mapper
+     */
+    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
+
+
+    /**
      * Factory constructor.
      *
-     * @param LoggerInterface                 $log
-     * @param bool                            $perform
-     * @param string                          $host
-     * @param string                          $key
-     * @param string                          $zipDir
-     * @param bool                            $includePhoto
-     * @param string|null                     $file
-     * @param Mapper                          $baseProfileMapper
-     * @param UserProfile\Student\Mapper      $studentProfileMapper
-     * @param UserProfile\Parent\Mapper       $parentProfileMapper
-     * @param UserProfile\Staff\Mapper        $staffProfileMapper
-     * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param StorageMapper                   $storageMapper
-     * @param UserMapper                      $userMapper
-     * @param TimetableCycleMapper            $timetableCycleMapper
-     * @param TimetablePeriodMapper           $timetablePeriodMapper
-     * @param ClassEntryMapper                $classEntryMapper
-     * @param ClassInvolvementMapper          $classInvolvementMapper
-     * @param ClassPeriodMapper               $classPeriodMapper
+     * @param LoggerInterface                            $log
+     * @param bool                                       $perform
+     * @param string                                     $host
+     * @param string                                     $key
+     * @param string                                     $zipDir
+     * @param bool                                       $includePhoto
+     * @param string|null                                $file
+     * @param Mapper                                     $baseProfileMapper
+     * @param UserProfile\Student\Mapper                 $studentProfileMapper
+     * @param UserProfile\Parent\Mapper                  $parentProfileMapper
+     * @param UserProfile\Staff\Mapper                   $staffProfileMapper
+     * @param UserProfile\Relationship\Mapper            $relationshipMapper
+     * @param StorageMapper                              $storageMapper
+     * @param \Schoolbox\External\Event\Mapper           $eventMapper
+     * @param ClassEntryMapper                           $classEntryMapper
+     * @param ClassInvolvementMapper                     $classInvolvementMapper
+     * @param ClassPeriodMapper                          $classPeriodMapper
+     * @param TimetablePeriodMapper                      $periodMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -190,12 +197,12 @@ class Factory
         UserProfile\Relationship\Mapper $relationshipMapper,
         StorageMapper $storageMapper,
         /* Timetable pieces */
-        UserMapper $userMapper,
-        TimetableCycleMapper $timetableCycleMapper,
-        TimetablePeriodMapper $timetablePeriodMapper,
+        \Schoolbox\External\Event\Mapper $eventMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper
+        ClassPeriodMapper $classPeriodMapper,
+        TimetablePeriodMapper $periodMapper,
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -216,12 +223,12 @@ class Factory
 
         /* Timetable pieces
          */
-        $this->userMapper = $userMapper;
-        $this->timetableCycleMapper = $timetableCycleMapper;
-        $this->timetablePeriodMapper = $timetablePeriodMapper;
+        $this->eventMapper = $eventMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
+        $this->periodMapper = $periodMapper;
+        $this->overridesMapper = $overridesMapper;
     }
 
 
@@ -251,11 +258,6 @@ class Factory
                 DSN::MODULE_BATCHXML => new Batchxml(new Api($this->host, $this->key, DSN::MODULE_BATCHXML)),
             ];
         }
-
-        /* Cache a list of known users and periods
-         * Every student timetable processing uses info stored there
-         */
-        $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
 
         /* This lets you shank down zip files containing everyone's profile pictures
          */
@@ -297,35 +299,30 @@ class Factory
                 $this->relationshipMapper,
                 $photoDownloader
             ))
-            ->add(new Timetable\Prepare(
+            ->add(new TimetableCalendar\Prepare(
                 $this->log,
                 $this->perform,
-                $this->timetablePeriodMapper,
+                $this->eventMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
-                $this->classPeriodMapper
+                $this->classPeriodMapper,
+                $this->periodMapper,
+                $this->overridesMapper,
+                self::SOURCE_NAME
             ))
-            ->add(new Timetable\Identifier(
-                $this->log,
-                $this->perform,
-                $api
-            ))
-            ->add(new Timetable\Definition(
+            ->add(new TimetableCalendar\Classes(
                 $this->log,
                 $this->perform,
                 $api,
-                $this->timetableCycleMapper,
-                $this->timetablePeriodMapper
-            ))
-            ->add(new Timetable\Classes(
-                $this->log,
-                $this->perform,
-                $api,
-                $lookup,
+                $this->eventMapper,
+                $this->overridesMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
-                $this->classPeriodMapper
             ))
-            ;
+            ->add(new TimetableCalendar\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->eventMapper
+            ));
     }
 }

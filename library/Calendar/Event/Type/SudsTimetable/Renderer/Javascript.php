@@ -48,9 +48,16 @@ class Javascript extends Base
         $titlePart = '';
 
         if ('' !== $this->event->getTitle() && '' !== $this->event->getCode()) {
-            /* Have both pieces; concat them nicely
-             */
-            $titlePart = "{$this->event->getTitle()} ({$this->event->getCode()})";
+            if ($this->event->getTitle() === $this->event->getCode()) {
+                /* Have both pieces, but they say the same thing
+                 * Avoid repeating ourselves
+                 */
+                $titlePart = $this->event->getTitle();
+            } else {
+                /* Have both pieces; concat them nicely
+                 */
+                $titlePart = "{$this->event->getTitle()} ({$this->event->getCode()})";
+            }
         } elseif ('' === $this->event->getTitle() && '' !== $this->event->getCode()) {
             /* Just have the code, but not a nice name
              */
