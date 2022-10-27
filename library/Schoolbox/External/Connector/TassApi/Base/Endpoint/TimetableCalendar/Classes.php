@@ -18,7 +18,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
-use Schoolbox\External\Event\Overrides\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
 
@@ -46,6 +45,17 @@ class Classes implements IStrategy
      * just "in the past"
      */
     private const PAST_THRESHOLD = 30;
+
+
+    /**
+     * Timetable involvements are processed *mostly* synonymously
+     *
+     * The only difference is staff get overrides to decide who's teaching
+     * an instance of a class. We use these consts to decide when that happens.
+     * The numeric values have no ulterior meaning beyond this usage.
+     */
+    private const STUDENT = 0;
+    private const STAFF = 1;
 
 
     /**
@@ -147,14 +157,15 @@ class Classes implements IStrategy
     private array $watchlist;
 
 
-//    /**
-//     * A caching mechanism to prevent dupe CLEAR overrides actions
-//     *
-//     * $overridesEntries[$classCode][$startDate][$finishDate] = true
-//     *
-//     * @var array
-//     */
-//    private array $overridesEntries = [];
+    /**
+     * A caching mechanism to prevent dupe CLEAR overrides actions
+     *
+     * $overridesEntries[$classCode][$startDate][$finishDate] = true
+     *
+     * @var array
+     */
+    private array $overridesEntries = [];
+
 
     /**
      * Constructor
@@ -266,7 +277,7 @@ class Classes implements IStrategy
 //                    continue;
 //                }
 
-                $this->process($person, $timetable, false);
+                $this->process(self::STUDENT, $person, $timetable);
             }
 
             /* Example $timetable extract
@@ -422,7 +433,7 @@ class Classes implements IStrategy
 //                    continue;
 //                }
 
-                $this->process($person, $timetable, true);
+                $this->process(self::STAFF, $person, $timetable);
             }
             /* Example $timetable extract
 
@@ -503,20 +514,16 @@ class Classes implements IStrategy
      * Create individual SUDS Timetable events out of each element
      * inside this person's $timetable
      *
-     * $deconflictAll treats every class in this timetable as one that needs
-     * a specific set of participating people - yard duties, shared classes,
-     * etc. all need deconflicting
-     *
+     * @param int   $roleType
      * @param array $person
      * @param array $timetable
-     * @param bool  $deconflictAll
      * @return void
+     * @throws Exception
      * @throws \InvalidArgumentException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function process(array $person, array $timetable, bool $deconflictAll): void
+    private function process(int $roleType, array $person, array $timetable): void
     {
         $now = \Alaress_Date_Format::now();
 
@@ -719,114 +726,21 @@ class Classes implements IStrategy
                      */
                     $classEntry = $this->createClassEntry($event);
 
-                    /* Decide how involved humans are saved
+                    /* Create a new involvement for this event if one doesn't already exist
+                     * (This superpositions on top of Additional Subjects)
+                     *
+                     * Everyone is always involved
                      */
-                    if ($deconflictAll) {
-                        /* FIXME SPECULATIVE PROGRAMMING
-                         *
-                         * If this event is a Duty (identified by room code DUT)
-                         * and we haven't set up Overrides yet,
-                         *     - add a CLEAR override action
-                         *     - add an ADD override action for this (eventId, externalId) combo
-                         *     - remember that we did this
-                         *
-                         * if we have already set up a CLEAR override action,
-                         *     - create a new ADD override and put $externalId in
-                         */
-                        $this->deconflict($person, $event);
-                    } else {
-                        /* Create a new involvement for this event if one doesn't already exist
-                         * (This superpositions on top of Additional Subjects)
-                         */
-                        $this->saveInvolvement($event, $classEntry, $name, $person['external_id']);
+                    $this->saveRegularInvolvement($event, $classEntry, $name, $person['external_id']);
+
+                    /* Teachers get a special override so different teachers can be conducting
+                     * the class instead of the usual guy defined by saveRegularInvolvement
+                     */
+                    if (self::STAFF === $roleType) {
+                        $this->saveStaffInvolvement($event, $classEntry, $name, $person['external_id']);
                     }
                 }
             }
-        }
-    }
-
-
-//    /**
-//     * FIXME SPECULATIVE PROGRAMMING
-//     *
-//     * Decide if $event is one of those communal Duty events
-//     * Clear everyone's involvement then add specific people for a given date
-//     *
-//     * @param array $subject
-//     * @param array $classIdentifiers
-//     * @return bool
-//     */
-//    private function isDuty(array $subject, array $classIdentifiers): bool
-//    {
-//        /* No identifiers? No trabajo
-//         */
-//        if (!\count($classIdentifiers)) {
-//            return false;
-//        }
-//
-//        /* Otherwise, check if the current class identifier is requires special treatment
-//         */
-//        return \in_array(trim((string)$subject['CLASS']), $classIdentifiers, true);
-//    }
-
-
-    /**
-     * FIXME SPECULATIVE PROGRAMMING
-     *
-     * For each duty, clear everyone's calculated involvement
-     * and only add the guys specific to this $event
-     *
-     * @param array                           $person
-     * @param \Schoolbox\External\Event\Model $event
-     * @return void
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     */
-    private function deconflict(array $person, \Schoolbox\External\Event\Model $event): void
-    {
-//        $classCode = $event->getCode();
-//        $startAt = $event->getStartAt()->getDatabase();
-//        $finishAt = $event->getFinishAt()->getDatabase();
-
-        $this->log->debug(sprintf(
-            'Establishing overrides for %s in %s',
-            $person['external_id'],
-            $event->getTitle()
-        ));
-
-//        /* Set up a CLEAR action, with a hardcoded sequence 1
-//         * This must always happen first
-//         */
-//        if (!isset($this->overridesEntries[$classCode][$startAt][$finishAt])) {
-//            $this->log->debug('Setting up CLEAR override');
-//
-//            $overrideClear = $this->overridesMapper->createModel()
-//                ->setEventId($event->getId())
-//                ->setExternalId(null)
-//                ->setAction(Model::CLEAR)
-//                ->setSequence(1);
-//
-//            if ($this->perform) {
-//                $this->overridesMapper->save($overrideClear);
-//            }
-//
-//            /* Remember we did this
-//             */
-//            $this->overridesEntries[$classCode][$startAt][$finishAt] = true;
-//        }
-
-        /* Add a guy (doesn't matter what ordering these happen;
-         * just hardcode it to 2 for now)
-         */
-        $overrideAdd = $this->overridesMapper->createModel()
-            ->setEventId($event->getId())
-            ->setExternalId($person['external_id'])
-            ->setAction(Model::ADD)
-            ->setSequence(2);
-
-        if ($this->perform) {
-            $this->overridesMapper->save($overrideAdd);
         }
     }
 
@@ -865,6 +779,79 @@ class Classes implements IStrategy
 
 
     /**
+     * Save staff involvement as an override, which allows each class
+     * to have different teachers depending on their associated sis_event
+     *
+     * @param \Schoolbox\External\Event\Model $event
+     * @param ClassEntry                      $classEntry
+     * @param string                          $name
+     * @param string                          $externalId
+     * @return void
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function saveStaffInvolvement(
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry,
+        string $name,
+        string $externalId
+    ): void {
+        /* If we haven't already CLEAR_STAFF'd this event instance, do so
+         * Then proceed to add the guy
+         */
+        if (!isset($this->overridesEntries[$event->getCode()][$event->getStartAt()->getDatabase()][$event->getFinishAt()->getDatabase()])) {
+            /* Clear all other staff out first
+             *
+             * For specific teaching, execute CLEAR_STAFF to disregard the usual guy
+             * and add the guy teaching this particular instance (even though they
+             * might end up being the same person sometimes)
+             */
+            $clearOverride = $this->overridesMapper->createModel()
+                ->setEventId($event->getId())
+                ->setExternalId(null)
+                ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
+                ->setSequence(1);
+
+            if ($this->perform) {
+                $this->overridesMapper->save($clearOverride);
+            }
+
+            /* Remember we did this
+             */
+            $this->overridesEntries[$event->getCode()][$event->getStartAt()->getDatabase()][$event->getFinishAt()->getDatabase()] = true;
+        }
+
+        /* We use the Overrides system to specify a particular person's involvement
+         * in a particular sis_event instance, rather than being associated with all
+         */
+        $this->log->debug(sprintf(
+            'Creating new override involvements for %s (%s) in timetable event %s - %s, %s, %s-%s',
+            $name,
+            $externalId,
+            $event->getTitle(),
+            $event->getDay(),
+            $event->getPeriod(),
+            $event->getStartAt()->getDatabase(),
+            $event->getFinishAt()->getDatabase()
+        ));
+
+        /* It doesn't actually matter that these are all sequence 2
+         * The only thing that matters is that it follows after CLEAR_STAFF
+         */
+        $involvementOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId($externalId)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
+            ->setSequence(2);
+
+        if ($this->perform) {
+            $this->overridesMapper->save($involvementOverride);
+        }
+    }
+
+
+    /**
      * Save an involvement for user $externalId, whose name is $name,
      * for the sis_event $event
      *
@@ -873,11 +860,11 @@ class Classes implements IStrategy
      * @param string                          $name
      * @param string                          $externalId
      * @return void
+     * @throws Exception
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function saveInvolvement(
+    private function saveRegularInvolvement(
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry,
         string $name,
@@ -885,7 +872,7 @@ class Classes implements IStrategy
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
             $this->log->debug(sprintf(
-                'Reusing previous class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                'Reusing previous regular class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
                 $name,
                 $externalId,
                 $event->getTitle(),
@@ -895,33 +882,49 @@ class Classes implements IStrategy
                 $event->getFinishAt()->getDatabase()
             ));
         } else {
+            /* This may have already spawned by AdditionalSubjects strat
+             * From here, we won't have any knowledge of what happened over there
+             */
             try {
                 $classInvolvement = $this->classInvolvementMapper->findOneByColumnList([
-                    'class_id' => $classEntry->getId(),
-                    'external_id' => $externalId
+                    'external_id' => $externalId,
+                    'class_id' => $classEntry->getId()
                 ]);
+
+                $this->log->debug(sprintf(
+                    'Reusing previous regular class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                    $name,
+                    $externalId,
+                    $event->getTitle(),
+                    $event->getDay(),
+                    $event->getPeriod(),
+                    $event->getStartAt()->getDatabase(),
+                    $event->getFinishAt()->getDatabase()
+                ));
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $classInvolvement = $this->classInvolvementMapper->createModel()
                     ->setClass($classEntry)
                     ->setExternalId($externalId);
+
+                $this->log->debug(sprintf(
+                    'Creating new regular class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                    $name,
+                    $externalId,
+                    $event->getTitle(),
+                    $event->getDay(),
+                    $event->getPeriod(),
+                    $event->getStartAt()->getDatabase(),
+                    $event->getFinishAt()->getDatabase()
+                ));
+
+                if ($this->perform) {
+                    $this->classInvolvementMapper->save($classInvolvement);
+                }
             }
 
-            if ($this->perform) {
-                $this->classInvolvementMapper->save($classInvolvement);
-            }
-
+            /* Remember we did this
+             */
             $this->classInvolvements[$classEntry->getId()][$externalId] = true;
-
-            $this->log->debug(sprintf(
-                'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
-                $name,
-                $externalId,
-                $event->getTitle(),
-                $event->getDay(),
-                $event->getPeriod(),
-                $event->getStartAt()->getDatabase(),
-                $event->getFinishAt()->getDatabase()
-            ));
         }
     }
 
