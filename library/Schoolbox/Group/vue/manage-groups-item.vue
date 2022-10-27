@@ -349,34 +349,22 @@ export default {
                     </a>
                     <transition name="slide">
                         <div class="group-actions">
-                            <button v-if="isEnrolled && !(isPrivate || isAdmin)"
-                                    title="Leave Group"
-                                    class="group-action icon-logout"
-                                    @click="leave"
-                            >
-                                Leave
-                            </button>
-                            <button v-else-if="isMembershipPending && !(isPrivate || isAdmin)"
-                                    title="Cancel membership request"
-                                    class="group-action icon-logout"
-                                    @click="leave"
-                            >
-                                Cancel membership request
-                            </button>
-                            <button v-else-if="!isEnrolled && isRequestToJoin && !(isPrivate || isAdmin)"
-                                title="Request to join"
-                                class="group-action icon-add"
-                                @click="join"
-                                >
-                                Request to join
-                            </button>
-                            <button v-else-if="!(isPrivate || isAdmin)"
-                                    title="Join"
+                            <template v-if="!isEnrolled && !isMembershipPending">
+                                <button v-if="!isRequestToJoin && !(isPrivate || isAdmin)"
+                                    title="Request to join"
                                     class="group-action icon-add"
                                     @click="join"
-                            >
-                                Join
-                            </button>
+                                    >
+                                    Request to join
+                                </button>
+                                <button v-else-if="!(isPrivate || isAdmin)"
+                                        title="Join"
+                                        class="group-action icon-add"
+                                        @click="join"
+                                >
+                                    Join
+                                </button>
+                            </template>
                             <button
                                 v-if="isEnrolled || isPrivate"
                                 title="Toggle Favourites"
@@ -409,7 +397,7 @@ export default {
                     <div class="list-item">
                         <h3><a :href="`/homepage/${group.id}`" :title="`Visit ${group.name}`">{{ group.name }}</a></h3>
                     </div>
-                    <template v-if="group.isAccessWrite || group.isAccessAdmin">
+                    <template v-if="group.isAccessWrite || group.isAccessAdmin || ((isMembershipPending || isEnrolled) && !isPrivate)">
                         <nav>
                             <a href="#view-actions" class="icon-more" :data-dropdown="`class-options${ group.id }`" aria-expanded="false" title="View actions"></a>
                         </nav>
@@ -422,6 +410,12 @@ export default {
                             </li>
                             <li v-if="group.isAccessAdmin">
                                 <a :href="`/group/modify/${group.id}`" class="icon-group" title="Manage Group">Manage Group</a>
+                            </li>
+                            <li v-if="isEnrolled">
+                                <a href="#" class="icon-logout" @click="leave" title="Leave Group">Leave</a>
+                            </li>
+                            <li v-else-if="isMembershipPending">
+                                <a href="#" class="icon-logout" @click="leave" title="Cancel membership request">Cancel membership request</a>
                             </li>
                         </ul>
                     </template>
