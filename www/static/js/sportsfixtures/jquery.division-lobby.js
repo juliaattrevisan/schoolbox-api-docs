@@ -54,7 +54,7 @@
                 element: element,
 
                 // Show console.log output or not.
-                debugging: true
+                debugging: false
             };
 
             let derived = {
