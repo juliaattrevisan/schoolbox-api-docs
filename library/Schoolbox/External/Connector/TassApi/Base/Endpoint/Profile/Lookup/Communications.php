@@ -24,7 +24,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
  */
 class Communications
 {
-
     /**
      * $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
      *
