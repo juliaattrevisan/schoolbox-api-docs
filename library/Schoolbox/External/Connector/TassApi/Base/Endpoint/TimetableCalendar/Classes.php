@@ -640,7 +640,7 @@ class Classes implements IStrategy
                     $day = "Day {$dayNumber}";
                     $room = trim((string)$subject['ROOM_CODE']);
                     $classCode = (new Code())->encode($yearGroup, (string)$subject['SUB_CODE'], (string)$subject['CLASS']);
-                    $period = $periodData['PRD_DESC'];
+                    $period = trim((string)$periodData['PRD_DESC']);
                     $type = '';
                     $guid = '';
 
