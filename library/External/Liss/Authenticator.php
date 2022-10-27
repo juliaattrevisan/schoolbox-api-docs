@@ -13,7 +13,6 @@ use Schoolbox\IConfigLoader;
  */
 class External_Liss_Authenticator
 {
-
     /**
      * An object containing username/password sent to us
      *
