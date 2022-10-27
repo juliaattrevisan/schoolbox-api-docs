@@ -204,14 +204,25 @@ class Controller extends AbstractController
      */
     public function postAddPlayers(Team $team)
     {
+        $teamPlayerMapper = $this->getTeamPlayerMapper();
+
         $teamUsers = [];
         foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
+            if (count($teamPlayerMapper->findByColumn('user_id', $user->getId())) > 0) {
+                // The user already belongs to this team, so skip.
+                continue;
+            }
+
             $teamUsers[] = $this->getTeamPlayerMapper()->createModel()
                 ->setTeam($team)
                 ->setUser($user)
                 ->setSequence(0);
         }
-        $this->getTeamPlayerMapper()->save($teamUsers);
+
+        if (count($teamUsers) > 0) {
+            $teamPlayerMapper->save($teamUsers);
+        }
+
         $this->renderPostAddPlayersResponse($team);
     }
 
