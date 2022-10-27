@@ -35,13 +35,6 @@ class External_Liss_Authenticator
     private $password = 'alaress';
 
     /**
-     * School code
-     *
-     * @var string
-     */
-    private $schoolCode = 'EDVALHIGH';
-
-    /**
      * Log location
      * @var Logger $log
      */
