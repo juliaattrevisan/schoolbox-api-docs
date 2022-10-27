@@ -1,24 +1,5 @@
 <script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
-<script>
-    $(function () {
-        $.fn.alaressEditor({
-            targetElements: $('#reason'),
-            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed,schoolboxiframe',
-            /* Why does EqnEditor stop my images loading?
-             */
-            removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
-            toolbarGroups: [
-                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                {name: 'insert', groups: ['insert']},
-                {name: 'schoolbox', groups: ['schoolboxlink']},
-            ],
-            resize_enabled: true,
-            toolbarCanCollapse: false
-        });
-    });
-</script>
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     ['Badges', routeLookupIfAuthorized('learningBadge.getBadgeListPage') ],
@@ -57,6 +38,7 @@
                 <input type="hidden" name="badgeIds" value="{{ badgeIds }}">
                 <section>
                     <fieldset>
+                        <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
                         <textarea id="reason" name="reason"></textarea>
                     </fieldset>
                 </section>
@@ -72,3 +54,8 @@
         </form>
     </div>
 </div>
+<script>
+    $.fn.alaressEditor({
+        targetElements: $('#reason'),
+    });
+</script>
