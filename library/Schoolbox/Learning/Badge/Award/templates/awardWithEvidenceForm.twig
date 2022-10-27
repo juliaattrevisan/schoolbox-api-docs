@@ -43,7 +43,7 @@
 
 <div id="award-with-evidence-badge-list-container">
     <award-with-evidence-badge-list
-            :badges="{{ badges | json_encode }}"
+        :badges="{{ badges | json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/awardWithEvidenceBadgeList.js?v={{ config.site_version }}"></script>
@@ -51,20 +51,25 @@
 <div class="row">
     <div class="small-12 island">
         {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardWithEvidence') ~ '?returnUrl=' ~ returnUrl %}
-
         <form action="{{ postRoute }}" method="post">
-            <input type="hidden" name="targetUserIds" value="{{ targetUserIds }}">
-            <input type="hidden" name="badgeIds" value="{{ badgeIds }}">
-            <section>
-                <fieldset>
-                    <label for="reason">Evidence</label>
-                    <textarea id="reason" name="reason"></textarea>
-                </fieldset>
+            <section class="content">
+                <input type="hidden" name="targetUserIds" value="{{ targetUserIds }}">
+                <input type="hidden" name="badgeIds" value="{{ badgeIds }}">
+                <section>
+                    <fieldset>
+                        <label for="reason">Evidence</label>
+                        <textarea id="reason" name="reason"></textarea>
+                    </fieldset>
+                </section>
             </section>
-            <ul class="flex-list buttons">
-                <li><a href="{{ cancelUrl }}" class="button">Back</a></li>
-                <li><input type="submit" value="Award"/></li>
-            </ul>
+            <div class="row">
+                <div class="small-12 columns">
+                    <ul class="flex-list buttons">
+                        <li><a href="{{ cancelUrl }}" class="button">Cancel</a></li>
+                        <li><input type="submit" value="Award"/></li>
+                    </ul>
+                </div>
+            </div>
         </form>
     </div>
 </div>
