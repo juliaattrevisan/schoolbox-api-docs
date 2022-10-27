@@ -296,7 +296,8 @@ class Controller extends Base
             $this->sendError('No badge provided');
         }
 
-        $returnUrl       = $this->request->query->get(Redirect::RETURN_URL);
+        $returnUrl = $this->request->query->get(Redirect::RETURN_URL) ??
+            Redirect::encode($this->router->generate('learningBadge.getBadgeListPage'));
         $cancelUrl       = Redirect::decode($returnUrl);
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
         $userTranslator  = new User\Translator\Author\ModelToArray();
