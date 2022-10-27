@@ -717,8 +717,8 @@ class Profile implements IStrategy
         /* Parents that were preloaded for this student will exist in the lookup array
          * Otherwise the student doesn't have any parents in tass, for whatever reason
          */
-        if (isset($families['lookup'][$studentId])) {
-            foreach ($families['lookup'][$studentId] as $externalId => $parent) {
+        if (isset($familiesLookup['lookup'][$studentId])) {
+            foreach ($familiesLookup['lookup'][$studentId] as $externalId => $parent) {
                 /* Each parent in the family
                  */
                 $email = trim((string)$parent['email']);
