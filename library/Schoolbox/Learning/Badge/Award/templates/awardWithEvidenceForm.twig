@@ -33,7 +33,7 @@
             </div>
         </div>
         {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardWithEvidence') ~ '?returnUrl=' ~ returnUrl %}
-        <form action="{{ postRoute }}" method="post">
+        <form action="{{ postRoute }}" method="post" id="evidence-form">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -59,4 +59,5 @@
     $.fn.alaressEditor({
         targetElements: $('#reason'),
     });
+    $('#evidence-form').alaressValidate();
 </script>
