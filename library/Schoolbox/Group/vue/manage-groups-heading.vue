@@ -69,7 +69,7 @@ export default {
         currentGroups () {
             const currentGroups = {
                 [selectionTypes.ALL_GROUPS]: () => this.groups,
-                [selectionTypes.MY_FAVOURITE_GROUPS]: () => this.groups.filter((group) => group.isFavourite),
+                [selectionTypes.MY_FAVOURITE_GROUPS]: () => this.groups.filter((group) => (group.isFavourite && group.enrolmentStatus === enrolmentTypes.ENROLED)),
                 [selectionTypes.GROUPS_IM_IN]: () => this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.ENROLED),
                 [selectionTypes.GROUPS_I_CAN_JOIN]: () => this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.NOT_ENROLED),
                 [selectionTypes.GROUPS_PENDING_MEMBERSHIP]: () => this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.PENDING),
