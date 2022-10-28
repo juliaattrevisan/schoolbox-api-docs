@@ -545,105 +545,123 @@ class Team implements IStrategy
 
         /* No external id? Spawn a whole new guy from out of the blue
          */
+        if ('' === $externalId) {
+            $this->log->debug(sprintf(
+                'Assigned staff %s does not have an external id in Clipboard; arbitrarily creating a coach',
+                $coachName
+            ));
+
+            $coach = $this->coachMapper->createModel()
+                ->setName($coachName);
+
+            if ($this->perform) {
+                $this->coachMapper->save($coach);
+            }
+
+            return $coach;
+        }
 
         /* Clipboard provided an external id, but they might not exist
          * in a schoolbox staff user account
          *
          * If they don't exist, spawn a whole new guy from out of the blue
          */
-
-        /* If they do exist, see if there's already a coach that
-         * is associated with that schoolbox user id
-         *
-         * If it already exists, reuse it
-         * Otherwise spawn a whole new guy out of the blue
-         */
-
-        /* Finally, clipboard provided an external id
-         * that does not exist in our user able nor as a coach
-         * in the sportsfixtures_coach table
-         * Spawn a whole new guy out of the blue
-         */
-
-
-
-
-
-
-
-        if ('' === $externalId) {
-            $coach = $this->coachMapper->createModel()
-                ->setName($coachName);
-
-            $this->log->debug(sprintf(
-                'Assigned staff %s does not have an external id in Clipboard; arbitrarily creating a schoolbox coach',
-                $coachName
-            ));
-        } else {
+        try {
+            /* Coaches from Clipboard come with an id
+             * This is their external_id
+             * See if we can swipe them from a schoolbox user account
+             *
+             * If not, spawn a whole new guy from out of the blue
+             */
+            $user = $this->userMapper->findByExternalId($externalId, \Schoolbox\Role::STAFF);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* No schoolbox user found for the given external id
+             *
+             * I guess we make a whole new guy from out of the blue
+             * if one doesn't already exist that we can reuse
+             */
             try {
-                /* Coaches from Clipboard come with an id
-                 * This is their external_id
-                 * See if we can swipe them from a schoolbox user account
-                 */
-                $user = $this->userMapper->findByExternalId($externalId, \Schoolbox\Role::STAFF);
+                $this->log->debug(sprintf(
+                    'Reusing existing coach %s (%s) by using their name',
+                    $coachName,
+                    $externalId
+                ));
+
+                $coach = $this->coachMapper->findOneByColumnList([
+                    'name' => $coachName
+                ]);
+
+                if ($this->perform) {
+                    $this->coachMapper->save($coach);
+                }
+
+                return $coach;
             } catch (\Schoolbox\Mapper\Exception $e) {
-                /* Can't find the schoolbox user;
-                 * just spawn arbitrarily
+                /* Clipboard provided an external id
+                 * that does not exist in our user table nor our sportsfixtures_coach table
+                 * Spawn a whole new guy out of the blue
                  */
+                $this->log->debug(sprintf(
+                    'Assigned staff %s (%s) does not correlate with a schoolbox user account; spawning arbitrarily',
+                    $coachName,
+                    $externalId
+                ));
+
                 $coach = $this->coachMapper->createModel()
                     ->setName($coachName);
 
-                $this->log->debug(sprintf(
-                    'Assigned staff %s does not have an external id in Clipboard; arbitrarily creating a schoolbox coach',
-                    $coachName
-                ));
-            }
-
-                $coach = $this->coachMapper->findOneByColumnList([
-                    'id' => $user->getId()
-                ]);
-
-                $this->log->debug(sprintf(
-                    'Reusing existing coach %s (%s) via schoolbox user account %s',
-                    $coachName,
-                    $user->getExternalId(),
-                    $user->getId()
-                ));
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                /* If we can't find them by external id,
-                 * they might exist in the sportsfixtures_coach table already
-                 * but without a user id; look for them by name
-                 */
-                try {
-                    $coach = $this->coachMapper->findOneByColumnList([
-                        'name' => $coachName
-                    ]);
-
-                    $this->log->debug(sprintf(
-                        'Reusing existing coach %s (%s) by using their name',
-                        $coachName,
-                        $externalId
-                    ));
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    /* Otherwise, if we cannot find them by external id
-                     * or by name, just spawn them arbitrarily
-                     */
-                    $coach = $this->coachMapper->createModel()
-                        ->setName($coachName);
-
-                    $this->log->debug(sprintf(
-                        'Creating new coach %s (%s)',
-                        $coachName,
-                        $externalId
-                    ));
+                if ($this->perform) {
+                    $this->coachMapper->save($coach);
                 }
+
+                return $coach;
             }
         }
 
-        if ($this->perform) {
-            $this->coachMapper->save($coach);
-        }
+        /* If they do exist as a schoolbox user, see if there's already a coach that
+         * is associated with that schoolbox user id
+         *
+         * If the coach already exists, reuse it
+         * Otherwise spawn a whole new guy out of the blue
+         */
+        try {
+            $this->log->debug(sprintf(
+                'Reusing existing coach %s (%s) via schoolbox user account %s %s (%s)',
+                $coachName,
+                $externalId,
+                $user->getId(),
+                $user->getFullName(),
+                $user->getExternalId()
+            ));
 
-        return $coach;
+            $coach = $this->coachMapper->findOneByColumnList([
+                'user_id' => $user->getId()
+            ]);
+
+            if ($this->perform) {
+                $this->coachMapper->save($coach);
+            }
+
+            return $coach;
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->log->debug(sprintf(
+                'Assigned staff %s (%s) has a schoolbox user account %s %s (%s) but is not yet a coach; spawning arbitrarily',
+                $coachName,
+                $externalId,
+                $user->getId(),
+                $user->getFullName(),
+                $user->getExternalId()
+            ));
+
+            $coach = $this->coachMapper->createModel()
+                ->setName($coachName)
+                ->setUser($user);
+
+            if ($this->perform) {
+                $this->coachMapper->save($coach);
+            }
+
+            return $coach;
+        }
     }
 }
