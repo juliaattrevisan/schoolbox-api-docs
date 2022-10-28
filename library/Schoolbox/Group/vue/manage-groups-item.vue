@@ -212,6 +212,7 @@ export default {
                         removeGroupFromSideMenu(this.group.id);
                     }
                     this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLED;
+                    this.group.isAccessAdmin = false;
                 }
             } catch (error) {
                 console.warn(error);
