@@ -212,6 +212,7 @@ export default {
                         removeGroupFromSideMenu(this.group.id);
                     }
                     this.group.enrolmentStatus = enrolmentTypes.NOT_ENROLED;
+                    this.group.isAccessAdmin = false;
                 }
             } catch (error) {
                 console.warn(error);
@@ -351,18 +352,18 @@ export default {
                         <div class="group-actions">
                             <template v-if="!isEnrolled && !isMembershipPending">
                                 <button v-if="!isRequestToJoin && !(isPrivate || isAdmin)"
-                                    title="Request to join"
+                                    title="Join"
                                     class="group-action icon-add"
                                     @click="join"
                                     >
-                                    Request to join
+                                    Join
                                 </button>
                                 <button v-else-if="!(isPrivate || isAdmin)"
-                                        title="Join"
+                                        title="Request to join"
                                         class="group-action icon-add"
                                         @click="join"
                                 >
-                                    Join
+                                    Request to join
                                 </button>
                             </template>
                             <button
