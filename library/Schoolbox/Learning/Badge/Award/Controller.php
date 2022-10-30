@@ -461,47 +461,48 @@ class Controller extends Base
      */
     public function awardAsAchievement(Model $badge): void
     {
-        $data       = json_decode($this->request->content->getRaw(), true);
-        $userIds    = array_column($data['users'], 'id');
-        // Users are in the data.
-        // For now: badges may only be awarded to or set as goals for students.
-        $users      = $this->userMapper->findByColumn('id', $userIds);
-        $reason     = trim((string)$data['reason']);
-
-        $collection = $this->createAwardsFromRequestBody(
-            $badge,
-            AwardModel::AWARD_STATUS_ACHIEVEMENT,
-            $users,
-            $reason
-        );
-
-        // Return what was just created
-        $translator = $this->buildBadgeAwardModelToArrayTranslator();
-        $this->response->content->set(
-            $this->buildJsonOutput($collection->map($translator))
-        );
+        $this->createAwards($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT);
     }
 
 
     /**
      * Set a badge as a goal for a set of users in the request body.
      *
+     * @param Model $badge The badge to set as a goal.
+     * @throws MapperException
      * @api   POST /learning/badge/{badgeId}/goal
      * @since 20.2
      *
-     * @param Model $badge The badge to set as a goal.
-     * @throws MapperException
      */
     public function setAsGoal(Model $badge): void
     {
-        $data       = json_decode($this->request->content->getRaw(), true);
-        $userIds    = array_column($data['users'], 'id');
-        $users = $this->userMapper->findByColumn('id', $userIds);
-        $reason     = trim((string)$data['reason']);
+        $this->createAwards($badge, AwardModel::AWARD_STATUS_GOAL);
+    }
+
+
+    /**
+     * @param Model  $badge
+     * @param string $awardStatus
+     * @return void
+     * @throws MapperException
+     */
+    private function createAwards(Model $badge, string $awardStatus): void
+    {
+        $data    = json_decode($this->request->content->getRaw(), true);
+        $userIds = array_column($data['users'] ?? [], 'id');
+        if (empty($userIds)) {
+            $this->sendJsonError("No users provided to set $awardStatus", 400);
+            return;
+        }
+
+        // Users are in the data.
+        // For now: badges may only be awarded to or set as goals for students.
+        $users  = $this->userMapper->findByColumn('id', $userIds);
+        $reason = trim((string)($data['reason'] ?? ''));
 
         $collection = $this->createAwardsFromRequestBody(
             $badge,
-            AwardModel::AWARD_STATUS_GOAL,
+            $awardStatus,
             $users,
             $reason
         );
