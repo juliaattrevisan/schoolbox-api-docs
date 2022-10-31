@@ -421,11 +421,23 @@ class Database implements IDatabase, Serializable
     /**
      * Prints the PDOException error message and dies
      *
+     * If within a web request, give a response code that indicates the class of DB error:
+     * * 598 - DB offline
+     * * 597 - other fatal DB error
+     *
      * @param PDOException $exception
      * @return void
      */
-    private function error(PDOException $exception)
+    private function error(PDOException $exception): void
     {
+        if (PHP_SAPI !== 'cli') {
+            if($exception->getMessage() === "SQLSTATE[HY000] [2002] No such file or directory"){
+                http_response_code(598);
+                include __DIR__ . "/../templates/core/error/598-database-offline.html";
+                exit;
+            }
+            http_response_code(597);
+        }
         die("Database Error: {$exception->getMessage()}");
     }
 
