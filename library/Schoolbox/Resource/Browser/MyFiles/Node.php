@@ -13,10 +13,12 @@
 
 namespace Schoolbox\Resource\Browser\MyFiles;
 
-use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
 use Schoolbox\Resource\Browser\AbstractNode;
+use Schoolbox\Resource\My\Folder\Model;
+use Schoolbox\User;
 
 /**
  * Class Node
@@ -37,6 +39,19 @@ class Node extends AbstractNode
         $this->setFileLocator(new MyFileMapper());
     }
 
+    /**
+     * Get a list of breadcrumbs for this node
+     * Return empty array, if the current node is not user's
+     *
+     * @return array
+     */
+    protected function getBreadcrumbs()
+    {
+        if (!$this->hasPermission($this->nodeId, UserAccess::ACCESS_READ)) {
+            return [];
+        }
+        return parent::getBreadcrumbs();
+    }
 
     /**
      * Returns whether or not permission can be granted for the given node
@@ -47,6 +62,14 @@ class Node extends AbstractNode
      */
     protected function hasPermission($nodeId, $minimumLevel)
     {
-        return true;
+        $myFolder = $this->getFolderLocator()->findById($nodeId);
+        return (
+            $nodeId === 0
+            || (
+                $myFolder instanceof Model
+                && $_SESSION['user'] instanceof User
+                && $myFolder->getOwner()->getId() === $_SESSION['user']->getId()
+            )
+        );
     }
 }
