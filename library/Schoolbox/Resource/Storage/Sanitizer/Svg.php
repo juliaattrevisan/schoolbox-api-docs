@@ -50,7 +50,11 @@ class Svg implements ISanitizer
     public function sanitize(string $mimetype, string $contents): ?string
     {
         if ($this->accepts($mimetype)) {
+            /** @var string|false $sanitizedContents */
             $sanitizedContents = $this->sanitizer->sanitize($contents);
+            if (false === $sanitizedContents) {
+                return '';
+            }
             if (is_string($sanitizedContents)) {
                 return $sanitizedContents;
             }
