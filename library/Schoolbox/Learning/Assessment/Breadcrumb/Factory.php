@@ -4,7 +4,7 @@
  * Factory
  *
  * Create a trail of crumbs based on available information regarding an existing
- * IAssessable $asseessment, or derived from a contextId/contextType tuple
+ * IAssessable $assessment, or derived from a contextId/contextType tuple
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -14,55 +14,34 @@
 namespace Schoolbox\Learning\Assessment\Breadcrumb;
 
 use Alaress\Authorizer\Authorizer;
+use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
+use Exception;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 class Factory
 {
     /**
-     * @var Router
-     */
-    private $router;
-
-
-    /**
-     * @var Authorizer
-     */
-    private $authorizer;
-
-
-    /**
-     * @var Access
-     */
-    private $access;
-
-
-    /**
-     * Constructor
-     *
-     * @param Router $router Used to generate route URLs
-     */
-    /**
      * Constructor
      *
      * @param Router     $router     Used to generate route URLs
-     * @param Authorizer $authorizer Used to verify that route URLs are
-     *                               accessible
+     * @param Authorizer $authorizer Used to verify that route URLs are accessible
      * @param Access     $access     Used to verify homepage access permissions
      */
-    public function __construct(Router $router, Authorizer $authorizer, Access $access)
-    {
-        $this->router     = $router;
-        $this->authorizer = $authorizer;
-        $this->access     = $access;
+    public function __construct(
+        private Router $router,
+        private Authorizer $authorizer,
+        private Access $access
+    ) {
     }
 
     /**
@@ -72,60 +51,88 @@ class Factory
      * determine a meaningful trail of crumbs
      *
      * @param IAssessable $assessment
-     * @param User $user
+     * @param User        $user
      * @return Collection
+     * @throws RouteNotFound
+     * @throws Exception
      */
-    public function produceFromAssessment(IAssessable $assessment, User $user)
+    public function produceFromAssessment(IAssessable $assessment, User $user): Collection
     {
-        $trail = new Collection();
-        $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
+        $assessmentContext = $assessment->getContext();
+        $breadcrumbs       = new Collection();
+        $breadcrumbs->add(['Learning', $this->router->generate('learning.getClasses')]);
 
-        $context = $assessment->getContext();
-        $path = '';
+        if ($assessmentContext instanceof UnitImplementation) {
+            // Generate trail like 'Learning'->$unitImp->$unitSpec (eg. 'Learning'->'9ENGA'->'Romeo and Juliet').
+            $unitImp        = $assessmentContext;
+            $unitImpFolder  = $unitImp->getFolder();
+            $unitSpecFolder = $unitImp->getSpecification()->getFolder();
+            $breadcrumbs->add($this->generateBreadcrumbForFolder($unitImpFolder, $user));
+            // Point back to the unit impl folder, rather than the spec
+            $breadcrumbs->add($this->generateBreadcrumbForFolder($unitImpFolder, $user, $unitSpecFolder->getTitle()));
+        } elseif ($assessmentContext instanceof UnitSpecification) {
+            // Generate trail like 'Learning'->$unitSpec (eg. 'Learning'->'Romeo and Juliet').
+            $unitSpec       = $assessmentContext;
+            $unitSpecFolder = $unitSpec->getFolder();
+            $breadcrumbs->add($this->generateBreadcrumbForFolder($unitSpecFolder, $user));
+        } elseif ($assessmentContext instanceof Project) {
+            // Generate trail like one of:
+            //  * 'Learning->$unitImp->$unitSpec->$project (eg. 'Learning'->'9ENGA'->'Romeo and Juliet'->'Project title').
+            //  * 'Learning->$unitSpec->$project           (eg. 'Learning'->'Romeo and Juliet'->'Project title').
+            $project        = $assessmentContext;
+            $projectContext = $project->getContext();
 
-        if ($context instanceof Project) {
-            $routeName   = 'learningAssessment.getStatus';
+            if (!($projectContext instanceof UnitImplementation || $projectContext instanceof UnitSpecification)) {
+                throw new UnexpectedValueException(
+                    'Variable $projectContext is expected to be an instance of either UnitImplementation or UnitSpecification.' .
+                    "Found variable of class '" . get_class($projectContext) . "'."
+                );
+            }
+
+            // We have already dealt with cases UnitSpecification and UnitImplementation above, so get breadcrumbs up to unitSpec level recursively.
+            $breadcrumbs = $this->produceFromAssessment($project, $user);
+
             $routeParams = [
-                'assessment'   => $context,
-                'assessmentId' => $context->getId(),
-                'studentId' => $user->getId()
+                'assessment'   => $project,
+                'assessmentId' => $project->getId(),
+                'studentId'    => $user->getId()
             ];
 
-            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $user)) {
-                $path = $this->router->generate($routeName, $routeParams);
-            } else {
-                $path = $this->router->generate('learningAssessment.getSummary', $routeParams);
-            }
+            $breadcrumbs->add(
+                [
+                    $project->getTitle(),
+                    (
+                        // In some circumstances the user will not be authorised to view the 'status' page.
+                        // In that case, show the 'summary' page instead.
+                        ($this->authorizer->isPathAuthorizedForUser('learningAssessment.getStatus', $routeParams, $user)) ?
+                        $this->router->generate('learningAssessment.getStatus', $routeParams) :
+                        $this->router->generate('learningAssessment.getSummary', $routeParams)
+                    )
+                ]
+            );
+        } else {
+            // Assessment belongs directly to subject (eg. '9ENGA').
+            $subject       = $assessmentContext;
+            $subjectFolder = $subject->getFolder();
 
-            $trail = $this->produceFromAssessment($context, $user);
-        } elseif ($context instanceof UnitSpecification) {
-            $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]) . '#' . $context->getId();
-        } elseif ($context instanceof UnitImplementation) {
-            if ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
-                $path = "/homepage/{$context->getFolder()->getId()}";
-            }
-
-            $trail->add([$context->getFolder()->getTitle(), $path]);
-        } elseif ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
-            $path = "/homepage/{$context->getFolder()->getId()}";
+            $breadcrumbs->add($this->generateBreadcrumbForFolder($subjectFolder, $user));
         }
 
-        $trail->add([$context->getTitle(), $path]);
-
-        return $trail;
+        return $breadcrumbs;
     }
 
     /**
      * Produce breadcrumb trail for a new IAssessable $assessment
      *
-     * These won't have enough information to determine a meaningful trail of crumbs
+     * These won't have enough information to determine a meaningful trail of crumbs,
      * so we give it the contextId/contextType, and decide from there
      *
      * @param AssessmentContext $context
-     * @param IAssessable|null $assessment
+     * @param IAssessable|null  $assessment
      * @return Collection
+     * @throws RouteNotFound
      */
-    public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null)
+    public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null): Collection
     {
         $trail = new Collection();
         $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
@@ -144,5 +151,27 @@ class Factory
         $trail->add(["Create $assessmentType"]);
 
         return $trail;
+    }
+
+    /**
+     * Helper function for generating a breadcrumb for a folder.
+     * * breadcrumb has the folder's title
+     * * if user has permission to view the folder, it links to that folder:
+     *   otherwise there is no link
+     *
+     * @param Folder      $folder
+     * @param User        $user
+     * @param string|null $titleOverride
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function generateBreadcrumbForFolder(Folder $folder, User $user, ?string $titleOverride = null): array
+    {
+        return [
+            $titleOverride ?? $folder->getTitle(),
+            $this->access->getFolderAccess($user, $folder->getId())
+                ? "/homepage/{$folder->getId()}"
+                : null,
+        ];
     }
 }

@@ -9,22 +9,27 @@
 
 namespace Schoolbox;
 
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Scrub;
 use SitePage;
 
 class Breadcrumbs
 {
-    const TPL = 'breadcrumbTpl';
-
+    public const TPL = 'breadcrumbTpl';
 
     /**
+     * TODO: This function could be made static.
+     *
      * @param SitePage $page
      * @param string   $handle
      * @param array    $data
+     * @return void
      */
-    public function renderIntoSitePage(SitePage $page, $handle, array $data)
+    public function renderIntoSitePage(SitePage $page, string $handle, array $data): void
     {
         $page->setFile(self::TPL, 'resources/breadcrumbs.html');
-
         $page->setBlock(self::TPL, 'breadcrumb', 'breadcrumb_block');
         $page->setVar('breadcrumb_block', '');
         $page->setBlock(self::TPL, 'breadcrumb_last', 'breadcrumb_last_block');
@@ -34,7 +39,7 @@ class Breadcrumbs
         $lastKey = end($keys);
 
         foreach ($data as $key => $crumb) {
-            $page->setVar('BREADCRUMB_TEXT', \Scrub::text($crumb['text']));
+            $page->setVar('BREADCRUMB_TEXT', Scrub::text($crumb['text']));
             $page->setVar('BREADCRUMB_CLASS', $crumb['class']);
             if ($key !== $lastKey) {
                 $page->setVar('BREADCRUMB_HREF', $crumb['href']);
@@ -47,17 +52,19 @@ class Breadcrumbs
         $page->parse($handle, self::TPL);
     }
 
-
     /**
      * I don't have a better place for this to live, sorry -_-;
+     * TODO: This function could be made static.
      *
-     * @param \Schoolbox\Resource\Folder\Model $folder
-     * @param string $returnUrl
+     * @param FolderModel $folder
+     * @param string      $returnUrl
      * @return array
+     * @throws Exception
+     * @throws Deleted
      */
-    public function getFolderCrumbs($folder, $returnUrl = '')
+    public function getFolderCrumbs(FolderModel $folder, string $returnUrl = ''): array
     {
-        if (!$returnUrl || strpos(urldecode(base64_decode($returnUrl)), '/course/modify/') === false) {
+        if (!$returnUrl || !str_contains(urldecode(base64_decode($returnUrl)), '/course/modify/')) {
             // not a course modify path, or no return URL: just give us the homepage version
             return [
                 [
