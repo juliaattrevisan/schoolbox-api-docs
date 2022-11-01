@@ -196,7 +196,8 @@ export default {
         /**
          * Leave the group
          */
-        async leave () {
+        async leave (event) {
+            event.preventDefault();
             this.isProcessing = true;
             this.$emit('on-edit-start', 'Leaving group...');
             try {
