@@ -26,7 +26,6 @@ use Schoolbox\User;
  */
 class Node extends AbstractNode
 {
-
     /**
      * @param int  $nodeId
      * @param null $mimeFilter
