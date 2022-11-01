@@ -39,6 +39,9 @@ class ExternalUserValueIn extends Condition\In
     {
         $reader = new ObjectReader();
         $value  = $reader->read($externalUser, $this->field);
+        if (null === $value) {
+            return false;
+        }
 
         // this occurs if the field being read is multi, such as
         // * emails and campus codes (array)
