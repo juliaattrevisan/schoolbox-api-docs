@@ -17,6 +17,7 @@ use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Watchlist;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
@@ -73,6 +74,12 @@ class Profile implements IStrategy
      * should not be synced.
      */
     private const STAFF_EMPLOYMENT_STATUS_DEPARTED = 'left';
+
+
+    /**
+     * @var ValidStrats
+     */
+    private ValidStrats $validStrats;
 
 
     /**
@@ -140,6 +147,7 @@ class Profile implements IStrategy
     /**
      * Profile constructor.
      *
+     * @param ValidStrats                     $validStrats
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param IApi                            $api
@@ -152,6 +160,7 @@ class Profile implements IStrategy
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
+        ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         IApi $api,
@@ -163,6 +172,7 @@ class Profile implements IStrategy
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper
     ) {
+        $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
@@ -185,15 +195,19 @@ class Profile implements IStrategy
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
+        if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
+            $this->log->info('Processing students and their parents.');
 
-        $this->importStudents();
+            $this->importStudents();
+        }
 
         /* Import staff profile data
          */
-        $this->log->info('Processing staff.');
+        if ($this->validStrats->isStaffStratEnabled()) {
+            $this->log->info('Processing staff.');
 
-        $this->importStaff();
+            $this->importStaff();
+        }
     }
 
 
@@ -500,7 +514,9 @@ class Profile implements IStrategy
                  * This set is mixed with emergency contacts and other non-data, so
                  * sift through it all manually for the gems you need
                  */
-                $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
+                if ($this->validStrats->isFamiliesStratEnabled()) {
+                    $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
+                }
 
                 /* Remember that we saw a particular student id
                  * (-not- their externalId, the primary key in sentral for this student)
