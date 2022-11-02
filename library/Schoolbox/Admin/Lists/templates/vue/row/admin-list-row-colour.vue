@@ -64,5 +64,5 @@ export default {
 </script>
 
 <template>
-    <input type="text" :placeholder="caption" :value="colour" data-colour-picker />
+    <input type="text" :placeholder="caption" :value="colour" data-colour-picker/>
 </template>
