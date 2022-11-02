@@ -68,8 +68,8 @@ try {
     }
 } catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
-    SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'], $e->getHttpStatusCode());
+    SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'] ?? 'maxsize', $e->getHttpStatusCode());
 } catch (Exception $e) {
     // fall through
 }
-SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'], 404);
+SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'] ?? 'maxsize', 404);
