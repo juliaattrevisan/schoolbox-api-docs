@@ -20,7 +20,7 @@ class Alaress_HTMLPurifier_AttrTransform_SafeParam extends HTMLPurifier_AttrTran
     /**
      * @var HTMLPurifier_AttrDef_Enum
      */
-    protected $wmode;
+    public $wmode;
 
     public function __construct()
     {
