@@ -103,6 +103,14 @@ HELP;
         $file        = null;
         $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
 
+        /* Importer strats can be defined by cli args
+         * null or empty string means "import everything"
+         *
+         * Otherwise, whatever you specified must fit within a known vocabulary
+         * and works in conjunction with whatever watchlists you have in place
+         */
+        $strats = trim((string)($this->getOpt('strats') ?? null));
+
         /* SUDS imports can take a notoriously long time to complete based on sis etc.
          * and the instances could start up a new import before the existing one
          * has even finished. If you can't reserve this, then abort.
