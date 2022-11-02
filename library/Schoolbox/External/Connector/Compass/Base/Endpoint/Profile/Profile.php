@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Model;
@@ -76,6 +77,12 @@ class Profile implements IStrategy
      * for 5 days a week; they go home on weekends.
      */
     private const BOARDERS = ['Full Time', 'Part Time', 'Weekday'];
+
+
+    /**
+     * @var ValidStrats
+     */
+    private ValidStrats $validStrats;
 
 
     /**
@@ -171,6 +178,7 @@ class Profile implements IStrategy
     /**
      * Profile constructor.
      *
+     * @param ValidStrats                     $validStrats
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param IApi                            $api
@@ -183,6 +191,7 @@ class Profile implements IStrategy
      * @param StorageMapper                   $storageMapper
      */
     public function __construct(
+        ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         IApi $api,
@@ -194,6 +203,7 @@ class Profile implements IStrategy
         UserProfile\Relationship\Mapper $relationshipMapper,
         StorageMapper $storageMapper
     ) {
+        $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
@@ -242,15 +252,19 @@ class Profile implements IStrategy
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
+        if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
+            $this->log->info('Processing students and their parents.');
 
-        $this->importStudents();
+            $this->importStudents();
+        }
 
         /* Import staff profile data
          */
-        $this->log->info('Processing staff.');
+        if ($this->validStrats->isStaffStratEnabled()) {
+            $this->log->info('Processing staff.');
 
-        $this->importStaff();
+            $this->importStaff();
+        }
     }
 
 
@@ -505,7 +519,9 @@ class Profile implements IStrategy
 
             /* Add their parents' profile data
              */
-            $this->importParentsOfStudent($student['compassPersonId'], $student['relationships'], $studentBaseProfile, $families);
+            if ($this->validStrats->isFamiliesStratEnabled()) {
+                $this->importParentsOfStudent($student['compassPersonId'], $student['relationships'], $studentBaseProfile, $families);
+            }
         }
     }
 
