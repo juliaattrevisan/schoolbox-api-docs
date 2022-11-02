@@ -291,26 +291,6 @@ parameters:
 			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
 
 		-
-			message: "#^Constant TIDEWAYS_XHPROF_FLAGS_CPU not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
-
-		-
-			message: "#^Constant TIDEWAYS_XHPROF_FLAGS_MEMORY not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
-
-		-
-			message: "#^Function tideways_xhprof_disable not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
-
-		-
-			message: "#^Function tideways_xhprof_enable not found\\.$#"
-			count: 1
-			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
-
-		-
 			message: "#^Instanceof between null and Throwable will always evaluate to false\\.$#"
 			count: 1
 			path: library/Alaress/Jitter/Jitter.php
@@ -332,11 +312,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Alaress\\\\Json\\\\Serializable\\:\\:getPrimitive\\(\\)\\.$#"
-			count: 2
-			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
-
-		-
-			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 2
 			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
 
@@ -1096,11 +1071,6 @@ parameters:
 			path: library/Custom/Sk/NCEA/Controller.php
 
 		-
-			message: "#^string does not accept array\\<string, mixed\\>\\.$#"
-			count: 1
-			path: library/Custom/Sk/OleReport/Controller.php
-
-		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\UserMapper\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/ParticipationReport/Module.php
@@ -1176,7 +1146,7 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int|string will always evaluate to false\\.$#"
+			message: "#^Strict comparison using \\=\\=\\= between null and int\\|string will always evaluate to false\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
 
@@ -1242,86 +1212,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$array\\)\\: Unexpected token \"\\$array\", expected type at offset 149$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$array\\)\\: Unexpected token \"\\$array\", expected type at offset 186$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$array\\)\\: Unexpected token \"\\$array\", expected type at offset 210$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$db\\)\\: Unexpected token \"\\$db\", expected type at offset 96$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$identifier\\)\\: Unexpected token \"\\$identifier\", expected type at offset 123$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$identifier\\)\\: Unexpected token \"\\$identifier\", expected type at offset 97$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sql_q\\)\\: Unexpected token \"\\$sql_q\", expected type at offset 135$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sql_q\\)\\: Unexpected token \"\\$sql_q\", expected type at offset 167$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sql_q\\)\\: Unexpected token \"\\$sql_q\", expected type at offset 186$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$sql_q\\)\\: Unexpected token \"\\$sql_q\", expected type at offset 214$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$table\\)\\: Unexpected token \"\\$table\", expected type at offset 102$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$table\\)\\: Unexpected token \"\\$table\", expected type at offset 165$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$table\\)\\: Unexpected token \"\\$table\", expected type at offset 184$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$table\\)\\: Unexpected token \"\\$table\", expected type at offset 76$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$value\\)\\: Unexpected token \"\\$value\", expected type at offset 123$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$value\\)\\: Unexpected token \"\\$value\", expected type at offset 98$#"
 			count: 1
 			path: library/DeprecatedDatabase.php
 
@@ -1784,6 +1674,11 @@ parameters:
 			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\AssignmentOverride\\:\\:canvasIdPrefix\\(\\) is unused\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/Bridge/AssignmentOverride.php
+
+		-
+			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\Course\\:\\:canvasIdPrefix\\(\\) is unused\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/Bridge/Course.php
 
 		-
 			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\CourseGroup\\:\\:codePrefix\\(\\) is unused\\.$#"
@@ -2891,11 +2786,6 @@ parameters:
 			path: library/Schoolbox/Calendar/EventRecurrence.php
 
 		-
-			message: "#^Property Schoolbox\\\\Calendar\\\\EventRecurrence\\:\\:\\$efficacyValues \\(array\\<string\\>\\) does not accept string\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventRecurrence.php
-
-		-
 			message: "#^Property Schoolbox\\\\Calendar\\\\EventRecurrence\\:\\:\\$until \\(Alaress_Date_Format\\) does not accept string\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/EventRecurrence.php
@@ -3044,46 +2934,6 @@ parameters:
 			message: "#^Strict comparison using \\!\\=\\= between null and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Mapper.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Model\\:\\:canBeApproved\\(\\) should return bool but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Model.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Model\\:\\:canBeArchived\\(\\) should return bool but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Model.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Model\\:\\:canBeRejected\\(\\) should return bool but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Model.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Model\\:\\:canBeSubmitted\\(\\) should return bool but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Model.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Model\\:\\:canBeUnSubmitted\\(\\) should return bool but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Model.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Model\\:\\:isApproved\\(\\) should return bool but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Model.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Model\\:\\:isPublic\\(\\) should return bool but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Model.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Model\\:\\:isSubmitted\\(\\) should return bool but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Model.php
 
 		-
 			message: "#^If condition is always true\\.$#"
@@ -3434,6 +3284,11 @@ parameters:
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Kamar/Base/Endpoint/Timetable/Classes.php
+
+		-
+			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Liss\\\\Base\\\\Endpoint\\\\Helper\\:\\:\\$log is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Liss/Base/Endpoint/Helper.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Maze\\\\Base\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
@@ -4881,11 +4736,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/IAssessmentTypeTranslator.php
 
 		-
-			message: "#^Right side of \\|\\| is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Project.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between null and Schoolbox\\\\User will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Project.php
@@ -4897,6 +4747,11 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getDuration\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getExternalId\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
 
@@ -4927,6 +4782,11 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getDuration\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getExternalId\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
 
@@ -5628,6 +5488,11 @@ parameters:
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 2
+			path: library/Schoolbox/Mapper.php
+
+		-
+			message: "#^Offset 'type' on array in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 1
 			path: library/Schoolbox/Mapper.php
 
 		-
@@ -6836,6 +6701,11 @@ parameters:
 			path: library/Schoolbox/User/Password/Reset/Controller.php
 
 		-
+			message: "#^Expression in empty\\(\\) is always falsy\\.$#"
+			count: 1
+			path: library/Schoolbox/User/Password/Reset/Mapper.php
+
+		-
 			message: "#^If condition is always true\\.$#"
 			count: 3
 			path: library/Schoolbox/UserMapper.php
@@ -7111,6 +6981,26 @@ parameters:
 			path: tools/custom/wes/changeType.php
 
 		-
+			message: "#^Method class@anonymous/tools/custom/wes/changeType\\.php\\:11\\:\\:getRecordIdsFromTypeName\\(\\) is unused\\.$#"
+			count: 1
+			path: tools/custom/wes/changeType.php
+
+		-
+			message: "#^Offset 'map' does not exist on array\\{\\}\\|array\\{map\\?\\: array\\<int, array\\{field\\: mixed, property\\: string, type\\: string, selftype\\: string, id\\: bool\\}\\>, model\\?\\: non\\-falsy\\-string, table\\?\\: array\\|string\\|null\\}\\.$#"
+			count: 1
+			path: tools/mapper-template.php
+
+		-
+			message: "#^Offset 'model' does not exist on array\\{\\}\\|array\\{map\\?\\: array\\<int, array\\{field\\: mixed, property\\: string, type\\: string, selftype\\: string, id\\: bool\\}\\>, model\\?\\: non\\-falsy\\-string, table\\?\\: array\\|string\\|null\\}\\.$#"
+			count: 3
+			path: tools/mapper-template.php
+
+		-
+			message: "#^Offset 'table' does not exist on array\\{\\}\\|array\\{map\\?\\: array\\<int, array\\{field\\: mixed, property\\: string, type\\: string, selftype\\: string, id\\: bool\\}\\>, model\\?\\: non\\-falsy\\-string, table\\?\\: array\\|string\\|null\\}\\.$#"
+			count: 1
+			path: tools/mapper-template.php
+
+		-
 			message: "#^Variable \\$addParamsShort might not be defined\\.$#"
 			count: 1
 			path: tools/markbook/sync.php
@@ -7169,33 +7059,3 @@ parameters:
 			message: "#^Comparison operation \"\\>\\=\" between int\\<3, max\\> and 3 is always true\\.$#"
 			count: 1
 			path: tools/rubric/repairSpecAssessments.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getExternalId\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getExternalId\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
-		-
-			message: "#^Variable \\$this might not be defined\\.$#"
-			count: 6
-			path: www/modules/conference/index.php
-		-
-			message: "#^Variable \\$mapFile might not be defined\\.$#"
-			count: 3
-			path: www/modules/conference/index.php
-		-
-			message: "#^Variable \\$map might not be defined\\.$#"
-			count: 1
-			path: www/modules/conference/index.php
-		-
-			message: "#^Variable \\$type might not be defined\\.$#"
-			count: 1
-			path: www/modules/conference/index.php
-		-
-			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Liss\\\\Base\\\\Endpoint\\\\Helper\\:\\:\\$log is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Liss/Base/Endpoint/Helper.php
