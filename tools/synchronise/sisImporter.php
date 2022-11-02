@@ -90,7 +90,13 @@ This also imports timetable data from third party endpoint into local schema.
 
 Usage: sisImporter.php [--file] [--watchlist] [--perform]
         --perform       Persist changes
+        
         --watchlist     A csv of externalIds e.g. 123,456,789
+        
+        --strats        A csv of strats to import: student staff families timetable 
+                        e.g. import only profile-related stuff: sisImporter.php --strats=student,staff,families
+                        e.g. import only timetable-related stuff: sisImporter.php --strats=timetable
+                        
         --file          Optional path to a locally-cached xml file e.g. ../../../www/test.xml
                         Absence of this arg will cause the tool to access the api endpoint instead
 
@@ -98,7 +104,7 @@ HELP;
             exit;
         }
 
-        /* Spawn schedular based on args
+        /* Spawn scheduler based on args
          *
          * Use Hourly frequency, taking advantage of the functional equivalence
          *
