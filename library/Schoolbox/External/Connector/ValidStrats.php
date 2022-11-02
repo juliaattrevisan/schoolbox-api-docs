@@ -22,6 +22,11 @@ namespace Schoolbox\External\Connector;
  */
 class ValidStrats
 {
+    public const STAFF = 'staff';
+    public const STUDENT = 'student';
+    public const FAMILIES = 'families';
+    public const TIMETABLE = 'timetable';
+
     /**
      * These are valid as csv values in the arg
      */
@@ -42,6 +47,24 @@ class ValidStrats
          */
         'timetable'
     ];
+
+    /**
+     * After processing $csvArgs we remember what was valid
+     * because we'll probably reuse this a few times and
+     * we can save some cycles
+     *
+     * @var array
+     */
+    private array $filteredStrats;
+
+
+    /**
+     * @param string $csvArgs
+     */
+    public function __construct(string $csvArgs)
+    {
+        $this->filteredStrats = $this->filter($csvArgs);
+    }
 
 
     /**
@@ -83,5 +106,65 @@ class ValidStrats
          * Each factory interprets this as desired
          */
         return array_values($temp);
+    }
+
+
+    /**
+     * A convenience method that checks if the Staff strat is in the result set
+     *
+     * @return bool
+     */
+    public function isStaffStratEnabled(): bool
+    {
+        return $this->isStratEnabled(self::STAFF);
+    }
+
+
+    /**
+     * A convenience method that checks if the Student strat is in the result set
+     *
+     * @return bool
+     */
+    public function isStudentStratEnabled(): bool
+    {
+        return $this->isStratEnabled(self::STUDENT);
+    }
+
+
+    /**
+     * A convenience method that checks if the Families (student+parents) strat is in the result set
+     *
+     * @return bool
+     */
+    public function isFamiliesStratEnabled(): bool
+    {
+        return $this->isStratEnabled(self::FAMILIES);
+    }
+
+
+    /**
+     * A convenience method that checks if the Timetable strat is in the result set
+     *
+     * @return bool
+     */
+    public function isTimetableStratEnabled(): bool
+    {
+        return $this->isStratEnabled(self::TIMETABLE);
+    }
+
+
+    /**
+     * A convenience method that checks if a particular strat is in the result set
+     *
+     * @param string $strat
+     * @return bool
+     */
+    private function isStratEnabled(string $strat): bool
+    {
+        if (!\count($this->filteredStrats)) {
+            return true;
+        }
+
+        return \in_array($strat, $this->filteredStrats, true);
     }
 }

@@ -32,12 +32,12 @@ class ValidStratsTest extends TestCase
      */
     public function testValidStrats(string $cliArgs, array $expected)
     {
-        $this->assertEquals($expected, (new ValidStrats())->filter($cliArgs));
+        $this->assertEquals($expected, (new ValidStrats($cliArgs))->filter($cliArgs));
     }
 
 
     /**
-     * Data provider for testValidWatchlistValue
+     * Data provider for testValidStrats
      *
      * @return array
      */
@@ -118,6 +118,164 @@ I,searched,‘aurora,borealis,green’",
 I,searched,‘aurora,borealis,green’,,,,,,,,,,,,,This,scene,feels,like,what,I,once,saw,on,a,screen,
 I,searched,‘aurora,borealis,green’, STaFF,stuDenT, ---_+=-=   fAMILIesa,f,f, , ,sTafF,,,     ,, ,STAFF,stuDenT,    fAMILIes ,,       ,           ',
                 ['staff', 'student', 'families', 'timetable']
+            ]
+        ];
+    }
+
+
+    /**
+     * @dataProvider providerStratEnabled
+     * @param string $method
+     * @param string $cliArgs
+     * @param bool   $expected
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
+     */
+    public function testStratEnabled(string $method, string $cliArgs, bool $expected)
+    {
+        $validStrats = (new ValidStrats($cliArgs));
+
+        $this->assertEquals($expected, $validStrats->$method());
+    }
+
+
+    /**
+     * Data provider for testStratEnabled
+     *
+     * @return array
+     */
+    public function providerStratEnabled(): array
+    {
+        return [
+
+            /* Staff check
+             */
+            'Staff enabled special case' => [
+                'isStaffStratEnabled',
+                '',
+                true,
+            ],
+
+            'Staff enabled 1' => [
+                'isStaffStratEnabled',
+                'staff',
+                true
+            ],
+
+            'Staff enabled 2' => [
+                'isStaffStratEnabled',
+                'families,student,staff,timetable',
+                true
+            ],
+
+            'Staff not enabled 1' => [
+                'isStaffStratEnabled',
+                'families,student,timetable',
+                false,
+            ],
+
+            /* Student check
+             */
+            'Student enabled special case' => [
+                'isStudentStratEnabled',
+                '',
+                true,
+            ],
+
+            'Student enabled 1' => [
+                'isStudentStratEnabled',
+                'student',
+                true
+            ],
+
+            'Student enabled 2' => [
+                'isStudentStratEnabled',
+                'families,student,staff,timetable',
+                true
+            ],
+
+            'Student not enabled 1' => [
+                'isStudentStratEnabled',
+                'families,staff,timetable',
+                false,
+            ],
+
+            /* Families check
+             */
+            'Families enabled special case' => [
+                'isFamiliesStratEnabled',
+                '',
+                true,
+            ],
+
+            'Families enabled 1' => [
+                'isFamiliesStratEnabled',
+                'families',
+                true
+            ],
+
+            'Families enabled 2' => [
+                'isFamiliesStratEnabled',
+                'families,student,staff,timetable',
+                true
+            ],
+
+            'Families not enabled 1' => [
+                'isFamiliesStratEnabled',
+                'student,staff,timetable',
+                false,
+            ],
+
+            /* Timetable check
+             */
+            'Timetable enabled special case' => [
+                'isTimetableStratEnabled',
+                '',
+                true,
+            ],
+
+            'Timetable enabled 1' => [
+                'isTimetableStratEnabled',
+                'timetable',
+                true
+            ],
+
+            'Timetable enabled 2' => [
+                'isTimetableStratEnabled',
+                'families,student,staff,timetable',
+                true
+            ],
+
+            'Timetable not enabled 1' => [
+                'isTimetableStratEnabled',
+                'student,staff,families',
+                false,
+            ],
+
+            /* Combo check
+             */
+            'Combo 1.1' => [
+                'isStaffStratEnabled',
+                'families,student,staff',
+                true
+            ],
+
+            'Combo 1.2' => [
+                'isStudentStratEnabled',
+                'families,student,staff',
+                true
+            ],
+
+            'Combo 1.3' => [
+                'isFamiliesStratEnabled',
+                'families,student,staff',
+                true
+            ],
+
+            'Combo 1.4' => [
+                'isTimetableStratEnabled',
+                'families,student,staff',
+                false
             ]
         ];
     }
