@@ -86,7 +86,7 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
      */
     public function getTitle(Xml $input): string
     {
-        return $input->xml->channel->title;
+        return $input->xml->channel->title ?? '';
     }
 
     /**
