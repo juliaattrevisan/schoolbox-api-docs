@@ -26,7 +26,7 @@ class StatisticsTest extends TestCase
      */
     public function testMedian(array $values, ?float $expected): void
     {
-        $this->assertEquals($expected, Statistics::median($values));
+        $this->assertEqualsWithDelta($expected, Statistics::median($values), 0.0000001);
     }
 
     /**
@@ -108,7 +108,7 @@ class StatisticsTest extends TestCase
      */
     public function testBuildBoxPlotValues(array $values, array $expected): void
     {
-        $this->assertEquals($expected, Statistics::buildBoxPlotValues($values));
+        $this->assertEqualsWithDelta($expected, Statistics::buildBoxPlotValues($values), 0.0000001);
     }
 
     /**

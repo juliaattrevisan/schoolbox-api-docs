@@ -455,7 +455,7 @@ class SummatorTest extends TestCase
          *      = 1750 / 23
          *      = 76.08695652174
          */
-        $this->assertEquals(76.08695652174, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEqualsWithDelta(76.08695652174, $project->getNormalisedMark($project->getParticipant($this->hodes), true), $this->delta);
 
         /* Most Recent Weighted Average is
          *      = [(77*10) + (100*5) + ((100 * 12/20)*8)] / 23
@@ -463,7 +463,7 @@ class SummatorTest extends TestCase
          *      = 1750 / 23
          *      = 76.08695652174
          */
-        $this->assertEquals(76.08695652174, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
+        $this->assertEqualsWithDelta(76.08695652174, $project->getNormalisedMark($project->getParticipant($this->hodes), false), $this->delta);
     }
 
 
@@ -498,7 +498,7 @@ class SummatorTest extends TestCase
          *      = 2338 / 29
          *      = 80.62068965517
          */
-        $this->assertEquals(80.62068965517, $project->getNormalisedMark($project->getParticipant($this->hodes), true));
+        $this->assertEqualsWithDelta(80.62068965517, $project->getNormalisedMark($project->getParticipant($this->hodes), true), $this->delta);
 
         /* Most Recent Weighted Average is
          *      = [(98*6) + (77*10) + (100*5) + ((100 * 12/20)*8)] / 29
@@ -506,7 +506,7 @@ class SummatorTest extends TestCase
          *      = 2338 / 29
          *      = 80.62068965517
         */
-        $this->assertEquals(80.62068965517, $project->getNormalisedMark($project->getParticipant($this->hodes), false));
+        $this->assertEqualsWithDelta(80.62068965517, $project->getNormalisedMark($project->getParticipant($this->hodes), false), $this->delta);
     }
 
     /** Really go to town */
