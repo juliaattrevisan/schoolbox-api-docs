@@ -61,6 +61,8 @@ class Node extends AbstractNode
      */
     protected function hasPermission($nodeId, $minimumLevel)
     {
+        // could be string
+        $nodeId = (int)$nodeId;
         $myFolder = $this->getFolderLocator()->findById($nodeId);
         return (
             $nodeId === 0
