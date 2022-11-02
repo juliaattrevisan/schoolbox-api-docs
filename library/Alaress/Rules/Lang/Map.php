@@ -88,7 +88,7 @@ class Map implements Construct
                 if ($mapKey === $input) {
                     $isMatch = true;
                 } else {
-                    $isMatch = (new Matcher($mapKey))->match($input);
+                    $isMatch = (new Matcher($mapKey))->match($input ?? '');
                 }
 
                 if ($isMatch) {
