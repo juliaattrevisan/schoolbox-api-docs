@@ -22,6 +22,7 @@ use Schoolbox\External\Connector\Kamar\Base\Endpoint as KamarEndpoint;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint as SentralEndpoint;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\External\Connector\Compass\Base\Endpoint as CompassEndpoint;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint as WondeEndpoint;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
@@ -89,6 +90,12 @@ class Factory implements IFactory
 
 
     /**
+     * @var ValidStrats
+     */
+    private ValidStrats $validStrats;
+
+
+    /**
      * Factory constructor.
      *
      * @param string          $host
@@ -96,14 +103,16 @@ class Factory implements IFactory
      * @param bool            $perform
      * @param LoggerInterface $logger
      * @param array           $watchlist
+     * @param ValidStrats     $validStrats
      */
-    public function __construct(string $host, string $key, bool $perform, LoggerInterface $logger, array $watchlist)
+    public function __construct(string $host, string $key, bool $perform, LoggerInterface $logger, array $watchlist, ValidStrats $validStrats)
     {
         $this->host = $host;
         $this->key = $key;
         $this->perform = $perform;
         $this->logger = $logger;
         $this->watchlist = $watchlist;
+        $this->validStrats = $validStrats;
     }
 
 
@@ -126,6 +135,7 @@ class Factory implements IFactory
              */
             case self::ISAMS:
                 return (new IsamsEndpoint\Factory(
+                    $this->validStrats,
                     $this->logger,
                     $this->perform,
                     $this->host,
@@ -155,6 +165,7 @@ class Factory implements IFactory
              */
             case self::KAMAR:
                 return (new KamarEndpoint\Factory(
+                    $this->validStrats,
                     $this->logger,
                     $this->perform,
                     $this->host,
@@ -178,6 +189,7 @@ class Factory implements IFactory
 
             case self::SENTRAL:
                 return (new SentralEndpoint\Factory(
+                    $this->validStrats,
                     $this->logger,
                     $this->perform,
                     $this->host,
@@ -202,6 +214,7 @@ class Factory implements IFactory
 
             case self::TASS_API:
                 return (new TassApiEndpoint\Factory(
+                    $this->validStrats,
                     $this->logger,
                     $this->perform,
                     $this->host,
@@ -235,6 +248,7 @@ class Factory implements IFactory
 
             case self::COMPASS:
                 return (new CompassEndpoint\Factory(
+                    $this->validStrats,
                     $this->logger,
                     $this->perform,
                     $this->host,
@@ -260,6 +274,7 @@ class Factory implements IFactory
 
             case self::WONDE:
                 return (new WondeEndpoint\Factory(
+                    $this->validStrats,
                     $this->logger,
                     $this->perform,
                     $this->host,

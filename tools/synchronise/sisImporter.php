@@ -52,6 +52,11 @@ $app = new class extends CliTool\App
     private const OPT_LONG_WATCHLIST = 'watchlist:';
 
 
+    /**
+     * Pick the strat(s) to execute per factory
+     */
+    private const OPT_LONG_STRATS = 'strats::';
+
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -60,6 +65,7 @@ $app = new class extends CliTool\App
             self::OPT_LONG_HELP,
             self::OPT_LONG_FILE,
             self::OPT_LONG_WATCHLIST,
+            self::OPT_LONG_STRATS,
         ];
     }
 
@@ -114,6 +120,14 @@ HELP;
          */
         $watchlist   = (new Watchlist())->filter((string)$this->getOpt(self::OPT_LONG_WATCHLIST));
 
+        /* Importer strats can be defined by cli args
+         * null or empty string means "import everything"
+         *
+         * Otherwise, whatever you specified must fit within a known vocabulary
+         * and works in conjunction with whatever watchlists you have in place
+         */
+        $validStrats = new \Schoolbox\External\Connector\ValidStrats((string)($this->getOpt('strats')));
+
         /* You haven't specified a SUDS Data Source in Admin.
          */
         if (null === $type) {
@@ -162,7 +176,7 @@ NULLTYPE;
 
         /* Execute scheduler
          */
-        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), $watchlist);
+        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), $watchlist, $validStrats);
 
         $randomMapper = UserMapper::getInstance();
 
