@@ -147,18 +147,19 @@ export default {
 <style lang="scss" scoped>
 .student {
     border: 1px solid var(--form-border-color);
+    display: inline-block;
+    margin: 0 0.5rem 1rem 0.5rem;
     padding: 1rem;
     transition: background-color 0.3s; //shows that the student can be selected to toggle selection status
-    width: calc(v-bind(qrCodeSizeWithPx) + 2rem); //the width of the qr code plus 1rem padding left and right
     &:hover {
         background-color: var(--form-bg-hover-color);
     }
 }
 
     .student__code {
-        height: v-bind(qrCodeSizeWithPx); //should be the same as the qr code size
         position: relative;
-        width: v-bind(qrCodeSizeWithPx);
+        height: 170px; //should be the same as the qr code size
+        width: 170px;
     }
 
     .student_code-option {
@@ -173,7 +174,6 @@ export default {
     }
 
     .student__details {
-        overflow: hidden;
         padding: 1rem 0;
         text-align: center;
         h4 {
