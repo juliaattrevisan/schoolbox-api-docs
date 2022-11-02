@@ -58,16 +58,30 @@ class ValidStrats
     {
         /* Split $csv args into individual pieces
          */
+        $temp = explode(',', $csvArgs);
 
-        /* string-cast and trim everything
+        /* Cast all the elements in $values to strings
+         * because loosely typed data is poopy
          */
+        $temp = array_map('strval', $temp);
+
+        /* Lowercase everything
+         */
+        $temp = array_map('strtolower', $temp);
+
+        /* Trim all the strings in the set
+         * because doing manual trimming is boring
+         */
+        $temp = array_map('trim', $temp);
 
         /* Remove anything that doesn't also appear in self::STRATS
          * and ignore those
          */
+        $temp = array_intersect(self::STRATS, $temp);
 
         /* Return only the valid strats chosen
          * Each factory interprets this as desired
          */
+        return array_values($temp);
     }
 }
