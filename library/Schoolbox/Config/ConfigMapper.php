@@ -128,7 +128,8 @@ class ConfigMapper extends Mapper
     public const NAME_MAIL_ADDRESS           = 'mail_address';
     public const NAME_EMAIL_SIGNATURE        = 'email_signature';
     public const NAME_MAIL_FORCE_FROM_SYSTEM = 'mail_force_from_system';
-    public const NAME_MAIL_PASSWORD_CHANGE   = 'password_change_email_from';
+    public const NAME_MAIL_PASSWORD_CHANGE_FROM    = 'password_change_email_from';
+    public const NAME_MAIL_PASSWORD_CHANGE_SUBJECT = 'password_change_email_subject';
     public const NAME_MAIL_SUPPORT_ADDRESS   = 'mail_support_address';
     public const NAME_MAIL_FROM_ADDRESS      = 'mail_from_address';
     public const NAME_MAIL_FROM_NAME         = 'mail_from_name';
