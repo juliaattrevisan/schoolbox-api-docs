@@ -309,7 +309,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function isApproved(Alaress_Date_Format $now = null): bool
     {
-        return $this->getDiscreteState($now) & self::STATE_APPROVED;
+        return ($this->getDiscreteState($now) & self::STATE_APPROVED) !== 0;
     }
 
 
@@ -321,7 +321,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function isSubmitted(Alaress_Date_Format $now = null): bool
     {
-        return $this->getDiscreteState($now) & self::STATE_SUBMITTED;
+        return ($this->getDiscreteState($now) & self::STATE_SUBMITTED) !== 0;
     }
 
 
@@ -337,7 +337,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function isPublic(Alaress_Date_Format $now = null): bool
     {
-        return $this->getDiscreteState($now) & self::STATE_PUBLIC;
+        return ($this->getDiscreteState($now) & self::STATE_PUBLIC) !== 0;
     }
 
 
@@ -425,7 +425,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function canBeSubmitted(Alaress_Date_Format $now = null): bool
     {
-        return $this->getDiscreteState($now) & self::VALID_STATES_TO_SUBMIT;
+        return ($this->getDiscreteState($now) & self::VALID_STATES_TO_SUBMIT) !== 0;
     }
 
 
@@ -437,7 +437,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function canBeUnSubmitted(Alaress_Date_Format $now = null): bool
     {
-        return $this->getDiscreteState($now) & self::VALID_STATES_TO_UN_SUBMIT;
+        return ($this->getDiscreteState($now) & self::VALID_STATES_TO_UN_SUBMIT) !== 0;
     }
 
 
@@ -449,7 +449,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function canBeApproved(Alaress_Date_Format $now = null): bool
     {
-        return $this->getDiscreteState($now) & self::VALID_STATES_TO_APPROVE;
+        return ($this->getDiscreteState($now) & self::VALID_STATES_TO_APPROVE) !== 0;
     }
 
 
@@ -461,7 +461,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function canBeRejected(Alaress_Date_Format $now = null): bool
     {
-        return $this->getDiscreteState($now) & self::VALID_STATES_TO_REJECT;
+        return ($this->getDiscreteState($now) & self::VALID_STATES_TO_REJECT) !== 0;
     }
 
 
@@ -473,7 +473,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function canBeArchived(Alaress_Date_Format $now = null): bool
     {
-        return $this->getDiscreteState($now) & self::VALID_STATES_TO_ARCHIVE;
+        return ($this->getDiscreteState($now) & self::VALID_STATES_TO_ARCHIVE) !== 0;
     }
 
 
