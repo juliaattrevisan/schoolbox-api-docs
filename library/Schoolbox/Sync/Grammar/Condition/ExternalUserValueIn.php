@@ -84,7 +84,7 @@ class ExternalUserValueIn extends Condition\In
             if ($value === $validValue) {
                 return true;
             } else {
-                $isMatch = (new Matcher($validValue))->match($value);
+                $isMatch = (new Matcher($validValue))->match($value ?? '');
                 if ($isMatch) {
                     return true;
                 }
