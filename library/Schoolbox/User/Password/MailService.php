@@ -165,7 +165,7 @@ class MailService
         ?string $subject = null
     ) {
         $sent    = [];
-        $subject = $subject ?: $this->config->get('title') . ' Password Reset';
+        $subject = $subject ?: $this->config->get(ConfigMapper::NAME_MAIL_PASSWORD_CHANGE_SUBJECT);
 
         if (empty($users)) {
             // No users to mail to were found.
@@ -242,7 +242,7 @@ class MailService
     private function getFrom()
     {
         if (!$this->from) {
-            $this->from = new Address($this->config->get(ConfigMapper::NAME_MAIL_PASSWORD_CHANGE), $this->config->get(ConfigMapper::NAME_MAIL_FROM_NAME));
+            $this->from = new Address($this->config->get(ConfigMapper::NAME_MAIL_PASSWORD_CHANGE_FROM), $this->config->get(ConfigMapper::NAME_MAIL_FROM_NAME));
         }
         return $this->from;
     }
