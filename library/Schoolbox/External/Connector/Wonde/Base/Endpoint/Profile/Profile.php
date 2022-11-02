@@ -15,6 +15,7 @@ use DateTimeZone;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -71,6 +72,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var ValidStrats
+     */
+    private ValidStrats $validStrats;
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -123,6 +130,7 @@ class Profile implements IStrategy
     /**
      * Profile constructor.
      *
+     * @param ValidStrats                     $validStrats
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param IApi                            $api
@@ -133,6 +141,7 @@ class Profile implements IStrategy
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
+        ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         IApi $api,
@@ -142,6 +151,7 @@ class Profile implements IStrategy
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper
     ) {
+        $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
@@ -159,19 +169,22 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
-
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
+        if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
+            $this->log->info('Processing students and their parents.');
 
-        $this->importStudents();
+            $this->importStudents();
+        }
 
         /* Import staff profile data
          */
-        $this->log->info('Processing staff.');
+        if ($this->validStrats->isStaffStratEnabled()) {
+            $this->log->info('Processing staff.');
 
-        $this->importStaff();
+            $this->importStaff();
+        }
     }
 
 
@@ -458,7 +471,9 @@ class Profile implements IStrategy
 
                 /* Add their parents' profile data
                  */
-                $this->importParentsOfStudent($studentBaseProfile, $student['contacts']);
+                if ($this->validStrats->isFamiliesStratEnabled()) {
+                    $this->importParentsOfStudent($studentBaseProfile, $student['contacts']);
+                }
             }
 
             /* If there's a pagination struct, there's more data to come...
