@@ -18,6 +18,7 @@ use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Communications;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
@@ -77,6 +78,12 @@ class Profile implements IStrategy
      * Default TASS Communication Rule
      */
     private const DEFAULT_COMMUNICATION_RULE = 'tkco';
+
+
+    /**
+     * @var ValidStrats
+     */
+    private ValidStrats $validStrats;
 
 
     /**
@@ -220,6 +227,7 @@ class Profile implements IStrategy
     /**
      * Profile constructor.
      *
+     * @param ValidStrats                     $validStrats
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param array                           $api
@@ -239,6 +247,7 @@ class Profile implements IStrategy
      * @param StorageMapper                   $storageMapper
      */
     public function __construct(
+        ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         array $api,
@@ -257,6 +266,7 @@ class Profile implements IStrategy
         UserProfile\Relationship\Mapper $relationshipMapper,
         StorageMapper $storageMapper
     ) {
+        $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
@@ -293,13 +303,17 @@ class Profile implements IStrategy
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
-        $this->importStudents();
+        if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
+            $this->log->info('Processing students and their parents.');
+            $this->importStudents();
+        }
 
         /* Import staff profile data
          */
-        $this->log->info('Processing staff.');
-        $this->importStaff();
+        if ($this->validStrats->isStaffStratEnabled()) {
+            $this->log->info('Processing staff.');
+            $this->importStaff();
+        }
     }
 
 
@@ -315,23 +329,30 @@ class Profile implements IStrategy
             $this->communicationTypes
         ));
 
-        /* Grab all the parents' data in one big request
-         * We need this for the sfa_num for each identifier
+        /* Optionally load Parents' info
+         * Save some time by skipping this if the strat wasn't enabled
          */
-        $this->log->info('Downloading parent data (this might take a while)');
+        $familiesLookup = [];
 
-        $familiesLookup = (new Lookup\Family(
-            $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
-            $this->spousePrefix,
-            $this->addnumFather,
-            $this->addnumMother,
-            (new Communications(
-                $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
-                $this->fatherAddressDescription,
-                $this->motherAddressDescription,
-                $this->communicationTypes
-            ))->generate()
-        ))->generate();
+        if ($this->validStrats->isFamiliesStratEnabled()) {
+            /* Grab all the parents' data in one big request
+             * We need this for the sfa_num for each identifier
+             */
+            $this->log->info('Downloading parent data (this might take a while)');
+
+            $familiesLookup = (new Lookup\Family(
+                $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
+                $this->spousePrefix,
+                $this->addnumFather,
+                $this->addnumMother,
+                (new Communications(
+                    $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
+                    $this->fatherAddressDescription,
+                    $this->motherAddressDescription,
+                    $this->communicationTypes
+                ))->generate()
+            ))->generate();
+        }
 
         /* Process each current student, and their parents too.
            The includephoto parameter is available for both:
@@ -544,7 +565,9 @@ class Profile implements IStrategy
                 $this->studentProfileMapper->save($studentProfile);
             }
 
-            $this->importParentsOfStudent($studentBaseProfile, $familiesLookup);
+            if ($this->validStrats->isFamiliesStratEnabled()) {
+                $this->importParentsOfStudent($studentBaseProfile, $familiesLookup);
+            }
         }
     }
 
