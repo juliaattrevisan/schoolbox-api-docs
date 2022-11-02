@@ -12,7 +12,7 @@ use Schoolbox\Mapper as BaseMapper;
 /**
  * Mapper for learning areas.
  *
- * @deprecated 22.1: curriculum nodes no longer store their learning area or
+ * @deprecated 23.0: curriculum nodes no longer store their learning area or
  *             level, and these are no longer stored by
  *             `\Schoolbox\Curriculum\Source\BrowserInterface` implementations.
  *             (The corresponding models are _not_ deprecated, as they are still
