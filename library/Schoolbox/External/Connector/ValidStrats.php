@@ -110,6 +110,19 @@ class ValidStrats
 
 
     /**
+     * A convenience method that checks if the strats in the result set
+     * require the Profile strat to run. Any one of these profile-related
+     * strats cause it to start, doing its Prepare and Cleanup too
+     *
+     * @return bool
+     */
+    public function isProfileStratEnabled(): bool
+    {
+        return $this->isStudentStratEnabled() || $this->isFamiliesStratEnabled() || $this->isStaffStratEnabled();
+    }
+
+
+    /**
      * A convenience method that checks if the Staff strat is in the result set
      *
      * @return bool

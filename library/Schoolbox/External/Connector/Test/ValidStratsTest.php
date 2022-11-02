@@ -276,7 +276,53 @@ I,searched,‘aurora,borealis,green’, STaFF,stuDenT, ---_+=-=   fAMILIesa,f,f,
                 'isTimetableStratEnabled',
                 'families,student,staff',
                 false
-            ]
+            ],
+
+            /* Facade check
+            */
+            'Facade special case' => [
+                'isProfileStratEnabled',
+                '',
+                true
+            ],
+
+            'Facade 1' => [
+                'isProfileStratEnabled',
+                'families,student,staff',
+                true
+            ],
+
+            'Facade 2' => [
+                'isProfileStratEnabled',
+                'families,student',
+                true
+            ],
+
+            'Facade 3' => [
+                'isProfileStratEnabled',
+                'families',
+                true
+            ],
+
+            'Facade 4' => [
+                'isProfileStratEnabled',
+                'families,timetable',
+                true
+            ],
+
+            'Facade 5' => [
+                'isProfileStratEnabled',
+                'families,student,timetable',
+                true
+            ],
+
+            'Facade 6' => [
+                'isProfileStratEnabled',
+                'timetable',
+                false
+            ],
         ];
     }
 }
+
+

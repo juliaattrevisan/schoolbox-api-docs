@@ -126,7 +126,7 @@ HELP;
          * Otherwise, whatever you specified must fit within a known vocabulary
          * and works in conjunction with whatever watchlists you have in place
          */
-        $validStrats = new \Schoolbox\External\Connector\ValidStrats((string)($this->getOpt('strats')));
+        $validStrats = new \Schoolbox\External\Connector\ValidStrats((string)($this->getOpt(self::OPT_LONG_STRATS)));
 
         /* You haven't specified a SUDS Data Source in Admin.
          */
