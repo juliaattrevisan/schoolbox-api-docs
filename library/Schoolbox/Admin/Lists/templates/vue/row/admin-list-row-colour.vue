@@ -24,6 +24,10 @@ export default {
         this.initColourPicker();
     },
 
+    updated () {
+        $(this.$el).spectrum('set', this.colour);
+    },
+
     methods: {
 
         /**
