@@ -25,8 +25,11 @@ $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
 try {
+    /* Coalesce into a known default sizing in the absence of querystring param
+     */
+    $size = $_GET['size'] ?? 'maxsize';
+
     if (isset($_GET['hash']) && $_GET['hash']) {
-        $size = $_GET['size'] ?? 'maxsize';
         /** @var FilesystemProxy $filesystemProxy */
         $filesystemProxy = $kernel->get('filesystem.storageProxy');
         $resource        = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
@@ -68,8 +71,8 @@ try {
     }
 } catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
-    SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'] ?? 'maxsize', $e->getHttpStatusCode());
+    SitePage::redirectToBrokenImageWithTransform('storage', $size, $e->getHttpStatusCode());
 } catch (Exception $e) {
     // fall through
 }
-SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'] ?? 'maxsize', 404);
+SitePage::redirectToBrokenImageWithTransform('storage', $size, 404);
