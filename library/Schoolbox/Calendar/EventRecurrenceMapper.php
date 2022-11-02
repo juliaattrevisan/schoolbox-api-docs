@@ -140,7 +140,6 @@ class EventRecurrenceMapper
          */
         $eventRecurrence = new EventRecurrence(
             $this->eventMapper,
-            $efficacy,
             $repeatSetting,
             $until,
             $startDate,

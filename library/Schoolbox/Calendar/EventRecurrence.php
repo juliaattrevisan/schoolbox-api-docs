@@ -60,20 +60,6 @@ class EventRecurrence
     private $dateCollection = array();
 
     /**
-     * Efficacy setting chosen
-     *
-     * @var string
-     */
-    private $efficacy = '';
-
-    /**
-     * Possible efficacy values
-     *
-     * @var string[]
-     */
-    private $efficacyValues = [ EventRecurrenceMapper::EFFICACY_SERIES, EventRecurrenceMapper::EFFICACY_SELF ];
-
-    /**
      * The chosen frequency of event recurrence (daily, weekly, etc)
      * as selected by the user
      *
@@ -107,13 +93,12 @@ class EventRecurrence
      * Constructor
      *
      * @param EventMapper $mapper
-     * @param string $efficacy
      * @param string $repeatSetting
      * @param Alaress_Date_Format $until
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
      */
-    public function __construct($mapper, $efficacy, $repeatSetting, $until, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate)
+    public function __construct($mapper, $repeatSetting, $until, Alaress_Date_Format $startDate, Alaress_Date_Format $endDate)
     {
         $this->setCalendarHandler($mapper);
         $this->setDateCollection(new Collection());
@@ -122,15 +107,9 @@ class EventRecurrence
         $this->setStartDate($startDate);
         $this->setEndDate($endDate);
 
-        /* Used for recurring events - determines how broadly
-         * changes are made to event details etc
-         */
-        if (in_array($efficacy, $this->getEfficacyValues())) {
-            $this->setEfficacy($efficacy);
-        }
 
         if ($this->isValidInterval() && $this->getUntil()->getUnixTimeStamp()) {
-            // repeat specified, and and enddate also, populate the dates to be set
+            // repeat specified, and enddate also, populate the dates to be set
             $this->setSeriesId($this->getCalendarHandler()->getUpperSeriesIndex());
 
             $start_timestamp = $this->getStartDate()->getUnixTimeStamp();
@@ -138,7 +117,7 @@ class EventRecurrence
 
             // Repeat of events: repeat until the start date is after the until
             // date (or x100, whatever is less)
-            for ($i = 0; ($start_timestamp <= $this->getUntil()->getUnixTimeStamp()) && ($i < $this->getMaxNumRecurring()); $i++) {
+            for ($i = 0; ($start_timestamp <= $this->getUntil()->getUnixTimeStamp()) && ($i < $this->maxNumRecurring); $i++) {
                 $this_start_date = new Alaress_Date_Format($start_timestamp, 'U');
                 $this_end_date = new Alaress_Date_Format($end_timestamp, 'U');
 
@@ -213,26 +192,6 @@ class EventRecurrence
     }
 
     /**
-     * Set max num recurring
-     *
-     * @param int $maxNumRecurring
-     */
-    private function setMaxNumRecurring($maxNumRecurring)
-    {
-        $this->maxNumRecurring = $maxNumRecurring;
-    }
-
-    /**
-     * Get max num recurring
-     *
-     * @return int
-     */
-    private function getMaxNumRecurring()
-    {
-        return $this->maxNumRecurring;
-    }
-
-    /**
      * Set series id
      *
      * @param int $seriesId
@@ -290,46 +249,6 @@ class EventRecurrence
     public function getDateCollection()
     {
         return $this->dateCollection;
-    }
-
-    /**
-     * Set efficacy
-     *
-     * @param string $efficacy
-     */
-    private function setEfficacy($efficacy)
-    {
-        $this->efficacy = $efficacy;
-    }
-
-    /**
-     * Get efficacy
-     *
-     * @return string
-     */
-    private function getEfficacy()
-    {
-        return $this->efficacy;
-    }
-
-    /**
-     * Set efficacy values
-     *
-     * @param string $efficacyValues
-     */
-    private function setEfficacyValues($efficacyValues)
-    {
-        $this->efficacyValues = $efficacyValues;
-    }
-
-    /**
-     * Get efficacy values
-     *
-     * @return string[]
-     */
-    private function getEfficacyValues()
-    {
-        return $this->efficacyValues;
     }
 
     /**
