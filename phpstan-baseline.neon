@@ -2061,11 +2061,6 @@ parameters:
 			path: library/External/Isams/Timetable.php
 
 		-
-			message: "#^If condition is always false\\.$#"
-			count: 4
-			path: library/External/Liss/Server.php
-
-		-
 			message: "#^Property External_Maze_Class\\:\\:\\$helper \\(External_Maze_Helper\\) does not accept null\\.$#"
 			count: 1
 			path: library/External/Maze/Class.php
