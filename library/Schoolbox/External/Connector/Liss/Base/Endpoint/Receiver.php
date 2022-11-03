@@ -253,6 +253,11 @@ class Receiver
             return $this->generateResponse(self::AUTHENTICATION_FAILED);
         }
 
+        /* Cache locally whatever liss sent to us
+         * This allows you to replay locally
+         */
+        (new PayloadCache())->cache($message);
+
         /* This is the equivalent of a combined Scheduler.php and Factory.php
          * since the liss receiver immediately processes upon receiving data
          *
