@@ -52,41 +52,41 @@ class Controller extends Web\Controller\Base
 
 
     /** @var Storage\Mapper */
-    private $storageMapper;
+    private Storage\Mapper $storageMapper;
 
 
     /** @var ImporterFactory */
-    private $importerFactory;
+    private ImporterFactory $importerFactory;
 
 
     /**
      * @var External\Profile\Mapper
      */
-    private $baseProfileMapper;
+    private External\Profile\Mapper $baseProfileMapper;
 
 
     /**
      * @var External\Profile\Parent\Mapper
      */
-    private $parentProfileMapper;
+    private External\Profile\Parent\Mapper $parentProfileMapper;
 
 
     /**
      * @var External\Profile\Student\Mapper
      */
-    private $studentProfileMapper;
+    private External\Profile\Student\Mapper $studentProfileMapper;
 
 
     /**
      * @var External\Profile\Staff\Mapper
      */
-    private $staffProfileMapper;
+    private External\Profile\Staff\Mapper $staffProfileMapper;
 
 
     /**
      * @var External\Profile\Relationship\Mapper
      */
-    private $relationshipMapper;
+    private External\Profile\Relationship\Mapper $relationshipMapper;
 
 
     /**
@@ -332,5 +332,4 @@ class Controller extends Web\Controller\Base
             throw new InvalidArgumentException('The given authentication token is invalid.', 403);
         }
     }
-
 }
