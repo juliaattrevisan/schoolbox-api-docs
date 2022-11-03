@@ -63,7 +63,7 @@ $logoSizes = [
 ];
 
 $logo = $_GET['logo'];
-$size = $_GET['size'];
+$size = $_GET['size'] ?? 'normal';
 
 if (!(array_key_exists($logo, $logoSizes) && array_key_exists($size, $logoSizes[$logo]))) {
     SitePage::redirectToBrokenImageOfSize(80, 80, 404);
