@@ -24,8 +24,17 @@ export default {
         this.initColourPicker();
     },
 
-    updated () {
-        $(this.$el).spectrum('set', this.colour);
+    watch: {
+
+        /**
+         * Ensure the correct colour is always set on the row,
+         * as the colour could also change if we delete a row above,
+         * so we need to ensure the colour picker stays up to date
+         */
+        colour (newValue) {
+            $(this.$el).spectrum('set', newValue);
+        }
+
     },
 
     methods: {
