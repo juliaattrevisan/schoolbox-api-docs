@@ -212,7 +212,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
         } elseif (isset($_POST['update']) && ($_POST['update'] == 'page')) {
             // Update permissions and page title
 
-            EportfolioPermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
+            EportfolioPermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'] ?? [], $_POST['individual_permission'] ?? []);
             $eportfolioHandler->updatePageTitle(trim($_POST['pageTitle']));
             SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getOwner()->getId()}/{$eportfolioHandler->getPageId()}");
         } elseif (isset($_POST['deletePage'])) {
@@ -335,7 +335,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
         // Apply permissions to the newly-created page
 
-        Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
+        Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'] ?? [], $_POST['individual_permission'] ?? []);
 
         // Redirect to newly created page
 
