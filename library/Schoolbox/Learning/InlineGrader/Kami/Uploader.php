@@ -192,6 +192,12 @@ class Uploader
                         $kamiDoc->getId(),
                         $kamiDoc->getFileStatus()
                     ));
+                } catch (\League\Flysystem\FilesystemException $e) {
+                    //file does not exist on the filesystem, permanent failure...
+                    $kamiModel->setStatus(Model::STATUS_ERROR);
+                    $kamiModel->setErrorMessage("File does not exist ");
+                    $this->saveKamiModel($kamiModel);
+                    $this->logUploadFailure($kamiModel, $e);
                 } catch (Exception\NotFound $e) {
                     //file not found, error out
                     $kamiModel->setStatus(Model::STATUS_ERROR);
@@ -280,9 +286,8 @@ class Uploader
                 throw $e;
             } catch (\League\Flysystem\FilesystemException $e) {
                 //file does not exist on the filesystem, permanent failure...
-                $this->log->error($e->getTraceAsString());
-                $kamiModel->setStatus(Model::STATUS_ERROR);
-                $this->kamiMapper->save($kamiModel);
+                $this->logUploadException($e, $kamiModel, $countFailedAttempts);
+                throw $e;
             } catch (\Throwable $e) {
                 // But if unknown, also print the trace to help debugging
                 $this->logUploadException($e, $kamiModel, $countFailedAttempts);
