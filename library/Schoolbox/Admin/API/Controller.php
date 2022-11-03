@@ -11,7 +11,11 @@ namespace Schoolbox\Admin\API;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web;
+use Aura\Web\Exception\InvalidStatusCode;
 use InvalidArgumentException;
+use League\Flysystem\FilesystemException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\Import\Profile\Importer;
 use Schoolbox\Admin\Import\Profile\Mapping;
 use Schoolbox\External;
@@ -36,7 +40,6 @@ class Controller extends Web\Controller\Base
         Mapping::CSV_STAFF,
         Mapping::CSV_RELATIONSHIP
     ];
-
 
     /**
      * Timetable and Enrolment CSVs
@@ -119,31 +122,23 @@ class Controller extends Web\Controller\Base
 
 
     /**
+     * @throws InvalidStatusCode
      * @api POST /api/admin/csv
      */
-    public function postUploadCsv()
+    public function postUploadCsv(): void
     {
+        $post = $this->getRequest()->post;
+        $rs = $this->getResponse();
+
         $responseJson = [
             'success' => false
         ];
 
-        $rs = $this->getResponse();
-
-        // regrettably we can't do these checks in the module, because we don't have access to the $_POST array
-
-        $key  = $this->getRequest()->post->get('key');
-
         try {
-            if (!$key) {
-                throw new InvalidArgumentException('No authentication token was supplied.', 401);
-            }
-
-            if ($this->getConfigLoader()->get('api_key') !== $key) {
-                throw new InvalidArgumentException('The given authentication token is invalid.', 403);
-            }
+            // regrettably we can't do these checks in the module, because we don't have access to the $_POST array
+            $this->authenticate((string)$post->get('key'));
 
             // key validated; you may proceed
-
             $file = $this->getRequest()->files->get('file');
 
             if (!$file) {
@@ -169,12 +164,14 @@ class Controller extends Web\Controller\Base
 
     /**
      *
+     * @throws InvalidStatusCode
+     * @throws FilesystemException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @api POST /api/admin/process
      *
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
-    public function postProcess()
+    public function postProcess(): void
     {
         $post = $this->getRequest()->post;
         $rs   = $this->getResponse();
@@ -183,26 +180,29 @@ class Controller extends Web\Controller\Base
             'success' => false
         ];
 
-        // regrettably we can't do these checks in the module, because we don't have access to the $_POST array
-
-        $key  = $post->get('key');
-
         try {
-            if (!$key) {
-                throw new InvalidArgumentException('No authentication token was supplied.', 401);
-            }
-
-            if ($this->getConfigLoader()->get('api_key') !== $key) {
-                throw new InvalidArgumentException('The given authentication token is invalid.', 403);
-            }
+            // regrettably we can't do these checks in the module, because we don't have access to the $_POST array
+            $this->authenticate((string)$post->get('key'));
 
             // key validated; you may proceed
-
             // check for whether all the necessary files are supplied, and valid
-
             $files = [];
 
-            foreach (array_merge(self::REQUIRED_USER_PROFILE_CSVS, array_keys(self::REQUIRED_CSVS)) as $requiredCsv) {
+            /* Required csvs are a combination of Profile-related csvs and cyclic grid timetable csvs.
+             * You'll typically need one of the following sets of files in their entirety:
+             *     - profile csvs
+             *     - timetable csvs
+             *     - some combination of the two
+             *
+             * It's possible you can send a subset of those two sets
+             * e.g. send some profile csvs and some timetable csvs, but not all
+             *
+             * In that case we should presume users meant to send the full set of each
+             * but didn't
+             */
+            $requiredCsvs = array_merge(self::REQUIRED_USER_PROFILE_CSVS, array_keys(self::REQUIRED_CSVS));
+
+            foreach ($requiredCsvs as $requiredCsv) {
                 $hash = $post->get($requiredCsv);
 
                 if (!$hash) {
@@ -211,7 +211,7 @@ class Controller extends Web\Controller\Base
                 }
 
                 try {
-                    if (!in_array($requiredCsv, self::REQUIRED_USER_PROFILE_CSVS)) {
+                    if (!in_array($requiredCsv, self::REQUIRED_USER_PROFILE_CSVS, true)) {
                         // assign the given hash to its place in the files array
                         $files[self::REQUIRED_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
                     } else {
@@ -238,7 +238,7 @@ class Controller extends Web\Controller\Base
 
                 try {
                     foreach ($files as $keyspace => $file) {
-                        if (!in_array($keyspace, self::REQUIRED_USER_PROFILE_CSVS)) {
+                        if (!in_array($keyspace, self::REQUIRED_USER_PROFILE_CSVS, true)) {
                             // this is where the action happens
                             $this->importerFactory->buildImporter(
                                 $keyspace,
@@ -280,4 +280,25 @@ class Controller extends Web\Controller\Base
 
         $rs->content->set($this->buildJsonOutput($responseJson));
     }
+
+
+    /**
+     * Decide if the given $key was valid and matches the config var
+     * For some reason this throws exceptions
+     *
+     * @param string $key
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    private function authenticate(string $key): void
+    {
+        if (!$key) {
+            throw new InvalidArgumentException('No authentication token was supplied.', 401);
+        }
+
+        if ($this->getConfigLoader()->get('api_key') !== $key) {
+            throw new InvalidArgumentException('The given authentication token is invalid.', 403);
+        }
+    }
+
 }
