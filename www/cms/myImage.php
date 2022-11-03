@@ -70,13 +70,10 @@ if (isset($_GET['key'])) {
     $transforms = new Image\Transformation\Storage();
     $cacheKey   = $transforms->getCacheKey($_GET['key']);
     $transform  = $transforms->retrieve($_GET['key']);
-} elseif (isset($width) && isset($height)) {
+} else {
     $transforms = new Image\Transformation\MyImage();
     $cacheKey   = $transforms->getCacheKey((int)$width, (int)$height);
     $transform  = $transforms->retrieve((int)$width, (int)$height);
-} else {
-    redirectToBroken(400);
-    exit;
 }
 
 /** @var Storage\Model $storageModel */
