@@ -1,6 +1,7 @@
 <script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
-{% set title =  (badges | length > 1) ? 'Award Achievements' : 'Award Achievement' %}
+{% set awardType = isGoal ? 'goal' : 'achievement' %}
+{% set title = 'Award ' ~ (awardType | capitalize) ~ ((badges | length > 1) ? 's' : '') %}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     ['Badges', routeLookupIfAuthorized('learningBadge.getBadgeListPage') ],
@@ -22,7 +23,8 @@
         {% endif %}
     </div>
 </div>
-{% include '@learningBadgeAward/awardBadgeList.twig' %}
+{% include '@learningBadgeAward/awardBadgeList.twig'
+    with {badges: badges, isGoal: isGoal} only %}
 <div class="row">
     <div class="small-12 island">
         <div class="actions-small-2 row">
@@ -39,7 +41,9 @@
                     <div class="small-12 columns">
                         <input type="hidden" name="targetUserIds" value="{{ targetUserIds }}">
                         <input type="hidden" name="badgeIds" value="{{ badgeIds }}">
-                        <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
+                        <p class="meta">Provide evidence or narrative on how the
+                            {{ isGoal ? 'goal is progressing.' : 'achievement was earned.' }}
+                        </p>
                         <textarea id="reason" name="reason"></textarea>
                     </div>
                 </fieldset>

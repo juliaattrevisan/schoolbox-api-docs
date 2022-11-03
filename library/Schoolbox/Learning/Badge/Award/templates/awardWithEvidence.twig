@@ -1,7 +1,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     [ award.recipient.fullname, routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id}) ],
-    ['Achievement Evidence']
+    [ award.status | capitalize ~ ' Evidence']
 ) }}
 {% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
 {% set modifyRoute = routeLookupIfAuthorized('learningBadgeAward.getAwardUpdate', {awardId: award.id}) %}
@@ -11,7 +11,7 @@
         $('[data-delete-evidence]').click(function (e) {
             e.preventDefault();
             $(this).confirmDialog({
-                text: 'Are you sure you want to delete the evidence from this achievement?',
+                text: 'Are you sure you want to delete the evidence from this {{ award.status }}?',
                 confirmEvent: function () {
                     $.post('{{ postRoute }}', {
                         reason: ''
@@ -25,9 +25,9 @@
 </script>
 <div class="row">
     <div class="small-12 columns">
-        <h1>Achievement Evidence</h1>
+        <h1>{{ award.status | capitalize }} Evidence</h1>
         <ul class="meta">
-            <li class="icon-achievement">Awarded
+            <li class="icon-{{ award.status }}">Awarded
                 <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
                 by
                 {% if awardedByRoute %}
@@ -39,7 +39,8 @@
         </ul>
     </div>
 </div>
-{% include '@learningBadgeAward/awardBadgeList.twig' %}
+{% include '@learningBadgeAward/awardBadgeList.twig'
+    with {badges: badges, isGoal: award.isGoal} only %}
 <div class="row">
     <div class="small-12 island">
         <div class="actions-small-2 row">

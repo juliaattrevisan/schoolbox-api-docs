@@ -3,14 +3,14 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     [ award.recipient.fullname, routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id}) ],
-    ['Achievement Evidence']
+    [ (award.status | capitalize) ~ ' Evidence']
 ) }}
 {% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
 <div class="row">
     <div class="small-12 columns">
-        <h1>Achievement Evidence</h1>
+        <h1>{{ award.status | capitalize }} Evidence</h1>
         <ul class="meta">
-            <li class="icon-achievement">Awarded
+            <li class="icon-{{ award.status }}">{{ award.isGoal ? 'Goal set' : 'Awarded' }}
                 <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time> by
                 {% if awardedByRoute %}
                     <a href="{{ awardedByRoute }}">{{ award.awardedBy.fullname }}</a>
@@ -21,7 +21,8 @@
         </ul>
     </div>
 </div>
-{% include '@learningBadgeAward/awardBadgeList.twig' %}
+{% include '@learningBadgeAward/awardBadgeList.twig'
+    with {badges: badges, isGoal: award.isGoal} only %}
 <div class="row">
     <div class="small-12 island">
         <div class="actions-small-2 row">
@@ -36,7 +37,9 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
+                        <p class="meta">Provide evidence or narrative on how the
+                            {{ award.isGoal ? 'goal is progressing.' : 'achievement was earned.' }}
+                        </p>
                         <textarea id="reason" name="reason">{{ award.reason }}</textarea>
                     </div>
                 </fieldset>

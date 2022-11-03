@@ -306,6 +306,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardWithEvidenceForm.twig',
                 [
+                    'isGoal'        => false,
                     'badges'        => $badges->map($badgeTranslator),
                     'badgeIds'      => implode(',', $badges->getPropertyValues('id')),
                     'targetUsers'   => $users->map($userTranslator),
