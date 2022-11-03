@@ -316,6 +316,22 @@ export default {
                     <article v-if="award.badge.body" v-html="award.badge.body"></article>
                     <div class="component-action">
                         <section>
+                            <a
+                                v-if="award.reason && award.reason.length"
+                                title="View evidence"
+                                class="button"
+                                :href="`/learning/badge/award/${award.id}/viewEvidence`+getReturnUrl()"
+                            >
+                                View Evidence
+                            </a>
+                            <a
+                                v-else-if="award._links.awardUpdate"
+                                title="Add evidence"
+                                class="button"
+                                :href="`/learning/badge/award/${award.id}/update`+getReturnUrl()"
+                            >
+                                Add Evidence
+                            </a>
                             <template v-if="award._links.goalAward && award.isGoal && !award.award">
                                 <a
                                     title="Award with evidence"
@@ -331,22 +347,6 @@ export default {
                                     Award
                                 </button>
                             </template>
-                            <a
-                                v-else-if="award.reason && award.reason.length"
-                                title="View evidence"
-                                class="button"
-                                :href="`/learning/badge/award/${award.id}/viewEvidence`+getReturnUrl()"
-                            >
-                                View Evidence
-                            </a>
-                            <a
-                                v-else-if="award._links.awardUpdate"
-                                title="Add evidence"
-                                class="button"
-                                :href="`/learning/badge/award/${award.id}/update`+getReturnUrl()"
-                            >
-                                Add Evidence
-                            </a>
                         </section>
                     </div>
                 </div>
