@@ -11,7 +11,7 @@ import RevealModal from '@schoolboxVue/components/reveal-modal';
 import Toast from '@schoolboxVue/components/toast';
 
 export default {
-    
+
     components: {
         RevealModal,
         Toast
@@ -39,6 +39,8 @@ export default {
             } else if (newValue) { //otherwise open up the modal to confirm or cancel
                 this.$refs.deleteModal.open();
             }
+            //remove error state if it exists
+            $("[data-list='error']").remove();
         }
 
     },
@@ -76,7 +78,7 @@ export default {
 
         /**
          * Send through the data to delete the row
-         * 
+         *
          * @returns { FormData }
          */
         getDeleteRowFormData () {
