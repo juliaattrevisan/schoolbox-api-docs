@@ -93,22 +93,22 @@ I,searched,‘aurora,borealis,green’",
              */
             'Mixed 1' => [
                 'sTafF',
-                ['staff']
+                [ValidStrats::STAFF]
             ],
 
             'Mixed 2' => [
                 'STAFF',
-                ['staff']
+                [ValidStrats::STAFF]
             ],
 
             'Mixed 3' => [
                 'STAFF,stuDenT,    fAMILIes',
-                ['staff', 'student', 'families']
+                [ValidStrats::STAFF, ValidStrats::STUDENT, ValidStrats::FAMILIES]
             ],
 
             'Mixed 4' => [
                 '    STaFF,stuDenT,    fAMILIes, tIMeTABLe, timetableX',
-                ['staff', 'student', 'families', 'timetable']
+                [ValidStrats::STAFF, ValidStrats::STUDENT, ValidStrats::FAMILIES, ValidStrats::TIMETABLE]
             ],
 
             /* The chaos of the world
@@ -117,7 +117,7 @@ I,searched,‘aurora,borealis,green’",
                 '  , ,12% ,^0 ,STAFF ,(** , ,s,STaFF,stuDenT,    fAMILIes, tIMeTABLe, timetableXt,  23*&%* ,,,,,,,,,,,,This,scene,feels,like,what,I,once,saw,on,a,screen,
 I,searched,‘aurora,borealis,green’,,,,,,,,,,,,,This,scene,feels,like,what,I,once,saw,on,a,screen,
 I,searched,‘aurora,borealis,green’, STaFF,stuDenT, ---_+=-=   fAMILIesa,f,f, , ,sTafF,,,     ,, ,STAFF,stuDenT,    fAMILIes ,,       ,           ',
-                ['staff', 'student', 'families', 'timetable']
+                [ValidStrats::STAFF, ValidStrats::STUDENT, ValidStrats::FAMILIES, ValidStrats::TIMETABLE]
             ]
         ];
     }
