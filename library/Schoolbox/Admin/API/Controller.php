@@ -176,6 +176,8 @@ class Controller extends Web\Controller\Base
         $post = $this->getRequest()->post;
         $rs   = $this->getResponse();
 
+        $errors = [];
+
         $responseJson = [
             'success' => false
         ];
@@ -200,9 +202,39 @@ class Controller extends Web\Controller\Base
              * In that case we should presume users meant to send the full set of each
              * but didn't
              */
-            $requiredCsvs = array_merge(self::REQUIRED_USER_PROFILE_CSVS, array_keys(self::REQUIRED_CSVS));
+            $requiredProfileCsvs = self::REQUIRED_USER_PROFILE_CSVS;
+            $requiredTimetableCsvs = array_keys(self::REQUIRED_CSVS);
 
-            foreach ($requiredCsvs as $requiredCsv) {
+            /* If user sent at least one Profile csv, we will require all of them.
+             *
+             * Similarly for the Timetable csvs; if user sent one, we'll need all of them.
+             *
+             * If user didn't send any, we don't require them
+             */
+            $allRequiredCsvs = [];
+
+            foreach ($requiredProfileCsvs as $requiredProfileCsv) {
+                $hash = $post->get($requiredProfileCsv);
+
+                if ($hash) {
+                    $allRequiredCsvs = array_merge($allRequiredCsvs, $requiredProfileCsvs);
+                    break;
+                }
+            }
+
+            foreach ($requiredTimetableCsvs as $requiredProfileCsv) {
+                $hash = $post->get($requiredProfileCsv);
+
+                if ($hash) {
+                    $allRequiredCsvs = array_merge($allRequiredCsvs, $requiredTimetableCsvs);
+                    break;
+                }
+            }
+
+            /* Consume each csv files that we know to be required
+             * based on inspecting what the user sent
+             */
+            foreach ($allRequiredCsvs as $requiredCsv) {
                 $hash = $post->get($requiredCsv);
 
                 if (!$hash) {
@@ -223,7 +255,7 @@ class Controller extends Web\Controller\Base
                 }
             }
 
-            if (isset($errors)) {
+            if (\count($errors)) {
                 $responseJson['error'] = $errors;
                 $rs->status->set(400);
             } else {
