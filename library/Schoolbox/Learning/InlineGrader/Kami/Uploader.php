@@ -198,6 +198,13 @@ class Uploader
                     $kamiModel->setErrorMessage("File does not exist ");
                     $this->saveKamiModel($kamiModel);
                     $this->logUploadFailure($kamiModel, $e);
+                    $this->log->warning("Kami file unable to be found on the filesystem. Ignoring file.");
+                    $this->log->error(sprintf(
+                        "Setting kami document (id: %d) status to '%s'",
+                        $kamiModel->getId(),
+                        Model::STATUS_ERROR
+                    ));
+                    continue;
                 } catch (Exception\NotFound $e) {
                     //file not found, error out
                     $kamiModel->setStatus(Model::STATUS_ERROR);
