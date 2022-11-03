@@ -109,6 +109,6 @@ function redirectToBroken(int $code = 500): void
     } elseif (isset($_GET['width'])) {
         SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'] ?? $_GET['width'], $code);
     } else {
-        SitePage::redirectToBrokenImageOfSize(80, $_GET['height'] ?? $_GET['width'], $code);
+        SitePage::redirectToBrokenImageOfSize(80, 80, $code);
     }
 }
