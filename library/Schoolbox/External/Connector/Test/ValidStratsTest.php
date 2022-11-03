@@ -279,7 +279,14 @@ I,searched,‘aurora,borealis,green’, STaFF,stuDenT, ---_+=-=   fAMILIesa,f,f,
             ],
 
             /* Facade check
-            */
+             * This represents a combination of enabled strats for the supercategory
+             * Profile and Timetable. Profiles consist of multiple strats: staff student families
+             * so to find out if the Profile import should be enabled at all, at least
+             * one of those must have been selected
+             *
+             * This saves you import time by disabling certain parts that a suds
+             * importer doesn't need when you've selected a particular strat
+             */
             'Facade special case' => [
                 'isProfileStratEnabled',
                 '',
