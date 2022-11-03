@@ -17,6 +17,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
+use League\Flysystem\FilesystemException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
@@ -140,6 +141,7 @@ class Connector implements IConnector
      * @throws Exception\InvalidStatusException if response status is invalid
      * @throws Exception\NotFound If document somehow does not exist in Kami after being uploaded
      * @throws GuzzleException
+     * @throws FilesystemException if the file doesn't exist on the disk
      */
     public function uploadDocument(IStorage $storage, FilesystemProxy $filesystemProxy): Document
     {
