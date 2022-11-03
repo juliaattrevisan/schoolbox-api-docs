@@ -24,12 +24,16 @@ use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
+
+$height = $_GET['height'] ?? 80;
+$width = $_GET['width'] ?? 80;
+
 $kernel = new Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
-    new ResourceLimitExceededHandler(function () {
+    new ResourceLimitExceededHandler(function () use ($width, $height) {
         header('Cache-Control: no-store');
-        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 504);
+        SitePage::redirectToBrokenImageOfSize($width, $height, 504);
     }),
     ShutdownHandler::PRIORITY_HIGHEST,
 );
@@ -44,16 +48,16 @@ try {
     $groupHandler = new Group();
 
     if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
-        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
+        SitePage::redirectToBrokenImageOfSize($width, $height, 403);
     }
 } catch (Exception $e) {
-    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
+    SitePage::redirectToBrokenImageOfSize($width, $height, 404);
 }
 
 /* Process and stream image
  */
 $myImage  = new Transformation\MyImage();
-$cacheKey = $myImage->getCacheKey((int)$_GET['width'], (int)$_GET['height']);
+$cacheKey = $myImage->getCacheKey((int)$width, (int)$height);
 try {
     /** @var Schoolbox\Resource\File\Model $file */
     /** @var Schoolbox\Resource\Storage\Model $resource */
@@ -79,7 +83,7 @@ try {
 
     /** @var ProcessorFactory $processorFactory */
     $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
-    $transform        = $myImage->retrieve((int)$_GET['width'], (int)$_GET['height']);
+    $transform        = $myImage->retrieve((int)$width, (int)$height);
     $imageProcessor   = $processorFactory->buildForStorage(
         $resource,
         $cacheKey,
@@ -88,9 +92,9 @@ try {
     $imageProcessor->load()->stream();
 } catch (ConcurrentTransformationException | InvalidPresignedUrlDurationExecption $e) {
     $kernel->outputResourceBeingProcessedHeader();
-    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], $e->getHttpStatusCode());
+    SitePage::redirectToBrokenImageOfSize($width, $height, $e->getHttpStatusCode());
 } catch (SchoolboxNotFoundException $e) {
-    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
+    SitePage::redirectToBrokenImageOfSize($width, $height, 404);
 } catch (Exception $e) {
-    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 500);
+    SitePage::redirectToBrokenImageOfSize($width, $height, 500);
 }

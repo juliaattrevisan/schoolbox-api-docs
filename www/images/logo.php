@@ -22,12 +22,16 @@ use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
+
+$height = $_GET['height'] ?? 80;
+$width = $_GET['width'] ?? 80;
+
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
-    new ResourceLimitExceededHandler(function () {
+    new ResourceLimitExceededHandler(function () use ($width, $height) {
         header('Cache-Control: no-store');
-        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 504);
+        SitePage::redirectToBrokenImageOfSize($width, $height, 504);
     }),
     ShutdownHandler::PRIORITY_HIGHEST,
 );
@@ -62,11 +66,15 @@ $logoSizes = [
     ],
 ];
 
+if (!array_key_exists('logo', $_GET) || !array_key_exists('size', $_GET)) {
+    SitePage::redirectToBrokenImageOfSize($width, $height, 404);
+}
+
 $logo = $_GET['logo'];
 $size = $_GET['size'];
 
-if (!(array_key_exists($logo, $logoSizes) && array_key_exists($size, $logoSizes[$logo]))) {
-    SitePage::redirectToBrokenImageOfSize(80, 80, 404);
+if (!array_key_exists($logo, $logoSizes) || !array_key_exists($size, $logoSizes[$logo])) {
+    SitePage::redirectToBrokenImageOfSize($width, $height, 404);
 }
 
 $myImage = new Transformation\MyImage();
@@ -119,7 +127,7 @@ try {
         readfile($placeHolderFile);
         exit;
     }
-    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], $responseCode);
+    SitePage::redirectToBrokenImageOfSize($width, $height, $responseCode);
 } catch (Exception $e) {
     // redirect to the placeholder
     /** @var PrefixGenerator $cdnPrefixGenerator */

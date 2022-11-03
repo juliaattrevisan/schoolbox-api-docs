@@ -15,6 +15,10 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../conf/core/require.php';
+
+$height = $_GET['height'] ?? 80;
+$width = $_GET['width'] ?? 80;
+
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
@@ -66,10 +70,10 @@ if (isset($_GET['key'])) {
     $transforms = new Image\Transformation\Storage();
     $cacheKey   = $transforms->getCacheKey($_GET['key']);
     $transform  = $transforms->retrieve($_GET['key']);
-} elseif (isset($_GET['width']) && isset($_GET['height'])) {
+} elseif (isset($width) && isset($height)) {
     $transforms = new Image\Transformation\MyImage();
-    $cacheKey   = $transforms->getCacheKey((int)$_GET['width'], (int)$_GET['height']);
-    $transform  = $transforms->retrieve((int)$_GET['width'], (int)$_GET['height']);
+    $cacheKey   = $transforms->getCacheKey((int)$width, (int)$height);
+    $transform  = $transforms->retrieve((int)$width, (int)$height);
 } else {
     redirectToBroken(400);
     exit;
@@ -101,11 +105,13 @@ exit;
 /**
  * @param int $code
  */
-function redirectToBroken($code = 500)
+function redirectToBroken(int $code = 500): void
 {
     if (isset($_GET['key'])) {
         SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], $code);
     } elseif (isset($_GET['width'])) {
-        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height '] ?: $_GET['width'], $code);
+        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'] ?? $_GET['width'], $code);
+    } else {
+        SitePage::redirectToBrokenImageOfSize(80, $_GET['height'] ?? $_GET['width'], $code);
     }
 }
