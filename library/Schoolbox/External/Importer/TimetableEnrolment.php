@@ -122,8 +122,7 @@ class TimetableEnrolment extends AbstractImporter
             try {
                 $student = $this->userMapper->findByExternalId($studentCode);
             } catch (Mapper\Exception $e) {
-                $this->log->warning(sprintf('Student "%s" not found: skipping!', $studentCode));
-                continue;
+                $this->log->warning(sprintf('Student "%s" not found but assigning anyway', $studentCode));
             }
 
             $result[] = (new ClassInvolvement())
