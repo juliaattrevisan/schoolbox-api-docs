@@ -6,6 +6,7 @@
 {% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
 {% set modifyRoute = routeLookupIfAuthorized('learningBadgeAward.getAwardUpdate', {awardId: award.id}) %}
 {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
+{% set awardRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardAchieve', {awardId: award.id}) %}
 <script>
     $(function () {
         $('[data-delete-evidence]').click(function (e) {
@@ -18,6 +19,14 @@
                     }).done(function () {
                         window.location.reload();
                     });
+                }
+            });
+        });
+        $('[data-award-goal]').click(function (e) {
+            e.preventDefault();
+            $.post('{{ awardRoute }}', {}).done(function (response) {
+                if (response.viewUrl !== 'undefined') {
+                    window.location.href = response.viewUrl;
                 }
             });
         });
@@ -75,7 +84,7 @@
             <div class="small-12 columns">
                 <ul class="flex-list buttons">
                     <li><a href="{{ cancelUrl }}" class="button">Return to previous page</a></li>
-                    {% if award.status == 'goal' %}<li><a href="#" class="button submit">Award</a></li>{% endif %}
+                    {% if award.isGoal and award.award is empty and awardRoute %}<li><a data-award-goal class="button submit">Award</a></li>{% endif %}
                 </ul>
             </div>
         </div>
