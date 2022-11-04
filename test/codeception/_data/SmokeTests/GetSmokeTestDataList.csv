@@ -637,6 +637,7 @@ Evidence,"Create Badge",Parent,https://vagrant.dev.schoolbox.cloud/learning/badg
 Evidence,"View Badge Report",Superuser,https://vagrant.dev.schoolbox.cloud/learning/badge/award/list/83,200
 Evidence,"View Badge Report",Teacher,https://vagrant.dev.schoolbox.cloud/learning/badge/award/list/83,200
 Evidence,"View Badge Report",Student,https://vagrant.dev.schoolbox.cloud/learning/badge/award/list/83,401
+Evidence,"View Badge Report",Parent,https://vagrant.dev.schoolbox.cloud/learning/badge/award/list/83,401
 EOTC,"My EOTC events",Superuser,https://vagrant.dev.schoolbox.cloud/modules/eotc/myReview,200
 EOTC,"My EOTC events",Teacher,https://vagrant.dev.schoolbox.cloud/modules/eotc/myReview,200
 EOTC,"My EOTC events",Student,https://vagrant.dev.schoolbox.cloud/modules/eotc/myReview,400
