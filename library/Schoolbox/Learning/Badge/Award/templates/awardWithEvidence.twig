@@ -75,6 +75,7 @@
             <div class="small-12 columns">
                 <ul class="flex-list buttons">
                     <li><a href="{{ cancelUrl }}" class="button">Return to previous page</a></li>
+                    {% if award.status == 'goal' %}<li><a href="#" class="button submit">Award</a></li>{% endif %}
                 </ul>
             </div>
         </div>
