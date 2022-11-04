@@ -434,7 +434,7 @@ export default {
     position: relative;
 }
 .group-actions { //to put them in the top right corner
-    background: var(--navigation-background);
+    background: var(--accent-background);
     position: absolute;
     right: 0.5rem;
     top: 0.5rem;
@@ -442,7 +442,7 @@ export default {
 
 @mixin disabled-button { //both .group-action and .membership share the same disabled styling
     &:disabled {
-        color: white;
+        color: var(--accent-foreground);
     }
 }
 .group-action {
@@ -450,7 +450,7 @@ export default {
     background: none;
     font-size: 0;
     &:before { //tweak the icon display
-        color: white;
+        color: var(--accent-foreground);
         font-size: 1.5rem;
         padding: 0;
     }
