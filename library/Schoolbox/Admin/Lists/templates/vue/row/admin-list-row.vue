@@ -128,12 +128,8 @@ export default {
                         />
                     </template>
 
-                    <template v-else-if="field.mandatory && !field.readonly">
-                        <input type="text" required="required" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
-                    </template>
-
                     <template v-else>
-                        <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
+                        <input type="text" :required="field.mandatory" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
                     </template>
 
                 </div>
