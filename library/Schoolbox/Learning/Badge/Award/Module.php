@@ -41,7 +41,9 @@ class Module extends BaseModule
             ),
         );
 
-        $viewAwardedBadges =  new Rule\LazyCallback(function () {
+        /* This is for pages specific to a particular student.
+         */
+        $viewAwardedBadgesForStudent = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -56,6 +58,17 @@ class Module extends BaseModule
             );
         });
 
+        /* This is for pages not specific to a particular student.
+         */
+        $viewAwardedBadgesForAllStudents = new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
+                )
+            );
+        });
 
         $setGoalForSelfRule = new Rule\All(
             new Rule\IsLoggedIn(),
@@ -68,7 +81,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{userId}/awarded/{awardStatus}',
             'getAwardedBadges',
-            $viewAwardedBadges,
+            $viewAwardedBadgesForStudent,
             Closure::fromCallable([$this, 'preloadUser']),
         );
 
@@ -205,7 +218,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{awardId}/viewEvidence',
             'getAwardWithEvidence',
-            $viewAwardedBadges,
+            $viewAwardedBadgesForStudent,
             Closure::fromCallable([$this, 'preloadAward'])
         );
 
@@ -234,7 +247,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/list/{folderId}/data',
             'getListByFolderId',
-            $viewAwardedBadges,
+            $viewAwardedBadgesForAllStudents,
             Closure::fromCallable([$this, 'preloadFolder'])
         );
 
@@ -242,7 +255,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/list/{folderId}',
             'getListPage',
-            $viewAwardedBadges,
+            $viewAwardedBadgesForAllStudents,
             Closure::fromCallable([$this, 'preloadFolder'])
         );
     }
