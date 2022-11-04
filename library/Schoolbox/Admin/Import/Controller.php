@@ -287,7 +287,7 @@ class Controller extends ConfigController
         $this->getResponse()->content->set([
             'format' => 'noContent',
             'postOutput' => [
-                function() use ($logger) {
+                function () use ($logger) {
                     $this->syncCallback($logger);
                 }
             ],
