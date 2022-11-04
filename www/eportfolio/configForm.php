@@ -212,7 +212,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
         } elseif (isset($_POST['update']) && ($_POST['update'] == 'page')) {
             // Update permissions and page title
 
-            EportfolioPermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
+            EportfolioPermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'] ?? [], $_POST['individual_permission'] ?? []);
             $eportfolioHandler->updatePageTitle(trim($_POST['pageTitle']));
             SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getOwner()->getId()}/{$eportfolioHandler->getPageId()}");
         } elseif (isset($_POST['deletePage'])) {
@@ -308,7 +308,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             }
         }
     } else {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 } elseif (isset($_POST['page_title']) && strlen(trim($_POST['page_title'])) && isset($_POST['page_template']) && is_numeric($_POST['page_template'])) {
     // Create page for the currently logged-in user
@@ -321,8 +321,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
     try {
         $owner = \Schoolbox\UserMapper::getInstance()->findById($userId);
     } catch (\Schoolbox\Mapper\Exception $e) {
-        error(ErrorMapper::ERROR_INFORMATION_MISSING);
-        exit();
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
 
     $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner);
@@ -335,14 +334,14 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
         // Apply permissions to the newly-created page
 
-        Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'], $_POST['individual_permission']);
+        Eportfolio\PermissionMapper::getInstance()->updatePermissions($eportfolioHandler->getPageId(), $_POST['parent_permission'], $_POST['group_permission'] ?? [], $_POST['individual_permission'] ?? []);
 
         // Redirect to newly created page
 
         SitePage::localRedir("/eportfolio/{$eportfolioHandler->getUserId()}/{$eportfolioHandler->getPageId()}");
     } else {
-        error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 } else {
-    error(ErrorMapper::ERROR_INFORMATION_MISSING);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
