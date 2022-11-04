@@ -27,7 +27,7 @@
     <div class="small-12 columns">
         <h1>{{ award.status | capitalize }} Evidence</h1>
         <ul class="meta">
-            <li class="icon-{{ award.status }}">Awarded
+            <li class="icon-{{ award.status }}">{{ award.status == 'goal' ? 'Goal set' : 'Awarded' }}
                 <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
                 by
                 {% if awardedByRoute %}
