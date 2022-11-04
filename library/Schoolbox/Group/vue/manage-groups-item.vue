@@ -459,30 +459,6 @@ export default {
     }
 }
 
-.membership-button {
-    @include disabled-button;
-    margin: 0;
-}
-
-.expand {
-    padding: 1rem; //add extra padding
-}
-
-.private, .membership-pending  {
-    background: #DDDDDD;
-    color: #999999;
-    text-align: center;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.2s;
-}
-.fade-enter,
-.fade-leave-to {
-    opacity: 0;
-}
-
 .slide-enter-active,
 .slide-leave-active {
     transition: transform 0.3s ease-out;
