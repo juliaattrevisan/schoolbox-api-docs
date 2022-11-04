@@ -49,8 +49,13 @@ class OauthProviderIssued extends Base
         $claims      = $this->decodeWithoutVerification($jwt);
         $jwtIssuer   = $claims[self::CLAIM_ISS] ?? null;
         $oauthIssuer = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
+
+        // Accept the JWT if either:
+        // * the JWT's issuer begins with the oAuth provider
+        // * the oAuth provider begins with the JWT's issuer
+        // (Consider always accepting the JWT, as this will be the last parser)
         return isset($jwtIssuer, $oauthIssuer)
-            && trim($jwtIssuer, '/') === trim($oauthIssuer, '/');
+            && (str_starts_with($jwtIssuer, $oauthIssuer) || str_starts_with($oauthIssuer, $jwtIssuer));
     }
 
     /**
