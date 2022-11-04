@@ -1106,6 +1106,8 @@ class Controller extends Base
             } catch (MapperException\Deleted $e) {
                 /** @var Severity\Model $severity */
                 $severity = $e->getDeletedObject();
+            } catch (MapperException\NotFound $e) {
+                $severity = null;
             } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
