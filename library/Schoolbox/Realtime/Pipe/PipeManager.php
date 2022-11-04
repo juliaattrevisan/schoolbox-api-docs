@@ -40,7 +40,6 @@ use Schoolbox\Realtime\Subscription\ISubscriptionManager;
  */
 class PipeManager implements MessageComponentInterface, TaskResponseHandlerInterface, Async\EventListener
 {
-
     public const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:' . INSTANCE_ID . ':';
     const PHP_SESSION_PREFIX   = 'PHPSESSID';
     const INACTIVE_TIMEOUT     = 300; // 5 minutes
@@ -234,7 +233,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 //            $this->log->warning("Connection to client lost, terminating");
 //        }
 //        else
-        if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`', $e->getMessage(), $matches)) {
+        if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`i', $e->getMessage(), $matches)) {
             $this->log->warning("IOException: {$matches[3]} [{$matches[2]}] ({$matches[1]} bytes dropped)");
         } else {
             $this->log->critical(
