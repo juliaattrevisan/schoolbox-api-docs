@@ -20,7 +20,7 @@ export default {
 
     methods: {
 
-        ...mapActions(useAdminListStore, ['updateSequence', 'deleteRowCancelled']),
+        ...mapActions(useAdminListStore, ['updateSequence', 'deleteRowCancelled', 'isValidated']),
 
         /**
          * Save all data
@@ -34,21 +34,8 @@ export default {
                 $('button.sp-choose').click();
 
                 this.saveRows_isProcessing = true;
-                //are all required fields, actually filled out???
-                //set basic validation var
-                let valid = true;
-                //remove error state if it exists
-                $("[data-list='error']").remove();
-                //loop through required fields, trimming to confirm they are not empty
-                $(":input[required]:visible").each(function () {
-                    if ('' === this.value.trim()){
-                        //set validation var to false if things are empty
-                        valid = false;
-                        //highlight the missing fields
-                        $(this).after("<label data-list=\"error\" class=\"error\">This field is required.</label>");
-                    }
-                });
-                if (!valid) {
+                //check rows for valid / invalid data
+                if (!this.isValidated()) {
                     //if form is invalid... return
                     return;
                 }

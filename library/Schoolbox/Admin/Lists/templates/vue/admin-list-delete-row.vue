@@ -39,8 +39,6 @@ export default {
             } else if (newValue) { //otherwise open up the modal to confirm or cancel
                 this.$refs.deleteModal.open();
             }
-            //remove error state if it exists
-            $("[data-list='error']").remove();
         }
 
     },

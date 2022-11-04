@@ -7,7 +7,7 @@ export const useAdminListStore = defineStore('main', {
 
     state: () => ({
         loadedData: null, //contains the loaded data
-        rows: [], //to display and possibly edit the rows 
+        rows: [], //to display and possibly edit the rows
         selectedRow: {}, //to track which row is selected
         rowToDelete: {}, //to track which row could be deleted
         isPopOutOpen: false, //to open and close the list
@@ -18,7 +18,7 @@ export const useAdminListStore = defineStore('main', {
 
         /**
          * Retrieve only those fields that will appear in the header
-         * 
+         *
          * @returns { Array of Objects }
          */
         headerFields (state) {
@@ -26,27 +26,27 @@ export const useAdminListStore = defineStore('main', {
         },
 
         /**
-         * the popOut field that's used in the header, and is the reference for 
+         * the popOut field that's used in the header, and is the reference for
          * the following popOutFields
-         * 
+         *
          * @returns { Object }
          */
         popOutHeaderField () {
             const popOutHeaderField = this.headerFields.find((field) => field.isPopOutList); //use width to determine if it's to display in the header
             if (typeof popOutHeaderField !== 'undefined') {
                 return popOutHeaderField;
-            } 
+            }
             return {};
         },
-        
+
         /**
          * Just those fields that are used in a popoutList
-         * 
+         *
          * @returns { Array of Objects }
          */
         popOutFields (state) {
             return state.loadedData.fields.filter((field) => field.popOutList);
-        }, 
+        },
 
     },
 
@@ -105,7 +105,7 @@ export const useAdminListStore = defineStore('main', {
         },
 
         /**
-         * To clear the rowToDelete object, otherwise we couldn't reselect the same row to delete 
+         * To clear the rowToDelete object, otherwise we couldn't reselect the same row to delete
          */
         deleteRowCancelled () {
             this.rowToDelete = null;
@@ -137,6 +137,26 @@ export const useAdminListStore = defineStore('main', {
             });
         },
 
+        isValidated () {
+            debugger;
+            let valid = true;
+            //check each row
+            this.loadedData.rows.forEach((row) => {
+                //check each cell in the row
+                this.loadedData.fields.forEach((header) => {
+                    //if the header for that cell is manditory == true, and the cell is empty, set the error stat
+                    if (header.manditory &&  '' == row.String(header.id).value.trim() )
+                    {
+                        valid = false;
+                        row.hasValidationError = true;
+                    } else {
+                        row.hasValidationError = false;
+                    }
+                });
+            });
+            return valid;
+        }
+
     },
-    
+
 });
