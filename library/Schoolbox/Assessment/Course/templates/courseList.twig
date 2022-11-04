@@ -39,6 +39,19 @@ Usage:
             }
 
         });
+
+        // Wait for the browser to populate the [data-course-selector-filter] field with remembered data.
+        // Note that not all browsers will do this.  For browsers that do remember the data however, we want to
+        // trigger the filter so that results are preserved when the user returns to this page using the back button.
+        window.setTimeout(
+            function () {
+                if ($('[data-course-selector-filter]').val().trim() !== '') {
+                    $('[data-course-selector-filter]').keydown(); // Trigger the filter.
+                }
+            },
+            100
+        );
+
     });
 </script>
 
