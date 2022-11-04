@@ -24,6 +24,19 @@ export default {
         this.initColourPicker();
     },
 
+    watch: {
+
+        /**
+         * Ensure the correct colour is always set on the row,
+         * as the colour could also change if we delete a row above,
+         * so we need to ensure the colour picker stays up to date
+         */
+        colour (newValue) {
+            $(this.$el).spectrum('set', newValue);
+        }
+
+    },
+
     methods: {
 
         /**
@@ -60,5 +73,5 @@ export default {
 </script>
 
 <template>
-    <input type="text" :placeholder="caption" :value="colour" data-colour-picker />
+    <input type="text" :placeholder="caption" :value="colour" data-colour-picker/>
 </template>
