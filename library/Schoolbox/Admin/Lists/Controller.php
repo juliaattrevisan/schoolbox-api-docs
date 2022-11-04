@@ -347,7 +347,6 @@ class Controller extends Base
                         'key'                 => 'permissions',
                         'width'               => 7,
                         'tooltip'             => 'Permissions can be customised for each staff role. This can limit the visibility and access to parts of the instance.',
-                        'mandatory'           => true,
                         'isPopOutList'        => true,
                         'changePopOut'        => 'type',
                         'changePopOutOptions' => Role::VALID_PERMISSIONS,
@@ -641,7 +640,6 @@ class Controller extends Base
                         'tooltip'   => 'If checked, assessments with this work type will appear on the grades summary page.',
                         'checkbox'  =>  true,
                         'width'     => 1,
-                        'mandatory' => true,
                         'default'   => false,
                     ],
                     'staffOrInstructorVisibleOnly' => [
@@ -649,7 +647,6 @@ class Controller extends Base
                         'tooltip'   => 'If checked, assessments with this work-type will only be visible to Staff or Instructors. Assessment marks will still be included in aggregate marks',
                         'checkbox'  => true,
                         'width'     => 2,
-                        'mandatory' => true,
                         'default'   => false,
                     ],
                     'name'          => [
@@ -730,7 +727,6 @@ class Controller extends Base
                         'caption'   => 'Visible',
                         'width'     => 1,
                         'checkbox'  => true,
-                        'mandatory' => true,
                         'default'   => false,
                     ]
                 ]
@@ -777,7 +773,6 @@ class Controller extends Base
                         'getter'    => 'getDocumentClassification',
                         'caption'   => 'SIS Document Classification',
                         'lookup'    => $luDocumentClassifications,
-                        'mandatory' => true,
                         'nullable'  => true,
                         'nullable_label' => 'No Document Classification',
                         'width'     => 3,
@@ -898,7 +893,6 @@ class Controller extends Base
                     'dashboard' => [
                         'caption'   => 'Show On Pastoral Dashboard',
                         'width'     => 2,
-                        'mandatory' => true,
                         'checkbox'  => true,
                         'default'   => false,
                     ],
@@ -1006,7 +1000,6 @@ class Controller extends Base
                     'caption'             => 'Display Options',
                     'key'                 => 'displayOptions',
                     'width'               => 8,
-                    'mandatory'           => true,
                     'isPopOutList'        => true,
                 ],
                 'showOverallGrade'         => [
@@ -1155,7 +1148,6 @@ class Controller extends Base
                     'caption'   => 'Name',
                     'width'     => 11,
                     'maxLength' => 20,
-                    'mandatory' => true,
                     'default'   => '',
                 ],
             ]
