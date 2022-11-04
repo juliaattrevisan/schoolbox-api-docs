@@ -24,6 +24,13 @@ const props = defineProps({
         required: true,
         default: {},
     },
+    /**
+     * whether the awards are currently goals or if they're being awarded
+     */
+    isGoal: {
+        type: Boolean,
+        required: true,
+    },
 });
 
 const selectedNode = ref(getEmptyNode());
@@ -90,7 +97,7 @@ function onDetailModalClosed () {
                     <badge-detail
                         :badge="singleBadge"
                         parent-css="evidence-badge-container"
-                        img-css="evidence-badge-img-container"
+                        :img-css="`evidence-badge-img-container ${ isGoal ? 'goal' : '' }`"
                         @code-selected="onCodeSelected"
                     />
                 </div>
