@@ -94,6 +94,7 @@ HELP;
             /* Perform mode
              */
             $this->getDatabaseInternal()->executeQuery("
+                SET STATEMENT max_statement_time=0 FOR
                 DELETE
                 FROM login_log
                 WHERE login_log.`date` < NOW() - INTERVAL 2 YEAR
