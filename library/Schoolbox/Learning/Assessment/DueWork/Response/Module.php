@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -20,7 +21,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
-use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
@@ -76,9 +76,23 @@ class Module extends BaseModule
             return $this->preloadKami($params);
         };
 
-        $hasWriteAccess = new Rule\All(
+        $hasResponseAccess = new Rule\All(
             new Rule\IsLoggedIn(),
-            $this->buildRuleHasWriteAccess()
+            $this->buildRuleHasWriteAccess(),
+            new Rule\Callback(function (array $params) {
+                if (($params['response'] ?? null) instanceof IResponse) {
+                    return true;
+                }
+                if (($params['assessment'] ?? null) instanceof IAssessable && ($params['student'] ?? null) instanceof User) {
+                    // check whether the student is a participant
+                    foreach ($params['assessment']->getAllParticipants() as $p) {
+                        if ($p->getUser()->getId() === $params['student']->getId()) {
+                            return true;
+                        }
+                    }
+                }
+                throw new InvalidPath();
+            })
         );
 
         $hasKamiAccess = new Rule\All(
@@ -105,10 +119,10 @@ class Module extends BaseModule
         $participantPattern = $assessmentPattern . '/{studentId:\d+}';
         $responsePattern    = $assessmentPattern . '/responses/{responseId:\d+}';
 
-        $this->register('DELETE', $responsePattern, 'deleteParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
+        $this->register('DELETE', $responsePattern, 'deleteParticularResponse', $hasResponseAccess, $preloadParticipant); // a || r
 
-        $this->register('GET', $participantPattern . '/responses/blind{/responseId:\d+}', 'getParticularResponseBlind', $hasWriteAccess, $preloadParticipant); // a || r
-        $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
+        $this->register('GET', $participantPattern . '/responses/blind{/responseId:\d+}', 'getParticularResponseBlind', $hasResponseAccess, $preloadParticipant); // a || r
+        $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasResponseAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $turnitinPattern, 'getTurnitinReport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
         $this->register('GET', $turnitinPattern . '/iframe', 'getTurnitinReportContents', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
