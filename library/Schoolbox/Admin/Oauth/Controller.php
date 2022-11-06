@@ -104,10 +104,6 @@ class Controller extends ConfigController
     {
         return $this->getConfigMapper()
                     ->getPredicateBuilder()
-                    ->like(
-                        ConfigMapper::COL_NAME,
-                        $this->quoter->escapeForLike(ConfigMapper::PREFIX_CLOUDWORK_OAUTH) . "%"
-                    )
                     ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OAUTH);
     }
 }
