@@ -43,14 +43,14 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      *
      * @var array
      */
-    private $campusIds = array();
+    private $campus = array();
 
     /**
      * Group visibility for this stream
      *
      * @var array
      */
-    private $groupIds = array();
+    private $group = array();
 
     /**
      * Render configs into admin screen
@@ -174,7 +174,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      */
     public function setCampusIds(array $campusIds): void
     {
-        $this->campusIds = $campusIds;
+        $this->campus = $campusIds;
     }
 
     /**
@@ -184,7 +184,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      */
     public function getCampusIds(): array
     {
-        return $this->campusIds;
+        return $this->campus;
     }
 
     /**
@@ -194,7 +194,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      */
     public function setGroupIds(array $groupIds): void
     {
-        $this->groupIds = $groupIds;
+        $this->group = $groupIds;
     }
 
     /**
@@ -204,7 +204,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      */
     public function getGroupIds(): array
     {
-        return $this->groupIds;
+        return $this->group;
     }
 
 
