@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Oauth;
 
 use Alaress\Authorizer\Rule;
-use Alaress\Database\Quoter\Mysql\Quoter;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
@@ -45,7 +44,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
-            new Quoter(),
         );
     }
 

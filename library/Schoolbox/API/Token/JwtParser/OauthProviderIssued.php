@@ -30,9 +30,9 @@ class OauthProviderIssued extends Base
     /**
      * Constructor
      *
-     * @param UserMapper      $userMapper Mapper for retrieving users once the user in the JWT is identified.
-     * @param IConfigLoader   $config     Standard configuration store.
-     * @param Client          $httpClient HTTP client: required for retrieving JWKS from oAuth provider
+     * @param UserMapper    $userMapper Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader $config     Standard configuration store.
+     * @param Client        $httpClient HTTP client: required for retrieving JWKS from oAuth provider
      */
     public function __construct(
         private UserMapper $userMapper,
@@ -46,11 +46,17 @@ class OauthProviderIssued extends Base
      */
     public function accepts(string $jwt): bool
     {
-        $claims      = $this->decodeWithoutVerification($jwt);
-        $jwtIssuer   = $claims[self::CLAIM_ISS] ?? null;
-        $oauthIssuer = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
-        return isset($jwtIssuer, $oauthIssuer)
-            && trim($jwtIssuer, '/') === trim($oauthIssuer, '/');
+        // If no issuer is provided: always return true
+        // TODO remove this in 23.0: issuer must be provided, and match JWT
+        $oauthIssuer = trim((string)($this->config->get(ConfigMapper::NAME_OAUTH_ISSUER) ?? ''));
+        if ($oauthIssuer === '') {
+            return true;
+        }
+
+        // If the issuer is provided: it must match the issuer in the JWT
+        $claims    = $this->decodeWithoutVerification($jwt);
+        $jwtIssuer = trim((string)($claims[self::CLAIM_ISS] ?? ''));
+        return $jwtIssuer === $oauthIssuer;
     }
 
     /**
