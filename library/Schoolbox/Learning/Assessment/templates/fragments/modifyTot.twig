@@ -20,13 +20,12 @@
         <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
     </nav>
     <ul data-dropdown-content id="header-options" class="f-dropdown">
+        {% if gradeRoute %}
+        <li><a class="icon-task" href="{{ gradeRoute }}">View and {{ locale.grades }} submission</a></li>
+        {% endif %}
 
         {% if viewRoute %}
             <li><a class="icon-progress" href="{{ viewRoute }}">View Status</a></li>
-        {% endif %}
-
-        {% if gradeRoute %}
-            <li><a class="icon-task" href="{{ gradeRoute }}">View and {{ locale.grades }} submission</a></li>
         {% endif %}
 
         {# Students must have ePortfolio enabled, otherwise they can't do this
