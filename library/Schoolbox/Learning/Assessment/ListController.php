@@ -37,6 +37,7 @@ use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -578,6 +579,18 @@ class ListController extends Web\Controller\Base
                     ]
                 ),
             ];
+            // This needs to be here for creating a quiz in a project
+            $data['importAttachzone']  = (new Zone('importXml'))
+                ->setFileVar('importXml[]')
+                ->setThumbnailSize(64)
+                ->setModalTitle('Select XML')
+                ->setAttachmentsLabel('')
+                ->setAttachPrompt('Upload XML')
+                ->setMimeFilter('text/xml,application/xml')
+                ->setReadOnly(false)
+                ->setMulti(false)
+                ->useImportExpiryDate()
+                ->getTwigContext();
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
