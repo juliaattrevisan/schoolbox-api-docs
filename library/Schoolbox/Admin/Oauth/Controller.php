@@ -19,7 +19,6 @@ use Schoolbox\Config\ConfigMapper;
 
 class Controller extends ConfigController
 {
-
     /** @var Quoter */
     private $quoter;
 
