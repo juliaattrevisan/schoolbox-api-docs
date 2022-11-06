@@ -48,14 +48,14 @@ class OauthProviderIssued extends Base
     {
         // If no issuer is provided: always return true
         // TODO remove this in 23.0: issuer must be provided, and match JWT
-        $oauthIssuer = trim($this->config->get(ConfigMapper::NAME_OAUTH_ISSUER) ?? '');
+        $oauthIssuer = trim((string)($this->config->get(ConfigMapper::NAME_OAUTH_ISSUER) ?? ''));
         if ($oauthIssuer === '') {
             return true;
         }
 
         // If the issuer is provided: it must match the issuer in the JWT
         $claims    = $this->decodeWithoutVerification($jwt);
-        $jwtIssuer = trim($claims[self::CLAIM_ISS] ?? '');
+        $jwtIssuer = trim((string)($claims[self::CLAIM_ISS] ?? ''));
         return $jwtIssuer === $oauthIssuer;
     }
 
