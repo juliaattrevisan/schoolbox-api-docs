@@ -16,7 +16,7 @@ INSERT INTO config (
     'oauth_issuer',
     '',
     'oAuth Issuer',
-    'The issuer for your Schoolbox oAuth App',
+    'The issuer for your Schoolbox oAuth App. If provided: this must match the "iss" claim in the JWT provided by the identity provider.',
     (SELECT id FROM lu_config_field WHERE field = 'input'),
     '',
     null,
