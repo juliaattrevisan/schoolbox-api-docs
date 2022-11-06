@@ -303,7 +303,7 @@ class Kernel extends WebKernelAbstract
                     return new JwtParser\Composite(
                         new JwtParser\OtherInstanceIssued($userMapper, $instanceRegistryMapper, $config),
                         new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
-                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
+                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient, true),
                     );
                 }
             )

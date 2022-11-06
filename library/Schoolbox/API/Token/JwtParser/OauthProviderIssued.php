@@ -30,14 +30,17 @@ class OauthProviderIssued extends Base
     /**
      * Constructor
      *
-     * @param UserMapper      $userMapper Mapper for retrieving users once the user in the JWT is identified.
-     * @param IConfigLoader   $config     Standard configuration store.
-     * @param Client          $httpClient HTTP client: required for retrieving JWKS from oAuth provider
+     * @param UserMapper    $userMapper   Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader $config       Standard configuration store.
+     * @param Client        $httpClient   HTTP client: required for retrieving JWKS from oAuth provider
+     * @param bool          $alwaysAccept If true, this parser accepts all JWTs: otherwise, it only accepts JWTs if
+     *                                    the configured oAuth identity provider matches the JWT's issuer.
      */
     public function __construct(
         private UserMapper $userMapper,
         private IConfigLoader $config,
         private Client $httpClient,
+        private bool $alwaysAccept,
     ) {
     }
 
@@ -46,6 +49,9 @@ class OauthProviderIssued extends Base
      */
     public function accepts(string $jwt): bool
     {
+        if ($this->alwaysAccept) {
+            return true;
+        }
         $claims      = $this->decodeWithoutVerification($jwt);
         $jwtIssuer   = $claims[self::CLAIM_ISS] ?? null;
         $oauthIssuer = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
