@@ -24,33 +24,39 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
         return 'VCal Events';
     }
 
+    // DANGER! Private variables of this class must not be renamed
+    // -----------------------------------------------------------
+    // This class is used as a data-store object.  This means that objects of this class are serialized and then saved
+    // directly to the database.  Private variable names thus become publicly exposed field names that outside parties
+    // might rely on and so should not change.
+
     /**
      * A url to a vcal stream
      *
      * @var string
      */
-    private $url = '';
+    private $url = ''; // This variable must not be renamed.  See reason in comment above.
 
     /**
      * The authorization token to send to the vcal stream
      *
      * @var string
      */
-    private $authorization = '';
+    private $authorization = ''; // This variable must not be renamed.  See reason in comment above.
 
     /**
      * Campus visibility for this stream
      *
      * @var array
      */
-    private $campus = array();
+    private $campus = array(); // This variable must not be renamed.  See reason in comment above.
 
     /**
      * Group visibility for this stream
      *
      * @var array
      */
-    private $group = array();
+    private $group = array(); // This variable must not be renamed.  See reason in comment above.
 
     /**
      * Render configs into admin screen
