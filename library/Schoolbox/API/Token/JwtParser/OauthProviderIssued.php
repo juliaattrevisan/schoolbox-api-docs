@@ -30,17 +30,14 @@ class OauthProviderIssued extends Base
     /**
      * Constructor
      *
-     * @param UserMapper    $userMapper   Mapper for retrieving users once the user in the JWT is identified.
-     * @param IConfigLoader $config       Standard configuration store.
-     * @param Client        $httpClient   HTTP client: required for retrieving JWKS from oAuth provider
-     * @param bool          $alwaysAccept If true, this parser accepts all JWTs: otherwise, it only accepts JWTs if
-     *                                    the configured oAuth identity provider matches the JWT's issuer.
+     * @param UserMapper    $userMapper Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader $config     Standard configuration store.
+     * @param Client        $httpClient HTTP client: required for retrieving JWKS from oAuth provider
      */
     public function __construct(
         private UserMapper $userMapper,
         private IConfigLoader $config,
         private Client $httpClient,
-        private bool $alwaysAccept,
     ) {
     }
 
@@ -49,19 +46,17 @@ class OauthProviderIssued extends Base
      */
     public function accepts(string $jwt): bool
     {
-        if ($this->alwaysAccept) {
+        // If no issuer is provided: always return true
+        // TODO remove this in 23.0: issuer must be provided, and match JWT
+        $oauthIssuer = trim($this->config->get(ConfigMapper::NAME_OAUTH_ISSUER) ?? '');
+        if ($oauthIssuer === '') {
             return true;
         }
-        $claims      = $this->decodeWithoutVerification($jwt);
-        $jwtIssuer   = $claims[self::CLAIM_ISS] ?? null;
-        $oauthIssuer = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
 
-        // Accept the JWT if either:
-        // * the JWT's issuer begins with the oAuth provider
-        // * the oAuth provider begins with the JWT's issuer
-        // (Consider always accepting the JWT, as this will be the last parser)
-        return isset($jwtIssuer, $oauthIssuer)
-            && (str_starts_with($jwtIssuer, $oauthIssuer) || str_starts_with($oauthIssuer, $jwtIssuer));
+        // If the issuer is provided: it must match the issuer in the JWT
+        $claims    = $this->decodeWithoutVerification($jwt);
+        $jwtIssuer = trim($claims[self::CLAIM_ISS] ?? '');
+        return $jwtIssuer === $oauthIssuer;
     }
 
     /**
