@@ -41,27 +41,19 @@ Usage:
 
         });
 
-        // Wait for the browser to populate the [data-course-selector-filter] field with remembered data.
-        // Note that not all browsers will do this.  For browsers that do remember the data however, we want to
-        // trigger the filter so that results are preserved when the user returns to this page using the back button.
-        window.setTimeout(
-            function () {
-                let searchParams = new URLSearchParams(window.location.search);
+        let searchParams = new URLSearchParams(window.location.search);
 
-                if (searchParams.has('filterQuery')) {
-                    let $filterInput = $('[data-course-selector-filter]');
-                    $filterInput.val(searchParams.get('filterQuery')); // Fill the filter query input.
-                    $filterInput.keydown();                            // Trigger the filter.
+        if (searchParams.has('filterQuery')) {
+            let $filterInput = $('[data-course-selector-filter]');
+            $filterInput.val(searchParams.get('filterQuery')); // Fill the filter query input (remembered due to courseSelector config option addFilterQueryToUrlHistory).
+            $filterInput.keydown();                            // Trigger the filter.
 
-                    // Now that the filter has been triggered, we can remove the remembered filter query from the URL.
-                    // We do this so that if the user refreshes the page the blank filter state will be restored.
-                    let url = new URL(window.location);
-                    url.searchParams.delete('filterQuery');
-                    window.history.replaceState({}, document.title, url);
-                }
-            },
-            100
-        );
+            // Now that the filter has been triggered, we can remove the remembered filter query from the URL.
+            // We do this so that if the user refreshes the page the blank filter state will be restored.
+            let url = new URL(window.location);
+            url.searchParams.delete('filterQuery');
+            window.history.replaceState({}, document.title, url);
+        }
 
     });
 </script>
