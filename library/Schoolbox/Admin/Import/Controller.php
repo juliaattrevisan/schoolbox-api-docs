@@ -44,8 +44,6 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\MessageList\Listed;
 use Schoolbox\Realtime\MessageList\Unread;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 use UnexpectedValueException;
 
@@ -301,17 +299,15 @@ class Controller extends ConfigController
         $logFile = fopen($this->getConfigLoader()->get('logs_dir') . '/suds_live.log', 'a');
         $logger = new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
 
-        $this->syncCallback($logger);
-
 //        // Not the best place to put it but it will do for now
-//        $this->getResponse()->content->set([
-//            'format' => 'noContent',
-//            'postOutput' => [
-//                function () use ($logger) {
-//                    $this->syncCallback($logger);
-//                }
-//            ],
-//        ]);
+        $this->getResponse()->content->set([
+            'format' => 'noContent',
+            'postOutput' => [
+                function () use ($logger) {
+                    $this->syncCallback($logger);
+                }
+            ],
+        ]);
     }
 
 
