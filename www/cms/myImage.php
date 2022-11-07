@@ -16,27 +16,27 @@ use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$height = $_GET['height'] ?? 200;
-$width = $_GET['width'] ?? 200;
+$height = ((array_key_exists('height', $_GET) && ctype_digit($_GET['height']))? (int)$_GET['height']: 200);
+$width = ((array_key_exists('width', $_GET) && ctype_digit($_GET['width']))? (int)$_GET['width']: 200);
 
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
-    new ResourceLimitExceededHandler(function () {
+    new ResourceLimitExceededHandler(function () use ($width, $height) {
         header('Cache-Control: no-store');
-        redirectToBroken(504);
+        redirectToBroken($width, $height, 504);
     }),
     ShutdownHandler::PRIORITY_HIGHEST,
 );
 
 if (empty($_SESSION['id'])) {
-    redirectToBroken(403);
+    redirectToBroken($width, $height, 403);
 }
 
 try {
     $image = Schoolbox\Resource\My\File\Mapper::getInstance()->findById($_GET['id']);
 } catch (Schoolbox\Mapper\Exception $e) {
-    redirectToBroken(404);
+    redirectToBroken($width, $height, 404);
     exit;
 }
 
@@ -90,25 +90,25 @@ try {
     $processor->load()->stream();
 } catch (Image\Exception\ConcurrentTransformationException $e) {
     $kernel->outputResourceBeingProcessedHeader();
-    redirectToBroken($e->getHttpStatusCode());
+    redirectToBroken($width, $height, $e->getHttpStatusCode());
 } catch (SchoolboxNotFoundException $e) {
-    redirectToBroken(404);
+    redirectToBroken($width, $height, 404);
 } catch (Exception $e) {
-    redirectToBroken(500);
+    redirectToBroken($width, $height, 500);
 }
 
 exit;
 
 /**
+ * @param int $width
+ * @param int $height
  * @param int $code
  */
-function redirectToBroken(int $code = 500): void
+function redirectToBroken(int $width, int $height, int $code = 500): void
 {
     if (isset($_GET['key'])) {
         SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], $code);
-    } elseif (isset($_GET['width'])) {
-        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'] ?? $_GET['width'], $code);
     } else {
-        SitePage::redirectToBrokenImageOfSize(200, 200, $code);
+        SitePage::redirectToBrokenImageOfSize($width, $height, $code);
     }
 }
