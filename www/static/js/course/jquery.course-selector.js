@@ -98,6 +98,20 @@
                         $('#course-selector-results').html(responseText);
 
                         removeLoadingState(config.courseSelector.filter);
+
+                        $('[data-course-link]').click(
+                            function (e) {
+                                // Add filter query to URL history before redirecting to link destination page.  This
+                                // ensures that when the user clicks the 'back' button from the link destination page,
+                                // the filter query will be remembered on the results list page.
+                                let filterQuery = $('[data-course-selector-filter]').val();
+                                let url = new URL(window.location);
+                                url.searchParams.set('filterQuery', filterQuery.trim());
+                                if (filterQuery.trim() !== '') {
+                                    history.pushState({}, '', url);
+                                }
+                            }
+                        );
                     });
                 }, config.courseSelector.delay);
             });
