@@ -568,6 +568,18 @@ class ListController extends Web\Controller\Base
             ['Learning', $this->router->generate('learning.getClasses')],
             [$context->getFolder()->getTitle(), "/homepage/{$context->getFolder()->getId()}"],
         ];
+        // This needs to be here for creating a quiz in a project
+        $data['importAttachzone']  = (new Zone('importXml'))
+            ->setFileVar('importXml[]')
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select XML')
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Upload XML')
+            ->setMimeFilter('text/xml,application/xml')
+            ->setReadOnly(false)
+            ->setMulti(false)
+            ->useImportExpiryDate()
+            ->getTwigContext();
         if ($context instanceof Project) {
             $data['breadcrumbs'][] = [
                 $context->getTitle(),
@@ -579,18 +591,6 @@ class ListController extends Web\Controller\Base
                     ]
                 ),
             ];
-            // This needs to be here for creating a quiz in a project
-            $data['importAttachzone']  = (new Zone('importXml'))
-                ->setFileVar('importXml[]')
-                ->setThumbnailSize(64)
-                ->setModalTitle('Select XML')
-                ->setAttachmentsLabel('')
-                ->setAttachPrompt('Upload XML')
-                ->setMimeFilter('text/xml,application/xml')
-                ->setReadOnly(false)
-                ->setMulti(false)
-                ->useImportExpiryDate()
-                ->getTwigContext();
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
