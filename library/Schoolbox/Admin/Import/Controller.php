@@ -410,9 +410,9 @@ class Controller extends ConfigController
                     /* Go to suds import log
                      */
                     ->setHref($redirect)
-                    ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
-                    /* The actual message in the side panel
+                    /* Namespace controls the icon selection but that's about it...?
                      */
+                    ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
                     ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $this->getUser()->getId()));
 
                 $composite = new Composite(
