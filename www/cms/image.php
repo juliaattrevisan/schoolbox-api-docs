@@ -25,8 +25,8 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$height = $_GET['height'] ?? 80;
-$width = $_GET['width'] ?? 80;
+$height = $_GET['height'] ?? 200;
+$width = $_GET['width'] ?? 200;
 
 $kernel = new Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);

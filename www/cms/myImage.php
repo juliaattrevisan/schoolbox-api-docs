@@ -16,8 +16,8 @@ use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$height = $_GET['height'] ?? 80;
-$width = $_GET['width'] ?? 80;
+$height = $_GET['height'] ?? 200;
+$width = $_GET['width'] ?? 200;
 
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
@@ -109,6 +109,6 @@ function redirectToBroken(int $code = 500): void
     } elseif (isset($_GET['width'])) {
         SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'] ?? $_GET['width'], $code);
     } else {
-        SitePage::redirectToBrokenImageOfSize(80, 80, $code);
+        SitePage::redirectToBrokenImageOfSize(200, 200, $code);
     }
 }
