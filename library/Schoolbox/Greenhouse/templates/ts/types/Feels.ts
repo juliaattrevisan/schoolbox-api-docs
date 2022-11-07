@@ -4,13 +4,13 @@
  */
 
 enum Feels {
-    CONFUSED, //0 - these are known as numeric enmums, each value is auto incremented
-    COOL, //1
-    CRYING, //2
-    GRINNING, 
-    HAPPY, 
-    LAUGHING, 
-    SAD, 
+    CONFUSED, // 0 - these are known as numeric enmums, each value is auto incremented
+    COOL, // 1
+    CRYING, // 2
+    GRINNING,
+    HAPPY,
+    LAUGHING,
+    SAD,
 }
 
 export default Feels;
