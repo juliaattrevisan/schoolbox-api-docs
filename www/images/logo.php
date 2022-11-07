@@ -10,7 +10,7 @@
 
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\ProcessorFactory;
-use Alaress\Image\Transformation;
+use Alaress\Image\Transformation\MyImage;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Cdn\PrefixGenerator;
@@ -23,8 +23,7 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$height = (int)($_GET['height'] ?? '200');
-$width = (int)($_GET['width'] ?? '200');
+[$width, $height] = MyImage::ensureDimensionsAreReasonable($_GET['width'] ?? null, $_GET['height'] ?? null);
 
 // If supplied height and width are not within a reasonable range, use defaults.
 if ($height < 32 || $height > 2048 || $width < 32 || $width > 2048)
@@ -84,7 +83,7 @@ if (!array_key_exists($logo, $logoSizes) || !array_key_exists($size, $logoSizes[
     SitePage::redirectToBrokenImageOfSize($width, $height, 404);
 }
 
-$myImage = new Transformation\MyImage();
+$myImage = new MyImage();
 $key     = $myImage->getCacheKey($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
 try {
     /* Choose a caching method to use

@@ -19,6 +19,26 @@ class MyImage implements ITransformFactory
     use HasTranscodePathTrait;
 
     /**
+     * If supplied height and width are not within a reasonable range, use defaults.
+     * @param $width
+     * @param $height
+     * @return array
+     */
+    public static function ensureDimensionsAreReasonable($width, $height): array
+    {
+        if (
+            $width === null || $width < 32 || $width > 2048 ||
+            $height === null || $height < 32 || $height > 2048
+        )
+        {
+            $width = 200;
+            $height = 200;
+        }
+
+        return array($width, $height);
+    }
+
+    /**
      * @param int $width
      * @param int $height
      * @return ITransform

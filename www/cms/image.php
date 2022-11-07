@@ -10,7 +10,7 @@
 
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\ProcessorFactory;
-use Alaress\Image\Transformation;
+use Alaress\Image\Transformation\MyImage;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
@@ -25,15 +25,7 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$height = (int)($_GET['height'] ?? '200');
-$width = (int)($_GET['width'] ?? '200');
-
-// If supplied height and width are not within a reasonable range, use defaults.
-if ($height < 32 || $height > 2048 || $width < 32 || $width > 2048)
-{
-    $height = 200;
-    $width = 200;
-}
+[$width, $height] = MyImage::ensureDimensionsAreReasonable($_GET['width'] ?? null, $_GET['height'] ?? null);
 
 $kernel = new Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
@@ -63,7 +55,7 @@ try {
 
 /* Process and stream image
  */
-$myImage  = new Transformation\MyImage();
+$myImage  = new MyImage();
 $myImage->
 $cacheKey = $myImage->getCacheKey($width, $height);
 try {

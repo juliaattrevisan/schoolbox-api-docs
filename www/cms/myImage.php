@@ -7,7 +7,7 @@
  */
 
 use Alaress\Image;
-use Alaress\Image\ProcessorFactory;
+use Alaress\Image\Transformation\MyImage;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
@@ -16,15 +16,7 @@ use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$height = (int)($_GET['height'] ?? '200');
-$width = (int)($_GET['width'] ?? '200');
-
-// If supplied height and width are not within a reasonable range, use defaults.
-if ($height < 32 || $height > 2048 || $width < 32 || $width > 2048)
-{
-    $height = 200;
-    $width = 200;
-}
+[$width, $height] = MyImage::ensureDimensionsAreReasonable($_GET['width'] ?? null, $_GET['height'] ?? null);
 
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
@@ -78,7 +70,7 @@ if (isset($_GET['key'])) {
     $cacheKey   = $transforms->getCacheKey($_GET['key']);
     $transform  = $transforms->retrieve($_GET['key']);
 } else {
-    $transforms = new Image\Transformation\MyImage();
+    $transforms = new MyImage();
     $cacheKey   = $transforms->getCacheKey($width, $height);
     $transform  = $transforms->retrieve($width, $height);
 }
@@ -86,7 +78,7 @@ if (isset($_GET['key'])) {
 /** @var Storage\Model $storageModel */
 $storageModel = $image->getStorage();
 
-/** @var ProcessorFactory $processorFactory */
+/** @var Image\ProcessorFactory $processorFactory */
 $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
 $processor        = $processorFactory->buildForStorage(
     $storageModel,
