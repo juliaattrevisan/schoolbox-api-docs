@@ -56,7 +56,6 @@ try {
 /* Process and stream image
  */
 $myImage  = new MyImage();
-$myImage->
 $cacheKey = $myImage->getCacheKey($width, $height);
 try {
     /** @var Schoolbox\Resource\File\Model $file */
