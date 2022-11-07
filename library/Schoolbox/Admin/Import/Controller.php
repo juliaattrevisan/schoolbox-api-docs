@@ -401,12 +401,14 @@ class Controller extends ConfigController
              *
              * As recommended (for now) by Mr Sannang and Tomoko
              */
+            $title = sprintf(
+                'School Data Sync Live Run has finished at %s',
+                \Alaress_Date_Format::now()->getLocal()
+            );
+
             try {
                 $bob  = new NotificationInstanceBuilder();
-                $bob->setTitle(sprintf(
-                        'School Data Sync Live Run has finished at %s',
-                        \Alaress_Date_Format::now()->getLocal()
-                    ))
+                $bob->setTitle($title)
                     ->setAllowSelfSend(true)
                     ->setSeverity(\Monolog\Logger::INFO)
                     /* Alternatively I could make my own namespace...but should I?
