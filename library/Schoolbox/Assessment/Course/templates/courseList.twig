@@ -24,6 +24,7 @@ Usage:
         $.fn.courseSelector({
 
             courseSelector: {
+                addFilterQueryToUrlHistory: true,
                 query: {
                     {% if folder is defined %}
                         folder:           "{{ folder.id | escape('js') }}",
