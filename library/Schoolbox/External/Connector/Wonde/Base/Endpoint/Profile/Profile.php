@@ -32,7 +32,6 @@ use UnexpectedValueException;
  */
 class Profile implements IStrategy
 {
-
     /**
      * Maximum number of emergency contacts we've permitted (3 by default)
      */
