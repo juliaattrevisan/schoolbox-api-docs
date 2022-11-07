@@ -16,5 +16,12 @@ $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CAC
 $height = (int)($_GET['height'] ?? 200);
 $width = (int)($_GET['width'] ?? 200);
 
+// If supplied height and width are not within a reasonable range, use defaults.
+if ($height < 32 || $height > 2048 || $width < 32 || $width > 2048)
+{
+    $height = 200;
+    $width = 200;
+}
+
 // a bit heavy-handed, but I guess we're not implementing file previews for network??
 SitePage::redirectToBrokenImageOfSize($width, $height, 404);

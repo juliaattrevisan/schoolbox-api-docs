@@ -28,6 +28,13 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $height = (int)($_GET['height'] ?? '200');
 $width = (int)($_GET['width'] ?? '200');
 
+// If supplied height and width are not within a reasonable range, use defaults.
+if ($height < 32 || $height > 2048 || $width < 32 || $width > 2048)
+{
+    $height = 200;
+    $width = 200;
+}
+
 $kernel = new Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
@@ -57,6 +64,7 @@ try {
 /* Process and stream image
  */
 $myImage  = new Transformation\MyImage();
+$myImage->
 $cacheKey = $myImage->getCacheKey($width, $height);
 try {
     /** @var Schoolbox\Resource\File\Model $file */
