@@ -158,7 +158,7 @@ class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
      */
     public function weekendDays(): array
     {
-        return explode(',', $this->getConfig()->get('locale_weekend'));
+        return array_map('intval', explode(',', $this->getConfig()->get('locale_weekend')));
     }
 
     /**
