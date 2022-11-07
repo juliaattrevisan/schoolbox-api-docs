@@ -392,27 +392,28 @@ class Controller extends ConfigController
                 $importLogMapper
             ))->run(time(), $runId, Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
 
+            /* Go to the "Previous IMports" area of SUDS Control Panel
+             */
+            $redirect = $this->router->generate('adminImportIndex.getSchoolDataIndex') . '#previous';
+
             /* Arbitrarily inject and broadcast a notification,
              * bypassing all the usual Mr Matt mechanisms
              *
              * As recommended (for now) by Mr Sannang and Tomoko
              */
-            $redirect = $this->router->generate('adminImportIndex.getSchoolDataIndex') . '#previous';
-
             try {
                 $bob  = new NotificationInstanceBuilder();
                 $bob->setTitle('School Data Sync Live Run has finished.')
                     ->setAllowSelfSend(true)
                     ->setSeverity(\Monolog\Logger::INFO)
                     /* Alternatively I could make my own namespace...but should I?
+                     * Namespace controls the icon selection but that's about it...?
                      */
                     ->setNamespace(NSMapper::NS_MESSAGE)
+                    ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
                     /* Go to suds import log
                      */
                     ->setHref($redirect)
-                    /* Namespace controls the icon selection but that's about it...?
-                     */
-                    ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
                     ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $this->getUser()->getId()));
 
                 $composite = new Composite(

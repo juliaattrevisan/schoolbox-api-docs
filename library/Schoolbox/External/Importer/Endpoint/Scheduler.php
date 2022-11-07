@@ -49,8 +49,8 @@ class Scheduler
     /**
      * Live Run initiated from the gui, not the cli
      */
-    public const MANUAL_SIS_SCRIPT_NAME = 'Live School Data Import (SIS)';
-    public const MANUAL_CALENDAR_SCRIPT_NAME = 'Live School Data Import (Calendar)';
+    public const MANUAL_SIS_SCRIPT_NAME = 'User-initiated School Data Import (SIS)';
+    public const MANUAL_CALENDAR_SCRIPT_NAME = 'User-initiated School Data Import (Calendar)';
 
 
     /**
