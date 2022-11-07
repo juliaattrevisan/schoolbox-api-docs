@@ -35,16 +35,17 @@ class Controller extends Web\Controller\Base
      * Processor consts for declaring which file is being supplied
      */
     private const REQUIRED_USER_PROFILE_CSVS = [
-        Mapping::CSV_STUDENT,
-        Mapping::CSV_PARENT,
-        Mapping::CSV_STAFF,
-        Mapping::CSV_RELATIONSHIP
+        Mapping::CSV_STUDENT,       // 'student'
+        Mapping::CSV_PARENT,        // 'parent'
+        Mapping::CSV_STAFF,         // 'staff'
+        Mapping::CSV_RELATIONSHIP   // 'relationship'
     ];
+
 
     /**
      * Timetable and Enrolment CSVs
      */
-    private const REQUIRED_CSVS = [
+    private const REQUIRED_TIMETABLE_CSVS = [
         'timetable-structure'   => ImporterFactory::IMPORT_STRUCTURE,
         'timetable'             => ImporterFactory::IMPORT_TIMETABLE,
         'enrolment'             => ImporterFactory::IMPORT_ENROLMENT,
@@ -190,62 +191,27 @@ class Controller extends Web\Controller\Base
             // check for whether all the necessary files are supplied, and valid
             $files = [];
 
-            /* Required csvs are a combination of Profile-related csvs and cyclic grid timetable csvs.
-             * You'll typically need one of the following sets of files in their entirety:
-             *     - profile csvs
-             *     - timetable csvs
-             *     - some combination of the two
-             *
-             * It's possible you can send a subset of those two sets
-             * e.g. send some profile csvs and some timetable csvs, but not all
-             *
-             * In that case we should presume users meant to send the full set of each
-             * but didn't
-             */
-            $requiredProfileCsvs = self::REQUIRED_USER_PROFILE_CSVS;
-            $requiredTimetableCsvs = array_keys(self::REQUIRED_CSVS);
-
-            /* If user sent at least one Profile csv, we will require all of them.
-             *
-             * Similarly for the Timetable csvs; if user sent one, we'll need all of them.
-             *
-             * If user didn't send any, we don't require them
-             */
-            $allRequiredCsvs = [];
-
-            foreach ($requiredProfileCsvs as $requiredProfileCsv) {
-                $hash = $post->get($requiredProfileCsv);
-
-                if ($hash) {
-                    $allRequiredCsvs = array_merge($allRequiredCsvs, $requiredProfileCsvs);
-                    break;
-                }
-            }
-
-            foreach ($requiredTimetableCsvs as $requiredProfileCsv) {
-                $hash = $post->get($requiredProfileCsv);
-
-                if ($hash) {
-                    $allRequiredCsvs = array_merge($allRequiredCsvs, $requiredTimetableCsvs);
-                    break;
-                }
-            }
-
             /* Consume each csv files that we know to be required
              * based on inspecting what the user sent
              */
-            foreach ($allRequiredCsvs as $requiredCsv) {
+            $expectedKeys = array_merge(self::REQUIRED_USER_PROFILE_CSVS, array_keys(self::REQUIRED_TIMETABLE_CSVS));
+
+            foreach ($expectedKeys as $requiredCsv) {
                 $hash = $post->get($requiredCsv);
 
+                /* No hash provided; user didn't supply it.
+                 * Skip it quietly
+                 */
                 if (!$hash) {
-                    $errors[] = "No file hash was given for '$requiredCsv'.";
                     continue;
                 }
 
+                /* A value was provided; see if it exists in storage
+                 */
                 try {
                     if (!in_array($requiredCsv, self::REQUIRED_USER_PROFILE_CSVS, true)) {
                         // assign the given hash to its place in the files array
-                        $files[self::REQUIRED_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
+                        $files[self::REQUIRED_TIMETABLE_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
                     } else {
                         $files[$requiredCsv] = $this->storageMapper->findByHash($hash);
                     }
