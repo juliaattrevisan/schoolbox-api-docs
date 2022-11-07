@@ -143,7 +143,7 @@ class Mapper extends \Schoolbox\Mapper
             ->setRunId($runId)
             ->setScript($scriptName)
             ->setStatus(Model::STATUS_RUNNING)
-            ->setStartAt(\Alaress_Date_Format::now());
+            ->setStartAt(\Alaress_Date_Format::newFromTimestamp(time()));
 
         $this->save($importLog);
 
@@ -164,7 +164,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         $importLog
             ->setStatus(Model::STATUS_COMPLETE)
-            ->setFinishAt(\Alaress_Date_Format::now());
+            ->setFinishAt(\Alaress_Date_Format::newFromTimestamp(time()));
 
         $this->save($importLog);
 
