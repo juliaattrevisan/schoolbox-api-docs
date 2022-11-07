@@ -35,7 +35,7 @@ class MyImage implements ITransformFactory
             $height = 200;
         }
 
-        return array($width, $height);
+        return array((int)$width, (int)$height);
     }
 
     /**
