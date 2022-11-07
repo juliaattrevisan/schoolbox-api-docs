@@ -221,7 +221,16 @@ class Controller extends Web\Controller\Base
                 }
             }
 
-            if (\count($errors)) {
+            /* User didn't supply any files in the parameters expected
+             *     - either they literally didn't supply anything, or
+             *     - the args are misspelled e.g. used structure=... instead of timetable-structure=...
+             */
+            if (!\count($files)) {
+                $responseJson['error'] = 'No files supplied.';
+                $rs->status->set(400);
+            } elseif (\count($errors)) {
+                /* Some other error occurred during processing
+                 */
                 $responseJson['error'] = $errors;
                 $rs->status->set(400);
             } else {
