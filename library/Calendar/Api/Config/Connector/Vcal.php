@@ -24,33 +24,38 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
         return 'VCal Events';
     }
 
+    // DANGER! Private variables of this class must not be renamed
+    // -----------------------------------------------------------
+    // Objects of this class are serialized and then shared with outside parties.  Private variable names thus become
+    // publicly exposed field names that outside parties might rely on and so should not change.
+
     /**
      * A url to a vcal stream
      *
      * @var string
      */
-    private $url = '';
+    private $url = ''; // This variable must not be renamed.  See reason in comment above.
 
     /**
      * The authorization token to send to the vcal stream
      *
      * @var string
      */
-    private $authorization = '';
+    private $authorization = ''; // This variable must not be renamed.  See reason in comment above.
 
     /**
      * Campus visibility for this stream
      *
      * @var array
      */
-    private $campusIds = array();
+    private $campus = array(); // This variable must not be renamed.  See reason in comment above.
 
     /**
      * Group visibility for this stream
      *
      * @var array
      */
-    private $groupIds = array();
+    private $groups = array(); // This variable must not be renamed.  See reason in comment above.
 
     /**
      * Render configs into admin screen
@@ -174,7 +179,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      */
     public function setCampusIds(array $campusIds): void
     {
-        $this->campusIds = $campusIds;
+        $this->campus = $campusIds;
     }
 
     /**
@@ -184,7 +189,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      */
     public function getCampusIds(): array
     {
-        return $this->campusIds;
+        return $this->campus;
     }
 
     /**
@@ -194,7 +199,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      */
     public function setGroupIds(array $groupIds): void
     {
-        $this->groupIds = $groupIds;
+        $this->groups = $groupIds;
     }
 
     /**
@@ -204,7 +209,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      */
     public function getGroupIds(): array
     {
-        return $this->groupIds;
+        return $this->groups;
     }
 
 
