@@ -26,9 +26,8 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
 
     // DANGER! Private variables of this class must not be renamed
     // -----------------------------------------------------------
-    // This class is used as a data-store object.  This means that objects of this class are serialized and then perhaps
-    // shared with outside parties.  Private variable names thus become publicly exposed field names that outside parties
-    // might rely on and so should not change.
+    // Objects of this class are serialized and then shared with outside parties.  Private variable names thus become
+    // publicly exposed field names that outside parties might rely on and so should not change.
 
     /**
      * A url to a vcal stream
