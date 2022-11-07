@@ -352,26 +352,45 @@ class Controller extends ConfigController
                 exit(1);
             }
 
-            /* Execute scheduler in perform mode
+            /* This identifier indicates that the two schedulers were part of this
+             * script execution together
              */
-            $factory = new Factory($host, $key, true, $logger, $watchlist);
+            $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
 
             /* Get this particular db instance
              */
             $importLogMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
 
-            $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+            /* Execute scheduler: sis stuff
+             */
+            $sisFactory = new Factory($host, $key, true, $logger, $watchlist);
 
             (new Scheduler(
                 $importLogMapper->getDatabase(),
                 $frequency,
                 $customHours,
-                $factory,
+                $sisFactory,
                 $type,
                 $file,
                 $logger,
                 $importLogMapper
-            ))->run(time(), $runId, Scheduler::SISIMPORTER_SCRIPT_NAME);
+            ))->run(time(), $runId, Scheduler::MANUAL_SIS_SCRIPT_NAME);
+
+            /* Execute scheduler: calendar stuff
+             * Not all connectivities contain a calendar importer, just some
+             */
+            $calendarFactory = new Endpoint\CalendarFactory($host, $key, true, $logger);
+
+            (new Scheduler(
+                $importLogMapper->getDatabase(),
+                $frequency,
+                $customHours,
+                $calendarFactory,
+                $type,
+                $file,
+                $logger,
+                $importLogMapper
+            ))->run(time(), $runId, Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
 
             /* Arbitrarily inject and broadcast a notification,
              * bypassing all the usual Mr Matt mechanisms

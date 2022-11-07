@@ -45,6 +45,14 @@ class Scheduler
     public const SCHEDULER_SIS_SCRIPT_NAME = 'School Data Import (SIS)';
     public const SCHEDULER_CALENDAR_SCRIPT_NAME = 'School Data Import (Calendar)';
 
+
+    /**
+     * Live Run initiated from the gui, not the cli
+     */
+    public const MANUAL_SIS_SCRIPT_NAME = 'Live School Data Import (SIS)';
+    public const MANUAL_CALENDAR_SCRIPT_NAME = 'Live School Data Import (Calendar)';
+
+
     /**
      * max execution time before we consider the import process timed out.
      */
