@@ -39,7 +39,7 @@ function printNameOrAge(nameOrAge: number | string): void {
 
 printNameOrAge(myself.lastName);
 printNameOrAge(myself.age);
-git;
+
 /**
  * We can use optional parameters
  *
