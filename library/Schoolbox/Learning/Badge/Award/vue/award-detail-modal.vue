@@ -204,7 +204,7 @@ export default {
                     this.toastSuccess('Achievement awarded');
 
                     // Once awarded: update the award within this object
-                    this.award = response.data[0];
+                    this.award = response.data;
 
                     this.$emit('on-achievement-awarded', this.award); //dispatch to react specifically to this badge achievement
 
@@ -332,7 +332,7 @@ export default {
                             >
                                 Add Evidence
                             </a>
-                            <template v-if="award._links.goalAward && award.isGoal && !award.award">
+                            <template v-if="award._links.goalAward && award.isGoal && !award.award && (!award.reason || !award.reason.length)">
                                 <a
                                     title="Award with evidence"
                                     class="button"
@@ -340,6 +340,8 @@ export default {
                                 >
                                     Award with Evidence
                                 </a>
+                            </template>
+                            <template v-if="award._links.goalAward && award.isGoal && !award.award">
                                 <button
                                     @click.prevent="awardAchievement"
                                     @keyup.enter="awardAchievement"
