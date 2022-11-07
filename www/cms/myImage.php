@@ -16,8 +16,8 @@ use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$height = ((array_key_exists('height', $_GET) && ctype_digit($_GET['height']))? (int)$_GET['height']: 200);
-$width = ((array_key_exists('width', $_GET) && ctype_digit($_GET['width']))? (int)$_GET['width']: 200);
+$height = (int)($_GET['height'] ?? '200');
+$width = (int)($_GET['width'] ?? '200');
 
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
@@ -72,8 +72,8 @@ if (isset($_GET['key'])) {
     $transform  = $transforms->retrieve($_GET['key']);
 } else {
     $transforms = new Image\Transformation\MyImage();
-    $cacheKey   = $transforms->getCacheKey((int)$width, (int)$height);
-    $transform  = $transforms->retrieve((int)$width, (int)$height);
+    $cacheKey   = $transforms->getCacheKey($width, $height);
+    $transform  = $transforms->retrieve($width, $height);
 }
 
 /** @var Storage\Model $storageModel */

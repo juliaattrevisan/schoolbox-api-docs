@@ -25,8 +25,8 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$height = $_GET['height'] ?? 200;
-$width = $_GET['width'] ?? 200;
+$height = (int)($_GET['height'] ?? '200');
+$width = (int)($_GET['width'] ?? '200');
 
 $kernel = new Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
@@ -57,7 +57,7 @@ try {
 /* Process and stream image
  */
 $myImage  = new Transformation\MyImage();
-$cacheKey = $myImage->getCacheKey((int)$width, (int)$height);
+$cacheKey = $myImage->getCacheKey($width, $height);
 try {
     /** @var Schoolbox\Resource\File\Model $file */
     /** @var Schoolbox\Resource\Storage\Model $resource */
@@ -83,7 +83,7 @@ try {
 
     /** @var ProcessorFactory $processorFactory */
     $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
-    $transform        = $myImage->retrieve((int)$width, (int)$height);
+    $transform        = $myImage->retrieve($width, $height);
     $imageProcessor   = $processorFactory->buildForStorage(
         $resource,
         $cacheKey,

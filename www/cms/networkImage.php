@@ -13,8 +13,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
-$height = $_GET['height'] ?? 200;
-$width = $_GET['width'] ?? 200;
+$height = (int)($_GET['height'] ?? 200);
+$width = (int)($_GET['width'] ?? 200);
 
 // a bit heavy-handed, but I guess we're not implementing file previews for network??
 SitePage::redirectToBrokenImageOfSize($width, $height, 404);
