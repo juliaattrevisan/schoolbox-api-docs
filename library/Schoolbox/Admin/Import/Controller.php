@@ -10,6 +10,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import;
 
+use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
+use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Queue\Composite;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lock\InstanceLockFactory;
@@ -18,7 +21,9 @@ use Alaress\Lumberjack\Logger;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Crell\ApiProblem\ApiProblem;
 use PDOException;
+use Predis\ClientInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
@@ -29,12 +34,16 @@ use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\DSNFactory;
+use Schoolbox\External\Connector\Log\Mapper;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\MessageList\Listed;
+use Schoolbox\Realtime\MessageList\Unread;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
@@ -63,22 +72,31 @@ class Controller extends ConfigController
 
 
     /**
+     * @var ClientInterface
+     */
+    private ClientInterface $redisStorage;
+
+
+    /**
      * Constructor
      *
-     * @param ConfigMapper                             $configMapper
-     * @param FieldStrategyFactory                     $fieldStrategyFactory
-     * @param Rebuilder                                $rebuilder
-     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+     * @param ConfigMapper         $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder            $rebuilder
+     * @param Mapper               $importLogMapper
+     * @param ClientInterface      $redisStorage
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
-        \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+        \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
+        ClientInterface $redisStorage
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
 
         $this->importLogMapper = $importLogMapper;
+        $this->redisStorage = $redisStorage;
     }
 
 
@@ -283,15 +301,17 @@ class Controller extends ConfigController
         $logFile = fopen($this->getConfigLoader()->get('logs_dir') . '/suds_live.log', 'a');
         $logger = new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
 
-        // Not the best place to put it but it will do for now
-        $this->getResponse()->content->set([
-            'format' => 'noContent',
-            'postOutput' => [
-                function () use ($logger) {
-                    $this->syncCallback($logger);
-                }
-            ],
-        ]);
+        $this->syncCallback($logger);
+
+//        // Not the best place to put it but it will do for now
+//        $this->getResponse()->content->set([
+//            'format' => 'noContent',
+//            'postOutput' => [
+//                function () use ($logger) {
+//                    $this->syncCallback($logger);
+//                }
+//            ],
+//        ]);
     }
 
 
@@ -356,6 +376,44 @@ class Controller extends ConfigController
                 $logger,
                 $importLogMapper
             ))->run(time(), $runId, Scheduler::SISIMPORTER_SCRIPT_NAME);
+
+            /* Arbitrarily inject and broadcast a notification,
+             * bypassing all the usual Mr Matt mechanisms
+             *
+             * As recommended (for now) by Mr Sannang and Tomoko
+             */
+            $redirect = $this->router->generate('adminImportIndex.getSchoolDataIndex') . '#previous';
+
+            try {
+                $bob  = new NotificationInstanceBuilder();
+                $bob->setTitle('School Data Sync Live Run has finished.')
+                    ->setAllowSelfSend(true)
+                    ->setSeverity(\Monolog\Logger::INFO)
+                    /* Alternatively I could make my own namespace...but should I?
+                     */
+                    ->setNamespace(NSMapper::NS_MESSAGE)
+                    /* Go to suds import log
+                     */
+                    ->setHref($redirect)
+                    ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
+                    /* The actual message in the side panel
+                     */
+                    ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $this->getUser()->getId()));
+
+                $composite = new Composite(
+                    new Listed($this->redisStorage, INSTANCE_ID, $this->getUser()->getId()),
+                    new Unread($this->redisStorage, INSTANCE_ID, $this->getUser()->getId())
+                );
+
+                $composite->push($bob->build());
+            } catch (\Exception $e) {
+                $problem = (new ApiProblem($e->getMessage()))
+                    ->setStatus(500)
+                    ->asArray();
+                $this->getResponse()->status->setCode(500);
+                $this->getResponse()->content->set($this->buildJsonOutput($problem));
+                return;
+            }
         } catch (\Exception $e) {
             // the client has already detached - not much we can do
         }

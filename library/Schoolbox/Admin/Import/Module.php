@@ -63,6 +63,7 @@ class Module extends BaseModule
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->getMapperFactory()->get(\Schoolbox\External\Connector\Log\Mapper::class),
+            $this->injector->get('redis.storage')
         );
     }
 
