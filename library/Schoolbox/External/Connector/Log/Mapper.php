@@ -19,7 +19,6 @@ use Schoolbox\GenericCollection;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * Anything older than now minus EXPIRY_THRESHOLD days gets deleted
      */
