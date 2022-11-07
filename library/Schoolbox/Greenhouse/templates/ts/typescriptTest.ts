@@ -3,16 +3,16 @@
  *
  */
 
-import type Developer from './types/Developer'; //we add the 'type' key after import to inform that it's an interface
-import Feels from './types/Feels'; //we add the 'type' key after import to inform that it's an interface
+import type Developer from './types/Developer'; // we add the 'type' key after import to inform that it's an interface
+import Feels from './types/Feels'; // we add the 'type' key after import to inform that it's an interface
 
 const myself: Developer = {
     firstName: 'Michael',
     lastName: 'Heydon',
     age: 36,
-    // languages: 'TypeScript', //this would error and not build, as it expects an array - it should also highlight in your IDE?
+    // languages: 'TypeScript', // this would error and not build, as it expects an array - it should also highlight in your IDE?
     languages: ['TypeScript'],
-    // feeling: 'COOL', //this would error as it expects something from the Feels enum
+    // feeling: 'COOL', // this would error as it expects something from the Feels enum
     feeling: Feels.COOL,
 };
 
@@ -64,17 +64,3 @@ const htmlElement = document.getElementById('add-to-me');
 const htmlParagraphElement = document.getElementById('add-to-me') as HTMLParagraphElement;
 // htmlParagraphElement.inerText += ' Yep, check the console!' //like this would error and highlights as such in the IDE
 htmlParagraphElement.innerText += ' Yep, check the console!';
-
-// Generics are used to inform Typescript that whatever the value params is, it's the same type that will be returned by the function
-// we do this with the Type, adding <Type> after the method name
-function clone<Type>(value: Type): Type {
-    const json = JSON.stringify(value);
-    return JSON.parse(json);
-}
-
-const myClone = clone(myself); // so we can clone Developer
-console.warn(`my clone as is - ${myClone.age + 1}`);
-
-const books: string[] = ['Book 1', 'Book 2', 'Book 3'];
-const bookCopies = clone(books); // or something like books, and still have both linked to the correct type
-bookCopies.push('Book 4');
