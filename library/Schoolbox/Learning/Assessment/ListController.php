@@ -569,7 +569,7 @@ class ListController extends Web\Controller\Base
             [$context->getFolder()->getTitle(), "/homepage/{$context->getFolder()->getId()}"],
         ];
         // This needs to be here for creating a quiz in a project or from Course Builder component
-        $data['importAttachzone']  = (new Zone('importXml'))
+        $data['importAttachzone'] = (new Zone('importXml'))
             ->setFileVar('importXml[]')
             ->setThumbnailSize(64)
             ->setModalTitle('Select XML')
