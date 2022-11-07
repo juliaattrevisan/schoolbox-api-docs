@@ -55,7 +55,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      *
      * @var array
      */
-    private $group = array(); // This variable must not be renamed.  See reason in comment above.
+    private $groups = array(); // This variable must not be renamed.  See reason in comment above.
 
     /**
      * Render configs into admin screen
@@ -199,7 +199,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      */
     public function setGroupIds(array $groupIds): void
     {
-        $this->group = $groupIds;
+        $this->groups = $groupIds;
     }
 
     /**
@@ -209,7 +209,7 @@ class Calendar_Api_Config_Connector_Vcal extends Calendar_Api_Config_Connector_A
      */
     public function getGroupIds(): array
     {
-        return $this->group;
+        return $this->groups;
     }
 
 
