@@ -6,8 +6,6 @@ This file is internal use and is not shipped to clients.
 
 ## Directory and Structure
 
-* api - former home of Schoolbox API documentation, has since moved to
-  https://github.com/alaress/schoolbox-api-docs
 * conf - initialisation code for Schoolbox modules, see the [MVC docs](./docs/mvc/readme.md)
   for more information
 * dav - WebDav site for exporting the Schoolbox resources

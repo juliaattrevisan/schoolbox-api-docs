@@ -27,28 +27,12 @@ resources.
 ### Document the base resource, and endpoints for the standard HTTP verbs
 
 We use OpenAPI 3.0 as the standard for defining API specifications. These
-currently exist in the [/api/](../../api/) directory of the Schoolbox project.
-
-The specification should contain:
-* Endpoints for the standard HTTP actions:
-  * `GET    /`: find all resources of this type
-  * `POST   /`: create a new resource
-  * `GET    /{id}`: retrieve a single resource
-  * `PUT    /{id}`: update a resource
-  * `PATCH  /{id}`: update a subset of fields of a resource
-  * `DELETE /{id}`: delete a resource
-* A definition of the resource's fields
-  * This may be split into a readable version (for use in responses) and a
-    writable version (for use in request bodies), as not all fields are able to
-    be both read and written
-
-Once the documentation has been written, it may be viewed using ReDoc: see the
-API documentation README.md [/api/README.md](../../api/README.md)
+currently exist in the https://github.com/alaress/schoolbox-api-docs repository.
 
 #### Standards for documentation
 
-[/api/example.yaml](../../api/example.yaml) is intended as a living standard for
-how to write a OpenAPI specification.
+The current https://github.com/alaress/schoolbox-api-docs specification is
+intended as a living standard for how to write a OpenAPI specification.
 
 
 ### Discuss design with stakeholders
