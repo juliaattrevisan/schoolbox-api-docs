@@ -70,12 +70,6 @@ class TimetableUsers
 
 
     /**
-     * @var \Schoolbox\External\Profile\Staff\Mapper
-     */
-    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
      * @var Applicator
      */
     private Applicator $applicator;
@@ -101,8 +95,7 @@ class TimetableUsers
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->eventMapper = $eventMapper;
         $this->overrideMapper = $overrideMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->applicator = new Applicator($this->staffProfileMapper);
+        $this->applicator = new Applicator($staffProfileMapper);
     }
 
 
@@ -452,8 +445,6 @@ class TimetableUsers
         $statement = $this->eventMapper->getDatabase()->prepare($query);
         $statement->execute($params);
 
-        // List of codes that the user involves in
-        $userCodes = [];
         /* Pile it into the $stack in preparation for the mutations
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -470,18 +461,11 @@ class TimetableUsers
                      */
                     'manifest'  => [],
                 ];
-                if (!in_array($row['code'], $userCodes)) {
-                    $userCodes[] = $row['code'];
-                }
             }
 
             /* Insert and dedupe
              */
             $stack[$row['eventId']]['usuals'][$row['external_id']] = $row['external_id'];
-        }
-
-        if (empty($stack)) {
-            return $this->eventMapper->createCollection();
         }
 
         /* Get a list of events between $startTimestamp and $endTimestamp
