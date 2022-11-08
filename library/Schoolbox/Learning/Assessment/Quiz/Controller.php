@@ -55,7 +55,6 @@ use UnexpectedValueException;
  */
 class Controller extends Assessment\Controller
 {
-
     /**
      * @var QuizMapper
      */
