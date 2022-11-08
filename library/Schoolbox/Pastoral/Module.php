@@ -384,23 +384,17 @@ class Module extends BaseModule
              */
             if (array_key_exists('studentIds', $params)) {
                 $studentIds = array_unique(explode(',', $params['studentIds']));
-
-                $students = User::createCollection();
-
-                /** @var UserMapper $userMapper */
                 $userMapper = $this->getMapperFactory()->get(UserMapper::class);
 
-                try {
-                    foreach ($studentIds as $studentId) {
-                        $student = $userMapper->findWithSubjects($studentId);
-                        $student->loadTeachers();
-                        $student->loadParents();
-
-                        $students->add($student);
-                    }
-                } catch (MapperException $e) {
-                    throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-                }
+                // Parents, teachers and subjects are not required to build the
+                // pastoral records count:
+                // * whether a staff member is a teacher of a student is not
+                //   relevant for determining record access: only their role
+                //   membership is used to determine access
+                // * parents may not access the records count even for their own
+                //   children, so whether a user is a child's parent is not
+                //   relevant
+                $students = $userMapper->findByColumn('id', $studentIds);
 
                 if (count($students) === 0) {
                     throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
