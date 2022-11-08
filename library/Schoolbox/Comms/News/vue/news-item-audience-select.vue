@@ -556,6 +556,10 @@ export default {
          * @param page
          */
         showPage (page) {
+            // Reset everything so that when we submit, we only submit details from the selected page.
+            // If we do not do this, selecting an audience and then selecting a composite audience before submitting will result in an AJAX error.
+            this.resetModal();
+
             // Set all pages to false to start
             Object.keys(this.pageShow).forEach((page) => {
                 this.pageShow[page] = false;
