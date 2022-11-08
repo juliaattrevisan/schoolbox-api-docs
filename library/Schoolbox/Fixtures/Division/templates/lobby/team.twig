@@ -1,9 +1,5 @@
 <section data-team="{{ team.id }}">
-    <ul class="information-list sortable-card expandable-card"
-        data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: team.id}) }}"
-        data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: team.id}) }}"
-        data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: team.id}) }}"
-        data-team-player-list-proxy>
+    <ul class="information-list expandable-card">
 
         <li>
             <div class="actions-small-1">
