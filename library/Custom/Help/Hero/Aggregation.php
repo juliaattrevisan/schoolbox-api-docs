@@ -94,7 +94,9 @@ class Aggregation
                 $key = $currentAssessmentData['specId'];
 
                 $assessmentSpecNotStackedYet = !array_key_exists($key, $aggregatedData[$userId]['assessments']);
-                $existingSpecHasLowerMark = ((float)$aggregatedData[$userId]['assessments'][$key]['mark'] < (float)$currentAssessmentData['mark']);
+
+                $userAssessmentData = $aggregatedData[$userId]['assessments'];
+                $existingSpecHasLowerMark = ((float)($userAssessmentData['mark'] ?? 0) < (float)$currentAssessmentData['mark']);
 
                 /* Stack it if it doesn't exist
                  * Update the existing stack record if it already exists but mark was lower than current record
