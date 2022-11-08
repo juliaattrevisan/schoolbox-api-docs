@@ -833,11 +833,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$group_mapper->getColumnString('ug')},
                 {$courseSpecMapper->getColumnString('cs')},
                 {$unitSpecMapper->getColumnString('us')},
-                {$this->getJoinColumnString('curriculum_node_for_category', 'cn')},
-                {$this->getJoinColumnString('curriculum_node_for_category.level', 'cnl')},
-                {$this->getJoinColumnString('curriculum_node_for_category.level.source', 'cnls')},
-                {$this->getJoinColumnString('curriculum_node_for_category.area', 'cna')},
-                {$this->getJoinColumnString('curriculum_node_for_category.area.source', 'cnas')}
+                {$this->getJoinColumnString('curriculum_node_for_category', 'cn')}
         ";
     }
 
@@ -860,10 +856,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             LEFT JOIN {$this->getJoinSql('course_specification', '', 'cs')}
             LEFT JOIN {$this->getJoinSql('unit_specification', '', 'us')}
             LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', '', 'cn')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level', 'cn', 'cnl')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.level.source', 'cnl', 'cnls')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area', 'cn', 'cna')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category.area.source', 'cna', 'cnas')}
         ";
     }
 
@@ -1055,7 +1047,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // TODO replace ant infestation with `\Schoolbox\Curriculum\Node\Mapper::findForOtherMapper`
             if ($hydrateCurriculumNodes) {
                 /** @var Node\Model|null $curriculumNode */
-                $curriculumNode = $curriculumNodeMapper->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+                $curriculumNode = $curriculumNodeMapper->hydrate($row, 'cn');
                 if ($curriculumNode) {
                     $folders[$folderId]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
                 }

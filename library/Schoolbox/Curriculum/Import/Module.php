@@ -1,9 +1,6 @@
 <?php
 
 /**
- * Definition for the curriculum import submodule.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -19,6 +16,9 @@ use Schoolbox\Permission\Access\UserAccess;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Curriculum;
 
+/**
+ * Definition for the curriculum import submodule.
+ */
 class Module extends BaseModule
 {
     protected $basename = 'curriculumImport';
@@ -69,10 +69,12 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return (new Controller())
-            ->setSourceMapper($this->getMapperFactory()->get(Curriculum\Source\Mapper::class))
-            ->setAreaMapper($this->getMapperFactory()->get(Curriculum\LearningArea\Mapper::class))
-            ->setLevelMapper($this->getMapperFactory()->get(Curriculum\LearningLevel\Mapper::class))
-            ->setNodeMapper($this->getMapperFactory()->get(Curriculum\Node\Mapper::class));
+        return new Controller(
+            $this->getMapperFactory()->get(Curriculum\Node\Mapper::class),
+            $this->getMapperFactory()->get(Curriculum\Source\Mapper::class),
+            new Curriculum\Source\BrowserFactory(
+                $this->getMapperFactory()->get(Curriculum\Node\Mapper::class),
+            ),
+        );
     }
 }

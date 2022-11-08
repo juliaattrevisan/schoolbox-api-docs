@@ -1,11 +1,6 @@
 <?php
 
 /**
- * A browser for Australian Curriculum classes.
- *
- * This gets all the curricula that can be fetched from this source.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -28,18 +23,27 @@ use UnexpectedValueException;
 
 use function count;
 
-class Browser extends Source\BrowserAbstract
+/**
+ * A browser for Australian Curriculum classes.
+ *
+ * This gets all the curricula that can be fetched from this source.
+ */
+class Browser implements Source\BrowserInterface
 {
-    protected Client $client;
-    protected Html2Text $htmlConverter;
-
     /**
-     * Post-construct hook - creates a SPARQL client for the Australian Curriculum.
+     * Constructor
+     *
+     * @param Source\Model $source
+     * @param Node\Mapper  $nodeMapper
+     * @param Client       $client
+     * @param Html2Text    $htmlConverter
      */
-    public function setup()
-    {
-        $this->setClient(new SparqlClient(SparqlClient::API_URI));
-        $this->setHtmlConverter(new Html2Text());
+    public function __construct(
+        private Source\Model $source,
+        private Node\Mapper $nodeMapper,
+        private Client $client,
+        private Html2Text $htmlConverter,
+    ) {
     }
 
     /**
@@ -62,7 +66,7 @@ class Browser extends Source\BrowserAbstract
                 OPTIONAL { ?doc dct:title ?title . } .
             }';
         $models = array();
-        foreach ($this->getClient()->query($sparql) as $row) {
+        foreach ($this->client->query($sparql) as $row) {
             if (is_object($row->title)) {
                 $desc = $row->title->getValue();
             } elseif (is_object($row->description)) {
@@ -71,15 +75,10 @@ class Browser extends Source\BrowserAbstract
                 continue;
             }
 
-            try {
-                $area = $this->getAreaMapper()->findOneByColumn('reference', $row->doc->getUri(), ["deleted" => false]);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $area = new LearningArea\Model();
-            }
-
+            $area     = new LearningArea\Model();
             $modified = new Alaress_Date_Format($row->modified->getValue());
             $area
-                ->setSource($this->getSource())
+                ->setSource($this->source)
                 ->setName($desc)
                 ->setCreatedAt($modified)
                 ->setModifiedAt($modified)
@@ -109,15 +108,11 @@ class Browser extends Source\BrowserAbstract
             }
         }';
         $collection = new Collection();
-        foreach ($this->getClient()->query($sparql) as $row) {
-            try {
-                $level = $this->getLevelMapper()->findOneByColumn('reference', $row->level->getUri(), ["deleted" => false]);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $level = new LearningLevel\Model();
-                $level
-                    ->setSource($this->getSource())
-                    ->setReference($row->level->getUri());
-            }
+        foreach ($this->client->query($sparql) as $row) {
+            $level = new LearningLevel\Model();
+            $level
+                ->setSource($this->source)
+                ->setReference($row->level->getUri());
 
             $label    = null;
             $created  = null;
@@ -268,8 +263,8 @@ class Browser extends Source\BrowserAbstract
         }
 
         // Convert the name from HTML to text (and strip out newlines)
-        $this->getHtmlConverter()->setHtml($node->getName());
-        $node->setName(preg_replace('/\\s+/', ' ', $this->getHtmlConverter()->getText()));
+        $this->htmlConverter->setHtml($node->getName());
+        $node->setName(preg_replace('/\\s+/', ' ', $this->htmlConverter->getText()));
 
         // Set the timetable code if there is one
         if (isset($json->asn_statementNotation->literal)) {
@@ -287,41 +282,5 @@ class Browser extends Source\BrowserAbstract
             }
         }
         return $node;
-    }
-
-    /**
-     * @param  Client $client
-     * @return $this
-     */
-    public function setClient(Client $client)
-    {
-        $this->client = $client;
-        return $this;
-    }
-
-    /**
-     * @return Client
-     */
-    public function getClient(): Client
-    {
-        return $this->client;
-    }
-
-    /**
-     * @return Html2Text
-     */
-    public function getHtmlConverter()
-    {
-        return $this->htmlConverter;
-    }
-
-    /**
-     * @param  Html2Text $htmlConverter
-     * @return $this
-     */
-    public function setHtmlConverter($htmlConverter)
-    {
-        $this->htmlConverter = $htmlConverter;
-        return $this;
     }
 }

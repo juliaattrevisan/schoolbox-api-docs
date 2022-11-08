@@ -1,23 +1,28 @@
 <?php
 
 /**
- * Mapper for learning areas.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Curriculum\LearningLevel;
 
-use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 
+/**
+ * Mapper for learning levels.
+ *
+ * @deprecated 23.0: curriculum nodes no longer store their learning area or
+ *             level, and these are no longer stored by
+ *             `\Schoolbox\Curriculum\Source\BrowserInterface` implementations.
+ *             (The corresponding models are _not_ deprecated, as they are still
+ *             returned and requested by implementations of that interface.)
+ */
 class Mapper extends BaseMapper
 {
     public function mapping()
     {
-        $this->hasTable('curriculum_learning_level');
+        $this->hasTable('_curriculum_learning_level');
         $this->hasModel(Model::class);
         $this->hasMap(
             array(
@@ -93,33 +98,5 @@ class Mapper extends BaseMapper
             )
         );
         $this->hasSoftDeleteDateField('deleted_at');
-    }
-
-    /**
-     * Gets all learning levels, along with their source.
-     *
-     * @return Collection|Model[]
-     */
-    public function findAllWithSource()
-    {
-        $query = "
-            SELECT
-                {$this->getColumnString('l')},
-                {$this->getJoinColumnString('source', 's')}
-            FROM `{$this->getTable()}` `l`
-            INNER JOIN {$this->getJoinSql('source', 'l', 's')}
-            WHERE `l`.`deleted_at` IS NULL
-            ORDER BY `s`.`name` ASC, `l`.`order` ASC
-        ";
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute();
-        return $this->hydrateList(
-            $statement,
-            'l',
-            function ($mapper, $model, $row) {
-                $model->setSource($mapper->hydrateJoin($row, 'source', 's'));
-                return $model;
-            }
-        );
     }
 }

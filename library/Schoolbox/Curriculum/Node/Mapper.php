@@ -32,8 +32,6 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('curriculum_node_parent_id', self::class, 'id', null, null, 'parent', 'parent');
-        $this->joins('curriculum_learning_level_id', LearningLevel\Mapper::class, 'id', null, null, 'learningLevel', 'level');
-        $this->joins('curriculum_learning_area_id', LearningArea\Mapper::class, 'id', null, null, 'learningArea', 'area');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('code', self::TYPE_STRING);
         $this->uses('order', self::TYPE_INTEGER);
@@ -67,8 +65,6 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         /** @var Model $child */
         foreach ($model->getChildren() as $child) {
             $child
-                ->setLearningArea($model->getLearningArea())
-                ->setLearningLevel($model->getLearningLevel())
                 ->setParent($model)
                 ->setOrder($i++);
             $this->saveTree($child);
@@ -300,47 +296,6 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         ];
     }
 
-
-    /**
-     * Hydrates a curriculum node, with joins to area+source and level+source.
-     *
-     * @param array  $row
-     * @param string $alias
-     * @param string $areaAlias
-     * @param string $areaSourceAlias
-     * @param string $levelAlias
-     * @param string $levelSourceAlias
-     *
-     * @return Model
-     */
-    public function hydrateWithRelatedJoins(
-        $row,
-        $alias = null,
-        $areaAlias = 'cna',
-        $areaSourceAlias = 'cnas',
-        $levelAlias = 'cnl',
-        $levelSourceAlias = 'cnls'
-    ) {
-        /** @var Model $curriculumNode */
-        $curriculumNode = $this->hydrate($row, $alias);
-        if ($curriculumNode) {
-            $curriculumNode->setLearningArea($this->getJoinMapper('area')->hydrate($row, $areaAlias));
-            if ($curriculumNode->getLearningArea() instanceof LearningArea\Model) {
-                $curriculumNode->getLearningArea()->setSource(
-                    $this->getJoinMapper('area.source')->hydrate($row, $areaSourceAlias)
-                );
-            }
-
-            $curriculumNode->setLearningLevel($this->getJoinMapper('level')->hydrate($row, $levelAlias));
-            if ($curriculumNode->getLearningLevel() instanceof LearningLevel\Model) {
-                $curriculumNode->getLearningLevel()->setSource(
-                    $this->getJoinMapper('level.source')->hydrate($row, $levelSourceAlias)
-                );
-            }
-        }
-        return $curriculumNode;
-    }
-
     /**
      * Delete curriculum nodes associated with $assessment
      *
@@ -418,17 +373,9 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $nodeQuery = "
                 SELECT
                     {$otherMapper->getTable()}.{$otherMapper->getIdentifierColumn()},
-                    {$otherMapper->getJoinColumnString($otherJoin, 'cn')},
-                    {$otherMapper->getJoinColumnString("$otherJoin.level", 'cnl')},
-                    {$otherMapper->getJoinColumnString("$otherJoin.level.source", 'cnls')},
-                    {$otherMapper->getJoinColumnString("$otherJoin.area", 'cna')},
-                    {$otherMapper->getJoinColumnString("$otherJoin.area.source", 'cnas')}
+                    {$otherMapper->getJoinColumnString($otherJoin, 'cn')}
                 FROM {$otherMapper->getTable()}
                 INNER JOIN {$otherMapper->getJoinSql($otherJoin, '', 'cn')}
-                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.level", 'cn', 'cnl')}
-                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.level.source", 'cnl', 'cnls')}
-                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.area", 'cn', 'cna')}
-                LEFT  JOIN {$otherMapper->getJoinSql("$otherJoin.area.source", 'cna', 'cnas')}
                 WHERE {$where}
             ";
 
@@ -437,7 +384,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $result = [];
         foreach ($statement as $row) {
             $id   = $row['id'];
-            $node = $this->hydrateWithRelatedJoins($row, 'cn', 'cna', 'cnas', 'cnl', 'cnls');
+            $node = $this->hydrate($row, 'cn');
             if (!isset($result[$id])) {
                 $result[$id] = $this->createCollection();
             }
