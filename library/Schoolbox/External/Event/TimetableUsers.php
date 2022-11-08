@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Event\Overrides\Applicator;
@@ -69,17 +70,9 @@ class TimetableUsers
 
 
     /**
-     * @var \Schoolbox\External\Profile\Staff\Mapper
+     * @var Applicator
      */
-    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * Remember this set if we fetched it already
-     *
-     * @var array|null
-     */
-    private ?array $staffExternalIds = null;
+    private Applicator $applicator;
 
 
     /**
@@ -102,7 +95,7 @@ class TimetableUsers
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->eventMapper = $eventMapper;
         $this->overrideMapper = $overrideMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
+        $this->applicator = new Applicator($staffProfileMapper);
     }
 
 
@@ -210,7 +203,7 @@ class TimetableUsers
 
         /* Perform mutations
          */
-        $manifest = (new Applicator($this->staffProfileMapper))->apply(
+        $manifest = $this->applicator->apply(
             $stack[$classCode]['usuals'] ?? [],
             $stack[$classCode]['overrides'] ?? [],
         );
@@ -222,11 +215,7 @@ class TimetableUsers
          * If we haven't got this already, get it and remember it
          * in case we needed it again and again and again
          */
-        if (null === $this->staffExternalIds) {
-            $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
-        }
-
-        return array_values(array_intersect($this->staffExternalIds, $manifest));
+        return $this->applicator->staffOnly($manifest);
     }
 
 
@@ -364,7 +353,7 @@ class TimetableUsers
          */
         foreach ($lookup as $classCode => &$data) {
             foreach ($data['overrides'] as $eventId => $overrides) {
-                $manifest = (new Applicator($this->staffProfileMapper))->apply($data['usuals'], $overrides);
+                $manifest = $this->applicator->apply($data['usuals'], $overrides);
 
                 /* When we use this to calculate My Subjects in the side menu
                  * it's actually a union of the usual guys and the survivors
@@ -411,7 +400,10 @@ class TimetableUsers
      */
     public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
-        $startDatetime = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
+        if (!$user->getExternalId()) {
+            return $this->eventMapper->createCollection();
+        }
+        $startDatetime  = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
 
         /* Micromanage a stack of minimal event data with overrides
@@ -432,23 +424,34 @@ class TimetableUsers
             WHERE se.classification = :classification
             AND se.start_at >= :from
             AND se.start_at <= :to
-            ORDER BY sc.id ASC
+            AND scu.external_id = :externalId
         ";
 
-        $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute([
+        $params = [
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'from' => $startDatetime,
-            'to' => $finishDatetime,
-        ]);
+            'from'           => $startDatetime,
+            'to'             => $finishDatetime,
+            'externalId'     => $user->getExternalId(),
+        ];
+
+        if ($folderCodes && $folderCodes->count()) {
+            $bindings = Builder::getBindings($folderCodes->keys(), 'folderCode');
+            $query    .= " AND se.code IN ({$bindings->getPlaceholder()})";
+            $params   = array_merge($params, $bindings->getParams());
+        }
+
+        $query .= "ORDER BY sc.id ASC";
+
+        $statement = $this->eventMapper->getDatabase()->prepare($query);
+        $statement->execute($params);
 
         /* Pile it into the $stack in preparation for the mutations
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             if (!isset($stack[$row['eventId']])) {
                 $stack[$row['eventId']] = [
-                    'code' => $row['code'],
-                    'usuals' => [],
+                    'code'      => $row['code'],
+                    'usuals'    => [],
                     /* A list of overrides index by event id since each event
                      * has its own list of overrides
                      */
@@ -456,7 +459,7 @@ class TimetableUsers
                     /* A list of people who survived all the mutations
                      * and transformations in this algorithm
                      */
-                    'manifest' => [],
+                    'manifest'  => [],
                 ];
             }
 
@@ -479,11 +482,13 @@ class TimetableUsers
         ";
 
         $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute([
-            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'from' => $startDatetime,
-            'to' => $finishDatetime,
-        ]);
+        $statement->execute(
+            [
+                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                'from'           => $startDatetime,
+                'to'             => $finishDatetime,
+            ],
+        );
 
         /* Remember: overrides are generally optional so they might not even
          * exist for $classCode which is why we get the Usual Guys first
@@ -508,8 +513,8 @@ class TimetableUsers
              */
             if (!isset($stack[$row['eventId']])) {
                 $stack[$row['eventId']] = [
-                    'code' => $row['code'],
-                    'usuals' => [],
+                    'code'      => $row['code'],
+                    'usuals'    => [],
                     /* A list of overrides index by event id since each event
                      * has its own list of overrides
                      */
@@ -517,20 +522,20 @@ class TimetableUsers
                     /* A list of people who survived all the mutations
                      * and transformations in this algorithm
                      */
-                    'manifest' => [],
+                    'manifest'  => [],
                 ];
             }
 
             $stack[$row['eventId']]['overrides'][] = [
                 'external_id' => $row['external_id'],
-                'action' => $row['action']
+                'action'      => $row['action'],
             ];
         }
 
         /* Perform mutations
          */
         foreach ($stack as $eventId => &$data) {
-            $data['manifest'] = (new Applicator($this->staffProfileMapper))->apply($data['usuals'], $data['overrides']);
+            $data['manifest'] = $this->applicator->apply($data['usuals'], $data['overrides']);
 
             /* Only care about events the current user is in today
              */

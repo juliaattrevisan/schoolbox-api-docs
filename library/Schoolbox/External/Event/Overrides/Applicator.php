@@ -85,4 +85,23 @@ class Applicator
 
         return $manifest;
     }
+
+    /**
+     * From a $manifest produced by apply(), only return those who are staff members
+     *
+     * @param array $manifest
+     * @return array
+     * @throws \PDOException
+     */
+    public function staffOnly(array $manifest): array
+    {
+        /* If we haven't got this already, get it and remember it
+         * in case we needed it again and again and again
+         */
+        if (null === $this->staffExternalIds) {
+            $this->staffExternalIds = $this->staffProfileMapper->findAllExternalIds();
+        }
+
+        return array_values(array_intersect($this->staffExternalIds, $manifest));
+    }
 }
