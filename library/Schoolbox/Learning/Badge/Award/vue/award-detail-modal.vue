@@ -332,23 +332,21 @@ export default {
                             >
                                 Add Evidence
                             </a>
-                            <template v-if="award._links.goalAward && award.isGoal && !award.award && (!award.reason || !award.reason.length)">
-                                <a
-                                    title="Award with evidence"
-                                    class="button"
-                                    :href="getEvidenceUrl(award.badge.id)"
-                                >
-                                    Award with Evidence
-                                </a>
-                            </template>
-                            <template v-if="award._links.goalAward && award.isGoal && !award.award">
-                                <button
-                                    @click.prevent="awardAchievement"
-                                    @keyup.enter="awardAchievement"
-                                >
-                                    Award
-                                </button>
-                            </template>
+                            <a
+                                v-if="award._links.goalAward && award.isGoal && !award.award && (!award.reason || !award.reason.length)"
+                                title="Award with evidence"
+                                class="button"
+                                :href="getEvidenceUrl(award.badge.id)"
+                            >
+                                Award with Evidence
+                            </a>
+                            <button
+                                v-if="award._links.goalAward && award.isGoal && !award.award"
+                                @click.prevent="awardAchievement"
+                                @keyup.enter="awardAchievement"
+                            >
+                                Award
+                            </button>
                         </section>
                     </div>
                 </div>
