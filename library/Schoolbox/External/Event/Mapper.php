@@ -20,6 +20,7 @@ use Schoolbox\GenericCollection;
  * @method GenericCollection findByColumnList($columnList, array $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
+ * @method GenericCollection createCollection($contents = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {
