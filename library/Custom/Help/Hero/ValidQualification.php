@@ -119,7 +119,9 @@ class ValidQualification
         $conditionalQuizSatisfied = 0;
 
         foreach (self::CONDITIONAL_QUIZ_PAIRS as $opt1 => $opt2) {
-            if ($this->isFullmarks($assessments[$opt1]['mark']) || $this->isFullmarks($assessments[$opt2]['mark'])) {
+            $assessmentOpt1     = $assessments[$opt1] ?? null;
+            $assessmentOpt1Mark = ($assessmentOpt1 === null)? 0: $assessmentOpt1['mark'];
+            if ($this->isFullmarks($assessmentOpt1Mark) || $this->isFullmarks($assessments[$opt2]['mark'])) {
                 $conditionalQuizSatisfied++;
             }
         }
