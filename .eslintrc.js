@@ -1,3 +1,11 @@
+
+/**
+ * Here we are setting up our eslint configuration
+ * https://eslint.org/docs/latest/user-guide/configuring/configuration-files#configuration-file-formats
+ *
+ * We are currently using the Airbnb config with TypeScript support, and also adding the additional checks typescript-eslint provides.
+ * Prettier is added to the end so eslint doesnt report on formatting issues that prettier will automatically fix.
+ */
 module.exports = {
     extends: [
         'airbnb-base', // https://www.npmjs.com/package/eslint-config-airbnb-base
@@ -6,12 +14,10 @@ module.exports = {
         'plugin:@typescript-eslint/recommended-requiring-type-checking', // https://typescript-eslint.io/docs/linting/configs#recommended-requiring-type-checking
         'prettier', // https://typescript-eslint.io/docs/linting/configs#prettier
     ],
-    parser: '@typescript-eslint/parser',
+    parser: '@typescript-eslint/parser', // the parser that runs through our ts files
     parserOptions: {
-        tsconfigRootDir: __dirname,
         project: ['./tsconfig.json'],
-        extraFileExtensions: ['.vue'],
     },
-    plugins: ['@typescript-eslint'],
+    plugins: ['@typescript-eslint'], // for eslint to be using typescript-eslint
     root: true, // limits ESLint to this folder (wont go up parent folders)
 }
