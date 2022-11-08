@@ -39,6 +39,11 @@
                     <div class="small-12 columns">
                         <p class="meta">Provide evidence or narrative on how the
                             {{ award.isGoal ? 'goal is progressing.' : 'achievement was earned.' }}
+                            {% if USER.role.staff %}
+                            You may use the following tokens that will be substituted with the
+                            students details on creation:
+                            [firstname], [preferredname], [surname], [fullname], [year], [house]
+                            {% endif %}
                         </p>
                         <textarea id="reason" name="reason">{{ award.reason }}</textarea>
                     </div>
@@ -56,8 +61,19 @@
     </div>
 </div>
 <script>
-    $.fn.alaressEditor({
-        targetElements: $('#reason'),
-    });
-    $('#evidence-form').alaressValidate();
+
+/**
+ * Add the ckeditor config, adding the user token if the user is an admin
+ */
+const baseConfig = {
+    targetElements: $('#reason')
+};
+{% if USER.role.staff %}
+    $.fn.alaressEditor($.alaressEditorConfigWithUserTokens(baseConfig));
+{% else %}
+    $.fn.alaressEditor(baseConfig);
+{% endif %}
+
+$('#evidence-form').alaressValidate();
+
 </script>
