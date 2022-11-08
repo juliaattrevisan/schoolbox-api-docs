@@ -99,7 +99,9 @@ class ValidQualification
         $mandatoryDueWorksSatisfied = 0;
 
         foreach (self::MANDATORY_DUE_WORKS as $specId) {
-            if ($this->isFullmarks($assessments[$specId]['mark'])) {
+            $assessmentForSpec     = $assessments[$specId] ?? null;
+            $assessmentForSpecMark = ($assessmentForSpec === null)? 0: $assessmentForSpec['mark'];
+            if ($this->isFullmarks($assessmentForSpecMark)) {
                 $mandatoryDueWorksSatisfied++;
             }
         }
@@ -109,7 +111,9 @@ class ValidQualification
         $mandatoryQuizSatisfied = 0;
 
         foreach (self::MANDATORY_QUIZZES as $specId) {
-            if ($this->isFullmarks($assessments[$specId]['mark'])) {
+            $assessmentForSpec     = $assessments[$specId] ?? null;
+            $assessmentForSpecMark = ($assessmentForSpec === null)? 0: $assessmentForSpec['mark'];
+            if ($this->isFullmarks($assessmentForSpecMark)) {
                 $mandatoryQuizSatisfied++;
             }
         }
@@ -120,8 +124,10 @@ class ValidQualification
 
         foreach (self::CONDITIONAL_QUIZ_PAIRS as $opt1 => $opt2) {
             $assessmentOpt1     = $assessments[$opt1] ?? null;
+            $assessmentOpt2     = $assessments[$opt2] ?? null;
             $assessmentOpt1Mark = ($assessmentOpt1 === null)? 0: $assessmentOpt1['mark'];
-            if ($this->isFullmarks($assessmentOpt1Mark) || $this->isFullmarks($assessments[$opt2]['mark'])) {
+            $assessmentOpt2Mark = ($assessmentOpt2 === null)? 0: $assessmentOpt2['mark'];
+            if ($this->isFullmarks($assessmentOpt1Mark) || $this->isFullmarks($assessmentOpt2Mark)) {
                 $conditionalQuizSatisfied++;
             }
         }
