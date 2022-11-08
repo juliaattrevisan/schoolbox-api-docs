@@ -431,14 +431,14 @@ class TimetableUsers
             WHERE se.classification = :classification
             AND se.start_at >= :from
             AND se.start_at <= :to
-            AND scu.external_id = :external_id
+            AND scu.external_id = :externalId
         ";
 
         $params = [
             'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
             'from'           => $startDatetime,
             'to'             => $finishDatetime,
-            'external_id'    => $user->getExternalId(),
+            'externalId'     => $user->getExternalId(),
         ];
 
         if ($folderCodes && $folderCodes->count()) {
@@ -484,8 +484,6 @@ class TimetableUsers
             return $this->eventMapper->createCollection();
         }
 
-        $userCodeBindings = Builder::getBindings($userCodes, 'userFolderCode');
-
         /* Get a list of events between $startTimestamp and $endTimestamp
          * along with an ordered list of their overrides
          */
@@ -496,20 +494,17 @@ class TimetableUsers
             WHERE se.classification = :classification
             AND se.start_at >= :from
             AND se.start_at <= :to
-            AND se.code IN ({$userCodeBindings->getPlaceholder()})
             ORDER BY se.id ASC, seuo.sequence ASC
         ";
-        $params = array_merge(
+
+        $statement = $this->eventMapper->getDatabase()->prepare($query);
+        $statement->execute(
             [
                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
                 'from'           => $startDatetime,
                 'to'             => $finishDatetime,
             ],
-            $userCodeBindings->getParams()
         );
-
-        $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute($params);
 
         /* Remember: overrides are generally optional so they might not even
          * exist for $classCode which is why we get the Usual Guys first
