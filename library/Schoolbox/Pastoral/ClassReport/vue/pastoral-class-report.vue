@@ -232,12 +232,12 @@ export default {
                                             </a>
                                             <div class="time-container">
                                                 <template v-if="record.createdAt !== record.updatedAt">
-                                                    <span :title="'Created on ' + formatDateTime(record.createdAt) + ', last modified ' + formatDateTime(record.updatedAt)">
+                                                    <span class="meta" :title="'Created on ' + formatDateTime(record.createdAt) + ', last modified ' + formatDateTime(record.updatedAt)">
                                                         Last modified <time>{{ formatRelative(record.updatedAt) }}</time>
                                                     </span>
                                                 </template>
                                                 <template v-else>
-                                                    <span :title="'Created on ' + formatDateTime(record.createdAt)">
+                                                    <span class="meta" :title="'Created on ' + formatDateTime(record.createdAt)">
                                                         Created <time>{{ formatRelative(record.createdAt) }}</time>
                                                     </span>
                                                 </template>
@@ -398,6 +398,16 @@ input[type=radio]:not(.plain) + label.input-toggle {
                             padding-right: 1rem;
                             text-align: right;
                         }
+
+                        @media (max-width: 640px) {
+                            grid-template-columns: 1fr; // so the 2 column <a> tag and .time-container within grid become a single column
+                            margin-bottom: 0.825rem; // feels stacked too tight, so add some vertical space
+                            .time-container {
+                                padding-left: 2.25rem; // align with the profile img within the <a> tag
+                                text-align: left;
+                            }
+                        }
+
                     }
                 }
 
