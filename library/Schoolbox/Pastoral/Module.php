@@ -133,6 +133,13 @@ class Module extends BaseModule
             $permissionStudent,
         );
 
+        // Permissions required to view the student counts page:
+        // only moderators or staff may read this page
+        $permissionStudentsCountView = new Rule\Any(
+            $permissionPastoralModeratorRead,
+            $permissionStaff,
+        );
+
         // Permissions required to view/update/delete a pastoral record (any staff member can insert)
         $permissionRecordView = new Rule\Any(
             $permissionPastoralModeratorRead,
@@ -214,7 +221,7 @@ class Module extends BaseModule
                     '/actions'                                                                     => ['getActions' => $permissionStaff],
                     '/search'                                                                      => ['getSearch' => $permissionStaff],
                     '/student/{studentId:\d+}'                                                     => ['getStudent' => $permissionStudentView],
-                    '/students/count/{studentIds:[\d\x2c]+}'                                       => ['getStudentsCount' => $permissionStudentView],
+                    '/students/count/{studentIds:[\d\x2c]+}'                                       => ['getStudentsCount' => $permissionStudentsCountView],
                     '/student/{studentId:\d+}/record/{recordId:\d+}'                               => ['getStudentRecord' => $permissionRecordView],
                     '/student/{studentId:\d+}/linked/{linkedStudentId:\d+}'                        => ['getLinked' => $permissionStudentView],
                     '/student/{studentId:\d+}/record/{recordId:\d+}/attachment/{attachmentId:\d+}' => ['getStudentRecordAttachment' => $permissionRecordView],
