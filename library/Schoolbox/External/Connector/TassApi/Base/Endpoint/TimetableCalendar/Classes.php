@@ -44,7 +44,7 @@ class Classes implements IStrategy
      * events of that day if UPS ran and deleted those events because they were
      * just "in the past"
      */
-    private const PAST_THRESHOLD = 30;
+    private const PAST_THRESHOLD = 40;
 
 
     /**
@@ -271,12 +271,6 @@ class Classes implements IStrategy
              * multiple timetables - you have to find the one which contains $now
              */
             foreach ($data['student_timetable'] as $timetable) {
-//                /* Only import data for externalIds in $watchlist, if provided
-//                 */
-//                if (!(new Watchlist())->isOnWatchlist((string)$externalId, $this->watchlist)) {
-//                    continue;
-//                }
-
                 $this->process(self::STUDENT, $person, $timetable);
             }
 
@@ -427,12 +421,6 @@ class Classes implements IStrategy
              * (Not sure how many they can actually have in production)
              */
             foreach ($data['teacher_timetable'] as $timetable) {
-//                /* Only import data for externalIds in $watchlist, if provided
-//                 */
-//                if (!(new Watchlist())->isOnWatchlist((string)$externalId, $this->watchlist)) {
-//                    continue;
-//                }
-
                 $this->process(self::STAFF, $person, $timetable);
             }
             /* Example $timetable extract
@@ -738,6 +726,61 @@ class Classes implements IStrategy
                      */
                     if (self::STAFF === $roleType) {
                         $this->saveStaffInvolvement($event, $classEntry, $name, $person['external_id']);
+                    }
+
+                    /* Compare this subject's TO_DATE to $startAt
+                     * Subjects that aren't actually relevant to this date still appear here
+                     * for us to manually deduce validity (thanks tass)
+                     *
+                     * FROM_DATE and TO_DATE are optionally mandatory - they could be empty string/null
+                     * or not even here, despite what the docs say: Undefined array key "TO_DATE"
+                     */
+
+                    /* If TO_DATE is before $startDate, it is no longer occurring and we can
+                     * skip over it
+                     */
+                    $subjectTo = trim((string)($subject['TO_DATE'] ?? null));
+                    $subjectFrom = trim((string)($subject['FROM_DATE'] ?? null));
+
+                    if ('' !== $subjectTo && $subjectTo < $startAt->getDatabase()) {
+                        $this->log->debug(sprintf(
+                            '%s %s is an expired class which went until %s; applying SUBTRACT override',
+                            $title,
+                            $classCode,
+                            $subjectTo
+                        ));
+
+                        $subtractOverride = $this->overridesMapper->createModel()
+                            ->setEventId($event->getId())
+                            ->setExternalId($person['external_id'])
+                            ->setAction(\Schoolbox\External\Event\Overrides\Model::SUBTRACT)
+                            ->setSequence(2);
+
+                        if ($this->perform) {
+                            $this->overridesMapper->save($subtractOverride);
+                        }
+                    }
+
+                    /* If FROM_DATE is after $startDate, it's not yet occurring and we can
+                     * skip over it
+                     */
+                    if ('' !== $subjectFrom && $subjectFrom > $finishAt->getDatabase()) {
+                        $this->log->debug(sprintf(
+                            '%s %s is an upcoming class which starts on %s; applying SUBTRACT override',
+                            $title,
+                            $classCode,
+                            $subjectFrom
+                        ));
+
+                        $subtractOverride = $this->overridesMapper->createModel()
+                            ->setEventId($event->getId())
+                            ->setExternalId($person['external_id'])
+                            ->setAction(\Schoolbox\External\Event\Overrides\Model::SUBTRACT)
+                            ->setSequence(2);
+
+                        if ($this->perform) {
+                            $this->overridesMapper->save($subtractOverride);
+                        }
                     }
                 }
             }
