@@ -408,7 +408,7 @@ class TimetableUsers
     public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
         if (!$user->getExternalId()) {
-            return new $this->eventMapper->createCollection();
+            return $this->eventMapper->createCollection();
         }
         $startDatetime  = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
         $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
