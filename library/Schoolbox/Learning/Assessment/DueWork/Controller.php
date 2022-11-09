@@ -342,8 +342,8 @@ class Controller extends Assessment\Controller
             'assessment'             => $assessment,
             'student'                => $student,
             'participant'            => $participant,
-            'returnUrl'              => $returnUrl,
-            'returnUrlEncoded'       => Redirect::encode($returnUrl),
+            'returnUrl'              => $returnUrl,                   // Unencoded URL for use in direct redirection (eg. <a href='{{ returnUrl }}'>)
+            'returnUrlEncoded'       => Redirect::encode($returnUrl), // Encoded URL For use as a URL parameter (eg. '?returnUrl={{ returnUrlEncoded }}')
             'timeline'               => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
             'authoritativeFeedback'  => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
             'selfAssessmentFeedback' => $participant ? $participant->findMostRecentSelfAssessedPublishedFeedback() : null,
