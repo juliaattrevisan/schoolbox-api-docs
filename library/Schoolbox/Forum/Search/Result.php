@@ -22,7 +22,6 @@ use Schoolbox\User;
 
 class Result extends Base
 {
-
     /**
      * Get all the search results
      *
