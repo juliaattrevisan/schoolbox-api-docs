@@ -83,7 +83,7 @@ class Result extends Base
         $stmt->execute();
         $collection = $mapper->createCollection();
 
-        foreach ($this->buildSearchResult($stmt, $user, 'categoryID', $sanitiser->getOffset(), $sanitiser->getPageLimit()) as $row) {
+        foreach ($this->buildSearchResult($stmt, $user, 'categoryID', 0, $sanitiser->getPageLimit()) as $row) {
             /**
              * remove any forums that do not exist on homepages
              */
