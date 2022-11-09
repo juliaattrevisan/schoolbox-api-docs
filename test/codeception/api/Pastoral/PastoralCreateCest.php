@@ -1,0 +1,170 @@
+<?php
+
+/**
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Test\Api;
+
+use \ApiTester;
+use Schoolbox\Pastoral\Access\Mapper;
+use Schoolbox\Role;
+use Schoolbox\User;
+
+/**
+ * pastoral@create.yaml
+ * /usr/share/schoolbox/vendor/bin/codecept run api PastoralCreateCest
+ *
+ */
+class PastoralCreateCest
+{
+    private User $userPrivate;
+    private User $userPublic;
+    private User $userDeny;
+    private User $student;
+
+    /**
+     * @param ApiTester $i
+     * @return void
+     */
+    public function run(ApiTester $i)
+    {
+        $users = $i->getUsers();
+
+        $this->userPrivate = $i->createTestUser('private-' . time(), Role::STAFF, false);
+        $this->userPublic  = $i->createTestUser('public-' . time(), Role::STAFF, false);
+        $this->userDeny    = $i->createTestUser('deny-' . time(), Role::STAFF, false);
+        $this->student     = $i->getUsers()['student'];
+
+        /** @var User $user */
+        foreach ($users as $user) {
+            $this->testCreate($i, $user);
+        }
+    }
+
+    /**
+     * @param ApiTester $i
+     * @param bool      $superUser
+     * @return void
+     */
+    private function testCreate(\ApiTester $i, User $operator)
+    {
+        foreach ($this->getCreateTestData($i) as $postData) {
+            $i->comment("Testing as user {$operator->getUsername()} [{$operator->getId()}]");
+            $i->switchUser($operator);
+            $i->sendPost('/pastoral/record/insert', $postData['data']);
+
+            // TODO: check role permission
+            if (!$operator->getRole()->isStaff()) {
+                $i->seeResponseCodeIs(401);
+                return;
+            }
+
+            $i->seeResponseCodeIs(201);
+            $response = $i->grabDataFromResponseByJsonPath('$[0].id');
+
+
+            $recordId   = $response[0];
+            $recordPath = "/pastoral/student/{$this->student->getId()}/record/{$recordId}";
+
+            // get user by userId
+            $i->sendGet($recordPath, []);
+            $i->seeResponseCodeIs(200);
+
+            foreach ($postData['expectedResponseCode'] as $code => $users) {
+                foreach ($users as $user) {
+                    $i->switchUser($user);
+                    $i->sendGet($recordPath, []);
+                    $i->seeResponseCodeIs($code);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param ApiTester $i
+     * @return iterable
+     */
+    private function getCreateTestData(\ApiTester $i): iterable
+    {
+        /** @var \Schoolbox\Pastoral\Type\Model $pastoralType */
+        $pastoralType = $i->getPastoralTypes()->first();
+
+        // least required
+        yield [
+            'data'                 => [
+                'student_id' => $this->student->getId(),
+                'heading'    => 'Cest least ' . time(),
+                'typeId'     => $pastoralType->getId(),
+                //        'subtypeId' => $record->getSubType()?->getId();
+                'subtypeId'  => $pastoralType->getSubTypes()->first()?->getId(),
+                // TODO: config
+                'severityId' => $i->getPastoralSeverities()->first()->getId(),
+            ],
+            'expectedResponseCode' => [
+                400 => [$this->userDeny, $this->userPrivate, $this->userPublic],
+            ],
+        ];
+
+        // set null to nullable
+        yield [
+            'data'                 => [
+                'student_id'          => $this->student->getId(),
+                'duplicateIds'        => null,
+                'heading'             => 'Cest nullable ' . time(),
+                'typeId'              => $pastoralType->getId(),
+                //        'subtypeId' => $record->getSubType()?->getId();
+                'subtypeId'           => $pastoralType->getSubTypes()->first()?->getId(),
+                // TODO: config
+                'severityId'          => $i->getPastoralSeverities()->first()->getId(),
+                'public_attachments'  => null,
+                'private_attachments' => null,
+                'actions'             => null,
+                'tags'                => null,
+                'points'              => null,
+            ],
+            'expectedResponseCode' => [
+                400 => [$this->userDeny, $this->userPrivate, $this->userPublic],
+            ],
+        ];
+
+        yield [
+            'data'                 => [
+                'student_id'          => $this->student->getId(),
+                'heading'             => 'Cest normal ' . time(),
+                'typeId'              => $pastoralType->getId(),
+                //        'subtypeId' => $record->getSubType()?->getId();
+                'subtypeId'           => $pastoralType->getSubTypes()->first()?->getId(),
+                // TODO: config
+                'severityId'          => $i->getPastoralSeverities()->first()->getId(),
+                // TODO: permission
+                'role'                => [
+                    1                   => Mapper::ACCESS_PUBLIC,
+                    'role-type-student' => Mapper::ACCESS_PUBLIC,
+                    'role-type-parent'  => Mapper::ACCESS_PUBLIC,
+                ],
+                'group'               => [1 => Mapper::ACCESS_PUBLIC],
+                'user'                => [
+                    $this->userPrivate->getId() => Mapper::ACCESS_PRIVATE,
+                    $this->userPublic->getId()  => Mapper::ACCESS_PUBLIC,
+                    $this->userDeny->getId()    => Mapper::ACCESS_DENY,
+                ],
+                'public_attachments'  => ['store:723b6e31c2979b33deea852cdbbad9c4b0e00b96:piglet2.jpg'],
+                'private_attachments' => ['store:69903e5d89e1574d92de8afd1634f472e3096b3c:scrabble2.jpg'],
+                // TODO: config
+                'tags'                => "test tag A,test tag B",
+                'duplicateIds'        => '25,26',
+                'points'              => 50,
+                'body_public'         => "Public body\nPublic body.",
+                'body_private'        => "Private body\nPrivate body.",
+            ],
+            'expectedResponseCode' => [
+                400 => [$this->userDeny],
+                200 => [$this->userPrivate, $this->userPublic],
+            ],
+        ];
+    }
+}
