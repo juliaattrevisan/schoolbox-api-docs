@@ -241,6 +241,13 @@ class Factory
             throw new \DomainException('XML Preconditions not met. A transmission may be taking place and/or required quantity of xml files has yet to be met.');
         }
 
+        /* Load all the Profile xmls
+         *
+         * TODO: Replace with a sis_user_profile lookup equivalent
+         *  instead of remembering what we saw in Profile
+         */
+        $registry = new Profile\Registry();
+
         /* Purge previously-imported profile relationships
          */
         if ($this->validStrats->isProfileStratEnabled()) {
@@ -253,10 +260,6 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
             ));
-
-            /* Load all the Profile xmls
-             */
-            $registry = new Profile\Registry();
 
             foreach ($xml[Receiver::XML_FULL] as $xmlFile) {
                 $bus->add(new Profile\Profile(
