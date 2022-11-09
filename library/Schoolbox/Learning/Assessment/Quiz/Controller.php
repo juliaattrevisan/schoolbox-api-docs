@@ -55,6 +55,7 @@ use UnexpectedValueException;
  */
 class Controller extends Assessment\Controller
 {
+
     /**
      * @var QuizMapper
      */
@@ -260,7 +261,7 @@ class Controller extends Assessment\Controller
             'participant'       => $assessment->getParticipantIfExtant($student),
             'quiz'              => $quiz,
             'attemptInProgress' => $attemptInProgress,
-            'returnUrl'         => $this->getRequest()->query->get(Redirect::RETURN_URL), // The returnUrl URL parameter (to be used again as a URL parameter).  (No encoding/decoding necessary).
+            'returnUrl'         => $this->getRequest()->query->get(Redirect::RETURN_URL),
             // User may only attempt quiz from here if viewing own summary
             'canAttempt'        => $canAttempt,
             'canReview'         => $actionValidator->canReviewAttempts($this->getUser(), $student, $assessment),
