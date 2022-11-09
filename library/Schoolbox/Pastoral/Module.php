@@ -57,7 +57,6 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         // Define permissions for the routes
-
         $permissionPastoralModeratorModerate = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL);
         $permissionPastoralModeratorWrite    = new HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE);
         $permissionPastoralModeratorRead     =
@@ -131,6 +130,13 @@ class Module extends BaseModule
             $permissionStaff,
             $permissionParentOfStudent,
             $permissionStudent,
+        );
+
+        // Permissions required to view the student counts page:
+        // only moderators or staff may read this page
+        $permissionStudentsCountView = new Rule\Any(
+            $permissionPastoralModeratorRead,
+            $permissionStaff,
         );
 
         // Permissions required to view/update/delete a pastoral record (any staff member can insert)
@@ -214,7 +220,7 @@ class Module extends BaseModule
                     '/actions'                                                                     => ['getActions' => $permissionStaff],
                     '/search'                                                                      => ['getSearch' => $permissionStaff],
                     '/student/{studentId:\d+}'                                                     => ['getStudent' => $permissionStudentView],
-                    '/students/count/{studentIds:[\d\x2c]+}'                                       => ['getStudentsCount' => $permissionStudentView],
+                    '/students/count/{studentIds:[\d\x2c]+}'                                       => ['getStudentsCount' => $permissionStudentsCountView],
                     '/student/{studentId:\d+}/record/{recordId:\d+}'                               => ['getStudentRecord' => $permissionRecordView],
                     '/student/{studentId:\d+}/linked/{linkedStudentId:\d+}'                        => ['getLinked' => $permissionStudentView],
                     '/student/{studentId:\d+}/record/{recordId:\d+}/attachment/{attachmentId:\d+}' => ['getStudentRecordAttachment' => $permissionRecordView],
@@ -377,23 +383,17 @@ class Module extends BaseModule
              */
             if (array_key_exists('studentIds', $params)) {
                 $studentIds = array_unique(explode(',', $params['studentIds']));
-
-                $students = User::createCollection();
-
-                /** @var UserMapper $userMapper */
                 $userMapper = $this->getMapperFactory()->get(UserMapper::class);
 
-                try {
-                    foreach ($studentIds as $studentId) {
-                        $student = $userMapper->findWithSubjects($studentId);
-                        $student->loadTeachers();
-                        $student->loadParents();
-
-                        $students->add($student);
-                    }
-                } catch (MapperException $e) {
-                    throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-                }
+                // Parents, teachers and subjects are not required to build the
+                // pastoral records count:
+                // * whether a staff member is a teacher of a student is not
+                //   relevant for determining record access: only their role
+                //   membership is used to determine access
+                // * parents may not access the records count even for their own
+                //   children, so whether a user is a child's parent is not
+                //   relevant
+                $students = $userMapper->findByColumn('id', $studentIds);
 
                 if (count($students) === 0) {
                     throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
