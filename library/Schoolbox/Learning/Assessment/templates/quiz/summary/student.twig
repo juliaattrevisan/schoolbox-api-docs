@@ -91,9 +91,9 @@
     <div class="row">
         <div class="small-12 column">
             {% if attemptInProgress %}
-                <a href="/assess/attempt/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}" class="button submit">Resume Quiz</a>
+                <a href="/assess/attempt/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}" class="button submit">Resume Quiz</a>
             {% else %}
-                <a href="/assess/init/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}" class="button submit">Begin Quiz</a>
+                <a href="/assess/init/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}" class="button submit">Begin Quiz</a>
             {% endif %}
         </div>
     </div>
@@ -176,12 +176,12 @@
                                 {% endif %}
                                 {% if finished %}
                                     {% if canReview %}
-                                        <a href="/assess/review/{{ quiz.id }}/{{ quiz.sections.first.id }}/{{ attempt.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}" class="icon-view" title="Review"></a>
+                                        <a href="/assess/review/{{ quiz.id }}/{{ quiz.sections.first.id }}/{{ attempt.id }}/{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}" class="icon-view" title="Review"></a>
                                     {% elseif canStudentReview %}
-                                        <a href="/assess/studentReview/{{ quiz.id }}/{{ quiz.sections.first.id }}/{{ attempt.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}" class="icon-view" title="Review"></a>
+                                        <a href="/assess/studentReview/{{ quiz.id }}/{{ quiz.sections.first.id }}/{{ attempt.id }}/{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}" class="icon-view" title="Review"></a>
                                     {% endif %}
                                 {% elseif canAttempt %}
-                                    <a href='/assess/attempt/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrl %}?{{ RETURN_URL.name }}={{ returnUrl|escape('url') }}{% endif %}' class="icon-next" title="Resume"></a>
+                                    <a href='/assess/attempt/{{ quiz.id }}/{{ quiz.sections.first.id }}/{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}' class="icon-next" title="Resume"></a>
                                 {% endif %}
                             </nav>
                         </td>
