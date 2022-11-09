@@ -18,6 +18,10 @@
                     {{ award.awardedBy.fullname }}
                 {% endif %}
             </li>
+            {% if award.status == 'goal' and award.award %}
+                <li class="icon-achievement">
+                    Goal has been achieved <time title="{{ award.award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time></li>
+            {% endif %}
         </ul>
     </div>
 </div>
