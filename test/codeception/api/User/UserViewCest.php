@@ -20,9 +20,9 @@ use Schoolbox\User;
  */
 class UserViewCest
 {
-    private User $userPrivate;
-    private User $userPublic;
-    private User $userDeny;
+    private User $super;
+    private User $staff;
+    private User $parent;
     private User $student;
 
     /**
@@ -33,137 +33,66 @@ class UserViewCest
     {
         $users = $i->getUsers();
 
-        $this->userPrivate = $i->createTestUser('private-' . time(), Role::STAFF, false);
-        $this->userPublic  = $i->createTestUser('public-' . time(), Role::STAFF, false);
-        $this->userDeny    = $i->createTestUser('deny-' . time(), Role::STAFF, false);
+        $this->super = $i->createTestUser('super-' . time(), Role::STAFF, true);
+        $this->staff  = $i->createTestUser('staff-' . time(), Role::STAFF, false);
+        $this->parent    = $i->createTestUser('parent-' . time(), Role::PARENT, false);
         $this->student     = $i->getUsers()['student'];
 
         /** @var User $user */
         foreach ($users as $user) {
-            $this->testCreate($i, $user);
+            $this->testGetUser($i, $user);
         }
     }
 
     /**
      * @param ApiTester $i
-     * @param bool      $superUser
+     * @param User      $operator
      * @return void
      */
-    private function testCreate(\ApiTester $i, User $operator)
+    private function testGetUser(\ApiTester $i, User $operator)
     {
-        foreach ($this->getCreateTestData($i) as $postData) {
-            $i->comment("Testing as user {$operator->getUsername()} [{$operator->getId()}]");
-            $i->switchUser($operator);
-            $i->sendPost('/pastoral/record/insert', $postData['data']);
+        //check if current user can view this users getUser api endpoint
+        $i->sendGet('/api/user/', ['userId' => $operator->getId()]);
+        $i->seeResponseCodeIs(200);
 
-            // TODO: check role permission
-            if (!$operator->getRole()->isStaff()) {
-                $i->seeResponseCodeIs(401);
-                return;
-            }
-
-            $i->seeResponseCodeIs(201);
-            $response = $i->grabDataFromResponseByJsonPath('$[0].id');
-
-
-            $recordId   = $response[0];
-            $recordPath = "/pastoral/student/{$this->student->getId()}/record/{$recordId}";
-
-            // get user by userId
-            $i->sendGet($recordPath, []);
+        //check if I can see admin
+        $i->sendGet('/api/user/', ['userId' => $this->super->getId()]);
+        if ($operator->isSuperuser() || $this->super->getId() === $operator->getId()) {
+            //if I am also admin, I should see the user
             $i->seeResponseCodeIs(200);
-
-            foreach ($postData['expectedResponseCode'] as $code => $users) {
-                foreach ($users as $user) {
-                    $i->switchUser($user);
-                    $i->sendGet($recordPath, []);
-                    $i->seeResponseCodeIs($code);
-                }
-            }
+        } else {
+            //else don't show
+            $i->seeResponseCodeIs(401);
         }
-    }
 
-    /**
-     * @param ApiTester $i
-     * @return iterable
-     */
-    private function getCreateTestData(\ApiTester $i): iterable
-    {
-        /** @var \Schoolbox\Pastoral\Type\Model $pastoralType */
-        $pastoralType = $i->getPastoralTypes()->first();
+        //check if user can see other staff
+        $i->sendGet('/api/user/', ['userId' => $this->staff->getId()]);
+        if ($operator->isSuperuser() || $this->staff->getId() === $operator->getId()) {
+            //if I am also admin, I should see the user
+            $i->seeResponseCodeIs(200);
+        } else {
+            //else don't show
+            $i->seeResponseCodeIs(401);
+        }
 
-        // least required
-        yield [
-            'data'                 => [
-                'student_id' => $this->student->getId(),
-                'heading'    => 'Cest least ' . time(),
-                'typeId'     => $pastoralType->getId(),
-                //        'subtypeId' => $record->getSubType()?->getId();
-                'subtypeId'  => $pastoralType->getSubTypes()->first()?->getId(),
-                // TODO: config
-                'severityId' => $i->getPastoralSeverities()->first()->getId(),
-            ],
-            'expectedResponseCode' => [
-                400 => [$this->userDeny, $this->userPrivate, $this->userPublic],
-            ],
-        ];
+        //check if user can see other parent
+        $i->sendGet('/api/user/', ['userId' => $this->parent->getId()]);
+        if ($operator->isSuperuser() || $this->parent->getId() === $operator->getId()) {
+            //if I am also admin, I should see the user
+            $i->seeResponseCodeIs(200);
+        } else {
+            //else don't show
+            $i->seeResponseCodeIs(401);
+        }
 
-        // set null to nullable
-        yield [
-            'data'                 => [
-                'student_id'          => $this->student->getId(),
-                'duplicateIds'        => null,
-                'heading'             => 'Cest nullable ' . time(),
-                'typeId'              => $pastoralType->getId(),
-                //        'subtypeId' => $record->getSubType()?->getId();
-                'subtypeId'           => $pastoralType->getSubTypes()->first()?->getId(),
-                // TODO: config
-                'severityId'          => $i->getPastoralSeverities()->first()->getId(),
-                'public_attachments'  => null,
-                'private_attachments' => null,
-                'actions'             => null,
-                'tags'                => null,
-                'points'              => null,
-            ],
-            'expectedResponseCode' => [
-                400 => [$this->userDeny, $this->userPrivate, $this->userPublic],
-            ],
-        ];
-
-        yield [
-            'data'                 => [
-                'student_id'          => $this->student->getId(),
-                'heading'             => 'Cest normal ' . time(),
-                'typeId'              => $pastoralType->getId(),
-                //        'subtypeId' => $record->getSubType()?->getId();
-                'subtypeId'           => $pastoralType->getSubTypes()->first()?->getId(),
-                // TODO: config
-                'severityId'          => $i->getPastoralSeverities()->first()->getId(),
-                // TODO: permission
-                'role'                => [
-                    1                   => Mapper::ACCESS_PUBLIC,
-                    'role-type-student' => Mapper::ACCESS_PUBLIC,
-                    'role-type-parent'  => Mapper::ACCESS_PUBLIC,
-                ],
-                'group'               => [1 => Mapper::ACCESS_PUBLIC],
-                'user'                => [
-                    $this->userPrivate->getId() => Mapper::ACCESS_PRIVATE,
-                    $this->userPublic->getId()  => Mapper::ACCESS_PUBLIC,
-                    $this->userDeny->getId()    => Mapper::ACCESS_DENY,
-                ],
-                'public_attachments'  => ['store:723b6e31c2979b33deea852cdbbad9c4b0e00b96:piglet2.jpg'],
-                'private_attachments' => ['store:69903e5d89e1574d92de8afd1634f472e3096b3c:scrabble2.jpg'],
-                // TODO: config
-                'tags'                => "test tag A,test tag B",
-                'duplicateIds'        => '25,26',
-                'points'              => 50,
-                'body_public'         => "Public body\nPublic body.",
-                'body_private'        => "Private body\nPrivate body.",
-            ],
-            'expectedResponseCode' => [
-                400 => [$this->userDeny],
-                200 => [$this->userPrivate, $this->userPublic],
-            ],
-        ];
+        //check if user can see other student
+        $i->sendGet('/api/user/', ['userId' => $this->student->getId()]);
+        if ($operator->isSuperuser() || $this->student->getId() === $operator->getId()) {
+            //if I am also admin, I should see the user
+            $i->seeResponseCodeIs(200);
+        } else {
+            //else don't show
+            $i->seeResponseCodeIs(401);
+        }
     }
 }
