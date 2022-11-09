@@ -47,7 +47,7 @@ class PayloadCache
 
 
     /**
-     * @param \xmlrpcmsg $message
+     * @param Request $message
      * @return void
      * @throws \JsonException
      */
