@@ -325,6 +325,7 @@ Data:
              # populated when the student publishes their self-assessment.
              #}
             <input type="hidden" name="responseId" value="{{ response ? response.id : '' }}"/>
+            <input type="hidden" name="returnUrl" value="{{ returnUrl }}"/>
             {% if acceptsOnline or isSubmitOnBehalfOf %}
                 <h2 class="subheader">Submit Work</h2>
 

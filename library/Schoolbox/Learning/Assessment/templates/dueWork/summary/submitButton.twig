@@ -23,7 +23,7 @@ Data:
                         on behalf of {{ student.fullname }}
                     {% endif %}
                 {% endapply %}{% endset %}
-                <a class="submit button" href="{{ submitRoute }}">{{ submitText }}</a>
+                <a class="submit button" href="{{ submitRoute }}{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}">{{ submitText }}</a>
             {% endif %}
         {% elseif not acknowledgementBlocked %}
             {% if selfAcknowledgeRoute %}
