@@ -511,6 +511,7 @@ class Controller extends ConfigController
     /**
      * Exports the contents of sis_event into a csv format
      *
+     * @api /adminv2/import/schoolDataImport/timetable/export
      * @return void
      * @throws PDOException
      */
@@ -535,6 +536,7 @@ class Controller extends ConfigController
     /**
      * Exports the contents of sis_class into a csv format
      *
+     * @api /adminv2/import/schoolDataImport/classes/export
      * @return void
      * @throws PDOException
      */
@@ -547,7 +549,7 @@ class Controller extends ConfigController
         $headers->set('Cache-Control', ' ');
         $headers->set('Content-Type', 'text/csv');
         $headers->set('Content-Length', \strlen($content));
-        $headers->set('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"");
+        $headers->set('Content-Disposition', "attachment; filename=\"export-school-data-classes.csv\"");
 
         $this->getResponse()->content->set([
             'format' => 'file',
