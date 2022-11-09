@@ -40,6 +40,7 @@ class UserViewCest
 
         /** @var User $user */
         foreach ($users as $user) {
+            $i->comment("I am user: " . $user->getUsername());
             $this->testGetUser($i, $user);
         }
     }
@@ -52,12 +53,12 @@ class UserViewCest
     private function testGetUser(\ApiTester $i, User $operator)
     {
         //check if current user can view this users getUser api endpoint
-        $i->sendGet('/api/user/', ['userId' => $operator->getId()]);
+        $i->sendGet('/api/user/' . $operator->getId());
         $i->seeResponseCodeIs(200);
 
         //check if I can see admin
-        $i->sendGet('/api/user/', ['userId' => $this->super->getId()]);
-        if ($operator->isSuperuser() || $this->super->getId() === $operator->getId()) {
+        $i->sendGet('/api/user/' . $this->super->getId());
+        if ($operator->isSuperuser() || ($this->super->getId() === $operator->getId())) {
             //if I am also admin, I should see the user
             $i->seeResponseCodeIs(200);
         } else {
@@ -66,8 +67,8 @@ class UserViewCest
         }
 
         //check if user can see other staff
-        $i->sendGet('/api/user/', ['userId' => $this->staff->getId()]);
-        if ($operator->isSuperuser() || $this->staff->getId() === $operator->getId()) {
+        $i->sendGet('/api/user/' . $this->staff->getId());
+        if ($operator->isSuperuser() || ($this->staff->getId() === $operator->getId())) {
             //if I am also admin, I should see the user
             $i->seeResponseCodeIs(200);
         } else {
@@ -76,8 +77,8 @@ class UserViewCest
         }
 
         //check if user can see other parent
-        $i->sendGet('/api/user/', ['userId' => $this->parent->getId()]);
-        if ($operator->isSuperuser() || $this->parent->getId() === $operator->getId()) {
+        $i->sendGet('/api/user/' . $this->parent->getId());
+        if ($operator->isSuperuser() || ($this->parent->getId() === $operator->getId())) {
             //if I am also admin, I should see the user
             $i->seeResponseCodeIs(200);
         } else {
@@ -86,8 +87,8 @@ class UserViewCest
         }
 
         //check if user can see other student
-        $i->sendGet('/api/user/', ['userId' => $this->student->getId()]);
-        if ($operator->isSuperuser() || $this->student->getId() === $operator->getId()) {
+        $i->sendGet('/api/user/' . $this->student->getId());
+        if ($operator->isSuperuser() || ($this->student->getId() === $operator->getId())) {
             //if I am also admin, I should see the user
             $i->seeResponseCodeIs(200);
         } else {
