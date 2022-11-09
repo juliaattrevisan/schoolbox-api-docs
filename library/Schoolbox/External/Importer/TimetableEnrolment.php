@@ -122,12 +122,6 @@ class TimetableEnrolment extends AbstractImporter
                     ->setName(trim($row['Class Title']));
             }
 
-            try {
-                $student = $this->userMapper->findByExternalId($studentCode);
-            } catch (Mapper\Exception $e) {
-                $this->log->warning(sprintf('Student "%s" not found but assigning anyway', $studentCode));
-            }
-
             $result[] = (new ClassInvolvement())
                 ->setExternalId($studentCode)
                 ->setClass($class);
