@@ -51,7 +51,33 @@ class Factory implements IFactory
     public const TASS_API = 'tassapi';
     public const COMPASS = 'compass';
     public const WONDE = 'wonde';
+    public const LISS = 'liss';
     public const CSV = 'csv';
+
+
+    /**
+     * Formal naming
+     */
+    public const NAME = [
+        self::ISAMS => 'iSAMS',
+        self::KAMAR => 'Kamar',
+        self::SENTRAL => 'Sentral',
+        self::TASS_API => 'TASS',
+        self::COMPASS => 'Compass',
+        self::WONDE => 'Wonde',
+        self::LISS => 'LISS',
+        /* Not sure what this should really say
+         * Went with the usual name instead
+         */
+        self::CSV => 'Schoolbox'
+    ];
+
+
+    /**
+     * The importers that put data into the cyclic grid
+     * (including "-- select an option --")
+     */
+    public const CYCLIC_GRID = [ self::CSV, self::KAMAR, '' ];
 
 
     /**

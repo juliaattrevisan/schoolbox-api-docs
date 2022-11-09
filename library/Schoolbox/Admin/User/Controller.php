@@ -12,10 +12,12 @@ use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
 use Alaress\Password\Service as PasswordService;
 use Alaress\Redis;
 use Alaress\Web\Controller\Base;
+use External\IConnector;
 use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\Role;
 use Scrub;
 use UnexpectedValueException;
@@ -332,6 +334,16 @@ class Controller extends Base
                 ->attachFiles([$user->getPortrait()])->getTwigContext();
         }
 
+        /* Decode which connector name to show here
+         *
+         * If you're using the schoolbox connector, see which suds importer you chose
+         */
+        if (IConnector::EXTERNAL_TYPE_SCHOOLBOX === $this->getConfigLoader()->get('external_type')) {
+            $sudsConnector = trim((string)$this->getConfigLoader()->get('schooldata_import_data_source'));
+            $connectorName = Factory::NAME[$sudsConnector] ?? null;
+        } else {
+            $connectorName = ucfirst($this->getConfigLoader()->get('external_type'));
+        }
 
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
@@ -349,7 +361,7 @@ class Controller extends Base
                 'yearLevels' => $this->yearLevelMapper->findAll(),
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
-                'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),
+                'externalDatabase' => $connectorName,
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
                 'houses' => $this->houseMapper->findAll(),
                 'titles' => $this->userTitleMapper->findAll(),
