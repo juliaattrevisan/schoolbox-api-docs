@@ -36,6 +36,7 @@ use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Schoolbox\Learning\Badge\Translator as BadgeTranslator;
 use Schoolbox\Resource\Storage;
+use Schoolbox\TokenReplacer;
 
 use function count;
 use function in_array;
@@ -560,13 +561,14 @@ class Controller extends Base
          */
         $userIds = $users->getPropertyValues('id');
         $histories = $this->mapper->findHistories($userIds, $badge);
+        $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
 
         foreach ($users as $user) {
             $award = $this->mapper->createModel()
                 ->setRecipient($user)
                 ->setBadge($badge)
                 ->setStatus($status)
-                ->setReason($reason)
+                ->setReason($tokenReplacer->replace($reason, $user))
                 ->setAwardedBy($this->getUser())
                 ->setAwardedAt(Alaress_Date_Format::now());
             $award = $award->setExpiresAt((new ExpiryHelper())->determineExpiry($award));
@@ -797,7 +799,11 @@ class Controller extends Base
      */
     public function postAwardUpdate(AwardModel $award): void
     {
-        $award->setReason($this->request->post['reason']);
+        // hydrate student for token replacer
+        $student       = $this->userMapper->findById($award->getRecipient()->getId());
+        $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+        $reason        = trim($this->request->post->get('reason') ?? '');
+        $award->setReason($tokenReplacer->replace($reason, $student));
 
         $this->mapper->save($award);
 

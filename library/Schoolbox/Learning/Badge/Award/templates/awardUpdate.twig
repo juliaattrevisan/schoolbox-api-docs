@@ -11,7 +11,8 @@
         <h1>{{ award.status | capitalize }} Evidence</h1>
         <ul class="meta">
             <li class="icon-{{ award.status }}">{{ award.isGoal ? 'Goal set' : 'Awarded' }}
-                <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time> by
+                <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
+                by
                 {% if awardedByRoute %}
                     <a href="{{ awardedByRoute }}">{{ award.awardedBy.fullname }}</a>
                 {% else %}
@@ -19,65 +20,22 @@
                 {% endif %}
             </li>
             {% if award.status == 'goal' and award.award %}
-                <li class="icon-achievement">
-                    Goal has been achieved <time title="{{ award.award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time></li>
+                <li class="icon-achievement">Goal has been achieved
+                    <time title="{{ award.award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
+                </li>
             {% endif %}
         </ul>
     </div>
 </div>
 {% include '@learningBadgeAward/awardBadgeList.twig'
     with {badges: badges, isGoal: award.isGoal} only %}
-<div class="row">
-    <div class="small-12 island">
-        <div class="actions-small-2 row">
-            <div class="list-item">
-                <div class="small-12 columns">
-                    <h2 class="subheader">Evidence</h2>
-                </div>
-            </div>
-        </div>
-        {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
-        <form action="{{ postRoute ~ '?returnUrl=' ~ returnUrl }}" method="post" id="evidence-form">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <p class="meta">Provide evidence or narrative on how the
-                            {{ award.isGoal ? 'goal is progressing.' : 'achievement was earned.' }}
-                            {% if USER.role.staff %}
-                            You may use the following tokens that will be substituted with the
-                            students details on creation:
-                            [firstname], [preferredname], [surname], [fullname], [year], [house]
-                            {% endif %}
-                        </p>
-                        <textarea id="reason" name="reason">{{ award.reason }}</textarea>
-                    </div>
-                </fieldset>
-            </section>
-            <div class="row">
-                <div class="small-12 columns">
-                    <ul class="flex-list buttons">
-                        <li><a href="{{ cancelUrl }}" class="button">Cancel</a></li>
-                        <li><input type="submit" value="Save" /></li>
-                    </ul>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-<script>
-
-/**
- * Add the ckeditor config, adding the user token if the user is an admin
- */
-const baseConfig = {
-    targetElements: $('#reason')
-};
-{% if USER.role.staff %}
-    $.fn.alaressEditor($.alaressEditorConfigWithUserTokens(baseConfig));
-{% else %}
-    $.fn.alaressEditor(baseConfig);
-{% endif %}
-
-$('#evidence-form').alaressValidate();
-
-</script>
+{% include '@learningBadgeAward/reasonForm.twig'
+    with {
+    postRoute: routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id})~ '?returnUrl=' ~ returnUrl,
+    isGoal : award.isGoal,
+    reason : award.reason,
+    submitLabel: 'Save',
+    targetUserIds: null,
+    badgeIds: null,
+    cancelUrl: cancelUrl,
+} only %}
