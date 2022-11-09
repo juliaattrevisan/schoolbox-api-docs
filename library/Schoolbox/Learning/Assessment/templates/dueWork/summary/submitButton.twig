@@ -5,7 +5,8 @@ Data:
     selfAcknowledgeRoute   string
     assessment             DueWork\Model
     student                User
-    returnUrl              string
+    returnUrl              string (for use as URL (eg <a href={{ returnUrl }})
+    returnUrlEncoded       string (for use as URL parameter (eg. '?returnUrl={{ returnUrlEncoded }}')
 #}
 <div class="row">
     <div class="small-12 columns">
