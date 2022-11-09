@@ -19,7 +19,6 @@ use Schoolbox\User;
 
 class Aggregation
 {
-
     /**
      * @var Folder\Mapper
      */
