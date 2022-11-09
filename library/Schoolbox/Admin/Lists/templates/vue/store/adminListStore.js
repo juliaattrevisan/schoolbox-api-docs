@@ -141,16 +141,18 @@ export const useAdminListStore = defineStore('main', {
             debugger;
             let valid = true;
             //check each row
-            this.loadedData.rows.forEach((row) => {
+            this.rows.forEach((row, index) => {
                 //check each cell in the row
                 this.loadedData.fields.forEach((header) => {
                     //if the header for that cell is manditory == true, and the cell is empty, set the error stat
-                    if (header.manditory &&  '' == row.String(header.id).value.trim() )
+                    //header id
+                    let headerId = `${header.id}`;
+                    if (header.mandatory &&  '' === row[headerId].trim() )
                     {
                         valid = false;
-                        row.hasValidationError = true;
+                        this.rows[index].hasValidationError = true;
                     } else {
-                        row.hasValidationError = false;
+                        this.rows[index].hasValidationError = false;
                     }
                 });
             });
