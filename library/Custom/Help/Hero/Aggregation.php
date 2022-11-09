@@ -138,8 +138,8 @@ class Aggregation
                 'firstname' => $hero->getFirstname(),
                 'lastname' => $hero->getLastname(),
                 'fullname' => $hero->getFullName(),
-                'folderId' => $heroes['folderId'],
-                'folderName' => $heroes['folderName'],
+                'folderId' => null,   // We do not know which folder is relevant for older heroes, since these users have no $assessmentData.
+                'folderName' => null, // We do not know which folder is relevant for older heroes, since these users have no $assessmentData.
                 'qualified' => false,
                 'heroised' => true,
                 'assessments' => []
