@@ -742,44 +742,52 @@ class Classes implements IStrategy
                     $subjectTo = trim((string)($subject['TO_DATE'] ?? null));
                     $subjectFrom = trim((string)($subject['FROM_DATE'] ?? null));
 
-                    if ('' !== $subjectTo && $subjectTo < $startAt->getDatabase()) {
-                        $this->log->debug(sprintf(
-                            '%s %s is an expired class which went until %s; applying SUBTRACT override',
-                            $title,
-                            $classCode,
-                            $subjectTo
-                        ));
+                    if ('' !== $subjectTo) {
+                        $subjectToADF = new \Alaress_Date_Format($subjectTo, \Alaress_Date_Format::DATABASE_FORMAT);
 
-                        $subtractOverride = $this->overridesMapper->createModel()
-                            ->setEventId($event->getId())
-                            ->setExternalId($person['external_id'])
-                            ->setAction(\Schoolbox\External\Event\Overrides\Model::SUBTRACT)
-                            ->setSequence(2);
+                        if ($subjectToADF->lt($startAt)) {
+                            $this->log->debug(sprintf(
+                                '%s %s is an expired class which went until %s; applying SUBTRACT override',
+                                $title,
+                                $classCode,
+                                $subjectTo
+                            ));
 
-                        if ($this->perform) {
-                            $this->overridesMapper->save($subtractOverride);
+                            $subtractOverride = $this->overridesMapper->createModel()
+                                ->setEventId($event->getId())
+                                ->setExternalId($person['external_id'])
+                                ->setAction(\Schoolbox\External\Event\Overrides\Model::SUBTRACT)
+                                ->setSequence(2);
+
+                            if ($this->perform) {
+                                $this->overridesMapper->save($subtractOverride);
+                            }
                         }
                     }
 
                     /* If FROM_DATE is after $startDate, it's not yet occurring and we can
                      * skip over it
                      */
-                    if ('' !== $subjectFrom && $subjectFrom > $finishAt->getDatabase()) {
-                        $this->log->debug(sprintf(
-                            '%s %s is an upcoming class which starts on %s; applying SUBTRACT override',
-                            $title,
-                            $classCode,
-                            $subjectFrom
-                        ));
+                    if ('' !== $subjectFrom) {
+                        $subjectFromADF = new \Alaress_Date_Format($subjectFrom, \Alaress_Date_Format::DATABASE_FORMAT);
 
-                        $subtractOverride = $this->overridesMapper->createModel()
-                            ->setEventId($event->getId())
-                            ->setExternalId($person['external_id'])
-                            ->setAction(\Schoolbox\External\Event\Overrides\Model::SUBTRACT)
-                            ->setSequence(2);
+                        if ($subjectFromADF->gt($finishAt)) {
+                            $this->log->debug(sprintf(
+                                '%s %s is an upcoming class which starts on %s; applying SUBTRACT override',
+                                $title,
+                                $classCode,
+                                $subjectFrom
+                            ));
 
-                        if ($this->perform) {
-                            $this->overridesMapper->save($subtractOverride);
+                            $subtractOverride = $this->overridesMapper->createModel()
+                                ->setEventId($event->getId())
+                                ->setExternalId($person['external_id'])
+                                ->setAction(\Schoolbox\External\Event\Overrides\Model::SUBTRACT)
+                                ->setSequence(2);
+
+                            if ($this->perform) {
+                                $this->overridesMapper->save($subtractOverride);
+                            }
                         }
                     }
                 }
