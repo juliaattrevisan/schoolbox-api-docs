@@ -739,8 +739,8 @@ class Classes implements IStrategy
                     /* If TO_DATE is before $startDate, it is no longer occurring and we can
                      * skip over it
                      */
-                    $subjectTo = trim((string)($subject['TO_DATE'] ?? null));
-                    $subjectFrom = trim((string)($subject['FROM_DATE'] ?? null));
+                    $subjectTo = substr(trim((string)($subject['TO_DATE'] ?? null)), 0, 19);
+                    $subjectFrom = substr(trim((string)($subject['FROM_DATE'] ?? null)), 0, 19);
 
                     if ('' !== $subjectTo) {
                         $subjectToADF = new \Alaress_Date_Format($subjectTo, \Alaress_Date_Format::DATABASE_FORMAT);
