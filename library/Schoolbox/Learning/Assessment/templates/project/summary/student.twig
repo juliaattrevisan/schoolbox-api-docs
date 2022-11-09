@@ -112,9 +112,8 @@
                     {% for assessable in assessment.assessables %}
                     <li>
                         {% include '@learningGrades/fragments/assessmentGrade.twig' with {
-                            assessment: assessable,
-                            student: student,
-                            returnUrlSuffix: returnUrlSuffix
+                            assessment:  assessable,
+                            student:     student,
                         } only %}
                     </li>
                     {% endfor %}
