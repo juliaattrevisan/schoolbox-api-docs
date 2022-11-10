@@ -32,18 +32,26 @@ use Throwable;
 abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 {
     /**
-     * Output a "Cache-Control: max-age" response header. This instructs the
-     * browser to cache (and not re-request) this response until it reaches the
-     * max age.
+     * Output a "Cache-Control" response header.
      *
-     * Also removes the "Pragma" header, as this conflicts with Cache-Control.
+     * This instructs the browser to do the following, depending on `$maxAge`:
+     * * > 0: cache (and not re-request) this response until it is `$maxAge`
+     *  seconds old
+     * * <= 0: not cache this response at all
+     *
+     * Also removes the prehistoric "Pragma" and "Expires" headers, as these
+     * conflict with "Cache-Control".
      *
      * @param int $maxAge The number of seconds to instruct the browser to cache
      *                    this response for.
      */
     public function outputCacheControlMaxAgeHeader(int $maxAge): void
     {
-        header(sprintf('Cache-Control: max-age=%d, private', $maxAge));
+        if ($maxAge <= 0) {
+            header('Cache-Control: no-cache, private');
+        } else {
+            header(sprintf('Cache-Control: max-age=%d, private', $maxAge));
+        }
         header_remove('Pragma');
         header_remove('expires');
     }
