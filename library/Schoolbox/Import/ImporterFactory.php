@@ -11,7 +11,8 @@ namespace Schoolbox\Import;
 use Alaress\Csv\Reader;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Importer;
-use Schoolbox\Resource\Storage;
+use Schoolbox\External\Importer\AbstractImporter;
+use Schoolbox\Resource\Exception;
 
 /**
  * Class ImporterFactory
@@ -39,10 +40,10 @@ class ImporterFactory
      * @param LoggerInterface $log
      * @param bool            $performUpdate
      *
-     * @return Importer\AbstractImporter
+     * @return AbstractImporter
      * @throws \OutOfRangeException
      */
-    public function buildImporter(string $basename, Reader $reader, LoggerInterface $log, $performUpdate = false): ?\Schoolbox\External\Importer\AbstractImporter
+    public function buildImporter(string $basename, Reader $reader, LoggerInterface $log, bool $performUpdate = false): \Schoolbox\External\Importer\AbstractImporter
     {
         switch ($basename) {
             case self::IMPORT_USER:
@@ -66,6 +67,7 @@ class ImporterFactory
      * @param string|resource $upload
      * @return Reader
      * @throws \RuntimeException
+     * @throws Exception
      */
     public function buildReader(string $basename, $upload): \Alaress\Csv\Reader
     {

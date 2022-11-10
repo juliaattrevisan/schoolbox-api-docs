@@ -9,12 +9,14 @@
 namespace Schoolbox\External\Importer;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Database\Factory;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 
 /**
@@ -34,25 +36,25 @@ class TimetableEnrolment extends AbstractImporter
     /**
      * @var IConnector
      */
-    private $externalDb;
+    private IConnector $externalDb;
 
 
     /**
      * @var UserMapper
      */
-    protected $userMapper;
+    protected UserMapper $userMapper;
 
 
     /**
      * @var ClassEntryMapper
      */
-    protected $classMapper;
+    protected ClassEntryMapper $classMapper;
 
 
     /**
      * @var ClassInvolvementMapper
      */
-    protected $enrolmentMapper;
+    protected ClassInvolvementMapper $enrolmentMapper;
 
 
     /**
@@ -87,7 +89,8 @@ class TimetableEnrolment extends AbstractImporter
      * array structure.
      *
      * @return array|ClassInvolvement[]
-     * @throws Mapper\Exception
+     * @throws Exception
+     * @throws InvalidColumnException
      */
     protected function parse(): array
     {
@@ -119,13 +122,6 @@ class TimetableEnrolment extends AbstractImporter
                     ->setName(trim($row['Class Title']));
             }
 
-            try {
-                $student = $this->userMapper->findByExternalId($studentCode);
-            } catch (Mapper\Exception $e) {
-                $this->log->warning(sprintf('Student "%s" not found: skipping!', $studentCode));
-                continue;
-            }
-
             $result[] = (new ClassInvolvement())
                 ->setExternalId($studentCode)
                 ->setClass($class);
@@ -138,7 +134,8 @@ class TimetableEnrolment extends AbstractImporter
      * Reads the rows to insert from the CSV, and writes to the database.
      *
      * @return void
-     * @throws Mapper\Exception
+     * @throws Exception
+     * @throws InvalidColumnException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */

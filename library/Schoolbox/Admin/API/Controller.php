@@ -11,7 +11,11 @@ namespace Schoolbox\Admin\API;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web;
+use Aura\Web\Exception\InvalidStatusCode;
 use InvalidArgumentException;
+use League\Flysystem\FilesystemException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\Import\Profile\Importer;
 use Schoolbox\Admin\Import\Profile\Mapping;
 use Schoolbox\External;
@@ -31,17 +35,17 @@ class Controller extends Web\Controller\Base
      * Processor consts for declaring which file is being supplied
      */
     private const REQUIRED_USER_PROFILE_CSVS = [
-        Mapping::CSV_STUDENT,
-        Mapping::CSV_PARENT,
-        Mapping::CSV_STAFF,
-        Mapping::CSV_RELATIONSHIP
+        Mapping::CSV_STUDENT,       // 'student'
+        Mapping::CSV_PARENT,        // 'parent'
+        Mapping::CSV_STAFF,         // 'staff'
+        Mapping::CSV_RELATIONSHIP   // 'relationship'
     ];
 
 
     /**
      * Timetable and Enrolment CSVs
      */
-    private const REQUIRED_CSVS = [
+    private const REQUIRED_TIMETABLE_CSVS = [
         'timetable-structure'   => ImporterFactory::IMPORT_STRUCTURE,
         'timetable'             => ImporterFactory::IMPORT_TIMETABLE,
         'enrolment'             => ImporterFactory::IMPORT_ENROLMENT,
@@ -49,41 +53,41 @@ class Controller extends Web\Controller\Base
 
 
     /** @var Storage\Mapper */
-    private $storageMapper;
+    private Storage\Mapper $storageMapper;
 
 
     /** @var ImporterFactory */
-    private $importerFactory;
+    private ImporterFactory $importerFactory;
 
 
     /**
      * @var External\Profile\Mapper
      */
-    private $baseProfileMapper;
+    private External\Profile\Mapper $baseProfileMapper;
 
 
     /**
      * @var External\Profile\Parent\Mapper
      */
-    private $parentProfileMapper;
+    private External\Profile\Parent\Mapper $parentProfileMapper;
 
 
     /**
      * @var External\Profile\Student\Mapper
      */
-    private $studentProfileMapper;
+    private External\Profile\Student\Mapper $studentProfileMapper;
 
 
     /**
      * @var External\Profile\Staff\Mapper
      */
-    private $staffProfileMapper;
+    private External\Profile\Staff\Mapper $staffProfileMapper;
 
 
     /**
      * @var External\Profile\Relationship\Mapper
      */
-    private $relationshipMapper;
+    private External\Profile\Relationship\Mapper $relationshipMapper;
 
 
     /**
@@ -119,31 +123,23 @@ class Controller extends Web\Controller\Base
 
 
     /**
+     * @throws InvalidStatusCode
      * @api POST /api/admin/csv
      */
-    public function postUploadCsv()
+    public function postUploadCsv(): void
     {
+        $post = $this->getRequest()->post;
+        $rs = $this->getResponse();
+
         $responseJson = [
             'success' => false
         ];
 
-        $rs = $this->getResponse();
-
-        // regrettably we can't do these checks in the module, because we don't have access to the $_POST array
-
-        $key  = $this->getRequest()->post->get('key');
-
         try {
-            if (!$key) {
-                throw new InvalidArgumentException('No authentication token was supplied.', 401);
-            }
-
-            if ($this->getConfigLoader()->get('api_key') !== $key) {
-                throw new InvalidArgumentException('The given authentication token is invalid.', 403);
-            }
+            // regrettably we can't do these checks in the module, because we don't have access to the $_POST array
+            $this->authenticate((string)$post->get('key'));
 
             // key validated; you may proceed
-
             $file = $this->getRequest()->files->get('file');
 
             if (!$file) {
@@ -169,51 +165,53 @@ class Controller extends Web\Controller\Base
 
     /**
      *
+     * @throws InvalidStatusCode
+     * @throws FilesystemException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @api POST /api/admin/process
      *
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
-    public function postProcess()
+    public function postProcess(): void
     {
         $post = $this->getRequest()->post;
         $rs   = $this->getResponse();
+
+        $errors = [];
 
         $responseJson = [
             'success' => false
         ];
 
-        // regrettably we can't do these checks in the module, because we don't have access to the $_POST array
-
-        $key  = $post->get('key');
-
         try {
-            if (!$key) {
-                throw new InvalidArgumentException('No authentication token was supplied.', 401);
-            }
-
-            if ($this->getConfigLoader()->get('api_key') !== $key) {
-                throw new InvalidArgumentException('The given authentication token is invalid.', 403);
-            }
+            // regrettably we can't do these checks in the module, because we don't have access to the $_POST array
+            $this->authenticate((string)$post->get('key'));
 
             // key validated; you may proceed
-
             // check for whether all the necessary files are supplied, and valid
-
             $files = [];
 
-            foreach (array_merge(self::REQUIRED_USER_PROFILE_CSVS, array_keys(self::REQUIRED_CSVS)) as $requiredCsv) {
+            /* Consume each csv files that we know to be required
+             * based on inspecting what the user sent
+             */
+            $expectedKeys = array_merge(self::REQUIRED_USER_PROFILE_CSVS, array_keys(self::REQUIRED_TIMETABLE_CSVS));
+
+            foreach ($expectedKeys as $requiredCsv) {
                 $hash = $post->get($requiredCsv);
 
+                /* No hash provided; user didn't supply it.
+                 * Skip it quietly
+                 */
                 if (!$hash) {
-                    $errors[] = "No file hash was given for '$requiredCsv'.";
                     continue;
                 }
 
+                /* A value was provided; see if it exists in storage
+                 */
                 try {
-                    if (!in_array($requiredCsv, self::REQUIRED_USER_PROFILE_CSVS)) {
+                    if (!in_array($requiredCsv, self::REQUIRED_USER_PROFILE_CSVS, true)) {
                         // assign the given hash to its place in the files array
-                        $files[self::REQUIRED_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
+                        $files[self::REQUIRED_TIMETABLE_CSVS[$requiredCsv]] = $this->storageMapper->findByHash($hash);
                     } else {
                         $files[$requiredCsv] = $this->storageMapper->findByHash($hash);
                     }
@@ -223,7 +221,16 @@ class Controller extends Web\Controller\Base
                 }
             }
 
-            if (isset($errors)) {
+            /* User didn't supply any files in the parameters expected
+             *     - either they literally didn't supply anything, or
+             *     - the args are misspelled e.g. used structure=... instead of timetable-structure=...
+             */
+            if (!\count($files)) {
+                $responseJson['error'] = 'No files supplied.';
+                $rs->status->set(400);
+            } elseif (\count($errors)) {
+                /* Some other error occurred during processing
+                 */
                 $responseJson['error'] = $errors;
                 $rs->status->set(400);
             } else {
@@ -238,7 +245,7 @@ class Controller extends Web\Controller\Base
 
                 try {
                     foreach ($files as $keyspace => $file) {
-                        if (!in_array($keyspace, self::REQUIRED_USER_PROFILE_CSVS)) {
+                        if (!in_array($keyspace, self::REQUIRED_USER_PROFILE_CSVS, true)) {
                             // this is where the action happens
                             $this->importerFactory->buildImporter(
                                 $keyspace,
@@ -279,5 +286,25 @@ class Controller extends Web\Controller\Base
         }
 
         $rs->content->set($this->buildJsonOutput($responseJson));
+    }
+
+
+    /**
+     * Decide if the given $key was valid and matches the config var
+     * For some reason this throws exceptions
+     *
+     * @param string $key
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    private function authenticate(string $key): void
+    {
+        if (!$key) {
+            throw new InvalidArgumentException('No authentication token was supplied.', 401);
+        }
+
+        if ($this->getConfigLoader()->get('api_key') !== $key) {
+            throw new InvalidArgumentException('The given authentication token is invalid.', 403);
+        }
     }
 }
