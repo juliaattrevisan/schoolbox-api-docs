@@ -63,16 +63,15 @@ class Overwriter
 
         // Overwrite destination fields with values from source
         $updatedDestination = $destination->overwrite($source)
-            ->setDeletedAt(new \Alaress_Date_NullDate());
+            ->setDeletedAt(null);
 
         // If copying the assessment into a spec: clear its dates
         if ($destination->isSpecification()) {
-            $nullDate           = new \Alaress_Date_NullDate();
             $updatedDestination = $updatedDestination
-                ->setPublishAt($nullDate)
-                ->setOpenAt($nullDate)
-                ->setDueAt($nullDate)
-                ->setCloseAt($nullDate);
+                ->setPublishAt(null)
+                ->setOpenAt(null)
+                ->setDueAt(null)
+                ->setCloseAt(null);
         }
 
         // Delete quiz constituents and rubric

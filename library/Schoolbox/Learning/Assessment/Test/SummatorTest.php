@@ -1999,7 +1999,7 @@ class SummatorTest extends TestCase
             ->setNormalisedMark(100)
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->setPublishedAt(new \Alaress_Date_NullDate())
+            ->setPublishedAt(null)
             ->setCreatedAt(\Alaress_Date_Format::now())
             ->setUpdatedAt(\Alaress_Date_Format::now());
         $project->getAssessables()[$dueWork->getId()]

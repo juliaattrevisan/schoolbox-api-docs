@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;

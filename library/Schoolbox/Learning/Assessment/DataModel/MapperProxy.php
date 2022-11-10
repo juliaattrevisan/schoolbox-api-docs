@@ -1489,7 +1489,7 @@ class MapperProxy
             }
             $this->baseMapper->restoreSoftDeleted($dataModel);
         }
-        $assessable->setDeletedAt(new \Alaress_Date_NullDate());
+        $assessable->setDeletedAt(null);
     }
 
     /**
