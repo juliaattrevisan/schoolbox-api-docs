@@ -16,6 +16,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Exception\MissingModule;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
@@ -38,6 +39,12 @@ class Factory
      * An arbitrarily-chosen string to denote where these events came from
      */
     public const SOURCE_NAME = 'suds_tass';
+
+
+    /**
+     * @var ValidStrats
+     */
+    private ValidStrats $validStrats;
 
 
     /**
@@ -214,6 +221,7 @@ class Factory
     /**
      * Factory constructor.
      *
+     * @param ValidStrats                                $validStrats
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
      * @param string                                     $host
@@ -241,6 +249,7 @@ class Factory
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
+        ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         string $host,
@@ -269,6 +278,7 @@ class Factory
         TimetablePeriodMapper $periodMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
+        $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->host = $host;
@@ -338,83 +348,95 @@ class Factory
 
         /* Purge previously-imported profile relationships and classes
          */
-        return (new GenericCollection(IStrategy::class))
-            ->add(new Profile\Prepare(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Profile(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->watchlist,
-                $this->addnumFather,
-                $this->addnumMother,
-                $this->fatherAddressDescription,
-                $this->motherAddressDescription,
-                $this->includePhoto,
-                $this->spousePrefix,
-                $this->communicationTypes,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper,
-                $this->storageMapper
-            ))
-            ->add(new Profile\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new TimetableCalendar\Prepare(
-                $this->log,
-                $this->perform,
-                $this->eventMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper,
-                $this->periodMapper,
-                $this->overridesMapper,
-            ))
-            ->add(new TimetableCalendar\AdditionalSubjects(
-                $this->log,
-                $this->perform,
-                $api,
-                $lookup,
-                $this->watchlist,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper
-            ))
-            ->add(new TimetableCalendar\Classes(
-                $this->log,
-                $this->perform,
-                $api,
-                $lookup,
-                $this->watchlist,
-                $this->dateLocalFormat,
-                $this->eventMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->overridesMapper
-            ))
-            ->add(new TimetableCalendar\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->eventMapper
-            ))
-            ->add(new ApiCertification(
-                $this->log,
-                $api
-            ));
+        $bus = new GenericCollection(IStrategy::class);
+
+        if ($this->validStrats->isProfileStratEnabled()) {
+            $bus
+                ->add(new Profile\Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ))
+                ->add(new Profile\Profile(
+                    $this->validStrats,
+                    $this->log,
+                    $this->perform,
+                    $api,
+                    $this->watchlist,
+                    $this->addnumFather,
+                    $this->addnumMother,
+                    $this->fatherAddressDescription,
+                    $this->motherAddressDescription,
+                    $this->includePhoto,
+                    $this->spousePrefix,
+                    $this->communicationTypes,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper,
+                    $this->storageMapper
+                ))
+                ->add(new Profile\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ));
+        }
+
+        if ($this->validStrats->isTimetableStratEnabled()) {
+            $bus
+                ->add(new TimetableCalendar\Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $this->classPeriodMapper,
+                    $this->periodMapper,
+                    $this->overridesMapper,
+                ))
+                ->add(new TimetableCalendar\AdditionalSubjects(
+                    $this->log,
+                    $this->perform,
+                    $api,
+                    $lookup,
+                    $this->watchlist,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper
+                ))
+                ->add(new TimetableCalendar\Classes(
+                    $this->log,
+                    $this->perform,
+                    $api,
+                    $lookup,
+                    $this->watchlist,
+                    $this->dateLocalFormat,
+                    $this->eventMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $this->overridesMapper
+                ))
+                ->add(new TimetableCalendar\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper
+                ));
+        }
+
+        $bus->add(new ApiCertification(
+            $this->log,
+            $api
+        ));
+
+        return $bus;
     }
 }

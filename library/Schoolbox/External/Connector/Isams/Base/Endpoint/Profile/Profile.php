@@ -17,6 +17,7 @@ use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Profile as UserProfile;
@@ -47,6 +48,12 @@ class Profile implements IStrategy
      * when schools are first setting up
      */
     private const MAX_POSITION_LENGTH = 255;
+
+
+    /**
+     * @var ValidStrats
+     */
+    private ValidStrats $validStrats;
 
 
     /**
@@ -120,6 +127,7 @@ class Profile implements IStrategy
     /**
      * Profile constructor.
      *
+     * @param ValidStrats                     $validStrats
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param array                           $api
@@ -133,6 +141,7 @@ class Profile implements IStrategy
      * @param StorageMapper                   $storageMapper
      */
     public function __construct(
+        ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         array $api,
@@ -145,6 +154,7 @@ class Profile implements IStrategy
         UserProfile\Relationship\Mapper $relationshipMapper,
         StorageMapper $storageMapper
     ) {
+        $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
@@ -173,36 +183,40 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
-        /* Download a zip containing everyone's profile pictures, and extract them
-         * It uses isams internal ids, not external ids
-         */
-        if ($this->includePhoto) {
-            $this->log->info('Downloading student profile photos (this might take a while)');
-
-            $this->photoDownloader->downloadStudentPhotos();
-        }
-
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
+        if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
+            /* Download a zip containing everyone's profile pictures, and extract them
+             * It uses isams internal ids, not external ids
+             */
+            if ($this->includePhoto) {
+                $this->log->info('Downloading student profile photos (this might take a while)');
 
-        $this->importStudents();
+                $this->photoDownloader->downloadStudentPhotos();
+            }
 
-        /* Download a zip containing everyone's profile pictures, and extract them
-         * It uses isams internal ids, not external ids
-         */
-        if ($this->includePhoto) {
-            $this->log->info('Downloading staff profile photos (this might take a while)');
+            $this->log->info('Processing students and their parents.');
 
-            $this->photoDownloader->downloadStaffPhotos();
+            $this->importStudents();
         }
 
         /* Import staff profile data
          */
-        $this->log->info('Processing staff.');
+        if ($this->validStrats->isStaffStratEnabled()) {
+            /* Download a zip containing everyone's profile pictures, and extract them
+             * It uses isams internal ids, not external ids
+             */
+            if ($this->includePhoto) {
+                $this->log->info('Downloading staff profile photos (this might take a while)');
 
-        $this->importStaff();
+                $this->photoDownloader->downloadStaffPhotos();
+            }
+
+            $this->log->info('Processing staff.');
+
+            $this->importStaff();
+        }
     }
 
 
@@ -342,7 +356,11 @@ class Profile implements IStrategy
             /* Add their parents' profile data
              * Messages come from parents' nodes
              */
-            $messages = $this->importParentsOfStudent($externalId, $studentBaseProfile);
+            $messages = null;
+
+            if ($this->validStrats->isFamiliesStratEnabled()) {
+                $messages = $this->importParentsOfStudent($externalId, $studentBaseProfile);
+            }
 
             /* Smoosh it all together
              */

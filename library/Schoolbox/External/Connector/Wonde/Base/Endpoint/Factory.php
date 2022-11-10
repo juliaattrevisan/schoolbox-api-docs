@@ -13,8 +13,10 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use UnexpectedValueException;
@@ -47,6 +49,12 @@ class Factory
      * Measured in months, defaults to 6 months
      */
     private const TO = 6;
+
+
+    /**
+     * @var ValidStrats
+     */
+    private ValidStrats $validStrats;
 
 
     /**
@@ -156,12 +164,13 @@ class Factory
     /**
      * Factory constructor.
      *
+     * @param ValidStrats                                $validStrats
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
      * @param string                                     $host
      * @param string                                     $key
      * @param string                                     $timezone
-     * @param UserProfile\Mapper                         $baseProfileMapper
+     * @param Mapper                                     $baseProfileMapper
      * @param UserProfile\Student\Mapper                 $studentProfileMapper
      * @param UserProfile\Parent\Mapper                  $parentProfileMapper
      * @param UserProfile\Staff\Mapper                   $staffProfileMapper
@@ -174,6 +183,7 @@ class Factory
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
+        ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         string $host,
@@ -193,6 +203,7 @@ class Factory
         TimetablePeriodMapper $periodMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
+        $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->host = $host;
@@ -239,67 +250,79 @@ class Factory
          */
         $api = new Api($this->host, $this->key);
 
-        return (new GenericCollection(IStrategy::class))
-            /* Purge previously-imported profile relationships and classes
-             */
-            ->add(new Profile\Prepare(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Profile(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new TimetableCalendar\Prepare(
-                $this->log,
-                $this->perform,
-                $this->eventMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper,
-                $this->periodMapper,
-                $this->overridesMapper
-            ))
-            ->add(new TimetableCalendar\Classes(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->eventMapper,
-                $this->overridesMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $timezone,
-                $from,
-                $to
-            ))
-            ->add(new TimetableCalendar\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->eventMapper
-            ))
-            ->add(new ApiStatistics(
-                $this->log,
-                $api
-            ));
+        /* Purge previously-imported profile relationships and classes
+         */
+        $bus = new GenericCollection(IStrategy::class);
+
+        if ($this->validStrats->isProfileStratEnabled()) {
+            $bus
+                ->add(new Profile\Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ))
+                ->add(new Profile\Profile(
+                    $this->validStrats,
+                    $this->log,
+                    $this->perform,
+                    $api,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ))
+                ->add(new Profile\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ));
+        }
+
+        if ($this->validStrats->isTimetableStratEnabled()) {
+            $bus
+                ->add(new TimetableCalendar\Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $this->classPeriodMapper,
+                    $this->periodMapper,
+                    $this->overridesMapper
+                ))
+                ->add(new TimetableCalendar\Classes(
+                    $this->log,
+                    $this->perform,
+                    $api,
+                    $this->eventMapper,
+                    $this->overridesMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $timezone,
+                    $from,
+                    $to
+                ))
+                ->add(new TimetableCalendar\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper
+                ));
+        }
+
+        $bus->add(new ApiStatistics(
+            $this->log,
+            $api
+        ));
+
+        return $bus;
     }
 }

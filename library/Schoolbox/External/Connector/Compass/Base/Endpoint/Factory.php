@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
@@ -36,6 +37,12 @@ class Factory
      * them into the local event table so you can do a mass remove if needed
      */
     public const SOURCE_NAME = 'suds_compass';
+
+
+    /**
+     * @var ValidStrats
+     */
+    private ValidStrats $validStrats;
 
 
     /**
@@ -145,6 +152,7 @@ class Factory
     /**
      * Factory constructor.
      *
+     * @param ValidStrats                                $validStrats
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
      * @param string                                     $host
@@ -164,6 +172,7 @@ class Factory
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
+        ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         string $host,
@@ -184,6 +193,7 @@ class Factory
         TimetablePeriodMapper $periodMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
+        $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->host = $host;
@@ -227,69 +237,81 @@ class Factory
         $from = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
         $to = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
 
-        return (new GenericCollection(IStrategy::class))
-            /* Purge previously-imported profile relationships and classes
-             */
-            ->add(new Profile\Prepare(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Profile(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->includePhoto,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper,
-                $this->storageMapper
-            ))
-            ->add(new Profile\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new TimetableCalendar\Prepare(
-                $this->log,
-                $this->perform,
-                $this->eventMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper,
-                $this->periodMapper,
-                $this->overridesMapper,
-                self::SOURCE_NAME
-            ))
-            ->add(new TimetableCalendar\Classes(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->eventMapper,
-                $this->overridesMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $from,
-                $to
-            ))
-            ->add(new TimetableCalendar\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->eventMapper
-            ))
-            ->add(new ApiCertification(
-                $this->log,
-                $api
-            ));
+        /* Purge previously-imported profile relationships and classes
+         */
+        $bus = new GenericCollection(IStrategy::class);
+
+        if ($this->validStrats->isProfileStratEnabled()) {
+            $bus
+                ->add(new Profile\Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ))
+                ->add(new Profile\Profile(
+                    $this->validStrats,
+                    $this->log,
+                    $this->perform,
+                    $api,
+                    $this->includePhoto,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper,
+                    $this->storageMapper
+                ))
+                ->add(new Profile\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ));
+        }
+
+        if ($this->validStrats->isTimetableStratEnabled()) {
+            $bus
+                ->add(new TimetableCalendar\Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $this->classPeriodMapper,
+                    $this->periodMapper,
+                    $this->overridesMapper,
+                    self::SOURCE_NAME
+                ))
+                ->add(new TimetableCalendar\Classes(
+                    $this->log,
+                    $this->perform,
+                    $api,
+                    $this->eventMapper,
+                    $this->overridesMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $from,
+                    $to
+                ))
+                ->add(new TimetableCalendar\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper
+                ));
+        }
+
+        $bus->add(new ApiCertification(
+            $this->log,
+            $api
+        ));
+
+        return $bus;
     }
 }

@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
@@ -32,6 +33,11 @@ use UnexpectedValueException;
  */
 class Profile implements IStrategy
 {
+    /**
+     * @var ValidStrats
+     */
+    private ValidStrats $validStrats;
+
 
     /**
      * @var LoggerInterface
@@ -121,6 +127,7 @@ class Profile implements IStrategy
     /**
      * Profile constructor.
      *
+     * @param ValidStrats                     $validStrats
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param Batchxml                        $batchxml
@@ -132,6 +139,7 @@ class Profile implements IStrategy
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
+        ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
@@ -142,6 +150,7 @@ class Profile implements IStrategy
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper
     ) {
+        $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->batchxml = $batchxml;
@@ -169,7 +178,6 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
-
         /* Remember the one and only campus identifier
          */
         $this->campus = (string)$this->batchxml->fetchXml('/SMSDirectoryData/schools/school')[0]->xpath('@index')[0];
@@ -177,28 +185,18 @@ class Profile implements IStrategy
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
+        if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
+            $this->log->info('Processing students and their parents.');
 
-        $this->importStudents();
+            $this->importStudents();
+        }
 
         /* Import staff profile data
          */
-        $this->log->info('Processing staff.');
+        if ($this->validStrats->isStaffStratEnabled()) {
+            $this->log->info('Processing staff.');
 
-        $this->importStaff();
-
-        /* Remove any orphaned profiles
-         */
-        if ($this->perform) {
-            $orphans = (new OrphanRemover(
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))->remove();
-
-            $this->log->info("Removed {$orphans} orphaned profiles.");
+            $this->importStaff();
         }
     }
 
@@ -417,7 +415,9 @@ class Profile implements IStrategy
 
             /* Add their parents + relationships too, but only if we haven't already seen them
              */
-            $this->importParentsOfStudent($student, $studentBaseProfile);
+            if ($this->validStrats->isFamiliesStratEnabled()) {
+                $this->importParentsOfStudent($student, $studentBaseProfile);
+            }
 
             /* Remember this person's details
              */

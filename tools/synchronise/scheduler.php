@@ -37,6 +37,7 @@ $app = new class extends CliTool\App
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -102,8 +103,17 @@ HELP;
         $customHours = explode(Renderer::VALUE_DELIMITER, $this->getConfig()->get('schooldata_import_managed_hours') ?? '');
         $file        = null;
         $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
-        // This affects only Tass API
-        $includePhoto = true;
+
+        /* Importer strats can be defined by cli args
+         * null or empty string means "import everything"
+         *
+         * Otherwise, whatever you specified must fit within a known vocabulary
+         * and works in conjunction with whatever watchlists you have in place
+         *
+         * scheduler always runs all strats
+         * The cli option is hardcoded to empty str ''
+         */
+        $validStrats = new \Schoolbox\External\Connector\ValidStrats('');
 
         /* SUDS imports can take a notoriously long time to complete based on sis etc.
          * and the instances could start up a new import before the existing one
@@ -150,7 +160,7 @@ HELP;
 
         /* Execute scheduler: sis stuff
          */
-        $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), []);
+        $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), [], $validStrats);
 
         (new Endpoint\Scheduler(
             $randomMapper->getDatabase(),

@@ -52,6 +52,11 @@ $app = new class extends CliTool\App
     private const OPT_LONG_WATCHLIST = 'watchlist:';
 
 
+    /**
+     * Pick the strat(s) to execute per factory
+     */
+    private const OPT_LONG_STRATS = 'strats::';
+
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -60,6 +65,7 @@ $app = new class extends CliTool\App
             self::OPT_LONG_HELP,
             self::OPT_LONG_FILE,
             self::OPT_LONG_WATCHLIST,
+            self::OPT_LONG_STRATS,
         ];
     }
 
@@ -84,7 +90,13 @@ This also imports timetable data from third party endpoint into local schema.
 
 Usage: sisImporter.php [--file] [--watchlist] [--perform]
         --perform       Persist changes
+        
         --watchlist     A csv of externalIds e.g. 123,456,789
+        
+        --strats        A csv of strats to import: student staff families timetable 
+                        e.g. import only profile-related stuff: sisImporter.php --strats=student,staff,families
+                        e.g. import only timetable-related stuff: sisImporter.php --strats=timetable
+                        
         --file          Optional path to a locally-cached xml file e.g. ../../../www/test.xml
                         Absence of this arg will cause the tool to access the api endpoint instead
 
@@ -92,7 +104,7 @@ HELP;
             exit;
         }
 
-        /* Spawn schedular based on args
+        /* Spawn scheduler based on args
          *
          * Use Hourly frequency, taking advantage of the functional equivalence
          *
@@ -113,6 +125,14 @@ HELP;
          * Empty strings and spaces are filtered away etc.
          */
         $watchlist   = (new Watchlist())->filter((string)$this->getOpt(self::OPT_LONG_WATCHLIST));
+
+        /* Importer strats can be defined by cli args
+         * null or empty string means "import everything"
+         *
+         * Otherwise, whatever you specified must fit within a known vocabulary
+         * and works in conjunction with whatever watchlists you have in place
+         */
+        $validStrats = new \Schoolbox\External\Connector\ValidStrats((string)($this->getOpt(self::OPT_LONG_STRATS)));
 
         /* You haven't specified a SUDS Data Source in Admin.
          */
@@ -162,7 +182,7 @@ NULLTYPE;
 
         /* Execute scheduler
          */
-        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), $watchlist);
+        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), $watchlist, $validStrats);
 
         $randomMapper = UserMapper::getInstance();
 

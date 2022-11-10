@@ -16,8 +16,10 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable\WeekOffset;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
@@ -35,6 +37,11 @@ use UnexpectedValueException;
  */
 class Factory
 {
+    /**
+     * @var ValidStrats
+     */
+    private ValidStrats $validStrats;
+
 
     /**
      * @var LoggerInterface
@@ -138,11 +145,12 @@ class Factory
     /**
      * Factory constructor.
      *
+     * @param ValidStrats                     $validStrats
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param string                          $host
      * @param string                          $streamDir
-     * @param UserProfile\Mapper              $baseProfileMapper
+     * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
@@ -155,6 +163,7 @@ class Factory
      * @param ClassPeriodMapper               $classPeriodMapper
      */
     public function __construct(
+        ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         string $host,
@@ -173,6 +182,7 @@ class Factory
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper
     ) {
+        $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->host = $host;
@@ -231,28 +241,46 @@ class Factory
             throw new \DomainException('XML Preconditions not met. A transmission may be taking place and/or required quantity of xml files has yet to be met.');
         }
 
-        /* Purge previously-imported profile relationships
-         */
-        $bus->add(new Profile\Prepare(
-            $this->log,
-            $this->perform,
-            $this->baseProfileMapper,
-            $this->studentProfileMapper,
-            $this->parentProfileMapper,
-            $this->staffProfileMapper,
-            $this->relationshipMapper
-        ));
-
         /* Load all the Profile xmls
+         *
+         * TODO: Replace with a sis_user_profile lookup equivalent
+         *  instead of remembering what we saw in Profile
          */
         $registry = new Profile\Registry();
 
-        foreach ($xml[Receiver::XML_FULL] as $xmlFile) {
-            $bus->add(new Profile\Profile(
+        /* Purge previously-imported profile relationships
+         */
+        if ($this->validStrats->isProfileStratEnabled()) {
+            $bus->add(new Profile\Prepare(
                 $this->log,
                 $this->perform,
-                new Batchxml(new Api($this->host . '/' . $xmlFile)),
-                $registry,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ));
+
+            foreach ($xml[Receiver::XML_FULL] as $xmlFile) {
+                $bus->add(new Profile\Profile(
+                    $this->validStrats,
+                    $this->log,
+                    $this->perform,
+                    new Batchxml(new Api($this->host . '/' . $xmlFile)),
+                    $registry,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ));
+            }
+
+            /* Clean up after Profile import
+             */
+            $bus->add(new Profile\Cleanup(
+                $this->log,
+                $this->perform,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
@@ -261,107 +289,96 @@ class Factory
             ));
         }
 
-        /* Clean up after Profile import
-         */
-        $bus->add(new Profile\Cleanup(
-            $this->log,
-            $this->perform,
-            $this->baseProfileMapper,
-            $this->studentProfileMapper,
-            $this->parentProfileMapper,
-            $this->staffProfileMapper,
-            $this->relationshipMapper
-        ));
-
         /* Set up the Timetable definition separately from the masses of timetable-related xml files
          * Schools must do this via a timetableStructure import csv
          */
+        if ($this->validStrats->isTimetableStratEnabled()) {
+            /* Cache a list of known users and periods
+             * Every student timetable processing uses info stored there
+             * Recycle this instance in every iteration
+             */
+            $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
 
-        /* Cache a list of known users and periods
-         * Every student timetable processing uses info stored there
-         * Recycle this instance in every iteration
-         */
-        $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
+            /* Week Offset, Term selection
+             *
+             * TODO: Potentially configurable
+             * You could potentially make this configurable, giving the school an opportunity
+             * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
+             */
+            $weekOffsetCalculator = new WeekOffset(
+                $this->timetableCycleMapper,
+                Alaress_Date_Format::now(),
+                $this->log
+            );
 
-        /* Week Offset, Term selection
-         *
-         * TODO: Potentially configurable
-         * You could potentially make this configurable, giving the school an opportunity
-         * to view an arbitrary weekOffset's data (maybe repurpose a config field?)
-         */
-        $weekOffsetCalculator = new WeekOffset(
-            $this->timetableCycleMapper,
-            Alaress_Date_Format::now(),
-            $this->log
-        );
+            $currentWeekOffset = $weekOffsetCalculator->findWeekOffset();
+            $termSettings      = $weekOffsetCalculator->findCurrentTerm();
 
-        $currentWeekOffset = $weekOffsetCalculator->findWeekOffset();
-        $termSettings = $weekOffsetCalculator->findCurrentTerm();
+            /* You need both of these to work stuff out
+             *
+             * The cycles are set up via a specific CSV import into Timetable Structure
+             * They aren't defined in the kamar xmls; we import that info because we need
+             * to name their Periods specifically and kamar has no period data
+             */
+            if (null === $currentWeekOffset) {
+                throw new \DomainException('Could not determine week offset; check your Timetable Structure CSV import.');
+            }
 
-        /* You need both of these to work stuff out
-         *
-         * The cycles are set up via a specific CSV import into Timetable Structure
-         * They aren't defined in the kamar xmls; we import that info because we need
-         * to name their Periods specifically and kamar has no period data
-         */
-        if (null === $currentWeekOffset) {
-            throw new \DomainException('Could not determine week offset; check your Timetable Structure CSV import.');
-        }
+            if (null === $termSettings) {
+                throw new \DomainException('Could not determine term settings; check your Timetable Structure CSV import.');
+            }
 
-        if (null === $termSettings) {
-            throw new \DomainException('Could not determine term settings; check your Timetable Structure CSV import.');
-        }
+            /* Figure out which term number we're in, to navigate xml files' nodes
+             * Figure out which cycle we're in, when persisting data
+             */
+            $currentTerm    = $termSettings['termIndex'];
+            $currentCycleId = $termSettings['cycleId'];
 
-        /* Figure out which term number we're in, to navigate xml files' nodes
-         * Figure out which cycle we're in, when persisting data
-         */
-        $currentTerm = $termSettings['termIndex'];
-        $currentCycleId = $termSettings['cycleId'];
+            /* You need both of these to work stuff out
+             */
+            if (null === $currentTerm) {
+                throw new \DomainException('Unknown term; did you set the campus timetable code and/or import that timetable structure csv?');
+            }
 
-        /* You need both of these to work stuff out
-         */
-        if (null === $currentTerm) {
-            throw new \DomainException('Unknown term; did you set the campus timetable code and/or import that timetable structure csv?');
-        }
+            if (null === $currentCycleId) {
+                throw new \DomainException('Unknown cycle; did you set the campus timetable code and/or import that timetable structure csv');
+            }
 
-        if (null === $currentCycleId) {
-            throw new \DomainException('Unknown cycle; did you set the campus timetable code and/or import that timetable structure csv');
-        }
+            /* Otherwise continue onwards
+             */
+            $this->log->debug(sprintf(
+                'Loading timetables using Week Offset %s, Term %s',
+                $currentWeekOffset,
+                $currentTerm
+            ));
 
-        /* Otherwise continue onwards
-         */
-        $this->log->debug(sprintf(
-            'Loading timetables using Week Offset %s, Term %s',
-            $currentWeekOffset,
-            $currentTerm
-        ));
-
-        /* Purge previously-imported classes
-         */
-        $bus->add(new Timetable\Prepare(
-            $this->log,
-            $this->perform,
-            $this->classEntryMapper,
-            $this->classInvolvementMapper,
-            $this->classPeriodMapper
-        ));
-
-        /* Load all the Student Timetable xmls
-         */
-        foreach ($xml[Receiver::XML_STUDENTTIMETABLES] as $xmlFile) {
-            $bus->add(new Timetable\Classes(
+            /* Purge previously-imported classes
+             */
+            $bus->add(new Timetable\Prepare(
                 $this->log,
                 $this->perform,
-                $registry,
-                new Batchxml(new Api($this->host . '/' . $xmlFile)),
-                $lookup,
-                $currentWeekOffset,
-                $currentTerm,
-                $currentCycleId,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
             ));
+
+            /* Load all the Student Timetable xmls
+             */
+            foreach ($xml[Receiver::XML_STUDENTTIMETABLES] as $xmlFile) {
+                $bus->add(new Timetable\Classes(
+                    $this->log,
+                    $this->perform,
+                    $registry,
+                    new Batchxml(new Api($this->host . '/' . $xmlFile)),
+                    $lookup,
+                    $currentWeekOffset,
+                    $currentTerm,
+                    $currentCycleId,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $this->classPeriodMapper
+                ));
+            }
         }
 
         /* Archive the xmls into a folder when we're done processing
