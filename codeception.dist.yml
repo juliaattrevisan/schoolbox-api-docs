@@ -61,6 +61,20 @@ suites:
                 - \Helper\SchoolboxCli:
                 - Asserts:
 
+    api:
+      actor: ApiTester
+      path: api
+      step_decorators:
+        - \Codeception\Step\AsJson
+      modules:
+        enabled:
+          - REST:
+              depends: PhpBrowser
+              url: 'https://vagrant.dev.schoolbox.cloud'
+              xdebug: true
+              part: Json
+          - \Helper\Api:
+
 extensions:
     enabled:
         - Codeception\Extension\Logger

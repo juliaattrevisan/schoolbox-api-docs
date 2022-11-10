@@ -49,12 +49,20 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
+        //allow the user to see themselves, and allow superuser to also see users
+        $allowSelfAdminAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\IsUser('userId')
+            )
+        );
 
         $preloadUser = function ($params) {
             return $this->preloadUser($params);
         };
 
-        $this->register('GET', '/{userId}', 'apiUserGet', $hasApiAccess, $preloadUser);
+        $this->register('GET', '/{userId}', 'apiUserGet', $allowSelfAdminAccess, $preloadUser);
         $this->register('DELETE', '/{userId}', 'apiUserDelete', $hasApiAccess, $preloadUser);
         $this->register('POST', '', 'apiUserPost', $hasApiAccess);
         $this->register('PUT', '/{userId}', 'apiUserPut', $hasApiAccess, $preloadUser);
