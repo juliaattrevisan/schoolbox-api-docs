@@ -132,7 +132,7 @@ export default {
                         <input type="text" :required="field.mandatory" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
                     </template>
 
-                    <template v-if="row.hasValidationError">
+                    <template v-if="row.hasValidationError && row.hasValidationError[field.id]">
                         <label class="error">This field is required.</label>
                     </template>
                 </div>
