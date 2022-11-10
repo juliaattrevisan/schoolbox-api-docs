@@ -431,7 +431,7 @@ class Database implements IDatabase, Serializable
     private function error(PDOException $exception): void
     {
         if (PHP_SAPI !== 'cli') {
-            if($exception->getMessage() === "SQLSTATE[HY000] [2002] No such file or directory"){
+            if ($exception->getMessage() === "SQLSTATE[HY000] [2002] No such file or directory") {
                 http_response_code(598);
                 include __DIR__ . "/../templates/core/error/598-database-offline.html";
                 exit;
