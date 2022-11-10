@@ -48,7 +48,7 @@
                 <td {{ borderStyle|raw }}>{{ importLog.instance.script }}</td>
                 <td {{ borderStyle|raw }}><time title="{{ importLog.instance.startAt.database }}">{{ importLog.instance.startAt.local }}</time></td>
                 <td {{ borderStyle|raw }}>
-                    {% if not importLog.instance.finishAt.isNull %}
+                    {% if importLog.instance.finishAt %}
                         <time title="{{ importLog.duration.sec }} sec">
                             {{ importLog.duration.hms }}
                         </time>
