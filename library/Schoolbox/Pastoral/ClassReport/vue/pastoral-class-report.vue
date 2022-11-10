@@ -365,7 +365,7 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                     .tiny {
                         display: grid;
-                        gap: 0.25rem;
+                        gap: 0rem 0.25rem;
                         grid-template-areas: 'profile-img record-heading record-date';
                         grid-template-columns: 2rem 5fr 2fr;
                         padding: 0;
