@@ -14,8 +14,6 @@ use Schoolbox\Config\Loader;
 
 class External_Class extends CachingConnectorAbstract implements External_ClassInterface
 {
-
-
     /**
      * Constructor
      *
@@ -51,7 +49,6 @@ class External_Class extends CachingConnectorAbstract implements External_ClassI
         return $result;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -59,7 +56,6 @@ class External_Class extends CachingConnectorAbstract implements External_ClassI
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
-
 
     /**
      * @return array

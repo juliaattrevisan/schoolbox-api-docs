@@ -30,7 +30,6 @@ use function preg_match;
  */
 class CourseGroup
 {
-
     /** @var IConnector */
     private $schoolboxDb;
 

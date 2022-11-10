@@ -44,7 +44,6 @@ use function reset;
  */
 class CourseAccounts
 {
-
     /** @var IConnector */
     private $canvasDb;
 

@@ -11,7 +11,6 @@ use Schoolbox\Campus;
 
 trait External_Schoolbox_TimetableDefinitionTrait
 {
-
     /**
      * @param IConnector $database
      * @param Campus     $campus
@@ -60,7 +59,6 @@ trait External_Schoolbox_TimetableDefinitionTrait
 
         return $currentDay;
     }
-
 
     /**
      * Find the timetable cycle length and day length for a given campus

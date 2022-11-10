@@ -11,7 +11,6 @@
  */
 class External_Pcschools_Cc_Timetable extends External_Pcschools_Timetable
 {
-
     /**
      * A special stored proc just for cornerstone
      * Every other PC School instance will break if clients use this

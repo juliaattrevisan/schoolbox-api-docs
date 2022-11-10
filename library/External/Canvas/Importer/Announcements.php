@@ -26,7 +26,6 @@ use Symfony\Component\Lock\LockInterface;
  */
 class Announcements
 {
-
     /**
      * Arbitrary string indicating this article came from the canvas importer
      */

@@ -14,7 +14,6 @@ use Schoolbox\Resource\Storage;
 
 class External_User extends CachingConnectorAbstract implements External_UserInterface
 {
-
     /**
      * Constructor
      *
@@ -33,7 +32,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
         );
     }
 
-
     /**
      * @inheritdoc
      */
@@ -41,7 +39,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
-
 
     /**
      * @inheritDoc
@@ -59,7 +56,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
-
     /**
      * @inheritdoc
      */
@@ -67,7 +63,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
-
 
     /**
      * @inheritdoc
@@ -77,7 +72,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
-
     /**
      * @inheritdoc
      */
@@ -85,7 +79,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
-
 
     /**
      * @inheritdoc
@@ -95,7 +88,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
-
     /**
      * @inheritdoc
      */
@@ -103,7 +95,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
-
 
     /**
      * {@inheritdoc}
@@ -113,7 +104,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
-
     /**
      * @inheritdoc
      */
@@ -121,7 +111,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
-
 
     /**
      * @inheritdoc
@@ -147,7 +136,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
-
     /**
      * @inheritdoc
      */
@@ -155,7 +143,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
-
 
     /**
      * @inheritdoc
@@ -165,7 +152,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
-
     /**
      * @inheritdoc
      */
@@ -173,7 +159,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
-
 
     /**
      * @inheritdoc

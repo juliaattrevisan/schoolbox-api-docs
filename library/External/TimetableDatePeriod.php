@@ -15,7 +15,6 @@ use Schoolbox\Campus;
 
 class External_TimetableDatePeriod implements Iterator
 {
-
     /**
      * @var DateTime
      */

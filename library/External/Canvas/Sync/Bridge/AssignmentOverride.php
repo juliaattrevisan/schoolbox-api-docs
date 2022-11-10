@@ -18,7 +18,6 @@ use Alaress\Database\Predicate\InvalidColumnException;
  */
 class AssignmentOverride
 {
-
     /** @var IConnector */
     private $schoolboxDb;
 

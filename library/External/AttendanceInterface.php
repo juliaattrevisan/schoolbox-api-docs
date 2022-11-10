@@ -12,7 +12,6 @@
  */
 interface External_AttendanceInterface extends External\IConnector
 {
-
     /**
      * Returns a list of attendees for a particular class, date and period
      *

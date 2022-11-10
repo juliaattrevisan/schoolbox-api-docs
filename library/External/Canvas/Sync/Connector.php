@@ -21,7 +21,6 @@ use Schoolbox\External;
  */
 class Connector
 {
-
 //    private const API_HOST = 'portal.inshosteddata.com';
     private const API_HOST = 'api.inshosteddata.com';
 

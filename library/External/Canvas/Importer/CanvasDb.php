@@ -26,7 +26,6 @@ use PDO;
  */
 class CanvasDb
 {
-
     /**
      * @var string
      */

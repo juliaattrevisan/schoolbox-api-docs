@@ -14,8 +14,6 @@ use Schoolbox\Config\Loader;
 
 class External_UserDetention extends CachingConnectorAbstract implements External_UserDetentionInterface
 {
-
-
     /**
      * Constructor
      *
