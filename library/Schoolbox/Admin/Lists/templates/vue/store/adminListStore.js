@@ -137,19 +137,25 @@ export const useAdminListStore = defineStore('main', {
             });
         },
 
-        isValidated () {
+        /**
+         * Before the form is saved we need to check if there's any empty
+         * fields that are mandatory and if so prevent the form from submission
+         * and display the error on the relevant row fields.
+         * To do this we loop through the fields
+         * and the associated rows for each. Because of the structure
+         * of the data, (with the fields and rows being seperate objects)
+         * the check is a little more complicated than what we might expect.
+         **/
+         isValidated () {
             let valid = true;
-            //check each row
-            this.rows.forEach((row, index) => {
-                //set the field validation attribute
+            this.rows.forEach((row, index) => { // check each row
+                // set the field validation attribute
                 this.rows[index].hasValidationError = [];
-                //check each cell in the row
+                // check each cell in the row
                 this.loadedData.fields.forEach((header) => {
-                    //if the header for that cell is manditory == true, and the cell is empty, set the error stat
-                    //header id
-                    let headerId = `${header.id}`;
-                    if (header.mandatory &&  '' === row[headerId].trim() )
-                    {
+                    const headerId = `${header.id}`;
+                    // if the header for that cell is mandatory, and the cell is empty, set the error state
+                    if (header.mandatory && row[headerId].trim() === '') {
                         valid = false;
                         this.rows[index].hasValidationError[headerId] = true;
                     } else {
