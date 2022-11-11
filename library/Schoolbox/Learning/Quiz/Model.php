@@ -239,7 +239,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
      * Clears any attempts from the clone, and clones each Section in the Quiz
      * @return void
      */
-    function __clone()
+    public function __clone()
     {
         // Mark this object as a clone
         $this->id = null;

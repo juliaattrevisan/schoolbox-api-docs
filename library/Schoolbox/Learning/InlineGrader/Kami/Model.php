@@ -20,6 +20,11 @@ use Alaress_Date_Format;
 
 class Model implements ISoftDeletable
 {
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
+
     const STATUS_QUEUED = 'queued';          // Initial state. Inserted when we save a eligible submission file
     const STATUS_UPLOADING = 'uploading';    // As soon as we attempt to upload it. Transient state.
     const STATUS_FAILED = 'failed';          // Unable to be uploaded to Kami. May be permanent or transient
@@ -52,11 +57,6 @@ class Model implements ISoftDeletable
         'numbers' => true,
         'pdf'     => true,
     ];
-
-    use Id;
-    use CreatedAtDate;
-    use UpdatedAtDate;
-    use DeletedAtDate;
 
     /**
      * @var SingleFile\Model
