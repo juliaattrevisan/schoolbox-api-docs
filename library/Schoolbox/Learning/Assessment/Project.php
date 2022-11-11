@@ -17,6 +17,7 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress_Date_Format;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -431,9 +432,9 @@ class Project extends AbstractAssessment implements AssessmentContext
     /**
      * Override: open is always aliased to publish
      *
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getOpenAt()
+    public function getOpenAt(): ?Alaress_Date_Format
     {
         return $this->getPublishAt();
     }
@@ -441,9 +442,9 @@ class Project extends AbstractAssessment implements AssessmentContext
     /**
      * Override: close is always aliased to due
      *
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCloseAt()
+    public function getCloseAt(): ?Alaress_Date_Format
     {
         return $this->getDueAt();
     }
