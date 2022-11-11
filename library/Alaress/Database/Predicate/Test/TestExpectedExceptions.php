@@ -27,7 +27,6 @@ use Alaress_Date_Format;
  */
 class TestExpectedExceptions extends TestCase
 {
-
     /** @var Mysql\Quoter */
     private $mySqlQuoter;
 

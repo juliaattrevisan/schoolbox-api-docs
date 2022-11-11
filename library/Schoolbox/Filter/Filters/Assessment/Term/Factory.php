@@ -21,7 +21,6 @@ use Schoolbox\User;
  */
 abstract class Factory extends AbstractFactory
 {
-
     /**
      * @var Term\Mapper
      */

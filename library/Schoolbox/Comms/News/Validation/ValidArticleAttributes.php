@@ -22,7 +22,6 @@ use Alaress\Specification;
  */
 class ValidArticleAttributes extends Specification\Leaf
 {
-
     /**
      * Definition of a valid news article
      *

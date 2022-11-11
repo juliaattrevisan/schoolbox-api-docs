@@ -18,7 +18,6 @@ use Alaress_Date_Format;
  */
 class ClassListFactory
 {
-
     /** @var IConnector */
     private $database;
 

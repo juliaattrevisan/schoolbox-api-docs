@@ -14,7 +14,6 @@ namespace Schoolbox\Comms\News\Topic;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * @inheritDoc
      */

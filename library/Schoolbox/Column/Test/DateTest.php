@@ -16,7 +16,6 @@ use Schoolbox\Column\Date;
 
 class DateTest extends DatetimeTest
 {
-
     /**
      * @var Date
      */

@@ -16,7 +16,6 @@ use Schoolbox\Campus;
 
 class WarnTrigger extends TimetableTrigger
 {
-
     /**
      * @param Campus $campus
      * @param IClock $clock

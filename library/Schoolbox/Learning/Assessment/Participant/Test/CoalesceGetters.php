@@ -26,7 +26,6 @@ use Schoolbox\User;
  */
 class CoalesceGetters extends TestCase
 {
-
     /**
      * @param Participant $participant
      * @param Alaress_Date_Format $publish

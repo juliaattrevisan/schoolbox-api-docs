@@ -33,7 +33,6 @@ use Schoolbox\User;
  */
 class DemoData
 {
-
     /**
      * A cache of User objects, indexed by the first letter of their name, capitalised, eg 'A' for 'Andy', 'B' for Barry
      *
@@ -1382,7 +1381,7 @@ class DemoData
                 $user->setFirstname(sprintf('%d (Student)', $userChar));
                 $user->setLastname(sprintf('%d (Student)', $userChar));
                 $user->setUsername(sprintf('%d (Student)', $userChar));
-            break;
+                break;
             default:
                 throw new InvalidArgumentException("Unknown userChar: $userChar");
         }

@@ -16,7 +16,6 @@ use Schoolbox\Campus;
 
 class StartTrigger extends TimetableTrigger
 {
-
     /**
      * @param Campus $campus
      * @param IClock $clock

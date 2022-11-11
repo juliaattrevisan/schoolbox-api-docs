@@ -18,7 +18,6 @@ use ICollection;
 
 class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 {
-
     /**
      * Consts corresponding to ordering
      */

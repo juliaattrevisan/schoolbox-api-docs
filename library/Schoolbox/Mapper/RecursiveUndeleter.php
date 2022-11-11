@@ -84,7 +84,6 @@ use function sprintf;
 
 class RecursiveUndeleter
 {
-
     /**
      * Period in seconds, centered on parent deletedAt timestamp, that child models must be deleted within
      * to be considered part of the same deletion action.

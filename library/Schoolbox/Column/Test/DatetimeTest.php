@@ -16,7 +16,6 @@ use Alaress_Date_Format as DateWrapper;
 
 class DatetimeTest extends TestCase
 {
-
     /**
      * @var Datetime
      */

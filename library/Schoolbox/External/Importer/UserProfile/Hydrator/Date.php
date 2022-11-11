@@ -26,7 +26,6 @@ use function trim;
  */
 class Date implements HydratorInterface
 {
-
     /**
      * The key in $row to set the value in the user to.
      *

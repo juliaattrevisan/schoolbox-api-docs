@@ -33,7 +33,6 @@ use function in_array;
  */
 class Connector
 {
-
     // Known Tass2 HTTP API methods
     private const METHOD_GET_STUDENT = 'GetStudent';
     private const METHOD_GET_STUDENT_UD = 'GetStudentUD';

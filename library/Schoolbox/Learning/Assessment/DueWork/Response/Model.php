@@ -21,7 +21,6 @@ use Schoolbox\Learning\Assessment\AbstractResponse;
  */
 class Model extends AbstractResponse
 {
-
     /**
      * All the Files that are part of the Submission made by Student
      *

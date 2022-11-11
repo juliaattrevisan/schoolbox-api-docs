@@ -31,7 +31,6 @@ use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 
 class Controller extends Base
 {
-
     /** @var TermMapper $termMapper */
     private $termMapper;
 

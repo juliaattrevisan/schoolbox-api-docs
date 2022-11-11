@@ -18,7 +18,6 @@ use Schoolbox\Assessment\Term;
  */
 class Component extends Filter\BaseComponent
 {
-
     /**
      * A concrete Term model may match one or more availability configs. Eg, the admin may have selected 'all' terms.
      * We need to examine each concrete Term model to see if it matches an availability filter

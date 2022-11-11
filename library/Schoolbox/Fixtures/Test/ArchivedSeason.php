@@ -18,7 +18,6 @@ use Alaress_Date_Format;
 
 class ArchivedSeason extends TestCase
 {
-
     /**
      * Ensure Ids are unique so we don't run into cache complications
      *

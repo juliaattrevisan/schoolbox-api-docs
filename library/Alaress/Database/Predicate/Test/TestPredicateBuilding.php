@@ -23,7 +23,6 @@ use UnderflowException;
  */
 class TestPredicateBuilding extends TestCase
 {
-
     /** @var Mysql\Quoter */
     private $mySqlQuoter;
 

@@ -43,7 +43,6 @@ use Twig\Error\LoaderError;
 
 class Module extends BaseModule
 {
-
     /** @var string */
     protected $basename = 'learningAnalytics';
 

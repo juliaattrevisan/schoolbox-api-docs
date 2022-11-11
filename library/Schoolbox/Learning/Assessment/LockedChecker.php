@@ -18,7 +18,6 @@ use Schoolbox\Assessment\Term;
  */
 class LockedChecker
 {
-
     /** @var Term\Mapper */
     private $termMapper;
 

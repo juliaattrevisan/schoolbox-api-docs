@@ -30,7 +30,6 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Assess_Import_Xml extends Evaluation_Import_Xml
 {
-
     /**
      * @var AssessmentMapperProxy
      */

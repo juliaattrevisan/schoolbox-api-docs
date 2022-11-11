@@ -20,7 +20,6 @@ use Alaress_Date_Format;
 
 class Model implements ISoftDeletable
 {
-
     const STATUS_QUEUED = 'queued';          // Initial state. Inserted when we save a eligible submission file
     const STATUS_UPLOADING = 'uploading';    // As soon as we attempt to upload it. Transient state.
     const STATUS_FAILED = 'failed';          // Unable to be uploaded to Kami. May be permanent or transient
