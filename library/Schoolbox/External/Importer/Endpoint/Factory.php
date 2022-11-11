@@ -66,10 +66,12 @@ class Factory implements IFactory
         self::COMPASS => 'Compass',
         self::WONDE => 'Wonde',
         self::LISS => 'LISS',
-        /* Not sure what this should really say
-         * Went with the usual name instead
+        self::CSV => 'External',
+
+        /* When you've not chosen a SUDS Data Source
+         * (ie. you're still on "select an option")
          */
-        self::CSV => 'External'
+        '' => 'External'
     ];
 
 
