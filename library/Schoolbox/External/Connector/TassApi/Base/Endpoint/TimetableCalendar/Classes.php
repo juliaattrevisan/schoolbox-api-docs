@@ -16,6 +16,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Guid;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -601,6 +602,8 @@ class Classes implements IStrategy
 
             /* Process relevant dates
              */
+            $guidCodec = new Guid();
+
             foreach ($timetable['DAYS'][$dayNumber]['PERIODS'] as $periodData) {
                 /* Extract the useful time from this microsecond format
                  */
@@ -637,7 +640,17 @@ class Classes implements IStrategy
                     $classCode = (new Code())->encode($yearGroup, (string)$subject['SUB_CODE'], (string)$subject['CLASS']);
                     $period = trim((string)$periodData['PRD_DESC']);
                     $type = '';
-                    $guid = '';
+
+                    /* Circumstantially encode stuff we happen to need to make an
+                     * Attendance deeplink into the TASS system itself
+                     */
+                    $guid = $guidCodec->encode(
+                        $startAt->getDatabase(),
+                        (string)$timetable['TT_ID'],
+                        $dayNumber,
+                        (string)$periodData['PRD_CODE'],
+                        $classCode
+                    );
 
                     /* Try to find an event that already exists
                      * If it already exists, just continue; it's already been made
