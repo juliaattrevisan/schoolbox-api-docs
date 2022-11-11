@@ -6,12 +6,12 @@ import orderBy from 'lodash/orderBy';
 export const useAdminListStore = defineStore('main', {
 
     state: () => ({
-        loadedData: null, //contains the loaded data
-        rows: [], //to display and possibly edit the rows
-        selectedRow: {}, //to track which row is selected
-        rowToDelete: {}, //to track which row could be deleted
-        isPopOutOpen: false, //to open and close the list
-        selectedPopOutName: '', //to highlight all other rows that have that permission
+        loadedData: null, // contains the loaded data
+        rows: [], // to display and possibly edit the rows
+        selectedRow: {}, // to track which row is selected
+        rowToDelete: {}, // to track which row could be deleted
+        isPopOutOpen: false, // to open and close the list
+        selectedPopOutName: '', // to highlight all other rows that have that permission
     }),
 
     getters: {
