@@ -16,7 +16,6 @@ use Alaress\Async\Queue\Composite;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lock\InstanceLockFactory;
-use Alaress\Lock\LockRefreshException;
 use Alaress\Lumberjack\Logger;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
@@ -339,7 +338,7 @@ class Controller extends ConfigController
              * Exit early if either of those are selected
              */
             if ('' === $type || Factory::CSV === $type) {
-                exit(1);
+                return;
             }
 
             /* Nobody is on the watchlist in this context
@@ -349,7 +348,7 @@ class Controller extends ConfigController
             try {
                 $lock = $this->acquireLock($logger, Scheduler::LOCK_NAME, $timeout);
             } catch (\RuntimeException $e) {
-                exit(1);
+                return;
             }
 
             /* This identifier indicates that the two schedulers were part of this
