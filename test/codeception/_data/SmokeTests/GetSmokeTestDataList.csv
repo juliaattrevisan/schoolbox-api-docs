@@ -490,26 +490,6 @@ Admin,"Import timetable enrolment",Superuser,https://vagrant.dev.schoolbox.cloud
 Admin,"Import timetable enrolment",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment,401
 Admin,"Import timetable enrolment",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment,401
 Admin,"Import timetable enrolment",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment,401
-Boarder Leave,"View Boarder Leave",Superuser,https://vagrant.dev.schoolbox.cloud/modules/leave,200
-Boarder Leave,"View Boarder Leave",Teacher,https://vagrant.dev.schoolbox.cloud/modules/leave,200
-Boarder Leave,"View Boarder Leave",Student,https://vagrant.dev.schoolbox.cloud/modules/leave,400
-Boarder Leave,"View Boarder Leave",Parent,https://vagrant.dev.schoolbox.cloud/modules/leave,400
-Boarder Leave,"Create Request",Superuser,https://vagrant.dev.schoolbox.cloud/modules/leave/create,200
-Boarder Leave,"Create Request",Teacher,https://vagrant.dev.schoolbox.cloud/modules/leave/create,200
-Boarder Leave,"Create Request",Student,https://vagrant.dev.schoolbox.cloud/modules/leave/create,200
-Boarder Leave,"Create Request",Parent,https://vagrant.dev.schoolbox.cloud/modules/leave/create,200
-Boarder Leave,"View Requests",Superuser,https://vagrant.dev.schoolbox.cloud/modules/leave/house/1,200
-Boarder Leave,"View Requests",Teacher,https://vagrant.dev.schoolbox.cloud/modules/leave/house/1,200
-Boarder Leave,"View Requests",Student,https://vagrant.dev.schoolbox.cloud/modules/leave/house/1,400
-Boarder Leave,"View Requests",Parent,https://vagrant.dev.schoolbox.cloud/modules/leave/house/1,400
-Boarder Leave,"View Leave Report",Superuser,https://vagrant.dev.schoolbox.cloud/modules/leave/report/house/1,200
-Boarder Leave,"View Leave Report",Teacher,https://vagrant.dev.schoolbox.cloud/modules/leave/report/house/1,200
-Boarder Leave,"View Leave Report",Student,https://vagrant.dev.schoolbox.cloud/modules/leave/report/house/1,400
-Boarder Leave,"View Leave Report",Parent,https://vagrant.dev.schoolbox.cloud/modules/leave/report/house/1,400
-Boarder Leave,"View Catering Report",Superuser,https://vagrant.dev.schoolbox.cloud/modules/leave/report/catering,200
-Boarder Leave,"View Catering Report",Teacher,https://vagrant.dev.schoolbox.cloud/modules/leave/report/catering,200
-Boarder Leave,"View Catering Report",Student,https://vagrant.dev.schoolbox.cloud/modules/leave/report/catering,400
-Boarder Leave,"View Catering Report",Parent,https://vagrant.dev.schoolbox.cloud/modules/leave/report/catering,400
 Calendar,"View calendar",Superuser,https://vagrant.dev.schoolbox.cloud/calendar,200
 Calendar,"View calendar",Teacher,https://vagrant.dev.schoolbox.cloud/calendar,200
 Calendar,"View calendar",Student,https://vagrant.dev.schoolbox.cloud/calendar,200
