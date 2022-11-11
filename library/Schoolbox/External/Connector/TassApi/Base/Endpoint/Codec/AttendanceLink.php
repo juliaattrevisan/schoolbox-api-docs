@@ -44,7 +44,13 @@ class AttendanceLink
     /**
      * @var Code
      */
-    private Code $codec;
+    private Code $codeCodec;
+
+
+    /**
+     * @var Guid
+     */
+    private Guid $guidCodec;
 
 
     /**
@@ -59,36 +65,37 @@ class AttendanceLink
         $this->attendanceEnabled = $attendanceEnabled;
         $this->externalAttendanceDays = $externalAttendanceDays;
         $this->prodMenu = $prodMenu ? 'Y' : 'N';
-        $this->codec = new Code();
+
+        /* Codecs used to get pieces of data for this deeplink
+         */
+        $this->codeCodec = new Code();
+        $this->guidCodec = new Guid();
     }
 
 
     /**
-     * @param string               $ttid
-     * @param int                  $dayNumber
-     * @param int                  $periodCode
-     * @param string               $startAt
-     * @param string               $classCode
+     * @param string               $guid
      * @param User                 $user
-     * @param \Alaress_Date_Format $time
      * @return string
+     * @throws \InvalidArgumentException
      */
     public function generate(
-        string $ttid,
-        int $dayNumber,
-        int $periodCode,
-        string $startAt,
-        string $classCode,
-        \Schoolbox\User $user,
-        \Alaress_Date_Format $time
+        string $guid,
+        \Schoolbox\User $user
     ): string {
+        /* Get the parts you need
+         */
+        [$startAt, $ttid, $day, $periodCode, $classCode] = $this->guidCodec->decode($guid);
+
+        $startAtADF = new \Alaress_Date_Format($startAt, \Alaress_Date_Format::DATABASE_FORMAT);
+
         /* Only generate links where possible
          */
-        if (!$this->isEnabled($classCode, $user, $time)) {
+        if (!$this->isEnabled($classCode, $user, $startAtADF)) {
             return '';
         }
 
-        [$year, $subject, $class] = $this->codec->decode($classCode);
+        [$year, $subject, $class] = $this->codeCodec->decode($classCode);
 
         /* Example given by BTAC = [
                 "target":      "teacher.rollcall",
@@ -109,9 +116,9 @@ class AttendanceLink
             'classes'     => $class,
             'tchcode'     => $user->getExternalId(),
             'subjectcode' => $subject,
-            'date'        => $startAt,
+            'date'        => $startAtADF->getUsingFormat('d/m/Y'),
             'periodcode'  => $periodCode,
-            'daycode'     => $dayNumber,
+            'daycode'     => $day,
         ];
 
         $deepLink = urlencode(http_build_query($deepLinkParams));
