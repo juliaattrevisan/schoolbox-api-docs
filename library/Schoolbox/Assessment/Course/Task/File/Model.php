@@ -72,15 +72,4 @@ class Model implements IFile, ISoftDeletable
     {
         return $this->storage->getCreatedAt();
     }
-
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
-    }
 }

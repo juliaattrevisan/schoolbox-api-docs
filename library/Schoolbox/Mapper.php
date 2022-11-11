@@ -4250,7 +4250,7 @@ abstract class Mapper implements IMapper, Serializable
             $this->updateAll(
                 $object,
                 $this->updatedMap['column'],
-                ($updatedAt && !$updatedAt->isNull()) ? $updatedAt->getDatabase() : null
+                $updatedAt?->getDatabase(),
             );
         }
     }

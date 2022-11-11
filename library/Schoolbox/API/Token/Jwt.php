@@ -67,7 +67,7 @@ class Jwt
             IParser::CLAIM_ISS => $this->getSchoolboxIssuer(),
             IParser::CLAIM_SUB => $user->getUsername(),
         ];
-        if ($expiry !== null && !$expiry->isNull()) {
+        if ($expiry !== null) {
             $claims[IParser::CLAIM_EXP] = $expiry->getUnixTimeStamp();
         }
         if ($jwtId !== null) {

@@ -13,10 +13,16 @@ namespace Eportfolio;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
 
 class Page implements ISoftDeletable
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     public const PROFILE  = 'profile';
     public const SHOWCASE = 'showcase';
@@ -147,28 +153,6 @@ class Page implements ISoftDeletable
      * @var string
      */
     private $top_bg_primary;
-
-
-    /**
-     * Created at
-     *
-     * @var \Alaress_Date_Format
-     */
-    private $created_at;
-
-    /**
-     * Updated at
-     *
-     * @var \Alaress_Date_Format
-     */
-    private $updated_at;
-
-    /**
-     * Deleted at
-     *
-     * @var \Alaress_Date_Format|null
-     */
-    private $deleted_at;
 
     /**
      * A collection of permissions
@@ -541,66 +525,6 @@ class Page implements ISoftDeletable
     }
 
     /**
-     * Set created at
-     *
-     * @param \Alaress_Date_Format $created_at
-     */
-    public function setCreatedAt($created_at)
-    {
-        $this->created_at = $created_at;
-    }
-
-    /**
-     * Get created at
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->created_at;
-    }
-
-    /**
-     * Set deleted at
-     *
-     * @param \Alaress_Date_Format $deleted_at
-     */
-    public function setDeletedAt($deleted_at)
-    {
-        $this->deleted_at = $deleted_at;
-    }
-
-    /**
-     * Get deleted at
-     *
-     * @return \Alaress_Date_Format|null
-     */
-    public function getDeletedAt()
-    {
-        return $this->deleted_at;
-    }
-
-    /**
-     * Set updated at
-     *
-     * @param \Alaress_Date_Format $updated_at
-     */
-    public function setUpdatedAt($updated_at)
-    {
-        $this->updated_at = $updated_at;
-    }
-
-    /**
-     * Get updated at
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updated_at;
-    }
-
-    /**
      * Set permissions
      *
      * @param GenericCollection<Permission> $permissions
@@ -621,13 +545,5 @@ class Page implements ISoftDeletable
     public function getPermissions()
     {
         return $this->permissions;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return ($this->getDeletedAt() instanceof \Alaress_Date_Format && !$this->getDeletedAt()->isNull());
     }
 }

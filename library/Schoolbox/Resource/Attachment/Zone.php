@@ -345,9 +345,7 @@ class Zone
             'capture'    => $this->capture,
             'iconClass'  => $this->iconClass,
             'fs'         => $this->filesystemContext,
-            'expiryDate' => ($this->expiryDate && !$this->expiryDate->isNull())
-                ? $this->expiryDate->toRfc3339String()
-                : null,
+            'expiryDate' => $this->expiryDate?->toRfc3339String(),
         ];
 
         foreach ($this->attachments as $storage) {

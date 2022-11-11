@@ -12,9 +12,15 @@ namespace Etherpad;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
 class Pad implements ISoftDeletable
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * Identifier
@@ -64,27 +70,6 @@ class Pad implements ISoftDeletable
      * @var int
      */
     private $lock = 0;
-
-    /**
-     * Created at
-     *
-     * @var Alaress_Date_Format
-     */
-    private $createdAt = null;
-
-    /**
-     * Updated at
-     *
-     * @var Alaress_Date_Format
-     */
-    private $updatedAt = null;
-
-    /**
-     * Deleted at
-     *
-     * @var Alaress_Date_Format
-     */
-    private $deletedAt = null;
 
     /**
      * Constructor
@@ -141,14 +126,6 @@ class Pad implements ISoftDeletable
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function isDeleted()
-    {
-        return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
-    }
-
-    /**
      * Was this pad first spawned in the environment indicated by INSTANCE_ID
      *
      * @return bool
@@ -185,45 +162,6 @@ class Pad implements ISoftDeletable
         return $this->body;
     }
 
-    /**
-     * Set created at
-     *
-     * @param Alaress_Date_Format $createdAt
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    /**
-     * Get created at
-     *
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set deleted at
-     *
-     * @param Alaress_Date_Format $deletedAt
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-    }
-
-    /**
-     * Get deleted at
-     *
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
 
     /**
      * Set id
@@ -283,26 +221,6 @@ class Pad implements ISoftDeletable
     public function getPadId()
     {
         return $this->padId;
-    }
-
-    /**
-     * Set updated at
-     *
-     * @param Alaress_Date_Format $updatedAt
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    /**
-     * Get updated at
-     *
-     * @return Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 
     /**

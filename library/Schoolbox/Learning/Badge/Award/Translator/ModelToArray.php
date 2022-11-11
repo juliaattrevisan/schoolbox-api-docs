@@ -110,15 +110,9 @@ class ModelToArray
                 : null,
             'recipient' => $recipient,
             'awardedBy' => $awardedBy,
-            'awardedAt' => $model->getAwardedAt() && !$model->getAwardedAt()->isNull()
-                ? $model->getAwardedAt()->getUsingFormat(DATE_ATOM)
-                : null,
-            'expiresAt' => $model->getExpiresAt() && !$model->getExpiresAt()->isNull()
-                ? $model->getExpiresAt()->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT)
-                : null,
-            'viewedOn'  => $model->getViewedOn() && !$model->getViewedOn()->isNull()
-                ? $model->getViewedOn()->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT)
-                : null,
+            'awardedAt' => $model->getAwardedAt()?->getUsingFormat(DATE_ATOM),
+            'expiresAt' => $model->getExpiresAt()?->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT),
+            'viewedOn'  => $model->getViewedOn()?->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT),
             '_links'    => call_user_func($this->linkTranslator, $model),
         ];
     }

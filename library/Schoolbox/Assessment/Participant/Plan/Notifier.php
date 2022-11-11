@@ -1484,10 +1484,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $current = new Alaress_Date_Format($planDiff[$dateType][0], Alaress_Date_Format::DATABASE_FORMAT);
         $previous = new Alaress_Date_Format($planDiff[$dateType][1], Alaress_Date_Format::DATABASE_FORMAT);
 
-        if ($current->isNull() || $previous->isNull()) {
-            return false;
-        }
-
         switch ($transition) {
             case self::ANY:
                 return !$previous->eq($current);

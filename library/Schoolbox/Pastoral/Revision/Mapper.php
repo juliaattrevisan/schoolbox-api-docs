@@ -261,7 +261,7 @@ class Mapper extends BaseMapper
             ",
             [
                 'id'        => $object->getId(),
-                'updatedAt' => ($updatedAt && !$updatedAt->isNull()) ? $updatedAt->getDatabase() : null,
+                'updatedAt' => $updatedAt?->getDatabase(),
             ]
         );
     }

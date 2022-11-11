@@ -119,13 +119,9 @@ class ModelToArray
 
         return [
             'id'                => $model->getId(),
-            'createdAt'         => $model->getCreatedAt() && !$model->getCreatedAt()->isNull()
-                ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM)
-                : null,
+            'createdAt'         => $model->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy'         => $createdBy,
-            'updatedAt'         => $model->getUpdatedAt() && !$model->getUpdatedAt()->isNull()
-                ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM)
-                : null,
+            'updatedAt'         => $model->getUpdatedAt()?->getUsingFormat(DATE_ATOM),
             'updatedBy'         => $updatedBy,
             'name'              => $model->getName(),
             'body'              => $this->purifier->purify($model->getBody()),

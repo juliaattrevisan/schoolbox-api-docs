@@ -78,7 +78,7 @@ class SelfIssued extends Base
                         'jwt_id'  => $claims[self::CLAIM_JTI],
                     ]
                 );
-                if ($token->getExpiry() !== null && !$token->getExpiry()->isNull() && $token->getExpiry()->isPast()) {
+                if ($token->getExpiry() && $token->getExpiry()->isPast()) {
                     throw new Exception\Rejected('The JWT ID provided has expired');
                 }
             } catch (MapperException $e) {

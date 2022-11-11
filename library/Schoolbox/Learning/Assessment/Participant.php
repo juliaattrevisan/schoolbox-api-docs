@@ -649,7 +649,7 @@ class Participant
     {
         return $this->allResponses->filter(
             function (IResponse $response) {
-                return $response->getSubmittedAt() && !$response->getSubmittedAt()->isNull();
+                return $response->getSubmittedAt() !== null;
             }
         );
     }
@@ -681,7 +681,7 @@ class Participant
     {
         return $this->allFeedbacks->filter(
             function (IFeedback $feedback) {
-                return $feedback->getPublishedAt() && !$feedback->getPublishedAt()->isNull();
+                return $feedback->getPublishedAt() !== null;
             }
         );
     }

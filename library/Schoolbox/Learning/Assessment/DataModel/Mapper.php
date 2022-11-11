@@ -1320,7 +1320,7 @@ class Mapper extends BaseMapper
             'close'   => $assessment->getCloseDate(),
         ];
         foreach ($dates as $type => $date) {
-            $isDate = $date instanceof Alaress_Date_Format && !$date->isNull();
+            $isDate = $date instanceof Alaress_Date_Format;
             if ($isSpec && $isDate) {
                 throw new \InvalidArgumentException(sprintf('Spec assessments may not have a %s date', $type));
             }
