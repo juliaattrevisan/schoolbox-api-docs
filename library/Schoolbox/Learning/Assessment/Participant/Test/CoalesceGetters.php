@@ -32,9 +32,9 @@ class CoalesceGetters extends TestCase
      * @param Alaress_Date_Format $open
      * @param Alaress_Date_Format $due
      * @param Alaress_Date_Format $close
-     * @dataProvider provider_dates_domainObject
+     * @dataProvider providerDatesDomainObject
      */
-    public function test_dates_DomainObject(
+    public function testDatesDomainObject(
         Participant $participant,
         Alaress_Date_Format $publish,
         Alaress_Date_Format $open,
@@ -52,15 +52,15 @@ class CoalesceGetters extends TestCase
     /**
      * @param Participant $participant
      * @param null|string $description
-     * @dataProvider provider_description_domainObject
+     * @dataProvider providerDescriptionDomainObject
      */
-    public function test_description_DomainObject(Participant $participant, ?string $description): void
+    public function testDescriptionDomainObject(Participant $participant, ?string $description): void
     {
         $this->assertEquals($description, $participant->getDescription());
     }
 
 
-    public function provider_description_domainObject()
+    public function providerDescriptionDomainObject()
     {
         $data = [];
 
@@ -112,7 +112,7 @@ class CoalesceGetters extends TestCase
 
 
 
-    public function provider_dates_domainObject()
+    public function providerDatesDomainObject()
     {
         $data = [];
 

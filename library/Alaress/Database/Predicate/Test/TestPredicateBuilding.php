@@ -116,7 +116,7 @@ class TestPredicateBuilding extends TestCase
      * @throws InvalidColumnException
      * @throws \PHPUnit\Framework\Exception
      */
-    public function test_equals_adf()
+    public function testEqualsAlaressDateFormat()
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->equals('column', new Alaress_Date_Format('2010-01-01 00:00:00', Alaress_Date_Format::DATABASE_FORMAT));
