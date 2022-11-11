@@ -17,7 +17,7 @@ export default {
             canDelete: state => state.loadedData.canDelete, //allows space for the delete UI
             headerFields: state => state.headerFields, //allows space for the delete UI
         }),
-        
+
     }
 
 }
@@ -27,10 +27,10 @@ export default {
     <div :class="`${ isSortable ? 'sortable' : '' }`">
         <header :class="`list-header actions-small-${ canDelete ? '1' : '0' }`">
             <div class="list-item">
-                <div v-for="(field, index) in headerFields" :key="index" :class="`small-12 medium-${ field.width ? field.width : '2' } column`">
-                    {{ field.caption }}
+                <label v-for="(field, index) in headerFields" :key="index" :class="`small-12 medium-${ field.width ? field.width : '2' } column`">
+                    <span :class="`${ field.mandatory ? 'required-with-tip': ''}`">{{ field.caption }}</span>
                     <span v-if="field.tooltip" :class="`hint has-tip tip-${ field.tooltipPosition ? field.tooltipPosition : 'top' }`" data-tooltip :title="field.tooltip">?</span>
-                </div>
+                </label>
             </div>
         </header>
     </div>

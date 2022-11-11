@@ -11,7 +11,7 @@ import RevealModal from '@schoolboxVue/components/reveal-modal';
 import Toast from '@schoolboxVue/components/toast';
 
 export default {
-    
+
     components: {
         RevealModal,
         Toast
@@ -76,7 +76,7 @@ export default {
 
         /**
          * Send through the data to delete the row
-         * 
+         *
          * @returns { FormData }
          */
         getDeleteRowFormData () {
