@@ -179,10 +179,17 @@ class External_Synergetic_Class implements External_ClassInterface
         $userExternalId = $sessionUser instanceof \Schoolbox\User ? $sessionUser->getExternalId() : null;
 
         if ($date === null) {
+            $currentYear     = $this->externalUser->getCurrentYear($userExternalId);
+            $currentSemester = $this->externalUser->getCurrentSemester($userExternalId);
+
+            if ($currentYear === null || $currentSemester === null) {
+                return [];
+            }
+
             $join = '';
             $pb   = (new Predicate\Builder(new Quoter(), 'vSubjectClassesStaff'))
-                ->equals('FileYear', $this->externalUser->getCurrentYear($userExternalId))
-                ->equals('FileSemester', $this->externalUser->getCurrentSemester($userExternalId));
+                ->equals('FileYear', $currentYear)
+                ->equals('FileSemester', $currentSemester);
         } else {
             $join       = "
                 JOIN FileSemesters ON
