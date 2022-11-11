@@ -48,24 +48,24 @@ abstract class AbstractAssessment implements IAssessable
     private $description;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    private $publishAt;
+    private ?Alaress_Date_Format $publishAt;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    private $openAt;
+    private ?Alaress_Date_Format $openAt;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    private $dueAt;
+    private ?Alaress_Date_Format $dueAt;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    private $closeAt;
+    private ?Alaress_Date_Format $closeAt;
 
     /**
      * @var float
@@ -828,19 +828,19 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getPublishAt()
+    public function getPublishAt(): ?Alaress_Date_Format
     {
         return $this->publishAt;
     }
 
 
     /**
-     * @param Alaress_Date_Format $publishAt
+     * @param Alaress_Date_Format|null $publishAt
      * @return $this
      */
-    public function setPublishAt(?Alaress_Date_Format $publishAt)
+    public function setPublishAt(?Alaress_Date_Format $publishAt): self
     {
         $this->publishAt = $publishAt;
         return $this;
@@ -848,19 +848,19 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getOpenAt()
+    public function getOpenAt(): ?Alaress_Date_Format
     {
         return $this->openAt;
     }
 
 
     /**
-     * @param Alaress_Date_Format $openAt
+     * @param Alaress_Date_Format|null $openAt
      * @return $this
      */
-    public function setOpenAt(?Alaress_Date_Format $openAt)
+    public function setOpenAt(?Alaress_Date_Format $openAt): self
     {
         $this->openAt = $openAt;
         return $this;
@@ -868,19 +868,19 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getDueAt()
+    public function getDueAt(): ?Alaress_Date_Format
     {
         return $this->dueAt;
     }
 
 
     /**
-     * @param Alaress_Date_Format $dueAt
+     * @param Alaress_Date_Format|null $dueAt
      * @return $this
      */
-    public function setDueAt(?Alaress_Date_Format $dueAt)
+    public function setDueAt(?Alaress_Date_Format $dueAt): self
     {
         $this->dueAt = $dueAt;
         return $this;
@@ -888,19 +888,19 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCloseAt()
+    public function getCloseAt(): ?Alaress_Date_Format
     {
         return $this->closeAt;
     }
 
 
     /**
-     * @param Alaress_Date_Format $closeAt
+     * @param Alaress_Date_Format|null $closeAt
      * @return $this
      */
-    public function setCloseAt(?Alaress_Date_Format $closeAt)
+    public function setCloseAt(?Alaress_Date_Format $closeAt): self
     {
         $this->closeAt = $closeAt;
         return $this;
