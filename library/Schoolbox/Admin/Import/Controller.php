@@ -20,7 +20,6 @@ use Alaress\Lumberjack\Logger;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
-use Crell\ApiProblem\ApiProblem;
 use PDOException;
 use Predis\ClientInterface;
 use Psr\Container\ContainerExceptionInterface;
