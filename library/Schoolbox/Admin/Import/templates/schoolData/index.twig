@@ -292,8 +292,8 @@
                 {% else %}
                     {# Otherwise, provide link to download csvs from SUDS Timetable and SUDS Events
                      #}
-                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getClassesExport') }}" class="icon-download button">Export School Data Classes</a>
-                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getTimetableExport') }}" class="icon-download button">Export School Data Timetable</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getClassesExport') }}" class="icon-download button">Export Classes</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getTimetableExport') }}" class="icon-download button">Export Timetable</a>
                 {% endif %}
 
                 {# Timetable Enrolments (sis_class_user) is actually the same in both cases
