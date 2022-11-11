@@ -29,7 +29,7 @@ class GuidTest extends TestCase
      *
      * @return array
      */
-    public function provider_validGuidEncode(): array
+    public function providerValidGuidEncode(): array
     {
         /* This code format doesn't enforce Tass to provide all three pieces
          * In fact, Tass might provide none, and we'd still have to proceed
@@ -69,7 +69,7 @@ class GuidTest extends TestCase
     /**
      * Test valid guid pieces
      *
-     * @dataProvider provider_validGuidEncode
+     * @dataProvider providerValidGuidEncode
      * @param string $startAt
      * @param string $ttid
      * @param string $day
@@ -91,7 +91,7 @@ class GuidTest extends TestCase
      *
      * @return array
      */
-    public function provider_validGuidEncodeDecode(): array
+    public function providerValidGuidEncodeDecode(): array
     {
         /* This code format doesn't enforce Tass to provide all three pieces
          * In fact, Tass might provide none, and we'd still have to proceed
@@ -131,7 +131,7 @@ class GuidTest extends TestCase
     /**
      * Test valid guid pieces when reencoded
      *
-     * @dataProvider provider_validGuidEncodeDecode
+     * @dataProvider providerValidGuidEncodeDecode
      * @param array  $input
      * @param array $expected
      * @throws ExpectationFailedException
