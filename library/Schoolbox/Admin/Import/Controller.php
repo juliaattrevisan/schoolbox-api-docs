@@ -409,35 +409,26 @@ class Controller extends ConfigController
                 \Alaress_Date_Format::now()->getLocal()
             );
 
-            try {
-                $bob  = new NotificationInstanceBuilder();
-                $bob->setTitle($title)
-                    ->setAllowSelfSend(true)
-                    ->setSeverity(\Monolog\Logger::INFO)
-                    /* Alternatively I could make my own namespace...but should I?
-                     * Namespace controls the icon selection but that's about it...?
-                     */
-                    ->setNamespace(NSMapper::NS_MESSAGE)
-                    ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
-                    /* Go to suds import log
-                     */
-                    ->setHref($redirect)
-                    ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $this->getUser()->getId()));
+            $bob  = new NotificationInstanceBuilder();
+            $bob->setTitle($title)
+                ->setAllowSelfSend(true)
+                ->setSeverity(\Monolog\Logger::INFO)
+                /* Alternatively I could make my own namespace...but should I?
+                 * Namespace controls the icon selection but that's about it...?
+                 */
+                ->setNamespace(NSMapper::NS_MESSAGE)
+                ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
+                /* Go to suds import log
+                 */
+                ->setHref($redirect)
+                ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $this->getUser()->getId()));
 
-                $composite = new Composite(
-                    new Listed($this->redisStorage, INSTANCE_ID, $this->getUser()->getId()),
-                    new Unread($this->redisStorage, INSTANCE_ID, $this->getUser()->getId())
-                );
+            $composite = new Composite(
+                new Listed($this->redisStorage, INSTANCE_ID, $this->getUser()->getId()),
+                new Unread($this->redisStorage, INSTANCE_ID, $this->getUser()->getId())
+            );
 
-                $composite->push($bob->build());
-            } catch (\Exception $e) {
-                $problem = (new ApiProblem($e->getMessage()))
-                    ->setStatus(500)
-                    ->asArray();
-                $this->getResponse()->status->setCode(500);
-                $this->getResponse()->content->set($this->buildJsonOutput($problem));
-                return;
-            }
+            $composite->push($bob->build());
         } catch (\Exception $e) {
             // the client has already detached - not much we can do
         }
