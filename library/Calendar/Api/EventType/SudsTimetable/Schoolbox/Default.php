@@ -7,6 +7,7 @@
  */
 
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\External\Connector\AttendanceFactory;
 use Schoolbox\External\Event\Overrides\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
@@ -145,8 +146,16 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
          */
         $timetableColorManager = new Timetable_ColourManager($this->timetableColourMapper->findAll()->reindex());
 
+        /* Decide if the current SUDS connector supports Attendance Link generation
+         * If it does, use it repeatedly to create said links
+         * Otherwise it remains null and will do nothing
+         */
+        $attendanceLinkGenerator = (new AttendanceFactory())->produce(\Schoolbox\Config\Loader::getInstance()->get('schooldata_import_data_source'));
+
         /** @var \Schoolbox\External\Event\Model $timetableEvent */
         foreach ($timetableEvents as $timetableEvent) {
+            $attendanceLink = $attendanceLinkGenerator?->generate($timetableEvent, $this->getUser()) ?? '';
+
             $instance = new \Calendar\Event\Type\SudsTimetable\Event();
             $instance->setEventId($timetableEvent->getId());
             $instance->setConnectorId($this->getConnectorId());
@@ -163,6 +172,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setType($eventTypeSettings['type']);
             $instance->setFolder($timetableEvent->getFolder());
             $instance->setStaff($timetableEvent->getStaff());
+            $instance->setAttendanceUrl($attendanceLink);
 
             $stack->add($instance);
         }

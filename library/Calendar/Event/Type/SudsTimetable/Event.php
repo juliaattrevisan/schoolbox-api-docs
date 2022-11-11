@@ -48,6 +48,12 @@ class Event extends Day\Event
 
 
     /**
+     * @var string|null
+     */
+    private ?string $attendanceUrl = null;
+
+
+    /**
      * @return string[]
      */
     protected function getRenderClasses(): array
@@ -156,6 +162,25 @@ class Event extends Day\Event
     public function setStaff(array $staff): self
     {
         $this->staff = $staff;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getAttendanceUrl(): ?string
+    {
+        return $this->attendanceUrl;
+    }
+
+
+    /**
+     * @param string|null $attendanceUrl
+     */
+    public function setAttendanceUrl(?string $attendanceUrl): self
+    {
+        $this->attendanceUrl = $attendanceUrl;
         return $this;
     }
 }
