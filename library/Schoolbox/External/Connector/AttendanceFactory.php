@@ -30,7 +30,7 @@ class AttendanceFactory
             case \Schoolbox\External\Importer\Endpoint\Factory::TASS_API:
                 return new \Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\AttendanceLink(
                     (bool)$config->get('external_attendance'),
-                    (string)$config->get('external_attendance_days'),
+                    (int)$config->get('external_attendance_days'),
                     (string)$config->get('external_tass_attendance_show_prod_menu')
                 );
         }

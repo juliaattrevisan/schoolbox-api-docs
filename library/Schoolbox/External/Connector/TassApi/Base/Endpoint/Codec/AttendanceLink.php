@@ -32,9 +32,9 @@ class AttendanceLink implements IAttendanceLink
 
 
     /**
-     * @var string
+     * @var int
      */
-    private string $externalAttendanceDays;
+    private int $externalAttendanceDays;
 
 
     /**
@@ -59,10 +59,10 @@ class AttendanceLink implements IAttendanceLink
      * Constructor
      *
      * @param bool   $attendanceEnabled
-     * @param string $externalAttendanceDays
+     * @param int  $externalAttendanceDays
      * @param string $prodMenu
      */
-    public function __construct(bool $attendanceEnabled, string $externalAttendanceDays, string $prodMenu)
+    public function __construct(bool $attendanceEnabled, int $externalAttendanceDays, string $prodMenu)
     {
         $this->attendanceEnabled = $attendanceEnabled;
         $this->externalAttendanceDays = $externalAttendanceDays;
