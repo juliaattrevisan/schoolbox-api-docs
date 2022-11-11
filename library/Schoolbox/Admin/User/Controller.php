@@ -343,6 +343,13 @@ class Controller extends Base
             $connectorName = Factory::NAME[$sudsConnector] ?? null;
         } else {
             $connectorName = ucfirst($this->getConfigLoader()->get('external_type'));
+
+            /* Forcible rename when you've selected nothing for
+             * Database Provider nor SUDS Data Source. Not sure
+             * exactly how a school uses that particular setup
+             * as you'd typically enable one of these options.
+             */
+            $connectorName = '' !== $connectorName ?: 'External';
         }
 
         $this->getResponse()->content->set([
