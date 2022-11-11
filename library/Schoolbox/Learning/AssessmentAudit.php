@@ -105,7 +105,8 @@ class AssessmentAudit
         assessment.due_date as dueDate,
         unit_spec_folder.name as unitSpecName,
         unit_imp_folder.name as unitImpName,
-        COALESCE(course_spec_folder.name, course_imp_spec_folder.name) as courseName
+        COALESCE(course_spec_folder.name, course_imp_spec_folder.name) as courseName,
+        COALESCE(course_specification.subject_code, course_imp_spec.subject_code)  as 'subjectCode'
 
         FROM v_assessment_relation
         JOIN assessment ON assessment_id = assessment.id
@@ -133,7 +134,7 @@ class AssessmentAudit
 
 
         //build the csv
-        $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId', 'CourseName',
+        $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId', 'CourseName', 'SubjectCode',
                         'UnitFolderId', 'UnitName', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
                         'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation', 'PublishDate', 'DueDate', 'SelfReviewability', 'MarkVisibility'];
 
@@ -204,6 +205,7 @@ class AssessmentAudit
                 $allFolders[$row['folderId']]->getCodeString(),
                 $courseFolderId,
                 $row['courseName'],
+                $row['subjectCode'],
                 $unitCourseFolderId,
                 $unitFolderName,
                 $row['assessmentWorkType'],
