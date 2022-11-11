@@ -152,7 +152,6 @@ class Controller extends ConfigController
             /* A flash message to tell users to w8
              */
             'hasPerformUpdate' => $hasPerformUpdate,
-
         ])->setTitle('School Data Import'));
     }
 
@@ -299,7 +298,7 @@ class Controller extends ConfigController
         $logFile = fopen($this->getConfigLoader()->get('logs_dir') . '/suds_live.log', 'a');
         $logger = new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
 
-//        // Not the best place to put it but it will do for now
+        // Not the best place to put it but it will do for now
         $this->getResponse()->content->set([
             'format' => 'noContent',
             'postOutput' => [
