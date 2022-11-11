@@ -69,7 +69,7 @@ class Factory implements IFactory
         /* Not sure what this should really say
          * Went with the usual name instead
          */
-        self::CSV => 'Schoolbox'
+        self::CSV => 'External'
     ];
 
 
