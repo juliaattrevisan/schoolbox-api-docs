@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 
+use Schoolbox\External\Connector\IAttendanceLink;
+use Schoolbox\External\Event\Model;
 use Schoolbox\User;
 
 /**
@@ -21,7 +23,7 @@ use Schoolbox\User;
  *     (string)$config->get('external_tass_attendance_show_prod_menu')
  * );
  */
-class AttendanceLink
+class AttendanceLink implements IAttendanceLink
 {
     /**
      * @var bool
@@ -74,18 +76,18 @@ class AttendanceLink
 
 
     /**
-     * @param string               $guid
-     * @param User                 $user
+     * @param Model $event
+     * @param User  $user
      * @return string
      * @throws \InvalidArgumentException
      */
     public function generate(
-        string $guid,
+        \Schoolbox\External\Event\Model $event,
         \Schoolbox\User $user
     ): string {
         /* Get the parts you need
          */
-        [$startAt, $ttid, $day, $periodCode, $classCode] = $this->guidCodec->decode($guid);
+        [$startAt, $ttid, $day, $periodCode, $classCode] = $this->guidCodec->decode($event->getGuid());
 
         $startAtADF = new \Alaress_Date_Format($startAt, \Alaress_Date_Format::DATABASE_FORMAT);
 
