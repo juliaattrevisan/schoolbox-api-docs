@@ -34,6 +34,7 @@ use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\DSNFactory;
 use Schoolbox\External\Connector\Log\Mapper;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Factory;
@@ -360,9 +361,13 @@ class Controller extends ConfigController
              */
             $importLogMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
 
+            /* ValidStrats is now a cli option
+             */
+            $validStrats = new ValidStrats('');
+
             /* Execute scheduler: sis stuff
              */
-            $sisFactory = new Factory($host, $key, true, $logger, $watchlist);
+            $sisFactory = new Factory($host, $key, true, $logger, $watchlist, $validStrats);
 
             (new Scheduler(
                 $importLogMapper->getDatabase(),
