@@ -354,9 +354,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     private function getDiscreteState(Alaress_Date_Format $now = null): int
     {
         // Needed to compensate for AlaressNullDate object/null duality
-        $submittedAt = $this->submittedAt && !$this->submittedAt->isNull() ? $this->submittedAt : null;
-        $approvedAt  = $this->acceptedAt && !$this->acceptedAt->isNull() ? $this->acceptedAt : null;
-        $rejectedAt  = $this->rejectedAt && !$this->rejectedAt->isNull() ? $this->rejectedAt : null;
+        $submittedAt = $this->submittedAt ?? null;
+        $approvedAt  = $this->acceptedAt ?? null;
+        $rejectedAt  = $this->rejectedAt ?? null;
 
         if (!$submittedAt) {
             return self::STATE_DRAFT;

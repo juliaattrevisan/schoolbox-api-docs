@@ -340,16 +340,11 @@ class Event implements ISoftDeletable
     public function isPublished(?Alaress_Date_Format $date = null): bool
     {
         // An event without a publish date is considered published
-        if (!$this->publishDateTime || $this->publishDateTime->isNull()) {
+        if (!$this->publishDateTime) {
             return true;
         }
 
-        // What date was passed in?
-        // (I really hope you didn't pass in a null date)
-        if (!$date || $date->isNull()) {
-            $date = Alaress_Date_Format::now();
-        }
-        return $this->publishDateTime->lte($date);
+        return $this->publishDateTime->lte($date ?? Alaress_Date_Format::now());
     }
 
     /* Auxiliary methods which don't belong anywhere else
