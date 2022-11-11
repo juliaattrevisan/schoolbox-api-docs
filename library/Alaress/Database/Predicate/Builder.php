@@ -230,12 +230,12 @@ class Builder implements IBuilder
      * @throws InvalidColumnException
      * @throws TypeError If $columnValue is of invalid type. Use isNull() for matching NULL
      */
-    private function addScalarPredicate($columnName, $columnValue, string $operator): self
-    {
-        if (\is_scalar($columnValue) || $columnValue instanceof Alaress_Date_Format) {
-            return $this->addPredicate($columnName, $columnValue, $operator);
-        }
-        throw new TypeError('Invalid columnValue type. Expected: [string|int|float|ADF]. Actual: ' . gettype($columnValue));
+    private function addScalarPredicate(
+        $columnName,
+        string|int|float|Alaress_Date_Format $columnValue,
+        string $operator,
+    ): self {
+        return $this->addPredicate($columnName, $columnValue, $operator);
     }
 
 
