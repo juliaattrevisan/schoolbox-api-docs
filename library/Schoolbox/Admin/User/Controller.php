@@ -349,7 +349,7 @@ class Controller extends Base
              * exactly how a school uses that particular setup
              * as you'd typically enable one of these options.
              */
-            $connectorName = '' !== $connectorName ?: 'External';
+            $connectorName = '' !== $connectorName ? $connectorName : 'External';
         }
 
         $this->getResponse()->content->set([
