@@ -141,18 +141,14 @@ class UserMapper extends Mapper
 
         // Boarder leave field is only there if the boarder leave module is enabled.
 
-        $this_object = $this;
         $this->hasMap(
             array(
                 'column' => 'boarding_status',
                 'property' => 'boardingStatus',
                 'type' => self::TYPE_STRING,
-                'enabled' => function () use ($this_object) {
-                    return $this_object->getConfigLoader()->get('boarder_leave_enabled');
-                }
+                'enabled' => 0
             )
         );
-        unset($this_object);
 
         // Setup callbacks
 

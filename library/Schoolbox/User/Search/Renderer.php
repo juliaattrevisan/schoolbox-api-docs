@@ -224,17 +224,6 @@ class Renderer extends Handler
                     $hasActions = true;
                 }
 
-                // Boarder Leave: only show to res house students if enabled
-                if (
-                    $resultIsStudent
-                    && $currentUserIsStaff
-                    && $user['residential_house_id']
-                    && Config::get('boarder_leave_enabled')
-                ) {
-                    $this->getPage()->parse('boarder_leave_block', 'boarder_leave');
-                    $hasActions = true;
-                }
-
                 // Modify: show only to supers
                 if (!$currentUserIsSuperuser) {
                     $this->getPage()->setVar('modify_block');

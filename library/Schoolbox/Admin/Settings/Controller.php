@@ -239,9 +239,6 @@ class Controller extends ConfigController
                    ->equals('lct.type', $typeLabel)
                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
 
-        if (!$this->getConfigLoader()->get(ConfigMapper::_BOARDER_LEAVE_ENABLED)) {
-            $pb->notEquals(ConfigMapper::COL_TYPE, ConfigMapper::TYPE_BOARD);
-        }
         return $pb;
     }
 }
