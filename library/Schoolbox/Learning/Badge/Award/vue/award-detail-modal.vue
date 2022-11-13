@@ -260,7 +260,46 @@ export default {
          */
         getReturnUrl() {
             return (this.returnUrl !== null) ? `?returnUrl=${this.returnUrl}` : '';
-        }
+        },
+
+        isAwardedGoal (award) {
+            return award.award !== null;
+        },
+
+        isUnawardedGoal (award) {
+            return award.isGoal && award.award === null;
+        },
+
+        hasGoalAwardLink (award) {
+            return award._links?.goalAward !== null;
+        },
+
+        hasAwardUpdateLink (award) {
+            return award._links?.awardUpdate !== null;
+        },
+
+        hasEvidence (award) {
+            return award.reason !== null && award.reason.length > 0;
+        },
+
+        awardedGoalHasEvidence (award) {
+            return award.award !== null && this.hasEvidence(award.award);
+        },
+
+        getViewEvidenceLink (award) {
+            let awardId;
+            if (this.awardedGoalHasEvidence(award)) { // is a goal that's been achieved which as evidence
+                awardId = award.award.id;
+            } else if (this.hasEvidence(award)) { // otherwise its a goal, or achievement without a goal
+                awardId = award.id;
+            }
+            return `/learning/badge/award/${awardId}/viewEvidence${this.getReturnUrl()}`
+        },
+
+        getAddEvidenceLink (award) {
+            return `/learning/badge/award/${award.id}/update${this.getReturnUrl()}`
+        },
+
     }
 }
 </script>
@@ -317,23 +356,23 @@ export default {
                     <div class="component-action">
                         <section>
                             <a
-                                v-if="award.reason && award.reason.length"
+                                v-if="awardedGoalHasEvidence(award) || hasEvidence(award)"
                                 title="View evidence"
                                 class="button"
-                                :href="`/learning/badge/award/${award.id}/viewEvidence`+getReturnUrl()"
+                                :href="getViewEvidenceLink(award)"
                             >
                                 View Evidence
                             </a>
                             <a
-                                v-else-if="award._links.awardUpdate && !award.award"
+                                v-else-if="hasAwardUpdateLink(award) && !award.award"
                                 title="Add evidence"
                                 class="button"
-                                :href="`/learning/badge/award/${award.id}/update`+getReturnUrl()"
+                                :href="getAddEvidenceLink(award)"
                             >
                                 Add Evidence
                             </a>
                             <a
-                                v-if="award._links.goalAward && award.isGoal && !award.award && (!award.reason || !award.reason.length)"
+                                v-if="hasGoalAwardLink(award) && isUnawardedGoal(award) && !hasEvidence(award)"
                                 title="Award with evidence"
                                 class="button"
                                 :href="getEvidenceUrl(award.badge.id)"
@@ -341,7 +380,7 @@ export default {
                                 Award with Evidence
                             </a>
                             <button
-                                v-if="award._links.goalAward && award.isGoal && !award.award"
+                                v-if="hasGoalAwardLink(award) && isUnawardedGoal(award)"
                                 @click.prevent="awardAchievement"
                                 @keyup.enter="awardAchievement"
                             >
