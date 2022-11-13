@@ -262,42 +262,90 @@ export default {
             return (this.returnUrl !== null) ? `?returnUrl=${this.returnUrl}` : '';
         },
 
-        isAwardedGoal (award) {
-            return award.award !== null;
+        /**
+         * The existence of award.award let us know that
+         * the award is a goal and it's been awarded
+         *
+         * @returns { boolean }
+         */
+        isAwardedGoal () {
+            return this.award.award !== null;
         },
 
-        isUnawardedGoal (award) {
-            return award.isGoal && award.award === null;
+        /**
+         * The award is a goal and its yet to be awarded,
+         * so it could be awarded
+         *
+         * @returns { boolean }
+         */
+        isUnawardedGoal () {
+            return this.award.isGoal && this.award.award === null;
         },
 
-        hasGoalAwardLink (award) {
-            return award._links?.goalAward !== null;
+        /**
+         * The existence of the link will determine if the
+         * user has permission to access it
+         *
+         * @returns { boolean }
+         */
+        hasGoalAwardLink () {
+            return this.award._links?.goalAward !== null;
         },
 
-        hasAwardUpdateLink (award) {
-            return award._links?.awardUpdate !== null;
+        /**
+         * The existence of the link will determine if the
+         * user has permission to access it
+         *
+         * @returns { boolean }
+         */
+        hasAwardUpdateLink () {
+            return this.award._links?.awardUpdate !== null;
         },
 
-        hasEvidence (award) {
-            return award.reason !== null && award.reason.length > 0;
+        /**
+         * If there's already evidence we can view linked to
+         * the award
+         *
+         * @returns { boolean }
+         */
+        hasEvidence () {
+            return this.award.reason !== null && this.award.reason.length > 0;
         },
 
-        awardedGoalHasEvidence (award) {
-            return award.award !== null && this.hasEvidence(award.award);
+        /**
+         * If the award is an achieved goal that has evidence.
+         *
+         * @returns { boolean }
+         */
+        awardedGoalHasEvidence () {
+            return this.award.award !== null && this.hasEvidence(this.award.award);
         },
 
-        getViewEvidenceLink (award) {
-            let awardId;
-            if (this.awardedGoalHasEvidence(award)) { // is a goal that's been achieved which as evidence
-                awardId = award.award.id;
-            } else if (this.hasEvidence(award)) { // otherwise its a goal, or achievement without a goal
-                awardId = award.id;
-            }
+        /**
+         * If the award is an achieved goal that has evidence, we should show
+         * the evidence linked to the achievement. Not the evidence that may
+         * be linked to the goal. Accessing this link assumes the existence
+         * and ability to add evidence has been checked elsewhere.
+         *
+         * @returns { string }
+         */
+        getViewEvidenceLink () {
+            // check if it's a goal that's been achieved which has evidence, otherwise a goal/achievement with evidence
+            const awardId = this.awardedGoalHasEvidence(this.award) ? this.award.award.id : this.award.id;
             return `/learning/badge/award/${awardId}/viewEvidence${this.getReturnUrl()}`
         },
 
-        getAddEvidenceLink (award) {
-            return `/learning/badge/award/${award.id}/update${this.getReturnUrl()}`
+        /**
+         * If the award is an achieved goal, we should create evidence on the achievement,
+         * not on the goal. Accessing this link assumes the existence
+         * and ability to add evidence has been checked elsewhere.
+         *
+         * @returns { string }
+         */
+        getAddEvidenceLink () {
+            // check if it's a goal that's been achieved so link to the achievement evidence, not the goal evidence, otherwise just link to the goal/achievement link
+            const awardId = this.isAwardedGoal(this.award) ? this.award.award.id : this.award.id;
+            return `/learning/badge/award/${awardId}/update${this.getReturnUrl()}`
         },
 
     }
@@ -356,23 +404,23 @@ export default {
                     <div class="component-action">
                         <section>
                             <a
-                                v-if="awardedGoalHasEvidence(award) || hasEvidence(award)"
+                                v-if="awardedGoalHasEvidence() || hasEvidence()"
                                 title="View evidence"
                                 class="button"
-                                :href="getViewEvidenceLink(award)"
+                                :href="getViewEvidenceLink()"
                             >
                                 View Evidence
                             </a>
                             <a
-                                v-else-if="hasAwardUpdateLink(award) && !award.award"
+                                v-else-if="hasAwardUpdateLink()"
                                 title="Add evidence"
                                 class="button"
-                                :href="getAddEvidenceLink(award)"
+                                :href="getAddEvidenceLink()"
                             >
                                 Add Evidence
                             </a>
                             <a
-                                v-if="hasGoalAwardLink(award) && isUnawardedGoal(award) && !hasEvidence(award)"
+                                v-if="hasGoalAwardLink() && isUnawardedGoal() && !hasEvidence()"
                                 title="Award with evidence"
                                 class="button"
                                 :href="getEvidenceUrl(award.badge.id)"
@@ -380,7 +428,7 @@ export default {
                                 Award with Evidence
                             </a>
                             <button
-                                v-if="hasGoalAwardLink(award) && isUnawardedGoal(award)"
+                                v-if="hasGoalAwardLink() && isUnawardedGoal()"
                                 @click.prevent="awardAchievement"
                                 @keyup.enter="awardAchievement"
                             >
