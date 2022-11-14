@@ -10,23 +10,8 @@ Usage:
     } only %}
 #}
 
-<script>
-    $(function() {
-
-        var $component = $('#component{{ componentInstance.id }}');
-        var $deleteIcon = $component.find('[data-target=delete]');
-
-        $component.on('click', '[data-action="delete-component"]', function(event){
-            event.preventDefault();
-            if('closed' == $deleteIcon.attr('data-state')){
-                $deleteIcon.trigger('click');
-            }
-        });
-    });
-</script>
-
 <div class="empty-state" data-empty-state>
     <i class="icon-course"></i>
     {% set entity = hasUnitSpec ? (locale.unit.indefiniteArticle ~ ' ' ~ locale.unit ~ ' page') : (hasCourseSpec ? 'a course page' : 'an invalid context') %}
-    <p>This component works on class pages to import courses for students to complete. This page is {{ entity }} so the component doesn't work here. <a href="#" data-action="delete-component">Remove this component</a>.</p>
+    <p>This component works on class pages to import courses for students to complete. This page is {{ entity }} so the component doesn't work here. <a href="#remove-component" data-target="delete">Remove this component</a>.</p>
 </div>
