@@ -304,12 +304,14 @@ export default {
 
         /**
          * If there's already evidence we can view linked to
-         * the award
+         * the award.
+         *
+         * @param { object }
          *
          * @returns { boolean }
          */
-        hasEvidence () {
-            return this.award.reason !== null && this.award.reason.length > 0;
+        hasEvidence (award) {
+            return award.reason !== null && award.reason.length > 0;
         },
 
         /**
@@ -404,7 +406,7 @@ export default {
                     <div class="component-action">
                         <section>
                             <a
-                                v-if="awardedGoalHasEvidence() || hasEvidence()"
+                                v-if="awardedGoalHasEvidence() || hasEvidence(award)"
                                 title="View evidence"
                                 class="button"
                                 :href="getViewEvidenceLink()"
@@ -420,7 +422,7 @@ export default {
                                 Add Evidence
                             </a>
                             <a
-                                v-if="hasGoalAwardLink() && isUnawardedGoal() && !hasEvidence()"
+                                v-if="hasGoalAwardLink() && isUnawardedGoal() && !hasEvidence(award)"
                                 title="Award with evidence"
                                 class="button"
                                 :href="getEvidenceUrl(award.badge.id)"
