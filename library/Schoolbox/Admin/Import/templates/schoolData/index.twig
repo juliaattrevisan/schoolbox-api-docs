@@ -178,7 +178,7 @@
             $(this).confirmDialog({
                 header: 'Warning! Live School Data Sync Selected',
                 format: 'html',
-                text: '<span style="color:red"><b>You have selected to perform a live School Data Sync. This will update profile and timetable data with the latest from your SIS.</b></span><br><br>Are you sure you wish to proceed?',
+                text: '<div class="alert-box warning">You have selected to perform a live School Data Sync. This will update profile and timetable data with the latest from your SIS.</div><p>Are you sure you wish to proceed?</p>',
                 confirmEvent: function () {
                     window.location.href = '{{ routeLookup('adminImportIndex.getPerformUpdate') }}';
                 }
