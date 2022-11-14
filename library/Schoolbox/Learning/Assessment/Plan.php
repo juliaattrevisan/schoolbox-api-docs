@@ -54,7 +54,7 @@ class Plan
     /**
      * @var null|Alaress_Date_Format
      */
-    private ?Alaress_Date_Format $publishDate = NULL;
+    private ?Alaress_Date_Format $publishDate = null;
 
     /**
      * @var null|Alaress_Date_Format

@@ -19,7 +19,6 @@ use Alaress_Date_Format;
  */
 class TimetableCycle
 {
-
     /**
      * @var int
      */

@@ -19,12 +19,12 @@ use Schoolbox\User;
 
 class Completion implements ISoftDeletable
 {
+    use Id;
+    use DeletedAtDate;
+
     const STATUS_INCOMPLETE                = 1;
     const STATUS_SELF_ASSESSED_COMPLETE    = 2;
     const STATUS_TEACHER_ASSESSED_COMPLETE = 3;
-
-    use Id;
-    use DeletedAtDate;
 
     /**
      * @var Task
