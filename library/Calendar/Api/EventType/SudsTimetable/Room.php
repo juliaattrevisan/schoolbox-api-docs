@@ -41,7 +41,16 @@ class Room implements Calendar_Api_EventType_Interface
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
     {
-        // TODO: Implement getEvents() method.
+        /* Find all the SUDS Timetable records in use between $startTimestamp and $endTimestamp
+         */
+
+        /* Collect their Location value, name and class code
+         * so we can push it into a \Calendar\Event\Type\SudsTimetable\Event instance
+         */
+
+        /* Then pop out the collection as a subscription that can be used
+         * among all the other calendar subscription
+         */
     }
 
 
