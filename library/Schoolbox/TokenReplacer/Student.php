@@ -16,6 +16,7 @@ use Schoolbox\User;
  *
  * Supports the following tokens:
  * * "[firstname]": the student's first name
+ * * "[preferredname]": the student's preferred name, falling back to first name, if empty
  * * "[surname]":   the student's surname
  * * "[fullname]":  the student's full name
  * * "[year]":      the student's year level, or an empty string if not defined
@@ -52,7 +53,7 @@ class Student
             $body,
             [
                 '[firstname]'     => $student->getFirstname(),
-                '[preferredname]' => $student->getPreferredName(),
+                '[preferredname]' => $student->getPreferredName() ?? $student->getFirstname(),
                 '[surname]'       => $student->getLastname(),
                 '[fullname]'      => $student->getFullName(),
                 '[year]'          => $student->getYear() ? $student->getYear()->getLongName() : '',
