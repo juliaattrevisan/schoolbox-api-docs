@@ -38,18 +38,6 @@ Usage:
             $updateForm.trigger('submit');
         }
 
-        /**
-         * Removing this component with a link
-         */
-        var $component = $('#component{{ componentInstance.id }}');
-        var $deleteIcon = $component.find('[data-target=delete]');
-
-        $component.on('click', '[data-action="delete-component"]', function(event){
-            event.preventDefault();
-            if('closed' == $deleteIcon.attr('data-state')){
-                $deleteIcon.trigger('click');
-            }
-        });
     });
 
 </script>
@@ -73,7 +61,7 @@ Usage:
 
     {% elseif not parentHasCourse and not folderHasParent %}
 
-        <p>This component works on {{ locale.unit }} pages within courses to create activities to import to your class. This page has no parent folder to use as a course. <a href="#" data-action="delete-component">Remove this component</a>.</p>
+        <p>This component works on {{ locale.unit }} pages within courses to create activities to import to your class. This page has no parent folder to use as a course. <a href="#remove-component" data-target="delete">Remove this component</a>.</p>
 
     {% elseif not parentHasCourse %}
 
