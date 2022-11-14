@@ -15,11 +15,9 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
-use Schoolbox\Forum\ThreadMapper as ThreadMapper;
 
 class Thread implements ISoftDeletable
 {
-
     /** @var int */
     protected $id;
 
