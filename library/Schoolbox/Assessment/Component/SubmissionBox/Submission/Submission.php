@@ -21,7 +21,6 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -29,10 +28,8 @@ use Schoolbox\User;
  * A student's submission to a due work.
  *
  * A submission may contain multiple files.
- *
- * TODO remove IStorage once all uses are found and removed
  */
-class Submission implements IStorage, ISoftDeletable
+class Submission implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
