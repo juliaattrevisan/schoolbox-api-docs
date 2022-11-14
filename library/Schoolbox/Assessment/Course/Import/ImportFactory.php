@@ -735,14 +735,14 @@ class ImportFactory
 
     /**
      * @param string|null $dateString
-     * @return \Alaress_Date_Format|null
+     * @return Alaress_Date_Format|null
      */
-    protected function createDate(?string $dateString): Alaress_Date_Format
+    protected function createDate(?string $dateString): ?Alaress_Date_Format
     {
         if (is_null($dateString)) {
             return null;
         } else {
-            return new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_FORMAT);
+            return new Alaress_Date_Format($dateString, Alaress_Date_Format::DATABASE_FORMAT);
         }
     }
 
