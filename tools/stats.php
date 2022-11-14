@@ -157,9 +157,6 @@ $app = new class extends CliTool\App {
             //EOTC
             'eotc_events'       => 'SELECT count(*) FROM eotc_event WHERE deleted_at IS NULL',
 
-            //Boarder Leave
-            'leave_requests'    => 'SELECT count(*) FROM leave_request',
-
             //Curriculum
             'curriculum'                    => 'SELECT count(*) FROM curriculum_node WHERE deleted_at IS NULL',
             'curriculum_assessment'         => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa on curriculum_node.id = cnfa.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',

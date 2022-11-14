@@ -85,7 +85,6 @@ $app = new class extends CliTool\App {
         'forumThread'                              => ['date', 'last_post_date'],
         'homepage_log'                             => ['datetime'],
         'homepage_visits'                          => ['date'],
-        'leave_request'                            => ['authorisation_datetime', 'finish', 'start'],
         'link'                                     => ['modified', 'submitted'],
         'participant_plan'                         => ['close_date', 'due_date', 'open_date', 'publish_date'],
         'pastoral'                                 => ['created_at', 'updated_at'],
