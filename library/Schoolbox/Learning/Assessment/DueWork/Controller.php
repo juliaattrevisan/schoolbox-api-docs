@@ -342,7 +342,8 @@ class Controller extends Assessment\Controller
             'assessment'             => $assessment,
             'student'                => $student,
             'participant'            => $participant,
-            'returnUrl'              => $returnUrl,
+            'returnUrl'              => $returnUrl,                   // Unencoded URL for use in direct redirection (eg. <a href='{{ returnUrl }}'>)
+            'returnUrlEncoded'       => Redirect::encode($returnUrl), // Encoded URL For use as a URL parameter (eg. '?returnUrl={{ returnUrlEncoded }}')
             'timeline'               => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
             'authoritativeFeedback'  => $participant ? $participant->findAuthoritativeVisibleFeedback($this->getUser()) : null,
             'selfAssessmentFeedback' => $participant ? $participant->findMostRecentSelfAssessedPublishedFeedback() : null,
@@ -851,6 +852,12 @@ class Controller extends Assessment\Controller
         $selfReflect = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
         $selfAssess = $reviewRoute === ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
 
+        if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
+        } else {
+            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
+        }
+
         $data = [
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
@@ -879,6 +886,7 @@ class Controller extends Assessment\Controller
             'selfReflect'    => $selfReflect,
             'selfAssess'     => $selfAssess,
             'acceptsOnline'  => $acceptsOnlineSubmissions,
+            'returnUrl'      => $returnUrl,
 
             /* Only show these things if the assessment is self-gradable */
             'showDescriptorValue' => $selfAssess,
@@ -1252,8 +1260,11 @@ class Controller extends Assessment\Controller
                     'learningAssessment.getSummary',
                     [
                         'assessmentId' => $assessment->getId(),
-                        'studentId'    => $student->getId(),
+                        'studentId'    => $student->getId()
                     ]
+                ) . (
+                    ($rq->post->get('returnUrl') === null) ? '' :
+                    '?returnUrl=' .  Redirect::encode($rq->post->get('returnUrl'))
                 )
             );
         }
