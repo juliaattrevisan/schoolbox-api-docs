@@ -71,7 +71,7 @@ class Submission implements ISoftDeletable
      */
     public function isDraft()
     {
-        return $this->submittedAt instanceof Alaress_Date_Format;
+        return !$this->submittedAt;
     }
 
 
