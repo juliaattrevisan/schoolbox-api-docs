@@ -89,6 +89,13 @@ class AttendanceLink implements IAttendanceLink
          */
         [$startAt, $ttid, $day, $periodCode, $classCode] = $this->guidCodec->decode($event->getGuid());
 
+        /* No date was found; guid might be empty for this tass record or
+         * otherwise incorrectly encoded. Just silently not provide anything
+         */
+        if ('' === $startAt) {
+            return '';
+        }
+
         $startAtADF = new \Alaress_Date_Format($startAt, \Alaress_Date_Format::DATABASE_FORMAT);
 
         /* Only generate links where possible
