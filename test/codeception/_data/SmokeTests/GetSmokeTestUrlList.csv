@@ -111,7 +111,6 @@ Admin,View Media Queue,https://vagrant.dev.schoolbox.cloud/adminv2/video
 Admin,Import users,https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount
 Admin,Import photos,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload
 Admin,Modules Home,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules
-Admin,Modules Board Leave,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Board+Leave
 Admin,Configure feature tours,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours
 Admin,Modules Package,https://vagrant.dev.schoolbox.cloud/adminv2/package
 Admin,Modules Pastoral Care,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Pastoral+Care

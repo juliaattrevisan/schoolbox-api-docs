@@ -454,10 +454,6 @@ Admin,"Modules Home",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setti
 Admin,"Modules Home",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules,401
 Admin,"Modules Home",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules,401
 Admin,"Modules Home",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules,401
-Admin,"Modules Board Leave",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Board+Leave,200
-Admin,"Modules Board Leave",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Board+Leave,401
-Admin,"Modules Board Leave",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Board+Leave,401
-Admin,"Modules Board Leave",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Board+Leave,401
 Admin,"Configure feature tours",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours,200
 Admin,"Configure feature tours",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours,401
 Admin,"Configure feature tours",Student,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours,401

@@ -80,7 +80,6 @@ class ConfigMapper extends Mapper
     public const TYPE_COLOURS       =  9;
     public const TYPE_3RD           = 10;
     public const TYPE_MODULES       = 11;
-    public const TYPE_BOARD         = 12;
     public const TYPE_WELCOME       = 13;
     public const TYPE_DEBUGGING     = 14;
     public const TYPE_LMS_POLICY    = 15;
