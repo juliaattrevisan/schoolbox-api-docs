@@ -34,10 +34,10 @@ class Model implements ISoftDeletable, ValueLabelInterface
     protected $name;
 
     /** @var Alaress_Date_Format */
-    protected $start;
+    protected Alaress_Date_Format $start;
 
     /** @var Alaress_Date_Format */
-    protected $end;
+    protected Alaress_Date_Format $end;
 
     /** @var Alaress_Date_Format|null */
     private ?Alaress_Date_Format $archivedAt = null;
@@ -114,9 +114,10 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /**
      * @param Alaress_Date_Format $start
+     *
      * @return static
      */
-    public function setStart(Alaress_Date_Format $start)
+    public function setStart(Alaress_Date_Format $start): self
     {
         $this->start = $start;
         return $this;
@@ -125,16 +126,17 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return Alaress_Date_Format
      */
-    public function getStart()
+    public function getStart(): Alaress_Date_Format
     {
         return $this->start;
     }
 
     /**
      * @param Alaress_Date_Format $end
+     *
      * @return static
      */
-    public function setEnd(Alaress_Date_Format $end)
+    public function setEnd(Alaress_Date_Format $end): self
     {
         $this->end = $end;
         return $this;
@@ -143,7 +145,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return Alaress_Date_Format
      */
-    public function getEnd()
+    public function getEnd(): Alaress_Date_Format
     {
         return $this->end;
     }
