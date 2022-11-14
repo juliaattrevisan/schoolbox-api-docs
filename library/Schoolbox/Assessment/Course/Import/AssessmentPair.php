@@ -32,7 +32,7 @@ class AssessmentPair
     /**
      * Recursive to permit any level of Project nesting
      *
-     * @var AssessmentPair[]|GenericCollection
+     * @var static[]|GenericCollection
      */
     private $assessmentPairs;
 

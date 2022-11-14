@@ -706,11 +706,6 @@ parameters:
 			path: library/Calendar/Api/EventType/ResourceBooking/Moderation/Default.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Calendar/Api/EventType/Submission/Schoolbox/Default.php
-
-		-
 			message: "#^Method Calendar\\\\Event\\\\Collection\\:\\:getFirst\\(\\) should return Calendar\\\\Event\\\\Type\\\\EventBase but return statement is missing\\.$#"
 			count: 1
 			path: library/Calendar/Event/Collection.php
@@ -2641,11 +2636,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Controller.php
 
 		-
-			message: "#^Method Schoolbox\\\\Assessment\\\\Course\\\\Import\\\\AssessmentPair\\:\\:getSubPairs\\(\\) should return iterable\\<static\\(Schoolbox\\\\Assessment\\\\Course\\\\Import\\\\AssessmentPair\\)\\>&Schoolbox\\\\GenericCollection but returns \\(iterable\\<Schoolbox\\\\Assessment\\\\Course\\\\Import\\\\AssessmentPair\\>&Schoolbox\\\\GenericCollection\\)\\|null\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/AssessmentPair.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$description with type string\\|null is not subtype of native type string\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/Atlas/Api/Curriculum.php
@@ -2856,11 +2846,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Config/Filter.php
 
 		-
-			message: "#^Instanceof between Alaress_Date_Format and DateTime will always evaluate to false\\.$#"
-			count: 2
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
 			message: "#^Method Schoolbox\\\\Calendar\\\\Event\\:\\:getRoleCollection\\(\\) should return iterable\\<Schoolbox\\\\Calendar\\\\Relation\\\\Role\\>&Schoolbox\\\\Collection but returns iterable\\<Schoolbox\\\\Role\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event.php
@@ -2974,11 +2959,6 @@ parameters:
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^Unsafe usage of new static\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Column/Date.php
 
 		-
 			message: "#^Strict comparison using \\=\\=\\= between float\\|null and '' will always evaluate to false\\.$#"
@@ -4501,11 +4481,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/AssessmentContextType.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Api.php
-
-		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Calendar\\\\Events\\\\Controller\\:\\:\\$visibility is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Controller.php
@@ -4926,11 +4901,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between null and Alaress_Date_Format will always evaluate to false\\.$#"
-			count: 4
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between null and Schoolbox\\\\User will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
@@ -5069,11 +5039,6 @@ parameters:
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setUrl\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 4
-			path: library/Schoolbox/Learning/Assessment/Dehydrator.php
 
 		-
 			message: "#^Ternary operator condition is always true\\.$#"
@@ -5222,7 +5187,7 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
+			count: 1
 			path: library/Schoolbox/Learning/Assessment/LockedChecker.php
 
 		-
@@ -5234,11 +5199,6 @@ parameters:
 			message: "#^Dead catch \\- OutOfBoundsException is never thrown in the try block\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Module.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/Participant.php
 
 		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Participant\\:\\:hasPublishedFeedback\\(\\) should return bool but returns null\\.$#"
@@ -5291,11 +5251,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Project/Controller.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with Alaress_Date_Format will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/MapperProxy.php
-
-		-
 			message: "#^Cannot call method add\\(\\) on array\\<Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Attempt\\\\Model\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/MapperProxy.php
@@ -5339,11 +5294,6 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Response/SubmittedFilter.php
 
 		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Average\\:\\:calculateTotalWeight\\(\\) should return int but returns null\\.$#"
@@ -5459,16 +5409,6 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Badge/Award/Notifier.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Badge/Award/Translator/ModelToArray.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Badge/Translator/ModelToArray.php
 
 		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
