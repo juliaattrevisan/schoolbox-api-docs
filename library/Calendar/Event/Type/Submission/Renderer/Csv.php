@@ -12,7 +12,6 @@ namespace Calendar\Event\Type\Submission\Renderer;
 
 class Csv extends Base
 {
-
     /**
      * Render this event out as CSV data
      */
@@ -21,16 +20,20 @@ class Csv extends Base
         $fd = fopen('php://temp/maxmemory:10000', 'rw');
 
 
-        $data = array($this->getEvent()->getStartTime()->getLocalShort(),
-                      $this->getEvent()->getStartTime()->getTimeOnly(),
-                      $this->getEvent()->getEndTime()->getLocalShort(),
-                      $this->getEvent()->getEndTime()->getTimeOnly(),
-                      $this->getEvent()->getAllday(),
-                      $this->getEvent()->getTitle(),
-                      $this->getEvent()->getDetail(),
-                      '',
-                      $this->getEvent()->getEventType(),
-                      $this->getEVent()->getPublishDate()->getLocalShort(),);
+        $data = [
+            $this->getEvent()->getStartTime()->getLocalShort(),
+            $this->getEvent()->getStartTime()->getTimeOnly(),
+            $this->getEvent()->getEndTime()->getLocalShort(),
+            $this->getEvent()->getEndTime()->getTimeOnly(),
+            $this->getEvent()->getAllday(),
+            $this->getEvent()->getTitle(),
+            $this->getEvent()->getDetail(),
+            '',
+            $this->getEvent()->getEventType(),
+            $this->getEvent()->getPublishDate() !== null
+                ? $this->getEvent()->getPublishDate()->getLocalShort()
+                : '',
+        ];
 
         fputcsv($fd, $data);
         rewind($fd);
