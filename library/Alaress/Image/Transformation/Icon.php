@@ -33,7 +33,6 @@ class Icon implements ITransformFactory
         NSMapper::NS_FORUM                   => 'forum',
         NSMapper::NS_NEWS                    => 'news',
         NSMapper::NS_CALENDAR                => 'calendar',
-        NSMapper::NS_BOARDER_LEAVE           => 'tick',
         NSMapper::NS_WIKI                    => 'wiki',
         NSMapper::NS_GROUP                   => 'group',
         NSMapper::NS_CMS                     => 'link',
