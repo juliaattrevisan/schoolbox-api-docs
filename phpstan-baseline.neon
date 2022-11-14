@@ -721,16 +721,6 @@ parameters:
 			path: library/Calendar/Event/Type/Day/Event.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
-			message: "#^Elseif branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Calendar/Event/Type/EventBase.php
-
-		-
 			message: "#^Method Calendar\\\\Event\\\\Type\\\\EventBase\\:\\:getAuthorName\\(\\) should return null but returns string\\.$#"
 			count: 1
 			path: library/Calendar/Event/Type/EventBase.php
