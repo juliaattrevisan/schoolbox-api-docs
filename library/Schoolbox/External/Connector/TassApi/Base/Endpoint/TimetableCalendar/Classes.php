@@ -714,13 +714,28 @@ class Classes implements IStrategy
                             $event->getFinishAt()->getDatabase()
                         ));
 
-                        /* Remember we did this
+                        /* Weird shim
+                         *
+                         * Sometimes the db just won't save N rows of this field...wtf?
+                         * Explicitly set the guid always, with the available data
                          */
-                        $this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()] = $event;
+                        $event->setGuid($guid);
+
+                        $this->log->debug(sprintf(
+                            'Assigning guid %s to %s on %s-%s',
+                            $guid,
+                            $classCode,
+                            $startAt->getDatabase(),
+                            $finishAt->getDatabase()
+                        ));
 
                         if ($this->perform) {
                             $this->eventMapper->save($event);
                         }
+
+                        /* Remember we did this
+                         */
+                        $this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()] = $event;
                     }
 
                     /* Save sis_class record
