@@ -65,6 +65,8 @@ class PastoralCreateCest
 
             $i->seeResponseCodeIs(201);
             $response = $i->grabDataFromResponseByJsonPath('$[0].id');
+            $i->seeResponseIsValidOnJsonSchemaString($this->getSchema());
+            $studentResponse = $i->grabDataFromResponseByJsonPath('$[0].student');
 
 
             $recordId   = $response[0];
@@ -166,5 +168,37 @@ class PastoralCreateCest
                 200 => [$this->userPrivate, $this->userPublic],
             ],
         ];
+    }
+
+    /**
+     * @return false|string
+     */
+    private function getSchema()
+    {
+        $schema = [
+           'type' => 'array',
+           'properties' => [
+               'id' => [
+                   'type' => 'integer'
+               ],
+               'externalId' => [
+                   'type' => 'string',
+                   'nullable' => true,
+               ],
+               'student' => [
+                   'type' => 'object',
+               ],
+               'heading' => [
+                   'type' => 'string',
+                ],
+               'type' => [
+                   'type' => 'object'
+               ],
+               '_links' => [
+                   'type' => 'object'
+               ]
+           ]
+        ];
+        return json_encode($schema);
     }
 }

@@ -63,15 +63,13 @@ class ModelToArray
             // Standard fields
             'id'                 => $model->getId(),
             'externalId'         => $model->getExternalId(),
-            'student'            => $model->getStudent()
-                ? call_user_func($this->userTranslator, $model->getStudent())
-                : null,
+            'student'            => $this->translateUser($model->getStudent()),
             'heading'            => $model->getHeading(),
             'type'               => $model->getType()
                 ? [
                     'id'        => $model->getType()->getId(),
                     'name'      => $model->getType()->getName(),
-                    'colour'    => $model->getType()->getColor(),
+                    'colour'    => $model->getType()->getColor()?->getAsRgba(),
                     'icon'      => $model->getType()->getIcon(),
                     'sentiment' => $model->getType()->getSentiment(),
                     'sequence'  => $model->getType()->getSequence(),
@@ -81,7 +79,7 @@ class ModelToArray
                 ? [
                     'id'        => $model->getSubType()->getId(),
                     'name'      => $model->getSubType()->getName(),
-                    'colour'    => $model->getSubType()->getColor(),
+                    'colour'    => $model->getSubType()->getColor()?->getAsRgba(),
                     'icon'      => $model->getSubType()->getIcon(),
                     'sentiment' => $model->getSubType()->getSentiment(),
                     'sequence'  => $model->getSubType()->getSequence(),
@@ -109,7 +107,7 @@ class ModelToArray
             // Text and comments
             'bodyPrivate'        => $this->scrubAdapter->purify($model->getBodyPrivate()),
             'bodyPublic'         => $this->scrubAdapter->purify($model->getBodyPublic()),
-            'attachmentsPrivate'  => $model->getAttachments()
+            'attachmentsPrivate' => $model->getAttachments()
                                           ->filter(
                                               static function ($attachment) {
                                                   /** @var \Schoolbox\Pastoral\Attachment\Model $attachment */
@@ -122,7 +120,7 @@ class ModelToArray
                                                   return call_user_func($storageTranslator, $attachment->getStorage());
                                               }
                                           ),
-            'attachmentsPublic' => $model->getAttachments()
+            'attachmentsPublic'  => $model->getAttachments()
                                           ->filter(
                                               static function ($attachment) {
                                                   /** @var \Schoolbox\Pastoral\Attachment\Model $attachment */
@@ -135,7 +133,8 @@ class ModelToArray
                                                   return call_user_func($storageTranslator, $attachment->getStorage());
                                               }
                                           ),
-            'comments'           => $model->getComments()->map($this->commentTranslator),
+            'commentsPrivate'    => $model->getComments()->filterBy('private', true)->map($this->commentTranslator),
+            'commentsPublic'     => $model->getComments()->filterBy('private', false)->map($this->commentTranslator),
 
             // Actions
             'recordActions'      => $model->getRecordActions()->map(
@@ -145,9 +144,7 @@ class ModelToArray
                         'name'      => $action->getAction()->getName(),
                         'completed' => $action->getCompleted(),
                         'updatedAt' => $action->getUpdatedAt()->toRfc3339String(),
-                        'updatedBy' => $action->getUpdatedBy()
-                            ? call_user_func($this->userTranslator, $action->getUpdatedBy())
-                            : null,
+                        'updatedBy' => $this->translateUser($action->getUpdatedBy()),
                     ];
                 }
             ),
@@ -155,9 +152,9 @@ class ModelToArray
             // Excluded for now: access, related records, revisions
 
             // Ownership, last modifying user and time
-            'createdBy'          => call_user_func($this->userTranslator, $model->getOwner()),
+            'createdBy'          => $this->translateUser($model->getOwner()),
             'createdAt'          => $model->getCreatedAt()->toRfc3339String(),
-            'updatedBy'          => call_user_func($this->userTranslator, $model->getModifiedBy()),
+            'updatedBy'          => $this->translateUser($model->getModifiedBy()),
             'updatedAt'          => $model->getUpdatedAtDisplay()->toRfc3339String(),
 
             // Links
@@ -173,5 +170,20 @@ class ModelToArray
                 ),
             ],
         ];
+    }
+
+    /**
+     * Adds external id to output of user translator
+     * @param User|null $student
+     * @return array|null
+     */
+    private function translateUser(?User $student): array | null
+    {
+        if (!$student) {
+            return null;
+        }
+        $userArray               = call_user_func($this->userTranslator, $student);
+        $userArray['externalId'] = $student->getExternalId();
+        return $userArray;
     }
 }
