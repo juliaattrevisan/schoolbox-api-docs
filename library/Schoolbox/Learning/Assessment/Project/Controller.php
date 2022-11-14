@@ -99,7 +99,6 @@ class Controller extends Assessment\Controller
             'allSummators'            => $summatorMapping,
             'allMarkTypes'            => $this->getAllMarkTypes($assessment),
             'allGradeSchemes'         => $this->getAllGradeSchemes(),
-            'allNullSubmissionStates' => $this->stateMapper->findByColumn('normalise_as', null),
         ];
     }
 
