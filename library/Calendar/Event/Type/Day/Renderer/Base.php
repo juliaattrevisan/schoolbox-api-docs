@@ -55,10 +55,8 @@ abstract class Base extends RendererBase
      */
     public function isTranslucent()
     {
-
-        /* TODO: This is a temporary fix and should be repaired when ADN merges into ADF
-         */
-        if ($this->event->getPublishDate()) {
+        // No publish date? Assume event is not translucent
+        if (!$this->event->getPublishDate()) {
             return false;
         }
 

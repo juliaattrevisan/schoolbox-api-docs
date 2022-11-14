@@ -48,7 +48,10 @@ abstract class EventBase implements EventInterface
 
     /**
      * The date when the event was published (made visible to users)
-     * Stored always as an Alaress_Date_Format() instance
+     * Stored always as an Alaress_Date_Format() instance.
+     *
+     * An event with a null publish date should be assumed to be currently
+     * published.
      *
      * @var Alaress_Date_Format|null
      */
