@@ -644,10 +644,10 @@ class Calendar extends DeprecatedModel
                 $event->setAuthorId($currentEvent['uid']);
                 $event->setEventId($currentEvent['id']);
                 $event->setStartTime(
-                    new Alaress_Date_Format($currentEvent['start_datetime'], 'Y-m-d H:i:s')
+                    new Alaress_Date_Format($currentEvent['start_datetime'], Alaress_Date_Format::DATABASE_FORMAT)
                 );
                 $event->setEndTime(
-                    new Alaress_Date_Format($currentEvent['end_datetime'], 'Y-m-d H:i:s')
+                    new Alaress_Date_Format($currentEvent['end_datetime'], Alaress_Date_Format::DATABASE_FORMAT)
                 );
                 $event->setType($currentEvent['type']);
                 $event->setTitle($currentEvent['title']);
@@ -657,7 +657,11 @@ class Calendar extends DeprecatedModel
                 $event->setColour($currentEvent['eventColour']);
                 $event->setDetail($currentEvent['detail']);
                 $event->setLocation($currentEvent['location']);
-                $event->setPublishDate($currentEvent['publish_date']);
+                $event->setPublishDate(
+                    empty($currentEvent['publish_date'])
+                        ? null
+                        : new Alaress_Date_Format($currentEvent['publish_date'], Alaress_Date_Format::DATABASE_FORMAT)
+                );
                 $event->setAllDay(!empty($currentEvent['allday']));
                 $event->setSeriesId($currentEvent['series_id']);
 

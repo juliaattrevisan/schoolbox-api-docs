@@ -38,21 +38,21 @@ abstract class EventBase implements EventInterface
      *
      * @var Alaress_Date_Format
      */
-    protected $startTime = null;
+    protected Alaress_Date_Format $startTime;
 
     /**
      * End date and time of event
      * @var Alaress_Date_Format
      */
-    protected $endTime = null;
+    protected Alaress_Date_Format $endTime;
 
     /**
      * The date when the event was published (made visible to users)
      * Stored always as an Alaress_Date_Format() instance
      *
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $publishDate = null;
+    protected ?Alaress_Date_Format $publishDate = null;
 
     /**
      * A resource identifier, for the FullCalendar scheduler plugin
@@ -509,7 +509,7 @@ abstract class EventBase implements EventInterface
      *
      * @return Alaress_Date_Format
      */
-    public function getEndTime()
+    public function getEndTime(): Alaress_Date_Format
     {
         return $this->endTime;
     }
@@ -520,7 +520,7 @@ abstract class EventBase implements EventInterface
      */
     public function getStartTimeForCalendar(): string
     {
-            return $this->startTime->toW3cString();
+        return $this->startTime->toW3cString();
     }
 
     /**
@@ -547,7 +547,7 @@ abstract class EventBase implements EventInterface
      *
      * @return Alaress_Date_Format
      */
-    public function getStartTime()
+    public function getStartTime(): Alaress_Date_Format
     {
         return $this->startTime;
     }
@@ -629,25 +629,19 @@ abstract class EventBase implements EventInterface
     /**
      * Set publish date object
      *
-     * @param Alaress_Date_Format $publishDate
+     * @param Alaress_Date_Format|null $publishDate
      */
-    public function setPublishDate($publishDate)
+    public function setPublishDate(?Alaress_Date_Format $publishDate)
     {
-        if ($publishDate instanceof Alaress_Date_Format) {
-            $this->publishDate = $publishDate;
-        } elseif ($publishDate == null) {
-            $this->publishDate = null;
-        } else {
-            $this->publishDate = new Alaress_Date_Format($publishDate, 'Y-m-d H:i:s');
-        }
+        $this->publishDate = $publishDate;
     }
 
     /**
      * Get publish date
      *
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getPublishDate()
+    public function getPublishDate(): ?Alaress_Date_Format
     {
         return $this->publishDate;
     }
