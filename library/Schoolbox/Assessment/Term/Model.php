@@ -45,22 +45,22 @@ class Model implements \IComparable, IModel
      *
      * @var Alaress_Date_Format
      */
-    protected $start;
+    protected Alaress_Date_Format $start;
 
     /**
      * The display date on which this term is said to finish.
      *
      * @var Alaress_Date_Format
      */
-    protected $displayFinish;
+    protected Alaress_Date_Format $displayFinish;
 
     /**
      * The date on which this term actually finishes.
      * (This date will always be one day before the next term starts)
      *
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $actualFinish;
+    protected ?Alaress_Date_Format $actualFinish = null;
 
 
     /**
@@ -171,7 +171,7 @@ class Model implements \IComparable, IModel
     /**
      * @return Alaress_Date_Format
      */
-    public function getStart()
+    public function getStart(): Alaress_Date_Format
     {
         return $this->start;
     }
@@ -190,10 +190,11 @@ class Model implements \IComparable, IModel
     }
 
     /**
-     * @param  Alaress_Date_Format $start
-     * @return $this
+     * @param Alaress_Date_Format $start
+     *
+     * @return static
      */
-    public function setStart($start)
+    public function setStart(Alaress_Date_Format $start): self
     {
         $this->start = $start;
         return $this;
@@ -202,34 +203,36 @@ class Model implements \IComparable, IModel
     /**
      * @return Alaress_Date_Format
      */
-    public function getDisplayFinish()
+    public function getDisplayFinish(): Alaress_Date_Format
     {
         return $this->displayFinish;
     }
 
     /**
-     * @param  Alaress_Date_Format $displayFinish
-     * @return $this
+     * @param Alaress_Date_Format $displayFinish
+     *
+     * @return static
      */
-    public function setDisplayFinish($displayFinish)
+    public function setDisplayFinish(Alaress_Date_Format $displayFinish): self
     {
         $this->displayFinish = $displayFinish;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getActualFinish()
+    public function getActualFinish(): ?Alaress_Date_Format
     {
         return $this->actualFinish;
     }
 
     /**
-     * @param  Alaress_Date_Format $actualFinish
-     * @return $this
+     * @param Alaress_Date_Format|null $actualFinish
+     *
+     * @return static
      */
-    public function setActualFinish($actualFinish)
+    public function setActualFinish(?Alaress_Date_Format $actualFinish): self
     {
         $this->actualFinish = $actualFinish;
         return $this;

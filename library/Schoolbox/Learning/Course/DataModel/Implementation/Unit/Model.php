@@ -47,12 +47,12 @@ class Model extends AbstractUnit
     /**
      * @var Alaress_Date_Format
      */
-    private $openDate;
+    private Alaress_Date_Format $openDate;
 
     /**
      * @var Alaress_Date_Format
      */
-    private $dueDate;
+    private Alaress_Date_Format $dueDate;
 
 
     /**
@@ -204,16 +204,17 @@ class Model extends AbstractUnit
     /**
      * @return Alaress_Date_Format
      */
-    public function getOpenDate()
+    public function getOpenDate(): Alaress_Date_Format
     {
         return $this->openDate;
     }
 
     /**
      * @param Alaress_Date_Format $openDate
+     *
      * @return static
      */
-    public function setOpenDate($openDate)
+    public function setOpenDate(Alaress_Date_Format $openDate): self
     {
         $this->openDate = $openDate;
         return $this;
@@ -222,16 +223,17 @@ class Model extends AbstractUnit
     /**
      * @return Alaress_Date_Format
      */
-    public function getDueDate()
+    public function getDueDate(): Alaress_Date_Format
     {
         return $this->dueDate;
     }
 
     /**
      * @param Alaress_Date_Format $dueDate
+     *
      * @return static
      */
-    public function setDueDate($dueDate)
+    public function setDueDate(Alaress_Date_Format $dueDate): self
     {
         $this->dueDate = $dueDate;
         return $this;
