@@ -64,7 +64,7 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="badge-name" class="required">Name</label>
-                        <input name="name" type="text" id="badge-name" required value="{{ badge and badge.name ? badge.name : '' }}"/>
+                        <input name="name" type="text" id="badge-name" required value="{{ badge and badge.name ? badge.name : '' }}" maxlength="255"/>
 
                         <label for="badge-body">
                             Description
