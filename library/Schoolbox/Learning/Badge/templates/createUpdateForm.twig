@@ -429,9 +429,13 @@
                     },
                     body: JSON.stringify(payload)
                 })
-                .then(() => {
-                    toast.toastTimeout({text: 'Saved'});
-                    window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadgeListPage') }}';
+                .then((response) => {
+                    if (response.ok) {
+                        toast.toastTimeout({text: 'Saved'});
+                        window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadgeListPage') }}';
+                    } else {
+                        throw new Error("Save failed!");
+                    }
                 })
                 .catch(() => {
                     toast.toastTimeout({text: 'Save failed', css: 'alert'});
