@@ -249,21 +249,21 @@ class Event implements ISoftDeletable
      *
      * @var Alaress_Date_Format|null
      */
-    protected $publishDateTime;
+    protected ?Alaress_Date_Format $publishDateTime = null;
 
     /**
      * The datetime when the event starts
      *
      * @var Alaress_Date_Format
      */
-    protected $startDateTime;
+    protected Alaress_Date_Format $startDateTime;
 
     /**
      * The datetime when the event ends
      *
      * @var Alaress_Date_Format
      */
-    protected $endDateTime;
+    protected Alaress_Date_Format $endDateTime;
 
     /**
      * Source of import
@@ -583,11 +583,11 @@ class Event implements ISoftDeletable
     /**
      * Set end datetime
      *
-     * @param Alaress_Date_Format $endDateTime
+     * @param Alaress_Date_Format|DateTime $endDateTime
      * @return $this
      * @throws InvalidArgumentException
      */
-    public function setEndDateTime($endDateTime): self
+    public function setEndDateTime(Alaress_Date_Format|DateTime $endDateTime): self
     {
         // enforce casting to ADF
         if ($endDateTime instanceof DateTime) {
@@ -731,11 +731,11 @@ class Event implements ISoftDeletable
     /**
      * Set start datetime
      *
-     * @param Alaress_Date_Format $startDateTime
+     * @param Alaress_Date_Format|DateTime $startDateTime
      * @return $this
      * @throws InvalidArgumentException
      */
-    public function setStartDateTime($startDateTime): self
+    public function setStartDateTime(Alaress_Date_Format|DateTime $startDateTime): self
     {
         // enforce casting to ADF
         if ($startDateTime instanceof DateTime) {
