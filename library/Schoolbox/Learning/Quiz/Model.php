@@ -91,14 +91,14 @@ class Model implements ISoftDeletable, IAssessableDataModel
     protected $completion_message;
 
     /**
-    * @var Alaress_Date_Format
+    * @var Alaress_Date_Format|null
     */
-    protected $start;
+    protected ?Alaress_Date_Format $start = null;
 
     /**
-    * @var Alaress_Date_Format
+    * @var Alaress_Date_Format|null
     */
-    protected $finish;
+    protected ?Alaress_Date_Format $finish = null;
 
     /**
     * @var int
@@ -424,20 +424,20 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @param  \Alaress_Date_Format $finish
-    *
-    * @return $this
-    */
-    public function setFinish($finish)
+     * @param Alaress_Date_Format|null $finish
+     *
+     * @return static
+     */
+    public function setFinish(?Alaress_Date_Format $finish): self
     {
         $this->finish = $finish;
         return $this;
     }
 
     /**
-    * @return \Alaress_Date_Format
-    */
-    public function getFinish()
+     * @return Alaress_Date_Format|null
+     */
+    public function getFinish(): ?Alaress_Date_Format
     {
         return $this->finish;
     }
@@ -482,20 +482,20 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @param  \Alaress_Date_Format $start
-    *
-    * @return $this
-    */
-    public function setStart($start)
+     * @param Alaress_Date_Format|null $start
+     *
+     * @return static
+     */
+    public function setStart(?Alaress_Date_Format $start): self
     {
         $this->start = $start;
         return $this;
     }
 
     /**
-    * @return \Alaress_Date_Format
-    */
-    public function getStart()
+     * @return Alaress_Date_Format|null
+     */
+    public function getStart(): ?Alaress_Date_Format
     {
         return $this->start;
     }

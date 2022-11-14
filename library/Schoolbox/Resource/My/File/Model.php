@@ -24,23 +24,23 @@ use Schoolbox\Resource\AbstractFile;
  */
 class Model extends AbstractFile implements ISoftDeletable
 {
-    /** @var Alaress_Date_Format */
-    protected $publishedAt;
+    /** @var Alaress_Date_Format|null */
+    protected ?Alaress_Date_Format $publishedAt = null;
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getPublishedAt()
+    public function getPublishedAt(): ?Alaress_Date_Format
     {
         return $this->publishedAt;
     }
 
-
     /**
-     * @param Alaress_Date_Format $publishedAt
-     * @return self
+     * @param Alaress_Date_Format|null $publishedAt
+     *
+     * @return static
      */
-    public function setPublishedAt($publishedAt)
+    public function setPublishedAt(?Alaress_Date_Format $publishedAt): self
     {
         $this->publishedAt = $publishedAt;
         return $this;

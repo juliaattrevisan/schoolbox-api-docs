@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Survey;
 
+use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
@@ -50,8 +51,8 @@ class Model implements ISoftDeletable
     /** @var bool */
     protected $anonymousResult;
 
-    /** @var \Alaress_Date_Format */
-    protected $finish;
+    /** @var Alaress_Date_Format|null */
+    protected ?Alaress_Date_Format $finish = null;
 
     /**
      * @param string $availability
@@ -198,18 +199,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getFinish()
+    public function getFinish(): ?Alaress_Date_Format
     {
         return $this->finish;
     }
 
     /**
-     * @param \Alaress_Date_Format $finish
-     * @return $this
+     * @param Alaress_Date_Format|null $finish
+     *
+     * @return static
      */
-    public function setFinish($finish)
+    public function setFinish(?Alaress_Date_Format $finish): self
     {
         $this->finish = $finish;
         return $this;

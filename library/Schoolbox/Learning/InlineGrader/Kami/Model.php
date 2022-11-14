@@ -90,7 +90,7 @@ class Model implements ISoftDeletable
      *
      * @var Alaress_Date_Format|null
      */
-    private $kamiCreatedAt;
+    private ?Alaress_Date_Format $kamiCreatedAt = null;
 
 
     /**
@@ -293,7 +293,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function getKamiCreatedAt(): ?Alaress_Date_Format
     {
@@ -302,8 +302,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param null|Alaress_Date_Format $kamiCreatedAt
-     * @return $this|self
+     * @param Alaress_Date_Format|null $kamiCreatedAt
+     *
+     * @return static
      */
     public function setKamiCreatedAt(?Alaress_Date_Format $kamiCreatedAt): self
     {
