@@ -94,29 +94,25 @@
 <div class="reveal-modal" data-reveal id="reveal-summators-description">
     <h2>Mark Summation</h2>
     <p>
-        The project&rsquo;s mark summation method determines how a participant&rsquo;s total mark is calculated.
+        The project’s mark summation method determines how a student’s total mark is calculated.
     </p>
     <h3>Methods</h3>
     <dl>
         <dt>{{ allSummators.map.weighted }}</dt>
         <dd>
-            The participant&rsquo;s total mark is equal to the <strong>average</strong> mark they have received for each
-            activity within the project, <strong>weighted</strong> by that activity&rsquo;s weight.
+            The grade given for the project will be based upon the weighting assigned to the learning activities within the project.
         </dd>
         <dt>{{ allSummators.map.avg }}</dt>
         <dd>
-            The participant&rsquo;s total mark is equal to the <strong>average</strong> mark they have received for each
-            activity within the project; the activity&rsquo;s <strong>weight is ignored</strong>.
+            All graded learning activities (weighted and unweighted) will contribute equally to the grade given for the project.
         </dd>
         <dt>{{ allSummators.map.max }}</dt>
         <dd>
-            The participant&rsquo;s total mark is equal to the <strong>highest</strong> mark they have received for any
-            activity within the project.
+            The highest grade given to a learning activity will be the grade given for the project.
         </dd>
         <dt>{{ allSummators.map.min }}</dt>
         <dd>
-            The participant&rsquo;s total mark is equal to the <strong>lowest</strong> mark they have received for any
-            activity within the project.
+            The lowest grade given to a learning activity will be the grade given for the project.
         </dd>
     </dl>
     <h3>Require All Activities</h3>
@@ -125,10 +121,11 @@
     </p>
     <ul>
         <li>
-            <strong>On</strong>: unmarked activities count as having a mark of zero;
-            this is useful where a participant must complete all activities within the project
+            <strong>On</strong>: Learning activities (due work, quiz, tasks) that haven’t been submitted or graded will have a mark of zero.
+            This is useful where a student must finish all activities to complete the project.
+            Custom participation and submission states can still be utilised to exclude students from parts of the project.
         </li>
-        <li><strong>Off</strong>: unmarked activities are ignored, and do not contribute to the total mark at all</li>
+        <li><strong>Off</strong>: Learning activities that haven’t been undertaken do not yet contribute to the project mark.</li>
     </ul>
     <h3>Ignoring Activities</h3>
     <p>
