@@ -85,7 +85,6 @@ class Renderer extends Handler
             $this->getPage()->setBlock('user', 'user_name_no_link', 'user_name_no_link_block');
             $this->getPage()->setBlock('user', 'position_title', 'position_title_block');
             $this->getPage()->setBlock('user', 'normal_title', 'normal_title_block');
-            $this->getPage()->setBlock('user', 'boarder_leave', 'boarder_leave_block');
             $this->getPage()->setBlock('user', 'academic_reports', 'academic_reports_block');
             $this->getPage()->setBlock('user', 'user_calendar', 'user_calendar_block');
 
@@ -125,7 +124,6 @@ class Renderer extends Handler
                 $this->getPage()->setVar('timetable_block');
                 $this->getPage()->setVar('pastoral_block');
                 $this->getPage()->setVar('eportfolio_block');
-                $this->getPage()->setVar('boarder_leave_block');
                 $this->getPage()->setVar('academic_reports_block');
                 $this->getPage()->setVar('tot_block');
 
