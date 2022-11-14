@@ -444,37 +444,37 @@ class Report_Parent extends Report_Abstract
 
                     /* Postal Address
                      */
-                    if (strlen(trim($currentContact['StudentContactAddress1']))) {
+                    if (strlen(trim($currentContact['StudentContactAddress1'] ?? ''))) {
                         $postalAddress .= Scrub::text($currentContact['StudentContactAddress1']);
                     }
 
-                    if (strlen(trim($currentContact['StudentContactAddress2']))) {
+                    if (strlen(trim($currentContact['StudentContactAddress2'] ?? ''))) {
                         $postalAddress .= '<br />' . Scrub::text($currentContact['StudentContactAddress2']);
                     }
 
-                    if (strlen(trim($currentContact['StudentContactAddress3']))) {
+                    if (strlen(trim($currentContact['StudentContactAddress3'] ?? ''))) {
                         $postalAddress .= '<br />' . Scrub::text($currentContact['StudentContactAddress3']);
                     }
 
                     $postalAddress .= '<br />';
-                    $postalCountry = Scrub::text($currentContact['StudentContactCountryCode']);
+                    $postalCountry = Scrub::text($currentContact['StudentContactCountryCode'] ?? '');
 
                     /* Home Address
                      */
-                    if (strlen(trim($currentContact['StudentContactHomeAddress1']))) {
-                        $homeAddress .= Scrub::text($currentContact['StudentContactHomeAddress1']);
+                    if (strlen(trim($currentContact['StudentContactHomeAddress1'] ?? ''))) {
+                        $homeAddress .= Scrub::text($currentContact['StudentContactHomeAddress1'] ?? '');
                     }
 
-                    if (strlen(trim($currentContact['StudentContactHomeAddress2']))) {
-                        $homeAddress .= '<br />' . Scrub::text($currentContact['StudentContactHomeAddress2']);
+                    if (strlen(trim($currentContact['StudentContactHomeAddress2'] ?? ''))) {
+                        $homeAddress .= '<br />' . Scrub::text($currentContact['StudentContactHomeAddress2'] ?? '');
                     }
 
-                    if (strlen(trim($currentContact['StudentContactHomeAddress3']))) {
-                        $homeAddress .= '<br />' . Scrub::text($currentContact['StudentContactHomeAddress3']);
+                    if (strlen(trim($currentContact['StudentContactHomeAddress3'] ?? ''))) {
+                        $homeAddress .= '<br />' . Scrub::text($currentContact['StudentContactHomeAddress3'] ?? '');
                     }
 
                     $homeAddress .= '<br />';
-                    $homeCountry = Scrub::text($currentContact['StudentContactHomeCountryCode']);
+                    $homeCountry = Scrub::text($currentContact['StudentContactHomeCountryCode'] ?? '');
 
                     /* Figure out whether to use the Preferred or the Given (LegalFullName) field
                      * for this contact
@@ -487,24 +487,24 @@ class Report_Parent extends Report_Abstract
 
                     $this->getPage()->setVar(
                         array(
-                            'CONTACT_CONTACT_TYPE'    => Scrub::text($currentContact['StudentContactType']),
-                            'CONTACT_TITLE'           => Scrub::text($currentContact['StudentContactTitle']),
+                            'CONTACT_CONTACT_TYPE'    => Scrub::text($currentContact['StudentContactType'] ?? ''),
+                            'CONTACT_TITLE'           => Scrub::text($currentContact['StudentContactTitle'] ?? ''),
                             'CONTACT_FIRSTNAME'       => Scrub::text($firstname),
-                            'CONTACT_SURNAME'         => Scrub::text($currentContact['StudentContactSurname']),
-                            'CONTACT_PHONE'           => $currentContact['StudentContactSilentPhoneFlag'] ? '' : Scrub::text($currentContact['StudentContactPhoneActual']),
-                            'CONTACT_MOBILE'          => $currentContact['StudentContactSilentMobilePhoneFlag'] ? '' : Scrub::text($currentContact['StudentContactMobilePhone']),
-                            'CONTACT_EMAIL'           => Scrub::text($currentContact['StudentContactDefaultEmail']),
+                            'CONTACT_SURNAME'         => Scrub::text($currentContact['StudentContactSurname'] ?? ''),
+                            'CONTACT_PHONE'           => Scrub::text($currentContact['StudentContactPhoneActual'] ?? ''),
+                            'CONTACT_MOBILE'          => Scrub::text($currentContact['StudentContactMobilePhone'] ?? ''),
+                            'CONTACT_EMAIL'           => Scrub::text($currentContact['StudentContactDefaultEmail'] ?? ''),
 
                             'CONTACT_POSTAL_STREET'   => $postalAddress,
-                            'CONTACT_POSTAL_SUBURB'   => Scrub::text($currentContact['StudentContactSuburb']),
-                            'CONTACT_POSTAL_STATE'    => Scrub::text($currentContact['StudentContactState']),
-                            'CONTACT_POSTAL_POSTCODE' => Scrub::text($currentContact['StudentContactPostCode']),
+                            'CONTACT_POSTAL_SUBURB'   => Scrub::text($currentContact['StudentContactSuburb'] ?? ''),
+                            'CONTACT_POSTAL_STATE'    => Scrub::text($currentContact['StudentContactState'] ?? ''),
+                            'CONTACT_POSTAL_POSTCODE' => Scrub::text($currentContact['StudentContactPostCode'] ?? ''),
                             'CONTACT_POSTAL_COUNTRY'  => $postalCountry,
 
                             'CONTACT_HOME_STREET'     => $homeAddress,
-                            'CONTACT_HOME_SUBURB'     => Scrub::text($currentContact['StudentContactHomeSuburb']),
-                            'CONTACT_HOME_STATE'      => Scrub::text($currentContact['StudentContactHomeState']),
-                            'CONTACT_HOME_POSTCODE'   => Scrub::text($currentContact['StudentContactHomePostCode']),
+                            'CONTACT_HOME_SUBURB'     => Scrub::text($currentContact['StudentContactHomeSuburb'] ?? ''),
+                            'CONTACT_HOME_STATE'      => Scrub::text($currentContact['StudentContactHomeState'] ?? ''),
+                            'CONTACT_HOME_POSTCODE'   => Scrub::text($currentContact['StudentContactHomePostCode'] ?? ''),
                             'CONTACT_HOME_COUNTRY'    => (trim($homeCountry) == 'Not Selected' ? '' : $homeCountry),
                         )
                     );
@@ -554,11 +554,11 @@ class Report_Parent extends Report_Abstract
                     $this->getPage()->setVar(
                         array(
                             'SPOUSE_CONTACT_TYPE'   => Scrub::text($currentContact['StudentContactSpouseType'] ?? ''),
-                            'SPOUSE_TITLE'          => Scrub::text($currentContact['StudentContactSpouseTitle']),
+                            'SPOUSE_TITLE'          => Scrub::text($currentContact['StudentContactSpouseTitle'] ?? ''),
                             'SPOUSE_FIRSTNAME'      => Scrub::text($firstname),
-                            'SPOUSE_SURNAME'        => Scrub::text($currentContact['StudentContactSpouseSurname']),
-                            'SPOUSE_CONTACT_MOBILE' => Scrub::text($currentContact['StudentContactSpouseMobilePhone']),
-                            'SPOUSE_CONTACT_EMAIL'  => Scrub::text($currentContact['StudentContactSpouseDefaultEmail']),
+                            'SPOUSE_SURNAME'        => Scrub::text($currentContact['StudentContactSpouseSurname'] ?? ''),
+                            'SPOUSE_CONTACT_MOBILE' => Scrub::text($currentContact['StudentContactSpouseMobilePhone'] ?? ''),
+                            'SPOUSE_CONTACT_EMAIL'  => Scrub::text($currentContact['StudentContactSpouseDefaultEmail'] ?? ''),
                         )
                     );
 
