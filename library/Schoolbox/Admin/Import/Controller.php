@@ -10,12 +10,21 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import;
 
+use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
+use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Queue\Composite;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress\Lock\InstanceLockFactory;
+use Alaress\Lumberjack\Logger;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use PDOException;
+use Predis\ClientInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -23,9 +32,18 @@ use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\DSNFactory;
+use Schoolbox\External\Connector\Log\Mapper;
+use Schoolbox\External\Connector\ValidStrats;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint;
+use Schoolbox\External\Importer\Endpoint\Factory;
+use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\MessageList\Listed;
+use Schoolbox\Realtime\MessageList\Unread;
+use Symfony\Component\Lock\LockInterface;
 use UnexpectedValueException;
 
 /**
@@ -51,22 +69,31 @@ class Controller extends ConfigController
 
 
     /**
+     * @var ClientInterface
+     */
+    private ClientInterface $redisStorage;
+
+
+    /**
      * Constructor
      *
-     * @param ConfigMapper                             $configMapper
-     * @param FieldStrategyFactory                     $fieldStrategyFactory
-     * @param Rebuilder                                $rebuilder
-     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+     * @param ConfigMapper         $configMapper
+     * @param FieldStrategyFactory $fieldStrategyFactory
+     * @param Rebuilder            $rebuilder
+     * @param Mapper               $importLogMapper
+     * @param ClientInterface      $redisStorage
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
-        \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+        \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
+        ClientInterface $redisStorage
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
 
         $this->importLogMapper = $importLogMapper;
+        $this->redisStorage = $redisStorage;
     }
 
 
@@ -88,6 +115,7 @@ class Controller extends ConfigController
         $host = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $dataSource = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
+        $type = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
 
         $hasIndicator = $host !== '' && $key !== '';
 
@@ -98,6 +126,14 @@ class Controller extends ConfigController
          */
         $configContext['dsn'][$dataSource] = (new DSNFactory())->produceDSNParts($dataSource, $key);
 
+        /* If you run the Live Sync, you might get a message about it
+         */
+        $hasPerformUpdate = false;
+
+        if ($this->getSession()->getSegment(static::class)->getFlash('hasPerformUpdate')) {
+            $hasPerformUpdate = true;
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getSchoolDataIndex')),
@@ -106,7 +142,15 @@ class Controller extends ConfigController
             'configContext' => $configContext,
             'hasIndicator' => $hasIndicator,
             'statusIndicatorRoute' => $this->getRouter()->generate('adminImportIndex.getStatusIndicator'),
-            'importLogs' => $this->importLogMapper->findLogsWithDuration()
+            'importLogs' => $this->importLogMapper->findLogsWithDuration(),
+            /* Decide if the Perform Live Sync is available based on the current
+             * data source selected (you can't do it if you're using No Data Source
+             * or if you're using CSV Files)
+             */
+            'canPerformUpdate' => '' !== $type && Factory::CSV !== $type,
+            /* A flash message to tell users to w8
+             */
+            'hasPerformUpdate' => $hasPerformUpdate,
         ])->setTitle('School Data Import'));
     }
 
@@ -225,5 +269,228 @@ class Controller extends ConfigController
                 'status' => ISpecification::STATUS_ERROR
             ]]
         ]));
+    }
+
+    /**
+     * Set up the live sync
+     *
+     * @throws RouteNotFound
+     */
+    public function getPerformUpdate(): void
+    {
+        $type = $this->getConfigLoader()->get('schooldata_import_data_source');
+
+        /* Cannot do this with No Data Source, or with CSV Files
+         * Exit early if either of those are selected
+         *
+         * You shouldn't be able to get here, but if you do,
+         * throw a generic error. You could perhaps get here
+         * by bookmarking the url or visiting it directly.
+         */
+        if ('' === $type || Factory::CSV === $type) {
+            throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+
+        // Redirect back to ruleset page, with either an alert message on the page or in notifications
+        $this->getSession()->getSegment(static::class)->setFlash('hasPerformUpdate', true);
+        $this->getResponse()->redirect->to($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
+
+        /* Spawn a logger out of darkness
+         * Was there a particular way to do this?
+         */
+        $logFile = fopen($this->getConfigLoader()->get('logs_dir') . '/suds_live.log', 'a');
+        $logger = new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
+
+        // Not the best place to put it but it will do for now
+        $this->getResponse()->content->set([
+            'format' => 'noContent',
+            'postOutput' => [
+                function () use ($logger) {
+                    $this->syncCallback($logger);
+                }
+            ],
+        ]);
+    }
+
+
+    /**
+     * Performs an actual sync.
+     */
+    public function syncCallback(LoggerInterface $logger): void
+    {
+        /* Disable the mapper cache universally, by imitating a cli request.
+         *
+         * The mapper cache is disabled in the cli, but not in a web request.
+         * $cacheEnabled and disableCache() are protected methods by strict
+         * intent, to avoid a change to the base mapper, I can instead
+         * do a little code cosplay here. Unhygienic but the alternative is
+         * just as disgusting to contemplate
+         */
+        unset($_SERVER['REQUEST_METHOD']);
+
+        try {
+            $host        = $this->getConfigLoader()->get('schooldata_import_endpoint_host');
+            $key         = $this->getConfigLoader()->get('schooldata_import_endpoint_key');
+            $frequency   = Scheduler::HOURLY;
+            $customHours = [];
+            $type        = $this->getConfigLoader()->get('schooldata_import_data_source');
+            $file        = null;
+            $timeout     = (float)($this->getConfigLoader()->get('schooldata_import_timeout') ?: Scheduler::DEFAULT_TIMEOUT);
+
+            /* Cannot do this with No Data Source, or with CSV Files
+             * Exit early if either of those are selected
+             */
+            if ('' === $type || Factory::CSV === $type) {
+                return;
+            }
+
+            /* Nobody is on the watchlist in this context
+             */
+            $watchlist   = (new Watchlist())->filter('');
+
+            try {
+                $lock = $this->acquireLock($logger, Scheduler::LOCK_NAME, $timeout);
+            } catch (\RuntimeException $e) {
+                return;
+            }
+
+            /* This identifier indicates that the two schedulers were part of this
+             * script execution together
+             */
+            $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+
+            /* Get this particular db instance
+             */
+            $importLogMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
+
+            /* ValidStrats is now a cli option
+             */
+            $validStrats = new ValidStrats('');
+
+            /* Execute scheduler: sis stuff
+             */
+            $sisFactory = new Factory($host, $key, true, $logger, $watchlist, $validStrats);
+
+            (new Scheduler(
+                $importLogMapper->getDatabase(),
+                $frequency,
+                $customHours,
+                $sisFactory,
+                $type,
+                $file,
+                $logger,
+                $importLogMapper
+            ))->run(time(), $runId, Scheduler::MANUAL_SIS_SCRIPT_NAME);
+
+            /* Execute scheduler: calendar stuff
+             * Not all connectivities contain a calendar importer, just some
+             */
+            $calendarFactory = new Endpoint\CalendarFactory($host, $key, true, $logger);
+
+            (new Scheduler(
+                $importLogMapper->getDatabase(),
+                $frequency,
+                $customHours,
+                $calendarFactory,
+                $type,
+                $file,
+                $logger,
+                $importLogMapper
+            ))->run(time(), $runId, Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
+
+            /* Go to the "Previous IMports" area of SUDS Control Panel
+             */
+            $redirect = $this->router->generate('adminImportIndex.getSchoolDataIndex') . '#previous';
+
+            /* Arbitrarily inject and broadcast a notification,
+             * bypassing all the usual Mr Matt mechanisms
+             *
+             * As recommended (for now) by Mr Sannang and Tomoko
+             */
+            $title = sprintf(
+                'School Data Sync Live Run has finished at %s',
+                \Alaress_Date_Format::now()->getLocal()
+            );
+
+            $bob  = new NotificationInstanceBuilder();
+            $bob->setTitle($title)
+                ->setAllowSelfSend(true)
+                ->setSeverity(\Monolog\Logger::INFO)
+                /* Alternatively I could make my own namespace...but should I?
+                 * Namespace controls the icon selection but that's about it...?
+                 */
+                ->setNamespace(NSMapper::NS_MESSAGE)
+                ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
+                /* Go to suds import log
+                 */
+                ->setHref($redirect)
+                ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $this->getUser()->getId()));
+
+            $composite = new Composite(
+                new Listed($this->redisStorage, INSTANCE_ID, $this->getUser()->getId()),
+                new Unread($this->redisStorage, INSTANCE_ID, $this->getUser()->getId())
+            );
+
+            $composite->push($bob->build());
+        } catch (\Exception $e) {
+            // the client has already detached - not much we can do
+        }
+    }
+
+
+    /* Lock Acquisition
+     * cloned from cli land because we can perhaps give user feedback here
+     */
+
+    /**
+     * Acquires and returns a lock object.
+     *
+     * @param LoggerInterface $logger
+     * @param string          $lockName The name of the lock to acquire.
+     *                                  Will be automatically made unique across
+     *                                  separate instances.
+     * @param float|null      $timeout  The amount of time (in seconds) to hold the
+     *                                  lock for.
+     * @return LockInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \RuntimeException
+     */
+    protected function acquireLock(LoggerInterface $logger, string $lockName, ?float $timeout): LockInterface
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @var InstanceLockFactory $lockFactory */
+        $lockFactory = $this->getDi()->get('lockFactory');
+        $lock        = $lockFactory->createLock($lockName, $timeout);
+
+        // Try to acquire this lock
+        try {
+            $acquired = $lock->acquire();
+        } catch (\Exception $e) {
+            /* Any weird exception being thrown here - lock-related or otherwise -
+             * is going to preclude a proper lock acquisition and you should be
+             * prevented from doing whatever you're doing
+             */
+            $message = 'This process is already running for this instance: trusting it will self-terminate on timeout';
+
+            throw new \RuntimeException($message);
+        }
+
+        /* You didn't die, but you also couldn't acquire a lock
+         * Drop a nice message because this is an intended behaviour
+         */
+        if (!$acquired) {
+            $message = sprintf(
+                'Could not acquire %s lock',
+                $lockName
+            );
+
+            $logger->warning($message);
+
+            throw new \RuntimeException($message);
+        }
+
+        return $lock;
     }
 }

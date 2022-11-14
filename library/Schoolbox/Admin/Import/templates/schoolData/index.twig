@@ -169,6 +169,21 @@
             $('[data-data-source="'+dataSource+'"]').show();
             $('[data-data-source="'+dataSource+'"] input').prop('disabled', false);
         }
+
+        /* Live Update as per UPS implementation
+         */
+        $('[data-perform-update]').click(function(e) {
+            e.preventDefault();
+
+            $(this).confirmDialog({
+                header: 'Warning! Live School Data Sync Selected',
+                format: 'html',
+                text: '<div class="alert-box warning">You have selected to perform a live School Data Sync. This will update profile and timetable data with the latest from your SIS.</div><p>Are you sure you wish to proceed?</p>',
+                confirmEvent: function () {
+                    window.location.href = '{{ routeLookup('adminImportIndex.getPerformUpdate') }}';
+                }
+            });
+        });
     });
 </script>
 
@@ -180,9 +195,38 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+        {% if hasPerformUpdate ?? false %}
+            <div class="small-12 columns">
+                <div data-alert class="alert-box">
+                    <h2>Performing Live Sync</h2>
+                    {% if config.messaging_enabled %}
+                        <p>Please be patient - we'll notify you when it's done.</p>
+                    {% else %}
+                        <p>
+                            If messaging was enabled, you would have been notified when the School Data sync
+                            was completed. It isn't though, so maybe check again in a few minutes?
+                        </p>
+                    {% endif %}
+                    <a href="" class="close">×</a>
+                </div>
+            </div>
+        {% endif %}
+
         <div id='option-container' class="hide">
             <div class="small-12 columns">
-                <h2 class="subheader">School Data Import</h2>
+                <div class="actions-small-1">
+                    <div class="list-item">
+                        <h2 class="subheader">School Data Import</h2>
+                    </div>
+                    {% if canPerformUpdate ?? false %}
+                    <nav>
+                        <a class="icon-more" title="Actions" data-dropdown="suds-options"></a>
+                    </nav>
+                    <ul id="suds-options" class="f-dropdown" data-dropdown-content>
+                        <li><a data-perform-update href='#' class="icon-export" title="Perform Live Update">Perform Live Update</a></li>
+                    </ul>
+                    {% endif %}
+                </div>
             </div>
 
             {% include '@adminImportIndex/schoolData/dsn/moduleConfig.twig' with configContext only %}
@@ -247,4 +291,3 @@
         </div>
     </div>
 </div>
-

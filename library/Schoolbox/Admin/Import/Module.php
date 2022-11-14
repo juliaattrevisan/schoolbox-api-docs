@@ -51,6 +51,7 @@ class Module extends BaseModule
         $this->register('POST', '/schoolDataImport', 'postSchoolDataOptions', $perms);
         $this->register('GET', '/schoolDataImport/status/indicator', 'getStatusIndicator', $perms);
         $this->register('GET', '/schoolDataImport/status/report', 'getStatusReport', $perms);
+        $this->register('GET', '/schoolDataImport/performUpdate', 'getPerformUpdate', $perms);
     }
 
     /**
@@ -63,6 +64,7 @@ class Module extends BaseModule
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->getMapperFactory()->get(\Schoolbox\External\Connector\Log\Mapper::class),
+            $this->injector->get('redis.storage')
         );
     }
 

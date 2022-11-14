@@ -33,17 +33,33 @@ class Scheduler
     /**
      * This script name appears in the import log
      *
-     * sisImporter is when you run an on-demand suds import via sisImporter.php
-     *
      * scheduler.php is a two-part system, the first imports regular sis data
      * such as profiles and timetables - this manifests as "School Data Import (SIS)"
      *
      * The other part is TASS Calendar, which manifests as "School Data Import (Calendar)"
+     *
+     * These names mean it was run normally as part of the scheduled cron task
+     */
+    public const SCHEDULER_SIS_SCRIPT_NAME = 'School Data Import (SIS)';
+    public const SCHEDULER_CALENDAR_SCRIPT_NAME = 'School Data Import (Calendar)';
+
+
+    /**
+     * CLI Tools ran directly on the command line, usually manually initiated
+     * by someone at schoolbox while testing or debugging
+     *
+     * sisImporter is when you run an on-demand suds import via sisImporter.php
      */
     public const SISIMPORTER_SCRIPT_NAME = 'sisImporter';
     public const CALENDARIMPORTER_SCRIPT_NAME = 'calendarImporter';
-    public const SCHEDULER_SIS_SCRIPT_NAME = 'School Data Import (SIS)';
-    public const SCHEDULER_CALENDAR_SCRIPT_NAME = 'School Data Import (Calendar)';
+
+
+    /**
+     * Live Run initiated from the gui, not the cli
+     */
+    public const MANUAL_SIS_SCRIPT_NAME = 'User-initiated School Data Import (SIS)';
+    public const MANUAL_CALENDAR_SCRIPT_NAME = 'User-initiated School Data Import (Calendar)';
+
 
     /**
      * max execution time before we consider the import process timed out.
