@@ -13,9 +13,9 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
  * Creates an arbitrary string that contains data which can
  * help uniquely identify a sis_event instance
  *
- * Note that it contains the (ttd, day, period code) which are
+ * Note that it contains the (ttd, day, period code, classCode) which are
  * all required for the attendance link to work. The attendance
- * link is calculated at runtime for the currently logged in user
+ * link is calculated at runtime for the currently logged-in user
  * and needs those four pieces to function as a path to the
  * remote TASS systems
  */

@@ -19,7 +19,7 @@ use Schoolbox\User;
  *
  * new AttendanceLink(
  *     (bool)$config->get('external_attendance'),
- *     (string)$config->get('external_attendance_days'),
+ *     (int)$config->get('external_attendance_days'),
  *     (string)$config->get('external_tass_attendance_show_prod_menu')
  * );
  */
