@@ -49,22 +49,6 @@ abstract class Base extends RendererBase
 
 
     /**
-     * If an event has not been published yet, but is still visible (see isVisible) then it should be translucent
-     *
-     * @return mixed
-     */
-    public function isTranslucent()
-    {
-        // No publish date? Assume event is not translucent
-        if (!$this->event->getPublishDate()) {
-            return false;
-        }
-
-        return $this->event->getPublishDate()->gt(\Alaress_Date_Format::now());
-    }
-
-
-    /**
      * Returns the current attendance status for the viewer of a given attendance event
      *
      * @return int|null One of the `Event\Attendance\Model::STATUS_*` constants,

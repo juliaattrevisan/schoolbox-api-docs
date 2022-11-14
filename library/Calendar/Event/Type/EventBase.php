@@ -650,6 +650,24 @@ abstract class EventBase implements EventInterface
     }
 
     /**
+     * Is the event published as of `$date`?
+     *
+     * It is published if:
+     * * the publish date is set, and isn't after `$date`
+     * * there is no publish date (event is assumed to be published)
+     *
+     * @param Alaress_Date_Format $date
+     * @return bool
+     */
+    public function isPublishedAtDate(Alaress_Date_Format $date): bool
+    {
+        if (!$this->publishDate) {
+            return true;
+        }
+        return $this->publishDate->lte($date);
+    }
+
+    /**
      * @return int
      */
     public function getSeriesId()

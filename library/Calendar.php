@@ -688,11 +688,10 @@ class Calendar extends DeprecatedModel
                 $event->setCompleted((bool)$currentEvent['completed']);
                 $event->setPath('/calendar/event/' . $currentEvent['id']);
 
-                // TODO port this into SQL query so we don't bother building the event just to throw it away
-                $isFutureEvent   = $event->getPublishDate()->getUnixTimeStamp() >= time();
+                $isPublished     = $event->isPublishedAtDate(Alaress_Date_Format::now());
                 $isAlwaysVisible = $viewer->isSuperuser() || $event->isOwner($viewer->getId()) || $event->isEditable();
 
-                if ($isAlwaysVisible || !$isFutureEvent) {
+                if ($isAlwaysVisible || $isPublished) {
                     $stack->add($event);
                 }
             }
