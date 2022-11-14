@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Comms\News\Statistics;
 
+use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -60,9 +61,9 @@ class Model implements ISoftDeletable
      * mapper behaviours of created_at and updated_at. This allows us to mass produce data
      * and fudge some of the datetimes to simulate scenarios
      *
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format
      */
-    private $occursAt;
+    private Alaress_Date_Format $occursAt;
 
     /**
      * @return null|int
@@ -145,19 +146,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
-    public function getOccursAt(): \Alaress_Date_Format
+    public function getOccursAt(): Alaress_Date_Format
     {
         return $this->occursAt;
     }
 
 
     /**
-     * @param \Alaress_Date_Format $occursAt
+     * @param Alaress_Date_Format $occursAt
      * @return Model
      */
-    public function setOccursAt(\Alaress_Date_Format $occursAt): self
+    public function setOccursAt(Alaress_Date_Format $occursAt): self
     {
         $this->occursAt = $occursAt;
         return $this;

@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Event;
 
+use Alaress_Date_Format;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
 class Model
@@ -72,15 +73,15 @@ class Model
 
 
     /**
-     * @var \Alaress_Date_Format|null
+     * @var Alaress_Date_Format|null
      */
-    private ?\Alaress_Date_Format $startAt;
+    private ?Alaress_Date_Format $startAt;
 
 
     /**
-     * @var \Alaress_Date_Format|null
+     * @var Alaress_Date_Format|null
      */
-    private ?\Alaress_Date_Format $finishAt;
+    private ?Alaress_Date_Format $finishAt;
 
 
     /**
@@ -266,19 +267,19 @@ class Model
 
 
     /**
-     * @return \Alaress_Date_Format|null
+     * @return Alaress_Date_Format|null
      */
-    public function getStartAt(): ?\Alaress_Date_Format
+    public function getStartAt(): ?Alaress_Date_Format
     {
         return $this->startAt;
     }
 
 
     /**
-     * @param \Alaress_Date_Format|null $startAt
+     * @param Alaress_Date_Format|null $startAt
      * @return Model
      */
-    public function setStartAt(?\Alaress_Date_Format $startAt): self
+    public function setStartAt(?Alaress_Date_Format $startAt): self
     {
         $this->startAt = $startAt;
         return $this;
@@ -286,9 +287,9 @@ class Model
 
 
     /**
-     * @return \Alaress_Date_Format|null
+     * @return Alaress_Date_Format|null
      */
-    public function getFinishAt(): ?\Alaress_Date_Format
+    public function getFinishAt(): ?Alaress_Date_Format
     {
         return $this->finishAt;
     }
@@ -315,10 +316,10 @@ class Model
 
 
     /**
-     * @param \Alaress_Date_Format|null $finishAt
+     * @param Alaress_Date_Format|null $finishAt
      * @return Model
      */
-    public function setFinishAt(?\Alaress_Date_Format $finishAt): self
+    public function setFinishAt(?Alaress_Date_Format $finishAt): self
     {
         $this->finishAt = $finishAt;
         return $this;

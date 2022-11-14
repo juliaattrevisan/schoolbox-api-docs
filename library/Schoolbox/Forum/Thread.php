@@ -53,8 +53,8 @@ class Thread implements ISoftDeletable
     /** @var Collection|Post[] */
     protected $posts;
 
-    /** @var Alaress_Date_Format */
-    protected $lastPostDate;
+    /** @var Alaress_Date_Format|null */
+    protected ?Alaress_Date_Format $lastPostDate = null;
 
     /** @var User */
     protected $lastPostUser;
@@ -268,10 +268,11 @@ class Thread implements ISoftDeletable
     }
 
     /**
-     * @param Alaress_Date_Format $lastPostDate
-     * @return self
+     * @param Alaress_Date_Format|null $lastPostDate
+     *
+     * @return static
      */
-    public function setLastPostDate($lastPostDate)
+    public function setLastPostDate(?Alaress_Date_Format $lastPostDate): self
     {
         $this->lastPostDate = $lastPostDate;
         return $this;
@@ -279,9 +280,9 @@ class Thread implements ISoftDeletable
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getLastPostDate()
+    public function getLastPostDate(): ?Alaress_Date_Format
     {
         return $this->lastPostDate;
     }

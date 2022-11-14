@@ -117,7 +117,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     /**
      * @var Alaress_Date_Format|null
      */
-    private $submittedAt;
+    private ?Alaress_Date_Format $submittedAt;
 
     /**
      * The person who allowed this article to be published
@@ -131,14 +131,14 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      *
      * @var Alaress_Date_Format|null
      */
-    private $acceptedAt;
+    private ?Alaress_Date_Format $acceptedAt;
 
     /**
      * The datetime when this article was rejected
      *
      * @var Alaress_Date_Format|null
      */
-    private $rejectedAt;
+    private ?Alaress_Date_Format $rejectedAt;
 
     /**
      * The person who rejected this article
@@ -157,16 +157,16 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     /**
      * The article becomes available to the audience at this time
      *
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    private $publishAt;
+    private ?Alaress_Date_Format $publishAt;
 
     /**
      * The article becomes archived at this time
      *
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    private $expiresAt;
+    private ?Alaress_Date_Format $expiresAt;
 
 
     /**
@@ -867,19 +867,20 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
 
     /**
-     * @return \Alaress_Date_Format|null
+     * @return Alaress_Date_Format|null
      */
-    public function getPublishAt(): ?\Alaress_Date_Format
+    public function getPublishAt(): ?Alaress_Date_Format
     {
         return $this->publishAt;
     }
 
 
     /**
-     * @param \Alaress_Date_Format $publishAt
-     * @return $this
+     * @param Alaress_Date_Format|null $publishAt
+     *
+     * @return static
      */
-    public function setPublishAt(\Alaress_Date_Format $publishAt): self
+    public function setPublishAt(?Alaress_Date_Format $publishAt): self
     {
         $this->publishAt = $publishAt;
         return $this;
@@ -887,19 +888,20 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
 
     /**
-     * @return \Alaress_Date_Format|null
+     * @return Alaress_Date_Format|null
      */
-    public function getExpiresAt(): ?\Alaress_Date_Format
+    public function getExpiresAt(): ?Alaress_Date_Format
     {
         return $this->expiresAt;
     }
 
 
     /**
-     * @param \Alaress_Date_Format $expiresAt
-     * @return $this;
+     * @param Alaress_Date_Format|null $expiresAt
+     *
+     * @return static
      */
-    public function setExpiresAt(\Alaress_Date_Format $expiresAt): self
+    public function setExpiresAt(?Alaress_Date_Format $expiresAt): self
     {
         $this->expiresAt = $expiresAt;
         return $this;
@@ -927,19 +929,20 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
 
     /**
-     * @return \Alaress_Date_Format|null
+     * @return Alaress_Date_Format|null
      */
-    public function getAcceptedAt(): ?\Alaress_Date_Format
+    public function getAcceptedAt(): ?Alaress_Date_Format
     {
         return $this->acceptedAt;
     }
 
 
     /**
-     * @param null|\Alaress_Date_Format $acceptedAt
-     * @return $this
+     * @param Alaress_Date_Format|null $acceptedAt
+     *
+     * @return static
      */
-    public function setAcceptedAt(?\Alaress_Date_Format $acceptedAt): self
+    public function setAcceptedAt(?Alaress_Date_Format $acceptedAt): self
     {
         $this->acceptedAt = $acceptedAt;
         return $this;
@@ -1007,19 +1010,20 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
 
     /**
-     * @return \Alaress_Date_Format|null
+     * @return Alaress_Date_Format|null
      */
-    public function getSubmittedAt(): ?\Alaress_Date_Format
+    public function getSubmittedAt(): ?Alaress_Date_Format
     {
         return $this->submittedAt;
     }
 
 
     /**
-     * @param null|\Alaress_Date_Format $submittedAt
-     * @return $this
+     * @param Alaress_Date_Format|null $submittedAt
+     *
+     * @return static
      */
-    public function setSubmittedAt(?\Alaress_Date_Format $submittedAt): self
+    public function setSubmittedAt(?Alaress_Date_Format $submittedAt): self
     {
         $this->submittedAt = $submittedAt;
         return $this;
@@ -1027,19 +1031,20 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
 
     /**
-     * @return \Alaress_Date_Format|null
+     * @return Alaress_Date_Format|null
      */
-    public function getRejectedAt(): ?\Alaress_Date_Format
+    public function getRejectedAt(): ?Alaress_Date_Format
     {
         return $this->rejectedAt;
     }
 
 
     /**
-     * @param \Alaress_Date_Format $rejectedAt
-     * @return $this
+     * @param Alaress_Date_Format|null $rejectedAt
+     *
+     * @return static
      */
-    public function setRejectedAt(\Alaress_Date_Format $rejectedAt): self
+    public function setRejectedAt(?Alaress_Date_Format $rejectedAt): self
     {
         $this->rejectedAt = $rejectedAt;
         return $this;

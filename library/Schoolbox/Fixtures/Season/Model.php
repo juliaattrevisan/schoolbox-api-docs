@@ -9,8 +9,10 @@
 namespace Schoolbox\Fixtures\Season;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\ValueLabelInterface;
 
 /**
@@ -21,6 +23,8 @@ use Schoolbox\ValueLabelInterface;
 class Model implements ISoftDeletable, ValueLabelInterface
 {
     // Implements ISoftDeletable
+    use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /** @var int */
@@ -35,14 +39,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /** @var Alaress_Date_Format */
     protected $end;
 
-    /** @var Alaress_Date_Format */
-    private $archivedAt;
-
-    /** @var Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var Alaress_Date_Format */
-    protected $updatedAt;
+    /** @var Alaress_Date_Format|null */
+    private ?Alaress_Date_Format $archivedAt = null;
 
     /**
      * Model constructor.
@@ -151,56 +149,21 @@ class Model implements ISoftDeletable, ValueLabelInterface
     }
 
     /**
-     * @param Alaress_Date_Format $archivedAt
-     * @return static
+     * @return Alaress_Date_Format|null
      */
-    public function setArchivedAt(?Alaress_Date_Format $archivedAt)
-    {
-        $this->archivedAt = $archivedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getArchivedAt()
+    public function getArchivedAt(): ?Alaress_Date_Format
     {
         return $this->archivedAt;
     }
 
     /**
-     * @param Alaress_Date_Format $createdAt
+     * @param Alaress_Date_Format|null $archivedAt
+     *
      * @return static
      */
-    public function setCreatedAt(Alaress_Date_Format $createdAt)
+    public function setArchivedAt(?Alaress_Date_Format $archivedAt): self
     {
-        $this->createdAt = $createdAt;
+        $this->archivedAt = $archivedAt;
         return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format $createdAt
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $updatedAt
-     * @return static
-     */
-    public function setUpdatedAt(Alaress_Date_Format $updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 }
