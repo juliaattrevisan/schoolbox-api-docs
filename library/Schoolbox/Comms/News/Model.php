@@ -159,14 +159,14 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      *
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $publishAt;
+    private ?Alaress_Date_Format $publishAt = null;
 
     /**
      * The article becomes archived at this time
      *
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $expiresAt;
+    private ?Alaress_Date_Format $expiresAt = null;
 
 
     /**

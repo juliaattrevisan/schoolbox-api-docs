@@ -50,22 +50,22 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $publishAt;
+    private ?Alaress_Date_Format $publishAt = null;
 
     /**
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $openAt;
+    private ?Alaress_Date_Format $openAt = null;
 
     /**
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $dueAt;
+    private ?Alaress_Date_Format $dueAt = null;
 
     /**
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $closeAt;
+    private ?Alaress_Date_Format $closeAt = null;
 
     /**
      * @var float
