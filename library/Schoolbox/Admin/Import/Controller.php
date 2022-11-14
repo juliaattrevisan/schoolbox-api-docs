@@ -132,6 +132,10 @@ class Controller extends ConfigController
         $postData['schooldata_import_endpoint_key'] = (new DSNFactory())
             ->produceDSNString($postData['schooldata_import_data_source'] ?? '', $postData['dsn'] ?? []);
 
+        /* Trim the schooldata_import_endpoint_host, as it could possibly have whitespace which should be removed...
+         */
+        $postData['schooldata_import_endpoint_host'] = trim((string)$postData['schooldata_import_endpoint_host']);
+
         /* We don't need this array element which has no corresponding db rows
          */
         unset($postData['dsn']);
