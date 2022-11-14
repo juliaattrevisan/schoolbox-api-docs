@@ -39,8 +39,6 @@ class ImplementationTest extends TestCase
         $this->assertInstanceOf(Collection::class, $impl->getAssessables());
         $this->assertCount(0, $impl->getAssessables());
         // Dates are all null
-        $this->assertNull($impl->getOpenDate());
-        $this->assertNull($impl->getDueDate());
         $this->assertNull($impl->getCreatedAt());
         $this->assertNull($impl->getUpdatedAt());
         $this->assertNull($impl->getDeletedAt());
