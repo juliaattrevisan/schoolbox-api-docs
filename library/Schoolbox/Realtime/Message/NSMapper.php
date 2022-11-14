@@ -13,7 +13,6 @@ use Schoolbox\Mapper;
 
 class NSMapper extends Mapper
 {
-
     const NS_PASTORAL                = 'pastoral';
     const NS_PASTORAL_COMMENT        = 'pastoral_comment';
     const NS_PASTORAL_LOG            = 'pastoral_log';

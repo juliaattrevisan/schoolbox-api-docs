@@ -18,7 +18,6 @@ use Psr\Log\LoggerInterface;
 
 class SoftLinks implements Check
 {
-
     /** @var Database */
     protected $db;
 

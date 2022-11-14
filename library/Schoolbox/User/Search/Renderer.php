@@ -19,7 +19,6 @@ use Scrub;
 
 class Renderer extends Handler
 {
-
     /**
      * Type (e.g. 'link', 'blog', etc)
      *
