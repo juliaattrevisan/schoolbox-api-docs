@@ -24,6 +24,7 @@ Usage:
         $.fn.courseSelector({
 
             courseSelector: {
+                addFilterQueryToUrlHistory: true,
                 query: {
                     {% if folder is defined %}
                         folder:           "{{ folder.id | escape('js') }}",
@@ -39,6 +40,21 @@ Usage:
             }
 
         });
+
+        let searchParams = new URLSearchParams(window.location.search);
+
+        if (searchParams.has('filterQuery')) {
+            let $filterInput = $('[data-course-selector-filter]');
+            $filterInput.val(searchParams.get('filterQuery')); // Fill the filter query input (remembered due to courseSelector config option addFilterQueryToUrlHistory).
+            $filterInput.keydown();                            // Trigger the filter.
+
+            // Now that the filter has been triggered, we can remove the remembered filter query from the URL.
+            // We do this so that if the user refreshes the page the blank filter state will be restored.
+            let url = new URL(window.location);
+            url.searchParams.delete('filterQuery');
+            window.history.replaceState({}, document.title, url);
+        }
+
     });
 </script>
 
