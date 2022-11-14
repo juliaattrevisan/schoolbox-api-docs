@@ -54,22 +54,22 @@ class Plan
     /**
      * @var null|Alaress_Date_Format
      */
-    private $publishDate;
+    private ?Alaress_Date_Format $publishDate = NULL;
 
     /**
      * @var null|Alaress_Date_Format
      */
-    private $openDate;
+    private ?Alaress_Date_Format $openDate = null;
 
     /**
      * @var null|Alaress_Date_Format
      */
-    private $dueDate;
+    private ?Alaress_Date_Format $dueDate = null;
 
     /**
      * @var null|Alaress_Date_Format
      */
-    private $closeDate;
+    private ?Alaress_Date_Format $closeDate = null;
 
     /**
      * Indexed by user.id
