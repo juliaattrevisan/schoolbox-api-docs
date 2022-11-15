@@ -26,39 +26,39 @@ class User
         $this->teachers = new Collection();
     }
 
-    public function getParents(string $externalId)
+    public function getParents(\Schoolbox\User $user)
     {
         //load students if they have not been loaded
         if (empty($this->parents)) {
-            $this->loadParents($externalId);
+            $this->loadParents($user);
         }
         //return $this->parents
         return $this->parents;
     }
 
-    public function getTeachers(string $externalId)
+    public function getTeachers(\Schoolbox\User $user)
     {
         //load teachers if they have not been loaded
         if (empty($this->teachers)) {
-            $this->loadTeachers($externalId);
+            $this->loadTeachers($user);
         }
         //return teachers
         return $this->teachers;
     }
 
-    public function getStudents(string $externalId)
+    public function getStudents(\Schoolbox\User $user)
     {
         //load students if they have not been loaded
         if (empty($this->students)) {
-            $this->loadStudents($externalId);
+            $this->loadStudents($user);
         }
         //return students
         return $this->students;
     }
 
-    private function loadParents(string $externalId)
+    private function loadParents(\Schoolbox\User $user)
     {
-        $allParents               = $this->externalUser->getStudentContactList([$externalId]);
+        $allParents               = $this->externalUser->getStudentContactList([$user->getExternalId()]);
 
         foreach ($allParents as $currentParent) {
             /* Add parent
@@ -84,7 +84,7 @@ class User
         }
     }
 
-    private function loadTeachers(string $externalId)
+    private function loadTeachers(\Schoolbox\User $user)
     {
         $codeMatcher       = (new ClassCodeMatchFactory())->build($this->externalType);
 
@@ -92,7 +92,7 @@ class User
 
         $found = [];
         //TODO: alter getSubjectList to accept just the externalID, not the userObject....???
-        $subjects = $this->externalUser->getSubjectList($this);
+        $subjects = $this->externalUser->getSubjectList($user);
 
         // Iterate and find teachers associated with each subject
         if (is_array($subjects)) {
@@ -105,7 +105,7 @@ class User
                     if (!isset($found[$teacher])) {
                         try {
                             $this->teachers->add(
-                                UserMapper::getInstance()->findByExternalId($teacher, Role::STAFF)
+                                $this->userMapper->findByExternalId($teacher, Role::STAFF)
                             );
 
                             $found[$teacher] = 1;
@@ -118,10 +118,10 @@ class User
         }
     }
 
-    private function loadStudents(string $externalId)
+    private function loadStudents(\Schoolbox\User $user)
     {
         $this->students = new GenericCollection(self::class);
-        $enrolments = $this->externalUser->getEnrolledStudents($externalId);
+        $enrolments = $this->externalUser->getEnrolledStudents($user->getExternalId());
         foreach ($enrolments as $child) {
             try {
                 $this->students->add($this->userMapper->findByExternalId($child['RelatedID']));
