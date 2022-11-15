@@ -86,7 +86,7 @@ class SoftDeleteTestModel implements ISoftDeletable
     /**
      * {@inheritdoc}
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
         return $this->getDeleted();
     }

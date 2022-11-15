@@ -309,7 +309,7 @@ class Thread implements ISoftDeletable
      * Is this object deleted?
      * @return bool
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
         return ($this->getDeleted() == 'true');
     }

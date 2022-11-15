@@ -581,7 +581,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     *
     * @return bool
     */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
         return $this->getDeleted() instanceof \Alaress_Date_Format;
     }

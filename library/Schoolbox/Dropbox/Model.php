@@ -214,7 +214,7 @@ class Model implements ISoftDeletable
      *
      * @return bool
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
         return $this->deletedAt instanceof Alaress_Date_Format
             && $this->deletedAt->getUnixTimeStamp() < Alaress_Date_Format::now()->getUnixTimeStamp();

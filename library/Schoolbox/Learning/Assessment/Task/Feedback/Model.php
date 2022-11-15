@@ -273,10 +273,9 @@ class Model extends AbstractFeedback
 
     /**
      * @param  Alaress_Date_Format $createdAt
-     *
      * @return $this
      */
-    public function setCreatedAt(Alaress_Date_Format $createdAt)
+    public function setCreatedAt(Alaress_Date_Format $createdAt): static
     {
         $this->getResponse()->setCreatedAt($createdAt);
         return $this;
@@ -294,10 +293,9 @@ class Model extends AbstractFeedback
 
     /**
      * @param  Alaress_Date_Format $updatedAt
-     *
      * @return $this
      */
-    public function setUpdatedAt(Alaress_Date_Format $updatedAt)
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt): static
     {
         $this->getResponse()->setUpdatedAt($updatedAt);
         return $this;
@@ -317,7 +315,7 @@ class Model extends AbstractFeedback
      * @param  Alaress_Date_Format|null $deletedAt
      * @return $this
      */
-    public function setDeletedAt(?Alaress_Date_Format $deletedAt = null)
+    public function setDeletedAt(?Alaress_Date_Format $deletedAt = null): static
     {
         $this->getResponse()->setDeletedAt($deletedAt);
         return $this;

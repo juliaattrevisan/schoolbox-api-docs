@@ -314,9 +314,9 @@ class Mimetype implements ISoftDeletable
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
         return $this->deleted;
     }

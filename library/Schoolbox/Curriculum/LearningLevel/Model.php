@@ -250,7 +250,7 @@ class Model implements ISoftDeletable, JsonSerializable
      *
      * @return bool
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
         return ($this->getDeletedAt() instanceof Alaress_Date_Format);
     }
