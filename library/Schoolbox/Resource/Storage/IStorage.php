@@ -96,7 +96,7 @@ interface IStorage
     /**
      * @return Alaress_Date_Format
      */
-    public function getCreatedAt();
+    public function getCreatedAt(): Alaress_Date_Format;
 
     /**
      * @return Alaress_Date_Format

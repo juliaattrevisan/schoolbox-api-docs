@@ -21,7 +21,7 @@ class File implements IStorage
     /**
      * @return Alaress_Date_Format
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): Alaress_Date_Format
     {
         return $this->storage->getCreatedAt();
     }
