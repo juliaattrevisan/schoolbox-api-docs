@@ -19,12 +19,12 @@ trait UpdatedAtDate
      *
      * @var Alaress_Date_Format
      */
-    protected $updatedAt;
+    protected Alaress_Date_Format $updatedAt;
 
     /**
      * @return Alaress_Date_Format
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): Alaress_Date_Format
     {
         return $this->updatedAt;
     }
@@ -34,7 +34,7 @@ trait UpdatedAtDate
      *
      * @return $this
      */
-    public function setUpdatedAt(Alaress_Date_Format $updatedAt = null)
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt)
     {
         $this->updatedAt = $updatedAt;
         return $this;

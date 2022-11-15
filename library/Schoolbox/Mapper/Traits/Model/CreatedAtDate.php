@@ -19,12 +19,12 @@ trait CreatedAtDate
      *
      * @var Alaress_Date_Format
      */
-    protected $createdAt;
+    protected Alaress_Date_Format $createdAt;
 
     /**
      * @return Alaress_Date_Format
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): Alaress_Date_Format
     {
         return $this->createdAt;
     }
@@ -34,7 +34,7 @@ trait CreatedAtDate
      *
      * @return $this
      */
-    public function setCreatedAt(Alaress_Date_Format $createdAt = null)
+    public function setCreatedAt(Alaress_Date_Format $createdAt)
     {
         $this->createdAt = $createdAt;
         return $this;
