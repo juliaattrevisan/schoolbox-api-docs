@@ -53,7 +53,7 @@ class AccessLevelCensorTest extends TestCase
      * @param User                $viewer
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function test_filterRecordsForUser(
+    public function testFilterRecordsForUser(
         string $recordType,
         Pastoral\Model $originalRecord,
         ?Pastoral\Model $expectedFilteredRecord,
@@ -160,7 +160,15 @@ class AccessLevelCensorTest extends TestCase
         // no owner record
         $ownerX        = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STAFF));
         $studentX      = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STUDENT));
-        $recordX       = (new Pastoral\Model())->setHeading('X')->setId(9)->setOwner($ownerX)->setModifiedBy($ownerX)->setStudent($studentX);
+        $recordX       = (new Pastoral\Model())
+            ->setHeading('X')
+            ->setId(9)
+            ->setOwner($ownerX)
+            ->setModifiedBy($ownerX)
+            ->setStudent($studentX)
+            ->setCreatedAt((new Alaress_Date_Format())::now())
+            ->setUpdatedAt((new Alaress_Date_Format())::now())
+        ;
         $recordXPublic = $this->filterPrivate($recordX);
 
         $recordAForOwner = clone $recordA;
@@ -231,11 +239,17 @@ class AccessLevelCensorTest extends TestCase
     private function generateRecord(string $name, User $owner, ?PastoralAccess $pastoralAccess = null): Pastoral\Model
     {
         $student = (new User())->setId($this->guid++)->setRole((new Role())->setType(Role::STUDENT));
-        $record  = (new Pastoral\Model())->setHeading($name)->setId($this->guid++)->setOwner($owner)->setModifiedBy($owner)->setStudent($student)
-                                         ->setBodyPrivate('Private Body')
-                                         ->setBodyPublic('Public Body')
-                                         ->setCreatedAt((new Alaress_Date_Format())::now())
-                                         ->setUpdatedAt((new Alaress_Date_Format())::now());
+        $record  = (new Pastoral\Model())
+            ->setHeading($name)
+            ->setId($this->guid++)
+            ->setOwner($owner)
+            ->setModifiedBy($owner)
+            ->setStudent($student)
+            ->setBodyPrivate('Private Body')
+            ->setBodyPublic('Public Body')
+            ->setCreatedAt((new Alaress_Date_Format())::now())
+            ->setUpdatedAt((new Alaress_Date_Format())::now())
+        ;
         $record->setComments(
             PastoralComment::createCollection()->add(
                 (new PastoralComment())->setPrivate(true)->setBody('Private Comment')
