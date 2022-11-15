@@ -24,4 +24,4 @@ DELETE FROM lu_config_type WHERE type='Board Leave';
 
 
 -- Delete no longer used error constant.
-DELETE FROM error WHERE message='Leave request commences too soon.';
+DELETE FROM error WHERE id=162; -- Expected error message: 'Leave request commences too soon.'
