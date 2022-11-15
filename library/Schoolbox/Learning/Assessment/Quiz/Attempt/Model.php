@@ -43,13 +43,13 @@ class Model extends AbstractResponse
      *
      * @var Alaress_Date_Format|null
      */
-    protected $submittedAt;
+    protected ?Alaress_Date_Format $submittedAt = null;
 
 
     /**
      * @return Alaress_Date_Format|null
      */
-    public function getSubmittedAt()
+    public function getSubmittedAt(): ?Alaress_Date_Format
     {
         return $this->submittedAt;
     }
@@ -58,7 +58,7 @@ class Model extends AbstractResponse
      * @param Alaress_Date_Format|null $submittedAt
      * @return $this
      */
-    public function setSubmittedAt(?Alaress_Date_Format $submittedAt)
+    public function setSubmittedAt(?Alaress_Date_Format $submittedAt): self
     {
         $this->submittedAt = $submittedAt;
         return $this;

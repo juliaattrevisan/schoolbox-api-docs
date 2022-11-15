@@ -24,6 +24,8 @@ class Model extends AbstractResponse
      * * the submission date is the time the score was created in the tool
      * * the creation date is the time the corresponding response was created in
      *   Schoolbox
+     *
+     * (LTI assessment responses will always have a submit date)
      */
     private Alaress_Date_Format $submittedAt;
 
@@ -46,7 +48,7 @@ class Model extends AbstractResponse
     /**
      * The response's creation date is its submit date.
      */
-    public function getSubmittedAt()
+    public function getSubmittedAt(): Alaress_Date_Format
     {
         return $this->submittedAt;
     }

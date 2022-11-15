@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\Task\Response;
 
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Learning\Assessment\AbstractResponse;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -103,9 +104,9 @@ class Model extends AbstractResponse
      * Completions are submitted at the updatedAt value
      * in case the Completion is modified by the Student
      *
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getSubmittedAt()
+    public function getSubmittedAt(): ?Alaress_Date_Format
     {
         return $this->getCreatedAt();
     }
