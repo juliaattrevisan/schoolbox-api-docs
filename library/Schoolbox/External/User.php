@@ -39,11 +39,11 @@ class User
     public function getTeachers(\Schoolbox\User $user)
     {
         //load teachers if they have not been loaded
-        if (empty($this->teachers)) {
-            $this->loadTeachers($user);
+        if (empty($this->teachers) || empty($this->teachers[$user->getExternalId()])) {
+            $this->loadTeachers([$user]);
         }
         //return teachers
-        return $this->teachers;
+        return $this->teachers[$user->getExternalId()];
     }
 
     public function getStudents(\Schoolbox\User $user)
@@ -84,17 +84,22 @@ class User
         }
     }
 
-    private function loadTeachers(\Schoolbox\User $user)
+    /**
+     * @param \Schoolbox\User[] $students
+     * @return void
+     */
+    private function loadTeachers($students)
     {
         $codeMatcher       = (new ClassCodeMatchFactory())->build($this->externalType);
 
         // Get all of the students subjects
 
-        $found = [];
-        $subjects = $this->externalUser->getSubjectList($user);
+        foreach ($students as $student) {
+            $this->teachers[$student->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
+            $found                                     = [];
+            $subjects                                  = $this->externalUser->getSubjectList($student);
 
-        // Iterate and find teachers associated with each subject
-        if (is_array($subjects)) {
+            // Iterate and find teachers associated with each subject
             foreach ($subjects as $subject) {
                 $teachers = $this->externalClass->getTeachers($codeMatcher::generateFolderCode($subject['campusCode'], $subject['code']));
 
@@ -103,7 +108,7 @@ class User
 
                     if (!isset($found[$teacher])) {
                         try {
-                            $this->teachers->add(
+                            $this->teachers[$student->getExternalId()]->add(
                                 $this->userMapper->findByExternalId($teacher, Role::STAFF)
                             );
 
@@ -124,7 +129,7 @@ class User
     public function loadStudents($students)
     {
         foreach ($students as $student) {
-            $this->students[$student->getExternalId()] = new GenericCollection(self::class);
+            $this->students[$student->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
             $enrolments                             = $this->externalUser->getEnrolledStudents($student->getExternalId());
             foreach ($enrolments as $child) {
                 try {
