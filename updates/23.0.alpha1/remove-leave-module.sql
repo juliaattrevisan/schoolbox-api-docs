@@ -1,5 +1,7 @@
 -- Delete all config variables pertaining to the boarder-leave module.
 DELETE FROM config WHERE name LIKE "boarder_%";
+DELETE FROM config WHERE name="terms_and_conditions";
+DELETE FROM config WHERE name="debug_email_address";
 
 -- Deprecate the leave_request table and associated lookup tables.
 --  1. Remove qny foreign key links to tables to be removed.
@@ -19,3 +21,7 @@ WHERE type_id IN (
    WHERE type='Board Leave'
 );
 DELETE FROM lu_config_type WHERE type='Board Leave';
+
+
+-- Delete no longer used error constant.
+DELETE FROM error WHERE message='Leave request commences too soon.';
