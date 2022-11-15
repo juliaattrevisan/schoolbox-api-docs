@@ -10,6 +10,7 @@ use Page\Curriculum\Manage\ManageCurriculum;
 use Page\Curriculum\Manage\action\AddNewCurriculum;
 use Page\Curriculum\Manage\action\AddNewSubsection;
 use Page\Curriculum\Manage\action\DisableNodes;
+use Page\Curriculum\Manage\action\DeleteNodes;
 use Exception;
 
 class ManageCurriculumCest
@@ -39,8 +40,8 @@ class ManageCurriculumCest
      */
     // public function addNewCurriculum(AcceptanceTester $i)
     // {
-    //     $addNew = new AddNewCurriculum($i);
     //     $i->amGoingTo('add a new curriculum');
+    //     $addNew = new AddNewCurriculum($i);
     //     $addNew->clickDisplay();
     //     $i->amGoingTo('ensure the add button is disabled until I add a name');
     //     $addNew->seeAddButtonIsDisabled();
@@ -61,8 +62,8 @@ class ManageCurriculumCest
      */
     // public function addNewSubsection(AcceptanceTester $i)
     // {
-    //     $addNew = new AddNewSubsection($i);
     //     $i->amGoingTo('add a new subsection to English');
+    //     $addNew = new AddNewSubsection($i);
     //     $addNew->clickDisplay('English');
     //     $i->amGoingTo('ensure the add button is disabled until I add a name');
     //     $addNew->seeAddButtonIsDisabled();
@@ -81,17 +82,40 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum disable some nodes
      */
-    public function disableNodes(AcceptanceTester $i)
+    // public function disableNodes(AcceptanceTester $i)
+    // {
+    //     $i->amGoingTo('disable Year 4 English and Year 9 History');
+    //     $mc = new ManageCurriculum($i);
+    //     $mc->checkNode('#checkbox-247');
+    //     $mc->checkNode('#checkbox-1');
+    //     $disableNodes = new DisableNodes($i);
+    //     $disableNodes->clickDisableButton();
+    //     $disableNodes->waitForConfirmModal();
+    //     $disableNodes->clickConfirmButton();
+    //     $i->amGoingTo('ensure the toast message is shown');
+    //     $mc->waitForToast();
+    //     $i->canSee('Nodes successfully disabled');
+    // }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * on https://vagrant.dev.schoolbox.cloud/curriculum disable some nodes
+     */
+    public function deleteNode(AcceptanceTester $i)
     {
-        $disableNodes = new DisableNodes($i);
-        $i->amGoingTo('disable Year 4 English and Year 9 History');
-        $disableNodes->checkNode('#checkbox-247');
-        $disableNodes->checkNode('#checkbox-1');
-        $disableNodes->clickDisableButton();
-        $disableNodes->waitForConfirmModal();
-        $disableNodes->clickConfirmButton();
+        $i->amGoingTo('delete the Year 12 French Node');
+        $mc = new ManageCurriculum($i);
+        $mc->checkNode('#checkbox-302');
+        $deleteNodes = new DeleteNodes($i);
+        $deleteNodes->clickDeleteButton();
+        $deleteNodes->waitForConfirmModal();
+        $deleteNodes->clickConfirmButton();
         $i->amGoingTo('ensure the toast message is shown');
-        $i->canSee('Node successfully disabled');
+        $mc->waitForToast();
+        $i->canSee('Node successfully deleted');
+        $i->dontSee('Year 12 French');
     }
 
 }

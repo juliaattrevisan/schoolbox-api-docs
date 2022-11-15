@@ -22,14 +22,6 @@ class DisableNodes
     }
 
     /**
-     * select the node checkbox to disable
-     */
-    public function checkNode($value): void
-    {
-        $this->tester->checkOption($value);
-    }
-
-    /**
      * click the button to disable the selected nodes
      */
     public function clickDisableButton(): void
