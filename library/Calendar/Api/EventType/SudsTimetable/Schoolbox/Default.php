@@ -7,12 +7,25 @@
  */
 
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\External\Connector\AttendanceFactory;
 use Schoolbox\External\Event\Overrides\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
+    /**
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $folderCodes;
+
+
+    /**
+     * @var \Schoolbox\IConfigLoader
+     */
+    private \Schoolbox\IConfigLoader $configLoader;
+
+
     /**
      * @var EventTypeMapper
      */
@@ -56,12 +69,6 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
 
 
     /**
-     * @var GenericCollection|null
-     */
-    private ?GenericCollection $folderCodes;
-
-
-    /**
      * @inheritdoc
      */
     public function __construct(
@@ -69,6 +76,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         User $user,
         User $viewer,
         ?GenericCollection $folderCodes,
+        \Schoolbox\IConfigLoader $configLoader,
         \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         \Schoolbox\External\ClassEntryMapper $classEntryMapper,
         \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper,
@@ -80,6 +88,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         parent::__construct($connectorId, $user, $viewer);
 
         $this->folderCodes = $folderCodes;
+        $this->configLoader = $configLoader;
         $this->eventTypeMapper = $eventTypeMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
@@ -97,6 +106,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
      * @return \Calendar\Event\Collection
+     * @throws InvalidArgumentException
      * @throws PDOException
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
@@ -145,8 +155,16 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
          */
         $timetableColorManager = new Timetable_ColourManager($this->timetableColourMapper->findAll()->reindex());
 
+        /* Decide if the current SUDS connector supports Attendance Link generation
+         * If it does, use it repeatedly to create said links
+         * Otherwise it remains null and will do nothing
+         */
+        $attendanceLinkGenerator = (new AttendanceFactory($this->configLoader))->produce();
+
         /** @var \Schoolbox\External\Event\Model $timetableEvent */
         foreach ($timetableEvents as $timetableEvent) {
+            $attendanceLink = $attendanceLinkGenerator?->generate($timetableEvent, $this->getUser()) ?? '';
+
             $instance = new \Calendar\Event\Type\SudsTimetable\Event();
             $instance->setEventId($timetableEvent->getId());
             $instance->setConnectorId($this->getConnectorId());
@@ -163,6 +181,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setType($eventTypeSettings['type']);
             $instance->setFolder($timetableEvent->getFolder());
             $instance->setStaff($timetableEvent->getStaff());
+            $instance->setAttendanceUrl($attendanceLink);
 
             $stack->add($instance);
         }

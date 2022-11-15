@@ -39,6 +39,11 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
  */
 class Code
 {
+    /**
+     * This char separates the pieces of a tass class code
+     */
+    private const SEPARATOR = '-';
+
 
     /**
      * Encodes three pieces of data into a hyphen-separated string
@@ -62,6 +67,23 @@ class Code
      */
     public function encode(string $yearGroup, string $subjectCode, string $class): string
     {
-        return "{$yearGroup}-{$subjectCode}-{$class}";
+        return sprintf(
+            '%s%s%s%s%s',
+            $yearGroup,
+            self::SEPARATOR,
+            $subjectCode,
+            self::SEPARATOR,
+            $class
+        );
+    }
+
+
+    /**
+     * @param string $classCode
+     * @return array
+     */
+    public function decode(string $classCode): array
+    {
+        return explode(self::SEPARATOR, $classCode);
     }
 }

@@ -16,6 +16,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Guid;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -601,6 +602,8 @@ class Classes implements IStrategy
 
             /* Process relevant dates
              */
+            $guidCodec = new Guid();
+
             foreach ($timetable['DAYS'][$dayNumber]['PERIODS'] as $periodData) {
                 /* Extract the useful time from this microsecond format
                  */
@@ -637,7 +640,17 @@ class Classes implements IStrategy
                     $classCode = (new Code())->encode($yearGroup, (string)$subject['SUB_CODE'], (string)$subject['CLASS']);
                     $period = trim((string)$periodData['PRD_DESC']);
                     $type = '';
-                    $guid = '';
+
+                    /* Circumstantially encode stuff we happen to need to make an
+                     * Attendance deeplink into the TASS system itself
+                     */
+                    $guid = $guidCodec->encode(
+                        $startAt->getDatabase(),
+                        (string)$timetable['TT_ID'],
+                        $dayNumber,
+                        (string)$periodData['PRD_CODE'],
+                        $classCode
+                    );
 
                     /* Try to find an event that already exists
                      * If it already exists, just continue; it's already been made
@@ -701,13 +714,28 @@ class Classes implements IStrategy
                             $event->getFinishAt()->getDatabase()
                         ));
 
-                        /* Remember we did this
+                        /* Weird shim
+                         *
+                         * Sometimes the db just won't save N rows of this field...wtf?
+                         * Explicitly set the guid always, with the available data
                          */
-                        $this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()] = $event;
+                        $event->setGuid($guid);
+
+                        $this->log->debug(sprintf(
+                            'Assigning guid %s to %s on %s-%s',
+                            $guid,
+                            $classCode,
+                            $startAt->getDatabase(),
+                            $finishAt->getDatabase()
+                        ));
 
                         if ($this->perform) {
                             $this->eventMapper->save($event);
                         }
+
+                        /* Remember we did this
+                         */
+                        $this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()] = $event;
                     }
 
                     /* Save sis_class record

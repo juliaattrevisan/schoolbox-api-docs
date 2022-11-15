@@ -143,6 +143,14 @@ class Javascript extends Base
                     'staff' => $this->event->getStaff()
                 ],
 
+                /* Give users a link to mark attendance for a SUDS Timetable class
+                 * Hardcoded for now to always open in a new window
+                 */
+                'classAttendance' => [
+                    'url'    => $this->event->getAttendanceUrl(),
+                    'target' => '_blank',
+                ],
+
                 'attendance' => [
                     'icon'          => false,
                     'status'        => false,

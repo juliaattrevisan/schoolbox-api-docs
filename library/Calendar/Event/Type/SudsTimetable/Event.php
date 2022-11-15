@@ -16,7 +16,6 @@ use Calendar\Event\Type\Day;
  */
 class Event extends Day\Event
 {
-
     /**
      * @var string|null
      */
@@ -45,6 +44,12 @@ class Event extends Day\Event
      * @var \Schoolbox\Resource\Folder\Model|null
      */
     private ?\Schoolbox\Resource\Folder\Model $folder;
+
+
+    /**
+     * @var string|null
+     */
+    private ?string $attendanceUrl = null;
 
 
     /**
@@ -156,6 +161,25 @@ class Event extends Day\Event
     public function setStaff(array $staff): self
     {
         $this->staff = $staff;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getAttendanceUrl(): ?string
+    {
+        return $this->attendanceUrl;
+    }
+
+
+    /**
+     * @param string|null $attendanceUrl
+     */
+    public function setAttendanceUrl(?string $attendanceUrl): self
+    {
+        $this->attendanceUrl = $attendanceUrl;
         return $this;
     }
 }
