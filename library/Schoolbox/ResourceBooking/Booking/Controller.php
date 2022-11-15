@@ -199,7 +199,8 @@ class Controller extends Base
             $this->getStatusMapper(),
             $this->getTermMapper(),
             $this->getExternalTimetableHandler(),
-            $this->getCampusMapper()
+            $this->getCampusMapper(),
+            $this->getConfigLoader()
         );
         $errors = $validation->validateBookingFromPostData($item, $this->getRequest()->post, null);
         if (empty($errors)) {
@@ -302,7 +303,8 @@ class Controller extends Base
             $this->getStatusMapper(),
             $this->getTermMapper(),
             $this->getExternalTimetableHandler(),
-            $this->getCampusMapper()
+            $this->getCampusMapper(),
+            $this->getConfigLoader()
         );
         $errors = $validation->validateBookingFromPostData($item->getResource(), $this->getRequest()->post, $item);
 
@@ -800,7 +802,8 @@ class Controller extends Base
             $this->getStatusMapper(),
             $this->getTermMapper(),
             $this->getExternalTimetableHandler(),
-            $this->getCampusMapper()
+            $this->getCampusMapper(),
+            $this->getConfigLoader()
         );
         // validate this booking
         $booking
