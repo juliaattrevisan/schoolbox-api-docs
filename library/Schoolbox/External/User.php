@@ -3,6 +3,7 @@
 namespace Schoolbox\External;
 
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 use Schoolbox\Role;
@@ -14,13 +15,20 @@ class User
     private Collection $parents;
     private Collection $students;
     private Collection $teachers;
+    private \External_User $externalUser;
+    private \External_Class $externalClass;
+    private UserMapper $userMapper;
+    private string $externalType;
 
-    public function __construct(
-        private \External_User $externalUser,
-        private \External_Class $externalClass,
-        private UserMapper $userMapper,
-        private string $externalType,
-    ) {
+    public function __construct()
+    {
+        //could inject... will need to see how much code is required to drag these from modules into the function calls...
+        $this->externalType = ConfigMapper::getInstance()->getConfigLoader()->get('external_type');
+        $this->externalClass = new \External_Class();
+        $this->externalUser = new \External_User();
+        $this->userMapper = UserMapper::getInstance();
+
+
         $this->parents = new Collection();
         $this->students = new Collection();
         $this->teachers = new Collection();
