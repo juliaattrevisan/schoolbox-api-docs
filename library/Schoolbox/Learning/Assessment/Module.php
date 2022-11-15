@@ -466,7 +466,6 @@ class Module extends BaseModule
                     $unitSpecMapper,
                     $replicator,
                     $viewLatestMapper,
-                    $stateMapper,
                 );
 
             case Assessment\Quiz\Controller::class:
