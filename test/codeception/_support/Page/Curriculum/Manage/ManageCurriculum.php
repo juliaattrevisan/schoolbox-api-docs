@@ -1,6 +1,6 @@
 <?php
 
-namespace Page\ManageCurriculum;
+namespace Page\Curriculum\Manage;
 
 use AcceptanceTester;
 
@@ -8,8 +8,6 @@ class ManageCurriculum
 {
 
     public const URL = '/curriculum';
-
-    public const NEW_CURRICULUM_NAME = '#name';
     private AcceptanceTester $tester;
 
     /**
@@ -21,14 +19,5 @@ class ManageCurriculum
     {
         $this->tester = $i;
     }
-
-    /**
-     *
-     */
-    public function fillNewCurriculumName($value): void
-    {
-        $this->tester->fillField(self::NEW_CURRICULUM_NAME, $value);
-    }
-
 
 }

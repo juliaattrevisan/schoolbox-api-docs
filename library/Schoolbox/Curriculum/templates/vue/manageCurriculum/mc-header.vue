@@ -57,7 +57,7 @@ async function onLeave (el, done) {
                 <a
                     href="#create-curriculum"
                     data-interaction="create-curriculum"
-                    data-test-create-curriculum
+                    data-test-toggle-create-curriculum
                     :class="`icon ${ addCurriculumStore.isOpen ? 'icon-close' : 'icon-add' }`"
                     title="Create New Curriculum"
                     @click.prevent="onCreateNewSelected"

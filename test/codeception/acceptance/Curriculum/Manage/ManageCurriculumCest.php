@@ -6,7 +6,8 @@ namespace ManageCurriculum;
 
 use AcceptanceTester;
 use Codeception\Util\Locator;
-use Page\ManageCurriculum\ManageCurriculum;
+use Page\Curriculum\Manage\ManageCurriculum;
+use Page\Curriculum\Manage\action\AddNewCurriculum;
 use Exception;
 
 class ManageCurriculumCest
@@ -36,13 +37,13 @@ class ManageCurriculumCest
      */
     public function addNewCurriculum(AcceptanceTester $i)
     {
-        $mc = new ManageCurriculum($i);
+        $addNew = new AddNewCurriculum($i);
         $i->amGoingTo('Add a new Curriculum');
-        $i->click('Create New Curriculum');
-        $i->seeElement('[data-test-add-curriculum]:disabled');
-        $mc->fillNewCurriculumName('Party Town');
-        $i->fillField('#code', 'PT');
-        $i->click('Add');
+        $addNew->toggleDisplay();
+        $addNew->seeAddButtonIsDisabled();
+        $addNew->fillName('Party Town');
+        $addNew->fillCode('PT');
+        $addNew->clickAddButton('PT');
         $i->canSee('Curriculum successfully added');
         $i->canSee('[PT] Party Town');
     }
