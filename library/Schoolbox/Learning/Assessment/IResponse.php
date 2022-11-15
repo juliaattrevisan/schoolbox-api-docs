@@ -192,10 +192,9 @@ interface IResponse
 
     /**
      * @param Alaress_Date_Format $createdAt
-     *
      * @return $this
      */
-    public function setCreatedAt(Alaress_Date_Format $createdAt);
+    public function setCreatedAt(Alaress_Date_Format $createdAt): static;
 
     /**
      * @return Alaress_Date_Format
@@ -207,7 +206,7 @@ interface IResponse
      *
      * @return $this
      */
-    public function setUpdatedAt(Alaress_Date_Format $updatedAt);
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt): static;
 
     /**
      * @return Alaress_Date_Format|null
@@ -218,5 +217,5 @@ interface IResponse
      * @param Alaress_Date_Format|null $deletedAt
      * @return $this
      */
-    public function setDeletedAt(?Alaress_Date_Format $deletedAt = null);
+    public function setDeletedAt(?Alaress_Date_Format $deletedAt = null): static;
 }
