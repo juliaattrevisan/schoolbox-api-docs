@@ -4541,16 +4541,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Project/Model.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and iterable\\<Schoolbox\\\\Curriculum\\\\Node\\\\Model\\>&Schoolbox\\\\GenericCollection will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:addAttachment\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
