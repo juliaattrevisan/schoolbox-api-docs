@@ -11,7 +11,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 if (!isset($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
-    SitePage::localRedir(\preg_replace('/.php$/', '', $_SERVER['SCRIPT_NAME']));
+    SitePage::localRedir('/modules/report/staff');
 }
 /** @var SitePage $this */
 
