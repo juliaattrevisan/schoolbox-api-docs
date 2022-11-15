@@ -58,11 +58,11 @@ class AttendanceLink implements IAttendanceLink
     /**
      * Constructor
      *
-     * @param bool   $attendanceEnabled
+     * @param bool $attendanceEnabled
      * @param int  $externalAttendanceDays
-     * @param string $prodMenu
+     * @param bool $prodMenu
      */
-    public function __construct(bool $attendanceEnabled, int $externalAttendanceDays, string $prodMenu)
+    public function __construct(bool $attendanceEnabled, int $externalAttendanceDays, bool $prodMenu)
     {
         $this->attendanceEnabled = $attendanceEnabled;
         $this->externalAttendanceDays = $externalAttendanceDays;

@@ -15,6 +15,18 @@ use Schoolbox\User;
 class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Api_EventType_Abstract
 {
     /**
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $folderCodes;
+
+
+    /**
+     * @var \Schoolbox\IConfigLoader
+     */
+    private \Schoolbox\IConfigLoader $configLoader;
+
+
+    /**
      * @var EventTypeMapper
      */
     private EventTypeMapper $eventTypeMapper;
@@ -57,12 +69,6 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
 
 
     /**
-     * @var GenericCollection|null
-     */
-    private ?GenericCollection $folderCodes;
-
-
-    /**
      * @inheritdoc
      */
     public function __construct(
@@ -70,6 +76,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         User $user,
         User $viewer,
         ?GenericCollection $folderCodes,
+        \Schoolbox\IConfigLoader $configLoader,
         \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
         \Schoolbox\External\ClassEntryMapper $classEntryMapper,
         \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper,
@@ -81,6 +88,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
         parent::__construct($connectorId, $user, $viewer);
 
         $this->folderCodes = $folderCodes;
+        $this->configLoader = $configLoader;
         $this->eventTypeMapper = $eventTypeMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
@@ -98,6 +106,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
      * @param int        $endTimestamp
      * @param array|null $allowedEventTypes
      * @return \Calendar\Event\Collection
+     * @throws InvalidArgumentException
      * @throws PDOException
      */
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
@@ -150,7 +159,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
          * If it does, use it repeatedly to create said links
          * Otherwise it remains null and will do nothing
          */
-        $attendanceLinkGenerator = (new AttendanceFactory())->produce(\Schoolbox\Config\Loader::getInstance()->get('schooldata_import_data_source'));
+        $attendanceLinkGenerator = (new AttendanceFactory($this->configLoader))->produce();
 
         /** @var \Schoolbox\External\Event\Model $timetableEvent */
         foreach ($timetableEvents as $timetableEvent) {

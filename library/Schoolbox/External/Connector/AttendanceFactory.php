@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector;
 
-use Schoolbox\Config\Loader;
+use Schoolbox\IConfigLoader;
 
 /**
  * Produces a class that can manufacture an attendance link in some manner
@@ -17,21 +17,28 @@ use Schoolbox\Config\Loader;
 class AttendanceFactory
 {
     /**
+     * Constructor.
+     *
+     * @param IConfigLoader $configLoader
+     */
+    public function __construct(private IConfigLoader $configLoader)
+    {
+    }
+
+
+    /**
      * Produces a specific DSN codec for the selected suds importer
      *
-     * @param string $type
      * @return IAttendanceLink|null
      */
-    public function produce(string $type): ?IAttendanceLink
+    public function produce(): ?IAttendanceLink
     {
-        $config = Loader::getInstance();
-
-        switch ($type) {
+        switch ($this->configLoader->get('schooldata_import_data_source')) {
             case \Schoolbox\External\Importer\Endpoint\Factory::TASS_API:
                 return new \Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\AttendanceLink(
-                    (bool)$config->get('external_attendance'),
-                    (int)$config->get('external_attendance_days'),
-                    (string)$config->get('external_tass_attendance_show_prod_menu')
+                    (bool)$this->configLoader->get('external_attendance'),
+                    (int)$this->configLoader->get('external_attendance_days'),
+                    (bool)$this->configLoader->get('external_tass_attendance_show_prod_menu')
                 );
         }
 
