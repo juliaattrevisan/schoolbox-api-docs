@@ -11,6 +11,7 @@ use Page\Curriculum\Manage\action\AddNewCurriculum;
 use Page\Curriculum\Manage\action\AddNewSubsection;
 use Page\Curriculum\Manage\action\DisableNodes;
 use Page\Curriculum\Manage\action\DeleteNodes;
+use Page\Curriculum\Manage\action\SearchNodes;
 use Exception;
 
 class ManageCurriculumCest
@@ -101,21 +102,38 @@ class ManageCurriculumCest
      * @param AcceptanceTester $i
      * @throws Exception
      *
-     * on https://vagrant.dev.schoolbox.cloud/curriculum disable some nodes
+     * on https://vagrant.dev.schoolbox.cloud/curriculum delete a node
      */
-    public function deleteNode(AcceptanceTester $i)
+    // public function deleteNode(AcceptanceTester $i)
+    // {
+    //     $i->amGoingTo('delete the Year 12 French Node');
+    //     $mc = new ManageCurriculum($i);
+    //     $mc->checkNode('#checkbox-302');
+    //     $deleteNodes = new DeleteNodes($i);
+    //     $deleteNodes->clickDeleteButton();
+    //     $deleteNodes->waitForConfirmModal();
+    //     $deleteNodes->clickConfirmButton();
+    //     $i->amGoingTo('ensure the toast message is shown');
+    //     $mc->waitForToast();
+    //     $i->canSee('Node successfully deleted');
+    //     $i->dontSee('Year 12 French');
+    // }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * on https://vagrant.dev.schoolbox.cloud/curriculum search for nodes
+     */
+    public function searchNodes(AcceptanceTester $i)
     {
-        $i->amGoingTo('delete the Year 12 French Node');
+        $i->amGoingTo('search for nodes containing "historical" in Year 4 History');
         $mc = new ManageCurriculum($i);
-        $mc->checkNode('#checkbox-302');
-        $deleteNodes = new DeleteNodes($i);
-        $deleteNodes->clickDeleteButton();
-        $deleteNodes->waitForConfirmModal();
-        $deleteNodes->clickConfirmButton();
-        $i->amGoingTo('ensure the toast message is shown');
-        $mc->waitForToast();
-        $i->canSee('Node successfully deleted');
-        $i->dontSee('Year 12 French');
+        $mc->clickNode('Year 4 History');
+        $searchNodes = new SearchNodes($i);
+        $searchNodes->fillSearch('historical');
+        $i->amGoingTo('expect 4 search results are shown');
+        $searchNodes->seeResultsMatch('[data-test-node]', 4);
     }
 
 }

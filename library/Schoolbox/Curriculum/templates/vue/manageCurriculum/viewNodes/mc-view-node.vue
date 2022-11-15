@@ -222,7 +222,11 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
 
 <template>
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-        <li v-if="showNode" ref="viewNodeEl">
+        <li
+            v-if="showNode"
+            ref="viewNodeEl"
+            data-test-node
+        >
             <div
                 class="buttons-container"
                 :data-enabled="props.node.enabled"

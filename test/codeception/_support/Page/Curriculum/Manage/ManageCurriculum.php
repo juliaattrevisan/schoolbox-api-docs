@@ -30,6 +30,14 @@ class ManageCurriculum
     }
 
     /**
+     * select the node to navigate next o
+     */
+    public function clickNode($value): void
+    {
+        $this->tester->click($value);
+    }
+
+    /**
      * wait for the toast message to appear
      */
     public function waitForToast(): void

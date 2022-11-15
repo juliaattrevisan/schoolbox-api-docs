@@ -80,6 +80,7 @@ function onClearSearchSelected () {
                 :disabled="isDisabled"
                 :placeholder="placeholder"
                 data-modal-search-input
+                data-test-search-input
                 @input="$event.target.composing = false"
             />
             <button
@@ -101,6 +102,7 @@ function onClearSearchSelected () {
                 id="show-only-enabled"
                 type="checkbox"
                 v-model="viewNodesStore.showDisabled"
+                data-test-show-only-enabled
                 :disabled="props.isDisabled"
             />
             <label for="show-only-enabled">
