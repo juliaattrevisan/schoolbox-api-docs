@@ -694,6 +694,9 @@ class Controller extends Base
                 );
             } else {
                 $roomSource = new \Calendar_Api_EventType_SudsTimetable_Room(
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                    $this->getUser(),
+                    $this->getUser(),
                     \Schoolbox\External\Event\Mapper::getInstance(),
                     $roomCodes
                 );

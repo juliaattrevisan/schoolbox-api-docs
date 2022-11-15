@@ -25,13 +25,20 @@ class Calendar_Api_EventType_SudsTimetable_Room extends Calendar_Api_EventType_A
     /**
      * Constructor.
      *
+     * @param int                              $connectorId
+     * @param \Schoolbox\User                  $user
+     * @param \Schoolbox\User                  $viewer
      * @param \Schoolbox\External\Event\Mapper $eventMapper
      * @param array                            $roomCodes
      */
     public function __construct(
+        private int $connectorId,
+        protected \Schoolbox\User $user,
+        protected \Schoolbox\User $viewer,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private array $roomCodes = []
     ) {
+        parent::__construct($this->connectorId, $user, $viewer);
     }
 
 

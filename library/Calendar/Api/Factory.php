@@ -345,7 +345,7 @@ class Calendar_Api_Factory
              * TODO (but where/how is this used/accessed?)
              */
             case Calendar_Api_EventType_SudsTimetable_Room::class:
-                return new Calendar_Api_EventType_SudsTimetable_Room(\Schoolbox\External\Event\Mapper::getInstance());
+                return new Calendar_Api_EventType_SudsTimetable_Room($connectorId, $user, $viewer, \Schoolbox\External\Event\Mapper::getInstance());
 
             case Calendar_Api_EventType_TimetableDays_External_Default::class:
                 return new Calendar_Api_EventType_TimetableDays_External_Default($connectorId, $user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance());

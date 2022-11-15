@@ -84,7 +84,13 @@ class CalendarApiFactory
                     $roomCodes
                 );
             } else {
-                $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room($this->eventMapper, $roomCodes);
+                $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room(
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                    $this->user,
+                    $this->user,
+                    $this->eventMapper,
+                    $roomCodes
+                );
             }
 
             $api->add($timetableApi);
@@ -142,7 +148,13 @@ class CalendarApiFactory
                     $roomCodes
                 );
             } else {
-                $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room($this->eventMapper, $roomCodes);
+                $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room(
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                    $this->user,
+                    $this->user,
+                    $this->eventMapper,
+                    $roomCodes
+                );
             }
 
             $api->add($timetableApi);
