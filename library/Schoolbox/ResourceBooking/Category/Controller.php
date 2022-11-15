@@ -14,6 +14,7 @@ use Alaress\Paginator\IUrlPaginator;
 use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
 use Calendar\Event\Type\EventBase;
+use Schoolbox\External\Event\Mapper;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 use Schoolbox\ResourceBooking\Report\CalendarApiFactory;
 
@@ -41,8 +42,9 @@ class Controller extends Base
      * Controller constructor.
      *
      * @param ItemMapper $itemMapper
+     * @param Mapper     $eventMapper
      */
-    public function __construct(ItemMapper $itemMapper)
+    public function __construct(ItemMapper $itemMapper, private \Schoolbox\External\Event\Mapper $eventMapper)
     {
         $this->itemMapper = $itemMapper;
     }
@@ -225,7 +227,7 @@ class Controller extends Base
      */
     public function calendar(Model $category)
     {
-        $apiFactory = new CalendarApiFactory($this->getUser(), new \External_Timetable());
+        $apiFactory = new CalendarApiFactory($this->getUser(), new \External_Timetable(), $this->getConfigLoader(), $this->eventMapper);
         $source     = $apiFactory->buildFromResourceCollection(
             ItemMapper::getInstance()->findByColumn(
                 'resource_category_id',

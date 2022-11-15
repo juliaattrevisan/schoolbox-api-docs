@@ -13,6 +13,8 @@ namespace Schoolbox\ResourceBooking\Report;
 use Calendar_Api_Composite;
 use Calendar_Api_EventType_Interface;
 use External_TimetableInterface;
+use Schoolbox\External\Event\Mapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\User;
 use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
@@ -31,14 +33,21 @@ class CalendarApiFactory
      */
     private $timetable;
 
+
     /**
      * Constructor
      *
      * @param User                        $user
      * @param External_TimetableInterface $timetable
+     * @param IConfigLoader               $configLoader
+     * @param Mapper                      $eventMapper
      */
-    public function __construct(User $user, External_TimetableInterface $timetable)
-    {
+    public function __construct(
+        User $user,
+        External_TimetableInterface $timetable,
+        private \Schoolbox\IConfigLoader $configLoader,
+        private \Schoolbox\External\Event\Mapper $eventMapper
+    ) {
         $this->user      = $user;
         $this->timetable = $timetable;
     }
@@ -129,12 +138,7 @@ class CalendarApiFactory
             $api->add($resourceApi);
         }
         if ($getTimetabledRooms && !empty($roomCodes)) {
-            /* TODO: Inject this
-             */
-            $config = \Schoolbox\Config\Loader::getInstance();
-            $eventMapper = \Schoolbox\External\Event\Mapper::getInstance();
-
-            if (in_array($config->get('schooldata_import_endpoint_host'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
+            if (in_array($this->configLoader->get('schooldata_import_endpoint_host'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
                 $timetableApi = new Calendar_Api_EventType_Timetable_Room(
                     Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $this->user,
@@ -143,7 +147,7 @@ class CalendarApiFactory
                     $roomCodes
                 );
             } else {
-                $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room($eventMapper, $roomCodes);
+                $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room($this->eventMapper, $roomCodes);
             }
 
             $api->add($timetableApi);
