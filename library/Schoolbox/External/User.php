@@ -148,4 +148,48 @@ class User
             }
         }
     }
+
+    /**
+     * Is this $parent a parent of $child?
+     *
+     * @param \Schoolbox\User $parent
+     * @param \Schoolbox\User $child
+     * @return bool
+     */
+    public function isParentOf(\Schoolbox\User $parent, \Schoolbox\User $child): bool
+    {
+        /* Parents were never initialised for $child
+         * Their ancestry is inconclusive; continue
+         */
+        if (null !== $child->getParents()) {
+            foreach ($child->getParents() as $parent) {
+                if ($parent->getId() == $child->getId()) {
+                    return true;
+                }
+            }
+        }
+
+        /* $this->children was never initialised for this user
+         * Their descendents are inconclusive; continue
+         */
+        foreach ($this->getStudents($parent) as $currentChild) {
+            if ($currentChild->getId() == $child->getId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Is this $child a child of $parent?
+     *
+     * @param \Schoolbox\User $parent
+     * @param \Schoolbox\User $child
+     * @return bool
+     */
+    public function isChildOf(\Schoolbox\User $parent, \Schoolbox\User $child): bool
+    {
+        return $this->isParentOf($parent, $child);
+    }
 }
