@@ -352,9 +352,8 @@ class Full
         } elseif ($interaction instanceof IFeedback) {
             if ($interaction->getPublishedAt()) {
                 return $interaction->getPublishedAt();
-            } elseif ($interaction->getUpdatedAt()) {
-                return $interaction->getUpdatedAt();
             }
+            return $interaction->getUpdatedAt();
         }
 
         //Item had none of the above dates... We'll try "now"?
