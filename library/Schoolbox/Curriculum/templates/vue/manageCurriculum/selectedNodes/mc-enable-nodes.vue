@@ -106,10 +106,24 @@ function onModalClosed () {
         </p>
         <ul class="flex-list">
             <li>
-                <button @click.prevent="onEnableSelected" class="button icon-approve submit" :disabled="enableNodesStore.isProcessing">{{ enabledButtonText }}</button>
+                <button
+                    class="button icon-approve submit"
+                    data-test-confirm-enable-nodes
+                    :disabled="enableNodesStore.isProcessing"
+                    @click.prevent="onEnableSelected"
+                >
+                    {{ enabledButtonText }}
+                </button>
             </li>
             <li>
-                <button @click.prevent="onCancelSelected" class="button icon-close" :disabled="enableNodesStore.isProcessing">Cancel</button>
+                <button
+                    class="button icon-close"
+                    data-test-cancel-enable-nodes
+                    :disabled="enableNodesStore.isProcessing"
+                    @click.prevent="onCancelSelected"
+                >
+                    Cancel
+                </button>
             </li>
         </ul>
     </reveal-modal>
