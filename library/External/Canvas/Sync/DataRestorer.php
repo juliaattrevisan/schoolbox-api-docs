@@ -116,7 +116,7 @@ class DataRestorer
         $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
         $this->executeIfPersisting($sql);
 
-        $sql = "LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDbName}.{$tableName}";
+        $sql = "SET STATEMENT max_statement_time=0 FOR LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDbName}.{$tableName}";
         try {
             $this->executeIfPersisting($sql);
         } catch (Database\Exception $e) {

@@ -280,6 +280,9 @@ class CliImporter extends CliTool\App
                 continue;
             }
             $tableName = substr($tableGzFile, 0, $posExt);
+            if (!in_array($tableName, self::TABLES_TO_IMPORT)) {
+                continue;
+            }
             $tableFile = "$tempDir/$tableName";
             $this->getLogger()->debug("Loading $tableFile.");
 
