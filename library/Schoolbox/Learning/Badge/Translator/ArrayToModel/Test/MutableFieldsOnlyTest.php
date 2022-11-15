@@ -168,20 +168,8 @@ class MutableFieldsOnlyTest extends TestCase
             (clone $baseModel),
         ];
 
-        yield 'null created at' => [
-            ['createdAt' => null,],
-            (clone $baseModel),
-            (clone $baseModel),
-        ];
-
         yield 'update updated at' => [
             ['updatedAt' => $newDate,],
-            (clone $baseModel),
-            (clone $baseModel),
-        ];
-
-        yield 'null updated at' => [
-            ['updatedAt' => null,],
             (clone $baseModel),
             (clone $baseModel),
         ];
