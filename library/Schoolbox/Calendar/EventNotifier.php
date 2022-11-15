@@ -31,7 +31,6 @@ use Schoolbox\Calendar\Event\Attendance\Mapper as AttendanceMapper;
 
 class EventNotifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_UPCOMING = 'upcoming';
     const TRIGGER_UPDATED  = 'updated';
     const TRIGGER_INVITED  = 'invited';
