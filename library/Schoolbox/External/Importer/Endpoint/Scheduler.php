@@ -184,9 +184,12 @@ class Scheduler
              *  - You don't need a $type at all (csv imports)
              *  - You tried accessing an optional module like TASS Calendar, but it wasn't in the DSN
              *  - The factory produced an empty set for some reason
+             *
+             * Note this is now used in the web context, as well as the cli context
+             * Treat as if it were a web request, using return instead of exit
              */
             if (null === $composites || !$composites->count()) {
-                exit;
+                return;
             }
 
             /* Always log the start of the run
