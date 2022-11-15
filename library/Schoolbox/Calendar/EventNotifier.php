@@ -497,7 +497,12 @@ class EventNotifier extends AbstractModuleNotifier
 
         /** @var Event $event */
         try {
-            $event = $this->mapper->findById($event->getId());
+            if ($event->inSeries()) {
+                // if event is in series, notify with the closest event information
+                $event = $this->mapper->findNextInSeries($event->getSeriesId());
+            } else {
+                $event = $this->mapper->findById($event->getId());
+            }
         } catch (MapperException $e) {
             return $envelope;
         }
