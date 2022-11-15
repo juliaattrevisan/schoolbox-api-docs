@@ -26,7 +26,7 @@ class AddNewCurriculum
     /**
      * select the add new curriculum button
      */
-    public function toggleDisplay(): void
+    public function clickDisplay(): void
     {
         $this->tester->click(self::DISPLAY_TOGGLE);
     }
