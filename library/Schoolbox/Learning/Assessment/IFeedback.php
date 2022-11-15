@@ -183,35 +183,35 @@ interface IFeedback
      *
      * @var Alaress_Date_Format
      */
-    public function getCreatedAt();
+    public function getCreatedAt(): Alaress_Date_Format;
 
     /**
      * @param  Alaress_Date_Format $createdAt
      *
      * @return $this
      */
-    public function setCreatedAt(Alaress_Date_Format $createdAt = null);
+    public function setCreatedAt(Alaress_Date_Format $createdAt);
 
     /**
      * @return Alaress_Date_Format
      */
-    public function getUpdatedAt();
+    public function getUpdatedAt(): Alaress_Date_Format;
 
     /**
      * @param  Alaress_Date_Format $updatedAt
      *
      * @return $this
      */
-    public function setUpdatedAt(Alaress_Date_Format $updatedAt = null);
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt);
 
     /**
      * @return Alaress_Date_Format
      */
-    public function getDeletedAt();
+    public function getDeletedAt(): ?Alaress_Date_Format;
 
     /**
-     * @param  Alaress_Date_Format $deletedAt
+     * @param  Alaress_Date_Format|null $deletedAt
      * @return $this
      */
-    public function setDeletedAt(Alaress_Date_Format $deletedAt = null);
+    public function setDeletedAt(?Alaress_Date_Format $deletedAt = null);
 }
