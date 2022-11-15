@@ -64,13 +64,25 @@ class CalendarApiFactory
 
         // Add the room code API if this resource has got a room code
         if ($roomCode = $resource->getRoomCode()) {
-            $timetableApi = new Calendar_Api_EventType_Timetable_Room(
-                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                $this->user,
-                $this->user,
-                $this->timetable,
-                [$roomCode => $resource->getId()]
-            );
+            /* TODO: Inject this
+             */
+            $config = \Schoolbox\Config\Loader::getInstance();
+            $eventMapper = \Schoolbox\External\Event\Mapper::getInstance();
+
+            $roomCodes = [$roomCode => $resource->getId()];
+
+            if (in_array($config->get('schooldata_import_endpoint_host'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
+                $timetableApi = new Calendar_Api_EventType_Timetable_Room(
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                    $this->user,
+                    $this->user,
+                    $this->timetable,
+                    $roomCodes
+                );
+            } else {
+                $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room($eventMapper, $roomCodes);
+            }
+
             $api->add($timetableApi);
         }
         return $api;
@@ -117,13 +129,23 @@ class CalendarApiFactory
             $api->add($resourceApi);
         }
         if ($getTimetabledRooms && !empty($roomCodes)) {
-            $timetableApi = new Calendar_Api_EventType_Timetable_Room(
-                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                $this->user,
-                $this->user,
-                $this->timetable,
-                $roomCodes
-            );
+            /* TODO: Inject this
+             */
+            $config = \Schoolbox\Config\Loader::getInstance();
+            $eventMapper = \Schoolbox\External\Event\Mapper::getInstance();
+
+            if (in_array($config->get('schooldata_import_endpoint_host'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
+                $timetableApi = new Calendar_Api_EventType_Timetable_Room(
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                    $this->user,
+                    $this->user,
+                    $this->timetable,
+                    $roomCodes
+                );
+            } else {
+                $timetableApi = new \Calendar_Api_EventType_SudsTimetable_Room($eventMapper, $roomCodes);
+            }
+
             $api->add($timetableApi);
         }
         return $api;

@@ -513,8 +513,19 @@ class Validation
      */
     protected function getTimetableRoomEvents($roomCode, DateTime $startDate, DateTime $endDate)
     {
+        /* TODO: Inject this
+         */
+        $config = \Schoolbox\Config\Loader::getInstance();
+        $eventMapper = \Schoolbox\External\Event\Mapper::getInstance();
+
         // Using  [$roomCode => true] to make Calendar_Api_EventType_Timetable_Room::getEvents happy
-        $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, [$roomCode => true]);
+        $roomCodes = [$roomCode => true];
+
+        if (in_array($config->get('schooldata_import_endpoint_host'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
+            $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes);
+        } else {
+            $timetableRoom = new \Calendar_Api_EventType_SudsTimetable_Room($eventMapper, $roomCodes);
+        }
 
         return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
     }

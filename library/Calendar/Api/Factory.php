@@ -334,8 +334,19 @@ class Calendar_Api_Factory
                 );
             case Calendar_Api_EventType_Timetable_ExternalConstrained_Default::class:
                 return new Calendar_Api_EventType_Timetable_ExternalConstrained_Default($connectorId, $user, $viewer, $this->configLoader, \Schoolbox\Calendar\EventTypeMapper::getInstance());
+
+            /* Resource Booking out of the cyclic grid
+             * TODO (but where/how is this used/accessed?)
+             */
             case Calendar_Api_EventType_Timetable_Room::class:
                 return new Calendar_Api_EventType_Timetable_Room($connectorId, $user, $viewer, new External_Timetable());
+
+            /* Resource Booking out of SUDS Timetable
+             * TODO (but where/how is this used/accessed?)
+             */
+            case Calendar_Api_EventType_SudsTimetable_Room::class:
+                return new Calendar_Api_EventType_SudsTimetable_Room(\Schoolbox\External\Event\Mapper::getInstance());
+
             case Calendar_Api_EventType_TimetableDays_External_Default::class:
                 return new Calendar_Api_EventType_TimetableDays_External_Default($connectorId, $user, $viewer, \Schoolbox\Calendar\EventTypeMapper::getInstance());
             case Calendar_Api_EventType_Fixtures_Schoolbox_Default::class:

@@ -670,18 +670,20 @@ class Controller extends Base
         $roomCode = $item->getRoomCode();
 
         if (!empty($roomCode)) {
-            if (in_array($this->getConfigLoader()->get('schooldata_import_endpoint_host'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID)) {
+            $roomCodes = [$item->getRoomCode() => $item->getId()];
+
+            if (in_array($this->getConfigLoader()->get('schooldata_import_endpoint_host'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
                 $roomSource = new \Calendar_Api_EventType_Timetable_Room(
                     Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $this->getUser(),
                     $this->getUser(),
                     $this->externalTimetableHandler,
-                    [$item->getRoomCode() => $item->getId()]
+                    $roomCodes
                 );
             } else {
                 $roomSource = new \Calendar_Api_EventType_SudsTimetable_Room(
                     \Schoolbox\External\Event\Mapper::getInstance(),
-                    [$item->getRoomCode() => $item->getId()]
+                    $roomCodes
                 );
             }
 
