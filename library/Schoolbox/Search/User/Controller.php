@@ -117,6 +117,9 @@ class Controller extends BaseController
      */
     private TermMapper $termMapper;
 
+    protected \Schoolbox\External\User $externalUserDetails;
+
+
     /**
      * Constructor
      * @param UserMapper                    $userMapper
@@ -161,6 +164,9 @@ class Controller extends BaseController
         $this->pastoralSubTypeMapper         = $pastoralSubTypeMapper;
         $this->pastoralDataSource            = $pastoralDataSource;
         $this->termMapper                    = $termMapper;
+
+        $this->externalUserDetails = new \Schoolbox\External\User();
+
     }
 
     /**
@@ -192,8 +198,7 @@ class Controller extends BaseController
     {
         $externalUser = $parent->getExternalId() ? $this->externalUser->getParent($parent->getExternalId()) : [];
 
-        $parent->loadStudents();
-        $students = $parent->getChildren();
+        $students = $this->externalUserDetails->getStudents($parent);
 
         if (isset($externalUser['SpouseID'])) {
             try {
@@ -526,8 +531,7 @@ class Controller extends BaseController
         // Determine whether current user is student's parent, and if not if they
         // are related in some other way.
 
-        $student->loadParents();
-        $isParentOfStudent = $this->getUser()->isParentOf($student);
+        $isParentOfStudent = $this->externalUserDetails->isParentOf($this->getUser(), $student);
         $isPrimaryCarer    = false;
         if ($isParentOfStudent && !empty($contactList)) {
             // Only the primary parent will see emergency contact information
