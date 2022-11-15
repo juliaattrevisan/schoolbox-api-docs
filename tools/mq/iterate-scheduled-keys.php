@@ -9,11 +9,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Async\Notification\Notification;
-use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Redis;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Realtime\Notification\Decorator;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -34,10 +31,7 @@ $app = new class extends CliTool\App
         return;
     }
 
-    /**
-     * @param array $args
-     * @param bool $regexMode
-     */
+
     private function checkRedis(): void
     {
         $redis = Redis::getStorageClientInstance();

@@ -54,11 +54,11 @@ class StartTrigger extends TimetableTrigger
 
 
     /**
-     * @param ADF $start
-     * @param ADF $end
-     * @param ADF $now
+     * @param ADF      $start
+     * @param ADF|null $end
+     * @param ADF      $now
      * @throws OutOfBoundsException if this period is not relevant
-     * @return ADF
+     * @return ADF|null
      */
     protected function testPeriod(ADF $start, ?ADF $end, ADF $now)
     {

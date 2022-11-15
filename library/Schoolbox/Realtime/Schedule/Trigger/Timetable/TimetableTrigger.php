@@ -118,7 +118,7 @@ abstract class TimetableTrigger extends AbstractTrigger
      *
      * @param array $definition
      * @param ADF   $now
-     * @return ADF
+     * @return ADF|null
      */
     protected function getWarningTime(array $definition, $now)
     {
@@ -183,7 +183,7 @@ abstract class TimetableTrigger extends AbstractTrigger
      *
      * @param array $definition
      * @param ADF   $now
-     * @return ADF
+     * @return ADF|null
      */
     protected function getRelevantTime(array $definition, ADF $now)
     {
@@ -267,11 +267,11 @@ abstract class TimetableTrigger extends AbstractTrigger
 
 
     /**
-     * @param ADF $start
-     * @param ADF $end
-     * @param ADF $now
+     * @param ADF      $start
+     * @param ADF|null $end
+     * @param ADF      $now
      * @throws OutOfBoundsException if this period is not relevant
-     * @return ADF
+     * @return ADF|null
      */
     abstract protected function testPeriod(ADF $start, ?ADF $end, ADF $now);
 
