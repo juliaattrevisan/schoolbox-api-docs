@@ -33,7 +33,7 @@ class ModelToArray
     /**
      * @param User $user
      * @param GenericCollection|UserAccess[]|array|bool $groups
-     * @param \Schoolbox\External\User $externalUser
+     * @param \Schoolbox\External\User|null $externalUser
      * @return array
      */
     public function __invoke(User $user, $groups = null, \Schoolbox\External\User $externalUser = null): array

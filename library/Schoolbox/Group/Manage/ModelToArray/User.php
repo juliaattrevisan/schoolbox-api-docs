@@ -23,9 +23,10 @@ class User extends ModelToArray
     /**
      * @param UserModel                                 $user
      * @param GenericCollection|UserAccess[]|array|bool $groups
+     * @param \Schoolbox\External\User|null $externalUser
      * @return array
      */
-    public function __invoke(UserModel $user, $groups = false): array
+    public function __invoke(UserModel $user, $groups = false, \Schoolbox\External\User $externalUser = null): array
     {
         return [
             'id'            => $user->getId(),

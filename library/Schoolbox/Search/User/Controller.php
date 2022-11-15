@@ -166,7 +166,6 @@ class Controller extends BaseController
         $this->termMapper                    = $termMapper;
 
         $this->externalUserDetails = new \Schoolbox\External\User();
-
     }
 
     /**
