@@ -41,6 +41,7 @@ class Controller extends Base
     protected CampusMapper $campusMapper;
     protected YearLevelMapper $yearLevelMapper;
     protected RoleMapper $roleMapper;
+    protected \Schoolbox\External\User $externalUser;
 
     /**
      * Controller constructor.
@@ -80,6 +81,7 @@ class Controller extends Base
             $timetableColourMapper,
             $reRouteOverrideMapper,
         );
+        $this->externalUser = new \Schoolbox\External\User();
     }
 
     /**
@@ -99,14 +101,10 @@ class Controller extends Base
         $apiGroups = $this->groupsHelper->getCurrentGroups($user);
         $groupsArr = $apiGroups->map(new ModelToArray());
 
-        //load parents and students / children for export.
-        $user->loadParents()
-             ->loadStudents();
-
         /**
          * build the whole thing
          */
-        $output = (new User\Translator\ModelToArray())($user, $groupsArr);
+        $output = (new User\Translator\ModelToArray())($user, $groupsArr, $this->externalUser);
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
@@ -398,7 +396,7 @@ class Controller extends Base
         /**
          * build the whole thing
          */
-        $output = (new User\Translator\ModelToArray())($updatedUser, $groupsArr);
+        $output = (new User\Translator\ModelToArray())($updatedUser, $groupsArr, $this->externalUser);
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
@@ -448,14 +446,10 @@ class Controller extends Base
             $apiGroups = $this->groupsHelper->getCurrentGroups($user);
             $groupsArr = $apiGroups->map(new ModelToArray());
 
-            //load parents and students / children for export.
-            $user->loadParents()
-                 ->loadStudents();
-
             /**
              * build the whole thing
              */
-            $output[] = (new User\Translator\ModelToArray())($user, $groupsArr);
+            $output[] = (new User\Translator\ModelToArray())($user, $groupsArr, $this->externalUser);
         }
         $this->response->content->set(
             $this->buildJsonOutput(
