@@ -29,7 +29,6 @@ use Schoolbox\CampusMapper;
 
 class ValidationTest extends TestCase
 {
-
     /**
      * @param User|null             $user
      * @param BookingMapper|null    $bookingMapper
