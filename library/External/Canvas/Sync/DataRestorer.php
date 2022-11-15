@@ -29,32 +29,19 @@ use function substr;
  */
 class DataRestorer
 {
-
-    /** @var IConnector */
-    private $canvasDb;
-
-    /** @var LoggerInterface */
-    private $log;
-
-    /** @var string */
-    private $canvasDbName;
-
-    /** @var bool */
-    private $persistChanges;
-
-
     /**
      * @param IConnector      $canvasDb
      * @param LoggerInterface $log
      * @param string          $canvasDbName
      * @param bool            $persistChanges If false, don't persist changes to staging database
      */
-    public function __construct(IConnector $canvasDb, LoggerInterface $log, string $canvasDbName, bool $persistChanges)
-    {
-        $this->canvasDb = $canvasDb;
-        $this->log = $log;
-        $this->canvasDbName = $canvasDbName;
-        $this->persistChanges = $persistChanges;
+    public function __construct(
+        private IConnector $canvasDb,
+        private LoggerInterface $log,
+        private string $canvasDbName,
+        private bool $persistChanges,
+        private array $tableNames
+    ) {
     }
 
 
@@ -74,6 +61,9 @@ class DataRestorer
         foreach ($schema as $tableIndex => $tableData) {
             $columns     = $tableData['columns'];
             $tableName   = $tableData['tableName'];
+            if (!in_array($tableName, $this->tableNames)) {
+                continue;
+            }
             $description = str_replace('"', '\"', $tableData['description'] ?? '');
 
             // https://dev.mysql.com/doc/workbench/en/wb-migration-database-postgresql-typemapping.html
