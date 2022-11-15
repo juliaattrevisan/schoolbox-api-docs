@@ -13,6 +13,7 @@ use DateTime;
 use DateInterval;
 use Alaress\Date\Interval;
 use Schoolbox\Collection;
+use Schoolbox\Config\Loader;
 use Schoolbox\User;
 use External_Timetable;
 use PHPUnit\Framework\TestCase;
@@ -43,7 +44,8 @@ class ValidationTest extends TestCase
         $bookingMapper = null,
         $statusMapper = null,
         $termMapper = null,
-        $campusMapper = null
+        $campusMapper = null,
+        $externalEventMapper = null
     ) {
 
         if (!$user) {
@@ -66,6 +68,20 @@ class ValidationTest extends TestCase
             $campusMapper = new CampusMapper();
         }
 
+        if (!$externalEventMapper) {
+            $externalEventMapper = new \Schoolbox\External\Event\Mapper();
+        }
+
+        $mockConfig = $this->createMock(Loader::class);
+        $mockConfig
+            ->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap([
+                    ['school_data_endpoint_host', \Schoolbox\External\Importer\Endpoint\Factory::TASS_API,],
+                ])
+            );
+
         // Stub external timetable, don't allow it to use it ist own constractor
         $externalTimetable = $this->getMockBuilder(External_Timetable::Class)
                                   ->setMethods(['__construct'])
@@ -74,7 +90,7 @@ class ValidationTest extends TestCase
 
         /** @var External_Timetable $externalTimetable */
         $mockValidation = $this->getMockBuilder(Validation::Class)
-                               ->setConstructorArgs([$user, $bookingMapper, $statusMapper, $termMapper, $externalTimetable, $campusMapper])
+                               ->setConstructorArgs([$user, $bookingMapper, $statusMapper, $termMapper, $externalTimetable, $campusMapper, $mockConfig, $externalEventMapper])
                                ->setMethods(['getTimetableRoomEvents']) // we need this to be a stub
                                ->getMock();
 
