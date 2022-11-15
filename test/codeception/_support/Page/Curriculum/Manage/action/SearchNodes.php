@@ -3,12 +3,12 @@
 namespace Page\Curriculum\Manage\action;
 
 use AcceptanceTester;
+use Page\Curriculum\Manage\ManageCurriculum;
 
 class SearchNodes
 {
 
     public const SEARCH_FIELD = '[data-test-search-input]';
-    public const SEARCH_RESULTS = '[data-test-node]';
     public const TOGGLE_SHOW_DISABLED_NODES = '[data-test-show-only-enabled]';
     private AcceptanceTester $tester;
 
@@ -35,7 +35,7 @@ class SearchNodes
      */
     public function seeResultsMatch($value): void
     {
-        $this->tester->seeNumberOfElements(self::SEARCH_RESULTS, $value);
+        $this->tester->seeNumberOfElements(ManageCurriculum::NODES, $value);
     }
 
 }

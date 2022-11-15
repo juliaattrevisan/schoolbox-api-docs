@@ -12,6 +12,7 @@ use Page\Curriculum\Manage\action\AddNewSubsection;
 use Page\Curriculum\Manage\action\DisableNodes;
 use Page\Curriculum\Manage\action\DeleteNodes;
 use Page\Curriculum\Manage\action\SearchNodes;
+use Page\Curriculum\Manage\action\UpdateNode;
 use Exception;
 
 class ManageCurriculumCest
@@ -29,8 +30,7 @@ class ManageCurriculumCest
     {
         $i->logout();
         $i->loginAsAdmin();
-        $mc = new ManageCurriculum($i);
-        $i->amOnPage($mc::URL);
+        $i->amOnPage(ManageCurriculum::URL);
     }
 
     /**
@@ -39,21 +39,21 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum create a new curriculum
      */
-    // public function addNewCurriculum(AcceptanceTester $i)
-    // {
-    //     $i->amGoingTo('add a new curriculum');
-    //     $addNew = new AddNewCurriculum($i);
-    //     $addNew->clickDisplay();
-    //     $i->amGoingTo('ensure the add button is disabled until I add a name');
-    //     $addNew->seeAddButtonIsDisabled();
-    //     $addNew->fillName('Party Town');
-    //     $addNew->fillCode('PT');
-    //     $addNew->clickAddButton();
-    //     $i->amGoingTo('ensure the toast message is shown');
-    //     $i->canSee('Curriculum successfully added');
-    //     $i->amGoingTo('ensure I can see the new curriculum');
-    //     $i->canSee('[PT] Party Town');
-    // }
+    public function addNewCurriculum(AcceptanceTester $i)
+    {
+        $i->amGoingTo('add a new curriculum');
+        $addNew = new AddNewCurriculum($i);
+        $addNew->clickDisplay();
+        $i->amGoingTo('ensure the add button is disabled until I add a name');
+        $addNew->seeAddButtonIsDisabled();
+        $addNew->fillName('Party Town');
+        $addNew->fillCode('PT');
+        $addNew->clickAddButton();
+        $i->amGoingTo('ensure the toast message is shown');
+        $i->canSee('Curriculum successfully added');
+        $i->amGoingTo('ensure I can see the new curriculum');
+        $i->canSee('[PT] Party Town');
+    }
 
     /**
      * @param AcceptanceTester $i
@@ -61,21 +61,21 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum create a new subsection
      */
-    // public function addNewSubsection(AcceptanceTester $i)
-    // {
-    //     $i->amGoingTo('add a new subsection to English');
-    //     $addNew = new AddNewSubsection($i);
-    //     $addNew->clickDisplay('English');
-    //     $i->amGoingTo('ensure the add button is disabled until I add a name');
-    //     $addNew->seeAddButtonIsDisabled();
-    //     $addNew->fillName('Grammar');
-    //     $addNew->fillCode('GR');
-    //     $addNew->clickAddButton();
-    //     $i->amGoingTo('ensure the toast message is shown');
-    //     $i->canSee('Subsection successfully added');
-    //     $i->amGoingTo('ensure I can see the new subsection');
-    //     $i->canSee('[GR] Grammar');
-    // }
+    public function addNewSubsection(AcceptanceTester $i)
+    {
+        $i->amGoingTo('add a new subsection to English');
+        $addNew = new AddNewSubsection($i);
+        $addNew->clickDisplay('English');
+        $i->amGoingTo('ensure the add button is disabled until I add a name');
+        $addNew->seeAddButtonIsDisabled();
+        $addNew->fillName('Grammar');
+        $addNew->fillCode('GR');
+        $addNew->clickAddButton();
+        $i->amGoingTo('ensure the toast message is shown');
+        $i->canSee('Subsection successfully added');
+        $i->amGoingTo('ensure I can see the new subsection');
+        $i->canSee('[GR] Grammar');
+    }
 
     /**
      * @param AcceptanceTester $i
@@ -83,20 +83,20 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum disable some nodes
      */
-    // public function disableNodes(AcceptanceTester $i)
-    // {
-    //     $i->amGoingTo('disable Year 4 English and Year 9 History');
-    //     $mc = new ManageCurriculum($i);
-    //     $mc->checkNode('#checkbox-247');
-    //     $mc->checkNode('#checkbox-1');
-    //     $disableNodes = new DisableNodes($i);
-    //     $disableNodes->clickDisableButton();
-    //     $disableNodes->waitForConfirmModal();
-    //     $disableNodes->clickConfirmButton();
-    //     $i->amGoingTo('ensure the toast message is shown');
-    //     $mc->waitForToast();
-    //     $i->canSee('Nodes successfully disabled');
-    // }
+    public function disableNodes(AcceptanceTester $i)
+    {
+        $i->amGoingTo('disable Year 4 English and Year 9 History');
+        $mc = new ManageCurriculum($i);
+        $mc->checkNode('#checkbox-247');
+        $mc->checkNode('#checkbox-1');
+        $disableNodes = new DisableNodes($i);
+        $disableNodes->clickDisableButton();
+        $disableNodes->waitForConfirmModal();
+        $disableNodes->clickConfirmButton();
+        $i->amGoingTo('ensure the toast message is shown');
+        $mc->waitForToast();
+        $i->canSee('Nodes successfully disabled');
+    }
 
     /**
      * @param AcceptanceTester $i
@@ -104,20 +104,20 @@ class ManageCurriculumCest
      *
      * on https://vagrant.dev.schoolbox.cloud/curriculum delete a node
      */
-    // public function deleteNode(AcceptanceTester $i)
-    // {
-    //     $i->amGoingTo('delete the Year 12 French Node');
-    //     $mc = new ManageCurriculum($i);
-    //     $mc->checkNode('#checkbox-302');
-    //     $deleteNodes = new DeleteNodes($i);
-    //     $deleteNodes->clickDeleteButton();
-    //     $deleteNodes->waitForConfirmModal();
-    //     $deleteNodes->clickConfirmButton();
-    //     $i->amGoingTo('ensure the toast message is shown');
-    //     $mc->waitForToast();
-    //     $i->canSee('Node successfully deleted');
-    //     $i->dontSee('Year 12 French');
-    // }
+    public function deleteNode(AcceptanceTester $i)
+    {
+        $i->amGoingTo('delete the Year 12 French Node');
+        $mc = new ManageCurriculum($i);
+        $mc->checkNode('#checkbox-302');
+        $deleteNodes = new DeleteNodes($i);
+        $deleteNodes->clickDeleteButton();
+        $deleteNodes->waitForConfirmModal();
+        $deleteNodes->clickConfirmButton();
+        $i->amGoingTo('ensure the toast message is shown');
+        $mc->waitForToast();
+        $i->canSee('Node successfully deleted');
+        $i->dontSee('Year 12 French');
+    }
 
     /**
      * @param AcceptanceTester $i
@@ -133,7 +133,28 @@ class ManageCurriculumCest
         $searchNodes = new SearchNodes($i);
         $searchNodes->fillSearch('historical');
         $i->amGoingTo('expect 4 search results are shown');
-        $searchNodes->seeResultsMatch('[data-test-node]', 4);
+        $searchNodes->seeResultsMatch(4);
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * on https://vagrant.dev.schoolbox.cloud/curriculum update a node
+     */
+    public function updateNode(AcceptanceTester $i)
+    {
+        $i->amGoingTo('update Year 9 History');
+        $updateNode = new UpdateNode($i);
+        $updateNode->clickDisplay('Year 9 History');
+        $updateNode->fillName('Year 9 Ancient History');
+        $updateNode->fillCode('9AH');
+        $updateNode->fillDescription('1', 'Here we will focus mainly on the Romans, Egyptians and Babylonians');
+        $updateNode->clickUpdateButton();
+        $i->amGoingTo('ensure the toast message is shown');
+        $i->canSee('Node successfully updated');
+        $i->amGoingTo('ensure the updated node displays correctly');
+        $i->canSee('[9AH] Year 9 Ancient History');
     }
 
 }

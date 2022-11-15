@@ -9,6 +9,7 @@ class ManageCurriculum
 
     public const URL = '/curriculum';
     public const TOAST = '.toast';
+    public const NODES = '[data-test-node]';
     private AcceptanceTester $tester;
 
     /**
