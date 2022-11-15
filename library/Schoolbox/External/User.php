@@ -49,11 +49,11 @@ class User
     public function getStudents(\Schoolbox\User $user)
     {
         //load students if they have not been loaded
-        if (empty($this->students)) {
-            $this->loadStudents($user);
+        if (empty($this->students) || empty($this->students[$user->getExternalId()])) {
+            $this->loadStudents([$user]);
         }
         //return students
-        return $this->students;
+        return $this->students[$user->getExternalId()];
     }
 
     private function loadParents(\Schoolbox\User $user)
@@ -117,15 +117,21 @@ class User
         }
     }
 
-    private function loadStudents(\Schoolbox\User $user)
+    /**
+     * @param \Schoolbox\User[] $students
+     * @return void
+     */
+    public function loadStudents($students)
     {
-        $this->students = new GenericCollection(self::class);
-        $enrolments = $this->externalUser->getEnrolledStudents($user->getExternalId());
-        foreach ($enrolments as $child) {
-            try {
-                $this->students->add($this->userMapper->findByExternalId($child['RelatedID']));
-            } catch (MapperException $e) {
-                // noop
+        foreach ($students as $student) {
+            $this->students[$student->getExternalId()] = new GenericCollection(self::class);
+            $enrolments                             = $this->externalUser->getEnrolledStudents($student->getExternalId());
+            foreach ($enrolments as $child) {
+                try {
+                    $this->students[$student->getExternalId()]->add($this->userMapper->findByExternalId($child['RelatedID']));
+                } catch (MapperException $e) {
+                    // noop
+                }
             }
         }
     }
