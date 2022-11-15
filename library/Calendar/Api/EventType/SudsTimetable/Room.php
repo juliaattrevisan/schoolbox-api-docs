@@ -14,7 +14,7 @@ declare(strict_types=1);
  * This is used to populate the Resource Booking calendar to indicate when
  * a Room is currently in use so people don't try to book it at the same time.
  */
-class Calendar_Api_EventType_SudsTimetable_Room implements Calendar_Api_EventType_Interface
+class Calendar_Api_EventType_SudsTimetable_Room extends Calendar_Api_EventType_Abstract
 {
     /**
      * Seemingly arbitrarily hardcdoed colour
