@@ -29,11 +29,11 @@ class User
     public function getParents(\Schoolbox\User $user)
     {
         //load students if they have not been loaded
-        if (empty($this->parents)) {
-            $this->loadParents($user);
+        if (empty($this->parents) || empty($this->parents[$user->getExternalId()])) {
+            $this->loadParents([$user]);
         }
         //return $this->parents
-        return $this->parents;
+        return $this->parents[$user->getExternalId()];
     }
 
     public function getTeachers(\Schoolbox\User $user)
@@ -56,29 +56,37 @@ class User
         return $this->students[$user->getExternalId()];
     }
 
-    private function loadParents(\Schoolbox\User $user)
+    /**
+     * @param \Schoolbox\User[] $students
+     * @return void
+     */
+    private function loadParents($students)
     {
-        $allParents               = $this->externalUser->getStudentContactList([$user->getExternalId()]);
+        foreach ($students as $student) {
+            $this->parents[$student->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
 
-        foreach ($allParents as $currentParent) {
-            /* Add parent
-             */
-            if (!empty($currentParent['StudentContactID'])) {
-                try {
-                    $parent = $this->userMapper->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
-                    $this->parents->add($parent);
-                } catch (MapperException $e) {
-                    //noop
+            $allParents = $this->externalUser->getStudentContactList([$student->getExternalId()]);
+
+            foreach ($allParents as $currentParent) {
+                /* Add parent
+                 */
+                if (!empty($currentParent['StudentContactID'])) {
+                    try {
+                        $parent = $this->userMapper->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
+                        $this->parents[$student->getExternalId()]->add($parent);
+                    } catch (MapperException $e) {
+                        //noop
+                    }
                 }
-            }
-            /* Add speece
-             */
-            if (!empty($currentParent['StudentContactSpouseID'])) {
-                try {
-                    $spouse = $this->userMapper->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
-                    $this->parents->add($spouse);
-                } catch (MapperException $e) {
-                    //noop
+                /* Add speece
+                 */
+                if (!empty($currentParent['StudentContactSpouseID'])) {
+                    try {
+                        $spouse = $this->userMapper->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
+                        $this->parents[$student->getExternalId()]->add($spouse);
+                    } catch (MapperException $e) {
+                        //noop
+                    }
                 }
             }
         }
