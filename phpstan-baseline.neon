@@ -5118,16 +5118,6 @@ parameters:
 		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 1
-			path: library/Schoolbox/Learning/Assessment/IFeedback.php
-
-		-
-			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/IFeedback.php
-
-		-
-			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
-			count: 1
 			path: library/Schoolbox/Learning/Assessment/IResponse.php
 
 		-
