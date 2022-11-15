@@ -98,7 +98,7 @@ class Validation
 
     /**
      * @param User                             $user
-     * @param Mapper                           $bookingMapper
+     * @param BookingMapper                    $bookingMapper
      * @param StatusMapper                     $statusMapper
      * @param TermMapper                       $termMapper
      * @param External_Timetable               $externalTimetableHandler
