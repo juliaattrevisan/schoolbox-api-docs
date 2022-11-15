@@ -76,8 +76,8 @@ class ModelToArray
             'owner'        => call_user_func($this->userTranslator, $model->getOwner()),
             'body'         => $this->purifier->purify($model->getBody()),
             'externalCode' => $model->getExternalCode(),
-            'createdAt'    => $model->getCreatedAt()?->getUsingFormat(DATE_ATOM),
-            'updatedAt'    => $model->getUpdatedAt()?->getUsingFormat(DATE_ATOM),
+            'createdAt'    => $model->getCreatedAt()->getUsingFormat(DATE_ATOM),
+            'updatedAt'    => $model->getUpdatedAt()->getUsingFormat(DATE_ATOM),
             'isDeleted'    => $model->isDeleted(),
             'private'      => $model->getPrivate(),
             '_links'       => [
