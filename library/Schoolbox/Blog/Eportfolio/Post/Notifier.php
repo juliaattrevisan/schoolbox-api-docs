@@ -35,7 +35,6 @@ use Schoolbox\Mapper\Exception;
 
 class Notifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_POSTED = 'posted';
     // This is to support ePortfolio for staff and parent
     const TRIGGER_BLOG_POSTED = 'blogPosted';
@@ -122,7 +121,7 @@ class Notifier extends AbstractModuleNotifier
             }
 
             // Send it to all their teachers (across all subjects)
-            $audience = $owner->loadTeachers()->getTeacherCollection();
+            $audience = $this->externalUser->getTeachers($owner);
 
             return $this->notifyPosted($post, $owner, $effector, $audience, Role::STAFF);
         } catch (Exception $e) {

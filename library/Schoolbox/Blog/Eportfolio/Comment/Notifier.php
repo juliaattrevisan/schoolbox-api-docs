@@ -38,7 +38,6 @@ use InvalidArgumentException;
  */
 class Notifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_CREATED = 'created';
     const TRIGGER_COMMENTED = 'commented';
     // this is to support ePortfolio for staff and parent
@@ -152,7 +151,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Send it to all their teachers (across all subjects)
-        $audience = $owner->loadTeachers()->getTeacherCollection();
+        $audience = $this->externalUser->getTeachers($owner);
 
         return $this->notifyCommented($comment, $effector, $audience, Role::STAFF);
     }

@@ -222,8 +222,7 @@ class Notifier extends AbstractModuleNotifier
         $envelope->targetToParent($student->getId(), $instance);
         $envelope->targetToUser($student, $instance);
 
-        $student->loadTeachers();
-        foreach ($student->getTeacherCollection() as $teacher) {
+        foreach ($this->externalUser->getTeachers($student) as $teacher) {
             $envelope->targetToUser($teacher, $instance);
         }
         return $envelope;
@@ -304,8 +303,7 @@ class Notifier extends AbstractModuleNotifier
         $envelope->targetToParent($student->getId(), $instance);
         $envelope->targetToUser($student, $instance);
 
-        $student->loadTeachers();
-        foreach ($student->getTeacherCollection() as $teacher) {
+        foreach ($this->externalUser->getTeachers($student) as $teacher) {
             $envelope->targetToUser($teacher, $instance);
         }
         return $envelope;

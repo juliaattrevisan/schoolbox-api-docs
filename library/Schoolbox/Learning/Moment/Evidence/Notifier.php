@@ -185,9 +185,8 @@ class Notifier extends AbstractModuleNotifier
         // This is just to reduce work load of scheduled and routed.
         switch ($roleType) {
             case Role::STAFF:
-                $student->loadTeachers();
                 /** @var User $teacher */
-                foreach ($student->getTeacherCollection() as $teacher) {
+                foreach ($this->externalUser->getTeachers($student) as $teacher) {
                     if (!$teacher->getRole()->getAccessEvidence()) {
                         continue;
                     }
