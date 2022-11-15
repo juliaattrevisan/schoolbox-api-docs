@@ -194,10 +194,14 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     protected $subject_collection;
 
-    /** @var Collection */
+    /**
+     * @deprecated
+     * @var Collection
+     */
     protected $parents;
 
     /**
+     * @deprecated
      * Determines if parent collection has been loaded
      * @var bool
      */
@@ -251,22 +255,26 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     protected $config_loader;
 
     /**
+     * @deprecated
      * @var Collection|User[]
      */
     protected $teacherCollection;
 
     /**
+     * @deprecated
      * Determines if teacher collection has been loaded
      * @var bool
      */
     private $teachersLoaded = false;
 
     /**
+     * @deprecated
      * @var GenericCollection|User[]
      */
     private $children;
 
     /**
+     * @deprecated
      * Determines if children collection has been loaded
      * @var bool
      */
@@ -1094,6 +1102,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
+     * @deprecated
      * Is this user a parent of $child?
      *
      * Requires that either:
@@ -1131,6 +1140,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
+     * @deprecated
      * Is this user a child of $parent?
      *
      * Requires that `loadParents()` has been called on this user.
@@ -1145,6 +1155,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
+     * @deprecated
      * Load teachers into object from external db
      * @return $this
      */
@@ -1194,6 +1205,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
+     * @deprecated
      * Load parents into object from external db
      * @return self
      */
@@ -1238,6 +1250,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
+     * @deprecated
      * Load students / children into object from external db
      * @return self
      */
@@ -1267,6 +1280,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
+     * @deprecated
      * @param GenericCollection<User> $parents
      * @return User
      */
@@ -1279,6 +1293,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
+     * @deprecated
      * Get the parents associated with this user
      *
      * @return Collection|self[]
@@ -1405,6 +1420,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
+     * @deprecated
      * @return Collection<User>
      */
     public function getTeacherCollection()
@@ -1413,6 +1429,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
+     * @deprecated
      * @param Collection<User> $teacherCollection
      * @return $this
      */
@@ -1424,6 +1441,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
+     * @deprecated
      * @return GenericCollection<User>|null
      */
     public function getChildren()
@@ -1433,6 +1451,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
+     * @deprecated
      * @param GenericCollection<User> $children
      * @return $this
      */
