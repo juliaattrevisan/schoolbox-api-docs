@@ -91,7 +91,6 @@ class User
         // Get all of the students subjects
 
         $found = [];
-        //TODO: alter getSubjectList to accept just the externalID, not the userObject....???
         $subjects = $this->externalUser->getSubjectList($user);
 
         // Iterate and find teachers associated with each subject
