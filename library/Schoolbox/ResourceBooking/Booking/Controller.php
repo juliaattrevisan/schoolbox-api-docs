@@ -37,7 +37,7 @@ use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
 class Controller extends Base
 {
     /**
-     * @var Mapper
+     * @var \Schoolbox\ResourceBooking\Booking\Mapper
      */
     protected $bookingMapper;
 
@@ -209,7 +209,7 @@ class Controller extends Base
             $this->getExternalTimetableHandler(),
             $this->getCampusMapper(),
             $this->getConfigLoader(),
-            $this->getEventMapper()
+            $this->getExternalEventMapper()
         );
         $errors = $validation->validateBookingFromPostData($item, $this->getRequest()->post, null);
         if (empty($errors)) {
@@ -314,7 +314,7 @@ class Controller extends Base
             $this->getExternalTimetableHandler(),
             $this->getCampusMapper(),
             $this->getConfigLoader(),
-            $this->getEventMapper()
+            $this->getExternalEventMapper()
         );
         $errors = $validation->validateBookingFromPostData($item->getResource(), $this->getRequest()->post, $item);
 
@@ -814,7 +814,7 @@ class Controller extends Base
             $this->getExternalTimetableHandler(),
             $this->getCampusMapper(),
             $this->getConfigLoader(),
-            $this->getEventMapper()
+            $this->getExternalEventMapper()
         );
         // validate this booking
         $booking
@@ -991,7 +991,7 @@ class Controller extends Base
     }
 
     /**
-     * @param  Mapper $bookingMapper
+     * @param  \Schoolbox\ResourceBooking\Booking\Mapper $bookingMapper
      *
      * @return $this
      */
@@ -1003,7 +1003,7 @@ class Controller extends Base
     }
 
     /**
-     * @return Mapper
+     * @return \Schoolbox\ResourceBooking\Booking\Mapper
      */
     public function getBookingMapper()
     {
