@@ -64,7 +64,7 @@ This file is internal use and is not shipped to clients.
   aws_iam_key: xxxx
   aws_iam_secret: xxxx
 ```
-* You can get your `aws_iam_key` and `aws_iam_secret` from the infrastructure team #infrastructure-support
+* You can get your `aws_iam_key` and `aws_iam_secret` from the infrastructure team [#infrastructure-support](https://alaress.slack.com/archives/CTP55SURE)
 * In your schoolbox directory import your vagrant box and bring it up for the first time
 ```
   vagrant box add ubuntu-1804-php74 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-1804-php74.box;
@@ -89,6 +89,7 @@ For full information on the build process of making a APT package and deploying 
 * Technical Processes:
   * [Build Process](./docs/front-end/build-process.md)
   * [Database Guide](./docs/database.md)
+  * [Data Sets](./docs/datasets.md)
   * [Standards](./docs/charter/standards.md)
   * [Code Style](./docs/charter/code-style.md)
   * [Sanitisation](./docs/scrub.md)
