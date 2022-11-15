@@ -141,7 +141,8 @@ class Module extends BaseModule
             ->setExternalTimetableHandler($this->injector->get('externalTimetable'))
             ->setCampusMapper($this->getMapperFactory()->get(CampusMapper::class))
             ->setStatusMapper($this->getMapperFactory()->get(StatusMapper::class))
-            ->setTermMapper($this->getMapperFactory()->get(TermMapper::class));
+            ->setTermMapper($this->getMapperFactory()->get(TermMapper::class))
+            ->setExternalEventMapper($this->getMapperFactory()->get(\Schoolbox\External\Event\Mapper::class));
     }
 
     /* Getters / Setters

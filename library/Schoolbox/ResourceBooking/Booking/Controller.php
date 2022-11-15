@@ -21,6 +21,7 @@ use External_Timetable;
 use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -73,6 +74,13 @@ class Controller extends Base
      * @var StatusMapper
      */
     protected $statusMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Mapper
+     */
+    protected \Schoolbox\External\Event\Mapper $externalEventMapper;
+
 
     /**
      * Creates a booking for an item.
@@ -200,7 +208,8 @@ class Controller extends Base
             $this->getTermMapper(),
             $this->getExternalTimetableHandler(),
             $this->getCampusMapper(),
-            $this->getConfigLoader()
+            $this->getConfigLoader(),
+            $this->getEventMapper()
         );
         $errors = $validation->validateBookingFromPostData($item, $this->getRequest()->post, null);
         if (empty($errors)) {
@@ -304,7 +313,8 @@ class Controller extends Base
             $this->getTermMapper(),
             $this->getExternalTimetableHandler(),
             $this->getCampusMapper(),
-            $this->getConfigLoader()
+            $this->getConfigLoader(),
+            $this->getEventMapper()
         );
         $errors = $validation->validateBookingFromPostData($item->getResource(), $this->getRequest()->post, $item);
 
@@ -803,7 +813,8 @@ class Controller extends Base
             $this->getTermMapper(),
             $this->getExternalTimetableHandler(),
             $this->getCampusMapper(),
-            $this->getConfigLoader()
+            $this->getConfigLoader(),
+            $this->getEventMapper()
         );
         // validate this booking
         $booking
@@ -1136,6 +1147,26 @@ class Controller extends Base
     {
         $this->termMapper = $termMapper;
 
+        return $this;
+    }
+
+
+    /**
+     * @return \Schoolbox\External\Event\Mapper
+     */
+    public function getExternalEventMapper(): \Schoolbox\External\Event\Mapper
+    {
+        return $this->externalEventMapper;
+    }
+
+
+    /**
+     * @param Mapper $externalEventMapper
+     * @return Controller
+     */
+    public function setExternalEventMapper(\Schoolbox\External\Event\Mapper $externalEventMapper): self
+    {
+        $this->externalEventMapper = $externalEventMapper;
         return $this;
     }
 }

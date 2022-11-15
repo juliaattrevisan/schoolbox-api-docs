@@ -11,6 +11,7 @@ namespace Schoolbox\ResourceBooking\Booking;
 use DateTime;
 use Alaress_Date_Format;
 use External_Timetable;
+use Schoolbox\External\Event\Mapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\Collection;
@@ -90,13 +91,20 @@ class Validation
 
 
     /**
-     * @param User               $user
-     * @param Mapper             $bookingMapper
-     * @param StatusMapper       $statusMapper
-     * @param TermMapper         $termMapper
-     * @param External_Timetable $externalTimetableHandler
-     * @param CampusMapper       $campusMapper
-     * @param IConfigLoader      $configLoader
+     * @var \Schoolbox\External\Event\Mapper
+     */
+    private \Schoolbox\External\Event\Mapper $eventMapper;
+
+
+    /**
+     * @param User                             $user
+     * @param Mapper                           $bookingMapper
+     * @param StatusMapper                     $statusMapper
+     * @param TermMapper                       $termMapper
+     * @param External_Timetable               $externalTimetableHandler
+     * @param CampusMapper                     $campusMapper
+     * @param IConfigLoader                    $configLoader
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
      */
     public function __construct(
         User $user,
@@ -105,7 +113,8 @@ class Validation
         TermMapper $termMapper,
         External_Timetable $externalTimetableHandler,
         CampusMapper $campusMapper,
-        \Schoolbox\IConfigLoader $configLoader
+        \Schoolbox\IConfigLoader $configLoader,
+        \Schoolbox\External\Event\Mapper $eventMapper
     ) {
         $this->user = $user;
         $this->setBookingMapper($bookingMapper);
@@ -114,6 +123,7 @@ class Validation
         $this->setExternalTimetableHandler($externalTimetableHandler);
         $this->setCampusMapper($campusMapper);
         $this->setConfigLoader($configLoader);
+        $this->setEventMapper($eventMapper);
     }
 
 
@@ -525,17 +535,13 @@ class Validation
      */
     protected function getTimetableRoomEvents($roomCode, DateTime $startDate, DateTime $endDate)
     {
-        /* TODO: Inject this
-         */
-        $eventMapper = \Schoolbox\External\Event\Mapper::getInstance();
-
         // Using  [$roomCode => true] to make Calendar_Api_EventType_Timetable_Room::getEvents happy
         $roomCodes = [$roomCode => true];
 
         if (in_array($this->configLoader->get('schooldata_import_endpoint_host'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
             $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes);
         } else {
-            $timetableRoom = new \Calendar_Api_EventType_SudsTimetable_Room($eventMapper, $roomCodes);
+            $timetableRoom = new \Calendar_Api_EventType_SudsTimetable_Room($this->eventMapper, $roomCodes);
         }
 
         return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
@@ -670,6 +676,26 @@ class Validation
     public function setConfigLoader(\Schoolbox\IConfigLoader $configLoader): self
     {
         $this->configLoader = $configLoader;
+        return $this;
+    }
+
+
+    /**
+     * @return Mapper
+     */
+    public function getEventMapper(): Mapper
+    {
+        return $this->eventMapper;
+    }
+
+
+    /**
+     * @param Mapper $eventMapper
+     * @return Validation
+     */
+    public function setEventMapper(Mapper $eventMapper): self
+    {
+        $this->eventMapper = $eventMapper;
         return $this;
     }
 }
