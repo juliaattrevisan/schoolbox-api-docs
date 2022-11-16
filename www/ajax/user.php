@@ -40,6 +40,8 @@ $showCampus = false;
 $residentialHouseID = $_GET['residentialHouseID'] ?? null;
 $showEmail = $_GET['email'] ?? false;
 
+$externalUser = new \Schoolbox\External\User();
+
 if (!empty($residentialHouseID)) {
     $residentialHouseID = explode(';', $residentialHouseID);
 }
@@ -104,7 +106,6 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
     if ($filterParents) {
         try {
             $student = $userMapper->findById($_GET["studentId"] ?? null);
-            $student->loadParents();
         } catch (\Schoolbox\Mapper\Exception $e) {
             // noop
         }
@@ -124,10 +125,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                 $userSchoolbox = $userCollection->offsetGet($userId);
                 if ($userSchoolbox) {
                     if ($userSchoolbox->getRole()->isParent()) {
-                        if (!$userSchoolbox->getChildren()) {
-                            $userSchoolbox->setChildren(\Schoolbox\User::createCollection());
-                        }
-                        if (!$userSchoolbox->isParentOf($student)) {
+                        if (!$externalUser->isParentOf($userSchoolbox, $student)) {
                             continue;
                         }
                     }

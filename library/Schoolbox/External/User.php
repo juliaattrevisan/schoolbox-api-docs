@@ -180,11 +180,10 @@ class User
         /* Parents were never initialised for $child
          * Their ancestry is inconclusive; continue
          */
-        if (null !== $child->getParents()) {
-            foreach ($child->getParents() as $parent) {
-                if ($parent->getId() == $child->getId()) {
-                    return true;
-                }
+        $parents = $this->getParents($child);
+        foreach ($parents as $parentTest) {
+            if ($parentTest->getId() == $parent->getId()) {
+                return true;
             }
         }
 
