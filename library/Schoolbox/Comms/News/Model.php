@@ -117,7 +117,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     /**
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $submittedAt;
+    private ?Alaress_Date_Format $submittedAt = null;
 
     /**
      * The person who allowed this article to be published
@@ -131,14 +131,14 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      *
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $acceptedAt;
+    private ?Alaress_Date_Format $acceptedAt = null;
 
     /**
      * The datetime when this article was rejected
      *
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $rejectedAt;
+    private ?Alaress_Date_Format $rejectedAt = null;
 
     /**
      * The person who rejected this article
