@@ -21,7 +21,6 @@ use InvalidArgumentException;
  */
 class Api implements IApi
 {
-
     /**
      * Default pagination limit - can go between 0 and 200
      *
@@ -126,15 +125,15 @@ class Api implements IApi
 
         /* Dig out the key and tenant values
          */
-        $credentials = (new Codec\DSN())->decode($key);
+        $dsnParts = (new Codec\DSN())->decode($key);
 
         /* Remember the optional pieces we offer
          */
         $this->options = $dsnParts['options'] ?? [];
 
         $headers = [
-            'X-API-KEY' => $credentials['key'],
-            'X-API-TENANT' => $credentials['tenant'],
+            'X-API-KEY' => $dsnParts['key'],
+            'X-API-TENANT' => $dsnParts['tenant'],
             'X-API-OPTIONS' => 'map-include,inline-include'
         ];
 

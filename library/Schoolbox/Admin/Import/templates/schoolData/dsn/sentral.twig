@@ -64,7 +64,7 @@
 
                         <select name="dsn[sentral][options][parentRelationIds][]" size="8" multiple>
                             {% for id, name in parentRelationLookup %}
-                                <option value="{{ id }}" {% if id in parentRelationIds %}selected="selected"{% endif%}>{{ name }}</option>
+                                <option value="{{ id }}" {% if id in options.parentRelationIds %}selected="selected"{% endif%}>{{ name }}</option>
                             {% endfor %}
                         </select>
                     </div>

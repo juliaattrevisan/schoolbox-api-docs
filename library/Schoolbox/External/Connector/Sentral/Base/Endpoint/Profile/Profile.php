@@ -944,7 +944,7 @@ class Profile implements IStrategy
              * Siblings and the student themselves might appear here
              * for no apparent reason, but ok
              */
-            $relationshipId = trim((string)$contact['attributes']['relationId']);
+            $relationshipId = trim((string)$contact['attributes']['relationType']);
             $relationshipName = trim((string)$contact['attributes']['relationName']);
 
             /* We only assign Parents as chosen by the school in Sentral Configuration
