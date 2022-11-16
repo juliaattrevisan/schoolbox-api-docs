@@ -52,6 +52,13 @@ class DSN implements IDSN
 
 
     /**
+     * Perform a special transformation on this option's value
+     * which we know to be a csv
+     */
+    private const OPTION_CSV = ['parentRelationIds'];
+
+
+    /**
      * Decode a dsn string
      *
      * @param string $dsn
@@ -97,7 +104,15 @@ class DSN implements IDSN
                 $matches = [];
                 preg_match(self::OPTION_FORMAT, $dsnPart, $matches);
 
-                $struct['options'][$matches[1]] = $matches[2];
+                /* Automatically unpack parentRelationIds into a useful array
+                 * Also accommodates other fields which might be csvs
+                 * (just add these to the const)
+                 */
+                if (in_array($matches[1], self::OPTION_CSV, true)) {
+                    $struct['options'][$matches[1]] = explode(',', $matches[2]);
+                } else {
+                    $struct['options'][$matches[1]] = $matches[2];
+                }
             }
         }
 

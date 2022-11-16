@@ -77,6 +77,22 @@ class Profile implements IStrategy
 
 
     /**
+     * These relationship types, by default, are imported as Parents of a Student
+     * They are used when you've never configured this in SUDS Control Panel
+     * (the school should check and revise these selections in their instance)
+     *
+     * 01 Parent
+     * 02 Step-Parent
+     * 03 Adoptive Parent
+     * 04 Foster Parent
+     * 20 Guardian
+     */
+    private const DEFAULT_ALLOWED_RELATIONSHIP_IDS = [
+        '01', '02', '03', '04', '20'
+    ];
+
+
+    /**
      * @var ValidStrats
      */
     private ValidStrats $validStrats;
@@ -950,7 +966,7 @@ class Profile implements IStrategy
             /* We only assign Parents as chosen by the school in Sentral Configuration
              * in the SUDS Control Panel; anyone outside the chosen set is ignored
              */
-            if (!in_array($relationshipId, $this->api->getOptions()['parentRelationIds'] ?? [], true)) {
+            if (!in_array($relationshipId, $this->api->getOptions()['parentRelationIds'] ?? self::DEFAULT_ALLOWED_RELATIONSHIP_IDS, true)) {
                 $this->log->debug(sprintf(
                     'Person id %s is a "%s %s" of the student - skipping.',
                     $contact['attributes']['personId'],
