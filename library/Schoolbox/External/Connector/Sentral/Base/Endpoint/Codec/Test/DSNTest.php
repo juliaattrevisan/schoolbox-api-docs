@@ -48,7 +48,7 @@ class DSNTest extends TestCase
     {
         return [
             'Valid DSN 1' => [
-                'key=qwrSDFh823468;tenant=ABC12345abc;parentRelationIds=00,01,02,20',
+                'key=qwrSDFh823468;tenant=ABC12345abc?parentRelationIds=00,01,02,20',
                 [
                     'key' => 'qwrSDFh823468',
                     'tenant' => 'ABC12345abc',
@@ -126,10 +126,10 @@ class DSNTest extends TestCase
                 'key=aaaaaa ;tenant=ab c123',
             ],
             'Invalid DSN 14' => [
-                'key=aaaaaa ;tenant=ab c123;parentRelationIds=gg',
+                'key=aaaaaa ;tenant=ab c123?parentRelationIds=gg',
             ],
             'Invalid DSN 15' => [
-                'key=aaaaaa ;tenant=ab c123;parentRelationIds=001122 g   g',
+                'key=aaaaaa ;tenant=ab c123?parentRelationIds=001122 g   g',
             ],
         ];
     }
@@ -165,8 +165,8 @@ class DSNTest extends TestCase
     {
         return [
             'Re-encode 1' => [
-                'key=qwrSDFh823468;tenant=ABC12345abc;parentRelationIds=00,01,02,20',
-                'key=qwrSDFh823468;tenant=ABC12345abc;parentRelationIds=00,01,02,20'
+                'key=qwrSDFh823468;tenant=ABC12345abc?parentRelationIds=00,01,02,20',
+                'key=qwrSDFh823468;tenant=ABC12345abc?parentRelationIds=00,01,02,20'
             ],
         ];
     }
