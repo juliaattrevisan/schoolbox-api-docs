@@ -52,7 +52,7 @@ class DSN implements IDSN
         return [
             'key' => $matches[1],
             'tenant' => $matches[2],
-            'parentRelationIds' => $matches[3]
+            'parentRelationIds' => explode(',', $matches[3])
         ];
     }
 
