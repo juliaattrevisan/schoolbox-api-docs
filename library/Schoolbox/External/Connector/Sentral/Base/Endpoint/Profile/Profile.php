@@ -63,13 +63,6 @@ class Profile implements IStrategy
 
 
     /**
-     * This relationshipName identifies a contact as a sibling
-     * This might be configurable in sentral, though
-     */
-    private const RELATIONSHIP_SIBLING = 'Sibling';
-
-
-    /**
      * Employment status for departed staff: if a staff member is departed, they
      * should not be synced.
      */
