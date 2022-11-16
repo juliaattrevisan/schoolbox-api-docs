@@ -57,10 +57,11 @@ class CanViewAssessable extends AbstractAssessableRule
         if ($this->visibility->isVisibleToUser($assessable, $user, $this->showClosed, $this->now)) {
             return;
         }
+        $externalUser = new \Schoolbox\External\User();
 
         // Can the user see the assessment because their child can?
         if ($user->getRole()->isParent()) {
-            foreach ($user->getChildren() as $child) {
+            foreach ($externalUser->getStudents($user) as $child) {
                 if ($this->visibility->isVisibleToUser($assessable, $child, $this->showClosed, $this->now)) {
                     return;
                 }
