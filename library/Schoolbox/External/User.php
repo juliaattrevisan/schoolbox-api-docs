@@ -20,14 +20,25 @@ class User
     private UserMapper $userMapper;
     private string $externalType;
 
-    public function __construct()
+    public function __construct(string $externalType = null, \External_Class $externalClass = null, \External_User $externalUser = null, UserMapper $userMapper = null)
     {
-        //could inject... will need to see how much code is required to drag these from modules into the function calls...
-        $this->externalType = ConfigMapper::getInstance()->getConfigLoader()->get('external_type');
-        $this->externalClass = new \External_Class();
-        $this->externalUser = new \External_User();
-        $this->userMapper = UserMapper::getInstance();
-
+        $this->externalType = $externalType;
+        $this->externalClass = $externalClass;
+        $this->externalUser = $externalUser;
+        $this->userMapper = $userMapper;
+        //if we are in a space where we are not injecting, spawn these classes correctly...
+        if (null === $externalType) {
+            $this->externalType = ConfigMapper::getInstance()->getConfigLoader()->get('external_type');
+        }
+        if (null === $externalClass) {
+            $this->externalClass = new \External_Class();
+        }
+        if (null === $externalUser) {
+            $this->externalUser = new \External_User();
+        }
+        if (null === $userMapper) {
+            $this->userMapper = UserMapper::getInstance();
+        }
 
         $this->parents = new Collection();
         $this->students = new Collection();
@@ -68,7 +79,7 @@ class User
      * @param \Schoolbox\User[] $students
      * @return void
      */
-    private function loadParents($students)
+    public function loadParents($students)
     {
         foreach ($students as $student) {
             $this->parents[$student->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
@@ -104,7 +115,7 @@ class User
      * @param \Schoolbox\User[] $students
      * @return void
      */
-    private function loadTeachers($students)
+    public function loadTeachers($students)
     {
         $codeMatcher       = (new ClassCodeMatchFactory())->build($this->externalType);
 

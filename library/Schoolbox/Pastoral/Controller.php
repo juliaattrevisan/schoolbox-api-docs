@@ -90,6 +90,7 @@ class Controller extends Base
      * @param Comment\Translator\ModelToArray $pastoralCommentTranslator
      * @param Translator\ModelToArray         $pastoralTranslator
      * @param FilesystemProxy                 $filesystemProxy
+     * @param \Schoolbox\External\User        $externalUser
      */
     public function __construct(
         private IConfigLoader $config,
@@ -115,6 +116,7 @@ class Controller extends Base
         private Comment\Translator\ModelToArray $pastoralCommentTranslator,
         private Translator\ModelToArray $pastoralTranslator,
         private FilesystemProxy $filesystemProxy,
+        private \Schoolbox\External\User $externalUser
     ) {
     }
 
@@ -513,19 +515,19 @@ class Controller extends Base
             if ($allowParents && $roleCurrent->isParent()) {
                 $roles->add($roleCurrent);
                 if ($record->getStudent()) {
-                    foreach ($record->getStudent()->getParents() as $parent) {
+                    foreach ($this->externalUser->getParents($record) as $parent) {
                         if ($parent->getRole()->getId() == $roleCurrent->getId()) {
                             $rolesWithUsers[$roleCurrent->getId()] = true;
                             break;
                         }
                     }
                 }
+                $this->externalUser->loadParents($duplicates);
                 foreach ($duplicates as $duplicateStudent) {
                     if ($rolesWithUsers[$roleCurrent->getId()]) {
                         break;
                     }
-                    $duplicateStudent->loadParents();
-                    foreach ($duplicateStudent->getParents() as $parent) {
+                    foreach ($this->externalUser->getParents($duplicateStudent) as $parent) {
                         if ($parent->getRole()->getId() == $roleCurrent->getId()) {
                             $rolesWithUsers[$roleCurrent->getId()] = true;
                         }
