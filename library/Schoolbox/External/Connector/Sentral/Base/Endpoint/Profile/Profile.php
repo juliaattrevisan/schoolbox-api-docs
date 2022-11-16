@@ -973,7 +973,7 @@ class Profile implements IStrategy
                     $relationshipId,
                     $relationshipName
                 ));
-                
+
                 continue;
             }
 

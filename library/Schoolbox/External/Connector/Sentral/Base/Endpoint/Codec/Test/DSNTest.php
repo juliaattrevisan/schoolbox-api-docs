@@ -23,7 +23,6 @@ use Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec\DSN;
  */
 class DSNTest extends TestCase
 {
-
     /**
      * Test valid DSN strings
      *

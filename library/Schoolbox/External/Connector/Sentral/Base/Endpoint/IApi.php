@@ -16,7 +16,6 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
  */
 interface IApi
 {
-
     /**
      * Retrieves data from an endpoint
      *
