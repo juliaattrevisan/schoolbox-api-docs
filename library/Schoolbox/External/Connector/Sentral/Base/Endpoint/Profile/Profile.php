@@ -957,6 +957,8 @@ class Profile implements IStrategy
                     $relationshipId,
                     $relationshipName
                 ));
+                
+                continue;
             }
 
             /* Go digging in another endpoint for data
