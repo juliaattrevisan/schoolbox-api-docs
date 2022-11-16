@@ -363,7 +363,7 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::getAll`, to ease transition.
      *
-     * @deprecated Replace with `$this->executeQuery($sql, $parameters)->getAll()`
+     * @deprecated Replace with `$this->executeQuery($sql, $parameters)->fetchAll()`
      * @param string     $sql
      * @param array|null $parameters
      * @return array
