@@ -893,5 +893,5 @@ interface IAssessable extends ISoftDeletable
      * @param Alaress_Date_Format|null $deletedAt
      * @return $this
      */
-    public function setDeletedAt(?Alaress_Date_Format $deletedAt = null): static;
+    public function setDeletedAt(?Alaress_Date_Format $deletedAt): static;
 }
