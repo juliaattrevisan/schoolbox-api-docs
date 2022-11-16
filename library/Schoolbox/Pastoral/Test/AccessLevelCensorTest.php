@@ -166,8 +166,6 @@ class AccessLevelCensorTest extends TestCase
             ->setOwner($ownerX)
             ->setModifiedBy($ownerX)
             ->setStudent($studentX)
-            ->setCreatedAt((new Alaress_Date_Format())::now())
-            ->setUpdatedAt((new Alaress_Date_Format())::now())
         ;
         $recordXPublic = $this->filterPrivate($recordX);
 

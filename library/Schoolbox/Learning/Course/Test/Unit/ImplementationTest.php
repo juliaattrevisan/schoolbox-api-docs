@@ -38,34 +38,14 @@ class ImplementationTest extends TestCase
         // Assessables is an empty collection
         $this->assertInstanceOf(Collection::class, $impl->getAssessables());
         $this->assertCount(0, $impl->getAssessables());
-        // Deleted date is null
+        // Dates are all null
+        $this->assertNull($impl->getCreatedAt());
+        $this->assertNull($impl->getUpdatedAt());
         $this->assertNull($impl->getDeletedAt());
 
         // This is an impl and not a spec
         $this->assertTrue($impl->isImplementationContext());
         $this->assertFalse($impl->isSpecificationContext());
-    }
-
-    /**
-     * Test that object's created date is uninitialized when created.
-     */
-    public function testConstructCreatedAtDateUninitialized(): void
-    {
-        $impl = new UnitImplementation();
-        $this->expectError();
-        /** @noinspection PhpExpressionResultUnusedInspection */
-        $impl->getCreatedAt();
-    }
-
-    /**
-     * Test that object's updated date is uninitialized when created.
-     */
-    public function testConstructUpdatedAtDateUninitialized(): void
-    {
-        $impl = new UnitImplementation();
-        $this->expectError();
-        /** @noinspection PhpExpressionResultUnusedInspection */
-        $impl->getUpdatedAt();
     }
 
     /**

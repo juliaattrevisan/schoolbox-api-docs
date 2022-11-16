@@ -158,10 +158,22 @@ class AllFieldsTest extends TestCase
             (clone $baseModel)->setCreatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone)),
         ];
 
+        yield 'null created at' => [
+            ['createdAt' => null,],
+            (clone $baseModel),
+            (clone $baseModel)->setCreatedAt(null),
+        ];
+
         yield 'update updated at' => [
             ['updatedAt' => $newDate,],
             (clone $baseModel),
             (clone $baseModel)->setUpdatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone)),
+        ];
+
+        yield 'null updated at' => [
+            ['updatedAt' => null,],
+            (clone $baseModel),
+            (clone $baseModel)->setUpdatedAt(null),
         ];
 
         yield 'update deleted at' => [

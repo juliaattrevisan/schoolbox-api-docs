@@ -141,7 +141,7 @@ class SummatorTest extends TestCase
             /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
                 if ($currentAssessable instanceof Task) {
-                    $currentFeedback->getResponse()->setCreatedAt(Alaress_Date_Format::now());
+                    $currentFeedback->getResponse()->setCreatedAt(null);
                 } else {
                     $currentFeedback->setPublishedAt(null);
                 }
@@ -151,7 +151,7 @@ class SummatorTest extends TestCase
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     if ($currentAssessable instanceof Task) {
-                        $currentFeedback->getResponse()->setCreatedAt(Alaress_Date_Format::now());
+                        $currentFeedback->getResponse()->setCreatedAt(null);
                     } else {
                         $currentFeedback->setPublishedAt(null);
                     }
@@ -351,7 +351,7 @@ class SummatorTest extends TestCase
             /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
                 if ($currentAssessable instanceof Task) {
-                    $currentFeedback->getResponse()->setCreatedAt(Alaress_Date_Format::now());
+                    $currentFeedback->getResponse()->setCreatedAt(null);
                 } else {
                     $currentFeedback->setPublishedAt(null);
                 }
@@ -361,7 +361,7 @@ class SummatorTest extends TestCase
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     if ($currentAssessable instanceof Task) {
-                        $currentFeedback->getResponse()->setCreatedAt(Alaress_Date_Format::now());
+                        $currentFeedback->getResponse()->setCreatedAt(null);
                     } else {
                         $currentFeedback->setPublishedAt(null);
                     }
@@ -763,7 +763,7 @@ class SummatorTest extends TestCase
             /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
                 if ($currentAssessable instanceof Task) {
-                    $currentFeedback->getResponse()->setCreatedAt(Alaress_Date_Format::now());
+                    $currentFeedback->getResponse()->setCreatedAt(null);
                 } else {
                     $currentFeedback->setPublishedAt(null);
                 }
@@ -773,7 +773,7 @@ class SummatorTest extends TestCase
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     if ($currentAssessable instanceof Task) {
-                        $currentFeedback->getResponse()->setCreatedAt(Alaress_Date_Format::now());
+                        $currentFeedback->getResponse()->setCreatedAt(null);
                     } else {
                         $currentFeedback->setPublishedAt(null);
                     }
@@ -1367,7 +1367,7 @@ class SummatorTest extends TestCase
             /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
                 if ($currentAssessable instanceof Task) {
-                    $currentFeedback->getResponse()->setCreatedAt(Alaress_Date_Format::now());
+                    $currentFeedback->getResponse()->setCreatedAt(null);
                 } else {
                     $currentFeedback->setPublishedAt(null);
                 }
@@ -1377,7 +1377,7 @@ class SummatorTest extends TestCase
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                     if ($currentAssessable instanceof Task) {
-                        $currentFeedback->getResponse()->setCreatedAt(Alaress_Date_Format::now());
+                        $currentFeedback->getResponse()->setCreatedAt(null);
                     } else {
                         $currentFeedback->setPublishedAt(null);
                     }

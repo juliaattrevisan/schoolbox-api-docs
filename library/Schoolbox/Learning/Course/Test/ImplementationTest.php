@@ -35,30 +35,10 @@ class ImplementationTest extends TestCase
         // Units is an empty collection
         $this->assertInstanceOf(Collection::class, $impl->getUnits());
         $this->assertCount(0, $impl->getUnits());
-        // Deleted date is null
+        // Dates are all null
+        $this->assertNull($impl->getCreatedAt());
+        $this->assertNull($impl->getUpdatedAt());
         $this->assertNull($impl->getDeletedAt());
-    }
-
-    /**
-     * Test that object's created date is uninitialized when created.
-     */
-    public function testConstructCreatedAtDateUninitialized(): void
-    {
-        $impl = new CourseImplementation();
-        $this->expectError();
-        /** @noinspection PhpExpressionResultUnusedInspection */
-        $impl->getCreatedAt();
-    }
-
-    /**
-     * Test that object's updated date is uninitialized when created.
-     */
-    public function testConstructUpdatedAtDateUninitialized(): void
-    {
-        $impl = new CourseImplementation();
-        $this->expectError();
-        /** @noinspection PhpExpressionResultUnusedInspection */
-        $impl->getUpdatedAt();
     }
 
     /**

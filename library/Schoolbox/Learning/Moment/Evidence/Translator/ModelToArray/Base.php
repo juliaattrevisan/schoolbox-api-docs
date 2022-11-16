@@ -71,37 +71,23 @@ class Base
      */
     public function __invoke(Evidence\Model $model): array
     {
-        // The following fields may not be null in persisted entities:
-        // * creator
-        // * recipient
-        // * created date
-        // * updated date
+        // Creator and recipient cannot be null in persisted entities.
         // Allow them to be null when translating though?
         try {
             $creator = call_user_func($this->userTranslator, $model->getCreator());
-        } catch (Error) {
+        } catch (Error $e) {
             $creator = null;
         }
         try {
             $recipient = call_user_func($this->userTranslator, $model->getRecipient());
-        } catch (Error) {
+        } catch (Error $e) {
             $recipient = null;
-        }
-        try {
-            $createdAt = $model->getCreatedAt()->getUsingFormat(DATE_ATOM);
-        } catch (Error) {
-            $createdAt = null;
-        }
-        try {
-            $updatedAt = $model->getUpdatedAt()->getUsingFormat(DATE_ATOM);
-        } catch (Error) {
-            $updatedAt = null;
         }
 
         return [
             'id'               => $model->getId(),
-            'createdAt'        => $createdAt,
-            'updatedAt'        => $updatedAt,
+            'createdAt'        => $model->getCreatedAt() ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM) : null,
+            'updatedAt'        => $model->getUpdatedAt() ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM) : null,
             'body'             => $this->purifier->purify($model->getBody()),
             'creator'          => $creator,
             'discussionThread' => $model->getDiscussionThread()

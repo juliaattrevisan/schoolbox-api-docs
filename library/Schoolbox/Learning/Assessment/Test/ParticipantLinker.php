@@ -49,17 +49,9 @@ class ParticipantLinker
         $plan = (new Plan($assessable))
             ->setId($assessable->getId())
             ->setIsDynamic($isDynamic)
+            ->setCreatedAt($assessable->getCreatedAt() ? clone $assessable->getCreatedAt() : null)
+            ->setUpdatedAt($assessable->getUpdatedAt() ? clone $assessable->getUpdatedAt() : null)
             ->setDeletedAt($assessable->getDeletedAt() ? clone $assessable->getDeletedAt() : null);
-        try {
-            $plan = $plan->setCreatedAt(clone $assessable->getCreatedAt());
-        } catch (\Error) {
-            // noop
-        }
-        try {
-            $plan = $plan->setUpdatedAt(clone $assessable->getUpdatedAt());
-        } catch (\Error) {
-            // noop
-        }
         $assessable->getPlans()->add($plan);
         return $plan;
     }

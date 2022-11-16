@@ -32,30 +32,10 @@ class SpecificationTest extends TestCase
         // Units is an empty collection
         $this->assertInstanceOf(Collection::class, $spec->getUnits());
         $this->assertCount(0, $spec->getUnits());
-        // Deleted date is null
+        // Dates are all null
+        $this->assertNull($spec->getCreatedAt());
+        $this->assertNull($spec->getUpdatedAt());
         $this->assertNull($spec->getDeletedAt());
-    }
-
-    /**
-     * Test that object's created date is uninitialized when created.
-     */
-    public function testConstructCreatedAtDateUninitialized(): void
-    {
-        $spec = new CourseSpecification();
-        $this->expectError();
-        /** @noinspection PhpExpressionResultUnusedInspection */
-        $spec->getCreatedAt();
-    }
-
-    /**
-     * Test that object's updated date is uninitialized when created.
-     */
-    public function testConstructUpdatedAtDateUninitialized(): void
-    {
-        $spec = new CourseSpecification();
-        $this->expectError();
-        /** @noinspection PhpExpressionResultUnusedInspection */
-        $spec->getUpdatedAt();
     }
 
     /**

@@ -277,20 +277,9 @@ class Translator
             ->setSebEnabled((bool)$domainObject->getSebEnabled())
             ->setWeight($domainObject->getWeight())
             ->setSequence($domainObject->getSequence())
-            ->setWorkType($domainObject->getWorkType());
-        // Perhaps these are not yet initialized?
-        // If so, then don't set them at all
-        try {
-            $assessmentModel->setCreatedAt($domainObject->getCreatedAt());
-        } catch (\Error) {
-            // noop
-        }
-        try {
-            $assessmentModel->setUpdatedAt($domainObject->getUpdatedAt());
-        } catch (\Error) {
-            // noop
-        }
-        $assessmentModel
+            ->setWorkType($domainObject->getWorkType())
+            ->setCreatedAt($domainObject->getCreatedAt())
+            ->setUpdatedAt($domainObject->getUpdatedAt())
             ->setDeletedAt($domainObject->getDeletedAt())
             ->setCurriculumNodes($domainObject->getCurriculumNodes());
 
@@ -440,19 +429,8 @@ class Translator
         $domainObject->setOpenAt($assessmentModel->getOpenDate());
         $domainObject->setDueAt($assessmentModel->getDueDate());
         $domainObject->setCloseAt($assessmentModel->getCloseDate());
-
-        // Perhaps these are not yet initialized?
-        // If so, then don't set them at all
-        try {
-            $domainObject->setCreatedAt($assessmentModel->getCreatedAt());
-        } catch (\Error) {
-            // noop
-        }
-        try {
-            $domainObject->setUpdatedAt($assessmentModel->getUpdatedAt());
-        } catch (\Error) {
-            // noop
-        }
+        $domainObject->setCreatedAt($assessmentModel->getCreatedAt());
+        $domainObject->setUpdatedAt($assessmentModel->getUpdatedAt());
         if ($assessmentModel->getCurriculumNodes() !== null) {
             $domainObject->setCurriculumNodes($assessmentModel->getCurriculumNodes());
         }

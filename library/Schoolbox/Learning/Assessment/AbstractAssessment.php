@@ -197,8 +197,8 @@ abstract class AbstractAssessment implements IAssessable
         /* TODO: Dump away all the attached files?
          */
 
-        $this->setCreatedAt(clone $this->getCreatedAt());
-        $this->setUpdatedAt(clone $this->getUpdatedAt());
+        $this->setCreatedAt($this->getCreatedAt() instanceof Alaress_Date_Format ? clone $this->getCreatedAt() : null);
+        $this->setUpdatedAt($this->getUpdatedAt() instanceof Alaress_Date_Format ? clone $this->getUpdatedAt() : null);
         $this->setDeletedAt($this->getDeletedAt() instanceof Alaress_Date_Format ? clone $this->getDeletedAt() : null);
     }
 

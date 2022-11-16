@@ -2367,7 +2367,6 @@ class AssessableTest extends TestCase
         $response2->setSubmittedBy($student2);
         $response2->setSubmittedOnBehalfOf($student2);
         $response2->setMarkedComplete(true);
-        $response2->setCreatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $response2->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant2->getAllResponses()->add($response2);
 
@@ -2379,7 +2378,6 @@ class AssessableTest extends TestCase
         $response3->setSubmittedBy($teacher);
         $response3->setSubmittedOnBehalfOf($student3);
         $response3->setMarkedComplete(true);
-        $response3->setCreatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $response3->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant3->getAllResponses()->add($response3);
 
@@ -2395,7 +2393,6 @@ class AssessableTest extends TestCase
         $response4a->setSubmittedBy($student4);
         $response4a->setSubmittedOnBehalfOf($student4);
         $response4a->setMarkedComplete(true);
-        $response4a->setCreatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $response4a->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant4->getAllResponses()->add($response4a);
 
@@ -2405,7 +2402,6 @@ class AssessableTest extends TestCase
         $response4b->setSubmittedBy($student4);
         $response4b->setSubmittedOnBehalfOf($teacher);
         $response4b->setMarkedComplete(true);
-        $response4b->setCreatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $response4b->setUpdatedAt($this->getDummyDate('2016-10-10 21:03:19'));
         $participant4->getAllResponses()->add($response4b);
 
