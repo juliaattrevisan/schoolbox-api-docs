@@ -6,6 +6,7 @@
  #
  # @param string|null $key
  # @param string|null $tenant
+ # @param string|null $parentRelationIds
  #}
 <div data-data-source="sentral" style="display:none">
     <section>
@@ -21,6 +22,36 @@
                     <div class="small-12 medium-4 columns">
                         <label class="required">Tenant</label>
                         <input type="text" class='required suds-crypto' name="dsn[sentral][tenant]" value="{{ tenant ?? ''}}" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <label class="required">Parent</label>
+                        <span class="meta">Select which type(s) of contact will be identified as parents of students.</span>
+
+                        <select name="dsn[sentral][parentRelationIds]" multiple>
+                            <option value='00'>Spouse</option>
+                            <option value='01'>Parent</option>
+                            <option value='02'>Step-Parent</option>
+                            <option value='03'>Adoptive Parent</option>
+                            <option value='04'>Foster Parent</option>
+                            <option value='05'>Host Family</option>
+                            <option value='06'>Relative</option>
+                            <option value='07'>Friend</option>
+                            <option value='08'>Self</option>
+                            <option value='09'>Other</option>
+                            <option value='10'>Sibling</option>
+                            <option value='11'>Grandparent</option>
+                            <option value='12'>Aunt/Uncle</option>
+                            <option value='13'>Nephew/Niece</option>
+                            <option value='20'>Guardian</option>
+                            <option value='30'>Case Worker</option>
+                            <option value='31'>Supervisor</option>
+                            <option value='32'>Duty Manager</option>
+                            <option value='40'>Medical Contact</option>
+                            <option value='99'>Not provided</option>
+                        </select>
                     </div>
                 </div>
             </div>
