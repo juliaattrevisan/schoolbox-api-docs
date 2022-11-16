@@ -5316,11 +5316,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/TranslatorTest.php
 
 		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/Test/ParticipantLinker.php
-
-		-
 			message: "#^Left side of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Timeline/Full.php
@@ -5529,11 +5524,6 @@ parameters:
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Moment/Evidence/Translator/ArrayToModel/AllFields.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Moment/Evidence/Translator/ModelToArray/Base.php
 
 		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Mapper\\:\\:findUnfinishedExpiredAttempts\\(\\) should return array\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Model\\> but returns Schoolbox\\\\GenericCollection\\.$#"
