@@ -6,7 +6,6 @@ use AcceptanceTester;
 
 class UpdateNode
 {
-
     public const DISPLAY_TOGGLE = 'Update ';
     public const NAME_FIELD = '#name';
     public const CODE_FIELD = '#code';
@@ -71,6 +70,4 @@ class UpdateNode
     {
         $this->tester->click(self::UPDATE_BUTTON);
     }
-
-
 }

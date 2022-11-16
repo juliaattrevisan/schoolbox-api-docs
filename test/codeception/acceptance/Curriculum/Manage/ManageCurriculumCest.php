@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ManageCurriculum;
 
 use AcceptanceTester;
-use Codeception\Util\Locator;
 use Page\Curriculum\Manage\ManageCurriculum;
 use Page\Curriculum\Manage\action\AddNewCurriculum;
 use Page\Curriculum\Manage\action\AddNewSubsection;
@@ -156,5 +155,4 @@ class ManageCurriculumCest
         $i->amGoingTo('ensure the updated node displays correctly');
         $i->canSee('[9AH] Year 9 Ancient History');
     }
-
 }

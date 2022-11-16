@@ -6,7 +6,6 @@ use AcceptanceTester;
 
 class DeleteNodes
 {
-
     public const DELETE_BUTTON = '[data-test-delete-nodes]';
     public const CONFIRM_BUTTON = '[data-test-confirm-delete-node]';
     private AcceptanceTester $tester;
@@ -52,6 +51,4 @@ class DeleteNodes
     {
         $this->tester->click(self::CONFIRM_BUTTON);
     }
-
-
 }

@@ -6,7 +6,6 @@ use AcceptanceTester;
 
 class ManageCurriculum
 {
-
     public const URL = '/curriculum';
     public const TOAST = '.toast';
     public const NODES = '[data-test-node]';
@@ -45,5 +44,4 @@ class ManageCurriculum
     {
         $this->tester->waitForElementVisible(self::TOAST, 2);
     }
-
 }

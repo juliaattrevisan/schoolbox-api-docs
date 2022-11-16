@@ -6,7 +6,6 @@ use AcceptanceTester;
 
 class AddNewSubsection
 {
-
     public const DISPLAY_TOGGLE = 'Add subsection to ';
     public const NAME_FIELD = '#name';
     public const CODE_FIELD = '#code';
@@ -63,6 +62,4 @@ class AddNewSubsection
     {
         $this->tester->click(self::ADD_BUTTON);
     }
-
-
 }

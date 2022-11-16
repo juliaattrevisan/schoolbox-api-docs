@@ -6,7 +6,6 @@ use AcceptanceTester;
 
 class DisableNodes
 {
-
     public const DISABLE_BUTTON = '[data-test-disable-nodes]';
     public const CONFIRM_BUTTON = '[data-test-confirm-enable-nodes]';
     private AcceptanceTester $tester;
@@ -44,6 +43,4 @@ class DisableNodes
     {
         $this->tester->click(self::CONFIRM_BUTTON);
     }
-
-
 }

@@ -7,7 +7,6 @@ use Page\Curriculum\Manage\ManageCurriculum;
 
 class SearchNodes
 {
-
     public const SEARCH_FIELD = '[data-test-search-input]';
     public const TOGGLE_SHOW_DISABLED_NODES = '[data-test-show-only-enabled]';
     private AcceptanceTester $tester;
@@ -37,5 +36,4 @@ class SearchNodes
     {
         $this->tester->seeNumberOfElements(ManageCurriculum::NODES, $value);
     }
-
 }
