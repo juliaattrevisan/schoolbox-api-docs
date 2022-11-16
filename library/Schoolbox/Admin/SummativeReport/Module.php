@@ -168,6 +168,12 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
+            new \Schoolbox\External\User(
+                $this->injector->get('config')->get('external_type'),
+                new \External_Class(),
+                new \External_User(),
+                $this->getMapperFactory()->get(UserMapper::class)
+            )
         );
     }
 

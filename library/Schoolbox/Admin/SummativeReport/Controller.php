@@ -116,6 +116,8 @@ class Controller extends ConfigController
 
     private RoleMapper $roleMapper;
 
+    private \Schoolbox\External\User $externalUser;
+
 
     /**
      * Constructor
@@ -136,6 +138,7 @@ class Controller extends ConfigController
      * @param ConfigMapper            $configMapper
      * @param FieldStrategyFactory    $fieldStrategyFactory
      * @param Rebuilder               $rebuilder
+     * @param \Schoolbox\External\User $externalUser
      */
     public function __construct(
         \Schoolbox\Error\Mapper $errorMapper,
@@ -153,7 +156,8 @@ class Controller extends ConfigController
         RoleMapper $roleMapper,
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
-        Rebuilder $rebuilder
+        Rebuilder $rebuilder,
+        \Schoolbox\External\User $externalUser,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
         $this->errorMapper           = $errorMapper;
@@ -169,6 +173,7 @@ class Controller extends ConfigController
         $this->access                = $access;
         $this->userBulkMapper        = $userBulkMapper;
         $this->roleMapper            = $roleMapper;
+        $this->externalUser          = $externalUser;
     }
 
 
@@ -641,7 +646,8 @@ class Controller extends ConfigController
             $this->termMapper,
             $this->roleMapper,
             $this->userBulkMapper,
-            $this->userMapper
+            $this->userMapper,
+            $this->externalUser
         ))->generate($report);
 
         $warnings = $reportConfigs['warnings'];
@@ -756,7 +762,8 @@ class Controller extends ConfigController
             $this->termMapper,
             $this->roleMapper,
             $this->userBulkMapper,
-            $this->userMapper
+            $this->userMapper,
+            $this->externalUser
         ))->calculateDateRange($optionsPayload['terms']);
 
         /* Manufacture a placeholder instance
@@ -775,12 +782,11 @@ class Controller extends ConfigController
                 $viewer = $student;
                 break;
             case Role::PARENT:
-                $student->loadParents();
-
                 /* No parents found for the current guy
                  * Exit - nothing to render
                  */
-                if (!$student->getParents()->count()) {
+                $parents = $this->externalUser->getParents($student);
+                if (!$parents->count()) {
                     $this->sendError(sprintf(
                         'Unable to generate report for student id %d (%s). No parents.',
                         $student->getId(),
@@ -790,7 +796,7 @@ class Controller extends ConfigController
 
                 /* View as the first parent in the stack...whoever that might be
                  */
-                $viewer = $student->getParents()->first();
+                $viewer = $parents->first();
                 break;
             case Role::STAFF:
             default:
@@ -938,7 +944,8 @@ class Controller extends ConfigController
             $this->termMapper,
             $this->roleMapper,
             $this->userBulkMapper,
-            $this->userMapper
+            $this->userMapper,
+            $this->externalUser
         ))->generate($report);
 
         $reports = $reportConfigs['reportConfigs'];

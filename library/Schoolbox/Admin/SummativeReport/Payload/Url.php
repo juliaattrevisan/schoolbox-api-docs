@@ -33,6 +33,8 @@ class Url
     private \Schoolbox\RoleMapper $roleMapper;
     private \Schoolbox\UserBulkMapper $userBulkMapper;
     private \Schoolbox\UserMapper $userMapper;
+    private \Schoolbox\External\User $externalUser;
+
 
 
     /**
@@ -44,6 +46,7 @@ class Url
      * @param \Schoolbox\RoleMapper $roleMapper
      * @param UserBulkMapper        $userBulkMapper
      * @param \Schoolbox\UserMapper $userMapper
+     * @param \Schoolbox\External\User $externalUser
      */
     public function __construct(
         Router $router,
@@ -51,7 +54,8 @@ class Url
         \Schoolbox\Assessment\Term\Mapper $termMapper,
         \Schoolbox\RoleMapper $roleMapper,
         \Schoolbox\UserBulkMapper $userBulkMapper,
-        \Schoolbox\UserMapper $userMapper
+        \Schoolbox\UserMapper $userMapper,
+        \Schoolbox\External\User $externalUser,
     ) {
         $this->router = $router;
         $this->baseUrl = $baseUrl;
@@ -59,6 +63,7 @@ class Url
         $this->roleMapper = $roleMapper;
         $this->userBulkMapper = $userBulkMapper;
         $this->userMapper = $userMapper;
+        $this->externalUser          = $externalUser;
     }
 
 
@@ -127,12 +132,11 @@ class Url
 
         foreach ($reportStudents as $student) {
             if (isset($optionsPayload['viewAs']) && $optionsPayload['viewAs'] === Role::PARENT) {
-                $student->loadParents();
 
                 /* Student doesn't have parents, but we tried to make reports
                  * formatted specifically for parents; skip them
                  */
-                if ($student->getParents()->count() === 0) {
+                if ($this->externalUser->getParents($student)->count() === 0) {
                     $warnings[] = sprintf(
                         'Unable to generate report for student id %d (%s). No parents.',
                         $student->getId(),
