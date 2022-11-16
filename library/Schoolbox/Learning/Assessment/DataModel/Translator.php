@@ -406,30 +406,30 @@ class Translator
         // Where there's both a version in assessment model and base model,
         // use the version in assessment model.
 
-        // Nullable properties
-        $domainObject->setSequence($assessmentModel->getSequence())
-                     ->setWorkType($assessmentModel->getWorkType())
-                     ->setTitle($assessmentModel->getTitle())
-                     ->setDescription($assessmentModel->getDescription())
-                     ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
-                     ->setCourseManaged((bool)$assessmentModel->getCourseManaged())
-                     ->setSebEnabled((bool)$assessmentModel->getSebEnabled())
-                     ->setDeletedAt($assessmentModel->getDeletedAt());
+        // Properties which should be set as is
+        $domainObject
+            ->setSequence($assessmentModel->getSequence())
+            ->setWorkType($assessmentModel->getWorkType())
+            ->setTitle($assessmentModel->getTitle())
+            ->setDescription($assessmentModel->getDescription())
+            ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
+            ->setCourseManaged((bool)$assessmentModel->getCourseManaged())
+            ->setSebEnabled((bool)$assessmentModel->getSebEnabled())
+            ->setWeight($assessmentModel->getWeight())
+            ->setPublishAt($assessmentModel->getPublishDate())
+            ->setOpenAt($assessmentModel->getOpenDate())
+            ->setDueAt($assessmentModel->getDueDate())
+            ->setCloseAt($assessmentModel->getCloseDate())
+            ->setCreatedAt($assessmentModel->getCreatedAt())
+            ->setUpdatedAt($assessmentModel->getUpdatedAt())
+            ->setDeletedAt($assessmentModel->getDeletedAt())
+        ;
 
-        // Non-nullable properties
+        // Non-nullable properties: should only be set if set in domain object
         $markScheme = $this->markSchemeFactory->spawnMarkSchemeFor($domainObject);
         if ($markScheme !== null) {
             $domainObject->setMarkScheme($markScheme);
         }
-
-        // These properties aren't nullable, and thus should always be set
-        $domainObject->setWeight($assessmentModel->getWeight());
-        $domainObject->setPublishAt($assessmentModel->getPublishDate());
-        $domainObject->setOpenAt($assessmentModel->getOpenDate());
-        $domainObject->setDueAt($assessmentModel->getDueDate());
-        $domainObject->setCloseAt($assessmentModel->getCloseDate());
-        $domainObject->setCreatedAt($assessmentModel->getCreatedAt());
-        $domainObject->setUpdatedAt($assessmentModel->getUpdatedAt());
         if ($assessmentModel->getCurriculumNodes() !== null) {
             $domainObject->setCurriculumNodes($assessmentModel->getCurriculumNodes());
         }
