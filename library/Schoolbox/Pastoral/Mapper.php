@@ -788,32 +788,32 @@ class Mapper extends BaseMapper
     /**
      * This is the function that gets the report results out of the database
      *
-     * @param User                  $user
-     * @param Alaress_Date_Format   $before_date
-     * @param Alaress_Date_Format   $after_date
-     * @param null|PastoralSeverity $severity
-     * @param Collection            $types
-     * @param Collection            $subtypes
-     * @param Collection            $authors
-     * @param Collection            $students
-     * @param Collection            $tags
-     * @param Collection            $order
-     * @param bool                  $involved
-     * @param Collection            $years
-     * @param Collection            $houses
-     * @param Collection            $campuses
-     * @param Collection            $actions
-     * @param bool                  $includeStudentsWithoutYear
-     * @param bool                  $includeStudentsWithoutHouse
-     * @param bool                  $includeReportsWithoutAction
-     * @param bool                  $includeUncompletedActionsOnly
+     * @param User                     $user
+     * @param Alaress_Date_Format|null $before_date
+     * @param Alaress_Date_Format|null $after_date
+     * @param PastoralSeverity|null    $severity
+     * @param Collection               $types
+     * @param Collection               $subtypes
+     * @param Collection               $authors
+     * @param Collection               $students
+     * @param Collection               $tags
+     * @param Collection               $order
+     * @param bool                     $involved
+     * @param Collection               $years
+     * @param Collection               $houses
+     * @param Collection               $campuses
+     * @param Collection               $actions
+     * @param bool                     $includeStudentsWithoutYear
+     * @param bool                     $includeStudentsWithoutHouse
+     * @param bool                     $includeReportsWithoutAction
+     * @param bool                     $includeUncompletedActionsOnly
      *
      * @return Collection|Model[]
      */
     public function getReportData(
         User $user,
-        Alaress_Date_Format $before_date,
-        Alaress_Date_Format $after_date,
+        ?Alaress_Date_Format $before_date,
+        ?Alaress_Date_Format $after_date,
         ?PastoralSeverity $severity,
         Collection $types,
         Collection $subtypes,
