@@ -27,7 +27,6 @@ use LogicException;
  */
 class Translator
 {
-
     /**
      * By default, only permit 2 levels (ie sub-assessments inside a project)
      *

@@ -14,7 +14,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 class Wiki implements ISoftDeletable
 {
-
     /** @var int */
     protected $id;
 

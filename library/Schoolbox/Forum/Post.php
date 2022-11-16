@@ -16,7 +16,6 @@ use Schoolbox\User;
 
 class Post implements ISoftDeletable
 {
-
     /** @var int */
     protected $id;
 
