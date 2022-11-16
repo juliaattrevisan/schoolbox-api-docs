@@ -509,6 +509,8 @@ class UserMapper extends Mapper
     /**
      * Fetches the user, and all of the user's subjects.
      *
+     * NOTE: spawns External\SubjectMapper to find these subjects
+     *
      * @param  int $id
      * @return \Schoolbox\User
      *
