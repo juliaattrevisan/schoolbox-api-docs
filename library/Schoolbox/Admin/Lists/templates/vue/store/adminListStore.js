@@ -155,7 +155,7 @@ export const useAdminListStore = defineStore('main', {
                 this.loadedData.fields.forEach((header) => {
                     const headerId = `${header.id}`;
                     // if the header for that cell is mandatory, and the cell is empty, set the error state
-                    if (header.mandatory && row[headerId].trim() === '') {
+                    if (header.mandatory && String(row[headerId]).trim() === '') {
                         valid = false;
                         this.rows[index].hasValidationError[headerId] = true;
                     } else {
