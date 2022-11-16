@@ -45,14 +45,24 @@ class Model extends AbstractUnit
     private $title;
 
     /**
-     * @var Alaress_Date_Format
+     * The open date of the unit.
+     *
+     * Will never be null once persisted, but may be when the object is first
+     * used: therefore, it needs to be nullable.
+     *
+     * @var Alaress_Date_Format|null
      */
-    private Alaress_Date_Format $openDate;
+    private ?Alaress_Date_Format $openDate = null;
 
     /**
-     * @var Alaress_Date_Format
+     * The due date of the unit.
+     *
+     * Will never be null once persisted, but may be when the object is first
+     * used: therefore, it needs to be nullable.
+     *
+     * @var Alaress_Date_Format|null
      */
-    private Alaress_Date_Format $dueDate;
+    private ?Alaress_Date_Format $dueDate = null;
 
 
     /**
@@ -202,38 +212,38 @@ class Model extends AbstractUnit
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getOpenDate(): Alaress_Date_Format
+    public function getOpenDate(): ?Alaress_Date_Format
     {
         return $this->openDate;
     }
 
     /**
-     * @param Alaress_Date_Format $openDate
+     * @param Alaress_Date_Format|null $openDate
      *
      * @return static
      */
-    public function setOpenDate(Alaress_Date_Format $openDate): self
+    public function setOpenDate(?Alaress_Date_Format $openDate): self
     {
         $this->openDate = $openDate;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getDueDate(): Alaress_Date_Format
+    public function getDueDate(): ?Alaress_Date_Format
     {
         return $this->dueDate;
     }
 
     /**
-     * @param Alaress_Date_Format $dueDate
+     * @param Alaress_Date_Format|null $dueDate
      *
      * @return static
      */
-    public function setDueDate(Alaress_Date_Format $dueDate): self
+    public function setDueDate(?Alaress_Date_Format $dueDate): self
     {
         $this->dueDate = $dueDate;
         return $this;
