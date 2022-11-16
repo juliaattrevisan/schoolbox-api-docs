@@ -555,9 +555,6 @@ class Session
                         } catch (MapperException $e) {
                             continue;
                         }
-                        $childObject->setParents(new GenericCollection(User::class));
-                        $user->getChildren()[$childObject->getId()] = $childObject;
-                        $childObject->getParents()[$user->getId()]  = $user;
                         if (!$childObject->getHideTimetable()) {
                             $subjectList = $synUser->getSubjectList($childObject);
                         } else {
