@@ -49,10 +49,11 @@ class DSNTest extends TestCase
     {
         return [
             'Valid DSN 1' => [
-                'key=qwrSDFh823468;tenant=ABC12345abc',
+                'key=qwrSDFh823468;tenant=ABC12345abc;parentRelationIds=00,01,02,20',
                 [
                     'key' => 'qwrSDFh823468',
-                    'tenant' => 'ABC12345abc'
+                    'tenant' => 'ABC12345abc',
+                    'parentRelationIds' => '00,01,02,20'
                 ]
             ],
         ];
@@ -122,6 +123,12 @@ class DSNTest extends TestCase
             ],
             'Invalid DSN 13' => [
                 'key=aaaaaa ;tenant=ab c123',
+            ],
+            'Invalid DSN 14' => [
+                'key=aaaaaa ;tenant=ab c123;parentRelationIds=gg',
+            ],
+            'Invalid DSN 15' => [
+                'key=aaaaaa ;tenant=ab c123;parentRelationIds=001122 g   g',
             ],
         ];
     }

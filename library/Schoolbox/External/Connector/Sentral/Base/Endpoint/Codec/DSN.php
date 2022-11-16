@@ -31,7 +31,7 @@ class DSN implements IDSN
     /**
      * DSN format
      */
-    private const DSN_FORMAT = '/key=([A-Za-z0-9]+);tenant=([A-Za-z0-9]+)/';
+    private const DSN_FORMAT = '/key=([A-Za-z0-9]+);tenant=([A-Za-z0-9]+);parentRelationIds=([0-9,]*)/';
 
 
     /**
@@ -51,7 +51,8 @@ class DSN implements IDSN
 
         return [
             'key' => $matches[1],
-            'tenant' => $matches[2]
+            'tenant' => $matches[2],
+            'parentRelationIds' => $matches[3]
         ];
     }
 
@@ -64,6 +65,14 @@ class DSN implements IDSN
      */
     public function encode(array $parts): string
     {
-        return "key={$parts['key']};tenant={$parts['tenant']}";
+        $parentRelationIds = [];
+
+        /* This field may not have existed in the ui previously
+         */
+        if (isset($parts['parentRelationIds']) && \count($parts['parentRelationIds'])) {
+            $parentRelationIds = implode(',', $parts['parentRelationIds']);
+        }
+
+        return "key={$parts['key']};tenant={$parts['tenant']};parentRelationIds={$parentRelationIds}";
     }
 }
