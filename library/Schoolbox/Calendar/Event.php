@@ -252,18 +252,24 @@ class Event implements ISoftDeletable
     protected ?Alaress_Date_Format $publishDateTime = null;
 
     /**
-     * The datetime when the event starts
+     * The datetime when the event starts.
      *
-     * @var Alaress_Date_Format
+     * Will never be null once persisted, but may be when the object is first
+     * used: therefore, it needs to be nullable.
+     *
+     * @var Alaress_Date_Format|null
      */
-    protected Alaress_Date_Format $startDateTime;
+    protected ?Alaress_Date_Format $startDateTime = null;
 
     /**
-     * The datetime when the event ends
+     * The datetime when the event ends.
      *
-     * @var Alaress_Date_Format
+     * Will never be null once persisted, but may be when the object is first
+     * used: therefore, it needs to be nullable.
+     *
+     * @var Alaress_Date_Format|null
      */
-    protected Alaress_Date_Format $endDateTime;
+    protected ?Alaress_Date_Format $endDateTime = null;
 
     /**
      * Source of import
@@ -583,11 +589,11 @@ class Event implements ISoftDeletable
     /**
      * Set end datetime
      *
-     * @param Alaress_Date_Format|DateTime $endDateTime
+     * @param Alaress_Date_Format|DateTime|null $endDateTime
      * @return $this
      * @throws InvalidArgumentException
      */
-    public function setEndDateTime(Alaress_Date_Format|DateTime $endDateTime): self
+    public function setEndDateTime(Alaress_Date_Format|DateTime|null $endDateTime): self
     {
         // enforce casting to ADF
         if ($endDateTime instanceof DateTime) {
@@ -731,11 +737,11 @@ class Event implements ISoftDeletable
     /**
      * Set start datetime
      *
-     * @param Alaress_Date_Format|DateTime $startDateTime
+     * @param Alaress_Date_Format|DateTime|null $startDateTime
      * @return $this
      * @throws InvalidArgumentException
      */
-    public function setStartDateTime(Alaress_Date_Format|DateTime $startDateTime): self
+    public function setStartDateTime(Alaress_Date_Format|DateTime|null $startDateTime): self
     {
         // enforce casting to ADF
         if ($startDateTime instanceof DateTime) {
