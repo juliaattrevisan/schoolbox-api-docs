@@ -34,37 +34,38 @@
                         <label class="required">Parent</label>
                         <span class="meta">Select which type(s) of contact will be identified as parents of students.</span>
 
+                        {# Sentral implements a SIF lookup
+                         # http://specification.sifassociation.org/Implementation/AU/3.4.3/CodeSets.html
+                         #}
                         {%
                             set parentRelationLookup = {
-                                '00': 'Spouse',
-                                '01': 'Parent'
+                                '00': "Spouse",
+                                '01': "Parent",
+                                '02': "Step-Parent",
+                                '03': "Adoptive Parent",
+                                '04': "Foster Parent",
+                                '05': "Host Family",
+                                '06': "Relative",
+                                '07': "Friend",
+                                '08': "Self",
+                                '09': "Other",
+                                '10': "Sibling",
+                                '11': "Grandparent",
+                                '12': "Aunt/Uncle",
+                                '13': "Nephew/Niece",
+                                '20': "Guardian",
+                                '30': "Case Worker",
+                                '31': "Supervisor",
+                                '32': "Duty Manager",
+                                '40': "Medical Contact",
+                                '99': "Not provided",
                             }
                         %}
 
-                        {% for id, name in parentRelationLookup %}
-                            {{ id }} - {{ name }}
-                        {% endfor %}
-                        <select name="dsn[sentral][parentRelationIds][]" size="8"multiple>
-                            <option value='00' {{ macro.parentRelationSelected('00', parentRelationIds) }}>Spouse</option>
-                            <option value='01' {{ macro.parentRelationSelected('01', parentRelationIds) }}>Parent</option>
-                            <option value='02' {{ macro.parentRelationSelected('02', parentRelationIds) }}>Step-Parent</option>
-                            <option value='03' {{ macro.parentRelationSelected('03', parentRelationIds) }}>Adoptive Parent</option>
-                            <option value='04' {{ macro.parentRelationSelected('04', parentRelationIds) }}>Foster Parent</option>
-                            <option value='05' {{ macro.parentRelationSelected('05', parentRelationIds) }}>Host Family</option>
-                            <option value='06' {{ macro.parentRelationSelected('06', parentRelationIds) }}>Relative</option>
-                            <option value='07' {{ macro.parentRelationSelected('07', parentRelationIds) }}>Friend</option>
-                            <option value='08' {{ macro.parentRelationSelected('08', parentRelationIds) }}>Self</option>
-                            <option value='09' {{ macro.parentRelationSelected('09', parentRelationIds) }}>Other</option>
-                            <option value='10' {{ macro.parentRelationSelected('10', parentRelationIds) }}>Sibling</option>
-                            <option value='11' {{ macro.parentRelationSelected('11', parentRelationIds) }}>Grandparent</option>
-                            <option value='12' {{ macro.parentRelationSelected('12', parentRelationIds) }}>Aunt/Uncle</option>
-                            <option value='13' {{ macro.parentRelationSelected('13', parentRelationIds) }}>Nephew/Niece</option>
-                            <option value='20' {{ macro.parentRelationSelected('20', parentRelationIds) }}>Guardian</option>
-                            <option value='30' {{ macro.parentRelationSelected('30', parentRelationIds) }}>Case Worker</option>
-                            <option value='31' {{ macro.parentRelationSelected('31', parentRelationIds) }}>Supervisor</option>
-                            <option value='32' {{ macro.parentRelationSelected('32', parentRelationIds) }}>Duty Manager</option>
-                            <option value='40' {{ macro.parentRelationSelected('40', parentRelationIds) }}>Medical Contact</option>
-                            <option value='99' {{ macro.parentRelationSelected('99', parentRelationIds) }}>Not provided</option>
+                        <select name="dsn[sentral][parentRelationIds][]" size="8" multiple>
+                            {% for id, name in parentRelationLookup %}
+                                <option value="{{ id }}" {% if id in parentRelationIds %}selected="selected"{% endif%}>{{ name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
