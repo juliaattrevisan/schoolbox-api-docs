@@ -184,29 +184,26 @@ interface IResponse
     public function setAssessable($assessable);
 
     /**
-     * Created date
-     *
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCreatedAt(): Alaress_Date_Format;
+    public function getCreatedAt(): ?Alaress_Date_Format;
 
     /**
-     * @param Alaress_Date_Format $createdAt
+     * @param  Alaress_Date_Format|null $createdAt
      * @return $this
      */
-    public function setCreatedAt(Alaress_Date_Format $createdAt): static;
+    public function setCreatedAt(?Alaress_Date_Format $createdAt): static;
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getUpdatedAt(): Alaress_Date_Format;
+    public function getUpdatedAt(): ?Alaress_Date_Format;
 
     /**
-     * @param Alaress_Date_Format $updatedAt
-     *
+     * @param Alaress_Date_Format|null $updatedAt
      * @return $this
      */
-    public function setUpdatedAt(Alaress_Date_Format $updatedAt): static;
+    public function setUpdatedAt(?Alaress_Date_Format $updatedAt): static;
 
     /**
      * @return Alaress_Date_Format|null

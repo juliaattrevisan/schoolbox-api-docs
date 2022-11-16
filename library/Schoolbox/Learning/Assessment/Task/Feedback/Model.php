@@ -264,18 +264,18 @@ class Model extends AbstractFeedback
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCreatedAt(): Alaress_Date_Format
+    public function getCreatedAt(): ?Alaress_Date_Format
     {
         return $this->getResponse()->getCreatedAt();
     }
 
     /**
-     * @param  Alaress_Date_Format $createdAt
+     * @param  Alaress_Date_Format|null $createdAt
      * @return $this
      */
-    public function setCreatedAt(Alaress_Date_Format $createdAt): static
+    public function setCreatedAt(?Alaress_Date_Format $createdAt): static
     {
         $this->getResponse()->setCreatedAt($createdAt);
         return $this;
@@ -283,19 +283,19 @@ class Model extends AbstractFeedback
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getUpdatedAt(): Alaress_Date_Format
+    public function getUpdatedAt(): ?Alaress_Date_Format
     {
         return $this->getResponse()->getUpdatedAt();
     }
 
 
     /**
-     * @param  Alaress_Date_Format $updatedAt
+     * @param  Alaress_Date_Format|null $updatedAt
      * @return $this
      */
-    public function setUpdatedAt(Alaress_Date_Format $updatedAt): static
+    public function setUpdatedAt(?Alaress_Date_Format $updatedAt): static
     {
         $this->getResponse()->setUpdatedAt($updatedAt);
         return $this;

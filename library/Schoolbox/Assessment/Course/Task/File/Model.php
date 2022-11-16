@@ -66,9 +66,9 @@ class Model implements IFile, ISoftDeletable
 
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCreatedAt(): Alaress_Date_Format
+    public function getCreatedAt(): ?Alaress_Date_Format
     {
         return $this->storage->getCreatedAt();
     }

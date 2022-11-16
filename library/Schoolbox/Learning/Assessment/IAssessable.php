@@ -861,9 +861,9 @@ interface IAssessable extends ISoftDeletable
     /**
      * Created date
      *
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCreatedAt(): Alaress_Date_Format;
+    public function getCreatedAt(): ?Alaress_Date_Format;
 
     /**
      * @param Alaress_Date_Format $createdAt
@@ -873,9 +873,9 @@ interface IAssessable extends ISoftDeletable
     public function setCreatedAt(Alaress_Date_Format $createdAt): static;
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getUpdatedAt(): Alaress_Date_Format;
+    public function getUpdatedAt(): ?Alaress_Date_Format;
 
     /**
      * @param Alaress_Date_Format $updatedAt
