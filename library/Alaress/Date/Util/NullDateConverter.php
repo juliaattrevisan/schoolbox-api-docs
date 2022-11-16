@@ -15,6 +15,9 @@ use ReflectionObject;
 /**
  * Utility class for recursively iterating an object's properties, and replacing
  * any `Alaress_Date_NullDate` instances found with actual `null` values.
+ *
+ * (Currently unused, but could be used for mass-processing serialized objects
+ * from a Redis queue and re-storing them without null dates.)
  */
 class NullDateConverter
 {
@@ -71,10 +74,24 @@ class NullDateConverter
             // skip if so, as it has no value
             if ($reflectionProperty->isInitialized($object)) {
                 $property = $reflectionProperty->getValue($object);
+
+                // Convert null dates to nulls
                 if ($property instanceof Alaress_Date_NullDate) {
-                    // Set this object's property to null
                     $reflectionProperty->setValue($object, null);
-                } elseif (is_object($property)) {
+                    continue;
+                }
+
+                // Eventually, this will need to convert incomplete null dates
+                // to nulls
+//                if ($property instanceof \__PHP_Incomplete_Class) {
+//                    if ($property->__PHP_Incomplete_Class_Name === 'Alaress_Date_NullDate') {
+//                        $reflectionProperty->setValue($object, null);
+//                        continue;
+//                    }
+//                }
+
+                // Any null dates within this object are converted recursively
+                if (is_object($property)) {
                     // Don't process object if already at max depth
                     if ($currentDepth >= self::MAX_DEPTH) {
                         $property = $this->convertNullDates($property, $currentDepth + 1);
