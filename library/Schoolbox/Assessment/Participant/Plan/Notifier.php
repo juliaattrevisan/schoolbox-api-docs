@@ -518,7 +518,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         // * targeted to one of $user's children
         // * targeted to a folder which $user is a part of
         $childIds = [];
-        foreach ($user->getChildren() as $child) {
+        foreach ($this->externalUser->getStudents($user) as $child) {
             $childIds[$child->getId()] = true;
         }
 

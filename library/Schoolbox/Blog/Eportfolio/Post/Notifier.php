@@ -232,7 +232,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Send it to all their parents
-        $parents = $owner->loadParents()->getParents();
+        $parents = $this->externalUser->getParents($owner);
         $audience = $this->userMapper->createCollection();
         // Need to explicitly set page owner
         $post->getPage()->setOwner($owner);
@@ -266,20 +266,8 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
-        // Are we targeting parents?
-        if (Role::PARENT === $roleType) {
-            // Load parents so we can display just their child's first name
-            $effector->loadParents();
-            if ($effector->getId() !== $owner->getId()) {
-                $owner->loadParents();
-            }
-        }
-
         foreach ($audience as $target) {
             /** @var User $target */
-            if (!$target->getChildren()) {
-                $target->setChildren(User::createCollection());
-            }
             // Just first name if advising parent of child's action
             $effectorParam = Role::PARENT === $roleType && $this->externalUser->isParentOf($target, $effector)
                 ? new ChildParam($effector)
