@@ -251,7 +251,7 @@ class Notifier extends AbstractModuleNotifier
 
         $audience = $this->userMapper->createCollection();
 
-        foreach ($owner->getParents() as $parent) {
+        foreach ($this->externalUser->getParents($owner) as $parent) {
             try {
                 if ($this->access->userCanView($post, $parent)) {
                     $audience[$parent->getId()] = $parent;
@@ -442,10 +442,7 @@ class Notifier extends AbstractModuleNotifier
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action
             /** @var User $target */
-            if (!$target->getChildren()) {
-                $target->setChildren(User::createCollection());
-            }
-            $effectorParam = Role::PARENT === $roleType && $target->isParentOf($effector)
+            $effectorParam = Role::PARENT === $roleType && $this->externalUser->isParentOf($target, $effector)
                 ? new ChildParam($effector)
                 : new UserParam($effector);
 
@@ -458,7 +455,7 @@ class Notifier extends AbstractModuleNotifier
                 // Did effector comment on their own blog?
                 $ownerToken = 'their';
                 $ownerParam = [];
-            } elseif (Role::PARENT === $roleType && $target->isParentOf($owner)) {
+            } elseif (Role::PARENT === $roleType && $this->externalUser->isParentOf($target, $owner)) {
                 // Are we sending to post owner's parents?
                 $ownerToken = ":student's";
                 $ownerParam = ['student' => new ChildParam($owner)];

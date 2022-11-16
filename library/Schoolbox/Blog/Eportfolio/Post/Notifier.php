@@ -281,7 +281,7 @@ class Notifier extends AbstractModuleNotifier
                 $target->setChildren(User::createCollection());
             }
             // Just first name if advising parent of child's action
-            $effectorParam = Role::PARENT === $roleType && $target->isParentOf($effector)
+            $effectorParam = Role::PARENT === $roleType && $this->externalUser->isParentOf($target, $effector)
                 ? new ChildParam($effector)
                 : new UserParam($effector);
 
@@ -294,7 +294,7 @@ class Notifier extends AbstractModuleNotifier
                 // Did effector comment on their own blog?
                 $ownerToken = 'their';
                 $ownerParam = [];
-            } elseif (Role::PARENT === $roleType && $target->isParentOf($owner)) {
+            } elseif (Role::PARENT === $roleType && $this->externalUser->isParentOf($target, $owner)) {
                 // Are we sending to post owner's parents?
                 $ownerToken = ":student's";
                 $ownerParam = ['student' => new ChildParam($owner)];
