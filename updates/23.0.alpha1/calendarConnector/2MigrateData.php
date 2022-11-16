@@ -20,9 +20,7 @@ $app = new class extends CliTool\App
      */
     public function getLongOpts(): array
     {
-        return [
-            self::OPT_LONG_HELP,
-        ];
+        return [self::OPT_LONG_HELP];
     }
 
     /**
@@ -35,12 +33,21 @@ $app = new class extends CliTool\App
 
 Migrate serialized calendar_connector config data to JSON format
 
-This script will read from schoolbox.calendar_connector.config and write to
-schoolbox.calendar_connector.config_json.
+This script will read from schoolbox.calendar_connector._config and write to
+schoolbox.calendar_connector.config.
 
-For each row, the value written to the `config_json` column will be the data
-from the corresponding `config` column, transformed so that it is encoded in
-JSON format instead
+Note that any existing contents of schoolbox.calendar_connector.config will be
+overwritten by this script.
+
+Note also that this script expects that the column named `_config` exists, and
+that it contains the same data as was originally contained in the `config`
+column.
+
+For each row, the value written to the `config` column will be the data
+from the corresponding `_config` column, transformed so that it is encoded in
+JSON format instead of by the previous encoding method (which was to first
+serialize and then base64encode a Calendar_Api_Config_Connector_Abstract
+object).
 
 Usage: php replace_serialized_calendar_config_with_json.php
 
@@ -51,12 +58,12 @@ HELP;
         $dbc = $this->getDatabaseInternal();
 
         echo 'Getting calendar_connector rows...';
-        $rows = $dbc->executeQuery('SELECT id, config FROM calendar_connector')->fetchAll();
+        $rows = $dbc->executeQuery('SELECT id, _config FROM calendar_connector')->fetchAll();
         echo 'done.  Found ' . count($rows) . " rows.\n\n";
 
-        echo "For each row in calendar_connector, updating `config_json` to the JSON equivalent of `config`.\n";
+        echo "For each row in calendar_connector, updating `config` to the JSON equivalent of `_config`.\n";
         foreach ($rows as $row) {
-            $config = unserialize(base64_decode($row['config']), ['Calendar_Api_Config_Connector_Abstract']);
+            $config = unserialize(base64_decode($row['_config']), ['Calendar_Api_Config_Connector_Abstract']);
 
             $configJson = convertConfigObjectToJson($config);
 
@@ -64,11 +71,11 @@ HELP;
                 $configJson = null; // If we could not convert to JSON, store as NULL in the database.
             }
 
-            printf(" * id: %3s, strlen(config): %4d, strlen(config_json): %4d\n", $row['id'], strlen($row['config']), strlen($configJson));
+            printf(" * id: %3s, strlen(config): %4d, strlen(configJson): %4d\n", $row['id'], strlen($row['_config']), strlen($configJson));
 
             $query = (
                 "UPDATE calendar_connector
-                 SET config_json=:configJson
+                 SET config=:configJson
                  WHERE id=:id"
             );
             $statement = $dbc->prepareQuery($query, ['id' => $row['id'], 'configJson' => $configJson]);
