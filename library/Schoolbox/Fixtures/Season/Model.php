@@ -33,13 +33,29 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /** @var string */
     protected $name;
 
-    /** @var Alaress_Date_Format */
-    protected Alaress_Date_Format $start;
+    /**
+     * The start of the season.
+     *
+     * Will never be null once persisted, but may be when the object is first
+     * used: therefore, it needs to be nullable.
+     *
+     * @var Alaress_Date_Format|null
+     */
+    protected ?Alaress_Date_Format $start = null;
 
-    /** @var Alaress_Date_Format */
-    protected Alaress_Date_Format $end;
+    /**
+     * The end of the season.
+     *
+     * Will never be null once persisted, but may be when the object is first
+     * used: therefore, it needs to be nullable.
+     *
+     * @var Alaress_Date_Format|null
+     */
+    protected ?Alaress_Date_Format $end = null;
 
-    /** @var Alaress_Date_Format|null */
+    /**
+     * @var Alaress_Date_Format|null
+     */
     private ?Alaress_Date_Format $archivedAt = null;
 
     /**
@@ -113,39 +129,39 @@ class Model implements ISoftDeletable, ValueLabelInterface
     }
 
     /**
-     * @param Alaress_Date_Format $start
+     * @param Alaress_Date_Format|null $start
      *
      * @return static
      */
-    public function setStart(Alaress_Date_Format $start): self
+    public function setStart(?Alaress_Date_Format $start): self
     {
         $this->start = $start;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getStart(): Alaress_Date_Format
+    public function getStart(): ?Alaress_Date_Format
     {
         return $this->start;
     }
 
     /**
-     * @param Alaress_Date_Format $end
+     * @param Alaress_Date_Format|null $end
      *
      * @return static
      */
-    public function setEnd(Alaress_Date_Format $end): self
+    public function setEnd(?Alaress_Date_Format $end): self
     {
         $this->end = $end;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getEnd(): Alaress_Date_Format
+    public function getEnd(): ?Alaress_Date_Format
     {
         return $this->end;
     }
