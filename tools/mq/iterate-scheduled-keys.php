@@ -9,6 +9,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Date\Util\NullDateConverter;
 use Alaress\Redis;
 use Schoolbox\Application\CliTool;
 
@@ -28,7 +29,6 @@ $app = new class extends CliTool\App
     public function run(): void
     {
         $this->checkRedis();
-        return;
     }
 
 
@@ -46,44 +46,17 @@ $app = new class extends CliTool\App
 
         $this->getLogger()->info("Checking redis data...");
 
+        $converter = new NullDateConverter();
+
         foreach ($redisList as $key) {
             $compressed = $redis->get($key);
             $uncompress = gzuncompress($compressed);
             $trigger    = unserialize($uncompress);
             if (is_object($trigger)) {
-                $this->interrogateObject($trigger);
+                $converter->convert($trigger);
                 $this->getLogger()->notice(get_class($trigger));
             }
         }
-    }
-
-
-    private function interrogateObject(object $object): object
-    {
-        $hash = spl_object_hash($object);
-
-        // Don't process the same object more than once
-        if (isset($this->objectMap[$hash])) {
-            return $this->objectMap[$hash];
-        }
-
-        $this->objectMap[$hash] = $object;
-        $reflection = new ReflectionObject($object);
-        foreach ($reflection->getProperties() as $reflectionProperty) {
-            $reflectionProperty->setAccessible(true);
-            // Maybe this is being accessed before init
-            if ($reflectionProperty->isInitialized($object)) {
-                $property = $reflectionProperty->getValue($object);
-                if ($property instanceof Alaress_Date_NullDate) {
-                    // Set this object's property to null
-                    $reflectionProperty->setValue($object, null);
-                } elseif (is_object($property)) {
-                    $property = $this->interrogateObject($property);
-                    $reflectionProperty->setValue($object, $property);
-                }
-            }
-        }
-        return $object;
     }
 };
 
