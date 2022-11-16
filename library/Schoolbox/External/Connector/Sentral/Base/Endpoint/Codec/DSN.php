@@ -52,7 +52,9 @@ class DSN implements IDSN
         return [
             'key' => $matches[1],
             'tenant' => $matches[2],
-            'parentRelationIds' => explode(',', $matches[3])
+            'options' => [
+                'parentRelationIds' => explode(',', $matches[3])
+            ]
         ];
     }
 
@@ -69,8 +71,8 @@ class DSN implements IDSN
 
         /* This field may not have existed in the ui previously
          */
-        if (isset($parts['parentRelationIds']) && \count($parts['parentRelationIds'])) {
-            $parentRelationIds = implode(',', $parts['parentRelationIds']);
+        if (isset($parts['options']['parentRelationIds']) && \count($parts['options']['parentRelationIds'])) {
+            $parentRelationIds = implode(',', $parts['options']['parentRelationIds']);
         }
 
         return "key={$parts['key']};tenant={$parts['tenant']};parentRelationIds={$parentRelationIds}";

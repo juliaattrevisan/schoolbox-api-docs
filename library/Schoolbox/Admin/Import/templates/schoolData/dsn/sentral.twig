@@ -62,7 +62,7 @@
                             }
                         %}
 
-                        <select name="dsn[sentral][parentRelationIds][]" size="8" multiple>
+                        <select name="dsn[sentral][options][parentRelationIds][]" size="8" multiple>
                             {% for id, name in parentRelationLookup %}
                                 <option value="{{ id }}" {% if id in parentRelationIds %}selected="selected"{% endif%}>{{ name }}</option>
                             {% endfor %}

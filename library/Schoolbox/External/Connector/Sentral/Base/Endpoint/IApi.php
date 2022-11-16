@@ -27,7 +27,15 @@ interface IApi
 
 
     /**
+     * The statistics object which remembers how much you accessed the api
+     *
      * @return ApiUsage
      */
     public function getUsage(): ApiUsage;
+
+
+    /**
+     * Gets the additional configuration settings selected by schools
+     */
+    public function getOptions(): array;
 }

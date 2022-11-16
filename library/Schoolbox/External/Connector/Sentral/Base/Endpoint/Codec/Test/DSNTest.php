@@ -53,7 +53,9 @@ class DSNTest extends TestCase
                 [
                     'key' => 'qwrSDFh823468',
                     'tenant' => 'ABC12345abc',
-                    'parentRelationIds' => '00,01,02,20'
+                    'options' => [
+                        'parentRelationIds' => ['00','01','02','20']
+                    ]
                 ]
             ],
         ];
@@ -129,6 +131,43 @@ class DSNTest extends TestCase
             ],
             'Invalid DSN 15' => [
                 'key=aaaaaa ;tenant=ab c123;parentRelationIds=001122 g   g',
+            ],
+        ];
+    }
+
+    /**
+     * Test invalid DSN strings (these throw DomainExceptions)
+     *
+     * @dataProvider providerValidDSNEncodeDecode
+     * @param string $dsn
+     * @throws DomainException
+     *
+     */
+    public function testValidDSNEncodeDecode(string $dsn, string $expected): void
+    {
+        $codec = new DSN();
+
+        $decoded = $codec->decode($dsn);
+        $encoded = $codec->encode($decoded);
+        $decoded = $codec->decode($encoded);
+        $encoded = $codec->encode($decoded);
+        $decoded = $codec->decode($encoded);
+        $encoded = $codec->encode($decoded);
+
+        $this->assertEquals($expected, $encoded);
+    }
+
+    /**
+     * Data provider for testValidDSNEncodeDecode
+     *
+     * @return array
+     */
+    public function providerValidDSNEncodeDecode(): array
+    {
+        return [
+            'Re-encode 1' => [
+                'key=qwrSDFh823468;tenant=ABC12345abc;parentRelationIds=00,01,02,20',
+                'key=qwrSDFh823468;tenant=ABC12345abc;parentRelationIds=00,01,02,20'
             ],
         ];
     }

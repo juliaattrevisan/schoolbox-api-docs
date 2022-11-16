@@ -944,18 +944,19 @@ class Profile implements IStrategy
              * Siblings and the student themselves might appear here
              * for no apparent reason, but ok
              */
+            $relationshipId = trim((string)$contact['attributes']['relationId']);
             $relationshipName = trim((string)$contact['attributes']['relationName']);
 
-            /* Skip Sibling relationships
+            /* We only assign Parents as chosen by the school in Sentral Configuration
+             * in the SUDS Control Panel; anyone outside the chosen set is ignored
              */
-            if ($relationshipName === self::RELATIONSHIP_SIBLING) {
+            if (!in_array($relationshipId, $this->api->getOptions()['parentRelationIds'], true)) {
                 $this->log->debug(sprintf(
-                    'Person id %s is a %s of the student - skipping.',
+                    'Person id %s is a "%s %s" of the student - skipping.',
                     $contact['attributes']['personId'],
+                    $relationshipId,
                     $relationshipName
                 ));
-
-                continue;
             }
 
             /* Go digging in another endpoint for data
