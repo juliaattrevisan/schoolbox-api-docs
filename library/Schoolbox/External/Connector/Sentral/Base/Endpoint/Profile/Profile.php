@@ -950,7 +950,7 @@ class Profile implements IStrategy
             /* We only assign Parents as chosen by the school in Sentral Configuration
              * in the SUDS Control Panel; anyone outside the chosen set is ignored
              */
-            if (!in_array($relationshipId, $this->api->getOptions()['parentRelationIds'], true)) {
+            if (!in_array($relationshipId, $this->api->getOptions()['parentRelationIds'] ?? [], true)) {
                 $this->log->debug(sprintf(
                     'Person id %s is a "%s %s" of the student - skipping.',
                     $contact['attributes']['personId'],
