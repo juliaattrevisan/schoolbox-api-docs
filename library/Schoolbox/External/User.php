@@ -15,10 +15,10 @@ class User
     private Collection $parents;
     private Collection $students;
     private Collection $teachers;
-    private \External_User $externalUser;
-    private \External_Class $externalClass;
-    private UserMapper $userMapper;
-    private string $externalType;
+    private \External_User|null $externalUser;
+    private \External_Class|null $externalClass;
+    private UserMapper|null $userMapper;
+    private string|null $externalType;
 
     public function __construct(string $externalType = null, \External_Class $externalClass = null, \External_User $externalUser = null, UserMapper $userMapper = null)
     {
