@@ -58,7 +58,7 @@ HELP;
         foreach ($rows as $row) {
             $config = unserialize(base64_decode($row['config']), ['Calendar_Api_Config_Connector_Abstract']);
 
-            $configJson = convertConfigObjectToJsonNotUsingEval($config);
+            $configJson = convertConfigObjectToJson($config);
 
             if ($configJson === false) {
                 $configJson = null; // If we could not convert to JSON, store as NULL in the database.
@@ -96,7 +96,7 @@ HELP;
  * @param Calendar_Api_Config_Connector_Abstract $config
  * @return bool|string
  */
-function convertConfigObjectToJsonNotUsingEval(Calendar_Api_Config_Connector_Abstract $config): bool|string
+function convertConfigObjectToJson(Calendar_Api_Config_Connector_Abstract $config): bool|string
 {
     try {
         $configJson = json_encode(
@@ -116,51 +116,4 @@ function convertConfigObjectToJsonNotUsingEval(Calendar_Api_Config_Connector_Abs
     }
 
     return $configJson;
-}
-
-/**
- * @param Calendar_Api_Config_Connector_Abstract $config
- * @return bool|string
- *
- * This is an alternative method to convertConfigObjectToJsonNotUsingEval(), for use in cases where the serialized
- * object no longer matches the current version of the Calendar_Api_Config_Connector_Abstract class.  This function
- * will probably not be needed.
- *
- * The non-eval version of this function should be preferred over this one because of the dangers of using eval().
- */
-function convertConfigObjectToJsonUsingEval(Calendar_Api_Config_Connector_Abstract $config): bool|string
-{
-    $configPhpString = var_export($config, true);
-    $configArrayString = "array(\n" . stripFirstAndLastLinesFromMultilineString($configPhpString) . "\n)";
-    $configArray       = null; // To avoid PHPStorm 'undefined variable' warning below.
-
-    eval("\$configArray = $configArrayString;");
-
-    try {
-        $configJson = json_encode($configArray, JSON_THROW_ON_ERROR);
-    } catch (JsonException) {
-        return false;
-    }
-
-    return $configJson;
-}
-
-/**
- * @param $string
- * @return string
- */
-function stripFirstAndLastLinesFromMultilineString($string): string
-{
-    $lines = explode("\n", $string);
-    $linesToReturn = [];
-
-    foreach ($lines as $lineNo => $line) {
-        if ($lineNo === 0 || $lineNo === count($lines) - 1) {
-            continue;
-        }
-
-        $linesToReturn[] = $line;
-    }
-
-    return implode("\n", $linesToReturn);
 }
