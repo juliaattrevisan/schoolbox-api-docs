@@ -98,11 +98,11 @@ class Helper
         /* Recompile everything
          */
         $restructured = [
-            'guid' => trim((string)$currentEvent->me['struct']['Guid']->me['string']),
+            'guid' => trim((string)($currentEvent->me['struct']['Guid']->me['string'] ?? null)),
 
             /* Timing
              */
-            'period' => trim((string)$currentEvent->me['struct']['Period']->me['string']),
+            'period' => trim((string)($currentEvent->me['struct']['Period']->me['string'] ?? null)),
             'startDateTime' => new \Alaress_Date_Format($startDateTime, \Alaress_Date_Format::DATABASE_FORMAT),
             'endDateTime' => new \Alaress_Date_Format($endDateTime, \Alaress_Date_Format::DATABASE_FORMAT),
 
@@ -110,7 +110,7 @@ class Helper
              */
             'code' => $this->generateClassCode(trim((string)$currentEvent->me['struct']['ClassCode']->me['string'])),
             'name' => trim((string)$currentEvent->me['struct']['ClassName']->me['string']),
-            'rooms' => trim((string)$currentEvent->me['struct']['Rooms']->me['string']),
+            'rooms' => trim((string)($currentEvent->me['struct']['Rooms']->me['string'] ?? null)),
             'type' => trim((string)$currentEvent->me['struct']['Type']->me['string']),
             'detail' => '',
 
@@ -121,8 +121,8 @@ class Helper
             /* Assemble numeric Teacher Ids and alphanumeric Teacher Codes
              * No idea why this has to be a csv, but students is an array...wevs
              */
-            'teacherCodes' => array_filter(explode(',', (string)$currentEvent->me['struct']['TeacherCodes']->me['string'])),
-            'teacherIds' => array_filter(explode(',', (string)$currentEvent->me['struct']['TeacherIds']->me['string'])),
+            'teacherCodes' => array_filter(explode(',', (string)($currentEvent->me['struct']['TeacherCodes']->me['string'] ?? null))),
+            'teacherIds' => array_filter(explode(',', (string)($currentEvent->me['struct']['TeacherIds']->me['string'] ?? null))),
         ];
 
         /* Assemble Students
