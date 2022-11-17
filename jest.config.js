@@ -4,9 +4,12 @@ module.exports = {
     snapshotSerializers: [ //A list of paths to snapshot serializer modules Jest should use for snapshot testing.
         '<rootDir>/node_modules/jest-serializer-vue'
     ],
-    transform: { //A map from regular expressions to paths to transformers. 
+    transform: { //A map from regular expressions to paths to transformers.
         '^.+\\.vue$': 'vue-jest',
         '^.+\\js$': 'babel-jest'
+    },
+    moduleNameMapper: { //may any required webpack aliases across
+        "^@schoolboxCurriculum(.*)$": "<rootDir>/library/Schoolbox/Curriculum/templates$1",
     },
     verbose: true, //Indicates whether each individual test should be reported during the run. All errors will also still be shown on the bottom after execution. Note that if there is only one test file being run it will default to true.
 }

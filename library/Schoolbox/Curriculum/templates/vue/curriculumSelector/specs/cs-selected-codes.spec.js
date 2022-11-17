@@ -18,7 +18,7 @@ beforeEach(() => {
 test('should not display when there is no codes', () => {
     const selectedNodesStore = useSelectedNodesStore();
     expect(selectedNodesStore.hasNodes).toBe(false);
-    expect(wrapper.find('[data-test-container]').exists()).toBe(false);
+    expect(wrapper.find('[data-test-nodes-container]').exists()).toBe(false);
 });
 
 test('should display when there is codes', async () => {
@@ -41,5 +41,5 @@ test('should not display when had codes but has been emptied', async () => {
     expect(selectedNodesStore.hasNodes).toBe(true); //should have codes now
     selectedNodesStore.empty();
     expect(selectedNodesStore.hasNoNodes).toBe(true); //and now no codes
-    expect(wrapper.find('[data-test-container]').exists()).toBe(false);
+    expect(wrapper.find('[data-test-nodes-container]').exists()).toBe(false);
 });
