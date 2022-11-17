@@ -510,7 +510,7 @@ class Controller extends Base
         ) {
             //build signature, and replace requested tokens
             $emailBody = "<p>&nbsp;</p><p>---</p>"
-                . $tokenReplacer->replaceRaw(
+                . $tokenReplacer->replaceHtml(
                     $signature,
                     [
                         '[title]'         => $this->getUser()->getTitle(),

@@ -51,14 +51,18 @@ class Simple
 
 
     /**
-     * Replace without Scrub, to return replaced raw html
+     * Replace using Scrub::html, to return replaced html
      * @param string $body
      * @param array  $replacements
      * @return string
      */
-    public function replaceRaw(string $body, array $replacements): string
+    public function replaceHtml(string $body, array $replacements): string
     {
-        return str_replace(array_keys($replacements), $replacements, $body);
+        $sanitisedReplacements = array_map(static function ($val) {
+            return \Scrub::html($val);
+        }, array_values($replacements));
+
+        return str_replace(array_keys($replacements), $sanitisedReplacements, $body);
     }
 
 
