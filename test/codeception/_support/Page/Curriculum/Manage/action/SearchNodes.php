@@ -23,16 +23,20 @@ class SearchNodes
 
     /**
      * add a search
+     *
+     * @param string $value
      */
-    public function fillSearch($value): void
+    public function fillSearch(string $value): void
     {
         $this->tester->fillField(self::SEARCH_FIELD, $value);
     }
 
     /**
      * to check the number of expected results matches the actual
+     *
+     * @param int $value
      */
-    public function seeResultsMatch($value): void
+    public function seeResultsMatch(int $value): void
     {
         $this->tester->seeNumberOfElements(ManageCurriculum::NODES, $value);
     }

@@ -25,8 +25,10 @@ class UpdateNode
 
     /**
      * select the add new subsection button
+     *
+     * @param string $value
      */
-    public function clickDisplay($value): void
+    public function clickDisplay(string $value): void
     {
         $this->tester->click(self::DISPLAY_TOGGLE . $value);
     }
@@ -41,22 +43,29 @@ class UpdateNode
 
     /**
      * update a name
+     *
+     * @param string $value
      */
-    public function fillName($value): void
+    public function fillName(string $value): void
     {
         $this->tester->fillField(self::NAME_FIELD, $value);
     }
 
     /**
      * update a code
+     *
+     * @param string $value
      */
-    public function fillCode($value): void
+    public function fillCode(string $value): void
     {
         $this->tester->fillField(self::CODE_FIELD, $value);
     }
 
     /**
      * update a description
+     *
+     * @param string $id
+     * @param string $value
      */
     public function fillDescription($id, $value): void
     {

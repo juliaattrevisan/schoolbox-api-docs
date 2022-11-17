@@ -41,16 +41,20 @@ class AddNewSubsection
 
     /**
      * add a name
+     *
+     * @param string $value
      */
-    public function fillName($value): void
+    public function fillName(string $value): void
     {
         $this->tester->fillField(self::NAME_FIELD, $value);
     }
 
     /**
      * add a code
+     *
+     * @param string $value
      */
-    public function fillCode($value): void
+    public function fillCode(string $value): void
     {
         $this->tester->fillField(self::CODE_FIELD, $value);
     }

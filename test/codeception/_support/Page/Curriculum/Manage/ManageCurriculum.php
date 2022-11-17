@@ -23,16 +23,20 @@ class ManageCurriculum
 
     /**
      * select the node checkbox to enable/disable or delete
+     *
+     * @param string $value
      */
-    public function checkNode($value): void
+    public function checkNode(string $value): void
     {
         $this->tester->checkOption($value);
     }
 
     /**
-     * select the node to navigate next o
+     * select the node to navigate next to
+     *
+     * @param string $value
      */
-    public function clickNode($value): void
+    public function clickNode(string $value): void
     {
         $this->tester->click($value);
     }

@@ -21,15 +21,7 @@ class DeleteNodes
     }
 
     /**
-     * select the node checkbox to disable
-     */
-    public function checkNode($value): void
-    {
-        $this->tester->checkOption($value);
-    }
-
-    /**
-     * click the button to disable the selected nodes
+     * click the button to delete the selected nodes
      */
     public function clickDeleteButton(): void
     {
@@ -45,7 +37,7 @@ class DeleteNodes
     }
 
     /**
-     * click the confirm button to disable nodes
+     * click the confirm button to delete nodes
      */
     public function clickConfirmButton(): void
     {
