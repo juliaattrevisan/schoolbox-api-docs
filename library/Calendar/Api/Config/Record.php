@@ -12,7 +12,6 @@
  */
 class Calendar_Api_Config_Record
 {
-
     /**
      * Status of a config record
      *
@@ -23,14 +22,12 @@ class Calendar_Api_Config_Record
     public const ACTIVE   = 1;
     public const INACTIVE = 0;
 
-
     /**
      * Primary key
      *
      * @var int|null
      */
     public ?int $id = null;
-
 
     /**
      * The kind of event this configuration is for
@@ -42,7 +39,6 @@ class Calendar_Api_Config_Record
      */
     public string $eventType = '';
 
-
     /**
      * Class name of the API which will use this config
      * e.g. 'Schoolbox', 'Vcal'
@@ -53,14 +49,12 @@ class Calendar_Api_Config_Record
      */
     public string $connectorClass = '';
 
-
     /**
      * Serialized configuration object
      *
      * @var string
      */
     public string $config = '';
-
 
     /**
      * Status of the config
@@ -92,33 +86,68 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * Encode config object for storage in db
      *
      * @param Calendar_Api_Config_Connector_Abstract $config
      * @return $this
+     * @throws JsonException
      */
     public function encodeConfig(Calendar_Api_Config_Connector_Abstract $config): self
     {
-        $this->setConfig(base64_encode(serialize($config)));
+        $this->setConfig(
+            json_encode(
+                [
+                   'connectorClass' => $config->getConnectorClass(),
+                   'eventType'      => $config->getEventType(),
+                   'failedCount'    => $config->getFailedCount(),
+                   'id'             => $config->getId(),
+                   'label'          => $config->getLabel(),
+                   'luEventType'    => $config->getLuEventType(),
+                ],
+                JSON_THROW_ON_ERROR
+            )
+        );
+
         return $this;
     }
-
 
     /**
      * Decode config object when retrieving from db
      *
-     * @return Calendar_Api_Config_Connector_Abstract
+     * @return Calendar_Api_Config_Connector_Abstract|null
+     * @throws JsonException
      */
-    public function decodeConfig(): Calendar_Api_Config_Connector_Abstract
+    public function decodeConfig(): Calendar_Api_Config_Connector_Abstract|null
     {
-        /** @var Calendar_Api_Config_Connector_Abstract $obj */
-        $obj = unserialize(base64_decode($this->getConfig()), [Calendar_Api_Config_Connector_Abstract::class]);
-        $obj->setFailedCount($this->getFailedCount());
+        $configJson = $this->getConfig();
+
+        if ($configJson === null) {
+            return null;
+        }
+
+        try {
+            $config = json_decode($configJson, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            echo "Could not decode json '$configJson'.";
+            die;
+        }
+
+        // Instantiate class object given description in $config;
+
+        $className = "Calendar_Api_Config_Connector_{$config['connectorClass']}";
+
+        $obj = new $className();
+
+        $obj->setEventType($config['eventType']);
+        $obj->setConnectorClass($config['connectorClass']);
+        $obj->setId($config['id']);
+        $obj->setLuEventType($config['luEventType']);
+        $obj->setLabel($config['label']);
+        $obj->setFailedCount($config['failedCount']);
+
         return $obj;
     }
-
 
     /**
      * Activate this config record
@@ -130,7 +159,6 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * Deactivate this config record, but not delete it
      * @return Calendar_Api_Config_Record
@@ -140,7 +168,6 @@ class Calendar_Api_Config_Record
         $this->setStatus(self::INACTIVE);
         return $this;
     }
-
 
     /**
      * This connector active?
@@ -165,7 +192,6 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * @return string|null
      */
@@ -173,7 +199,6 @@ class Calendar_Api_Config_Record
     {
         return $this->eventType;
     }
-
 
     /**
      * Set connectorClass
@@ -187,7 +212,6 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * Get connectorClass
      *
@@ -197,7 +221,6 @@ class Calendar_Api_Config_Record
     {
         return $this->connectorClass;
     }
-
 
     /**
      * Set config
@@ -211,7 +234,6 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * Get config
      *
@@ -221,7 +243,6 @@ class Calendar_Api_Config_Record
     {
         return $this->config;
     }
-
 
     /**
      * Set id
@@ -235,7 +256,6 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * Get id
      *
@@ -245,7 +265,6 @@ class Calendar_Api_Config_Record
     {
         return $this->id;
     }
-
 
     /**
      * Set status
@@ -258,7 +277,6 @@ class Calendar_Api_Config_Record
         $this->status = $status;
         return $this;
     }
-
 
     /**
      * Get status
