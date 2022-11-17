@@ -35,7 +35,6 @@ use UnexpectedValueException;
  */
 class Access
 {
-
     /**
      * @var FolderAccess
      */

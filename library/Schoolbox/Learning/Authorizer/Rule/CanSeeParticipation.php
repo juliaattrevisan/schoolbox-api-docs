@@ -37,7 +37,6 @@ use Schoolbox\User;
  */
 class CanSeeParticipation extends AbstractParticipationRule
 {
-
     /** @var Access */
     private $access;
 

@@ -17,7 +17,6 @@ use Schoolbox\User;
  */
 class ParentCanViewFeedback extends AbstractCanViewFeedback
 {
-
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException
