@@ -94,13 +94,14 @@ class Eportfolio_Authenticator
          */
         $youCanView = false;
 
+        $externalUser = new \Schoolbox\External\User();
         /* These pages are hardcoded and have special conditions
          */
         if (null === $this->pageId) {
             /* Parents of the page owner are allowed
              */
             if ($this->currentUser->getRole()->isParent()) {
-                if ($this->currentUser->isParentOf($this->owner)) {
+                if ($externalUser->isParentOf($this->currentUser, $this->owner)) {
                     $youCanView = true;
                 }
             } elseif ($this->currentUser->getRole()->isStudent()) {
@@ -119,7 +120,7 @@ class Eportfolio_Authenticator
 
             foreach ($parentSettingCollection as $current) {
                 /* @var $current Eportfolio\Permission */
-                if ($current->getValue() && $this->currentUser->isParentOf($this->owner)) {
+                if ($current->getValue() && $externalUser->isParentOf($this->currentUser, $this->owner)) {
                     $youCanView = true;
                 }
             }
