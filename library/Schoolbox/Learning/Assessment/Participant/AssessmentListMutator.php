@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Participant;
 
@@ -105,7 +105,7 @@ class AssessmentListMutator
 
         // Unset children who don't have visibility, and set visibility
         // based on that factor
-        foreach ($this->user->getChildren() as $child) {
+        foreach ((new \Schoolbox\External\User())->getStudents($this->user) as $child) {
             if ($assessment->isParticipant($child)) {
                 if ($this->visibility->isVisibleToUser($assessment, $child, $this->showClosed, $this->now)) {
                     $this->visibilityCache[$assessmentId] = true;
