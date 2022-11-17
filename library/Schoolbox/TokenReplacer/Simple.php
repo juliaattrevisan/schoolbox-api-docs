@@ -52,6 +52,18 @@ class Simple
 
 
     /**
+     * Replace without Scrub, to return replaced raw html
+     * @param string $body
+     * @param array  $replacements
+     * @return string
+     */
+    public function replaceRaw(string $body, array $replacements): string
+    {
+        return str_replace(array_keys($replacements), $replacements, $body);
+    }
+
+
+    /**
      * Diagnostic for seeing which tokens are available for substitutions
      *
      * @param string $body
