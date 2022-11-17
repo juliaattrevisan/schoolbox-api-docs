@@ -152,7 +152,6 @@ class Session
             }
 
             // If external is off, or user is not a parent, user explicitly has no children (as opposed to unknown)
-            $user->setChildren(new GenericCollection(User::class));
             if (Config::get('external_enable')) {
                 $this->setSynergyInfo($userMapper, $user);
             }
