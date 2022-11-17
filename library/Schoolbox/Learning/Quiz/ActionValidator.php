@@ -68,7 +68,7 @@ class ActionValidator
             return true;
         }
         if ($user->getRole()->isParent()) {
-            foreach ($this->externalUser->getStudents($user) as $child) {
+            foreach ($this->externalUser->getChildren($user) as $child) {
                 if ($this->visibility->isVisibleToUser($quiz, $child, true, $this->now)) {
                     return true;
                 }

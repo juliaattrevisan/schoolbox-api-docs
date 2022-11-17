@@ -197,7 +197,7 @@ class Controller extends BaseController
     {
         $externalUser = $parent->getExternalId() ? $this->externalUser->getParent($parent->getExternalId()) : [];
 
-        $students = $this->externalUserDetails->getStudents($parent);
+        $students = $this->externalUserDetails->getChildren($parent);
 
         if (isset($externalUser['SpouseID'])) {
             try {

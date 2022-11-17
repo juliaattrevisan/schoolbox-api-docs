@@ -550,10 +550,10 @@ class Folder extends SimpleStrategy
                  * should we put the parents children back into the session/ user object? or cache this somewhere???
                 */
                 $externalUser = new \Schoolbox\External\User();
-                if ($externalUser->getStudents($user)->count() === 0) {
+                if ($externalUser->getChildren($user)->count() === 0) {
                     return null;
                 }
-                foreach ($externalUser->getStudents($user) as $child) {
+                foreach ($externalUser->getChildren($user) as $child) {
                     if ($child->getSubjectCollection() === null) {
                         continue;
                     }

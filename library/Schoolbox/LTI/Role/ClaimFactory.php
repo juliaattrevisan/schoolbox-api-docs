@@ -128,7 +128,7 @@ class ClaimFactory
         }
 
         // Parent case
-        foreach ((new \Schoolbox\External\User())->getStudents($user) as $child) {
+        foreach ((new \Schoolbox\External\User())->getChildren($user) as $child) {
             $participant = $assessment->getParticipantIfExtant($child);
             if ($participant && !$participant->isExcluded()) {
                 return [self::MEMBERSHIP_ROLE_MENTOR];

@@ -150,10 +150,10 @@ abstract class SimpleStrategy implements ISimpleStrategy
                  * should we put the parents children back into the session/ user object? or cache this somewhere???
                 */
                 $externalUser = new \Schoolbox\External\User();
-                if ($externalUser->getStudents($user)->count() === 0) {
+                if ($externalUser->getChildren($user)->count() === 0) {
                     return null;
                 }
-                return count(array_intersect($this->getValues($externalUser->getStudents($user)), $entityValues)) > 0;
+                return count(array_intersect($this->getValues($externalUser->getChildren($user)), $entityValues)) > 0;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
                 if (!$user->getRole()->isStaff()) {
                     return false;

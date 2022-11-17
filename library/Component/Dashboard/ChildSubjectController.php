@@ -28,7 +28,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         if (isset($_SESSION['children']) && is_array($_SESSION['children'])) {
             $this->children = $_SESSION['children'];
             $this->externalUser = new Schoolbox\External\User();
-            $this->externalUser->loadStudents([$this->getUser()]);
+            $this->externalUser->loadChildren([$this->getUser()]);
             return true;
         }
         return false;
@@ -69,7 +69,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         foreach ($this->children as $child) {
             // Check if the current child's timetable is viewable and hide if necessary
             try {
-                $userChild = $this->externalUser->getStudents($this->getUser())->getBy('id', $child['id']);
+                $userChild = $this->externalUser->getChildren($this->getUser())->getBy('id', $child['id']);
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 continue;
             }

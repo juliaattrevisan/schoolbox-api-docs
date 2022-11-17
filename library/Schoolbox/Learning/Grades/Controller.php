@@ -343,7 +343,7 @@ class Controller extends Base
                     return true;
                 }
                 if ($viewer->getRole()->isParent()) {
-                    foreach ((new \Schoolbox\External\User())->getStudents($viewer) as $child) {
+                    foreach ((new \Schoolbox\External\User())->getChildren($viewer) as $child) {
                         if ($visibility->isVisibleToUser($a, $child, true)) {
                             return true;
                         }

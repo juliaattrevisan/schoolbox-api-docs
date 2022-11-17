@@ -53,7 +53,7 @@ class ModelToArray
 
             // Null for now
             'guardians'        => $externalUser?->getParents($user),
-            'students'         => $externalUser?->getStudents($user),
+            'students'         => $externalUser?->getChildren($user),
 
             'impersonableUser' => $user->getLinkedUser(),
 
