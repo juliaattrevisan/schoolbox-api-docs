@@ -139,7 +139,7 @@ class CalendarApiFactory
             $api->add($resourceApi);
         }
         if ($getTimetabledRooms && !empty($roomCodes)) {
-            if (in_array($this->configLoader->get('schooldata_import_endpoint_host'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
+            if (in_array($this->configLoader->get('schooldata_import_data_source'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
                 $timetableApi = new Calendar_Api_EventType_Timetable_Room(
                     Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $this->user,

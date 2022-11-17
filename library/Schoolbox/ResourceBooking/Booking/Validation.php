@@ -538,7 +538,7 @@ class Validation
         // Using  [$roomCode => true] to make Calendar_Api_EventType_Timetable_Room::getEvents happy
         $roomCodes = [$roomCode => true];
 
-        if (in_array($this->configLoader->get('schooldata_import_endpoint_host'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
+        if (in_array($this->configLoader->get('schooldata_import_data_source'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
             $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes);
         } else {
             $timetableRoom = new \Calendar_Api_EventType_SudsTimetable_Room(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->eventMapper, $roomCodes);
