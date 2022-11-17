@@ -80,7 +80,7 @@ class Module extends BaseModule
                         if ($event->isPersonalLevel()) {
                             $isStaff        = $loggedInUser->getRole()->isStaff();
                             $isOwner        = $event->getOwner()->getId() === $loggedInUser->getId();
-                            $isParentOfUser = $loggedInUser->isParentOf($event->getAuthor()->loadParents());
+                            $isParentOfUser = (new \Schoolbox\External\User())->isParentOf($loggedInUser, $event->getAuthor());
 
                             /* I suppose if you're on the invited list,
                              * you should be able to see it

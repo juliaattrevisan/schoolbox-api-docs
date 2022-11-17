@@ -145,7 +145,7 @@ class Model implements ISoftDeletable
         // Is this a parent rule?
         if ($user->getRole()->isParent()) {
             // Rule only applies if user is actually a parent of the student.
-            if ($user->isParentOf($this->getPastoral()->getStudent())) {
+            if ((new \Schoolbox\External\User())->isParentOf($user, $this->getPastoral()->getStudent())) {
                 return $this->access;
             }
             return null;

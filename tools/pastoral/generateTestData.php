@@ -56,7 +56,6 @@ $app = new class extends CliTool\App
         $students     = $userMapper->findByColumn('group_id', $studentRoles->getPropertyValues('id'));
         $testStudents = $userMapper->createCollection();
         foreach ($students as $student) {
-            $student->loadParents();
             $testStudents->add($student);
             if ($testStudents->count() > 5) {
                 break;
