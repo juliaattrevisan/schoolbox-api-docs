@@ -35,6 +35,7 @@ use Schoolbox\External\Connector\DSNFactory;
 use Schoolbox\External\Connector\Log\Mapper;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
+use Schoolbox\External\Event\Export\Classes;
 use Schoolbox\External\Event\Export\Timetable;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Factory;
@@ -508,9 +509,33 @@ class Controller extends ConfigController
      * @return void
      * @throws PDOException
      */
-    public function getExport(): void
+    public function getTimetableExport(): void
     {
         $content = (new Timetable(\Schoolbox\External\Event\Mapper::getInstance()))->export();
+
+        $headers = $this->getResponse()->headers;
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', \strlen($content));
+        $headers->set('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $content
+        ]);
+    }
+
+
+    /**
+     * Exports the contents of sis_class into a csv format
+     *
+     * @return void
+     * @throws PDOException
+     */
+    public function getClassesExport(): void
+    {
+        $content = (new Classes(\Schoolbox\External\ClassEntryMapper::getInstance()))->export();
 
         $headers = $this->getResponse()->headers;
         $headers->set('Pragma', ' ');
