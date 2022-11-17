@@ -283,9 +283,22 @@
                 <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
                 <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
 
+                {% if cyclicGrid %}
+                    {# Only show these buttons if you're using the cyclic grid
+                     # Kamar, Live Connectors and No Data Source download from cyclic grid
+                     #}
+                    <a href="{{ routeLookupIfAuthorized('adminImportTimetableStructure.getExport') }}" class="icon-download button">Export Timetable Structure</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportTimetable.getExport') }}" class="icon-download button">Export Timetable</a>
+                {% else %}
+                    {# Otherwise, provide link to download csvs from SUDS Timetable and SUDS Events
+                     #}
+                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getClassesExport') }}" class="icon-download button">Export Classes</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getTimetableExport') }}" class="icon-download button">Export Timetable</a>
+                {% endif %}
 
-                <a href="{{ routeLookupIfAuthorized('adminImportTimetableStructure.getExport') }}" class="icon-download button">Export Timetable Structure</a>
-                <a href="{{ routeLookupIfAuthorized('adminImportTimetable.getExport') }}" class="icon-download button">Export Timetable</a>
+                {# Timetable Enrolments (sis_class_user) is actually the same in both cases
+                 # since we reused that concept
+                 #}
                 <a href="{{ routeLookupIfAuthorized('adminImportTimetableEnrolment.getExport') }}" class="icon-download button">Export Timetable Enrolments</a>
             </section>
         </div>

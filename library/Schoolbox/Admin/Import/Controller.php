@@ -31,10 +31,13 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\Connector\DSNFactory;
 use Schoolbox\External\Connector\Log\Mapper;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
+use Schoolbox\External\Event\Export\Classes;
+use Schoolbox\External\Event\Export\Timetable;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
@@ -77,18 +80,22 @@ class Controller extends ConfigController
     /**
      * Constructor
      *
-     * @param ConfigMapper         $configMapper
-     * @param FieldStrategyFactory $fieldStrategyFactory
-     * @param Rebuilder            $rebuilder
-     * @param Mapper               $importLogMapper
-     * @param ClientInterface      $redisStorage
+     * @param ConfigMapper                     $configMapper
+     * @param FieldStrategyFactory             $fieldStrategyFactory
+     * @param Rebuilder                        $rebuilder
+     * @param Mapper                           $importLogMapper
+     * @param ClientInterface                  $redisStorage
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param ClassEntryMapper                 $classEntryMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
-        ClientInterface $redisStorage
+        ClientInterface $redisStorage,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\ClassEntryMapper $classEntryMapper
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
 
@@ -134,6 +141,10 @@ class Controller extends ConfigController
             $hasPerformUpdate = true;
         }
 
+        /* Decide if the current suds selection uses the cyclic grid
+         */
+        $cyclicGrid = \in_array($dataSource, Factory::CYCLIC_GRID, true);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getSchoolDataIndex')),
@@ -151,6 +162,7 @@ class Controller extends ConfigController
             /* A flash message to tell users to w8
              */
             'hasPerformUpdate' => $hasPerformUpdate,
+            'cyclicGrid' => $cyclicGrid
         ])->setTitle('School Data Import'));
     }
 
@@ -270,6 +282,7 @@ class Controller extends ConfigController
             ]]
         ]));
     }
+
 
     /**
      * Set up the live sync
@@ -492,5 +505,55 @@ class Controller extends ConfigController
         }
 
         return $lock;
+    }
+
+
+    /**
+     * Exports the contents of sis_event into a csv format
+     *
+     * @api /adminv2/import/schoolDataImport/timetable/export
+     * @return void
+     * @throws PDOException
+     */
+    public function getTimetableExport(): void
+    {
+        $content = (new Timetable($this->eventMapper))->export();
+
+        $headers = $this->getResponse()->headers;
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', \strlen($content));
+        $headers->set('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $content
+        ]);
+    }
+
+
+    /**
+     * Exports the contents of sis_class into a csv format
+     *
+     * @api /adminv2/import/schoolDataImport/classes/export
+     * @return void
+     * @throws PDOException
+     */
+    public function getClassesExport(): void
+    {
+        $content = (new Classes($this->classEntryMapper))->export();
+
+        $headers = $this->getResponse()->headers;
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', \strlen($content));
+        $headers->set('Content-Disposition', "attachment; filename=\"export-school-data-classes.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $content
+        ]);
     }
 }
