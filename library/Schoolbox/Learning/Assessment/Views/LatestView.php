@@ -24,6 +24,8 @@ class LatestView
      */
     private Mapper $mapper;
 
+    private \Schoolbox\External\User $externalUser;
+
     /**
      * Constructor
      * @param Mapper $mapper
@@ -31,6 +33,7 @@ class LatestView
     public function __construct(Mapper $mapper)
     {
         $this->mapper = $mapper;
+        $this->externalUser = new \Schoolbox\External\User();
     }
 
     /**
@@ -68,7 +71,7 @@ class LatestView
          * check if use is either that student or the parents, then save
          */
         if (
-            (null !== $user->getChildren() && $user->getChildren()->getBy('id', $participant->getId())) ||
+            ($this->externalUser->isParentOf($user, $participant)) ||
              $participant->getId() === $user->getId()
         ) {
             /**
@@ -150,8 +153,7 @@ class LatestView
          * parent's now
          * check status of parent's lasts views, and set the status'
          */
-        $parentList = $participant->getUser()->loadParents()->getParents();
-        foreach ($parentList as $parent) {
+        foreach ($this->externalUser->getParents($participant->getUser()) as $parent) {
             /**
              * set basic data
              */
