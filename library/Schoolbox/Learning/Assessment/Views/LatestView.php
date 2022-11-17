@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\Views;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\User;
 
