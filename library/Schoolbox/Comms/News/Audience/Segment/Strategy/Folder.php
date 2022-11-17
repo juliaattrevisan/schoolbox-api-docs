@@ -546,10 +546,14 @@ class Folder extends SimpleStrategy
                 if (!$user->getRole()->isParent()) {
                     return false;
                 }
-                if ($user->getChildren() === null) {
+                /* Must not hit the DB... ummm is there a different way of doing this?
+                 * should we put the parents children back into the session/ user object? or cache this somewhere???
+                */
+                $externalUser = new \Schoolbox\External\User();
+                if ($externalUser->getStudents($user)->count() === 0) {
                     return null;
                 }
-                foreach ($user->getChildren() as $child) {
+                foreach ($externalUser->getStudents($user) as $child) {
                     if ($child->getSubjectCollection() === null) {
                         continue;
                     }
