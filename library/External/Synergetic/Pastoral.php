@@ -401,6 +401,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             if ($record['ModifiedByID']) {
                                 $modifier = $this->getSchoolboxUser($record['ModifiedByID']) ?: $defaultOwner;
                                 $pastoralRecord->setModifiedBy($modifier);
+                            } else {
+                                $pastoralRecord->setModifiedBy($defaultOwner);
                             }
 
                             $modifiedDate = $createdDate;
