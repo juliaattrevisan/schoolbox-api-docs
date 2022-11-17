@@ -35,6 +35,7 @@ use Schoolbox\External\Connector\DSNFactory;
 use Schoolbox\External\Connector\Log\Mapper;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Watchlist;
+use Schoolbox\External\Event\Export\Timetable;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
@@ -276,6 +277,7 @@ class Controller extends ConfigController
         ]));
     }
 
+
     /**
      * Set up the live sync
      *
@@ -504,8 +506,22 @@ class Controller extends ConfigController
      * Exports the contents of sis_event into a csv format
      *
      * @return void
+     * @throws PDOException
      */
     public function getExport(): void
     {
+        $content = (new Timetable(\Schoolbox\External\Event\Mapper::getInstance()))->export();
+
+        $headers = $this->getResponse()->headers;
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', \strlen($content));
+        $headers->set('Content-Disposition', "attachment; filename=\"export-school-data-timetable.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $content
+        ]);
     }
 }
