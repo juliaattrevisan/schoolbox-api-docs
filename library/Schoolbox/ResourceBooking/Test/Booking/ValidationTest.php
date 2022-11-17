@@ -77,7 +77,7 @@ class ValidationTest extends TestCase
             ->method('get')
             ->will(
                 $this->returnValueMap([
-                    ['school_data_endpoint_host', \Schoolbox\External\Importer\Endpoint\Factory::TASS_API,],
+                    ['schooldata_import_data_source', \Schoolbox\External\Importer\Endpoint\Factory::TASS_API,],
                 ])
             );
 
