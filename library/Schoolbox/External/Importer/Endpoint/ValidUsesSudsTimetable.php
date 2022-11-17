@@ -21,10 +21,20 @@ namespace Schoolbox\External\Importer\Endpoint;
 class ValidUsesSudsTimetable
 {
     /**
-     * The importers that put data into the cyclic grid
-     * (including "-- select an option --")
+     * These SUDS connectors use SUDS Timetable which is a calendar
+     * representation of a timetable
+     *
+     * Everything outside this set uses (or is presumed to use)
+     * the classical cyclic grid
      */
-    public const CYCLIC_GRID = [ Factory::CSV, Factory::KAMAR, '' ];
+    private const SUDS_TIMETABLE = [
+        Factory::ISAMS,
+        Factory::SENTRAL,
+        Factory::TASS_API,
+        Factory::COMPASS,
+        Factory::WONDE,
+        Factory::LISS,
+    ];
 
 
     /**
@@ -36,6 +46,6 @@ class ValidUsesSudsTimetable
      */
     public function isSatisfiedBy(string $dataSource): bool
     {
-        return \in_array($dataSource, self::CYCLIC_GRID, true);
+        return \in_array($dataSource, self::SUDS_TIMETABLE, true);
     }
 }

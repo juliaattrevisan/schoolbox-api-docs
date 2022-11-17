@@ -161,7 +161,7 @@ class Controller extends ConfigController
             'hasPerformUpdate' => $hasPerformUpdate,
             /* Decide if the current suds selection uses the cyclic grid
              */
-            'cyclicGrid' => (new ValidUsesSudsTimetable())->isSatisfiedBy($dataSource)
+            'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($dataSource)
         ])->setTitle('School Data Import'));
     }
 
