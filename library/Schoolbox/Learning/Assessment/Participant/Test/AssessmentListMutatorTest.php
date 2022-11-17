@@ -40,9 +40,8 @@ class AssessmentListMutatorTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->student = (new User())->setId(9)->setChildren(new GenericCollection(User::class));
-        $this->parent  = (new User())->setId(10)->setChildren(new GenericCollection(User::class));
-        $this->parent->getChildren()->setOffset($this->student->getId(), $this->student);
+        $this->student = (new User())->setId(9);
+        $this->parent  = (new User())->setId(10);
 
         // Set up assessments
         $assessment1 = new DueWork\Model();
