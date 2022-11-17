@@ -50,6 +50,7 @@ class Connector extends AMQPConnector
         private array $connectionOptions = [],
     ) {
         parent::__construct($settings);
+        AbstractConnection::validate_host($connectionOptions);
     }
 
 
