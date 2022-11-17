@@ -8,7 +8,7 @@ module.exports = {
         '^.+\\.vue$': 'vue-jest',
         '^.+\\js$': 'babel-jest'
     },
-    moduleNameMapper: { //may any required webpack aliases across
+    moduleNameMapper: { //map any required webpack aliases across
         "^@schoolboxCurriculum(.*)$": "<rootDir>/library/Schoolbox/Curriculum/templates$1",
     },
     verbose: true, //Indicates whether each individual test should be reported during the run. All errors will also still be shown on the bottom after execution. Note that if there is only one test file being run it will default to true.
