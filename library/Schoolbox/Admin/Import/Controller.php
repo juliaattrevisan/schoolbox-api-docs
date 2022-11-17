@@ -498,4 +498,14 @@ class Controller extends ConfigController
 
         return $lock;
     }
+
+
+    /**
+     * Exports the contents of sis_event into a csv format
+     *
+     * @return void
+     */
+    public function getExport(): void
+    {
+    }
 }

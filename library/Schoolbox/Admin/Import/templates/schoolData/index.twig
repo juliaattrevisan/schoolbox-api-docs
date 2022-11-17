@@ -292,7 +292,7 @@
                 {% else %}
                     {# Otherwise, provide link to download csvs from SUDS Timetable and SUDS Events
                      #}
-
+                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getExport') }}" class="icon-download button">Export School Data Timetable</a>
                 {% endif %}
 
                 {# Timetable Enrolments (sis_class_user) is actually the same in both cases
