@@ -24,6 +24,25 @@ class Model
     protected $indefiniteArticle;
 
     /**
+     * Added to allow testing of updates/23.0.alpha1/calendarConnector/02-migrateData.php, using var_export() and eval().
+     *
+     * @param array $state
+     * @return Model
+     */
+    public static function __set_state(array $state)
+    {
+        $obj = new self;
+        $obj->term              = $state['term'];
+        $obj->title             = $state['title'];
+        $obj->singularForm      = $state['singularForm'];
+        $obj->pluralForm        = $state['pluralForm'];
+        $obj->capitaliseFirst   = $state['capitaliseFirst'];
+        $obj->indefiniteArticle = $state['indefiniteArticle'];
+
+        return $obj;
+    }
+
+    /**
      * @param string $value
      * @return self
      */

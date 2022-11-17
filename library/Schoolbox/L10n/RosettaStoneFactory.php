@@ -14,6 +14,18 @@ namespace Schoolbox\L10n;
 class RosettaStoneFactory
 {
     /**
+     * Added to allow testing of updates/23.0.alpha1/calendarConnector/02-migrateData.php, using var_export() and eval().
+     *
+     * @param array $state
+     * @return RosettaStoneFactory
+     */
+    public static function __set_state(array $state)
+    {
+        $obj = new self;
+        return $obj;
+    }
+
+    /**
      * Engraves a rosetta stone based on the contents of a l10n mapper.
      *
      * @param Mapper $mapper
