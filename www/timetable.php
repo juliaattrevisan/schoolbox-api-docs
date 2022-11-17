@@ -9,6 +9,7 @@
 //timetable object that displays the users timetable
 
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 
@@ -22,7 +23,7 @@ if (!isset($this)) {
  * representation of timetable events; any other selection causes you to see
  * the classical cyclic timetable grid
  */
-if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === Config::get('timetable_view')) {
+if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)Config::get('schooldata_import_data_source'))) {
     if (is_numeric($this->arg[0])) {
         SitePage::localRedir("/timetable/calendar/{$this->arg[0]}");
     }

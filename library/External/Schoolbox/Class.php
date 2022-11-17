@@ -10,6 +10,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\Role;
 
 /**
@@ -155,17 +156,17 @@ class External_Schoolbox_Class implements External_ClassInterface
             }
         }
 
-        /* Only need to do this if you are using the Calendar view
-         * because that typically means you activated SUDS Timetable subscription
-         * or used it to populate data that we must investigate
+        /* Only need to do this if you are using one of the SUDS Timetable connectors
+         * to populate data that we must investigate
          *
          * All you classical grid users can skip this step
          */
-        $pastThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
-        $futureThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_FUTURE_THRESHOLD)->endOfDay()->getUnixTimeStamp();
         $config = \Schoolbox\Config\Loader::getInstance();
 
-        if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === $config->get('timetable_view')) {
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)$config->get('schooldata_import_data_source'))) {
+            $pastThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_PAST_THRESHOLD)->startOfDay()->getUnixTimeStamp();
+            $futureThreshold = \Alaress_Date_Format::now()->addWeeks(\Schoolbox\External\Event\TimetableUsers::INVOLVEMENT_FUTURE_THRESHOLD)->endOfDay()->getUnixTimeStamp();
+
             $staffExternalIds = (new \Schoolbox\External\Event\TimetableUsers(
                 \Schoolbox\External\ClassEntryMapper::getInstance(),
                 \Schoolbox\External\ClassInvolvementMapper::getInstance(),

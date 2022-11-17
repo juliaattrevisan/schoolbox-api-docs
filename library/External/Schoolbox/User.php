@@ -10,6 +10,7 @@ declare(strict_types=1);
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -232,11 +233,11 @@ class External_Schoolbox_User implements External_UserInterface
          * remove people in any combination in any order and in any quantity
          * so you have to do a bit of math to figure out the final answer.
          *
-         * $futureThreshold is the number of weeks into the future to look
+         * $futureThreshold is the length of time into the future to look
          * for involvements. You might not be a teacher of a class today,
          * but you might be some time later.
          *
-         * $pastThreshold is the number of weeks into the past to look
+         * $pastThreshold is the length of time into the past to look
          * for involvements. You might have been the teacher of a class
          * at some point in the past, but no longer
          *
@@ -248,18 +249,18 @@ class External_Schoolbox_User implements External_UserInterface
          * We chose not to accommodate covering teachers having more access than
          * this; if a school wants that, add them to the homepage manually.
          */
-        $pastThreshold = \Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
-        $futureThreshold = \Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp();
         $overridesTeachers = [];
         $config = \Schoolbox\Config\Loader::getInstance();
 
-        /* Only need to do this if you are using the Calendar view
-         * because that typically means you activated SUDS Timetable subscription
-         * or used it to populate data that we must investigate
+        /* Only need to do this if you are using one of the SUDS Timetable connectors
+         * to populate data that we must investigate
          *
          * All you classical grid users can skip this step
          */
-        if (\Schoolbox\External\Event\Model::TIMETABLE_VIEW_CALENDAR === $config->get('timetable_view')) {
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)$config->get('schooldata_import_data_source'))) {
+            $pastThreshold = \Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
+            $futureThreshold = \Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp();
+
             $events = (new \Schoolbox\External\Event\TimetableUsers(
                 \Schoolbox\External\ClassEntryMapper::getInstance(),
                 \Schoolbox\External\ClassInvolvementMapper::getInstance(),
