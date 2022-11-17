@@ -31,6 +31,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\Connector\DSNFactory;
 use Schoolbox\External\Connector\Log\Mapper;
 use Schoolbox\External\Connector\ValidStrats;
@@ -79,18 +80,22 @@ class Controller extends ConfigController
     /**
      * Constructor
      *
-     * @param ConfigMapper         $configMapper
-     * @param FieldStrategyFactory $fieldStrategyFactory
-     * @param Rebuilder            $rebuilder
-     * @param Mapper               $importLogMapper
-     * @param ClientInterface      $redisStorage
+     * @param ConfigMapper                     $configMapper
+     * @param FieldStrategyFactory             $fieldStrategyFactory
+     * @param Rebuilder                        $rebuilder
+     * @param Mapper                           $importLogMapper
+     * @param ClientInterface                  $redisStorage
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param ClassEntryMapper                 $classEntryMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
-        ClientInterface $redisStorage
+        ClientInterface $redisStorage,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\ClassEntryMapper $classEntryMapper
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
 
@@ -511,7 +516,7 @@ class Controller extends ConfigController
      */
     public function getTimetableExport(): void
     {
-        $content = (new Timetable(\Schoolbox\External\Event\Mapper::getInstance()))->export();
+        $content = (new Timetable($this->eventMapper))->export();
 
         $headers = $this->getResponse()->headers;
         $headers->set('Pragma', ' ');
@@ -535,7 +540,7 @@ class Controller extends ConfigController
      */
     public function getClassesExport(): void
     {
-        $content = (new Classes(\Schoolbox\External\ClassEntryMapper::getInstance()))->export();
+        $content = (new Classes($this->classEntryMapper))->export();
 
         $headers = $this->getResponse()->headers;
         $headers->set('Pragma', ' ');
