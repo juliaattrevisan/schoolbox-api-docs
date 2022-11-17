@@ -88,6 +88,7 @@ class Controller extends ConfigController
      * @param ClientInterface                  $redisStorage
      * @param \Schoolbox\External\Event\Mapper $eventMapper
      * @param ClassEntryMapper                 $classEntryMapper
+     * @param \Calendar_Api_Config_Mapper      $calendarApiConfigMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
@@ -96,7 +97,8 @@ class Controller extends ConfigController
         \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
         ClientInterface $redisStorage,
         private \Schoolbox\External\Event\Mapper $eventMapper,
-        private \Schoolbox\External\ClassEntryMapper $classEntryMapper
+        private \Schoolbox\External\ClassEntryMapper $classEntryMapper,
+        private \Calendar_Api_Config_Mapper $calendarApiConfigMapper
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
 
@@ -198,6 +200,20 @@ class Controller extends ConfigController
         /* Save it
          */
         $this->updateConfig($postData, $this->buildConfigPredicate());
+
+        /* If you're using a SUDS Timetable connector,
+         * forcibly enable your calendar subscription
+         *
+         * Otherwise, unsubscribe you from it if you're
+         * using a Cyclic Grid connectivity
+         */
+        $toggler = new Endpoint\SudsTimetableSubscriptionToggle($this->calendarApiConfigMapper);
+
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($postData['schooldata_import_data_source'])) {
+            $toggler->enableSudsTimetable();
+        } else {
+            $toggler->disableSudsTimetable();
+        }
 
         /* Go back to the place from whence you came
          */

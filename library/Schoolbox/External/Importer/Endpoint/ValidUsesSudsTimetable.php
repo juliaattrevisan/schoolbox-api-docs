@@ -38,7 +38,7 @@ class ValidUsesSudsTimetable
 
 
     /**
-     * $dtaSource corresponds to schooldata_import_data_source in config
+     * $dataSource corresponds to schooldata_import_data_source in config
      * (You could convert Factory::NAME to a more comprehensive hash lookup)
      *
      * @param string $dataSource
