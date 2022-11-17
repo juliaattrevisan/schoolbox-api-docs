@@ -15,8 +15,8 @@ use Custom\Vist\TravelLog\Renderer;
 
 class Component_Dashboard_ChildSubjectController extends Component_Dashboard_ControllerAbstract
 {
-
     private $children;
+    private \Schoolbox\External\User $externalUser;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -27,6 +27,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
     {
         if (isset($_SESSION['children']) && is_array($_SESSION['children'])) {
             $this->children = $_SESSION['children'];
+            $this->externalUser = new Schoolbox\External\User();
+            $this->externalUser->loadStudents([$this->getUser()]);
             return true;
         }
         return false;
@@ -67,8 +69,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         foreach ($this->children as $child) {
             // Check if the current child's timetable is viewable and hide if necessary
             try {
-                $userChild = $userMapper->findById($child['id']);
-                $userChild->loadParents();
+                $userChild = $this->externalUser->getStudents($this->getUser())->getBy('id', $child['id']);
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 continue;
             }
@@ -90,7 +91,6 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             if (
                 $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED) &&
-                $this->getUser()->isParentOf($userChild) &&
                 $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)
             ) {
                 $this->parse('pastoral_block', 'pastoral');
@@ -125,7 +125,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 (new ValidJuniorSchoolStudent())->isSatisfiedBy($userChild)
             ) {
                 $this->setVar([
-                    'subject_item' => ''
+                    'subject_item' => '',
                 ]);
             }
 
@@ -243,7 +243,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 'subject_item' => '',
                 'due_work_block' => '',
                 'custom_buttons_block' => '',
-                'geosnapshot_block' => ''
+                'geosnapshot_block' => '',
             ]);
         }
 
