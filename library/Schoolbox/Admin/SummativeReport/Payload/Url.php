@@ -132,7 +132,6 @@ class Url
 
         foreach ($reportStudents as $student) {
             if (isset($optionsPayload['viewAs']) && $optionsPayload['viewAs'] === Role::PARENT) {
-
                 /* Student doesn't have parents, but we tried to make reports
                  * formatted specifically for parents; skip them
                  */

@@ -17,7 +17,6 @@ use Alaress_Date_Format;
 
 class CanViewAssessable extends AbstractAssessableRule
 {
-
     /** @var Visibility */
     private $visibility;
 

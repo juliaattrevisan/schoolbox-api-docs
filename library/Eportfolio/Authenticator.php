@@ -18,7 +18,6 @@ use Schoolbox\User;
 
 class Eportfolio_Authenticator
 {
-
     /**
      * The currently logged in user, usually
      *
