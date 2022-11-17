@@ -5,8 +5,5 @@ ALTER TABLE calendar_connector ADD COLUMN _config text DEFAULT NULL AFTER config
 UPDATE calendar_connector SET _config=config
 WHERE config IS NOT NULL; # Do not overwrite data in _config with NULL (to avoid losing data while testing).
 
-# Clear contents of `config` so we can change this column's type to JSON.
+# Clear contents of `config`.  We do this only so that the WHERE condition in the above query has the desired effect.
 UPDATE calendar_connector SET config=NULL;
-
-# Change type of `config` column to JSON.
-ALTER TABLE calendar_connector CHANGE COLUMN config config JSON DEFAULT NULL;
