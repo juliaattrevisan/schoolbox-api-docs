@@ -15,7 +15,6 @@ use Alaress_Date_Format;
 
 class Visibility
 {
-
     /**
      * @var Access
      */
