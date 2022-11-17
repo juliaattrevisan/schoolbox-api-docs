@@ -21,7 +21,6 @@ use Schoolbox\User;
  */
 class ValidStudentPhotosAvailable extends ValidGeosnapshotAvailable
 {
-
     /**
      * Geosnapshot integration is decided by two config vars and two users
      * (the one doing the viewing and the one being viewed)
@@ -71,7 +70,7 @@ class ValidStudentPhotosAvailable extends ValidGeosnapshotAvailable
         /* $viewer is a parent of $viewee
          * They can view content for $viewee but nobody else
          */
-        if ($viewer->isParentOf($viewee)) {
+        if ((new \Schoolbox\External\User())->isParentOf($viewer, $viewee)) {
             return true;
         }
 
