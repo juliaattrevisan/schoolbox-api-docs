@@ -241,7 +241,7 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentCommented(Model $comment, User $effector): Envelope
     {
         $post  = $this->postMapper->findById($comment->getBlog()->getId());
-        $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
+        $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId());
         $post->getPage()->setOwner($owner);
 
         // Only care about student
@@ -317,7 +317,7 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentFollowed(Model $comment, User $effector): Envelope
     {
         $post = $this->postMapper->findById($comment->getBlog()->getId());
-        $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents());
+        $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId()));
 
         $audience = $this->userMapper->createCollection();
         foreach ($this->getOtherCommentAuthors($comment, Role::PARENT) as $parent) {
@@ -428,16 +428,7 @@ class Notifier extends AbstractModuleNotifier
     ): Envelope {
         $envelope = new Envelope();
         $post     = $this->postMapper->findById($comment->getBlog()->getId());
-        $owner    = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
-
-        // Are we targeting parents?
-        if (Role::PARENT === $roleType) {
-            // Load parents so we can display just their child's first name
-            $effector->loadParents();
-            if ($effector->getId() !== $owner->getId()) {
-                $owner->loadParents();
-            }
-        }
+        $owner    = $this->userMapper->findById($post->getPage()->getOwner()->getId());
 
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action
