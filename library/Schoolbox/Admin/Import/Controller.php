@@ -134,6 +134,10 @@ class Controller extends ConfigController
             $hasPerformUpdate = true;
         }
 
+        /* Decide if the current suds selection uses the cyclic grid
+         */
+        $cyclicGrid = \in_array($dataSource, Factory::CYCLIC_GRID, true);
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getSchoolDataIndex')),
@@ -151,6 +155,7 @@ class Controller extends ConfigController
             /* A flash message to tell users to w8
              */
             'hasPerformUpdate' => $hasPerformUpdate,
+            'cyclicGrid' => $cyclicGrid
         ])->setTitle('School Data Import'));
     }
 

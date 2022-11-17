@@ -283,18 +283,22 @@
                 <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
                 <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
 
-                {# Only show these buttons if you're using the cyclic grid
-                 # Kamar, Live Connectors and No Data Source download from cyclic grid
+                {% if cyclicGrid %}
+                    {# Only show these buttons if you're using the cyclic grid
+                     # Kamar, Live Connectors and No Data Source download from cyclic grid
+                     #}
+                    <a href="{{ routeLookupIfAuthorized('adminImportTimetableStructure.getExport') }}" class="icon-download button">Export Timetable Structure</a>
+                    <a href="{{ routeLookupIfAuthorized('adminImportTimetable.getExport') }}" class="icon-download button">Export Timetable</a>
+                {% else %}
+                    {# Otherwise, provide link to download csvs from SUDS Timetable and SUDS Events
+                     #}
+
+                {% endif %}
+
+                {# Timetable Enrolments (sis_class_user) is actually the same in both cases
+                 # since we reused that concept
                  #}
-                <a href="{{ routeLookupIfAuthorized('adminImportTimetableStructure.getExport') }}" class="icon-download button">Export Timetable Structure</a>
-                <a href="{{ routeLookupIfAuthorized('adminImportTimetable.getExport') }}" class="icon-download button">Export Timetable</a>
                 <a href="{{ routeLookupIfAuthorized('adminImportTimetableEnrolment.getExport') }}" class="icon-download button">Export Timetable Enrolments</a>
-
-                {# Otherwise, provide link to download csvs from SUDS Timetable and SUDS Events
-                 # Timetable Enrolments is actually the same in this case (sis_class_user)
-                 # since we reused that concept.
-                 #}
-
             </section>
         </div>
     </div>
