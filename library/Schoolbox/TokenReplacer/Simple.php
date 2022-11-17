@@ -18,7 +18,6 @@ namespace Schoolbox\TokenReplacer;
  */
 class Simple
 {
-
     /**
      * $replacements is a set of key-value tuples just like phplib:
      *
