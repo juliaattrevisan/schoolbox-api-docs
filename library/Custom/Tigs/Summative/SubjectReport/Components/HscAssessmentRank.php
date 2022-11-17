@@ -26,7 +26,6 @@ use UnexpectedValueException;
 
 class HscAssessmentRank extends BaseComponent
 {
-
     /**
      * 'HscAssessmentRank' assessments across the cohort
      *
