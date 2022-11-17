@@ -77,13 +77,6 @@ class Factory implements IFactory
 
 
     /**
-     * The importers that put data into the cyclic grid
-     * (including "-- select an option --")
-     */
-    public const CYCLIC_GRID = [ self::CSV, self::KAMAR, '' ];
-
-
-    /**
      * API Endpoint url
      *
      * @var string

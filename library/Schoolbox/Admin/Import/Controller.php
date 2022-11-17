@@ -42,6 +42,7 @@ use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\MessageList\Listed;
@@ -87,6 +88,7 @@ class Controller extends ConfigController
      * @param ClientInterface                  $redisStorage
      * @param \Schoolbox\External\Event\Mapper $eventMapper
      * @param ClassEntryMapper                 $classEntryMapper
+     * @param \Calendar_Api_Config_Mapper      $calendarApiConfigMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
@@ -95,7 +97,8 @@ class Controller extends ConfigController
         \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
         ClientInterface $redisStorage,
         private \Schoolbox\External\Event\Mapper $eventMapper,
-        private \Schoolbox\External\ClassEntryMapper $classEntryMapper
+        private \Schoolbox\External\ClassEntryMapper $classEntryMapper,
+        private \Calendar_Api_Config_Mapper $calendarApiConfigMapper
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
 
@@ -141,10 +144,6 @@ class Controller extends ConfigController
             $hasPerformUpdate = true;
         }
 
-        /* Decide if the current suds selection uses the cyclic grid
-         */
-        $cyclicGrid = \in_array($dataSource, Factory::CYCLIC_GRID, true);
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
             'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getSchoolDataIndex')),
@@ -162,7 +161,9 @@ class Controller extends ConfigController
             /* A flash message to tell users to w8
              */
             'hasPerformUpdate' => $hasPerformUpdate,
-            'cyclicGrid' => $cyclicGrid
+            /* Decide if the current suds selection uses the cyclic grid
+             */
+            'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($dataSource)
         ])->setTitle('School Data Import'));
     }
 
@@ -199,6 +200,20 @@ class Controller extends ConfigController
         /* Save it
          */
         $this->updateConfig($postData, $this->buildConfigPredicate());
+
+        /* If you're using a SUDS Timetable connector,
+         * forcibly enable your calendar subscription
+         *
+         * Otherwise, unsubscribe you from it if you're
+         * using a Cyclic Grid connectivity
+         */
+        $toggler = new Endpoint\SudsTimetableSubscriptionToggle($this->calendarApiConfigMapper);
+
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($postData['schooldata_import_data_source'])) {
+            $toggler->enableSudsTimetable();
+        } else {
+            $toggler->disableSudsTimetable();
+        }
 
         /* Go back to the place from whence you came
          */
