@@ -1,0 +1,282 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="{CDN_PREFIX}/js/select-all/attacher.select-all.js?v={SITE_VERSION}"></script>
+<script type='text/javascript'>
+    $(function() {
+        let absenceCounter = $('[data-attendance-count]');
+        let absenceChecks  = $('[data-attendance-absence]');
+        absenceChecks.on('change', function() {
+            absenceCounter.text($('[data-attendance-absence]:checked').length);
+        });
+
+        // Disable the submit button on submitting the attendance form.
+        // No need to re-enable it, as the form submit redirects elsewhere.
+        $('#attendance-form-submit').on('click', function (event) {
+            event.preventDefault();
+            $('#attendance-form-submit').prop('disabled', true);
+            let form = $('#attendance-form');
+            // let checked = [];
+            $('[data-attendance-absence]').not(':checked').each(function() {
+                let input = document.createElement('input');
+                input.setAttribute('type', 'hidden');
+                input.setAttribute('name', 'attending[]');
+                input.setAttribute('value', $(this).attr('data-student-id'));
+                form.append(input);
+            })
+            form.submit();
+        });
+
+        /* Get the list of values that exist per type
+         */
+        let reasonStack = {DROPDOWN_HASH};
+
+
+        /* For each student's Type dropdown, figure out
+         *  - the type currently selected
+         *  - the corresponding Reason dropdown that needs to be replaced
+         */
+        $('[data-absence-type]').on('change', function(event) {
+            let id = $(this).attr('data-absence-type');
+
+            let destination = '#' + 'absenceReason' + id;
+
+            /* When the Type dropdown changes, find its value
+             * then build the Reason dropdown
+             */
+            let availableOptions = reasonStack[$(this).val()];
+
+            let select = $('<select id="absenceReason'+id+'" name="PossibleReasonCode[]" data-absence-reason="'+id+'" />');
+
+            /* All other uncorrelated options (also happens to include Not Selected)
+             */
+            $.each(reasonStack['{INDEX_ALL}'], function(index, element) {
+                $('<option />', {value: element.Code, text: element.Description}).appendTo(select);
+            });
+
+            /* Correlated options
+             */
+            if (availableOptions !== undefined) {
+                $.each(availableOptions, function(index, element) {
+                    $('<option />', {value: element.Code, text: element.Description}).appendTo(select);
+                });
+            }
+
+            /* Stick it in
+             */
+            $(destination).replaceWith(select);
+        });
+
+        /**
+         * None of this is necessary if the pastoral module is disabled
+         */
+        let isPastoralEnabled = {PASTORAL_ENABLED};
+
+        if (isPastoralEnabled) {
+            let allStudentIds       = {ALL_STUDENT_IDS};
+            let pastoralCountUrl    = "/pastoral/students/count/{studentIds}".replace('{studentIds}', allStudentIds.join(','));
+            let pastoralStudentUrl  = "{PASTORAL_STUDENT_URL}";
+            let pastoralCountBadges = [];
+
+            /**
+             * Build a reusable pastoral count badge, in javascript ;)
+             *
+             * @param studentId
+             * @param typeId
+             * @param subtypeId
+             * @param title
+             * @param icon
+             * @param fgColor
+             * @param bgColor
+             * @param count
+             * @returns {`
+                <span id="pastoralCountBadge-${string}-${string}-${string}"
+                      class="label neutral icon-${string}"
+                      title="${string}"
+                      style="color: ${string}; background-color: ${string}"
+                >${string}</span>
+            `}
+             */
+            let tagPastoralCountBadge = function (studentId, typeId, subtypeId, title, icon, fgColor, bgColor, count) {
+                return `
+                <a href="${pastoralStudentUrl.replace('{studentId}', studentId).replace('{typeId}',typeId).replace('{subTypeId}', !subtypeId ? "" : subtypeId)}">
+                <span id="pastoralCountBadge-${studentId}-${typeId}-${subtypeId}"
+                      class="label neutral icon-${icon} pastoral-flag-in-attendance"
+                      title="${title}"
+                      style="color: ${fgColor}; background-color: ${bgColor}"
+                >${count}</span></a>
+            `
+            }
+
+            /**
+             * reach out and get a summary of which users have pastoral results
+             */
+            $.get(pastoralCountUrl)
+                    .done(function (response) {
+                        pastoralCountBadges = response;
+
+                        /**
+                         * for each of the students we receive a summary
+                         */
+                        for (let studentId in pastoralCountBadges) {
+
+                            /**
+                             * check whether they have any badges
+                             */
+                            if (pastoralCountBadges[studentId].length) {
+                                let studentCountBadgeContainer = $(`#pastoralCountBadges-${studentId}`);
+                                let tagMarkup = '';
+
+                                /**
+                                 * then build the markup for each badge
+                                 */
+                                for (let index in pastoralCountBadges[studentId]) {
+                                    let studentBadge = pastoralCountBadges[studentId][index];
+                                    tagMarkup = tagMarkup.concat(tagPastoralCountBadge(studentId, studentBadge.typeId, studentBadge.subtypeId, studentBadge.title, studentBadge.icon, studentBadge.fgColor, studentBadge.bgColor, studentBadge.count));
+                                }
+
+                                /**
+                                 * then write the badges for the student into the dom and un-hide the students container
+                                 */
+                                if (tagMarkup.length) {
+                                    studentCountBadgeContainer.html(tagMarkup);
+                                    studentCountBadgeContainer.removeClass('hide');
+                                }
+                            }
+                        }
+                    });
+        }
+
+    });
+</script>
+<!-- END custom_head -->
+
+<datalist id="attendance-time-steps">
+    <!-- BEGIN attendance_time_step -->
+    <option value="{TIME_STEP}">{TIME_STEP}</option>
+    <!-- END attendance_time_step -->
+</datalist>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Student Attendances for {ATTENDANCE_PERIOD_LONG} on day {ATTENDANCE_DAY} - {CLASS_CODE}</h1>
+    </div>
+</div>
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h2 class="subheader">{ATTENDANCE_DATE_FORMATTED}</h2>
+        </div>
+    </div>
+    <!-- BEGIN class_list_link -->
+    <nav><a href="#" class="icon-overflow" data-dropdown="overflow"></a></nav>
+    <ul class="f-dropdown" data-dropdown-content id="overflow">
+        <li><a href="/learning/class/{ID}" class="icon-class-list">View Class List</a></li>
+    </ul>
+    <!-- END class_list_link -->
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form method='post' action='/modules/attendance/modifyForm' id="attendance-form">
+            <section>
+                <input name='fileType' type='hidden' value='{FILETYPE}' />
+                <input name='classCode' type='hidden' value='{CLASS_CODE}' />
+                <input name='attendanceDate' type='hidden' value='{ATTENDANCE_DATE}' />
+                <input name='attendanceDay' type='hidden' value='{ATTENDANCE_DAY}' />
+                <!-- BEGIN attendance_period -->
+                <input name='attendancePeriod[]' type='hidden' value='{ATTENDANCE_PERIOD}' />
+                <!-- END attendance_period -->
+                <input name='timetableGroup' type='hidden' value='{TIMETABLE_GROUP}' />
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th class="hide-for-small">Late Arrival</th>
+                        <th class="hide-for-small">Early Departure</th>
+                        <th class="hide-for-small">Type</th>
+                        <th class="hide-for-small">Reason</th>
+                        <th>Present<br>
+                            <span title="Select all" class="show-for-medium-up">
+                            <input data-selectall="present[]" id="present-all" type="checkbox" data-select-all
+                                   data-select-all-for-group="present" {ALL_PRESENT} />
+                            <label for="present-all" class="checkbox-label" title="Toggle All Present"></label>
+                            </span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- BEGIN student -->
+                    <tr>
+                        <th scope="row">
+                            <div class="card wrap-down">
+                                <a href="/search/user/{STUDENT_UID}" title="View Profile">
+                                    <img src="/portrait.php?id={STUDENT_UID}&size=square64" />
+                                    {STUDENT_NAME}
+                                </a>
+                                <p class="meta">{STUDENT_ATTENDANCESTRING}</p>
+                                <p class="meta">{STUDENT_NONATTENDREASON}</p>
+                            </div>
+                            <div class="content small-12 columns">
+                                <div id="pastoralCountBadges-{STUDENT_UID}" class="hide meta inline-container"></div>
+                                <div class="meta inline-container">
+                                    <!-- BEGIN flags -->
+                                        <span data-tooltip class="icon-{ICON} icon" title="{DESCRIPTION}"></span>
+                                    <!-- END flags -->
+                                </div>
+                            </div>
+                        </th>
+                        <td class="hide-for-small">
+                            <input type='time'
+                                   list="attendance-time-steps"
+                                   size="8"
+                                   min="{ATTENDANCE_START_FORM_VALUE}"
+                                   max="{ATTENDANCE_END_FORM_VALUE}"
+                                   name='LateArrivalTime[]'
+                                   value="{STUDENT_ARRIVAL_TIME}"
+                            />
+                        </td>
+                        <td class="hide-for-small">
+                            <input type='time'
+                                   list="attendance-time-steps"
+                                   size="8"
+                                   min="{ATTENDANCE_START_FORM_VALUE}"
+                                   max="{ATTENDANCE_END_FORM_VALUE}"
+                                   name='EarlyDepartureTime[]'
+                                   value="{STUDENT_DEPT_TIME}"
+                            />
+                        </td>
+                        <td class="hide-for-small">
+                            <select id='absenceType{STUDENT_SYNERGY_ID}' name='PossibleAbsenceCode[]' data-absence-type="{STUDENT_SYNERGY_ID}" disabled="disabled">
+                                <!-- BEGIN absence_options -->
+                                <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
+                                <!-- END absence_options -->
+                            </select>
+                        </td>
+                        <td class="hide-for-small">
+                            <select id='absenceReason{STUDENT_SYNERGY_ID}' name='PossibleReasonCode[]' data-absence-reason="{STUDENT_SYNERGY_ID}" disabled="disabled">
+                                <!-- BEGIN reason_options -->
+                                <option value='{REASON_OPTIONS_VALUE}' {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
+                                <!-- END reason_options -->
+                            </select>
+                            <input type='text' maxlength='100' name='PossibleReasonDescription[]' value="{STUDENT_REASON_DESCRIPTION}" />
+                        </td>
+                        <td>
+                            <input type="hidden" name="studentID[]" value="{STUDENT_SYNERGY_ID}" />
+                            <input id="attendanceOptions_{STUDENT_SYNERGY_ID}" type="checkbox" name="present[]" data-student-id="{STUDENT_SYNERGY_ID}" {IS_PRESENT} data-attendance-absence data-select-all-group="present"/>
+                            <label for="attendanceOptions_{STUDENT_SYNERGY_ID}" class="checkbox-label"></label>
+                            <!-- BEGIN student_absent -->
+                            <i class="icon-alert" title="Student is reported absent"></i>
+                            <!-- END student_absent -->
+                        </td>
+                    </tr>
+                    <!-- END student -->
+                    </tbody>
+                </table>
+                <div class="alert-box">
+                    <span data-attendance-count>{ATTENDANCE_COUNT}</span> students attending out of {ATTENDANCE_TOTAL}
+                </div>
+            </section>
+            <input type="submit" value="Submit Attendances" id="attendance-form-submit" />
+        </form>
+    </div>
+</div>

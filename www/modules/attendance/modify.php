@@ -335,6 +335,7 @@ if ($class) {
                 'STUDENT_ARRIVAL_TIME' => parseDateTimeString($currentStudent['LateArrivalTime'], $outputTimeFormat),
                 'STUDENT_DEPT_TIME' => parseDateTimeString($currentStudent['EarlyDepartureTime'], $outputTimeFormat),
                 'IS_ABSENT' => $isAbsent ? 'checked="checked"' : '',
+                'IS_PRESENT' => $isAbsent ? '' : 'checked="checked"',
             ]);
 
             if ($currentStudent['PossibleNonAttendFlag']) {
@@ -460,6 +461,7 @@ if ($class) {
 
     $this->setVar('ATTENDANCE_COUNT', $attendanceCount);
     $this->setVar('ATTENDANCE_TOTAL', $attendanceTotal);
+    $this->setVar('ALL_PRESENT', $attendanceCount === $attendanceTotal ? 'checked="checked"' : '');
 } else {
     error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
