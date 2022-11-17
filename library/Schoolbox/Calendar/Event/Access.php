@@ -151,7 +151,7 @@ class Access
          */
         if ($accessLevel === Event::ACCESS_PERSONAL) {
             if ($owner->getRole()->isStudent() && $effector->getRole()->isParent()) {
-                $isParentOfOwner = $owner->loadParents()->isChildOf($effector);
+                $isParentOfOwner = (new \Schoolbox\External\User())->isChildOf($effector, $owner);
             } else {
                 $isParentOfOwner = false;
             }

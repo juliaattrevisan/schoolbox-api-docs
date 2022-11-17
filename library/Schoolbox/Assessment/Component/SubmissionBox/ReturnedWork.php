@@ -152,8 +152,7 @@ class ReturnedWork implements ISoftDeletable
         }
         if ($user->getRole()->isParent()) {
             $this->setOwner(UserMapper::getInstance()->findById($this->getOwner()->getId()));
-            $this->getOwner()->loadParents();
-            if ($this->getOwner()->isChildOf($user)) {
+            if ((new \Schoolbox\External\User())->isChildOf($user, $this->getOwner())) {
                 return true;
             }
         }
