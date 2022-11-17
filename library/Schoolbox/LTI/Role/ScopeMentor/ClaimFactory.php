@@ -71,7 +71,7 @@ class ClaimFactory
                 }
             }
         } elseif ($user->getRole()->isParent()) {
-            foreach ($user->getChildren() as $child) {
+            foreach ((new \Schoolbox\External\User())->getStudents($user) as $child) {
                 $participant = $assessment->getParticipantIfExtant($child);
                 if ($participant && !$participant->isExcluded()) {
                     $mentoredUserIds[] = $this->userCodec->encode($child);
