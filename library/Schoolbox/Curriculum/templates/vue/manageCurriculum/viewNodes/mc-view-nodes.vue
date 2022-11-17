@@ -39,7 +39,7 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
 </script>
 
 <template>
-    <div class="small-12 columns">
+    <div class="small-12 columns" data-test-view-nodes>
         <div v-if="nodesStore.isLoading || searchStore.isLoading">
             <loading-table />
         </div>
@@ -54,6 +54,7 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
                 :key="node.id"
                 :node="node"
                 :depth="depth"
+                data-test-view-node
             />
         </ul>
     </div>
