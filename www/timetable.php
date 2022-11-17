@@ -24,7 +24,7 @@ if (!isset($this)) {
  * the classical cyclic timetable grid
  */
 if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)Config::get('schooldata_import_data_source'))) {
-    if (is_numeric($this->arg[0])) {
+    if (is_numeric($this->arg[0] ?? null)) {
         SitePage::localRedir("/timetable/calendar/{$this->arg[0]}");
     }
     /* Go to the currently-logged in user id
