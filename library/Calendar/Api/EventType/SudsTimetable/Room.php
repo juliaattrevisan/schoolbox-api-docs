@@ -65,10 +65,33 @@ class Calendar_Api_EventType_SudsTimetable_Room extends Calendar_Api_EventType_A
         /* Find all the SUDS Timetable records in use between $startTimestamp and $endTimestamp
          * which are in the locations specified by $this->roomCodes
          */
+        $startAtADF = \Alaress_Date_Format::newFromTimestamp($startTimestamp);
+        $finishAtADF = \Alaress_Date_Format::newFromTimestamp($endTimestamp);
+
+        /* Find all the events which are occurring between the two timestamps
+         * $startTimestamp, $endTimestamp; these include the events which:
+         *
+         *   - start outside this window, but finish within it
+         *   - start inside this window, but finishes outside it
+         *   - start outside this window, and finishes outside it
+         *   - start inside this window, and finishes inside it
+         *
+         * We presume that start <= finish.
+         */
+        $eventsOutsideWindowPast = $this->eventMapper->getPredicateBuilder()
+            ->lessThan('start_at', $startAtADF)
+            ->lessThan('start_at', $finishAtADF);
+
+        $eventsOutsideWindowFuture = $this->eventMapper->getPredicateBuilder()
+            ->greaterThan('finish_at', $startAtADF)
+            ->greaterThan('finish_at', $finishAtADF);
+
         $pb = $this->eventMapper->getPredicateBuilder()
             ->in('location', array_keys($this->roomCodes))
-            ->greaterThanOrEqualTo('start_at', \Alaress_Date_Format::newFromTimestamp($startTimestamp))
-            ->lessThanOrEqualTo('finish_at', \Alaress_Date_Format::newFromTimestamp($endTimestamp));
+            ->notAll($eventsOutsideWindowPast)
+            ->notAll($eventsOutsideWindowFuture)
+            ->greaterThanOrEqualTo('start_at', $startAtADF)
+            ->lessThanOrEqualTo('finish_at', $finishAtADF);
 
         $eventIds = $this->eventMapper->findIdsByPredicates($pb);
 
