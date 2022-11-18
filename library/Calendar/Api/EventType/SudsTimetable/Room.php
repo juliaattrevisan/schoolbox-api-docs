@@ -63,27 +63,14 @@ class Calendar_Api_EventType_SudsTimetable_Room extends Calendar_Api_EventType_A
     public function getEvents(int $startTimestamp, int $endTimestamp, ?array $allowedEventTypes = null): \Calendar\Event\Collection
     {
         /* Find all the SUDS Timetable records in use between $startTimestamp and $endTimestamp
+         * which are in the locations specified by $this->roomCodes
          */
-        $statement = $this->eventMapper->getDatabase()->prepare("
-            SELECT *
-            FROM {$this->eventMapper->getTable()} se
-            WHERE start_at >= :startTimestamp
-            AND finish_at <= :endTimestamp
-        ");
+        $pb = $this->eventMapper->getPredicateBuilder()
+            ->in('location', array_keys($this->roomCodes))
+            ->greaterThanOrEqualTo('start_at', \Alaress_Date_Format::newFromTimestamp($startTimestamp))
+            ->lessThanOrEqualTo('finish_at', \Alaress_Date_Format::newFromTimestamp($endTimestamp));
 
-        $statement->execute([
-            'startTimestamp' => \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(),
-            'endTimestamp' => \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase(),
-        ]);
-
-        /* Collect their Location value, name and class code
-         * so we can push it into a \Calendar\Event\Type\SudsTimetable\Event instance
-         */
-        $eventIds = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $eventIds[] = $row['id'];
-        }
+        $eventIds = $this->eventMapper->findIdsByPredicates($pb);
 
         /* Then pop out the collection as a subscription that can be used
          * among all the other calendar subscription
