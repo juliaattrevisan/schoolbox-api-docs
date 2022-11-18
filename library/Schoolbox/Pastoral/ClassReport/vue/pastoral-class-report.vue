@@ -221,26 +221,24 @@ export default {
 
                                     <div v-for="record in studentData.records.data" :key="'record-' + String(record.id)" class="pastoral-container">
                                         <div class="tiny card small-12">
-                                            <a :href="record._links.read" title="View record" :class="{disabled: !record._links.read}">
+                                            <a :href="record._links.read" title="View record" :class="`profile-img ${record._links.read ? '' : 'disabled'}`">
                                                 <img :src="record.createdBy._links.avatar"
                                                      :alt="`Profile photo of ${record.createdBy.fullName}`"
                                                      :title="`Created by ${ record.createdBy.fullName }`"
                                                      class="portrait"/>
+                                            </a>
+                                            <a :href="record._links.read" title="View record" :class="`record-heading ${record._links.read ? '' : 'disabled'}`">
                                                 <span>{{ record.heading }}
                                                     <span v-if="record.severity?.color" class="circle" :style="'background-color:'+record.severity?.color" :title="record.severity?.name"></span>
                                                 </span>
                                             </a>
-                                            <div class="time-container">
-                                                <template v-if="record.createdAt !== record.updatedAt">
-                                                    <span :title="'Created on ' + formatDateTime(record.createdAt) + ', last modified ' + formatDateTime(record.updatedAt)">
-                                                        Last modified <time>{{ formatRelative(record.updatedAt) }}</time>
-                                                    </span>
-                                                </template>
-                                                <template v-else>
-                                                    <span :title="'Created on ' + formatDateTime(record.createdAt)">
-                                                        Created <time>{{ formatRelative(record.createdAt) }}</time>
-                                                    </span>
-                                                </template>
+                                            <div class="record-date">
+                                                <span v-if="record.createdAt !== record.updatedAt" class="meta" :title="'Created on ' + formatDateTime(record.createdAt) + ', last modified ' + formatDateTime(record.updatedAt)">
+                                                    Last modified <time>{{ formatRelative(record.updatedAt) }}</time>
+                                                </span>
+                                                <span v-else class="meta" :title="'Created on ' + formatDateTime(record.createdAt)">
+                                                    Created <time>{{ formatRelative(record.createdAt) }}</time>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -367,14 +365,13 @@ input[type=radio]:not(.plain) + label.input-toggle {
 
                     .tiny {
                         display: grid;
-                        grid-template-columns: 6fr 2fr;
+                        gap: 0rem 0.25rem;
+                        grid-template-areas: 'profile-img record-heading record-date';
+                        grid-template-columns: 2rem 5fr 2fr;
                         padding: 0;
 
-                        a {
-                            display: grid;
-                            grid-template-columns: 2rem 1fr;
-                            padding-bottom: 0.25rem;
-
+                        .profile-img {
+                            grid-area: profile-img;
                             img {
                                 border-radius: 50%;
                                 margin: 0;
@@ -382,22 +379,33 @@ input[type=radio]:not(.plain) + label.input-toggle {
                                 width: 100%;
                             }
 
+                        }
+
+                        .record-heading {
+                            grid-area: record-heading;
                             span {
                                 line-height: 1.5rem;
-                                padding-left: 0.25rem;
                             }
                         }
 
-                        p {
-                            text-overflow: inherit;
-                            overflow: visible;
-                            white-space: inherit;
-                        }
-
-                        .time-container {
+                        .record-date {
+                            grid-area: record-date;
                             padding-right: 1rem;
                             text-align: right;
                         }
+
+                        @media (max-width: 640px) {
+                            grid-template-areas: // so the 3 column layout becomes 2, with heading and date stacking underneath eachother
+                                'profile-img record-heading'
+                                'profile-img record-date';
+                            grid-template-columns: 2rem 7fr;
+                            margin-bottom: 0.825rem; // feels stacked too tight, so add some vertical space
+
+                            .record-date {
+                                text-align: left;
+                            }
+                        }
+
                     }
                 }
 
