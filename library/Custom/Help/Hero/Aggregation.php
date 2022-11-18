@@ -19,7 +19,6 @@ use Schoolbox\User;
 
 class Aggregation
 {
-
     /**
      * @var Folder\Mapper
      */
@@ -94,7 +93,9 @@ class Aggregation
                 $key = $currentAssessmentData['specId'];
 
                 $assessmentSpecNotStackedYet = !array_key_exists($key, $aggregatedData[$userId]['assessments']);
-                $existingSpecHasLowerMark = ((float)$aggregatedData[$userId]['assessments'][$key]['mark'] < (float)$currentAssessmentData['mark']);
+
+                $userAssessmentData = $aggregatedData[$userId]['assessments'];
+                $existingSpecHasLowerMark = ((float)($userAssessmentData['mark'] ?? 0) < (float)$currentAssessmentData['mark']);
 
                 /* Stack it if it doesn't exist
                  * Update the existing stack record if it already exists but mark was lower than current record
@@ -137,8 +138,8 @@ class Aggregation
                 'firstname' => $hero->getFirstname(),
                 'lastname' => $hero->getLastname(),
                 'fullname' => $hero->getFullName(),
-                'folderId' => $heroes['folderId'],
-                'folderName' => $heroes['folderName'],
+                'folderId' => null,   // We do not know which folder is relevant for older heroes, since these users have no $assessmentData.
+                'folderName' => null, // We do not know which folder is relevant for older heroes, since these users have no $assessmentData.
                 'qualified' => false,
                 'heroised' => true,
                 'assessments' => []
