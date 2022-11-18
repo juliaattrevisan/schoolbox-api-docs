@@ -82,13 +82,6 @@ class Javascript extends Base
                     'visible' => $this->getEvent()->getPeriodCancelled() ? 'strike' : '',
                 ],
 
-                /* Timetable-related nodes
-                 */
-                'timetable' => [
-                    'code' => $this->event->getCode(),
-                    'staff' => []
-                ],
-
                 'classAttendance' => [
                     'url'    => $this->getEvent()->getAttendanceLink(),
                     'target' => $this->getEvent()->getAttendanceLinkTarget(),
