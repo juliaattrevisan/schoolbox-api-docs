@@ -12,6 +12,7 @@ use DateTime;
 use Alaress_Date_Format;
 use External_Timetable;
 use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\Collection;
@@ -538,10 +539,10 @@ class Validation
         // Using  [$roomCode => true] to make Calendar_Api_EventType_Timetable_Room::getEvents happy
         $roomCodes = [$roomCode => true];
 
-        if (in_array($this->configLoader->get('schooldata_import_data_source'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
-            $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes);
-        } else {
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->configLoader->get('schooldata_import_data_source'))) {
             $timetableRoom = new \Calendar_Api_EventType_SudsTimetable_Room(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->eventMapper, $roomCodes);
+        } else {
+            $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes);
         }
 
         return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);

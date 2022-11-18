@@ -22,6 +22,7 @@ use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -684,28 +685,9 @@ class Controller extends Base
         if (!empty($roomCode)) {
             $roomCodes = [$item->getRoomCode() => $item->getId()];
 
-            if (in_array($this->getConfigLoader()->get('schooldata_import_data_source'), \Schoolbox\External\Importer\Endpoint\Factory::CYCLIC_GRID, true)) {
-                $roomSource = new \Calendar_Api_EventType_Timetable_Room(
-                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                    $this->getUser(),
-                    $this->getUser(),
-                    $this->externalTimetableHandler,
-                    $roomCodes
-                );
-
-                $roomEvents = $roomSource->getEvents($query['start'], $query['end']);
-
-                foreach ($roomEvents as $event) {
-                    $renderer = new Javascript(
-                        $this->getAuthorizer(),
-                        $this->getRouter(),
-                        $event,
-                        $this->getUser(),
-                        $this->getUser()
-                    );
-                    $output[] = $renderer->render();
-                }
-            } else {
+            /* Load the suds timetable-specific connectivity and grab its events
+             */
+            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->getConfigLoader()->get('schooldata_import_data_source'))) {
                 $roomSource = new \Calendar_Api_EventType_SudsTimetable_Room(
                     Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $this->getUser(),
@@ -718,6 +700,27 @@ class Controller extends Base
 
                 foreach ($roomEvents as $event) {
                     $renderer = new \Calendar\Event\Type\SudsTimetable\Renderer\Javascript(
+                        $this->getAuthorizer(),
+                        $this->getRouter(),
+                        $event,
+                        $this->getUser(),
+                        $this->getUser()
+                    );
+                    $output[] = $renderer->render();
+                }
+            } else {
+                $roomSource = new \Calendar_Api_EventType_Timetable_Room(
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                    $this->getUser(),
+                    $this->getUser(),
+                    $this->externalTimetableHandler,
+                    $roomCodes
+                );
+
+                $roomEvents = $roomSource->getEvents($query['start'], $query['end']);
+
+                foreach ($roomEvents as $event) {
+                    $renderer = new Javascript(
                         $this->getAuthorizer(),
                         $this->getRouter(),
                         $event,
