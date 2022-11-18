@@ -95,19 +95,37 @@ class Calendar_Api_Config_Record
      */
     public function encodeConfig(Calendar_Api_Config_Connector_Abstract $config): self
     {
-        $this->setConfig(
-            json_encode(
-                [
-                   'connectorClass' => $config->getConnectorClass(),
-                   'eventType'      => $config->getEventType(),
-                   'failedCount'    => $config->getFailedCount(),
-                   'id'             => $config->getId(),
-                   'label'          => $config->getLabel(),
-                   'luEventType'    => $config->getLuEventType(),
-                ],
-                JSON_THROW_ON_ERROR
-            )
-        );
+        $configArray = [
+            'connectorClass' => $config->getConnectorClass(),
+            'eventType'      => $config->getEventType(),
+            'failedCount'    => $config->getFailedCount(),
+            'id'             => $config->getId(),
+            'label'          => $config->getLabel(),
+            'luEventType'    => $config->getLuEventType(),
+        ];
+
+        switch (get_class($config)) {
+            case 'Calendar_Api_Config_Connector_ExternalConstrained':
+                $configArray['duration'] = $config->getDuration();
+                break;
+
+            case 'Calendar_Api_Config_Connector_EOTC':
+                $configArray['stone']        = new stdClass();
+                $configArray['stoneFactory'] = new stdClass();
+                break;
+
+            case 'Calendar_Api_Config_Connector_Vcal':
+                $configArray['url']           = $config->getUrl();
+                $configArray['authorization'] = $config->getAuthorization();
+                $configArray['campus']        = $config->getCampusIds();
+                $configArray['groups']        = $config->getGroupIds();
+                break;
+
+            default:
+                // Do nothing.
+        }
+
+        $this->setConfig(json_encode($configArray,JSON_THROW_ON_ERROR));
 
         return $this;
     }
@@ -135,6 +153,10 @@ class Calendar_Api_Config_Record
 
         // Instantiate class object given description in $config;
 
+        if (!array_key_exists('connectorClass', $config)) {
+            return null; // Bad data.  Cannot decode, so return null.
+        }
+
         $className = "Calendar_Api_Config_Connector_{$config['connectorClass']}";
 
         $obj = new $className();
@@ -145,6 +167,27 @@ class Calendar_Api_Config_Record
         $obj->setLuEventType($config['luEventType']);
         $obj->setLabel($config['label']);
         $obj->setFailedCount($config['failedCount']);
+
+        switch (get_class($obj)) {
+            case 'Calendar_Api_Config_Connector_ExternalConstrained':
+                $obj->setDuration($config['duration']);
+                break;
+
+            case 'Calendar_Api_Config_Connector_EOTC':
+                $obj->setStone($config['stone']);
+                $obj->setStoneFactory($config['stoneFactory']);
+                break;
+
+            case 'Calendar_Api_Config_Connector_Vcal':
+                if (array_key_exists('url', $config)) {$obj->setUrl($config['url']);}
+                if (array_key_exists('authorization', $config)) {$obj->setAuthorization($config['authorization']);}
+                if (array_key_exists('campus', $config)) {$obj->setCampusIds($config['campus']);}
+                if (array_key_exists('groups', $config)) {$obj->setGroupIds($config['groups']);}
+                break;
+
+            default:
+                // Do nothing.
+        }
 
         return $obj;
     }
