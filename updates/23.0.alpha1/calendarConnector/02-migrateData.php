@@ -65,11 +65,11 @@ HELP;
         foreach ($rows as $row) {
             $config = unserialize(base64_decode($row['_config']), ['Calendar_Api_Config_Connector_Abstract']);
 
-//            $configJson = convertConfigObjectToJson($config);
-            $configJson = convertConfigObjectToJsonUsingEval($config);
+            $configJson = convertConfigObjectToJson($config);
+//            $configJson = convertConfigObjectToJsonUsingEval($config);
 
             if ($configJson === false) {
-                $configJson = null; // If we could not convert to JSON, store as NULL in the database.
+                $configJson = ''; // If we could not convert to JSON, store as a blank string in the database.  Any connector that suffers this fate will have to be re-entered by a user.
             }
 
             printf(" * id: %3s, strlen(config): %4d, strlen(configJson): %4d\n", $row['id'], strlen($row['_config']), strlen($configJson));
@@ -106,19 +106,29 @@ HELP;
  */
 function convertConfigObjectToJson(Calendar_Api_Config_Connector_Abstract $config): bool|string
 {
+    $configArray = [
+        'label'       => $config->getLabel(),
+        'luEventType' => $config->getLuEventType(),
+    ];
+
+    switch (get_class($config)) {
+        case Calendar_Api_Config_Connector_ExternalConstrained::class:
+            $configArray['duration'] = $config->getDuration();
+            break;
+
+        case Calendar_Api_Config_Connector_Vcal::class:
+            $configArray['url']           = $config->getUrl();
+            $configArray['authorization'] = $config->getAuthorization();
+            $configArray['campus']        = $config->getCampusIds();
+            $configArray['groups']        = $config->getGroupIds();
+            break;
+
+        default:
+            // Do nothing.
+    }
+
     try {
-        $configJson = json_encode(
-            [
-                'connectorClass' => $config->getConnectorClass(),
-                'id'             => $config->getId(),
-                'label'          => $config->getLabel(),
-                'eventType'      => $config->getEventType(),
-                'luEventType'    => $config->getLuEventType(),
-                'hasPermissions' => false, // The serialized value will always be zero, because at the time this script was written, no class that extends Calendar_Api_Config_Connector_Abstract ever changes the private $hasPermissions variable from its default value of false.
-                'failedCount'    => $config->getFailedCount(),
-            ],
-            JSON_THROW_ON_ERROR
-        );
+        $configJson = json_encode($configArray,JSON_THROW_ON_ERROR);
     } catch (JsonException) {
         return false;
     }
@@ -133,7 +143,8 @@ function convertConfigObjectToJson(Calendar_Api_Config_Connector_Abstract $confi
  * This is an alternative method to convertConfigObjectToJsonNotUsingEval(), for use in testing.
  *
  * To test using this function, convert to JSON using this function and convertConfigObjectToJson() and compare the
- * results.  The results should be identical.
+ * results.  The results should not be identical, because data that used to be stored in both the `config` column and
+ * in other columns is (after this script has run) no longer stored in the `config` column.
  *
  * The non-eval version of this function should be preferred over this one because of the dangers of using eval().
  */
