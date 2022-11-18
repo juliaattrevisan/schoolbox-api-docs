@@ -18,7 +18,6 @@ namespace Schoolbox\TokenReplacer;
  */
 class Simple
 {
-
     /**
      * $replacements is a set of key-value tuples just like phplib:
      *
@@ -45,6 +44,22 @@ class Simple
     {
         $sanitisedReplacements = array_map(static function ($val) {
             return \Scrub::text($val);
+        }, array_values($replacements));
+
+        return str_replace(array_keys($replacements), $sanitisedReplacements, $body);
+    }
+
+
+    /**
+     * Replace using Scrub::html, to return replaced html
+     * @param string $body
+     * @param array  $replacements
+     * @return string
+     */
+    public function replaceHtml(string $body, array $replacements): string
+    {
+        $sanitisedReplacements = array_map(static function ($val) {
+            return \Scrub::html($val);
         }, array_values($replacements));
 
         return str_replace(array_keys($replacements), $sanitisedReplacements, $body);
