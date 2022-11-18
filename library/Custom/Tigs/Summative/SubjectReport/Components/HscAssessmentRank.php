@@ -26,7 +26,6 @@ use UnexpectedValueException;
 
 class HscAssessmentRank extends BaseComponent
 {
-
     /**
      * 'HscAssessmentRank' assessments across the cohort
      *
@@ -105,9 +104,11 @@ class HscAssessmentRank extends BaseComponent
         // (Note we are already in the context of a single ReportPeriod)
         /** @var int[][] $participantPerFolder Indexed by folderId, studentId */
         $participantPerFolder = [];
+        $allAssessments       = new GenericCollection(IAssessable::class);
         foreach ($cohortAssessmentsPerClass as $folderId => $classAssessments) {
             $participantPerFolder[$folderId] = [];
             foreach ($classAssessments as $classAssessment) {
+                $allAssessments[$classAssessment->getId()] = $classAssessment;
                 foreach ($classAssessment->getAllParticipants() as $participant) {
                     if ($participant->isExcluded()) {
                         continue;
@@ -148,7 +149,7 @@ class HscAssessmentRank extends BaseComponent
         $statistics = (new CohortStatistics(
             $this->getViewer(),
             $this->getRoleTypeOverride(),
-            (new GenericCollection(IAssessable::class))->add($participation->getAssessable()),
+            $allAssessments,
             $participation->getAuthoritativeFeedback(true)
         ))->generate();
 
