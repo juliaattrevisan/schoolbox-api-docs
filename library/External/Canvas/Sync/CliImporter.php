@@ -72,6 +72,26 @@ class CliImporter extends CliTool\App
     private const OPT_LONG_SKIP_IMPORT = 'skip-import'; // Don't re-import files into staging DB
     private const OPT_LONG_SKIP_SYNC = 'skip-sync';   // Don't sync from staging DB to schoolbox DB
 
+    // Canvas tables to import
+    private const TABLES_TO_IMPORT = [
+        'account_dim',
+        'assignment_dim',
+        'assignment_group_dim',
+        'assignment_override_dim',
+        'assignment_override_user_dim',
+        'course_dim',
+        'course_section_dim',
+        'enrollment_dim',
+        'enrollment_term_dim',
+        'group_dim',
+        'group_membership_fact',
+        'pseudonym_dim',
+        'quiz_dim',
+        'quiz_fact',
+        'submission_dim',
+        'submission_fact',
+        'submission_comment_dim',
+    ];
 
     /** @inheritdoc */
     public function getShortOpts(): array
@@ -241,7 +261,7 @@ class CliImporter extends CliTool\App
         }
 
         // Create schema in the staging database
-        $dataRestorer = new DataRestorer($canvasDb, $this->getLogger(), $this->getCanvasDbName(), $this->perform());
+        $dataRestorer = new DataRestorer($canvasDb, $this->getLogger(), $this->getCanvasDbName(), $this->perform(), self::TABLES_TO_IMPORT);
         $this->getLogger()->notice("Importing schema from json file: $schemaFile.");
         $schemaContainer = json_decode(file_get_contents($schemaFile), true);
         $schema          = $schemaContainer['schema'];
@@ -260,6 +280,9 @@ class CliImporter extends CliTool\App
                 continue;
             }
             $tableName = substr($tableGzFile, 0, $posExt);
+            if (!in_array($tableName, self::TABLES_TO_IMPORT)) {
+                continue;
+            }
             $tableFile = "$tempDir/$tableName";
             $this->getLogger()->debug("Loading $tableFile.");
 
@@ -401,7 +424,7 @@ class CliImporter extends CliTool\App
     {
         $client = new Client();
         foreach ($tableList as $tableName => $tableData) {
-            if (!count($tableData['files'])) {
+            if (!in_array($tableName, self::TABLES_TO_IMPORT) || !count($tableData['files'])) {
                 continue;
             }
             $tableFile     = $tableData['files'][0];
