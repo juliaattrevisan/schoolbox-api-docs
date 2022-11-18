@@ -140,19 +140,25 @@ class Calendar_Api_Config_Record
         $className = 'Calendar_Api_Config_Connector_' . $this->getConnectorClass();
         $obj       = new $className();
 
+        // These fields are stored in the schoolbox.calendar_connector table in columns other than `config`.
+        // Since we are instantiating a new object, we need data from both the `config` column and the other columns.
         $obj->setConnectorClass($this->getConnectorClass());
         $obj->setEventType($this->getEventType());
         $obj->setFailedCount($this->getFailedCount());
         $obj->setId($this->getId());
+
+        // These fields are stored in schoolbox.calendar_connector as a JSON string in the `config` column.
         $obj->setLabel($config['label'] ?? '');
         $obj->setLuEventType($config['luEventType'] ?? 1); // This refers to database table schoolbox.luEventType.
 
         switch (get_class($obj)) {
             case Calendar_Api_Config_Connector_ExternalConstrained::class:
+                // These fields are stored in schoolbox.calendar_connector as a JSON string in the `config` column.
                 $obj->setDuration($config['duration'] ?? '');
                 break;
 
             case Calendar_Api_Config_Connector_Vcal::class:
+                // These fields are stored in schoolbox.calendar_connector as a JSON string in the `config` column.
                 $obj->setUrl($config['url'] ?? '');
                 $obj->setAuthorization($config['authorization'] ?? '');
                 $obj->setCampusIds($config['campus'] ?? []);
