@@ -171,7 +171,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
         foreach ($configs as $record) {
             $config = $record->decodeConfig();
             try {
-                if (!$moduleChecker->isEnabled($config)) {
+                if (!$moduleChecker->isEnabled('Calendar_Api_Config_Connector_' . $record->getConnectorClass())) {
                     continue;
                 }
 
@@ -235,14 +235,8 @@ class Calendar_Api_Config_Mapper extends BaseMapper
         $allConfigs = [];
 
         foreach ($configs as $currentConfig) {
-            $config = $currentConfig->decodeConfig();
-            try {
-                if ($moduleChecker->isEnabled($config)) {
-                    $config->setId($currentConfig->getId());
-                    $allConfigs[] = $config;
-                }
-            } catch (\TypeError $e) {
-                // I will not buy this record; it is scratched
+            if ($moduleChecker->isEnabled("Calendar_Api_Config_Connector_$currentConnector")) {
+                $allConfigs[] = $currentConfig->decodeConfig();
             }
         }
 

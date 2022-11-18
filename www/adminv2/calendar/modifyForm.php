@@ -24,6 +24,13 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
             $configRecord = Calendar_Api_Config_Mapper::getInstance()->findById($id);
             $config = $configRecord->decodeConfig();
 
+            if ($config === null) {
+                // Config could not be decoded, so create a blank record matching the expected class.
+                // This allows the corrupted data to be overwritten.
+                $connectorClassName = "Calendar_Api_Config_Connector_{$attribs['connectorClass']}";
+                $config = new $connectorClassName;
+            }
+
             /* Process multiple Vcals
              */
             if (isset($attribs['luEventType'])) {

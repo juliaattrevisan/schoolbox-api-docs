@@ -96,25 +96,16 @@ class Calendar_Api_Config_Record
     public function encodeConfig(Calendar_Api_Config_Connector_Abstract $config): self
     {
         $configArray = [
-            'connectorClass' => $config->getConnectorClass(),
-            'eventType'      => $config->getEventType(),
-            'failedCount'    => $config->getFailedCount(),
-            'id'             => $config->getId(),
-            'label'          => $config->getLabel(),
-            'luEventType'    => $config->getLuEventType(),
+            'label'       => $config->getLabel(),
+            'luEventType' => $config->getLuEventType(),
         ];
 
         switch (get_class($config)) {
-            case 'Calendar_Api_Config_Connector_ExternalConstrained':
+            case Calendar_Api_Config_Connector_ExternalConstrained::class:
                 $configArray['duration'] = $config->getDuration();
                 break;
 
-            case 'Calendar_Api_Config_Connector_EOTC':
-                $configArray['stone']        = new stdClass();
-                $configArray['stoneFactory'] = new stdClass();
-                break;
-
-            case 'Calendar_Api_Config_Connector_Vcal':
+            case Calendar_Api_Config_Connector_Vcal::class:
                 $configArray['url']           = $config->getUrl();
                 $configArray['authorization'] = $config->getAuthorization();
                 $configArray['campus']        = $config->getCampusIds();
@@ -133,56 +124,39 @@ class Calendar_Api_Config_Record
     /**
      * Decode config object when retrieving from db
      *
-     * @return Calendar_Api_Config_Connector_Abstract|null
-     * @throws JsonException
+     * @return Calendar_Api_Config_Connector_Abstract
      */
-    public function decodeConfig(): Calendar_Api_Config_Connector_Abstract|null
+    public function decodeConfig(): Calendar_Api_Config_Connector_Abstract
     {
         $configJson = $this->getConfig();
-
-        if ($configJson === null) {
-            return null;
-        }
 
         try {
             $config = json_decode($configJson, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException) {
-            echo "Could not decode json '$configJson'.";
-            die;
+            $config = [];
         }
 
         // Instantiate class object given description in $config;
+        $className = 'Calendar_Api_Config_Connector_' . $this->getConnectorClass();
+        $obj       = new $className();
 
-        if (!array_key_exists('connectorClass', $config)) {
-            return null; // Bad data.  Cannot decode, so return null.
-        }
-
-        $className = "Calendar_Api_Config_Connector_{$config['connectorClass']}";
-
-        $obj = new $className();
-
-        $obj->setEventType($config['eventType']);
-        $obj->setConnectorClass($config['connectorClass']);
-        $obj->setId($config['id']);
-        $obj->setLuEventType($config['luEventType']);
-        $obj->setLabel($config['label']);
-        $obj->setFailedCount($config['failedCount']);
+        $obj->setConnectorClass($this->getConnectorClass());
+        $obj->setEventType($this->getEventType());
+        $obj->setFailedCount($this->getFailedCount());
+        $obj->setId($this->getId());
+        $obj->setLabel($config['label'] ?? '');
+        $obj->setLuEventType($config['luEventType'] ?? 1); // This refers to database table schoolbox.luEventType.
 
         switch (get_class($obj)) {
-            case 'Calendar_Api_Config_Connector_ExternalConstrained':
-                $obj->setDuration($config['duration']);
+            case Calendar_Api_Config_Connector_ExternalConstrained::class:
+                $obj->setDuration($config['duration'] ?? '');
                 break;
 
-            case 'Calendar_Api_Config_Connector_EOTC':
-                $obj->setStone($config['stone']);
-                $obj->setStoneFactory($config['stoneFactory']);
-                break;
-
-            case 'Calendar_Api_Config_Connector_Vcal':
-                if (array_key_exists('url', $config)) {$obj->setUrl($config['url']);}
-                if (array_key_exists('authorization', $config)) {$obj->setAuthorization($config['authorization']);}
-                if (array_key_exists('campus', $config)) {$obj->setCampusIds($config['campus']);}
-                if (array_key_exists('groups', $config)) {$obj->setGroupIds($config['groups']);}
+            case Calendar_Api_Config_Connector_Vcal::class:
+                $obj->setUrl($config['url'] ?? '');
+                $obj->setAuthorization($config['authorization'] ?? '');
+                $obj->setCampusIds($config['campus'] ?? []);
+                $obj->setGroupIds($config['groups'] ?? []);
                 break;
 
             default:
