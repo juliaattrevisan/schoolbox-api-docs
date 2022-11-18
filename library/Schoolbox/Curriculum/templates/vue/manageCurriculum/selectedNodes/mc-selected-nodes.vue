@@ -55,11 +55,12 @@ function onDeleteNodesSelected () {
 <template>
     <div class="small-12 island">
         <bottom-drawer :showDrawer="selectedNodesStore.hasNodes && !updateNodeStore.isOpen && !addSubsectionStore.isOpen">
-            <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container">
+            <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-nodes-container>
                 <mc-selected-node
                     v-for="node in selectedNodesStore.nodes"
                     :key="node.id"
                     :node="node"
+                    data-test-node
                 />
             </div>
             <p v-if="selectedNodesStore.hasDisabledChildNodes && !selectedNodesStore.allNodesEnabled" class="meta">If you wish to re-enable disabled nodes, please enable the disabled parent.</p>

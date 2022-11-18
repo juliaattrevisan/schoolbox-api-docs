@@ -79,7 +79,6 @@ function onClearSearchSelected () {
                 type="text"
                 :disabled="isDisabled"
                 :placeholder="placeholder"
-                data-modal-search-input
                 data-test-search-input
                 @input="$event.target.composing = false"
             />
@@ -88,6 +87,7 @@ function onClearSearchSelected () {
                 title="Clear the current search"
                 class="button icon-close"
                 :disabled="isDisabled"
+                data-test-clear-search
                 @click.prevent="onClearSearchSelected"
                 @keyup.enter="onClearSearchSelected"
             >

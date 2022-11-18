@@ -68,7 +68,6 @@ const debounceSearch = debounce(() => {
             class="search-input"
             :disabled="isDisabled"
             :placeholder="placeholder"
-            data-modal-search-input
             @input="$event.target.composing = false"
         />
         <button

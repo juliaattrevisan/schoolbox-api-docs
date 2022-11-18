@@ -24,10 +24,17 @@ const props = defineProps({
         type: Boolean,
         required: true,
     },
+    /**
+     * to shorten names that exceed a specified length
+     */
+    maxNameLength: {
+        type: Number,
+        required: false,
+        default: 50,
+    },
 });
 
 const viewNodesStore = useViewNodesStore();
-const maxNameLength = 50;
 
 /**
  * to display the just selected node
@@ -41,7 +48,7 @@ function onSelected () {
 <template>
     <li>
         <span v-if="props.isDisabled">
-            {{ shortenLength(props.breadcrumb.name, maxNameLength) }}
+            {{ shortenLength(props.breadcrumb.name, props.maxNameLength) }}
         </span>
         <a v-else
             :href="`/curricululm/${props.breadcrumb.id}`"
@@ -49,7 +56,7 @@ function onSelected () {
             @click.prevent="onSelected()"
             @keyup.enter="onSelected()"
         >
-            {{ shortenLength(props.breadcrumb.name, maxNameLength) }}
+            {{ shortenLength(props.breadcrumb.name, props.maxNameLength) }}
         </a>
     </li>
 </template>

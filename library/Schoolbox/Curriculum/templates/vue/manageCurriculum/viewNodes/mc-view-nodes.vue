@@ -46,7 +46,14 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
         <div v-else-if="searchStore.hasNoResults" class="empty-state-flex-centered">
             <i class="icon-curriculum"></i>
             <p>No Curriculum matches your current search.</p>
-            <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
+            <button
+                title="Clear the current search"
+                data-test-clear-search
+                @click.prevent="onClearSearchSelected"
+                @keyup.enter="onClearSearchSelected"
+            >
+                Clear search
+            </button>
         </div>
         <ul v-else ref="nodesContainerEl">
             <mc-view-node
