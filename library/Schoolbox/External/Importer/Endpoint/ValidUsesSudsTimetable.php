@@ -11,7 +11,6 @@ namespace Schoolbox\External\Importer\Endpoint;
 
 use External\IConnector;
 
-
 /**
  * Decide if the current SUDS connector uses the SUDS Timetable
  * (If it doesn't, then we presume usage of the cyclic grid)
