@@ -77,7 +77,7 @@ function onUpdateToggleSelected () {
         :class="`button-action-option ${ props.isUpdating ? 'icon-close' : 'icon-modify' }`"
         :title="`Update ${props.title}`"
         :disabled="props.isAdding"
-        data-test-update-node
+        data-test-update
         @click.prevent="onUpdateToggleSelected"
         @keyup.enter="onUpdateToggleSelected"
     >
@@ -87,7 +87,7 @@ function onUpdateToggleSelected () {
         :class="`button-action-option ${ props.isAdding ? 'icon-close' : 'icon-add' }`"
         :title="`Add subsection to ${props.title}`"
         :disabled="props.isUpdating"
-        data-test-add-subsection
+        data-test-add
         @click.prevent="onAddSubsectionToggleSelected"
         @keyup.enter="onAddSubsectionToggleSelected"
     >

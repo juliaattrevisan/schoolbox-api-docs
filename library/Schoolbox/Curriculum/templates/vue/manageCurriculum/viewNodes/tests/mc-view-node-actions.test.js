@@ -26,12 +26,12 @@ beforeEach(() => {
 
 test('update button is disabled when prop isAdding is true', async () => {
     await wrapper.setProps( { isAdding: true } );
-    expect(wrapper.find('[data-test-update-node]').element).toBeDisabled();
-    expect(wrapper.find('[data-test-add-subsection]').element).not.toBeDisabled();
+    expect(wrapper.find('[data-test-update]').element).toBeDisabled();
+    expect(wrapper.find('[data-test-add]').element).not.toBeDisabled();
 });
 
 test('add button is disabled when prop isUpdating is true', async () => {
     await wrapper.setProps( { isUpdating: true } );
-    expect(wrapper.find('[data-test-update-node]').element).not.toBeDisabled();
-    expect(wrapper.find('[data-test-add-subsection]').element).toBeDisabled();
+    expect(wrapper.find('[data-test-update]').element).not.toBeDisabled();
+    expect(wrapper.find('[data-test-add]').element).toBeDisabled();
 });

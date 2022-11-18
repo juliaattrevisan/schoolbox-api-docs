@@ -9,7 +9,6 @@ class AddNewSubsection
     public const DISPLAY_TOGGLE = 'Add subsection to ';
     public const NAME_FIELD = '#name';
     public const CODE_FIELD = '#code';
-    public const DESCRIPTION_FIELD = '#description-';
     public const ADD_BUTTON = '[data-test-add-subsection]';
     private AcceptanceTester $tester;
 

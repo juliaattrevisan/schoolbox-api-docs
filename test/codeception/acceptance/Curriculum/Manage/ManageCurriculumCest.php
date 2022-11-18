@@ -84,7 +84,7 @@ class ManageCurriculumCest
      */
     public function disableNodes(AcceptanceTester $i)
     {
-        $i->amGoingTo('disable Year 4 English and Year 9 History');
+        $i->amGoingTo('disable Year 4 History and Year 9 History');
         $mc = new ManageCurriculum($i);
         $mc->checkNode('#checkbox-247');
         $mc->checkNode('#checkbox-1');
@@ -154,5 +154,31 @@ class ManageCurriculumCest
         $i->canSee('Node successfully updated');
         $i->amGoingTo('ensure the updated node displays correctly');
         $i->canSee('[9AH] Year 9 Ancient History');
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * on https://vagrant.dev.schoolbox.cloud/curriculum
+     *
+     */
+    public function hideDisabledNodesAndSearch(AcceptanceTester $i)
+    {
+        $i->amGoingTo('navigate to First Contacts in Year 4 History');
+        $mc = new ManageCurriculum($i);
+        $mc->clickNode('Year 4 History');
+        $mc->clickNode('Year 4');
+        $mc->clickNode('Historical Knowledge and Understanding');
+        $mc->clickNode('First Contacts');
+        $i->amGoingTo('search for nodes containing ACHH');
+        $searchNodes = new SearchNodes($i);
+        $searchNodes->fillSearch('ACHH');
+        $i->amGoingTo('expect 4 search results are shown');
+        $searchNodes->seeResultsMatch(4);
+        $i->amGoingTo('hide disabled nodes and so expect no search results are now shown');
+        $searchNodes->uncheckShowDisabledNodes();
+        $i->waitForElementNotVisible('[data-test-node]', 1); // waiting for the animation to hide the disabled nodes
+        $searchNodes->seeResultsMatch(0);
     }
 }

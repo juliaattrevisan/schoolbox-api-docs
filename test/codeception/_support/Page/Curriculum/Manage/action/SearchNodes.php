@@ -40,4 +40,14 @@ class SearchNodes
     {
         $this->tester->seeNumberOfElements(ManageCurriculum::NODES, $value);
     }
+
+    /**
+     * to check the number of expected results matches the actual
+     *
+     * @param int $value
+     */
+    public function uncheckShowDisabledNodes(): void
+    {
+        $this->tester->uncheckOption(self::TOGGLE_SHOW_DISABLED_NODES);
+    }
 }
