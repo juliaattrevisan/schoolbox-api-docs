@@ -86,7 +86,7 @@ class Javascript extends Base
                  */
                 'timetable' => [
                     'code' => $this->event->getCode(),
-                    'staff' => $this->event->getStaff()
+                    'staff' => []
                 ],
 
                 'classAttendance' => [

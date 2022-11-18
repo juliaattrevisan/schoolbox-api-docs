@@ -23,7 +23,7 @@ if (!isset($this)) {
  * representation of timetable events; any other selection causes you to see
  * the classical cyclic timetable grid
  */
-if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)Config::get('schooldata_import_data_source'))) {
+if ((new ValidUsesSudsTimetable())->isSatisfiedBy((string)Config::get('external_type'), (string)Config::get('schooldata_import_data_source'))) {
     if (is_numeric($this->arg[0] ?? null)) {
         SitePage::localRedir("/timetable/calendar/{$this->arg[0]}");
     }
