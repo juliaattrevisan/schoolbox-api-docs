@@ -157,6 +157,7 @@ class ManageCurriculumCest
     }
 
     /**
+     * @depends disableNodes
      * @param AcceptanceTester $i
      * @throws Exception
      *
