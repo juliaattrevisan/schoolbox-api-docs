@@ -63,7 +63,21 @@ HELP;
 
         echo "For each row in calendar_connector, updating `config` to the JSON equivalent of `_config`.\n";
         foreach ($rows as $row) {
-            $config = unserialize(base64_decode($row['_config']), ['Calendar_Api_Config_Connector_Abstract']);
+            $configBase64Decoded = base64_decode($row['_config']);
+
+            if ($configBase64Decoded === false) {
+                echo " * Could not base64_decode() string.  Skipping.\n";
+                echo "   (_config: '{$row['_config']}')\n";
+                continue;
+            }
+
+            $config = unserialize($configBase64Decoded, ['Calendar_Api_Config_Connector_Abstract']);
+
+            if ($config === false) {
+                echo " * Could not unserialize() string.  Skipping.\n";
+                echo "   (string: '$configBase64Decoded')\n";
+                continue;
+            }
 
             $configJson = convertConfigObjectToJson($config);
 
