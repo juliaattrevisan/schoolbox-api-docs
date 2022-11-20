@@ -69,29 +69,24 @@ class Calendar_Api_EventType_SudsTimetable_Room extends Calendar_Api_EventType_A
         $finishAtADF = \Alaress_Date_Format::newFromTimestamp($endTimestamp);
 
         /* Find all the events which are occurring between the two timestamps
-         * $startTimestamp, $endTimestamp; these include the events which:
+         * $startTimestamp, $endTimestamp.
          *
-         *   - start outside this window, but finish within it
-         *   - start inside this window, but finishes outside it
-         *   - start outside this window, and finishes outside it
-         *   - start inside this window, and finishes inside it
+         * This includes all events, EXCEPT for ones which either:
+         *   - finish before $startTimestamp
+         *   - start after $finishTimestamp
          *
          * We presume that start <= finish.
          */
-        $eventsOutsideWindowPast = $this->eventMapper->getPredicateBuilder()
-            ->lessThan('start_at', $startAtADF)
-            ->lessThan('start_at', $finishAtADF);
-
-        $eventsOutsideWindowFuture = $this->eventMapper->getPredicateBuilder()
-            ->greaterThan('finish_at', $startAtADF)
-            ->greaterThan('finish_at', $finishAtADF);
-
         $pb = $this->eventMapper->getPredicateBuilder()
             ->in('location', array_keys($this->roomCodes))
-            ->notAll($eventsOutsideWindowPast)
-            ->notAll($eventsOutsideWindowFuture)
-            ->greaterThanOrEqualTo('start_at', $startAtADF)
-            ->lessThanOrEqualTo('finish_at', $finishAtADF);
+            ->rawWhere(
+                'NOT (finish_at < :startTimestamp OR start_at > :endTimestamp)',
+                [
+                    'startTimestamp' => $startAtADF->getDatabase(),
+                    'endTimestamp'   => $finishAtADF->getDatabase(),
+                ]
+            )
+        ;
 
         $eventIds = $this->eventMapper->findIdsByPredicates($pb);
 
