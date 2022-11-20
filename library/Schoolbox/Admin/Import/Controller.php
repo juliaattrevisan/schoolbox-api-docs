@@ -122,6 +122,7 @@ class Controller extends ConfigController
             [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,],
         );
 
+        $externalType = (string)$this->getConfigLoader()->get('external_type');
         $host = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_host');
         $key = (string)$this->getConfigLoader()->get('schooldata_import_endpoint_key');
         $dataSource = (string)$this->getConfigLoader()->get('schooldata_import_data_source');
@@ -163,7 +164,7 @@ class Controller extends ConfigController
             'hasPerformUpdate' => $hasPerformUpdate,
             /* Decide if the current suds selection uses the cyclic grid
              */
-            'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($dataSource)
+            'cyclicGrid' => !(new ValidUsesSudsTimetable())->isSatisfiedBy($externalType, $dataSource)
         ])->setTitle('School Data Import'));
     }
 
@@ -209,7 +210,9 @@ class Controller extends ConfigController
          */
         $toggler = new Endpoint\SudsTimetableSubscriptionToggle($this->calendarApiConfigMapper);
 
-        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($postData['schooldata_import_data_source'])) {
+        $externalType = $this->getConfigLoader()->get('external_type');
+
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($externalType, $postData['schooldata_import_data_source'])) {
             $toggler->enableSudsTimetable();
         } else {
             $toggler->disableSudsTimetable();

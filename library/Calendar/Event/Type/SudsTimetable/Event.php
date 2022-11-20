@@ -46,6 +46,31 @@ class Event extends Day\Event
     private ?\Schoolbox\Resource\Folder\Model $folder;
 
 
+    /* For resource booking purposes we need these method signatures
+     * and corresponding properties
+     */
+
+    /**
+     * @var bool $periodCancelled Whether the period is cancelled
+     */
+    protected bool $periodCancelled = false;
+
+
+    /**
+     * URL of the attendance link
+     *
+     * @var string
+     */
+    private string $attendanceLink = '';
+
+
+    /**
+     * How the attendance link should be opened
+     * @var string
+     */
+    private string $attendanceLinkTarget = '_blank';
+
+
     /**
      * @var string|null
      */
@@ -181,5 +206,63 @@ class Event extends Day\Event
     {
         $this->attendanceUrl = $attendanceUrl;
         return $this;
+    }
+
+
+    /* For resource booking
+     */
+
+    /**
+     * @return bool|null
+     */
+    public function getPeriodCancelled(): ?bool
+    {
+        return $this->periodCancelled;
+    }
+
+
+    /**
+     * @param bool $periodCancelled
+     * @return $this
+     */
+    public function setPeriodCancelled(bool $periodCancelled): self
+    {
+        $this->periodCancelled = $periodCancelled;
+        return $this;
+    }
+
+
+    /**
+     * @param string $attendanceLink
+     */
+    public function setAttendanceLink(string $attendanceLink): void
+    {
+        $this->attendanceLink = $attendanceLink;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getAttendanceLink(): ?string
+    {
+        return $this->attendanceLink;
+    }
+
+
+    /**
+     * @param string $attendanceLinkTarget
+     */
+    public function setAttendanceLinkTarget(string $attendanceLinkTarget): void
+    {
+        $this->attendanceLinkTarget = $attendanceLinkTarget;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAttendanceLinkTarget(): ?string
+    {
+        return $this->attendanceLinkTarget;
     }
 }

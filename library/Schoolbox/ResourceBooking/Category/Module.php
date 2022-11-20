@@ -84,7 +84,7 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return (new Controller($this->getMapperFactory()->get(ResourceBooking\Item\Mapper::class)))
+        return (new Controller($this->getMapperFactory()->get(ResourceBooking\Item\Mapper::class), $this->getMapperFactory()->get(\Schoolbox\External\Event\Mapper::class)))
             ->setMapper($this->getMapperFactory()->get(Mapper::class))
             ->setPaginator(
                 (new UrlPaginator())

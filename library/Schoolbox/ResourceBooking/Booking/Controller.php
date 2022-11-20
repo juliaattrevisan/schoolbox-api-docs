@@ -21,6 +21,8 @@ use External_Timetable;
 use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -36,7 +38,7 @@ use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
 class Controller extends Base
 {
     /**
-     * @var Mapper
+     * @var \Schoolbox\ResourceBooking\Booking\Mapper
      */
     protected $bookingMapper;
 
@@ -73,6 +75,13 @@ class Controller extends Base
      * @var StatusMapper
      */
     protected $statusMapper;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Mapper
+     */
+    protected \Schoolbox\External\Event\Mapper $externalEventMapper;
+
 
     /**
      * Creates a booking for an item.
@@ -199,7 +208,9 @@ class Controller extends Base
             $this->getStatusMapper(),
             $this->getTermMapper(),
             $this->getExternalTimetableHandler(),
-            $this->getCampusMapper()
+            $this->getCampusMapper(),
+            $this->getConfigLoader(),
+            $this->getExternalEventMapper()
         );
         $errors = $validation->validateBookingFromPostData($item, $this->getRequest()->post, null);
         if (empty($errors)) {
@@ -302,7 +313,9 @@ class Controller extends Base
             $this->getStatusMapper(),
             $this->getTermMapper(),
             $this->getExternalTimetableHandler(),
-            $this->getCampusMapper()
+            $this->getCampusMapper(),
+            $this->getConfigLoader(),
+            $this->getExternalEventMapper()
         );
         $errors = $validation->validateBookingFromPostData($item->getResource(), $this->getRequest()->post, $item);
 
@@ -670,25 +683,52 @@ class Controller extends Base
         $roomCode = $item->getRoomCode();
 
         if (!empty($roomCode)) {
-            $roomSource = new \Calendar_Api_EventType_Timetable_Room(
-                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
-                $this->getUser(),
-                $this->getUser(),
-                $this->externalTimetableHandler,
-                [$item->getRoomCode() => $item->getId()]
-            );
+            $roomCodes = [$item->getRoomCode() => $item->getId()];
 
-            $roomEvents = $roomSource->getEvents($query['start'], $query['end']);
-
-            foreach ($roomEvents as $event) {
-                $renderer = new Javascript(
-                    $this->getAuthorizer(),
-                    $this->getRouter(),
-                    $event,
+            /* Load the suds timetable-specific connectivity and grab its events
+             */
+            if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->getConfigLoader()->get('external_type'), $this->getConfigLoader()->get('schooldata_import_data_source'))) {
+                $roomSource = new \Calendar_Api_EventType_SudsTimetable_Room(
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $this->getUser(),
-                    $this->getUser()
+                    $this->getUser(),
+                    \Schoolbox\External\Event\Mapper::getInstance(),
+                    $roomCodes
                 );
-                $output[] = $renderer->render();
+
+                $roomEvents = $roomSource->getEvents($query['start'], $query['end']);
+
+                foreach ($roomEvents as $event) {
+                    $renderer = new \Calendar\Event\Type\SudsTimetable\Renderer\Javascript(
+                        $this->getAuthorizer(),
+                        $this->getRouter(),
+                        $event,
+                        $this->getUser(),
+                        $this->getUser()
+                    );
+                    $output[] = $renderer->render();
+                }
+            } else {
+                $roomSource = new \Calendar_Api_EventType_Timetable_Room(
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                    $this->getUser(),
+                    $this->getUser(),
+                    $this->externalTimetableHandler,
+                    $roomCodes
+                );
+
+                $roomEvents = $roomSource->getEvents($query['start'], $query['end']);
+
+                foreach ($roomEvents as $event) {
+                    $renderer = new Javascript(
+                        $this->getAuthorizer(),
+                        $this->getRouter(),
+                        $event,
+                        $this->getUser(),
+                        $this->getUser()
+                    );
+                    $output[] = $renderer->render();
+                }
             }
         }
 
@@ -791,7 +831,9 @@ class Controller extends Base
             $this->getStatusMapper(),
             $this->getTermMapper(),
             $this->getExternalTimetableHandler(),
-            $this->getCampusMapper()
+            $this->getCampusMapper(),
+            $this->getConfigLoader(),
+            $this->getExternalEventMapper()
         );
         // validate this booking
         $booking
@@ -968,7 +1010,7 @@ class Controller extends Base
     }
 
     /**
-     * @param  Mapper $bookingMapper
+     * @param  \Schoolbox\ResourceBooking\Booking\Mapper $bookingMapper
      *
      * @return $this
      */
@@ -980,7 +1022,7 @@ class Controller extends Base
     }
 
     /**
-     * @return Mapper
+     * @return \Schoolbox\ResourceBooking\Booking\Mapper
      */
     public function getBookingMapper()
     {
@@ -1124,6 +1166,26 @@ class Controller extends Base
     {
         $this->termMapper = $termMapper;
 
+        return $this;
+    }
+
+
+    /**
+     * @return \Schoolbox\External\Event\Mapper
+     */
+    public function getExternalEventMapper(): \Schoolbox\External\Event\Mapper
+    {
+        return $this->externalEventMapper;
+    }
+
+
+    /**
+     * @param Mapper $externalEventMapper
+     * @return Controller
+     */
+    public function setExternalEventMapper(\Schoolbox\External\Event\Mapper $externalEventMapper): self
+    {
+        $this->externalEventMapper = $externalEventMapper;
         return $this;
     }
 }

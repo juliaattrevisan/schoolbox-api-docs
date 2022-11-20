@@ -81,6 +81,7 @@ class Javascript extends Base
                 'styles'          => [
                     'visible' => $this->getEvent()->getPeriodCancelled() ? 'strike' : '',
                 ],
+
                 'classAttendance' => [
                     'url'    => $this->getEvent()->getAttendanceLink(),
                     'target' => $this->getEvent()->getAttendanceLinkTarget(),

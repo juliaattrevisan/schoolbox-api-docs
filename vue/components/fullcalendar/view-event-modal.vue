@@ -131,7 +131,7 @@ export default {
                     deleteLink = ENDPOINTS.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, returnUrl);
                 }
             }
-
+console.log(data);
             return {
                 eventId: metadata?.eventId,
                 seriesId: metadata?.seriesId,
@@ -719,10 +719,7 @@ export default {
                             <template v-if="id">
                                 <a :href="'/search/user/' + String(id)">{{ name }}</a>
                             </template>
-                            <template v-else>
-                                {{ name }}
-                            </template>
-                            <span v-if="index != Object.keys(eventExtendedProps.timetable.staff).length - 1">, </span>
+                            <template v-else>{{ name }}</template><span v-if="index != Object.keys(eventExtendedProps.timetable.staff).length - 1">, </span>
                         </template>
                     </meta-item>
                 </template>

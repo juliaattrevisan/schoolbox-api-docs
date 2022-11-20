@@ -14,24 +14,22 @@ use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
 use Calendar\Event\Type\RendererBase;
 use Calendar\Event\Type\Timetable;
-use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
 
 abstract class Base extends RendererBase
 {
-
     /** @var Timetable\Event */
-    protected $event;
+    protected Timetable\Event $event;
 
 
     /**
      * Constructor
      *
-     * @param Authorizer $authorizer
-     * @param Router     $router
-     * @param Event      $event
-     * @param User       $user
-     * @param User       $viewer
+     * @param Authorizer      $authorizer
+     * @param Router          $router
+     * @param Timetable\Event $event
+     * @param User            $user
+     * @param User            $viewer
      */
     public function __construct(Authorizer $authorizer, Router $router, Timetable\Event $event, User $user, User $viewer)
     {

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
 
+use External\IConnector;
+
 /**
  * Decide if the current SUDS connector uses the SUDS Timetable
  * (If it doesn't, then we presume usage of the cyclic grid)
@@ -41,11 +43,16 @@ class ValidUsesSudsTimetable
      * $dataSource corresponds to schooldata_import_data_source in config
      * (You could convert Factory::NAME to a more comprehensive hash lookup)
      *
+     * @param string $externalDb
      * @param string $dataSource
      * @return bool
      */
-    public function isSatisfiedBy(string $dataSource): bool
+    public function isSatisfiedBy(string $externalDb, string $dataSource): bool
     {
-        return \in_array($dataSource, self::SUDS_TIMETABLE, true);
+        /* You also have to be on the Schoolbox connector, not some other live connector
+         * This can occur when you trade SUDS for a Live connector or vice versa,
+         * predominantly in testing
+         */
+        return IConnector::EXTERNAL_TYPE_SCHOOLBOX === $externalDb && \in_array($dataSource, self::SUDS_TIMETABLE, true);
     }
 }

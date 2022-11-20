@@ -161,6 +161,10 @@ class Javascript extends Base
                     'moreDetailsLink' => null
                 ],
             ],
+
+            /* For Resource Booking to group things up in the Category calendar
+             */
+            'resourceId' => $this->event->getResourceId(),
         ];
 
         return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR);

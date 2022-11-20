@@ -11,6 +11,9 @@ namespace Schoolbox\ResourceBooking\Booking;
 use DateTime;
 use Alaress_Date_Format;
 use External_Timetable;
+use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
@@ -81,13 +84,28 @@ class Validation
      */
     private $campusMapper;
 
+
     /**
-     * @param User               $user
-     * @param Mapper             $bookingMapper
-     * @param StatusMapper       $statusMapper
-     * @param TermMapper         $termMapper
-     * @param External_Timetable $externalTimetableHandler
-     * @param CampusMapper       $campusMapper
+     * @var \Schoolbox\IConfigLoader
+     */
+    private \Schoolbox\IConfigLoader $configLoader;
+
+
+    /**
+     * @var \Schoolbox\External\Event\Mapper
+     */
+    private \Schoolbox\External\Event\Mapper $eventMapper;
+
+
+    /**
+     * @param User                             $user
+     * @param BookingMapper                    $bookingMapper
+     * @param StatusMapper                     $statusMapper
+     * @param TermMapper                       $termMapper
+     * @param External_Timetable               $externalTimetableHandler
+     * @param CampusMapper                     $campusMapper
+     * @param IConfigLoader                    $configLoader
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
      */
     public function __construct(
         User $user,
@@ -95,7 +113,9 @@ class Validation
         StatusMapper $statusMapper,
         TermMapper $termMapper,
         External_Timetable $externalTimetableHandler,
-        CampusMapper $campusMapper
+        CampusMapper $campusMapper,
+        \Schoolbox\IConfigLoader $configLoader,
+        \Schoolbox\External\Event\Mapper $eventMapper
     ) {
         $this->user = $user;
         $this->setBookingMapper($bookingMapper);
@@ -103,7 +123,10 @@ class Validation
         $this->setTermMapper($termMapper);
         $this->setExternalTimetableHandler($externalTimetableHandler);
         $this->setCampusMapper($campusMapper);
+        $this->setConfigLoader($configLoader);
+        $this->setEventMapper($eventMapper);
     }
+
 
     /**
      * Attempts to validate the creation or update of a booking from post data.
@@ -514,7 +537,13 @@ class Validation
     protected function getTimetableRoomEvents($roomCode, DateTime $startDate, DateTime $endDate)
     {
         // Using  [$roomCode => true] to make Calendar_Api_EventType_Timetable_Room::getEvents happy
-        $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, [$roomCode => true]);
+        $roomCodes = [$roomCode => true];
+
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->configLoader->get('external_type'), $this->configLoader->get('schooldata_import_data_source'))) {
+            $timetableRoom = new \Calendar_Api_EventType_SudsTimetable_Room(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->eventMapper, $roomCodes);
+        } else {
+            $timetableRoom = new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes);
+        }
 
         return $timetableRoom->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
     }
@@ -629,5 +658,45 @@ class Validation
     public function setCampusMapper($campusMapper)
     {
         $this->campusMapper = $campusMapper;
+    }
+
+
+    /**
+     * @return \Schoolbox\IConfigLoader
+     */
+    public function getConfigLoader(): \Schoolbox\IConfigLoader
+    {
+        return $this->configLoader;
+    }
+
+
+    /**
+     * @param IConfigLoader $configLoader
+     * @return Validation
+     */
+    public function setConfigLoader(\Schoolbox\IConfigLoader $configLoader): self
+    {
+        $this->configLoader = $configLoader;
+        return $this;
+    }
+
+
+    /**
+     * @return Mapper
+     */
+    public function getEventMapper(): Mapper
+    {
+        return $this->eventMapper;
+    }
+
+
+    /**
+     * @param Mapper $eventMapper
+     * @return Validation
+     */
+    public function setEventMapper(Mapper $eventMapper): self
+    {
+        $this->eventMapper = $eventMapper;
+        return $this;
     }
 }
