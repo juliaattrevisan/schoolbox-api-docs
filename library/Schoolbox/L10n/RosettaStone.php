@@ -28,20 +28,6 @@ class RosettaStone
     }
 
     /**
-     * Added to allow testing of updates/23.0.alpha1/calendarConnector/02-migrateData.php, using var_export() and eval().
-     *
-     * @param array $state
-     * @return RosettaStone
-     */
-    public static function __set_state(array $state)
-    {
-        $obj = new self;
-        $obj->dictionary = $state['dictionary'];
-
-        return $obj;
-    }
-
-    /**
      * Adds a term to this stone's dictionary.
      *
      * @param Model $term

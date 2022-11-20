@@ -66,7 +66,6 @@ HELP;
             $config = unserialize(base64_decode($row['_config']), ['Calendar_Api_Config_Connector_Abstract']);
 
             $configJson = convertConfigObjectToJson($config);
-//            $configJson = convertConfigObjectToJsonUsingEval($config);
 
             if ($configJson === false) {
                 $configJson = ''; // If we could not convert to JSON, store as a blank string in the database.  Any connector that suffers this fate will have to be re-entered by a user.
@@ -134,53 +133,4 @@ function convertConfigObjectToJson(Calendar_Api_Config_Connector_Abstract $confi
     }
 
     return $configJson;
-}
-
-/**
- * @param Calendar_Api_Config_Connector_Abstract $config
- * @return bool|string
- *
- * This is an alternative method to convertConfigObjectToJsonNotUsingEval(), for use in testing.
- *
- * To test using this function, convert to JSON using this function and convertConfigObjectToJson() and compare the
- * results.  The results should not be identical, because data that used to be stored in both the `config` column and
- * in other columns is (after this script has run) no longer stored in the `config` column.
- *
- * The non-eval version of this function should be preferred over this one because of the dangers of using eval().
- */
-function convertConfigObjectToJsonUsingEval(Calendar_Api_Config_Connector_Abstract $config): bool|string
-{
-    $configPhpString = var_export($config, true);
-    $configArrayString = "array(\n" . stripFirstAndLastLinesFromMultilineString($configPhpString) . "\n)";
-    $configArray       = null; // To avoid PHPStorm 'undefined variable' warning below.
-
-    eval("\$configArray = $configArrayString;");
-
-    try {
-        $configJson = json_encode($configArray, JSON_THROW_ON_ERROR);
-    } catch (JsonException) {
-        return false;
-    }
-
-    return $configJson;
-}
-
-/**
- * @param $string
- * @return string
- */
-function stripFirstAndLastLinesFromMultilineString($string): string
-{
-    $lines = explode("\n", $string);
-    $linesToReturn = [];
-
-    foreach ($lines as $lineNo => $line) {
-        if ($lineNo === 0 || $lineNo === count($lines) - 1) {
-            continue;
-        }
-
-        $linesToReturn[] = $line;
-    }
-
-    return implode("\n", $linesToReturn);
 }
