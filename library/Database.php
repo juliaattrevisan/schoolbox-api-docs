@@ -431,7 +431,12 @@ class Database implements IDatabase, Serializable
     private function error(PDOException $exception): void
     {
         if (PHP_SAPI !== 'cli') {
-            if ($exception->getMessage() === "SQLSTATE[HY000] [2002] No such file or directory") {
+            $databaseOfflineErrors = [
+                "SQLSTATE[HY000] [2002] No such file or directory",  // on-premises mariadb
+                "SQLSTATE[HY000] [2002] Connection refused",         // cloud-saas RDS mariadb
+            ];
+            // Does the error message indicate the database is simply offline?
+            if (in_array($exception->getMessage(), $databaseOfflineErrors, true)) {
                 http_response_code(598);
                 include __DIR__ . "/../templates/core/error/598-database-offline.html";
                 exit;
