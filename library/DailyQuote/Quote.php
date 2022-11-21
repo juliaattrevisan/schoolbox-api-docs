@@ -10,8 +10,15 @@
 
 namespace DailyQuote;
 
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+
 class Quote
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * Identifier
@@ -33,27 +40,6 @@ class Quote
      * @var string
      */
     private $author = '';
-
-    /**
-     * Created at
-     *
-     * @var string
-     */
-    private $createdAt = '';
-
-    /**
-     * Updated at
-     *
-     * @var string
-     */
-    private $updatedAt = '';
-
-    /**
-     * Deleted at
-     *
-     * @var string
-     */
-    private $deletedAt = '';
 
     /* Getters/Setters
      */
@@ -116,65 +102,5 @@ class Quote
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set created at
-     *
-     * @param string $createdAt
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    /**
-     * Get created at
-     *
-     * @return string
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set deleted at
-     *
-     * @param string $deletedAt
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-    }
-
-    /**
-     * Get deleted at
-     *
-     * @return string
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * Set updated at
-     *
-     * @param string $updatedAt
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    /**
-     * Get updated at
-     *
-     * @return string
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 }

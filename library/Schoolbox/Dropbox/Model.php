@@ -11,6 +11,8 @@ namespace Schoolbox\Dropbox;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
@@ -24,6 +26,9 @@ use Schoolbox\User;
  */
 class Model implements ISoftDeletable
 {
+    use CreatedAtDate;
+    use DeletedAtDate;
+
     /** @var int */
     protected $id;
 
@@ -39,34 +44,8 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $filename;
 
-    /** @var Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var Alaress_Date_Format */
-    protected $deletedAt;
-
     /** @var Storage */
     protected $storage;
-
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
 
 
     /**
@@ -186,37 +165,5 @@ class Model implements ISoftDeletable
     {
         $this->title = $title;
         return $this;
-    }
-
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-
-    /**
-     * @param Alaress_Date_Format $deletedAt
-     * @return self
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return $this->deletedAt instanceof Alaress_Date_Format
-            && $this->deletedAt->getUnixTimeStamp() < Alaress_Date_Format::now()->getUnixTimeStamp();
     }
 }

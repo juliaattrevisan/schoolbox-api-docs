@@ -13,10 +13,12 @@ namespace Schoolbox\Resource\Textbox;
 use Alaress\Json\Serializable;
 use Alaress\Json\SerializeTrait;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Model implements ISoftDeletable, Serializable
 {
+    use DeletedAtDate;
     use SerializeTrait;
 
     /**
@@ -46,13 +48,6 @@ class Model implements ISoftDeletable, Serializable
      * @var string
      */
     private $body = '';
-
-    /**
-     * Deleted
-     *
-     * @var \Alaress_Date_Format|null
-     */
-    private $deletedAt = '';
 
     /**
      * Check whether this textbox is softdeleted
@@ -117,28 +112,6 @@ class Model implements ISoftDeletable, Serializable
     public function getCategory()
     {
         return $this->category;
-    }
-
-    /**
-     * Set deleted at
-     *
-     * @param \Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * Get deleted at
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
     }
 
     /**

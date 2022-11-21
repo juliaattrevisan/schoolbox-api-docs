@@ -10,10 +10,16 @@
 
 namespace EOTC\ActivityLog;
 
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
 
 class Log
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * Log id
@@ -49,27 +55,6 @@ class Log
      * @var string
      */
     protected $message = '';
-
-    /**
-     * An instance of Alaress_Date_Format
-     *
-     * @var \Alaress_Date_Format
-     */
-    protected $createdAt;
-
-    /**
-     * An instance of Alaress_Date_Format
-     *
-     * @var \Alaress_Date_Format
-     */
-    protected $updatedAt;
-
-    /**
-     * An instance of Alaress_Date_Format
-     *
-     * @var \Alaress_Date_Format
-     */
-    protected $deletedAt;
 
     /**
      * The final notification string
@@ -119,46 +104,6 @@ class Log
     }
 
     /**
-     * Set created at
-     *
-     * @param \Alaress_Date_Format $createdAt
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    /**
-     * Get created at
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set deleted at
-     *
-     * @param \Alaress_Date_Format $deletedAt
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-    }
-
-    /**
-     * Get deleted at
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
      * Set id
      *
      * @param string $id
@@ -196,26 +141,6 @@ class Log
     public function getMessage()
     {
         return $this->message;
-    }
-
-    /**
-     * Set updated at
-     *
-     * @param null $updatedAt
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    /**
-     * Get updated at
-     *
-     * @return null
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 
     /**

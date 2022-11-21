@@ -13,6 +13,8 @@ namespace Schoolbox\Tile\Layout;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Role;
@@ -20,6 +22,9 @@ use Schoolbox\Tile\Model as TileModel;
 
 class Model implements ISoftDeletable, \JsonSerializable
 {
+    use CreatedAtDate;
+    use DeletedAtDate;
+
     /**
      * Value of $layoutType for grid layouts.
      *
@@ -114,17 +119,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @var Alaress_Date_Format
      */
-    protected $createdAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
     protected $modifiedAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $deletedAt;
 
 
     /**
@@ -213,42 +208,6 @@ class Model implements ISoftDeletable, \JsonSerializable
     public function getColumnCount()
     {
         return $this->columnCount;
-    }
-
-    /**
-     * @param  Alaress_Date_Format $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param  Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
     }
 
     /**
@@ -517,16 +476,6 @@ class Model implements ISoftDeletable, \JsonSerializable
             || $this->isPanoramicShape()
             || $this->isBannerShape()
         );
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return $this->getDeletedAt() instanceof Alaress_Date_Format;
     }
 
     /**

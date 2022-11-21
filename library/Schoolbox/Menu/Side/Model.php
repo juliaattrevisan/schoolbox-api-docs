@@ -10,9 +10,12 @@
 namespace Schoolbox\Menu\Side;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class Model implements ISoftDeletable
 {
+    use DeletedAtDate;
+
     /** @var int */
     protected $id;
 
@@ -30,9 +33,6 @@ class Model implements ISoftDeletable
 
     /** @var string */
     protected $target;
-
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
 
     /** @var \Schoolbox\Collection */
     protected $children;
@@ -151,34 +151,6 @@ class Model implements ISoftDeletable
     public function getSortOrder()
     {
         return $this->sortOrder;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return self
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $deletedAt
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return null !== $this->getDeletedAt();
     }
 
     /**

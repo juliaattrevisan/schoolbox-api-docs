@@ -11,11 +11,13 @@ namespace Schoolbox\Resource\Folder\Code;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder;
 
 class Model implements ISoftDeletable
 {
     use CreateCollection;
+    use DeletedAtDate;
 
     // Maximum length allowed for folder codes
     public const CODE_LENGTH_MAX = 20;
@@ -29,11 +31,6 @@ class Model implements ISoftDeletable
      * @var string
      */
     protected $code;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $deletedAt;
 
     /**
      * @param  Folder\Model $folder
@@ -69,29 +66,5 @@ class Model implements ISoftDeletable
     public function getCode()
     {
         return $this->code;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return $this->getDeletedAt() instanceof \Alaress_Date_Format;
     }
 }

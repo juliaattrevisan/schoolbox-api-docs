@@ -12,12 +12,17 @@ namespace Schoolbox\Tile;
 
 use Alaress_Date_Format;
 use Alaress\Color\Color;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Tile\Layout;
 use Schoolbox\ISoftDeletable;
 
 class Model implements ISoftDeletable, \JsonSerializable
 {
+    use CreatedAtDate;
+    use DeletedAtDate;
+
     /**
      * Value of $titlePosition for when it's at the top left.
      *
@@ -186,17 +191,7 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @var Alaress_Date_Format
      */
-    protected $createdAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
     protected $modifiedAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $deletedAt;
 
     /**
      * Creates this object with sensible default colors.
@@ -471,42 +466,6 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * @param  Alaress_Date_Format $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param  Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
      * @param  int $id
      * @return $this
      */
@@ -646,16 +605,6 @@ class Model implements ISoftDeletable, \JsonSerializable
                 // Center
                 return 'background-middle background-center';
         }
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return $this->getDeletedAt() instanceof Alaress_Date_Format;
     }
 
     /**

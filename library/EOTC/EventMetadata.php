@@ -13,17 +13,20 @@ namespace EOTC;
 use EOTC\ActivityLog\Log as ActivityLog;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\ResourceBooking\Booking\Model as ResourceBooking;
 
 class EventMetadata
 {
-
-    /**
-     * @var int
-     */
-    private $id = null;
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * @var EventType
@@ -76,21 +79,6 @@ class EventMetadata
     protected $permissionSlipRequired = false;
 
     /**
-     * @var \Alaress_Date_Format
-     */
-    private $createdAt = null;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    private $updatedAt = null;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    private $deletedAt = null;
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -103,42 +91,6 @@ class EventMetadata
 
     /* Getters/Setters
      */
-
-    /**
-     * @param \Alaress_Date_Format $createdAt
-     * @return self $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return self $this
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
 
     /**
      * @param EventType $eventType
@@ -210,24 +162,6 @@ class EventMetadata
     public function getStatus()
     {
         return $this->status;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $updatedAt
-     * @return self $this
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 
     /**
