@@ -63,20 +63,20 @@ class Timespan implements IColumnType
             return intval($value);
         }
         if ($value instanceof DateInterval) {
-            $hours    = $value->format('%h');
-            $minutes  = $value->format('%i');
-            $seconds  = $value->format('%s');
+            $hours    = (int)$value->format('%h');
+            $minutes  = (int)$value->format('%i');
+            $seconds  = (int)$value->format('%s');
             $negative = $value->invert;
         } elseif (preg_match('/^(?P<i>-)?(?P<h>\\d+):(?P<m>\\d+):(?P<s>\\d+)$/', $value, $matches)) {
             // H:MM:SS
-            $hours    = $matches['h'];
-            $minutes  = $matches['m'];
-            $seconds  = $matches['s'];
+            $hours    = (int)$matches['h'];
+            $minutes  = (int)$matches['m'];
+            $seconds  = (int)$matches['s'];
             $negative = !empty($matches['i']);
         } elseif (preg_match('/^(?P<i>-)?(?P<h>\\d+):(?P<m>\\d+)$/', $value, $matches)) {
             // H:MM
-            $hours    = $matches['h'];
-            $minutes  = $matches['m'];
+            $hours    = (int)$matches['h'];
+            $minutes  = (int)$matches['m'];
             $seconds  = 0;
             $negative = !empty($matches['i']);
         }

@@ -201,6 +201,11 @@ parameters:
 			path: library/Alaress/Date/Format.php
 
 		-
+			message: "#^Dead catch \\- InvalidArgumentException is never thrown in the try block\\.$#"
+			count: 1
+			path: library/Alaress/Date/Format.php
+
+		-
 			message: "#^Method Alaress_Date_Format\\:\\:get12Hour\\(\\) should return int but returns string\\.$#"
 			count: 1
 			path: library/Alaress/Date/Format.php
@@ -573,11 +578,6 @@ parameters:
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 4
-			path: library/AllowedFile.php
-
-		-
-			message: "#^Variable \\$files might not be defined\\.$#"
-			count: 1
 			path: library/AllowedFile.php
 
 		-
@@ -1489,16 +1489,6 @@ parameters:
 			message: "#^Variable \\$tabList in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Eportfolio/Page/Instance.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Eportfolio/Page/Showcase.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Eportfolio/Page/Showcase.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
@@ -2426,19 +2416,9 @@ parameters:
 			path: library/Schoolbox/Admin/Service/Controller.php
 
 		-
-			message: "#^Method Schoolbox\\\\Admin\\\\Settings\\\\FieldType\\\\AbstractRenderer\\:\\:getData\\(\\) should return array\\<string\\> but returns array\\<string, bool\\|string\\|null\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Settings/FieldType/AbstractRenderer.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Settings/FieldType/FileMulti/Renderer.php
-
-		-
-			message: "#^Property Schoolbox\\\\Admin\\\\Timezone\\\\Timezone\\:\\:\\$offset \\(int\\) does not accept array\\|string\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Timezone/Timezone.php
 
 		-
 			message: "#^Property Schoolbox\\\\Admin\\\\Usage\\\\Controller\\:\\:\\$errorMapper is never read, only written\\.$#"
@@ -4091,16 +4071,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/IdFinder.php
 
 		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\IdFinder\\:\\:getClauseTerm\\(\\) should return array\\<string\\> but returns array\\<int, array\\|string\\>\\.$#"
-			count: 2
-			path: library/Schoolbox/Filter/Filters/Assessment/IdFinder.php
-
-		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\IdFinder\\:\\:getClauseYear\\(\\) should return array\\<string\\> but returns array\\<int, array\\|string\\>\\.$#"
-			count: 2
-			path: library/Schoolbox/Filter/Filters/Assessment/IdFinder.php
-
-		-
 			message: "#^Result of && is always false\\.$#"
 			count: 26
 			path: library/Schoolbox/Filter/Filters/Assessment/IdFinder.php
@@ -4149,6 +4119,11 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\Collection and null will always evaluate to false\\.$#"
 			count: 2
 			path: library/Schoolbox/Filter/Filters/Event/Matcher.php
+
+		-
+			message: "#^If condition is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Filter/Test/Assessment/LogicTests.php
 
 		-
 			message: "#^Result of \\|\\| is always true\\.$#"
@@ -5334,11 +5309,6 @@ parameters:
 			message: "#^If condition is always false\\.$#"
 			count: 11
 			path: library/Schoolbox/Learning/MarkScheme/Test/AssessableTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\MarkScheme\\\\Test\\\\CompletionTest\\:\\:provider_normalised_valid\\(\\) should return array\\<array\\<int\\>\\> but returns array\\<int, array\\<int, float\\|int\\>\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/Test/CompletionTest.php
 
 		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
@@ -6984,21 +6954,6 @@ parameters:
 			message: "#^Method class@anonymous/tools/custom/wes/changeType\\.php\\:11\\:\\:getRecordIdsFromTypeName\\(\\) is unused\\.$#"
 			count: 1
 			path: tools/custom/wes/changeType.php
-
-		-
-			message: "#^Offset 'map' does not exist on array\\{\\}\\|array\\{map\\?\\: array\\<int, array\\{field\\: mixed, property\\: string, type\\: string, selftype\\: string, id\\: bool\\}\\>, model\\?\\: non\\-falsy\\-string, table\\?\\: array\\|string\\|null\\}\\.$#"
-			count: 1
-			path: tools/mapper-template.php
-
-		-
-			message: "#^Offset 'model' does not exist on array\\{\\}\\|array\\{map\\?\\: array\\<int, array\\{field\\: mixed, property\\: string, type\\: string, selftype\\: string, id\\: bool\\}\\>, model\\?\\: non\\-falsy\\-string, table\\?\\: array\\|string\\|null\\}\\.$#"
-			count: 3
-			path: tools/mapper-template.php
-
-		-
-			message: "#^Offset 'table' does not exist on array\\{\\}\\|array\\{map\\?\\: array\\<int, array\\{field\\: mixed, property\\: string, type\\: string, selftype\\: string, id\\: bool\\}\\>, model\\?\\: non\\-falsy\\-string, table\\?\\: array\\|string\\|null\\}\\.$#"
-			count: 1
-			path: tools/mapper-template.php
 
 		-
 			message: "#^Variable \\$addParamsShort might not be defined\\.$#"

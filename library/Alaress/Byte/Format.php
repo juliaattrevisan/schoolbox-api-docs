@@ -87,6 +87,6 @@ class Alaress_Byte_Format
 
         $power = array_search(strtoupper($exponent), ['B','K','M','G','T']);
 
-        return (int)round($mantissa * ($multiplier ** $power), 0);
+        return (int)round((int)$mantissa * ($multiplier ** $power), 0);
     }
 }

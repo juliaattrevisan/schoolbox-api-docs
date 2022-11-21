@@ -165,6 +165,8 @@ class AllowedFile extends DeprecatedModel
         //get a list of filenames from mime
         $dir  = WEB_root . '/static/images/mime/';
         $path = opendir($dir);
+        $files = [];
+
         while (false !== ($file = readdir($path))) {
             if ($file != "." && $file != "..") {
                 if (is_file($dir . "/" . $file)) {
@@ -173,7 +175,7 @@ class AllowedFile extends DeprecatedModel
             }
         }
 
-        if ($files) {
+        if (count($files) > 0) {
             natcasesort($files);
         }
         closedir($path);

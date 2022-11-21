@@ -59,7 +59,7 @@ class Postman
 
             $json = json_encode($array);
 
-            if ($json === '') {
+            if (empty($json)) {
                 // message could not be serialized, therefore cannot be delivered
                 $this->log->notice('Broken message, was unable to json_encode', ['char' => '?']);
                 continue;
