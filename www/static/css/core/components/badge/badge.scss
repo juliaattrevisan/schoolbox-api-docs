@@ -243,11 +243,11 @@
     }
 }
 
-.awards, .activity-feed, .badge-modal, .badges {
+.awards, .activity-feed, .badge-modal, .badges, .evidence-badge-container {
     /* Goals are greyscaled
      * Achievements are full colour
      */
-    img.goal {
+    .goal {
         filter: grayscale(100%);
     }
 }

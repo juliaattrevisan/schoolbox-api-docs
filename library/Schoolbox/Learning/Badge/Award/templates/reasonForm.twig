@@ -1,0 +1,55 @@
+<div class="row">
+    <div class="small-12 island">
+        <div class="actions-small-2 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Evidence</h2>
+                </div>
+            </div>
+        </div>
+        <form action="{{ postRoute }}" method="post" id="evidence-form">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="targetUserIds" value="{{ targetUserIds }}">
+                        <input type="hidden" name="badgeIds" value="{{ badgeIds }}">
+                        <p class="meta">Provide evidence or narrative on how the
+                            {{ isGoal ? 'goal is progressing.' : 'achievement was earned.' }}
+                            {% if USER.role.staff %}
+                                You may use the following tokens that will be substituted with the
+                                students details on creation:
+                                [firstname], [preferredname], [surname], [fullname], [year], [house]
+                            {% endif %}
+                        </p>
+                        <textarea id="reason" name="reason">{{ reason }}</textarea>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <ul class="flex-list buttons">
+                        <li><a href="{{ cancelUrl }}" class="button">Cancel</a></li>
+                        <li><input type="submit" value="{{ submitLabel }}" /></li>
+                    </ul>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+
+    /**
+     * Add the ckeditor config, adding the user token if the user is an admin
+     */
+    const baseConfig = {
+        targetElements: $('#reason')
+    };
+    {% if USER.role.staff %}
+    $.fn.alaressEditor($.alaressEditorConfigWithUserTokens(baseConfig));
+    {% else %}
+    $.fn.alaressEditor(baseConfig);
+    {% endif %}
+
+    $('#evidence-form').alaressValidate();
+
+</script>

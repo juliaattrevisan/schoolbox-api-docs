@@ -204,7 +204,7 @@ export default {
                     this.toastSuccess('Achievement awarded');
 
                     // Once awarded: update the award within this object
-                    this.award = response.data[0];
+                    this.award = response.data;
 
                     this.$emit('on-achievement-awarded', this.award); //dispatch to react specifically to this badge achievement
 
@@ -260,7 +260,96 @@ export default {
          */
         getReturnUrl() {
             return (this.returnUrl !== null) ? `?returnUrl=${this.returnUrl}` : '';
-        }
+        },
+
+        /**
+         * The existence of award.award let us know that
+         * the award is a goal and it's been awarded
+         *
+         * @returns { boolean }
+         */
+        isAwardedGoal () {
+            return this.award.award !== null;
+        },
+
+        /**
+         * The award is a goal and its yet to be awarded,
+         * so it could be awarded
+         *
+         * @returns { boolean }
+         */
+        isUnawardedGoal () {
+            return this.award.isGoal && this.award.award === null;
+        },
+
+        /**
+         * The existence of the link will determine if the
+         * user has permission to access it
+         *
+         * @returns { boolean }
+         */
+        hasGoalAwardLink () {
+            return this.award._links?.goalAward !== null;
+        },
+
+        /**
+         * The existence of the link will determine if the
+         * user has permission to access it
+         *
+         * @returns { boolean }
+         */
+        hasAwardUpdateLink () {
+            return this.award._links?.awardUpdate !== null;
+        },
+
+        /**
+         * If there's already evidence we can view linked to
+         * the award.
+         *
+         * @param { object }
+         *
+         * @returns { boolean }
+         */
+        hasEvidence (award) {
+            return award.reason !== null && award.reason.length > 0;
+        },
+
+        /**
+         * If the award is an achieved goal that has evidence.
+         *
+         * @returns { boolean }
+         */
+        awardedGoalHasEvidence () {
+            return this.award.award !== null && this.hasEvidence(this.award.award);
+        },
+
+        /**
+         * If the award is an achieved goal that has evidence, we should show
+         * the evidence linked to the achievement. Not the evidence that may
+         * be linked to the goal. Accessing this link assumes the existence
+         * and ability to add evidence has been checked elsewhere.
+         *
+         * @returns { string }
+         */
+        getViewEvidenceLink () {
+            // check if it's a goal that's been achieved which has evidence, otherwise a goal/achievement with evidence
+            const awardId = this.awardedGoalHasEvidence(this.award) ? this.award.award.id : this.award.id;
+            return `/learning/badge/award/${awardId}/viewEvidence${this.getReturnUrl()}`
+        },
+
+        /**
+         * If the award is an achieved goal, we should create evidence on the achievement,
+         * not on the goal. Accessing this link assumes the existence
+         * and ability to add evidence has been checked elsewhere.
+         *
+         * @returns { string }
+         */
+        getAddEvidenceLink () {
+            // check if it's a goal that's been achieved so link to the achievement evidence, not the goal evidence, otherwise just link to the goal/achievement link
+            const awardId = this.isAwardedGoal(this.award) ? this.award.award.id : this.award.id;
+            return `/learning/badge/award/${awardId}/update${this.getReturnUrl()}`
+        },
+
     }
 }
 </script>
@@ -316,37 +405,37 @@ export default {
                     <article v-if="award.badge.body" v-html="award.badge.body"></article>
                     <div class="component-action">
                         <section>
-                            <template v-if="award._links.goalAward && award.isGoal && !award.award">
-                                <a
-                                    title="Award with evidence"
-                                    class="button"
-                                    :href="getEvidenceUrl(award.badge.id)"
-                                >
-                                    Award with Evidence
-                                </a>
-                                <button
-                                    @click.prevent="awardAchievement"
-                                    @keyup.enter="awardAchievement"
-                                >
-                                    Award
-                                </button>
-                            </template>
                             <a
-                                v-else-if="award.reason && award.reason.length"
+                                v-if="awardedGoalHasEvidence() || hasEvidence(award)"
                                 title="View evidence"
                                 class="button"
-                                :href="`/learning/badge/award/${award.id}/viewEvidence`+getReturnUrl()"
+                                :href="getViewEvidenceLink()"
                             >
                                 View Evidence
                             </a>
                             <a
-                                v-else-if="award._links.awardUpdate"
+                                v-else-if="hasAwardUpdateLink()"
                                 title="Add evidence"
                                 class="button"
-                                :href="`/learning/badge/award/${award.id}/update`+getReturnUrl()"
+                                :href="getAddEvidenceLink()"
                             >
                                 Add Evidence
                             </a>
+                            <a
+                                v-if="hasGoalAwardLink() && isUnawardedGoal() && !hasEvidence(award)"
+                                title="Award with evidence"
+                                class="button"
+                                :href="getEvidenceUrl(award.badge.id)"
+                            >
+                                Award with Evidence
+                            </a>
+                            <button
+                                v-if="hasGoalAwardLink() && isUnawardedGoal()"
+                                @click.prevent="awardAchievement"
+                                @keyup.enter="awardAchievement"
+                            >
+                                Award
+                            </button>
                         </section>
                     </div>
                 </div>

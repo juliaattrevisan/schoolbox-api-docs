@@ -1,17 +1,18 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     [ award.recipient.fullname, routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id}) ],
-    ['Achievement Evidence']
+    [ award.status | capitalize ~ ' Evidence']
 ) }}
 {% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
 {% set modifyRoute = routeLookupIfAuthorized('learningBadgeAward.getAwardUpdate', {awardId: award.id}) %}
 {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
+{% set awardRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardAchieve', {awardId: award.id}) %}
 <script>
     $(function () {
         $('[data-delete-evidence]').click(function (e) {
             e.preventDefault();
             $(this).confirmDialog({
-                text: 'Are you sure you want to delete the evidence from this achievement?',
+                text: 'Are you sure you want to delete the evidence from this {{ award.status }}?',
                 confirmEvent: function () {
                     $.post('{{ postRoute }}', {
                         reason: ''
@@ -21,13 +22,21 @@
                 }
             });
         });
+        $('[data-award-goal]').click(function (e) {
+            e.preventDefault();
+            $.post('{{ awardRoute }}', {}).done(function (response) {
+                if (response.viewUrl !== 'undefined') {
+                    window.location.href = response.viewUrl;
+                }
+            });
+        });
     });
 </script>
 <div class="row">
     <div class="small-12 columns">
-        <h1>Achievement Evidence</h1>
+        <h1>{{ award.status | capitalize }} Evidence</h1>
         <ul class="meta">
-            <li class="icon-achievement">Awarded
+            <li class="icon-{{ award.status }}">{{ award.status == 'goal' ? 'Goal set' : 'Awarded' }}
                 <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
                 by
                 {% if awardedByRoute %}
@@ -36,10 +45,14 @@
                     {{ award.awardedBy.fullname }}
                 {% endif %}
             </li>
+            {% if award.status == 'goal' and award.award %}
+                <li class="icon-achievement">Goal has been achieved <time title="{{ award.award.awardedAt.local }}">{{ award.award.awardedAt.relativeTime }}</time></li>
+            {% endif %}
         </ul>
     </div>
 </div>
-{% include '@learningBadgeAward/awardBadgeList.twig' %}
+{% include '@learningBadgeAward/awardBadgeList.twig'
+    with {badges: badges, isGoal: award.isGoal} only %}
 <div class="row">
     <div class="small-12 island">
         <div class="actions-small-2 row">
@@ -74,6 +87,7 @@
             <div class="small-12 columns">
                 <ul class="flex-list buttons">
                     <li><a href="{{ cancelUrl }}" class="button">Return to previous page</a></li>
+                    {% if award.isGoal and award.award is empty and awardRoute %}<li><a data-award-goal class="button submit">Award</a></li>{% endif %}
                 </ul>
             </div>
         </div>

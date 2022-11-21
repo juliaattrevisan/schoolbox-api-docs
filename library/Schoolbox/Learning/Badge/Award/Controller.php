@@ -36,6 +36,7 @@ use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Schoolbox\Learning\Badge\Translator as BadgeTranslator;
 use Schoolbox\Resource\Storage;
+use Schoolbox\TokenReplacer;
 
 use function count;
 use function in_array;
@@ -287,6 +288,8 @@ class Controller extends Base
      *
      * @param GenericCollection $users
      * @return void
+     * @api   GET /learning/badge/award/user/{userIds}/award
+     * @since 22.1
      */
     public function getAwardWithEvidenceForm(GenericCollection $users): void
     {
@@ -306,6 +309,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardWithEvidenceForm.twig',
                 [
+                    'isGoal'        => false,
                     'badges'        => $badges->map($badgeTranslator),
                     'badgeIds'      => implode(',', $badges->getPropertyValues('id')),
                     'targetUsers'   => $users->map($userTranslator),
@@ -323,6 +327,8 @@ class Controller extends Base
      * @return void
      * @throws MapperException
      * @throws \Alaress\Web\Controller\Exception
+     * @api   POST /learning/badge/award/user/awardWithEvidence
+     * @since 22.1
      */
     public function postAwardWithEvidence(): void
     {
@@ -349,6 +355,9 @@ class Controller extends Base
      * Show award detail with evidence
      * @param \Schoolbox\Learning\Badge\Award\Model $award
      * @return void
+     * @throws RouteNotFound
+     * @since 22.1
+     * @api   GET /learning/badge/award/{awardId}/viewEvidence
      */
     public function getAwardWithEvidence(AwardModel $award): void
     {
@@ -552,13 +561,14 @@ class Controller extends Base
          */
         $userIds = $users->getPropertyValues('id');
         $histories = $this->mapper->findHistories($userIds, $badge);
+        $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
 
         foreach ($users as $user) {
             $award = $this->mapper->createModel()
                 ->setRecipient($user)
                 ->setBadge($badge)
                 ->setStatus($status)
-                ->setReason($reason)
+                ->setReason($tokenReplacer->replace($reason, $user))
                 ->setAwardedBy($this->getUser())
                 ->setAwardedAt(Alaress_Date_Format::now());
             $award = $award->setExpiresAt((new ExpiryHelper())->determineExpiry($award));
@@ -789,7 +799,11 @@ class Controller extends Base
      */
     public function postAwardUpdate(AwardModel $award): void
     {
-        $award->setReason($this->request->post['reason']);
+        // hydrate student for token replacer
+        $student       = $this->userMapper->findById($award->getRecipient()->getId());
+        $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+        $reason        = trim($this->request->post->get('reason') ?? '');
+        $award->setReason($tokenReplacer->replace($reason, $student));
 
         $this->mapper->save($award);
 
@@ -805,6 +819,48 @@ class Controller extends Base
             $redirectUrl = Redirect::decode($this->request->query->get(Redirect::RETURN_URL));
         }
         $this->response->redirect->to($redirectUrl);
+    }
+
+
+    /**
+     * Create a new achievement award from the goal award given
+     *
+     * @param AwardModel $award
+     * @return void
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     * @api   POST /learning/badge/award/{awardId}/achieve
+     * @since 22.1
+     */
+    public function postAwardAchieve(AwardModel $award): void
+    {
+        if ($award->isAchievement()) {
+            $this->sendJsonError("Award {$award->getId()} is already achieved", 400);
+            return;
+        }
+
+        // create new achievement award from award
+        $achievement = $this->mapper->createModel()
+                                    ->setRecipient($award->getRecipient())
+                                    ->setBadge($award->getBadge())
+                                    ->setReason($award->getReason())
+                                    ->setStatus(AwardModel::AWARD_STATUS_ACHIEVEMENT)
+                                    ->setAwardedBy($this->getUser())
+                                    ->setAwardedAt(Alaress_Date_Format::now());
+        $achievement = $achievement->setExpiresAt((new ExpiryHelper())->determineExpiry($achievement));
+        $this->mapper->save($achievement);
+
+        // set the achievement as award_id
+        $award->setAward($achievement);
+        $this->mapper->save($award);
+
+        $translator      = $this->buildBadgeAwardModelToArrayTranslator();
+        $data['viewUrl'] = $this->router->generate('learningBadgeAward.getAwardWithEvidence', ['awardId' => $achievement->getId()]);
+        $this->response->status->setCode(201);
+        $this->response->content->set(
+            $this->buildJsonOutput(array_merge($translator($achievement), $data))
+        );
     }
 
 

@@ -3,58 +3,39 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     [ award.recipient.fullname, routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id}) ],
-    ['Achievement Evidence']
+    [ (award.status | capitalize) ~ ' Evidence']
 ) }}
 {% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
 <div class="row">
     <div class="small-12 columns">
-        <h1>Achievement Evidence</h1>
+        <h1>{{ award.status | capitalize }} Evidence</h1>
         <ul class="meta">
-            <li class="icon-achievement">Awarded
-                <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time> by
+            <li class="icon-{{ award.status }}">{{ award.isGoal ? 'Goal set' : 'Awarded' }}
+                <time title="{{ award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
+                by
                 {% if awardedByRoute %}
                     <a href="{{ awardedByRoute }}">{{ award.awardedBy.fullname }}</a>
                 {% else %}
                     {{ award.awardedBy.fullname }}
                 {% endif %}
             </li>
+            {% if award.status == 'goal' and award.award %}
+                <li class="icon-achievement">Goal has been achieved
+                    <time title="{{ award.award.awardedAt.local }}">{{ award.awardedAt.relativeTime }}</time>
+                </li>
+            {% endif %}
         </ul>
     </div>
 </div>
-{% include '@learningBadgeAward/awardBadgeList.twig' %}
-<div class="row">
-    <div class="small-12 island">
-        <div class="actions-small-2 row">
-            <div class="list-item">
-                <div class="small-12 columns">
-                    <h2 class="subheader">Evidence</h2>
-                </div>
-            </div>
-        </div>
-        {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
-        <form action="{{ postRoute ~ '?returnUrl=' ~ returnUrl }}" method="post" id="evidence-form">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <p class="meta">Provide evidence or narrative on how the achievement was earned.</p>
-                        <textarea id="reason" name="reason">{{ award.reason }}</textarea>
-                    </div>
-                </fieldset>
-            </section>
-            <div class="row">
-                <div class="small-12 columns">
-                    <ul class="flex-list buttons">
-                        <li><a href="{{ cancelUrl }}" class="button">Cancel</a></li>
-                        <li><input type="submit" value="Save" /></li>
-                    </ul>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-<script>
-    $.fn.alaressEditor({
-        targetElements: $('#reason'),
-    });
-    $('#evidence-form').alaressValidate();
-</script>
+{% include '@learningBadgeAward/awardBadgeList.twig'
+    with {badges: badges, isGoal: award.isGoal} only %}
+{% include '@learningBadgeAward/reasonForm.twig'
+    with {
+    postRoute: routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id})~ '?returnUrl=' ~ returnUrl,
+    isGoal : award.isGoal,
+    reason : award.reason,
+    submitLabel: 'Save',
+    targetUserIds: null,
+    badgeIds: null,
+    cancelUrl: cancelUrl,
+} only %}
