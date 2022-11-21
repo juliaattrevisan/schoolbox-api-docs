@@ -21,7 +21,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
-use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -138,7 +138,7 @@ class Helper
                     ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti) &&
                     $folderAssessment->getWorkType() &&
                     \in_array($folderAssessment->getWorkType()->getId(), $workTypes->getPropertyValues('id'), true) &&
-                    $visibility->isVisibleToUser($folderAssessment, $viewee, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
+                    $visibility->isVisibleToUser($folderAssessment, $viewer, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
                 ) {
                     $workTypeAssessments->add($folderAssessment);
                 }
