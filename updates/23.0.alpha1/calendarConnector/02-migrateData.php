@@ -66,7 +66,7 @@ HELP;
             $configBase64Decoded = base64_decode($row['_config']);
 
             if ($configBase64Decoded === false) {
-                echo " * Could not base64_decode() string.  Skipping.\n";
+                echo " * Could not base64_decode() _config.  Skipping.\n";
                 echo "   (_config: '{$row['_config']}')\n";
                 continue;
             }
@@ -74,8 +74,9 @@ HELP;
             $config = unserialize($configBase64Decoded, ['Calendar_Api_Config_Connector_Abstract']);
 
             if ($config === false) {
-                echo " * Could not unserialize() string.  Skipping.\n";
-                echo "   (string: '$configBase64Decoded')\n";
+                echo " * Could not unserialize() _configBase64Decoded.  Skipping.\n";
+                echo "   (_config: '{$row['_config']}')\n";
+                echo "   (_configBase64Decoded: '$configBase64Decoded')\n";
                 continue;
             }
 
