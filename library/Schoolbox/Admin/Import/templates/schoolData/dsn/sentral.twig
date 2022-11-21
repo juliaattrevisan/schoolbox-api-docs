@@ -31,8 +31,11 @@
 
                 <div class="row">
                     <div class="small-12 columns">
-                        <label class="required">Parent</label>
-                        <span class="meta">Select which type(s) of contact will be identified as parents of students.</span>
+                        <label>Parent</label>
+                        <span class="meta">
+                            Select which type(s) of contact will be identified as parents of students.
+                            (If none are selected, "Parent, Step-Parent, Adoptive Parent, Foster Parent, Guardian" will be identified by default.)
+                        </span>
 
                         {# Sentral implements a SIF lookup
                          # http://specification.sifassociation.org/Implementation/AU/3.4.3/CodeSets.html
@@ -62,11 +65,21 @@
                             }
                         %}
 
-                        <select name="dsn[sentral][options][parentRelationIds][]" size="8" class="required" multiple>
-                            {% for id, name in parentRelationLookup %}
-                                <option value="{{ id }}" {% if id in options.parentRelationIds ?? [] %}selected="selected"{% endif%}>{{ name }}</option>
-                            {% endfor %}
-                        </select>
+                        <fieldset class="checklist">
+                            <ul class="option-list">
+                                {% for id, name in parentRelationLookup %}
+                                    <li>
+                                        <input id="dsnSentralOptionsParentRelationIds-{{ id }}"
+                                               name="dsn[sentral][options][parentRelationIds][]"
+                                               value="{{ id }}"
+                                               type="checkbox"
+                                               {% if id in options.parentRelationIds ?? [] %}checked{% endif%}
+                                        >
+                                        <label for="dsnSentralOptionsParentRelationIds-{{ id }}">{{ name }}</label>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </fieldset>
                     </div>
                 </div>
             </div>
