@@ -108,8 +108,8 @@ class Calendar_Api_Config_Record
             case Calendar_Api_Config_Connector_Vcal::class:
                 $configArray['url']           = $config->getUrl();
                 $configArray['authorization'] = $config->getAuthorization();
-                $configArray['campus']        = $config->getCampusIds();
-                $configArray['groups']        = $config->getGroupIds();
+                $configArray['campusIds']     = $config->getCampusIds();
+                $configArray['groupIds']      = $config->getGroupIds();
                 break;
 
             default:
@@ -161,8 +161,8 @@ class Calendar_Api_Config_Record
                 // These fields are stored in schoolbox.calendar_connector as a JSON string in the `config` column.
                 $obj->setUrl($config['url'] ?? '');
                 $obj->setAuthorization($config['authorization'] ?? '');
-                $obj->setCampusIds($config['campus'] ?? []);
-                $obj->setGroupIds($config['groups'] ?? []);
+                $obj->setCampusIds($config['campusIds'] ?? []);
+                $obj->setGroupIds($config['groupIds'] ?? []);
                 break;
 
             default:
