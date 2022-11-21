@@ -133,6 +133,15 @@ class Calendar_Api_Config_Record
         try {
             $config = json_decode($configJson, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException) {
+            // If we cannot decode the JSON-encoded config, start with an empty array.  We do this so that the user can
+            // still edit and fix the calendar connector config on page https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,
+            // even if the JSON config data has become corrupted for whatever reason.  Handling the JsonException here
+            // also allows for simpler code in calling functions.
+            trigger_error(
+                // Even though we are handling this exception, we still want to log when it happens.
+                "JSON string could not be decoded - empty object created instead. (JSON string: '$configJson')",
+                E_USER_WARNING
+            );
             $config = [];
         }
 
