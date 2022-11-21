@@ -244,8 +244,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 $periodListAdaption[$periodSequence] = [
                     'periodNumber'   => $period['sequence'],
                     'periodName'     => $period['title'],
-                    'periodStart'    => $startTime ? $startTime->getTimeOnly() : null,
-                    'periodEnd'      => $endTime ? $endTime->getTimeOnly() : null,
+                    'periodStart'    => $startTime?->getTimeOnly(),
+                    'periodEnd'      => $endTime?->getTimeOnly(),
                     'periodSequence' => 1,
                     'day'            => array_fill(1, $dayCount, []),
                 ];
@@ -474,8 +474,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             $periodAdaption = [
                 'periodNumber'   => $period['sequence'],
                 'periodName'     => $period['title'],
-                'periodStart'    => $startTime ? $startTime->getTimeOnly() : null,
-                'periodEnd'      => $endTime ? $endTime->getTimeOnly() : null,
+                'periodStart'    => $startTime?->getTimeOnly(),
+                'periodEnd'      => $endTime?->getTimeOnly(),
                 'periodSequence' => 1,
                 'class'          => [],
             ];
