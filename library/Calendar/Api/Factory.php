@@ -15,6 +15,7 @@
  */
 
 use Calendar\Api\ModuleChecker;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
@@ -197,8 +198,12 @@ class Calendar_Api_Factory
 
 
     /**
-     * Only show the Timetable related subscriptions, if enabled
+     * Only show the Timetable related subscriptions.
      * This is used specifically for the special Timetable Calendar representation
+     *
+     * This factory retrieves subscriptions whether or not they exist or are
+     * enabled: this is because the timetable calendar shouldn't depend on the
+     * standard calendar subscription status.
      *
      * @param User $user
      * @param User $viewer
@@ -210,56 +215,47 @@ class Calendar_Api_Factory
     public function produceForTimetableCalendar(User $user, User $viewer): Calendar_Api_EventType_Interface
     {
         $composite = new Calendar_Api_Composite();
-
-        $calendarConfigs = Calendar_Api_Config_Mapper::getInstance()->findActiveTimetableSubscriptions();
-
-        foreach ($calendarConfigs as $calendarConfig) {
-            switch ($calendarConfig->getEventType()) {
-                /* SUDS Timetable Events
-                 */
-                case 'SudsTimetable':
-                    $composite->add(new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
-                        $calendarConfig->getId(),
-                        $user,
-                        $viewer,
-                        null,
-                        $this->configLoader,
-                        \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-                        \Schoolbox\External\ClassEntryMapper::getInstance(),
-                        \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-                        \Schoolbox\External\Event\Mapper::getInstance(),
-                        \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-                        \Timetable_ColourMapper::getInstance(),
-                        \Schoolbox\External\Profile\Staff\Mapper::getInstance()
-                    ));
-                    break;
-
-                /* Live connector timetable subscription: Timetable/ExternalConstrained
-                 */
-                case 'Timetable':
-                    $composite->add(new Calendar_Api_EventType_Timetable_ExternalConstrained_Default(
-                        $calendarConfig->getId(),
-                        $user,
-                        $viewer,
-                        $this->configLoader,
-                        \Schoolbox\Calendar\EventTypeMapper::getInstance()
-                    ));
-                    break;
-
-                /* Live connector timetable subscription: Timetable/TimetableDays
-                 * (Not sure where this comes from, but it was a thing)
-                 */
-                case 'TimetableDays':
-                    $composite->add(new Calendar_Api_EventType_TimetableDays_External_Default(
-                        $calendarConfig->getId(),
-                        $user,
-                        $viewer,
-                        \Schoolbox\Calendar\EventTypeMapper::getInstance()
-                    ));
-                    break;
-            }
+        if (
+            (new ValidUsesSudsTimetable())->isSatisfiedBy(
+                (string)$this->configLoader->get('external_type'),
+                (string)$this->configLoader->get('schooldata_import_data_source'),
+            )
+        ) {
+            $composite->add(
+                new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
+                    -1,
+                    $user,
+                    $viewer,
+                    null,
+                    $this->configLoader,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                    \Schoolbox\External\ClassEntryMapper::getInstance(),
+                    \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                    \Schoolbox\External\Event\Mapper::getInstance(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                    \Timetable_ColourMapper::getInstance(),
+                    \Schoolbox\External\Profile\Staff\Mapper::getInstance()
+                )
+            );
+        } else {
+            $composite->add(
+                new Calendar_Api_EventType_Timetable_ExternalConstrained_Default(
+                    -1,
+                    $user,
+                    $viewer,
+                    $this->configLoader,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance()
+                )
+            );
+            $composite->add(
+                new Calendar_Api_EventType_TimetableDays_External_Default(
+                    -1,
+                    $user,
+                    $viewer,
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance()
+                )
+            );
         }
-
         return $composite;
     }
 
