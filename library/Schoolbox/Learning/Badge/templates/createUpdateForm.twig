@@ -64,7 +64,7 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="badge-name" class="required">Name</label>
-                        <input name="name" type="text" id="badge-name" required value="{{ badge and badge.name ? badge.name : '' }}"/>
+                        <input name="name" type="text" id="badge-name" required value="{{ badge and badge.name ? badge.name : '' }}" maxlength="255"/>
 
                         <label for="badge-body">
                             Description
@@ -429,9 +429,13 @@
                     },
                     body: JSON.stringify(payload)
                 })
-                .then(() => {
-                    toast.toastTimeout({text: 'Saved'});
-                    window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadgeListPage') }}';
+                .then((response) => {
+                    if (response.ok) {
+                        toast.toastTimeout({text: 'Saved'});
+                        window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadgeListPage') }}';
+                    } else {
+                        throw new Error("Save failed!");
+                    }
                 })
                 .catch(() => {
                     toast.toastTimeout({text: 'Save failed', css: 'alert'});
