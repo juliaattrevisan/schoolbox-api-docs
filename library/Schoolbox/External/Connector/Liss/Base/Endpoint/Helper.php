@@ -98,11 +98,11 @@ class Helper
         /* Recompile everything
          */
         $restructured = [
-            'guid' => trim((string)($currentEvent->me['struct']['Guid']->me['string'] ?? null)),
+            'guid' => trim((string)$currentEvent->me['struct']['Guid']->me['string']),
 
             /* Timing
              */
-            'period' => trim((string)($currentEvent->me['struct']['Period']->me['string'] ?? null)),
+            'period' => trim((string)$currentEvent->me['struct']['Period']->me['string']),
             'startDateTime' => new \Alaress_Date_Format($startDateTime, \Alaress_Date_Format::DATABASE_FORMAT),
             'endDateTime' => new \Alaress_Date_Format($endDateTime, \Alaress_Date_Format::DATABASE_FORMAT),
 
