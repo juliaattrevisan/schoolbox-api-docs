@@ -10,5 +10,3 @@ UPDATE calendar_connector SET config='';
 
 # Disallow nulls so we don't need to deal with them in code.  A blank string will mean the same as NULL, so we don't need NULL.
 ALTER TABLE calendar_connector CHANGE config config text NOT NULL;
-
-INSERT INTO calendar_connector SET event_type=CONCAT('SQL script ran at ', NOW()), config='', _config=NULL; # For testing.
