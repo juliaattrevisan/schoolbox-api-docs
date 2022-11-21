@@ -19,7 +19,8 @@ const myself: Developer = {
 /**
  * Say hello
  *
- * @param { Developer }
+ * @param {Developer} person - person to say hello to
+ * @returns {string} say hello
  */
 function hello(person: Developer): string {
     return `Hi there ${person.firstName.toUpperCase()}!`; // the IDE will allow better autocomplete on firstName as it knows it's a string
@@ -30,7 +31,7 @@ console.warn(hello(myself));
 /**
  * Log name or age
  *
- * @param { number or string }
+ * @param { number | string } nameOrAge - log either name or age
  */
 function printNameOrAge(nameOrAge: number | string): void {
     // union types can be used to declare multiple allowed property types
@@ -43,7 +44,7 @@ printNameOrAge(myself.age);
 /**
  * We can use optional parameters
  *
- * @param { string }
+ * @param {string} name - name to greet
  */
 function greet(name?: string): void {
     if (name) {

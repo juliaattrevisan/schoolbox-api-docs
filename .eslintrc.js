@@ -12,12 +12,16 @@ module.exports = {
         'airbnb-typescript/base', // https://www.npmjs.com/package/eslint-config-airbnb-typescript
         'plugin:@typescript-eslint/recommended', // https://typescript-eslint.io/docs/linting/configs#eslint-recommended
         'plugin:@typescript-eslint/recommended-requiring-type-checking', // https://typescript-eslint.io/docs/linting/configs#recommended-requiring-type-checking
+        'plugin:jsdoc/recommended', // https://www.npmjs.com/package/eslint-plugin-jsdoc
         'prettier', // https://typescript-eslint.io/docs/linting/configs#prettier
     ],
     parser: '@typescript-eslint/parser', // the parser that runs through our ts files
     parserOptions: {
         project: ['./tsconfig.json'],
     },
-    plugins: ['@typescript-eslint'], // for eslint to be using typescript-eslint
+    plugins: [
+        '@typescript-eslint', // for eslint to be using typescript-eslint
+        'eslint-plugin-jsdoc' // to lint jsdocs
+    ],
     root: true, // limits ESLint to this folder (wont go up parent folders)
 }
