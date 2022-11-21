@@ -178,16 +178,16 @@ interface IBuilder
     /**
      * Adds predicates for checking if this value is between two dates.
      *
-     * @param string|ISqlFunc      $columnName
-     * @param \Alaress_Date_Format $from If null, this value is excluded.
-     * @param \Alaress_Date_Format $to   If null, this value is excluded.
-     * @param string               $compareFormat
+     * @param string|ISqlFunc           $columnName
+     * @param \Alaress_Date_Format|null $from If null, this value is excluded.
+     * @param \Alaress_Date_Format|null $to   If null, this value is excluded.
+     * @param string                    $compareFormat
      * @return IBuilder
      */
     public function betweenDates(
         $columnName,
-        \Alaress_Date_Format $from = null,
-        \Alaress_Date_Format $to = null,
+        ?\Alaress_Date_Format $from = null,
+        ?\Alaress_Date_Format $to = null,
         $compareFormat = \Alaress_Date_Format::DATABASE_FORMAT
     );
 

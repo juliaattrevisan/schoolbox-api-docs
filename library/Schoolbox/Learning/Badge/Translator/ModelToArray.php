@@ -140,18 +140,16 @@ class ModelToArray
             'achievementExpiry' => $model->getAchievementExpiry(),
             'goalExpiry'        => $model->getGoalExpiry(),
             'curriculumNodes'   => $curriculumNodes
-                ? $curriculumNodes
-                    ->map(
-                        static function (Node\Model $node) {
-                            return [
-                                'id'   => $node->getId(),
-                                'name' => $node->getName(),
-                                'code' => $node->getCode(),
-                            ];
-                        }
-                    )
-                    ->reindex()
-                : null,
+                ?->map(
+                    static function (Node\Model $node) {
+                        return [
+                            'id'   => $node->getId(),
+                            'name' => $node->getName(),
+                            'code' => $node->getCode(),
+                        ];
+                    }
+                )
+                ->reindex(),
 
             // Tags don't exist yet, they will be added soon though
             'tags'              => null,

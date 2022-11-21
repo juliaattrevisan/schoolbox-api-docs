@@ -494,29 +494,24 @@ class Builder implements IBuilder
     /**
      * Adds predicates for checking if this value is between two dates.
      *
-     * @param string|ISqlFunc      $columnName
-     * @param Alaress_Date_Format  $from If null, this value is excluded.
-     * @param Alaress_Date_Format  $to   If null, this value is excluded.
-     * @param string               $compareFormat
+     * @param string|ISqlFunc          $columnName
+     * @param Alaress_Date_Format|null $from If null, this value is excluded.
+     * @param Alaress_Date_Format|null $to   If null, this value is excluded.
+     * @param string                   $compareFormat
      * @return null|$this
      * @throws InvalidColumnException If unable to parse column name
      */
     public function betweenDates(
         $columnName,
-        Alaress_Date_Format $from = null,
-        Alaress_Date_Format $to = null,
+        ?Alaress_Date_Format $from = null,
+        ?Alaress_Date_Format $to = null,
         $compareFormat = Alaress_Date_Format::DATABASE_FORMAT
     ): ?self {
-        $fromString = $toString = null;
-        if (isset($from)) {
-            $fromString = $from->getUsingFormat($compareFormat);
-        }
-        if (isset($to)) {
-            $toString = $to->getUsingFormat($compareFormat);
-        }
+        $fromString = $from?->getUsingFormat($compareFormat);
+        $toString   = $to?->getUsingFormat($compareFormat);
         try {
             return $this->between($columnName, $fromString, $toString);
-        } catch (TypeError $e) {
+        } catch (TypeError) {
             // Impossible to throw as we are passing null or string
             return null;
         }

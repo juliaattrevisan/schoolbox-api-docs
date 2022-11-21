@@ -504,10 +504,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $key = "{$assessment->getId()}.{$domainModelPlan->getId()}";
                 $notifsForPlans["$key.open"] = $this
                     ->internalNotifyOpen($assessment, $dataModelPlan, true)
-                    ->getAll($openDate ? $openDate->getUnixTimeStamp() : null);
+                    ->getAll($openDate?->getUnixTimeStamp());
                 $notifsForPlans["$key.closed"] = $this
                     ->internalNotifyClosed($assessment, $dataModelPlan, true)
-                    ->getAll($dueDate ? $dueDate->getUnixTimeStamp() : null);
+                    ->getAll($dueDate?->getUnixTimeStamp());
             }
         }
 

@@ -221,9 +221,9 @@ class MiddleYearsAssessmentTasks extends BaseComponent
             'assessmentTitle' => $statistics['assessmentTitle'],
             'studentMark'     => $statistics['studentMark'],
             'cohortAverage'   => $statistics['cohortAverage'],
-            'publishAt'       => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
-            'comment'         => $feedback ? $feedback->getComment() : null,
-            'commentBy'       => $feedback ? $feedback->getReviewer() : null,
+            'publishAt'       => $feedback?->getPublishedAt()->getDatabase(),
+            'comment'         => $feedback?->getComment(),
+            'commentBy'       => $feedback?->getReviewer(),
             'dueDate'         => $classAssessment->getDueAt(),
         ];
     }
@@ -244,12 +244,7 @@ class MiddleYearsAssessmentTasks extends BaseComponent
         }
 
         $participant = $assessable->getParticipantIfExtant($this->student);
-
-        if (!$participant) {
-            return null;
-        }
-
-        return $participant->getAuthoritativeFeedback(true);
+        return $participant?->getAuthoritativeFeedback(true);
     }
 
 

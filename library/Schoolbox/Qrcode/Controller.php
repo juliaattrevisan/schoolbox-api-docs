@@ -182,7 +182,7 @@ class Controller extends Base
 
         $payload = [
             'students' => $students,
-            'expiry'   => $expiry ? $expiry->getLocalShort() : null,
+            'expiry'   => $expiry?->getLocalShort(),
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
