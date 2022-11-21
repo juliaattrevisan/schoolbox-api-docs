@@ -119,18 +119,15 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             return $stack;
         }
 
+        // Find the event type from this connector's configuration:
+        // if there is no configuration, use the first meaningful event type
         try {
+            $configuration     = $this->loadConnectorConfiguration();
             $eventTypeSettings = (new \Schoolbox\External\Event\EventTypeGenerator($this->eventTypeMapper))
-                ->findEventType($this->loadConnectorConfiguration(), $allowedEventTypes);
+                ->findEventType($configuration, $allowedEventTypes);
+            $eventType = $eventTypeSettings['type'];
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $eventTypeSettings = null;
-        }
-
-        /* No event type for the ($config, $allowedEventTypes) combination
-         * or something went wrong with the event type detection
-         */
-        if (null === $eventTypeSettings) {
-            return $stack;
+            $eventType = $this->eventTypeMapper->findFirstMeaningfulId(null);
         }
 
         /* The list of events in which $this->getUser() is involved
@@ -178,7 +175,7 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $instance->setEndTime($timetableEvent->getFinishAt());
             $instance->setAllDay(false);
             $instance->setColour($timetableColorManager->getColour($timetableEvent->getCode()));
-            $instance->setType($eventTypeSettings['type']);
+            $instance->setType($eventType);
             $instance->setFolder($timetableEvent->getFolder());
             $instance->setStaff($timetableEvent->getStaff());
             $instance->setAttendanceUrl($attendanceLink);
