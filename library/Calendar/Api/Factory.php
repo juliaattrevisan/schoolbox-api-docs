@@ -223,7 +223,7 @@ class Calendar_Api_Factory
         ) {
             $composite->add(
                 new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
-                    -1,
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $user,
                     $viewer,
                     null,
@@ -240,7 +240,7 @@ class Calendar_Api_Factory
         } else {
             $composite->add(
                 new Calendar_Api_EventType_Timetable_ExternalConstrained_Default(
-                    -1,
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $user,
                     $viewer,
                     $this->configLoader,
@@ -249,7 +249,7 @@ class Calendar_Api_Factory
             );
             $composite->add(
                 new Calendar_Api_EventType_TimetableDays_External_Default(
-                    -1,
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $user,
                     $viewer,
                     \Schoolbox\Calendar\EventTypeMapper::getInstance()
