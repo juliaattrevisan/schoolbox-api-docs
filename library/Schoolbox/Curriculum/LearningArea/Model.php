@@ -11,6 +11,8 @@ use Alaress_Date_Format;
 use JsonSerializable;
 use Schoolbox\Curriculum\Source;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 /**
  * Model for curriculum learning areas.
@@ -27,6 +29,9 @@ use Schoolbox\ISoftDeletable;
  */
 class Model implements ISoftDeletable, JsonSerializable
 {
+    use CreatedAtDate;
+    use DeletedAtDate;
+
     /**
      * Primary key
      *
@@ -80,17 +85,7 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * @var Alaress_Date_Format
      */
-    protected $createdAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
     protected $modifiedAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $deletedAt;
 
     /**
      * @param  string $class
@@ -108,42 +103,6 @@ class Model implements ISoftDeletable, JsonSerializable
     public function getClass()
     {
         return $this->class;
-    }
-
-    /**
-     * @param  Alaress_Date_Format $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param  Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
     }
 
     /**
@@ -271,16 +230,6 @@ class Model implements ISoftDeletable, JsonSerializable
     {
         $this->order = $order;
         return $this;
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return ($this->getDeletedAt() instanceof Alaress_Date_Format);
     }
 
     /**

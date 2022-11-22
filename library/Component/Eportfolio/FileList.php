@@ -11,10 +11,14 @@
 namespace Component\Eportfolio;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
 class FileList extends ListItem implements ISoftDeletable
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /**
@@ -38,19 +42,6 @@ class FileList extends ListItem implements ISoftDeletable
      */
     private $file;
 
-    /**
-     * When the File List item was created
-     *
-     * @var \Alaress_Date_Format
-     */
-    private $created_at;
-
-    /**
-     * When the File List item was updated
-     * @var \Alaress_Date_Format
-     */
-    private $updated_at;
-
     /* Getters/Setters
      */
 
@@ -72,46 +63,6 @@ class FileList extends ListItem implements ISoftDeletable
     public function getFileId()
     {
         return $this->fileId;
-    }
-
-    /**
-     * Set created at
-     *
-     * @param \Alaress_Date_Format $created_at
-     */
-    public function setCreatedAt($created_at)
-    {
-        $this->created_at = $created_at;
-    }
-
-    /**
-     * Get created at
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->created_at;
-    }
-
-    /**
-     * Set updated at
-     *
-     * @param \Alaress_Date_Format $updated_at
-     */
-    public function setUpdatedAt($updated_at)
-    {
-        $this->updated_at = $updated_at;
-    }
-
-    /**
-     * Get updated at
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updated_at;
     }
 
     /**

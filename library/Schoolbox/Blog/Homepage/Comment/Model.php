@@ -12,11 +12,15 @@ namespace Schoolbox\Blog\Homepage\Comment;
 
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
 
 class Model implements ISoftDeletable
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /** @var int */
@@ -27,12 +31,6 @@ class Model implements ISoftDeletable
 
     /** @var User */
     protected $owner;
-
-    /** @var \Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $updatedAt;
 
     /** @var string */
     protected $body;
@@ -89,42 +87,6 @@ class Model implements ISoftDeletable
     public function getOwner()
     {
         return $this->owner;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param  \Alaress_Date_Format $updatedAt
-     * @return $this
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
     }
 
     /**

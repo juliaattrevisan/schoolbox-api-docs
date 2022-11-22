@@ -9,9 +9,11 @@
 namespace Schoolbox\Fixtures\Position;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Alaress_Date_Format;
 use Schoolbox\Fixtures\Sport\Model as Sport;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
 /**
  * Represents a Position a player may take in some Sport.
@@ -23,7 +25,8 @@ use Schoolbox\Fixtures\Sport\Model as Sport;
  */
 class Model implements ISoftDeletable, \JsonSerializable
 {
-    // Implements ISoftDeletable
+    use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /** @var int */
@@ -34,14 +37,6 @@ class Model implements ISoftDeletable, \JsonSerializable
 
     /** @var string */
     protected $name;
-
-    /** @var Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var Alaress_Date_Format */
-    protected $updatedAt;
-
-
 
     /**
      * Model constructor.
@@ -109,45 +104,9 @@ class Model implements ISoftDeletable, \JsonSerializable
     }
 
     /**
-     * @param Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format $createdAt
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $updatedAt
-     * @return self
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
      * @return array
      */
-    function jsonSerialize()
+    public function jsonSerialize()
     {
         return [
             'id'   => $this->getId(),

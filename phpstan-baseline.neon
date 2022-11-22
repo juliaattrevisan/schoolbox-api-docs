@@ -1341,22 +1341,12 @@ parameters:
 			path: library/EOTC/ActivityLog/Log.php
 
 		-
-			message: "#^Method EOTC\\\\ActivityLog\\\\Log\\:\\:getUpdatedAt\\(\\) should return null but returns Alaress_Date_Format\\.$#"
-			count: 1
-			path: library/EOTC/ActivityLog/Log.php
-
-		-
 			message: "#^Property EOTC\\\\ActivityLog\\\\Log\\:\\:\\$id \\(int\\) does not accept default value of type string\\.$#"
 			count: 1
 			path: library/EOTC/ActivityLog/Log.php
 
 		-
 			message: "#^Property EOTC\\\\ActivityLog\\\\Log\\:\\:\\$id \\(int\\) does not accept string\\.$#"
-			count: 1
-			path: library/EOTC/ActivityLog/Log.php
-
-		-
-			message: "#^Property EOTC\\\\ActivityLog\\\\Log\\:\\:\\$updatedAt \\(Alaress_Date_Format\\) does not accept null\\.$#"
 			count: 1
 			path: library/EOTC/ActivityLog/Log.php
 
@@ -6604,11 +6594,6 @@ parameters:
 			message: "#^Return type \\(Schoolbox\\\\Resource\\\\Textbox\\\\Search\\\\Result\\) of method Schoolbox\\\\Resource\\\\Textbox\\\\Mapper\\:\\:search\\(\\) should be compatible with return type \\(Schoolbox\\\\Collection\\) of method Schoolbox\\\\Mapper\\\\Searchable\\:\\:search\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Resource/Textbox/Mapper.php
-
-		-
-			message: "#^Property Schoolbox\\\\Resource\\\\Textbox\\\\Model\\:\\:\\$deletedAt \\(Alaress_Date_Format\\|null\\) does not accept default value of type string\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Textbox/Model.php
 
 		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"

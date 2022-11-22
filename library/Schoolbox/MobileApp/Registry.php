@@ -11,11 +11,13 @@ namespace Schoolbox\MobileApp;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\User;
 
 class Registry implements ISoftDeletable
 {
+    use CreatedAtDate;
     use DeletedAtDate;
 
     const PROVIDER_GOOGLE    = 'GCM';
@@ -34,9 +36,6 @@ class Registry implements ISoftDeletable
 
     /** @var Service */
     protected $service;
-
-    /** @var Alaress_Date_Format */
-    protected $createdAt;
 
     /** @var Alaress_Date_Format */
     protected $touchedAt;
@@ -137,26 +136,6 @@ class Registry implements ISoftDeletable
     public function setService($service)
     {
         $this->service = $service;
-        return $this;
-    }
-
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
         return $this;
     }
 }

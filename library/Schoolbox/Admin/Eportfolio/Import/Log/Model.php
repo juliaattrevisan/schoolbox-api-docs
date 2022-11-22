@@ -9,8 +9,13 @@
 
 namespace Schoolbox\Admin\Eportfolio\Import\Log;
 
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+
 class Model
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
 
     /** @var int */
     protected $id;
@@ -20,12 +25,6 @@ class Model
 
     /** @var string */
     protected $result;
-
-    /** @var \Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $updatedAt;
 
     /**
      * @param string $result
@@ -79,41 +78,5 @@ class Model
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $createdAt
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $updatedAt
-     * @return self
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format $updatedAt
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 }

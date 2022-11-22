@@ -11,6 +11,8 @@ use Alaress_Date_Format;
 use JsonSerializable;
 use Schoolbox\Curriculum\Source;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 /**
  * Model for curriculum learning levels.
@@ -24,6 +26,9 @@ use Schoolbox\ISoftDeletable;
  */
 class Model implements ISoftDeletable, JsonSerializable
 {
+    use CreatedAtDate;
+    use DeletedAtDate;
+
     /**
      * Primary key
      *
@@ -70,54 +75,7 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * @var Alaress_Date_Format
      */
-    protected $createdAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
     protected $modifiedAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $deletedAt;
-
-
-    /**
-     * @param  Alaress_Date_Format $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param  Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
 
     /**
      * @param  string $description

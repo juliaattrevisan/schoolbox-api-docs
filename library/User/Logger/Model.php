@@ -10,11 +10,13 @@ declare(strict_types=1);
 
 namespace User\Logger;
 
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Alaress_Date_Format;
 
 class Model
 {
+    use CreatedAtDate;
     use Id;
 
     /**
@@ -33,9 +35,6 @@ class Model
 
     /** @var string */
     private $ip;
-
-    /** @var Alaress_Date_Format */
-    private $createdAt;
 
 
     /**
@@ -94,26 +93,6 @@ class Model
     public function setIp(string $ip): self
     {
         $this->ip = $ip;
-        return $this;
-    }
-
-
-    /**
-     * @return null|Alaress_Date_Format
-     */
-    public function getCreatedAt(): ?Alaress_Date_Format
-    {
-        return $this->createdAt;
-    }
-
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     * @return $this
-     */
-    public function setCreatedAt(Alaress_Date_Format $createdAt): self
-    {
-        $this->createdAt = $createdAt;
         return $this;
     }
 }

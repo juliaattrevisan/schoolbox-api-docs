@@ -11,11 +11,17 @@
 namespace EOTC;
 
 use Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
 use Schoolbox\Campus;
 
 class EventPermission
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * @var int
@@ -57,21 +63,6 @@ class EventPermission
      * @var bool
      */
     protected $subscribed = false;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    private $createdAt = null;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    private $updatedAt = null;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    private $deletedAt = null;
 
     /* Getters/Setters
      */
@@ -146,60 +137,6 @@ class EventPermission
     public function getUser()
     {
         return $this->user;
-    }
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $updatedAt
-     * @return $this
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 
     /**

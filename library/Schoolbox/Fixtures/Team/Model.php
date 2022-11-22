@@ -13,6 +13,8 @@ namespace Schoolbox\Fixtures\Team;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
 use Schoolbox\ValueLabelInterface;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -21,6 +23,8 @@ use Schoolbox\Fixtures\Division\Model as Division;
 
 class Model implements ISoftDeletable, ValueLabelInterface
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /** @var int */
@@ -34,12 +38,6 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /** @var string */
     protected $url;
-
-    /** @var Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var Alaress_Date_Format */
-    protected $updatedAt;
 
     /**
      * Players within the team.
@@ -157,42 +155,6 @@ class Model implements ISoftDeletable, ValueLabelInterface
     {
         $this->division = $division;
         return $this;
-    }
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format $createdAt
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $updatedAt
-     * @return self
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 
     /**

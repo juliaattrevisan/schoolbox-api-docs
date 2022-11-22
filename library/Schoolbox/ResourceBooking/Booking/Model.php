@@ -10,6 +10,8 @@
 
 namespace Schoolbox\ResourceBooking\Booking;
 
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Collection;
@@ -20,6 +22,9 @@ use JsonSerializable;
 
 class Model implements ISoftDeletable, JsonSerializable
 {
+    use CreatedAtDate;
+    use DeletedAtDate;
+
     /**
      * @var int
      */
@@ -63,17 +68,7 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * @var Alaress_Date_Format
      */
-    protected $createdAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
     protected $modifiedAt;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    protected $deletedAt;
 
     /**
      * @var Collection|self[]
@@ -96,43 +91,6 @@ class Model implements ISoftDeletable, JsonSerializable
     public function getModifiedAt()
     {
         return $this->modifiedAt;
-    }
-
-    /**
-     * @param  Alaress_Date_Format $createdAt
-     *
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param  Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
     }
 
     /**
@@ -284,16 +242,6 @@ class Model implements ISoftDeletable, JsonSerializable
             }
         }
         return false;
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return $this->getDeletedAt() instanceof Alaress_Date_Format;
     }
 
     /**

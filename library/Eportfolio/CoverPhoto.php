@@ -10,8 +10,15 @@
 
 namespace Eportfolio;
 
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+
 class CoverPhoto
 {
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * The primary key
@@ -34,69 +41,8 @@ class CoverPhoto
      */
     private $imagehash;
 
-    /**
-     * Created time for the pic
-     *
-     * @var \Alaress_Date_Format
-     */
-    private $created_at;
-
-    /**
-     * Updated time for the pic
-     *
-     * @var \Alaress_Date_Format
-     */
-    private $updated_at;
-
-    /**
-     * Deleted time for the pic
-     *
-     * @var \Alaress_Date_Format|null
-     */
-    private $deleted_at;
-
     /* Getters/Setters
      */
-
-    /**
-     * Set created at
-     *
-     * @param \Alaress_Date_Format $created_at
-     */
-    public function setCreatedAt($created_at)
-    {
-        $this->created_at = $created_at;
-    }
-
-    /**
-     * Get created at
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->created_at;
-    }
-
-    /**
-     * Set deleted at
-     *
-     * @param \Alaress_Date_Format $deleted_at
-     */
-    public function setDeletedAt($deleted_at)
-    {
-        $this->deleted_at = $deleted_at;
-    }
-
-    /**
-     * Get deleted at
-     *
-     * @return \Alaress_Date_Format|null
-     */
-    public function getDeletedAt()
-    {
-        return $this->deleted_at;
-    }
 
     /**
      * Set id
@@ -136,26 +82,6 @@ class CoverPhoto
     public function getUid()
     {
         return $this->uid;
-    }
-
-    /**
-     * Set updated at
-     *
-     * @param \Alaress_Date_Format $updated_at
-     */
-    public function setUpdatedAt($updated_at)
-    {
-        $this->updated_at = $updated_at;
-    }
-
-    /**
-     * Get updated at
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updated_at;
     }
 
     /**
