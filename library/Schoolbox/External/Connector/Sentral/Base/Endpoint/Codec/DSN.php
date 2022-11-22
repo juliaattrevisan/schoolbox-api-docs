@@ -102,16 +102,16 @@ class DSN implements IDSN
 
             foreach ($dsnParts as $dsnPart) {
                 $matches = [];
-                preg_match(self::OPTION_FORMAT, $dsnPart, $matches);
-
-                /* Automatically unpack parentRelationIds into a useful array
-                 * Also accommodates other fields which might be csvs
-                 * (just add these to the const)
-                 */
-                if (in_array($matches[1], self::OPTION_CSV, true)) {
-                    $struct['options'][$matches[1]] = explode(',', $matches[2]);
-                } else {
-                    $struct['options'][$matches[1]] = $matches[2];
+                if (preg_match(self::OPTION_FORMAT, $dsnPart, $matches)) {
+                    /* Automatically unpack parentRelationIds into a useful array
+                     * Also accommodates other fields which might be csvs
+                     * (just add these to the const)
+                     */
+                    if (in_array($matches[1], self::OPTION_CSV, true)) {
+                        $struct['options'][$matches[1]] = explode(',', $matches[2]);
+                    } else {
+                        $struct['options'][$matches[1]] = $matches[2];
+                    }
                 }
             }
         }
