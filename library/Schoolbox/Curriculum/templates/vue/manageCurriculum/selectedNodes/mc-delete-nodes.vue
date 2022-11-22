@@ -27,7 +27,7 @@ watch(() => deleteNodesStore.isOpen, (isOpen) => {
  * delete the node when confirmed
  */
 function onDeleteSelected () {
-    deleteNodesStore.delete();
+    deleteNodesStore.deleteNodes();
 }
 
 /**
@@ -35,7 +35,7 @@ function onDeleteSelected () {
  * and update the UI accordingly
  */
 deleteNodesStore.$onAction(({ name, after, onError }) => {
-    if (name === 'delete') {
+    if (name === 'deleteNodes') {
         store.toastEl.activate('Deleting...');
         after((result) => {
             store.toastEl.timeout(result, true, 5000);
