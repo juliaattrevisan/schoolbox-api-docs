@@ -63,17 +63,26 @@ class Profile implements IStrategy
 
 
     /**
-     * This relationshipName identifies a contact as a sibling
-     * This might be configurable in sentral, though
-     */
-    private const RELATIONSHIP_SIBLING = 'Sibling';
-
-
-    /**
      * Employment status for departed staff: if a staff member is departed, they
      * should not be synced.
      */
     private const STAFF_EMPLOYMENT_STATUS_DEPARTED = 'left';
+
+
+    /**
+     * These relationship types, by default, are imported as Parents of a Student
+     * They are used when you've never configured this in SUDS Control Panel
+     * (the school should check and revise these selections in their instance)
+     *
+     * 01 Parent
+     * 02 Step-Parent
+     * 03 Adoptive Parent
+     * 04 Foster Parent
+     * 20 Guardian
+     */
+    private const DEFAULT_ALLOWED_RELATIONSHIP_IDS = [
+        '01', '02', '03', '04', '20'
+    ];
 
 
     /**
@@ -921,6 +930,9 @@ class Profile implements IStrategy
      */
     private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $contacts): void
     {
+        // Get default relationIds, if no options selected in config
+        $allowedRelationshipIds = $this->api->getOptions()['parentRelationIds'] ?? self::DEFAULT_ALLOWED_RELATIONSHIP_IDS;
+
         /* Each student comes with a set of Contacts
          * Some are Emergency Contacts, some are not
          */
@@ -944,14 +956,17 @@ class Profile implements IStrategy
              * Siblings and the student themselves might appear here
              * for no apparent reason, but ok
              */
+            $relationshipId = trim((string)$contact['attributes']['relationType']);
             $relationshipName = trim((string)$contact['attributes']['relationName']);
 
-            /* Skip Sibling relationships
+            /* We only assign Parents as chosen by the school in Sentral Configuration
+             * in the SUDS Control Panel; anyone outside the chosen set is ignored
              */
-            if ($relationshipName === self::RELATIONSHIP_SIBLING) {
+            if (!in_array($relationshipId, $allowedRelationshipIds, true)) {
                 $this->log->debug(sprintf(
-                    'Person id %s is a %s of the student - skipping.',
+                    'Person id %s is a "%s %s" of the student - skipping.',
                     $contact['attributes']['personId'],
+                    $relationshipId,
                     $relationshipName
                 ));
 

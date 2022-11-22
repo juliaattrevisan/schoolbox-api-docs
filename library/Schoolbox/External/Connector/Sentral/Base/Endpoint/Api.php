@@ -21,7 +21,6 @@ use InvalidArgumentException;
  */
 class Api implements IApi
 {
-
     /**
      * Default pagination limit - can go between 0 and 200
      *
@@ -80,6 +79,12 @@ class Api implements IApi
 
 
     /**
+     * @var array
+     */
+    private array $options = [];
+
+
+    /**
      * Constructor
      *
      * @param string $host
@@ -110,7 +115,6 @@ class Api implements IApi
      */
     private function initClient(string $host, string $key, int $timeout): Client
     {
-
         /* Remember the actual host value
          *
          * Check trailing slash in the host
@@ -121,11 +125,15 @@ class Api implements IApi
 
         /* Dig out the key and tenant values
          */
-        $credentials = (new Codec\DSN())->decode($key);
+        $dsnParts = (new Codec\DSN())->decode($key);
+
+        /* Remember the optional pieces we offer
+         */
+        $this->options = $dsnParts['options'] ?? [];
 
         $headers = [
-            'X-API-KEY' => $credentials['key'],
-            'X-API-TENANT' => $credentials['tenant'],
+            'X-API-KEY' => $dsnParts['key'],
+            'X-API-TENANT' => $dsnParts['tenant'],
             'X-API-OPTIONS' => 'map-include,inline-include'
         ];
 
@@ -148,7 +156,6 @@ class Api implements IApi
      */
     public function retrieveDocument(string $endpoint): array
     {
-
         /* Mine out an error message if you try to access a thing that doesn't exist
          */
         $lastGuzzleError = '';
@@ -267,5 +274,14 @@ class Api implements IApi
     public function getUsage(): ApiUsage
     {
         return $this->apiUsage;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 }

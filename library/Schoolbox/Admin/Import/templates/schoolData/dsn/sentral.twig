@@ -6,7 +6,12 @@
  #
  # @param string|null $key
  # @param string|null $tenant
+ # @param string|null $parentRelationIds
  #}
+{% import _self as macro %}
+{% macro parentRelationSelected(identifier, parentRelationIds) %}
+    {% if identifier in parentRelationIds %}selected="selected"{% endif %}
+{% endmacro %}
 <div data-data-source="sentral" style="display:none">
     <section>
         <fieldset class="content">
@@ -21,6 +26,60 @@
                     <div class="small-12 medium-4 columns">
                         <label class="required">Tenant</label>
                         <input type="text" class='required suds-crypto' name="dsn[sentral][tenant]" value="{{ tenant ?? ''}}" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <label>Parent</label>
+                        <span class="meta">
+                            Select which type(s) of contact will be identified as parents of students.
+                            (If none are selected, "Parent, Step-Parent, Adoptive Parent, Foster Parent, Guardian" will be identified by default.)
+                        </span>
+
+                        {# Sentral implements a SIF lookup
+                         # http://specification.sifassociation.org/Implementation/AU/3.4.3/CodeSets.html
+                         #}
+                        {%
+                            set parentRelationLookup = {
+                                '00': "Spouse",
+                                '01': "Parent",
+                                '02': "Step-Parent",
+                                '03': "Adoptive Parent",
+                                '04': "Foster Parent",
+                                '05': "Host Family",
+                                '06': "Relative",
+                                '07': "Friend",
+                                '08': "Self",
+                                '09': "Other",
+                                '10': "Sibling",
+                                '11': "Grandparent",
+                                '12': "Aunt/Uncle",
+                                '13': "Nephew/Niece",
+                                '20': "Guardian",
+                                '30': "Case Worker",
+                                '31': "Supervisor",
+                                '32': "Duty Manager",
+                                '40': "Medical Contact",
+                                '99': "Not provided",
+                            }
+                        %}
+
+                        <fieldset class="checklist">
+                            <ul class="option-list">
+                                {% for id, name in parentRelationLookup %}
+                                    <li>
+                                        <input id="dsnSentralOptionsParentRelationIds-{{ id }}"
+                                               name="dsn[sentral][options][parentRelationIds][]"
+                                               value="{{ id }}"
+                                               type="checkbox"
+                                               {% if id in options.parentRelationIds ?? [] %}checked{% endif%}
+                                        >
+                                        <label for="dsnSentralOptionsParentRelationIds-{{ id }}">{{ name }}</label>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </fieldset>
                     </div>
                 </div>
             </div>

@@ -27,11 +27,35 @@ use Schoolbox\External\Importer\Endpoint\IDSN;
  */
 class DSN implements IDSN
 {
+    /**
+     * This character separates tuples from each other
+     */
+    private const TUPLE_SEPARATOR = ';';
+
+
+    /**
+     * This character separates credentials-related tuples from option tuples
+     */
+    private const OPTION_SEPARATOR = '?';
+
+
+    /**
+     * Optional params we permitted in SUDS Config
+     */
+    private const OPTION_FORMAT = '/([^;]+)=([^;]*)/';
+
 
     /**
      * DSN format
      */
     private const DSN_FORMAT = '/key=([A-Za-z0-9]+);tenant=([A-Za-z0-9]+)/';
+
+
+    /**
+     * Perform a special transformation on this option's value
+     * which we know to be a csv
+     */
+    private const OPTION_CSV = ['parentRelationIds'];
 
 
     /**
@@ -43,16 +67,56 @@ class DSN implements IDSN
      */
     public function decode(string $dsn): array
     {
-        preg_match(self::DSN_FORMAT, $dsn, $matches);
+        $bits = explode(self::OPTION_SEPARATOR, $dsn);
+        $credentials = $bits[0];
+        $options = $bits[1] ?? null;
 
+        preg_match(self::DSN_FORMAT, $credentials, $matches);
+
+        /* You didn't specify key/tenant properly somehow
+         */
         if (!count($matches)) {
             throw new DomainException('Sentral DSN: could not decode; check key and tenant format');
         }
 
-        return [
+        $struct = [
             'key' => $matches[1],
-            'tenant' => $matches[2]
+            'tenant' => $matches[2],
+            'options' => []
         ];
+
+        /* Have a look at the options which may or may not exist
+         * These options might have been introduced *after* the dsn was last saved
+         * so those array elements might not exist yet. The user needs to save
+         * the form to re-encode their dsn accordingly.
+         */
+        if (null !== $options) {
+            /* No tuples, but you gave an option separator; malformed DSN
+             * Looks like there were supposed to be options, but none exist
+             */
+            if ('' === $options) {
+                throw new DomainException('Detected option separator but no options found');
+            }
+
+            $dsnParts = explode(self::TUPLE_SEPARATOR, $options);
+
+            foreach ($dsnParts as $dsnPart) {
+                $matches = [];
+                if (preg_match(self::OPTION_FORMAT, $dsnPart, $matches)) {
+                    /* Automatically unpack parentRelationIds into a useful array
+                     * Also accommodates other fields which might be csvs
+                     * (just add these to the const)
+                     */
+                    if (in_array($matches[1], self::OPTION_CSV, true)) {
+                        $struct['options'][$matches[1]] = explode(',', $matches[2]);
+                    } else {
+                        $struct['options'][$matches[1]] = $matches[2];
+                    }
+                }
+            }
+        }
+
+        return $struct;
     }
 
 
@@ -64,6 +128,28 @@ class DSN implements IDSN
      */
     public function encode(array $parts): string
     {
-        return "key={$parts['key']};tenant={$parts['tenant']}";
+        /* Encode option pieces
+         */
+        $options = [];
+
+        /* Arrays are serialized into a csv
+         */
+        foreach (($parts['options'] ?? []) as $key => $value) {
+            if (is_array($value)) {
+                $imploded = implode(',', $value);
+
+                $options[] = "{$key}={$imploded}";
+            } else {
+                $options[] = "{$key}={$value}";
+            }
+        }
+
+        // Only include options if some were set
+        $optionEncoding = '';
+        if (count($options)) {
+            $optionEncoding = '?' . implode(self::TUPLE_SEPARATOR, $options);
+        }
+
+        return "key={$parts['key']};tenant={$parts['tenant']}{$optionEncoding}";
     }
 }
