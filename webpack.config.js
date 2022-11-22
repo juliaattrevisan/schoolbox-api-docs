@@ -336,7 +336,11 @@ module.exports = {
                         options: babelOptions,
                     },
                     {
-                        loader: 'ts-loader'
+                        loader: 'ts-loader',
+                        options: {
+                            appendTsSuffixTo: [/\.vue$/],
+                            transpileOnly: true,
+                        }
                     }
                 ]
             },

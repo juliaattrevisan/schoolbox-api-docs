@@ -10,8 +10,10 @@
         "moduleResolution": "node",
         "baseUrl": "./",
         "paths": {
-            "@js": ["www/static/js/*"],
-        },
+            "@schoolboxCurriculum/*": ["library/Schoolbox/Curriculum/templates/*"],
+            "@schoolboxVue/*": ["vue/*"],
+            "@js/*": ["www/static/js/*"]
+        }
     },
     "include": ["library/**/*", "templates/**/*", "vue/**/*", "www/static/js/**/*"], //Specifies an array of filenames or patterns to include in the program.
     "exclude": ["node_modules", "**/*.spec.ts"], //Specifies an array of filenames or patterns that should be skipped when resolving include.

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * To search the currently selected curriculum node
