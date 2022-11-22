@@ -4681,11 +4681,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: "#^Right side of \\|\\| is always true\\.$#"
-			count: 3
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between null and Schoolbox\\\\User will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
