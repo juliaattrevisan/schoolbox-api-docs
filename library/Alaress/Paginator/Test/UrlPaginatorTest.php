@@ -17,7 +17,6 @@ use PHPUnit\Framework\TestCase;
 
 class UrlPaginatorTest extends TestCase
 {
-
     /**
      * Simple factory for a test UrlPaginator object.
      *

@@ -16,7 +16,6 @@ use Schoolbox\Url\Uri;
 
 class UrlPaginator implements IUrlPaginator
 {
-
     /**
      * The URL to use to generate page URLs.
      *

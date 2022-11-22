@@ -28,7 +28,6 @@ use Schoolbox\UserMapper;
 use Schoolbox\User;
 use Schoolbox\Url\Uri;
 
-
 /**
  * Command-line PDF generator for Meriden's eReports.
  */

@@ -376,7 +376,7 @@ class CommandLineTool extends App
                             '(Try downloading from %s, and uploading to staging)',
                             (new Uri('https://schoolbox.churchie.com.au/'))
                                 ->withPath('/storage/fetch.php')
-                                ->addQueryParameter('hash', $file->getHash())
+                                ->appendQueryParameters(['hash' => $file->getHash()])
                         )
                     );
                 }

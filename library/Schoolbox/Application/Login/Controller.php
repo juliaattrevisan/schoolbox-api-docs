@@ -17,7 +17,6 @@ use Session;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Schoolbox\Url\Uri;
 
-
 class Controller extends Base
 {
     public const LOGIN_ERROR_FLASH = 'login';
@@ -184,7 +183,7 @@ class Controller extends Base
                 if ($authenticated) {
                     if (
                         strlen($page)
-                        && $pageUri->isValidRelative()
+                        && $pageUri->isAbsolutePath()
                         && $page !== '/'
                         && $page !== '/login'
                         && $page !== '/login/'

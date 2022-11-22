@@ -18,7 +18,7 @@ use Psr\Http\Message\UriInterface;
 class Uri extends \GuzzleHttp\Psr7\Uri implements UriInterface
 {
     /**
-     * Set query parameters
+     * Set query parameters in key => value array
      * @param array $queryParameters
      * @return self
      */
@@ -35,7 +35,7 @@ class Uri extends \GuzzleHttp\Psr7\Uri implements UriInterface
     }
 
     /**
-     *
+     * Get query parameters in key => value array
      * @return array
      */
     public function getQueryAsArray(): array

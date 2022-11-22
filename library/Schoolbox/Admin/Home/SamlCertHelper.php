@@ -76,7 +76,7 @@ class SamlCertHelper
         } else {
             try {
                 $metadataXml = $this->fetchMetadataXml($idpMetadataUrl);
-            } catch (InvalidUriException | SchoolboxException\Exception $e) {
+            } catch (\InvalidArgumentException | SchoolboxException\Exception $e) {
                 // Invalid URL | Unable to connect.
                 $metadataXml = null;
             }
@@ -102,14 +102,14 @@ class SamlCertHelper
      *
      * @param string $idpMetadataUrl
      * @return string|null
-     * @throws InvalidUriException             If $idpMetadataUrl cannot be recognised as a URL
+     * @throws \InvalidArgumentException             If $idpMetadataUrl cannot be recognised as a URL
      * @throws SchoolboxException\Exception    If we cannot connect to ULR
      */
     private function fetchMetadataXml(string $idpMetadataUrl): ?string
     {
         try {
             $url = new Uri($idpMetadataUrl);
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             // Should never get here. Only thrown in $idpMetadataUrl is not a string, which is
             // impossible due to method's param type declaration.
             throw new UnreachableException($e);

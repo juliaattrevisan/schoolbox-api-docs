@@ -100,9 +100,9 @@ class SelfIssued extends Base
     /**
      * Determine what this instance's issuer value is.
      *
-     * @return string|null
+     * @return string
      */
-    private function determineThisInstanceIssuer(): ?string
+    private function determineThisInstanceIssuer(): string
     {
         return (new Factory($this->config))->buildFullyQualified()->getHost();
     }

@@ -17,7 +17,6 @@ use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Url\Uri;
 
-
 /**
  * Class Internal
  *
@@ -27,7 +26,6 @@ use Schoolbox\Url\Uri;
  */
 class Internal extends Base
 {
-
     /**
      * Storage urls
      */

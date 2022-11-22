@@ -58,13 +58,15 @@ class Jwt
      */
     public function generate(User $user, ?Alaress_Date_Format $expiry = null, ?string $jwtId = null, array $additionalClaims = []): string
     {
+        $schoolboxFqdn = (new Factory($this->config))->buildFullyQualified()->getHost();
+
         // Issuer:     this Schoolbox instance's FQDN
         // Subject:    $user
         // Expiry:     optional
         // Not before: not used for now
         // May add ability to regenerate tokens later?
         $claims = [
-            IParser::CLAIM_ISS => $this->getSchoolboxIssuer(),
+            IParser::CLAIM_ISS => $schoolboxFqdn,
             IParser::CLAIM_SUB => $user->getUsername(),
         ];
         if ($expiry !== null) {
@@ -78,13 +80,5 @@ class Jwt
             $this->config->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
             self::SIGNING_ALGORITHM
         );
-    }
-
-    /**
-     * @return string|null
-     */
-    private function getSchoolboxIssuer(): ?string
-    {
-        return (new Factory($this->config))->buildFullyQualified()->getHost();
     }
 }

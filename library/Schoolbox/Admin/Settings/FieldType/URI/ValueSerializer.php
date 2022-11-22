@@ -14,7 +14,6 @@ use Schoolbox\Url\Uri;
 
 class ValueSerializer implements IFieldValueSerializer
 {
-
     /**
      * @inheritdoc
      */
@@ -24,7 +23,11 @@ class ValueSerializer implements IFieldValueSerializer
         if ($value === '') {
             return '';
         }
-        $url = new Uri($value);
+        try {
+            $url = new Uri($value);
+        } catch (\InvalidArgumentException $e) {
+            throw new \UnexpectedValueException("Invalid URL supplied");
+        }
         return $value;
     }
 }

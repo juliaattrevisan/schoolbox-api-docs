@@ -225,7 +225,6 @@ class Profile implements IStrategy
      * @throws RuntimeException
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     private function importStudents(): void
     {

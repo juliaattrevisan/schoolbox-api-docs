@@ -11,9 +11,8 @@ namespace Custom\Ms\Pastoral\CommandLineTool;
 
 use Aura\Router\Router;
 use Custom\Ms\Pastoral\StudentInvolvement\Report\Factory;
-use Schoolbox\User;
 use Psr\Http\Message\UriInterface;
-
+use Schoolbox\User;
 
 /**
  * Class UrlGenerator
@@ -55,7 +54,8 @@ class UrlGenerator
      *                                         for this role type
      * @param int|null     $graphWidthOverride If provided, hardcode graph width
      *                                         to this value
-     * @return array|string[]
+     * @return array<string>
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function generate(
         UriInterface $baseUrl,
@@ -85,7 +85,7 @@ class UrlGenerator
                     'id'      => $student->getId(),
                     'year'    => $year,
                 ];
-                $results[] = $baseUrl
+                $results[] = (string)$baseUrl
                     ->withPath($this->router->generate('customMeridenPastoral.index', $params))
                     ->withQuery(http_build_query($query));
                 break;
@@ -104,10 +104,9 @@ class UrlGenerator
                     'subject'     => $subject,
                     'subjectCode' => $subject->getSubjectCode(),
                 ];
-                $results[] = $baseUrl
+                $results[] = (string)$baseUrl
                     ->withPath($this->router->generate('customMeridenPastoral.subject', $params))
-                    ->($query)
-                    ->toString();
+                    ->withQuery(http_build_query($query));
             }
         }
         return $results;

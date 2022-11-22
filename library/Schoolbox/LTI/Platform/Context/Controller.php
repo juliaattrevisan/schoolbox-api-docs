@@ -212,7 +212,7 @@ class Controller extends BaseController
             )
             // If a context was passed in the query string:
             // add it to the return URL
-            ->addQueryParameter('context', $this->request->query->get('context'));
+            ->appendQueryParameters(['context' => $this->request->query->get('context')]);
 
         // Standard deep linking settings
         $deepLinkingSettings = new DeepLinkingSettings(
