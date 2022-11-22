@@ -134,7 +134,7 @@ class DSN implements IDSN
 
         /* Arrays are serialized into a csv
          */
-        foreach ($parts['options'] as $key => $value) {
+        foreach (($parts['options'] ?? []) as $key => $value) {
             if (is_array($value)) {
                 $imploded = implode(',', $value);
 
@@ -144,8 +144,12 @@ class DSN implements IDSN
             }
         }
 
-        $optionEncoding = implode(self::TUPLE_SEPARATOR, $options);
+        // Only include options if some were set
+        $optionEncoding = '';
+        if (count($options)) {
+            $optionEncoding = '?' . implode(self::TUPLE_SEPARATOR, $options);
+        }
 
-        return "key={$parts['key']};tenant={$parts['tenant']}?{$optionEncoding}";
+        return "key={$parts['key']};tenant={$parts['tenant']}{$optionEncoding}";
     }
 }
