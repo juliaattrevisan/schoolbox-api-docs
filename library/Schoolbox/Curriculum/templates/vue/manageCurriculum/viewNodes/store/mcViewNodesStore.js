@@ -20,7 +20,6 @@ export const useViewNodesStore = defineStore('mcViewNodes', () => {
     const currentDepth = ref(0); // track how far down the tree we are
     const currentDirection = ref(DIRECTION.FORWARDS); // which direction we are currently travelling in the tree
 
-
     /**
      * Can now use the search input when we have selected at least one node
      *
@@ -170,6 +169,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', () => {
     }
 
     return {
+        currentDirection,
         isActive,
         breadcrumbs,
         current,

@@ -7,102 +7,102 @@
  * which is used to bulk enable or delete MULTIPLE nodes
  */
 
+import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { useNodesStore } from '../../store/mcNodesStore';
 import { sortNodes } from '@schoolboxCurriculum/js/nodeUtils';
 import { useViewNodesStore } from '../../viewNodes/store/mcViewNodesStore';
 
 
-export const useActiveNodeStore = defineStore('mcActiveNode', {
+export const useActiveNodeStore = defineStore('mcActiveNode', () => {
 
-    state: () => ({
-        node: null, //the currently selected node
-    }),
+    const node = ref(null); //the currently selected node
 
-    getters: {
+    /**
+     * To show further info on a selected node
+     *
+     * @return { Boolean }
+     */
+    const isActive = computed(() => {
+        return node.value !== null ? true : false;
+    });
 
-        /**
-         * To show further info on a selected node
-         *
-         * @return { Boolean }
-         */
-        isActive () {
-            return this.node !== null ? true : false;
-        },
+    /**
+     * Add in the code if it's available otherwise just show the title
+     *
+     * @return { String }
+     */
+    const title = computed(() => {
+        if (node.value === null) {
+            return '';
+        } else if (node.value.code && node.value.code !== '') {
+            return `[${node.value.code}] ${node.value.name}`;
+        }
+        return node.value.name;
+    });
 
-        /**
-         * Add in the code if it's available otherwise just show the title
-         *
-         * @return { String }
-         */
-        title () {
-            if (this.node === null) {
-                return '';
-            } else if (this.node.code && this.node.code !== '') {
-                return `[${this.node.code}] ${this.node.name}`;
-            } else {
-                return this.node.name;
-            }
-        },
+    /**
+     * set the node to perform an action on
+     *
+     * @param { Object }
+     */
+    function set (newNode) {
+        node.value = newNode;
+    }
 
-    },
+    /**
+     * Set newly saved values on the node
+     *
+     * @param { Object }
+     */
+    function update (newNode) {
+        if (newNode.name !== node.value.name) {
+            node.value.name = newNode.name;
+            useNodesStore().nodeUpdated(node.value); // notify to prompt a sort
+        }
+        if (newNode.code !== node.value.code) {
+            node.value.code = newNode.code.trim();
+        }
+        if (newNode.description !== node.value.description) {
+            node.value.description = newNode.description;
+        }
+    }
 
-    actions: {
+    /**
+     * Add in a new subsection to the active node
+     *
+     * @param { object }
+     */
+    async function addSubsection (newNode) {
+        if (node.value.children === null) { // if the children aren't loaded, load them in - which will also return the newly added node
+            await useNodesStore().loadNextChildren(node.value.id);
+        } else { // otherwise we need to push the newNode in as the children are already loaded
+            node.value.children.push(newNode);
+            sortByName(node.value.children); // and sort again with the new node added
+        }
+        const viewNodesStore = useViewNodesStore();
+        if (viewNodesStore.current.id !== newNode.parent.id) { // if we aren't on the new nodes level move down so we can see the new node
+            viewNodesStore.setNextSelected(newNode.parent.id);
+        }
+    }
 
-        /**
-         * set the node to perform an action on
-         *
-         * @param { Object }
-         */
-        set (node) {
-            this.node = node;
-        },
+    /**
+     * unset ready for another use
+     *
+     * @param { Object }
+     */
+    function unset () {
+        node.value = null;
+    }
 
-        /**
-         * Set newly saved values on the node
-         *
-         * @param { Object }
-         */
-        update (node) {
-            if (node.name !== this.node.name) {
-                this.node.name = node.name;
-            }
-            if (node.code !== this.node.code) {
-                this.node.code = node.code.trim();
-            }
-            if (node.description !== this.node.description) {
-                this.node.description = node.description;
-            }
-            useNodesStore().nodeUpdated(this.node); //notify to prompt a sort
-        },
-
-        /**
-         * Add in a new subsection to the active node
-         *
-         * @param { object }
-         */
-        async addSubsection (newNode) {
-            if (this.node.children === null) { //if the children aren't loaded, load them in - which will also return the newly added node
-                await useNodesStore().loadNextChildren(this.node.id);
-            } else { //otherwise we need to push the newNode in as the children are already loaded
-                this.node.children.push(newNode);
-                this.node.children = sortNodes(this.node.children); // and sort again with the new node added
-            }
-            const viewNodesStore = useViewNodesStore();
-            if (viewNodesStore.current.id !== newNode.parent.id) { //if we aren't on the new nodes level move down so we can see the new node
-                viewNodesStore.setNextSelected(newNode.parent.id);
-            }
-        },
-
-        /**
-         * unset ready for another use
-         *
-         * @param { Object }
-         */
-        unset () {
-            this.node = null;
-        },
-
-    },
+    return {
+        node,
+        isActive,
+        title,
+        set,
+        update,
+        addSubsection,
+        unset
+    }
 
 })
