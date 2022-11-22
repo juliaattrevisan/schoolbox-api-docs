@@ -453,14 +453,4 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
     {
         return $this->externalTitle;
     }
-
-    /**
-     * Is this deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return $this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull();
-    }
 }

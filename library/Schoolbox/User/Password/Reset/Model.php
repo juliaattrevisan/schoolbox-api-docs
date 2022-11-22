@@ -9,7 +9,6 @@
 namespace Schoolbox\User\Password\Reset;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Schoolbox\User;
 
 /**
@@ -45,25 +44,24 @@ class Model
     /**
      * The time that the reset took place (if it ever did).
      *
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $resetTime;
+    protected ?Alaress_Date_Format $resetTime = null;
 
     /**
      * When the reset attempt expires. Defaults to one day from now.
      *
      * @var Alaress_Date_Format
      */
-    protected $expiry;
+    protected Alaress_Date_Format $expiry;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->user      = new User();
-        $this->expiry    = Alaress_Date_Format::now()->addDays(1);
-        $this->resetTime = new Alaress_Date_NullDate();
+        $this->user   = new User();
+        $this->expiry = Alaress_Date_Format::now()->addDays(1);
     }
 
     /**
@@ -121,18 +119,19 @@ class Model
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getResetTime()
+    public function getResetTime(): ?Alaress_Date_Format
     {
         return $this->resetTime;
     }
 
     /**
-     * @param  Alaress_Date_Format $resetTime
-     * @return $this
+     * @param Alaress_Date_Format|null $resetTime
+     *
+     * @return static
      */
-    public function setResetTime($resetTime)
+    public function setResetTime(?Alaress_Date_Format $resetTime): self
     {
         $this->resetTime = $resetTime;
         return $this;
@@ -141,16 +140,17 @@ class Model
     /**
      * @return Alaress_Date_Format
      */
-    public function getExpiry()
+    public function getExpiry(): Alaress_Date_Format
     {
         return $this->expiry;
     }
 
     /**
-     * @param  Alaress_Date_Format $expiry
-     * @return $this
+     * @param Alaress_Date_Format $expiry
+     *
+     * @return static
      */
-    public function setExpiry($expiry)
+    public function setExpiry(Alaress_Date_Format $expiry): self
     {
         $this->expiry = $expiry;
         return $this;

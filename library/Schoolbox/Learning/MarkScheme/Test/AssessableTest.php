@@ -39,7 +39,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
 use Schoolbox\User;
 use InvalidArgumentException;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 
 /**
  * Tests IAssessable:
@@ -3106,12 +3105,12 @@ class AssessableTest extends TestCase
 
     /**
      * @param string $dateString eg '2016-08-08 21:03:19'
-     * @return \Alaress_Date_Format
+     * @return \Alaress_Date_Format|null
      */
     private function getDummyDate($dateString = null)
     {
         return null === $dateString
-            ? new Alaress_Date_NullDate()
+            ? null
             : new Alaress_Date_Format($dateString, Alaress_Date_Format::DATABASE_FORMAT);
     }
 }

@@ -333,7 +333,7 @@ class Controller extends BaseController
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 /** @var Service $serviceModel */
                 $serviceModel = $e->getDeletedObject();
-                $serviceModel->setDeletedAt();
+                $serviceModel->setDeletedAt(null);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $serviceModel = $serviceMapper->createModel();
             }

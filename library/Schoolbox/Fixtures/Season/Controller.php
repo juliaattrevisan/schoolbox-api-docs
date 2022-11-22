@@ -305,7 +305,7 @@ class Controller extends AbstractController
      */
     public function unArchiveEntity(Season $season)
     {
-        $season->setArchivedAt(new \Alaress_Date_NullDate());
+        $season->setArchivedAt(null);
         try {
             $this->getMapper()->save($season);
             $this->outputPostSuccess($season);

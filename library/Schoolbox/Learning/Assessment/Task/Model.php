@@ -17,6 +17,7 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
+use Alaress_Date_Format;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -436,36 +437,36 @@ class Model extends AbstractAssessment
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getOpenAt()
+    public function getOpenAt(): ?Alaress_Date_Format
     {
         return $this->getPublishAt();
     }
 
     /**
-     * @param \Alaress_Date_Format $openAt
+     * @param Alaress_Date_Format|null $openAt
      * @return static
      */
-    public function setOpenAt(\Alaress_Date_Format $openAt)
+    public function setOpenAt(?Alaress_Date_Format $openAt): self
     {
         //noop
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCloseAt()
+    public function getCloseAt(): ?Alaress_Date_Format
     {
         return $this->getDueAt();
     }
 
     /**
-     * @param \Alaress_Date_Format $closeAt
+     * @param Alaress_Date_Format|null $closeAt
      * @return static
      */
-    public function setCloseAt(\Alaress_Date_Format $closeAt)
+    public function setCloseAt(?Alaress_Date_Format $closeAt): self
     {
         // noop
         return $this;

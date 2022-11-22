@@ -78,9 +78,9 @@ class Model implements IStorage, ISoftDeletable
     protected $studentSubmissionFileId;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $privatisedAt;
+    protected ?Alaress_Date_Format $privatisedAt = null;
 
     /**
      * Figure out the url to the plagscan report
@@ -268,22 +268,21 @@ class Model implements IStorage, ISoftDeletable
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getPrivatisedAt()
+    public function getPrivatisedAt(): ?Alaress_Date_Format
     {
         return $this->privatisedAt;
     }
 
     /**
-     * @param Alaress_Date_Format $privatisedAt
+     * @param Alaress_Date_Format|null $privatisedAt
      *
-     * @return self|$this
+     * @return static
      */
-    public function setPrivatisedAt($privatisedAt)
+    public function setPrivatisedAt(?Alaress_Date_Format $privatisedAt): self
     {
         $this->privatisedAt = $privatisedAt;
-
         return $this;
     }
 }

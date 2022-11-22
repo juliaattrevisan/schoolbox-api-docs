@@ -43,7 +43,6 @@ use Twig\Error\LoaderError;
 
 class Module extends BaseModule
 {
-
     /** @var string */
     protected $basename = 'learningAnalytics';
 
@@ -209,7 +208,7 @@ class Module extends BaseModule
              * Folder options should never be restricted to a specific $classFolder
              */
             $dueAfterTermStart = $assessmentImpl->getDueAt()->gte($term->getStart());
-            $dueBeforeTermEnd  = $term->getActualFinish()->isNull() || $assessmentImpl->getDueAt()->lt($term->getActualFinish());
+            $dueBeforeTermEnd  = !$term->getActualFinish() || $assessmentImpl->getDueAt()->lt($term->getActualFinish());
 
             if ($dueAfterTermStart && $dueBeforeTermEnd) {
                 $courseImplementationFolders->setOffset($assessmentImpl->getBaseContext()->getFolder()->getId(), $assessmentImpl->getBaseContext()->getFolder());
@@ -228,7 +227,7 @@ class Module extends BaseModule
 
             // Ensure Assessment is due in term
             $dueAfterTermStart = $assessment->getDueAt()->gte($term->getStart());
-            $dueBeforeTermEnd  = $term->getActualFinish()->isNull() || $assessment->getDueAt()->lt($term->getActualFinish());
+            $dueBeforeTermEnd  = !$term->getActualFinish() || $assessment->getDueAt()->lt($term->getActualFinish());
             return $dueAfterTermStart && $dueBeforeTermEnd;
         });
 

@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
@@ -22,7 +21,6 @@ use Schoolbox\Learning\Assessment\AbstractResponse;
  */
 class Model extends AbstractResponse
 {
-
     /**
      * All the Files that are part of the Submission made by Student
      *
@@ -35,9 +33,9 @@ class Model extends AbstractResponse
      * The datetime at which the Student actually made the submission
      * This is not the same as the createdAt or updatedAt datetimes
      *
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $submittedAt;
+    protected ?Alaress_Date_Format $submittedAt = null;
 
 
     /**
@@ -138,20 +136,20 @@ class Model extends AbstractResponse
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getSubmittedAt()
+    public function getSubmittedAt(): ?Alaress_Date_Format
     {
         return $this->submittedAt;
     }
 
     /**
-     * @param mixed $submittedAt
+     * @param Alaress_Date_Format|null $submittedAt
      * @return $this
      */
-    public function setSubmittedAt(Alaress_Date_Format $submittedAt = null)
+    public function setSubmittedAt(?Alaress_Date_Format $submittedAt): self
     {
-        $this->submittedAt = $submittedAt ?: new Alaress_Date_NullDate();
+        $this->submittedAt = $submittedAt;
         return $this;
     }
 }

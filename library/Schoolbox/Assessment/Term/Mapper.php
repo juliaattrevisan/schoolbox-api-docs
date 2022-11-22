@@ -436,10 +436,10 @@ class Mapper extends BaseMapper
      */
     public function verifyDates(Model $model)
     {
-        if (!($model->getStart() instanceof Alaress_Date_Format && !$model->getStart()->isNull())) {
+        if (!($model->getStart() instanceof Alaress_Date_Format)) {
             throw new UnexpectedValueException('The term start date is not a valid date.');
         }
-        if (!($model->getDisplayFinish() instanceof Alaress_Date_Format && !$model->getDisplayFinish()->isNull())) {
+        if (!($model->getDisplayFinish() instanceof Alaress_Date_Format)) {
             throw new UnexpectedValueException('The term end date is not a valid date.');
         }
         if ($model->getStart()->gte($model->getDisplayFinish())) {

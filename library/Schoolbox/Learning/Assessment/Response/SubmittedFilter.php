@@ -25,6 +25,6 @@ class SubmittedFilter
      */
     public function __invoke(IResponse $response)
     {
-        return $response->getSubmittedAt() && !$response->getSubmittedAt()->isNull();
+        return $response->getSubmittedAt() !== null;
     }
 }

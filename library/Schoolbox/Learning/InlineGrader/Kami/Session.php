@@ -19,7 +19,6 @@ use Alaress_Date_Format;
  */
 class Session
 {
-
     /** @var string */
     private $viewSessionKey;
 
@@ -35,7 +34,7 @@ class Session
      * @param string              $viewerUrl
      * @param Alaress_Date_Format $expiry
      */
-    public function __construct(string $viewSessionKey, string $viewerUrl, Alaress_Date_Format $expiry)
+    public function __construct(string $viewSessionKey, string $viewerUrl, ?Alaress_Date_Format $expiry)
     {
         $this->viewSessionKey = $viewSessionKey;
         $this->viewerUrl      = $viewerUrl;
@@ -64,7 +63,7 @@ class Session
     /**
      * @return Alaress_Date_Format
      */
-    public function getExpiry(): Alaress_Date_Format
+    public function getExpiry(): ?Alaress_Date_Format
     {
         return $this->expiry;
     }

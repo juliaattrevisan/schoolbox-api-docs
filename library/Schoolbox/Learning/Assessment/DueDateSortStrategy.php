@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment;
 
@@ -56,8 +56,6 @@ class DueDateSortStrategy
         if (
             $aDate instanceof Alaress_Date_Format
             && $bDate instanceof Alaress_Date_Format
-            && !$aDate->isNull()
-            && !$bDate->isNull()
         ) {
             $dateComp = $aDate->compare($bDate);
             if ($dateComp) {
@@ -80,7 +78,6 @@ class DueDateSortStrategy
      *
      * @param IAssessable $assessment
      * @return Alaress_Date_Format|null
-     * @phpstan-ignore-next-line: getDueAt may return null
      */
     private function retrieveDateForSort(IAssessable $assessment): ?Alaress_Date_Format
     {

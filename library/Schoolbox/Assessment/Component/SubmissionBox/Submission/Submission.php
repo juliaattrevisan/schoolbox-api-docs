@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
 
+use Alaress_Date_Format;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
@@ -20,7 +21,6 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -28,10 +28,8 @@ use Schoolbox\User;
  * A student's submission to a due work.
  *
  * A submission may contain multiple files.
- *
- * TODO remove IStorage once all uses are found and removed
  */
-class Submission implements IStorage, ISoftDeletable
+class Submission implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
@@ -63,9 +61,9 @@ class Submission implements IStorage, ISoftDeletable
     protected $files;
 
     /**
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    private $submittedAt;
+    private ?Alaress_Date_Format $submittedAt = null;
 
 
     /**
@@ -73,7 +71,7 @@ class Submission implements IStorage, ISoftDeletable
      */
     public function isDraft()
     {
-        return $this->submittedAt instanceof \Alaress_Date_NullDate;
+        return !$this->submittedAt;
     }
 
 
@@ -84,7 +82,7 @@ class Submission implements IStorage, ISoftDeletable
      */
     public function isLate()
     {
-        $now = \Alaress_Date_Format::now();
+        $now = Alaress_Date_Format::now();
         $dueDate = $this->submissionBox->getDueDate();
         $isSubmitted = ! $this->isDraft();
 
@@ -248,105 +246,21 @@ class Submission implements IStorage, ISoftDeletable
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getSubmittedAt()
+    public function getSubmittedAt(): ?Alaress_Date_Format
     {
         return $this->submittedAt;
     }
 
     /**
-     * @param \Alaress_Date_Format $submittedAt
+     * @param Alaress_Date_Format|null $submittedAt
+     *
      * @return static
      */
-    public function setSubmittedAt(\Alaress_Date_Format $submittedAt = null)
+    public function setSubmittedAt(?Alaress_Date_Format $submittedAt): self
     {
-        $this->submittedAt = $submittedAt ?: new \Alaress_Date_NullDate();
+        $this->submittedAt = $submittedAt;
         return $this;
-    }
-
-
-
-    // Deliberately broken implementation of IStorage.
-    // Added only so that uses of this object which assume it's still an IStorage can be rewritten.
-
-    public function getFilename()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function setFilename($filename)
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function getExtension()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function setExtension($extension)
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function getBasename()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function setBasename($basename)
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function getMime()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function getMimetype()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function getSize()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function getHash()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function getLastAccessed()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function exists()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function read()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function readStream()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function getFilesystem()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
-    }
-
-    public function getPath()
-    {
-        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
     }
 }

@@ -18,7 +18,6 @@ use Schoolbox\Assessment\Term;
  */
 class Component extends Filter\BaseComponent
 {
-
     /**
      * A concrete Term model may match one or more availability configs. Eg, the admin may have selected 'all' terms.
      * We need to examine each concrete Term model to see if it matches an availability filter
@@ -70,7 +69,7 @@ class Component extends Filter\BaseComponent
         if ($previousTerm && $abstractOptions[Definition::KEY_PREVIOUS]->getAvailable() && $previousTerm->getId() === $term->getId()) {
             return true;
         }
-        if (!$termFinish->isNull() && $abstractOptions[Definition::KEY_PAST]->getAvailable() && $term->getActualFinish()->isPast()) {
+        if ($termFinish && $abstractOptions[Definition::KEY_PAST]->getAvailable() && $termFinish->isPast()) {
             return true;
         }
         if ($abstractOptions[$term->getId()] && $abstractOptions[$term->getId()]->getAvailable()) {
@@ -101,25 +100,32 @@ class Component extends Filter\BaseComponent
             return true;
         }
         if (
-            $abstractOptions->offsetExists(Definition::KEY_FUTURE) && $term->getStart()->isFuture()
+            $abstractOptions->offsetExists(Definition::KEY_FUTURE)
+            && $term->getStart()->isFuture()
             && $abstractOptions[Definition::KEY_FUTURE]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
         if (
-            $currentTerm && $abstractOptions->offsetExists(Definition::KEY_CURRENT) && $currentTerm->getId() === $term->getId()
+            $currentTerm
+            && $abstractOptions->offsetExists(Definition::KEY_CURRENT)
+            && $currentTerm->getId() === $term->getId()
             && $abstractOptions[Definition::KEY_CURRENT]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
         if (
-            $previousTerm && $abstractOptions->offsetExists(Definition::KEY_PREVIOUS) && $previousTerm->getId() === $term->getId()
+            $previousTerm
+            && $abstractOptions->offsetExists(Definition::KEY_PREVIOUS)
+            && $previousTerm->getId() === $term->getId()
             && $abstractOptions[Definition::KEY_PREVIOUS]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
         if (
-            !$termFinish->isNull() && $abstractOptions->offsetExists(Definition::KEY_PAST) && $term->getActualFinish()->isPast()
+            $termFinish
+            && $abstractOptions->offsetExists(Definition::KEY_PAST)
+            && $termFinish->isPast()
             && $abstractOptions[Definition::KEY_PAST]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;

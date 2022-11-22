@@ -329,7 +329,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $event->setCampusList(implode(',', $decodedConfig->getCampusIds()));
         $event->setDetail(nl2br("{$currentEvent->DESCRIPTION}"));
         $event->setLocation("{$currentEvent->LOCATION}");
-        $event->setPublishDate('');
+        $event->setPublishDate(null);
         $event->setAllDay($allDay);
 
         $event->setIsEditable(false);

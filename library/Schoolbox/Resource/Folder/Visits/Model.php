@@ -9,13 +9,14 @@
 
 namespace Schoolbox\Resource\Folder\Visits;
 
+use Alaress_Date_Format;
 use Schoolbox\Role;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Model
 {
-    /** @var \Alaress_Date_Format */
-    protected $date;
+    /** @var Alaress_Date_Format */
+    protected Alaress_Date_Format $date;
 
     /** @var int */
     protected $hitcount;
@@ -83,19 +84,20 @@ class Model
     }
 
     /**
-     * @param \Alaress_Date_Format $date
-     * @return self
+     * @param Alaress_Date_Format $date
+     *
+     * @return static
      */
-    public function setDate($date)
+    public function setDate(Alaress_Date_Format $date): self
     {
         $this->date = $date;
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
-    public function getDate()
+    public function getDate(): Alaress_Date_Format
     {
         return $this->date;
     }

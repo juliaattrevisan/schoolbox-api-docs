@@ -16,7 +16,7 @@
 
             {% if data.resolution is defined %}<p>{{ data.resolution }}</p>{% endif %}
 
-            {% if data.date and not data.date.isNull %}
+            {% if data.date %}
                 <p><br>Issue occurred at {{ data.date.long }}, further information has been logged.</p>
             {% endif %}
         </div>

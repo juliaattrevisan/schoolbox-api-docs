@@ -18,7 +18,6 @@ use Schoolbox\User;
 
 abstract class Base extends RendererBase
 {
-
     /** @var Day\Event */
     protected $event;
 
@@ -46,24 +45,6 @@ abstract class Base extends RendererBase
         // TODO would rather not create this like this, but it's better than every renderer depending on it
         $this->calHandler = new \Calendar();
         $this->event      = $event;
-    }
-
-
-    /**
-     * If an event has not been published yet, but is still visible (see isVisible) then it should be translucent
-     *
-     * @return mixed
-     */
-    public function isTranslucent()
-    {
-
-        /* TODO: This is a temporary fix and should be repaired when ADN merges into ADF
-         */
-        if ($this->event->getPublishDate() instanceof \Alaress_Date_NullDate) {
-            return false;
-        }
-
-        return $this->event->getPublishDate()->gt(\Alaress_Date_Format::now());
     }
 
 

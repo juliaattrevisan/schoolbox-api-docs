@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\Task\Feedback;
 
+use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\AbstractFeedback;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -23,7 +24,6 @@ use Schoolbox\User;
  */
 class Model extends AbstractFeedback
 {
-
     /**
      * @return Task
      */
@@ -242,9 +242,9 @@ class Model extends AbstractFeedback
     /**
      * TaskFeedback is published when the TaskResponse was created.
      *
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getPublishedAt()
+    public function getPublishedAt(): ?Alaress_Date_Format
     {
         return $this->getResponse()->getCreatedAt();
     }
@@ -253,10 +253,10 @@ class Model extends AbstractFeedback
     /**
      * Set the date when this IFeedback was made accessible to respondents
      *
-     * @param \Alaress_Date_Format $publishedAt
+     * @param Alaress_Date_Format|null $publishedAt
      * @return $this
      */
-    public function setPublishedAt($publishedAt)
+    public function setPublishedAt(?Alaress_Date_Format $publishedAt): self
     {
         // Ignored. Task Feedback are always published.
         return $this;
@@ -264,19 +264,18 @@ class Model extends AbstractFeedback
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCreatedAt()
+    public function getCreatedAt(): ?Alaress_Date_Format
     {
         return $this->getResponse()->getCreatedAt();
     }
 
     /**
-     * @param  \Alaress_Date_Format $createdAt
-     *
+     * @param  Alaress_Date_Format|null $createdAt
      * @return $this
      */
-    public function setCreatedAt(\Alaress_Date_Format $createdAt = null)
+    public function setCreatedAt(?Alaress_Date_Format $createdAt): static
     {
         $this->getResponse()->setCreatedAt($createdAt);
         return $this;
@@ -284,20 +283,19 @@ class Model extends AbstractFeedback
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): ?Alaress_Date_Format
     {
         return $this->getResponse()->getUpdatedAt();
     }
 
 
     /**
-     * @param  \Alaress_Date_Format $updatedAt
-     *
+     * @param  Alaress_Date_Format|null $updatedAt
      * @return $this
      */
-    public function setUpdatedAt(\Alaress_Date_Format $updatedAt = null)
+    public function setUpdatedAt(?Alaress_Date_Format $updatedAt): static
     {
         $this->getResponse()->setUpdatedAt($updatedAt);
         return $this;
@@ -305,19 +303,19 @@ class Model extends AbstractFeedback
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getDeletedAt()
+    public function getDeletedAt(): ?Alaress_Date_Format
     {
         return $this->getResponse()->getDeletedAt();
     }
 
 
     /**
-     * @param  \Alaress_Date_Format $deletedAt
+     * @param  Alaress_Date_Format|null $deletedAt
      * @return $this
      */
-    public function setDeletedAt(\Alaress_Date_Format $deletedAt = null)
+    public function setDeletedAt(?Alaress_Date_Format $deletedAt = null): static
     {
         $this->getResponse()->setDeletedAt($deletedAt);
         return $this;

@@ -84,11 +84,11 @@ class Mapper extends BaseMapper implements IReceiver
             $expiryAt = $storage->getExpiryAt();
             // Only check against previous expiry if the new storage file
             // actually has an expiry
-            if ($expiryAt && !$expiryAt->isNull()) {
+            if ($expiryAt) {
                 $previousExpiryAt = $previous->getExpiryAt();
                 // Allow update of expiry only if the new expiry is after the
                 // previous
-                if ($previousExpiryAt && !$previousExpiryAt->isNull()) {
+                if ($previousExpiryAt) {
                     $updateExpiry = $expiryAt->gt($previousExpiryAt);
                 } else {
                     $updateExpiry = false;

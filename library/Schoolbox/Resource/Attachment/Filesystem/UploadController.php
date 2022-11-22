@@ -54,7 +54,7 @@ class UploadController extends AbstractController
     public function getUrl()
     {
         $url = parent::getUrl();
-        if (!$this->expiryDate || $this->expiryDate->isNull()) {
+        if (!$this->expiryDate) {
             return $url;
         }
 
@@ -77,7 +77,7 @@ class UploadController extends AbstractController
         }
 
         $uploadUrl = new Uri('/storage/asyncUpload.php');
-        if ($this->expiryDate && !$this->expiryDate->isNull()) {
+        if ($this->expiryDate) {
             $uploadUrl = $uploadUrl->setQuery(['expiryDate' => $this->expiryDate->toRfc3339String()]);
         }
 

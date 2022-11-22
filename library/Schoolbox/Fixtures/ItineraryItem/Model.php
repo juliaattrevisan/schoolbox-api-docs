@@ -9,9 +9,11 @@
 namespace Schoolbox\Fixtures\ItineraryItem;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Alaress_Date_Format;
 use Schoolbox\Fixtures\Matchup\Model as Matchup;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
 /**
  * Represents a Position a player may take in some Sport.
@@ -24,6 +26,8 @@ use Schoolbox\Fixtures\Matchup\Model as Matchup;
 class Model implements ISoftDeletable
 {
     // Implements ISoftDeletable
+    use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /** @var int */
@@ -35,14 +39,8 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $description;
 
-    /** @var \Alaress_Date_Format */
-    protected $startAt;
-
     /** @var Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var Alaress_Date_Format */
-    protected $updatedAt;
+    protected Alaress_Date_Format $startAt;
 
     /**
      * Model constructor.
@@ -107,52 +105,19 @@ class Model implements ISoftDeletable
     /**
      * @return Alaress_Date_Format
      */
-    public function getStartAt()
+    public function getStartAt(): Alaress_Date_Format
     {
         return $this->startAt;
     }
 
     /**
      * @param Alaress_Date_Format $startAt
+     *
+     * @return static
      */
-    public function setStartAt($startAt)
+    public function setStartAt(Alaress_Date_Format $startAt): self
     {
         $this->startAt = $startAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
         return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format $createdAt
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $updatedAt
-     * @return self
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 }

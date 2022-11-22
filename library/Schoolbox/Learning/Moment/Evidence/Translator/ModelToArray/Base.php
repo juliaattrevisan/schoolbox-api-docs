@@ -75,19 +75,19 @@ class Base
         // Allow them to be null when translating though?
         try {
             $creator = call_user_func($this->userTranslator, $model->getCreator());
-        } catch (Error $e) {
+        } catch (Error) {
             $creator = null;
         }
         try {
             $recipient = call_user_func($this->userTranslator, $model->getRecipient());
-        } catch (Error $e) {
+        } catch (Error) {
             $recipient = null;
         }
 
         return [
             'id'               => $model->getId(),
-            'createdAt'        => $model->getCreatedAt() ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM) : null,
-            'updatedAt'        => $model->getUpdatedAt() ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM) : null,
+            'createdAt'        => $model->getCreatedAt()?->getUsingFormat(DATE_ATOM),
+            'updatedAt'        => $model->getUpdatedAt()?->getUsingFormat(DATE_ATOM),
             'body'             => $this->purifier->purify($model->getBody()),
             'creator'          => $creator,
             'discussionThread' => $model->getDiscussionThread()
@@ -111,17 +111,14 @@ class Base
                         )
                         ->reindex()
                 : null,
-            'tags'            => $model->getTags()
-                ? $model->getTags()
-                        ->map(
-                            static function (Evidence\Tag\Model $tag) {
-                                return [
-                                    'id'   => $tag->getId(),
-                                    'name' => $tag->getName(),
-                                ];
-                            }
-                        )->reindex()
-                : null,
+            'tags'            => $model->getTags()?->map(
+                static function (Evidence\Tag\Model $tag) {
+                    return [
+                        'id'   => $tag->getId(),
+                        'name' => $tag->getName(),
+                    ];
+                }
+            )->reindex(),
             '_links'           => [],
         ];
     }

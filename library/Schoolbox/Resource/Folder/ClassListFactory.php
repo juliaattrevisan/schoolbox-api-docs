@@ -18,7 +18,6 @@ use Alaress_Date_Format;
  */
 class ClassListFactory
 {
-
     /** @var IConnector */
     private $database;
 
@@ -56,7 +55,7 @@ class ClassListFactory
             ->buildPredicateBuilder('')
             ->in('f.id', $folderIds)
             ->greaterThanOrEqualTo('a.due_date', $start->getDatabase());
-        if ($end && !$end->isNull()) {
+        if ($end) {
             $pb->lessThan('a.due_date', $end->getDatabase());
         }
 

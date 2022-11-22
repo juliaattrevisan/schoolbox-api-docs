@@ -9,8 +9,10 @@
 namespace Schoolbox\Fixtures\Season;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\ValueLabelInterface;
 
 /**
@@ -21,6 +23,8 @@ use Schoolbox\ValueLabelInterface;
 class Model implements ISoftDeletable, ValueLabelInterface
 {
     // Implements ISoftDeletable
+    use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /** @var int */
@@ -29,20 +33,30 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /** @var string */
     protected $name;
 
-    /** @var Alaress_Date_Format */
-    protected $start;
+    /**
+     * The start of the season.
+     *
+     * Will never be null once persisted, but may be when the object is first
+     * used: therefore, it needs to be nullable.
+     *
+     * @var Alaress_Date_Format|null
+     */
+    protected ?Alaress_Date_Format $start = null;
 
-    /** @var Alaress_Date_Format */
-    protected $end;
+    /**
+     * The end of the season.
+     *
+     * Will never be null once persisted, but may be when the object is first
+     * used: therefore, it needs to be nullable.
+     *
+     * @var Alaress_Date_Format|null
+     */
+    protected ?Alaress_Date_Format $end = null;
 
-    /** @var Alaress_Date_Format */
-    private $archivedAt;
-
-    /** @var Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var Alaress_Date_Format */
-    protected $updatedAt;
+    /**
+     * @var Alaress_Date_Format|null
+     */
+    private ?Alaress_Date_Format $archivedAt = null;
 
     /**
      * Model constructor.
@@ -72,7 +86,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
      */
     public function isArchived()
     {
-        return !$this->getArchivedAt()->isNull();
+        return $this->getArchivedAt() instanceof Alaress_Date_Format;
     }
 
     /* Getters/Setters
@@ -115,92 +129,59 @@ class Model implements ISoftDeletable, ValueLabelInterface
     }
 
     /**
-     * @param Alaress_Date_Format $start
+     * @param Alaress_Date_Format|null $start
+     *
      * @return static
      */
-    public function setStart(Alaress_Date_Format $start)
+    public function setStart(?Alaress_Date_Format $start): self
     {
         $this->start = $start;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getStart()
+    public function getStart(): ?Alaress_Date_Format
     {
         return $this->start;
     }
 
     /**
-     * @param Alaress_Date_Format $end
+     * @param Alaress_Date_Format|null $end
+     *
      * @return static
      */
-    public function setEnd(Alaress_Date_Format $end)
+    public function setEnd(?Alaress_Date_Format $end): self
     {
         $this->end = $end;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getEnd()
+    public function getEnd(): ?Alaress_Date_Format
     {
         return $this->end;
     }
 
     /**
-     * @param Alaress_Date_Format $archivedAt
-     * @return static
+     * @return Alaress_Date_Format|null
      */
-    public function setArchivedAt(Alaress_Date_Format $archivedAt)
-    {
-        $this->archivedAt = $archivedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getArchivedAt()
+    public function getArchivedAt(): ?Alaress_Date_Format
     {
         return $this->archivedAt;
     }
 
     /**
-     * @param Alaress_Date_Format $createdAt
+     * @param Alaress_Date_Format|null $archivedAt
+     *
      * @return static
      */
-    public function setCreatedAt(Alaress_Date_Format $createdAt)
+    public function setArchivedAt(?Alaress_Date_Format $archivedAt): self
     {
-        $this->createdAt = $createdAt;
+        $this->archivedAt = $archivedAt;
         return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format $createdAt
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $updatedAt
-     * @return static
-     */
-    public function setUpdatedAt(Alaress_Date_Format $updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 }

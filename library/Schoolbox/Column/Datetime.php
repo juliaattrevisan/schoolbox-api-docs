@@ -44,18 +44,18 @@ class Datetime implements IColumnType
      * @param string|null $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function hydrate($value, $mapper = null)
     {
         if (!isset($value) || static::ZERO_VALUE === $value) {
-            return new \Alaress_Date_NullDate();
+            return null;
         }
 
         try {
             return clone $this->cache->get($value, [$value, $this->input_format]);
         } catch (\Exception $e) {
-            return new \Alaress_Date_NullDate();
+            return null;
         }
     }
 
@@ -71,9 +71,6 @@ class Datetime implements IColumnType
      */
     public function dehydrate($value, $mapper = null)
     {
-        if ($value instanceof \Alaress_Date_NullDate) {
-            return null;
-        }
         if ($value instanceof Alaress_Date_Format) {
             return $value->getUsingFormat($this->output_format);
         }

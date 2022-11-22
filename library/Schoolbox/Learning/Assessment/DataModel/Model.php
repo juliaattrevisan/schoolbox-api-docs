@@ -9,7 +9,6 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
@@ -56,30 +55,30 @@ class Model implements ISoftDeletable
     /**
      * The date/time at which this assessment become visible to its participants.
      *
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $publishDate;
+    protected ?Alaress_Date_Format $publishDate = null;
 
     /**
      * The date/time at which participants able to create responses to this assessment.
      *
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $openDate;
+    protected ?Alaress_Date_Format $openDate = null;
 
     /**
      * The date/time after which a participant's response will be marked as late.
      *
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $dueDate;
+    protected ?Alaress_Date_Format $dueDate = null;
 
     /**
      * The date/time at which participants are no longer able to create responses to this assessment.
      *
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $closeDate;
+    protected ?Alaress_Date_Format $closeDate = null;
 
     /**
      * The comparative amount that this assessment affects a student's grade by.
@@ -242,13 +241,6 @@ class Model implements ISoftDeletable
      */
     public function __construct()
     {
-        $this->publishDate     = new Alaress_Date_NullDate();
-        $this->openDate        = new Alaress_Date_NullDate();
-        $this->dueDate         = new Alaress_Date_NullDate();
-        $this->closeDate       = new Alaress_Date_NullDate();
-        $this->createdAt       = new Alaress_Date_NullDate();
-        $this->updatedAt       = new Alaress_Date_NullDate();
-        $this->deletedAt       = new Alaress_Date_NullDate();
     }
 
 
@@ -482,72 +474,76 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getPublishDate()
+    public function getPublishDate(): ?Alaress_Date_Format
     {
         return $this->publishDate;
     }
 
     /**
-     * @param Alaress_Date_Format $publishDate
+     * @param Alaress_Date_Format|null $publishDate
+     *
      * @return static
      */
-    public function setPublishDate(Alaress_Date_Format $publishDate = null)
+    public function setPublishDate(?Alaress_Date_Format $publishDate): self
     {
         $this->publishDate = $publishDate;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getOpenDate()
+    public function getOpenDate(): ?Alaress_Date_Format
     {
         return $this->openDate;
     }
 
     /**
-     * @param Alaress_Date_Format $openDate
+     * @param Alaress_Date_Format|null $openDate
+     *
      * @return static
      */
-    public function setOpenDate(Alaress_Date_Format $openDate = null)
+    public function setOpenDate(?Alaress_Date_Format $openDate): self
     {
         $this->openDate = $openDate;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getDueDate()
+    public function getDueDate(): ?Alaress_Date_Format
     {
         return $this->dueDate;
     }
 
     /**
-     * @param Alaress_Date_Format $dueDate
+     * @param Alaress_Date_Format|null $dueDate
+     *
      * @return static
      */
-    public function setDueDate(Alaress_Date_Format $dueDate = null)
+    public function setDueDate(?Alaress_Date_Format $dueDate): self
     {
         $this->dueDate = $dueDate;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCloseDate()
+    public function getCloseDate(): ?Alaress_Date_Format
     {
         return $this->closeDate;
     }
 
     /**
-     * @param Alaress_Date_Format $closeDate
+     * @param Alaress_Date_Format|null $closeDate
+     *
      * @return static
      */
-    public function setCloseDate($closeDate)
+    public function setCloseDate(?Alaress_Date_Format $closeDate): self
     {
         $this->closeDate = $closeDate;
         return $this;

@@ -10,6 +10,8 @@
 
 namespace Calendar\Event\Type\Day\Renderer;
 
+use Alaress_Date_Format;
+
 class Javascript extends Base
 {
     /**
@@ -19,7 +21,7 @@ class Javascript extends Base
     {
         /* Future events are visible to superusers, event owners, group members with write access
          */
-        if ($this->isTranslucent()) {
+        if (!$this->getEvent()->isPublishedAtDate(Alaress_Date_Format::now())) {
             $cssClass = 'translucent';
         } else {
             $cssClass = '';

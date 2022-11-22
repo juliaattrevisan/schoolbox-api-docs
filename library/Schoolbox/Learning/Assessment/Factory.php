@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
@@ -483,13 +482,13 @@ class Factory
     /**
      * @param AssessmentContext $context
      * @param string            $dateString
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
     private function deriveDate(AssessmentContext $context, $dateString)
     {
         // no dates exist in spec-land
         if ($context instanceof UnitSpecification) {
-            return new Alaress_Date_NullDate();
+            return null;
         }
 
         try {
@@ -497,7 +496,7 @@ class Factory
             return Alaress_Date_Format::newLocal($dateString);
         } catch (InvalidArgumentException $e) {
             // unparseable - safely return null
-            return new Alaress_Date_NullDate();
+            return null;
         }
     }
 

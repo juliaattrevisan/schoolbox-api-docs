@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Test\Event;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Calendar\Event;
 
@@ -145,7 +144,6 @@ class EventTest extends TestCase
     public function getTestIsPublishedData(): iterable
     {
         $now      = Alaress_Date_Format::now();
-        $nullDate = new Alaress_Date_NullDate();
         $lastYear = Alaress_Date_Format::now()->addYears(-1);
         $nextYear = Alaress_Date_Format::now()->addYears(1);
         return [
@@ -219,17 +217,17 @@ class EventTest extends TestCase
 
             // Deprecated null date publish: always published
             'null date publish, check next year' => [
-                (new Event())->setPublishDateTime($nullDate),
+                (new Event())->setPublishDateTime(null),
                 $nextYear,
                 true,
             ],
             'null date publish, check now'       => [
-                (new Event())->setPublishDateTime($nullDate),
+                (new Event())->setPublishDateTime(null),
                 null,
                 true,
             ],
             'null date publish, check last year' => [
-                (new Event())->setPublishDateTime($nullDate),
+                (new Event())->setPublishDateTime(null),
                 $lastYear,
                 true,
             ],
@@ -237,17 +235,17 @@ class EventTest extends TestCase
             // Deprecated null date now: treat as now
             'last year publish, check null date' => [
                 (new Event())->setPublishDateTime($lastYear),
-                $nullDate,
+                null,
                 true,
             ],
             'now publish, check null date'       => [
                 (new Event())->setPublishDateTime($now),
-                $nullDate,
+                null,
                 true,
             ],
             'next year publish, check null date' => [
                 (new Event())->setPublishDateTime($nextYear),
-                $nullDate,
+                null,
                 false,
             ],
         ];

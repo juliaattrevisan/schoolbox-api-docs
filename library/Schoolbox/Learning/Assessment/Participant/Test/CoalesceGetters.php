@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\Participant\Test;
 
 use PHPUnit\Framework\TestCase;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan as PlanObject;
@@ -27,16 +26,15 @@ use Schoolbox\User;
  */
 class CoalesceGetters extends TestCase
 {
-
     /**
      * @param Participant $participant
      * @param Alaress_Date_Format $publish
      * @param Alaress_Date_Format $open
      * @param Alaress_Date_Format $due
      * @param Alaress_Date_Format $close
-     * @dataProvider provider_dates_domainObject
+     * @dataProvider providerDatesDomainObject
      */
-    public function test_dates_DomainObject(
+    public function testDatesDomainObject(
         Participant $participant,
         Alaress_Date_Format $publish,
         Alaress_Date_Format $open,
@@ -54,15 +52,15 @@ class CoalesceGetters extends TestCase
     /**
      * @param Participant $participant
      * @param null|string $description
-     * @dataProvider provider_description_domainObject
+     * @dataProvider providerDescriptionDomainObject
      */
-    public function test_description_DomainObject(Participant $participant, ?string $description): void
+    public function testDescriptionDomainObject(Participant $participant, ?string $description): void
     {
         $this->assertEquals($description, $participant->getDescription());
     }
 
 
-    public function provider_description_domainObject()
+    public function providerDescriptionDomainObject()
     {
         $data = [];
 
@@ -114,7 +112,7 @@ class CoalesceGetters extends TestCase
 
 
 
-    public function provider_dates_domainObject()
+    public function providerDatesDomainObject()
     {
         $data = [];
 
@@ -139,10 +137,10 @@ class CoalesceGetters extends TestCase
 
                     $data[] = [
                         new Participant(new User(), $planObject),
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
-                        null === $planDate || $planDate->isNull() ? $assessmentDate : $planDate,
+                        $planDate ?? $assessmentDate,
+                        $planDate ?? $assessmentDate,
+                        $planDate ?? $assessmentDate,
+                        $planDate ?? $assessmentDate,
                     ];
 
                     // Dynamic plan: always use assessment's date
@@ -191,13 +189,12 @@ class CoalesceGetters extends TestCase
 
 
     /**
-     * @return null[]|Alaress_Date_NullDate[]|Alaress_Date_Format[]
+     * @return null[]|Alaress_Date_Format[]|Alaress_Date_Format[]
      */
     private function getDates(): array
     {
         return [
             null,
-            new Alaress_Date_NullDate(),
             $this->buildDate('2016-01-01 00:00:00'),
             $this->buildDate('2016-01-01 12:00:00'),
             $this->buildDate('2016-01-01 23:59:59'),

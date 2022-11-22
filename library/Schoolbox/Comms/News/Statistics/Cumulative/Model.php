@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Comms\News\Statistics\Cumulative;
 
+use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -24,9 +25,9 @@ class Model implements ISoftDeletable
     use DeletedAtDate;
 
     /**
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format
      */
-    private $date;
+    private Alaress_Date_Format $date;
 
     /**
      * @var int
@@ -82,19 +83,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
-    public function getDate(): \Alaress_Date_Format
+    public function getDate(): Alaress_Date_Format
     {
         return $this->date;
     }
 
 
     /**
-     * @param \Alaress_Date_Format $date
+     * @param Alaress_Date_Format $date
      * @return Model
      */
-    public function setDate(\Alaress_Date_Format $date): self
+    public function setDate(Alaress_Date_Format $date): self
     {
         $this->date = $date;
         return $this;

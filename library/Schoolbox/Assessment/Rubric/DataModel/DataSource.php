@@ -1650,7 +1650,7 @@ class DataSource
            ->isNull('u.deleted_at');
 
         $finish = $term->getActualFinish();
-        if (null !== $finish && !$finish->isNull()) {
+        if (null !== $finish) {
             $pb->lessThan('a.due_date', $finish->getDatabase());
         }
 

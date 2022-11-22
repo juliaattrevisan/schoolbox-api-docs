@@ -54,22 +54,22 @@ class Model implements ISoftDeletable
     /**
      * @var null|Alaress_Date_Format
      */
-    private $publishDate;
+    private ?Alaress_Date_Format $publishDate = null;
 
     /**
      * @var null|Alaress_Date_Format
      */
-    private $openDate;
+    private ?Alaress_Date_Format $openDate = null;
 
     /**
      * @var null|Alaress_Date_Format
      */
-    private $dueDate;
+    private ?Alaress_Date_Format $dueDate = null;
 
     /**
      * @var null|Alaress_Date_Format
      */
-    private $closeDate;
+    private ?Alaress_Date_Format $closeDate = null;
 
     /**
      * @var Participant\Model[]|GenericCollection
@@ -170,7 +170,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return null|Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function getPublishDate(): ?Alaress_Date_Format
     {
@@ -179,8 +179,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param null|Alaress_Date_Format $publishDate
-     * @return $this
+     * @param Alaress_Date_Format|null $publishDate
+     *
+     * @return static
      */
     public function setPublishDate(?Alaress_Date_Format $publishDate): self
     {
@@ -190,7 +191,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return null|Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function getOpenDate(): ?Alaress_Date_Format
     {
@@ -199,8 +200,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param null|Alaress_Date_Format $openDate
-     * @return $this
+     * @param Alaress_Date_Format|null $openDate
+     *
+     * @return static
      */
     public function setOpenDate(?Alaress_Date_Format $openDate): self
     {
@@ -210,7 +212,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return null|Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function getDueDate(): ?Alaress_Date_Format
     {
@@ -219,8 +221,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param null|Alaress_Date_Format $dueDate
-     * @return $this
+     * @param Alaress_Date_Format|null $dueDate
+     *
+     * @return static
      */
     public function setDueDate(?Alaress_Date_Format $dueDate): self
     {
@@ -230,7 +233,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return null|Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function getCloseDate(): ?Alaress_Date_Format
     {
@@ -239,8 +242,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param null|Alaress_Date_Format $closeDate
-     * @return $this
+     * @param Alaress_Date_Format|null $closeDate
+     *
+     * @return static
      */
     public function setCloseDate(?Alaress_Date_Format $closeDate): self
     {

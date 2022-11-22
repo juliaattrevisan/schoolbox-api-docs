@@ -37,7 +37,7 @@ class External_AscTimetables_Translator_Structure extends External_AscTimetables
         }
 
         $endResult = [];
-        if ($result['termStart'] instanceof Alaress_Date_Format && !$result['termStart']->isNull()) {
+        if ($result['termStart'] instanceof Alaress_Date_Format) {
             $termStart  = $result['termStart']->getDatabaseDate();
             $termFinish = clone $result['termStart'];
             $termFinish = $termFinish->addYears(1)->getDatabaseDate();

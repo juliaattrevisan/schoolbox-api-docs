@@ -735,14 +735,14 @@ class ImportFactory
 
     /**
      * @param string|null $dateString
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    protected function createDate(?string $dateString): Alaress_Date_Format
+    protected function createDate(?string $dateString): ?Alaress_Date_Format
     {
         if (is_null($dateString)) {
-            return new \Alaress_Date_NullDate();
+            return null;
         } else {
-            return new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_FORMAT);
+            return new Alaress_Date_Format($dateString, Alaress_Date_Format::DATABASE_FORMAT);
         }
     }
 
@@ -801,7 +801,7 @@ class ImportFactory
 
         $assessmentSpec->setDefaultOpenSpan($row['sa.default_open_span']);
         if (is_null($row['sa.deleted_at'])) {
-            $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
+            $assessmentSpec->setDeletedAt(null);
         } else {
             $assessmentSpec->setDeletedAt($this->createDate($row['sa.deleted_at']));
         }

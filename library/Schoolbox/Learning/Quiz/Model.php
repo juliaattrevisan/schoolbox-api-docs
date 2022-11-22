@@ -91,14 +91,14 @@ class Model implements ISoftDeletable, IAssessableDataModel
     protected $completion_message;
 
     /**
-    * @var Alaress_Date_Format
+    * @var Alaress_Date_Format|null
     */
-    protected $start;
+    protected ?Alaress_Date_Format $start = null;
 
     /**
-    * @var Alaress_Date_Format
+    * @var Alaress_Date_Format|null
     */
-    protected $finish;
+    protected ?Alaress_Date_Format $finish = null;
 
     /**
     * @var int
@@ -239,7 +239,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
      * Clears any attempts from the clone, and clones each Section in the Quiz
      * @return void
      */
-    function __clone()
+    public function __clone()
     {
         // Mark this object as a clone
         $this->id = null;
@@ -424,20 +424,20 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @param  \Alaress_Date_Format $finish
-    *
-    * @return $this
-    */
-    public function setFinish($finish)
+     * @param Alaress_Date_Format|null $finish
+     *
+     * @return static
+     */
+    public function setFinish(?Alaress_Date_Format $finish): self
     {
         $this->finish = $finish;
         return $this;
     }
 
     /**
-    * @return \Alaress_Date_Format
-    */
-    public function getFinish()
+     * @return Alaress_Date_Format|null
+     */
+    public function getFinish(): ?Alaress_Date_Format
     {
         return $this->finish;
     }
@@ -482,20 +482,20 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @param  \Alaress_Date_Format $start
-    *
-    * @return $this
-    */
-    public function setStart($start)
+     * @param Alaress_Date_Format|null $start
+     *
+     * @return static
+     */
+    public function setStart(?Alaress_Date_Format $start): self
     {
         $this->start = $start;
         return $this;
     }
 
     /**
-    * @return \Alaress_Date_Format
-    */
-    public function getStart()
+     * @return Alaress_Date_Format|null
+     */
+    public function getStart(): ?Alaress_Date_Format
     {
         return $this->start;
     }
@@ -581,9 +581,9 @@ class Model implements ISoftDeletable, IAssessableDataModel
     *
     * @return bool
     */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
-        return ($this->getDeleted() instanceof \Alaress_Date_Format && !$this->getDeleted()->isNull());
+        return $this->getDeleted() instanceof \Alaress_Date_Format;
     }
 
     /**

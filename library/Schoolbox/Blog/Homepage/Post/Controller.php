@@ -190,7 +190,7 @@ class Controller extends Base
                 $this->getBlogImageMapper()->delete($attachment);
             } elseif ($foundAttachment && $attachment->isDeleted()) {
                 // The attachment was found but deleted in the database. Restore it
-                $attachment->setDeletedAt();
+                $attachment->setDeletedAt(null);
                 $this->getBlogImageMapper()->save($attachment);
                 $retainedAttachments[] = $attachment->getHash();
             } else {

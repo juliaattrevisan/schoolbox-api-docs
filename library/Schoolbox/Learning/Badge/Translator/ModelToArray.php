@@ -119,13 +119,9 @@ class ModelToArray
 
         return [
             'id'                => $model->getId(),
-            'createdAt'         => $model->getCreatedAt() && !$model->getCreatedAt()->isNull()
-                ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM)
-                : null,
+            'createdAt'         => $model->getCreatedAt()->getUsingFormat(DATE_ATOM),
             'createdBy'         => $createdBy,
-            'updatedAt'         => $model->getUpdatedAt() && !$model->getUpdatedAt()->isNull()
-                ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM)
-                : null,
+            'updatedAt'         => $model->getUpdatedAt()->getUsingFormat(DATE_ATOM),
             'updatedBy'         => $updatedBy,
             'name'              => $model->getName(),
             'body'              => $this->purifier->purify($model->getBody()),
@@ -144,18 +140,16 @@ class ModelToArray
             'achievementExpiry' => $model->getAchievementExpiry(),
             'goalExpiry'        => $model->getGoalExpiry(),
             'curriculumNodes'   => $curriculumNodes
-                ? $curriculumNodes
-                    ->map(
-                        static function (Node\Model $node) {
-                            return [
-                                'id'   => $node->getId(),
-                                'name' => $node->getName(),
-                                'code' => $node->getCode(),
-                            ];
-                        }
-                    )
-                    ->reindex()
-                : null,
+                ?->map(
+                    static function (Node\Model $node) {
+                        return [
+                            'id'   => $node->getId(),
+                            'name' => $node->getName(),
+                            'code' => $node->getCode(),
+                        ];
+                    }
+                )
+                ->reindex(),
 
             // Tags don't exist yet, they will be added soon though
             'tags'              => null,

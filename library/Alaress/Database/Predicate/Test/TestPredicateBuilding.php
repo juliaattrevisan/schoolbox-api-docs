@@ -14,7 +14,6 @@ use Alaress\Database\Predicate\Builder;
 use PHPUnit\Framework\TestCase;
 use Alaress\Database\Quoter\Mysql;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Alaress\Database\Predicate\InvalidColumnException;
 use TypeError;
 use UnderflowException;
@@ -24,7 +23,6 @@ use UnderflowException;
  */
 class TestPredicateBuilding extends TestCase
 {
-
     /** @var Mysql\Quoter */
     private $mySqlQuoter;
 
@@ -118,7 +116,7 @@ class TestPredicateBuilding extends TestCase
      * @throws InvalidColumnException
      * @throws \PHPUnit\Framework\Exception
      */
-    public function test_equals_adf()
+    public function testEqualsAlaressDateFormat()
     {
         $pb = new Builder($this->mySqlQuoter, 'table');
         $pb->equals('column', new Alaress_Date_Format('2010-01-01 00:00:00', Alaress_Date_Format::DATABASE_FORMAT));
@@ -365,15 +363,12 @@ class TestPredicateBuilding extends TestCase
     {
         $date1    = new Alaress_Date_Format('2010-01-01', Alaress_Date_Format::DATABASE_DATE_FORMAT);
         $date2    = new Alaress_Date_Format('2010-01-01', Alaress_Date_Format::DATABASE_DATE_FORMAT);
-        $nullDate = new Alaress_Date_NullDate();
         return [
             [null, null, [], []],
-            [$nullDate, $nullDate, [], []],
-            [$nullDate, null, [], []],
             [$date1, null, ['`table`.`column` >= :column_0'], ['column_0' => $date1->getDatabase()]],
-            [$date1, $nullDate, ['`table`.`column` >= :column_0'], ['column_0' => $date1->getDatabase()]],
+            [$date1, null, ['`table`.`column` >= :column_0'], ['column_0' => $date1->getDatabase()]],
             [null, $date2, ['`table`.`column` <= :column_0'], ['column_0' => $date2->getDatabase()]],
-            [$nullDate, $date2, ['`table`.`column` <= :column_0'], ['column_0' => $date2->getDatabase()]],
+            [null, $date2, ['`table`.`column` <= :column_0'], ['column_0' => $date2->getDatabase()]],
             [
                 $date1,
                 $date2,

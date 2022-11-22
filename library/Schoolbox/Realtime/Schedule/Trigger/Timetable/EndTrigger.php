@@ -16,7 +16,6 @@ use Schoolbox\Campus;
 
 class EndTrigger extends TimetableTrigger
 {
-
     /**
      * @param Campus $campus
      * @param IClock $clock
@@ -55,15 +54,18 @@ class EndTrigger extends TimetableTrigger
 
 
     /**
-     * @param ADF $start
-     * @param ADF $end
-     * @param ADF $now
+     * @param ADF      $start
+     * @param ADF|null $end
+     * @param ADF      $now
      * @throws OutOfBoundsException if this period is not relevant
-     * @return ADF
+     * @return ADF|null
      */
-    protected function testPeriod(ADF $start, ADF $end, ADF $now)
+    protected function testPeriod(ADF $start, ?ADF $end, ADF $now)
     {
         // if we're inside this period, return its end
+        if (!$end) {
+            return null;
+        }
         if ($now->lt($end) && $now->gt($start)) {
             return $end;
         }

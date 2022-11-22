@@ -90,24 +90,24 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      * If this isn't null, the submission box won't be shown on student's
      * calendars until this date.
      *
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $publish_date;
+    protected ?Alaress_Date_Format $publish_date = null;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $open_date;
+    protected ?Alaress_Date_Format $open_date = null;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $due_date;
+    protected ?Alaress_Date_Format $due_date = null;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $late_date;
+    protected ?Alaress_Date_Format $late_date = null;
 
     /**
      * @var bool
@@ -205,10 +205,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function __construct()
     {
         $this->setCategory(new FolderModel());
-        $this->setPublishDate(new \Alaress_Date_NullDate());
-        $this->setOpenDate(new \Alaress_Date_NullDate());
-        $this->setDueDate(new \Alaress_Date_NullDate());
-        $this->setLateDate(new \Alaress_Date_NullDate());
         $this->setAssessmentModel(new Model());
     }
 
@@ -445,41 +441,42 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         return $this->accept_online;
     }
 
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getDueDate(): ?Alaress_Date_Format
+    {
+        return $this->due_date;
+    }
 
     /**
-     * @param  Alaress_Date_Format $due_date
-     * @return $this
+     * @param Alaress_Date_Format|null $due_date
+     *
+     * @return static
      */
-    public function setDueDate($due_date)
+    public function setDueDate(?Alaress_Date_Format $due_date): self
     {
         $this->due_date = $due_date;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getDueDate()
+    public function getLateDate(): ?Alaress_Date_Format
     {
-        return $this->due_date;
+        return $this->late_date;
     }
 
     /**
-     * @param  Alaress_Date_Format $late_date
-     * @return $this
+     * @param Alaress_Date_Format|null $late_date
+     *
+     * @return static
      */
-    public function setLateDate($late_date)
+    public function setLateDate(?Alaress_Date_Format $late_date): self
     {
         $this->late_date = $late_date;
         return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getLateDate()
-    {
-        return $this->late_date;
     }
 
     /**
@@ -519,21 +516,22 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @param  Alaress_Date_Format $open_date
-     * @return $this
+     * @return Alaress_Date_Format|null
      */
-    public function setOpenDate($open_date)
+    public function getOpenDate(): ?Alaress_Date_Format
     {
-        $this->open_date = $open_date;
-        return $this;
+        return $this->open_date;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @param Alaress_Date_Format|null $open_date
+     *
+     * @return static
      */
-    public function getOpenDate()
+    public function setOpenDate(?Alaress_Date_Format $open_date): self
     {
-        return $this->open_date;
+        $this->open_date = $open_date;
+        return $this;
     }
 
     /**
@@ -701,18 +699,19 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getPublishDate()
+    public function getPublishDate(): ?Alaress_Date_Format
     {
         return $this->publish_date;
     }
 
     /**
-     * @param  Alaress_Date_Format $publish_date
-     * @return $this
+     * @param Alaress_Date_Format|null $publish_date
+     *
+     * @return static
      */
-    public function setPublishDate($publish_date)
+    public function setPublishDate(?Alaress_Date_Format $publish_date): self
     {
         $this->publish_date = $publish_date;
         return $this;

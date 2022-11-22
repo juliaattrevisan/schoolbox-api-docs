@@ -17,7 +17,6 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
-use Alaress_Date_NullDate;
 
 class Model implements ISoftDeletable
 {
@@ -39,12 +38,12 @@ class Model implements ISoftDeletable
     /**
      * @var Alaress_Date_Format
      */
-    private $start;
+    private Alaress_Date_Format $start;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    private $finish;
+    private ?Alaress_Date_Format $finish = null;
 
     /**
      * The teacher who reviewed this attempt. Null if not yet reviewed.
@@ -54,9 +53,9 @@ class Model implements ISoftDeletable
     private $reviewer;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    private $reviewed;
+    private ?Alaress_Date_Format $reviewed = null;
 
     /**
      * @var Alaress_Date_Format
@@ -83,9 +82,9 @@ class Model implements ISoftDeletable
      *
      * @return bool
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
-        return !$this->getDeleted()->isNull();
+        return $this->getDeleted() instanceof Alaress_Date_Format;
     }
 
     /* Getters / Setters
@@ -110,21 +109,20 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param  Alaress_Date_Format $finish
-     * @return $this
+     * @param Alaress_Date_Format|null $finish
+     *
+     * @return static
      */
-    public function setFinish(Alaress_Date_Format $finish)
+    public function setFinish(?Alaress_Date_Format $finish): self
     {
         $this->finish = $finish;
         return $this;
     }
 
     /**
-     * The timestamp when user clicked 'Finish' while attempting the Quiz
-     *
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getFinish()
+    public function getFinish(): ?Alaress_Date_Format
     {
         return $this->finish;
     }
@@ -137,25 +135,25 @@ class Model implements ISoftDeletable
      */
     public function isFinished(): bool
     {
-        return !(null === $this->finish || $this->finish instanceof Alaress_Date_NullDate);
+        return null !== $this->finish;
     }
 
 
     /**
-     * @param  Alaress_Date_Format $reviewed
+     * @param Alaress_Date_Format|null $reviewed
      *
-     * @return $this
+     * @return static
      */
-    public function setReviewed(Alaress_Date_Format $reviewed)
+    public function setReviewed(?Alaress_Date_Format $reviewed): self
     {
         $this->reviewed = $reviewed;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getReviewed()
+    public function getReviewed(): ?Alaress_Date_Format
     {
         return $this->reviewed;
     }
@@ -167,15 +165,15 @@ class Model implements ISoftDeletable
      */
     public function isReviewed()
     {
-        return ($this->getReviewed() instanceof \Alaress_Date_Format && !$this->getReviewed()->isNull());
+        return $this->getReviewed() instanceof \Alaress_Date_Format;
     }
 
     /**
-     * @param  Alaress_Date_Format $start
+     * @param Alaress_Date_Format $start
      *
-     * @return $this
+     * @return static
      */
-    public function setStart(Alaress_Date_Format $start)
+    public function setStart(Alaress_Date_Format $start): self
     {
         $this->start = $start;
         return $this;
@@ -184,7 +182,7 @@ class Model implements ISoftDeletable
     /**
      * @return Alaress_Date_Format
      */
-    public function getStart()
+    public function getStart(): Alaress_Date_Format
     {
         return $this->start;
     }
@@ -213,7 +211,7 @@ class Model implements ISoftDeletable
      *
      * @return $this
      */
-    public function setDeleted(Alaress_Date_Format $deleted)
+    public function setDeleted(?Alaress_Date_Format $deleted)
     {
         $this->deleted = $deleted;
         return $this;

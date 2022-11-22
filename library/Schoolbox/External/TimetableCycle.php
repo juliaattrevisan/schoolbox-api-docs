@@ -8,6 +8,8 @@
 
 namespace Schoolbox\External;
 
+use Alaress_Date_Format;
+
 /**
  * Class TimetableCycle
  *
@@ -17,7 +19,6 @@ namespace Schoolbox\External;
  */
 class TimetableCycle
 {
-
     /**
      * @var int
      */
@@ -43,15 +44,15 @@ class TimetableCycle
 
 
     /**
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format
      */
-    private $start;
+    private Alaress_Date_Format $start;
 
 
     /**
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format
      */
-    private $finish;
+    private Alaress_Date_Format $finish;
 
 
     /**
@@ -156,10 +157,11 @@ class TimetableCycle
 
 
     /**
-     * @param  \Alaress_Date_Format $finish
-     * @return $this
+     * @param Alaress_Date_Format $finish
+     *
+     * @return static
      */
-    public function setFinish($finish)
+    public function setFinish(Alaress_Date_Format $finish): self
     {
         $this->finish = $finish;
         return $this;
@@ -167,9 +169,9 @@ class TimetableCycle
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
-    public function getFinish()
+    public function getFinish(): Alaress_Date_Format
     {
         return $this->finish;
     }
@@ -196,10 +198,11 @@ class TimetableCycle
 
 
     /**
-     * @param  \Alaress_Date_Format $start
-     * @return $this
+     * @param Alaress_Date_Format $start
+     *
+     * @return static
      */
-    public function setStart($start)
+    public function setStart(Alaress_Date_Format $start): self
     {
         $this->start = $start;
         return $this;
@@ -207,12 +210,13 @@ class TimetableCycle
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
-    public function getStart()
+    public function getStart(): Alaress_Date_Format
     {
         return $this->start;
     }
+
 
 
     /**

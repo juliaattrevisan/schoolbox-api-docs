@@ -21,14 +21,12 @@ use PHPUnit\Framework\TestCase;
 use Alaress\Database\Quoter\Mysql;
 use Traversable;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 
 /**
  * Test that the Predicate Builder's public methods throw the exceptions they claim to.
  */
 class TestExpectedExceptions extends TestCase
 {
-
     /** @var Mysql\Quoter */
     private $mySqlQuoter;
 
@@ -44,14 +42,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumnNamesAndValues
+     * @dataProvider providerInvalidColumnNamesAndValues
      * @param string $invalidColumnName
      * @param mixed  $value
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
-    public function test_addColumnList(string $invalidColumnName, $value): void
+    public function testAddColumnList(string $invalidColumnName, $value): void
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -60,12 +58,12 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn
+     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_isNull($invalidOperand)
+    public function testIsNull($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -74,12 +72,12 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn
+     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_notNull($invalidOperand)
+    public function testNotNull($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -88,12 +86,12 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn
+     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_isTrue($invalidOperand)
+    public function testIsTrue($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -102,12 +100,12 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn
+     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_isFalse($invalidOperand)
+    public function testIsFalse($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -116,14 +114,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn_validValue
+     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc  $invalidColumn
      * @param string|float|int $value
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_equals_invalidColumn($invalidColumn, $value)
+    public function testEqualsInvalidColumn($invalidColumn, $value)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -132,14 +130,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_validColumn_invalidValue
+     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc  $validOperand
      * @param string|float|int $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_equals_invalidArg($validOperand, $invalidValue)
+    public function testEqualsInvalidArg($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -148,14 +146,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn_validValue
+     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc  $invalidOperand
      * @param string|float|int $value
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_notEquals_invalidColumn($invalidOperand, $value)
+    public function testNotEqualsInvalidColumn($invalidOperand, $value)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -164,14 +162,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_validColumn_invalidValue
+     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc  $validOperand
      * @param string|float|int $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_notEquals_invalidArg($validOperand, $invalidValue)
+    public function testNotEqualsInvalidArg($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -180,7 +178,7 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn_validValueTraversable
+     * @dataProvider providerInvalidColumnValidValueTraversable
      * @param string|ISqlFunc   $invalidOperand
      * @param array|Traversable $validValue
      * @throws TypeError
@@ -188,7 +186,7 @@ class TestExpectedExceptions extends TestCase
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
-    public function test_in_invalidColumn($invalidOperand, $validValue)
+    public function testInInvalidColumn($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -197,7 +195,7 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_validColumn_invalidValueTraversable
+     * @dataProvider providerValidColumnInvalidValueTraversable
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
@@ -205,7 +203,7 @@ class TestExpectedExceptions extends TestCase
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
-    public function test_in_invalidArg($validOperand, $invalidValue)
+    public function testInInvalidArg($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -218,7 +216,7 @@ class TestExpectedExceptions extends TestCase
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
-    public function test_in_eEmpty()
+    public function testInEmpty()
     {
         $this->expectException(UnderflowException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -227,7 +225,7 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn_validValueTraversable
+     * @dataProvider providerInvalidColumnValidValueTraversable
      * @param string|ISqlFunc   $invalidOperand
      * @param array|Traversable $validValue
      * @throws TypeError
@@ -235,7 +233,7 @@ class TestExpectedExceptions extends TestCase
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
-    public function test_notIn_invalidColumn($invalidOperand, $validValue)
+    public function testNotInInvalidColumn($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -244,7 +242,7 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_validColumn_invalidValueTraversable
+     * @dataProvider providerValidColumnInvalidValueTraversable
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
@@ -252,7 +250,7 @@ class TestExpectedExceptions extends TestCase
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
-    public function test_notIn_invalidArg($validOperand, $invalidValue)
+    public function testNotInInvalidArg($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -274,12 +272,12 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn
+     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_like_invalidColumn($invalidOperand)
+    public function testLikeInvalidColumn($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -288,12 +286,12 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn
+     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_likeAny_invalidColumn($invalidOperand)
+    public function testLikeAnyInvalidColumn($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -302,12 +300,12 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn
+     * @dataProvider providerInvalidColumn
      * @param string|ISqlFunc $invalidOperand
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_notLike_invalidColumn($invalidOperand)
+    public function testNotLikeInvalidColumn($invalidOperand)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -316,14 +314,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn_validValue
+     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_lessThan_invalidColumn_validValue($invalidOperand, $validValue)
+    public function testLessThanInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -332,14 +330,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_validColumn_invalidValue
+     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_lessThan_validColumn_invalidValue($validOperand, $invalidValue)
+    public function testLessThanValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -348,14 +346,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn_validValue
+     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_lessThanOrEqualTo_invalidColumn_validValue($invalidOperand, $validValue)
+    public function testLessThanOrEqualToInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -364,14 +362,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_validColumn_invalidValue
+     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_lessThanOrEqualTo_validColumn_invalidValue($validOperand, $invalidValue)
+    public function testLessThanOrEqualToValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -380,14 +378,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn_validValue
+     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_greaterThan_invalidColumn_validValue($invalidOperand, $validValue)
+    public function testGreaterThanInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -396,14 +394,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_validColumn_invalidValue
+     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_greaterThan_validColumn_invalidValue($validOperand, $invalidValue)
+    public function testGreaterThanValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -412,14 +410,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn_validValue
+     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_greaterThanOrEqualTo_invalidColumn_validValue($invalidOperand, $validValue)
+    public function testGreaterThanOrEqualToInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -428,14 +426,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_validColumn_invalidValue
+     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_greaterThanOrEqualTo_validColumn_invalidValue($validOperand, $invalidValue)
+    public function testGreaterThanOrEqualToValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -444,14 +442,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn_validValue
+     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_notLessThan_invalidColumn_validValue($invalidOperand, $validValue)
+    public function testNotLessThanInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -460,14 +458,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_validColumn_invalidValue
+     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_notLessThan_validColumn_invalidValue($validOperand, $invalidValue)
+    public function testNotLessThanValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -476,14 +474,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_invalidColumn_validValue
+     * @dataProvider providerInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_notGreaterThan_invalidColumn_validValue($invalidOperand, $validValue)
+    public function testNotGreaterThanInvalidColumnValidValue($invalidOperand, $validValue)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -492,14 +490,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_validColumn_invalidValue
+     * @dataProvider providerValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidValue
      * @throws TypeError
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_notGreaterThan_validColumn_invalidValue($validOperand, $invalidValue)
+    public function testNotGreaterThanValidColumnInvalidValue($validOperand, $invalidValue)
     {
         $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -508,7 +506,7 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_between_invalidColumn_validValue
+     * @dataProvider providerBetweenInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validFrom
      * @param mixed           $validTo
@@ -516,7 +514,7 @@ class TestExpectedExceptions extends TestCase
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_between_invalidColumn_validValue($invalidOperand, $validFrom, $validTo)
+    public function testBetweenInvalidColumnValidValue($invalidOperand, $validFrom, $validTo)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -525,7 +523,7 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_between_validColumn_invalidValue
+     * @dataProvider providerBetweenValidColumnInvalidValue
      * @param string|ISqlFunc $validOperand
      * @param mixed           $invalidFrom
      * @param mixed           $invalidTo
@@ -533,7 +531,7 @@ class TestExpectedExceptions extends TestCase
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_between_validColumn_invalidValue($validOperand, $invalidFrom, $invalidTo)
+    public function testBetweenValidColumnInvalidValue($validOperand, $invalidFrom, $invalidTo)
     {
         $this->expectException(TypeError::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -542,14 +540,14 @@ class TestExpectedExceptions extends TestCase
 
 
     /**
-     * @dataProvider provider_betweenDates_invalidColumn_validValue
+     * @dataProvider providerBetweenDatesInvalidColumnValidValue
      * @param string|ISqlFunc $invalidOperand
      * @param mixed           $validFrom
      * @param mixed           $validTo
      * @throws InvalidColumnException
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_betweenDates_invalidColumn_validValue($invalidOperand, $validFrom, $validTo)
+    public function testBetweenDatesInvalidColumnValidValue($invalidOperand, $validFrom, $validTo)
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');
@@ -559,7 +557,7 @@ class TestExpectedExceptions extends TestCase
 
     // Data Providers
 
-    public function provider_betweenDates_invalidColumn_validValue()
+    public function providerBetweenDatesInvalidColumnValidValue()
     {
         $data   = [];
         $format = Alaress_Date_Format::DATABASE_DATE_FORMAT;
@@ -579,7 +577,7 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function provider_between_invalidColumn_validValue()
+    public function providerBetweenInvalidColumnValidValue()
     {
         $data = [];
         foreach ($this->getInvalidColumnNames() as $invalidColumnName) {
@@ -602,7 +600,7 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function provider_between_validColumn_invalidValue()
+    public function providerBetweenValidColumnInvalidValue()
     {
         $data = [];
         foreach ($this->getValidColumnNames() as $validColumnName) {
@@ -621,7 +619,7 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function provider_invalidColumn()
+    public function providerInvalidColumn()
     {
         $data = [];
         foreach ($this->getInvalidColumnNames() as $invalidColumnName) {
@@ -634,7 +632,7 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function provider_invalidColumn_validValue()
+    public function providerInvalidColumnValidValue()
     {
         $data = [];
         foreach ($this->getInvalidColumnNames() as $invalidColumnName) {
@@ -653,7 +651,7 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function provider_validColumn_invalidValueTraversable()
+    public function providerValidColumnInvalidValueTraversable()
     {
         $data = [];
         foreach ($this->getValidColumnNames() as $validColumnName) {
@@ -676,7 +674,7 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function provider_invalidColumn_validValueTraversable()
+    public function providerInvalidColumnValidValueTraversable()
     {
         $data = [];
         foreach ($this->getInvalidColumnNames() as $invalidColumnName) {
@@ -693,18 +691,16 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function provider_validColumn_invalidValue()
+    public function providerValidColumnInvalidValue()
     {
         $data = [];
         foreach ($this->getValidColumnNames() as $validColumn) {
             $data[] = [$validColumn, null];
-            $data[] = [$validColumn, new Alaress_Date_NullDate()];
             $data[] = [$validColumn, []];
             $data[] = [$validColumn, [10, 20]];
         }
         foreach ($this->getSqlFuncWithValidColumnNames() as $validSqlFunc) {
             $data[] = [$validSqlFunc, null];
-            $data[] = [$validSqlFunc, new Alaress_Date_NullDate()];
             $data[] = [$validSqlFunc, []];
             $data[] = [$validSqlFunc, [10, 20]];
         }
@@ -712,7 +708,7 @@ class TestExpectedExceptions extends TestCase
     }
 
 
-    public function provider_invalidColumnNamesAndValues()
+    public function providerInvalidColumnNamesAndValues()
     {
         $data = [];
         foreach ($this->getInvalidColumnNames() as $invalidColumnName) {

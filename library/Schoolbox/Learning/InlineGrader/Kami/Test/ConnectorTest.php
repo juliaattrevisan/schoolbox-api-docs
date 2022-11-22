@@ -458,7 +458,7 @@ class ConnectorTest extends TestCase
                 $session->getExpiry()->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC)
             );
         } else {
-            $this->assertTrue($session->getExpiry()->isNull());
+            $this->assertNull($session->getExpiry());
         }
     }
 

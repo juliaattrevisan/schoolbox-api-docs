@@ -32,7 +32,7 @@ class AssessmentPair
     /**
      * Recursive to permit any level of Project nesting
      *
-     * @var AssessmentPair[]|GenericCollection|null
+     * @var static[]|GenericCollection
      */
     private $assessmentPairs;
 
@@ -59,17 +59,13 @@ class AssessmentPair
         // Are we setting an Implementation ?
         if ($impl instanceof IAssessable) {
             // Ensure Implementation is not deleted
-            if (is_null($impl->getDeletedAt())) {
-                throw new \DomainException("AssessmentImpl deletedAt required for integrity check: {$impl->getId()}");
-            } elseif (!$impl->getDeletedAt() instanceof \Alaress_Date_NullDate) {
+            if ($impl->isDeleted()) {
                 throw new \DomainException('AssessmentImpl cannot be deleted: ' . $impl->getId());
             }
         } else {
             // else we must have just received a Spec
             // Ensure it is not deleted
-            if (is_null($spec->getDeletedAt())) {
-                throw new \DomainException("AssessmentSpec deletedAt required for integrity check: {$spec->getId()}");
-            } elseif (!$spec->getDeletedAt() instanceof \Alaress_Date_NullDate) {
+            if ($spec->isDeleted()) {
                 throw new \DomainException("AssessmentSpec cannot be deleted if no AssessmentImpl present: {$spec->getId()}");
             }
         }

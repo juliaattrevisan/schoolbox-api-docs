@@ -9,7 +9,7 @@
 <fieldset class="content collapsible" id="participation-container">
     {% set hasCustomisation = false %}
     {% for participant in assessment.allParticipants  %}
-        {% if (participant.excludedAt and not participant.excludedAt.null) or participant.plan.name %}
+        {% if participant.excludedAt or participant.plan.name %}
             {% set hasCustomisation = true %}
         {% endif %}
     {% endfor %}
@@ -102,7 +102,7 @@
                     {% for participant in assessment.allParticipants %}
                         {% set user = participant.user %}
                         {% set hasInteraction = (participant.allResponses|length) > 0 or (participant.allFeedbacks|length) > 0 %}
-                        {% set userInclude = (not participant.excludedAt) or participant.excludedAt.null %}
+                        {% set userInclude = (not participant.excludedAt) %}
                         {% set userPlanName = userInclude ? (participant.plan.name ?: '(no customisations)') : '(excluded)' %}
                         {% set userStatus = userInclude ? (participant.plan.name ? 'custom' : 'included') : 'excluded' %}
 

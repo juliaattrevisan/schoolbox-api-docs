@@ -504,10 +504,10 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $key = "{$assessment->getId()}.{$domainModelPlan->getId()}";
                 $notifsForPlans["$key.open"] = $this
                     ->internalNotifyOpen($assessment, $dataModelPlan, true)
-                    ->getAll($openDate ? $openDate->getUnixTimeStamp() : null);
+                    ->getAll($openDate?->getUnixTimeStamp());
                 $notifsForPlans["$key.closed"] = $this
                     ->internalNotifyClosed($assessment, $dataModelPlan, true)
-                    ->getAll($dueDate ? $dueDate->getUnixTimeStamp() : null);
+                    ->getAll($dueDate?->getUnixTimeStamp());
             }
         }
 
@@ -1260,7 +1260,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function coalesceDates(?Alaress_Date_Format ...$dates): ?Alaress_Date_Format
     {
         foreach ($dates as $date) {
-            if ($date instanceof Alaress_Date_Format && !$date->isNull()) {
+            if ($date instanceof Alaress_Date_Format) {
                 return clone $date;
             }
         }
@@ -1483,10 +1483,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
         $current = new Alaress_Date_Format($planDiff[$dateType][0], Alaress_Date_Format::DATABASE_FORMAT);
         $previous = new Alaress_Date_Format($planDiff[$dateType][1], Alaress_Date_Format::DATABASE_FORMAT);
-
-        if ($current->isNull() || $previous->isNull()) {
-            return false;
-        }
 
         switch ($transition) {
             case self::ANY:

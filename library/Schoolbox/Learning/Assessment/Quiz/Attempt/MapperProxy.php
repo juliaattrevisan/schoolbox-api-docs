@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz\Attempt;
 
+use Alaress_Date_Format;
 use Schoolbox\Learning\Quiz\Model as QuizDataObject;
 use Schoolbox\Learning\Quiz\Attempt\Model as DataObject;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -102,10 +103,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach ($mapperModels as $attempt) {
             // Get the last time this record was updated
             $updatedAt = $attempt->getStart();
-            /** @var \Alaress_Date_Format[] $interactionPoints */
+            /** @var (Alaress_Date_Format|null)[] $interactionPoints */
             $interactionPoints = [$attempt->getFinish(), $attempt->getReviewed()];
             foreach ($interactionPoints as $interaction) {
-                if (!is_null($interaction) && !$interaction instanceof \Alaress_Date_NullDate && $interaction->lt($updatedAt)) {
+                if ($interaction && $interaction->lt($updatedAt)) {
                     $updatedAt = $interaction;
                 }
             }

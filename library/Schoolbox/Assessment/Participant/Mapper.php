@@ -19,7 +19,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Participant\Plan;
-use Alaress_Date_NullDate;
 
 /**
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -165,7 +164,7 @@ class Mapper extends BaseMapper
     public function restoreResponsesAndFeedbacks(Model $participant): int
     {
         $assessment = $participant->getPlan()->getAssessment();
-        $excludedAt = $participant->getExcludedAt() instanceof Alaress_Date_NullDate ? null : $participant->getExcludedAt();
+        $excludedAt = $participant->getExcludedAt();
 
         if ($assessment->getDueWork() instanceof SubmissionBox) {
             // restore submission

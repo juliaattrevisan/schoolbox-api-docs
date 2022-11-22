@@ -14,7 +14,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 class Wiki implements ISoftDeletable
 {
-
     /** @var int */
     protected $id;
 
@@ -162,7 +161,7 @@ class Wiki implements ISoftDeletable
      *
      * @return bool
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
         return $this->deleted;
     }

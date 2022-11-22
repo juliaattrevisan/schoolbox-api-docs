@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment\Quiz\Attempt;
 
 use Alaress\Date\Interval;
+use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\AbstractResponse;
 
 class Model extends AbstractResponse
@@ -40,26 +41,24 @@ class Model extends AbstractResponse
     /**
      * When was this submitted?
      *
-     * TODO this should accept NULL values instead of Alaress_Date_NullDate
-     *
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $submittedAt;
+    protected ?Alaress_Date_Format $submittedAt = null;
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getSubmittedAt()
+    public function getSubmittedAt(): ?Alaress_Date_Format
     {
         return $this->submittedAt;
     }
 
     /**
-     * @param \Alaress_Date_Format $submittedAt
+     * @param Alaress_Date_Format|null $submittedAt
      * @return $this
      */
-    public function setSubmittedAt(\Alaress_Date_Format $submittedAt)
+    public function setSubmittedAt(?Alaress_Date_Format $submittedAt): self
     {
         $this->submittedAt = $submittedAt;
         return $this;

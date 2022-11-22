@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress_Date_Format;
 use Schoolbox\User;
 
 interface IFeedback
@@ -163,55 +164,50 @@ interface IFeedback
      * Get the date when this IFeedback was made accessible to respondents
      * (typically students)
      *
-     * A value of null or instance of Alaress_Date_NullDate indicates that
-     * this IFeedback was never published
+     * A value of null indicates that this IFeedback was never published
      *
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getPublishedAt();
+    public function getPublishedAt(): ?Alaress_Date_Format;
 
     /**
      * Set the date when this IFeedback was made accessible to respondents
      *
-     * @param \Alaress_Date_Format $publishedAt
+     * @param Alaress_Date_Format|null $publishedAt
      * @return $this
      */
-    public function setPublishedAt($publishedAt);
+    public function setPublishedAt(?Alaress_Date_Format $publishedAt): self;
 
     /**
-     * Created date
-     *
-     * @var \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCreatedAt();
+    public function getCreatedAt(): ?Alaress_Date_Format;
 
     /**
-     * @param  \Alaress_Date_Format $createdAt
-     *
+     * @param  Alaress_Date_Format|null $createdAt
      * @return $this
      */
-    public function setCreatedAt(\Alaress_Date_Format $createdAt = null);
+    public function setCreatedAt(?Alaress_Date_Format $createdAt): static;
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getUpdatedAt();
+    public function getUpdatedAt(): ?Alaress_Date_Format;
 
     /**
-     * @param  \Alaress_Date_Format $updatedAt
-     *
+     * @param Alaress_Date_Format|null $updatedAt
      * @return $this
      */
-    public function setUpdatedAt(\Alaress_Date_Format $updatedAt = null);
+    public function setUpdatedAt(?Alaress_Date_Format $updatedAt): static;
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getDeletedAt();
+    public function getDeletedAt(): ?Alaress_Date_Format;
 
     /**
-     * @param  \Alaress_Date_Format $deletedAt
+     * @param  Alaress_Date_Format|null $deletedAt
      * @return $this
      */
-    public function setDeletedAt(\Alaress_Date_Format $deletedAt = null);
+    public function setDeletedAt(?Alaress_Date_Format $deletedAt): static;
 }

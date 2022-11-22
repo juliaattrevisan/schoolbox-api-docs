@@ -135,7 +135,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
 
             // Publish date is not available in Synergetic Staff Scheduler, but may be available elsewhere
             if (empty($externalEvent['publish'])) {
-                $publishDate = '';
+                $publishDate = null;
             } else {
                 $publishDate = new Alaress_Date_Format($externalEvent['finish'], Alaress_Date_Format::DATABASE_FORMAT);
             }

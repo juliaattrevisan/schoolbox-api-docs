@@ -27,7 +27,6 @@ use LogicException;
  */
 class Translator
 {
-
     /**
      * By default, only permit 2 levels (ie sub-assessments inside a project)
      *
@@ -407,27 +406,33 @@ class Translator
         // Where there's both a version in assessment model and base model,
         // use the version in assessment model.
 
-        // Nullable properties
-        $domainObject->setSequence($assessmentModel->getSequence())
-                     ->setWorkType($assessmentModel->getWorkType())
-                     ->setTitle($assessmentModel->getTitle())
-                     ->setDescription($assessmentModel->getDescription())
-                     ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
-                     ->setCourseManaged((bool)$assessmentModel->getCourseManaged())
-                     ->setSebEnabled((bool)$assessmentModel->getSebEnabled())
-                     ->setDeletedAt($assessmentModel->getDeletedAt());
+        // Properties which should be set as is
+        $domainObject
+            ->setSequence($assessmentModel->getSequence())
+            ->setWorkType($assessmentModel->getWorkType())
+            ->setTitle($assessmentModel->getTitle())
+            ->setDescription($assessmentModel->getDescription())
+            ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
+            ->setCourseManaged((bool)$assessmentModel->getCourseManaged())
+            ->setSebEnabled((bool)$assessmentModel->getSebEnabled())
+            ->setWeight($assessmentModel->getWeight())
+            ->setPublishAt($assessmentModel->getPublishDate())
+            ->setOpenAt($assessmentModel->getOpenDate())
+            ->setDueAt($assessmentModel->getDueDate())
+            ->setCloseAt($assessmentModel->getCloseDate())
+            ->setCreatedAt($assessmentModel->getCreatedAt())
+            ->setUpdatedAt($assessmentModel->getUpdatedAt())
+            ->setDeletedAt($assessmentModel->getDeletedAt())
+        ;
 
-        // Non-nullable properties
+        // Non-nullable properties: should only be set if set in domain object
         $markScheme = $this->markSchemeFactory->spawnMarkSchemeFor($domainObject);
-        null === $markScheme || $domainObject->setMarkScheme($markScheme);
-        null === $assessmentModel->getWeight() || $domainObject->setWeight($assessmentModel->getWeight());
-        null === $assessmentModel->getPublishDate() || $domainObject->setPublishAt($assessmentModel->getPublishDate());
-        null === $assessmentModel->getOpenDate() || $domainObject->setOpenAt($assessmentModel->getOpenDate());
-        null === $assessmentModel->getDueDate() || $domainObject->setDueAt($assessmentModel->getDueDate());
-        null === $assessmentModel->getCloseDate() || $domainObject->setCloseAt($assessmentModel->getCloseDate());
-        null === $assessmentModel->getCreatedAt() || $domainObject->setCreatedAt($assessmentModel->getCreatedAt());
-        null === $assessmentModel->getUpdatedAt() || $domainObject->setUpdatedAt($assessmentModel->getUpdatedAt());
-        null === $assessmentModel->getCurriculumNodes() || $domainObject->setCurriculumNodes($assessmentModel->getCurriculumNodes());
+        if ($markScheme !== null) {
+            $domainObject->setMarkScheme($markScheme);
+        }
+        if ($assessmentModel->getCurriculumNodes() !== null) {
+            $domainObject->setCurriculumNodes($assessmentModel->getCurriculumNodes());
+        }
 
         // Translate specification assessment if there is one
         $specification = $dataModel->getAssessmentModel()->getSpecificationAssessment();

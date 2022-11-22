@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Interface that defines a model class as able to be soft-deletable.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox;
 
+/**
+ * Interface that defines a model class as able to be soft-deletable.
+ */
 interface ISoftDeletable
 {
     /**
@@ -17,5 +17,5 @@ interface ISoftDeletable
      *
      * @return bool
      */
-    public function isDeleted();
+    public function isDeleted(): bool;
 }

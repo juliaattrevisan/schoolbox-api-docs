@@ -282,7 +282,7 @@ class Mapper extends \Schoolbox\Mapper
             foreach ($ranges as $key => $range) {
                 // if the current term's range does not exist
                 if (
-                    (!$term->getActualFinish()->isnull() && $term->getActualFinish()->diffInDays($range['from']) < -1)
+                    ($term->getActualFinish() && $term->getActualFinish()->diffInDays($range['from']) < -1)
                     || (!$range['to']->isNull() && $term->getStart()->diffInDays($range['to']) > 1)
                 ) {
                     continue;
@@ -294,7 +294,7 @@ class Mapper extends \Schoolbox\Mapper
                     $ranges[$key]['from'] = $term->getStart();
                 }
                 // and current end is later than existing end
-                if ($term->getActualFinish()->isNull() || (!$range['to']->isNull() && $term->getActualFinish()->gt($range['to']))) {
+                if (!$term->getActualFinish() || (!$range['to']->isNull() && $term->getActualFinish()->gt($range['to']))) {
                     $ranges[$key]['to'] = $term->getActualFinish();
                 }
             }

@@ -2250,7 +2250,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     private function buildWherePartForTerm(Term $term)
     {
-        if ($term->getActualFinish()->isNull()) {
+        if (!$term->getActualFinish()) {
             return "\nAND (`a`.`due_date` >= :startDate)";
         } else {
             return "\nAND (`a`.`due_date` BETWEEN :startDate AND :endDate)";
@@ -2270,7 +2270,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $whereParams = [
             ':startDate' => $term->getStart()->getDatabase(),
         ];
-        if (!$term->getActualFinish()->isNull()) {
+        if ($term->getActualFinish()) {
             $whereParams[':endDate'] = $term->getActualFinish()->endOfDay()->getDatabase();
         }
         return $whereParams;

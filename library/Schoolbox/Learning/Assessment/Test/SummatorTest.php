@@ -13,6 +13,7 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use Alaress_Date_Format;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Collection;
@@ -639,7 +640,7 @@ class SummatorTest extends TestCase
         /* Reset all but one of the weights
          */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->setWeight(null);
+            $currentAssessable->setWeight(0);
         }
 
         /* Due Work 1: Weight  null, NormalisedMark: P,null UP,18
@@ -677,7 +678,7 @@ class SummatorTest extends TestCase
          */
         foreach ($project->getAssessables() as $currentAssessable) {
             if ($currentAssessable->getId() != 10005) {
-                $currentAssessable->setWeight(null);
+                $currentAssessable->setWeight(0);
             }
         }
 
@@ -1001,7 +1002,7 @@ class SummatorTest extends TestCase
 
             /* Reset all the weights
              */
-            $currentAssessable->setWeight(null);
+            $currentAssessable->setWeight(0);
         }
 
         /* Due Work 1: Weight  null, NormalisedMark: P,null UP,18
@@ -1031,7 +1032,7 @@ class SummatorTest extends TestCase
          */
         foreach ($project->getAssessables() as $currentAssessable) {
             if ($currentAssessable->getId() != 10005) {
-                $currentAssessable->setWeight(null);
+                $currentAssessable->setWeight(0);
             }
         }
 
@@ -1099,9 +1100,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-13 13:31:13', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1113,8 +1114,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1177,9 +1178,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-13 13:31:13', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork1->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1191,8 +1192,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork1->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1242,9 +1243,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-13 13:31:13', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1256,8 +1257,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1267,8 +1268,8 @@ class SummatorTest extends TestCase
             ->setAssessable($dueWork2)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-23 23:23:23', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-23 23:23:23', Alaress_Date_Format::DATABASE_FORMAT));
 
         $linkedFeedback = (new DueWorkFeedback())
             ->setId(90123)
@@ -1278,8 +1279,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-24 01:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 16:16:16', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-24 01:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-24 16:16:16', Alaress_Date_Format::DATABASE_FORMAT));
 
         $submission->getAllFeedback()->add($linkedFeedback);
         $linkedFeedback->setResponse($submission);
@@ -1293,8 +1294,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-09-01 01:01:01', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-09-01 01:01:01', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1591,7 +1592,7 @@ class SummatorTest extends TestCase
 
             /* Reset all the weights
              */
-            $currentAssessable->setWeight(null);
+            $currentAssessable->setWeight(0);
         }
 
         /* Due Work 1: Weight  null, NormalisedMark: P,null UP,18
@@ -1634,7 +1635,7 @@ class SummatorTest extends TestCase
             /* Reset all but one of the weights
              */
             if ($currentAssessable->getId() != 10005) {
-                $currentAssessable->setWeight(null);
+                $currentAssessable->setWeight(0);
             }
         }
 
@@ -1702,9 +1703,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-13 13:31:13', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1716,8 +1717,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1780,9 +1781,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-13 13:31:13', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1794,8 +1795,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1844,9 +1845,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-13 13:31:13', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1858,8 +1859,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-22 14:14:14', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1869,8 +1870,8 @@ class SummatorTest extends TestCase
             ->setAssessable($dueWork2)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-23 23:23:23', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-23 23:23:23', Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback = (new DueWorkFeedback())
             ->setId(90123)
@@ -1880,8 +1881,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-24 01:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 16:16:16', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-24 01:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-24 16:16:16', Alaress_Date_Format::DATABASE_FORMAT));
 
         $submission->getAllFeedback()->add($feedback);
         $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
@@ -1894,8 +1895,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-09-01 01:01:01', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-09-01 01:01:01', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -1999,9 +2000,9 @@ class SummatorTest extends TestCase
             ->setNormalisedMark(100)
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->setPublishedAt(new \Alaress_Date_NullDate())
-            ->setCreatedAt(\Alaress_Date_Format::now())
-            ->setUpdatedAt(\Alaress_Date_Format::now());
+            ->setPublishedAt(null)
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
         $project->getAssessables()[$dueWork->getId()]
             ->getParticipant($this->sberryhill)
             ->getAllFeedbacks()[$dueWorkFeedback->getId()] = $dueWorkFeedback;
@@ -2060,7 +2061,7 @@ class SummatorTest extends TestCase
 
 
         // Publish the due work feedback
-        $dueWorkFeedback->setPublishedAt(\Alaress_Date_Format::now());
+        $dueWorkFeedback->setPublishedAt(Alaress_Date_Format::now());
 
         // With any standard summator:
         // * his mark is 100 (as only one has a mark)
@@ -2164,8 +2165,8 @@ class SummatorTest extends TestCase
         // If feedback has null value and student is excluded from other
         // assessments:
         $dueWorkFeedback->setNormalisedMark(null);
-        $quiz->getParticipant($this->sberryhill)->setExcludedAt(\Alaress_Date_Format::now());
-        $task->getParticipant($this->sberryhill)->setExcludedAt(\Alaress_Date_Format::now());
+        $quiz->getParticipant($this->sberryhill)->setExcludedAt(Alaress_Date_Format::now());
+        $task->getParticipant($this->sberryhill)->setExcludedAt(Alaress_Date_Format::now());
 
         // With standard summators: his mark is null
         $project->setSummator($summatorMinStandard);
@@ -2370,9 +2371,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-13 13:31:13', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
         $collection->add($dueWork);
@@ -2416,8 +2417,8 @@ class SummatorTest extends TestCase
             ->setAssessable($dueWork)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 09:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-01 09:00:00', Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback = (new DueWorkFeedback())
             ->setId(90021)
@@ -2425,9 +2426,9 @@ class SummatorTest extends TestCase
             ->setNormalisedMark(14)
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-03 14:15:16', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:14:15', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:14:12', Alaress_Date_Format::DATABASE_FORMAT));
 
         $submission->getAllFeedback()->add($feedback);
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
@@ -2445,9 +2446,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-12 12:21:12', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-12 12:21:12', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 13:19:25', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -2464,9 +2465,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-13 13:31:13', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 14:44:42', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
         $collection->add($dueWork);
@@ -2510,8 +2511,8 @@ class SummatorTest extends TestCase
             ->setAssessable($dueWork)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 09:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-01 09:00:00', Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback = (new DueWorkFeedback())
             ->setId(90031)
@@ -2519,9 +2520,9 @@ class SummatorTest extends TestCase
             ->setNormalisedMark(45)
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-03 14:15:16', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:14:15', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:14:12', Alaress_Date_Format::DATABASE_FORMAT));
 
         $submission->getAllFeedback()->add($feedback);
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
@@ -2539,9 +2540,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-13 13:31:13', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
         $collection->add($dueWork);
@@ -2585,8 +2586,8 @@ class SummatorTest extends TestCase
             ->setAssessable($dueWork)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 09:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-01 09:00:00', Alaress_Date_Format::DATABASE_FORMAT));
 
         $collection->add($dueWork);
 
@@ -2628,8 +2629,8 @@ class SummatorTest extends TestCase
             ->setAssessable($dueWork)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 09:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-01 09:00:00', Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback = (new DueWorkFeedback())
             ->setId(90051)
@@ -2637,8 +2638,8 @@ class SummatorTest extends TestCase
             ->setNormalisedMark(76)
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 10:10:10', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 10:10:10', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 10:10:10', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-01 10:10:10', Alaress_Date_Format::DATABASE_FORMAT));
 
         $submission->getAllFeedback()->add($feedback);
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
@@ -2725,8 +2726,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 01:01:01', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-01 01:01:01', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -2737,8 +2738,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-02 02:02:02', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 02:02:02', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-02 02:02:02', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 02:02:02', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -2749,8 +2750,8 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-03 03:03:03', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-03 03:03:03', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-03 03:03:03', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-03 03:03:03', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -2760,8 +2761,8 @@ class SummatorTest extends TestCase
             ->setAssessable($dueWork)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-04 00:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-04 00:00:00', Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback = (new DueWorkFeedback())
             ->setId(90074)
@@ -2770,9 +2771,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-04 04:04:04', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-04 04:04:04', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-04 04:04:04', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-04 04:04:04', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-04 04:04:04', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-04 04:04:04', Alaress_Date_Format::DATABASE_FORMAT));
 
         $submission->getAllFeedback()->add($feedback);
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
@@ -2784,9 +2785,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-05 05:05:05', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-05 05:05:05', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-05 05:05:05', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-05 05:05:05', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-05 05:05:05', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-05 05:05:05', Alaress_Date_Format::DATABASE_FORMAT));
 
         $submission->getAllFeedback()->add($feedback);
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
@@ -2798,9 +2799,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 06:06:06', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 06:06:06', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 06:06:06', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-06 06:06:06', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-06 06:06:06', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-06 06:06:06', Alaress_Date_Format::DATABASE_FORMAT));
 
         $submission->getAllFeedback()->add($feedback);
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
@@ -2897,9 +2898,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-13 13:31:13', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -2957,9 +2958,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-11 11:12:23', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-11 11:12:23', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -3010,8 +3011,8 @@ class SummatorTest extends TestCase
             ->setAssessable($dueWork)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 09:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-01 09:00:00', Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback = (new DueWorkFeedback())
             ->setId(3385)
@@ -3019,9 +3020,9 @@ class SummatorTest extends TestCase
             ->setNormalisedMark(-3)
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-03 14:15:16', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:14:15', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:14:12', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllResponses()->add($submission);
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
@@ -3040,9 +3041,9 @@ class SummatorTest extends TestCase
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setAllFiles(new Collection())
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 22:22:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-06 22:22:13', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-01 13:19:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-02 14:44:42', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -3053,9 +3054,9 @@ class SummatorTest extends TestCase
             ->setComment('meow - this is the most recently published feedback, despite the ordering in which this appears')
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 23:43:43', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:41:41', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 23:41:41', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-06 23:43:43', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-06 23:41:41', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-06 23:41:41', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -3065,9 +3066,9 @@ class SummatorTest extends TestCase
             ->setNormalisedMark(10)
             ->setReviewer($this->celia)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 23:23:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 23:23:21', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-06 23:23:25', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-06 23:23:23', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-06 23:23:21', Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
@@ -3112,8 +3113,8 @@ class SummatorTest extends TestCase
             ->setAssessable($task)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-06 10:01:22', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-06 10:01:22', Alaress_Date_Format::DATABASE_FORMAT));
 
         $feedback = (new TaskFeedback())
             ->setResponse($response);
@@ -3207,9 +3208,9 @@ class SummatorTest extends TestCase
             ->setNormalisedMark(IMarkScheme::NORMALISED_MARK_MAX * $marksGiven / $marksAvailable)
             ->setReviewer($this->celia)
             ->setResponse($attempt)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new Alaress_Date_Format('2016-08-15 03:27:33', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-08-08 21:03:19', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-08-08 21:03:19', Alaress_Date_Format::DATABASE_FORMAT));
 
         $attempt->getAllFeedback()->add($feedback);
         $quiz->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);

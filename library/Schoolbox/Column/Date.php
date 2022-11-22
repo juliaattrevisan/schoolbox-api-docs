@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Column;
 
+use Alaress_Date_Format;
 use Schoolbox\Mapper;
 
 class Date extends Datetime
@@ -47,12 +48,12 @@ class Date extends Datetime
     /**
      * @param string $value
      * @param Mapper $mapper
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function hydrate($value, $mapper = null)
     {
         $hydrated = parent::hydrate($value, $mapper);
-        if (!empty($this->time) && !$hydrated->isNull()) {
+        if (!empty($this->time) && $hydrated) {
             $hydrated->modify($this->time);
         }
         return $hydrated;
@@ -61,20 +62,20 @@ class Date extends Datetime
     /**
      * Return a hydrator that will generate dates with time component at start of day
      *
-     * @return static
+     * @return self
      */
     public static function startOfDay()
     {
-        return new static('00:00:00');
+        return new self('00:00:00');
     }
 
     /**
      * Return a hydrator that will generate dates with time component at end of day
      *
-     * @return static
+     * @return self
      */
     public static function endOfDay()
     {
-        return new static('23:59:59');
+        return new self('23:59:59');
     }
 }

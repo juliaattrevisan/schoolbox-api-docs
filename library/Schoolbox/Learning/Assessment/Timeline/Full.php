@@ -26,7 +26,6 @@ use Schoolbox\User;
 
 class Full
 {
-
     /**
      * @var Participant
      */
@@ -347,15 +346,14 @@ class Full
     protected function getDate($interaction)
     {
         if ($interaction instanceof IResponse) {
-            if (!$interaction->getSubmittedAt()->isNull()) {
+            if ($interaction->getSubmittedAt()) {
                 return $interaction->getSubmittedAt();
             }
         } elseif ($interaction instanceof IFeedback) {
-            if (!$interaction->getPublishedAt()->isNull()) {
+            if ($interaction->getPublishedAt()) {
                 return $interaction->getPublishedAt();
-            } elseif (!$interaction->getUpdatedAt()->isNull()) {
-                return $interaction->getUpdatedAt();
             }
+            return $interaction->getUpdatedAt();
         }
 
         //Item had none of the above dates... We'll try "now"?

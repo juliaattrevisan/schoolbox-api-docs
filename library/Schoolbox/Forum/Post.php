@@ -16,7 +16,6 @@ use Schoolbox\User;
 
 class Post implements ISoftDeletable
 {
-
     /** @var int */
     protected $id;
 
@@ -250,7 +249,7 @@ class Post implements ISoftDeletable
      * Is this object deleted?
      * @return bool
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
         return ($this->getDeleted() == 'true');
     }

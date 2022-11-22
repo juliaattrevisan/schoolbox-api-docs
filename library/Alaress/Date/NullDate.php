@@ -5,6 +5,8 @@ use Alaress\Date\IClock;
 /**
  * Null date class - this represents a null date object.
  *
+ * @deprecated Alaress_Date_NullDate is dead; use NULL instead
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -18,6 +20,8 @@ class Alaress_Date_NullDate extends Alaress_Date_Format
      */
     public function __construct()
     {
+        trigger_error("Alaress_Date_NullDate is deprecated: use NULL instead", E_USER_DEPRECATED);
+
         // set a locale so that locale based formatting doesn't fatal error
         $this->setLocale(new Alaress_Date_Locale_Static());
     }

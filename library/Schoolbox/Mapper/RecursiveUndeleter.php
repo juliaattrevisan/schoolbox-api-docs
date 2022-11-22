@@ -27,7 +27,6 @@ namespace Schoolbox\Mapper;
 
 use Alaress\Lumberjack\Logger;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Component\Eportfolio as ComponentEportfolio;
 use Eportfolio;
 use UnexpectedValueException;
@@ -85,7 +84,6 @@ use function sprintf;
 
 class RecursiveUndeleter
 {
-
     /**
      * Period in seconds, centered on parent deletedAt timestamp, that child models must be deleted within
      * to be considered part of the same deletion action.
@@ -523,7 +521,7 @@ class RecursiveUndeleter
                     $deletedAt->getDatabase()
                 )
             );
-            if ($deletedAt instanceof Alaress_Date_Format && !$deletedAt instanceof Alaress_Date_NullDate) {
+            if ($deletedAt instanceof Alaress_Date_Format) {
                 $deletedAfter = clone $deletedAt;
                 $deletedAfter->addSeconds(-1 * $this->deletedAtWindow / 2);
 

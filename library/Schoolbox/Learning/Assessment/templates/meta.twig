@@ -28,7 +28,7 @@
         </li>
     {% endif %}
 
-    {% if assessment.getAllParticipants()[student.id].getExcludedAt().isNull() is defined and assessment.getAllParticipants()[student.id].getExcludedAt().isNull() is same as(false) %}
+    {% if assessment.allParticipants[student.id].isExcluded ?? false %}
         {#
          # now using the same code as the assessment update page:
          # library/Schoolbox/Learning/Assessment/templates/fragments/participation.twig:105

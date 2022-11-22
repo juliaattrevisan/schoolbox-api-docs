@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
 
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
@@ -84,9 +85,9 @@ class ReturnedWork implements ISoftDeletable
 
 
     /**
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $publishedAt;
+    protected ?Alaress_Date_Format $publishedAt = null;
 
     /**
      * @var ReturnedWork\SingleFile\Model[]|Collection
@@ -327,23 +328,23 @@ class ReturnedWork implements ISoftDeletable
      */
     public function isPublished()
     {
-        return ($this->getPublishedAt() instanceof \Alaress_Date_Format && !$this->getPublishedAt()->isNull());
+        return ($this->getPublishedAt() instanceof Alaress_Date_Format);
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getPublishedAt()
+    public function getPublishedAt(): ?Alaress_Date_Format
     {
         return $this->publishedAt;
     }
 
     /**
-     * @param  \Alaress_Date_Format $publishedAt
+     * @param Alaress_Date_Format|null $publishedAt
      *
      * @return static
      */
-    public function setPublishedAt($publishedAt)
+    public function setPublishedAt(?Alaress_Date_Format $publishedAt): self
     {
         $this->publishedAt = $publishedAt;
         return $this;

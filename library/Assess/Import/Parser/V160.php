@@ -9,7 +9,6 @@
 namespace Assess\Import\Parser;
 
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Evaluation\Import\Parser\Base as EvaluationParser;
 
 /**
@@ -95,12 +94,12 @@ class V160 extends EvaluationParser implements IParser
     /**
      * @param string $dateString
      * @param string $format
-     * @return Alaress_Date_Format
+     * @return null|Alaress_Date_Format
      */
     protected function createDateFromString($dateString, $format = Alaress_Date_Format::DATABASE_FORMAT)
     {
         if (empty($dateString)) {
-            return new Alaress_Date_NullDate();
+            return null;
         }
         return new Alaress_Date_Format($dateString, $format);
     }

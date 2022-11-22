@@ -228,9 +228,9 @@ class HscAssessmentTasks extends BaseComponent
             'studentMark'     => $statistics['studentMark'],
             'cohortRank'      => $statistics['cohortRank'],
             'cohortAverage'   => $statistics['cohortAverage'],
-            'publishAt'       => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
-            'comment'         => $feedback ? $feedback->getComment() : null,
-            'commentBy'       => $feedback ? $feedback->getReviewer() : null,
+            'publishAt'       => $feedback?->getPublishedAt()->getDatabase(),
+            'comment'         => $feedback?->getComment(),
+            'commentBy'       => $feedback?->getReviewer(),
             'dueDate'         => $classAssessment->getDueAt(),
         ];
     }
@@ -250,9 +250,6 @@ class HscAssessmentTasks extends BaseComponent
             return null;
         }
         $participant = $assessable->getParticipantIfExtant($this->student);
-        if (!$participant) {
-            return null;
-        }
-        return $participant->getAuthoritativeFeedback(true);
+        return $participant?->getAuthoritativeFeedback(true);
     }
 }

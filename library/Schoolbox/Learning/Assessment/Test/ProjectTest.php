@@ -696,7 +696,7 @@ class ProjectTest extends TestCase
             ->setNormalisedMark(1)
             ->setComment('This is the most recent feedback')
             ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_NullDate())
+            ->setPublishedAt(null)
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT));
 

@@ -10,6 +10,7 @@
 
 namespace Schoolbox\ProfessionalDevelopment;
 
+use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\User;
@@ -43,9 +44,9 @@ class Model implements ISoftDeletable
     /**
      * The date someone was accredited
      *
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    private $accreditedAt;
+    private ?Alaress_Date_Format $accreditedAt = null;
 
     /**
      * @return User
@@ -106,21 +107,20 @@ class Model implements ISoftDeletable
         return $this;
     }
 
-
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getAccreditedAt(): ?\Alaress_Date_Format
+    public function getAccreditedAt(): ?Alaress_Date_Format
     {
         return $this->accreditedAt;
     }
 
-
     /**
-     * @param \Alaress_Date_Format $accreditedAt
-     * @return self
+     * @param Alaress_Date_Format|null $accreditedAt
+     *
+     * @return static
      */
-    public function setAccreditedAt(\Alaress_Date_Format $accreditedAt): self
+    public function setAccreditedAt(?Alaress_Date_Format $accreditedAt): self
     {
         $this->accreditedAt = $accreditedAt;
         return $this;

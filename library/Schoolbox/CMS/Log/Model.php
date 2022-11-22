@@ -9,6 +9,7 @@
 
 namespace Schoolbox\CMS\Log;
 
+use Alaress_Date_Format;
 use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Textbox\Model as Textbox;
@@ -52,8 +53,8 @@ class Model
     /** @var User */
     protected $user;
 
-    /** @var \Alaress_Date_Format */
-    protected $time;
+    /** @var Alaress_Date_Format */
+    protected Alaress_Date_Format $time;
 
     /**
      * @param int $id
@@ -254,20 +255,21 @@ class Model
     }
 
     /**
-     * @param \Alaress_Date_Format $time
-     * @return self
+     * @return Alaress_Date_Format
      */
-    public function setTime($time)
+    public function getTime(): Alaress_Date_Format
     {
-        $this->time = $time;
-        return $this;
+        return $this->time;
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @param Alaress_Date_Format $time
+     *
+     * @return static
      */
-    public function getTime()
+    public function setTime(Alaress_Date_Format $time): self
     {
-        return $this->time;
+        $this->time = $time;
+        return $this;
     }
 }

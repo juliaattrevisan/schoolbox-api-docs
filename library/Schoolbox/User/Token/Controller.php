@@ -87,13 +87,13 @@ class Controller extends Base
                 [
                     'token'        => $this->tokenBuilder->generate(
                         $user,
-                        $userJwtId ? $userJwtId->getExpiry() : null,
-                        $userJwtId ? $userJwtId->getJwtId() : null
+                        $userJwtId?->getExpiry(),
+                        $userJwtId?->getJwtId()
                     ),
-                    'createdAt'    => $userJwtId ? $userJwtId->getCreatedAt()->getShort() : null,
-                    'expiry'       => $userJwtId ? $userJwtId->getExpiry()?->getShort() : null,
-                    'createdBy'    => $userJwtId ? $userJwtId->getCreatedBy()->getFullName() : null,
-                    'jwtId'        => $userJwtId ? $userJwtId->getJwtId() : null,
+                    'createdAt'    => $userJwtId?->getCreatedAt()->getShort(),
+                    'expiry'       => $userJwtId?->getExpiry()?->getShort(),
+                    'createdBy'    => $userJwtId?->getCreatedBy()->getFullName(),
+                    'jwtId'        => $userJwtId?->getJwtId(),
                     'showExisting' => $showExisting,
                 ]
             )

@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Assessment\Course\Task;
 
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -18,12 +19,12 @@ use Schoolbox\User;
 
 class Completion implements ISoftDeletable
 {
+    use Id;
+    use DeletedAtDate;
+
     const STATUS_INCOMPLETE                = 1;
     const STATUS_SELF_ASSESSED_COMPLETE    = 2;
     const STATUS_TEACHER_ASSESSED_COMPLETE = 3;
-
-    use Id;
-    use DeletedAtDate;
 
     /**
      * @var Task
@@ -50,7 +51,7 @@ class Completion implements ISoftDeletable
     private $completionStatus = self::STATUS_INCOMPLETE;
 
 
-    private $completionDate;
+    private ?Alaress_Date_Format $completionDate = null;
 
 
     /* Getters / Setters
@@ -111,18 +112,19 @@ class Completion implements ISoftDeletable
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCompletionDate()
+    public function getCompletionDate(): ?Alaress_Date_Format
     {
         return $this->completionDate;
     }
 
     /**
-     * @param null|\Alaress_Date_Format $completionDate
+     * @param Alaress_Date_Format|null $completionDate
+     *
      * @return static
      */
-    public function setCompletionDate(?\Alaress_Date_Format $completionDate)
+    public function setCompletionDate(?Alaress_Date_Format $completionDate): self
     {
         $this->completionDate = $completionDate;
         return $this;

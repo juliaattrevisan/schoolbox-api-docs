@@ -1465,10 +1465,12 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * This isn't a null date: however, subclasses might be
      *
+     * @deprecated Alaress_Date_NullDate is dead; use NULL instead
      * @return bool
      */
     public function isNull()
     {
+        trigger_error("isNull is deprecated: use NULL instead", E_USER_DEPRECATED);
         return false;
     }
 
@@ -1656,9 +1658,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public function compare($other)
     {
-        if ($this->isNull() || $other->isNull()) {
-            return 0;
-        }
+//        if ($this->isNull() || $other->isNull()) {
+//            return 0;
+//        }
         if ($this->lt($other)) {
             return -1;
         }

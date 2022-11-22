@@ -1489,7 +1489,7 @@ class MapperProxy
             }
             $this->baseMapper->restoreSoftDeleted($dataModel);
         }
-        $assessable->setDeletedAt(new \Alaress_Date_NullDate());
+        $assessable->setDeletedAt(null);
     }
 
     /**
@@ -1676,19 +1676,19 @@ class MapperProxy
 
 
         // Due before / after filter (an ADF)
-        if (isset($options['due_after']) && $options['due_after'] instanceof \Alaress_Date_Format && !$options['due_after']->isNull()) {
+        if (isset($options['due_after']) && $options['due_after'] instanceof \Alaress_Date_Format) {
             $builder->notLessThan($dueDateColumn, $options['due_after']->getDatabase());
         }
-        if (isset($options['due_before']) && $options['due_before'] instanceof \Alaress_Date_Format && !$options['due_before']->isNull()) {
+        if (isset($options['due_before']) && $options['due_before'] instanceof \Alaress_Date_Format) {
             $builder->notGreaterThan($dueDateColumn, $options['due_before']->getDatabase());
         }
 
         // Close before / after filter (an ADF)
-        if (isset($options['closed_after']) && $options['closed_after'] instanceof \Alaress_Date_Format && !$options['closed_after']->isNull()) {
+        if (isset($options['closed_after']) && $options['closed_after'] instanceof \Alaress_Date_Format) {
             $builder->notLessThan($closeDateColumn, $options['closed_after']->getDatabase());
         }
 
-        if (isset($options['close_before']) && $options['close_before'] instanceof \Alaress_Date_Format && !$options['close_before']->isNull()) {
+        if (isset($options['close_before']) && $options['close_before'] instanceof \Alaress_Date_Format) {
             $builder->notGreaterThan($closeDateColumn, $options['close_before']->getDatabase());
         }
 
@@ -1696,8 +1696,6 @@ class MapperProxy
         if (
             isset($options['window_open']) && $options['window_open'] instanceof \Alaress_Date_Format
             && isset($options['window_close']) && $options['window_close'] instanceof \Alaress_Date_Format
-            && !$options['window_open']->isNull()
-            && !$options['window_close']->isNull()
         ) {
             // NOT (assess.end < window.open OR assess.start >= window.close)
             $builder->notAny(

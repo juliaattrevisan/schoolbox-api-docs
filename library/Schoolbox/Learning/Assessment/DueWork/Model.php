@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
+use Alaress_Date_Format;
 use DomainException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
@@ -372,11 +373,11 @@ class Model extends AbstractAssessment implements ISelfAssessable
             $closeDate = $this->getCloseAt();
         }
 
-        if ($openDate->gt(\Alaress_Date_Format::now())) {
+        if ($openDate->gt(Alaress_Date_Format::now())) {
             throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
         }
 
-        if (\Alaress_Date_Format::now()->gt($closeDate)) {
+        if (Alaress_Date_Format::now()->gt($closeDate)) {
             throw new DomainException(null, ErrorMapper::ERROR_ASSESSMENT_CLOSED);
         }
     }
@@ -571,9 +572,9 @@ class Model extends AbstractAssessment implements ISelfAssessable
 
     /**
      * Override: if this doesn't accept submissions, open is aliased to publish
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getOpenAt()
+    public function getOpenAt(): ?Alaress_Date_Format
     {
         if ($this->isAcceptNone()) {
             return $this->getPublishAt();
@@ -584,9 +585,9 @@ class Model extends AbstractAssessment implements ISelfAssessable
 
     /**
      * Override: if this doesn't accept submissions, close is aliased to due
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCloseAt()
+    public function getCloseAt(): ?Alaress_Date_Format
     {
         if ($this->isAcceptNone()) {
             return $this->getDueAt();

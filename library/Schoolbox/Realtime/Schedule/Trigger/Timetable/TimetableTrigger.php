@@ -96,7 +96,7 @@ abstract class TimetableTrigger extends AbstractTrigger
         // find a relevant time
         $relevantTime = $this->getRelevantTime($definition, $now);
 
-        if (!$relevantTime->isNull()) {
+        if ($relevantTime) {
             // if it's not null, return it
             return $relevantTime->getUnixTimeStamp();
         }
@@ -118,7 +118,7 @@ abstract class TimetableTrigger extends AbstractTrigger
      *
      * @param array $definition
      * @param ADF   $now
-     * @return ADF
+     * @return ADF|null
      */
     protected function getWarningTime(array $definition, $now)
     {
@@ -134,7 +134,7 @@ abstract class TimetableTrigger extends AbstractTrigger
             }
 
             try {
-                return $this->testPeriod($start, new \Alaress_Date_NullDate(), $now);
+                return $this->testPeriod($start, null, $now);
             } catch (BadMethodCallException $e) {
                 continue;
             } catch (OutOfBoundsException $e) {
@@ -142,7 +142,7 @@ abstract class TimetableTrigger extends AbstractTrigger
             }
         }
 
-        return new \Alaress_Date_NullDate();
+        return null;
     }
 
 
@@ -151,7 +151,7 @@ abstract class TimetableTrigger extends AbstractTrigger
      *
      * @param array $definition
      * @param ADF    $now
-     * @return ADF
+     * @return ADF|null
      */
     protected function getStartEndTime(array $definition, $now)
     {
@@ -174,7 +174,7 @@ abstract class TimetableTrigger extends AbstractTrigger
             }
         }
 
-        return new \Alaress_Date_NullDate();
+        return null;
     }
 
 
@@ -183,7 +183,7 @@ abstract class TimetableTrigger extends AbstractTrigger
      *
      * @param array $definition
      * @param ADF   $now
-     * @return ADF
+     * @return ADF|null
      */
     protected function getRelevantTime(array $definition, ADF $now)
     {
@@ -191,17 +191,17 @@ abstract class TimetableTrigger extends AbstractTrigger
         $startEndTime = $this->getStartEndTime($definition, $now);
 
         // if they're both null, just return null
-        if ($warningTime->isNull() && $startEndTime->isNull()) {
+        if (!$warningTime && !$startEndTime) {
             return $warningTime;
         }
 
         // otherwise, if just warning is null, return startEnd
-        if ($warningTime->isNull()) {
+        if (!$warningTime) {
             return $startEndTime;
         }
 
         // conversely, if just startEnd is null, return warning
-        if ($startEndTime->isNull()) {
+        if (!$startEndTime) {
             return $warningTime;
         }
 
@@ -267,13 +267,13 @@ abstract class TimetableTrigger extends AbstractTrigger
 
 
     /**
-     * @param ADF $start
-     * @param ADF $end
-     * @param ADF $now
+     * @param ADF      $start
+     * @param ADF|null $end
+     * @param ADF      $now
      * @throws OutOfBoundsException if this period is not relevant
-     * @return ADF
+     * @return ADF|null
      */
-    abstract protected function testPeriod(ADF $start, ADF $end, ADF $now);
+    abstract protected function testPeriod(ADF $start, ?ADF $end, ADF $now);
 
 
     /**

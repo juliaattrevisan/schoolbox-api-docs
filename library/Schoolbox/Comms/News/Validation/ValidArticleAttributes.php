@@ -22,7 +22,6 @@ use Alaress\Specification;
  */
 class ValidArticleAttributes extends Specification\Leaf
 {
-
     /**
      * Definition of a valid news article
      *
@@ -35,8 +34,8 @@ class ValidArticleAttributes extends Specification\Leaf
          * Publish must occur before, or equal to, expiry
          */
         $hasTitle =  '' !== trim($article->getTitle() ?? '');
-        $hasPublishDate = $article->getPublishAt() !== null && !$article->getPublishAt()->isNull();
-        $hasExpiryDate = $article->getExpiresAt() !== null && !$article->getExpiresAt()->isNull();
+        $hasPublishDate = $article->getPublishAt() !== null;
+        $hasExpiryDate = $article->getExpiresAt() !== null;
 
         return $hasTitle && $hasPublishDate && $hasExpiryDate && $article->getPublishAt()->lte($article->getExpiresAt());
     }

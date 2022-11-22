@@ -557,82 +557,78 @@ interface IAssessable extends ISoftDeletable
      * This is the date at which the IAssessable becomes both visible
      * and available for user participation
      *
-     * A value of null or instance of Alaress_Date_NullDate indicates that
-     * this IFeedback was never published
+     * A value of null indicates that this IFeedback was never published
      *
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getPublishAt();
+    public function getPublishAt(): ?Alaress_Date_Format;
 
     /**
      * Set the date when this IAssessable was made accessible to respondents
      *
-     * @param \Alaress_Date_Format $publishAt
+     * @param Alaress_Date_Format|null $publishAt
      * @return $this
      */
-    public function setPublishAt(\Alaress_Date_Format $publishAt);
+    public function setPublishAt(?Alaress_Date_Format $publishAt): self;
 
     /**
      * Get the date when this IAssessable opens
      *
      * This is the date at which participants can create Responses to this IAssessable
      *
-     * A value of null or instance of Alaress_Date_NullDate indicates that
-     * this IAssessable will never open
+     * A value of null indicates that this IAssessable will never open
      *
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getOpenAt();
+    public function getOpenAt(): ?Alaress_Date_Format;
 
     /**
      * Set the date when this IAssessable opens
      *
-     * @param \Alaress_Date_Format $openAt
+     * @param Alaress_Date_Format|null $openAt
      * @return $this
      */
-    public function setOpenAt(\Alaress_Date_Format $openAt);
+    public function setOpenAt(?Alaress_Date_Format $openAt): self;
 
     /**
      * Get the date when this IAssessable is due
      *
      * This is the date by which participants should create their Responses to this IAssessable
      *
-     * A value of null or instance of Alaress_Date_NullDate indicates that
-     * this IAssessable has no particular date to check against (it will be
-     * subclass-specific logic which uses it)
+     * A value of null indicates that this IAssessable has no particular date to check against
+     * (it will be subclass-specific logic which uses it)
      *
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getDueAt();
+    public function getDueAt(): ?Alaress_Date_Format;
 
     /**
      * Set the date when this IAssessable is due
      *
-     * @param \Alaress_Date_Format $dueAt
+     * @param Alaress_Date_Format|null $dueAt
      * @return $this
      */
-    public function setDueAt(\Alaress_Date_Format $dueAt);
+    public function setDueAt(?Alaress_Date_Format $dueAt): self;
 
     /**
      * Get the date when this IAssessable closes
      *
      * When this date is reached, any IResponses spawned are indicated as being "late"
      *
-     * A value of null or instance of Alaress_Date_NullDate indicates that
-     * this IAssessable has no particular date to check against (it will be
-     * subclass-specific logic which uses it)
+     * A value of null indicates that this IAssessable has no particular date to check against
+     * (it will be subclass-specific logic which uses it)
      *
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCloseAt();
+    public function getCloseAt(): ?Alaress_Date_Format;
 
     /**
      * Set the date when this IAssessable closes
      *
-     * @param \Alaress_Date_Format $closeAt
+     * @param Alaress_Date_Format|null $closeAt
      * @return $this
      */
-    public function setCloseAt(\Alaress_Date_Format $closeAt);
+    public function setCloseAt(?Alaress_Date_Format $closeAt): self;
 
     /**
      * Period in days to schedule an Assessment for during Course Import
@@ -865,37 +861,37 @@ interface IAssessable extends ISoftDeletable
     /**
      * Created date
      *
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getCreatedAt();
+    public function getCreatedAt(): ?Alaress_Date_Format;
 
     /**
-     * @param  \Alaress_Date_Format $createdAt
+     * @param Alaress_Date_Format $createdAt
      *
      * @return $this
      */
-    public function setCreatedAt(\Alaress_Date_Format $createdAt = null);
+    public function setCreatedAt(Alaress_Date_Format $createdAt): static;
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getUpdatedAt();
+    public function getUpdatedAt(): ?Alaress_Date_Format;
 
     /**
-     * @param  \Alaress_Date_Format $updatedAt
+     * @param Alaress_Date_Format $updatedAt
      *
      * @return $this
      */
-    public function setUpdatedAt(\Alaress_Date_Format $updatedAt = null);
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt): static;
 
     /**
-     * @return \Alaress_Date_Format|null
+     * @return Alaress_Date_Format|null
      */
-    public function getDeletedAt();
+    public function getDeletedAt(): ?Alaress_Date_Format;
 
     /**
-     * @param  \Alaress_Date_Format $deletedAt
+     * @param Alaress_Date_Format|null $deletedAt
      * @return $this
      */
-    public function setDeletedAt(\Alaress_Date_Format $deletedAt = null);
+    public function setDeletedAt(?Alaress_Date_Format $deletedAt): static;
 }

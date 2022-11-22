@@ -398,7 +398,7 @@ class Mapper extends BaseMapper
      *
      * @return int
      */
-    public function getAttemptCountForStudentInTerm($studentId, $folderId, Alaress_Date_Format $from, Alaress_Date_Format $to)
+    public function getAttemptCountForStudentInTerm($studentId, $folderId, ?Alaress_Date_Format $from, ?Alaress_Date_Format $to)
     {
         $parts = [
             'aa.user_id = :studentId',
@@ -410,11 +410,11 @@ class Mapper extends BaseMapper
             'studentId' => $studentId,
             'folderId'  => $folderId,
         ];
-        if (!$from->isNull()) {
+        if ($from) {
             $params['from'] = $from->getDatabaseDate();
             $parts[] = 'DATE(a.finish) >= :from';
         }
-        if (!$to->isNull()) {
+        if ($to) {
             $params['to'] = $to->getDatabaseDate();
             $parts[] = 'DATE(a.finish) <= :to';
         }
@@ -443,7 +443,7 @@ class Mapper extends BaseMapper
      * @param Alaress_Date_Format $to
      * @return Collection|Folder[]
      */
-    public function getAttemptedSubjects($studentId, Alaress_Date_Format $from, Alaress_Date_Format $to)
+    public function getAttemptedSubjects($studentId, ?Alaress_Date_Format $from, ?Alaress_Date_Format $to)
     {
         $parts = [
             'aa.user_id = :studentId',
@@ -451,11 +451,11 @@ class Mapper extends BaseMapper
         $params = [
             'studentId' => $studentId,
         ];
-        if (!$from->isNull()) {
+        if ($from) {
             $params['from'] = $from->getDatabaseDate();
             $parts[] = 'DATE(a.finish) >= :from';
         }
-        if (!$to->isNull()) {
+        if ($to) {
             $params['to'] = $to->getDatabaseDate();
             $parts[] = 'DATE(a.finish) <= :to';
         }

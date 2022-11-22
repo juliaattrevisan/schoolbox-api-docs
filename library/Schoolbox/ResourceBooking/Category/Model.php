@@ -16,7 +16,6 @@ use JsonSerializable;
 
 class Model implements ISoftDeletable, JsonSerializable
 {
-
     /**
      * @var int
      */
@@ -138,9 +137,9 @@ class Model implements ISoftDeletable, JsonSerializable
      *
      * @return bool
      */
-    public function isDeleted()
+    public function isDeleted(): bool
     {
-        return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
+        return $this->getDeletedAt() instanceof Alaress_Date_Format;
     }
 
     /**

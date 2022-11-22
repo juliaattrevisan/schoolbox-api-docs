@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment;
 
@@ -150,18 +150,10 @@ class Dehydrator
             'title'          => $assessment->getTitle(),
             'weight'         => $assessment->getWeight(),
             'markVisibility' => $assessment->getMarkVisibility(),
-            'publishDate'    => $assessment->getPublishAt() && !$assessment->getPublishAt()->isNull()
-                ? $assessment->getPublishAt()->getDatabase()
-                : null,
-            'openDate'       => $assessment->getOpenAt() && !$assessment->getOpenAt()->isNull()
-                ? $assessment->getOpenAt()->getDatabase()
-                : null,
-            'dueDate'        => $assessment->getDueAt() && !$assessment->getDueAt()->isNull()
-                ? $assessment->getDueAt()->getDatabase()
-                : null,
-            'closeDate'      => $assessment->getCloseAt() && !$assessment->getCloseAt()->isNull()
-                ? $assessment->getCloseAt()->getDatabase()
-                : null,
+            'publishDate'    => $assessment->getPublishAt()?->getDatabase(),
+            'openDate'       => $assessment->getOpenAt()?->getDatabase(),
+            'dueDate'        => $assessment->getDueAt()?->getDatabase(),
+            'closeDate'      => $assessment->getCloseAt()?->getDatabase(),
             'workType'       => $assessment->getWorkType()
                 // TODO remove explicit type-coercion once model hydration is fixed SA-4539
                 ? (int)$assessment->getWorkType()->getId()
@@ -230,18 +222,10 @@ class Dehydrator
             'id'          => $plan->getId(),
             'name'        => $plan->getName(),
             'dynamic'     => $plan->getIsDynamic(),
-            'publishDate' => $plan->getPublishDate() && !$plan->getPublishDate()->isNull()
-                ? $plan->getPublishDate()->getDatabase()
-                : null,
-            'openDate'    => $plan->getOpenDate() && !$plan->getOpenDate()->isNull()
-                ? $plan->getOpenDate()->getDatabase()
-                : null,
-            'dueDate'     => $plan->getDueDate() && !$plan->getDueDate()->isNull()
-                ? $plan->getDueDate()->getDatabase()
-                : null,
-            'closeDate'   => $plan->getCloseDate() && !$plan->getCloseDate()->isNull()
-                ? $plan->getCloseDate()->getDatabase()
-                : null,
+            'publishDate' => $plan->getPublishDate()?->getDatabase(),
+            'openDate'    => $plan->getOpenDate()?->getDatabase(),
+            'dueDate'     => $plan->getDueDate()?->getDatabase(),
+            'closeDate'   => $plan->getCloseDate()?->getDatabase(),
         ];
     }
 

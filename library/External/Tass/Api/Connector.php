@@ -21,7 +21,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Token as TokenCodec
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Alaress_Date_Format;
-use Alaress_Date_NullDate;
 use Schoolbox\GenericCollection;
 use RuntimeException;
 
@@ -34,7 +33,6 @@ use function in_array;
  */
 class Connector
 {
-
     // Known Tass2 HTTP API methods
     private const METHOD_GET_STUDENT = 'GetStudent';
     private const METHOD_GET_STUDENT_UD = 'GetStudentUD';
@@ -413,12 +411,12 @@ class Connector
      * @throws InvalidArg If method args are invalid
      * @throws ResponseDecodeException If unable to decode API response
      */
-    public function getStudentTimetable(string $studentCode, Alaress_Date_Format $date = null): array
+    public function getStudentTimetable(string $studentCode, ?Alaress_Date_Format $date = null): array
     {
         $params = [
             'studcode' => $studentCode,
         ];
-        if (null !== $date && !$date instanceof Alaress_Date_NullDate) {
+        if (null !== $date) {
             $params['date'] = $date->getUsingFormat(self::TASS_DATE_FORMAT);
         }
         return $this->modelFactory->buildStudentTimetable($this->executeMethod(self::METHOD_GET_STUDENT_TIMETABLE, $params));
@@ -435,12 +433,12 @@ class Connector
      * @throws InvalidArg If method args are invalid
      * @throws ResponseDecodeException If unable to decode API response
      */
-    public function getTeacherTimetable(string $teacherCode, Alaress_Date_Format $date = null): array
+    public function getTeacherTimetable(string $teacherCode, ?Alaress_Date_Format $date = null): array
     {
         $params = [
             'tchcode' => $teacherCode,
         ];
-        if (null !== $date && !$date instanceof Alaress_Date_NullDate) {
+        if (null !== $date) {
             $params['date'] = $date->getUsingFormat(self::TASS_DATE_FORMAT);
         }
         return $this->modelFactory->buildTeacherTimetable($this->executeMethod(self::METHOD_GET_TEACHER_TIMETABLE, $params));

@@ -218,7 +218,7 @@ class Controller extends Base
             $this->getResponse()->redirect->to(
                 $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
             );
-        } elseif (!$reset->getResetTime()->isNull()) {
+        } elseif ($reset->getResetTime()) {
             // Token already used - go elsewhere
             $this->getResponse()->redirect->to(
                 $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')

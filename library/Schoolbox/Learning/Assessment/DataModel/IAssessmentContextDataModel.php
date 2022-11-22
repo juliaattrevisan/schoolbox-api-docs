@@ -60,8 +60,9 @@ interface IAssessmentContextDataModel
     public function isImplementationContext();
 
     /**
-     * Is this context soft deleted
-     * @return mixed
+     * Is this context soft deleted?
+     *
+     * @return bool
      */
-    public function isDeleted();
+    public function isDeleted(): bool;
 }

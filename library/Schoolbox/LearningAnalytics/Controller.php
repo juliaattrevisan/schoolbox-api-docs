@@ -31,7 +31,6 @@ use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 
 class Controller extends Base
 {
-
     /** @var TermMapper $termMapper */
     private $termMapper;
 
@@ -310,7 +309,7 @@ class Controller extends Base
 
                     foreach ($allTerms as $t) {
                         // Is this Assessment due in this Term?
-                        if ($t->getStart()->lte($a->getDueAt()) && ($t->getActualFinish()->isNull() || $t->getActualFinish()->gt($a->getDueAt()))) {
+                        if ($t->getStart()->lte($a->getDueAt()) && (!$t->getActualFinish() || $t->getActualFinish()->gt($a->getDueAt()))) {
                             $navigableTerms->setOffset($t->getId(), $t);
 
                             // Remove from available terms to avoid repeated traversals

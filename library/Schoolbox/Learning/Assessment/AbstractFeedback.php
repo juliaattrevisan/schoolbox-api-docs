@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress_Date_Format;
 use Schoolbox\User;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -84,9 +85,9 @@ abstract class AbstractFeedback implements IFeedback
      *         $publishedAt = null
      *     }
      *
-     * @var \Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
-    protected $publishedAt = null;
+    protected ?Alaress_Date_Format $publishedAt = null;
 
     /**
      * Determine whether this Feedback has been published.
@@ -96,12 +97,6 @@ abstract class AbstractFeedback implements IFeedback
      */
     public function isPublished()
     {
-        /* If it's a nulldate instance, it's not published
-         */
-        if ($this->getPublishedAt() instanceof \Alaress_Date_NullDate) {
-            return false;
-        }
-
         return $this->getPublishedAt() !== null;
     }
 
@@ -209,18 +204,18 @@ abstract class AbstractFeedback implements IFeedback
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
-    public function getPublishedAt()
+    public function getPublishedAt(): ?Alaress_Date_Format
     {
         return $this->publishedAt;
     }
 
     /**
-     * @param \Alaress_Date_Format $publishedAt
+     * @param Alaress_Date_Format|null $publishedAt
      * @return $this
      */
-    public function setPublishedAt($publishedAt)
+    public function setPublishedAt(?Alaress_Date_Format $publishedAt): self
     {
         $this->publishedAt = $publishedAt;
         return $this;

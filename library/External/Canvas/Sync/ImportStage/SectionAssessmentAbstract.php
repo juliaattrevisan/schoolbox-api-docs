@@ -1268,10 +1268,10 @@ abstract class SectionAssessmentAbstract
             $this->countPlansCreated++;
             $plan = $this->createPlan($assessmentModel, $isDynamic, $planName, $publish, $open, $due, $close);
         } else {
-            $currentPublish = ($plan->getPublishDate() === null || $plan->getPublishDate()->isNull()) ? null : $plan->getPublishDate()->getDatabase();
-            $currentOpen    = ($plan->getOpenDate() === null || $plan->getOpenDate()->isNull()) ? null : $plan->getOpenDate()->getDatabase();
-            $currentDue     = ($plan->getDueDate() === null || $plan->getDueDate()->isNull()) ? null : $plan->getDueDate()->getDatabase();
-            $currentClose   = ($plan->getCloseDate() === null || $plan->getCloseDate()->isNull()) ? null : $plan->getCloseDate()->getDatabase();
+            $currentPublish = $plan->getPublishDate()?->getDatabase();
+            $currentOpen    = $plan->getOpenDate()?->getDatabase();
+            $currentDue     = $plan->getDueDate()?->getDatabase();
+            $currentClose   = $plan->getCloseDate()?->getDatabase();
 
             if (
                 $currentPublish !== $publish ||

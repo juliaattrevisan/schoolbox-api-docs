@@ -78,12 +78,11 @@ class Replicator
 
         // If copying the assessment into a spec: clear its dates
         if ($destinationContext->isSpecificationContext()) {
-            $nullDate      = new \Alaress_Date_NullDate();
             $newAssessment = $newAssessment
-                ->setPublishAt($nullDate)
-                ->setOpenAt($nullDate)
-                ->setDueAt($nullDate)
-                ->setCloseAt($nullDate);
+                ->setPublishAt(null)
+                ->setOpenAt(null)
+                ->setDueAt(null)
+                ->setCloseAt(null);
         }
 
         $destinationContext->getAssessables()->add($newAssessment);

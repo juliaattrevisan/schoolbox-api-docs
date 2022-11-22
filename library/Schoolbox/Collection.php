@@ -18,7 +18,6 @@ use ICollection;
 
 class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 {
-
     /**
      * Consts corresponding to ordering
      */
@@ -491,7 +490,9 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
                 $a_value = $a->{$get_methods[$i]}();
                 $b_value = $b->{$get_methods[$i]}();
 
-                if ($a_value instanceof \IComparable && $b_value instanceof \IComparable) {
+                if (!isset($a_value, $b_value)) {
+                    $result = 0;
+                } elseif ($a_value instanceof \IComparable && $b_value instanceof \IComparable) {
                     $result = $a_value->compare($b_value);
                 } elseif ($a_value !== $b_value) {
                     if ($isCallable[$i]) {
