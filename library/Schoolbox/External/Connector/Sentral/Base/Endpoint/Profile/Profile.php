@@ -930,6 +930,9 @@ class Profile implements IStrategy
      */
     private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $contacts): void
     {
+        // Get default relationIds, if no options selected in config
+        $allowedRelationshipIds = $this->api->getOptions()['parentRelationIds'] ?? self::DEFAULT_ALLOWED_RELATIONSHIP_IDS;
+
         /* Each student comes with a set of Contacts
          * Some are Emergency Contacts, some are not
          */
@@ -959,7 +962,7 @@ class Profile implements IStrategy
             /* We only assign Parents as chosen by the school in Sentral Configuration
              * in the SUDS Control Panel; anyone outside the chosen set is ignored
              */
-            if (!in_array($relationshipId, $this->api->getOptions()['parentRelationIds'] ?? self::DEFAULT_ALLOWED_RELATIONSHIP_IDS, true)) {
+            if (!in_array($relationshipId, $allowedRelationshipIds, true)) {
                 $this->log->debug(sprintf(
                     'Person id %s is a "%s %s" of the student - skipping.',
                     $contact['attributes']['personId'],
