@@ -176,7 +176,7 @@ class Controller extends Base
              ->setAttachPrompt('Attach files')
              ->useImportExpiryDate();
 
-        $uri = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme("https");
+        $uri = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified()->withScheme("https");
 
         $student = null;
         if ($params->get('studentId')) {

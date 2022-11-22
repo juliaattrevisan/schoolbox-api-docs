@@ -62,7 +62,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         $deploymentId = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID);
         $learnerUrl = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL);
         $cohortUrl = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL);
-        $jwtIssuer = (new Factory($this->getConfigLoader()))->buildFullyQualified()->toString();
+        $jwtIssuer = (string)(new Factory($this->getConfigLoader()))->buildFullyQualified();
 
         $this->jwtFactory = new JwtFactory(
             $key,

@@ -6,15 +6,15 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 $user = $_SESSION['user'];
-$url = new \Laminas\Uri\Uri(Config::get('external_portal'));
+$url = new \Schoolbox\Url\Uri(Config::get('external_portal'));
 
 /* If the user has already passed by the login, we can go directly to the page */
 if ($_SESSION['communityLogin']) {
     if ($_GET['page']) {
-        $url->setPath('/' . $_GET['page'] . '.aspx');
+        $url->withPath('/' . $_GET['page'] . '.aspx');
     } else {
         // This seems to be the default post-login landing page
-        $url->setPath('/stures.aspx');
+        $url->withPath('/stures.aspx');
     }
 
     $query = $url->getQueryAsArray();
@@ -29,15 +29,15 @@ if ($_SESSION['communityLogin']) {
     if ($_GET['menu']) {
         $query['menu'] = 0;
     }
-    $url->setQuery($query);
+    $url->appendQueryParameters($query);
 
-    header('Location: ' . $url->toString());
+    header('Location: ' . $url);
     exit;
 } else {
     /* Setup form variable */
-    $url->setPath('/login.aspx');
+    $url->withPath('/login.aspx');
     $form   = "Form1";
-    $action = $url->toString();
+    $action = (string)$url;
 
     /* First contact the site to get some CSRF hacks */
     $method = "POST";

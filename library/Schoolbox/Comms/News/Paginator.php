@@ -13,9 +13,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News;
 
 use Alaress\Paginator\UrlPaginator;
-use Laminas\Uri\Exception\InvalidArgumentException;
-use Laminas\Uri\Exception\InvalidUriException;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 
 class Paginator extends UrlPaginator
 {
@@ -24,8 +22,6 @@ class Paginator extends UrlPaginator
      *
      * @param  int $page
      * @return string
-     * @throws InvalidArgumentException
-     * @throws InvalidUriException
      */
     public function getUrlForPage($page): string
     {
@@ -36,13 +32,13 @@ class Paginator extends UrlPaginator
         $query = $url->getQueryAsArray();
         $query[$this->param] = $page;
 
-        $url->setQuery(array_intersect_key($query, [
+        $url = $url->appendQueryParameters(array_intersect_key($query, [
             Querystring::TOPIC_SLUG => '',
             Querystring::PAGE_NUMBER => '',
             Querystring::COMPONENT_ID => '',
             Querystring::FOLDER => '',
         ]));
 
-        return $url->toString();
+        return (string)$url;
     }
 }

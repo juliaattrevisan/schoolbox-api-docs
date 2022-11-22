@@ -11,12 +11,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use Alaress_Curl_Url;
-use Laminas\Uri\Exception\InvalidArgumentException;
-use Laminas\Uri\Exception\InvalidUriException;
-use Laminas\Uri\Exception\InvalidUriPartException;
 use RuntimeException;
-use Laminas\Uri\Exception;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 
 /**
@@ -76,9 +72,6 @@ class Api implements IApi
      * Retrieves a XML document representing the result from the API call.
      *
      * @return string|null
-     * @throws InvalidArgumentException
-     * @throws InvalidUriException
-     * @throws InvalidUriPartException
      * @throws RuntimeException if the retrieval of the XML doc failed
      * @throws \DomainException
      */
@@ -107,8 +100,6 @@ class Api implements IApi
      * Cache a url definition then return its value
      *
      * @return Uri
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException|\DomainException
      */
     public function getUrl(): Uri
     {
@@ -124,10 +115,10 @@ class Api implements IApi
              * for everything you do in isams
              */
             $this->url = (new Uri())
-                ->setScheme('https')
-                ->setHost(rtrim($this->host, "/ \n\r\t\v\x00"))
-                ->setPath("/{$path}")
-                ->setQuery(['apikey' => $credentials['modules'][$this->module]['key']]);
+                ->withScheme('https')
+                ->withHost(rtrim($this->host, "/ \n\r\t\v\x00"))
+                ->withPath("/{$path}")
+                ->appendQueryParameters(['apikey' => $credentials['modules'][$this->module]['key']]);
         }
 
         return $this->url;
@@ -138,14 +129,11 @@ class Api implements IApi
      * Set up curl instance
      *
      * @return Alaress_Curl_Url
-     * @throws InvalidArgumentException
-     * @throws InvalidUriException
-     * @throws InvalidUriPartException
      * @throws \DomainException
      */
     private function initCurl(): \Alaress_Curl_Url
     {
-        return new Alaress_Curl_Url($this->getUrl()->toString());
+        return new Alaress_Curl_Url((string)$this->getUrl());
     }
 
 
@@ -153,8 +141,6 @@ class Api implements IApi
      * Save the xml to $filename in the root folder of the instance
      *
      * @param string $filename
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
      * @throws RuntimeException
      */
     public function saveToFile(string $filename): void

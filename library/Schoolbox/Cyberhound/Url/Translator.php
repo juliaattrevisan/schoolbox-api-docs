@@ -10,7 +10,8 @@ namespace Schoolbox\Cyberhound\Url;
 
 use Schoolbox\Config\Loader as ConfigLoader;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
+
 
 /**
  * Translates a URL to a CyberHound URL
@@ -91,19 +92,19 @@ class Translator
 
             try {
                 $urlObject = new Uri($url);
-                if (!$urlObject->isValidRelative()) {
+                if (!$urlObject->isAbsolutePath()) {
                     // If using Cyberhound: redirect to its proxy rather than the URL directly.
                     // Only redirect for non-local links though.
 
                     $cyberHoundUrl = new Uri($this->apiUrl);
                     $cyberHoundUrl
-                        ->setPath('/api/overrideurl')
-                        ->setQuery([
+                        ->withPath('/api/overrideurl')
+                        ->appendQueryParameters([
                             'key'       => hash('sha256', $_SERVER['REQUEST_TIME'] . $url . $this->apiSharedKey),
                             'time'      => $_SERVER['REQUEST_TIME'],
                             'base64url' => base64_encode($url),
                         ]);
-                    $url = $cyberHoundUrl->toString();
+                    $url = (string)$cyberHoundUrl;
                 }
             } catch (\InvalidArgumentException $e) {
                 return $url;

@@ -9,7 +9,7 @@
 namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use Alaress_Date_Format;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 use Schoolbox\Resource\Attachment\AbstractController;
 use Scrub;
 use SitePage;
@@ -59,10 +59,8 @@ class UploadController extends AbstractController
         }
 
         $urlObject = new Uri($url);
-        $urlObject->setQuery(
-            $urlObject->getQueryAsArray() + ['expiryDate' => $this->expiryDate->toRfc3339String()],
-        );
-        return $urlObject->toString();
+        $urlObject->appendQueryParameters(['expiryDate' => $this->expiryDate->toRfc3339String()]);
+        return $urlObject;
     }
 
     /**
@@ -78,11 +76,11 @@ class UploadController extends AbstractController
 
         $uploadUrl = new Uri('/storage/asyncUpload.php');
         if ($this->expiryDate) {
-            $uploadUrl = $uploadUrl->setQuery(['expiryDate' => $this->expiryDate->toRfc3339String()]);
+            $uploadUrl = $uploadUrl->appendQueryParameters(['expiryDate' => $this->expiryDate->toRfc3339String()]);
         }
 
         $page->setVar([
-            'UPLOAD_URL'     => $uploadUrl->toString(),
+            'UPLOAD_URL'     => $uploadUrl,
             'MAX_FILES'      => $this->multi ? self::DEFAULT_MAX_FILES : '1',
             'ACCEPTED_FILES' => $mime,
         ]);

@@ -26,7 +26,8 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
-use Laminas\Uri\UriInterface;
+use Schoolbox\Url\Uri;
+
 
 /**
  * Command-line PDF generator for Meriden's eReports.
@@ -146,7 +147,7 @@ EXAMPLES:
     /**
      * @inheritdoc
      */
-    protected function generatePdfSources(UriInterface $baseUrl): GenericCollection
+    protected function generatePdfSources(Uri $baseUrl): GenericCollection
     {
         // Determine and validate the role type, if there is one
         $roleType = $this->getOpt(self::OPT_LONG_ROLE_TYPE);

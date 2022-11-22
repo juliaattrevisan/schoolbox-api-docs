@@ -205,19 +205,18 @@ class Controller extends BaseController
 
         // Return URL:
         // this is somewhere else
-        $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https');
+        $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified()->withScheme('https');
         $returnUrl = (clone $baseUrl)
-            ->setPath(
+            ->withPath(
                 $this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
             )
             // If a context was passed in the query string:
             // add it to the return URL
-            ->setQuery(['context' => $this->request->query->get('context')])
-            ->toString();
+            ->addQueryParameter('context', $this->request->query->get('context'));
 
         // Standard deep linking settings
         $deepLinkingSettings = new DeepLinkingSettings(
-            $returnUrl,
+            (string)$returnUrl,
             [LtiResourceLinkInterface::TYPE,],
             [$tool->getTarget(),],
             null,

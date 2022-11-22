@@ -15,7 +15,8 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\User;
 use Session;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
+
 
 class Controller extends Base
 {
@@ -82,7 +83,7 @@ class Controller extends Base
             && (!$this->samlBlacklist() || $samlAuth === '1')
         ) {
             $redirectUrl = '/saml/index.php';
-            if ($pageUri->isValidRelative()) {
+            if ($pageUri->isAbsolutePath()) {
                 $redirectUrl .= '?page=' . rawurlencode($pageUri);
             }
             $this->getResponse()->redirect->to($redirectUrl, 303);
@@ -93,8 +94,8 @@ class Controller extends Base
         $data['requestParams'] = http_build_query($getParams);
 
         //Determine if page redirect is valid
-        if ($pageUri->isValidRelative() && $page !== '/login' && $page !== '/login/') {
-            $data['page'] = $pageUri->toString();
+        if ($pageUri->isAbsolutePath() && $page !== '/login' && $page !== '/login/') {
+            $data['page'] = (string)$pageUri;
         } else {
             $data['page'] = '';
         }

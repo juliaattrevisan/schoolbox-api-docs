@@ -10,14 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Url;
 
 use Schoolbox\IConfigLoader;
-use Laminas\Uri\Uri;
-use Laminas\Uri\UriInterface;
 
 /**
  * Factory for building URLs based upon Schoolbox configuration.
- *
- * Currently it creates `\Laminas\Uri\UriInterface` instances: this seems to be the
- * most modern URI/URL object in use in Schoolbox
  */
 class Factory
 {
@@ -47,13 +42,19 @@ class Factory
      * location on a network: this is enough to make this URI a URL.
      * (@see https://www.guru99.com/url-vs-uri-difference.html)
      *
-     * @return UriInterface
+     * @return Uri
      */
-    public function buildFullyQualified(): UriInterface
+    public function buildFullyQualified(): Uri
     {
         $host = trim("{$this->config->get('site_hostname')}.{$this->config->get('site_domain')}", '. ');
+
+        // adding scheme will set host as localhost
+        if (empty($host)) {
+            return new Uri();
+        }
+
         return (new Uri())
-            ->setScheme('https')
-            ->setHost($host);
+            ->withScheme('https')
+            ->withHost($host);
     }
 }

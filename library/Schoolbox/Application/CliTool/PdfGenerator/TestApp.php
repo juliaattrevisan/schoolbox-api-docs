@@ -13,7 +13,7 @@ use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
-use Laminas\Uri\UriInterface;
+use Schoolbox\Url\Uri;
 
 /**
  * Test application for the CLI PDF generator.
@@ -102,7 +102,7 @@ EXAMPLES:
     /**
      * @inheritdoc
      */
-    protected function generatePdfSources(UriInterface $baseUrl): GenericCollection
+    protected function generatePdfSources(Uri $baseUrl): GenericCollection
     {
         $urls = $this->getOpt(self::OPT_SHORT_URL);
         if (!isset($urls)) {
@@ -114,7 +114,7 @@ EXAMPLES:
 
         $outputUrls = [];
         foreach ($urls as $url) {
-            $outputUrls[] = $baseUrl->setPath($url)->toString();
+            $outputUrls[] = (string)$baseUrl->withPath($url);
         }
 
         return new GenericCollection(

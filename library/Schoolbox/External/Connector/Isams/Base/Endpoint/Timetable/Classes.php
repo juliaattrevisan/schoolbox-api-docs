@@ -25,8 +25,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
-use Laminas\Uri\Exception\InvalidArgumentException;
-use Laminas\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Classes
@@ -133,8 +131,6 @@ class Classes implements IStrategy
      * Import data from xml into local schema
      *
      * @throws RuntimeException
-     * @throws InvalidUriPartException
-     * @throws InvalidArgumentException
      * @throws Exception
      */
     public function import(): void

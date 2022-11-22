@@ -12,7 +12,7 @@ namespace Custom\Tigs\Summative;
 use Aura\Router\Router;
 use Schoolbox\GenericCollection;
 use Schoolbox\YearLevel;
-use Laminas\Uri\UriInterface;
+use Schoolbox\Url\Uri;
 use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use External_UserInterface;
 use InvalidArgumentException;
@@ -140,7 +140,7 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
     /**
      * @inheritdoc
      */
-    protected function generatePdfSources(UriInterface $baseUrl): GenericCollection
+    protected function generatePdfSources(Uri $baseUrl): GenericCollection
     {
         $collection          = new GenericCollection(CliTool\PdfGenerator\SourceBundle::class);
         $studentIds          = $this->getStudentIds();

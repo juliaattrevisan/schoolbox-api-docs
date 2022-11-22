@@ -629,7 +629,6 @@ class Controller extends ConfigController
      * @throws \Interop\Queue\Exception\InvalidDestinationException
      * @throws \Interop\Queue\Exception\InvalidMessageException
      * @throws \JsonException
-     * @throws \Laminas\Uri\Exception\InvalidUriException
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      * @api GET /adminv2/summative-report/{reportId}/generate
@@ -690,15 +689,14 @@ class Controller extends ConfigController
             $message = $messageFactory
                 ->setUser($this->getUser())
                 ->setCallbackUrl(
-                    $urlBase
-                        ->setPath(
+                    (string)$urlBase
+                        ->withPath(
                             $this->getRouter()->generate(
                                 'apiusernotify.apiUserNotify',
                                 ['userId' => $this->getUser()->getId()]
                             )
                         )
-                        ->setQuery(null)
-                        ->toString()
+                        ->withQuery(null)
                 )
                 ->setCallbackParams([
                     'message' => sprintf(

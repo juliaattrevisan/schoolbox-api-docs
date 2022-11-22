@@ -90,10 +90,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         $message        = $messageFactory->build(
             'notify',
             [],
-            (new Factory($this->getConfig()))
+            (string)(new Factory($this->getConfig()))
                 ->buildFullyQualified()
-                ->setPath(sprintf('/api/user/%d/notify', $toUserId))
-                ->toString(),
+                ->withPath(sprintf('/api/user/%d/notify', $toUserId)),
             [
                 'message'   => $messageBody,
                 'from'      => call_user_func($userSerializer, $fromUser),

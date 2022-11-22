@@ -98,11 +98,10 @@ class Controller extends Base
                 $this->request->query->get('loginHint'),
                 $this->request->query->get('messageType'),
                 $this->request->query->get('targetUrl'),
-                (new Factory($this->getConfigLoader()))
+                (string)(new Factory($this->getConfigLoader()))
                     ->buildFullyQualified()
-                    ->setScheme('https')
-                    ->setPath($this->router->generate('ltiPrototypePlatform.getDeepLinkingResponse'))
-                    ->toString(),
+                    ->withScheme('https')
+                    ->withPath($this->router->generate('ltiPrototypePlatform.getDeepLinkingResponse')),
             );
 
         $this->response->content->set(

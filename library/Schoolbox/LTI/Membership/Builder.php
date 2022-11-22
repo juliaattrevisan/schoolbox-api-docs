@@ -10,8 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Membership;
 
 use Closure;
-use Laminas\Uri\Uri;
-use Laminas\Uri\UriInterface;
+use Schoolbox\Url\Uri;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
 use OAT\Library\Lti1p3Core\User\UserIdentity;
@@ -478,8 +477,7 @@ class Builder implements MembershipServiceServerBuilderInterface
         $membershipId = $contextId . '/memberships';
         if (isset($resourceLinkIdentifier)) {
             $membershipId = (new Uri($membershipId))
-                ->setQuery(['rlid' => $resourceLinkIdentifier])
-                ->toString();
+                ->appendQueryParameters(['rlid' => $resourceLinkIdentifier]);
         }
         return new Membership(
             $membershipId,
@@ -495,10 +493,10 @@ class Builder implements MembershipServiceServerBuilderInterface
     /**
      * Build a base URL.
      *
-     * @return UriInterface
+     * @return Uri
      */
-    private function buildBaseUrl(): UriInterface
+    private function buildBaseUrl(): Uri
     {
-        return (new Factory($this->config))->buildFullyQualified()->setScheme('https');
+        return (new Factory($this->config))->buildFullyQualified()->withScheme('https');
     }
 }

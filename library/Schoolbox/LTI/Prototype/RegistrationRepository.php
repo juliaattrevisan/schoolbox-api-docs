@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Prototype;
 
-use Laminas\Uri\UriInterface;
+use Psr\Http\Message\UriInterface;
 use OAT\Library\Lti1p3Core\Platform\Platform;
 use OAT\Library\Lti1p3Core\Registration\Registration;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
@@ -203,8 +203,8 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         $platform = new Platform(
             'schoolbox',
             'Schoolbox Platform',
-            (clone $this->baseUrl)->toString(),
-            (clone $this->baseUrl)->setPath('/lti-prototype/platform/oidc/authentication')->toString(),
+            (string)(clone $this->baseUrl),
+            (string)(clone $this->baseUrl)->withPath('/lti-prototype/platform/oidc/authentication'),
         );
 
         // Configure a tool
@@ -212,9 +212,9 @@ class RegistrationRepository implements RegistrationRepositoryInterface
         $tool = new Tool(
             'schoolboxTool',
             'Schoolbox Tool',
-            (clone $this->baseUrl)->toString(),
-            (clone $this->baseUrl)->setPath('/lti-prototype/tool/oidc/initiation')->toString(),
-            (clone $this->baseUrl)->setPath('/lti-prototype/tool/launch')->toString(),
+            (string)(clone $this->baseUrl),
+            (string)(clone $this->baseUrl)->withPath('/lti-prototype/tool/oidc/initiation'),
+            (string)(clone $this->baseUrl)->withPath('/lti-prototype/tool/launch'),
         );
 
         // Configure a registration

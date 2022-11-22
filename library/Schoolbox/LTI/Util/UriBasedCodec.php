@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Util;
 
 use Alaress\Codec\ICodec;
-use Laminas\Uri\UriInterface;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Codec for generating identifiers in URI format.
@@ -51,10 +51,9 @@ abstract class UriBasedCodec implements ICodec
     public function encode($rawValue)
     {
         return (clone $this->baseUri)
-            ->setPath($this->retrieveBasePath() . self::SEPARATOR . $rawValue)
-            ->setQuery(null)
-            ->setFragment(null)
-            ->toString();
+            ->withPath($this->retrieveBasePath() . self::SEPARATOR . $rawValue)
+            ->withQuery(null)
+            ->sithFragment(null);
     }
 
     /**

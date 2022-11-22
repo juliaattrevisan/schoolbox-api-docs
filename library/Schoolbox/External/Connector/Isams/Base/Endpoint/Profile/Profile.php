@@ -14,7 +14,6 @@ use InvalidArgumentException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\ValidStrats;
@@ -26,7 +25,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use UnexpectedValueException;
-use Laminas\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Profile
@@ -178,8 +176,6 @@ class Profile implements IStrategy
      * @throws RuntimeException
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
-     * @throws \Laminas\Uri\Exception\InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function import(): void
     {
@@ -229,7 +225,6 @@ class Profile implements IStrategy
      * @throws RuntimeException
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
-     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      * @throws InvalidUriPartException
      */
     private function importStudents(): void

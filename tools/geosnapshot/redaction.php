@@ -120,7 +120,7 @@ HELP;
          */
         $this->getLogger()->info('Geosnapshot Redactions.');
 
-        $fqdn = (new Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified()->toString();
+        $fqdn = (string)(new Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified();
         $redactionList = (new External_User())->getPhotoRedactionList();
 
         /* Generate a list of guys who are about to be redacted

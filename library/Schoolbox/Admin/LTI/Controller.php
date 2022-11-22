@@ -92,10 +92,10 @@ class Controller extends ConfigController
                     'providerTargetIframe'  => Provider::TARGET_IFRAME,
                     'providerTargetWindow'  => Provider::TARGET_WINDOW,
                     'configContext'         => $configContext,
-                    'issuer'                => $baseUrl->toString(),
-                    'oidcAuthenticationUrl' => (clone $baseUrl)->setPath($this->router->generate('ltiPlatform.getOidcAuthenticationRequest')),
-                    'oauthAccessTokenUrl'   => (clone $baseUrl)->setPath($this->router->generate('ltiPlatform.getOauthAccessTokenRequest')),
-                    'jsonWebKeySetUrl'      => (clone $baseUrl)->setPath($this->router->generate('ltiPlatform.getJsonWebKeySet')),
+                    'issuer'                => (string)$baseUrl,
+                    'oidcAuthenticationUrl' => (string)(clone $baseUrl)->withPath($this->router->generate('ltiPlatform.getOidcAuthenticationRequest')),
+                    'oauthAccessTokenUrl'   => (string)(clone $baseUrl)->withPath($this->router->generate('ltiPlatform.getOauthAccessTokenRequest')),
+                    'jsonWebKeySetUrl'      => (string)(clone $baseUrl)->withPath($this->router->generate('ltiPlatform.getJsonWebKeySet')),
                 ],
             ]
         );

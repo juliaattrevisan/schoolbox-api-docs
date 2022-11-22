@@ -1,11 +1,16 @@
 <?php
 
+/**
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Laminas\Uri\Http as HttpUri;
 
 // Figure out if the URL ends with /window - and don't include it in the
 // decoded URL if it does.
 $isWindow        = false;
+/** @var SitePage $this */
 $encodedUrlParts = $this->arg;
 $lastPart        = array_pop($encodedUrlParts);
 if ($lastPart === 'window') {
@@ -24,13 +29,10 @@ $heightStyle = '';
 $class = '';
 
 try {
-    $url = new HttpUri($remoteUrl);
+    $url = new \Schoolbox\Url\Uri($remoteUrl);
 } catch (InvalidArgumentException $e) {
     // Not a HTTP(s) URI
     $this->error(ErrorMapper::ERROR_PAGE_NOT_FOUND);
-}
-if (!$url->isValid()) {
-    $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
 //Check the security of the remoteUrl, by validating it against the safe iframe list
@@ -49,6 +51,7 @@ if (!$secureUrl) {
     $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
+/** @var \Schoolbox\Url\Uri $url */
 $fragment = $url->getFragment();
 
 preg_match("#zx_h=([0-9]+)#", $fragment, $matches);
@@ -61,9 +64,7 @@ if (isset($matches[1])) {
     $class = "fullscreen";
 }
 
-$url->setFragment('');
-
-$query = $url->getQueryAsArray();
+$url->withFragment('');
 
 $secret = Config::get('remote_secret');
 $time = time();
@@ -79,15 +80,15 @@ $query[$prefix . 'id'] = $externalUserId;
 $query[$prefix . 'user'] = urlencode($_SESSION['username']);
 $query[$prefix . 'key'] = sha1($secret . $time . $externalUserId);
 
-$url->setQuery($query);
+$url = (string)$url->appendQueryParameters($query);
 
 if ($isWindow) {
-    header('Location: ' . $url->toString());
+    header('Location: ' . $url);
     exit;
 } else {
     $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
     $this->setVar(array(
-        'REMOTE_URL' => addslashes($url->toString()),
+        'REMOTE_URL' => addslashes($url),
         'HEIGHT_STYLE' => $heightStyle,
         'FRAME_CLASS' => $class,
     ));

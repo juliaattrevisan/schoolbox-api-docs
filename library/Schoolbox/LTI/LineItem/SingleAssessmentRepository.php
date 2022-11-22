@@ -11,7 +11,7 @@ namespace Schoolbox\LTI\LineItem;
 
 use Aura\Router\Router;
 use BadMethodCallException;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItem;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemCollectionInterface;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemInterface;

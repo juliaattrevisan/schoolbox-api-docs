@@ -46,7 +46,7 @@ class Renderer extends AbstractRenderer
          * This will not update existing entries, only when adding a new link with the ckeditor link dialogue
          */
         $data =  parent::getData($config);
-        $data['BASE_HREF'] = (new \Schoolbox\Url\Factory(ConfigMapper::getInstance()->getConfigLoader()))->buildFullyQualified()->setScheme("https");
+        $data['BASE_HREF'] = (new \Schoolbox\Url\Factory(ConfigMapper::getInstance()->getConfigLoader()))->buildFullyQualified()->withScheme("https");
         return $data;
     }
 }

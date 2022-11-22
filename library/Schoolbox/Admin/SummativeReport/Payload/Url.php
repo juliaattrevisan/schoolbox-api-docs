@@ -11,7 +11,7 @@ namespace Schoolbox\Admin\SummativeReport\Payload;
 
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
-use Laminas\Uri\UriInterface;
+use Psr\Http\Message\UriInterface;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Role;
 use Schoolbox\UserBulkMapper;
@@ -71,7 +71,6 @@ class Url
      * @param \Schoolbox\Admin\SummativeReport\Model $report
      * @return array
      * @throws \JsonException
-     * @throws \Laminas\Uri\Exception\InvalidUriException
      */
     public function generate(\Schoolbox\Admin\SummativeReport\Model $report): array
     {
@@ -233,7 +232,7 @@ class Url
                      */
                     $reportConfig = [
                         'filename' => sprintf("%s.pdf", $filename),
-                        'url' => $urlBase->setPath($reportPath)->toString(),
+                        'url' => (string)$urlBase->withPath($reportPath),
                     ];
 
                     $reportConfigs[] = $reportConfig;

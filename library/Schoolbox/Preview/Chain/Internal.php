@@ -15,8 +15,8 @@ use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
 use Schoolbox\Preview\Chain\Strategy\Internal\Redirect;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
-use Laminas\Uri\Exception\InvalidArgumentException;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
+
 
 /**
  * Class Internal
@@ -44,7 +44,6 @@ class Internal extends Base
      * Constructor
      *
      * @param string $url
-     * @throws InvalidArgumentException
      */
     public function __construct(string $url)
     {

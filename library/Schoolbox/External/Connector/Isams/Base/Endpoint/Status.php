@@ -11,8 +11,6 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
-use Laminas\Uri\Exception\InvalidArgumentException;
-use Laminas\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Status
@@ -50,8 +48,6 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      * @throws \DomainException
      */
     public function isReachable(): bool
@@ -77,8 +73,6 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function getReport(): array
     {

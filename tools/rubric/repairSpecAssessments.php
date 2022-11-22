@@ -28,7 +28,7 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 use Schoolbox\Assessment\Rubric\Util as RubricUtil;
 use Schoolbox\Learning\Course\DataModel\Specification;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -896,10 +896,10 @@ $kernel->run(new class extends App {
     {
         foreach ($this->significantEvents as $assessmentId => $events) {
             $url = (new Uri())
-                ->setScheme('https')
-                ->setHost($this->fqdn)
-                ->setPath('/learning/assessments/' . $assessmentId);
-            $this->log->warning(self::indent(1) . $url->toString());
+                ->withScheme('https')
+                ->withHost($this->fqdn)
+                ->withPath('/learning/assessments/' . $assessmentId);
+            $this->log->warning(self::indent(1) . $url);
             foreach ($events as $event) {
                 $this->log->warning(self::indent(2) . $event);
             }

@@ -160,7 +160,7 @@ class LaunchFactory
         User $actingUser,
         ?int $height
     ): array {
-        $baseUrl = (new UrlFactory($this->config))->buildFullyQualified()->setScheme('https');
+        $baseUrl = (new UrlFactory($this->config))->buildFullyQualified()->withScheme('https');
 
         $additionalClaims = [];
 
@@ -219,28 +219,26 @@ class LaunchFactory
         $additionalClaims[] = new AgsClaim(
             [ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE],
             null,
-            (clone $baseUrl)
-                ->setPath(
+            (string)(clone $baseUrl)
+                ->withPath(
                     $this->router->generate(
                         'ltiPlatformLineItem.getLineItemForAssessment',
                         ['assessmentId' => $assessment->getId()]
                     )
-                )
-                ->toString(),
+                ),
         );
 
         // NPRS claim:
         // provide the folder as the context, with a resource ID parameter
         $additionalClaims[] = new NrpsClaim(
-            (clone $baseUrl)
-                ->setPath(
+            (string)(clone $baseUrl)
+                ->withPath(
                     $this->router->generate(
                         'ltiPlatformContext.getMembershipsForFolder',
                         ['folderId' => $assessment->getBaseContext()->getFolder()->getId()]
                     )
                 )
-                ->setQuery(['rlid' => $resourceLinkCodec->encode($assessment->getId()),])
-                ->toString(),
+                ->appendQueryParameters(['rlid' => $resourceLinkCodec->encode($assessment->getId()),]),
         );
 
         return $additionalClaims;

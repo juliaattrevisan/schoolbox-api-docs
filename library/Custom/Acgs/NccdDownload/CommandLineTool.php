@@ -13,10 +13,10 @@ use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Schoolbox\Url\Uri;
 use Gotenberg\Modules\Chromium;
 use Gotenberg\Stream;
 use Http\Factory\Guzzle\StreamFactory;
-use Laminas\Uri\Uri;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 use Schoolbox\Gotenberg\Client;
@@ -177,7 +177,7 @@ class CommandLineTool extends App
         }
 
 
-        $this->baseUri = (new UrlFactory($this->getConfig()))->buildFullyQualified()->toString();
+        $this->baseUri = (string)(new UrlFactory($this->getConfig()))->buildFullyQualified();
 
         // Find every folder which imports the NCCD Information course
         $params = Builder::getArrayPlaceholders(self::COURSE_IDS);
@@ -375,8 +375,8 @@ class CommandLineTool extends App
                         sprintf(
                             '(Try downloading from %s, and uploading to staging)',
                             (new Uri('https://schoolbox.churchie.com.au/'))
-                                ->setPath('/storage/fetch.php')
-                                ->setQuery(['hash' => $file->getHash()])
+                                ->withPath('/storage/fetch.php')
+                                ->addQueryParameter('hash', $file->getHash())
                         )
                     );
                 }

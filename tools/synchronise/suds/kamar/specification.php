@@ -18,7 +18,6 @@ use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
-use Laminas\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../../../conf/core/require.php';
 
@@ -87,7 +86,7 @@ HELP;
                     'message' => "Cannot access api endpoint: cannot open/read at least one {$key} xml",
                     'status' => ISpecification::STATUS_EMPTY
                 ];
-            } catch (InvalidUriPartException | InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $result[] = [
                     'message' => "Cannot access api endpoint, bad url: {$e->getMessage()}",
                     'status' => ISpecification::STATUS_EMPTY
