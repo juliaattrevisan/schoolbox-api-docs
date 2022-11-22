@@ -1,8 +1,6 @@
-# CLI Request
+# Web Request
 
-One point of input for requests into Schoolbox is via the execution of a CLI
-script: these scripts will generally live in the `tools/` directory of
-Schoolbox's code base.
+One point of input for requests into Schoolbox is via a standard HTTP request.
 
 Incoming HTTP requests are handled by a standard HTTP server:
 * currently, self-hosted Schoolbox instances serve requests via an
@@ -20,6 +18,7 @@ In either case:
   the request.
 
 If Schoolbox handles the request, it will be redirected to `www/index.php`:
-then, Schoolbox will perform
-[instance routing](../configuration/instance-routing.md) so that it may
-bootstrap the instance's configuration.
+there, Schoolbox will perform
+[instance routing](../../configuration/instance-routing.md) so that it may
+bootstrap the instance's configuration, and then run the web request using the
+[web kernel](../../adapters/web-kernel.md).
