@@ -47,7 +47,7 @@ class DSNTest extends TestCase
     public function providerValidDSNDecode(): array
     {
         return [
-            'Valid DSN 1' => [
+            'Valid DSN 1 (parent relation IDs)' => [
                 'key=qwrSDFh823468;tenant=ABC12345abc?parentRelationIds=00,01,02,20',
                 [
                     'key' => 'qwrSDFh823468',
@@ -55,6 +55,22 @@ class DSNTest extends TestCase
                     'options' => [
                         'parentRelationIds' => ['00','01','02','20']
                     ]
+                ]
+            ],
+            'Valid DSN 2 (no options set)' => [
+                'key=qwrSDFh823468;tenant=ABC12345abc',
+                [
+                    'key' => 'qwrSDFh823468',
+                    'tenant' => 'ABC12345abc',
+                    'options' => [],
+                ]
+            ],
+            'Valid DSN 3 (options set, but empty parent relation IDs)' => [
+                'key=qwrSDFh823468;tenant=ABC12345abc?parentRelationIds',
+                [
+                    'key' => 'qwrSDFh823468',
+                    'tenant' => 'ABC12345abc',
+                    'options' => [],
                 ]
             ],
         ];
@@ -166,7 +182,8 @@ class DSNTest extends TestCase
         return [
             'Re-encode 1' => [
                 'key=qwrSDFh823468;tenant=ABC12345abc?parentRelationIds=00,01,02,20',
-                'key=qwrSDFh823468;tenant=ABC12345abc?parentRelationIds=00,01,02,20'
+                'key=qwrSDFh823468;tenant=ABC12345abc?parentRelationIds=00,01,02,20',
+                'key=qwrSDFh823468;tenant=ABC12345abc',
             ],
         ];
     }
