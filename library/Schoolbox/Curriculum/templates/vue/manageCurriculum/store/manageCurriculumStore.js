@@ -37,11 +37,11 @@ export const useStore = defineStore('manageCurriculum', () => {
      * @param { object }
      * @param { ref }
      */
-    function init (props, toastEl) {
+    function init (props, toastElement) {
         checkForNodeHash();
         checkForStorybook();
         isReadOnly.value = props.isReadOnly;
-        toastEl.value = toastEl;
+        toastEl.value = toastElement;
         if (props.dataEndpoint !== '') { //only load when we need to
             apiEndpoint = props.dataEndpoint;
             useNodesStore().load(); //load the top level curricula

@@ -36,13 +36,13 @@ function onDeleteSelected () {
  */
 deleteNodesStore.$onAction(({ name, after, onError }) => {
     if (name === 'deleteNodes') {
-        store.toastEl.activate('Deleting...');
+        store.toastEl.value.activate('Deleting...');
         after((result) => {
-            store.toastEl.timeout(result, true, 5000);
+            store.toastEl.value.timeout(result, true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            // store.toastEl.timeout('Unable to delete node', false, 5000);
+            // store.toastEl.value.timeout('Unable to delete node', false, 5000);
         });
     }
 });

@@ -53,13 +53,13 @@ function onAddSubsectionSelected () {
  */
 addCurriculumStore.$onAction(({ name, after, onError }) => {
     if (name === 'add') {
-        store.toastEl.activate('Adding...');
+        store.toastEl.value.activate('Adding...');
         after((result) => {
-            store.toastEl.timeout(result.message, true, 5000);
+            store.toastEl.value.timeout(result.message, true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            store.toastEl.timeout('Unable to add Curriculum', false, 5000);
+            store.toastEl.value.timeout('Unable to add Curriculum', false, 5000);
         });
     }
 });
