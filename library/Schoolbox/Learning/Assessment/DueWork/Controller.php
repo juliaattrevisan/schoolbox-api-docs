@@ -78,8 +78,11 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
+use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 use Sentry\State\HubInterface;
 use TheCodingMachine\Gotenberg;
@@ -431,9 +434,6 @@ class Controller extends Assessment\Controller
      */
     public function downloadSubmissions(IAssessable $assessment): void
     {
-        // Creating a ZIP archive might take a while
-        $this->extendExecutionTime();
-
         // Retrieve all participants
 
         $participants = $assessment->getAllParticipants();
@@ -448,9 +448,12 @@ class Controller extends Assessment\Controller
         $titleSanitized = $this->sanitizeForFilename($assessment->getTitle());
         $dateNow        = Alaress_Date_Format::now()->getUsingFormat('Ymd-His');
 
-        $zipOptions = new ZipStream\Option\Archive();
-        $zipOptions->setSendHttpHeaders(true);
-        $zipStream = new ZipStream\ZipStream("$titleSanitized-$dateNow.zip", $zipOptions);
+
+        // Generate list and send to taskd
+        /** @var MessageFactory $messageFactory */
+        $messageFactory = $this->getDi()->get('taskd.downloadPagesMessageFactory');
+        $userSerializer = new ModelToArray();
+        $urlBase        = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
 
         // Iterate participants and get their responses
         /** @var Participant $participant */
@@ -487,17 +490,66 @@ class Controller extends Assessment\Controller
                                 $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
                                 $this->sanitizeForFilename($file->getBasename())
                             );
-                            $zipStream->addFileFromStream($zipFilename, $this->filesystemProxy->readStream($file));
+
+                            // Generate a link to this file
+                            $messageFactory = $messageFactory->addFileContent(
+                                $zipFilename,
+                                $urlBase->setPath('/storage/fetch.php')->setQuery(['hash' => $file->getHash()]),
+                            );
                         }
                     }
                 }
             }
-            $this->addSubmissionHistoryToZipStream($participant, $zipStream, $baseFolderName);
+
+            // Add submission history
+            $messageFactory = $messageFactory->addPdfContent(
+                sprintf(
+                    "%s/submissionHistory.pdf",
+                    $baseFolderName,
+                ),
+                $urlBase->setPath(
+                    $this->router->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'assessmentId' => $participant->getAssessable()->getId(),
+                            'studentId'    => $participant->getUser()->getId(),
+                        ],
+                    )
+                ),
+            );
         }
 
-        // Stream the zip archive
-        $zipStream->finish();
-        exit;
+        $title = "$titleSanitized-$dateNow.zip";
+        $message = $messageFactory
+            ->setUser($this->getUser())
+            ->setCallbackUrl(
+                $urlBase
+                    ->setPath(
+                        $this->router->generate(
+                            'apiusernotify.apiUserNotify',
+                            ['userId' => $this->getUser()->getId()]
+                        )
+                    )
+                    ->setQuery(null)
+                    ->toString()
+            )
+            ->setCallbackParams([
+                'message' => sprintf(
+                    'Your due work summary %s is ready to download',
+                    $title,
+                ),
+                'from'    => call_user_func($userSerializer, $this->getUser()),
+                'to'      => call_user_func($userSerializer, $this->getUser()),
+            ])
+            ->build($title);
+
+        /* Send it to task for async processing
+         */
+        /** @var Producer $producer */
+        $producer = $this->getDi()->get('taskd.messageProducer');
+        $producer->send($message);
+
+        // Go back to the status page?
     }
 
 
