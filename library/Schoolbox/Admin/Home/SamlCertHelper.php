@@ -115,7 +115,7 @@ class SamlCertHelper
             throw new UnreachableException($e);
         }
 
-        $validUrl = $url->toString();
+        $validUrl = (string)$url;
 
         try {
             $idpMetadataCache = $this->samlCache->init($validUrl);

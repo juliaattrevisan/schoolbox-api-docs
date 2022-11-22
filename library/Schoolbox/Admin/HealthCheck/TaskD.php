@@ -112,7 +112,7 @@ class TaskD
 
         //if passed url is null, generate a local url
         if (null === $url) {
-            $url = $urlBase->setPath($this->router->generate('adminHealthCheckExport.' . $report))->toString();
+            $url = $urlBase->withPath($this->router->generate('adminHealthCheckExport.' . $report));
         }
         $this->sources[] = [
             'filename' => sprintf(
@@ -120,7 +120,7 @@ class TaskD
                 $folder,
                 mb_substr($report, 0, self::FILENAME_MAX_LENGTH, 'UTF-8'),
             ),
-            'source'     => $url,
+            'source' => $url,
         ];
     }
 }
