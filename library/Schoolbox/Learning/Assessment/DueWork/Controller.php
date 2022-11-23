@@ -28,7 +28,7 @@ use PDOException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\Exception;
-use Schoolbox\L10n\RosettaStoneFactory;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -85,7 +85,6 @@ use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Url;
-use ZipStream;
 
 use function count;
 
@@ -155,6 +154,7 @@ class Controller extends Assessment\Controller
         LatestViewMapper $latestViewMapper,
         private FilesystemProxy $filesystemProxy,
         private StateMapper $stateMapper,
+        private RosettaStone $rosettaStone,
     ) {
         parent::__construct(
             $userMapper,
@@ -521,7 +521,8 @@ class Controller extends Assessment\Controller
             )
             ->setCallbackParams([
                 'message' => sprintf(
-                    'Your due work summary %s is ready to download',
+                    'Feedback and submissions for %s "%s" are ready to download',
+                    $this->rosettaStone->translate('dueWork'),
                     $title,
                 ),
                 'from'    => call_user_func($userSerializer, $this->getUser()),
@@ -1520,8 +1521,6 @@ class Controller extends Assessment\Controller
     {
         $zoneFactory = new Assessment\Attachzone\Factory();
 
-        $stoneFactory = (new RosettaStoneFactory())->build(\Schoolbox\L10n\Mapper::getInstance());
-
         // setup some data...
         $data = [
             'acceptingResponses' => true,
@@ -1535,14 +1534,14 @@ class Controller extends Assessment\Controller
                 ],
                 'reflect' => [
                     'value' => SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY,
-                    'label' => $stoneFactory->translate('selfReflection', false, true)
+                    'label' => $this->rosettaStone->translate('selfReflection', false, true)
                 ],
                 'full' => [
                     'value' => SubmissionBox::SELF_REVIEWABILITY_FULL,
                     'label' => sprintf(
                         '%s + %s',
-                        $stoneFactory->translate('selfReflection', false, true),
-                        $stoneFactory->translate('selfAssessment', false, true)
+                        $this->rosettaStone->translate('selfReflection', false, true),
+                        $this->rosettaStone->translate('selfAssessment', false, true)
                     )
                 ],
             ],

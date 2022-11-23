@@ -450,6 +450,7 @@ class Module extends BaseModule
                     $viewLatestMapper,
                     $this->injector->get('filesystem.storageProxy'),
                     $stateMapper,
+                    $this->injector->get('l10n'),
                 );
 
             case Assessment\Project\Controller::class:
