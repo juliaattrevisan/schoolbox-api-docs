@@ -43,7 +43,7 @@
                href="{{ routeLookup('learningAssessment.downloadSubmissions', {
                    assessmentId: assessment.id,
                    assessment: assessment
-               }) }}">Download All</a>
+               }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Download All</a>
         </li>
     {% endif %}
 

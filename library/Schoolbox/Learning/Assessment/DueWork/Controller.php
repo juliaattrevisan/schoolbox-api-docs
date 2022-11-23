@@ -533,7 +533,16 @@ class Controller extends Assessment\Controller
         $producer = $this->getDi()->get('taskd.messageProducer');
         $producer->send($message);
 
-        // Return to the status page?
+        // Return whence we came,
+        // or to the assessment's status page if not specified
+        $encodedReturnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $returnUrl        = isset($encodedReturnUrl)
+            ? Redirect::decode($encodedReturnUrl)
+            : $this->router->generate(
+                'learningAssessment.getStatus',
+                ['assessmentId' => $assessment->getId()],
+            );
+        $this->response->redirect->to($returnUrl);
     }
 
 
