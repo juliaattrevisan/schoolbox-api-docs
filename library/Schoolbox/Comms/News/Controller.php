@@ -1445,12 +1445,11 @@ class Controller extends Base
             ->setBlurb($postData['blurb'] ?? '')
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics'] ?? null));
 
-        /* I still think that the ValidNewsModerator spec pattern makes this low level
-         * interrogation go away and behave consistently...but ok
-         *
-         * Write and Moderate are the only service level perms; Read doesn't exist.
-         */
-        if ($this->mayChangeStickyStatus()) {
+        // Is sticky news off? Forcibly disable that setting no matter what.
+        // Otherwise, only allow users who may change sticky status to do so.
+        if (!($this->getConfigLoader()->get(ConfigMapper::COMMS_STICKY_ENABLED))) {
+            $article->setSticky(false);
+        } elseif ($this->mayChangeStickyStatus()) {
             $article->setSticky((bool)($postData['sticky'] ?? false));
         }
 
