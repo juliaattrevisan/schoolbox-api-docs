@@ -36,11 +36,14 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Only superusers can access the Groups API
-         */
+        // Superusers may notify any other user:
+        // other users may only notify themselves.
         $hasApiAccess = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\IsUser('userId'),
+            ),
         );
 
         $preloadUser = function ($params) {
