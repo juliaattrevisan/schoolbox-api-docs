@@ -83,7 +83,6 @@ use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory;
 use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
-use TheCodingMachine\Gotenberg;
 use UnexpectedValueException;
 use Url;
 use ZipStream;
@@ -117,7 +116,10 @@ class Controller extends Assessment\Controller
      * @param CourseSpecificationMapper         $courseSpecificationMapper
      * @param UnitSpecificationMapper           $unitSpecificationMapper
      * @param Replicator                        $replicator
-     * @param Gotenberg\Client                  $pdfGenerator       - PDF generator, as used by the `downloadSubmissions` method.
+     * @param MessageFactory                    $messageFactory for building a message to send to taskd to download
+     *                                                          submissions
+     * @param Producer                          $producer       for sending the message created by `$messageFactory` to
+     *                                                          taskd
      * @param Turnitin\File\Mapper              $turnitinFileMapper - for generating the Similarity Report.
      * @param IFeedbackDataSource               $feedbackDataSource
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
@@ -145,7 +147,8 @@ class Controller extends Assessment\Controller
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
-        private Gotenberg\Client $pdfGenerator,
+        private MessageFactory $messageFactory,
+        private Producer $producer,
         private Turnitin\File\Mapper $turnitinFileMapper,
         private Assessment\Feedback\IFeedbackDataSource $feedbackDataSource,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
@@ -435,8 +438,7 @@ class Controller extends Assessment\Controller
         $users = [];
 
         // Generate list of files to fetch via taskd, and add to a ZIP
-        /** @var MessageFactory $messageFactory */
-        $messageFactory = $this->getDi()->get('taskd.downloadPagesMessageFactory');
+        $messageFactory = $this->messageFactory;
         $userSerializer = new ModelToArray();
         $urlBase        = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
 
@@ -527,11 +529,8 @@ class Controller extends Assessment\Controller
             ])
             ->build($title);
 
-        /* Send it to task for async processing
-         */
-        /** @var Producer $producer */
-        $producer = $this->getDi()->get('taskd.messageProducer');
-        $producer->send($message);
+        // Send to taskd
+        $this->producer->send($message);
 
         // Return whence we came,
         // or to the assessment's status page if not specified
