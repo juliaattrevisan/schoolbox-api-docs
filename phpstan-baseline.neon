@@ -576,11 +576,6 @@ parameters:
 			path: library/Alaress/Xml/Map/SimpleXml.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 4
-			path: library/AllowedFile.php
-
-		-
 			message: "#^Parameter \\#2 \\$existingResponse \\(string\\) of method Assess_Answer_Radio\\:\\:isAnswerSelected\\(\\) should be compatible with parameter \\$existingResponse \\(array\\) of method Evaluation_Answer_Multi\\:\\:isAnswerSelected\\(\\)$#"
 			count: 1
 			path: library/Assess/Answer/Radio.php
