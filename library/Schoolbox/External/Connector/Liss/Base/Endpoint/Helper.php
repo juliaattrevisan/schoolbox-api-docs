@@ -108,10 +108,10 @@ class Helper
 
             /* Detail
              */
-            'code' => $this->generateClassCode(trim((string)$currentEvent->me['struct']['ClassCode']->me['string'])),
-            'name' => trim((string)$currentEvent->me['struct']['ClassName']->me['string']),
+            'code' => $this->generateClassCode(trim((string)($currentEvent->me['struct']['ClassCode']->me['string'] ?? null))),
+            'name' => trim((string)($currentEvent->me['struct']['ClassName']->me['string'] ?? null)),
             'rooms' => trim((string)($currentEvent->me['struct']['Rooms']->me['string'] ?? null)),
-            'type' => trim((string)$currentEvent->me['struct']['Type']->me['string']),
+            'type' => trim((string)($currentEvent->me['struct']['Type']->me['string'] ?? null)),
             'detail' => '',
 
             /* Involvements
