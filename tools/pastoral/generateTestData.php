@@ -22,7 +22,6 @@ require __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App
 {
-
     private const NUM_RECORDS = 500;
 
     /** @var Schoolbox\Pastoral\Tag\Mapper */
@@ -107,13 +106,13 @@ $app = new class extends CliTool\App
                 $this->pastoralTagMapper->assignToRecord($pastoral, $tags->getOffset($j));
             }
 
-            if ($i % 3 == 0) {
+            if ($i % 4 == 0) {
                 $access = (new PastoralAccess())->setUser($currentStudent->getParents()->first())->setAccess(PastoralAccessMapper::ACCESS_PUBLIC)
                                                 ->setPastoral($pastoral);
-            } elseif ($i % 3 == 1) {
+            } elseif ($i % 4 == 1) {
                 $access = (new PastoralAccess())->setUser($viewStaff)->setAccess(PastoralAccessMapper::ACCESS_PUBLIC)
                                                 ->setPastoral($pastoral);
-            } elseif ($i % 3 == 2) {
+            } elseif ($i % 4 == 2) {
                 $access = (new PastoralAccess())->setRole($staffRoles->current())->setAccess(PastoralAccessMapper::ACCESS_PUBLIC)
                                                 ->setPastoral($pastoral);
             } else {

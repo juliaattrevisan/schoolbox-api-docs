@@ -2,8 +2,7 @@
 
 class AllowedFile extends DeprecatedModel
 {
-
-    function __construct()
+    public function __construct()
     {
 
         $this->_table = "allowedFileTypes";
@@ -12,26 +11,23 @@ class AllowedFile extends DeprecatedModel
         parent::__construct();
     }
 
-    function checkError($error)
+    public function checkError($error)
     {
         switch ($error) {
             case 0: //no error
                 break;
             case 1: //uploaded file exceeds the upload_max_filesize directive in php.ini
                 return ['code' => 10];
-                break;
             case 2: //uploaded file exceeds the Config::get('max_file_size') directive that was specified in the html form
                 return ['code' => 10];
-                break;
             case 3: //uploaded file was only partially uploaded
                 return ['code' => 43];
-                break;
             case 4: //no file was uploaded
                 return ['code' => 43];
-                break;
             default: //a default error, just in case!  :)
                 break;
         }
+        return null;
     }
 
     /**
@@ -41,12 +37,12 @@ class AllowedFile extends DeprecatedModel
      * @param  string $filename
      * @return string
      */
-    public function getExtension($filename)
+    private function getExtension($filename)
     {
         return substr(strrchr($filename, "."), 1);
     }
 
-    function isAllowed($filename)
+    private function isAllowed($filename)
     {
 
         $extension = $this->getExtension($filename);
@@ -71,7 +67,7 @@ class AllowedFile extends DeprecatedModel
      *
      * @return int
      */
-    public function getMaxFileSize($filename)
+    private function getMaxFileSize($filename)
     {
         $query = "
 			SELECT max_file_size
@@ -82,30 +78,12 @@ class AllowedFile extends DeprecatedModel
         return ($size > 0) ? $size : Config::get('max_file_size');
     }
 
-    /**
-     * Get mime type for a particular file extension
-     *
-     * @param string $extension
-     * @return mixed
-     */
-    public function getMime($extension)
+    public function fileSecurityCheck($file, $typeCheck = true)
     {
-        $query = "
-			SELECT mime
-			FROM allowedFileExtension afe
-			LEFT JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
-			WHERE extension = {$this->db->smartQuote($extension)}
-		";
-
-        $mime = $this->db->getOne($query);
-
-        return $mime;
-    }
-
-
-    function fileSecurityCheck($file, $typeCheck = true)
-    {
-        $this->checkError($file['error']);
+        $error = $this->checkError($file['error']);
+        if ($error) {
+            return $error;
+        }
 
         /* Check file is in upload dir, or that it exists on the file system
          * in the case of zipFileUpload()
@@ -122,9 +100,10 @@ class AllowedFile extends DeprecatedModel
         if ($typeCheck) {
             return $this->isAllowed($file['name']);
         }
+        return null;
     }
 
-    function getClass($iconFile)
+    public function getClass($iconFile)
     {
         $url = new Url(substr($iconFile, 0, strrpos($iconFile, ".")));
 
@@ -150,7 +129,7 @@ class AllowedFile extends DeprecatedModel
          */
     }
 
-    function getAll($order = '')
+    public function getAll($order = '')
     {
         $query = "SELECT *, GROUP_CONCAT(extension SEPARATOR ',') as extension FROM `" . $this->_table . "` a JOIN allowedFileExtension b ON a.fileTypeID=b.fileTypeID GROUP BY a.fileTypeID";
         if ($order) {
@@ -160,11 +139,13 @@ class AllowedFile extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    function getIconList()
+    public function getIconList()
     {
         //get a list of filenames from mime
         $dir  = WEB_root . '/static/images/mime/';
         $path = opendir($dir);
+        $files = [];
+
         while (false !== ($file = readdir($path))) {
             if ($file != "." && $file != "..") {
                 if (is_file($dir . "/" . $file)) {
@@ -173,7 +154,7 @@ class AllowedFile extends DeprecatedModel
             }
         }
 
-        if ($files) {
+        if (count($files) > 0) {
             natcasesort($files);
         }
         closedir($path);

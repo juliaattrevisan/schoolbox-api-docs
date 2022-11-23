@@ -143,7 +143,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                 /* Showcased items within the subject
                  */
-                if (count($currentSubject['items'])) {
+                if (is_array($currentSubject['items'])) {
                     foreach ($currentSubject['items'] as $currentItem) {
                         /** @var Eportfolio\Showcase $showcase */
                         $showcase   = $currentItem['currentShowcasedItem'];
@@ -167,7 +167,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                         /* Show submitted work information (if available)
                          */
-                        if ($submission) {
+                        if ($submission !== null) {
                             foreach ($submission->getAllFiles() as $currentFile) {
                                 $this->getPage()->setVar(
                                     array(
@@ -187,7 +187,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                         /* Show returned work information (if available)
                          */
-                        if ($return && $assessment->isFeedbackVisibleToUser($currentUser)) {
+                        if ($return !== null && $assessment->isFeedbackVisibleToUser($currentUser)) {
                             $this->getPage()->setVar(
                                 [
                                     'SHOWCASED_WORK_RETURNED_MARK'     => $return->getHumanReadableMark(),

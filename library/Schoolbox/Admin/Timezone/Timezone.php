@@ -11,7 +11,7 @@ class Timezone
     /** @var string $timezone */
     private $timezone;
 
-    /** @var int $offset */
+    /** @var string $offset */
     private $offset;
 
     /** @var string $name */
@@ -60,9 +60,9 @@ class Timezone
     /**
      * Returns this timezone's offset from GMT, in HHMM format.
      *
-     * @return int
+     * @return string
      */
-    public function getOffset(): int
+    public function getOffset(): string
     {
         return $this->offset;
     }

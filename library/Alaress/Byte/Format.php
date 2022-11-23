@@ -17,7 +17,6 @@
  */
 class Alaress_Byte_Format
 {
-
     /**
      * Converts a size in bytes to human-readable size.
      *
@@ -87,6 +86,6 @@ class Alaress_Byte_Format
 
         $power = array_search(strtoupper($exponent), ['B','K','M','G','T']);
 
-        return (int)round($mantissa * ($multiplier ** $power), 0);
+        return (int)round((float)$mantissa * ($multiplier ** $power), 0);
     }
 }

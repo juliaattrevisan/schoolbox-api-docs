@@ -124,7 +124,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
             return null;
         }
 
-        $floatVal = (float)($matches[1] / $denominator * self::NORMALISED_MARK_MAX);
+        $floatVal = (float)$matches[1] / $denominator * self::NORMALISED_MARK_MAX;
         $this->validateNormalisedMark($floatVal);
         return $floatVal;
     }

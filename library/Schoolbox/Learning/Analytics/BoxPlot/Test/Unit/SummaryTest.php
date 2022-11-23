@@ -15,7 +15,6 @@ use Schoolbox\Learning\Analytics\BoxPlot\Summary;
  */
 class SummaryTest extends TestCase
 {
-
     /**
      * Data provider for `getSummary`.
      *
@@ -183,7 +182,7 @@ class SummaryTest extends TestCase
         $summary = new Summary($marks);
         $statistics = $summary->getSummary();
 
-        $this->assertEquals($statistics, $expected);
+        $this->assertEqualsWithDelta($statistics, $expected, 0.000000001);
     }
 
     /**
