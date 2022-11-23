@@ -217,16 +217,16 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'action'               => 'Create',
-            'article'              => $article,
-            'featureImageZone'     => $zone->getTwigContext(),
-            'fileZone'             => $fileZone->getTwigContext(),
-            'isAutoSavable'        => true,
-            'encodedSegments'      => $audienceSegments,
-            'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
-            'returnUrl'            => $this->getExplicitReturnUrl(),
-            'entityTypesData'      => $this->getEntityTypesData(),
-            'isNewsModerator'      => $this->isNewsModerator(),
+            'action'                => 'Create',
+            'article'               => $article,
+            'featureImageZone'      => $zone->getTwigContext(),
+            'fileZone'              => $fileZone->getTwigContext(),
+            'isAutoSavable'         => true,
+            'encodedSegments'       => $audienceSegments,
+            'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
+            'returnUrl'             => $this->getExplicitReturnUrl(),
+            'entityTypesData'       => $this->getEntityTypesData(),
+            'mayChangeStickyStatus' => $this->mayChangeStickyStatus(),
         ])->setTab('news')->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -327,16 +327,16 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'action'                 => 'Update',
-            'article'                => $article,
-            'featureImageZone'       => $zone->getTwigContext(),
-            'fileZone'               => $fileZone->getTwigContext(),
-            'encodedSegments'        => $this->getAudienceSegments($article),
-            'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
-            'returnUrl'              => $this->getExplicitReturnUrl(),
-            'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
-            'entityTypesData'        => $this->getEntityTypesData(),
-            'isNewsModerator'        => $this->isNewsModerator(),
+            'action'                => 'Update',
+            'article'               => $article,
+            'featureImageZone'      => $zone->getTwigContext(),
+            'fileZone'              => $fileZone->getTwigContext(),
+            'encodedSegments'       => $this->getAudienceSegments($article),
+            'isAutoSavable'         => !$article->isSubmitted() || $article->isRejected(),
+            'returnUrl'             => $this->getExplicitReturnUrl(),
+            'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
+            'entityTypesData'       => $this->getEntityTypesData(),
+            'mayChangeStickyStatus' => $this->mayChangeStickyStatus(),
         ])->setTab('news')->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -1450,7 +1450,7 @@ class Controller extends Base
          *
          * Write and Moderate are the only service level perms; Read doesn't exist.
          */
-        if ($this->isNewsModerator()) {
+        if ($this->mayChangeStickyStatus()) {
             $article->setSticky((bool)($postData['sticky'] ?? false));
         }
 
@@ -1720,16 +1720,17 @@ class Controller extends Base
 
 
     /**
-     * Decide whether the currently-logged-in user is a News Moderator or Superuser
+     * May the current user change an article's sticky status?
      *
      * @return bool
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws MapperException
-     * @throws UnexpectedValueException
      */
-    private function isNewsModerator(): bool
+    private function mayChangeStickyStatus(): bool
     {
-        return ($this->getUser()->isSuperuser() || Access::getInstance()->getAccessLevel($this->getUser(), UserAccess::SERVICE_NEWS) === UserAccess::ACCESS_FULL);
+        return (
+            new ValidChangeStickyStatus(
+                $this->access,
+                $this->getConfigLoader()->get(ConfigMapper::COMMS_STICKY_ENABLED),
+            )
+        )->isSatisfiedBy($this->getUser());
     }
 }

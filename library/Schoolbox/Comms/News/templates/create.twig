@@ -6,6 +6,7 @@
     isAutoSavable         bool
     availableEntityTypes  string[]         The set of entity types that can be audienced by the current user
     entityTypesData       array
+    mayChangeStickyStatus bool
 #}
 
 {% import '@commsNews/macro/indicator.twig' as indicator %}
@@ -567,10 +568,13 @@
                 </fieldset>
                 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsItemAudienceSelect.js?v={{ config.site_version }}"></script>
 
-                {# Only news moderator or superuser can change this setting
-                 # This prevents teachers getting over eager about their content
+                {# Only allow users with ValidChangeStickyStatus to change the
+                 # article's sticky status.
+                 #
+                 # This will be nobody if the setting is disabled: otherwise, it
+                 # will be news moderators and superusers.
                  #}
-                {% if isNewsModerator %}
+                {% if mayChangeStickyStatus %}
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="news-sticky" class="inline-block">Priority {{ locale.news.proper }}</label>

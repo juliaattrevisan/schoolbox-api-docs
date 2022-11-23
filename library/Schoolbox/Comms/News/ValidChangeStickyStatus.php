@@ -21,11 +21,12 @@ class ValidChangeStickyStatus
     /**
      * Constructor
      *
-     * @param bool $configStickyEnabled Is the sticky config setting enabled?
+     * @param Access $access              User access lookup object
+     * @param bool   $configStickyEnabled Is the sticky config setting enabled?
      */
     public function __construct(
-        private bool $configStickyEnabled,
         private Access $access,
+        private bool $configStickyEnabled,
     ) {
     }
 
