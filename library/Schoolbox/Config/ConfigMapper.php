@@ -103,6 +103,7 @@ class ConfigMapper extends Mapper
 //    public const _EXTERNAL_MS_SQL_SERVER_DRIVER  = 'external_ms_sql_server_driver';
     public const COMMS_COMMENTS_ENABLED          = 'comms_comments_enabled';
     public const COMMS_STATISTICS_ENABLED        = 'comms_statistics_enabled';
+    public const COMMS_STICKY_ENABLED            = 'comms_sticky_enabled';
     public const NAME_EXTERNAL_TYPE              = 'external_type';
     public const NAME_ALLOW_STUDENT_CLASS_ACCESS = 'allow_student_class_access';
     public const NAME_LMS_RESUBMIT_WINDOW        = 'lms_resubmit_window';
