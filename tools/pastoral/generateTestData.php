@@ -22,7 +22,6 @@ require __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App
 {
-
     private const NUM_RECORDS = 500;
 
     /** @var Schoolbox\Pastoral\Tag\Mapper */

@@ -2,7 +2,6 @@
 
 class AllowedFile extends DeprecatedModel
 {
-
     function __construct()
     {
 

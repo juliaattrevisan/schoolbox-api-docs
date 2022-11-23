@@ -17,7 +17,6 @@
  */
 class Alaress_Byte_Format
 {
-
     /**
      * Converts a size in bytes to human-readable size.
      *

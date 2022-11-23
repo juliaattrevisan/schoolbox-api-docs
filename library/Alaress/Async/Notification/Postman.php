@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 
 class Postman
 {
-
     /** @var IBroker */
     private $broker;
 

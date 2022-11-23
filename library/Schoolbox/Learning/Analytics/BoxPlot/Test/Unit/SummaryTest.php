@@ -15,7 +15,6 @@ use Schoolbox\Learning\Analytics\BoxPlot\Summary;
  */
 class SummaryTest extends TestCase
 {
-
     /**
      * Data provider for `getSummary`.
      *

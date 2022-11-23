@@ -16,7 +16,6 @@ use Schoolbox\Collection;
 
 class EventRecurrence
 {
-
     /**
      * Possible values for recurrence
      *
