@@ -16,3 +16,4 @@ Once instance configuration is loaded: depending on the source of the request,
 it will be routed to either:
 * [Web Kernel](../adapters/kernels/web/README.md)
 * [CLI Kernel](../adapters/kernels/cli.md)
+* [Daemon Kernel](../adapters/kernels/daemon.md)

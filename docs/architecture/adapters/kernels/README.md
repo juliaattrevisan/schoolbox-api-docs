@@ -14,10 +14,10 @@ The base class for all kernels is `\Alaress\Application\Kernel`.
 - [Daemon](daemon.md)
 
 
-## Responsibilities
+## Bootstrapping
 
-All kernels have the following responsibilities, as seen in
-`\Alaress\Application\Kernel::__construct`.
+All kernels have the following responsibilities in their bootstrap phase, as
+seen in `\Alaress\Application\Kernel::__construct`.
 
 Some kernel variants may have additional responsibilities.
 
@@ -55,3 +55,12 @@ these are set up in `postInstallDependencies`.
 
 > Currently this sets up sessions, routing table and modules: this may not be
 > required as all of these dependencies could be set up in dependency injection.
+
+
+## Running a request
+
+After bootstrapping has taken place, a kernel's run method may be called in
+order to actually process a request.
+
+(Each variant of the kernel has its own run method, which will be documented
+specifically in each variant's documentation.)

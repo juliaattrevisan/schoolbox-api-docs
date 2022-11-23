@@ -10,3 +10,4 @@ an overview about how a request coming through any of these sources is
 bootstrapped, routed and processed:
 * [Web request](io/requests/web.md)
 * [CLI request](io/requests/cli.md)
+* [Daemon request](io/requests/daemon.md)
