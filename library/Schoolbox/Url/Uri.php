@@ -9,10 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Url;
 
-use League\Uri\Components\Query;
-use League\Uri\QueryString;
-use League\Uri\UriInfo;
-use League\Uri\UriModifier;
 use Psr\Http\Message\UriInterface;
 
 class Uri extends \GuzzleHttp\Psr7\Uri implements UriInterface
@@ -24,13 +20,12 @@ class Uri extends \GuzzleHttp\Psr7\Uri implements UriInterface
      */
     public function appendQueryParameters(array $queryParameters): self
     {
-        $reformattedParams = [];
+        $parameters = $this->getQueryAsArray();
         foreach ($queryParameters as $key => $value) {
-            // format params to array of [key, value] array
-            $reformattedParams[] = [$key, $value];
+            $parameters[$key] = $value;
         }
         /** @var Uri $uri */
-        $uri = UriModifier::mergeQuery($this, QueryString::build($reformattedParams));
+        $uri = self::withQueryValues($this, $parameters);
         return $uri;
     }
 
@@ -40,12 +35,7 @@ class Uri extends \GuzzleHttp\Psr7\Uri implements UriInterface
      */
     public function getQueryAsArray(): array
     {
-        $queryArray = [];
-        $query = Query::createFromUri($this);
-        foreach ($query->getIterator() as $item) {
-            $queryArray[$item[0]] = $item[1];
-        }
-        return $queryArray;
+        return \GuzzleHttp\Psr7\Query::parse($this->getQuery());
     }
 
     /**
@@ -53,6 +43,6 @@ class Uri extends \GuzzleHttp\Psr7\Uri implements UriInterface
      */
     public function isAbsolutePath(): bool
     {
-        return UriInfo::isAbsolutePath($this);
+        return self::isAbsolutePathReference($this);
     }
 }
