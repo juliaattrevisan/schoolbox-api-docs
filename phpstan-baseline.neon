@@ -821,11 +821,6 @@ parameters:
 			path: library/Component/Eportfolio/FileListController.php
 
 		-
-			message: "#^Property Component_Homepage_AudioController\\:\\:\\$allowedFileHandler is never read, only written\\.$#"
-			count: 1
-			path: library/Component/Homepage/AudioController.php
-
-		-
 			message: "#^Method Component_Homepage_ControllerAbstract\\:\\:getDefaultCollapsedState\\(\\) should return string but returns array\\<string, string\\>\\.$#"
 			count: 2
 			path: library/Component/Homepage/ControllerAbstract.php

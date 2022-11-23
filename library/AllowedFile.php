@@ -27,6 +27,7 @@ class AllowedFile extends DeprecatedModel
             default: //a default error, just in case!  :)
                 break;
         }
+        return null;
     }
 
     /**
@@ -36,12 +37,12 @@ class AllowedFile extends DeprecatedModel
      * @param  string $filename
      * @return string
      */
-    public function getExtension($filename)
+    private function getExtension($filename)
     {
         return substr(strrchr($filename, "."), 1);
     }
 
-    public function isAllowed($filename)
+    private function isAllowed($filename)
     {
 
         $extension = $this->getExtension($filename);
@@ -66,7 +67,7 @@ class AllowedFile extends DeprecatedModel
      *
      * @return int
      */
-    public function getMaxFileSize($filename)
+    private function getMaxFileSize($filename)
     {
         $query = "
 			SELECT max_file_size
@@ -77,30 +78,12 @@ class AllowedFile extends DeprecatedModel
         return ($size > 0) ? $size : Config::get('max_file_size');
     }
 
-    /**
-     * Get mime type for a particular file extension
-     *
-     * @param string $extension
-     * @return mixed
-     */
-    public function getMime($extension)
-    {
-        $query = "
-			SELECT mime
-			FROM allowedFileExtension afe
-			LEFT JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
-			WHERE extension = {$this->db->smartQuote($extension)}
-		";
-
-        $mime = $this->db->getOne($query);
-
-        return $mime;
-    }
-
-
     public function fileSecurityCheck($file, $typeCheck = true)
     {
-        $this->checkError($file['error']);
+        $error = $this->checkError($file['error']);
+        if ($error) {
+            return $error;
+        }
 
         /* Check file is in upload dir, or that it exists on the file system
          * in the case of zipFileUpload()
@@ -117,6 +100,7 @@ class AllowedFile extends DeprecatedModel
         if ($typeCheck) {
             return $this->isAllowed($file['name']);
         }
+        return null;
     }
 
     public function getClass($iconFile)

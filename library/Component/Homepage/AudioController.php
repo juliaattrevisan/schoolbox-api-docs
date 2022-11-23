@@ -14,12 +14,6 @@ use Schoolbox\Video\ResourceVideoMapper;
 
 class Component_Homepage_AudioController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * @var AllowedFile
-     */
-    private $allowedFileHandler;
-
     /**
      * @var Collection|ResourceVideo[]
      */
@@ -51,7 +45,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             return false;
         }
 
-        $this->allowedFileHandler  = new AllowedFile();
         $this->videoResourceMapper = $this->getMapperFactory()->get(ResourceVideoMapper::class);
         return true;
     }
