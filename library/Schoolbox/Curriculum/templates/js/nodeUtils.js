@@ -34,7 +34,7 @@ export function getEmptyNode () {
  * @param { array }
  * @param { number }
  */
- export function findById (array, id) {
+export function findById (array, id) {
     for (const item of array) {
         if (item.id === id) {
             return item;

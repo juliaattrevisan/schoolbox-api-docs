@@ -19,6 +19,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', () => {
     const idList = ref([]); // ids of the selected nodes
     const currentDepth = ref(0); // track how far down the tree we are
     const currentDirection = ref(DIRECTION.FORWARDS); // which direction we are currently travelling in the tree
+    const showDisabled = ref(true); //whether only enabled nodes should appear
 
     /**
      * Can now use the search input when we have selected at least one node
@@ -169,6 +170,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', () => {
     }
 
     return {
+        showDisabled,
         currentDirection,
         isActive,
         breadcrumbs,
