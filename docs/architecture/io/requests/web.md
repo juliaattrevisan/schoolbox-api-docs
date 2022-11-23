@@ -21,4 +21,4 @@ If Schoolbox handles the request, it will be redirected to `www/index.php`:
 there, Schoolbox will perform
 [instance routing](../../configuration/instance-routing.md) so that it may
 bootstrap the instance's configuration, and then run the web request using the
-[web kernel](../../adapters/web-kernel.md).
+[web kernel](../../adapters/kernels/web/README.md).

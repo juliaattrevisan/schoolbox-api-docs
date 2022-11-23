@@ -14,5 +14,5 @@ for other input/output adapters:
 
 Once instance configuration is loaded: depending on the source of the request,
 it will be routed to either:
-* [Web Kernel](../adapters/web-kernel.md)
-* [CLI Kernel](../adapters/cli-kernel.md)
+* [Web Kernel](../adapters/kernels/web/README.md)
+* [CLI Kernel](../adapters/kernels/cli.md)

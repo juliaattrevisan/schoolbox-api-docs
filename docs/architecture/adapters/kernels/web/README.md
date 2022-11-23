@@ -20,7 +20,7 @@ All kernels have the following responsibilities, as seen in
 `\Alaress\Application\Kernel::__construct`:
 * initialize connections to databases (`initialiseExternalConnections`)
   * (may not be required anymore, because a connection was created in
-    [instance configuration](../configuration/instance-configuration.md))
+    [instance configuration](../../../configuration/instance-configuration.md))
 * register error, exception and shutdown handling
 * set up dependency injection
 * set up dependencies which are only configurable after dependency injection

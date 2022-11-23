@@ -7,4 +7,4 @@ Schoolbox's code base.
 Schoolbox will perform
 [instance routing](../../configuration/instance-routing.md) so that it may
 bootstrap the instance's configuration, and then run the CLI request's
-configured tool using the [CLI kernel](../../adapters/cli-kernel.md).
+configured tool using the [CLI kernel](../../adapters/kernels/cli-kernel.md).
