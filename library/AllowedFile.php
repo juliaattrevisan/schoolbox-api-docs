@@ -2,7 +2,7 @@
 
 class AllowedFile extends DeprecatedModel
 {
-    function __construct()
+    public function __construct()
     {
 
         $this->_table = "allowedFileTypes";
@@ -11,23 +11,19 @@ class AllowedFile extends DeprecatedModel
         parent::__construct();
     }
 
-    function checkError($error)
+    public function checkError($error)
     {
         switch ($error) {
             case 0: //no error
                 break;
             case 1: //uploaded file exceeds the upload_max_filesize directive in php.ini
                 return ['code' => 10];
-                break;
             case 2: //uploaded file exceeds the Config::get('max_file_size') directive that was specified in the html form
                 return ['code' => 10];
-                break;
             case 3: //uploaded file was only partially uploaded
                 return ['code' => 43];
-                break;
             case 4: //no file was uploaded
                 return ['code' => 43];
-                break;
             default: //a default error, just in case!  :)
                 break;
         }
@@ -45,7 +41,7 @@ class AllowedFile extends DeprecatedModel
         return substr(strrchr($filename, "."), 1);
     }
 
-    function isAllowed($filename)
+    public function isAllowed($filename)
     {
 
         $extension = $this->getExtension($filename);
@@ -102,7 +98,7 @@ class AllowedFile extends DeprecatedModel
     }
 
 
-    function fileSecurityCheck($file, $typeCheck = true)
+    public function fileSecurityCheck($file, $typeCheck = true)
     {
         $this->checkError($file['error']);
 
@@ -123,7 +119,7 @@ class AllowedFile extends DeprecatedModel
         }
     }
 
-    function getClass($iconFile)
+    public function getClass($iconFile)
     {
         $url = new Url(substr($iconFile, 0, strrpos($iconFile, ".")));
 
@@ -149,7 +145,7 @@ class AllowedFile extends DeprecatedModel
          */
     }
 
-    function getAll($order = '')
+    public function getAll($order = '')
     {
         $query = "SELECT *, GROUP_CONCAT(extension SEPARATOR ',') as extension FROM `" . $this->_table . "` a JOIN allowedFileExtension b ON a.fileTypeID=b.fileTypeID GROUP BY a.fileTypeID";
         if ($order) {
@@ -159,7 +155,7 @@ class AllowedFile extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    function getIconList()
+    public function getIconList()
     {
         //get a list of filenames from mime
         $dir  = WEB_root . '/static/images/mime/';
