@@ -20,15 +20,15 @@ use Eportfolio\ShowcaseMapper;
 use Eportfolio_Authenticator;
 use External\Canvas\Importer\CanvasDb;
 use ICollection;
+use Interop\Queue\Exception\InvalidDestinationException;
+use Interop\Queue\Exception\InvalidMessageException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\Exception;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Gotenberg\RequestFactory;
-use Schoolbox\L10n\RosettaStoneFactory;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -78,14 +78,13 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Url\Factory;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory;
 use Schoolbox\User;
+use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
-use Sentry\State\HubInterface;
-use TheCodingMachine\Gotenberg;
 use UnexpectedValueException;
 use Url;
-use ZipStream;
 
 use function count;
 
@@ -116,7 +115,10 @@ class Controller extends Assessment\Controller
      * @param CourseSpecificationMapper         $courseSpecificationMapper
      * @param UnitSpecificationMapper           $unitSpecificationMapper
      * @param Replicator                        $replicator
-     * @param Gotenberg\Client                  $pdfGenerator       - PDF generator, as used by the `downloadSubmissions` method.
+     * @param MessageFactory                    $messageFactory for building a message to send to taskd to download
+     *                                                          submissions
+     * @param Producer                          $producer       for sending the message created by `$messageFactory` to
+     *                                                          taskd
      * @param Turnitin\File\Mapper              $turnitinFileMapper - for generating the Similarity Report.
      * @param IFeedbackDataSource               $feedbackDataSource
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
@@ -144,13 +146,15 @@ class Controller extends Assessment\Controller
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
-        private Gotenberg\Client $pdfGenerator,
+        private MessageFactory $messageFactory,
+        private Producer $producer,
         private Turnitin\File\Mapper $turnitinFileMapper,
         private Assessment\Feedback\IFeedbackDataSource $feedbackDataSource,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         LatestViewMapper $latestViewMapper,
         private FilesystemProxy $filesystemProxy,
         private StateMapper $stateMapper,
+        private RosettaStone $rosettaStone,
     ) {
         parent::__construct(
             $userMapper,
@@ -417,44 +421,29 @@ class Controller extends Assessment\Controller
     /**
      * Download all student submissions for a given assessable
      * @param IAssessable $assessment
-     * @throws Gotenberg\ClientException
-     * @throws Gotenberg\FilesystemException
-     * @throws Gotenberg\RequestException
      * @throws MapperException
      * @throws RouteNotFound
-     * @throws ZipStream\Exception\FileNotFoundException
-     * @throws ZipStream\Exception\FileNotReadableException
-     * @throws ZipStream\Exception\OverflowException
-     * @throws \League\Flysystem\FilesystemException
+     * @throws \Interop\Queue\Exception
+     * @throws InvalidDestinationException
+     * @throws InvalidMessageException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @api   GET /learning/assessments/:assessmentId/submissions/download
      * @since 165
      */
     public function downloadSubmissions(IAssessable $assessment): void
     {
-        // Creating a ZIP archive might take a while
-        $this->extendExecutionTime();
-
-        // Retrieve all participants
-
-        $participants = $assessment->getAllParticipants();
-
         // Cache users
-
         /** @var User[] $users */
         $users = [];
 
-        // Create a zip stream to hold the downloaded submissions
-
-        $titleSanitized = $this->sanitizeForFilename($assessment->getTitle());
-        $dateNow        = Alaress_Date_Format::now()->getUsingFormat('Ymd-His');
-
-        $zipOptions = new ZipStream\Option\Archive();
-        $zipOptions->setSendHttpHeaders(true);
-        $zipStream = new ZipStream\ZipStream("$titleSanitized-$dateNow.zip", $zipOptions);
+        // Generate list of files to fetch via taskd, and add to a ZIP
+        $messageFactory = $this->messageFactory;
+        $userSerializer = new ModelToArray();
+        $urlBase        = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
 
         // Iterate participants and get their responses
-        /** @var Participant $participant */
-        foreach ($participants as $participant) {
+        foreach ($assessment->getAllParticipants() as $participant) {
             // Short-circuit if there's no interactions
             // (draft feedback does count, though)
             if (!$participant->hasSubmittedResponse() && $participant->getAllFeedbacks()->count() === 0) {
@@ -462,11 +451,10 @@ class Controller extends Assessment\Controller
             }
 
             // Get the users details and generate an appropriate folder name
-            if (!isset($users[$participant->getUser()->getId()])) {
-                $users[$participant->getUser()->getId()] = $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
-            }
+            $users[$participant->getUser()->getId()]
+                ??= $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
             $participantUser = $users[$participant->getUser()->getId()];
-            $baseFolderName = sprintf(
+            $baseFolderName  = sprintf(
                 "%s_%s_%d",
                 $this->sanitizeForFilename($participantUser->getLastname()),
                 $this->sanitizeForFilename($participantUser->getFirstname()),
@@ -478,26 +466,83 @@ class Controller extends Assessment\Controller
             foreach ($participant->getSubmittedResponses() as $response) {
                 // If the response is a submission...
                 if ($response instanceof Submission) {
-                    // ...iterate all files in that submission and add them to the ZIP archive
+                    // ...iterate all files in that submission and add them to
+                    // the ZIP archive downloaded from taskd
                     foreach ($response->getAllFiles() as $file) {
-                        if ($this->filesystemProxy->fileExists($file)) {
-                            $zipFilename = sprintf(
+                        $messageFactory = $messageFactory->addFileContent(
+                            sprintf(
                                 "%s/%s/%s",
                                 $baseFolderName,
                                 $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
                                 $this->sanitizeForFilename($file->getBasename())
-                            );
-                            $zipStream->addFileFromStream($zipFilename, $this->filesystemProxy->readStream($file));
-                        }
+                            ),
+                            $urlBase->setPath('/storage/fetch.php')->setQuery(['hash' => $file->getHash()]),
+                        );
                     }
                 }
             }
-            $this->addSubmissionHistoryToZipStream($participant, $zipStream, $baseFolderName);
+
+            // Add this participant's submission history
+            $messageFactory = $messageFactory->addPdfContent(
+                sprintf(
+                    "%s/submissionHistory.pdf",
+                    $baseFolderName,
+                ),
+                $urlBase->setPath(
+                    $this->router->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'assessmentId' => $participant->getAssessable()->getId(),
+                            'studentId'    => $participant->getUser()->getId(),
+                        ],
+                    )
+                ),
+            );
         }
 
-        // Stream the zip archive
-        $zipStream->finish();
-        exit;
+        // Send the entire request to taskd
+        $title = sprintf(
+            "%s-%s.zip",
+            $this->sanitizeForFilename($assessment->getTitle()),
+            Alaress_Date_Format::now()->getUsingFormat('Ymd-His'),
+        );
+        $message = $messageFactory
+            ->setUser($this->getUser())
+            ->setCallbackUrl(
+                $urlBase
+                    ->setPath(
+                        $this->router->generate(
+                            'apiusernotify.apiUserNotify',
+                            ['userId' => $this->getUser()->getId()]
+                        )
+                    )
+                    ->setQuery(null)
+                    ->toString()
+            )
+            ->setCallbackParams([
+                'message' => sprintf(
+                    'Feedback and submissions for %s "%s" are ready to download',
+                    $this->rosettaStone->translate('dueWork'),
+                    $title,
+                ),
+                'from'    => call_user_func($userSerializer, $this->getUser()),
+                'to'      => call_user_func($userSerializer, $this->getUser()),
+            ])
+            ->build($title);
+
+        // Send to taskd
+        $this->producer->send($message);
+
+        // Return whence we came,
+        // or to the assessment's status page if not specified
+        $encodedReturnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        $returnUrl        = isset($encodedReturnUrl)
+            ? Redirect::decode($encodedReturnUrl)
+            : $this->router->generate(
+                'learningAssessment.getStatus',
+                ['assessmentId' => $assessment->getId()],
+            );
+        $this->response->redirect->to($returnUrl);
     }
 
 
@@ -1476,8 +1521,6 @@ class Controller extends Assessment\Controller
     {
         $zoneFactory = new Assessment\Attachzone\Factory();
 
-        $stoneFactory = (new RosettaStoneFactory())->build(\Schoolbox\L10n\Mapper::getInstance());
-
         // setup some data...
         $data = [
             'acceptingResponses' => true,
@@ -1491,14 +1534,14 @@ class Controller extends Assessment\Controller
                 ],
                 'reflect' => [
                     'value' => SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY,
-                    'label' => $stoneFactory->translate('selfReflection', false, true)
+                    'label' => $this->rosettaStone->translate('selfReflection', false, true)
                 ],
                 'full' => [
                     'value' => SubmissionBox::SELF_REVIEWABILITY_FULL,
                     'label' => sprintf(
                         '%s + %s',
-                        $stoneFactory->translate('selfReflection', false, true),
-                        $stoneFactory->translate('selfAssessment', false, true)
+                        $this->rosettaStone->translate('selfReflection', false, true),
+                        $this->rosettaStone->translate('selfAssessment', false, true)
                     )
                 ],
             ],
@@ -1685,69 +1728,6 @@ class Controller extends Assessment\Controller
         }
 
         return $kamiModels;
-    }
-
-
-    /**
-     * Add this participant's submission history (as a generated PDF) to the Zip
-     * stream for download.
-     *
-     * @param Participant         $participant    The participant record
-     * @param ZipStream\ZipStream $zipStream      The stream to download
-     * @param string              $baseFolderName The folder within `$zipStream`
-     *                                            to put the PDF
-     * @throws Gotenberg\ClientException
-     * @throws Gotenberg\FilesystemException
-     * @throws Gotenberg\RequestException
-     * @throws RouteNotFound
-     * @throws ZipStream\Exception\FileNotFoundException
-     * @throws ZipStream\Exception\FileNotReadableException
-     */
-    private function addSubmissionHistoryToZipStream(
-        Participant $participant,
-        ZipStream\ZipStream $zipStream,
-        string $baseFolderName
-    ): void {
-        // Generate a PDF of the submission history page,
-        // Since PDF generation is a remote service, need a fully-qualified
-        // domain name in the URL.
-        $urlFactory = new Factory($this->getConfigLoader());
-        $url        = $urlFactory
-            ->buildFullyQualified()
-            ->setScheme('https')
-            ->setPort($this->request->server->get('SERVER_PORT'))
-            ->setPath(
-                $this->router->generate(
-                    'learningAssessment.getSummary',
-                    [
-                        'assessmentId' => $participant->getAssessable()->getId(),
-                        'studentId'    => $participant->getUser()->getId(),
-                    ],
-                )
-            );
-
-        $requestFactory = new RequestFactory($this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
-        $request        = $requestFactory->buildUrlRequest(
-            $url->toString(),
-            RequestFactory::DEFAULT_WAIT_DELAY,
-            RequestFactory::DEFAULT_WAIT_TIMEOUT,
-            session_id(),
-        );
-        $request->setScale(0.75);
-
-        // Generate, download and store the PDF
-        $tempfile = sb_tempnam();
-        try {
-            $this->pdfGenerator->store($request, $tempfile);
-            $zipFilename = sprintf(
-                "%s/submissionHistory.pdf",
-                $baseFolderName,
-            );
-            $zipStream->addFileFromPath($zipFilename, $tempfile);
-        } finally {
-            // Clean up once finished
-            unlink($tempfile);
-        }
     }
 
 

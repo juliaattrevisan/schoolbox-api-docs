@@ -442,13 +442,15 @@ class Module extends BaseModule
                     $courseSpecMapper,
                     $unitSpecMapper,
                     $replicator,
-                    $this->injector->get('pdfGenerator'),
+                    $this->injector->get('taskd.downloadPagesMessageFactory'),
+                    $this->injector->get('taskd.messageProducer'),
                     $this->getMapperFactory()->get(\Schoolbox\Learning\Turnitin\File\Mapper::class),
                     $this->injector->get('feedbackDataSource'),
                     $folderMapper,
                     $viewLatestMapper,
                     $this->injector->get('filesystem.storageProxy'),
                     $stateMapper,
+                    $this->injector->get('l10n'),
                 );
 
             case Assessment\Project\Controller::class:

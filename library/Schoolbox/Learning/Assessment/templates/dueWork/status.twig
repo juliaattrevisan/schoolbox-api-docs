@@ -43,7 +43,7 @@
                href="{{ routeLookup('learningAssessment.downloadSubmissions', {
                    assessmentId: assessment.id,
                    assessment: assessment
-               }) }}">Download All</a>
+               }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Download All</a>
         </li>
     {% endif %}
 
@@ -301,7 +301,19 @@
                 event.preventDefault();
                 $(this).confirmDialog({
                     header: 'Download all feedback and submissions?',
-                    text: 'Please be aware that your download will take some time to begin as we compile the students feedback and submissions into a ZIP file.',
+                    format: 'html',
+                    text: `
+                    <p>
+                        Please be aware that your download will take some time
+                        to complete, as we compile the students&rsquo; feedback
+                        and submissions into a ZIP file.
+                    </p>
+                    <p>
+                        Feel free to move away from this page and continue
+                        working: we will send you a notification when the file
+                        is ready to download.
+                    </p>
+                    `,
                 });
             })
         });
