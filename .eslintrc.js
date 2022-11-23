@@ -24,4 +24,7 @@ module.exports = {
         'eslint-plugin-jsdoc' // to lint jsdocs
     ],
     root: true, // limits ESLint to this folder (wont go up parent folders)
+    rules: { // customised rules
+        "sort-keys": "error", // https://eslint.org/docs/latest/rules/sort-keys
+    },
 }
