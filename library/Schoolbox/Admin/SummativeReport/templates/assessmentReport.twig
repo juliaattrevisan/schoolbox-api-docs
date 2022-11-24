@@ -56,7 +56,7 @@
      #
      # If this feedback has a rubric grid, show that
      #}
-    {% if feedback and showRubrics and feedback.rubricMarkedGrid %}
+    {% if feedback and showRubrics and (feedback.rubricMarkedGrid ?? null) %}
         <div class="rubric-wrap">
             {% include '@rubric/grid.twig' with {
                 rubricGrid:       feedback.rubricMarkedGrid.grid,
