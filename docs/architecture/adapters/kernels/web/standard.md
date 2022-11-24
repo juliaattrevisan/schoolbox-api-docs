@@ -31,6 +31,9 @@ and module cache into the kernel.
 These caches may be pre-built by a CLI tool `tools/module/refresh-cache.php`, or
 on request if the cache has expired.
 
+Modules will be defined in Schoolbox's
+[module configuration](../../../configuration/modules.md).
+
 
 ## Running a request
 
