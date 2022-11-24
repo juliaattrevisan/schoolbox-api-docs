@@ -178,7 +178,6 @@ class ModelToArrayTest extends TestCase
                     'name' => 'Year 12',
                 ],
                 'isDeleted'        => false,
-                'isBoarder'        => true,
                 'flags'            => [
                     'showWebmailTab'         => false,
                     'showContacts'           => false,
