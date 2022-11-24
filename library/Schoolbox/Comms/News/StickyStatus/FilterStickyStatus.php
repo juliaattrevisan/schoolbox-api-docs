@@ -27,8 +27,11 @@ class FilterStickyStatus
     }
 
     /**
+     * Filter the article's sticky status.
+     *
      * @param Model $article
-     * @return Model
+     * @return Model `$article`, with the sticky status set to false if the
+     *               config is disabled.
      */
     public function filter(Model $article): Model
     {

@@ -1453,9 +1453,8 @@ class Controller extends Base
 
         // Is sticky news off? Forcibly disable that setting no matter what.
         // Otherwise, only allow users who may change sticky status to do so.
-        if (!($this->getConfigLoader()->get(ConfigMapper::COMMS_STICKY_ENABLED))) {
-            $article->setSticky(false);
-        } elseif ($this->validChangeStickyStatus->isSatisfiedBy($this->getUser())) {
+        $article = $this->filterStickyStatus->filter($article);
+        if ($this->validChangeStickyStatus->isSatisfiedBy($this->getUser())) {
             $article->setSticky((bool)($postData['sticky'] ?? false));
         }
 
