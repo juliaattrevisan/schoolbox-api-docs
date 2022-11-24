@@ -54,32 +54,11 @@ export default {
          */
         initColourPicker () {
             $(this.$el).spectrum(
-//                {
-//                    allowEmpty: true,
-//                    clickoutFiresChange: true,
-//                    preferredFormat: 'hex',
-//                    showAlpha: false,
-//                    showButtons: false,
-//                    showInitial: true,
-//                    showInput: true,
-//                    change: (color) => {
-//                        this.$emit('input', color ? color.toHexString() : null)
-//                    }
-//                }
                 $.extend(
                     {},
                     window.sbProps.spectrum,
-// spectrum: {
-//    SAME allowEmpty: true,
-//    SAME clickoutFiresChange: true,
-//    SAME preferredFormat: 'hex',
-//    SAME showAlpha: false,
-//    SAME showButtons: false,
-//    SAME showInitial: true,
-//    SAME showInput: true,
-// }
                     {
-                        change: (color) => {this.$emit('input', color ? color.toHexString() : null)}
+                        change: (color) => {this.$emit('input', color ? color.toHexString() : null);}
                     }
                 )
             );
