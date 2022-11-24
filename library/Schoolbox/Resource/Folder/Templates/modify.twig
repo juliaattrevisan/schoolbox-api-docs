@@ -40,17 +40,35 @@
 <script type="text/javascript">
     $(function() {
 
-        $("[data-colour-picker]").spectrum({
-            allowEmpty: true,
-            showAlpha: false,
-            showInput: true,
-            preferredFormat: 'rgb',
-            clickoutFiresChange: true,
-            showInitial: true,
-            change: function(color) {
-                $(this).val(color.toRgbString());
-            }
-        });
+        $("[data-colour-picker]").spectrum(
+//            {
+//                allowEmpty: true,
+//                showAlpha: false,
+//                showInput: true,
+//                preferredFormat: 'rgb',
+//                clickoutFiresChange: true,
+//                showInitial: true,
+//                change: function(color) {
+//                    $(this).val(color.toRgbString());
+//                }
+//            }
+            $.extend(
+                {},
+                window.sbProps.spectrum,
+// spectrum: {
+//    DIFF preferredFormat: 'hex',
+//    NONE showButtons: false,
+//    SAME allowEmpty: true,
+//    SAME clickoutFiresChange: true,
+//    SAME showAlpha: false,
+//    SAME showInitial: true,
+//    SAME showInput: true,
+// }
+                {
+                    change: function (color) {$(this).val(color.toRgbString());}
+                }
+            )
+        );
 
         var writePermission = {{ write }};
 

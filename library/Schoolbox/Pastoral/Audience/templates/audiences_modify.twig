@@ -150,14 +150,31 @@
                                     let colorInput = document.getElementById('pastoralColor'),
                                             iconSelect = document.getElementById('pastoralIcon'),
                                             flagPreview = document.getElementById('pastoralFlagPreview');
-                                    $(colorInput).spectrum({
-                                        allowEmpty: false,
-                                        showAlpha: false,
-                                        showInput: true,
-                                        preferredFormat: 'hex',
-                                        clickoutFiresChange: true,
-                                        showInitial: true,
-                                    });
+                                    $(colorInput).spectrum(
+//                                        {
+//                                            allowEmpty: false,
+//                                            showAlpha: false,
+//                                            showInput: true,
+//                                            preferredFormat: 'hex',
+//                                            clickoutFiresChange: true,
+//                                            showInitial: true,
+//                                        }
+                                        $.extend(
+                                            {},
+                                            window.sbProps.spectrum,
+// spectrum: {
+//    DIFF allowEmpty: true,
+//    NONE showButtons: false,
+//    SAME clickoutFiresChange: true,
+//    SAME preferredFormat: 'hex',
+//    SAME showAlpha: false,
+//    SAME showInitial: true,
+//    SAME showInput: true,
+// }
+                                            {
+                                            }
+                                        )
+                                    );
 
                                     $().add(colorInput).add(iconSelect).on('change', function () {
                                         let color = colorInput.value,

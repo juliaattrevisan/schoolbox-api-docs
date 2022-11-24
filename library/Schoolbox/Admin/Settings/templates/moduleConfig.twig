@@ -45,21 +45,38 @@
             currentHighlightedElement = checkForAdminSearchHighlight();
         });
 
-
         let settingsForm = $('#settings');
 
         {% if hasColourPicker %}
-        $("[data-colour-picker]").spectrum({
-            allowEmpty: false,
-            showAlpha: true,
-            showInput: true,
-            preferredFormat: 'rgb',
-            clickoutFiresChange: true,
-            showInitial: true,
-            change: function(color) {
-                $(this).val(color.toRgbString());
-            }
-        });
+        $("[data-colour-picker]").spectrum(
+//           {
+//               allowEmpty: false,
+//               showAlpha: true,
+//               showInput: true,
+//               preferredFormat: 'rgb',
+//               clickoutFiresChange: true,
+//               showInitial: true,
+//               change: function(color) {
+//                   $(this).val(color.toRgbString());
+//               }
+//           }
+            $.extend(
+                {},
+                window.sbProps.spectrum,
+// spectrum: {
+//    DIFF allowEmpty: true,
+//    DIFF preferredFormat: 'hex',
+//    DIFF showAlpha: false,
+//    NONE showButtons: false,
+//    SAME clickoutFiresChange: true,
+//    SAME showInitial: true,
+//    SAME showInput: true,
+// }
+                {
+                    change: function (color) {$(this).val(color.toRgbString());}
+                }
+            )
+        );
         {% endif %}
 
         {% if hasHtmlEditor %}

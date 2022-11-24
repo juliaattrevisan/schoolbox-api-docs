@@ -139,7 +139,9 @@ module.exports = {
             // MS Immersive Reader
             './www/static/js/immersive-reader.js',
 
-            './www/static/js/calendar/jquery.getExportCalendarLink.js'
+            './www/static/js/calendar/jquery.getExportCalendarLink.js',
+
+            './www/static/js/global/sb_props.js'
         ],
         spectrum: {
             import: [

@@ -10,16 +10,35 @@
         form.alaressValidate();
 
         // Init colorpickers
-        $('input[data-colorpicker]').spectrum({
-            showPalette: false,
-            showSelectionPalette: false,
-            showButtons: false,
-            showAlpha: true,
-            showInitial: true,
-            showInput: true,
-            preferredFormat: "rgb",
-            allowEmpty: true
-        }).each(function() {
+        $('input[data-colorpicker]').spectrum(
+//            {
+//                showPalette: false,
+//                showSelectionPalette: false,
+//                showButtons: false,
+//                showAlpha: true,
+//                showInitial: true,
+//                showInput: true,
+//                preferredFormat: "rgb",
+//                allowEmpty: true
+//            }
+            $.extend(
+                {},
+                window.sbProps.spectrum,
+// spectrum: {
+//    DIFF preferredFormat: 'hex',
+//    DIFF showAlpha: false,
+//    NONE clickoutFiresChange: true,
+//    SAME allowEmpty: true,
+//    SAME showButtons: false,
+//    SAME showInitial: true,
+//    SAME showInput: true,
+// }
+//    NONE showPalette
+//    NONE showSelectionPalette
+                {
+                }
+            )
+        ).each(function() {
             // when I select a color on a transparent element,
             // what I really mean is I want to select an opaque color.
             // Setting the color to an opaque equivalent, then clearing it,

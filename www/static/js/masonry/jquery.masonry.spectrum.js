@@ -43,20 +43,42 @@
 
         opt = this.options;
 
-        $(this.element).find(this.options.inputSelector).spectrum({
-            showPalette: false,
-            showSelectionPalette: false,
-            showButtons: false,
-            showAlpha: true,
-            showInitial: true,
-            showInput: true,
-            clickoutFiresChange: true,
-            preferredFormat: 'hex',
-            replacerClassName: 'colorBox',
-            allowEmpty: true,
-            change: function (colorObject) { mspec.onColorChange(this, colorObject) },
-            move: function (colorObject) { mspec.onColorChange(this, colorObject) }
-        });
+        $(this.element).find(this.options.inputSelector).spectrum(
+//            {
+//                showPalette: false,
+//                showSelectionPalette: false,
+//                showButtons: false,
+//                showAlpha: true,
+//                showInitial: true,
+//                showInput: true,
+//                clickoutFiresChange: true,
+//                preferredFormat: 'hex',
+//                replacerClassName: 'colorBox',
+//                allowEmpty: true,
+//                change: function (colorObject) { mspec.onColorChange(this, colorObject) },
+//                move: function (colorObject) { mspec.onColorChange(this, colorObject) }
+//            }
+            $.extend(
+                {},
+                window.sbProps.spectrum,
+// spectrum: {
+//    DIFF showAlpha: false,
+//    SAME allowEmpty: true,
+//    SAME clickoutFiresChange: true,
+//    SAME preferredFormat: 'hex',
+//    SAME showButtons: false,
+//    SAME showInitial: true,
+//    SAME showInput: true,
+// }
+//  NONE showPalette
+//  NONE showSelectionPalette
+//  NONE replacerClassName
+                {
+                    change: function (colorObject) {mspec.onColorChange(this, colorObject);},
+                    move: function (colorObject) {mspec.onColorChange(this, colorObject);}
+                }
+            )
+        );
 
         // setup colour selectors
         this.loadColorpickerColors();
@@ -138,8 +160,6 @@
                         });
                 }
             });
-
-
     }
 
 
