@@ -19,6 +19,9 @@ use Schoolbox\Comms\News\StickyStatus\Corrector;
 class CorrectorTest extends TestCase
 {
     /**
+     * Test that `\Schoolbox\Comms\News\StickyStatus\Corrector::__invoke`
+     * returns an article with the sticky flag set correctly.
+     *
      * @dataProvider getTestInvokeData
      * @covers \Schoolbox\Comms\News\StickyStatus\Corrector::__invoke
      * @param Corrector $corrector
@@ -32,6 +35,26 @@ class CorrectorTest extends TestCase
         ?bool $expectedStickyStatus,
     ): void {
         $this->assertSame($expectedStickyStatus, $corrector($article)->getSticky());
+    }
+
+    /**
+     * Test that `\Schoolbox\Comms\News\StickyStatus\Corrector::__invoke`
+     * modifies the article passed to it correctly.
+     *
+     * @dataProvider getTestInvokeData
+     * @covers \Schoolbox\Comms\News\StickyStatus\Corrector::__invoke
+     * @param Corrector $corrector
+     * @param Model     $article
+     * @param bool|null $expectedStickyStatus
+     * @return void
+     */
+    public function testInvokeModifiesArticleInPlace(
+        Corrector $corrector,
+        Model $article,
+        ?bool $expectedStickyStatus,
+    ): void {
+        $corrector($article);
+        $this->assertSame($expectedStickyStatus, $article->getSticky());
     }
 
     /**
