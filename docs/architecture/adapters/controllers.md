@@ -1,0 +1,11 @@
+# Controllers
+
+Schoolbox's controllers are created by [modules](../configuration/modules.md),
+in the [Aura variant of the standard web kernel](kernels/web/standard.md#aura).
+
+Controller actions should be as lightweight as possible: they should only
+parse data from the request, and pass off any work to another component, e.g.:
+- a rendering engine for outputting content
+- a mapper for persisting data
+- a more sophisticated class structure for validating input, translating to
+  another format, etc.
