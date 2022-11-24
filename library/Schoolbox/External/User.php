@@ -10,7 +10,6 @@
 
 namespace Schoolbox\External;
 
-use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
@@ -80,7 +79,7 @@ class User
                 if (!empty($currentParent['StudentContactID'])) {
                     try {
                         $parent = $this->userMapper->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
-                        $parents[$student->getExternalId()]->add($parent);
+                        $parents->add($parent);
                     } catch (MapperException $e) {
                         //noop
                     }
@@ -90,7 +89,7 @@ class User
                 if (!empty($currentParent['StudentContactSpouseID'])) {
                     try {
                         $spouse = $this->userMapper->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
-                        $parents[$student->getExternalId()]->add($spouse);
+                        $parents->add($spouse);
                     } catch (MapperException $e) {
                         //noop
                     }
@@ -114,7 +113,7 @@ class User
 
         // Get all of the students subjects
         foreach ($students as $student) {
-            $teachers = new GenericCollection(\Schoolbox\User::class);
+            $teachersLoaded = new GenericCollection(\Schoolbox\User::class);
             $found                                     = [];
             $subjects                                  = $this->externalUser->getSubjectList($student);
 
@@ -127,7 +126,7 @@ class User
 
                     if (!isset($found[$teacher])) {
                         try {
-                            $teachers[$student->getExternalId()]->add(
+                            $teachersLoaded->add(
                                 $this->userMapper->findByExternalId($teacher, Role::STAFF)
                             );
 
@@ -138,7 +137,7 @@ class User
                     }
                 }
             }
-            $student->setTeacherCollection($teachers);
+            $student->setTeacherCollection($teachersLoaded);
         }
         return $students;
     }
@@ -157,7 +156,7 @@ class User
             $enrolments                             = $this->externalUser->getEnrolledStudents($parent->getExternalId());
             foreach ($enrolments as $child) {
                 try {
-                    $children[$parent->getExternalId()]->add($this->userMapper->findByExternalId($child['RelatedID']));
+                    $children->add($this->userMapper->findByExternalId($child['RelatedID']));
                 } catch (MapperException $e) {
                     // noop
                 }
