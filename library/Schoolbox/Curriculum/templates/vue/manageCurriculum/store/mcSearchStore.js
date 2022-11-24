@@ -4,7 +4,7 @@
 
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { apiEndpoint } from './manageCurriculumStore';
+import { useStore } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 
 
@@ -84,7 +84,7 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
     async function search () {
         try {
             const viewNodesStore = useViewNodesStore();
-            const response = await fetch(`${apiEndpoint}?parentId=${viewNodesStore.current.id}&query=${query.value}&limit=50${enabled.value}`, {
+            const response = await fetch(`${useStore().getApiEndpoint()}?parentId=${viewNodesStore.current.id}&query=${query.value}&limit=50${enabled.value}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

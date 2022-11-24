@@ -4,8 +4,8 @@
 
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { UNSET_ID, findById, sortNodes, removeId, getBreadcrumbs } from '@schoolboxCurriculum/js/nodeUtils';
-import { useStore, apiEndpoint } from './manageCurriculumStore';
+import { UNSET_ID, findById, sortByName, removeId, getBreadcrumbs } from '@schoolboxCurriculum/js/nodeUtils';
+import { useStore } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
 
@@ -41,7 +41,7 @@ export const useNodesStore = defineStore('mcNodes', () => {
     async function load () {
         const store = useStore();
         try {
-            const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&descendants=1&limit=50`, {
+            const response = await fetch(`${store.getApiEndpoint()}/?topLevelOnly=1&descendants=1&limit=50`, {
                 headers: {
                     'Content-Type': 'application/json',
                 }
@@ -90,7 +90,7 @@ export const useNodesStore = defineStore('mcNodes', () => {
     async function loadId (id) {
         try {
             isLoading.value = true;
-            const response = await fetch(`${apiEndpoint}/${id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
+            const response = await fetch(`${useStore().getApiEndpoint()}/${id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
             if (response.ok) {
                 const nodeWithParents = await response.json();
                 await loadAllChildren(nodeWithParents);
@@ -143,7 +143,7 @@ export const useNodesStore = defineStore('mcNodes', () => {
     async function loadNextChildren (id) {
         try {
             isLoading.value = true;
-            const response = await fetch(`${apiEndpoint}/${id}?descendants=2&limit=50`, {
+            const response = await fetch(`${useStore().getApiEndpoint()}/${id}?descendants=2&limit=50`, {
                 headers: {
                     'Content-Type': 'application/json',
                 }

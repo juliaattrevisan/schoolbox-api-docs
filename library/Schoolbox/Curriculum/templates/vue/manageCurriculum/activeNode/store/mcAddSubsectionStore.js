@@ -4,7 +4,7 @@
 
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { apiEndpoint } from '../../store/manageCurriculumStore';
+import { getApiEndpoint } from '../../store/manageCurriculumStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
 import { useSelectedNodesStore } from '../../selectedNodes/store/mcSelectedNodesStore';
 
@@ -37,7 +37,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
         const activeNodeStore = useActiveNodeStore();
         try {
             isProcessing.value = true;
-            const response = await fetch(`${apiEndpoint}/${activeNodeStore.node.id}`, {
+            const response = await fetch(`${getApiEndpoint()}/${activeNodeStore.node.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

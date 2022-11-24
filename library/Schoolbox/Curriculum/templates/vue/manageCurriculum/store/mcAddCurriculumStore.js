@@ -4,7 +4,7 @@
 
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { apiEndpoint } from './manageCurriculumStore';
+import { getApiEndpoint } from './manageCurriculumStore';
 import { useNodesStore } from './mcNodesStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 
@@ -33,7 +33,7 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
     async function add () {
         try {
             isProcessing.value = true;
-            const response = await fetch(`${apiEndpoint}/`, {
+            const response = await fetch(`${getApiEndpoint()}/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

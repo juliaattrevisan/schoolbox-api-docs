@@ -5,7 +5,7 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { capitalizeFirstLetter } from '@js/util/stringUtils';
-import { apiEndpoint } from '../../store/manageCurriculumStore';
+import { getApiEndpoint } from '../../store/manageCurriculumStore';
 import { useSelectedNodesStore } from './mcSelectedNodesStore';
 
 
@@ -58,7 +58,7 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', () => {
         const fetchList = [];
         const selectedNodesStore = useSelectedNodesStore();
         selectedNodesStore.nodes.forEach((node) => {
-            fetchList.push(fetch(`${apiEndpoint}/${node.id}`, {
+            fetchList.push(fetch(`${getApiEndpoint()}/${node.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'

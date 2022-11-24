@@ -4,7 +4,7 @@
 
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { apiEndpoint } from '../../store/manageCurriculumStore';
+import { getApiEndpoint } from '../../store/manageCurriculumStore';
 import { useSelectedNodesStore } from './mcSelectedNodesStore';
 
 
@@ -60,7 +60,7 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', () => {
         const fetchList = [];
         const selectedNodesStore = useSelectedNodesStore();
         selectedNodesStore.nodes.forEach((node) => {
-            fetchList.push(fetch(`${apiEndpoint}/${node.id}`, {
+            fetchList.push(fetch(`${getApiEndpoint()}/${node.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'

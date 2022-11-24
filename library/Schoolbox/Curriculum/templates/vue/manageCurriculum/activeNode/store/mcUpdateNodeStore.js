@@ -4,7 +4,7 @@
 
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { apiEndpoint } from '../../store/manageCurriculumStore';
+import { getApiEndpoint } from '../../store/manageCurriculumStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
 
 
@@ -35,7 +35,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
             isProcessing.value = true;
             const activeNodeStore = useActiveNodeStore();
             const nodeId = activeNodeStore.node.id;
-            const response = await fetch(`${apiEndpoint}/${nodeId}`, {
+            const response = await fetch(`${getApiEndpoint()}/${nodeId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
