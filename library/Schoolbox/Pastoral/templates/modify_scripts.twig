@@ -21,8 +21,9 @@
 
                 {% if canCreate %}
                 create: function (input) {
+                    $('#tagNames').val($('#tagNames').val()+','+input);
                     return {
-                        id: input,
+                        id: 'new-' + input,
                         name: input
                     }
                 },

@@ -7,11 +7,14 @@
 
 namespace Helper;
 
+use Codeception\Exception\ModuleException;
+use Codeception\Module\Db;
 use Codeception\TestInterface;
 use Payload\Request;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\CampusMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
@@ -33,6 +36,8 @@ class Api extends \Codeception\Module
     public Kernel $cliKernel;
 
     private UserMapper $userMapper;
+
+    private array $originalConfig = [];
 
     /**
      * HOOK: executed after configuration is loaded
@@ -94,6 +99,39 @@ class Api extends \Codeception\Module
     }
 
     /**
+     * Sets database config value temporally
+     * @param string $name
+     * @param mixed $value
+     */
+    public function changeDBConfig(string $name, $value)
+    {
+        $db = $this->getDbModule();
+
+        $currentValue = $db->grabFromDatabase('config', 'value', ['name' => $name]);
+        if ($value === $currentValue) {
+            // no need to change
+            return;
+        }
+
+        if (!key_exists($name, $this->originalConfig)) {
+            $this->originalConfig[$name] = $currentValue;
+        }
+
+        $db->updateInDatabase('config', ['value' => $value], ['name' => $name]);
+    }
+
+    /**
+     * Resets database value back
+     */
+    public function restoreDBConfig()
+    {
+        $db = $this->getDbModule();
+        foreach ($this->originalConfig as $name => $value) {
+            $db->updateInDatabase('config', ['value' => $value], ['name' => $name]);
+        }
+    }
+
+    /**
      * @param string $username
      * @param string $roleType
      * @param bool   $superUser
@@ -150,5 +188,16 @@ class Api extends \Codeception\Module
     public function getPastoralSeverities(): GenericCollection
     {
         return PastoralSeverityMapper::getInstance()->findAll();
+    }
+
+    /**
+     * Return DB module in a type-safe manner.
+     *
+     * @return Db
+     * @throws ModuleException
+     */
+    private function getDbModule(): Db
+    {
+        return $this->getModule('Db');
     }
 }

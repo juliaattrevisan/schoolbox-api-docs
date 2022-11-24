@@ -73,6 +73,10 @@ suites:
               url: 'https://vagrant.dev.schoolbox.cloud'
               xdebug: true
               part: Json
+          - Db:
+              dsn: "mysql:host=localhost;dbname=schoolbox"
+              user: "root"
+              password: "tnp879"
           - \Helper\Api:
 
 extensions:

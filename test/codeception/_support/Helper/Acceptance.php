@@ -68,10 +68,6 @@ class Acceptance extends \Codeception\Module
     public function changeDBConfig(string $name, string $value)
     {
         $db = $this->getDbModule();
-        if (key_exists($name, $this->originalConfig)) {
-            // already stored
-            return;
-        }
 
         $currentValue = $db->grabFromDatabase('config', 'value', ['name' => $name]);
         if ($value === $currentValue) {
@@ -79,8 +75,11 @@ class Acceptance extends \Codeception\Module
             return;
         }
 
-        $this->originalConfig[$name] = $currentValue;
-        $db->updateInDatabase('config', ['value' => $value], ['name' => 'debug_mode']);
+        if (!key_exists($name, $this->originalConfig)) {
+            $this->originalConfig[$name] = $currentValue;
+        }
+
+        $db->updateInDatabase('config', ['value' => $value], ['name' => $name]);
     }
 
     /**

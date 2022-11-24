@@ -90,6 +90,7 @@ class Controller extends Base
      * @param Audience\Mapper                 $audienceMapper
      * @param TermMapper                      $termMapper
      * @param Comment\Translator\ModelToArray $pastoralCommentTranslator
+     * @param Translator\ModelToArray         $pastoralTranslator
      * @param FilesystemProxy                 $filesystemProxy
      */
     public function __construct(
@@ -699,46 +700,46 @@ class Controller extends Base
      * Assign tags to a record, spawning them if required, or resurrecting them
      * if these tags once existed
      *
-     * @param string $tagCsv
+     * @param string $tagIdCsv
+     * @param string $tagNameCsv
      * @return Collection
      * @throws MapperException
      */
-    private function prepareTags(string $tagCsv): Collection
+    private function prepareTags(string $tagIdCsv, string $tagNameCsv): Collection
     {
-        $tagNames = explode(",", $tagCsv);
-        $tags     = $this->pastoralTagMapper->createCollection();
+        $tagNames = array_map('trim', array_filter(explode(',', $tagNameCsv)));
+        // remove new tags set as string starting from 'new-'
+        $tagIds   = array_map(
+            'trim',
+            array_filter(explode(',', $tagIdCsv), static function ($tagId) {
+                return is_numeric(trim($tagId));
+            })
+        );
+
+        // create initial tag collection from tagIds
+        $tags          = $this->pastoralTagMapper->findByColumn('id', $tagIds);
+        $invalidTagIds = array_diff($tagIds, $tags->getPropertyValues('id'));
+        if (!empty($invalidTagIds)) {
+            throw new SchoolboxException(sprintf("Invalid Tag ID provided: %s", implode(',', $invalidTagIds)));
+        }
 
         $canCreate = (bool)$this->getConfigLoader()->get('pastoral_create_tag_enable');
 
-        foreach ($tagNames as $tagCurrent) {
-            if (trim($tagCurrent) != '') {
-                $tag = null;
-                try {
-                    /* Assign an existing tag to this pastoral record
-                     */
-
-                    /** @var PastoralTagsModel $tag */
-                    $tag = $this->pastoralTagMapper->findOneByColumn('id', $tagCurrent, ['cache' => false]);
-                } catch (MapperDeletedException $e) {
-                    /* Restore this tag to active duty SA-2737
-                     * This was put here to reduce dupe tags from original implementation
-                     */
-                } catch (MapperException $e) {
-                    /* Tag doesn't exist - spawn it, save it, then assign it
-                     */
+        foreach ($tagNames as $tagName) {
+            /** @var PastoralTagsModel|null $tag */
+            $tag = null;
+            // newly created tag from selectize has this strange string from modify_scripts.twig
+            try {
+                $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagName, ['cache' => false]);
+                $tags->add($tag);
+            } catch (MapperException $e) {
+                if (!$canCreate) {
+                    throw new SchoolboxException(sprintf("Tag %s not found.", $tagName));
                 }
-
-                /* Tag doesn't exist - spawn it, save it, then assign it
-                 */
-                if (!$tag && $canCreate) {
-                    $tag = new PastoralTagsModel();
-                    $tag->setName($tagCurrent);
-                    $this->pastoralTagMapper->save($tag);
-                }
-
-                if ($tag) {
-                    $tags->add($tag);
-                }
+                $tag = new PastoralTagsModel();
+                $tag->setName($tagName);
+                $this->pastoralTagMapper->save($tag);
+                $tags->add($tag);
             }
         }
         return $tags;
@@ -862,7 +863,7 @@ class Controller extends Base
             'strlen',
         );
         if (empty($studentId) && empty($duplicateStudentIds)) {
-            throw new InvalidArgumentException('No student provided.');
+            throw new SchoolboxException('No student provided.');
         }
         if (empty($studentId)) {
             $studentId = (int)array_shift($duplicateStudentIds);
@@ -882,7 +883,7 @@ class Controller extends Base
 
         $records = $this->processPastoralRecords($studentId, $post, $duplicates);
 
-        if ($this->request->isXhr()) {
+        if ($this->isJsonRequest()) {
             $this->response->status->setCode(201);
             $this->response->content->set(
                 $this->buildJsonOutput(
@@ -934,7 +935,7 @@ class Controller extends Base
             }
         }
 
-        $updatedRecord = $this->processPastoralRecords($studentId, $post, $duplicates, $record);
+        $this->processPastoralRecords($studentId, $post, $duplicates, $record);
 
         // Go back to students pastoral record
 
@@ -953,13 +954,12 @@ class Controller extends Base
      *
      * @return GenericCollection
      * @throws MapperException
-     * @throws Exception
      */
     private function processPastoralRecords(int $primaryStudentId, RequestValues $post, array $duplicateStudentIds = [], PastoralModel $parent = null): GenericCollection
     {
-        $heading = trim($post->get('heading'));
+        $heading = trim((string)$post->get('heading'));
         if (empty($heading)) {
-            throw new InvalidArgumentException('Title cannot be empty');
+            throw new SchoolboxException('Title cannot be empty');
         }
         $records = $this->pastoralDataSource->createCollection();
 
@@ -973,7 +973,7 @@ class Controller extends Base
             /** @var Type\Model $type */
             $type = $e->getDeletedObject();
         } catch (MapperException $e) {
-            throw new InvalidArgumentException("Pastoral type with ID {$post->get('typeId')} cannot be found");
+            throw new SchoolboxException("Pastoral type with ID {$post->get('typeId')} cannot be found");
         }
 
         // Prepare subtype. No database change.
@@ -986,7 +986,7 @@ class Controller extends Base
                 /** @var SubType\Model $subtype */
                 $subtype = $e->getDeletedObject();
             } catch (MapperException $e) {
-                throw new InvalidArgumentException("Pastoral sub-type with ID {$subtypeId} cannot be found");
+                throw new SchoolboxException("Pastoral sub-type with ID {$subtypeId} cannot be found");
             }
             // Ensure that subtype belongs to the parent type:
             // if there is somehow a mismatch, clear the subtype
@@ -998,14 +998,16 @@ class Controller extends Base
         // Prepare Severity. No database change.
         $severity = null;
         if ($this->getConfigLoader()->get('pastoral_severity')) {
+            if (!$post->get('severityId')) {
+                throw new SchoolboxException("Pastoral severity is required");
+            }
             try {
                 $severity = $this->pastoralSeverityMapper->findById($post->get('severityId'));
             } catch (MapperException\Deleted $e) {
                 /** @var Severity\Model $severity */
                 $severity = $e->getDeletedObject();
-            } catch (MapperException\NotFound $e) {
             } catch (MapperException $e) {
-                throw new InvalidArgumentException("Pastoral severity with ID {$post->get('severityId')} cannot be found");
+                throw new SchoolboxException("Pastoral severity with ID {$post->get('severityId')} cannot be found");
             }
         }
 
@@ -1023,7 +1025,7 @@ class Controller extends Base
         $db->beginTransaction();
 
         // Prepare tags. Save newly created tags.
-        $tags = $this->prepareTags($post->get('tags') ?? '');
+        $tags = $this->prepareTags($post->get('tags') ?? '', $post->get('tagNames') ?? '');
 
         $pastoralExternal = new External_Pastoral();
 
@@ -1359,10 +1361,19 @@ class Controller extends Base
             return $recordActions;
         }
 
-        $actions       =
-            is_array($post->get('actions'))
-                ? $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter($post->get('actions'))))
+        $postedActionIds = array_map('intval', array_filter($post->get('actions') ?? []));
+
+        $actions =
+            !empty($postedActionIds)
+                ? $this->pastoralActionMapper->findByColumn('id', $postedActionIds)
                 : $this->pastoralActionMapper->createCollection();
+
+        // if there are actions which are not in db, throw error
+        $invalidActionIds = array_diff($postedActionIds, $actions->getPropertyValues('id'));
+        if (!empty($invalidActionIds)) {
+            throw new SchoolboxException(sprintf("Action %s not found.", implode(',', $invalidActionIds)));
+        }
+
         foreach ($actions as $action) {
             /** @var RecordAction\Model $recordAction */
             $recordAction = $this->pastoralRecordActionMapper->createModel();

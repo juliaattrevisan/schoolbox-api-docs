@@ -83,6 +83,30 @@ class PastoralCreateCest
                     $i->seeResponseCodeIs($code);
                 }
             }
+
+            // turn off severity
+            $i->changeDBConfig('pastoral_severity', 0);
+            $i->sendPost('/pastoral/record/insert', $postData['data']);
+
+            $i->seeResponseCodeIs(201);
+            $i->seeResponseIsValidOnJsonSchemaString($this->getSchema());
+            $i->restoreDBConfig();
+
+            // turn on action
+            $i->changeDBConfig('pastoral_action_enable', 0);
+            $i->sendPost('/pastoral/record/insert', $postData['data']);
+
+            $i->seeResponseCodeIs(201);
+            $i->seeResponseIsValidOnJsonSchemaString($this->getSchema());
+            $i->restoreDBConfig();
+
+            // turn off tag creation
+            $i->changeDBConfig('pastoral_create_tag_enable', 0);
+            $postData['data']['tagNames'] = "newTag" . time();
+            $i->sendPost('/pastoral/record/insert', $postData['data']);
+
+            $i->seeResponseCodeIs(400);
+            $i->restoreDBConfig();
         }
     }
 
@@ -118,16 +142,17 @@ class PastoralCreateCest
                 'duplicateIds'        => null,
                 'heading'             => 'Cest nullable ' . time(),
                 'typeId'              => $pastoralType->getId(),
-                //        'subtypeId' => $record->getSubType()?->getId();
                 'subtypeId'           => $pastoralType->getSubTypes()->first()?->getId(),
                 // TODO: config
                 'severityId'          => $i->getPastoralSeverities()->first()->getId(),
                 'public_attachments'  => null,
                 'private_attachments' => null,
-                'actions'             => null,
+                'actions'             => [1, 2],
                 'tags'                => null,
                 'points'              => null,
             ],
+            'body_public'          => null,
+            'body_private'         => null,
             'expectedResponseCode' => [
                 400 => [$this->userDeny, $this->userPrivate, $this->userPublic],
             ],
@@ -136,7 +161,12 @@ class PastoralCreateCest
         yield [
             'data'                 => [
                 'student_id'          => $this->student->getId(),
-                'heading'             => 'Cest normal ' . time(),
+                //                'heading'             => 'Cest normal ' . time(),
+                'heading'             => '
+01234567890123456789012345678901234567890123456789
+01234567890123456789012345678901234567890123456789
+01234567890123456789012345678901234567890123456789
+                ',
                 'typeId'              => $pastoralType->getId(),
                 //        'subtypeId' => $record->getSubType()?->getId();
                 'subtypeId'           => $pastoralType->getSubTypes()->first()?->getId(),
@@ -157,7 +187,8 @@ class PastoralCreateCest
                 'public_attachments'  => ['store:723b6e31c2979b33deea852cdbbad9c4b0e00b96:piglet2.jpg'],
                 'private_attachments' => ['store:69903e5d89e1574d92de8afd1634f472e3096b3c:scrabble2.jpg'],
                 // TODO: config
-                'tags'                => "test tag A,test tag B",
+                'tags'                => "131,132",
+                'tagNames'            => "test tag A,test tag B",
                 'duplicateIds'        => '25,26',
                 'points'              => 50,
                 'body_public'         => "Public body\nPublic body.",
@@ -176,28 +207,28 @@ class PastoralCreateCest
     private function getSchema()
     {
         $schema = [
-           'type' => 'array',
-           'properties' => [
-               'id' => [
-                   'type' => 'integer'
-               ],
-               'externalId' => [
-                   'type' => 'string',
-                   'nullable' => true,
-               ],
-               'student' => [
-                   'type' => 'object',
-               ],
-               'heading' => [
-                   'type' => 'string',
+            'type'       => 'array',
+            'properties' => [
+                'id'         => [
+                    'type' => 'integer',
                 ],
-               'type' => [
-                   'type' => 'object'
-               ],
-               '_links' => [
-                   'type' => 'object'
-               ]
-           ]
+                'externalId' => [
+                    'type'     => 'string',
+                    'nullable' => true,
+                ],
+                'student'    => [
+                    'type' => 'object',
+                ],
+                'heading'    => [
+                    'type' => 'string',
+                ],
+                'type'       => [
+                    'type' => 'object',
+                ],
+                '_links'     => [
+                    'type' => 'object',
+                ],
+            ],
         ];
         return json_encode($schema);
     }
