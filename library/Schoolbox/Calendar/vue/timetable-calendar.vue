@@ -191,15 +191,15 @@ export default {
                 left: 'quickSwitchButton,customToday,customPrev,customNext',
                 center: 'title',
                 // right: 'customFilters,list,dayGridMonth,timeGridWeek,timeGridDay,customExport'
-                right: 'timeGridWeek,timeGridDay'
+                right: ''
             },
             buttonText: {
                 today:    'Today',
                 /* Didn't need any of these extra buttons in Timetable View
                  */
                 // month:    'Month',
-                week:     'Week',
-                day:      'Day',
+                // week:     'Week',
+                // day:      'Day',
                 // list:     'List',
             },
             initialDate: this.config.defaultDate,
