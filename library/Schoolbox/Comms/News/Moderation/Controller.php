@@ -19,7 +19,6 @@ use Schoolbox\Mapper;
 
 class Controller extends Base
 {
-
     /**
      * Flash message text appears in this key
      */
@@ -55,15 +54,11 @@ class Controller extends Base
 
 
     /**
-     * @param News\Mapper                          $newsMapper
-     * @param News\Validation\Factory              $validSpecFactory
-     * @param News\StickyStatus\FilterStickyStatus $filterStickyStatus Filter for article's sticky status
+     * @param News\Mapper             $newsMapper
+     * @param News\Validation\Factory $validSpecFactory
      */
-    public function __construct(
-        News\Mapper $newsMapper,
-        News\Validation\Factory $validSpecFactory,
-        private News\StickyStatus\FilterStickyStatus $filterStickyStatus,
-    ) {
+    public function __construct(News\Mapper $newsMapper, News\Validation\Factory $validSpecFactory)
+    {
         $this->newsMapper       = $newsMapper;
         $this->validSpecFactory = $validSpecFactory;
     }
@@ -159,7 +154,6 @@ class Controller extends Base
         } else {
             // Valid article. Attempt to submit and save
             $article->submit();
-            $article = $this->filterStickyStatus->filter($article);
             if (false === $this->newsMapper->save($article)) {
                 $httpCode  = 500;
                 $errorCode = self::ERROR_CODE_UNABLE_TO_SAVE;
@@ -225,7 +219,6 @@ class Controller extends Base
         } else {
             // Valid article. Attempt to approve and save
             $article->approve($this->getUser());
-            $article = $this->filterStickyStatus->filter($article);
             if (false === $this->newsMapper->save($article)) {
                 $httpCode  = 500;
                 $errorCode = self::ERROR_CODE_UNABLE_TO_SAVE;
@@ -308,7 +301,6 @@ class Controller extends Base
         } else {
             // Valid article. Attempt to approve and save
             $article->reject($this->getUser(), $rejectionReason);
-            $article = $this->filterStickyStatus->filter($article);
             if (false === $this->newsMapper->save($article)) {
                 $httpCode  = 500;
                 $errorCode = self::ERROR_CODE_UNABLE_TO_SAVE;

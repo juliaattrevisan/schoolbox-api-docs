@@ -21,8 +21,6 @@ use Schoolbox\Comms\News\Authorizer\Rule\IsModerationEnabled;
 use Schoolbox\Comms\News\Authorizer\Rule\IsArticleAuthor;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Authorizer\Rule\IsPublishedOrExpired;
-use Schoolbox\Comms\News\StickyStatus\FilterStickyStatus;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -30,7 +28,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Module extends BaseModule
 {
-
     /**
      * @inheritdoc
      */
@@ -169,7 +166,6 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(News\Mapper::class),
             new News\Validation\Factory($this->getStrategyFactory()),
-            new FilterStickyStatus($this->getConfig()->get(ConfigMapper::COMMS_STICKY_ENABLED)),
         );
     }
 

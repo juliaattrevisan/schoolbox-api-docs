@@ -99,7 +99,6 @@ class Controller extends Base
      * @param Thread\Mapper                    $threadMapper
      * @param CommentMapper                    $commentMapper
      * @param File\Mapper                      $fileMapper
-     * @param FilterStickyStatus               $filterStickyStatus      Filter for article's sticky status
      * @param ValidChangeStickyStatus          $validChangeStickyStatus Spec pattern for if sticky status may be changed
      */
     public function __construct(
@@ -117,7 +116,6 @@ class Controller extends Base
         Thread\Mapper $threadMapper,
         CommentMapper $commentMapper,
         File\Mapper $fileMapper,
-        private FilterStickyStatus $filterStickyStatus,
         private ValidChangeStickyStatus $validChangeStickyStatus,
     ) {
         $this->newsMapper                 = $newsMapper;
@@ -1451,9 +1449,7 @@ class Controller extends Base
             ->setBlurb($postData['blurb'] ?? '')
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics'] ?? null));
 
-        // Is sticky news off? Forcibly disable that setting no matter what.
-        // Otherwise, only allow users who may change sticky status to do so.
-        $article = $this->filterStickyStatus->filter($article);
+        // Only allow users who may change sticky status to do so
         if ($this->validChangeStickyStatus->isSatisfiedBy($this->getUser())) {
             $article->setSticky((bool)($postData['sticky'] ?? false));
         }
