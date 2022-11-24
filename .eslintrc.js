@@ -28,5 +28,6 @@ module.exports = {
         "import/prefer-default-export": "off", // Pinia especially uses a single export
         "@typescript-eslint/no-unsafe-assignment": "off", //
         "@typescript-eslint/no-unsafe-member-access": "off", //
+        "@typescript-eslint/no-unsafe-call": "off", //
     },
 }

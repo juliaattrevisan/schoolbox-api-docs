@@ -57,11 +57,11 @@ export const useStore = defineStore('manageCurriculum', () => {
      * as they persist between the stories otherwise
      */
     function checkForStorybook() {
-        // if (typeof window.STORYBOOK_ENV !== 'undefined') {
-        //     $reset();
-        //     useViewNodesStore().$reset();
-        //     useActiveNodeStore().$reset();
-        // }
+        if (typeof window.STORYBOOK_ENV !== 'undefined') {
+            $reset();
+            useViewNodesStore().$reset();
+            useActiveNodeStore().$reset();
+        }
     }
 
     /**
