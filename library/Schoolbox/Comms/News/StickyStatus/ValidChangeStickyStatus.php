@@ -5,6 +5,8 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Comms\News\StickyStatus;
 
 use Schoolbox\Mapper\Exception;
