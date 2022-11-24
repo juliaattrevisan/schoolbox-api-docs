@@ -33,7 +33,7 @@ $app = new class extends CliTool\App {
 
         $query = "
             INSERT INTO calendar_connector (event_type, connector_class, config, status)
-            VALUES ('Fixtures', 'Schoolbox', '{$record->getConfig()}', 0)
+            VALUES ('SudsEvent', 'Schoolbox', '{$record->getConfig()}', 0)
         ";
 
         $this->getDatabaseInternal()->query($query);
