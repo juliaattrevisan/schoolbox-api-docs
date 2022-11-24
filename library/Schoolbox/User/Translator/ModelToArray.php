@@ -33,10 +33,9 @@ class ModelToArray
     /**
      * @param User $user
      * @param GenericCollection|UserAccess[]|array|bool $groups
-     * @param \Schoolbox\External\User|null $externalUser
      * @return array
      */
-    public function __invoke(User $user, $groups = null, \Schoolbox\External\User $externalUser = null): array
+    public function __invoke(User $user, $groups = null): array
     {
         return [
             'id'     => $user->getId(),
@@ -52,8 +51,8 @@ class ModelToArray
             'schoolHouse'      => $this->convertSchoolHouse($user->getSchoolHouse()),
 
             // Null for now
-            'guardians'        => $user->getParents($user),
-            'students'         => $user->getChildren($user),
+            'guardians'        => $user->getParents(),
+            'students'         => $user->getChildren(),
 
             'impersonableUser' => $user->getLinkedUser(),
 

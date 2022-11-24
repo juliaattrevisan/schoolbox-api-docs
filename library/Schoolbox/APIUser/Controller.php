@@ -41,7 +41,6 @@ class Controller extends Base
     protected CampusMapper $campusMapper;
     protected YearLevelMapper $yearLevelMapper;
     protected RoleMapper $roleMapper;
-    protected \Schoolbox\External\User $externalUser;
 
     /**
      * Controller constructor.
@@ -81,7 +80,6 @@ class Controller extends Base
             $timetableColourMapper,
             $reRouteOverrideMapper,
         );
-        $this->externalUser = new \Schoolbox\External\User();
     }
 
     /**
@@ -104,7 +102,7 @@ class Controller extends Base
         /**
          * build the whole thing
          */
-        $output = (new User\Translator\ModelToArray())($user, $groupsArr, $this->externalUser);
+        $output = (new User\Translator\ModelToArray())($user, $groupsArr);
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
@@ -396,7 +394,7 @@ class Controller extends Base
         /**
          * build the whole thing
          */
-        $output = (new User\Translator\ModelToArray())($updatedUser, $groupsArr, $this->externalUser);
+        $output = (new User\Translator\ModelToArray())($updatedUser, $groupsArr);
         $this->response->content->set(
             $this->buildJsonOutput(
                 $output
@@ -449,7 +447,7 @@ class Controller extends Base
             /**
              * build the whole thing
              */
-            $output[] = (new User\Translator\ModelToArray())($user, $groupsArr, $this->externalUser);
+            $output[] = (new User\Translator\ModelToArray())($user, $groupsArr);
         }
         $this->response->content->set(
             $this->buildJsonOutput(
