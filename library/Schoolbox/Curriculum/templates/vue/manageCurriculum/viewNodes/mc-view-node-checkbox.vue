@@ -55,9 +55,9 @@ const isChecked = computed(() => {
 /**
  * add or remove based on the current status
  *
- * @param { boolean }
+ * @param { boolean } isChecked - whether the Node is selected or not
  */
-function onChange (isChecked) {
+function onChange (isChecked: boolean) {
     selectedNodesStore.switchNode(props.node, isChecked);
 }
 

@@ -25,6 +25,8 @@ module.exports = {
     ],
     root: true, // limits ESLint to this folder (wont go up parent folders)
     rules: { // customised rules
-        "import/prefer-default-export": "off", // Pinia especially uses a single export
+        "import/prefer-default-export": "off", // as Pinia especially uses single exports
+        "no-param-reassign": [2, { "props": false }], // allow modifying props of parameters, especially valid when passing DOM elements, as we don't really want to be cloning DOM elements
+        "arrow-body-style": "off", // this can be at the dev discretion instead: https://eslint.org/docs/latest/rules/arrow-body-style
     },
 }

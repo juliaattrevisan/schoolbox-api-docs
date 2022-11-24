@@ -2,7 +2,8 @@
  * Various utils related to managing curriculum nodes
  */
 
-import Node from '@schoolboxCurriculum/types/Node';
+import { Node } from '@schoolboxCurriculum/types/Node';
+import { Breadcrumb } from '@schoolboxCurriculum/types/Breadcrumb';
 
 /**
  * To indicate that a node should be invalid and unset
@@ -24,7 +25,12 @@ const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' })
  */
 export function getEmptyNode(): Node {
     return {
+        children: null,
+        code: null,
+        description: null,
+        enabled: true,
         id: UNSET_ID,
+        parent: null,
         name: '',
     };
 }
@@ -34,21 +40,24 @@ export function getEmptyNode(): Node {
  * We recursively loop through the object until we find the
  * matched object or undefined if not found
  *
- * @param { array }
- * @param { number }
+ * @param { Node[] } array - an array of Node to loop through
+ * @param { number } id - the id to find
+ * @returns { Node | undefined } - the found Node
  */
-export function findById(array, id) {
-    for (const item of array) {
+export function findById(array: Node[], id: number): Node | undefined {
+    let node: Node;
+    array.forEach((item) => {
         if (item.id === id) {
-            return item;
+            node = item;
         }
         if (item.children?.length) {
             const innerResult = findById(item.children, id);
             if (innerResult) {
-                return innerResult;
+                node = innerResult;
             }
         }
-    }
+    });
+    return node;
 }
 
 /**
@@ -116,16 +125,16 @@ export function removeId(data, id) {
 /**
  * Recursively loop through the parents adding in a breadcrumb for each
  *
- * @param { object }
- * @param { array }
+ * @param { Node } node - the Node to traverse for breadcrumbs
+ * @param { Breadcrumb[] } currentBreadcrumbs - the current breadcrumbs
+ * @returns { Breadcrumb[] } - the new breadcrumbs
  */
-export function getBreadcrumbs(node, currentBreadcrumbs) {
-    if (node.hasOwnProperty('parent') && node.parent !== null) {
-        //if there's a parent to use as a breadcrumb
-        let breadcrumbs = [{ id: node.parent.id, name: node.parent.name }, ...currentBreadcrumbs]; //add it in to the front of the list
-        return (breadcrumbs = getBreadcrumbs(node.parent, breadcrumbs)); //and then check the next node up the list
-    } else {
-        //otherwise we must be at the top of the breadcrumb list
-        return currentBreadcrumbs; //so we can return now
+export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Breadcrumb[] {
+    if (node.parent !== null) {
+        // if there's a parent to use as a breadcrumb
+        let breadcrumbs = [{ id: node.parent.id, name: node.parent.name }, ...currentBreadcrumbs]; // add it in to the front of the list
+        return (breadcrumbs = getBreadcrumbs(node.parent, breadcrumbs)); // and then check the next node up the list
     }
+    // otherwise we must be at the top of the breadcrumb list
+    return currentBreadcrumbs; // so we can return now
 }

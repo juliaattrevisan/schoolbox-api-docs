@@ -8,7 +8,7 @@ import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manage
 import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
 import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
 import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
-import Node from '@schoolboxCurriculum/types/Node';
+import { Node } from '@schoolboxCurriculum/types/Node';
 
 const UNSET_ID = -1;
 

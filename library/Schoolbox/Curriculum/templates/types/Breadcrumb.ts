@@ -3,8 +3,8 @@
  * and backwards through the node tree
  */
 
-export default interface Breadcrumb {
-    depth: number;
+export type Breadcrumb = {
+    depth?: number;
     id: number;
     name: string;
-}
+};

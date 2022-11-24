@@ -8,8 +8,8 @@ import { defineStore } from 'pinia';
 import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
 import { useSearchStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcSearchStore';
 import { UNSET_ID, findById } from '@schoolboxCurriculum/js/nodeUtils';
-import Node from '@schoolboxCurriculum/types/Node';
-import Breadcrumb from '@schoolboxCurriculum/types/Breadcrumb';
+import { Node } from '@schoolboxCurriculum/types/Node';
+import { Breadcrumb } from '@schoolboxCurriculum/types/Breadcrumb';
 
 export const DIRECTION = {
     FORWARDS: 'forwards',

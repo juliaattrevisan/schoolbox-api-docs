@@ -15,8 +15,8 @@ import {
 import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
 import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
 import { useSelectedNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore';
-import Node from '@schoolboxCurriculum/types/Node';
-import Breadcrumb from '@schoolboxCurriculum/types/Breadcrumb';
+import { Node } from '@schoolboxCurriculum/types/Node';
+import { Breadcrumb } from '@schoolboxCurriculum/types/Breadcrumb';
 
 export const useNodesStore = defineStore('mcNodes', () => {
     const nodes = ref<Node>(getEmptyNode()); // all the nodes currently loaded
@@ -62,7 +62,7 @@ export const useNodesStore = defineStore('mcNodes', () => {
      */
     async function loadSingleCurriculum() {
         if (nodes.value?.children !== null) {
-            const singleCurriculumId = nodes.value?.children[0]?.id;
+            const singleCurriculumId: number = nodes.value?.children[0]?.id;
             await useViewNodesStore().setNextSelected(singleCurriculumId);
         }
     }

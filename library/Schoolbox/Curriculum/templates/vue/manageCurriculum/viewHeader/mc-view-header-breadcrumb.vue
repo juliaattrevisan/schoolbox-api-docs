@@ -7,7 +7,7 @@
 
 import { shortenLength } from '@js/util/stringUtils';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
-import Breadcrumb from '@schoolboxCurriculum/types/Breadcrumb';
+import { Breadcrumb } from '@schoolboxCurriculum/types/Breadcrumb';
 
 interface Props {
     breadcrumb: Breadcrumb; // the relevant breadcrumb

@@ -12,7 +12,7 @@ import { defineStore } from 'pinia';
 import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
 import { UNSET_ID, getEmptyNode, sortNodes } from '@schoolboxCurriculum/js/nodeUtils';
 import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
-import Node from '@schoolboxCurriculum/types/Node';
+import { Node } from '@schoolboxCurriculum/types/Node';
 
 export const useActiveNodeStore = defineStore('mcActiveNode', () => {
     const node = ref<Node>(getEmptyNode()); // the currently selected node

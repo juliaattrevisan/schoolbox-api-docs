@@ -7,7 +7,7 @@ import { defineStore } from 'pinia';
 import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
 import { useActiveNodeStore } from '@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore';
 import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
-import Node from '@schoolboxCurriculum/types/Node';
+import { Node } from '@schoolboxCurriculum/types/Node';
 
 /**
  * Create a copy so the data is only updated once actually saved
