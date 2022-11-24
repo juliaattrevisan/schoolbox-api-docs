@@ -12,30 +12,29 @@ namespace Schoolbox\Comms\News\StickyStatus;
 use Schoolbox\Comms\News\Model;
 
 /**
- * Filter for an article's sticky status.
+ * Corrector for an article's sticky status.
  *
  * If the sticky config setting is disabled: set the sticky status to false.
  */
-class FilterStickyStatus
+class Corrector
 {
     /**
      * Constructor
      *
      * @param bool $configStickyEnabled Is the sticky config setting enabled?
      */
-    public function __construct(
-        private bool $configStickyEnabled,
-    ) {
+    public function __construct(private bool $configStickyEnabled)
+    {
     }
 
     /**
-     * Filter the article's sticky status.
+     * Correct the article's sticky status.
      *
      * @param Model $article
      * @return Model `$article`, with the sticky status set to false if the
      *               config is disabled.
      */
-    public function filter(Model $article): Model
+    public function apply(Model $article): Model
     {
         if (!$this->configStickyEnabled) {
             return $article->setSticky(false);

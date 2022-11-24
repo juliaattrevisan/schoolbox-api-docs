@@ -18,7 +18,7 @@ use PDOException;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\SaveForLater;
-use Schoolbox\Comms\News\StickyStatus\FilterStickyStatus;
+use Schoolbox\Comms\News\StickyStatus\Corrector;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\File\MimetypeMapper;
@@ -787,9 +787,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     public function filterStickyStatus(Model $model): bool
     {
-        (new FilterStickyStatus(
+        (new Corrector(
             $this->getConfigLoader()->get(ConfigMapper::COMMS_STICKY_ENABLED)
-        ))->filter($model);
+        ))->apply($model);
         return true;
     }
 }

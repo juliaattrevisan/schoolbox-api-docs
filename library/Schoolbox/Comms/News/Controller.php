@@ -31,7 +31,6 @@ use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\Lists\UserFeed;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\Interactions;
-use Schoolbox\Comms\News\StickyStatus\FilterStickyStatus;
 use Schoolbox\Comms\News\StickyStatus\ValidChangeStickyStatus;
 use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
