@@ -52,6 +52,11 @@ const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
 const DEFAULT_EVENT_DURATION    = 60 * 60 * 1000;
 const DEFAULT_ALLDAY_EVENT_DAYS = 1;
 
+/* Viewports smaller than this width will be presumed to be a small viewport
+ * such as a phone, vertical tablet, or similar device
+ */
+const SMALL_VIEWPORT_THRESHOLD = 768;
+
 const EVENT_SOURCE_ID = 'events';
 
 export default {
@@ -258,7 +263,7 @@ export default {
         onResize() {
             this.windowWidth = window.innerWidth
 
-            if (this.windowWidth < 768) {
+            if (this.windowWidth < SMALL_VIEWPORT_THRESHOLD) {
                 this.calendarApi.changeView('timeGridDay');
             } else {
                 this.calendarApi.changeView('timeGridWeek');
