@@ -31,6 +31,7 @@ use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\Lists\UserFeed;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\Interactions;
+use Schoolbox\Comms\News\StickyStatus\FilterStickyStatus;
 use Schoolbox\Comms\News\StickyStatus\ValidChangeStickyStatus;
 use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
@@ -98,6 +99,8 @@ class Controller extends Base
      * @param Thread\Mapper                    $threadMapper
      * @param CommentMapper                    $commentMapper
      * @param File\Mapper                      $fileMapper
+     * @param FilterStickyStatus               $filterStickyStatus      Filter for article's sticky status
+     * @param ValidChangeStickyStatus          $validChangeStickyStatus Spec pattern for if sticky status may be changed
      */
     public function __construct(
         Mapper $newsMapper,
@@ -113,7 +116,9 @@ class Controller extends Base
         Access $access,
         Thread\Mapper $threadMapper,
         CommentMapper $commentMapper,
-        File\Mapper $fileMapper
+        File\Mapper $fileMapper,
+        private FilterStickyStatus $filterStickyStatus,
+        private ValidChangeStickyStatus $validChangeStickyStatus,
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -227,7 +232,7 @@ class Controller extends Base
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'entityTypesData'       => $this->getEntityTypesData(),
-            'mayChangeStickyStatus' => $this->mayChangeStickyStatus(),
+            'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
         ])->setTab('news')->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -337,7 +342,7 @@ class Controller extends Base
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'       => $this->getEntityTypesData(),
-            'mayChangeStickyStatus' => $this->mayChangeStickyStatus(),
+            'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
         ])->setTab('news')->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -1450,7 +1455,7 @@ class Controller extends Base
         // Otherwise, only allow users who may change sticky status to do so.
         if (!($this->getConfigLoader()->get(ConfigMapper::COMMS_STICKY_ENABLED))) {
             $article->setSticky(false);
-        } elseif ($this->mayChangeStickyStatus()) {
+        } elseif ($this->validChangeStickyStatus->isSatisfiedBy($this->getUser())) {
             $article->setSticky((bool)($postData['sticky'] ?? false));
         }
 
@@ -1716,21 +1721,5 @@ class Controller extends Base
         if (Access::getInstance()->getFolderAccess($this->getUser(), $folderId) === UserAccess::ACCESS_DENY) {
             throw new AccessDenied("User {$this->getUser()->getId()} does not have access to folder $folderId");
         }
-    }
-
-
-    /**
-     * May the current user change an article's sticky status?
-     *
-     * @return bool
-     */
-    private function mayChangeStickyStatus(): bool
-    {
-        return (
-            new ValidChangeStickyStatus(
-                $this->access,
-                $this->getConfigLoader()->get(ConfigMapper::COMMS_STICKY_ENABLED),
-            )
-        )->isSatisfiedBy($this->getUser());
     }
 }
