@@ -73,7 +73,7 @@ class IsParentOfExternalUser implements IAuthorizationRule
         $child = $this->userMapper->findByExternalId($userId, Role::STUDENT);
 
         if ($user instanceof User) {
-            if ((new \Schoolbox\External\User())->isParentOf($user, $child)) {
+            if ($user->isParentOf($child)) {
                 return true;
             }
         }

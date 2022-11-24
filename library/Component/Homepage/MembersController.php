@@ -174,6 +174,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
             $studentPhotoHidden   = $this->getConfigLoader()->get('protect_student_photo');
             $viewer               = $this->getUser();
+            (new \Schoolbox\External\User())->loadChildren($viewer);
 
             if ($userListCount > 0) {
                 $i = 0;
@@ -213,7 +214,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                         if ($user->getRole()->isStudent()) {
                             if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
                                 $this->setVar('photo_block', '');
-                            } elseif ($viewer->getRole()->isParent() && !$externalUser->isParentOf($viewer, $user)) {
+                            } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user)) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');

@@ -52,8 +52,8 @@ class ModelToArray
             'schoolHouse'      => $this->convertSchoolHouse($user->getSchoolHouse()),
 
             // Null for now
-            'guardians'        => $externalUser?->getParents($user),
-            'students'         => $externalUser?->getChildren($user),
+            'guardians'        => $user->getParents($user),
+            'students'         => $user->getChildren($user),
 
             'impersonableUser' => $user->getLinkedUser(),
 

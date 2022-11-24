@@ -73,10 +73,13 @@ class IsParentOfUser implements IAuthorizationRule
     public function authorize(array $params = [], User $user = null)
     {
         if ($user) {
+            // May need to load children into user, as they are not guaranteed
+            // to be within the current user
             $externalUser = new \Schoolbox\External\User();
+            $externalUser->loadChildren([$user]);
             // Test each child against the user authorizer:
             // if any child passes that authorizer, pass this authorizer
-            foreach ($externalUser->getChildren($user) as $child) {
+            foreach ($user->getChildren() as $child) {
                 try {
                     $this->userAuthorizer->authorize($params, $child);
                     return true;

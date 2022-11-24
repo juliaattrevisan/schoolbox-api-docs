@@ -85,6 +85,8 @@ class ClassStatistics
          * Exclude hidden quizzes from the Assessments cube
          */
         $quizVisibility = new \Assess\Visibility();
+        //load children for the current user, to confirm they are the parent
+        (new \Schoolbox\External\User())->loadChildren([$user]);
         $quizVisibilities = $quizVisibility->getVisibilityArray($user, $_SESSION['user']);
 
         // retrieve ALL the submission boxes for this category

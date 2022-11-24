@@ -64,7 +64,7 @@ class Visibility
             $visibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
             $visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
         } else {
-            if ((new \Schoolbox\External\User())->isParentOf($currentUser, $student)) {
+            if ($currentUser->isParentOf($student)) {
                 $visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
             }
         }
