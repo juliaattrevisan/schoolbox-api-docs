@@ -4,12 +4,10 @@
 
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { getApiEndpoint } from '../../store/manageCurriculumStore';
+import { useStore } from '../../store/manageCurriculumStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
 
-
 export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
-
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
     const activeNodeCopy = ref({}); // hold a copy of the changes, only update once we confirm the changes
@@ -19,7 +17,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
      *
      * @param { object }
      */
-    function prompt (node) {
+    function prompt(node) {
         useActiveNodeStore().set(node);
         activeNodeCopy.value = getActiveNodeCopy(node);
         isOpen.value = true;
@@ -30,12 +28,12 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
      *
      * @param { object or null }
      */
-    async function update () {
+    async function update() {
         try {
             isProcessing.value = true;
             const activeNodeStore = useActiveNodeStore();
             const nodeId = activeNodeStore.node.id;
-            const response = await fetch(`${getApiEndpoint()}/${nodeId}`, {
+            const response = await fetch(`${useStore().getApiEndpoint()}/${nodeId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -49,7 +47,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
                 cancel();
                 return { id: nodeId, message: 'Node successfully updated' };
             } else {
-                throw new Error(responseJson.title, { ...responseJson } );
+                throw new Error(responseJson.title, { ...responseJson });
             }
         } catch (error) {
             throw new Error(error.message, error.options);
@@ -59,7 +57,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
     /**
      * to hide the update details prompt
      */
-    function cancel () {
+    function cancel() {
         useActiveNodeStore().unset();
         isOpen.value = false;
     }
@@ -71,9 +69,8 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
         prompt,
         update,
         cancel,
-    }
-
-})
+    };
+});
 
 /**
  * Create a copy so the data is only updated once actually saved
@@ -82,12 +79,12 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
  *
  * @returns { Object }
  */
- function getActiveNodeCopy (node) {
+function getActiveNodeCopy(node) {
     return {
         name: node.name,
         code: node.code,
         description: node.description,
-    }
+    };
 }
 
 /**
@@ -95,7 +92,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
  *
  * @returns { FormData }
  */
- function getFormData (node) {
+function getFormData(node) {
     return JSON.stringify({
         name: node.name,
         code: node.code,

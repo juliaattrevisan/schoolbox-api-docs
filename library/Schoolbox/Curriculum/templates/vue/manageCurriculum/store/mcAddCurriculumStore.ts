@@ -4,16 +4,13 @@
 
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { getApiEndpoint } from './manageCurriculumStore';
+import { useStore } from './manageCurriculumStore';
 import { useNodesStore } from './mcNodesStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 
-
 const UNSET_ID = -1;
 
-
 export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
-
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
     const curriculum = ref({});
@@ -22,7 +19,7 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
     /**
      * to display a prompt to add a curriculum
      */
-    function prompt () {
+    function prompt() {
         curriculum.value = getCurriculum();
         isOpen.value = true;
     }
@@ -30,10 +27,10 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
     /**
      * pass the new curriculum details to the backend
      */
-    async function add () {
+    async function add() {
         try {
             isProcessing.value = true;
-            const response = await fetch(`${getApiEndpoint()}/`, {
+            const response = await fetch(`${useStore().getApiEndpoint()}/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,7 +48,7 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
                 cancel();
                 return { id: newCurriculum.id, message: 'Curriculum successfully added' };
             } else {
-                throw new Error(responseJson.title, { ...responseJson } );
+                throw new Error(responseJson.title, { ...responseJson });
             }
         } catch (error) {
             throw new Error(error.message, error.options);
@@ -61,14 +58,14 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
     /**
      * to hide the add prompt
      */
-    function cancel () {
+    function cancel() {
         isOpen.value = false;
     }
 
     /**
      * to unset the id, called when the toast has already been displayed once
      */
-    function unsetId () {
+    function unsetId() {
         id.value = UNSET_ID;
     }
 
@@ -81,9 +78,8 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
         add,
         cancel,
         unsetId,
-    }
-
-})
+    };
+});
 
 /**
  * Pass empty fields to be added
@@ -92,12 +88,12 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
  *
  * @returns { Object }
  */
- function getCurriculum (node) {
+function getCurriculum(node) {
     return {
         name: '',
         code: '',
         description: '',
-    }
+    };
 }
 
 /**
@@ -105,7 +101,7 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
  *
  * @returns { FormData }
  */
- function getFormData (node) {
+function getFormData(node) {
     return JSON.stringify({
         name: node.name,
         code: node.code,

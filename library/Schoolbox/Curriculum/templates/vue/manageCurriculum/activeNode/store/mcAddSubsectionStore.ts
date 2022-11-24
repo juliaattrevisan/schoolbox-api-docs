@@ -4,18 +4,15 @@
 
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { getApiEndpoint } from '../../store/manageCurriculumStore';
+import { useStore } from '../../store/manageCurriculumStore';
 import { useActiveNodeStore } from './mcActiveNodeStore';
 import { useSelectedNodesStore } from '../../selectedNodes/store/mcSelectedNodesStore';
 
-
 const UNSET_ID = -1;
 
-
 export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
-
     const isProcessing = ref(false);
-    const isOpen = ref(false) // to notify that the prompt is opened / closed
+    const isOpen = ref(false); // to notify that the prompt is opened / closed
     const subsection = ref({});
     const id = ref(UNSET_ID); // the id of the last updated node
 
@@ -24,7 +21,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
      *
      * @param { object }
      */
-    function prompt (node) {
+    function prompt(node) {
         useActiveNodeStore().set(node);
         subsection.value = getSubsection();
         isOpen.value = true;
@@ -33,11 +30,11 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
     /**
      * pass the new subsections details to the backend
      */
-    async function add () {
+    async function add() {
         const activeNodeStore = useActiveNodeStore();
         try {
             isProcessing.value = true;
-            const response = await fetch(`${getApiEndpoint()}/${activeNodeStore.node.id}`, {
+            const response = await fetch(`${useStore().getApiEndpoint()}/${activeNodeStore.node.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -53,7 +50,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
                 cancel();
                 return { id: newNode.id, message: 'Subsection successfully added' };
             } else {
-                throw new Error(responseJson.title, { ...responseJson } );
+                throw new Error(responseJson.title, { ...responseJson });
             }
         } catch (error) {
             throw new Error(error.message, error.options);
@@ -65,7 +62,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
     /**
      * to hide the confirmation prompt
      */
-    function cancel () {
+    function cancel() {
         useActiveNodeStore().unset();
         isOpen.value = false;
     }
@@ -73,7 +70,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
     /**
      * to unset the id, called when the toast has already been displayed once
      */
-    function unsetId () {
+    function unsetId() {
         id.value = UNSET_ID;
     }
 
@@ -84,22 +81,21 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
         prompt,
         add,
         cancel,
-        unsetId
-    }
-
-})
+        unsetId,
+    };
+});
 
 /**
  * Pass empty fields to be added
  *
  * @returns { Object }
  */
-function getSubsection () {
+function getSubsection() {
     return {
         name: '',
         code: '',
         description: '',
-    }
+    };
 }
 
 /**
@@ -110,7 +106,7 @@ function getSubsection () {
  *
  * @returns { FormData }
  */
-function getFormData (subsection, node) {
+function getFormData(subsection, node) {
     return JSON.stringify({
         name: subsection.name,
         code: subsection.code,

@@ -5,19 +5,17 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { capitalizeFirstLetter } from '@js/util/stringUtils';
-import { getApiEndpoint } from '../../store/manageCurriculumStore';
+import { useStore } from '../../store/manageCurriculumStore';
 import { useSelectedNodesStore } from './mcSelectedNodesStore';
 
-
 export const useDeleteNodesStore = defineStore('mcDeleteNodes', () => {
-
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
 
     /**
      * to display a prompt to confirm a node removal
      */
-    function prompt () {
+    function prompt() {
         isOpen.value = true;
     }
 
@@ -27,7 +25,7 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', () => {
      *
      * @TODO - more extensive error checking needs to occur
      */
-    async function deleteNodes () {
+    async function deleteNodes() {
         try {
             isProcessing.value = true;
             const nodeDeletions = await Promise.all(getFetches());
@@ -54,16 +52,18 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', () => {
      *
      * @returns { Array }
      */
-    function getFetches () {
+    function getFetches() {
         const fetchList = [];
         const selectedNodesStore = useSelectedNodesStore();
         selectedNodesStore.nodes.forEach((node) => {
-            fetchList.push(fetch(`${getApiEndpoint()}/${node.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            }));
+            fetchList.push(
+                fetch(`${useStore().getApiEndpoint()}/${node.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+            );
         });
         return fetchList;
     }
@@ -73,7 +73,7 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', () => {
      *
      * @returns { string }
      */
-    function getSuccessMessage () {
+    function getSuccessMessage() {
         const nodeSingleOrPlural = capitalizeFirstLetter(useSelectedNodesStore().singleOrPlural);
         return `${nodeSingleOrPlural} successfully deleted`;
     }
@@ -81,7 +81,7 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', () => {
     /**
      * to hide the confirmation prompt
      */
-    function cancel () {
+    function cancel() {
         isOpen.value = false;
     }
 
@@ -91,6 +91,5 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', () => {
         prompt,
         deleteNodes,
         cancel,
-    }
-
-})
+    };
+});
