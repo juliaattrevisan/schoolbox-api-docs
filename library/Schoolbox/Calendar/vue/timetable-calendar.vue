@@ -83,7 +83,11 @@ export default {
                 start: null,
                 end: null,
             },
-            calendarOptions: {}
+            calendarOptions: {},
+
+            /* For deciding which display format to use
+             */
+            windowWidth: window.innerWidth
         }
     },
 
@@ -229,6 +233,10 @@ export default {
                 this.calendarApi = this.$refs.fullCalendar.getApi();
                 this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
                 this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
+
+                /* shanked from https://stackoverflow.com/questions/47219272/how-can-i-use-window-size-in-vue-how-do-i-detect-the-soft-keyboard
+                 */
+                window.addEventListener('resize', this.onResize);
             });
 
         this.registerListCustomInputFields();
@@ -237,10 +245,26 @@ export default {
         let quickSwitchIcon = document.createElement('a');
         quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
+    },
 
+    beforeDestroy() {
+        window.removeEventListener('resize', this.onResize);
     },
 
     methods: {
+        /**
+         * Change the display format depending on viewport size
+         */
+        onResize() {
+            this.windowWidth = window.innerWidth
+
+            if (this.windowWidth < 768) {
+                this.calendarApi.changeView('timeGridDay');
+            } else {
+                this.calendarApi.changeView('timeGridWeek');
+            }
+        },
+
         /**
          * Open the export modal.
          */
