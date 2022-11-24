@@ -182,6 +182,35 @@ class Calendar_Api_Config_Record
     }
 
     /**
+     * Encode config object for storage in db
+     * This is the pre-JSON encoding method, preserved for legacy purposes.
+     *
+     * @deprecated
+     * @param Calendar_Api_Config_Connector_Abstract $config
+     * @return $this
+     */
+    public function encodeConfigLegacy(Calendar_Api_Config_Connector_Abstract $config): self
+    {
+        $this->setConfig(base64_encode(serialize($config)));
+        return $this;
+    }
+
+    /**
+     * Decode config object when retrieving from db
+     * This is the pre-JSON decoding method, preserved for legacy purposes.
+     *
+     * @deprecated
+     * @return Calendar_Api_Config_Connector_Abstract
+     */
+    public function decodeConfigLegacy(): Calendar_Api_Config_Connector_Abstract
+    {
+        /** @var Calendar_Api_Config_Connector_Abstract $obj */
+        $obj = unserialize(base64_decode($this->getConfig()), [Calendar_Api_Config_Connector_Abstract::class]);
+        $obj->setFailedCount($this->getFailedCount());
+        return $obj;
+    }
+
+    /**
      * Activate this config record
      * @return Calendar_Api_Config_Record
      */

@@ -28,33 +28,17 @@ $app = new class extends CliTool\App {
             ->createModel()
             ->setEventType('SudsEvent') // This is actually the classname corresponding to Calendar/Api/Config/Connector/SudsTimetable.php
             ->setConnectorClass('Schoolbox')
-            ->deactivate();
-
-        $encodedConfig = encodeConfigUsingOldMethod($record->getConfig());
+            ->deactivate()
+            ->encodeConfigLegacy($config);
 
         $query = "
             INSERT INTO calendar_connector (event_type, connector_class, config, status)
-            VALUES ('SudsEvent', 'Schoolbox', :encodedConfig, 0)
+            VALUES ('Fixtures', 'Schoolbox', '{$record->getConfig()}', 0)
         ";
 
-        $this->getDatabaseInternal()->query($query, ['encodedConfig' => $encodedConfig]);
+        $this->getDatabaseInternal()->query($query);
     }
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app))->runApp();
-
-// Functions. //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Prior to SA-14746 (released in version 23.0.alpha1), this method was used to encode calendar subscriptions.
- * The old encoding method has been reproduced here so as to preserve the old behaviour in update scripts for
- * versions <23.0.alpha1.
- *
- * @param string $config
- * @return string
- */
-function encodeConfigUsingOldMethod(string $config): string
-{
-    return base64_encode(serialize($config));
-}
