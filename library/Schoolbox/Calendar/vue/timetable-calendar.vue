@@ -263,6 +263,9 @@ export default {
         onResize() {
             this.windowWidth = window.innerWidth
 
+            /* Dynamically change display format
+             * https://fullcalendar.io/docs/Calendar-changeView
+             */
             if (this.windowWidth < SMALL_VIEWPORT_THRESHOLD) {
                 this.calendarApi.changeView('timeGridDay');
             } else {
