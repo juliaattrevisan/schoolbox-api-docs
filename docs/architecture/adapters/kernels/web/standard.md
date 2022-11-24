@@ -52,12 +52,15 @@ request will be handled via the Aura system.
 `\Schoolbox\Application\WebRequest\Kernel::outputAuraContent` will perform the
 following actions required to output the results of an Aura-handled request:
 
-#### Fetching a module
+#### Fetch a module
 
 The matched route's name will contain a controller and action name:
 - the controller name will match the name of a module which has been loaded in
   the module cache
 - the action name will match a public method of that controller's class
+
+> e.g. if the route's name is "userModule.modify", the controller name will be
+> "userModule", and the action name will be "modify".
 
 This module will know how to build the controller which handles the request, and
 will also load the preloads and permission checks which are relevant to each of
@@ -72,7 +75,7 @@ The user authentication step will either:
   user based on that
 
 
-#### Preloading objects
+#### Preload objects
 
 The Aura router may parse a path into a set of parameters: e.g. the path
 `/adminv2/user/1/modify` may parse into a parameter set `{userId: 1}`.
@@ -86,15 +89,40 @@ search for a user whose ID is `1`: this user will be injected into the parameter
 set, thus resulting in the set `{userId: 1, user: <User object>}`
 
 
-#### Permission checking
+#### Check permissions
+
+The module may perform permission checks, in order to verify that the user
+authenticated in [User authentication](#user-authentication) is actually
+authorized to perform the action that they have requested.
+
+The parameters from the route, as well as from
+[Preloading objects](#preload-objects), may be passed into the module's
+permission check.
 
 
+#### Run the controller action
 
-that the current user has permission to perform the requested action
+At this point, the controller is then built from the module, and the requested
+action is run.
+
+The controller method matching the name of the action is introspected for its
+parameters, and those parameters are matched against the route and preloader
+params: then, the controller method is called with those parameters.
 
 
-- run the controller action
-- render the results of that controller action
+#### Render the controller's output
+
+The controller method should have injected a
+`\Alaress\Web\Output\OutputInterface` instance into the controller's response
+object.
+
+This object's `output` method will then be called to generate actual output.
+
+Various variants of the output object exist, depending on the type of content
+to be output:
+- `\Alaress\Web\Controller\Base::buildHtmlOutput` can construct HTML output,
+  with the Schoolbox instance's headers, sidebars and footers
+- `\Alaress\Web\Controller\Base::buildJsonOutput` can construct JSON output
 
 
 ### Sitepage
