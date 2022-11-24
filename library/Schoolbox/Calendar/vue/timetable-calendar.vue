@@ -135,12 +135,12 @@ export default {
                 /* Only the Week view is used in Timetable Calendar
                  * Disabled the other two
                  */
-                // day: {
-                //     dayHeaders: false,
-                //     titleFormat: (date) => {
-                //         return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong); // will produce something like "Tuesday July 16th 2021"
-                //     }
-                // },
+                day: {
+                    dayHeaders: false,
+                    titleFormat: (date) => {
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong); // will produce something like "Tuesday July 16th 2021"
+                    }
+                },
                 week: {
                     dayHeaderFormat: (date) => {
                         return dayjs(date.date.array).format(this.formats.displayWeekDay);
@@ -149,13 +149,13 @@ export default {
                         return this.fullCalendarHelper_titleFormatWeek(date);
                     }
                 },
-                // list: {
-                //     buttonText: 'List',
-                //     duration: this.duration,
-                //     listDayFormat: (date) => {
-                //         return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong);
-                //     }
-                // }
+                list: {
+                    buttonText: 'List',
+                    duration: this.duration,
+                    listDayFormat: (date) => {
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong);
+                    }
+                }
             },
             eventTimeFormat: (date) => {
                 return this.fullCalendarHelper_eventTimeFormat(date);
@@ -191,15 +191,15 @@ export default {
                 left: 'quickSwitchButton,customToday,customPrev,customNext',
                 center: 'title',
                 // right: 'customFilters,list,dayGridMonth,timeGridWeek,timeGridDay,customExport'
-                right: ''
+                right: 'timeGridWeek,timeGridDay'
             },
             buttonText: {
                 today:    'Today',
                 /* Didn't need any of these extra buttons in Timetable View
                  */
                 // month:    'Month',
-                // week:     'Week',
-                // day:      'Day',
+                week:     'Week',
+                day:      'Day',
                 // list:     'List',
             },
             initialDate: this.config.defaultDate,
