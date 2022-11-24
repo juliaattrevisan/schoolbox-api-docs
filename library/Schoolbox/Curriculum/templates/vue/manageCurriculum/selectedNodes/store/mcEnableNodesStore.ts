@@ -4,8 +4,8 @@
 
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { useStore } from '../../store/manageCurriculumStore';
-import { useSelectedNodesStore } from './mcSelectedNodesStore';
+import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
+import { useSelectedNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore';
 
 export const useEnableNodesStore = defineStore('mcEnableNodes', () => {
     const isProcessing = ref(false);
@@ -15,18 +15,25 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', () => {
     /**
      * to display a prompt to confirm a node enabled change
      *
-     * @param { boolean }
+     * @param { boolean } newEnabled - whether to enable or disable the selected nodes
      */
-    function prompt(newEnabled) {
+    function prompt(newEnabled: boolean) {
         enabled.value = newEnabled;
         isOpen.value = true;
+    }
+
+    /**
+     * to hide the confirmation prompt
+     */
+    function cancel() {
+        isOpen.value = false;
     }
 
     /**
      * node enable/disable has been confirmed so notify the backend
      * and update the frontend to match
      *
-     * @TODO - more extensive error checking needs to occur
+     * @todo - more extensive error checking needs to occur
      */
     async function enable() {
         try {
@@ -40,9 +47,8 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', () => {
                 isProcessing.value = false;
                 cancel();
                 return successMessage;
-            } else {
-                throw new Error();
             }
+            throw new Error();
         } catch (error) {
             console.warn(error);
         }
@@ -52,10 +58,10 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', () => {
      * To delete all the marked nodes in parallel
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
      *
-     * @returns { Array }
+     * @returns { Array } - to individually enable/disable each node
      */
     function getFetches() {
-        const fetchList = [];
+        const fetchList: Promise<string> = [];
         const selectedNodesStore = useSelectedNodesStore();
         selectedNodesStore.nodes.forEach((node) => {
             fetchList.push(
@@ -83,13 +89,6 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', () => {
         const nodeSingleOrPlural = `Node${selectedNodesStore.count > 1 ? 's' : ''}`;
         const enabledOrDisabled = `${selectedNodesStore.nodes[0].enabled ? 'disabled' : 'enabled'}`;
         return `${nodeSingleOrPlural} successfully ${enabledOrDisabled}`;
-    }
-
-    /**
-     * to hide the confirmation prompt
-     */
-    function cancel() {
-        isOpen.value = false;
     }
 
     return {

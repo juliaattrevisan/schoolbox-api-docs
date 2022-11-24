@@ -8,71 +8,58 @@
 
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { useNodesStore } from '../../store/mcNodesStore';
+import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
 import { UNSET_ID, findById, getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
-import { useEnableNodesStore } from './mcEnableNodesStore';
-
+import { useEnableNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcEnableNodesStore';
+import Node from '@schoolboxCurriculum/types/Node';
 
 export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
-
-    const nodes = ref([]); // the currently selected nodes
-    const childNodes = ref([]); // any children of currently selected nodes
+    const nodes = ref<Node[]>([]); // the currently selected nodes
+    const childNodes = ref<Node[]>([]); // any children of currently selected nodes
     const activeNode = ref(getEmptyNode()); // to show extra info on a selected code in a modal
     const hasDisabledChildNodes = ref(false);
 
     /**
      * Do we have any selected nodes?
      *
-     * @return { Boolean }
+     * @returns { boolean }
      */
-    const hasNoNodes = computed(() => {
-        return nodes.value.length === 0;
-    });
+    const hasNoNodes = computed(() => nodes.value.length === 0);
 
     /**
      * Do we have any selected nodes?
      *
-     * @return { Boolean }
+     * @returns { boolean }
      */
-    const hasNodes = computed(() => {
-        return nodes.value.length > 0;
-    });
+    const hasNodes = computed(() => nodes.value.length > 0);
 
     /**
      * Number of nodes
      *
-     * @return { number }
+     * @returns { number }
      */
-    const count = computed(() => {
-        return nodes.value.length;
-    });
+    const count = computed(() => nodes.value.length);
 
     /**
      * Return the single or plural depending on node selection
      *
-     * @return { string }
+     * @returns { string }
      */
-    const singleOrPlural = computed(() => {
-        return count.value > 1 ? 'nodes' : 'node';
-    });
+    const singleOrPlural = computed(() => (count.value > 1 ? 'nodes' : 'node'));
 
     /**
      * just return an array of ids, used to compare if a node is selected or not
      *
-     * @return { array }
+     * @returns { array }
      */
-    const nodesIds = computed(() => {
-        return nodes.value.map((node) => node.id);
-    });
+    const nodesIds = computed(() => nodes.value.map((node) => node.id));
 
     /**
      * just return an array of ids, used to compare if a node is selected or not
      *
-     * @return { array }
+     * @returns { array }
      */
-    const childNodesIds = computed(() => {
-        return childNodes.value.map((node) => node.id);
-    });
+    const childNodesIds = computed(() => childNodes.value.map((node) => node.id));
 
     /**
      * check if all nodes are enabled so we can just show the disable button
@@ -83,9 +70,8 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
         if (hasNodes.value) {
             const enabledNodes = nodes.value.filter((node) => node.enabled);
             return enabledNodes.length === nodes.value.length;
-        } else {
-            return false;
         }
+        return false;
     });
 
     /**
@@ -98,56 +84,43 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
         if (hasNodes.value) {
             const enabledNodes = nodes.value.filter((node) => !node.enabled);
             const nodesStore = useNodesStore();
-            const noChildEnabledNodes = enabledNodes.filter((node) => { //prevent enabling child nodes of disabled parents
-                if (node.parent) { //could be the root level node, so won't have a parent
+            const noChildEnabledNodes = enabledNodes.filter((node) => {
+                // prevent enabling child nodes of disabled parents
+                if (node.parent) {
+                    // could be the root level node, so won't have a parent
                     const parentNode = findById(nodesStore.nodes.children, node.parent.id);
                     return parentNode.enabled ? true : false;
-                } else {
-                    return node.enabled ? false : true;
                 }
+                return node.enabled ? false : true;
             });
-            hasDisabledChildNodes.value = noChildEnabledNodes.length !== enabledNodes.length ? true : false; //show a note in the the UI that enabling child nodes of disabled parents is not possible
+            hasDisabledChildNodes.value = noChildEnabledNodes.length !== enabledNodes.length; // show a note in the the UI that enabling child nodes of disabled parents is not possible
             return noChildEnabledNodes.length === nodes.value.length;
-        } else {
-            return false;
         }
+        return false;
     });
 
     /**
      * To show further info on a selected node
      *
-     * @return { Boolean }
+     * @returns { boolean }
      */
-    const hasActiveNode = computed(() => {
-        return activeNode.value.id !== UNSET_ID ? true : false;
-    });
-
-    /**
-     * add a node
-     *
-     * @param { Object  }
-     */
-    function add (nodeToAdd) {
-        nodes.value = noChildrenOfNode(nodeToAdd);
-        nodes.value = [...nodes.value, nodeToAdd];
-        childNodes.value = removeChildNodes();
-        updateChildNodes(nodeToAdd, true, nodeToAdd.id);
-    }
+    const hasActiveNode = computed(() => activeNode.value.id !== UNSET_ID);
 
     /**
      * we need to check if a new parent has been selected of any existing children,
      * if it has the children should be removed as the parent now takes precedence
      *
-     * @param { Object }
-     *
+     * @param { Node } nodeToAdd - the Node to add
      * @returns { array }
      */
-    function noChildrenOfNode (nodeToAdd) {
+    function noChildrenOfNode(nodeToAdd: Node) {
         const noChildrenOfNode = nodes.value.filter((selectedNode) => {
-            if (nodeToAdd.children) { //only if the children have loaded
+            if (nodeToAdd.children) {
+                //only if the children have loaded
                 const node = findById(nodeToAdd.children, selectedNode.id);
                 return node !== undefined ? false : true; //only keep those nodes that aren't a child of the new node
-            } else { //otherwise no existing nodes will be children, as they haven't been loaded and so couldn't have been selected
+            } else {
+                //otherwise no existing nodes will be children, as they haven't been loaded and so couldn't have been selected
                 return true;
             }
         });
@@ -159,10 +132,22 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
      *
      * @returns { array }
      */
-    function removeChildNodes () {
+    function removeChildNodes() {
         return childNodes.value.filter((selectedChildNode) => {
             return nodesIds.value.includes(selectedChildNode.selectedParentId);
         });
+    }
+
+    /**
+     * add a node
+     *
+     * @param { Node } nodeToAdd - the Node to add
+     */
+    function add(nodeToAdd: Node) {
+        nodes.value = noChildrenOfNode(nodeToAdd);
+        nodes.value = [...nodes.value, nodeToAdd];
+        childNodes.value = removeChildNodes();
+        updateChildNodes(nodeToAdd, true, nodeToAdd.id);
     }
 
     /**
@@ -170,7 +155,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
      *
      * @param { Object }
      */
-    function remove (nodeToRemove) {
+    function remove(nodeToRemove) {
         updateChildNodes(nodeToRemove, false, nodeToRemove.id);
         nodes.value = nodes.value.filter((node) => node.id !== nodeToRemove.id);
     }
@@ -183,18 +168,19 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
      *
      * @param { object }
      */
-    function checkIfSelected (node) {
+    function checkIfSelected(node) {
         const parentNode = findById(useNodesStore().nodes.children, node.parent?.id);
         //no parent node, so it would be a root level node, already in the selected list, or already in the children of selected list
         if (parentNode === undefined || nodesIds.value.includes(node.id) || childNodesIds.value.includes(node.id)) {
             return;
         } else if (nodesIds.value.includes(parentNode.id)) {
             node.selectedParentId = parentNode.id; //add the base level selectedParentId
-            childNodes.value  = [...childNodes.value, node]; //and then add the node
-        } else if (childNodesIds.value.includes(parentNode.id)) { //if the parent is in the children of selected list, this node can also go in the list
+            childNodes.value = [...childNodes.value, node]; //and then add the node
+        } else if (childNodesIds.value.includes(parentNode.id)) {
+            //if the parent is in the children of selected list, this node can also go in the list
             const selectedParentNode = childNodes.value.find((node) => node.id === parentNode.id); //find the selected parent in the list
             node.selectedParentId = selectedParentNode.selectedParentId; //add the base level selectedParentId
-            childNodes.value  = [...childNodes.value, node]; //and then add the node
+            childNodes.value = [...childNodes.value, node]; //and then add the node
         }
     }
 
@@ -207,14 +193,18 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
      * @param { boolean }
      * @param { number }
      */
-    function updateChildNodes (node, isSelected, selectedParentId) {
+    function updateChildNodes(node, isSelected, selectedParentId) {
         if (isSelected) {
-            if (!nodesIds.value.includes(node.id) && !childNodesIds.value.includes(node.id)) { //don't include the parent node and nodes already in the child list
+            if (!nodesIds.value.includes(node.id) && !childNodesIds.value.includes(node.id)) {
+                //don't include the parent node and nodes already in the child list
                 node.selectedParentId = selectedParentId;
-                childNodes .value= [...childNodes.value, node];
+                childNodes.value = [...childNodes.value, node];
             }
-        } else { //use the .selectedParentId property to determine which child nodes to remove from the list
-            childNodes.value = childNodes.value.filter((selectedCode) => selectedCode.selectedParentId !== selectedParentId);
+        } else {
+            //use the .selectedParentId property to determine which child nodes to remove from the list
+            childNodes.value = childNodes.value.filter(
+                (selectedCode) => selectedCode.selectedParentId !== selectedParentId
+            );
         }
         node.children?.forEach((innerNode) => {
             updateChildNodes(innerNode, isSelected, selectedParentId);
@@ -227,14 +217,14 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
      * @param { object }
      * @param { boolean }
      */
-    function switchNode (node, isChecked) {
+    function switchNode(node, isChecked) {
         isChecked ? add(node) : remove(node);
     }
 
     /**
      * clear all the currently selected nodes
      */
-    function empty () {
+    function empty() {
         nodes.value.forEach((node) => remove(node));
     }
 
@@ -243,7 +233,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
      *
      * @param { object }
      */
-    function setActiveNode (node) {
+    function setActiveNode(node) {
         activeNode.value = node;
     }
 
@@ -252,7 +242,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
      *
      * @param { object }
      */
-    function enableNodes () {
+    function enableNodes() {
         const enabled = useEnableNodesStore().enabled;
         nodes.value.forEach((node) => enableAllChildren(node, enabled)); //set the enabled on each node
         empty();
@@ -265,7 +255,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
      * @param { array }
      * @param { boolean }
      */
-    function enableAllChildren (node, enabled) {
+    function enableAllChildren(node, enabled) {
         node.enabled = enabled;
         node.children?.forEach((innerNode) => {
             enableAllChildren(innerNode, enabled);
@@ -275,7 +265,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
     /**
      * Delete all the seleced nodes from the tree structure
      */
-    function deleteNodes () {
+    function deleteNodes() {
         const nodesStore = useNodesStore();
         nodes.value.forEach((node) => nodesStore.deleteNode(node)); //delete each node from the tree
         empty();
@@ -300,8 +290,6 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
         switchNode,
         setActiveNode,
         enableNodes,
-        deleteNodes
-    }
-
-})
-
+        deleteNodes,
+    };
+});
