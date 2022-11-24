@@ -237,6 +237,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /**
      * Student's boarding status (only used if boarder leave module is enabled)
      *
+     * @deprecated In 23.0, can be removed after that release
      * @var null|string
      */
     private $boardingStatus;
@@ -999,7 +1000,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      * Set boarding status (only if boarder leave is enabled)
      *
      * @param null|string $boardingStatus
-     *
+     * @deprecated In 23.0, can be removed after that release
      * @return $this
      */
     public function setBoardingStatus(?string $boardingStatus): self
@@ -1011,6 +1012,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /**
      * Get boarding status
      *
+     * @deprecated In 23.0, can be removed after that release
      * @return null|string
      */
     public function getBoardingStatus(): ?string
