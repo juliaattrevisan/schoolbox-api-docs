@@ -20,9 +20,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 class User
 {
-    private Collection $parents;
-    private Collection $children;
-    private Collection $teachers;
     private \External_User|null $externalUser;
     private \External_Class|null $externalClass;
     private UserMapper|null $userMapper;
@@ -61,76 +58,19 @@ class User
         if (null === $userMapper) {
             $this->userMapper = UserMapper::getInstance();
         }
-
-        $this->parents = new Collection();
-        $this->children = new Collection();
-        $this->teachers = new Collection();
-    }
-
-    /**
-     * Checks if the parents for $student have been loaded.
-     * If not, it will load them from the externalDB
-     * Then just return the collection of hydrated parents for $student
-     *
-     * @param \Schoolbox\User $student
-     * @return \Schoolbox\User[]|GenericCollection
-     */
-    public function getParents(\Schoolbox\User $student)
-    {
-        //load students if they have not been loaded
-        if (empty($this->parents) || empty($this->parents[$student->getExternalId()])) {
-            $this->loadParents([$student]);
-        }
-        //return $this->parents
-        return $this->parents[$student->getExternalId()];
-    }
-
-    /**
-     * Checks if the teachers for $student have been loaded.
-     * If not, it will load them from the externalDB
-     * Then just return the collection of hydrated teachers for $student
-     *
-     * @param \Schoolbox\User $student
-     * @return \Schoolbox\User[]|GenericCollection
-     */
-    public function getTeachers(\Schoolbox\User $student)
-    {
-        //load teachers if they have not been loaded
-        if (empty($this->teachers) || empty($this->teachers[$student->getExternalId()])) {
-            $this->loadTeachers([$student]);
-        }
-        //return teachers
-        return $this->teachers[$student->getExternalId()];
-    }
-
-    /**
-     * Checks if the children for $parent have been loaded.
-     * If not, it will load them from the externalDB
-     * Then just return the collection of hydrated students for $parent
-     *
-     * @param \Schoolbox\User $parent
-     * @return \Schoolbox\User[]|GenericCollection
-     */
-    public function getChildren(\Schoolbox\User $parent)
-    {
-        //load students if they have not been loaded
-        if (empty($this->children) || empty($this->children[$parent->getExternalId()])) {
-            $this->loadChildren([$parent]);
-        }
-        //return students
-        return $this->children[$parent->getExternalId()];
     }
 
     /**
      * Finds the parents for each $students from the external database (sis) and will hydrate user objects for each $parent
      * These are all stored in the $this->parents[$student.ExternalID] = [$parent]
      * @param \Schoolbox\User[] $students
-     * @return void
+     * @return Collection
      */
-    public function loadParents($students): void
+    public function loadParents($students): Collection
     {
+        $parents = new Collection();
         foreach ($students as $student) {
-            $this->parents[$student->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
+            $parents[$student->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
 
             $allParents = $this->externalUser->getStudentContactList([$student->getExternalId()]);
 
@@ -140,7 +80,7 @@ class User
                 if (!empty($currentParent['StudentContactID'])) {
                     try {
                         $parent = $this->userMapper->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
-                        $this->parents[$student->getExternalId()]->add($parent);
+                        $parents[$student->getExternalId()]->add($parent);
                     } catch (MapperException $e) {
                         //noop
                     }
@@ -150,13 +90,14 @@ class User
                 if (!empty($currentParent['StudentContactSpouseID'])) {
                     try {
                         $spouse = $this->userMapper->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
-                        $this->parents[$student->getExternalId()]->add($spouse);
+                        $parents[$student->getExternalId()]->add($spouse);
                     } catch (MapperException $e) {
                         //noop
                     }
                 }
             }
         }
+        return $parents;
     }
 
     /**
@@ -164,16 +105,16 @@ class User
      * These are all stored in the $this->teachers[$student.ExternalID] = [$teacher]
      *
      * @param \Schoolbox\User[] $students
-     * @return void
+     * @return Collection
      */
-    public function loadTeachers($students): void
+    public function loadTeachers($students): Collection
     {
         $codeMatcher       = (new ClassCodeMatchFactory())->build($this->externalType);
 
         // Get all of the students subjects
-
+        $teachers = new Collection();
         foreach ($students as $student) {
-            $this->teachers[$student->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
+            $teachers[$student->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
             $found                                     = [];
             $subjects                                  = $this->externalUser->getSubjectList($student);
 
@@ -186,7 +127,7 @@ class User
 
                     if (!isset($found[$teacher])) {
                         try {
-                            $this->teachers[$student->getExternalId()]->add(
+                            $teachers[$student->getExternalId()]->add(
                                 $this->userMapper->findByExternalId($teacher, Role::STAFF)
                             );
 
@@ -198,79 +139,29 @@ class User
                 }
             }
         }
+        return $teachers;
     }
 
     /**
      * Finds the children for each $parents from the external database (sis) and will hydrate user objects for each $child
      * These are all stored in the $this->children[$parent.ExternalID] = [$child]
      * @param \Schoolbox\User[] $parents
-     * @return void
+     * @return Collection
      */
-    public function loadChildren($parents): void
+    public function loadChildren($parents): Collection
     {
+        $children = new Collection();
         foreach ($parents as $parent) {
-            $this->children[$parent->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
+            $children[$parent->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
             $enrolments                             = $this->externalUser->getEnrolledStudents($parent->getExternalId());
             foreach ($enrolments as $child) {
                 try {
-                    $this->children[$parent->getExternalId()]->add($this->userMapper->findByExternalId($child['RelatedID']));
+                    $children[$parent->getExternalId()]->add($this->userMapper->findByExternalId($child['RelatedID']));
                 } catch (MapperException $e) {
                     // noop
                 }
             }
         }
-    }
-
-    /**
-     * Is this $parent a parent of $child?
-     *
-     * If the parents or children of the users have not been loaded
-     * this will hit the external db and load them
-     *
-     * First checks if any of $child's parents is $parent
-     * Then if that is inconclusive then check if any of $parent's children is $child
-     * I'm guessing this is due with split families, a child / parent relationship might be 1 direction
-     *
-     * @param \Schoolbox\User $parent
-     * @param \Schoolbox\User $child
-     * @return bool
-     */
-    public function isParentOf(\Schoolbox\User $parent, \Schoolbox\User $child): bool
-    {
-        /* Parents were never initialised for $child
-         * Their ancestry is inconclusive; continue
-         */
-        $parents = $this->getParents($child);
-        foreach ($parents as $parentTest) {
-            if ($parentTest->getId() == $parent->getId()) {
-                return true;
-            }
-        }
-
-        /* $this->children was never initialised for this user
-         * Their descendents are inconclusive; continue
-         */
-        foreach ($this->getChildren($parent) as $currentChild) {
-            if ($currentChild->getId() == $child->getId()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Is this $child a child of $parent?
-     *
-     * Just calls self::isParentOf($parent, $child)
-     * @see self::isParentOf()
-     *
-     * @param \Schoolbox\User $parent
-     * @param \Schoolbox\User $child
-     * @return bool
-     */
-    public function isChildOf(\Schoolbox\User $parent, \Schoolbox\User $child): bool
-    {
-        return $this->isParentOf($parent, $child);
+        return $children;
     }
 }

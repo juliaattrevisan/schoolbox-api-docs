@@ -242,6 +242,30 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     protected $config_loader;
 
+    /**
+     * Collection of parents, used for identifying relationships the user has.
+     *
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadParents
+     * @var Collection|User[]|null
+     */
+    protected $parents;
+
+    /**
+     * Collection of teachers, used for identifying relationships the user has.
+     *
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadTeachers
+     * @var Collection|User[]|null
+     */
+    protected $teacherCollection = null;
+
+    /**
+     * Collection of children, used for identifying relationships the user has.
+     *
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadChildren
+     * @var GenericCollection|User[]|null
+     */
+    private $children = null;
+
     /** @var GenericCollection|Pastoral\Group\Member\Model[] */
     private $pastoralGroupsMemberships;
 
@@ -1063,6 +1087,79 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         return $this->config_loader;
     }
 
+    /**
+     * Is this user a parent of $child?
+     *
+     * Requires that either:
+     * - `loadParents()` has been called on $child, or
+     * - this user is the current session user (and hence their children were loaded during session creation)
+     *
+     * @param  User $child
+     * @return bool
+     */
+    public function isParentOf(User $child): bool
+    {
+        /* Parents were never initialised for $child
+         * Their ancestry is inconclusive; continue
+         */
+        if (null !== $child->getParents()) {
+            foreach ($child->getParents() as $parent) {
+                if ($parent->getId() == $this->getId()) {
+                    return true;
+                }
+            }
+        }
+
+        /* $this->children was never initialised for this user
+         * Their descendents are inconclusive; continue
+         */
+        if (null !== $this->children) {
+            foreach ($this->children as $currentChild) {
+                if ($currentChild->getId() == $child->getId()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Is this user a child of $parent?
+     *
+     * Requires that `loadParents()` has been called on this user.
+     *
+     * @param  User $parent
+     * @return bool
+     */
+    public function isChildOf(User $parent): bool
+    {
+        return $parent->isParentOf($this);
+    }
+
+    /**
+     * @param GenericCollection<User> $parents
+     * @return User
+     */
+    public function setParents(GenericCollection $parents): self
+    {
+        $parents->assertCollectionOf(self::class);
+        $this->parents = $parents;
+        return $this;
+    }
+
+
+    /**
+     * Get the parents associated with this user
+     *
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadParents
+     *
+     * @return Collection|self[]|null
+     */
+    public function getParents()
+    {
+        return $this->parents;
+    }
 
     /**
      * Hide the sidenav
@@ -1177,6 +1274,51 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function setHideSidenav(?bool $hideSidenav): self
     {
         $this->hideSidenav = $hideSidenav;
+        return $this;
+    }
+
+    /**
+     * Collection of teachers, used for identifying relationships the user has.
+     *
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadTeachers
+     * @return Collection<User>|null
+     */
+    public function getTeacherCollection()
+    {
+        return $this->teacherCollection;
+    }
+
+    /**
+     * @param Collection<User> $teacherCollection
+     * @return $this
+     */
+    public function setTeacherCollection($teacherCollection)
+    {
+        $this->teacherCollection = $teacherCollection;
+        return $this;
+    }
+
+
+    /**
+     * Collection of children, used for identifying relationships the user has.
+     *
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadChildren
+     * @return GenericCollection<User>|null
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+
+    /**
+     * @param GenericCollection<User> $children
+     * @return $this
+     */
+    public function setChildren(GenericCollection $children): self
+    {
+        $children->assertCollectionOf(self::class);
+        $this->children = $children;
         return $this;
     }
 
