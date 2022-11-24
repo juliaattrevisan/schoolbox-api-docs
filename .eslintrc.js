@@ -26,8 +26,5 @@ module.exports = {
     root: true, // limits ESLint to this folder (wont go up parent folders)
     rules: { // customised rules
         "import/prefer-default-export": "off", // Pinia especially uses a single export
-        "@typescript-eslint/no-unsafe-assignment": "off", //
-        "@typescript-eslint/no-unsafe-member-access": "off", //
-        "@typescript-eslint/no-unsafe-call": "off", //
     },
 }

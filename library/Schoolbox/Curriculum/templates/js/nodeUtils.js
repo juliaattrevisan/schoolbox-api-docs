@@ -103,9 +103,8 @@ export function removeId (data, id) {
             }
             return previousValue;
         }, []);
-    } else {
-        return data;
     }
+    return data;
 }
 
 /**
