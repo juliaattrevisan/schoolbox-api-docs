@@ -69,7 +69,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         foreach ($this->children as $child) {
             // Check if the current child's timetable is viewable and hide if necessary
             try {
-                $userChild = $this->externalUser->getChildren($this->getUser())->getBy('id', $child['id']);
+                $userChild = $this->getUser()->getChildren()->getBy('id', $child['id']);
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 continue;
             }
