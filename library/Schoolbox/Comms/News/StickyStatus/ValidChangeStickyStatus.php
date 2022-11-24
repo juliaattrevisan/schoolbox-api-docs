@@ -5,7 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Comms\News;
+namespace Schoolbox\Comms\News\StickyStatus;
 
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
@@ -13,8 +13,8 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
 /**
- * Is the user allowed to change the sticky (a.k.a. priority) status of an
- * article?
+ * Spec pattern for checking whether the user may change the sticky
+ * (a.k.a. priority) status of an article.
  */
 class ValidChangeStickyStatus
 {
