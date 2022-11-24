@@ -7,6 +7,7 @@ RENAME TABLE lu_leave_request_host_type TO _lu_leave_request_host_type;
 RENAME TABLE lu_leave_request_travel_type TO _lu_leave_request_travel_type;
 RENAME TABLE leave_request TO _leave_request;
 
+ALTER TABLE user CHANGE boarding_status _boarding_status varchar(255) null;
 
 -- Remove database config for Board Leave page.
 DELETE FROM config
@@ -16,6 +17,9 @@ WHERE type_id IN (
    WHERE type='Board Leave'
 );
 DELETE FROM lu_config_type WHERE type='Board Leave';
+
+
+DELETE FROM config WHERE name LIKE "boarder_leave_enabled";
 
 
 -- Delete no longer used error constant.

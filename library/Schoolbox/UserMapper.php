@@ -139,17 +139,6 @@ class UserMapper extends Mapper
             )
         );
 
-        // Boarder leave field is only there if the boarder leave module is enabled.
-
-        $this->hasMap(
-            array(
-                'column' => 'boarding_status',
-                'property' => 'boardingStatus',
-                'type' => self::TYPE_STRING,
-                'enabled' => 0
-            )
-        );
-
         // Setup callbacks
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setDefaultDisplayGradeGraph']);
