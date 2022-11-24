@@ -1,7 +1,7 @@
 <?php
 
 /**
- * External interface for accessing users relationships as specified by the SIS
+ * External interface for loading users relationships as specified by the SIS
  *
  * @author      Justin Clarke <justin.clarke@schoolbox.com.au>
  * @copyright   Copyright 2022, Schoolbox Pty Ltd
@@ -26,8 +26,8 @@ class User
     private string|null $externalType;
 
     /**
-     * Create the interface for checking a users relationships from a sis.
-     * Can load multiple users at once, or will load just the relationship that hs been requested
+     * Hydrator to load relationships for users from external databases
+     * Can load multiple users at once, or will load just the relationship that has been requested
      *
      * If you do not inject into this class, it will spawn the following:
      * ConfigMapper instance, to get the external db type
@@ -62,15 +62,15 @@ class User
 
     /**
      * Finds the parents for each $students from the external database (sis) and will hydrate user objects for each $parent
-     * These are all stored in the $this->parents[$student.ExternalID] = [$parent]
+     * Then return the collection
+     *
      * @param \Schoolbox\User[] $students
-     * @return Collection
+     * @return \Schoolbox\User[]
      */
-    public function loadParents($students): Collection
+    public function loadParents($students): array
     {
-        $parents = new Collection();
         foreach ($students as $student) {
-            $parents[$student->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
+            $parents = new GenericCollection(\Schoolbox\User::class);
 
             $allParents = $this->externalUser->getStudentContactList([$student->getExternalId()]);
 
@@ -96,25 +96,25 @@ class User
                     }
                 }
             }
+            $student->setParents($parents);
         }
-        return $parents;
+        return $students;
     }
 
     /**
      * Finds the teachers for each $students from the external database (sis) and will hydrate user objects for each $teacher
-     * These are all stored in the $this->teachers[$student.ExternalID] = [$teacher]
+     * Then return the collection
      *
      * @param \Schoolbox\User[] $students
-     * @return Collection
+     * @return \Schoolbox\User[]
      */
-    public function loadTeachers($students): Collection
+    public function loadTeachers($students): array
     {
         $codeMatcher       = (new ClassCodeMatchFactory())->build($this->externalType);
 
         // Get all of the students subjects
-        $teachers = new Collection();
         foreach ($students as $student) {
-            $teachers[$student->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
+            $teachers = new GenericCollection(\Schoolbox\User::class);
             $found                                     = [];
             $subjects                                  = $this->externalUser->getSubjectList($student);
 
@@ -138,21 +138,22 @@ class User
                     }
                 }
             }
+            $student->setTeacherCollection($teachers);
         }
-        return $teachers;
+        return $students;
     }
 
     /**
      * Finds the children for each $parents from the external database (sis) and will hydrate user objects for each $child
-     * These are all stored in the $this->children[$parent.ExternalID] = [$child]
+     * Then return the collection
+     *
      * @param \Schoolbox\User[] $parents
-     * @return Collection
+     * @return \Schoolbox\User[]
      */
-    public function loadChildren($parents): Collection
+    public function loadChildren($parents): array
     {
-        $children = new Collection();
         foreach ($parents as $parent) {
-            $children[$parent->getExternalId()] = new GenericCollection(\Schoolbox\User::class);
+            $children = new GenericCollection(\Schoolbox\User::class);
             $enrolments                             = $this->externalUser->getEnrolledStudents($parent->getExternalId());
             foreach ($enrolments as $child) {
                 try {
@@ -161,7 +162,8 @@ class User
                     // noop
                 }
             }
+            $parent->setChildren($children);
         }
-        return $children;
+        return $parents;
     }
 }
