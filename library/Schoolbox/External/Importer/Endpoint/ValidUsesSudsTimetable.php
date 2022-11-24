@@ -43,11 +43,11 @@ class ValidUsesSudsTimetable
      * $dataSource corresponds to schooldata_import_data_source in config
      * (You could convert Factory::NAME to a more comprehensive hash lookup)
      *
-     * @param string $externalDb
-     * @param string $dataSource
+     * @param string|null $externalDb
+     * @param string|null $dataSource
      * @return bool
      */
-    public function isSatisfiedBy(string $externalDb, string $dataSource): bool
+    public function isSatisfiedBy(?string $externalDb, ?string $dataSource): bool
     {
         /* You also have to be on the Schoolbox connector, not some other live connector
          * This can occur when you trade SUDS for a Live connector or vice versa,
