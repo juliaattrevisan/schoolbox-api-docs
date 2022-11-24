@@ -785,7 +785,8 @@ class Controller extends ConfigController
                 /* No parents found for the current guy
                  * Exit - nothing to render
                  */
-                $parents = $this->externalUser->getParents($student);
+                $this->externalUser->loadParents([$student]);
+                $parents = $student->getParents();
                 if (!$parents->count()) {
                     $this->sendError(sprintf(
                         'Unable to generate report for student id %d (%s). No parents.',

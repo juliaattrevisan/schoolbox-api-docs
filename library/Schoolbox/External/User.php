@@ -10,6 +10,7 @@
 
 namespace Schoolbox\External;
 
+use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
@@ -63,7 +64,7 @@ class User
      * Finds the parents for each $students from the external database (sis) and will hydrate user objects for each $parent
      * Then return the collection
      *
-     * @param \Schoolbox\User[] $students
+     * @param \Schoolbox\User[]|Collection $students
      * @return \Schoolbox\User[]
      */
     public function loadParents($students): array
@@ -146,7 +147,7 @@ class User
      * Finds the children for each $parents from the external database (sis) and will hydrate user objects for each $child
      * Then return the collection
      *
-     * @param \Schoolbox\User[] $parents
+     * @param \Schoolbox\User[]|Collection $parents
      * @return \Schoolbox\User[]
      */
     public function loadChildren($parents): array

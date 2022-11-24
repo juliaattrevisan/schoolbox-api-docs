@@ -151,7 +151,8 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Send it to all their teachers (across all subjects)
-        $audience = $this->externalUser->getTeachers($owner);
+        $this->externalUser->loadTeachers([$owner]);
+        $audience = $owner->getTeacherCollection();
 
         return $this->notifyCommented($comment, $effector, $audience, Role::STAFF);
     }
@@ -251,7 +252,10 @@ class Notifier extends AbstractModuleNotifier
 
         $audience = $this->userMapper->createCollection();
 
-        foreach ($this->externalUser->getParents($owner) as $parent) {
+        //make it easier, hit the db here and here again...
+        $this->externalUser->loadParents([$owner]);
+        $this->externalUser->loadParents($owner->getParents());
+        foreach ($owner->getParents() as $parent) {
             try {
                 if ($this->access->userCanView($post, $parent)) {
                     $audience[$parent->getId()] = $parent;
@@ -295,7 +299,9 @@ class Notifier extends AbstractModuleNotifier
     {
         $post     = $this->postMapper->findById($comment->getBlog()->getId());
         $audience = $this->userMapper->createCollection();
-        foreach ($this->getOtherCommentAuthors($comment, Role::STUDENT) as $student) {
+        $studentAuthors = $this->getOtherCommentAuthors($comment, Role::STUDENT);
+        $this->externalUser->loadParents($studentAuthors);
+        foreach ($studentAuthors as $student) {
             if ($this->access->userCanView($post, $student)) {
                 $audience[$student->getId()] = $student;
             }
@@ -320,7 +326,9 @@ class Notifier extends AbstractModuleNotifier
         $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId()));
 
         $audience = $this->userMapper->createCollection();
-        foreach ($this->getOtherCommentAuthors($comment, Role::PARENT) as $parent) {
+        $parentAuthors = $this->getOtherCommentAuthors($comment, Role::PARENT);
+        $this->externalUser->loadChildren($parentAuthors);
+        foreach ($parentAuthors as $parent) {
             if ($this->access->userCanView($post, $parent)) {
                 $audience[$parent->getId()] = $parent;
             }
@@ -430,10 +438,11 @@ class Notifier extends AbstractModuleNotifier
         $post     = $this->postMapper->findById($comment->getBlog()->getId());
         $owner    = $this->userMapper->findById($post->getPage()->getOwner()->getId());
 
+        $this->externalUser->loadChildren($audience);
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action
             /** @var User $target */
-            $effectorParam = Role::PARENT === $roleType && $this->externalUser->isParentOf($target, $effector)
+            $effectorParam = Role::PARENT === $roleType && $target->isParentOf($effector)
                 ? new ChildParam($effector)
                 : new UserParam($effector);
 
@@ -446,7 +455,7 @@ class Notifier extends AbstractModuleNotifier
                 // Did effector comment on their own blog?
                 $ownerToken = 'their';
                 $ownerParam = [];
-            } elseif (Role::PARENT === $roleType && $this->externalUser->isParentOf($target, $owner)) {
+            } elseif (Role::PARENT === $roleType && $target->isParentOf($owner)) {
                 // Are we sending to post owner's parents?
                 $ownerToken = ":student's";
                 $ownerParam = ['student' => new ChildParam($owner)];

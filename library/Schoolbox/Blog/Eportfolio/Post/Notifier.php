@@ -121,7 +121,8 @@ class Notifier extends AbstractModuleNotifier
             }
 
             // Send it to all their teachers (across all subjects)
-            $audience = $this->externalUser->getTeachers($owner);
+            $this->externalUser->loadTeachers([$owner]);
+            $audience = $owner->getTeacherCollection();
 
             return $this->notifyPosted($post, $owner, $effector, $audience, Role::STAFF);
         } catch (Exception $e) {
@@ -231,12 +232,15 @@ class Notifier extends AbstractModuleNotifier
             return new Envelope();
         }
 
-        // Send it to all their parents
-        $parents = $this->externalUser->getParents($owner);
         $audience = $this->userMapper->createCollection();
         // Need to explicitly set page owner
         $post->getPage()->setOwner($owner);
 
+        // Send it to all their parents
+        //hit the external db, and hit it again for good measure
+        $this->externalUser->loadParents([$owner]);
+        $parents = $owner->getParents();
+        $this->externalUser->loadChildren($parents);
         foreach ($parents as $parent) {
             try {
                 if ($this->access->userCanView($post, $parent)) {
@@ -266,10 +270,12 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
+        //hit the db and load all parents for the audience members
+        $this->externalUser->loadChildren($audience);
         foreach ($audience as $target) {
             /** @var User $target */
             // Just first name if advising parent of child's action
-            $effectorParam = Role::PARENT === $roleType && $this->externalUser->isParentOf($target, $effector)
+            $effectorParam = Role::PARENT === $roleType && $target->isParentOf($effector)
                 ? new ChildParam($effector)
                 : new UserParam($effector);
 
@@ -282,7 +288,7 @@ class Notifier extends AbstractModuleNotifier
                 // Did effector comment on their own blog?
                 $ownerToken = 'their';
                 $ownerParam = [];
-            } elseif (Role::PARENT === $roleType && $this->externalUser->isParentOf($target, $owner)) {
+            } elseif (Role::PARENT === $roleType && $target->isParentOf($owner)) {
                 // Are we sending to post owner's parents?
                 $ownerToken = ":student's";
                 $ownerParam = ['student' => new ChildParam($owner)];

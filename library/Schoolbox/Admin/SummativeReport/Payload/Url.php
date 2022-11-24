@@ -130,12 +130,13 @@ class Url
         $warnings = [];
         $filenames = [];
 
+        $this->externalUser->loadParents($reportStudents);
         foreach ($reportStudents as $student) {
             if (isset($optionsPayload['viewAs']) && $optionsPayload['viewAs'] === Role::PARENT) {
                 /* Student doesn't have parents, but we tried to make reports
                  * formatted specifically for parents; skip them
                  */
-                if ($this->externalUser->getParents($student)->count() === 0) {
+                if ($student->getParents()->count() === 0) {
                     $warnings[] = sprintf(
                         'Unable to generate report for student id %d (%s). No parents.',
                         $student->getId(),

@@ -153,7 +153,8 @@ class Submission implements ISoftDeletable
         }
 
         // Parents can view their own children's submissions
-        if ((new \Schoolbox\External\User())->isChildOf($user, $this->getOwner())) {
+        (new \Schoolbox\External\User())->loadChildren([$user]);
+        if ($user->isChildOf($this->getOwner())) {
             return true;
         }
 

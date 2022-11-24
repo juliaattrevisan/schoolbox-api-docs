@@ -56,7 +56,7 @@ class Access
 
         if ($role->isParent()) {
             // parents have access if the page is flagged as such...
-            if ($this->isPostVisibleToParents($post) && (new \Schoolbox\External\User())->isParentOf($user, $post->getPage()->getOwner())) {
+            if ($this->isPostVisibleToParents($post) && $user->isParentOf($post->getPage()->getOwner())) {
                 return true;
             }
 

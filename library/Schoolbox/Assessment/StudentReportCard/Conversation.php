@@ -50,8 +50,10 @@ class Conversation
              * list of participants
              */
 
+            //hit the external db and load the parents
+            (new \Schoolbox\External\User())->loadParents([$student]);
             $this->participants = $this->participants->add($student)
-                ->merge((new \Schoolbox\External\User())->getParents($student))
+                ->merge($student->getParents())
                 ->merge($subject->getTeachers());
         }
 
