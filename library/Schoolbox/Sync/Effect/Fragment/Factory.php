@@ -70,7 +70,6 @@ class Factory
 
         'residentialHouse' => 'Residential House',
         'schoolHouse' => 'School House',
-        'boardingStatus' => 'Boarding Status',
 
         'localEmail' => 'Email Address from Username',
         'useInternalMail' => 'Use External Mail Client',

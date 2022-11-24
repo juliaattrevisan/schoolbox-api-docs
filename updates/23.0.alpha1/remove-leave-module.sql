@@ -21,6 +21,7 @@ DELETE FROM lu_config_type WHERE type='Board Leave';
 
 DELETE FROM config WHERE name LIKE "boarder_leave_enabled";
 
+DELETE FROM ups_effect WHERE user_property = 'boardingStatus';
 
 -- Delete no longer used error constant.
 DELETE
