@@ -4,7 +4,14 @@
 
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { UNSET_ID, findById, sortByName, removeId, getBreadcrumbs } from '@schoolboxCurriculum/js/nodeUtils';
+import {
+    UNSET_ID,
+    findById,
+    sortByName,
+    removeId,
+    getBreadcrumbs,
+    getEmptyNode,
+} from '@schoolboxCurriculum/js/nodeUtils';
 import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
 import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
 import { useSelectedNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore';
@@ -12,7 +19,7 @@ import Node from '@schoolboxCurriculum/types/Node';
 import Breadcrumb from '@schoolboxCurriculum/types/Breadcrumb';
 
 export const useNodesStore = defineStore('mcNodes', () => {
-    const nodes = ref<Node | null>(null); // all the nodes currently loaded
+    const nodes = ref<Node>(getEmptyNode()); // all the nodes currently loaded
     const isLoading = ref(false); // to display loading note
     const hasLoadError = ref(false); // to display loading error
 

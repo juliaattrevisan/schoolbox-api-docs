@@ -29,7 +29,7 @@ const descriptionField = useDescriptionEditor(addCurriculumStore.curriculum?.des
 /**
  * And watch for changes on this field so we can update the description in the store
  */
-watch(descriptionField, (newValue) => {
+watch(descriptionField, (newValue: string) => {
     addCurriculumStore.curriculum.description = newValue;
 });
 

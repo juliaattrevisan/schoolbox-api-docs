@@ -7,6 +7,7 @@ import { defineStore } from 'pinia';
 import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
 import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
 import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 import Node from '@schoolboxCurriculum/types/Node';
 
 const UNSET_ID = -1;
@@ -25,7 +26,7 @@ function getCurriculum() {
 }
 
 /**
- * Pass through the group id
+ * Get the data to pass to the backend
  *
  * @param { Node } node - the node with the fields to update
  * @returns { string } - the data to send to the backend
@@ -41,7 +42,7 @@ function getFormData(node: Node) {
 export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
-    const curriculum = ref<Node | null>(null);
+    const curriculum = ref<Node>(getEmptyNode());
     const id = ref(UNSET_ID); // the id of the last updated node
 
     /**
@@ -70,12 +71,12 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: getFormData(curriculum.value),
+                body: getFormData(curriculum.value as Node),
             });
             const responseJson: Node = (await response.json()) as Node;
             if (response.ok) {
                 const newCurriculum: Node = responseJson;
-                id.value = newCurriculum.id;
+                id.value = newCurriculum.id as number;
                 const nodesStore = useNodesStore();
                 nodesStore.addNewCurriculum(newCurriculum);
                 useViewNodesStore().setSelected(0);

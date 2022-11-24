@@ -2,6 +2,8 @@
  * Various utils related to managing curriculum nodes
  */
 
+import Node from '@schoolboxCurriculum/types/Node';
+
 /**
  * To indicate that a node should be invalid and unset
  * used as the base 'node' to show all Curricula in the curriculum display list
@@ -18,12 +20,13 @@ const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' })
  * return an empty node, usually used to indicate there's currently
  * nothing to display
  *
- * @returns { object }
+ * @returns { Node } the empty Node
  */
-export function getEmptyNode () {
+export function getEmptyNode(): Node {
     return {
         id: UNSET_ID,
-    }
+        name: '',
+    };
 }
 
 /**
@@ -34,7 +37,7 @@ export function getEmptyNode () {
  * @param { array }
  * @param { number }
  */
-export function findById (array, id) {
+export function findById(array, id) {
     for (const item of array) {
         if (item.id === id) {
             return item;
@@ -54,13 +57,15 @@ export function findById (array, id) {
  * @param { object }
  * @param { object }
  */
- function sortNodesByCodeThenName (aNode, bNode) {
+function sortNodesByCodeThenName(aNode, bNode) {
     const aHasCode = aNode.code !== '';
     const bHasCode = bNode.code !== '';
-    if (aHasCode && bHasCode) { // if both have codes, sort by the code
+    if (aHasCode && bHasCode) {
+        // if both have codes, sort by the code
         return collator.compare(aNode.code, bNode.code);
     }
-    if (!aHasCode && !bHasCode) { // if both have no code, just sort by name
+    if (!aHasCode && !bHasCode) {
+        // if both have no code, just sort by name
         return collator.compare(aNode.name, bNode.name);
     }
     return aHasCode ? -1 : bHasCode ? 1 : 0; // those with a code take precendence over those without
@@ -72,7 +77,7 @@ export function findById (array, id) {
  * @param { array }
  * @returns { array }
  */
-export function sortNodes (nodes) {
+export function sortNodes(nodes) {
     const nodesWithOrder = nodes.filter((node) => node.order !== 0); // to prioritise nodes with order
     if (nodesWithOrder.length > 0) {
         nodesWithOrder.sort((aNode, bNode) => aNode.order - bNode.order); // sort ascending
@@ -95,11 +100,12 @@ export function sortNodes (nodes) {
  *
  * @returns { object }
  */
-export function removeId (data, id) {
-    if (data !== null) { // .children wont always be available if the node hasn't been loaded yet
+export function removeId(data, id) {
+    if (data !== null) {
+        // .children wont always be available if the node hasn't been loaded yet
         return data.reduce((previousValue, currentValue) => {
             if (currentValue.id !== id) {
-                previousValue.push( { ...currentValue, children: removeId(currentValue.children, id) } );
+                previousValue.push({ ...currentValue, children: removeId(currentValue.children, id) });
             }
             return previousValue;
         }, []);
@@ -113,11 +119,13 @@ export function removeId (data, id) {
  * @param { object }
  * @param { array }
  */
-export function getBreadcrumbs (node, currentBreadcrumbs) {
-    if (node.hasOwnProperty('parent') && node.parent !== null) { //if there's a parent to use as a breadcrumb
-        let breadcrumbs = [ { id: node.parent.id, name: node.parent.name }, ...currentBreadcrumbs ]; //add it in to the front of the list
-        return breadcrumbs = getBreadcrumbs(node.parent, breadcrumbs); //and then check the next node up the list
-    } else { //otherwise we must be at the top of the breadcrumb list
+export function getBreadcrumbs(node, currentBreadcrumbs) {
+    if (node.hasOwnProperty('parent') && node.parent !== null) {
+        //if there's a parent to use as a breadcrumb
+        let breadcrumbs = [{ id: node.parent.id, name: node.parent.name }, ...currentBreadcrumbs]; //add it in to the front of the list
+        return (breadcrumbs = getBreadcrumbs(node.parent, breadcrumbs)); //and then check the next node up the list
+    } else {
+        //otherwise we must be at the top of the breadcrumb list
         return currentBreadcrumbs; //so we can return now
     }
 }

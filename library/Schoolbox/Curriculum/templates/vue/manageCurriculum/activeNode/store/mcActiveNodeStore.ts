@@ -9,53 +9,51 @@
 
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { useNodesStore } from '../../store/mcNodesStore';
-import { sortNodes } from '@schoolboxCurriculum/js/nodeUtils';
-import { useViewNodesStore } from '../../viewNodes/store/mcViewNodesStore';
-
+import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
+import { UNSET_ID, getEmptyNode, sortNodes } from '@schoolboxCurriculum/js/nodeUtils';
+import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
+import Node from '@schoolboxCurriculum/types/Node';
 
 export const useActiveNodeStore = defineStore('mcActiveNode', () => {
-
-    const node = ref(null); //the currently selected node
+    const node = ref<Node>(getEmptyNode()); // the currently selected node
 
     /**
      * To show further info on a selected node
      *
-     * @return { Boolean }
+     * @returns { boolean }
      */
-    const isActive = computed(() => {
-        return node.value !== null ? true : false;
-    });
+    const isActive = computed(() => node.value.id !== UNSET_ID);
 
     /**
      * Add in the code if it's available otherwise just show the title
      *
-     * @return { String }
+     * @returns { string }
      */
     const title = computed(() => {
-        if (node.value === null) {
+        if (node.value.id === UNSET_ID) {
             return '';
         } else if (node.value.code && node.value.code !== '') {
             return `[${node.value.code}] ${node.value.name}`;
+        } else {
+            return node.value.name;
         }
-        return node.value.name;
     });
 
     /**
      * set the node to perform an action on
      *
-     * @param { Object }
+     * @param { Node } newNode - the new node
      */
-    function set (newNode) {
+    function set(newNode: Node) {
         node.value = newNode;
     }
 
     /**
      * Set newly saved values on the node
      *
-     * @param { Object }
+     * @param { Node } newNode - the new node
      */
-    function update (newNode) {
+    function update(newNode: Node) {
         if (newNode.name !== node.value.name) {
             node.value.name = newNode.name;
             useNodesStore().nodeUpdated(node.value); // notify to prompt a sort
@@ -71,28 +69,29 @@ export const useActiveNodeStore = defineStore('mcActiveNode', () => {
     /**
      * Add in a new subsection to the active node
      *
-     * @param { object }
+     * @param { Node } newNode - the new node to add in
      */
-    async function addSubsection (newNode) {
-        if (node.value.children === null) { // if the children aren't loaded, load them in - which will also return the newly added node
+    async function addSubsection(newNode: Node) {
+        if (node.value.children === null) {
+            // if the children aren't loaded, load them in - which will also return the newly added node
             await useNodesStore().loadNextChildren(node.value.id);
-        } else { // otherwise we need to push the newNode in as the children are already loaded
+        } else {
+            // otherwise we need to push the newNode in as the children are already loaded
             node.value.children.push(newNode);
-            sortByName(node.value.children); // and sort again with the new node added
+            sortNodes(node.value.children); // and sort again with the new node added
         }
         const viewNodesStore = useViewNodesStore();
-        if (viewNodesStore.current.id !== newNode.parent.id) { // if we aren't on the new nodes level move down so we can see the new node
+        if (viewNodesStore.current.id !== newNode.parent.id) {
+            // if we aren't on the new nodes level move down so we can see the new node
             viewNodesStore.setNextSelected(newNode.parent.id);
         }
     }
 
     /**
      * unset ready for another use
-     *
-     * @param { Object }
      */
-    function unset () {
-        node.value = null;
+    function unset() {
+        node.value = getEmptyNode();
     }
 
     return {
@@ -102,7 +101,6 @@ export const useActiveNodeStore = defineStore('mcActiveNode', () => {
         set,
         update,
         addSubsection,
-        unset
-    }
-
-})
+        unset,
+    };
+});

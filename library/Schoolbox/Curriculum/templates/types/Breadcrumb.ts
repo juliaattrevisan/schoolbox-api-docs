@@ -4,7 +4,7 @@
  */
 
 export default interface Breadcrumb {
-    depth: number;
-    id: number;
-    name: string;
+    depth?: number;
+    id?: number;
+    name?: string;
 }
