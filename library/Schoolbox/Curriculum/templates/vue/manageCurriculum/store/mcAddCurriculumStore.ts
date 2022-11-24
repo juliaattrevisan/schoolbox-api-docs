@@ -4,16 +4,44 @@
 
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { useStore } from './manageCurriculumStore';
-import { useNodesStore } from './mcNodesStore';
-import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
+import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
+import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
+import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
+import Node from '@schoolboxCurriculum/types/Node';
 
 const UNSET_ID = -1;
+
+/**
+ * Pass empty fields to be added
+ *
+ * @returns { Node } - a fresh node to use
+ */
+function getCurriculum() {
+    return {
+        name: '',
+        code: '',
+        description: '',
+    };
+}
+
+/**
+ * Pass through the group id
+ *
+ * @param { Node } node - the node with the fields to update
+ * @returns { string } - the data to send to the backend
+ */
+function getFormData(node: Node) {
+    return JSON.stringify({
+        name: node.name,
+        code: node.code,
+        description: node.description,
+    });
+}
 
 export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
-    const curriculum = ref({});
+    const curriculum = ref<Node | null>(null);
     const id = ref(UNSET_ID); // the id of the last updated node
 
     /**
@@ -22,6 +50,13 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
     function prompt() {
         curriculum.value = getCurriculum();
         isOpen.value = true;
+    }
+
+    /**
+     * to hide the add prompt
+     */
+    function cancel() {
+        isOpen.value = false;
     }
 
     /**
@@ -37,9 +72,9 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
                 },
                 body: getFormData(curriculum.value),
             });
-            const responseJson = await response.json();
+            const responseJson: Node = (await response.json()) as Node;
             if (response.ok) {
-                const newCurriculum = responseJson;
+                const newCurriculum: Node = responseJson;
                 id.value = newCurriculum.id;
                 const nodesStore = useNodesStore();
                 nodesStore.addNewCurriculum(newCurriculum);
@@ -47,19 +82,11 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
                 isProcessing.value = false;
                 cancel();
                 return { id: newCurriculum.id, message: 'Curriculum successfully added' };
-            } else {
-                throw new Error(responseJson.title, { ...responseJson });
             }
+            throw new Error(responseJson.title, { ...responseJson });
         } catch (error) {
             throw new Error(error.message, error.options);
         }
-    }
-
-    /**
-     * to hide the add prompt
-     */
-    function cancel() {
-        isOpen.value = false;
     }
 
     /**
@@ -80,31 +107,3 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
         unsetId,
     };
 });
-
-/**
- * Pass empty fields to be added
- *
- * @param { Object }
- *
- * @returns { Object }
- */
-function getCurriculum(node) {
-    return {
-        name: '',
-        code: '',
-        description: '',
-    };
-}
-
-/**
- * Pass through the group id
- *
- * @returns { FormData }
- */
-function getFormData(node) {
-    return JSON.stringify({
-        name: node.name,
-        code: node.code,
-        description: node.description,
-    });
-}

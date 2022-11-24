@@ -427,8 +427,8 @@ module.exports = {
         }),
         new VueLoaderPlugin(), // to handle .vue files
         new RemoveEmptyScriptsPlugin(),
-        new ESLintPlugin({
-            extensions: 'ts'
-        }), // This plugin uses eslint to find and fix problems in your JavaScript code
+        // new ESLintPlugin({
+        //     extensions: 'ts'
+        // }), // This plugin uses eslint to find and fix problems in your JavaScript code
     ],
 };
