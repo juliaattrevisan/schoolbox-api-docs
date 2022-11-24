@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * to show further info in a modal on a code that's been selected

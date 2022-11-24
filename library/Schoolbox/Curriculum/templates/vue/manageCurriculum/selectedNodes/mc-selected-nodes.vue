@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * Manage member selection and the various actions that can occur based

@@ -9,9 +9,7 @@
 import { ref, onMounted } from 'vue';
 import { isScriptAdded, injectScript } from '@js/util/domUtils';
 
-
-export function useDescriptionEditor ($initialValue, $ckeditorInstance) {
-
+export function useDescriptionEditor($initialValue, $ckeditorInstance) {
     const initialValue = ref($initialValue);
     const ckeditorInstance = $ckeditorInstance;
 
@@ -25,7 +23,7 @@ export function useDescriptionEditor ($initialValue, $ckeditorInstance) {
     /**
      * load the ckeditor into the browser
      */
-    async function loadCKEditor () {
+    async function loadCKEditor() {
         try {
             const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
             if (!isScriptAdded(ckeditorScript)) {
@@ -46,24 +44,27 @@ export function useDescriptionEditor ($initialValue, $ckeditorInstance) {
      *
      * @returns { Object }
      */
-    function getVueSpecificConfig () {
+    function getVueSpecificConfig() {
         return {
             on: {
-                change: () => { // Bind the content of CKEditor into the description model on change
+                change: () => {
+                    // Bind the content of CKEditor into the description model on change
                     initialValue.value = CKEDITOR.instances[ckeditorInstance].getData();
                 },
-                instanceReady: (event) => { //can display the loaded CKEditor now
+                instanceReady: (event) => {
+                    //can display the loaded CKEditor now
                     if (initialValue.value !== null) {
                         event.editor.setData(initialValue.value); //set the initial data
                         removeMediaEmbedButtons(event.editor.container.$);
                     }
                 },
-                drop: (event) => { //prevent drag and drop from functioning (haven't been able to disable it prior in any other config setting)
+                drop: (event) => {
+                    //prevent drag and drop from functioning (haven't been able to disable it prior in any other config setting)
                     event.stop();
                 },
             },
             targetElements: $(`#${ckeditorInstance}`),
-        }
+        };
     }
 
     /**
@@ -71,16 +72,14 @@ export function useDescriptionEditor ($initialValue, $ckeditorInstance) {
      *
      * @returns { HTMLElement }
      */
-    function removeMediaEmbedButtons (ckeditor) {
+    function removeMediaEmbedButtons(ckeditor) {
         const videoAudioButton = ckeditor.querySelector('.cke_button__schoolboxresourcemedia');
         videoAudioButton.style.display = 'none';
         const imageButton = ckeditor.querySelector('.cke_button__schoolboxresourceimage');
         imageButton.style.display = 'none';
         const eqnEditorButton = ckeditor.querySelector('.cke_button__eqneditor');
         eqnEditorButton.style.display = 'none';
-
     }
 
     return initialValue;
-
 }

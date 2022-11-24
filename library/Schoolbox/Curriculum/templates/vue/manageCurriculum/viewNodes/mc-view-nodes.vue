@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * The filtered results from using the <selects> or search <input>

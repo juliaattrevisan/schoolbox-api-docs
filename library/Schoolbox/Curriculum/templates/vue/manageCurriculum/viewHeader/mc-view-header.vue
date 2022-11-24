@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" lang="ts">
 
 /**
  * The header containing the breadcrumbs and search input

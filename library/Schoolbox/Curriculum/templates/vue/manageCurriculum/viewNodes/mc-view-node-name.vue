@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * A curriculum node to select to traverse further down the tree,

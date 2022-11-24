@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * to be able to update a nodes name, code and description
