@@ -34,7 +34,7 @@ class Corrector
      * @return Model `$article`, with the sticky status set to false if the
      *               config is disabled.
      */
-    public function apply(Model $article): Model
+    public function __invoke(Model $article): Model
     {
         if (!$this->configStickyEnabled) {
             return $article->setSticky(false);

@@ -19,27 +19,27 @@ use Schoolbox\Comms\News\StickyStatus\Corrector;
 class CorrectorTest extends TestCase
 {
     /**
-     * @dataProvider getTestFilterData
-     * @covers \Schoolbox\Comms\News\StickyStatus\Corrector::apply
+     * @dataProvider getTestInvokeData
+     * @covers \Schoolbox\Comms\News\StickyStatus\Corrector::__invoke
      * @param Corrector $corrector
      * @param Model     $article
      * @param bool|null $expectedStickyStatus
      * @return void
      */
-    public function testFilter(
+    public function testInvoke(
         Corrector $corrector,
         Model $article,
         ?bool $expectedStickyStatus,
     ): void {
-        $this->assertSame($expectedStickyStatus, $corrector->apply($article)->getSticky());
+        $this->assertSame($expectedStickyStatus, $corrector($article)->getSticky());
     }
 
     /**
-     * Data provider for `testFilter`
+     * Data provider for `testInvoke`
      *
      * @return iterable
      */
-    public function getTestFilterData(): iterable
+    public function getTestInvokeData(): iterable
     {
         yield 'config enabled, article enabled => enabled' => [
             new Corrector(true),

@@ -780,7 +780,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
     /**
      * Pre-save callback: if sticky articles are disabled in config, set this
-     * article's sticky flag to  false before saving it.
+     * article's sticky flag to false before saving it.
      *
      * @param Model $model
      * @return bool
@@ -789,7 +789,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     {
         (new Corrector(
             $this->getConfigLoader()->get(ConfigMapper::COMMS_STICKY_ENABLED)
-        ))->apply($model);
+        ))($model);
         return true;
     }
 }
