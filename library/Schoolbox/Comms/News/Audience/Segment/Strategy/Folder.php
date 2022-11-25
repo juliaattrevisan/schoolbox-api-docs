@@ -549,11 +549,11 @@ class Folder extends SimpleStrategy
                 /* Must not hit the DB... ummm is there a different way of doing this?
                  * should we put the parents children back into the session/ user object? or cache this somewhere???
                 */
-                $externalUser = new \Schoolbox\External\User();
-                if ($externalUser->getChildren($user)->count() === 0) {
+                (new \Schoolbox\External\User())->loadChildren([$user]);
+                if ($user->getChildren()->count() === 0) {
                     return null;
                 }
-                foreach ($externalUser->getChildren($user) as $child) {
+                foreach ($user->getChildren() as $child) {
                     if ($child->getSubjectCollection() === null) {
                         continue;
                     }

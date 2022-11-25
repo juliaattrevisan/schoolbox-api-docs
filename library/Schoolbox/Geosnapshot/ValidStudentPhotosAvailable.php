@@ -70,7 +70,7 @@ class ValidStudentPhotosAvailable extends ValidGeosnapshotAvailable
         /* $viewer is a parent of $viewee
          * They can view content for $viewee but nobody else
          */
-        if ((new \Schoolbox\External\User())->isParentOf($viewer, $viewee)) {
+        if ($viewer->isParentOf($viewee)) {
             return true;
         }
 

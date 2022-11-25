@@ -139,8 +139,8 @@ class Full
         } elseif ($role->isStaff()) {
             return $this->getForTeacher();
         } elseif ($role->isParent()) {
-            $externalUser = new \Schoolbox\External\User();
-            if ($externalUser->isChildOf($user, $participant)) {
+            (new \Schoolbox\External\User())->loadParents([$participant]);
+            if ($participant->isChildOf($user)) {
                 return $this->getForParent();
             }
         }

@@ -71,6 +71,12 @@ class Module extends BaseModule
                         $event = $params['event'];
 
                         $loggedInUser = $this->getAuthorizer()->getUser();
+                        (new \Schoolbox\External\User(
+                            $this->getConfig()->get('external_type'),
+                            new \External_Class(),
+                            new \External_User(),
+                            $this->getMapperFactory()->get(UserMapper::class)
+                        ))->loadChildren([$loggedInUser]);
 
                         /**
                          * Personal Event: owner, parent of owner, staff, or invited guest, can see event
@@ -80,7 +86,7 @@ class Module extends BaseModule
                         if ($event->isPersonalLevel()) {
                             $isStaff        = $loggedInUser->getRole()->isStaff();
                             $isOwner        = $event->getOwner()->getId() === $loggedInUser->getId();
-                            $isParentOfUser = (new \Schoolbox\External\User())->isParentOf($loggedInUser, $event->getAuthor());
+                            $isParentOfUser = $loggedInUser->isParentOf($event->getAuthor());
 
                             /* I suppose if you're on the invited list,
                              * you should be able to see it

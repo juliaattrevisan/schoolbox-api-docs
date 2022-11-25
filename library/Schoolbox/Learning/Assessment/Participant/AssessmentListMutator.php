@@ -105,7 +105,8 @@ class AssessmentListMutator
 
         // Unset children who don't have visibility, and set visibility
         // based on that factor
-        foreach ((new \Schoolbox\External\User())->getChildren($this->user) as $child) {
+        (new \Schoolbox\External\User())->loadChildren([$this->user]);
+        foreach ($this->user->getChildren() as $child) {
             if ($assessment->isParticipant($child)) {
                 if ($this->visibility->isVisibleToUser($assessment, $child, $this->showClosed, $this->now)) {
                     $this->visibilityCache[$assessmentId] = true;

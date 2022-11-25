@@ -149,11 +149,11 @@ abstract class SimpleStrategy implements ISimpleStrategy
                 /* Must not hit the DB... ummm is there a different way of doing this?
                  * should we put the parents children back into the session/ user object? or cache this somewhere???
                 */
-                $externalUser = new \Schoolbox\External\User();
-                if ($externalUser->getChildren($user)->count() === 0) {
+                (new \Schoolbox\External\User())->loadChildren([$user]);
+                if ($user->getChildren()->count() === 0) {
                     return null;
                 }
-                return count(array_intersect($this->getValues($externalUser->getChildren($user)), $entityValues)) > 0;
+                return count(array_intersect($this->getValues($user->getChildren()), $entityValues)) > 0;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
                 if (!$user->getRole()->isStaff()) {
                     return false;

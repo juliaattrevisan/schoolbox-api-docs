@@ -152,7 +152,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $parentUrl = null;
 
         if ($this->getUser()->getRole()->isParent()) {
-            foreach ((new \Schoolbox\External\User())->getChildren($this->getUser()) as $child) {
+            (new \Schoolbox\External\User())->loadChildren([$this->getUser()]);
+            foreach ($this->getUser()->getChildren() as $child) {
                 $parentUrl = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
                     'assessment' => $assessment,
                     'assessmentId' => $assessment->getId(),
