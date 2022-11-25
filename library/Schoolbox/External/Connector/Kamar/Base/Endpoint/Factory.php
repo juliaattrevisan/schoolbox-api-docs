@@ -241,13 +241,6 @@ class Factory
             throw new \DomainException('XML Preconditions not met. A transmission may be taking place and/or required quantity of xml files has yet to be met.');
         }
 
-        /* Load all the Profile xmls
-         *
-         * TODO: Replace with a sis_user_profile lookup equivalent
-         *  instead of remembering what we saw in Profile
-         */
-        $registry = new Profile\Registry();
-
         /* Purge previously-imported profile relationships
          */
         if ($this->validStrats->isProfileStratEnabled()) {
@@ -267,7 +260,6 @@ class Factory
                     $this->log,
                     $this->perform,
                     new Batchxml(new Api($this->host . '/' . $xmlFile)),
-                    $registry,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
@@ -368,7 +360,6 @@ class Factory
                 $bus->add(new Timetable\Classes(
                     $this->log,
                     $this->perform,
-                    $registry,
                     new Batchxml(new Api($this->host . '/' . $xmlFile)),
                     $lookup,
                     $currentWeekOffset,
