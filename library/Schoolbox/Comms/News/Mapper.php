@@ -123,7 +123,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             ]
         );
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'filterStickyStatus']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'applyStickyStatus']);
     }
 
 
@@ -785,7 +785,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param Model $model
      * @return bool
      */
-    public function filterStickyStatus(Model $model): bool
+    public function applyStickyStatus(Model $model): bool
     {
         (new Corrector(
             $this->getConfigLoader()->get(ConfigMapper::COMMS_STICKY_ENABLED)
