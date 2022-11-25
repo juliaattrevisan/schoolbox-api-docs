@@ -24,7 +24,6 @@ use SimpleXMLElement;
  */
 class SubjectIterator implements Iterator
 {
-
     /**
      * Slot Offset. Start parsing kamar slot data at this index. Kamar always sends us ten slots
      * but schools (Wang) are only using eight; the first and last Kamar slot isn't used by that
