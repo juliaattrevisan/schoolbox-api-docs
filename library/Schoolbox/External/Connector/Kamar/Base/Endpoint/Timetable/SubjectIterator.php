@@ -44,15 +44,19 @@ class SubjectIterator implements Iterator
 
 
     /**
-     * @var LoggerInterface
+     * A hash lookup of users
+     *
+     * [ externalaId => [user id, external id, title, firstname, lastname, username]]
+     *
+     * @var array
      */
-    private LoggerInterface $log;
+    private array $users;
 
 
     /**
-     * @var Registry
+     * @var LoggerInterface
      */
-    private Registry $registry;
+    private LoggerInterface $log;
 
 
     /**
@@ -83,14 +87,14 @@ class SubjectIterator implements Iterator
      * SubjectIterator constructor.
      *
      * @param LoggerInterface  $log
-     * @param Registry         $registry
+     * @param array            $users
      * @param string           $studentId
      * @param SimpleXMLElement $day
      */
-    public function __construct(LoggerInterface $log, Registry $registry, string $studentId, SimpleXMLElement $day)
+    public function __construct(LoggerInterface $log, array $users, string $studentId, SimpleXMLElement $day)
     {
         $this->log = $log;
-        $this->registry = $registry;
+        $this->users = $users;
         $this->studentId = $studentId;
         $this->subjects = $day->xpath('slots/subjects');
         $this->day = trim((string)$day->xpath('@index')[0]);
@@ -270,7 +274,6 @@ class SubjectIterator implements Iterator
      */
     private function findTeacher(SimpleXMLElement $subject): array
     {
-
         /* Accumulate all the teachers here
          * Assign one to be the authoritative teacher
          * Add the others as class attendees
@@ -284,7 +287,7 @@ class SubjectIterator implements Iterator
         $teacherIds = explode(',', trim((string)$subject->teachers));
 
         foreach ($teacherIds as $teacherId) {
-            $teacher = $this->registry->recall($teacherId);
+            $teacher = $this->users[$teacherId] ?? null;
 
             if (!$teacher) {
                 $this->log->warning(sprintf(
@@ -317,7 +320,7 @@ class SubjectIterator implements Iterator
      */
     private function findStudents(string $studentId): ?array
     {
-        $student = $this->registry->recall($studentId);
+        $student = $this->users[$studentId] ?? null;
 
         if (!$student) {
             $this->log->warning(sprintf(

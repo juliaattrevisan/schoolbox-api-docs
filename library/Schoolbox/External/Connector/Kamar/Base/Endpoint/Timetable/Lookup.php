@@ -93,7 +93,13 @@ class Lookup
     private function initUserLookup(): array
     {
         $userStatement = $this->userMapper->getDatabase()->query("
-            SELECT u.`id`, username
+            SELECT 
+                synergy_id AS externalId, 
+                u.`id`,
+                title, 
+                firstname, 
+                lastname, 
+                username
             FROM {$this->userMapper->getTable()} u
             INNER JOIN `groups` g ON u.`group_id` = g.id
             WHERE synergy_id IS NOT NULL
@@ -102,7 +108,7 @@ class Lookup
         $users = [];
 
         foreach ($userStatement as $row) {
-            $users[$row['username']] = $row['id'];
+            $users[$row['externalId']] = $row;
         }
 
         return $users;

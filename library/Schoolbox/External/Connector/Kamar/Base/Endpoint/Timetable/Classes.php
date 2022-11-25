@@ -321,7 +321,7 @@ class Classes implements IStrategy
                     } else {
                         /* Nonexistent users get a warning, but assign their external ids anyway
                          */
-                        if (!isset($users[$student['username']])) {
+                        if (!isset($users[$student['externalId']])) {
                             $this->log->debug(sprintf(
                                 'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s; username might not exist in schoolbox user table',
                                 $student['username'],
@@ -341,7 +341,7 @@ class Classes implements IStrategy
                     foreach ($subject['teachers'] as $teacher) {
                         /* Throw warning, but assign them anyway
                          */
-                        if (null === $teacher || !isset($users[$teacher['username']])) {
+                        if (null === $teacher || !isset($users[$teacher['externalId']])) {
                             $this->log->debug(sprintf(
                                 'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s; username might not exist in schoolbox user table',
                                 $teacher['username'],
@@ -461,7 +461,7 @@ class Classes implements IStrategy
         /* Throw warning, but assign them anyway
          */
         if (\count($subject['teachers'])) {
-            if (!isset($users[$subject['teachers'][0]['username']])) {
+            if (!isset($users[$subject['teachers'][0]['externalId']])) {
                 $this->log->debug(sprintf(
                     'Tried to assign nonexistent schoolbox account %s (%s) as teacher to class %s %s',
                     $subject['teachers'][0]['username'],
