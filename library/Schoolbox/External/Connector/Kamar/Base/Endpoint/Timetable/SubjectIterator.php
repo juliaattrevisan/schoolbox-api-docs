@@ -12,7 +12,6 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
 use Iterator;
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Registry;
 use SimpleXMLElement;
 
 /**
