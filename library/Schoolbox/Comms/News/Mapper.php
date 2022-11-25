@@ -788,7 +788,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function applyStickyStatus(Model $model): bool
     {
         (new Corrector(
-            $this->getConfigLoader()->get(ConfigMapper::COMMS_STICKY_ENABLED)
+            (bool)$this->getConfigLoader()->get(ConfigMapper::COMMS_STICKY_ENABLED)
         ))($model);
         return true;
     }
