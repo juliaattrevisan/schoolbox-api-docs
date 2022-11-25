@@ -19,7 +19,6 @@ use Schoolbox\Mapper;
 
 class Controller extends Base
 {
-
     /**
      * Flash message text appears in this key
      */

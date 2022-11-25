@@ -18,8 +18,9 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Audience\UserResolver;
-use Schoolbox\Comms\News\Discussion\ThreadLocator;
 use Schoolbox\Comms\News\Discussion\Permission\CanModerateThread;
+use Schoolbox\Comms\News\StickyStatus\ValidChangeStickyStatus;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
@@ -217,6 +218,10 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Thread\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Discussion\Comment\Mapper::class),
             $this->getMapperFactory()->get(File\Mapper::class),
+            new ValidChangeStickyStatus(
+                $this->getMapperFactory()->get(Access\Access::class),
+                $this->getConfig()->get(ConfigMapper::COMMS_STICKY_ENABLED),
+            ),
         );
     }
 

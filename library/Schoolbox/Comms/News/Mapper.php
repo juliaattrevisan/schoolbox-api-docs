@@ -18,6 +18,8 @@ use PDOException;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\SaveForLater;
+use Schoolbox\Comms\News\StickyStatus\Corrector;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
@@ -120,6 +122,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 'other_key' => 'article_id',
             ]
         );
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'applyStickyStatus']);
     }
 
 
@@ -772,5 +776,20 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     private function determinePredicateBuilderPrefix(?string $tableAlias): string
     {
         return isset($tableAlias) ? "$tableAlias." : '';
+    }
+
+    /**
+     * Pre-save callback: if sticky articles are disabled in config, set this
+     * article's sticky flag to false before saving it.
+     *
+     * @param Model $model
+     * @return bool
+     */
+    public function applyStickyStatus(Model $model): bool
+    {
+        (new Corrector(
+            (bool)$this->getConfigLoader()->get(ConfigMapper::COMMS_STICKY_ENABLED)
+        ))($model);
+        return true;
     }
 }

@@ -31,6 +31,7 @@ use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\Lists\UserFeed;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\Interactions;
+use Schoolbox\Comms\News\StickyStatus\ValidChangeStickyStatus;
 use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
@@ -97,6 +98,7 @@ class Controller extends Base
      * @param Thread\Mapper                    $threadMapper
      * @param CommentMapper                    $commentMapper
      * @param File\Mapper                      $fileMapper
+     * @param ValidChangeStickyStatus          $validChangeStickyStatus Spec pattern for if sticky status may be changed
      */
     public function __construct(
         Mapper $newsMapper,
@@ -112,7 +114,8 @@ class Controller extends Base
         Access $access,
         Thread\Mapper $threadMapper,
         CommentMapper $commentMapper,
-        File\Mapper $fileMapper
+        File\Mapper $fileMapper,
+        private ValidChangeStickyStatus $validChangeStickyStatus,
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -217,16 +220,16 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'action'               => 'Create',
-            'article'              => $article,
-            'featureImageZone'     => $zone->getTwigContext(),
-            'fileZone'             => $fileZone->getTwigContext(),
-            'isAutoSavable'        => true,
-            'encodedSegments'      => $audienceSegments,
-            'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
-            'returnUrl'            => $this->getExplicitReturnUrl(),
-            'entityTypesData'      => $this->getEntityTypesData(),
-            'isNewsModerator'      => $this->isNewsModerator(),
+            'action'                => 'Create',
+            'article'               => $article,
+            'featureImageZone'      => $zone->getTwigContext(),
+            'fileZone'              => $fileZone->getTwigContext(),
+            'isAutoSavable'         => true,
+            'encodedSegments'       => $audienceSegments,
+            'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
+            'returnUrl'             => $this->getExplicitReturnUrl(),
+            'entityTypesData'       => $this->getEntityTypesData(),
+            'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
         ])->setTab('news')->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
@@ -327,16 +330,16 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
-            'action'                 => 'Update',
-            'article'                => $article,
-            'featureImageZone'       => $zone->getTwigContext(),
-            'fileZone'               => $fileZone->getTwigContext(),
-            'encodedSegments'        => $this->getAudienceSegments($article),
-            'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
-            'returnUrl'              => $this->getExplicitReturnUrl(),
-            'availableEntityTypes'   => $this->getAvailableAudienceTypeStrategies(),
-            'entityTypesData'        => $this->getEntityTypesData(),
-            'isNewsModerator'        => $this->isNewsModerator(),
+            'action'                => 'Update',
+            'article'               => $article,
+            'featureImageZone'      => $zone->getTwigContext(),
+            'fileZone'              => $fileZone->getTwigContext(),
+            'encodedSegments'       => $this->getAudienceSegments($article),
+            'isAutoSavable'         => !$article->isSubmitted() || $article->isRejected(),
+            'returnUrl'             => $this->getExplicitReturnUrl(),
+            'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
+            'entityTypesData'       => $this->getEntityTypesData(),
+            'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
         ])->setTab('news')->setTitle("Update {$article->getTitle()}"));
     }
 
@@ -1445,12 +1448,8 @@ class Controller extends Base
             ->setBlurb($postData['blurb'] ?? '')
             ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics'] ?? null));
 
-        /* I still think that the ValidNewsModerator spec pattern makes this low level
-         * interrogation go away and behave consistently...but ok
-         *
-         * Write and Moderate are the only service level perms; Read doesn't exist.
-         */
-        if ($this->isNewsModerator()) {
+        // Only allow users who may change sticky status to do so
+        if ($this->validChangeStickyStatus->isSatisfiedBy($this->getUser())) {
             $article->setSticky((bool)($postData['sticky'] ?? false));
         }
 
@@ -1716,20 +1715,5 @@ class Controller extends Base
         if (Access::getInstance()->getFolderAccess($this->getUser(), $folderId) === UserAccess::ACCESS_DENY) {
             throw new AccessDenied("User {$this->getUser()->getId()} does not have access to folder $folderId");
         }
-    }
-
-
-    /**
-     * Decide whether the currently-logged-in user is a News Moderator or Superuser
-     *
-     * @return bool
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     * @throws MapperException
-     * @throws UnexpectedValueException
-     */
-    private function isNewsModerator(): bool
-    {
-        return ($this->getUser()->isSuperuser() || Access::getInstance()->getAccessLevel($this->getUser(), UserAccess::SERVICE_NEWS) === UserAccess::ACCESS_FULL);
     }
 }
