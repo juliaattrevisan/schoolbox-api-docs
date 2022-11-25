@@ -36,7 +36,6 @@ use UnexpectedValueException;
  */
 class Classes implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */
@@ -201,7 +200,6 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-
         /* Can't determine which week we're in; can't import anything
          */
         if (null === $this->currentWeekOffset) {
