@@ -25,14 +25,14 @@ use SimpleXMLElement;
 class SubjectIterator implements Iterator
 {
     /**
-     * Slot Offset. Start parsing kamar slot data at this index. Kamar always sends us ten slots
+     * Slot Offset. Start parsing Kamar slot data at this index. Kamar always sends us ten slots
      * but schools (Wang) are only using eight; the first and last Kamar slot isn't used by that
      * school, but we have no way to exclude slots (reduce the data set) accordingly.
      *
      * This offset is used to skip slots at the start and anything that doesn't positionally match
      * the imported timetable definition gets silently ignored.
      *
-     * Note that this is used in a zer-index array context; if you want the offset to start at
+     * Note that this is used in a zero-index array context; if you want the offset to start at
      * Kamar's <subjects slot="2"> xml node, use SLOT_OFFSET 1.
      *
      * TODO Convert into a config var
@@ -44,7 +44,7 @@ class SubjectIterator implements Iterator
     /**
      * A hash lookup of users
      *
-     * [ externalaId => [user id, external id, title, firstname, lastname, username]]
+     * [ externalId => [external id, user id, title, firstname, lastname, username]]
      *
      * @var array
      */
