@@ -7,7 +7,7 @@
  */
 
 use Alaress\Image;
-use Alaress\Image\ProcessorFactory;
+use Alaress\Image\Transformation\MyImage;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
@@ -15,24 +15,27 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../conf/core/require.php';
+
+[$width, $height] = MyImage::ensureDimensionsAreReasonable($_GET['width'] ?? null, $_GET['height'] ?? null);
+
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
-    new ResourceLimitExceededHandler(function () {
+    new ResourceLimitExceededHandler(function () use ($width, $height) {
         header('Cache-Control: no-store');
-        redirectToBroken(504);
+        redirectToBroken($width, $height, 504);
     }),
     ShutdownHandler::PRIORITY_HIGHEST,
 );
 
 if (empty($_SESSION['id'])) {
-    redirectToBroken(403);
+    redirectToBroken($width, $height, 403);
 }
 
 try {
     $image = Schoolbox\Resource\My\File\Mapper::getInstance()->findById($_GET['id']);
 } catch (Schoolbox\Mapper\Exception $e) {
-    redirectToBroken(404);
+    redirectToBroken($width, $height, 404);
     exit;
 }
 
@@ -66,19 +69,16 @@ if (isset($_GET['key'])) {
     $transforms = new Image\Transformation\Storage();
     $cacheKey   = $transforms->getCacheKey($_GET['key']);
     $transform  = $transforms->retrieve($_GET['key']);
-} elseif (isset($_GET['width']) && isset($_GET['height'])) {
-    $transforms = new Image\Transformation\MyImage();
-    $cacheKey   = $transforms->getCacheKey((int)$_GET['width'], (int)$_GET['height']);
-    $transform  = $transforms->retrieve((int)$_GET['width'], (int)$_GET['height']);
 } else {
-    redirectToBroken(400);
-    exit;
+    $transforms = new MyImage();
+    $cacheKey   = $transforms->getCacheKey($width, $height);
+    $transform  = $transforms->retrieve($width, $height);
 }
 
 /** @var Storage\Model $storageModel */
 $storageModel = $image->getStorage();
 
-/** @var ProcessorFactory $processorFactory */
+/** @var Image\ProcessorFactory $processorFactory */
 $processorFactory = $kernel->get('filesystem.imageProcessorFactory');
 $processor        = $processorFactory->buildForStorage(
     $storageModel,
@@ -89,23 +89,25 @@ try {
     $processor->load()->stream();
 } catch (Image\Exception\ConcurrentTransformationException $e) {
     $kernel->outputResourceBeingProcessedHeader();
-    redirectToBroken($e->getHttpStatusCode());
+    redirectToBroken($width, $height, $e->getHttpStatusCode());
 } catch (SchoolboxNotFoundException $e) {
-    redirectToBroken(404);
+    redirectToBroken($width, $height, 404);
 } catch (Exception $e) {
-    redirectToBroken(500);
+    redirectToBroken($width, $height, 500);
 }
 
 exit;
 
 /**
+ * @param int $width
+ * @param int $height
  * @param int $code
  */
-function redirectToBroken($code = 500)
+function redirectToBroken(int $width, int $height, int $code = 500): void
 {
     if (isset($_GET['key'])) {
         SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], $code);
-    } elseif (isset($_GET['width'])) {
-        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height '] ?: $_GET['width'], $code);
+    } else {
+        SitePage::redirectToBrokenImageOfSize($width, $height, $code);
     }
 }

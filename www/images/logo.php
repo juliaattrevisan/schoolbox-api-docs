@@ -10,7 +10,7 @@
 
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\ProcessorFactory;
-use Alaress\Image\Transformation;
+use Alaress\Image\Transformation\MyImage;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Cdn\PrefixGenerator;
@@ -22,12 +22,15 @@ use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
+
+[$width, $height] = MyImage::ensureDimensionsAreReasonable($_GET['width'] ?? null, $_GET['height'] ?? null);
+
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
-    new ResourceLimitExceededHandler(function () {
+    new ResourceLimitExceededHandler(function () use ($width, $height) {
         header('Cache-Control: no-store');
-        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 504);
+        SitePage::redirectToBrokenImageOfSize($width, $height, 504);
     }),
     ShutdownHandler::PRIORITY_HIGHEST,
 );
@@ -63,17 +66,17 @@ $logoSizes = [
 ];
 
 if (!array_key_exists('logo', $_GET) || !array_key_exists('size', $_GET)) {
-    SitePage::redirectToBrokenImageOfSize(80, 80, 404);
+    SitePage::redirectToBrokenImageOfSize($width, $height, 404);
 }
 
 $logo = $_GET['logo'];
 $size = $_GET['size'];
 
 if (!array_key_exists($logo, $logoSizes) || !array_key_exists($size, $logoSizes[$logo])) {
-    SitePage::redirectToBrokenImageOfSize(80, 80, 404);
+    SitePage::redirectToBrokenImageOfSize($width, $height, 404);
 }
 
-$myImage = new Transformation\MyImage();
+$myImage = new MyImage();
 $key     = $myImage->getCacheKey($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
 try {
     /* Choose a caching method to use
@@ -123,7 +126,7 @@ try {
         readfile($placeHolderFile);
         exit;
     }
-    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], $responseCode);
+    SitePage::redirectToBrokenImageOfSize($width, $height, $responseCode);
 } catch (Exception $e) {
     // redirect to the placeholder
     /** @var PrefixGenerator $cdnPrefixGenerator */

@@ -18,6 +18,32 @@ class MyImage implements ITransformFactory
 {
     use HasTranscodePathTrait;
 
+    private const WIDTH_PIXELS_MIN = 32;
+    private const WIDTH_PIXELS_MAX = 2048;
+    private const WIDTH_PIXELS_DEFAULT = 200;
+    private const HEIGHT_PIXELS_MIN = 32;
+    private const HEIGHT_PIXELS_MAX = 2048;
+    private const HEIGHT_PIXELS_DEFAULT = 200;
+
+    /**
+     * If supplied height and width are not within a reasonable range, use defaults.
+     * @param mixed $width
+     * @param mixed $height
+     * @return array
+     */
+    public static function ensureDimensionsAreReasonable(mixed $width, mixed $height): array
+    {
+        if (
+            $width === null || $width < self::WIDTH_PIXELS_MIN || $width > self::WIDTH_PIXELS_MAX ||
+            $height === null || $height < self::HEIGHT_PIXELS_MIN || $height > self::HEIGHT_PIXELS_MAX
+        ) {
+            $width = self::WIDTH_PIXELS_DEFAULT;
+            $height = self::HEIGHT_PIXELS_DEFAULT;
+        }
+
+        return [(int)$width, (int)$height];
+    }
+
     /**
      * @param int $width
      * @param int $height
@@ -27,7 +53,6 @@ class MyImage implements ITransformFactory
     {
         return new Constrain($width, $height);
     }
-
 
     /**
      * Returns a cache key for a transformation
@@ -41,7 +66,6 @@ class MyImage implements ITransformFactory
         return "{$width}x{$height}";
     }
 
-
     /**
      * Returns whether this class generated the specified cache key
      *
@@ -52,7 +76,6 @@ class MyImage implements ITransformFactory
     {
         return preg_match('/\d+x\d+/', $cacheKey);
     }
-
 
     /**
      * Returns a Transform for the given cache key
