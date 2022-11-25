@@ -112,9 +112,9 @@ export const useViewNodesStore = defineStore('mcViewNodes', () => {
      */
     function updateHash() {
         if (current.value.id === UNSET_ID) {
-            history.replaceState(undefined, undefined, '#');
+            window.history.replaceState(undefined, '', '#');
         } else {
-            history.replaceState(undefined, undefined, `#${current.value.id}`);
+            window.history.replaceState(undefined, '', `#${current.value.id}`);
         }
     }
 
