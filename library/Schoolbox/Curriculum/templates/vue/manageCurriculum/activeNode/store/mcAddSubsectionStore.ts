@@ -4,27 +4,65 @@
 
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { useStore } from '../../store/manageCurriculumStore';
-import { useActiveNodeStore } from './mcActiveNodeStore';
-import { useSelectedNodesStore } from '../../selectedNodes/store/mcSelectedNodesStore';
+import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
+import { useActiveNodeStore } from '@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore';
+import { useSelectedNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore';
+import { Node } from '@schoolboxCurriculum/types/Node';
 
 const UNSET_ID = -1;
+
+/**
+ * Pass empty fields to be added
+ *
+ * @returns { Partial<Node> } - a new Node to add
+ */
+function getSubsection(): Partial<Node> {
+    return {
+        name: '',
+        code: '',
+        description: '',
+    };
+}
+
+/**
+ * Pass through the subsection and whether the node is enabled
+ *
+ * @param { Partial<Node> } subsection - the new subsection data
+ * @param { Node } node - the parent Node
+ * @returns { string } - the data to send to the backend
+ */
+function getFormData(subsection: Partial<Node>, node: Node) {
+    return JSON.stringify({
+        name: subsection.name,
+        code: subsection.code,
+        description: subsection.description,
+        enabled: node.enabled,
+    });
+}
 
 export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
-    const subsection = ref({});
+    const subsection = ref<Partial<Node>>(getSubsection());
     const id = ref(UNSET_ID); // the id of the last updated node
 
     /**
      * to display a prompt to confirm adding a node to a subsection
      *
-     * @param { object }
+     * @param { Node } node - the node being added
      */
-    function prompt(node) {
+    function prompt(node: Node) {
         useActiveNodeStore().set(node);
         subsection.value = getSubsection();
         isOpen.value = true;
+    }
+
+    /**
+     * to hide the confirmation prompt
+     */
+    function cancel() {
+        useActiveNodeStore().unset();
+        isOpen.value = false;
     }
 
     /**
@@ -43,28 +81,19 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
             });
             const responseJson = await response.json();
             if (response.ok) {
-                const newNode = responseJson;
+                const newNode: Node = responseJson as Node;
                 id.value = newNode.id;
-                useSelectedNodesStore().checkIfSelected(newNode); //the parent node could be selected, so this node will need to be selected as well
+                useSelectedNodesStore().checkIfSelected(newNode); // the parent node could be selected, so this node will need to be selected as well
                 await activeNodeStore.addSubsection(newNode);
                 cancel();
                 return { id: newNode.id, message: 'Subsection successfully added' };
-            } else {
-                throw new Error(responseJson.title, { ...responseJson });
             }
+            throw new Error(responseJson.title, { ...responseJson });
         } catch (error) {
             throw new Error(error.message, error.options);
         } finally {
             isProcessing.value = false;
         }
-    }
-
-    /**
-     * to hide the confirmation prompt
-     */
-    function cancel() {
-        useActiveNodeStore().unset();
-        isOpen.value = false;
     }
 
     /**
@@ -84,33 +113,3 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
         unsetId,
     };
 });
-
-/**
- * Pass empty fields to be added
- *
- * @returns { Object }
- */
-function getSubsection() {
-    return {
-        name: '',
-        code: '',
-        description: '',
-    };
-}
-
-/**
- * Pass through the subsection and whether the node is enabled
- *
- * @param { object }
- * @param { object }
- *
- * @returns { FormData }
- */
-function getFormData(subsection, node) {
-    return JSON.stringify({
-        name: subsection.name,
-        code: subsection.code,
-        description: subsection.description,
-        enabled: node.enabled,
-    });
-}

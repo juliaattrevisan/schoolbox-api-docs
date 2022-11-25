@@ -7,7 +7,6 @@ import { defineStore } from 'pinia';
 import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
 import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
 import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
-import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 import { Node } from '@schoolboxCurriculum/types/Node';
 
 const UNSET_ID = -1;
@@ -15,9 +14,9 @@ const UNSET_ID = -1;
 /**
  * Pass empty fields to be added
  *
- * @returns { Node } - a fresh node to use
+ * @returns { Partial<Node> } - a new Node to add
  */
-function getCurriculum() {
+function getCurriculum(): Partial<Node> {
     return {
         name: '',
         code: '',
@@ -31,7 +30,7 @@ function getCurriculum() {
  * @param { Node } node - the node with the fields to update
  * @returns { string } - the data to send to the backend
  */
-function getFormData(node: Node) {
+function getFormData(node: Partial<Node>) {
     return JSON.stringify({
         name: node.name,
         code: node.code,
@@ -42,7 +41,7 @@ function getFormData(node: Node) {
 export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
-    const curriculum = ref<Node>(getEmptyNode());
+    const curriculum = ref<Partial<Node>>(getCurriculum());
     const id = ref(UNSET_ID); // the id of the last updated node
 
     /**
@@ -71,12 +70,12 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: getFormData(curriculum.value as Node),
+                body: getFormData(curriculum.value as Partial<Node>),
             });
-            const responseJson: Node = (await response.json()) as Node;
+            const responseJson = await response.json();
             if (response.ok) {
-                const newCurriculum: Node = responseJson;
-                id.value = newCurriculum.id as number;
+                const newCurriculum: Node = responseJson as Node;
+                id.value = newCurriculum.id;
                 const nodesStore = useNodesStore();
                 nodesStore.addNewCurriculum(newCurriculum);
                 useViewNodesStore().setSelected(0);

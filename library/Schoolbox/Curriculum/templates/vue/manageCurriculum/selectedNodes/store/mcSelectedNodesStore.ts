@@ -50,21 +50,21 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
     /**
      * just return an array of ids, used to compare if a node is selected or not
      *
-     * @returns { array }
+     * @returns { number[] }
      */
     const nodesIds = computed(() => nodes.value.map((node) => node.id));
 
     /**
      * just return an array of ids, used to compare if a node is selected or not
      *
-     * @returns { array }
+     * @returns { number[] }
      */
     const childNodesIds = computed(() => childNodes.value.map((node) => node.id));
 
     /**
      * check if all nodes are enabled so we can just show the disable button
      *
-     * @return { boolean }
+     * @returns { boolean }
      */
     const allNodesEnabled = computed(() => {
         if (hasNodes.value) {
@@ -78,7 +78,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
      * check if all nodes are disabled so we can just show the enable button
      * disabled child nodes cant be enabled - only the disabled parent can be enabled
      *
-     * @return { boolean }
+     * @returns { boolean }
      */
     const allNodesDisabled = computed(() => {
         if (hasNodes.value) {
@@ -88,8 +88,8 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
                 // prevent enabling child nodes of disabled parents
                 if (node.parent) {
                     // could be the root level node, so won't have a parent
-                    const parentNode = findById(nodesStore.nodes.children, node.parent.id);
-                    return parentNode?.enabled;
+                    const parentNode: Node = findById(nodesStore.nodes.children as Node[], node.parent.id) as Node; // as we checked node.parent, we can be sure parentNode will be found
+                    return parentNode.enabled;
                 }
                 return node.enabled;
             });
@@ -118,7 +118,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
             if (nodeToAdd.children) {
                 // only if the children have loaded
                 const node = findById(nodeToAdd.children, selectedNode.id);
-                return node !== undefined; // only keep those nodes that aren't a child of the new node
+                return node === undefined; // only keep those nodes that aren't a child of the new node
             }
             // otherwise no existing nodes will be children, as they haven't been loaded and so couldn't have been selected
             return true;
@@ -202,12 +202,15 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
         // no parent node, so it would be a root level node, already in the selected list, or already in the children of selected list
         if (parentNode === undefined || nodesIds.value.includes(node.id) || childNodesIds.value.includes(node.id)) {
             return;
-        } else if (nodesIds.value.includes(parentNode.id)) {
+        }
+        if (nodesIds.value.includes(parentNode.id)) {
             node.selectedParentId = parentNode.id; // add the base level selectedParentId
             childNodes.value = [...childNodes.value, node]; // and then add the node
         } else if (childNodesIds.value.includes(parentNode.id)) {
             // if the parent is in the children of selected list, this node can also go in the list
-            const selectedParentNode = childNodes.value.find((node) => node.id === parentNode.id); // find the selected parent in the list
+            const selectedParentNode: Node = childNodes.value.find(
+                (childNode) => childNode.id === parentNode.id
+            ) as Node; // find the selected parent in the list
             node.selectedParentId = selectedParentNode.selectedParentId; // add the base level selectedParentId
             childNodes.value = [...childNodes.value, node]; // and then add the node
         }

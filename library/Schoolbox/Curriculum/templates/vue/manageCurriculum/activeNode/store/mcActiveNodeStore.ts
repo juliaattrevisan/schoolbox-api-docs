@@ -12,7 +12,7 @@ import { defineStore } from 'pinia';
 import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
 import { UNSET_ID, getEmptyNode, sortNodes } from '@schoolboxCurriculum/js/nodeUtils';
 import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
-import { Node } from '@schoolboxCurriculum/types/Node';
+import { Node, NodeToUpdate } from '@schoolboxCurriculum/types/Node';
 
 export const useActiveNodeStore = defineStore('mcActiveNode', () => {
     const node = ref<Node>(getEmptyNode()); // the currently selected node
@@ -32,11 +32,11 @@ export const useActiveNodeStore = defineStore('mcActiveNode', () => {
     const title = computed(() => {
         if (node.value.id === UNSET_ID) {
             return '';
-        } else if (node.value.code && node.value.code !== '') {
-            return `[${node.value.code}] ${node.value.name}`;
-        } else {
-            return node.value.name;
         }
+        if (node.value.code && node.value.code !== '') {
+            return `[${node.value.code}] ${node.value.name}`;
+        }
+        return node.value.name;
     });
 
     /**
@@ -51,14 +51,14 @@ export const useActiveNodeStore = defineStore('mcActiveNode', () => {
     /**
      * Set newly saved values on the node
      *
-     * @param { Node } newNode - the new node
+     * @param { NodeToUpdate } newNode - the new node
      */
-    function update(newNode: Node) {
+    function update(newNode: NodeToUpdate) {
         if (newNode.name !== node.value.name) {
             node.value.name = newNode.name;
             useNodesStore().nodeUpdated(node.value); // notify to prompt a sort
         }
-        if (newNode.code !== node.value.code) {
+        if (typeof newNode.code === 'string' && newNode.code !== node.value.code) {
             node.value.code = newNode.code.trim();
         }
         if (newNode.description !== node.value.description) {

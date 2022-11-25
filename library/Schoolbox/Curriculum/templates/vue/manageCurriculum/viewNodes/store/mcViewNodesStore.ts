@@ -32,7 +32,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', () => {
     /**
      * to traverse back through the nodes via breadcrumbs
      *
-     * @return { Array }
+     * @returns { Array }
      */
     const breadcrumbs = computed(() => {
         const currentBreadcrumbs: Breadcrumb[] = [];
@@ -43,7 +43,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', () => {
         }
         idList.value.forEach((id, index) => {
             // add in a breadcrumb for each selected node
-            const nodeAtDepth = findById(nodesStore.nodes.children, id);
+            const nodeAtDepth: Node = findById(nodesStore.nodes.children as Node[], id) as Node;
             currentBreadcrumbs.push({ id, name: nodeAtDepth.name, depth: index + 1 });
         });
         // we return an empty array if there's no selections yet, otherwise we pull out the latest as it represents the node we are currently on (not one we need to move back to)
@@ -55,21 +55,21 @@ export const useViewNodesStore = defineStore('mcViewNodes', () => {
      *
      * @returns { Node }
      */
-    const current = computed<Node>(() => {
+    const current = computed(() => {
         const nodesStore = useNodesStore();
         if (idList.value.length > 0) {
             // grab the current latest selection
-            return findById(nodesStore.nodes.children, idList.value[currentDepth.value - 1]);
+            return findById(nodesStore.nodes.children as Node[], idList.value[currentDepth.value - 1]) as Node;
         }
         // otherwise return the root level structure when there's more than one root level node
-        return nodesStore.nodes;
+        return nodesStore.nodes as Node;
     });
 
     /**
      * the current nodes to display, which are either just the current selection
      * or when the search is active the results found within the current selection
      *
-     * @returns { Array }
+     * @returns { Node[] }
      */
     const nodes = computed<Node[]>(() => {
         const searchStore = useSearchStore();

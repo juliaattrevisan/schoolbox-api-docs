@@ -233,8 +233,8 @@ export const useNodesStore = defineStore('mcNodes', () => {
      * @param { Node } node - the node to delete
      */
     function deleteNode(node: Node) {
-        useViewNodesStore().checkDeletedNode(node); // check we aren't on the deleted node currently, if so we could move traverse backwards
-        const nodeRemoved: Node[] = removeId(nodes.value?.children, node.id);
+        useViewNodesStore().checkDeletedNode(node); // check we aren't on the deleted node currently, if so we should traverse backwards one depth
+        const nodeRemoved: Node[] = removeId(nodes.value.children as Node[], node.id);
         updateNodes(nodeRemoved);
     }
 

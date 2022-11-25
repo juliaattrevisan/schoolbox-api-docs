@@ -100,26 +100,25 @@ export function sortNodes(nodes) {
 }
 
 /**
- * To return an array with any objects containing the specified id removed
+ * To return an array with any Nodes containing the specified id removed
  * we move through the object, looping recursively through .children and remove
  * any with the id that's being removed
  *
- * @param { array }
- * @param { number }
- *
- * @returns { object }
+ * @param { Node[] } children - all the Node children
+ * @param { number } id - id of the Node to remove
+ * @returns { Node[] } - list of children with the Node linked to id removed
  */
-export function removeId(data, id) {
-    if (data !== null) {
+export function removeId(children: Node[], id: number): Node[] {
+    if (children !== null) {
         // .children wont always be available if the node hasn't been loaded yet
-        return data.reduce((previousValue, currentValue) => {
+        return children.reduce((previousValue, currentValue) => {
             if (currentValue.id !== id) {
-                previousValue.push({ ...currentValue, children: removeId(currentValue.children, id) });
+                previousValue.push({ ...currentValue, children: removeId(currentValue.children as Node[], id) });
             }
             return previousValue;
-        }, []);
+        }, []) as Node[];
     }
-    return data;
+    return children;
 }
 
 /**
