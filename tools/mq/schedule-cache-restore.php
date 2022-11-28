@@ -19,6 +19,7 @@ use Schoolbox\Di\Configurator;
 use Schoolbox\Notif\MQ\Connector;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Notif\MQ\ConnectorFactory;
 use Schoolbox\Realtime\Schedule;
 use Schoolbox\Realtime\Schedule\Event\NotifierInflector;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
@@ -44,7 +45,7 @@ try {
          */
 
         // the passive part is important: it means the queue won't be created if it doesn't already exist
-        $mq = new Connector(['passive' => true]);
+        $mq = (new ConnectorFactory($di->get('config')))->build(['passive' => true]);
         $q  = Schedule\Broker::QUEUE;
 
         try {
@@ -64,7 +65,7 @@ try {
 
                 $splitter = new Splitter(new NotifierInflector(new Configurator($di)), $tff);
 
-                /** @var Alaress\Async\AMQP\AMQPInterface $amqp */
+                /** @var Connector $amqp */
                 $amqp = $di->get('amqp');
 
                 /** @var ClientInterface $redis */
@@ -78,7 +79,7 @@ try {
                 $propagator = new Propagator($splitter, $broker, INSTANCE_ID);
 
                 // restore data if possible
-                $restored = $jit->restoreSchedule(new Connector(), $propagator, $q);
+                $restored = $jit->restoreSchedule($amqp, $propagator, $q);
 
                 if (!$restored) {
                     throw new RuntimeException("Could not read cached data");
