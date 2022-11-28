@@ -45,10 +45,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
          * Each of these strats encompasses all it needs to procure data
          * and render it accordingly
          */
-        if ((new ValidUsesSudsTimetable())->isSatisfiedBy(
-            (string)$this->getConfigLoader()->get('external_type'),
-            (string)$this->getConfigLoader()->get('schooldata_import_data_source'),
-        )) {
+        if (
+            (new ValidUsesSudsTimetable())->isSatisfiedBy(
+                (string)$this->getConfigLoader()->get('external_type'),
+                (string)$this->getConfigLoader()->get('schooldata_import_data_source'),
+            )
+        ) {
             $this->strategy = new Component_Dashboard_Timetable_SudsStrategy(
                 $instance,
                 $this->getUser(),
