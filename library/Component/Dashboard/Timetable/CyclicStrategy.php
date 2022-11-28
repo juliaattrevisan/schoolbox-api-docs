@@ -17,7 +17,7 @@ use Schoolbox\Permission\Access\UserAccess;
  * Fulfils the Dashboard Timetable component's requirements
  * when using a live connector
  */
-class Component_Dashboard_Timetable_LiveStrategy implements Component_Dashboard_Timetable_ComponentInterface
+class Component_Dashboard_Timetable_CyclicStrategy implements Component_Dashboard_Timetable_ComponentInterface
 {
     /**
      * @var array

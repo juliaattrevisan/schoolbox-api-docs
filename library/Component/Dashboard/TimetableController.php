@@ -64,7 +64,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
             );
         } else {
-            $this->strategy = new Component_Dashboard_Timetable_LiveStrategy(
+            $this->strategy = new Component_Dashboard_Timetable_CyclicStrategy(
                 $this->getConfigLoader(),
                 $this->externalTimetable,
                 $this->getUser(),
