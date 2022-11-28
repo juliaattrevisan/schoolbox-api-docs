@@ -117,8 +117,10 @@ class Controller extends BaseController
      */
     private TermMapper $termMapper;
 
-    protected \Schoolbox\External\User $externalUserDetails;
-
+    /**
+     * User relationship Hydrator
+     */
+    protected \Schoolbox\External\User $userRelationHydrator;
 
     /**
      * Constructor
@@ -135,6 +137,7 @@ class Controller extends BaseController
      * @param PastoralSubTypeMapper         $pastoralSubTypeMapper
      * @param PastoralDataSource            $pastoralDataSource
      * @param TermMapper                    $termMapper
+     * @param \Schoolbox\External\User      $userRelationHydrator
      */
     public function __construct(
         UserMapper $userMapper,
@@ -149,7 +152,8 @@ class Controller extends BaseController
         PastoralTypeMapper $pastoralTypeMapper,
         PastoralSubTypeMapper $pastoralSubTypeMapper,
         PastoralDataSource $pastoralDataSource,
-        TermMapper $termMapper
+        TermMapper $termMapper,
+        \Schoolbox\External\User $userRelationHydrator
     ) {
         $this->userMapper                    = $userMapper;
         $this->roleMapper                    = $roleMapper;
@@ -165,7 +169,7 @@ class Controller extends BaseController
         $this->pastoralDataSource            = $pastoralDataSource;
         $this->termMapper                    = $termMapper;
 
-        $this->externalUserDetails = new \Schoolbox\External\User();
+        $this->userRelationHydrator = $userRelationHydrator;
     }
 
     /**
@@ -184,8 +188,10 @@ class Controller extends BaseController
         if ($user->getRole()->isStaff()) {
             $this->renderStaff($user);
         } elseif ($user->getRole()->isStudent()) {
+            $this->userRelationHydrator->loadParents([$user]);
             $this->renderStudent($user);
         } elseif ($user->getRole()->isParent()) {
+            $this->userRelationHydrator->loadChildren([$user]);
             $this->renderParent($user);
         }
     }
@@ -197,7 +203,7 @@ class Controller extends BaseController
     {
         $externalUser = $parent->getExternalId() ? $this->externalUser->getParent($parent->getExternalId()) : [];
 
-        $students = $this->externalUserDetails->getChildren($parent);
+        $students = $parent->getChildren();
 
         if (isset($externalUser['SpouseID'])) {
             try {
@@ -530,7 +536,7 @@ class Controller extends BaseController
         // Determine whether current user is student's parent, and if not if they
         // are related in some other way.
 
-        $isParentOfStudent = $this->externalUserDetails->isParentOf($this->getUser(), $student);
+        $isParentOfStudent = $this->getUser()->isParentOf($student);
         $isPrimaryCarer    = false;
         if ($isParentOfStudent && !empty($contactList)) {
             // Only the primary parent will see emergency contact information

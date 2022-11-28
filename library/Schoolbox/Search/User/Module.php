@@ -62,6 +62,12 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Pastoral\SubType\Mapper::class),
             $this->injector->get('pastoralDataSource'),
             $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
+            new \Schoolbox\External\User(
+                $this->injector->get('config')->get('external_type'),
+                new \External_Class(),
+                new \External_User(),
+                $this->getMapperFactory()->get(UserMapper::class)
+            )
         );
     }
 
