@@ -16,7 +16,7 @@ class Homepage
 {
     public const URL = '/homepage/{id}';
 
-    public const ELEMENT_ADD_COMPONENT_TAB = '#tabs-1';
+    public const ELEMENT_ADD_COMPONENT_TAB = 'a#add-component';
     public const ELEMENT_ADD_COMPONENT_SECTION_INFORMATION = '#tabs-sub-1';
     public const ELEMENT_ADD_COMPONENT_SECTION_COLLABORATION = '#tabs-sub-2';
     public const ELEMENT_ADD_COMPONENT_SECTION_LEARNING = '#tabs-sub-3';
@@ -181,5 +181,15 @@ class Homepage
     private function openTabPanel(string $selector): void
     {
         $this->tester->click(['css' => sprintf('[href="%s"]', $selector)]);
+    }
+
+
+    /**
+     * Click Add components button at the top of the screen
+     */
+    public function clickAddComponentsButton(): void
+    {
+        $this->tester->click(self::ELEMENT_ADD_COMPONENT_TAB);
+        $this->tester->waitForElementVisible(self::ELEMENT_ADD_COMPONENT_SECTION_INFORMATION);
     }
 }
