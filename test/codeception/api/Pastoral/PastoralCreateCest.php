@@ -113,9 +113,30 @@ class PastoralCreateCest
             $i->changeDBConfig('pastoral_create_tag_enable', 0);
             $postData['data']['tagNames'] = "newTag" . time();
             $i->sendPost('/pastoral/record/insert', $postData['data']);
+            unset($postData['data']['tagNames']);
 
             $i->seeResponseCodeIs(400);
             $i->restoreDBConfig();
+
+            // try invalid points
+            $postData['data']['points'] = 1000000000;
+            $i->sendPost('/pastoral/record/insert', $postData['data']);
+            $i->seeResponseCodeIs(400);
+            $postData['data']['points'] = 100;
+
+            // check pastoral_student_access config
+            if (isset($postData['data']['role'])) {
+                $i->changeDBConfig('pastoral_student_access', 0);
+                $postData['data']['role']['role-type-student'] = Mapper::ACCESS_PUBLIC;
+                $i->sendPost('/pastoral/record/insert', $postData['data']);
+                $i->seeResponseCodeIs(400);
+
+                $i->changeDBConfig('pastoral_student_access', 1);
+                $postData['data']['role']['role-type-student'] = Mapper::ACCESS_PUBLIC;
+                $i->sendPost('/pastoral/record/insert', $postData['data']);
+                $i->seeResponseCodeIs(201);
+                $i->restoreDBConfig();
+            }
         }
     }
 
@@ -185,9 +206,8 @@ class PastoralCreateCest
                 'severityId'          => $i->getPastoralSeverities()->first()->getId(),
                 // TODO: permission
                 'role'                => [
-                    1                   => Mapper::ACCESS_PUBLIC,
-                    'role-type-student' => Mapper::ACCESS_PUBLIC,
-                    'role-type-parent'  => Mapper::ACCESS_PUBLIC,
+                    1                  => Mapper::ACCESS_PUBLIC,
+                    'role-type-parent' => Mapper::ACCESS_PUBLIC,
                 ],
                 'group'               => [1 => Mapper::ACCESS_PUBLIC],
                 'user'                => [
@@ -203,7 +223,7 @@ class PastoralCreateCest
                 ]),
                 'tagNames'            => "test tag A,test tag B",
                 'duplicateIds'        => '25,26',
-                'points'              => 50,
+                'points'              => 100.1,
                 'body_public'         => "Public body\nPublic body.",
                 'body_private'        => "Private body\nPrivate body.",
             ],

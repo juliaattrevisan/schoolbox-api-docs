@@ -17,7 +17,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Request\Values as RequestValues;
 use Exception;
 use External_Pastoral;
-use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
@@ -27,7 +26,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
@@ -760,9 +758,11 @@ class Controller extends Base
             $allowedRoles     = $this->pastoralAccessMapper->determineAllowedRoles();
             $allowedRoleTypes = $this->pastoralAccessMapper->determineAllowedRoleTypes();
             foreach ($post->get("role") as $roleId => $accessLevel) {
+                if (!in_array($accessLevel, Access\Mapper::ACCESSES)) {
+                    throw new SchoolboxException(sprintf("Invalid access provided for role %s: %s", $roleId, $accessLevel));
+                }
                 if (in_array($roleId, $foundRoles)) {
-                    // should not happen
-                    continue;
+                    throw new SchoolboxException("Invalid role id: $roleId");
                 }
                 $foundRoles[] = $roleId;
 
@@ -773,7 +773,7 @@ class Controller extends Base
                 // Is this a role or a role type?
                 if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
                     if (!in_array($matches['roleType'], $allowedRoleTypes)) {
-                        continue;
+                        throw new SchoolboxException("Invalid role type: {$matches['roleType']}");
                     }
                     $access->setRoleType($matches['roleType']);
                 } else {
@@ -795,9 +795,11 @@ class Controller extends Base
         if (is_array($post->get("group"))) {
             $foundGroups = [];
             foreach ($post->get("group") as $groupId => $accessLevel) {
+                if (!in_array($accessLevel, Access\Mapper::ACCESSES)) {
+                    throw new SchoolboxException(sprintf("Invalid access provided for pastoral group %s: %s", $groupId, $accessLevel));
+                }
                 if (in_array($groupId, $foundGroups)) {
-                    // should not happen
-                    continue;
+                    throw new SchoolboxException("Invalid group id: $groupId");
                 }
                 $foundGroups[] = $groupId;
                 try {
@@ -820,9 +822,11 @@ class Controller extends Base
         if (is_array($post->get("user"))) {
             $foundUsers = [];
             foreach ($post->get("user") as $userId => $accessLevel) {
+                if (!in_array($accessLevel, Access\Mapper::ACCESSES)) {
+                    throw new SchoolboxException(sprintf("Invalid access provided for pastoral user %s: %s", $userId, $accessLevel));
+                }
                 if (in_array($userId, $foundUsers)) {
-                    // should not happen
-                    continue;
+                    throw new SchoolboxException("Invalid user id: $userId");
                 }
                 $foundUsers[] = $userId;
                 try {
@@ -1079,7 +1083,13 @@ class Controller extends Base
             $record->setSeverity($severity);
             $record->setModifiedBy($this->getUser());
             $record->setHeading($heading);
-            $record->setPoints($post->get('points'));
+            $points = $post->getFloat('points');
+            if ($points) {
+                if (!is_numeric($post->get('points') ?? '') || $points < -1000000 || $points > 1000000) {
+                    throw new SchoolboxException('Points must be float between ');
+                }
+                $record->setPoints($points);
+            }
 
             /* Perform token replacements, basically a square bracket phplib
              * that performs a one-way substitution

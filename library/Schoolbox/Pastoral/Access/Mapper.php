@@ -37,9 +37,14 @@ class Mapper extends BaseMapper
 {
     // Define record access levels
 
-    const ACCESS_DENY = 0;                      // Deny trumps all other access to allow exclusion of a user/group/role
-    const ACCESS_PUBLIC = 1;
-    const ACCESS_PRIVATE = 2;
+    public const ACCESS_DENY    = 0;                      // Deny trumps all other access to allow exclusion of a user/group/role
+    public const ACCESS_PUBLIC  = 1;
+    public const ACCESS_PRIVATE = 2;
+    public const ACCESSES       = [
+        self::ACCESS_DENY,
+        self::ACCESS_PUBLIC,
+        self::ACCESS_PRIVATE,
+    ];
 
     /**
      * Setup mapper
