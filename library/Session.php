@@ -543,6 +543,7 @@ class Session
 
         if ($synergy_id) {
 //if user is parent get information regarding enrolled students
+            $user->setChildren(new GenericCollection(User::class));
             if ($user->getRole()->isParent()) {
                 $children = $synUser->getEnrolledStudents($synergy_id);
 
@@ -554,6 +555,9 @@ class Session
                         } catch (MapperException $e) {
                             continue;
                         }
+                        $childObject->setParents(new GenericCollection(User::class));
+                        $user->getChildren()[$childObject->getId()] = $childObject;
+                        $childObject->getParents()[$user->getId()]  = $user;
                         if (!$childObject->getHideTimetable()) {
                             $subjectList = $synUser->getSubjectList($childObject);
                         } else {
