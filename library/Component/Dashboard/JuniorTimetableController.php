@@ -159,10 +159,9 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
             if ($timetable[$i]['periodSequence'] == 2) {
                 if ($this->getIncludeNonclasses()) {
                     $period = $timetable[$i];
-                }
-                /* Skip nonclasses
-                 */
-                else {
+                } else {
+                    /* Skip nonclasses
+                     */
                     continue;
                 }
             } else {
@@ -177,11 +176,10 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                     $period['periodEnd']      = $timetable[$i]['periodEnd'];
                     $period['periodNumber']   = $timetable[$i]['periodNumber'];
                     $period['periodSequence'] = $timetable[$i]['periodSequence'];
-                }
-                /* Hide periodSequence 1 periods which have no classes
-                 * (Hide spares)
-                 */
-                else {
+                } else {
+                    /* Hide periodSequence 1 periods which have no classes
+                     * (Hide spares)
+                     */
                     continue;
                 }
             }
@@ -192,10 +190,9 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                 $condensedClass = $period;
 
                 $stack[] = "Initial condensed class is {$this->getCode($period)}<br>";
-            }
-            /* Condense
-             */
-            else {
+            } else {
+                /* Condense
+                 */
                 if ($condensedClass['code'] == $period['code']) {
                     $stack[] = "Updating periodEnd to {$period['periodEnd']}<br>";
 
