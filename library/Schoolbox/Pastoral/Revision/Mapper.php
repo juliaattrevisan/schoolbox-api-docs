@@ -171,6 +171,11 @@ class Mapper extends BaseMapper
         $model->setOwner($ownerMapper->hydrate($row, 'o'));
         $model->setModifiedBy($modifiedByMapper->hydrate($row, 'mb'));
         $model->setStudent($studentMapper->hydrate($row, 's'));
+        //hydrate student relationships, this existed previously, just making it more obvious
+        $externalUser = (new \Schoolbox\External\User());
+        $externalUser->loadTeachers([$model->getStudent()]);
+        $externalUser->loadParents([$model->getStudent()]);
+
         $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getRootId()));
         $model->setType($typeMapper->hydrate($row, 't'));
         $model->setSubType($subtypeMapper->hydrate($row, 'c'));

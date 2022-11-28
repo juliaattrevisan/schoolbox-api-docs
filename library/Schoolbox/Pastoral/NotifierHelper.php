@@ -32,8 +32,6 @@ class NotifierHelper
 
     private LoggerInterface $log;
 
-    private \Schoolbox\External\User $externalUser;
-
     /**
      * Constructor
      *
@@ -49,8 +47,6 @@ class NotifierHelper
         $this->userMapper          = $userMapper;
         $this->pastoralGroupMapper = $pastoralGroupMapper;
         $this->log                 = $log;
-
-        $this->externalUser = new \Schoolbox\External\User();
     }
 
     /**
@@ -151,14 +147,14 @@ class NotifierHelper
         $targetUsers = [];
         if ($role->isStaff() && $role->getAccessPastoral()) {
             // Only notify staff if they are a teacher of the student
-            foreach ($this->externalUser->getTeachers($student) as $teacher) {
+            foreach ($student->getTeacherCollection() as $teacher) {
                 if ($teacher->getRole()->getId() === $role->getId()) {
                     $targetUsers[$teacher->getId()] = $teacher;
                 }
             }
         } elseif ($role->isParent() && $parentAccessEnabled) {
             // Only send to parents if pastoral parent access is enabled
-            foreach ($this->externalUser->getParents($student) as $parent) {
+            foreach ($student->getParents() as $parent) {
                 if ($parent->getRole()->getId() === $role->getId()) {
                     $targetUsers[$parent->getId()] = $parent;
                 }
@@ -198,7 +194,7 @@ class NotifierHelper
             case Role::STAFF:
                 // Only notify student's teachers,
                 // if their role allows it
-                foreach ($this->externalUser->getTeachers($student) as $teacher) {
+                foreach ($student->getTeacherCollection() as $teacher) {
                     if ($teacher->getRole()->getAccessPastoral()) {
                         $targetUsers[$teacher->getId()] = $teacher;
                     }
@@ -215,7 +211,7 @@ class NotifierHelper
             case Role::PARENT:
                 // Only notify parents if parent access enabled
                 if ($parentAccessEnabled) {
-                    foreach ($this->externalUser->getParents($student) as $parent) {
+                    foreach ($student->getParents() as $parent) {
                         $targetUsers[$parent->getId()] = $parent;
                     }
                 }
