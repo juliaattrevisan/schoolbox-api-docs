@@ -145,7 +145,7 @@ class Notifier extends AbstractModuleNotifier
             : '';
         $type = strtolower($pastoral->getType()->getName());
         if ($pastoral->getSubType() instanceof SubType\Model) {
-            $type = sprintf('%s (%s)', $type, $pastoral->getSubType()->getName());
+            $type = sprintf('%s (%s)', $type, strtolower($pastoral->getSubType()->getName()));
         }
 
         $builder = new Builder();
