@@ -11,7 +11,7 @@ declare(strict_types=1);
  * Fulfils the Dashboard Timetable component's requirements
  * when using a SUDS Timetable connector
  */
-class SudsStrategy implements DashboardTimetableInterface
+class SudsStrategy implements ComponentInterface
 {
 
     public function execute()
