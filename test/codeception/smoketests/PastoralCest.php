@@ -542,6 +542,7 @@ class PastoralCest
         $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
         $createPastoral->setHeading($heading);
         $createPastoral->setPastoralType($id);
+        $createPastoral->setPastoralSubType(null);
         $i->amGoingTo('Send request create pastoral record with the new pastoral type for student #' . $student_jreed->getId());
         $i->sendRequest($createPastoral);
 
@@ -629,6 +630,7 @@ class PastoralCest
         $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
         $createPastoral->setHeading($heading);
         $createPastoral->setPastoralType($pastoralType);
+        $createPastoral->setPastoralSubType(null);
         $createPastoral->setPastoralActions($pastoralAction);
         $i->amGoingTo('Send request create pastoral record with the new pastoral action for student #' . $student_jreed->getId());
         $i->sendRequest($createPastoral);

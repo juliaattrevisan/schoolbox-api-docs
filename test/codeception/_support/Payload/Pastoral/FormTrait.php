@@ -33,7 +33,7 @@ trait FormTrait
         $this->setFormParam('typeId', $type);
     }
 
-    public function setPastoralSubType(int $subType): void
+    public function setPastoralSubType(?int $subType): void
     {
         $this->setFormParam('subtypeId', $subType);
     }
