@@ -1083,9 +1083,9 @@ class Controller extends Base
             $record->setSeverity($severity);
             $record->setModifiedBy($this->getUser());
             $record->setHeading($heading);
-            $points = $post->getFloat('points');
-            if ($points) {
-                if (!is_numeric($post->get('points') ?? '') || $points < -1000000 || $points > 1000000) {
+            if ($post->get('points')) {
+                $points = $post->getFloat('points');
+                if (!is_numeric($post->get('points')) || $points < -1000000 || $points > 1000000) {
                     throw new SchoolboxException('Points must be a float between -1000000 and 1000000');
                 }
                 $record->setPoints($points);
