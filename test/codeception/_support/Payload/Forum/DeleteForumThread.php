@@ -16,9 +16,6 @@ class DeleteForumThread extends \Payload\Request
     use PostTrait;
     use FormTrait;
 
-//    private int $id;
-//    private string $deleteForum;
-
     public function __construct(int $threadID, int $id, string $deleteForum)
     {
         $this->threadID = $threadID;

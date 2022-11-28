@@ -45,6 +45,7 @@ class ForumCest
     /** modify threads
      * check the responses
      *
+     * @depends postThread
      * @param IntegrationTester $i
      */
     public function modifyThread(IntegrationTester $i): void
@@ -72,6 +73,7 @@ class ForumCest
     /** reply threads
      * check the responses
      *
+     * @depends postThread
      * @param IntegrationTester $i
      */
     public function replyThread(IntegrationTester $i): void
@@ -99,12 +101,14 @@ class ForumCest
     /** delete a post and a thread
      * check the responses
      *
+     * @depends modifyThread
      * @param IntegrationTester $i
      */
     public function deletePostThread(IntegrationTester $i): void
     {
         #GIVEN
         // Deleting a post
+        $categoryId = 83;
         $threadId = $i->grabFromDatabase('forumThread', 'threadID', ['title like' => 'Forum: Automation API Smoke Test UPDATED%']);
         $postID = $i->grabFromDatabase('forumPost', 'postID', ['threadID' => $threadId, 'body like' => 'Forum Reply: Automation API Smoke Test Replying a Thread%']);
         $forumPayload = new Payload\Forum\DeleteForumThread($threadId, $postID, 'deletePost');
@@ -113,6 +117,11 @@ class ForumCest
         $i->sendRequest($forumPayload);
         #THEN
         $i->seeResponseCodeIs(302);
+
+        #GIVEN
+        // There is no comments anymore in the thread the forum/folder_id page is still accessible SA-13919
+        $i->sendGet("/forum/" . $categoryId);
+        $i->seeResponseCodeIs(200);
 
         #GIVEN
         // Deleting a thread
