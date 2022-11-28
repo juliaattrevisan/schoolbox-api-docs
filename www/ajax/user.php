@@ -27,6 +27,9 @@ $pageHandler->initSession();
 
 $userMapper = UserMapper::getInstance();
 
+// user relationship hydrator
+$externalUser = new \Schoolbox\External\User();
+
 $result = $suggestions = $data = $return = [];
 
 $excludeID = isset($_GET['excludeID']) ? intval($_GET['excludeID']) : null;
@@ -39,8 +42,6 @@ $roleTypeID = $_GET['roleTypeID'] ?? null;
 $showCampus = false;
 $residentialHouseID = $_GET['residentialHouseID'] ?? null;
 $showEmail = $_GET['email'] ?? false;
-
-$externalUser = new \Schoolbox\External\User();
 
 if (!empty($residentialHouseID)) {
     $residentialHouseID = explode(';', $residentialHouseID);
@@ -125,7 +126,8 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                 $userSchoolbox = $userCollection->offsetGet($userId);
                 if ($userSchoolbox) {
                     if ($userSchoolbox->getRole()->isParent()) {
-                        if (!$externalUser->isParentOf($userSchoolbox, $student)) {
+                        $externalUser->loadParents([$student]);
+                        if (!$userSchoolbox->isParentOf($student)) {
                             continue;
                         }
                     }
