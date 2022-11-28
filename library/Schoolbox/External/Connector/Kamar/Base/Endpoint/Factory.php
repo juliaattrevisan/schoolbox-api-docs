@@ -289,7 +289,7 @@ class Factory
              * Every student timetable processing uses info stored there
              * Recycle this instance in every iteration
              */
-            $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
+            $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->baseProfileMapper);
 
             /* Week Offset, Term selection
              *

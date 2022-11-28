@@ -301,7 +301,6 @@ class SubjectIterator implements Iterator
                 'title' => $teacher['title'],
                 'firstname' => $teacher['firstname'],
                 'surname' => $teacher['lastname'],
-                'username' => $teacher['username'],
             ];
         }
 
@@ -334,7 +333,6 @@ class SubjectIterator implements Iterator
             'title' => $student['title'],
             'firstname' => $student['firstname'],
             'surname' => $student['lastname'],
-            'username' => $student['username'],
         ];
     }
 

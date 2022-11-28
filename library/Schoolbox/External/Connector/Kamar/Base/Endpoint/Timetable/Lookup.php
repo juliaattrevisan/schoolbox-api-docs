@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
@@ -31,9 +32,9 @@ class Lookup
 
 
     /**
-     * @var UserMapper
+     * @var \Schoolbox\External\Profile\Mapper
      */
-    private UserMapper $userMapper;
+    private \Schoolbox\External\Profile\Mapper $baseProfileMapper;
 
 
     /**
@@ -51,13 +52,13 @@ class Lookup
     /**
      * Lookup constructor.
      *
-     * @param TimetablePeriodMapper  $timetablePeriodMapper
-     * @param UserMapper             $userMapper
+     * @param TimetablePeriodMapper $timetablePeriodMapper
+     * @param Mapper                $baseProfileMapper
      */
-    public function __construct(TimetablePeriodMapper $timetablePeriodMapper, UserMapper $userMapper)
+    public function __construct(TimetablePeriodMapper $timetablePeriodMapper, \Schoolbox\External\Profile\Mapper $baseProfileMapper)
     {
         $this->timetablePeriodMapper = $timetablePeriodMapper;
-        $this->userMapper = $userMapper;
+        $this->baseProfileMapper = $baseProfileMapper;
 
         $this->users = null;
         $this->periods = null;
@@ -92,17 +93,26 @@ class Lookup
      */
     private function initUserLookup(): array
     {
-        $userStatement = $this->userMapper->getDatabase()->query("
-            SELECT 
-                synergy_id AS externalId, 
-                u.`id`,
+        $userStatement = $this->baseProfileMapper->getDatabase()->query("
+            (SELECT 
+                external_id AS externalId,
                 title, 
                 firstname, 
-                lastname, 
-                username
-            FROM {$this->userMapper->getTable()} u
-            INNER JOIN `groups` g ON u.`group_id` = g.id
-            WHERE synergy_id IS NOT NULL
+                lastname
+            FROM sis_user_profile_staff sups 
+            INNER JOIN {$this->baseProfileMapper->getTable()} b ON sups.sis_user_profile_id = b.id
+            WHERE external_id IS NOT NULL)
+            
+            UNION 
+            
+            (SELECT 
+                external_id AS externalId,
+                title, 
+                firstname, 
+                lastname
+            FROM sis_user_profile_student sups 
+            INNER JOIN {$this->baseProfileMapper->getTable()} b ON sups.sis_user_profile_id = b.id
+            WHERE external_id IS NOT NULL)
         ");
 
         $users = [];
