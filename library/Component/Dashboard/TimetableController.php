@@ -7,6 +7,7 @@
  */
 
 use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
+use Schoolbox\MapperFactory;
 use Schoolbox\User;
 
 /**
@@ -51,17 +52,44 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 (string)$this->getConfigLoader()->get('schooldata_import_data_source'),
             )
         ) {
+            /* Instead of dependency injecting through the constructor,
+             * dig out this ancient ritual from the deepest Abstract
+             */
+            /** @var MapperFactory $mapperFactory */
+            $mapperFactory = $sitepage->getDi()->get('mapperFactory');
+
+            /** @var \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper */
+            $eventTypeMapper = $mapperFactory->get(\Schoolbox\Calendar\EventTypeMapper::class);
+
+            /** @var \Schoolbox\External\ClassEntryMapper $classEntryMapper */
+            $classEntryMapper = $mapperFactory->get(\Schoolbox\External\ClassEntryMapper::class);
+
+            /** @var \Schoolbox\External\ClassInvolvementMapper $classInvolvementMapper */
+            $classInvolvementMapper = $mapperFactory->get(\Schoolbox\External\ClassInvolvementMapper::class);
+
+            /** @var \Schoolbox\External\Event\Mapper $eventMapper */
+            $eventMapper = $mapperFactory->get(\Schoolbox\External\Event\Mapper::class);
+
+            /** @var \Schoolbox\External\Event\Overrides\Mapper $eventOverridesMapper */
+            $eventOverridesMapper = $mapperFactory->get(\Schoolbox\External\Event\Overrides\Mapper::class);
+
+            /** @var \Timetable_ColourMapper $timetableColourMapper */
+            $timetableColourMapper = $mapperFactory->get(\Timetable_ColourMapper::class);
+
+            /** @var \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper */
+            $staffProfileMapper = $mapperFactory->get(\Schoolbox\External\Profile\Staff\Mapper::class);
+
             $this->strategy = new Component_Dashboard_Timetable_SudsStrategy(
                 $instance,
                 $this->getUser(),
                 $this->getConfigLoader(),
-                \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-                \Schoolbox\External\ClassEntryMapper::getInstance(),
-                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-                \Schoolbox\External\Event\Mapper::getInstance(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-                \Timetable_ColourMapper::getInstance(),
-                \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+                $eventTypeMapper,
+                $classEntryMapper,
+                $classInvolvementMapper,
+                $eventMapper,
+                $eventOverridesMapper,
+                $timetableColourMapper,
+                $staffProfileMapper,
             );
         } else {
             $this->strategy = new Component_Dashboard_Timetable_CyclicStrategy(
