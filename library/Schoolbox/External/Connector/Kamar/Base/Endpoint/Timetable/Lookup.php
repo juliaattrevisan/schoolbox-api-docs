@@ -9,10 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
-use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 
 /**
  * Class Lookup
@@ -24,19 +22,6 @@ use Schoolbox\UserMapper;
  */
 class Lookup
 {
-
-    /**
-     * @var TimetablePeriodMapper
-     */
-    private TimetablePeriodMapper $timetablePeriodMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Profile\Mapper
-     */
-    private \Schoolbox\External\Profile\Mapper $baseProfileMapper;
-
-
     /**
      * @var array|null
      */
@@ -52,14 +37,13 @@ class Lookup
     /**
      * Lookup constructor.
      *
-     * @param TimetablePeriodMapper $timetablePeriodMapper
-     * @param Mapper                $baseProfileMapper
+     * @param TimetablePeriodMapper              $timetablePeriodMapper
+     * @param \Schoolbox\External\Profile\Mapper $baseProfileMapper
      */
-    public function __construct(TimetablePeriodMapper $timetablePeriodMapper, \Schoolbox\External\Profile\Mapper $baseProfileMapper)
-    {
-        $this->timetablePeriodMapper = $timetablePeriodMapper;
-        $this->baseProfileMapper = $baseProfileMapper;
-
+    public function __construct(
+        private TimetablePeriodMapper $timetablePeriodMapper,
+        private \Schoolbox\External\Profile\Mapper $baseProfileMapper
+    ) {
         $this->users = null;
         $this->periods = null;
     }
