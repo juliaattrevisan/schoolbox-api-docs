@@ -17,7 +17,7 @@
  # Some suds connectors won't have a Day;
  # in that case, just use "Today's Timetable"
  #}
-{% set timetableComponentName = events.first.day ?? "Today's Timetable" %}
+{% set timetableComponentName = '' == events.first.day ? "Today's Timetable" : events.first.day %}
 
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/timetable/jquery.timetable-resize.js?v={{ config.site_version }}"></script>
