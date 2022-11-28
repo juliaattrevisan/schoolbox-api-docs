@@ -13,7 +13,6 @@ namespace Schoolbox\Learning\Quiz;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Alaress_Date_Format;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz;
 
@@ -39,9 +38,6 @@ class ActionValidator
     /** @var Visibility */
     private $visibility;
 
-    private \Schoolbox\External\User $externalUser;
-
-
     /**
      * @param Alaress_Date_Format $now
      * @param Access              $access
@@ -51,7 +47,6 @@ class ActionValidator
         $this->now        = $now;
         $this->access     = $access;
         $this->visibility = new Visibility($access);
-        $this->externalUser = new \Schoolbox\External\User();
     }
 
 
@@ -68,7 +63,7 @@ class ActionValidator
             return true;
         }
         if ($user->getRole()->isParent()) {
-            foreach ($this->externalUser->getChildren($user) as $child) {
+            foreach ($user->getChildren() as $child) {
                 if ($this->visibility->isVisibleToUser($quiz, $child, true, $this->now)) {
                     return true;
                 }
@@ -174,7 +169,7 @@ class ActionValidator
         // Parent of student may view participation
         // (as long as config.restrict_student_submissions is off)
         return !$restrictStudentSubmissions
-            && $this->externalUser->isParentOf($user, $student);
+            && $user->isParentOf($student);
     }
 
 

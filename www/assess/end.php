@@ -73,6 +73,8 @@ $assessmentFolder = $assessment->getBaseContext()->getFolder();
 $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $assessmentFolder->getId());
 
 $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+//load children for checks in ActionValidator
+(new \Schoolbox\External\User())->loadChildren([$_SESSION['user']]);
 if (!$actionValidator->canAttemptQuiz($_SESSION['user'], $assessment)) {
     $this->pageNotFound();
 }

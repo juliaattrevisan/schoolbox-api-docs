@@ -252,6 +252,10 @@ class Mapper extends BaseMapper
         $model->setOwner($ownerMapper->hydrate($row, 'o'));
         $model->setModifiedBy($modifiedByMapper->hydrate($row, 'mb'));
         $model->setStudent($studentMapper->hydrate($row, 's'));
+        //complete the hydration on the student object....
+        (new \Schoolbox\External\User())->loadParents([$model->getStudent()]);
+        (new \Schoolbox\External\User())->loadTeachers([$model->getStudent()]);
+
         $studentYear = $this->hydrateJoin($row, 'student.year', 'sy');
         if ($studentYear) {
             $model->getStudent()->setYear($studentYear);

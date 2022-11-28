@@ -210,14 +210,14 @@ class Controller extends Base
                 }
             }
         }
-        $children = (new \Schoolbox\External\User())->getChildren($this->getUser());
+        (new \Schoolbox\External\User())->loadChildren([$this->getUser()]);
         $data = [
             'student'         => $student,
             'date'            => $date,
             'subjects'        => $subjects,
             'mailHandle'      => $this->getSession()->get('mailhandle'),
             'currentTerm'     => $term,
-            'children'        => $children,
+            'children'        => $this->getUser()->getChildren(),
             'filterPanel'     => $filterPanel,
             'filterIdSlugMap' => $this->buildFilterIdSlugMap($filterPanel),
         ];

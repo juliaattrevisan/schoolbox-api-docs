@@ -343,7 +343,9 @@ class Controller extends Base
                     return true;
                 }
                 if ($viewer->getRole()->isParent()) {
-                    foreach ((new \Schoolbox\External\User())->getChildren($viewer) as $child) {
+                    //only if the $viewer is parent should we hit the external db and grab the children
+                    (new \Schoolbox\External\User())->loadChildren([$viewer]);
+                    foreach ($viewer->getChildren() as $child) {
                         if ($visibility->isVisibleToUser($a, $child, true)) {
                             return true;
                         }

@@ -96,6 +96,8 @@ $assessment  = $assessmentDataSource->findByQuizId($assess['assess_id'], $sessio
 // Check access rights
 // Rules are the same as seeing an attempt
 $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+//load children for checks in ActionValidator
+(new \Schoolbox\External\User())->loadChildren([$sessionUser]);
 if (
     !$actionValidator->canReviewAttemptsReadonly(
         $sessionUser,

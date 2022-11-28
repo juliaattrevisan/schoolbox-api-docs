@@ -41,7 +41,9 @@ class ParentCanViewFeedback extends AbstractCanViewFeedback
             // Let this continue, in case the only thing being checked here is a Kami doc
         }
 
-        if (!(new \Schoolbox\External\User())->isParentOf($user, $student)) {
+        //hydrate parents of student
+        (new \Schoolbox\External\User())->loadParents([$student]);
+        if (!$user->isParentOf($student)) {
             throw new Unauthorized('Current user is not a parent of the specified student');
         }
 

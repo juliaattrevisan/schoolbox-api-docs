@@ -109,7 +109,9 @@ class CanSeeParticipation extends AbstractParticipationRule
             throw new Unauthorized();
         }
 
-        if ((new \Schoolbox\External\User())->isParentOf($user, $student)) {
+        //load parents of $student, and see if the current user is one of the parents
+        (new \Schoolbox\External\User())->loadParents([$student]);
+        if ($user->isParentOf($student)) {
             return true;
         }
 

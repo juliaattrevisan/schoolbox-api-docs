@@ -74,6 +74,8 @@ $accessLevel      = Access::getInstance()->getFolderAccess($_SESSION['user'], $a
 
 // Ensure session user is permitted to attempt this quiz
 $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
+//load children for checks in ActionValidator
+(new \Schoolbox\External\User())->loadChildren([$_SESSION['user']]);
 if (!$actionValidator->canAttemptQuiz($_SESSION['user'], $assessment)) {
     $this->pageNotFound();
 }
