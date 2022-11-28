@@ -13,41 +13,58 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract
 {
-    /** @var External_TimetableInterface $externalTimetable */
-    private $externalTimetable;
+    /**
+     * @var array $dayName
+     */
+    protected array $dayName = [];
 
-    /** @var array $dayName */
-    protected $dayName = [];
 
-    /** @var array $dayNumber */
-    protected $dayNumber = [];
+    /**
+     * @var array $dayNumber
+     */
+    protected array $dayNumber = [];
+
 
     /**
      * The current period for each campus. Null if there is no current period
      *
-     * @var null[]|mixed[][] $currentPeriod
+     * @var array $currentPeriod
      */
-    private $currentPeriod = [];
+    private array $currentPeriod = [];
 
-    /** @var array $timetable */
-    protected $timetable = [];
 
-    /** @var Timetable_Colour[]|Collection $colourList */
-    protected $colourList;
+    /**
+     * @var array $timetable
+     */
+    protected array $timetable = [];
+
+
+    /**
+     * @var Collection|Timetable_Colour[] $colourList
+     */
+    protected Collection $colourList;
+
 
     /**
      * Indexed by subject.code
      *
      * @var string[]
      */
-    private $subjectColourMap;
+    private array $subjectColourMap;
+
 
     /**
      * Point to next colour from the colour list to assign to a subject
      *
      * @var int
      */
-    private $colourIndex;
+    private int $colourIndex;
+
+
+    /**
+     * @var External_AttendanceLink
+     */
+    private External_AttendanceLink $externalAttendanceLink;
 
 
     /**
@@ -56,15 +73,15 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * @param SitePage           $sitepage
      * @param External_Timetable $externalTimetable
      */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, External_Timetable $externalTimetable)
-    {
+    public function __construct(
+        protected Component_Instance $instance,
+        protected \Schoolbox\User $user,
+        protected SitePage $sitepage,
+        private External_Timetable $externalTimetable
+    ) {
         parent::__construct($instance, $user, $sitepage);
-
-        $this->externalTimetable = $externalTimetable;
     }
 
-    /** @var External_AttendanceLink */
-    private $externalAttendanceLink;
 
     /**
      * Prepares data for the render function. Business logic.
