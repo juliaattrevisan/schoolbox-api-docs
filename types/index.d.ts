@@ -3,10 +3,17 @@
  * https://bobbyhadz.com/blog/typescript-extend-window
  */
 
-export {};
-
 declare global {
+    let cdnPrefix: string;
+    let siteVersion: string;
+    let CKEDITOR: any;
     interface Window {
         STORYBOOK_ENV: string;
     }
 }
+
+declare module 'jquery' {
+    export = $;
+}
+
+export {};

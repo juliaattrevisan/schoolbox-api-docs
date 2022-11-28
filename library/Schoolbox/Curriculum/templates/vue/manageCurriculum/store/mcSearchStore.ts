@@ -58,7 +58,6 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
      * @returns { string }
      */
     const enabled = computed<string>(() => (useViewNodesStore().showDisabled ? '' : '&enabled=1'));
-    // const enabled = computed<string>(() => (useViewNodesStore().showDisabled ? '' : '&enabled=1'));
 
     /**
      * when the search isActive, we should display the loading prompt straight away,

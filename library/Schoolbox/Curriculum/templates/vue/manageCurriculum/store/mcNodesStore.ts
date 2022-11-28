@@ -110,7 +110,7 @@ export const useNodesStore = defineStore('mcNodes', () => {
             isLoading.value = true;
             const response = await fetch(`${useStore().getApiEndpoint()}/${id}?ancestors=99`); // just use 99 as hopefully there's no tree that deep...
             if (response.ok) {
-                const nodeWithParents: Node = await response.json();
+                const nodeWithParents = (await response.json()) as Node;
                 await loadAllChildren(nodeWithParents);
             } else {
                 useStore().hasId = false; // as the id couldn't be found
@@ -159,7 +159,7 @@ export const useNodesStore = defineStore('mcNodes', () => {
                 },
             });
             if (response.ok) {
-                const topLevelNodes: Node[] = await response.json();
+                const topLevelNodes = (await response.json()) as Node[];
                 await setTopLevel(topLevelNodes);
             } else {
                 store.hasLoadError = true; // show the load error display state
@@ -208,7 +208,7 @@ export const useNodesStore = defineStore('mcNodes', () => {
      */
     function addNewCurriculum(curriculum: Node) {
         nodes.value?.children?.push(curriculum);
-        sortByName(nodes.value?.children);
+        sortByName(nodes.value?.children as Node[]);
     }
 
     /**
@@ -219,11 +219,11 @@ export const useNodesStore = defineStore('mcNodes', () => {
     function nodeUpdated(node: Node) {
         if (node.parent) {
             // sort via the parent node
-            const parentNode = findById(nodes.value?.children, node.parent.id);
-            sortByName(parentNode.children);
+            const parentNode = findById(nodes.value?.children as Node[], node.parent.id) as Node;
+            sortByName(parentNode.children as Node[]);
         } else {
             // otherwise sort on the children
-            sortByName(nodes.value?.children);
+            sortByName(nodes.value?.children as Node[]);
         }
     }
 

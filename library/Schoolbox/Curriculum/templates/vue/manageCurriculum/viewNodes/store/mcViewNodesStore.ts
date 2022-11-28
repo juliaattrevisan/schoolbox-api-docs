@@ -74,7 +74,7 @@ export const useViewNodesStore = defineStore('mcViewNodes', () => {
     const nodes = computed<Node[]>(() => {
         const searchStore = useSearchStore();
         if (searchStore.isActive) {
-            return searchStore.results as Node[];
+            return searchStore.results;
         }
         return [current.value] as Node[];
     });

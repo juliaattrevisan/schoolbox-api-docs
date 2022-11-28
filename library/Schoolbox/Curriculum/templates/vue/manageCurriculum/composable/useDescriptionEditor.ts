@@ -9,11 +9,78 @@
 import { ref, onMounted } from 'vue';
 import { isScriptAdded, injectScript } from '@js/util/domUtils';
 
-
-export function useDescriptionEditor ($initialValue, $ckeditorInstance) {
-
+/**
+ * Initialise the composable
+ *
+ * @param { string } $initialValue - the initial string value to input into the ckeditor
+ * @param { string } $ckeditorInstance - the selector to target the CKEditor
+ * @returns { string } - the initial value
+ */
+export function useDescriptionEditor($initialValue: string, $ckeditorInstance: string) {
     const initialValue = ref($initialValue);
     const ckeditorInstance = $ckeditorInstance;
+
+    /**
+     * Remove these buttons as media shouldn't be added to the description
+     *
+     * @typedef HTMLElement
+     * @param { HTMLElement } ckeditor - the ckeditor instance in the DOM
+     */
+    function removeMediaEmbedButtons(ckeditor: HTMLElement) {
+        const videoAudioButton = ckeditor.querySelector('.cke_button__schoolboxresourcemedia') as HTMLElement;
+        videoAudioButton.style.display = 'none';
+        const imageButton = ckeditor.querySelector('.cke_button__schoolboxresourceimage') as HTMLElement;
+        imageButton.style.display = 'none';
+        const eqnEditorButton = ckeditor.querySelector('.cke_button__eqneditor') as HTMLElement;
+        eqnEditorButton.style.display = 'none';
+    }
+
+    /**
+     * The config that needs to be passed to CKEditor in order to for it to work in Vue land
+     *
+     * @returns { object } - configuration specific to Vue
+     */
+    function getVueSpecificConfig() {
+        return {
+            on: {
+                change: () => {
+                    // Bind the content of CKEditor into the description model on change
+                    initialValue.value = CKEDITOR.instances[ckeditorInstance].getData() as string;
+                },
+                instanceReady: (event) => {
+                    // can display the loaded CKEditor now
+                    if (initialValue.value !== null) {
+                        event.editor.setData(initialValue.value); // set the initial data
+                        removeMediaEmbedButtons(event.editor.container.$ as HTMLElement);
+                    }
+                },
+                drop: (event) => {
+                    // prevent drag and drop from functioning (haven't been able to disable it prior in any other config setting)
+                    event.stop();
+                },
+            },
+            targetElements: $(`#${ckeditorInstance}`),
+        };
+    }
+
+    /**
+     * load the ckeditor into the browser
+     */
+    async function loadCKEditor() {
+        try {
+            const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`; // cdnPrefix and siteVersion are global vars from chrome.twig
+            if (!isScriptAdded(ckeditorScript)) {
+                await injectScript(ckeditorScript);
+            }
+            const jqueryEditorScript = `${cdnPrefix}/js/editor/jquery.editor.js?v=${siteVersion}`; // cdnPrefix and siteVersion are global vars from chrome.twig
+            if (!isScriptAdded(jqueryEditorScript)) {
+                await injectScript(jqueryEditorScript);
+            }
+            $.fn.alaressEditor($.alaressEditorConfigForComments(getVueSpecificConfig()));
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
 
     /**
      * to load the ckeditor when ready
@@ -22,65 +89,5 @@ export function useDescriptionEditor ($initialValue, $ckeditorInstance) {
         loadCKEditor();
     });
 
-    /**
-     * load the ckeditor into the browser
-     */
-    async function loadCKEditor () {
-        try {
-            const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
-            if (!isScriptAdded(ckeditorScript)) {
-                await injectScript(ckeditorScript);
-            }
-            const jqueryEditorScript = `${cdnPrefix}/js/editor/jquery.editor.js?v=${siteVersion}`; //cdnPrefix and siteVersion are global vars from chrome.twig
-            if (!isScriptAdded(jqueryEditorScript)) {
-                await injectScript(jqueryEditorScript);
-            }
-            $.fn.alaressEditor($.alaressEditorConfigForComments(getVueSpecificConfig()));
-        } catch (error) {
-            console.warn(error);
-        }
-    }
-
-    /**
-     * The config that needs to be passed to CKEditor in order to for it to work in Vue land
-     *
-     * @returns { Object }
-     */
-    function getVueSpecificConfig () {
-        return {
-            on: {
-                change: () => { // Bind the content of CKEditor into the description model on change
-                    initialValue.value = CKEDITOR.instances[ckeditorInstance].getData();
-                },
-                instanceReady: (event) => { //can display the loaded CKEditor now
-                    if (initialValue.value !== null) {
-                        event.editor.setData(initialValue.value); //set the initial data
-                        removeMediaEmbedButtons(event.editor.container.$);
-                    }
-                },
-                drop: (event) => { //prevent drag and drop from functioning (haven't been able to disable it prior in any other config setting)
-                    event.stop();
-                },
-            },
-            targetElements: $(`#${ckeditorInstance}`),
-        }
-    }
-
-    /**
-     * Remove these buttons as media shouldn't be added to the description
-     *
-     * @returns { HTMLElement }
-     */
-    function removeMediaEmbedButtons (ckeditor) {
-        const videoAudioButton = ckeditor.querySelector('.cke_button__schoolboxresourcemedia');
-        videoAudioButton.style.display = 'none';
-        const imageButton = ckeditor.querySelector('.cke_button__schoolboxresourceimage');
-        imageButton.style.display = 'none';
-        const eqnEditorButton = ckeditor.querySelector('.cke_button__eqneditor');
-        eqnEditorButton.style.display = 'none';
-
-    }
-
     return initialValue;
-
 }

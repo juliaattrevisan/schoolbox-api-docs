@@ -20,33 +20,6 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', () => {
     }
 
     /**
-     * node removal has been confirmed so notify the backend
-     * and then pull it out of the nodes if successful
-     *
-     * @TODO - more extensive error checking needs to occur
-     */
-    async function deleteNodes() {
-        try {
-            isProcessing.value = true;
-            const nodeDeletions = await Promise.all(getFetches());
-            const deleteResponses = nodeDeletions.map((response) => response.ok);
-            const isAllResponsesOk = deleteResponses.every((response) => response === true);
-            if (isAllResponsesOk) {
-                const successMessage = getSuccessMessage();
-                useSelectedNodesStore().deleteNodes();
-                cancel();
-                return successMessage;
-            } else {
-                throw new Error();
-            }
-        } catch (error) {
-            console.warn(error);
-        } finally {
-            isProcessing.value = false;
-        }
-    }
-
-    /**
      * To delete all the marked nodes in parallel
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
      *
@@ -83,6 +56,32 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', () => {
      */
     function cancel() {
         isOpen.value = false;
+    }
+
+    /**
+     * node removal has been confirmed so notify the backend
+     * and then pull it out of the nodes if successful
+     *
+     * @TODO - more extensive error checking needs to occur
+     */
+    async function deleteNodes() {
+        try {
+            isProcessing.value = true;
+            const nodeDeletions = await Promise.all(getFetches());
+            const deleteResponses = nodeDeletions.map((response) => response.ok);
+            const isAllResponsesOk = deleteResponses.every((response) => response === true);
+            if (isAllResponsesOk) {
+                const successMessage = getSuccessMessage();
+                useSelectedNodesStore().deleteNodes();
+                cancel();
+                return successMessage;
+            }
+            throw new Error();
+        } catch (error) {
+            throw new Error();
+        } finally {
+            isProcessing.value = false;
+        }
     }
 
     return {

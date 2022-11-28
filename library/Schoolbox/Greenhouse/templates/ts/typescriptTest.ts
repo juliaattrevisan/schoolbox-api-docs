@@ -26,16 +26,17 @@ function hello(person: Developer): string {
     return `Hi there ${person.firstName.toUpperCase()}!`; // the IDE will allow better autocomplete on firstName as it knows it's a string
 }
 
-console.warn(hello(myself));
+hello(myself);
 
 /**
  * Log name or age
  *
  * @param { number | string } nameOrAge - log either name or age
+ * @returns { string } - to return name or age
  */
-function printNameOrAge(nameOrAge: number | string): void {
+function printNameOrAge(nameOrAge: number | string): string {
     // union types can be used to declare multiple allowed property types
-    console.warn(`Your name or age is: ${nameOrAge}`);
+    return `Your name or age is: ${nameOrAge}`;
 }
 
 printNameOrAge(myself.lastName);
@@ -44,21 +45,22 @@ printNameOrAge(myself.age);
 /**
  * We can use optional parameters
  *
- * @param {string} name - name to greet
+ * @param { string } name - name to greet
+ * @returns { string } - say hello
  */
-function greet(name?: string): void {
+function greet(name?: string): string {
     if (name) {
-        console.warn(`Hello ${name}`);
-    } else {
-        console.warn('Hello Stranger');
+        return `Hello ${name}`;
     }
+    return 'Hello Stranger';
 }
 
 greet();
 
 // type assertions to give Typescript hints on the type
 // for example Typescript returns this as HTMLElement
-const htmlElement = document.getElementById('add-to-me');
+// const htmlElement = document.getElementById('add-to-me');
+// commenting this out should provide a warning that htmlElement is not being used
 
 // but we know that it's actually going to be a HTMLParagraphElement
 // which will give us more confidence on the properties we can access/change

@@ -24,7 +24,7 @@ const ckeditorInstance = computed(() => `new-curriculum`);
 /**
  * Use a customised ckeditor for the description field
  */
-const descriptionField = useDescriptionEditor(addCurriculumStore.curriculum?.description, ckeditorInstance.value);
+const descriptionField = useDescriptionEditor(addCurriculumStore.curriculum?.description as string, ckeditorInstance.value);
 
 /**
  * And watch for changes on this field so we can update the description in the store
@@ -77,7 +77,10 @@ function onCancelSelected () {
  * @returns { Boolean }
  */
 const isAddDisabled = computed(() => {
-    return addCurriculumStore.curriculum?.name.trim().length === 0 || addCurriculumStore.isProcessing;
+    if (typeof addCurriculumStore.curriculum.name === 'string') {
+        return addCurriculumStore.curriculum?.name.trim().length === 0 || addCurriculumStore.isProcessing;
+    }
+    return false;
 });
 
 </script>
