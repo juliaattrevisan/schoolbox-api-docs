@@ -162,7 +162,8 @@ class Module extends BaseModule
                     new Callback(function (array $params) {
                         try {
                             $event = $this->getEventMapper()->findById($params['eventId']);
-
+                            //hydrate parents for further permission checks
+                            $this->getRelationshipHydrator()->loadParents([$event->getOwner()]);
                             if ((new Event\Access(Access::getInstance()))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
                                 return true;
                             }
@@ -219,7 +220,11 @@ class Module extends BaseModule
      */
     private function preloadEvent(array $params): array
     {
-        return ['event' => $this->getEventMapper()->findById($params['eventId'])];
+        $event = $this->getEventMapper()->findById($params['eventId'])
+        //hydrate parents for further permission checks
+        $this->getRelationshipHydrator()->loadParents([$event->getOwner()]);
+
+        return ['event' => $event];
     }
 
     /**
@@ -229,5 +234,20 @@ class Module extends BaseModule
     private function getEventMapper(): EventMapper
     {
         return $this->getMapperFactory()->get(EventMapper::class);
+    }
+
+    /**
+     * Quick call to build the external user relationship hydrator
+     *
+     * @return \Schoolbox\External\User
+     */
+    protected function getRelationshipHydrator()
+    {
+        return new \Schoolbox\External\User(
+            $this->getConfig()->get('external_type'),
+            new \External_Class(),
+            new \External_User(),
+            $this->getMapperFactory()->get(UserMapper::class)
+        );
     }
 }
