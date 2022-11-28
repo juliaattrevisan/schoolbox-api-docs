@@ -4,7 +4,6 @@ namespace Homepage;
 
 use AcceptanceTester;
 use Exception;
-use Page\Badges\Badges;
 use Page\Homepage;
 
 class ComponentsCest
@@ -16,14 +15,14 @@ class ComponentsCest
      * @throws Exception
      *
      * get logged in
-     * navigate to https://vagrant.dev.schoolbox.cloud/learning/badge
+     * navigate to https://vagrant.dev.schoolbox.cloud/homepage/83
      */
     public function _before(AcceptanceTester $i)
     {
         $i->logout();
         $i->loginAsAdmin();
-
-        $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/homepage/83');
+        $homepage = new Homepage($i);
+        $i->amOnPage($homepage->generateRoute(83));
     }
 
     /**
@@ -37,18 +36,15 @@ class ComponentsCest
     {
         $homepage = new Homepage($i);
         $i->amGoingTo('Click the add component icon');
-//        $i->click(['css' => 'a#add-component']);
         $homepage->clickAddComponentsButton();
-//        sleep(1);
-//        $i->canSeeElement(['css' => 'div#tabs-1']);
-        $i->amGoingTo('Check the tabs presents the proper numbers of components');
+        $i->amGoingTo('Check the tabs present the proper numbers of components');
         $i->canSee('Information (7)');
         $i->canSee('Collaboration (10)');
         $i->canSee('Learning (11)');
         $i->canSee('Multimedia (9)');
         $i->canSee('Resources (4)');
         $i->canSee('Feeds (6)');
-        $i->amGoingTo('Check the tabs presents the proper components');
+        $i->amGoingTo('Check the tabs present the proper components');
         $i->click(['css' => 'a[href=\#tabs-sub-3]']);
         $i->canSeeElement(['css' => 'ul#tabs-sub-3']);
         $i->canSeeElement(['css' => 'span[class=size-32\ icon-masonry\ icon-masonry-Component_Homepage_ClassListController]']);
