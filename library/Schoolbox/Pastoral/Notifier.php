@@ -143,7 +143,10 @@ class Notifier extends AbstractModuleNotifier
         $severity = $pastoral->getSeverity()
             ? sprintf('%s %s', strtolower($pastoral->getSeverity()->getName()), $this->l10n->translate('severity'))
             : '';
-        $type     = strtolower($pastoral->getSubType() instanceof SubType\Model ? $pastoral->getSubType()->getName() : $pastoral->getType()->getName());
+        $type = strtolower($pastoral->getType()->getName());
+        if ($pastoral->getSubType() instanceof SubType\Model) {
+            $type = sprintf('%s (%s)', $type, $pastoral->getSubType()->getName());
+        }
 
         $builder = new Builder();
         $builder->setTitle("A :pastoralcare record has been {$method}")
