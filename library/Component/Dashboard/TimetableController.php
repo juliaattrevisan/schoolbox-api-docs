@@ -50,6 +50,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             (string)$this->getConfigLoader()->get('schooldata_import_data_source'),
         )) {
             $this->strategy = new Component_Dashboard_Timetable_SudsStrategy(
+                $instance,
                 $this->getUser(),
                 $this->getConfigLoader(),
                 \Schoolbox\Calendar\EventTypeMapper::getInstance(),
@@ -77,6 +78,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
+     * @throws InvalidArgumentException
+     * @throws PDOException
      * @throws \DebugBar\DebugBarException
      */
     public function execute(): bool

@@ -27,6 +27,7 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
      * Just raid the subscription for data.
      * ez
      *
+     * @param Component_Instance                         $componentInstance
      * @param \Schoolbox\User                            $user
      * @param \Schoolbox\IConfigLoader                   $configLoader
      * @param \Schoolbox\Calendar\EventTypeMapper        $eventTypeMapper
@@ -38,6 +39,7 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
      * @param \Schoolbox\External\Profile\Staff\Mapper   $staffProfileMapper
      */
     public function __construct(
+        private Component_Instance $componentInstance,
         private \Schoolbox\User $user,
         private \Schoolbox\IConfigLoader $configLoader,
         private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
@@ -91,6 +93,8 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
         return [
             'template' => '@timetable/Dashboard/sudsComponent.twig',
             'data' => [
+                'componentInstanceId' => $this->componentInstance->getId(),
+                'now' => \Alaress_Date_Format::now()->getUnixTimeStamp(),
                 'events' => $this->events
             ]
         ];
