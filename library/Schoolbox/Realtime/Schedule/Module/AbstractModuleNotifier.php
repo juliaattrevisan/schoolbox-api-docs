@@ -60,8 +60,6 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
     /** @var int */
     protected $iconSize = 'square64';
 
-    protected \Schoolbox\External\User $externalUser;
-
     /**
      * Default behaviour is to allow propagation of sub-events
      * @var bool
@@ -136,11 +134,6 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
             $dependencies['srcMapper'] = SourceMapper::getInstance();
         }
 
-        //inject or build the new external User Class
-        if (empty($dependencies['externalUser'])) {
-            $dependencies['externalUser'] = new \Schoolbox\External\User();
-        }
-
         // rudimentary dependency injection to allow DI of mappers for testability
         foreach ($dependencies as $prop => $dep) {
             $method = 'set' . ucfirst($prop);
@@ -198,12 +191,6 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
     {
         $this->srcMapper = $srcMapper;
     }
-
-    public function setExternalUser(\Schoolbox\External\User $externalUser)
-    {
-        $this->externalUser = $externalUser;
-    }
-
 
     /**
      * Reconstructs and returns what the model looked like prior to the
