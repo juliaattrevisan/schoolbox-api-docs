@@ -991,8 +991,12 @@ class Controller extends Base
             // Ensure that subtype belongs to the parent type:
             // if there is somehow a mismatch, clear the subtype
             if ($type->getId() !== $subtype->getPastoralType()->getId()) {
-                $subtype = null;
+                throw new SchoolboxException("Pastoral sub-type with ID {$subtypeId} is not a sub-type of type {$type->getId()}");
             }
+        }
+        // If type has subtypes but subtype is not provided, throw error
+        if (!$subtype && $type->getSubTypes()->count() > 0) {
+            throw new SchoolboxException("Sub-type needs to be selected for type {$post->get('typeId')}");
         }
 
         // Prepare Severity. No database change.

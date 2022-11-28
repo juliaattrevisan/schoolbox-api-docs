@@ -17,7 +17,11 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralSubtypeMapper;
+use Schoolbox\Pastoral\SubType\Model;
+use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -101,7 +105,7 @@ class Api extends \Codeception\Module
     /**
      * Sets database config value temporally
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function changeDBConfig(string $name, $value)
     {
@@ -191,6 +195,53 @@ class Api extends \Codeception\Module
     }
 
     /**
+     * @return GenericCollection
+     */
+    public function getPastoralTags()
+    {
+        return PastoralTagMapper::getInstance()->findAll();
+    }
+
+    /**
+     * @return GenericCollection
+     * @throws MapperException
+     */
+    public function preparePastoralActions(): GenericCollection
+    {
+        $pastoralActionMapper  = PastoralActionMapper::getInstance();
+        $pastoralSubtypeMapper = PastoralSubtypeMapper::getInstance();
+        $pastoralTypeMapper    = PastoralTypeMapper::getInstance();
+        $actions               = $pastoralActionMapper->findAll();
+
+        if ($actions->count() === 0) {
+            for ($i = 0; $i < 5; $i++) {
+                $newAction = $pastoralActionMapper->createModel()
+                                                  ->setName($this->generateText(50))
+                                                  ->setSequence($i);
+                $pastoralActionMapper->save($newAction);
+            }
+            $actions = $pastoralActionMapper->findAll();
+        }
+
+        $types = $pastoralTypeMapper->findAll();
+        foreach ($types as $type) {
+            if ($type->getSubTypes()->count()) {
+                /** @var Model $subType */
+                $subType = $type->getSubTypes()->first();
+                $subType->setActions($pastoralActionMapper->createCollection()->add($actions->first()));
+                $pastoralSubtypeMapper->save($subType);
+            } else {
+                $type->setActions($pastoralActionMapper->createCollection()->add($actions->last()));
+                $pastoralTypeMapper->save($type);
+            }
+        }
+
+        $test = $this->getMaxValue('lu_pastoral_action', 'id');
+
+        return $pastoralActionMapper->findAll();
+    }
+
+    /**
      * Return DB module in a type-safe manner.
      *
      * @return Db
@@ -199,5 +250,34 @@ class Api extends \Codeception\Module
     private function getDbModule(): Db
     {
         return $this->getModule('Db');
+    }
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    public function generateText(int $length): string
+    {
+        $characters = 'abcdefghijklmnopqrstuvwxyz.012345678!@#$%*&^()-+';
+
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            if ($length > 8 && rand(1, 7) === 5) {
+                $randomString .= ' ';
+                $i++;
+            }
+            $randomString .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        return $randomString;
+    }
+
+
+    /**
+     * @param string $tableName
+     * @param string $column
+     * @return void
+     */
+    public function getMaxValue(string $tableName, string $column) {
+        return $this->getDbModule()->grabFromDatabase($tableName, "max($column)");
     }
 }

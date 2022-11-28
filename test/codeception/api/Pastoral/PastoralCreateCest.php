@@ -29,9 +29,12 @@ class PastoralCreateCest
     /**
      * @param ApiTester $i
      * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function run(ApiTester $i)
     {
+        $i->preparePastoralActions();
+
         $users = $i->getUsers();
 
         $this->userPrivate = $i->createTestUser('private-' . time(), Role::STAFF, false);
@@ -47,8 +50,9 @@ class PastoralCreateCest
 
     /**
      * @param ApiTester $i
-     * @param bool      $superUser
+     * @param User      $operator
      * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     private function testCreate(\ApiTester $i, User $operator)
     {
@@ -60,7 +64,12 @@ class PastoralCreateCest
             // TODO: check role permission
             if (!$operator->getRole()->isStaff()) {
                 $i->seeResponseCodeIs(401);
-                return;
+                continue;
+            }
+
+            if (!$postData['isValid']) {
+                $i->seeResponseCodeIs(400);
+                continue;
             }
 
             $i->seeResponseCodeIs(201);
@@ -93,7 +102,7 @@ class PastoralCreateCest
             $i->restoreDBConfig();
 
             // turn on action
-            $i->changeDBConfig('pastoral_action_enable', 0);
+            $i->changeDBConfig('pastoral_action_enable', 1);
             $i->sendPost('/pastoral/record/insert', $postData['data']);
 
             $i->seeResponseCodeIs(201);
@@ -133,6 +142,7 @@ class PastoralCreateCest
             'expectedResponseCode' => [
                 400 => [$this->userDeny, $this->userPrivate, $this->userPublic],
             ],
+            'isValid'              => true,
         ];
 
         // set null to nullable
@@ -156,6 +166,7 @@ class PastoralCreateCest
             'expectedResponseCode' => [
                 400 => [$this->userDeny, $this->userPrivate, $this->userPublic],
             ],
+            'isValid'              => true,
         ];
 
         yield [
@@ -186,8 +197,10 @@ class PastoralCreateCest
                 ],
                 'public_attachments'  => ['store:723b6e31c2979b33deea852cdbbad9c4b0e00b96:piglet2.jpg'],
                 'private_attachments' => ['store:69903e5d89e1574d92de8afd1634f472e3096b3c:scrabble2.jpg'],
-                // TODO: config
-                'tags'                => "131,132",
+                'tags'                => implode(',', [
+                    $i->getPastoralTags()->first()->getId(),
+                    $i->getPastoralTags()->last()->getId(),
+                ]),
                 'tagNames'            => "test tag A,test tag B",
                 'duplicateIds'        => '25,26',
                 'points'              => 50,
@@ -198,6 +211,7 @@ class PastoralCreateCest
                 400 => [$this->userDeny],
                 200 => [$this->userPrivate, $this->userPublic],
             ],
+            'isValid'              => true,
         ];
     }
 
