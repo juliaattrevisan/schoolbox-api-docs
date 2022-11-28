@@ -16,13 +16,20 @@ class Homepage
 {
     public const URL = '/homepage/{id}';
 
-    public const ELEMENT_ADD_COMPONENT_TAB = 'a#add-component';
+    public const ELEMENT_ADD_COMPONENT_TAB = '#tabs-1';
     public const ELEMENT_ADD_COMPONENT_SECTION_INFORMATION = '#tabs-sub-1';
     public const ELEMENT_ADD_COMPONENT_SECTION_COLLABORATION = '#tabs-sub-2';
     public const ELEMENT_ADD_COMPONENT_SECTION_LEARNING = '#tabs-sub-3';
     public const ELEMENT_ADD_COMPONENT_SECTION_MULTIMEDIA = '#tabs-sub-4';
     public const ELEMENT_ADD_COMPONENT_SECTION_RESOURCES = '#tabs-sub-5';
     public const ELEMENT_ADD_COMPONENT_SECTION_FEEDS = '#tabs-sub-6';
+
+    public const ELEMENT_COMPONENT_SECTION_INFORMATION = 'a[href=\#tabs-sub-1]';
+    public const ELEMENT_COMPONENT_SECTION_COLLABORATION = 'a[href=\#tabs-sub-2]';
+    public const ELEMENT_COMPONENT_SECTION_LEARNING = 'a[href=\#tabs-sub-3]';
+    public const ELEMENT_COMPONENT_SECTION_MULTIMEDIA = 'a[href=\#tabs-sub-4]';
+    public const ELEMENT_COMPONENT_SECTION_RESOURCES = 'a[href=\#tabs-sub-5]';
+    public const ELEMENT_COMPONENT_SECTION_FEEDS = 'a[href=\#tabs-sub-6]';
 
     public const ELEMENT_EDIT_COLUMNS_TAB = '#tabs-2';
 
@@ -178,18 +185,24 @@ class Homepage
      *
      * @param string $selector
      */
-    private function openTabPanel(string $selector): void
+    public function openTabPanel(string $selector): void
     {
         $this->tester->click(['css' => sprintf('[href="%s"]', $selector)]);
     }
 
+    /**
+     * Click one of the tabs to add components
+     */
+    public function clickComponentsTab(string $tab): void
+    {
+        $this->tester->click($tab);
+    }
 
     /**
-     * Click Add components button at the top of the screen
+     * Check component icons
      */
-    public function clickAddComponentsButton(): void
+    public function checkComponentIcon(string $icon): void
     {
-        $this->tester->click(self::ELEMENT_ADD_COMPONENT_TAB);
-        $this->tester->waitForElementVisible(self::ELEMENT_ADD_COMPONENT_SECTION_INFORMATION);
+        $this->tester->canSeeElement(['css' => 'span[class=size-32\ icon-masonry\ icon-masonry-' . $icon . ']']);
     }
 }
