@@ -7,12 +7,22 @@
 
 declare(strict_types=1);
 
+use Calendar\Event\Collection;
+
 /**
  * Fulfils the Dashboard Timetable component's requirements
  * when using a SUDS Timetable connector
  */
 class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_Timetable_ComponentInterface
 {
+    /**
+     * A set of sis_event records via the calendar subscription mechanism
+     *
+     * @var Collection
+     */
+    private Collection $events;
+
+
     /**
      * Just raid the subscription for data.
      * ez
@@ -52,7 +62,7 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
         $startTimestamp = \Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp();
         $endTimestamp = \Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp();
 
-        $events = (new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
+        $this->events = (new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
             Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
             $this->user,
             $this->user,
@@ -67,16 +77,22 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
             $this->staffProfileMapper
         ))->getEvents($startTimestamp, $endTimestamp);
 
-        new \Alaress_Probe($events);
+        return true;
     }
 
 
     /**
      * @param string $templateHandle
-     * @return bool
+     * @return bool|array
+     * @throws \DebugBar\DebugBarException
      */
-    public function renderTemplate(string $templateHandle): bool
+    public function renderTemplate(string $templateHandle): bool|array
     {
-        // TODO: Implement renderTemplate() method.
+        return [
+            'template' => '@timetable/Dashboard/sudsComponent.twig',
+            'data' => [
+                'events' => $this->events
+            ]
+        ];
     }
 }
