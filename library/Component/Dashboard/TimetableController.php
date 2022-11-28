@@ -8,6 +8,7 @@
 
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -68,6 +69,15 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
 
     /**
+     * Choose which data acquisition/data rendering approach to use
+     * since Dashboard Timetable component fulfils either
+     *
+     * @var DashboardTimetableInterface
+     */
+    private DashboardTimetableInterface $strategy;
+
+
+    /**
      * @param Component_Instance $instance
      * @param User               $user
      * @param SitePage           $sitepage
@@ -80,6 +90,21 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         private External_Timetable $externalTimetable
     ) {
         parent::__construct($instance, $user, $sitepage);
+
+        /* Choose which data acquisition/data rendering approach to use
+         * since Dashboard Timetable component fulfils either
+         *
+         * Each of these strats encompasses all it needs to procure data
+         * and render it accordingly
+         */
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy(
+            (string)$this->getConfigLoader()->get('external_type'),
+            (string)$this->getConfigLoader()->get('schooldata_import_data_source'),
+        )) {
+            $this->strategy = new SudsStrategy();
+        } else {
+            $this->strategy = new LiveStrategy();
+        }
     }
 
 
