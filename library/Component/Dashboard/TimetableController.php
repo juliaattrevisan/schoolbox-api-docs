@@ -49,7 +49,17 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             (string)$this->getConfigLoader()->get('external_type'),
             (string)$this->getConfigLoader()->get('schooldata_import_data_source'),
         )) {
-            $this->strategy = new Component_Dashboard_Timetable_SudsStrategy();
+            $this->strategy = new Component_Dashboard_Timetable_SudsStrategy(
+                $this->getUser(),
+                $this->getConfigLoader(),
+                \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                \Schoolbox\External\ClassEntryMapper::getInstance(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                \Timetable_ColourMapper::getInstance(),
+                \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+            );
         } else {
             $this->strategy = new Component_Dashboard_Timetable_LiveStrategy(
                 $this->getConfigLoader(),
@@ -67,6 +77,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
+     * @throws \DebugBar\DebugBarException
      */
     public function execute(): bool
     {
