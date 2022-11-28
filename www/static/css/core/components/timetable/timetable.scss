@@ -72,6 +72,16 @@ $timetable-cell-border: $body-bg;
     th, td {
         width: 50%;
     }
+
+    th {
+        /* Arbitrarily choose the white background
+         */
+        background-color: #fff;
+
+        /* Apparently in small viewports you're missing padding
+         */
+        padding: 1rem 1.5rem 1rem 1.5rem;
+    }
 }
 
 /* Fix guttering in small display - subject elements
@@ -92,45 +102,45 @@ $timetable-cell-border: $body-bg;
 /* Custom rules for full timetable grid
  */
 @media print {
-  .timetable {
+    .timetable {
 
-    /* Reduce font size in each time element
-     */
-    th, time {
-      font-size: 0.5rem;
-      padding: 0.25rem !important;
+        /* Reduce font size in each time element
+         */
+        th, time {
+            font-size: 0.5rem;
+            padding: 0.25rem !important;
+        }
+
+        /* Hide the indicator border
+         */
+        .timetable-subject-active {
+            border: 0 !important;
+
+            /* Hide the indicator triangle
+             */
+            &:before {
+                border-top: 0 !important
+            }
+        }
+
+        /* Reduce font size in each timetable-subject div
+         */
+        .timetable-subject {
+            font-size: 0.5rem;
+            font-weight: bold;
+            height: auto !important;
+            padding: 0.25rem !important;
+
+            /* Bold the subject being taught, but normal-weight
+             * all the subject's meta details
+             */
+            div {
+                font-weight: normal;
+            }
+        }
     }
 
-    /* Hide the indicator border
-     */
-    .timetable-subject-active {
-      border: 0 !important;
-
-      /* Hide the indicator triangle
-       */
-      &:before {
-        border-top: 0 !important
-      }
+    .timetable-small {
+        display: none;
     }
-
-    /* Reduce font size in each timetable-subject div
-     */
-    .timetable-subject {
-      font-size: 0.5rem;
-      font-weight: bold;
-      height: auto !important;
-      padding: 0.25rem !important;
-
-      /* Bold the subject being taught, but normal-weight
-       * all the subject's meta details
-       */
-      div {
-        font-weight: normal;
-      }
-    }
-  }
-
-  .timetable-small {
-    display: none;
-  }
 }

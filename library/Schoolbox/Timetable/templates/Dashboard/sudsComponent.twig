@@ -67,10 +67,10 @@
 
                                 <td style="width:{{ periodWidth }}%">
                                     <div {% if isCurrent %}class="timetable-subject-active"{% endif %}>
-                                        <div class="timetable-subject" data-timetable-subject>
+                                        <div class="timetable-subject" style="background:{{ event.colour|purify }};"  data-timetable-subject>
                                             <span>{{ event.title }}</span>
-                                            <div>{{ event.code }}</div>
-                                            <div>{{ event.location }}</div>
+                                            {% if event.code %}<div>{{ event.code }}</div>{% endif %}
+                                            {% if event.location %}<div>{{ event.location }}</div>{% endif %}
 
                                             {% if event.attendanceUrl %}
                                                 <br />
