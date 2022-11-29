@@ -26,7 +26,6 @@ use Schoolbox\User;
  */
 class ClassStatistics
 {
-
     /**
      * @var Folder
      */

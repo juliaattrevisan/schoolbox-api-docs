@@ -44,7 +44,6 @@ use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
  */
 class Controller extends Assessment\Controller
 {
-
     /**
      * @var TaskResponseDataSource
      */
