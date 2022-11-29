@@ -329,6 +329,21 @@ table.rb {
     font-family: monospace !important;
     margin-top: 0.5rem !important;
 }
+.rb-capabilities-indicators{
+    th{
+        margin-top: 0.35rem;
+        padding-bottom: 0rem;
+    }
+
+    tr td{
+        padding-bottom: 0;
+        padding-top: 0;
+    }
+
+    p{
+        margin-bottom: 0;
+    }
+}
 .sequencer {
     color: #9a9a9a;
     display: block;
