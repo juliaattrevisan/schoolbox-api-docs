@@ -69,7 +69,18 @@
                                     <div {% if isCurrent %}class="timetable-subject-active"{% endif %}>
                                         <div class="timetable-subject" style="background:{{ event.colour|purify }};"  data-timetable-subject>
                                             <span>{{ event.title }}</span>
-                                            {% if event.code %}<div>{{ event.code }}</div>{% endif %}
+
+                                            {# If the user had access to the homepage, provide a link
+                                             # Otherwise, just say the class code
+                                             #}
+                                            {% if event.code %}
+                                                {% if folderAccess[event.code] ?? false %}
+                                                    <div><a href="/homepage/code/{{ event.code }}">{{ event.code }}</a></div>
+                                                {% else %}
+                                                    <div>{{ event.code }}</div>
+                                                {% endif %}
+                                            {% endif %}
+
                                             {% if event.location %}<div>{{ event.location }}</div>{% endif %}
 
                                             {% if event.attendanceUrl %}

@@ -99,6 +99,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 $this->instance,
                 $this->getUser(),
                 $this->getConfigLoader(),
+                $this->getAccess(),
+                $this->getFolderMapper(),
                 $eventTypeMapper,
                 $classEntryMapper,
                 $classInvolvementMapper,
