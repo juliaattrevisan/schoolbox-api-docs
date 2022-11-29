@@ -64,10 +64,10 @@ class User
      * Finds the parents for each $students from the external database (sis) and will hydrate user objects for each $parent
      * Then return the collection
      *
-     * @param \Schoolbox\User[]|Collection $students
-     * @return \Schoolbox\User[]
+     * @param Collection|\Schoolbox\User[] $students
+     * @return  Collection|\Schoolbox\User[]
      */
-    public function loadParents($students): array
+    public function loadParents(Collection|array $students): Collection|array
     {
         foreach ($students as $student) {
             $parents = new GenericCollection(\Schoolbox\User::class);
@@ -106,9 +106,9 @@ class User
      * Then return the collection
      *
      * @param \Schoolbox\User[] $students
-     * @return \Schoolbox\User[]
+     * @return  Collection|\Schoolbox\User[]
      */
-    public function loadTeachers($students): array
+    public function loadTeachers(array $students): Collection|array
     {
         $codeMatcher       = (new ClassCodeMatchFactory())->build($this->externalType);
 
@@ -147,10 +147,10 @@ class User
      * Finds the children for each $parents from the external database (sis) and will hydrate user objects for each $child
      * Then return the collection
      *
-     * @param \Schoolbox\User[]|Collection $parents
-     * @return \Schoolbox\User[]
+     * @param Collection|\Schoolbox\User[] $parents
+     * @return \Schoolbox\User[]|Collection
      */
-    public function loadChildren($parents): array
+    public function loadChildren(Collection|array $parents): Collection|array
     {
         foreach ($parents as $parent) {
             $children = new GenericCollection(\Schoolbox\User::class);
