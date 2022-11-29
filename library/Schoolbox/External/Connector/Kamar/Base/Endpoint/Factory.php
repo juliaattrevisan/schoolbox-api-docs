@@ -148,7 +148,6 @@ class Factory
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param UserMapper                      $userMapper
      * @param TimetableCycleMapper            $timetableCycleMapper
      * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
