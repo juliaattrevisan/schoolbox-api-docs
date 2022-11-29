@@ -39,6 +39,22 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         private External_Timetable $externalTimetable
     ) {
         parent::__construct($instance, $user, $sitepage);
+    }
+
+
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws \DebugBar\DebugBarException
+     */
+    public function execute(): bool
+    {
+        if ($this->getUser()->getHideTimetable()) {
+            return false;
+        }
 
         /* Choose which data acquisition/data rendering approach to use
          * since Dashboard Timetable component fulfils either
@@ -56,7 +72,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
              * dig out this ancient ritual from the deepest Abstract
              */
             /** @var MapperFactory $mapperFactory */
-            $mapperFactory = $sitepage->getDi()->get('mapperFactory');
+            $mapperFactory = $this->sitepage->getDi()->get('mapperFactory');
 
             /** @var \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper */
             $eventTypeMapper = $mapperFactory->get(\Schoolbox\Calendar\EventTypeMapper::class);
@@ -80,7 +96,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             $staffProfileMapper = $mapperFactory->get(\Schoolbox\External\Profile\Staff\Mapper::class);
 
             $this->strategy = new Component_Dashboard_Timetable_SudsStrategy(
-                $instance,
+                $this->instance,
                 $this->getUser(),
                 $this->getConfigLoader(),
                 $eventTypeMapper,
@@ -98,24 +114,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                 $this->getUser(),
                 $this->getFolderMapper(),
                 $this->getAccess(),
-                $instance
+                $this->instance
             );
-        }
-    }
-
-
-    /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return bool Whether to continue on and attempt Component render
-     * @throws InvalidArgumentException
-     * @throws PDOException
-     * @throws \DebugBar\DebugBarException
-     */
-    public function execute(): bool
-    {
-        if ($this->getUser()->getHideTimetable()) {
-            return false;
         }
 
         $this->strategy->execute();
