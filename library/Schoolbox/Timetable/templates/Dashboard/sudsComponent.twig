@@ -68,17 +68,17 @@
                                 <td style="width:{{ periodWidth }}%">
                                     <div {% if isCurrent %}class="timetable-subject-active"{% endif %}>
                                         <div class="timetable-subject" style="background:{{ event.colour|purify }};"  data-timetable-subject>
-                                            <span>{{ event.title }}</span>
-
                                             {# If the user had access to the homepage, provide a link
                                              # Otherwise, just say the class code
                                              #}
                                             {% if event.code %}
                                                 {% if folderAccess[event.code] ?? false %}
-                                                    <div><a href="/homepage/code/{{ event.code }}">{{ event.code }}</a></div>
+                                                    <span><a href="/homepage/code/{{ event.code }}">{{ event.title }}</a></span>
                                                 {% else %}
-                                                    <div>{{ event.code }}</div>
+                                                    <span>{{ event.title }}</span>
                                                 {% endif %}
+
+                                                <div>{{ event.code }}</div>
                                             {% endif %}
 
                                             {% if event.location %}<div>{{ event.location }}</div>{% endif %}
