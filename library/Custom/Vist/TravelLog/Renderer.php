@@ -130,8 +130,8 @@ class Renderer
             } else {
                 /* Sort chronologically
                  */
-                usort($travelLogs['data'], function ($a, $b) {
-                    return strtotime($a['timestamp']) > strtotime($b['timestamp']);
+                usort($travelLogs['data'], static function (array $a, array $b): int {
+                    return strtotime($a['timestamp']) <=> strtotime($b['timestamp']);
                 });
 
                 /* Augment the array with an icon
