@@ -15,7 +15,6 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
@@ -628,15 +627,6 @@ abstract class AbstractController extends BaseController
     public function setFilesystemProxy(Resource\Storage\FilesystemProxy $filesystemProxy): self
     {
         $this->filesystemProxy = $filesystemProxy;
-        return $this;
-    }
-
-    /**
-     * @return self
-     */
-    public function setUserAccessMapper(UserAccessMapper $userAccessMapper)
-    {
-        $this->userAccessMapper = $userAccessMapper;
         return $this;
     }
 }

@@ -154,7 +154,6 @@ class Module extends AbstractModule
             ->setFileMapper($this->getMapperFactory()->get(Resource\File\Mapper::class))
             ->setConfig($this->getConfig())
             ->setUserMapper($this->getMapperFactory()->get(UserMapper::class))
-            ->setUserAccessMapper($this->getMapperFactory()->get(UserAccessMapper::class))
             ->setNodeFactory(new Resource\Browser\NodeFactory())
             ->setTreeBuilder($treeBuilder)
             ->setFolderMapper($this->getMapperFactory()->get(Resource\Folder\Mapper::class))
