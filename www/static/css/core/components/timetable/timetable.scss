@@ -56,6 +56,13 @@ $timetable-cell-border: $body-bg;
         }
     }
 
+    /* Arbitrarily choose the white background
+     * Applies to all viewport sizes
+     */
+    th {
+        background-color: #fff;
+    }
+
     /* For subtext under period names to sit correctly
      * on all size displays
      */
@@ -74,10 +81,6 @@ $timetable-cell-border: $body-bg;
     }
 
     th {
-        /* Arbitrarily choose the white background
-         */
-        background-color: #fff;
-
         /* Apparently in small viewports you're missing padding
          */
         padding: 1rem 1.5rem 1rem 1.5rem;
@@ -93,10 +96,14 @@ $timetable-cell-border: $body-bg;
 
 /* Indicate the Day and Period that is currently happening
  * Special reversed configuration, for extra strongness
+ *
+ * Applies to th elements in small viewport and larger viewports
  */
-.timetable-day-active, .timetable-period-active {
-    color: $accent-foreground;
-    background-color: $accent-background;
+.timetable, .timetable-small {
+    .timetable-day-active, .timetable-period-active {
+        color: $accent-foreground;
+        background-color: $accent-background;
+    }
 }
 
 /* Custom rules for full timetable grid
