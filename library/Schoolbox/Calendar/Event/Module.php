@@ -220,7 +220,7 @@ class Module extends BaseModule
      */
     private function preloadEvent(array $params): array
     {
-        $event = $this->getEventMapper()->findById($params['eventId'])
+        $event = $this->getEventMapper()->findById($params['eventId']);
         //hydrate parents for further permission checks
         $this->getRelationshipHydrator()->loadParents([$event->getOwner()]);
 
