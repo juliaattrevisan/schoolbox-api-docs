@@ -42,7 +42,10 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
-     * @return boolean
+     * @return bool
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function renderTemplate($templateHandle)
     {
@@ -65,11 +68,16 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             $this->setVar('HOMEPAGE_URL_JS', json_encode($url));
             $this->parse('addmylinks_block', 'addmylinks');
         }
-        if ($this->getContentPermission() >= UserAccess::ACCESS_FULL) {
+        $params = [
+            'folderId' => $this->getContext()->getId(),
+            'folder'   => $this->getContext(),
+        ];
+        if ($this->getAuthorizer()->isPathAuthorizedForUser('group.getModify', $params, $this->getUser())) {
             //is owner of area
             if ($this->getContext()->getInherit()) {
                 $this->setVar("manage_page_block", "");
             } else {
+                $this->setVar('MANAGE_GROUP_LINK', $this->getRouter()->generate('group.getModify', $params));
                 $this->parse("manage_page_block", "manage_page");
             }
         } else {

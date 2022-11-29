@@ -106,20 +106,6 @@ abstract class AbstractController extends BaseController
         // retrieve folder data
         $folder = $this->getFolder($folderId);
 
-        $groupAccess = null;
-        try {
-            $groupAccessObj = $this->userAccessMapper->findOneByColumnList(
-                [
-                    'uid' => $this->getUser()->getId(),
-                    'sid' => $folderId,
-                    'service' => UserAccess::SERVICE_HOMEPAGE,
-                ]
-            );
-            $groupAccess = $groupAccessObj->getAccessLevel();
-        } catch (Mapper\Exception $e) {
-            // noop
-        }
-
         try {
             // attempt to compile an ancestry for this folder, but if it doesn't work, that's ok
             $tree = $folder->getParent() instanceof IFolder ? $this->getBreadcrumbs($folder->getParent()) : [];
@@ -132,7 +118,6 @@ abstract class AbstractController extends BaseController
             'folder'    => $folder,
             'nodeType'  => $this->treeBuilder->getNodeType($folder),
             'access'    => $access,
-            'groupAccess' => $groupAccess,
             'user'      => $this->getUser(),
             'conf'      => $this->conf,
             'namespace' => $this->namespace,

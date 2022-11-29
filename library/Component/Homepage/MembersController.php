@@ -74,6 +74,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $this->setBlock('empty_state', 'empty_not_group_managers', 'empty_not_group_managers_block');
             $this->setBlock('empty_state', 'empty_members', 'empty_members_block');
             $this->setBlock('empty_state', 'empty_managers', 'empty_managers_block');
+            $this->setBlock('empty_state', 'empty_no_perm', 'empty_no_perm_block');
 
             $this->setVar(
                 [
@@ -83,6 +84,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     'empty_not_group_managers_block' => '',
                     'empty_members_block'            => '',
                     'empty_managers_block'           => '',
+                    'empty_no_perm_block'            => '',
                     'TYPE_NAME'                      => self::TYPE_NAME,
                     'COMPONENT_ICON'                 => 'group',
                     'ALT_COMPONENT'                  => 'class list',
@@ -96,10 +98,21 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 return false;
             } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';
-            } elseif (!$this->getSource()->getFolder()->isGroup()) {
-                $block = 'empty_not_group_members';
             } else {
-                $block = 'empty_members';
+                $params = [
+                    'folderId' => $this->getContext()->getId(),
+                    'folder'   => $this->getContext(),
+                ];
+                if ($this->getAuthorizer()->isPathAuthorizedForUser('group.getModify', $params, $this->getUser())) {
+                    $this->setVar('MANAGE_GROUP_LINK', $this->getRouter()->generate('group.getModify', $params));
+                    if (!$this->getSource()->getFolder()->isGroup()) {
+                        $block = 'empty_not_group_members';
+                    } else {
+                        $block = 'empty_members';
+                    }
+                } else {
+                    $block = 'empty_no_perm';
+                }
             }
 
             $this->parse($block . '_block', $block);
