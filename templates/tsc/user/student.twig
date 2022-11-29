@@ -6,3 +6,15 @@
         <li><a class="icon-result" href="https://dashboard.tsc.nsw.edu.au/login/index/{{user.id}}">Results</a></li>
     {% endif %}
 {% endblock buttons %}
+
+{# This adds Learning Enrichment Teacher field where a Coordinator
+ # would otherwise be found. The base template doesn't use this
+ # so I presume I can just hijack its spot. If there's no name,
+ # hide this definition entirely (render nothing)
+ #}
+{% block details_coordTeacher %}
+    {% if externalUser.LECaseManagerName ?? false %}
+        <dt class="no-margin small-6 medium-3">Learning Enrichment Teacher:</dt>
+        <dd class="no-margin small-6 medium-9">{{ externalUser.LECaseManagerName }}</dd>
+    {% endif %}
+{% endblock details_coordTeacher %}
