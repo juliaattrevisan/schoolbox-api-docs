@@ -52,6 +52,11 @@ const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
 const DEFAULT_EVENT_DURATION    = 60 * 60 * 1000;
 const DEFAULT_ALLDAY_EVENT_DAYS = 1;
 
+/* Viewports smaller than this width will be presumed to be a small viewport
+ * such as a phone, vertical tablet, or similar device
+ */
+const SMALL_VIEWPORT_THRESHOLD = 768;
+
 const EVENT_SOURCE_ID = 'events';
 
 export default {
@@ -83,7 +88,11 @@ export default {
                 start: null,
                 end: null,
             },
-            calendarOptions: {}
+            calendarOptions: {},
+
+            /* For deciding which display format to use
+             */
+            windowWidth: window.innerWidth
         }
     },
 
@@ -135,12 +144,12 @@ export default {
                 /* Only the Week view is used in Timetable Calendar
                  * Disabled the other two
                  */
-                // day: {
-                //     dayHeaders: false,
-                //     titleFormat: (date) => {
-                //         return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong); // will produce something like "Tuesday July 16th 2021"
-                //     }
-                // },
+                day: {
+                    dayHeaders: false,
+                    titleFormat: (date) => {
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong); // will produce something like "Tuesday July 16th 2021"
+                    }
+                },
                 week: {
                     dayHeaderFormat: (date) => {
                         return dayjs(date.date.array).format(this.formats.displayWeekDay);
@@ -149,13 +158,13 @@ export default {
                         return this.fullCalendarHelper_titleFormatWeek(date);
                     }
                 },
-                // list: {
-                //     buttonText: 'List',
-                //     duration: this.duration,
-                //     listDayFormat: (date) => {
-                //         return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong);
-                //     }
-                // }
+                list: {
+                    buttonText: 'List',
+                    duration: this.duration,
+                    listDayFormat: (date) => {
+                        return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong);
+                    }
+                }
             },
             eventTimeFormat: (date) => {
                 return this.fullCalendarHelper_eventTimeFormat(date);
@@ -229,6 +238,10 @@ export default {
                 this.calendarApi = this.$refs.fullCalendar.getApi();
                 this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
                 this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
+
+                /* shanked from https://stackoverflow.com/questions/47219272/how-can-i-use-window-size-in-vue-how-do-i-detect-the-soft-keyboard
+                 */
+                window.addEventListener('resize', this.onResize);
             });
 
         this.registerListCustomInputFields();
@@ -237,10 +250,29 @@ export default {
         let quickSwitchIcon = document.createElement('a');
         quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
+    },
 
+    beforeDestroy() {
+        window.removeEventListener('resize', this.onResize);
     },
 
     methods: {
+        /**
+         * Change the display format depending on viewport size
+         */
+        onResize() {
+            this.windowWidth = window.innerWidth
+
+            /* Dynamically change display format
+             * https://fullcalendar.io/docs/Calendar-changeView
+             */
+            if (this.windowWidth < SMALL_VIEWPORT_THRESHOLD) {
+                this.calendarApi.changeView('timeGridDay');
+            } else {
+                this.calendarApi.changeView('timeGridWeek');
+            }
+        },
+
         /**
          * Open the export modal.
          */
