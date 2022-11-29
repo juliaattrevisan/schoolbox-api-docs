@@ -105,6 +105,7 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
          * It's not very efficient, but on the less-dark side, there shouldn't be an
          * insane amount of data here
          */
+        /** @var \Calendar\Event\Type\SudsTimetable\Event $event */
         foreach ($this->events as $event) {
             try {
                 $folder = $this->folderMapper->findByCode($event->getCode());
