@@ -83,8 +83,6 @@ abstract class AbstractController extends BaseController
      */
     protected $tab = 'resources';
 
-    private ?UserAccessMapper $userAccessMapper = null;
-
     /**
      *
      * Note this is an abstract method and should only be used for abstract implementation
