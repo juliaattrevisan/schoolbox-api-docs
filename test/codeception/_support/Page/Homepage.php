@@ -24,6 +24,13 @@ class Homepage
     public const ELEMENT_ADD_COMPONENT_SECTION_RESOURCES = '#tabs-sub-5';
     public const ELEMENT_ADD_COMPONENT_SECTION_FEEDS = '#tabs-sub-6';
 
+    public const ELEMENT_COMPONENT_SECTION_INFORMATION = 'a[href=\#tabs-sub-1]';
+    public const ELEMENT_COMPONENT_SECTION_COLLABORATION = 'a[href=\#tabs-sub-2]';
+    public const ELEMENT_COMPONENT_SECTION_LEARNING = 'a[href=\#tabs-sub-3]';
+    public const ELEMENT_COMPONENT_SECTION_MULTIMEDIA = 'a[href=\#tabs-sub-4]';
+    public const ELEMENT_COMPONENT_SECTION_RESOURCES = 'a[href=\#tabs-sub-5]';
+    public const ELEMENT_COMPONENT_SECTION_FEEDS = 'a[href=\#tabs-sub-6]';
+
     public const ELEMENT_EDIT_COLUMNS_TAB = '#tabs-2';
 
     public const LINK_MENU = 'a[data-dropdown="tab-control"]';
@@ -178,8 +185,24 @@ class Homepage
      *
      * @param string $selector
      */
-    private function openTabPanel(string $selector): void
+    public function openTabPanel(string $selector): void
     {
         $this->tester->click(['css' => sprintf('[href="%s"]', $selector)]);
+    }
+
+    /**
+     * Click one of the tabs to add components
+     */
+    public function clickComponentsTab(string $tab): void
+    {
+        $this->tester->click($tab);
+    }
+
+    /**
+     * Check component icons
+     */
+    public function checkComponentIcon(string $icon): void
+    {
+        $this->tester->canSeeElement(['css' => 'span[class=size-32\ icon-masonry\ icon-masonry-' . $icon . ']']);
     }
 }
