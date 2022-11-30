@@ -35,26 +35,22 @@
     <li class="active"><span>{% if record is defined %}Modify{% else %}Post{% endif %} Blog</span></li>
 </ul>
 
-<div class="row">
-    <div class="column small-12">
-        <div class="actions-small-1 row">
-            <div class="list-item">
-                <div class="small-12 columns">
-                    <h1>{% if record is defined %}Modify{% else %}Post{% endif %} Blog</h1>
-                </div>
-            </div>
-            {% if record is defined %}
-                <nav>
-                    <a class="icon-more" title="Actions" data-dropdown="header-options" aria-expanded="false"></a>
-                </nav>
-                <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
-                    <li>
-                        <a class="icon-delete" title="Delete Blog" data-delete />Delete Blog</a>
-                    </li>
-                </ul>
-            {% endif %}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{% if record is defined %}Modify{% else %}Post{% endif %} Blog</h1>
         </div>
     </div>
+    {% if record is defined %}
+        <nav>
+            <a class="icon-more" title="Actions" data-dropdown="header-options" aria-expanded="false"></a>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
+            <li>
+                <a class="icon-delete" title="Delete Blog" data-delete />Delete Blog</a>
+            </li>
+        </ul>
+    {% endif %}
 </div>
 <div class="row">
     <div class="small-12 island">
