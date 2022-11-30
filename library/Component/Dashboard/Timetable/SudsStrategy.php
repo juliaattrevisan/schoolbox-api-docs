@@ -96,6 +96,10 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
             $this->staffProfileMapper
         ))->getEvents($startTimestamp, $endTimestamp);
 
+        /* Sort by time, because this is a ordered grid view, not a fullcalendar implementation
+         */
+        $this->events->sort();
+
         /* Links to homepages are for some reason different, depending on where you are
          * The event modal does it differently to this component
          *
