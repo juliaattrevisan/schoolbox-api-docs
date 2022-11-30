@@ -275,9 +275,11 @@ class Api extends \Codeception\Module
     /**
      * @param string $tableName
      * @param string $column
-     * @return void
+     * @return mixed
+     * @throws ModuleException
      */
-    public function getMaxValue(string $tableName, string $column) {
+    public function getMaxValue(string $tableName, string $column)
+    {
         return $this->getDbModule()->grabFromDatabase($tableName, "max($column)");
     }
 }
