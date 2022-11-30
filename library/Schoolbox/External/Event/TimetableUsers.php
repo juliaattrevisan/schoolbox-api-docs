@@ -488,7 +488,7 @@ class TimetableUsers
 
         if ($folderCodes && $folderCodes->count()) {
             $bindings = Builder::getBindings($folderCodes->keys(), 'folderCode');
-            $query    .= " AND (se.code IN ({$bindings->getPlaceholder()}) OR se.code IS NULL) ";
+            $query    .= " AND se.code IN ({$bindings->getPlaceholder()}) ";
             $params   = array_merge($params, $bindings->getParams());
         }
 
