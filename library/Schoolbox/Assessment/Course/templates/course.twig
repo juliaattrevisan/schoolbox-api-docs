@@ -211,7 +211,16 @@ Usage:
             onXhrDone: function (data) {
                 var newDOM = $(data).hide();
                 $(this).closest('[data-new-unit]').before(newDOM);
-                newDOM.slideDown();
+                /* 400ms is the default value
+                 */
+                newDOM.slideDown(400, function() {
+                    /* Toggle button availability after the animation finishes
+                     *
+                     * If you do it too soon, toggleSaveCourse can't recognise the
+                     * injection of the new html (hasUnits returns 0 too quickly)
+                     */
+                    toggleSaveCourse();
+                });
                 newDOM.find('[data-collapser]').collapsable();
                 //I'm not sure what's going on in here, but a new version of jQuery has added a
                 //display:block to this script tag, which will render out the tag code contents
