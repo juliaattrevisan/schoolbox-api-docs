@@ -1,0 +1,106 @@
+{##
+ # Dashboard Timetable Component for SUDS Timetable
+ #
+ # @param Calendar\Event\Collection $events
+ # @param int $componentInstanceId
+ #}
+{% import 'sub/attendanceIcon.twig' as attendanceIcon %}
+
+{# For cosmetic reasons
+ # Arbitrarily define the width of each period so that it fits nicely in the component
+ #}
+{% set countPeriods = events|length %}
+{% set periodWidth = ((98 - countPeriods * 0.05) / countPeriods)|round(0, 'floor') %}
+
+{# Take a guess as to what Day it is by inspecting the first event's info
+ #
+ # Some suds connectors won't have a Day;
+ # in that case, just use "Today's Timetable"
+ #}
+{% set timetableComponentName = '' == events.first.day ? "Today's Timetable" : events.first.day %}
+
+
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/timetable/jquery.timetable-resize.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/timetable/jquery.timetable-dashboard.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/scrollTo/jquery.scrollTo.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript">
+    $(function() {
+        $.fn.timetableStart();
+
+        // Scroll to current period
+        let timetable = $('#component{{ componentInstanceId }}').find('[data-timetable]');
+
+        if (timetable.find('.timetable-subject-active').length) {
+            timetable.closest('.scrollable').scrollTo(
+                timetable.find('.timetable-subject-active'),
+                {scrollX: true, scrollY: false, duration: 0, offsetLeft: 0}
+            );
+        }
+    });
+</script>
+<div class="small-12 columns">
+    <div data-timetable-container>
+        <h2 class="subheader" data-timetable-header>{{ timetableComponentName }}</h2>
+        <section>
+            <div class="scrollable show-for-medium-up">
+                <table class="timetable" data-timetable>
+                    <thead>
+                        <tr>
+                            {% for event in events %}
+                                {# Decide if we're in the current period by comparing the event's timestamps
+                                 # Note that it's possible this will never be set; sometimes periods are empty
+                                 # (devoid of events) and that won't display here in SUDS Timetable Component.
+                                 #}
+                                {% set isCurrent = event.startTime.unixTimestamp < now and event.endTime.unixTimestamp > now %}
+
+                                <th class="{% if isCurrent %}timetable-period-active{% endif %}" style="width:{{ periodWidth }}%">
+                                    {{ event.period }}
+                                    <time class="meta">{{ event.startTime.timeOnly }}&ndash;{{ event.endTime.timeOnly }}</time>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {% for event in events %}
+                                {% set isCurrent = event.startTime.unixTimestamp < now and event.endTime.unixTimestamp > now %}
+
+                                <td style="width:{{ periodWidth }}%">
+                                    <div {% if isCurrent %}class="timetable-subject-active"{% endif %}>
+                                        <div class="timetable-subject" style="background:{{ event.colour|purify }};"  data-timetable-subject>
+                                            {# If the user had access to the homepage, provide a link
+                                             # Otherwise, just say the class code
+                                             #}
+                                            {% if event.code %}
+                                                {% if folderAccess[event.code] ?? false %}
+                                                    <span><a href="/homepage/code/{{ event.code }}">{{ event.title }}</a></span>
+                                                {% else %}
+                                                    <span>{{ event.title }}</span>
+                                                {% endif %}
+
+                                                <div>{{ event.code }}</div>
+                                            {% endif %}
+
+                                            {% if event.location %}<div>{{ event.location }}</div>{% endif %}
+
+                                            {% if event.attendanceUrl %}
+                                                <br />
+                                                {# SUDS TASS is the only SUDS connector to use attendance atm, and
+                                                 # they burrow into a remote system; always use the same icon
+                                                 #}
+                                                <span class="icon-class-list">
+                                                    <a href="{{ event.attendanceUrl }}" title="Mark Attendance" target="{{ event.attendanceLinkTarget}}">Mark Attendance</a>
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <div class="row timetable-small show-for-small-only" data-smaller></div>
+    </div>
+</div>

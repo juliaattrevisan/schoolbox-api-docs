@@ -3256,11 +3256,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Kamar/Base/Endpoint/Timetable/Classes.php
 
 		-
-			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Liss\\\\Base\\\\Endpoint\\\\Helper\\:\\:\\$log is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Liss/Base/Endpoint/Helper.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Maze\\\\Base\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Maze/Base/Sync.php
@@ -4711,11 +4706,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getExternalId\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getMarkVisibility\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
@@ -4742,11 +4732,6 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getDuration\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getExternalId\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
 
@@ -6999,3 +6984,45 @@ parameters:
 			message: "#^Comparison operation \"\\>\\=\" between int\\<3, max\\> and 3 is always true\\.$#"
 			count: 1
 			path: tools/rubric/repairSpecAssessments.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getExternalId\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getExternalId\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Quiz.php
+		-
+			message: "#^Variable \\$this might not be defined\\.$#"
+			count: 6
+			path: www/modules/conference/index.php
+		-
+			message: "#^Variable \\$mapFile might not be defined\\.$#"
+			count: 3
+			path: www/modules/conference/index.php
+		-
+			message: "#^Variable \\$map might not be defined\\.$#"
+			count: 1
+			path: www/modules/conference/index.php
+		-
+			message: "#^Variable \\$type might not be defined\\.$#"
+			count: 1
+			path: www/modules/conference/index.php
+		-
+			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Liss\\\\Base\\\\Endpoint\\\\Helper\\:\\:\\$log is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Liss/Base/Endpoint/Helper.php
+		-
+			message: "#^Property Component_Dashboard_JuniorTimetableController\\:\\:\\$timetable is never read, only written\\.$#"
+			count: 1
+			path: library/Component/Dashboard/JuniorTimetableController.php
+		-
+			message: "#^Property Component_Dashboard_JuniorTimetableController\\:\\:\\$dayName is never read, only written\\.$#"
+			count: 1
+			path: library/Component/Dashboard/JuniorTimetableController.php
+		-
+			message: "#^Property Component_Dashboard_JuniorTimetableController\\:\\:\\$dayNumber is never read, only written\\.$#"
+			count: 1
+			path: library/Component/Dashboard/JuniorTimetableController.php

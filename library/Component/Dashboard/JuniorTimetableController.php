@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Collection;
+
 /**
  * Component_Dashboard_JuniorTimetableController
  *
@@ -11,7 +13,6 @@
  */
 class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_TimetableController
 {
-
     /**
      * Entirely ignore classes which have no code
      * such as recess, lunch, etc.
@@ -30,12 +31,39 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
      */
     protected $templateFile = 'juniorTimetable';
 
+
+    /**
+     * A list of colours to use
+     *
+     * @var Collection|Timetable_Colour[] $colourList
+     */
+    protected Collection $colourList;
+
+
+    /**
+     * @var array
+     */
+    private array $timetable = [];
+
+
+    /**
+     * @var array $dayName
+     */
+    private array $dayName = [];
+
+
+    /**
+     * @var array $dayNumber
+     */
+    private array $dayNumber = [];
+
+
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
      */
-    public function execute()
+    public function execute(): bool
     {
         $this->generateTimetables();
         $this->colourList = Timetable_ColourMapper::getInstance()->findAll();
@@ -131,10 +159,9 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
             if ($timetable[$i]['periodSequence'] == 2) {
                 if ($this->getIncludeNonclasses()) {
                     $period = $timetable[$i];
-                }
-                /* Skip nonclasses
-                 */
-                else {
+                } else {
+                    /* Skip nonclasses
+                     */
                     continue;
                 }
             } else {
@@ -149,11 +176,10 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                     $period['periodEnd']      = $timetable[$i]['periodEnd'];
                     $period['periodNumber']   = $timetable[$i]['periodNumber'];
                     $period['periodSequence'] = $timetable[$i]['periodSequence'];
-                }
-                /* Hide periodSequence 1 periods which have no classes
-                 * (Hide spares)
-                 */
-                else {
+                } else {
+                    /* Hide periodSequence 1 periods which have no classes
+                     * (Hide spares)
+                     */
                     continue;
                 }
             }
@@ -164,10 +190,9 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                 $condensedClass = $period;
 
                 $stack[] = "Initial condensed class is {$this->getCode($period)}<br>";
-            }
-            /* Condense
-             */
-            else {
+            } else {
+                /* Condense
+                 */
                 if ($condensedClass['code'] == $period['code']) {
                     $stack[] = "Updating periodEnd to {$period['periodEnd']}<br>";
 

@@ -56,6 +56,13 @@ $timetable-cell-border: $body-bg;
         }
     }
 
+    /* Arbitrarily choose the white background
+     * Applies to all viewport sizes
+     */
+    th {
+        background-color: #fff;
+    }
+
     /* For subtext under period names to sit correctly
      * on all size displays
      */
@@ -72,6 +79,12 @@ $timetable-cell-border: $body-bg;
     th, td {
         width: 50%;
     }
+
+    th {
+        /* Apparently in small viewports you're missing padding
+         */
+        padding: 1rem 1.5rem 1rem 1.5rem;
+    }
 }
 
 /* Fix guttering in small display - subject elements
@@ -83,54 +96,58 @@ $timetable-cell-border: $body-bg;
 
 /* Indicate the Day and Period that is currently happening
  * Special reversed configuration, for extra strongness
+ *
+ * Applies to th elements in small viewport and larger viewports
  */
-.timetable-day-active, .timetable-period-active {
-    color: $accent-foreground;
-    background-color: $accent-background;
+.timetable, .timetable-small {
+    .timetable-day-active, .timetable-period-active {
+        color: $accent-foreground;
+        background-color: $accent-background;
+    }
 }
 
 /* Custom rules for full timetable grid
  */
 @media print {
-  .timetable {
+    .timetable {
 
-    /* Reduce font size in each time element
-     */
-    th, time {
-      font-size: 0.5rem;
-      padding: 0.25rem !important;
+        /* Reduce font size in each time element
+         */
+        th, time {
+            font-size: 0.5rem;
+            padding: 0.25rem !important;
+        }
+
+        /* Hide the indicator border
+         */
+        .timetable-subject-active {
+            border: 0 !important;
+
+            /* Hide the indicator triangle
+             */
+            &:before {
+                border-top: 0 !important
+            }
+        }
+
+        /* Reduce font size in each timetable-subject div
+         */
+        .timetable-subject {
+            font-size: 0.5rem;
+            font-weight: bold;
+            height: auto !important;
+            padding: 0.25rem !important;
+
+            /* Bold the subject being taught, but normal-weight
+             * all the subject's meta details
+             */
+            div {
+                font-weight: normal;
+            }
+        }
     }
 
-    /* Hide the indicator border
-     */
-    .timetable-subject-active {
-      border: 0 !important;
-
-      /* Hide the indicator triangle
-       */
-      &:before {
-        border-top: 0 !important
-      }
+    .timetable-small {
+        display: none;
     }
-
-    /* Reduce font size in each timetable-subject div
-     */
-    .timetable-subject {
-      font-size: 0.5rem;
-      font-weight: bold;
-      height: auto !important;
-      padding: 0.25rem !important;
-
-      /* Bold the subject being taught, but normal-weight
-       * all the subject's meta details
-       */
-      div {
-        font-weight: normal;
-      }
-    }
-  }
-
-  .timetable-small {
-    display: none;
-  }
 }
