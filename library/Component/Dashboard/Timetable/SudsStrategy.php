@@ -10,7 +10,6 @@ declare(strict_types=1);
 use Calendar\Event\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 
-
 /**
  * Fulfils the Dashboard Timetable component's requirements
  * when using a SUDS Timetable connector
