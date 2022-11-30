@@ -152,6 +152,10 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
      */
     public function renderTemplate(string $templateHandle): bool|array
     {
+        if ($this->events->count() < 1) {
+            return false;
+        }
+
         return [
             'template' => '@timetable/Dashboard/sudsComponent.twig',
             'data' => [
