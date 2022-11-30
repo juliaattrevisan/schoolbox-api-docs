@@ -53,7 +53,7 @@ trait FormTrait
         $this->setFormParam("userComment$userId", '1');
     }
 
-    public function setRoleAccess(int $roleId, int $accessLevel): void
+    public function setRoleAccess(int|string $roleId, int $accessLevel): void
     {
         $this->setAccess('role', $roleId, $accessLevel);
     }
@@ -72,17 +72,17 @@ trait FormTrait
     {
         foreach ($accessRules as $accessRule) {
             if ($accessRule->getUser()) {
-                $this->setUserAccess($accessRule->getId(), $accessRule->getAccess());
+                $this->setUserAccess($accessRule->getUser()->getId(), $accessRule->getAccess());
             } elseif ($accessRule->getRole()) {
-                $this->setRoleAccess($accessRule->getId(), $accessRule->getAccess());
+                $this->setRoleAccess($accessRule->getRole()->getId(), $accessRule->getAccess());
             } elseif ($accessRule->getGroup()) {
-                $this->setGroupAccess($accessRule->getId(), $accessRule->getAccess());
+                $this->setGroupAccess($accessRule->getGroup()->getId(), $accessRule->getAccess());
             }
         }
     }
 
-    private function setAccess(string $type, int $id, int $accessLevel): void
+    private function setAccess(string $type, int|string $id, int $accessLevel): void
     {
-        $this->setFormParam(sprintf('%s[%d]', $type, $id), $accessLevel);
+        $this->setFormParam(sprintf('%s[%s]', $type, $id), $accessLevel);
     }
 }

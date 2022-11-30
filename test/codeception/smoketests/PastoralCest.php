@@ -291,11 +291,10 @@ class PastoralCest
         $student_jreed = $i->grabUser('jreed');
         $heading = 'Automated Test Pastoral Record visibility Role Teacher General and Parent Deny ' . time();
         $teacher_role    = $i->grabRoleByTitle('Teacher');
-        $parent_role = $i->grabRoleByTitle('Parent');
 
         $createPastoral = new Payload\Pastoral\Create($student_jreed->getId());
         $createPastoral->setHeading($heading);
-        $createPastoral->setRoleAccess($parent_role->getId(), Pastoral\Access\Mapper::ACCESS_DENY);
+        $createPastoral->setRoleAccess('role-type-parent', Pastoral\Access\Mapper::ACCESS_DENY);
         $createPastoral->setRoleAccess($teacher_role->getId(), Pastoral\Access\Mapper::ACCESS_PUBLIC);
         $i->amGoingTo('Send request create pastoral record grant access by role for student #' . $student_jreed->getId());
         $i->sendRequest($createPastoral);
