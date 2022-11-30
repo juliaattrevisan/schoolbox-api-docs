@@ -335,7 +335,7 @@ class Mapper extends BaseMapper
                 } else {
                     $actionWheres[] = "CONCAT(',', `actions`, ',') LIKE :actionLike$i";
                 }
-                $params["actionLike$i"] = "%,{$action->getId()},%";
+                $params["actionLike$i"] = "%,{$action->getAction()->getId()},%";
             }
             if ($pastoral->getRecordActions()->count() === 0) {
                 $wheres[] = "(`actions` IS NULL OR `include_records_without_action` = 1)";
