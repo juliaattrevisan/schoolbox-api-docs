@@ -7011,6 +7011,10 @@ parameters:
 			count: 1
 			path: www/modules/conference/index.php
 		-
+			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Liss\\\\Base\\\\Endpoint\\\\Helper\\:\\:\\$log is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/External/Connector/Liss/Base/Endpoint/Helper.php
+		-
 			message: "#^Property Component_Dashboard_JuniorTimetableController\\:\\:\\$timetable is never read, only written\\.$#"
 			count: 1
 			path: library/Component/Dashboard/JuniorTimetableController.php
