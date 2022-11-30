@@ -478,17 +478,24 @@ class TimetableUsers
             WHERE se.classification = :classification
             AND se.start_at >= :from
             AND se.start_at <= :to
-            ORDER BY se.id ASC, seuo.sequence ASC
         ";
 
+        $params = [
+            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+            'from'           => $startDatetime,
+            'to'             => $finishDatetime,
+        ];
+
+        if ($folderCodes && $folderCodes->count()) {
+            $bindings = Builder::getBindings($folderCodes->keys(), 'folderCode');
+            $query    .= " AND se.code IN ({$bindings->getPlaceholder()}) ";
+            $params   = array_merge($params, $bindings->getParams());
+        }
+
+        $query .= " ORDER BY se.id ASC, seuo.sequence ASC";
+
         $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute(
-            [
-                'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                'from'           => $startDatetime,
-                'to'             => $finishDatetime,
-            ],
-        );
+        $statement->execute($params);
 
         /* Remember: overrides are generally optional so they might not even
          * exist for $classCode which is why we get the Usual Guys first
