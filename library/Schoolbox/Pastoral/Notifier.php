@@ -288,7 +288,7 @@ class Notifier extends AbstractModuleNotifier
             $builder    = new Builder();
             $builder->setTitle($messageTitle)
                     ->setParam('record', new Param($recordName, $recordHref, ParameterInterface::STACKING_REPLACE))
-                    ->setParam('report', new Param($report->getName(), $reportHref, ParameterInterface::STACKING_APPEND))
+                    ->setParam('report', new Param($report->getName(), $reportHref, ParameterInterface::STACKING_REPLACE))
                     ->setIcon($this->getUserIcon($effector))
                     ->setHref($reportHref)
                     ->setNamespace($this->getSlug())
