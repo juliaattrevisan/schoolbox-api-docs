@@ -113,7 +113,6 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
 
         /** @var \Calendar\Event\Type\SudsTimetable\Event $event */
         foreach ($this->events as $event) {
-
             try {
                 if (!isset($folderLookup[$event->getCode()])) {
                     $folder = $this->folderMapper->findByCode($event->getCode());
