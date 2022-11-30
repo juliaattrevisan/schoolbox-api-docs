@@ -148,22 +148,23 @@ function onBrowseSelected () {
             @input="$event.target.composing = false"
             data-search-select-search-input
         />
-        <button
+        <div
             v-if="store.hasLoadedOk"
             class="button icon-curriculum"
             title="Browse and select from the Curriculum"
-            @click.prevent="onBrowseSelected"
-            @keyup.enter="onBrowseSelected">
+            @click="onBrowseSelected">
             Browse
-        </button>
+        </div>
     </div>
 </template>
 
 <style scoped>
 
-input,
-button {
+input, .button {
     margin-bottom: 0;
+}
+.button {
+    align-items: flex-start;
 }
 
 .input-group[data-is-small-container="true"] {
