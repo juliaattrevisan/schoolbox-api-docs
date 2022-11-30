@@ -1059,6 +1059,11 @@ Lots taken from Flatly (MIT): https://bootswatch.com/4/flatly/bootstrap.css
   border-radius: 5px;
 }
 
+/* Fix vertical alignment of dots to better match text */
+.fc-list-event-dot{
+  margin-top: 4px !important;
+}
+
 /* view wrapper */
 .fc-rtl .fc-list-view {
   direction: rtl;
@@ -1078,7 +1083,9 @@ Lots taken from Flatly (MIT): https://bootswatch.com/4/flatly/bootstrap.css
 
 .fc-list-table td {
   border-width: 1px 0 0;
-  padding: 8px 14px;
+  /*Need to use !important as npm rebuilding @fullcalendar 
+  keeps injecting padding: 8px 14px into fc's main.css */
+  padding: 10px 12px !important;
 }
 
 .fc-list-table tr:first-child td {
