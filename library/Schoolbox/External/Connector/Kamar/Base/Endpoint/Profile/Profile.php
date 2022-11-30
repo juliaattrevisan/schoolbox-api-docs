@@ -60,12 +60,6 @@ class Profile implements IStrategy
 
 
     /**
-     * @var Registry
-     */
-    private Registry $registry;
-
-
-    /**
      * @var UserProfile\Mapper
      */
     private UserProfile\Mapper $baseProfileMapper;
@@ -131,7 +125,6 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param Batchxml                        $batchxml
-     * @param Registry                        $registry
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -143,7 +136,6 @@ class Profile implements IStrategy
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
-        Registry $registry,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -154,7 +146,6 @@ class Profile implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->batchxml = $batchxml;
-        $this->registry = $registry;
 
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
@@ -297,6 +288,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstname)
                 ->setLastname($lastname);
 
             /* Then save it
@@ -418,10 +410,6 @@ class Profile implements IStrategy
             if ($this->validStrats->isFamiliesStratEnabled()) {
                 $this->importParentsOfStudent($student, $studentBaseProfile);
             }
-
-            /* Remember this person's details
-             */
-            $this->registry->remember($externalId, $externalId, $title, $firstname, $lastname, $username);
         }
     }
 
@@ -543,6 +531,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstname)
                 ->setLastname($lastname);
 
             /* Then save it
@@ -593,10 +582,6 @@ class Profile implements IStrategy
 
                 $this->relationshipMapper->save($relationship);
             }
-
-            /* Remember this person's details
-             */
-            $this->registry->remember($externalId, $externalId, $title, $firstname, $lastname, $username);
         }
     }
 
@@ -643,6 +628,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstname)
                 ->setLastname($lastname);
 
             /* Then save it
@@ -684,10 +670,6 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->staffProfileMapper->save($staffProfile);
             }
-
-            /* Remember this person's details
-             */
-            $this->registry->remember($externalId, $externalId, $title, $firstname, $lastname, $username);
         }
     }
 }

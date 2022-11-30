@@ -24,7 +24,6 @@ use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -107,12 +106,6 @@ class Factory
 
 
     /**
-     * @var UserMapper
-     */
-    private UserMapper $userMapper;
-
-
-    /**
      * @var TimetableCycleMapper
      */
     private TimetableCycleMapper $timetableCycleMapper;
@@ -155,7 +148,6 @@ class Factory
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param UserMapper                      $userMapper
      * @param TimetableCycleMapper            $timetableCycleMapper
      * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
@@ -175,7 +167,6 @@ class Factory
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
         /* Timetable pieces */
-        UserMapper $userMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
@@ -198,7 +189,6 @@ class Factory
 
         /* Timetable pieces
          */
-        $this->userMapper = $userMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
@@ -241,13 +231,6 @@ class Factory
             throw new \DomainException('XML Preconditions not met. A transmission may be taking place and/or required quantity of xml files has yet to be met.');
         }
 
-        /* Load all the Profile xmls
-         *
-         * TODO: Replace with a sis_user_profile lookup equivalent
-         *  instead of remembering what we saw in Profile
-         */
-        $registry = new Profile\Registry();
-
         /* Purge previously-imported profile relationships
          */
         if ($this->validStrats->isProfileStratEnabled()) {
@@ -267,7 +250,6 @@ class Factory
                     $this->log,
                     $this->perform,
                     new Batchxml(new Api($this->host . '/' . $xmlFile)),
-                    $registry,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
@@ -297,7 +279,7 @@ class Factory
              * Every student timetable processing uses info stored there
              * Recycle this instance in every iteration
              */
-            $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->userMapper);
+            $lookup = new Timetable\Lookup($this->timetablePeriodMapper, $this->baseProfileMapper);
 
             /* Week Offset, Term selection
              *
@@ -368,7 +350,6 @@ class Factory
                 $bus->add(new Timetable\Classes(
                     $this->log,
                     $this->perform,
-                    $registry,
                     new Batchxml(new Api($this->host . '/' . $xmlFile)),
                     $lookup,
                     $currentWeekOffset,

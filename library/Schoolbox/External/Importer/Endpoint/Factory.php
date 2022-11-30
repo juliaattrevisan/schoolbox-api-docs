@@ -200,7 +200,6 @@ class Factory implements IFactory
                     UserProfile\Relationship\Mapper::getInstance(),
                     /* Timetable pieces
                      */
-                    UserMapper::getInstance(),
                     TimetableCycleMapper::getInstance(),
                     TimetablePeriodMapper::getInstance(),
                     ClassEntryMapper::getInstance(),

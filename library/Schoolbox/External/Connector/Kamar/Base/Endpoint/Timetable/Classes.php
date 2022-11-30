@@ -20,7 +20,6 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
-use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\Mapper\Exception;
@@ -36,7 +35,6 @@ use UnexpectedValueException;
  */
 class Classes implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */
@@ -49,12 +47,6 @@ class Classes implements IStrategy
      * @var bool
      */
     private bool $perform;
-
-
-    /**
-     * @var Registry
-     */
-    private Registry $registry;
 
 
     /**
@@ -110,7 +102,6 @@ class Classes implements IStrategy
      *
      * @param LoggerInterface        $log
      * @param bool                   $perform
-     * @param Registry               $registry
      * @param Batchxml               $timetableBatchXml
      * @param Lookup                 $lookup
      * @param int|null               $currentWeekOffset
@@ -123,7 +114,6 @@ class Classes implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Registry $registry,
         Batchxml $timetableBatchXml,
         Lookup $lookup,
         ?int $currentWeekOffset,
@@ -135,7 +125,6 @@ class Classes implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->registry = $registry;
         $this->timetableBatchXml = $timetableBatchXml;
         $this->lookup = $lookup;
         $this->currentWeekOffset = $currentWeekOffset;
@@ -201,7 +190,6 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-
         /* Can't determine which week we're in; can't import anything
          */
         if (null === $this->currentWeekOffset) {
@@ -263,7 +251,7 @@ class Classes implements IStrategy
             foreach ($cycle->xpath('days/day') as $day) {
                 $dayNum = trim((string)$day->xpath('@index')[0]);
 
-                $subjects = new SubjectIterator($this->log, $this->registry, $studentId, $day);
+                $subjects = new SubjectIterator($this->log, $users, $studentId, $day);
 
                 foreach ($subjects as $subject) {
                     /* Subject doesn't exist in this slot
@@ -333,7 +321,7 @@ class Classes implements IStrategy
                     } else {
                         /* Nonexistent users get a warning, but assign their external ids anyway
                          */
-                        if (!isset($users[$student['username']])) {
+                        if (!isset($users[$student['externalId']])) {
                             $this->log->debug(sprintf(
                                 'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s; username might not exist in schoolbox user table',
                                 $student['username'],
@@ -353,7 +341,7 @@ class Classes implements IStrategy
                     foreach ($subject['teachers'] as $teacher) {
                         /* Throw warning, but assign them anyway
                          */
-                        if (null === $teacher || !isset($users[$teacher['username']])) {
+                        if (null === $teacher || !isset($users[$teacher['externalId']])) {
                             $this->log->debug(sprintf(
                                 'Tried to assign nonexistent schoolbox account %s (%s) to class %s %s; username might not exist in schoolbox user table',
                                 $teacher['username'],
@@ -473,7 +461,7 @@ class Classes implements IStrategy
         /* Throw warning, but assign them anyway
          */
         if (\count($subject['teachers'])) {
-            if (!isset($users[$subject['teachers'][0]['username']])) {
+            if (!isset($users[$subject['teachers'][0]['externalId']])) {
                 $this->log->debug(sprintf(
                     'Tried to assign nonexistent schoolbox account %s (%s) as teacher to class %s %s',
                     $subject['teachers'][0]['username'],
