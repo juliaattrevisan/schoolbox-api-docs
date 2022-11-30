@@ -7,7 +7,7 @@ workshops that usually take the form of one of the defined UX sessions.
 
 
 ## Sprint Planning
-* **When:** First day of the Sprint at 11:00am
+* **When:** First day of the Sprint at 10:30am
 * **Where:** A boardroom
 * **Timebox:** 60 minutes
 * **Participants** Product Team
