@@ -105,10 +105,19 @@ class Component_Dashboard_Timetable_SudsStrategy implements Component_Dashboard_
          * It's not very efficient, but on the less-dark side, there shouldn't be an
          * insane amount of data here
          */
+        $folderLookup = [];
+
         /** @var \Calendar\Event\Type\SudsTimetable\Event $event */
         foreach ($this->events as $event) {
+
             try {
-                $folder = $this->folderMapper->findByCode($event->getCode());
+                if (!isset($folderLookup[$event->getCode()])) {
+                    $folder = $this->folderMapper->findByCode($event->getCode());
+
+                    $folderLookup[$event->getCode()] = $folder;
+                } else {
+                    $folder = $folderLookup[$event->getCode()];
+                }
 
                 /* But...this always returns ACCESS_WRITE even if I set permissions to None
                  * in the Modify Folder screen, and remove the Homepage Template, and set
