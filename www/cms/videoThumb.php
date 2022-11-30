@@ -123,6 +123,7 @@ if (isset($type, $id)) {
                         $cacheKey,
                         $filesystem->fileSize($imageFilename),
                         Transform\Model::STATE_DONE,
+                        'jpg'
                     );
                 }
                 $preSignedUrlService->download($preSignedUrlDataObject);
