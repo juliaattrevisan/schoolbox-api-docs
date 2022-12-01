@@ -164,7 +164,11 @@ class Controller extends Assessment\Controller
 
         $result = (new ResultCache(Project\ResultCache\Mapper::getInstance()))->persist($assessment, $user, $this->getUser());
 
-        new \Alaress_Probe($result);
+//        new \Alaress_Probe($result);
+
+        $result2 = (new ResultCache(Project\ResultCache\Mapper::getInstance()))->retrieve($assessment, $user);
+
+        new \Alaress_Probe($result2);
         die();
         
         $twigData = [
