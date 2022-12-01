@@ -13,6 +13,7 @@ use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Participant\Mapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
@@ -157,7 +158,14 @@ class Controller extends Assessment\Controller
         foreach ($participants as $participant) {
             $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
         }
+        
+        $user = \Schoolbox\UserMapper::getInstance()->findById(60);
 
+        $result = (new ResultCache())->persist($this->getUser(), $assessment, $user);
+
+        new \Alaress_Probe($result);
+        die();
+        
         $twigData = [
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
             'baseContext'       => $assessment->getBaseContext(),
