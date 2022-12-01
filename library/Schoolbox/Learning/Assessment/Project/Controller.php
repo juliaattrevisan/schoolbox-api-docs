@@ -160,17 +160,6 @@ class Controller extends Assessment\Controller
             $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
         }
         
-        $user = \Schoolbox\UserMapper::getInstance()->findById(60);
-
-        $result = (new ResultCache(Project\ResultCache\Mapper::getInstance()))->persist($assessment, $user, $this->getUser());
-
-//        new \Alaress_Probe($result);
-
-        $result2 = (new ResultCache(Project\ResultCache\Mapper::getInstance()))->retrieve($assessment, $user);
-
-        new \Alaress_Probe($result2);
-        die();
-        
         $twigData = [
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
             'baseContext'       => $assessment->getBaseContext(),
