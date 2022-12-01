@@ -136,7 +136,21 @@ class Controller extends Base
             /* Save it to the project result caching place for sharpish retrieval later
              */
             if ($assessment->getContext() instanceof Project && $feedback->isPublished()) {
-                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->persist($assessment, $student, $this->getUser());
+                /* You're forced to require participants/participation hydrated here
+                 * That Is Unfortunate
+                 *
+                 * Spawn a one-element collection
+                 * Then somehow siphon all the participants into it
+                 * Then pop the first and only element out
+                 *
+                 * ffs really?! That's insanity.
+                 * Surely this isn't what we intended to do...??
+                 */
+                $projectCollection = $this->assessmentDataSource->findAllByProjectId($assessment->getContext()->getId());
+                $projectCollection = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($projectCollection);
+                $project = $projectCollection->first();
+
+                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->persist($project, $student, $this->getUser());
             }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided' . $e->getMessage() . $e->getTraceAsString());
