@@ -37,19 +37,26 @@ class ResultCache
      * saving you the explicit derivation steps. You'll get the answer(s)
      * straight away without having to calculate anything.
      *
-     * @param IAssessable      $project
-     * @param \Schoolbox\User $user
-     * @return void
+     * @param IAssessable $project
+     * @param User        $user
+     * @return Model|null
      */
-    public function retrieve(IAssessable $project, \Schoolbox\User $user)
+    public function retrieve(IAssessable $project, \Schoolbox\User $user): ?Model
     {
         /* Find a record for the (project id, user) tuple
          * and returns a model instance for it
          */
-
-        /* Returns null if it doesn't exist
-         * (no marks were ever calculated for this tuple)
-         */
+        try {
+            return $this->mapper->findOneByColumnList([
+                'project_id' => $project->getId(),
+                'user_id' => $user->getId()
+            ]);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* Returns null if it doesn't exist
+             * (no marks were ever calculated for this tuple)
+             */
+            return null;
+        }
     }
 
 
@@ -88,12 +95,9 @@ class ResultCache
          * If there is, update it with the new values
          * Otherwise, spawn a new record for them
          */
-        try {
-            $model = $this->mapper->findOneByColumnList([
-                'project_id' => $project->getId(),
-                'user_id' => $participant->getUser()->getId()
-            ]);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        $model = $this->retrieve($project, $participant->getUser());
+
+        if (null === $model) {
             $model = $this->mapper->createModel()
                 ->setProjectId($project->getId())
                 ->setUser($participant->getUser());
