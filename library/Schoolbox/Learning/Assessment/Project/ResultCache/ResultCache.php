@@ -32,7 +32,7 @@ class ResultCache
 
 
     /**
-     * Takes a $projet instance and for the given user,
+     * Takes a $project instance and for the given user,
      * finds the project result that we calculated and stashed in the db,
      * saving you the explicit derivation steps. You'll get the answer(s)
      * straight away without having to calculate anything.
@@ -62,7 +62,7 @@ class ResultCache
 
     /**
      * Takes a fully hydrated $project instance and for the given $user,
-     * finds the participant equivalent and obtains the human readable
+     * finds the participant equivalent and obtains the human-readable
      * and normalised marks.
      *
      * Shank it straight into a cache db
@@ -71,16 +71,16 @@ class ResultCache
      * to be aggregated and persisted to the db, overwriting (potentially)
      * anyone else who might have done the same, at some point in the past
      *
-     * @param User        $marker
      * @param IAssessable $project
      * @param User        $user
+     * @param User        $marker
      * @return Model|null
      * @throws Exception
      * @throws \DomainException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function persist(\Schoolbox\User $marker, IAssessable $project, \Schoolbox\User $user): ?Model
+    public function persist(IAssessable $project, \Schoolbox\User $user, \Schoolbox\User $marker): ?Model
     {
         $participant = $project->getParticipantIfExtant($user);
 
