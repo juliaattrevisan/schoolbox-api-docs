@@ -24,6 +24,8 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -54,6 +56,7 @@ class Controller extends Base
     /** @var ReturnedWorkMapper */
     private $returnedWorkMapper;
 
+
     /**
      * Controller constructor.
      *
@@ -64,6 +67,7 @@ class Controller extends Base
      * @param UserMapper            $userMapper
      * @param RubricDataSource      $rubricMapper
      * @param ReturnedWorkMapper    $returnedWorkMapper
+     * @param Mapper                $resultCacheMapper
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -72,7 +76,8 @@ class Controller extends Base
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
         RubricDataSource $rubricMapper,
-        ReturnedWorkMapper $returnedWorkMapper
+        ReturnedWorkMapper $returnedWorkMapper,
+        private Project\ResultCache\Mapper $resultCacheMapper
     ) {
         $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -126,6 +131,12 @@ class Controller extends Base
                 ) {
                     $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
                 }
+            }
+
+            /* Save it to the project result caching place for sharpish retrieval later
+             */
+            if ($assessment->getContext() instanceof Project && $feedback->isPublished()) {
+                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->persist($assessment, $student, $this->getUser());
             }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided' . $e->getMessage() . $e->getTraceAsString());
