@@ -67,32 +67,52 @@ class ResultCache
      * @param User        $marker
      * @param IAssessable $project
      * @param User        $user
-     * @return void
+     * @return Model|null
+     * @throws Exception
      * @throws \DomainException
      * @throws \PDOException
-     * @throws Exception
      * @throws \UnexpectedValueException
      */
-    public function persist(\Schoolbox\User $marker, IAssessable $project, \Schoolbox\User $user): void
+    public function persist(\Schoolbox\User $marker, IAssessable $project, \Schoolbox\User $user): ?Model
     {
         $participant = $project->getParticipantIfExtant($user);
 
         /* No participant? No trabajo
          */
         if (null === $participant) {
-            return;
+            return null;
         }
 
+        /* See if an existing record exists for this (project, user) tuple
+         *
+         * If there is, update it with the new values
+         * Otherwise, spawn a new record for them
+         */
+        try {
+            $model = $this->mapper->findOneByColumnList([
+                'project_id' => $project->getId(),
+                'user_id' => $participant->getUser()->getId()
+            ]);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $model = $this->mapper->createModel()
+                ->setProjectId($project->getId())
+                ->setUser($participant->getUser());
+        }
+
+        /* We only care for published feedbacks' marks, not draft ones
+         */
         $normalisedMark = $project->getNormalisedMark($participant, true);
         $humanReadableMark = $project->getHumanReadableMark($participant, true);
 
-        $model = $this->mapper->createModel()
-            ->setProjectId($project->getId())
-            ->setUser($participant->getUser())
+        /* Shove in all the parts
+         */
+        $model
             ->setMarker($marker)
             ->setHumanReadableMark($humanReadableMark)
             ->setNormalisedMark($normalisedMark);
 
         $this->mapper->save($model);
+
+        return $model;
     }
 }
