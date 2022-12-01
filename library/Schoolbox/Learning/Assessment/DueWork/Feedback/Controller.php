@@ -138,17 +138,8 @@ class Controller extends Base
             if ($assessment->getContext() instanceof Project && $feedback->isPublished()) {
                 /* You're forced to require participants/participation hydrated here
                  * That Is Unfortunate
-                 *
-                 * Spawn a one-element collection
-                 * Then somehow siphon all the participants into it
-                 * Then pop the first and only element out
-                 *
-                 * ffs really?! That's insanity.
-                 * Surely this isn't what we intended to do...??
                  */
-                $projectCollection = $this->assessmentDataSource->findAllByProjectId($assessment->getContext()->getId());
-                $projectCollection = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($projectCollection);
-                $project = $projectCollection->first();
+                $project = $this->assessmentDataSource->findByIdForReview($assessment->getContext()->getId());
 
                 (new Project\ResultCache\ResultCache($this->resultCacheMapper))->persist($project, $student, $this->getUser());
             }
