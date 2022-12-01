@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -161,7 +162,7 @@ class Controller extends Assessment\Controller
         
         $user = \Schoolbox\UserMapper::getInstance()->findById(60);
 
-        $result = (new ResultCache())->persist($this->getUser(), $assessment, $user);
+        $result = (new ResultCache(Project\ResultCache\Mapper::getInstance()))->persist($this->getUser(), $assessment, $user);
 
         new \Alaress_Probe($result);
         die();

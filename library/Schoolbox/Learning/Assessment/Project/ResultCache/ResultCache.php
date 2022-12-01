@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\Project;
+namespace Schoolbox\Learning\Assessment\Project\ResultCache;
 
-use DebugBar\DebugBarException;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
 /**
@@ -22,6 +22,15 @@ use Schoolbox\User;
  */
 class ResultCache
 {
+    /**
+     * @param Mapper $mapper
+     */
+    public function __construct(
+        private Mapper $mapper
+    ) {
+    }
+
+
     /**
      * Takes a $projet instance and for the given user,
      * finds the project result that we calculated and stashed in the db,
@@ -59,8 +68,10 @@ class ResultCache
      * @param IAssessable $project
      * @param User        $user
      * @return void
-     * @throws DebugBarException
      * @throws \DomainException
+     * @throws \PDOException
+     * @throws Exception
+     * @throws \UnexpectedValueException
      */
     public function persist(\Schoolbox\User $marker, IAssessable $project, \Schoolbox\User $user): void
     {
@@ -75,15 +86,13 @@ class ResultCache
         $normalisedMark = $project->getNormalisedMark($participant, true);
         $humanReadableMark = $project->getHumanReadableMark($participant, true);
 
-        $mapper = ResultCache\Mapper::getInstance();
-
-        $model = $mapper->createModel()
+        $model = $this->mapper->createModel()
             ->setProjectId($project->getId())
             ->setUser($participant->getUser())
             ->setMarker($marker)
             ->setHumanReadableMark($humanReadableMark)
             ->setNormalisedMark($normalisedMark);
 
-        $mapper->save($model);
+        $this->mapper->save($model);
     }
 }
