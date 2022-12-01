@@ -72,20 +72,18 @@ class ResultCache
             return;
         }
 
-        $normalised = $project->getNormalisedMark($participant, true);
-        $humanReadable = $project->getHumanReadableMark($participant, true);
+        $normalisedMark = $project->getNormalisedMark($participant, true);
+        $humanReadableMark = $project->getHumanReadableMark($participant, true);
 
-        new \Alaress_Probe(
-            'Student', 'project id', 'user id', 'marker id', 'human readable', 'normalised'
-        );
+        $mapper = ResultCache\Mapper::getInstance();
 
-        new \Alaress_Probe(
-            $participant->getUser()->getFullName(),
-            $project->getId(),
-            $participant->getUser()->getId(),
-            $marker->getId(),
-            $humanReadable,
-            $normalised
-        );
+        $model = $mapper->createModel()
+            ->setProjectId($project->getId())
+            ->setUser($participant->getUser())
+            ->setMarker($marker)
+            ->setHumanReadableMark($humanReadableMark)
+            ->setNormalisedMark($normalisedMark);
+
+        $mapper->save($model);
     }
 }
