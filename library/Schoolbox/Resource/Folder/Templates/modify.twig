@@ -227,19 +227,6 @@
             }
         });
         {% endif %}
-
-        //if enter occurs somewhere inside the form..., don't open or action curriculum selector, but attempt to submit the form
-        form.keyup(function(e){
-            //if inside the yearlevel selectize or curriculum selector don't overload this
-            if (('searchSelectSearchInput' in e.target.dataset) || ('yearLevels-selectized' === e.target.id)) {
-                return;
-            }
-            if ((13 === e.keyCode))
-            {
-                e.preventDefault();
-                form.submit();
-            }
-        });
     });
 </script>
 {% endautoescape %}
