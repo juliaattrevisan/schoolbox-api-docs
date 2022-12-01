@@ -64,7 +64,7 @@ class ApiHierarchyGenerator
                 $className = "Calendar_Api_Config_Connector_{$connectorClassFilename}";
                 $config    = new $className();
 
-                if ($this->moduleChecker->isEnabled($config)) {
+                if ($this->moduleChecker->isEnabled($className)) {
                     $allApi[$eventTypeFilename][$connectorClassFilename] = $config;
                 }
             }

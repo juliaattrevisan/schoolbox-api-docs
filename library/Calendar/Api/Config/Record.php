@@ -12,7 +12,6 @@
  */
 class Calendar_Api_Config_Record
 {
-
     /**
      * Status of a config record
      *
@@ -23,14 +22,12 @@ class Calendar_Api_Config_Record
     public const ACTIVE   = 1;
     public const INACTIVE = 0;
 
-
     /**
      * Primary key
      *
      * @var int|null
      */
     public ?int $id = null;
-
 
     /**
      * The kind of event this configuration is for
@@ -42,7 +39,6 @@ class Calendar_Api_Config_Record
      */
     public string $eventType = '';
 
-
     /**
      * Class name of the API which will use this config
      * e.g. 'Schoolbox', 'Vcal'
@@ -53,14 +49,12 @@ class Calendar_Api_Config_Record
      */
     public string $connectorClass = '';
 
-
     /**
      * Serialized configuration object
      *
      * @var string
      */
     public string $config = '';
-
 
     /**
      * Status of the config
@@ -92,19 +86,40 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * Encode config object for storage in db
      *
      * @param Calendar_Api_Config_Connector_Abstract $config
      * @return $this
+     * @throws JsonException
      */
     public function encodeConfig(Calendar_Api_Config_Connector_Abstract $config): self
     {
-        $this->setConfig(base64_encode(serialize($config)));
+        $configArray = [
+            'label'       => $config->getLabel(),
+            'luEventType' => $config->getLuEventType(),
+        ];
+
+        switch (get_class($config)) {
+            case Calendar_Api_Config_Connector_ExternalConstrained::class:
+                $configArray['duration'] = $config->getDuration();
+                break;
+
+            case Calendar_Api_Config_Connector_Vcal::class:
+                $configArray['url']           = $config->getUrl();
+                $configArray['authorization'] = $config->getAuthorization();
+                $configArray['campusIds']     = $config->getCampusIds();
+                $configArray['groupIds']      = $config->getGroupIds();
+                break;
+
+            default:
+                // Do nothing.
+        }
+
+        $this->setConfig(json_encode($configArray,JSON_THROW_ON_ERROR));
+
         return $this;
     }
-
 
     /**
      * Decode config object when retrieving from db
@@ -113,12 +128,87 @@ class Calendar_Api_Config_Record
      */
     public function decodeConfig(): Calendar_Api_Config_Connector_Abstract
     {
+        $configJson = $this->getConfig();
+
+        try {
+            $config = json_decode($configJson, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            // If we cannot decode the JSON-encoded config, start with an empty array.  We do this so that the user can
+            // still edit and fix the calendar connector config on page https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,
+            // even if the JSON config data has become corrupted for whatever reason.  Handling the JsonException here
+            // also allows for simpler code in calling functions.
+            trigger_error(
+                // Even though we are handling this exception, we still want to log when it happens.
+                "JSON string could not be decoded - empty object created instead. (JSON string: '$configJson')",
+                E_USER_WARNING
+            );
+            $config = [];
+        }
+
+        // Instantiate class object given description in $config;
+        $className = 'Calendar_Api_Config_Connector_' . $this->getConnectorClass();
+        $obj       = new $className();
+
+        // These fields are stored in the schoolbox.calendar_connector table in columns other than `config`.
+        // Since we are instantiating a new object, we need data from both the `config` column and the other columns.
+        $obj->setConnectorClass($this->getConnectorClass());
+        $obj->setEventType($this->getEventType());
+        $obj->setFailedCount($this->getFailedCount());
+        $obj->setId($this->getId());
+
+        // These fields are stored in schoolbox.calendar_connector as a JSON string in the `config` column.
+        $obj->setLabel($config['label'] ?? '');
+        $obj->setLuEventType($config['luEventType'] ?? 1); // This refers to database table schoolbox.luEventType.
+
+        switch (get_class($obj)) {
+            case Calendar_Api_Config_Connector_ExternalConstrained::class:
+                // These fields are stored in schoolbox.calendar_connector as a JSON string in the `config` column.
+                $obj->setDuration($config['duration'] ?? '');
+                break;
+
+            case Calendar_Api_Config_Connector_Vcal::class:
+                // These fields are stored in schoolbox.calendar_connector as a JSON string in the `config` column.
+                $obj->setUrl($config['url'] ?? '');
+                $obj->setAuthorization($config['authorization'] ?? '');
+                $obj->setCampusIds($config['campusIds'] ?? []);
+                $obj->setGroupIds($config['groupIds'] ?? []);
+                break;
+
+            default:
+                // Do nothing.
+        }
+
+        return $obj;
+    }
+
+    /**
+     * Encode config object for storage in db
+     * This is the pre-JSON encoding method, preserved for legacy purposes.
+     *
+     * @deprecated
+     * @param Calendar_Api_Config_Connector_Abstract $config
+     * @return $this
+     */
+    public function encodeConfigLegacy(Calendar_Api_Config_Connector_Abstract $config): self
+    {
+        $this->setConfig(base64_encode(serialize($config)));
+        return $this;
+    }
+
+    /**
+     * Decode config object when retrieving from db
+     * This is the pre-JSON decoding method, preserved for legacy purposes.
+     *
+     * @deprecated
+     * @return Calendar_Api_Config_Connector_Abstract
+     */
+    public function decodeConfigLegacy(): Calendar_Api_Config_Connector_Abstract
+    {
         /** @var Calendar_Api_Config_Connector_Abstract $obj */
         $obj = unserialize(base64_decode($this->getConfig()), [Calendar_Api_Config_Connector_Abstract::class]);
         $obj->setFailedCount($this->getFailedCount());
         return $obj;
     }
-
 
     /**
      * Activate this config record
@@ -130,7 +220,6 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * Deactivate this config record, but not delete it
      * @return Calendar_Api_Config_Record
@@ -140,7 +229,6 @@ class Calendar_Api_Config_Record
         $this->setStatus(self::INACTIVE);
         return $this;
     }
-
 
     /**
      * This connector active?
@@ -165,7 +253,6 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * @return string|null
      */
@@ -173,7 +260,6 @@ class Calendar_Api_Config_Record
     {
         return $this->eventType;
     }
-
 
     /**
      * Set connectorClass
@@ -187,7 +273,6 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * Get connectorClass
      *
@@ -197,7 +282,6 @@ class Calendar_Api_Config_Record
     {
         return $this->connectorClass;
     }
-
 
     /**
      * Set config
@@ -211,7 +295,6 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * Get config
      *
@@ -221,7 +304,6 @@ class Calendar_Api_Config_Record
     {
         return $this->config;
     }
-
 
     /**
      * Set id
@@ -235,7 +317,6 @@ class Calendar_Api_Config_Record
         return $this;
     }
 
-
     /**
      * Get id
      *
@@ -245,7 +326,6 @@ class Calendar_Api_Config_Record
     {
         return $this->id;
     }
-
 
     /**
      * Set status
@@ -258,7 +338,6 @@ class Calendar_Api_Config_Record
         $this->status = $status;
         return $this;
     }
-
 
     /**
      * Get status

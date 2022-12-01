@@ -24,6 +24,13 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
             $configRecord = Calendar_Api_Config_Mapper::getInstance()->findById($id);
             $config = $configRecord->decodeConfig();
 
+            if ($config === null) {
+                // Config could not be decoded, so create a blank record matching the expected class.
+                // This allows the corrupted data to be overwritten.
+                $connectorClassName = "Calendar_Api_Config_Connector_{$attribs['connectorClass']}";
+                $config = new $connectorClassName;
+            }
+
             /* Process multiple Vcals
              */
             if (isset($attribs['luEventType'])) {
@@ -48,7 +55,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
 
                 /* Add permissions for campus (or use the default empty array if not chosen)
                  */
-                if (is_array($attribs['campus'])) {
+                if (array_key_exists('campus', $attribs) && is_array($attribs['campus'])) {
                     $config->setCampusIds($attribs['campus']);
                 } else {
                     $config->setCampusIds([]);
@@ -56,7 +63,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
 
                 /* Add permission for groups (or use the default empty array if not chosen)
                  */
-                if (is_array($attribs['groupCheck'])) {
+                if (array_key_exists('groupCheck', $attribs) && is_array($attribs['groupCheck'])) {
                     $config->setGroupIds($attribs['groupCheck']);
                 } else {
                     $config->setGroupIds([]);

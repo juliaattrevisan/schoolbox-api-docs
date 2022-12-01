@@ -89,23 +89,11 @@ class Calendar_Api_Factory
 
             $allConfigRecords = \Calendar_Api_Config_Mapper::getInstance()->getAllConfigRecords();
 
-            /* These configs are base64-encode()'d to get around a weird issue with unserialize
-             * http://stackoverflow.com/questions/4264270/unserialize-sometimes-returns-false
-             */
             foreach ($allConfigRecords as $currentConfig) {
-                $config = $currentConfig->decodeConfig();
+                $currentConnectorClass = 'Calendar_Api_Config_Connector_' . $currentConfig->getConnectorClass();
 
-                try {
-                    if ($this->moduleChecker->isEnabled($config)) {
-                        /* Update $config so it knows the calendar_connector id from whence it came
-                         * This is used in produce() and passed to each unique/default implementation
-                         */
-                        $config->setId($currentConfig->getId());
-
-                        $this->allTypes[] = $config;
-                    }
-                } catch (\TypeError $e) {
-                    // I will not buy this record; it is scratched
+                if ($this->moduleChecker->isEnabled($currentConnectorClass)) {
+                    $this->allTypes[] = $currentConfig->decodeConfig();
                 }
             }
         }

@@ -29,7 +29,7 @@ $app = new class extends CliTool\App {
             ->setEventType('Fixtures') // This is actually the classname corresponding to Calendar/Api/Config/Connector/Fixtures.php
             ->setConnectorClass('Schoolbox')
             ->deactivate()
-            ->encodeConfig($config);
+            ->encodeConfigLegacy($config);
 
         $query = "
             INSERT INTO calendar_connector (event_type, connector_class, config, status)

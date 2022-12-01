@@ -21,10 +21,8 @@ use Schoolbox\IConfigLoader;
  */
 class ModuleChecker
 {
-
     /** @var IConfigLoader */
     private $config;
-
 
     /**
      * @param IConfigLoader $config
@@ -34,17 +32,16 @@ class ModuleChecker
         $this->config = $config;
     }
 
-
     /**
      * Returns whether the specified config's API is enabled.
      *
-     * @param Calendar_Api_Config_Connector_Interface $config
+     * @param string $connectorClass
      * @return bool
      */
-    public function isEnabled(Calendar_Api_Config_Connector_Interface $config): bool
+    public function isEnabled(string $connectorClass): bool
     {
-        switch (\get_class($config)) {
-            case Calendar_Api_Config_Connector_Booking::class:
+        switch ($connectorClass) {
+            case Calendar_Api_Config_Connector_Booking::class   : // Fall through.
             case Calendar_Api_Config_Connector_Moderation::class:
                 return 1 === (int)$this->config->get('resource_booking_enabled');
             case Calendar_Api_Config_Connector_EOTC::class:
