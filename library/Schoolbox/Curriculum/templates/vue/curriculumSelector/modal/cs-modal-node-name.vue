@@ -141,7 +141,7 @@ function highlightSearchInElement (toHighlight) {
 </script>
 
 <template>
-    <button
+    <div
         v-if="isButton"
         class="button-name"
         :title="`View ${props.title}`"
@@ -150,7 +150,7 @@ function highlightSearchInElement (toHighlight) {
         @keyup.enter="onNameSelected"
     >
         {{ props.title }}
-    </button>
+    </div>
     <div
         v-else
         class="name"
