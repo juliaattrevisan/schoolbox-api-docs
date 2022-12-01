@@ -11,6 +11,13 @@ class Badges
     public const URL = '/learning/badge';
 
     public const BUTTON_ADD = 'a.icon-add.button';
+    public const DROPDOWN_SET_GOAL = 'a.icon-goal';
+    public const DROPDOWN_DELETE = 'a.icon-delete';
+    public const BUTTON_CONFIRM_DELETE = 'a.button.submit';
+    public const LIST_BOX = "input[aria-controls='vs2__listbox']";
+    public const SELECTED_STUDENT = 'span.selected.d-center';
+    public const MODAL_BUTTON_SET_GOAL = 'button';
+
     private AcceptanceTester $tester;
 
     /**
@@ -72,11 +79,19 @@ class Badges
     }
 
     /**
+     * click an option Set Goal in the dropdown
+     */
+    public function clickDropdownSetGoal(): void
+    {
+        $this->tester->click(Locator::lastElement(self::DROPDOWN_SET_GOAL));
+    }
+
+    /**
      * click an option Delete in the dropdown
      */
     public function clickDropdownDelete(): void
     {
-        $this->tester->click(Locator::lastElement('a.icon-delete'));
+        $this->tester->click(Locator::lastElement(self::DROPDOWN_DELETE));
     }
 
 
@@ -85,6 +100,24 @@ class Badges
      */
     public function clickConfirmDelete(): void
     {
-        $this->tester->click(Locator::lastElement('a.button.submit'));
+        $this->tester->click(Locator::lastElement(self::BUTTON_CONFIRM_DELETE));
+    }
+
+    /**
+     * set goal/achievement modal
+     */
+    public function selectStudent(string $studentName): void
+    {
+        $this->tester->fillField(self::LIST_BOX, $studentName);
+        $this->tester->pressKey(self::LIST_BOX, \Facebook\WebDriver\WebDriverKeys::ENTER);
+        $this->tester->click(self::SELECTED_STUDENT);
+    }
+
+    /**
+     * click Set Goal
+     */
+    public function clickSetGoal(): void
+    {
+        $this->tester->click(Locator::lastElement(self::MODAL_BUTTON_SET_GOAL));
     }
 }
