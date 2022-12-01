@@ -121,16 +121,16 @@ class Helper
     /**
      * Filter assessments with given work types
      * @param User       $viewer
-     * @param User       $viewee
      * @param Collection $assessments
      * @param Collection $workTypes
      * @return Collection
      * @throws MapperException
      */
-    public function filterAssessments(User $viewer, User $viewee, Collection $assessments, Collection $workTypes)
+    public function filterAssessments(User $viewer, Collection $assessments, Collection $workTypes)
     {
         $visibility                  = new Visibility($this->access);
         $workTypeAssessmentsByFolder = new Collection();
+
         foreach ($assessments as $folderId => $folderAssessments) {
             $workTypeAssessments = new Collection();
             foreach ($folderAssessments as $folderAssessment) {
@@ -138,7 +138,7 @@ class Helper
                     ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti) &&
                     $folderAssessment->getWorkType() &&
                     \in_array($folderAssessment->getWorkType()->getId(), $workTypes->getPropertyValues('id'), true) &&
-                    $visibility->isVisibleToUser($folderAssessment, $viewer, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
+                    $visibility->isVisibleToUserOrChildOfUser($folderAssessment, $viewer, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
                 ) {
                     $workTypeAssessments->add($folderAssessment);
                 }

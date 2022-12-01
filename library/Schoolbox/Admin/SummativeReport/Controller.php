@@ -819,7 +819,7 @@ class Controller extends ConfigController
              * Summary and Class Pages
              */
             if ($summaryWorkTypes->count() > 0) {
-                $summaryAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $summaryWorkTypes);
+                $summaryAssessments = $gradeHelper->filterAssessments($viewer, $assessments, $summaryWorkTypes);
             }
         }
 
@@ -836,7 +836,7 @@ class Controller extends ConfigController
              * Summary and Class Pages
              */
             if ($classWorkTypes->count() > 0) {
-                $classAssessments = $gradeHelper->filterAssessments($viewer, $student, $assessments, $classWorkTypes);
+                $classAssessments = $gradeHelper->filterAssessments($viewer, $assessments, $classWorkTypes);
             }
         }
 
