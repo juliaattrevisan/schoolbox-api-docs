@@ -34,7 +34,6 @@ use UnexpectedValueException;
 
 class Controller extends Base
 {
-
     /** @var IFeedbackDataSource */
     protected $feedbackDataSource;
 

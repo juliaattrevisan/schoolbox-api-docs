@@ -172,7 +172,7 @@ class Controller extends Assessment\Controller
 
         $cachedProjectMarks = (new ResultCache($this->projectResultCacheMapper))
             ->retrieveMultiple($assessment, $userIds)
-            ->indexByCallback(static function(\Schoolbox\Learning\Assessment\Project\ResultCache\Model $model) {
+            ->indexByCallback(static function (\Schoolbox\Learning\Assessment\Project\ResultCache\Model $model) {
                 return $model->getUser()->getId();
             });
 
