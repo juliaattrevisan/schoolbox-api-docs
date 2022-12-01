@@ -88,10 +88,10 @@ class Model implements ISoftDeletable
 
         /* If possible, explode the csv values
         */
-        $optionsPayload['terms'] = explode(',', (string)$optionsPayload['terms']);
-        $optionsPayload['yearLevels'] = explode(',', (string)$optionsPayload['yearLevels']);
-        $optionsPayload['campuses'] = explode(',', (string)$optionsPayload['campuses']);
-        $optionsPayload['students'] = explode(',', (string)$optionsPayload['students']);
+        $optionsPayload['terms']      = (string)$optionsPayload['terms'] === '' ? [] : explode(',', (string)$optionsPayload['terms']);
+        $optionsPayload['yearLevels'] = (string)$optionsPayload['yearLevels'] === '' ? [] : explode(',', (string)$optionsPayload['yearLevels']);
+        $optionsPayload['campuses']   = (string)$optionsPayload['campuses'] === '' ? [] : explode(',', (string)$optionsPayload['campuses']);
+        $optionsPayload['students']   = (string)$optionsPayload['students'] === '' ? [] : explode(',', (string)$optionsPayload['students']);
 
         return $optionsPayload;
     }
