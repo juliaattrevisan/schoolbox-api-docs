@@ -131,6 +131,10 @@ class Helper
     {
         $visibility                  = new Visibility($this->access);
         $workTypeAssessmentsByFolder = new Collection();
+
+        // Attempted to replace $visibility with AssessmentListMutator, but couldn't work well with sivo check
+        // So, handling parents separately - If viewer is a parent of viewee, pass viewee as the user to check
+        $user = $viewer->isParentOf($viewee) ? $viewee : $viewer;
         foreach ($assessments as $folderId => $folderAssessments) {
             $workTypeAssessments = new Collection();
             foreach ($folderAssessments as $folderAssessment) {
@@ -138,7 +142,7 @@ class Helper
                     ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti) &&
                     $folderAssessment->getWorkType() &&
                     \in_array($folderAssessment->getWorkType()->getId(), $workTypes->getPropertyValues('id'), true) &&
-                    $visibility->isVisibleToUser($folderAssessment, $viewer, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
+                    $visibility->isVisibleToUser($folderAssessment, $user, true, null, !$this->access->isInstructor($user, $folderAssessment->getBaseContext()->getFolder()))
                 ) {
                     $workTypeAssessments->add($folderAssessment);
                 }
