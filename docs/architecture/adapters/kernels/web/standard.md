@@ -9,7 +9,7 @@ it configures all things which a web request may need.
 
 In order to protect against cross-site request forgery attempts: this kernel is
 able to reject mutative (e.g. non-`GET`) requests if it determines that the
-request's source host doesn't match its target host.
+request's source host doesn't match the instance's host name.
 
 This is handled in `\Schoolbox\Application\WebRequest\Kernel::runMiddleware`.
 
@@ -44,6 +44,15 @@ Its responsibilities include:
   - if so, loading and executing its module and controller, and outputting its
     response
   - if not, sending the request back to be handled via Sitepage
+
+Alternately: the kernel may have been created without being run. (This happens
+if the kernel was created via the
+[Requested path exists](README.md#requested-path-exists) mechanism.)
+
+In this case: the steps below are bypassed completely, as `run` is never called.
+Instead: as with the Basic kernel's
+[Running a request](basic.md#running-a-request) method, any code which is
+defined after the kernel is created is run automatically.
 
 
 ### Aura
