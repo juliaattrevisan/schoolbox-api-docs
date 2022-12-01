@@ -269,6 +269,17 @@ class Controller extends Base
         try {
             $feedback = $this->processFeedback($participant, $post, $reviewRoute, $mostRecentFeedback, $response);
             $this->processRubric($participant, $post, $feedback);
+
+            /* Save it to the project result caching place for sharpish retrieval later
+             */
+            if ($assessment->getContext() instanceof Project && $feedback->isPublished()) {
+                /* You're forced to require participants/participation hydrated here
+                 * That Is Unfortunate
+                 */
+                $project = $this->assessmentDataSource->findByIdForReview($assessment->getContext()->getId());
+
+                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->persist($project, $student, $this->getUser());
+            }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
             return;
