@@ -293,7 +293,7 @@ class Component_Dashboard_Timetable_CyclicStrategy implements Component_Dashboar
     {
         $classDescription = $class['description'] ?? '';
         $classLink = '';
-        $folder = $this->folderMapper->findForCampusAndClass($class['campus'], $class['code']);
+        $folder = $this->folderMapper->findForCampusAndClass((string)$class['campus'], (string)$class['code']);
         if ($folder) {
             $classDescription = $classDescription ?: $folder->getName();
             if ($this->access->getFolderAccess($this->user, $folder->getId()) >= UserAccess::ACCESS_READ) {
@@ -312,7 +312,7 @@ class Component_Dashboard_Timetable_CyclicStrategy implements Component_Dashboar
         ];
 
         // Optionally link to Attendance Records
-        if ($this->externalAttendanceLink->isEnabled($class['code'], !empty($class['AttendanceEnabled']), $now)) {
+        if ($this->externalAttendanceLink->isEnabled((string)$class['code'], !empty($class['AttendanceEnabled']), $now)) {
             $classContext['attendance'] = [
                 'link'   => $this->externalAttendanceLink->getAttendanceLink(
                     $class['code'],
