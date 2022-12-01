@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Project\ResultCache;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
@@ -28,6 +29,28 @@ class ResultCache
     public function __construct(
         private Mapper $mapper
     ) {
+    }
+
+
+    /**
+     * Takes a $project instance and for the given users,
+     * finds the project result that we calculated and stashed in the db,
+     * saving you the explicit derivation steps. You'll get the answer(s)
+     * straight away without having to calculate anything.
+     *
+     * @param IAssessable $project
+     * @param array       $userIds
+     * @return GenericCollection
+     */
+    public function retrieveMultiple(IAssessable $project, array $userIds): \Schoolbox\GenericCollection
+    {
+        /* Find a record for the (project id, user) tuple
+         * and returns a model instance for it
+         */
+        return $this->mapper->findByColumnList([
+            'project_id' => $project->getId(),
+            'user_id' => $userIds
+        ]);
     }
 
 

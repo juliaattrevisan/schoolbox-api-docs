@@ -208,7 +208,6 @@ Data:
                             <div class="flex-grade">
                                 <div class="small-12 compact card columns">
                                     {# cache to prevent repeated traversals #}
-                                    {% set publishedHumanReadableMark = participant.humanReadableMark(true) %}
                                     <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
                                         {% include 'include/portrait.twig' with {user: participant.user, limitWidth: 48} only %}
                                         <p>
@@ -220,6 +219,8 @@ Data:
                                         </p>
                                     </a>
                                 </div>
+                                {% set publishedHumanReadableMark = cachedProjectMarks[participant.user.id].humanReadableMark ?? null %}
+
                                 {% if publishedHumanReadableMark is not null %}
                                     <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg">
                                         <span>{{ publishedHumanReadableMark }}</span>

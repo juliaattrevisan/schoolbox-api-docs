@@ -58,6 +58,7 @@ class Controller extends Assessment\Controller
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
         LatestViewMapper $latestViewMapper,
+        protected Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -72,7 +73,7 @@ class Controller extends Assessment\Controller
             $courseSpecificationMapper,
             $unitSpecificationMapper,
             $replicator,
-            $latestViewMapper,
+            $latestViewMapper
         );
     }
 
@@ -159,14 +160,30 @@ class Controller extends Assessment\Controller
         foreach ($participants as $participant) {
             $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
         }
-        
+
+        /* Find all the cached marks for each of the guys here
+         * Save them in an (id, human readable) lookup for fast access
+         */
+        $userIds = [];
+
+        foreach ($assessment->getAllParticipants() as $participant) {
+            $userIds[] = $participant->getUser()->getId();
+        }
+
+        $cachedProjectMarks = (new ResultCache($this->projectResultCacheMapper))
+            ->retrieveMultiple($assessment, $userIds)
+            ->indexByCallback(static function(\Schoolbox\Learning\Assessment\Project\ResultCache\Model $model) {
+                return $model->getUser()->getId();
+            });
+
         $twigData = [
-            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
-            'baseContext'       => $assessment->getBaseContext(),
-            'assessment'        => $assessment,
-            'assessmentStats'   => $assessmentStats,
-            'participantStats'  => $participantStats,
-            'returnUrl'         => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
+            'breadcrumbs'        => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
+            'baseContext'        => $assessment->getBaseContext(),
+            'assessment'         => $assessment,
+            'assessmentStats'    => $assessmentStats,
+            'participantStats'   => $participantStats,
+            'cachedProjectMarks' => $cachedProjectMarks,
+            'returnUrl'          => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
         ];
 
         $this->getResponse()->content->set(
