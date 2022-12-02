@@ -53,7 +53,7 @@ In this case: the steps below are bypassed completely, as `run` is never called.
 Instead: as with the Basic kernel's
 [Running a request](basic.md#running-a-request) method, any code which is
 defined after the kernel is created is run automatically as a
-[Pseudo-controller](../../pseudo-controllers.md).
+[Sitepage controller](../../controllers/sitepage.md).
 
 
 ### Aura
@@ -132,7 +132,8 @@ The controller method matching the name of the action is introspected for its
 parameters, and those parameters are matched against the route and preloader
 params: then, the controller method is called with those parameters.
 
-Controllers are documented further in [their own section](../../controllers.md).
+Controllers are documented further in
+[their own section](../../controllers/aura.md).
 
 
 #### Render the controller's output
@@ -163,4 +164,4 @@ to be handled via Sitepage.
 `\Schoolbox\Application\WebRequest\Kernel::outputSitepageContent` sends requests
 to Sitepage. This method will include a file in `www/` which matches the
 request's path directly (minus the `.php` extension), and its code will be
-executed as a [Pseudo-controller](../../pseudo-controllers.md).
+executed as a [Sitepage controller](../../controllers/sitepage.md).

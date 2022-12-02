@@ -1,7 +1,7 @@
-# Controllers
+# Aura Controller
 
-Schoolbox's controllers are created by [modules](../configuration/modules.md),
-in the [Aura variant of the standard web kernel](kernels/web/standard.md#aura).
+Schoolbox's controllers are created by [modules](../../configuration/modules.md),
+in the [Aura variant of the standard web kernel](../kernels/web/standard.md#aura).
 
 All controllers inherit the `\Alaress\Web\Controller\Base` abstract class.
 

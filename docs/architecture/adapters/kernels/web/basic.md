@@ -12,5 +12,5 @@ injection container does not set up UI dependencies (e.g. Twig).
 ## Running a request
 
 Basic web request kernels do not have a `run` method: instead, any code which is
-defined after the kernel is created is run automatically, via the pattern
-described in [Pseudo-controllers](../../pseudo-controllers.md).
+defined after the kernel is created is run automatically as a
+[Sitepage controller](../../controllers/sitepage.md).

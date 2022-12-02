@@ -1,10 +1,10 @@
-# Pseudo-controllers
+# Sitepage Controller
 
-Pseudo-controllers are invoked by either:
-- [Basic kernels](kernels/web/basic.md)
-- [Standard kernels handled by Sitepage](kernels/web/standard.md#sitepage)
+Sitepage controllers are invoked by either:
+- [Basic kernels](../kernels/web/basic.md)
+- [Standard kernels handled by Sitepage](../kernels/web/standard.md#sitepage)
 
-Pseudo-controller code exists in the `www/` directory.
+All Sitepage controller code exists in the `www/` directory.
 
 ```php
 require_once SITE_root . '/conf/core/require.php';
