@@ -13,6 +13,7 @@ use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
+use Aura\Web\Request\Values;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
@@ -136,7 +137,7 @@ class Controller extends Base
                      */
                     $this->getResponse()->redirect->to(
                         $this->getRouteIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', [
-                            'subtypeId' => $subtype->getId()
+                            'subtypeId' => $subtype->getId(),
                         ])
                     );
 
@@ -150,7 +151,7 @@ class Controller extends Base
             $this->getResponse()->redirect->to(
                 $this->getRouteIfAuthorized('pastoralAudience.getAudiencesTypeModify', [
                     'typeId' => $type->getId(),
-                    'type' => $type
+                    'type' => $type,
                 ])
             );
 
@@ -232,7 +233,7 @@ class Controller extends Base
         if (null !== $subType) {
             $url = $this->router->generate('pastoralAudience.getAudiencesSubTypeModify', [
                 'typeId' => $type->getId(),
-                'subtypeId' => $subType->getId()
+                'subtypeId' => $subType->getId(),
             ]);
         } else {
             $url = $this->router->generate('pastoralAudience.getAudiencesTypeModify', [
@@ -276,15 +277,15 @@ class Controller extends Base
                 'type'            => $type,
                 'subtype'         => $subType,
                 'actions'         => $this->pastoralActionMapper->findAll(),
-                'typeActions'     => $subType ? $this->pastoralActionMapper->findForSubtype($subType) : $this->pastoralActionMapper->findforType($type),
+                'typeActions'     => $subType ? $subType->getTypeActions() : $type->getTypeActions(),
                 'icons'           => $this->iconMapper->findAll()->sortNaturally('title'),
-                'sentiments'      => Pastoral\Type\Model::SENTIMENT_VALUES,
+                'sentiments'      => Pastoral\Type\TypeAbstract::SENTIMENT_VALUES,
                 'flagColors'  => [
                     'foreground' => $foregroundColor->getAsRgba(),
                     'background' => $backgroundColor->getAsRgba(),
                     'baseLight'  => ColorHelper::BASE_BACKGROUND_COLOR_LIGHT,
                     'baseDark'   => ColorHelper::BASE_BACKGROUND_COLOR_DARK,
-                ]
+                ],
             ],
             'title'    => 'Pastoral Group Management',
         ]);
@@ -303,7 +304,7 @@ class Controller extends Base
      */
     public function postAudienceTypeModify(Pastoral\Type\Model $type): void
     {
-        $this->postAudienceModify($type, null, $this->getRequest()->post->getArrayCopy());
+        $this->postAudienceModify($type, null, $this->getRequest()->post);
     }
 
 
@@ -319,7 +320,7 @@ class Controller extends Base
      */
     public function postAudienceSubTypeModify(Pastoral\SubType\Model $subType): void
     {
-        $this->postAudienceModify($subType->getPastoralType(), $subType, $this->getRequest()->post->getArrayCopy());
+        $this->postAudienceModify($subType->getPastoralType(), $subType, $this->getRequest()->post);
     }
 
 
@@ -327,86 +328,93 @@ class Controller extends Base
      * Update default audience for a pastoral Type or SubType
      *
      * @param Pastoral\Type\Model         $type
-     * @param Pastoral\SubType\Model|null $subType
-     * @param array                       $post
+     * @param Pastoral\SubType\Model|null $currentType
+     * @param Values                      $post
+     * @return void
      * @throws MapperException
-     * @throws MapperException\Deleted
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
      */
-    private function postAudienceModify(Pastoral\Type\Model $type, ?Pastoral\SubType\Model $subType, array $post): void
+    private function postAudienceModify(Pastoral\Type\Model $type, ?Pastoral\SubType\Model $currentType, Values $post): void
     {
-        $isVisibilityLocked = isset($post['visibilityLocked']) ? (bool)$post['visibilityLocked'] : false;
-        $actions            =
-            is_array($post['actions'] ?? null)
-                ? $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter($post['actions'])))
-                : $this->pastoralActionMapper->createCollection();
+        $isVisibilityLocked = $post->getBool('visibilityLocked', false);
+
+        $this->pastoralTypeMapper->getDatabase()->beginTransaction();
+
+        /** @var Pastoral\Type\TypeAbstract $currentType */
+        $currentType = $currentType ?? $type;
+        $isSubType   = $currentType instanceof Pastoral\SubType\Model;
+
+        $existing = $isSubType
+            ? $this->pastoralAudienceMapper->findByColumnList(['subtype_id' => $currentType->getId()])
+            : $this->pastoralAudienceMapper->findByColumnList(['type_id' => $currentType->getId()]);
+
+        /** @var Pastoral\TypeAction\Mapper $typeActionMapper */
+        $typeActionMapper = $this->pastoralTypeMapper->getJoinMapper('typeActions');
+
         // Fetch the exiting rules
-        if ($subType) {
-            $existing = $this->pastoralAudienceMapper->findByColumnList(['subtype_id' => $subType->getId()]);
-            if (!$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
-                $actions = $this->pastoralActionMapper->findForSubtype($subType);
-            }
-            $subType->setActions($actions);
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+            $actions          =
+                is_array($post->get('actions'))
+                    ? $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter($post['actions'])))
+                    : $this->pastoralActionMapper->createCollection();
+            $defaultActionIds = is_array($post->get('defaultActions')) ? array_map('intval', array_filter($post->get('defaultActions'))) : [];
 
-            /* Save the "General Template" content
-             */
-            $subType->setTemplate($post['template']);
-            $subType->setTemplatePrivate($post['templatePrivate']);
-            $subType->setIcon($post['icon'] ?: null);
-            if (in_array($post['sentiment'], Pastoral\Type\Model::SENTIMENT_VALUES)) {
-                $subType->setSentiment($post['sentiment']);
-            }
-            $subType->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
-            $subType->setVisibilityLocked($isVisibilityLocked);
-            $this->pastoralSubTypeMapper->save($subType);
+            // remove all the current actions
+            $typeActionMapper->deleteByColumn($isSubType ? 'subtype_id' : 'type_id', $currentType->getId());
+            $currentType->setTypeActions($typeActionMapper->createCollection());
 
-            /* Reload this page
-             */
-            $redirect = $this->getRouteIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', [
-                'subtypeId' => $subType->getId()
-            ]);
-        } else {
-            $existing = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $type->getId()]);
-            if (!$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
-                $actions = $this->pastoralActionMapper->findForType($type);
+            /** @var Pastoral\Action\Model $action */
+            foreach ($actions as $action) {
+                $typeAction = (new Pastoral\TypeAction\Model())
+                    ->setAction($action)
+                    ->setDefault(in_array($action->getId(), $defaultActionIds));
+                if ($isSubType) {
+                    $typeAction->setSubtypeId($currentType->getId());
+                } else {
+                    $typeAction->setTypeId($currentType->getId());
+                }
+                $currentType->getTypeActions()->add($typeAction);
             }
-            $type->setActions($actions);
-
-            /* Save the "General Template" content
-             */
-            $type->setTemplate($post['template']);
-            $type->setTemplatePrivate($post['templatePrivate']);
-            $type->setIcon($post['icon'] ?: null);
-            if (in_array($post['sentiment'], Pastoral\Type\Model::SENTIMENT_VALUES)) {
-                $type->setSentiment($post['sentiment']);
-            }
-            $type->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
-            $type->setVisibilityLocked($isVisibilityLocked);
-            $this->pastoralTypeMapper->save($type);
-
-            /* Reload this page
-             */
-            $redirect = $this->getRouteIfAuthorized('pastoralAudience.getAudiencesTypeModify', [
-                'typeId' => $type->getId(),
-                'type' => $type
-            ]);
+            $typeActionMapper->save($currentType->getTypeActions());
         }
+
+        /* Save the "General Template" content
+         */
+        $currentType->setTemplate($post['template']);
+        $currentType->setTemplatePrivate($post['templatePrivate']);
+        $currentType->setIcon($post['icon'] ?: null);
+        if (in_array($post['sentiment'], Pastoral\Type\TypeAbstract::SENTIMENT_VALUES)) {
+            $currentType->setSentiment($post['sentiment']);
+        }
+        $currentType->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
+        $currentType->setVisibilityLocked($isVisibilityLocked);
+        if ($isSubType) {
+            $this->pastoralSubTypeMapper->save($currentType);
+        } else {
+            $this->pastoralTypeMapper->save($currentType);
+        }
+
+        /* Reload this page
+         */
+        $redirect = $isSubType
+            ? $this->getRouteIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', [
+                'subtypeId' => $currentType->getId(),
+            ])
+            : $this->getRouteIfAuthorized('pastoralAudience.getAudiencesTypeModify', [
+                'typeId' => $currentType->getId(),
+                'type'   => $currentType,
+            ]);
 
         // Build the posted rules
         $posted = $this->pastoralAudienceMapper->createCollection();
 
         // Build role and roletype-based rules
         foreach ($post["role"] ?? [] as $roleId => $accessLevel) {
-            $audience = $this->pastoralAudienceMapper->createModel();
-            $audience->setAccess((int)$accessLevel);
-            $subType ? $audience->setSubtype($subType) : $audience->setType($type);
+            $audience = $this->getAudience($currentType, $accessLevel);
             if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
                 $audience->setRoleType($matches['roleType']);
             } else {
                 $audience->setRole($this->roleMapper->findById($roleId));
-                $audience->setAccess((int)$accessLevel);
             }
 
             $posted->add($audience);
@@ -414,22 +422,16 @@ class Controller extends Base
 
         // Build pastoralGroup-based rules
         foreach ($post["group"] ?? [] as $groupId => $accessLevel) {
-            $foundGroups[] = $groupId;
-            $group         = $this->pastoralGroupMapper->findById($groupId);
-            $audience      = $this->pastoralAudienceMapper->createModel();
-            $subType ? $audience->setSubtype($subType) : $audience->setType($type);
+            $group    = $this->pastoralGroupMapper->findById($groupId);
+            $audience = $this->getAudience($currentType, $accessLevel);
             $audience->setGroup($group);
-            $audience->setAccess((int)$accessLevel);
             $posted->add($audience);
         }
 
         // Build user-based rules
         foreach ($post["user"] ?? [] as $userId => $accessLevel) {
-            $foundUsers[] = $userId;
-            $user         = $this->userMapper->findById($userId);
-            $audience     = $this->pastoralAudienceMapper->createModel();
-            $subType ? $audience->setSubtype($subType) : $audience->setType($type);
-            $audience->setAccess((int)$accessLevel);
+            $user     = $this->userMapper->findById($userId);
+            $audience = $this->getAudience($currentType, $accessLevel);
             $audience->setUser($user);
             $posted->add($audience);
         }
@@ -480,6 +482,8 @@ class Controller extends Base
         $this->pastoralAudienceMapper->save($rulesToAdd);
         $this->pastoralAudienceMapper->save($rulesToUpdate);
 
+        $this->pastoralTypeMapper->getDatabase()->commit();
+
         /* TODO Reload the current page.
          *  Because getAudiences() now redirects you to the first meaningful record,
          *  after you save you'll be redirected to a whole different record than the
@@ -502,5 +506,25 @@ class Controller extends Base
         $pb = $this->pastoralAudienceMapper->getPredicateBuilder();
         $subtype ? $pb->equals('subtype_id', $subtype->getId()) : $pb->equals('type_id', $type->getId());
         return $this->pastoralAudienceMapper->findByPredicates($pb)->filter($this->pastoralAudienceMapper->getPermissionCallback());
+    }
+
+    /**
+     * @param Pastoral\Type\TypeAbstract $currentType
+     * @param mixed                      $accessLevel
+     * @return Model
+     * @throws MapperException
+     */
+    private function getAudience(Pastoral\Type\TypeAbstract $currentType, mixed $accessLevel): Model
+    {
+        $audience = $this->pastoralAudienceMapper->createModel();
+        if ($currentType instanceof Pastoral\SubType\Model) {
+            $audience->setSubtype($currentType);
+        } elseif ($currentType instanceof Pastoral\Type\Model) {
+            $audience->setType($currentType);
+        } else {
+            throw new \UnexpectedValueException('Invalid pastoral type');
+        }
+        $audience->setAccess((int)$accessLevel);
+        return $audience;
     }
 }

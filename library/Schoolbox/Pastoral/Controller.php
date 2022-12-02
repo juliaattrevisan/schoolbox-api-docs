@@ -1395,7 +1395,7 @@ class Controller extends Base
         if (is_numeric($this->request->query->get('subtypeId'))) {
             try {
                 $subtype = $this->pastoralSubTypeMapper->findById((int)$this->request->query->get('subtypeId'));
-                $actions = $this->pastoralActionMapper->findForSubtype($subtype);
+                $actions = $subtype->getTypeActions();
             } catch (MapperException $e) {
             }
         }
@@ -1404,24 +1404,27 @@ class Controller extends Base
         if (!isset($actions) && is_numeric($this->request->query->get('typeId'))) {
             try {
                 $type    = $this->pastoralTypeMapper->findById((int)$this->request->query->get('typeId'));
-                $actions = $this->pastoralActionMapper->findForType($type);
+                $actions = $type->getTypeActions();
             } catch (MapperException $e) {
             }
         }
 
         // If no actions are set for type/subtype, return empty collection
         if (!isset($actions) && !isset($type) && !isset($subtype)) {
-            $actions = $this->pastoralActionMapper->findAll();
+            $actions = $this->pastoralActionMapper->findAll()->map(static function ($action) {
+                return (new TypeAction\Model())->setAction($action)->setDefault(false);
+            });
         } elseif (!isset($actions)) {
             $actions = $this->pastoralActionMapper->createCollection();
         }
 
         $output = [];
-        /** @var Action\Model $action */
+        /** @var TypeAction\Model $action */
         foreach ($actions as $action) {
             $output[] = [
-                'id'   => $action->getId(),
-                'name' => $action->getName(),
+                'id'      => $action->getAction()->getId(),
+                'name'    => $action->getAction()->getName(),
+                'default' => $action->getDefault(),
             ];
         }
         $this->getResponse()->content->set($this->buildJsonOutput($output));

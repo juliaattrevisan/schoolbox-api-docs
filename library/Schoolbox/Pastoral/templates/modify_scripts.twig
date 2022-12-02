@@ -187,11 +187,10 @@
             window.hasChanged = true;
         });
 
-        function updateActions() {
+        function updateActions () {
             {% if config.pastoral_action_enable %}
             let typeId = $("#typeId").val();
             let subtypeId = $("#subtypeId").val();
-            let currents = $('#pastoral-actions').val();
 
             $.ajax({
                 url: '{{ routeLookup('pastoral.getActions') }}',
@@ -204,18 +203,21 @@
                 }
                 actionSelectize[0].selectize.clear();
                 actionSelectize[0].selectize.clearOptions();
-                actionSelectize[0].selectize.addOption([result]);
+                let currents = $('#pastoral-actions').val();
                 let refreshOptions = false;
-                currents.forEach(function (item) {
-                            actionSelectize[0].selectize.addItem(item);
-                            // If current selection is not in updated available actions, open new options
-                            if ($('#pastoral-actions').val().indexOf(item) < 0) {
-                                refreshOptions = true;
-                            }
-                        }
-                );
-                for (let i = 0; i < currents.length; i++) {
-                }
+                result.forEach(function (item) {
+                    actionSelectize[0].selectize.addOption(item);
+                    // if item is in the current selected
+                    // or no current and item is default
+                    // add it
+                    if ((currents.length > 0 && currents.indexOf(item['id']) >= 0)
+                            || (currents.length === 0 && item['default'])
+                    ) {
+                        actionSelectize[0].selectize.addItem(item['id']);
+                    } else {
+                        refreshOptions = true;
+                    }
+                });
                 if (refreshOptions) {
                     actionSelectize[0].selectize.refreshOptions()
                 }
