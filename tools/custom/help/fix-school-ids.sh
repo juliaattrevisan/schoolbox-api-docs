@@ -3,8 +3,6 @@
 readonly LOG="/usr/bin/alaress-logger"
 readonly L_ERROR=400
 
-declare instance_id;
-
 error() {
   $LOG $L_ERROR "$1"
 }
@@ -15,12 +13,6 @@ parse_args() {
     error "No INSTANCE_ID PROVIDED"
     errors='1'
   fi
-  local this_file;
-  local this_dir;
-  instance_id=$INSTANCE_ID
-  this_file=$(readlink -f "$0");
-  this_dir=${this_file%/*};
-  site_root=$(readlink -f "$this_dir"/../../../)
 
   if [[ ! -f "/etc/schoolbox/instances.ini" ]]; then
     error "File not found: '/etc/schoolbox/instances.ini'"
@@ -33,12 +25,10 @@ parse_args() {
 }
 
 fix_ids() {
-  sql_host=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_host);
-  sql_user=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_user);
-  sql_pass=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_passwd);
-  sql_db=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/schoolbox/instances.ini" --option SQL_db);
-
-  echo $sql_host;
+  sql_host=$(schoolbox-read-instances --option SQL_host);
+  sql_user=$(schoolbox-read-instances --option SQL_user);
+  sql_pass=$(schoolbox-read-instances --option SQL_passwd);
+  sql_db=$(schoolbox-read-instances --option SQL_db);
 
   if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE user SET synergy_id = id WHERE COALESCE(synergy_id, '') = ''"; then
     error "failed to set IDs"
