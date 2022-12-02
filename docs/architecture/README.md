@@ -8,6 +8,8 @@ Schoolbox, and its possible outputs.
 
 ## Overview diagram
 
+![overview](overview.png)
+
 
 ## Structure
 
