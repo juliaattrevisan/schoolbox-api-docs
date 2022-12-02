@@ -92,29 +92,6 @@ abstract class AbstractSummator implements ISummator
      */
     protected function deriveNormalisedMark(IAssessable $assessable, Participant $participant, bool $publishedOnly): ?float
     {
-        /* Find the normalised mark from the project result cache
-         */
-        if ($assessable->getContext() instanceof \Schoolbox\Learning\Assessment\Project) {
-            /** @var \Schoolbox\Learning\Assessment\Project $context */
-            $context = $assessable->getContext();
-
-            $cachedProjectMarks = (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance()))
-                ->retrieve($context, $participant->getUser());
-
-            /* Mega action at a distance via the preopulator tool
-             * The method used to generate normalised marks
-             * ends up being here; but this method is now skipping the summation process
-             * and reading directly from the cache due to another usage elsewhere
-             *
-             * Fall back to deriving if the $cachedProjectMarks doesn't exist
-             */
-            if (null === $cachedProjectMarks) {
-                return $this->markDerivationStrategy->deriveNormalisedMark($participant, $publishedOnly);
-            }
-
-            return $cachedProjectMarks?->getNormalisedMark();
-        }
-
         return $this->markDerivationStrategy->deriveNormalisedMark($participant, $publishedOnly);
     }
 

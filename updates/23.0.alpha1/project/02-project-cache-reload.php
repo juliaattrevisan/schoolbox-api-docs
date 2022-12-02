@@ -169,7 +169,7 @@ HELP;
                             $project->getId()
                         ));
                     } else {
-                        $this->getLogger()->debug(sprintf(
+                        $this->getLogger()->info(sprintf(
                             'Persisting marks for %s (%s) in project %s (%s)',
                             $user->getFullname(),
                             $user->getId(),
