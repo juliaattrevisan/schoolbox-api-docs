@@ -12,6 +12,7 @@ use Exception;
 
 class BadgesCest
 {
+
     /**
      * Preparations
      *
@@ -21,7 +22,7 @@ class BadgesCest
      * get logged in
      * navigate to https://vagrant.dev.schoolbox.cloud/learning/badge
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();
@@ -30,8 +31,20 @@ class BadgesCest
     }
 
     /**
+     * Deleting Bagdes when the test is about to start so it does not get impacted by other tests already executed
+     *
+     * @param AcceptanceTester $i
+     */
+    public function beforeSuite(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the news article so it does not impact the news tests");
+        $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Automation Badge%"]);
+    }
+
+    /**
      * @param AcceptanceTester $i
      * @throws Exception
+     * @beforeSuite
      *
      * on learning/badge page click Create Badge button
      * Type a Name

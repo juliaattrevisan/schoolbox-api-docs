@@ -92,11 +92,10 @@ class CreateBadge
     /**
      * create a Badge
      */
-    public function createBadge(AcceptanceTester $i)
+    public function createBadge(AcceptanceTester $i, string $badgeName)
     {
 
         $badges = new Badges($i);
-        $badgeName = "Automation Badge created for convenience";
         $category = "Learning";
         $badges->clickAddBadgeButton();
         $this->typeName($badgeName);
