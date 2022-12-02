@@ -156,9 +156,11 @@ HELP;
             while ($row = $assessmentStatement->fetch(\PDO::FETCH_ASSOC)) {
                 $this->refreshLock($lock);
 
-                foreach ($users as $user) {
-                    $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
+                $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
 
+                /* TODO Maybe find $users as the set of guys inside $project somehow
+                 */
+                foreach ($users as $user) {
                     $outcome = $projectResultCache->persist($project, $user, $marker);
 
                     if (null === $outcome) {
