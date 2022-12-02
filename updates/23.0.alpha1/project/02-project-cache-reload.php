@@ -157,7 +157,26 @@ HELP;
 
                 foreach ($users as $user) {
                     $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
-                    $projectResultCache->persist($project, $user, $marker);
+
+                    $outcome = $projectResultCache->persist($project, $user, $marker);
+
+                    if (null === $outcome) {
+                        $this->getLogger()->debug(sprintf(
+                            '%s (%s) was not a participant in project %s (%s)',
+                            $user->getFullname(),
+                            $user->getId(),
+                            $project->getTitle(),
+                            $project->getId()
+                        ));
+                    } else {
+                        $this->getLogger()->debug(sprintf(
+                            'Persisting marks for %s (%s) in project %s (%s)',
+                            $user->getFullname(),
+                            $user->getId(),
+                            $project->getTitle(),
+                            $project->getId()
+                        ));
+                    }
                 }
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
