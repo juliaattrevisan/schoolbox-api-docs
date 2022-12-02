@@ -148,6 +148,7 @@ HELP;
         $projectResultCache = new ResultCache\ResultCache($projectResultCacheMapper);
 
         /* TEMPORARY MARKER GUY
+         * TODO: What are we gonna do with multiple teachers marking parts of a project
          */
         $marker = \Schoolbox\UserMapper::getInstance()->findById(1);
 
