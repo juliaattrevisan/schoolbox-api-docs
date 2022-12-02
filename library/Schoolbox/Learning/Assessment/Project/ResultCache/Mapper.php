@@ -30,7 +30,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('project_resultcache');
+        $this->hasTable('project_result');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('project_id', self::TYPE_INTEGER);

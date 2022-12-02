@@ -1,6 +1,6 @@
 -- Project aggregations saved here
 
-CREATE TABLE `project_resultcache` (
+CREATE TABLE `project_result` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `project_id` INT NOT NULL,
   `user_id` INT NOT NULL,
