@@ -15,6 +15,8 @@ namespace Schoolbox\Learning\Assessment\Summator;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
+use Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\User;
 
@@ -70,7 +72,8 @@ abstract class AbstractSummator implements ISummator
         foreach ($allAssessables as $currentAssessable) {
             $participant = $currentAssessable->getParticipantIfExtant($user);
             if ($participant) {
-                $normMark = $this->deriveNormalisedMark($participant, $publishedOnly);
+                $normMark = $this->deriveNormalisedMark($currentAssessable, $participant, $publishedOnly);
+
                 if (null !== $normMark) {
                     $this->aggregate($normMark, $currentAssessable->getWeight());
                 }
@@ -80,17 +83,32 @@ abstract class AbstractSummator implements ISummator
         return $this->finalise();
     }
 
+
     /**
      * Derive the normalised mark to use for this participant in an assessment.
      *
+     * @param IAssessable $assessable
      * @param Participant $participant
      * @param bool        $publishedOnly
      * @return float|null
      */
-    protected function deriveNormalisedMark(Participant $participant, bool $publishedOnly): ?float
+    protected function deriveNormalisedMark(IAssessable $assessable, Participant $participant, bool $publishedOnly): ?float
     {
+        /* Find the normalised mark from the project result cache
+         */
+        if ($assessable->getContext() instanceof \Schoolbox\Learning\Assessment\Project) {
+            /** @var \Schoolbox\Learning\Assessment\Project $context */
+            $context = $assessable->getContext();
+
+            $cachedProjectMarks = (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance()))
+                ->retrieve($context, $participant->getUser());
+
+            return $cachedProjectMarks?->getNormalisedMark();
+        }
+
         return $this->markDerivationStrategy->deriveNormalisedMark($participant, $publishedOnly);
     }
+
 
     /**
      * @inheritdoc
@@ -107,7 +125,8 @@ abstract class AbstractSummator implements ISummator
     {
         $this->reset();
         foreach ($assessable->getAllParticipants() as $participant) {
-            $normMark = $this->deriveNormalisedMark($participant, $publishedOnly);
+            $normMark = $this->deriveNormalisedMark($assessable, $participant, $publishedOnly);
+
             if (null !== $normMark) {
                 // Weight doesn't matter within the context of a single assessment
                 $this->aggregate($normMark, $assessable->getWeight());
