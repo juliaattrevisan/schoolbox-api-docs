@@ -16,3 +16,7 @@ parse data from the request, and pass off any work to another component, e.g.:
 - a mapper for persisting data
 - a more sophisticated class structure for validating input, translating to
   another format, etc.
+
+In other words: controllers should pass off actions to other components, which
+should be able to interact with one or more
+[other inputs and outputs](../../README.md#other-inputs-and-outputs).

@@ -20,3 +20,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 //   content
 // * a Standard kernel should output a PHPLib template
 ```
+
+As with Aura controllers: Sitepage controllers should pass off actions to other
+components, which should be able to interact with one or more
+[other inputs and outputs](../../README.md#other-inputs-and-outputs).

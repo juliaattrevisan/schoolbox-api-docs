@@ -39,3 +39,23 @@ bootstrapped, routed and processed:
 * [Web request](io/requests/web.md)
 * [CLI request](io/requests/cli.md)
 * [Daemon request](io/requests/daemon.md)
+
+
+## Other inputs and outputs
+
+* Standard output
+  * HTTP responses
+  * Logs
+* [Schoolbox Database](io/schoolbox-database.md)
+* [SIS Database](io/sis-database/README.md)
+  * [External](io/sis-database/external.md)
+  * School User Data Store
+* File Storage
+  * Local
+  * AWS S3
+* Redis Cache
+* Redis Storage
+* Task Daemon
+* Mail Transport
+* Gotenberg (PDF generation)
+* Notification Subsystem
