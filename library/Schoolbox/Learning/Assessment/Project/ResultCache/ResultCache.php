@@ -128,8 +128,8 @@ class ResultCache
 
         /* We only care for published feedbacks' marks, not draft ones
          */
-        $normalisedMark = $project->getNormalisedMark($participant, true);
-        $humanReadableMark = $project->getHumanReadableMark($participant, true);
+        $normalisedMark = $participant->generateNormalisedMark(true);
+        $humanReadableMark = $participant->generateHumanReadableMark(true);
 
         /* Shove in all the parts
          */

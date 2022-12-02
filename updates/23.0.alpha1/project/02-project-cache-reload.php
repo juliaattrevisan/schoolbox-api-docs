@@ -9,6 +9,8 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -98,6 +100,28 @@ HELP;
          *
          * If there are no projects to manage, just exit early
          */
+        $assessmentCountStatement = $this->getDatabaseInternal()->executeQuery("
+            SELECT COUNT(*) AS num
+            FROM project
+            WHERE deleted_at IS NULL
+        ");
+
+        $assessmentCount = (int)$assessmentCountStatement->fetch(\PDO::FETCH_ASSOC)['num'];
+
+        /* This instance has no living projects to deal with.
+         * Let's get out of here
+         */
+        if (!$assessmentCount) {
+            return;
+        }
+
+        /* Otherwise let's dig
+         */
+        $assessmentStatement = $this->getDatabaseInternal()->executeQuery("
+            SELECT assessment_id
+            FROM project
+            WHERE deleted_at IS NULL
+        ");
 
         /* Find all the users who *might* have participated
          * in all these projects. If they're not participants
@@ -110,22 +134,36 @@ HELP;
          * their marks, nor re-see them, once they've met such a fate
          * so I suppose we can just ignore those
          */
+        $users = \Schoolbox\UserMapper::getInstance()->findAll();
 
         /* I need this assessment mapper cache because of all the
          * participation insanity that we have manufactured
          */
+        /** @var AssessmentDataSource $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+
+        /* ResultCache instance
+         */
+        $projectResultCacheMapper = ResultCache\Mapper::getInstance();
+        $projectResultCache = new ResultCache\ResultCache($projectResultCacheMapper);
+
+        /* TEMPORARY MARKER GUY
+         */
+        $marker = \Schoolbox\UserMapper::getInstance()->findById(1);
 
         try {
-            for ($i = 0; $i < 10; $i++) {
+            while ($row = $assessmentStatement->fetch(\PDO::FETCH_ASSOC)) {
                 $this->refreshLock($lock);
 
-                /* Your logic goes here
-                 */
+                foreach ($users as $user) {
+                    $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
+                    $projectResultCache->persist($project, $user, $marker);
+                }
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
-            exit();
+            return;
         }
 
         if (!$this->perform()) {
