@@ -52,7 +52,8 @@ if the kernel was created via the
 In this case: the steps below are bypassed completely, as `run` is never called.
 Instead: as with the Basic kernel's
 [Running a request](basic.md#running-a-request) method, any code which is
-defined after the kernel is created is run automatically.
+defined after the kernel is created is run automatically as a
+[Pseudo-controller](../../pseudo-controllers.md).
 
 
 ### Aura
@@ -60,6 +61,16 @@ defined after the kernel is created is run automatically.
 If the request's path matches an Aura route loaded in the
 [Loading of routes and modules](#loading-of-routes-and-modules) step, then the
 request will be handled via the Aura system.
+
+> The Aura system is named after the Aura libraries upon which it is built.
+> This system was intended to replace the older Sitepage-based system, but has
+> not done so completely at time of writing.
+>
+> Aura itself is showing its age (its Web component does not support the
+> [PSR-7](https://www.php-fig.org/psr/psr-7/) standard for HTTP messages), but
+> the system Schoolbox has built upon it has proven its fitness for purpose.
+>
+> See https://auraphp.com/ for more information about the various libraries.
 
 `\Schoolbox\Application\WebRequest\Kernel::outputAuraContent` will perform the
 following actions required to output the results of an Aura-handled request:
@@ -121,6 +132,8 @@ The controller method matching the name of the action is introspected for its
 parameters, and those parameters are matched against the route and preloader
 params: then, the controller method is called with those parameters.
 
+Controllers are documented further in [their own section](../../controllers.md).
+
 
 #### Render the controller's output
 
@@ -142,7 +155,12 @@ to be output:
 If Aura's routes didn't match the request's path, then the request will be sent
 to be handled via Sitepage.
 
+> Sitepage is the controller paradigm which existed prior to Aura.
+>
+> It is considered deprecated: no new code should be written upon it (with the
+> _possible_ exception of [Basic](basic.md) web requests).
+
 `\Schoolbox\Application\WebRequest\Kernel::outputSitepageContent` sends requests
 to Sitepage. This method will include a file in `www/` which matches the
 request's path directly (minus the `.php` extension), and its code will be
-executed.
+executed as a [Pseudo-controller](../../pseudo-controllers.md).

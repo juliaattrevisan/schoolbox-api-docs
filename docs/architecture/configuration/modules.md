@@ -14,3 +14,5 @@ Custom modules exist within `conf/modules/Custom`: these modules are only
 available to an instance whose configured school code matches the sub-folder
 name, e.g. `conf/modules/Custom/Help` is available only to instances with the
 school code `Help`.
+
+> TODO talk about code actually within modules, not just configuration
