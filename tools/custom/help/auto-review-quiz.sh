@@ -113,6 +113,7 @@ ORDER BY aa.finish DESC;")
 }
 
 main (){
+  export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games;
   parse_args "$@"
   review
 }
