@@ -49,10 +49,10 @@ bootstrapped, routed and processed:
 * [Schoolbox Database](io/schoolbox-database.md)
 * [SIS Database](io/sis-database/README.md)
   * [External](io/sis-database/external.md)
-  * School User Data Store
-* File Storage
-  * Local
-  * AWS S3
+  * [School User Data Store](io/sis-database/suds.md)
+* [File Storage](io/file-storage/README.md)
+  * [Local](io/file-storage/local.md)
+  * [AWS S3](io/file-storage/s3.md)
 * Redis Cache
 * Redis Storage
 * Task Daemon
