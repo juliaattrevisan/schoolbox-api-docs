@@ -15,8 +15,6 @@ namespace Schoolbox\Learning\Assessment\Summator;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
-use Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\User;
 
