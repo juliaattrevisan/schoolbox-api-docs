@@ -99,7 +99,6 @@ class ResultCache
      * @param User        $marker
      * @return Model|null
      * @throws Exception
-     * @throws \DomainException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
