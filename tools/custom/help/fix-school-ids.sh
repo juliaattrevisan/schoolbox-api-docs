@@ -40,7 +40,7 @@ fix_ids() {
 
   echo $sql_host;
 
-  if [[ ! $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE user SET synergy_id=id WHERE synergy_id IS NULL or synergy_id = ''") ]]; then
+  if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE user SET synergy_id = id WHERE COALESCE(synergy_id, '') = ''"; then
     error "failed to set IDs"
   fi
 }
