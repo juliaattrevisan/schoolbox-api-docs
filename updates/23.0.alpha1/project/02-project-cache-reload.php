@@ -184,10 +184,6 @@ HELP;
              */
             return;
         }
-
-        if (!$this->perform()) {
-            $this->getLogger()->info('Planning finished.');
-        }
     }
 
 
