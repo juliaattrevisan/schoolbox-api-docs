@@ -94,7 +94,7 @@
             <h2 class="subheader">{{ locale.project }} {{ locale.grades }}</h2>
             <section>
                 <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg text-center">
-                    <span>{{ assessment.humanReadableMark(participant, true) }}</span>
+                    <span>{{ participant.humanReadableMark(true) }}</span>
                 </div>
             </section>
         {% endif %}
