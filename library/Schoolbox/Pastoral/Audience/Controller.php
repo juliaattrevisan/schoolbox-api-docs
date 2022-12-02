@@ -28,7 +28,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends Base
 {
-
     /** @var Pastoral\Group\Mapper $pastoralGroupMapper */
     private $pastoralGroupMapper;
 

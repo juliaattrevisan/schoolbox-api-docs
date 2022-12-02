@@ -5,6 +5,7 @@
  * @copyright   Copyright 2022, Alaress Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\TypeAction;
