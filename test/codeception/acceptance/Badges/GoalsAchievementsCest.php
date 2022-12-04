@@ -82,6 +82,8 @@ class GoalsAchievementsCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
+     * @beforeSuite
+     *
      *
      * award an achievement to Jana Reed from the Badges page
      * ensure the achievement is presented on Jana Reed's activity feed

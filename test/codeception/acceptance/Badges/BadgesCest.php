@@ -59,6 +59,7 @@ class BadgesCest
         $createBadge = new CreateBadge($i);
         $badgeName = "Automation Badge";
         $category = "Learning";
+        $i->amGoingTo('click Create Badge button and create a badge');
         $badges->clickAddBadgeButton();
         $createBadge->typeName($badgeName);
         $createBadge->clickBrowseIconLibraryButton();
@@ -68,6 +69,7 @@ class BadgesCest
         $createBadge->clickCategoryDropDown();
         $createBadge->clickCategoryItem($category);
         $createBadge->clickCreateBadgeButton();
+        $i->amGoingTo('ensure the badge is presented');
         $badges->waitAddBadgeButtonToBePresented();
         $badges->verifyTextIsPresented($badgeName);
         $badges->verifyTextIsPresented($category);
@@ -89,9 +91,11 @@ class BadgesCest
         $badges = new Badges($i);
         $createBadge = new CreateBadge($i);
         $category = "Learning";
+        $i->amGoingTo('click the badge dropdown and click Modify');
         $badgeId = $i->grabNumRecords('badge');
         $badges->clickBadgeDropdown($badgeId);
         $badges->clickDropdownModify($badgeId);
+        $i->amGoingTo('get name and category updated and click Modify Badge button');
         $createBadge->typeName('Automation Badge Updated');
         $createBadge->clickCategoryDropDown();
         $createBadge->clickCategoryItem($category);
@@ -113,10 +117,15 @@ class BadgesCest
     public function deleteBadge(AcceptanceTester $i)
     {
         $badges = new Badges($i);
+        $i->amGoingTo('click the badge dropdown and click Delete');
         $badgeId = $i->grabNumRecords('badge');
         $badges->clickBadgeDropdown($badgeId);
         $badges->clickDropdownDelete();
         $badges->clickConfirmDelete();
+        $i->amGoingTo('ensure the badge is no longer presented in the page');
+        $i->cantSee('Automation Badge Updated');
+        $i->amGoingTo('reload the page to ensue the badge is not presented');
+        $i->amOnPage($badges::URL);
         $i->cantSee('Automation Badge Updated');
     }
 }
