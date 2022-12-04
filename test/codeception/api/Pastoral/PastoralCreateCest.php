@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Test\Api;
 
-use \ApiTester;
+use ApiTester;
 use Schoolbox\Pastoral\Access\Mapper;
 use Schoolbox\Role;
 use Schoolbox\User;
