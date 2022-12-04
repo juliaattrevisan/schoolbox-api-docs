@@ -6,12 +6,12 @@ namespace ManageCurriculum;
 
 use AcceptanceTester;
 use Page\Curriculum\Manage\ManageCurriculum;
-use Page\Curriculum\Manage\action\AddNewCurriculum;
-use Page\Curriculum\Manage\action\AddNewSubsection;
-use Page\Curriculum\Manage\action\DisableNodes;
-use Page\Curriculum\Manage\action\DeleteNodes;
-use Page\Curriculum\Manage\action\SearchNodes;
-use Page\Curriculum\Manage\action\UpdateNode;
+use Page\Curriculum\Manage\Action\AddNewCurriculum;
+use Page\Curriculum\Manage\Action\AddNewSubsection;
+use Page\Curriculum\Manage\Action\DisableNodes;
+use Page\Curriculum\Manage\Action\DeleteNodes;
+use Page\Curriculum\Manage\Action\SearchNodes;
+use Page\Curriculum\Manage\Action\UpdateNode;
 use Exception;
 
 class ManageCurriculumCest
