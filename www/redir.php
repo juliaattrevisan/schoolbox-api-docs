@@ -17,7 +17,7 @@ $url    = '';
 $link       = false;
 $linkMapper = new LinkMapper();
 
-if ($_GET['url']) {
+if ($_GET['url'] ?? null) {
     try {
         $url = base64_decode($_GET['url']);
 
@@ -25,7 +25,7 @@ if ($_GET['url']) {
     } catch (\Exception $e) {
         // let it through
     }
-} elseif (is_numeric($_GET['id'])) {
+} elseif (is_numeric($_GET['id'] ?? null)) {
     try {
         $access = Access::getInstance();
         /** @var Link $link */
