@@ -1,15 +1,15 @@
 <?php
 
-namespace Page\Curriculum\Manage\action;
+namespace Page\Curriculum\Manage\Action;
 
 use AcceptanceTester;
 
-class AddNewCurriculum
+class AddNewSubsection
 {
-    public const DISPLAY_TOGGLE = '[data-test-toggle-create-curriculum]';
+    public const DISPLAY_TOGGLE = 'Add subsection to ';
     public const NAME_FIELD = '#name';
     public const CODE_FIELD = '#code';
-    public const ADD_BUTTON = '[data-test-add-curriculum]';
+    public const ADD_BUTTON = '[data-test-add-subsection]';
     private AcceptanceTester $tester;
 
     /**
@@ -23,11 +23,11 @@ class AddNewCurriculum
     }
 
     /**
-     * select the add new curriculum button
+     * select the add new subsection button
      */
-    public function clickDisplay(): void
+    public function clickDisplay($value): void
     {
-        $this->tester->click(self::DISPLAY_TOGGLE);
+        $this->tester->click(self::DISPLAY_TOGGLE . $value);
     }
 
     /**

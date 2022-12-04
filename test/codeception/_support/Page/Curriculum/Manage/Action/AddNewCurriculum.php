@@ -1,16 +1,15 @@
 <?php
 
-namespace Page\Curriculum\Manage\action;
+namespace Page\Curriculum\Manage\Action;
 
 use AcceptanceTester;
 
-class UpdateNode
+class AddNewCurriculum
 {
-    public const DISPLAY_TOGGLE = 'Update ';
+    public const DISPLAY_TOGGLE = '[data-test-toggle-create-curriculum]';
     public const NAME_FIELD = '#name';
     public const CODE_FIELD = '#code';
-    public const DESCRIPTION_FIELD = 'description-';
-    public const UPDATE_BUTTON = '[data-test-update-node]';
+    public const ADD_BUTTON = '[data-test-add-curriculum]';
     private AcceptanceTester $tester;
 
     /**
@@ -24,13 +23,11 @@ class UpdateNode
     }
 
     /**
-     * select the add new subsection button
-     *
-     * @param string $value
+     * select the add new curriculum button
      */
-    public function clickDisplay(string $value): void
+    public function clickDisplay(): void
     {
-        $this->tester->click(self::DISPLAY_TOGGLE . $value);
+        $this->tester->click(self::DISPLAY_TOGGLE);
     }
 
     /**
@@ -38,11 +35,11 @@ class UpdateNode
      */
     public function seeAddButtonIsDisabled(): void
     {
-        $this->tester->seeElement(self::UPDATE_BUTTON . ':disabled');
+        $this->tester->seeElement(self::ADD_BUTTON . ':disabled');
     }
 
     /**
-     * update a name
+     * add a name
      *
      * @param string $value
      */
@@ -52,7 +49,7 @@ class UpdateNode
     }
 
     /**
-     * update a code
+     * add a code
      *
      * @param string $value
      */
@@ -62,21 +59,10 @@ class UpdateNode
     }
 
     /**
-     * update a description
-     *
-     * @param string $id
-     * @param string $value
-     */
-    public function fillDescription($id, $value): void
-    {
-        $this->tester->fillCkEditorById(self::DESCRIPTION_FIELD . $id, $value);
-    }
-
-    /**
      * select the add button
      */
-    public function clickUpdateButton(): void
+    public function clickAddButton(): void
     {
-        $this->tester->click(self::UPDATE_BUTTON);
+        $this->tester->click(self::ADD_BUTTON);
     }
 }

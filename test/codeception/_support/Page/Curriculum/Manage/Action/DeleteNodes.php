@@ -1,13 +1,13 @@
 <?php
 
-namespace Page\Curriculum\Manage\action;
+namespace Page\Curriculum\Manage\Action;
 
 use AcceptanceTester;
 
-class DisableNodes
+class DeleteNodes
 {
-    public const DISABLE_BUTTON = '[data-test-disable-nodes]';
-    public const CONFIRM_BUTTON = '[data-test-confirm-enable-nodes]';
+    public const DELETE_BUTTON = '[data-test-delete-nodes]';
+    public const CONFIRM_BUTTON = '[data-test-confirm-delete-node]';
     private AcceptanceTester $tester;
 
     /**
@@ -21,11 +21,11 @@ class DisableNodes
     }
 
     /**
-     * click the button to disable the selected nodes
+     * click the button to delete the selected nodes
      */
-    public function clickDisableButton(): void
+    public function clickDeleteButton(): void
     {
-        $this->tester->click(self::DISABLE_BUTTON);
+        $this->tester->click(self::DELETE_BUTTON);
     }
 
     /**
@@ -37,7 +37,7 @@ class DisableNodes
     }
 
     /**
-     * click the confirm button to disable nodes
+     * click the confirm button to delete nodes
      */
     public function clickConfirmButton(): void
     {

@@ -1,15 +1,16 @@
 <?php
 
-namespace Page\Curriculum\Manage\action;
+namespace Page\Curriculum\Manage\Action;
 
 use AcceptanceTester;
 
-class AddNewSubsection
+class UpdateNode
 {
-    public const DISPLAY_TOGGLE = 'Add subsection to ';
+    public const DISPLAY_TOGGLE = 'Update ';
     public const NAME_FIELD = '#name';
     public const CODE_FIELD = '#code';
-    public const ADD_BUTTON = '[data-test-add-subsection]';
+    public const DESCRIPTION_FIELD = 'description-';
+    public const UPDATE_BUTTON = '[data-test-update-node]';
     private AcceptanceTester $tester;
 
     /**
@@ -24,8 +25,10 @@ class AddNewSubsection
 
     /**
      * select the add new subsection button
+     *
+     * @param string $value
      */
-    public function clickDisplay($value): void
+    public function clickDisplay(string $value): void
     {
         $this->tester->click(self::DISPLAY_TOGGLE . $value);
     }
@@ -35,11 +38,11 @@ class AddNewSubsection
      */
     public function seeAddButtonIsDisabled(): void
     {
-        $this->tester->seeElement(self::ADD_BUTTON . ':disabled');
+        $this->tester->seeElement(self::UPDATE_BUTTON . ':disabled');
     }
 
     /**
-     * add a name
+     * update a name
      *
      * @param string $value
      */
@@ -49,7 +52,7 @@ class AddNewSubsection
     }
 
     /**
-     * add a code
+     * update a code
      *
      * @param string $value
      */
@@ -59,10 +62,21 @@ class AddNewSubsection
     }
 
     /**
+     * update a description
+     *
+     * @param string $id
+     * @param string $value
+     */
+    public function fillDescription($id, $value): void
+    {
+        $this->tester->fillCkEditorById(self::DESCRIPTION_FIELD . $id, $value);
+    }
+
+    /**
      * select the add button
      */
-    public function clickAddButton(): void
+    public function clickUpdateButton(): void
     {
-        $this->tester->click(self::ADD_BUTTON);
+        $this->tester->click(self::UPDATE_BUTTON);
     }
 }

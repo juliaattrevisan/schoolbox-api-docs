@@ -1,6 +1,6 @@
 <?php
 
-namespace Page\Curriculum\Manage\action;
+namespace Page\Curriculum\Manage\Action;
 
 use AcceptanceTester;
 use Page\Curriculum\Manage\ManageCurriculum;
