@@ -17,7 +17,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Request\Values as RequestValues;
 use Exception;
 use External_Pastoral;
-use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
@@ -27,7 +26,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
@@ -50,100 +48,19 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
-use Schoolbox\RoleMapper;
 use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
-    /** @var IConfigLoader $config */
-    protected IConfigLoader $config;
-
-    /** @var ErrorMapper $errorMapper */
-    protected ErrorMapper $errorMapper;
-
-    /** @var FileMapper $fileMapper */
-    protected FileMapper $fileMapper;
-
-    /** @var PastoralDataSource $pastoralDataSource */
-    protected PastoralDataSource $pastoralDataSource;
-
-    /** @var PastoralAccessMapper $pastoralAccessMapper */
-    protected PastoralAccessMapper $pastoralAccessMapper;
-
-    /** @var PastoralGroupMapper $pastoralGroupMapper */
-    protected PastoralGroupMapper $pastoralGroupMapper;
-
-    /** @var PastoralGroupMemberMapper $pastoralGroupMemberMapper */
-    protected PastoralGroupMemberMapper $pastoralGroupMemberMapper;
-
-    /** @var PastoralAttachmentMapper $pastoralAttachmentMapper */
-    protected PastoralAttachmentMapper $pastoralAttachmentMapper;
-
-    /** @var PastoralAuditMapper $pastoralAuditMapper */
-    protected PastoralAuditMapper $pastoralAuditMapper;
-
-    /** @var PastoralSubTypeMapper $pastoralSubTypeMapper */
-    protected PastoralSubTypeMapper $pastoralSubTypeMapper;
-
-    /** @var PastoralCommentMapper $pastoralCommentMapper */
-    protected PastoralCommentMapper $pastoralCommentMapper;
-
-    /** @var PastoralSeverityMapper $pastoralSeverityMapper */
-    protected PastoralSeverityMapper $pastoralSeverityMapper;
-
-    /** @var PastoralRevisionDataSource $pastoralRevisionDataSource */
-    protected PastoralRevisionDataSource $pastoralRevisionDataSource;
-
-    /** @var PastoralTagMapper $pastoralTagMapper */
-    protected PastoralTagMapper $pastoralTagMapper;
-
-    /** @var PastoralActionMapper */
-    protected PastoralActionMapper $pastoralActionMapper;
-
-    /** @var PastoralTypeMapper $pastoralTypeMapper */
-    protected PastoralTypeMapper $pastoralTypeMapper;
-
-    /** @var RecordAction\Mapper $pastoralRecordActionMapper */
-    private RecordAction\Mapper $pastoralRecordActionMapper;
-
-    /** @var PastoralUploadQueueMapper $pastoralUploadQueueMapper */
-    protected PastoralUploadQueueMapper $pastoralUploadQueueMapper;
-
-    /** @var RoleMapper $roleMapper */
-    protected RoleMapper $roleMapper;
-
-    /** @var UserMapper $userMapper */
-    protected UserMapper $userMapper;
-
-    /** @var UserAccessMapper $userAccessMapper */
-    protected UserAccessMapper $userAccessMapper;
-
-    /** @var PastoralReportMapper $pastoralReportMapper */
-    private PastoralReportMapper $pastoralReportMapper;
-
-    /** @var Audience\Mapper */
-    private Audience\Mapper $audienceMapper;
-
-    /** TermMapper */
-    private TermMapper $termMapper;
-
-    /**
-     * Pastoral comment translator
-     */
-    private Comment\Translator\ModelToArray $pastoralCommentTranslator;
-
     const ATTACHZONE_PRIVATE = 'private';
     const ATTACHZONE_PUBLIC  = 'public';
 
@@ -151,13 +68,10 @@ class Controller extends Base
      * Constructor
      *
      * @param IConfigLoader                   $config
-     * @param FileMapper                      $fileMapper
      * @param PastoralDataSource              $pastoralDataSource
-     * @param UserAccessMapper                $userAccessMapper
      * @param PastoralAuditMapper             $pastoralAuditMapper
      * @param PastoralSubTypeMapper           $pastoralSubTypeMapper
      * @param PastoralTypeMapper              $pastoralTypeMapper
-     * @param PastoralUploadQueueMapper       $pastoralUploadQueueMapper
      * @param PastoralSeverityMapper          $pastoralSeverityMapper
      * @param PastoralRevisionDataSource      $pastoralRevisionDataSource
      * @param PastoralTagMapper               $pastoralTagMapper
@@ -165,7 +79,6 @@ class Controller extends Base
      * @param RecordAction\Mapper             $pastoralRecordActionMapper
      * @param PastoralCommentMapper           $pastoralCommentMapper
      * @param PastoralAttachmentMapper        $pastoralAttachmentMapper
-     * @param RoleMapper                      $roleMapper
      * @param UserMapper                      $userMapper
      * @param PastoralAccessMapper            $pastoralAccessMapper
      * @param PastoralGroupMapper             $pastoralGroupMapper
@@ -175,63 +88,35 @@ class Controller extends Base
      * @param Audience\Mapper                 $audienceMapper
      * @param TermMapper                      $termMapper
      * @param Comment\Translator\ModelToArray $pastoralCommentTranslator
+     * @param Translator\ModelToArray         $pastoralTranslator
      * @param FilesystemProxy                 $filesystemProxy
      */
     public function __construct(
-        IConfigLoader $config,
-        FileMapper $fileMapper,
-        PastoralDataSource $pastoralDataSource,
-        UserAccessMapper $userAccessMapper,
-        PastoralAuditMapper $pastoralAuditMapper,
-        PastoralSubTypeMapper $pastoralSubTypeMapper,
-        PastoralTypeMapper $pastoralTypeMapper,
-        PastoralUploadQueueMapper $pastoralUploadQueueMapper,
-        PastoralSeverityMapper $pastoralSeverityMapper,
-        PastoralRevisionDataSource $pastoralRevisionDataSource,
-        PastoralTagMapper $pastoralTagMapper,
-        PastoralActionMapper $pastoralActionMapper,
-        \Schoolbox\Pastoral\RecordAction\Mapper $pastoralRecordActionMapper,
-        PastoralCommentMapper $pastoralCommentMapper,
-        PastoralAttachmentMapper $pastoralAttachmentMapper,
-        RoleMapper $roleMapper,
-        UserMapper $userMapper,
-        PastoralAccessMapper $pastoralAccessMapper,
-        PastoralGroupMapper $pastoralGroupMapper,
-        PastoralGroupMemberMapper $pastoralGroupMemberMapper,
-        ErrorMapper $errorMapper,
-        PastoralReportMapper $pastoralReportMapper,
-        Audience\Mapper $audienceMapper,
-        TermMapper $termMapper,
-        Comment\Translator\ModelToArray $pastoralCommentTranslator,
+        private IConfigLoader $config,
+        private PastoralDataSource $pastoralDataSource,
+        private PastoralAuditMapper $pastoralAuditMapper,
+        private PastoralSubTypeMapper $pastoralSubTypeMapper,
+        private PastoralTypeMapper $pastoralTypeMapper,
+        private PastoralSeverityMapper $pastoralSeverityMapper,
+        private PastoralRevisionDataSource $pastoralRevisionDataSource,
+        private PastoralTagMapper $pastoralTagMapper,
+        private PastoralActionMapper $pastoralActionMapper,
+        private \Schoolbox\Pastoral\RecordAction\Mapper $pastoralRecordActionMapper,
+        private PastoralCommentMapper $pastoralCommentMapper,
+        private PastoralAttachmentMapper $pastoralAttachmentMapper,
+        private UserMapper $userMapper,
+        private PastoralAccessMapper $pastoralAccessMapper,
+        private PastoralGroupMapper $pastoralGroupMapper,
+        private PastoralGroupMemberMapper $pastoralGroupMemberMapper,
+        private ErrorMapper $errorMapper,
+        private PastoralReportMapper $pastoralReportMapper,
+        private Audience\Mapper $audienceMapper,
+        private TermMapper $termMapper,
+        private Comment\Translator\ModelToArray $pastoralCommentTranslator,
+        private Translator\ModelToArray $pastoralTranslator,
         private FilesystemProxy $filesystemProxy,
     ) {
-        $this->config                     = $config;
-        $this->errorMapper                = $errorMapper;
-        $this->fileMapper                 = $fileMapper;
-        $this->pastoralAuditMapper        = $pastoralAuditMapper;
-        $this->pastoralAccessMapper       = $pastoralAccessMapper;
-        $this->pastoralGroupMapper        = $pastoralGroupMapper;
-        $this->pastoralGroupMemberMapper  = $pastoralGroupMemberMapper;
-        $this->pastoralAttachmentMapper   = $pastoralAttachmentMapper;
-        $this->pastoralSubTypeMapper      = $pastoralSubTypeMapper;
-        $this->pastoralCommentMapper      = $pastoralCommentMapper;
-        $this->pastoralDataSource         = $pastoralDataSource;
-        $this->pastoralSeverityMapper     = $pastoralSeverityMapper;
-        $this->pastoralRevisionDataSource = $pastoralRevisionDataSource;
-        $this->pastoralTagMapper          = $pastoralTagMapper;
-        $this->pastoralActionMapper       = $pastoralActionMapper;
-        $this->pastoralRecordActionMapper = $pastoralRecordActionMapper;
-        $this->pastoralTypeMapper         = $pastoralTypeMapper;
-        $this->pastoralUploadQueueMapper  = $pastoralUploadQueueMapper;
-        $this->roleMapper                 = $roleMapper;
-        $this->userMapper                 = $userMapper;
-        $this->userAccessMapper           = $userAccessMapper;
-        $this->pastoralReportMapper       = $pastoralReportMapper;
-        $this->audienceMapper             = $audienceMapper;
-        $this->termMapper                 = $termMapper;
-        $this->pastoralCommentTranslator  = $pastoralCommentTranslator;
     }
-
 
     /**
      * Display pastoral dashboard page
@@ -813,46 +698,46 @@ class Controller extends Base
      * Assign tags to a record, spawning them if required, or resurrecting them
      * if these tags once existed
      *
-     * @param string $tagCsv
+     * @param string $tagIdCsv
+     * @param string $tagNameCsv
      * @return Collection
      * @throws MapperException
      */
-    private function prepareTags(string $tagCsv): Collection
+    private function prepareTags(string $tagIdCsv, string $tagNameCsv): Collection
     {
-        $tagNames = explode(",", $tagCsv);
-        $tags     = $this->pastoralTagMapper->createCollection();
+        $tagNames = array_map('trim', array_filter(explode(',', $tagNameCsv)));
+        // remove new tags set as string starting from 'new-'
+        $tagIds   = array_map(
+            'trim',
+            array_filter(explode(',', $tagIdCsv), static function ($tagId) {
+                return is_numeric(trim($tagId));
+            })
+        );
+
+        // create initial tag collection from tagIds
+        $tags          = $this->pastoralTagMapper->findByColumn('id', $tagIds);
+        $invalidTagIds = array_diff($tagIds, $tags->getPropertyValues('id'));
+        if (!empty($invalidTagIds)) {
+            throw new SchoolboxException(sprintf("Invalid Tag ID provided: %s", implode(',', $invalidTagIds)));
+        }
 
         $canCreate = (bool)$this->getConfigLoader()->get('pastoral_create_tag_enable');
 
-        foreach ($tagNames as $tagCurrent) {
-            if (trim($tagCurrent) != '') {
-                $tag = null;
-                try {
-                    /* Assign an existing tag to this pastoral record
-                     */
-
-                    /** @var PastoralTagsModel $tag */
-                    $tag = $this->pastoralTagMapper->findOneByColumn('id', $tagCurrent, ['cache' => false]);
-                } catch (MapperDeletedException $e) {
-                    /* Restore this tag to active duty SA-2737
-                     * This was put here to reduce dupe tags from original implementation
-                     */
-                } catch (MapperException $e) {
-                    /* Tag doesn't exist - spawn it, save it, then assign it
-                     */
+        foreach ($tagNames as $tagName) {
+            /** @var PastoralTagsModel|null $tag */
+            $tag = null;
+            // newly created tag from selectize has this strange string from modify_scripts.twig
+            try {
+                $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagName, ['cache' => false]);
+                $tags->add($tag);
+            } catch (MapperException $e) {
+                if (!$canCreate) {
+                    throw new SchoolboxException(sprintf("Tag %s not found.", $tagName));
                 }
-
-                /* Tag doesn't exist - spawn it, save it, then assign it
-                 */
-                if (!$tag && $canCreate) {
-                    $tag = new PastoralTagsModel();
-                    $tag->setName($tagCurrent);
-                    $this->pastoralTagMapper->save($tag);
-                }
-
-                if ($tag) {
-                    $tags->add($tag);
-                }
+                $tag = new PastoralTagsModel();
+                $tag->setName($tagName);
+                $this->pastoralTagMapper->save($tag);
+                $tags->add($tag);
             }
         }
         return $tags;
@@ -869,16 +754,12 @@ class Controller extends Base
         $accesses = $this->pastoralAccessMapper->createCollection();
 
         if (is_array($post->get("role"))) {
-            $foundRoles       = [];
             $allowedRoles     = $this->pastoralAccessMapper->determineAllowedRoles();
             $allowedRoleTypes = $this->pastoralAccessMapper->determineAllowedRoleTypes();
             foreach ($post->get("role") as $roleId => $accessLevel) {
-                if (in_array($roleId, $foundRoles)) {
-                    // should not happen
-                    continue;
+                if (!in_array($accessLevel, Access\Mapper::ACCESSES)) {
+                    throw new SchoolboxException(sprintf("Invalid access provided for role %s: %s", $roleId, $accessLevel));
                 }
-                $foundRoles[] = $roleId;
-
                 $access = $this->pastoralAccessMapper->createModel();
                 $access->setAccess($accessLevel);
                 $access->setCommentsAllowed($post->getBool("roleComment{$roleId}", false));
@@ -886,7 +767,7 @@ class Controller extends Base
                 // Is this a role or a role type?
                 if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
                     if (!in_array($matches['roleType'], $allowedRoleTypes)) {
-                        continue;
+                        throw new SchoolboxException("Invalid role type: {$matches['roleType']}");
                     }
                     $access->setRoleType($matches['roleType']);
                 } else {
@@ -894,7 +775,7 @@ class Controller extends Base
                     if ($role) {
                         $access->setRole($role);
                     } else {
-                        continue;
+                        throw new SchoolboxException("Invalid role id: $roleId");
                     }
                 }
                 if ($post->getInt("roleAccessId{$roleId}")) {
@@ -906,51 +787,45 @@ class Controller extends Base
 
         // Save pastoral group permissions, de-duplicating as we go
         if (is_array($post->get("group"))) {
-            $foundGroups = [];
             foreach ($post->get("group") as $groupId => $accessLevel) {
-                if (in_array($groupId, $foundGroups)) {
-                    // should not happen
-                    continue;
+                if (!in_array($accessLevel, Access\Mapper::ACCESSES)) {
+                    throw new SchoolboxException(sprintf("Invalid access provided for pastoral group %s: %s", $groupId, $accessLevel));
                 }
-                $foundGroups[] = $groupId;
                 try {
-                    $group  = $this->pastoralGroupMapper->findById($groupId);
-                    $access = $this->pastoralAccessMapper->createModel();
-                    $access->setAccess($accessLevel);
-                    $access->setGroup($group);
-                    $access->setCommentsAllowed($post->getBool("groupComment{$groupId}", false));
-                    if ($post->getInt("groupAccessId{$groupId}")) {
-                        $access->setId($post->getInt("groupAccessId{$groupId}"));
-                    }
-                    $accesses->add($access);
+                    $group = $this->pastoralGroupMapper->findById($groupId);
                 } catch (MapperException $e) {
-                    // Noop
+                    throw new SchoolboxException("Invalid pastoral group id: $groupId");
                 }
+                $access = $this->pastoralAccessMapper->createModel();
+                $access->setAccess($accessLevel);
+                $access->setGroup($group);
+                $access->setCommentsAllowed($post->getBool("groupComment{$groupId}", false));
+                if ($post->getInt("groupAccessId{$groupId}")) {
+                    $access->setId($post->getInt("groupAccessId{$groupId}"));
+                }
+                $accesses->add($access);
             }
         }
 
         // Save individual user permissions, de-duplicating as we go
         if (is_array($post->get("user"))) {
-            $foundUsers = [];
             foreach ($post->get("user") as $userId => $accessLevel) {
-                if (in_array($userId, $foundUsers)) {
-                    // should not happen
-                    continue;
+                if (!in_array($accessLevel, Access\Mapper::ACCESSES)) {
+                    throw new SchoolboxException(sprintf("Invalid access provided for pastoral user %s: %s", $userId, $accessLevel));
                 }
-                $foundUsers[] = $userId;
                 try {
-                    $user   = $this->userMapper->findById($userId);
-                    $access = $this->pastoralAccessMapper->createModel();
-                    $access->setAccess($accessLevel);
-                    $access->setCommentsAllowed($post->getBool("userComment{$userId}", false));
-                    $access->setUser($user);
-                    if ($post->getInt("userAccessId{$userId}")) {
-                        $access->setId($post->getInt("userAccessId{$userId}"));
-                    }
-                    $accesses->add($access);
+                    $user = $this->userMapper->findById($userId);
                 } catch (MapperException $e) {
-                    // Noop
+                    throw new SchoolboxException("Invalid user id: $userId");
                 }
+                $access = $this->pastoralAccessMapper->createModel();
+                $access->setAccess($accessLevel);
+                $access->setCommentsAllowed($post->getBool("userComment{$userId}", false));
+                $access->setUser($user);
+                if ($post->getInt("userAccessId{$userId}")) {
+                    $access->setId($post->getInt("userAccessId{$userId}"));
+                }
+                $accesses->add($access);
             }
         }
 
@@ -976,7 +851,7 @@ class Controller extends Base
             'strlen',
         );
         if (empty($studentId) && empty($duplicateStudentIds)) {
-            throw new InvalidArgumentException('No student provided.');
+            throw new SchoolboxException('No student provided.');
         }
         if (empty($studentId)) {
             $studentId = (int)array_shift($duplicateStudentIds);
@@ -994,7 +869,17 @@ class Controller extends Base
 
         // Create new pastoral record with duplicates
 
-        $this->processPastoralRecords($studentId, $post, $duplicates);
+        $records = $this->processPastoralRecords($studentId, $post, $duplicates);
+
+        if ($this->isJsonRequest()) {
+            $this->response->status->setCode(201);
+            $this->response->content->set(
+                $this->buildJsonOutput(
+                    $records->map($this->pastoralTranslator)
+                )
+            );
+            return;
+        }
 
         // Go back to students pastoral record
         $encodedReturnUrl = $post->get(Redirect::RETURN_URL);
@@ -1055,28 +940,31 @@ class Controller extends Base
      * @param array              $duplicateStudentIds List of students the primary record should be duplicated on
      * @param PastoralModel|null $parent              Parent record (if we are updating an existing record)
      *
-     * @return void
+     * @return GenericCollection
      * @throws MapperException
-     * @throws Exception
      */
-    private function processPastoralRecords(int $primaryStudentId, RequestValues $post, array $duplicateStudentIds = [], PastoralModel $parent = null): void
+    private function processPastoralRecords(int $primaryStudentId, RequestValues $post, array $duplicateStudentIds = [], PastoralModel $parent = null): GenericCollection
     {
-        $heading = trim($post->get('heading'));
+        $heading = trim((string)$post->get('heading'));
         if (empty($heading)) {
-            throw new InvalidArgumentException('Title cannot be empty');
+            throw new SchoolboxException('Heading cannot be empty');
         }
+        $records = $this->pastoralDataSource->createCollection();
 
         // Make sure the primary records student ID is at the start of the array so we create it first
         array_unshift($duplicateStudentIds, $primaryStudentId);
 
         // Prepare type. No database change.
+        if (!$post->get('typeId')) {
+            throw new SchoolboxException('Type cannot be empty');
+        }
         try {
             $type = $this->pastoralTypeMapper->findById($post->get('typeId'));
         } catch (MapperException\Deleted $e) {
             /** @var Type\Model $type */
             $type = $e->getDeletedObject();
         } catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+            throw new SchoolboxException("Pastoral type with ID {$post->get('typeId')} cannot be found");
         }
 
         // Prepare subtype. No database change.
@@ -1089,27 +977,32 @@ class Controller extends Base
                 /** @var SubType\Model $subtype */
                 $subtype = $e->getDeletedObject();
             } catch (MapperException $e) {
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                throw new SchoolboxException("Pastoral sub-type with ID {$subtypeId} cannot be found");
             }
             // Ensure that subtype belongs to the parent type:
             // if there is somehow a mismatch, clear the subtype
             if ($type->getId() !== $subtype->getPastoralType()->getId()) {
-                $subtype = null;
+                throw new SchoolboxException("Pastoral sub-type with ID {$subtypeId} is not a sub-type of type {$type->getId()}");
             }
+        }
+        // If type has subtypes but subtype is not provided, throw error
+        if (!$subtype && $type->getSubTypes()->count() > 0) {
+            throw new SchoolboxException("Sub-type needs to be selected for type {$post->get('typeId')}");
         }
 
         // Prepare Severity. No database change.
         $severity = null;
         if ($this->getConfigLoader()->get('pastoral_severity')) {
+            if (!$post->get('severityId')) {
+                throw new SchoolboxException("Pastoral severity is required");
+            }
             try {
                 $severity = $this->pastoralSeverityMapper->findById($post->get('severityId'));
             } catch (MapperException\Deleted $e) {
                 /** @var Severity\Model $severity */
                 $severity = $e->getDeletedObject();
-            } catch (MapperException\NotFound $e) {
-                $severity = null;
             } catch (MapperException $e) {
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                throw new SchoolboxException("Pastoral severity with ID {$post->get('severityId')} cannot be found");
             }
         }
 
@@ -1127,7 +1020,7 @@ class Controller extends Base
         $db->beginTransaction();
 
         // Prepare tags. Save newly created tags.
-        $tags = $this->prepareTags($post->get('tags'));
+        $tags = $this->prepareTags($post->get('tags') ?? '', $post->get('tagNames') ?? '');
 
         $pastoralExternal = new External_Pastoral();
 
@@ -1177,14 +1070,20 @@ class Controller extends Base
             $record->setSeverity($severity);
             $record->setModifiedBy($this->getUser());
             $record->setHeading($heading);
-            $record->setPoints($post->get('points'));
+            if ($post->get('points')) {
+                $points = $post->getFloat('points');
+                if (!is_numeric($post->get('points')) || $points < -1000000 || $points > 1000000) {
+                    throw new SchoolboxException('Points must be a float between -1000000 and 1000000');
+                }
+                $record->setPoints($points);
+            }
 
             /* Perform token replacements, basically a square bracket phplib
              * that performs a one-way substitution
              */
             $record->setBodyPublic(
                 (new TokenReplacer\Student(new TokenReplacer\Simple()))
-                    ->replace(trim($post->get('body_public')), $student)
+                    ->replace(trim($post->get('body_public') ?? ''), $student)
             );
 
             /* Perform token replacements, basically a square bracket phplib
@@ -1192,7 +1091,7 @@ class Controller extends Base
              */
             $record->setBodyPrivate(
                 (new TokenReplacer\Student(new TokenReplacer\Simple()))
-                    ->replace(trim($post->get('body_private')), $student)
+                    ->replace(trim($post->get('body_private') ?? ''), $student)
             );
 
             // Only set owner if this is a new record
@@ -1301,8 +1200,10 @@ class Controller extends Base
                     $pastoralExternal->syncPastoral($record);
                 }
             );
+            $records->add($record);
         }
         $db->commit();
+        return $records;
     }
 
     /**
@@ -1461,10 +1362,19 @@ class Controller extends Base
             return $recordActions;
         }
 
-        $actions       =
-            is_array($post->get('actions'))
-                ? $this->pastoralActionMapper->findByColumn('id', array_map('intval', array_filter($post->get('actions'))))
+        $postedActionIds = array_map('intval', array_filter($post->get('actions') ?? []));
+
+        $actions =
+            !empty($postedActionIds)
+                ? $this->pastoralActionMapper->findByColumn('id', $postedActionIds)
                 : $this->pastoralActionMapper->createCollection();
+
+        // if there are actions which are not in db, throw error
+        $invalidActionIds = array_diff($postedActionIds, $actions->getPropertyValues('id'));
+        if (!empty($invalidActionIds)) {
+            throw new SchoolboxException(sprintf("Action %s not found.", implode(',', $invalidActionIds)));
+        }
+
         foreach ($actions as $action) {
             /** @var RecordAction\Model $recordAction */
             $recordAction = $this->pastoralRecordActionMapper->createModel();

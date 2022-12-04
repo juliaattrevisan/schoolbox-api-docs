@@ -17,7 +17,6 @@ use Schoolbox\Resource\Storage\HashGenerator;
 
 class Acceptance extends \Codeception\Module
 {
-
     private $originalConfig = [];
 
     /**
@@ -68,10 +67,6 @@ class Acceptance extends \Codeception\Module
     public function changeDBConfig(string $name, string $value)
     {
         $db = $this->getDbModule();
-        if (key_exists($name, $this->originalConfig)) {
-            // already stored
-            return;
-        }
 
         $currentValue = $db->grabFromDatabase('config', 'value', ['name' => $name]);
         if ($value === $currentValue) {
@@ -79,8 +74,11 @@ class Acceptance extends \Codeception\Module
             return;
         }
 
-        $this->originalConfig[$name] = $currentValue;
-        $db->updateInDatabase('config', ['value' => $value], ['name' => 'debug_mode']);
+        if (!key_exists($name, $this->originalConfig)) {
+            $this->originalConfig[$name] = $currentValue;
+        }
+
+        $db->updateInDatabase('config', ['value' => $value], ['name' => $name]);
     }
 
     /**
@@ -553,15 +551,11 @@ class Acceptance extends \Codeception\Module
      * Return webdriver module in a type-safe manner.
      *
      * @return WebDriver
+     * @throws ModuleException
      */
     private function getWebDriverModule(): WebDriver
     {
-        try {
-            return $this->getModule('WebDriver');
-        } catch (ModuleException $e) {
-            // Wasn't found: return null, let TypeError handle it
-        }
-        return null;
+        return $this->getModule('WebDriver');
     }
 
     /**
@@ -576,34 +570,23 @@ class Acceptance extends \Codeception\Module
 
     /**
      * Return DB module in a type-safe manner.
-     *
      * @return Db
+     * @throws ModuleException
      */
     private function getDbModule(): Db
     {
-        try {
-            return $this->getModule('Db');
-        } catch (ModuleException $e) {
-            // Wasn't found: return null, let TypeError handle it
-        }
-        return null;
+        return $this->getModule('Db');
     }
 
     /**
      * Return CLI module in a type-safe manner.
-     *
      * @return Cli
+     * @throws ModuleException
      */
     private function getCliModule(): Cli
     {
-        try {
-            return $this->getModule('Cli');
-        } catch (ModuleException $e) {
-            // Wasn't found: return null, let TypeError handle it
-        }
-        return null;
+        return $this->getModule('Cli');
     }
-
 
     /**
      * Verifies that the notification exists

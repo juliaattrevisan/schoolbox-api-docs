@@ -16,6 +16,7 @@ use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -40,6 +41,7 @@ use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -245,15 +247,20 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $commentTranslator =             new Comment\Translator\ModelToArray(
+            new User\Translator\Author\ModelToArray(),
+            $this->injector->get('router'),
+            $this->injector->get('authorizer'),
+            $this->injector->get('user'),
+            new ScrubAdapter(),
+        );
+
         return new Controller(
             $this->injector->get('config'),
-            $this->getMapperFactory()->get(FileMapper::class),
             $this->injector->get('pastoralDataSource'),
-            $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(PastoralAuditMapper::class),
             $this->getMapperFactory()->get(PastoralSubTypeMapper::class),
             $this->getMapperFactory()->get(PastoralTypeMapper::class),
-            $this->getMapperFactory()->get(PastoralUploadQueueMapper::class),
             $this->getMapperFactory()->get(PastoralSeverityMapper::class),
             $this->injector->get('pastoralRevisionDataSource'),
             $this->getMapperFactory()->get(PastoralTagMapper::class),
@@ -261,7 +268,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RecordAction\Mapper::class),
             $this->getMapperFactory()->get(PastoralCommentMapper::class),
             $this->getMapperFactory()->get(PastoralAttachmentMapper::class),
-            $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(PastoralAccessMapper::class),
             $this->getMapperFactory()->get(PastoralGroupMapper::class),
@@ -270,8 +276,11 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(PastoralReportMapper::class),
             $this->getMapperFactory()->get(Audience\Mapper::class),
             $this->getMapperFactory()->get(TermMapper::class),
-            new Comment\Translator\ModelToArray(
+            $commentTranslator,
+            new Translator\ModelToArray(
                 new User\Translator\Author\ModelToArray(),
+                $commentTranslator,
+                new Storage\Translator\ModelToArray(new PrefixGenerator($this->injector->get('config'))),
                 $this->injector->get('router'),
                 $this->injector->get('authorizer'),
                 $this->injector->get('user'),

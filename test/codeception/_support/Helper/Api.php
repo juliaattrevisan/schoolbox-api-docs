@@ -7,14 +7,21 @@
 
 namespace Helper;
 
+use Codeception\Exception\ModuleException;
+use Codeception\Module\Db;
 use Codeception\TestInterface;
 use Payload\Request;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\CampusMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralSubtypeMapper;
+use Schoolbox\Pastoral\SubType\Model;
+use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -33,6 +40,8 @@ class Api extends \Codeception\Module
     public Kernel $cliKernel;
 
     private UserMapper $userMapper;
+
+    private array $originalConfig = [];
 
     /**
      * HOOK: executed after configuration is loaded
@@ -94,6 +103,39 @@ class Api extends \Codeception\Module
     }
 
     /**
+     * Sets database config value temporally
+     * @param string $name
+     * @param mixed  $value
+     */
+    public function changeDBConfig(string $name, $value)
+    {
+        $db = $this->getDbModule();
+
+        $currentValue = $db->grabFromDatabase('config', 'value', ['name' => $name]);
+        if ($value === $currentValue) {
+            // no need to change
+            return;
+        }
+
+        if (!key_exists($name, $this->originalConfig)) {
+            $this->originalConfig[$name] = $currentValue;
+        }
+
+        $db->updateInDatabase('config', ['value' => $value], ['name' => $name]);
+    }
+
+    /**
+     * Resets database value back
+     */
+    public function restoreDBConfig()
+    {
+        $db = $this->getDbModule();
+        foreach ($this->originalConfig as $name => $value) {
+            $db->updateInDatabase('config', ['value' => $value], ['name' => $name]);
+        }
+    }
+
+    /**
      * @param string $username
      * @param string $roleType
      * @param bool   $superUser
@@ -150,5 +192,94 @@ class Api extends \Codeception\Module
     public function getPastoralSeverities(): GenericCollection
     {
         return PastoralSeverityMapper::getInstance()->findAll();
+    }
+
+    /**
+     * @return GenericCollection
+     */
+    public function getPastoralTags()
+    {
+        return PastoralTagMapper::getInstance()->findAll();
+    }
+
+    /**
+     * @return GenericCollection
+     * @throws MapperException
+     */
+    public function preparePastoralActions(): GenericCollection
+    {
+        $pastoralActionMapper  = PastoralActionMapper::getInstance();
+        $pastoralSubtypeMapper = PastoralSubtypeMapper::getInstance();
+        $pastoralTypeMapper    = PastoralTypeMapper::getInstance();
+        $actions               = $pastoralActionMapper->findAll();
+
+        if ($actions->count() === 0) {
+            for ($i = 0; $i < 5; $i++) {
+                $newAction = $pastoralActionMapper->createModel()
+                                                  ->setName($this->generateText(50))
+                                                  ->setSequence($i);
+                $pastoralActionMapper->save($newAction);
+            }
+            $actions = $pastoralActionMapper->findAll();
+        }
+
+        $types = $pastoralTypeMapper->findAll();
+        foreach ($types as $type) {
+            if ($type->getSubTypes()->count()) {
+                /** @var Model $subType */
+                $subType = $type->getSubTypes()->first();
+                $subType->setActions($pastoralActionMapper->createCollection()->add($actions->first()));
+                $pastoralSubtypeMapper->save($subType);
+            } else {
+                $type->setActions($pastoralActionMapper->createCollection()->add($actions->last()));
+                $pastoralTypeMapper->save($type);
+            }
+        }
+
+        $test = $this->getMaxValue('lu_pastoral_action', 'id');
+
+        return $pastoralActionMapper->findAll();
+    }
+
+    /**
+     * Return DB module in a type-safe manner.
+     *
+     * @return Db
+     * @throws ModuleException
+     */
+    private function getDbModule(): Db
+    {
+        return $this->getModule('Db');
+    }
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    public function generateText(int $length): string
+    {
+        $characters = 'abcdefghijklmnopqrstuvwxyz.012345678!@#$%*&^()-+';
+
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            if ($length > 8 && rand(1, 7) === 5) {
+                $randomString .= ' ';
+                $i++;
+            }
+            $randomString .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        return $randomString;
+    }
+
+
+    /**
+     * @param string $tableName
+     * @param string $column
+     * @return mixed
+     * @throws ModuleException
+     */
+    public function getMaxValue(string $tableName, string $column)
+    {
+        return $this->getDbModule()->grabFromDatabase($tableName, "max($column)");
     }
 }
