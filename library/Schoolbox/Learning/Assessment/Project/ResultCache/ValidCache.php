@@ -87,4 +87,54 @@ class ValidCache
 
         return $cacheValid;
     }
+
+
+    /**
+     * Decide if the $postData makes changes to $assessment in way that
+     * invalidates previously stored marks
+     *
+     * Returns true when IAssessable is not an activity that exists inside Projects.
+     * Activities are: Due Work, Task, Quiz
+     *
+     * @param \Traversable     $postData
+     * @param IAssessable|null $assessment
+     * @return bool|null
+     */
+    public function isSatisifiedByActivity(\Traversable $postData, ?IAssessable $assessment = null): ?bool
+    {
+        /* $assessment is null? Nothing to do
+         */
+        if (null === $assessment) {
+            return true;
+        }
+
+        $isDueWork = $assessment instanceof \Schoolbox\Learning\Assessment\DueWork\Model;
+        $isTask = $assessment instanceof \Schoolbox\Learning\Assessment\Task\Model;
+        $isQuiz = $assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model;
+
+        /* Not an Activity instance?
+         * (You probably gave this a Project, not an Activity)
+         * Project cache is still valid, no matter what we do here.
+         */
+        if (!$isDueWork && !$isTask && !$isQuiz) {
+            return true;
+        }
+
+        /* Decide whether we have to invalidate project_result cache
+         * Have to compare $postData and $assessment -before- it's transacted/updated
+         */
+        $cacheValid = true;
+
+        /* Any one of the following changes invalidates the project result cache since
+         * they alter the summation outcome and the normalised- and human-readable mark
+         */
+
+        /* 1. Change in Weighting
+         */
+        if ($postData['weight'] !== $assessment->getWeight()) {
+            $cacheValid = false;
+        }
+
+        return $cacheValid;
+    }
 }

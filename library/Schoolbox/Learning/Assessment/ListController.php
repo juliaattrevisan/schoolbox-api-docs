@@ -644,7 +644,13 @@ class ListController extends Web\Controller\Base
             /* Decide whether we have to invalidate project_result cache
              * Have to compare $postData and $assessment -before- it's transacted/updated
              */
-            $cacheValid = (new ValidCache())->isSatisifiedByProject($postData, $assessment);
+            $projectResultCacheDetetor = new ValidCache();
+
+            if ($assessment instanceof Project) {
+                $cacheValid = $projectResultCacheDetetor->isSatisifiedByProject($postData, $assessment);
+            } else {
+                $cacheValid = $projectResultCacheDetetor->isSatisifiedByActivity($postData, $assessment);
+            }
 
             $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment);
             $assessment        = $assessmentFactory->produce($assessment);
@@ -680,9 +686,15 @@ class ListController extends Web\Controller\Base
         if (!$cacheValid) {
             $projectResultCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
 
-            foreach ($assessment->getAllParticipants() as $userId => $participant) {
+            if ($assessment instanceof Project) {
+                $project = $assessment;
+            } else {
+                $project = $this->assessmentMapper->findByIdForReview($assessment->getContext()->getId());
+            }
+
+            foreach ($project->getAllParticipants() as $userId => $participant) {
                 $user = $participant->getUser();
-                $projectResultCache->persist($assessment, $user, null);
+                $projectResultCache->persist($project, $user, null);
             }
         }
 
