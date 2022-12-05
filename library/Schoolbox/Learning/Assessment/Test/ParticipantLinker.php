@@ -22,7 +22,6 @@ use Schoolbox\User;
  */
 class ParticipantLinker
 {
-
     /**
      * Create a participant in the specified plan, and link them all up
      *

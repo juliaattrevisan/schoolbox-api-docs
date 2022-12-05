@@ -27,7 +27,7 @@ use UnexpectedValueException;
 class SelfGradableTest extends TestCase
 {
     /**
-     * @dataProvider provider_validSelfAssessable
+     * @dataProvider providerValidSelfAssessable
      * @param User        $currentUser The user currently "logged in"
      * @param Participant $participant The user whose trying to start self-assessment
      * @param int         $expected
@@ -45,7 +45,7 @@ class SelfGradableTest extends TestCase
      *
      * @return array
      */
-    public function provider_validSelfAssessable(): array
+    public function providerValidSelfAssessable(): array
     {
         $student = (new User())->setId(230);
         $otherStudent = (new User())->setId(999);

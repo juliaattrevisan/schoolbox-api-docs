@@ -42,7 +42,6 @@ use Schoolbox\Resource\Folder;
  */
 class VisibilityTests extends TestCase
 {
-
     /** @var Visibility */
     private $visibility;
 
@@ -73,7 +72,7 @@ class VisibilityTests extends TestCase
      * @param bool                $expected
      * @dataProvider provider_isVisible
      */
-    public function test_isVisible(
+    public function testIsVisible(
         bool $isParticipant,
         Role $role,
         User $user,
@@ -106,7 +105,7 @@ class VisibilityTests extends TestCase
      * @return array
      * @throws InvalidArgumentException
      */
-    public function provider_isVisible(): array
+    public function providerIsVisible(): array
     {
         // Is participant
         $isParticipant  = true;
