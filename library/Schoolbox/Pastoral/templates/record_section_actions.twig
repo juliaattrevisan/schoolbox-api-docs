@@ -12,6 +12,11 @@
                                        data-pastoral-action="{{ recordAction.id }}"/>
                                 <label for="action-{{ recordAction.action.id }}"
                                         {{ recordAction.completed ? 'class="strike"' : '' }}>{{ recordAction.action.name }}</label>
+                                {% if recordAction.completed %}
+                                    <div data-action-status-{{ recordAction.action.id }}>Completed
+                                        by {{ recordAction.updatedBy.fullname }}
+                                        at {{ recordAction.updatedAt.local }}</div>
+                                {% endif %}
                             </li>
                         {% endfor %}
                     </ul>
@@ -27,15 +32,26 @@
                 toast.toastActivate({text: 'Updating ...'});
                 let checked = 0;
                 if ($(this).is(':checked')) {
-                    $('label[for="' + $(this).attr('id') + '"]').addClass('strike');
                     checked = 1;
-                } else {
-                    $('label[for="' + $(this).attr('id') + '"]').removeClass('strike');
                 }
+                let actionId = $(this).attr('id');
                 $.post('{{ routeLookupIfAuthorized('pastoral.postActionUpdate', {recordId: record.id, record: record}) }}', {
                     recordActionId: $(this).attr('data-pastoral-action'),
                     checked: checked
                 }).done(function (response) {
+                    response.recordActions.forEach(function (action) {
+                                if (actionId !== 'action-' + action.id) {
+                                    return;
+                                }
+                                if (action.completed) {
+                                    $('label[for="' + actionId + '"]').addClass('strike');
+                                    $('[data-action-status-' + action.id + ']').show();
+                                } else {
+                                    $('label[for="' + actionId + '"]').removeClass('strike');
+                                    $('[data-action-status-' + action.id + ']').hide();
+                                }
+                            }
+                    )
                     toast.toastTimeout({text: 'Action updated.', css: 'success'});
                 }).fail(function () {
                     toast.toastTimeout({text: 'Could not update action ', css: 'alert'});
