@@ -116,11 +116,13 @@ HELP;
         }
 
         /* Otherwise let's dig
+         * (Only get Implementations, never Specifications)
          */
         $assessmentStatement = $this->getDatabaseInternal()->executeQuery("
-            SELECT assessment_id
-            FROM project
-            WHERE deleted_at IS NULL
+            SELECT p.assessment_id
+            FROM project p
+            INNER JOIN assessment_specification_implementation asi ON p.assessment_id = asi.implementation_assessment_id
+            WHERE p.deleted_at IS NULL
         ");
 
         /* Find all the users who *might* have participated
@@ -157,6 +159,11 @@ HELP;
                 $this->refreshLock($lock);
 
                 $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
+                $this->getLogger()->info(sprintf(
+                    'Examining project %s (assessment id %s)',
+                    $project->getTitle(),
+                    $project->getId()
+                ));
 
                 /* TODO Maybe find $users as the set of guys inside $project somehow
                  */
@@ -209,7 +216,7 @@ HELP;
  * You should generally try to fix those, even though in some special cases php will throw notices
  * for its own expected behaviours which will inadvertently cause this to fail
  */
-$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
