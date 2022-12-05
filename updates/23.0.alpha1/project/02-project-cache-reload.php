@@ -109,7 +109,8 @@ HELP;
          */
         $assessmentCountStatement = $this->getDatabaseInternal()->executeQuery("
             SELECT COUNT(*) AS num
-            FROM project
+            FROM project p
+            INNER JOIN assessment_specification_implementation asi ON p.assessment_id = asi.implementation_assessment_id
             WHERE deleted_at IS NULL
         ");
 
