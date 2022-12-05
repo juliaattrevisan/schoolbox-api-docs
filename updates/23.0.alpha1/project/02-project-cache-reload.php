@@ -167,6 +167,9 @@ HELP;
                     $outcome = $projectResultCache->persist($project, $user, $marker);
 
                     if (null === $outcome) {
+                        /* This use case shouldn't emerge in this tool, but the
+                         * project result cache knows how to reject non-participants
+                         */
                         $this->getLogger()->debug(sprintf(
                             '%s (%s) was not a participant in project %s (%s)',
                             $user->getFullname(),
