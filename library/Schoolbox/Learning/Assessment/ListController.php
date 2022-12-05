@@ -27,6 +27,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
 use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
+use Schoolbox\Learning\Assessment\Summator\Mapping;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -617,6 +618,7 @@ class ListController extends Web\Controller\Base
          * Controller must return early for that to happen
          */
         $db = $this->getUserMapper()->getDatabase();
+
         try {
             $db->beginTransaction();
             // Create a notifier proxy so that I may notify about assessment changes
@@ -635,6 +637,46 @@ class ListController extends Web\Controller\Base
                 $originalAssessment  = $assessment;
                 $assessment          = null;
             }
+
+
+
+
+            /* Decide whether we have to invalidate project_result cache
+             * Have to compare $postData and $assessment -before- it's transacted/updated
+             */
+            $cacheValid = true;
+
+            /* Any one of the following changes invalidates the project result cache since
+             * they alter the summation outcome and the normalised- and human-readable mark
+             */
+
+            /* 1. Change in Summator
+             */
+            if ($postData['summator'] !== (new Mapping())->decompose($assessment->getSummator())) {
+                $cacheValid = false;
+            }
+
+            /* 2. Change in "Require All Activities"
+             */
+            if ((bool)($postData['requireAllActivities'] ?? false) !== $assessment->getRequireAllActivities()) {
+                $cacheValid = false;
+            }
+
+            /* 3. Change in Mark Type
+             */
+            if ((int)$postData['markType'] !== $assessment->getMarkType()->getId()) {
+                $cacheValid = false;
+            }
+
+            /* 4. Change in the Grading Scheme
+             */
+            if ((int)$postData['gradingScheme'] !== (int)$assessment->getMarkScheme()?->getGradeGroup()->getId()) {
+                $cacheValid = false;
+            }
+
+            new \Alaress_Probe($cacheValid);
+            die();
+
 
             $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment);
             $assessment        = $assessmentFactory->produce($assessment);
