@@ -1,42 +1,39 @@
 {% if nodes | length > 0 %}
-    <div class="content">
-  {% for node in nodes %}
-        <h3>
-            {% if node.code %}
-                {% if isRouteAuthorized('curriculum.browse') %}
-                    [<a title="View in Manage Curriculum" href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
-                {% else %}
-                    [{{ node.code }}]
-                {% endif %}
-            {% endif %}
-            {{ node.name }}
-        </h3>
+    <ul class="information-list">
+      {% for node in nodes %}
+          <li class="content">
+              <p class="no-margin">
+                  {% if node.code %}
+                      {% if isRouteAuthorized('curriculum.browse') %}
+                          [<a title="View in Manage Curriculum"
+                              href="{{ routeLookup('curriculum.browse') }}#{{ node.id }}">{{ node.code }}</a>]
+                      {% else %}
+                          [{{ node.code }}]
+                      {% endif %}
+                  {% endif %}
+                  {{ node.name }}
+              </p>
 
-        {% if node.description %}
-            <article>{{ node.description|purify }}</article>
-        {% endif %}
-      {% if not loop.last %}
-          <hr>
-      {% endif %}
-  {% endfor %}
-    </div>
+              {% if node.description %}
+                  <article>{{ node.description|purify }}</article>
+              {% endif %}
+          </li>
+      {% endfor %}
+    </ul>
 {% else %}
-
     <div class="empty-state">
         <i class="icon-curriculum-details"></i>
 
-            {% if not curriculumTagging %}
+        {% if not curriculumTagging %}
 
-                {% if USER.isSuperuser %}
-                    <p><a href="/adminv2/setting/LMS+Policy">Turn on the Enable Curriculum Tagging toggle</a> in the Administration system to use this feature.</p>
-                {% else %}
-                    <p>Ask your System Administrator to enable curriculum mapping to use this feature.</p>
-                {% endif %}
-
+            {% if USER.isSuperuser %}
+                <p><a href="/adminv2/setting/LMS+Policy">Turn on the Enable Curriculum Tagging toggle</a> in the Administration system to use this feature.</p>
             {% else %}
-                <p><a href="{{ routeLookup('folder.getFolderModify', {id: context.id}) }}#curriculum-codes">Map a curriculum or an area of the curriculum</a> to your course or {{ locale.unit }} page to display the associated description of your curriculum.</p>
+                <p>Ask your System Administrator to enable curriculum mapping to use this feature.</p>
             {% endif %}
 
+        {% else %}
+            <p><a href="{{ routeLookup('folder.getFolderModify', {id: context.id}) }}#curriculum-codes">Map a curriculum or an area of the curriculum</a> to your course or {{ locale.unit }} page to display the associated description of your curriculum.</p>
+        {% endif %}
     </div>
-
 {% endif %}
