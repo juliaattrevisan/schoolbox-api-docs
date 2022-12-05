@@ -44,15 +44,15 @@ class RequestUriParser
         $parsedUrl = parse_url($requestUri, PHP_URL_PATH);
 
         # Unable to parse URL using normal processing?
-        if (!$parsedUrl) {
+        if ($parsedUrl === false) {
             // because parse_url returns false when the url contains ":"? Try replacing it.
             $parsedUrl = parse_url(str_replace(':', '%3A', $requestUri), PHP_URL_PATH);
-            if ($parsedUrl) {
+            if ($parsedUrl !== false) {
                 $parsedUrl = str_replace('%3A', ':', $parsedUrl);
             }
         }
 
-        if (!$parsedUrl) {
+        if ($parsedUrl === false) {
             throw new UnexpectedValueException("Unable to parse a URL path from URI '$requestUri'");
         }
 
