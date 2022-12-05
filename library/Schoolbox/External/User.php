@@ -70,6 +70,10 @@ class User
     public function loadParents(Collection|array $students): Collection|array
     {
         foreach ($students as $student) {
+            //if parents have already been loaded, the just continue
+            if (null !== $student->getParents()) {
+                continue;
+            }
             $parents = new GenericCollection(\Schoolbox\User::class);
 
             $allParents = $this->externalUser->getStudentContactList([$student->getExternalId()]);
@@ -114,6 +118,10 @@ class User
 
         // Get all of the students subjects
         foreach ($students as $student) {
+            //if teachers have already been loaded, the just continue
+            if (null !== $student->getTeacherCollection()) {
+                continue;
+            }
             $teachersLoaded = new GenericCollection(\Schoolbox\User::class);
             $found                                     = [];
             $subjects                                  = $this->externalUser->getSubjectList($student);
@@ -153,6 +161,10 @@ class User
     public function loadChildren(Collection|array $parents): Collection|array
     {
         foreach ($parents as $parent) {
+            //if children have already been loaded, the just continue
+            if (null !== $parent->getChildren()) {
+                continue;
+            }
             $children = new GenericCollection(\Schoolbox\User::class);
             $enrolments                             = $this->externalUser->getEnrolledStudents($parent->getExternalId());
             foreach ($enrolments as $child) {
