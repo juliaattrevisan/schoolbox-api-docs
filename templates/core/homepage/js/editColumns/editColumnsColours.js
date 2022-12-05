@@ -60,41 +60,17 @@ function getSelectedColumnCheckboxes () {
  * Initiate the colour pickers
  */
 function initColourPickers () {
+console.info('hello');
     $(COLOUR_PICKERS_SELECTOR).spectrum(
-//        {
-//            showPalette: false,
-//            showSelectionPalette: false,
-//            showButtons: false,
-//            showAlpha: true,
-//            showInitial: true,
-//            showInput: true,
-//            clickoutFiresChange: true,
-//            preferredFormat: 'hex',
-//            replacerClassName: 'colorBox',
-//            allowEmpty: true,
-//        }
         $.extend(
             {},
             window.sbProps.spectrum,
-// spectrum: {
-//    DIFF showAlpha: false,
-//    SAME allowEmpty: true,
-//    SAME clickoutFiresChange: true,
-//    SAME preferredFormat: 'hex',
-//    SAME showButtons: false,
-//    SAME showInitial: true,
-//    SAME showInput: true,
-// }
-//    NONE showPalette
-//    NONE showSelectionPalette
-//    NONE replacerClassName
-            {
-            }
+            {showAlpha: true}
         )
     );
     $(COLOUR_PICKERS_SELECTOR).on('change.spectrum, move.spectrum', (event, colour) => {
-        //apply when there's a colour selected, otherwise set the colour as black transparent,
-        //as the 'Clear Color Selection' button has been seleced
+        // Apply when there's a colour selected, otherwise set the colour as black transparent,
+        // as the 'Clear Color Selection' button has been selected.
         const colourAsRGB = colour instanceof tinycolor ? colour.toRgbString() : 'rgba(0, 0, 0, 0)';
         onColourChange(event.currentTarget, colourAsRGB);
     });
