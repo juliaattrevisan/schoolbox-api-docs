@@ -209,9 +209,17 @@ HELP;
             return;
         }
 
+        /* Announce conclusion
+         */
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
+
+        /* Announce lock release
+          */
+        $this->getLogger()->debug('Releasing lock');
+
+        $lock->release();
     }
 
 
