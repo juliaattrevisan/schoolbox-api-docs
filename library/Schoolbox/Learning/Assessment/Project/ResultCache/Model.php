@@ -48,7 +48,7 @@ class Model implements ISoftDeletable
      *
      * @var User|null
      */
-    private ?User $marker;
+    private ?User $marker = null;
 
 
     /**
