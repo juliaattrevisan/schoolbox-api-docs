@@ -140,7 +140,7 @@ class Controller extends Base
                  */
                 $project = $this->assessmentDataSource->findByIdForReview($assessment->getContext()->getId());
 
-                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->persist($project, $student, $this->getUser());
+                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->persist($project, $student, null);
             }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided' . $e->getMessage() . $e->getTraceAsString());
@@ -277,7 +277,7 @@ class Controller extends Base
                  */
                 $project = $this->assessmentDataSource->findByIdForReview($assessment->getContext()->getId());
 
-                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->persist($project, $student, $this->getUser());
+                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->persist($project, $student, null);
             }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided');

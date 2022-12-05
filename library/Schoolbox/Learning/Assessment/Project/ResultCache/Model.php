@@ -46,9 +46,9 @@ class Model implements ISoftDeletable
     /**
      * The person who marked $user's project
      *
-     * @var User
+     * @var User|null
      */
-    private User $marker;
+    private ?User $marker;
 
 
     /**
@@ -110,19 +110,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return User
+     * @return User|null
      */
-    public function getMarker(): User
+    public function getMarker(): ?User
     {
         return $this->marker;
     }
 
 
     /**
-     * @param User $marker
+     * @param User|null $marker
      * @return Model
      */
-    public function setMarker(User $marker): self
+    public function setMarker(?User $marker): self
     {
         $this->marker = $marker;
         return $this;

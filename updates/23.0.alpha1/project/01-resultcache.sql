@@ -4,7 +4,7 @@ CREATE TABLE `project_result` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `project_id` INT NOT NULL,
   `user_id` INT NOT NULL,
-  `marker_id` INT NOT NULL,
+  `marker_id` INT DEFAULT NULL,
   `mark` VARCHAR(64) NULL,
   `norm_mark` DECIMAL(14,11) NULL,
   `created_at` DATETIME NOT NULL,

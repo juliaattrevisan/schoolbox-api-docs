@@ -96,13 +96,13 @@ class ResultCache
      *
      * @param IAssessable $project
      * @param User        $user
-     * @param User        $marker
+     * @param User|null   $marker
      * @return Model|null
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function persist(IAssessable $project, \Schoolbox\User $user, \Schoolbox\User $marker): ?Model
+    public function persist(IAssessable $project, \Schoolbox\User $user, ?\Schoolbox\User $marker): ?Model
     {
         $participant = $project->getParticipantIfExtant($user);
 
