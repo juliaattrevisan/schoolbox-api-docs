@@ -76,7 +76,7 @@ and won't be persisted until --perform is specified.
 * This tool won't delete records from project_result
 * Non-participant users are ignored though you shouldn't encounter this
 
-Usage: 02-project-cache-reload.php [--perform]
+Usage: projectResultCacheReload.php [--perform]
 
 
 HELP;
