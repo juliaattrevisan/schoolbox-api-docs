@@ -92,7 +92,7 @@ Usage: example.php [--flag] [--input mytest.txt]
 
 
 HELP;
-            exit;
+            return;
         }
 
         /* Decide how loudly to announce lock acquisition failure
@@ -103,7 +103,7 @@ HELP;
         try {
             $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
-            exit;
+            return;
         }
 
         /* FIXME Main algorithm goes here
@@ -124,12 +124,21 @@ HELP;
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
-            exit();
+            return;
         }
 
+
+        /* Announce conclusion
+         */
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
+
+        /* Announce lock release
+          */
+        $this->getLogger()->debug('Releasing lock');
+
+        $lock->release();
     }
 
 

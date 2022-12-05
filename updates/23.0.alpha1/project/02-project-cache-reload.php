@@ -87,7 +87,7 @@ Usage: 02-project-cache-reload.php [--perform]
 
 
 HELP;
-            exit;
+            return;
         }
 
         /* Decide how loudly to announce lock acquisition failure
@@ -98,7 +98,7 @@ HELP;
         try {
             $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
-            exit;
+            return;
         }
 
         $this->getLogger()->info('Seeding project result cache');
