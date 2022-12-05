@@ -113,7 +113,7 @@ HELP;
             WHERE deleted_at IS NULL
         ");
 
-        $assessmentCount = (int)$assessmentCountStatement->fetch(\PDO::FETCH_ASSOC)['num'];
+        $assessmentCount = (int)$assessmentCountStatement->fetch()['num'];
 
         /* This instance has no living projects to deal with.
          * Let's get out of here
@@ -150,7 +150,7 @@ HELP;
         $marker = null;
 
         try {
-            while ($row = $assessmentStatement->fetch(\PDO::FETCH_ASSOC)) {
+            while ($row = $assessmentStatement->fetch()) {
                 $this->refreshLock($lock);
 
                 $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
@@ -184,7 +184,7 @@ HELP;
                             $project->getTitle(),
                             $project->getId()
                         ));
-                    } else if ($outcome->getNormalisedMark() && $outcome->getHumanReadableMark()) {
+                    } elseif ($outcome->getNormalisedMark() && $outcome->getHumanReadableMark()) {
                         /* Participants with a feedback(s) for this project
                          */
                         $this->getLogger()->info(sprintf(
