@@ -524,7 +524,6 @@ class Controller extends Base
                         }
                     }
                 }
-                $this->externalUser->loadParents($duplicates);
                 foreach ($duplicates as $duplicateStudent) {
                     if ($rolesWithUsers[$roleCurrent->getId()]) {
                         break;
