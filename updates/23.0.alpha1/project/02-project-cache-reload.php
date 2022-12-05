@@ -34,4 +34,4 @@ $app = new ResultCache\Cli\Reloader();
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp(true);
