@@ -24,7 +24,7 @@ use Schoolbox\User;
 class SelfReflectionWithResponseTest extends TestCase
 {
     /**
-     * @dataProvider provider_validSelfReflectable
+     * @dataProvider providerValidSelfReflectable
      * @param User        $currentUser  The user currently "logged in"
      * @param Participant $participant  The user whose trying to start self-assessment
      * @param int         $expected
@@ -41,7 +41,7 @@ class SelfReflectionWithResponseTest extends TestCase
      *
      * @return array
      */
-    public function provider_validSelfReflectable(): array
+    public function providerValidSelfReflectable(): array
     {
         $resultCacheMapper = ResultCache\Mapper::getInstance();
 
