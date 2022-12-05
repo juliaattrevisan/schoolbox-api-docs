@@ -1,22 +1,22 @@
 /**
- * To select Curriculum codes to apply to a Due Work, Learning Moments, Badges etc 
+ * To select Curriculum codes to apply to a Due Work, Learning Moments, Badges etc
  */
 
-import CurriculumSelector from '../../library/Schoolbox/Curriculum/templates/vue/curriculum-selector.vue';
+import CurriculumSelector from '@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue';
 import { rest } from 'msw';
 import { data as allCurriculumData } from './dataCurriculumSelector';
 import { data as vicCurriculumData } from './dataVicCurriculum';
 import { data as nswCurriculumData } from './dataNswCurriculum';
 
 
-const dataEndpoint = '/curriculumData'; 
-const selectedCodes = []; 
+const dataEndpoint = '/curriculumData';
+const selectedCodes = [];
 
 const mswHandlers = [
     rest.get(dataEndpoint, (req, res, ctx) => {
-        return res( 
+        return res(
             ctx.json(allCurriculumData)
-        ) 
+        )
     }),
 ];
 
@@ -28,7 +28,7 @@ export default {
     },
     component: CurriculumSelector,
     decorators: [
-        () => ({ 
+        () => ({
             template: `
             <div id="container">
                 <div id="content">
@@ -82,11 +82,11 @@ export const Default = Template.bind({});
 export const LoadError = Template.bind({});
 LoadError.parameters = {
     msw: {
-        handlers: [ 
+        handlers: [
             rest.get(dataEndpoint, (req, res, ctx) => {
-                return res( 
+                return res(
                     ctx.status(500) //to simulate an error
-                ) 
+                )
             }),
             ...mswHandlers,
         ]
@@ -122,7 +122,7 @@ readOnlyWithNoPreSelectedCodes.args = {
 
 export const SearchExamples = Template.bind({});
 SearchExamples.decorators = [
-    () => ({ 
+    () => ({
         template: `
         <story />
         <p style="margin-top: 1rem;">Paste Codes: GCCCT-ALR, GCCCT-DCDCA, GCCCT-EPO, GCN-RUPR, GCN-IPR, GCN-APR</p>
@@ -134,11 +134,11 @@ SearchExamples.decorators = [
 export const VicCurriculum = Template.bind({});
 VicCurriculum.parameters = {
     msw: {
-        handlers: [ 
+        handlers: [
             rest.get(dataEndpoint, (req, res, ctx) => {
-                return res( 
+                return res(
                     ctx.json(vicCurriculumData)
-                ) 
+                )
             }),
             ...mswHandlers,
         ]
@@ -148,11 +148,11 @@ VicCurriculum.parameters = {
 export const NswCurriculum = Template.bind({});
 NswCurriculum.parameters = {
     msw: {
-        handlers: [ 
+        handlers: [
             rest.get(dataEndpoint, (req, res, ctx) => {
-                return res( 
+                return res(
                     ctx.json(nswCurriculumData)
-                ) 
+                )
             }),
             ...mswHandlers,
         ]

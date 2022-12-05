@@ -2,7 +2,7 @@
  * To select Curriculum codes to apply to a Due Work, Learning Moments, Badges etc
  */
 
-import ManageCurriculum from '@library/Schoolbox/Curriculum/Manage/vue/manage-curriculum.vue';
+import ManageCurriculum from '@schoolboxCurriculum/vue/manageCurriculum/manage-curriculum.vue';
 import { rest } from 'msw';
 import { data as allCurriculumData } from '../../curriculumSelector/dataCurriculumSelector';
 import { data as vicCurriculumData } from '../../curriculumSelector/dataVicCurriculum';
