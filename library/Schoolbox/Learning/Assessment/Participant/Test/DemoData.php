@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Response;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as Attempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as Review;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -1203,6 +1204,8 @@ class DemoData
      */
     public static function getProject(ISummator $summator = null): Project
     {
+        $resultCacheMapper = ResultCache\Mapper::getInstance();
+
         $project = (new Project($summator))
             ->setId(1)
             ->setTitle('aProject');
@@ -1213,7 +1216,7 @@ class DemoData
                 ->add(self::getQuiz(4))
                 ->add(self::getDueWork(5));
 
-        $aggregator = new Participant\Aggregator();
+        $aggregator = new Participant\Aggregator($resultCacheMapper);
         $aggregator->aggregate($project);
 
         return $project;

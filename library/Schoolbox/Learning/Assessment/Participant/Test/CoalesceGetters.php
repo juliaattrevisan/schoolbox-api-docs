@@ -15,6 +15,7 @@ use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan as PlanObject;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
@@ -62,49 +63,51 @@ class CoalesceGetters extends TestCase
 
     public function providerDescriptionDomainObject()
     {
+        $resultCacheMapper = ResultCache\Mapper::getInstance();
+
         $data = [];
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription(null);
             $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(false);
-            $data[]     = [new Participant(new User(), $planObject), null];
+            $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), null];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription(null);
             $planObject = (new PlanObject($assessable))->setDescription('')->setIsDynamic(false);
-            $data[]     = [new Participant(new User(), $planObject), ''];
+            $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), ''];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription('');
             $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(false);
-            $data[]     = [new Participant(new User(), $planObject), ''];
+            $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), ''];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription('null');
             $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(false);
-            $data[]     = [new Participant(new User(), $planObject), 'null'];
+            $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), 'null'];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription(null);
             $planObject = (new PlanObject($assessable))->setDescription('null')->setIsDynamic(false);
-            $data[]     = [new Participant(new User(), $planObject), 'null'];
+            $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), 'null'];
         }
 
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription('string2');
             $planObject = (new PlanObject($assessable))->setDescription('string1')->setIsDynamic(false);
-            $data[]     = [new Participant(new User(), $planObject), 'string1'];
+            $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), 'string1'];
         }
 
         // Dynamic plan: always use assessment's description
         foreach ($this->getAssessables() as $assessable) {
             $assessable->setDescription('string2');
             $planObject = (new PlanObject($assessable))->setDescription('string1')->setIsDynamic(true);
-            $data[]     = [new Participant(new User(), $planObject), 'string2'];
+            $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), 'string2'];
         }
 
         return $data;
@@ -114,6 +117,8 @@ class CoalesceGetters extends TestCase
 
     public function providerDatesDomainObject()
     {
+        $resultCacheMapper = ResultCache\Mapper::getInstance();
+
         $data = [];
 
         foreach ($this->getDates() as $assessmentDate) {
@@ -136,7 +141,7 @@ class CoalesceGetters extends TestCase
                         ->setIsDynamic(false);
 
                     $data[] = [
-                        new Participant(new User(), $planObject),
+                        new Participant(new User(), $planObject, $resultCacheMapper),
                         $planDate ?? $assessmentDate,
                         $planDate ?? $assessmentDate,
                         $planDate ?? $assessmentDate,
@@ -151,7 +156,7 @@ class CoalesceGetters extends TestCase
                         ->setCloseDate($this->cloneDate($planDate))
                         ->setIsDynamic(true);
                     $data[] = [
-                        new Participant(new User(), $dynamicPlanObject),
+                        new Participant(new User(), $dynamicPlanObject, $resultCacheMapper),
                         $assessmentDate,
                         $assessmentDate,
                         $assessmentDate,

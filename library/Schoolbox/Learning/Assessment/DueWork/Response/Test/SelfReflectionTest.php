@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflection;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\User;
@@ -60,6 +61,8 @@ class SelfReflectionTest extends TestCase
         $incorrectAssessment2 = (new DueWork\Model())
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
 
+        $resultCacheMapper = ResultCache\Mapper::getInstance();
+
         /* Test everything
          */
         return [
@@ -67,7 +70,7 @@ class SelfReflectionTest extends TestCase
              */
             'Valid: Student starting their own self-Reflection' => [
                 $student,
-                new Participant($student, new Plan($correctAssessment)),
+                new Participant($student, new Plan($correctAssessment), $resultCacheMapper),
                 true
             ],
 
@@ -76,7 +79,7 @@ class SelfReflectionTest extends TestCase
              */
             'Invalid: Student starting someone else\'s self-Reflection' => [
                 $student,
-                new Participant($otherStudent, new Plan($correctAssessment)),
+                new Participant($otherStudent, new Plan($correctAssessment), $resultCacheMapper),
                 false
             ],
 
@@ -87,25 +90,25 @@ class SelfReflectionTest extends TestCase
              */
             'Invalid: Student starting an improperly-configured self-reflection (1)' => [
                 $student,
-                new Participant($student, new Plan($incorrectAssessment1)),
+                new Participant($student, new Plan($incorrectAssessment1), $resultCacheMapper),
                 false
             ],
 
             'Invalid: Student starting an improperly-configured self-reflection (2)' => [
                 $student,
-                new Participant($student, new Plan($incorrectAssessment2)),
+                new Participant($student, new Plan($incorrectAssessment2), $resultCacheMapper),
                 false
             ],
 
             'Invalid: Student starting an improperly-configured self-reflection for someone else (1)' => [
                 $student,
-                new Participant($otherStudent, new Plan($incorrectAssessment1)),
+                new Participant($otherStudent, new Plan($incorrectAssessment1), $resultCacheMapper),
                 false
             ],
 
             'Invalid: Student starting an improperly-configured self-reflection for someone else (2)' => [
                 $student,
-                new Participant($otherStudent, new Plan($incorrectAssessment2)),
+                new Participant($otherStudent, new Plan($incorrectAssessment2), $resultCacheMapper),
                 false
             ],
 
@@ -113,13 +116,13 @@ class SelfReflectionTest extends TestCase
              */
             'Invalid: Wrong assessment type (1)' => [
                 $student,
-                new Participant($student, new Plan(new Quiz\Model())),
+                new Participant($student, new Plan(new Quiz\Model()), $resultCacheMapper),
                 false
             ],
 
             'Invalid: Wrong assessment type (2)' => [
                 $student,
-                new Participant($student, new Plan(new Task\Model())),
+                new Participant($student, new Plan(new Task\Model()), $resultCacheMapper),
                 false
             ],
         ];

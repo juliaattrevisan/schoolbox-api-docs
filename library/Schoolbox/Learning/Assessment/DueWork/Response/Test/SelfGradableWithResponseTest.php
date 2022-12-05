@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradableWithResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\User;
 
 class SelfGradableWithResponseTest extends TestCase
@@ -42,6 +43,8 @@ class SelfGradableWithResponseTest extends TestCase
      */
     public function provider_validSelfAssessable(): array
     {
+        $resultCacheMapper = ResultCache\Mapper::getInstance();
+
         $student = (new User())->setId(230);
 
         $correctAssessment = (new DueWork\Model())
@@ -49,17 +52,18 @@ class SelfGradableWithResponseTest extends TestCase
 
         /* This participation is correctly set up to conclude Self Assessment
          */
-        $correctParticipation = new Participant($student, new Plan($correctAssessment));
+        $correctParticipation = new Participant($student, new Plan($correctAssessment), $resultCacheMapper);
         $correctParticipation->getAllResponses()->add(new DueWork\Response\Model());
 
         /* This participation is incorrectly set up: no draft response exists
          */
-        $incorrectParticipation1 = new Participant($student, new Plan($correctAssessment));
+        $incorrectParticipation1 = new Participant($student, new Plan($correctAssessment), $resultCacheMapper);
 
-        $incorrectParticipation2 = new Participant($student, new Plan($correctAssessment));
+        $incorrectParticipation2 = new Participant($student, new Plan($correctAssessment), $resultCacheMapper);
         $incorrectParticipation2->getAllResponses()->add(
             (new DueWork\Response\Model())->setSubmittedAt(\Alaress_Date_Format::now())
         );
+
 
         /* Test everything
          */

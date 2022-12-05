@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\User;
@@ -24,7 +25,6 @@ use UnexpectedValueException;
 
 class SelfAssessableTest extends TestCase
 {
-
     /**
      * @dataProvider provider_validSelfAssessable
      * @param User        $currentUser The user currently "logged in"
@@ -62,6 +62,8 @@ class SelfAssessableTest extends TestCase
         $incorrectAssessment = (new DueWork\Model())
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
 
+        $resultCacheMapper = ResultCache\Mapper::getInstance();
+
         /* Test everything
          */
         return [
@@ -69,7 +71,7 @@ class SelfAssessableTest extends TestCase
              */
             'Valid: Student starting their own self-assessment' => [
                 $student,
-                new Participant($student, new Plan($correctAssessment1)),
+                new Participant($student, new Plan($correctAssessment1), $resultCacheMapper),
                 true
             ],
 
@@ -78,7 +80,7 @@ class SelfAssessableTest extends TestCase
              */
             'Invalid: Student starting someone else\'s self-assessment' => [
                 $student,
-                new Participant($otherStudent, new Plan($correctAssessment1)),
+                new Participant($otherStudent, new Plan($correctAssessment1), $resultCacheMapper),
                 false
             ],
 
@@ -89,25 +91,25 @@ class SelfAssessableTest extends TestCase
              */
             'Invalid: Student starting an improperly-configured self-assessment (1)' => [
                 $student,
-                new Participant($student, new Plan($correctAssessment2)),
+                new Participant($student, new Plan($correctAssessment2), $resultCacheMapper),
                 true
             ],
 
             'Invalid: Student starting an improperly-configured self-assessment (2)' => [
                 $student,
-                new Participant($student, new Plan($incorrectAssessment)),
+                new Participant($student, new Plan($incorrectAssessment), $resultCacheMapper),
                 false
             ],
 
             'Invalid: Student starting an improperly-configured self-assessment for someone else (1)' => [
                 $student,
-                new Participant($otherStudent, new Plan($correctAssessment2)),
+                new Participant($otherStudent, new Plan($correctAssessment2), $resultCacheMapper),
                 false
             ],
 
             'Invalid: Student starting an improperly-configured self-assessment for someone else (2)' => [
                 $student,
-                new Participant($otherStudent, new Plan($incorrectAssessment)),
+                new Participant($otherStudent, new Plan($incorrectAssessment), $resultCacheMapper),
                 false
             ],
 
@@ -115,13 +117,13 @@ class SelfAssessableTest extends TestCase
              */
             'Invalid: Wrong assessment type (1)' => [
                 $student,
-                new Participant($student, new Plan(new Quiz\Model())),
+                new Participant($student, new Plan(new Quiz\Model()), $resultCacheMapper),
                 false
             ],
 
             'Invalid: Wrong assessment type (2)' => [
                 $student,
-                new Participant($student, new Plan(new Task\Model())),
+                new Participant($student, new Plan(new Task\Model()), $resultCacheMapper),
                 false
             ],
         ];
