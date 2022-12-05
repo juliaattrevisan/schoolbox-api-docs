@@ -76,6 +76,8 @@ are stored after they're derived from their constituent assessments.
 Every project that exists in project_assessment will get re-derived and
 stored into this caching table for rapid retrievals later.
 
+User ids and assessment ids are shown in brackets.
+
 Planning mode gives you a preview of what marks were found by the tool
 and won't be persisted until --perform is specified.
 
@@ -156,7 +158,7 @@ HELP;
 
                 $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
                 $this->getLogger()->info(sprintf(
-                    'Examining project %s (assessment id %s)',
+                    'Examining project %s (%s)',
                     $project->getTitle(),
                     $project->getId()
                 ));
