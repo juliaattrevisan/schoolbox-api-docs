@@ -43,9 +43,9 @@ $app = new class extends CliTool\App {
         $rSat   = $redHsl['saturation'];
         $rLight = $redHsl['lightness'];
 
-        $dHue   = ($rHue - $gHue) / ($count - 1);
-        $dSat   = ($rSat - $gSat) / ($count - 1);
-        $dLight = ($rLight - $gLight) / ($count - 1);
+        $dHue   = $count === 1 ? 0 : ($rHue - $gHue) / ($count - 1);
+        $dSat   = $count === 1 ? 0 : ($rSat - $gSat) / ($count - 1);
+        $dLight = $count === 1 ? 0 : ($rLight - $gLight) / ($count - 1);
 
         foreach ($severityIds as $i => $severityId) {
             $newColor = \SSNepenthe\ColorUtils\hsl(
