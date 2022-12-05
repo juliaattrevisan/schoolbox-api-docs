@@ -420,6 +420,7 @@ class Module extends BaseModule
                     $transactor,
                     $participantDataSource,
                     $this->getUnitSpecificationMapper(),
+                    $projectResultCacheMapper
                 );
 
             case Assessment\DueWork\Controller::class:

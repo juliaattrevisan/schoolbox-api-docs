@@ -22,7 +22,6 @@ use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -72,7 +71,8 @@ class Controller extends Assessment\Controller
             $courseSpecificationMapper,
             $unitSpecificationMapper,
             $replicator,
-            $latestViewMapper
+            $latestViewMapper,
+            $this->projectResultCacheMapper
         );
     }
 

@@ -99,9 +99,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
-        LatestViewMapper $latestViewMapper
+        LatestViewMapper $latestViewMapper,
+        protected Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper);
+        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper, $this->projectResultCacheMapper);
 
         $this->bakery                    = $bakery;
         $this->workTypeMapper            = $workTypeMapper;
