@@ -532,6 +532,16 @@ class Session
     {
         $synUser = new External_User();
         $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+        $externalUser = new \Schoolbox\External\User(
+            \Schoolbox\Config\ConfigMapper::getInstance()->getConfigLoader()->get('external_type'),
+            new \External_Class(),
+            $synUser,
+            UserMapper::getInstance()
+        );
+        //load all relationships for the current user
+        $externalUser->loadChildren([$user]);
+        $externalUser->loadTeachers([$user]);
+        $externalUser->loadParents([$user]);
 
         $synergy_id = $_SESSION['sid'];
 
@@ -542,22 +552,14 @@ class Session
         unset($_SESSION['children'], $_SESSION['subjects']);
 
         if ($synergy_id) {
-//if user is parent get information regarding enrolled students
-            $user->setChildren(new GenericCollection(User::class));
             if ($user->getRole()->isParent()) {
-                $children = $synUser->getEnrolledStudents($synergy_id);
+                $children = $user->getChildren();
+                //load parent object int the child object
+                $externalUser->loadParents($children);
 
                 /* Get subject list for each student */
-                if (is_array($children)) {
-                    foreach ($children as $child) {
-                        try {
-                            $childObject = $userMapper->findByExternalId($child['RelatedID']);
-                        } catch (MapperException $e) {
-                            continue;
-                        }
-                        $childObject->setParents(new GenericCollection(User::class));
-                        $user->getChildren()[$childObject->getId()] = $childObject;
-                        $childObject->getParents()[$user->getId()]  = $user;
+                if ($children->count()) {
+                    foreach ($children as $childObject) {
                         if (!$childObject->getHideTimetable()) {
                             $subjectList = $synUser->getSubjectList($childObject);
                         } else {
