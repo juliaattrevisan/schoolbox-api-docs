@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Permission\Access\Access;
@@ -85,7 +86,9 @@ class VisibilityTests extends TestCase
         // Apply participation
         $plan = (new Plan($assessable))->setIsDynamic(true);
         if ($isParticipant) {
-            $plan->getParticipants()[$user->getId()] = new Participant($user, $plan);
+            $resultCacheMapper = ResultCache\Mapper::getInstance();
+
+            $plan->getParticipants()[$user->getId()] = new Participant($user, $plan, $resultCacheMapper);
         }
         $assessable->setPlans($assessable->getPlans()->emptyClone()->add($plan));
 

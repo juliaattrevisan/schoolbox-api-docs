@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
 use Schoolbox\User;
 
@@ -40,7 +41,9 @@ class TimelineTest extends TestCase
      */
     public function testEmptyStacks()
     {
-        $this->assertCount(0, (new Timeline(new Participant(new User(), new Plan(new DueWork()))))->getForParent());
+        $resultCacheMapper = ResultCache\Mapper::getInstance();
+
+        $this->assertCount(0, (new Timeline(new Participant(new User(), new Plan(new DueWork()), $resultCacheMapper)))->getForParent());
     }
 
     /**

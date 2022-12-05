@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Task\Model as TaskAssessable;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -328,9 +329,11 @@ class CollectionTest extends TestCase
 
     public function providerObject()
     {
+        $resultCacheMapper = ResultCache\Mapper::getInstance();
+
         return [
             [new User()],
-            [new Participant(new User(), new Plan(new TaskAssessable()))],
+            [new Participant(new User(), new Plan(new TaskAssessable()), $resultCacheMapper)],
             [new TaskAssessable()],
         ];
     }
