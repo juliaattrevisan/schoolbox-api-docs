@@ -766,12 +766,7 @@ class Controller extends Base
 
         if ($this->request->query->get(Redirect::RETURN_URL)) {
             $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
-        } elseif ($this->getAuthorizer()->isPathAuthorizedForUser(
-            'learningBadgeAward.getAwardWithEvidence',
-            [
-                'awardId' => $award->getId(),
-            ]
-        )) {
+        } elseif ($this->getAuthorizer()->isPathAuthorizedForUser('learningBadgeAward.getAwardWithEvidence', ['awardId' => $award->getId()])) {
             $returnUrl = Redirect::encode(
                 $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
                     'awardId' => $award->getId(),
